@@ -1,0 +1,192 @@
+import Head from "next/head";
+import Image from "next/image";
+import { useEffect, useState, useMemo } from "react";
+import Header from "../components/Header";
+import FooterPro from "../components/FooterPro";
+import Link from "next/link";
+import FAQSection from "../components/FAQSection";
+import TokenomicsSimplified from "../components/TokenomicsSimplified";
+import TrustlineBlock from "../components/TrustlineBlock";
+import BuyXCSSection from "../components/BuyXCSSection";
+import SEOHead from "../components/SEOHead";
+import PriceTicker from "../components/PriceTicker";
+import WhyXcannesSection from "../components/WhyXcannesSection";
+import XummSecuritySection from "../components/XummSecuritySection";
+import RoadmapDistributionSection from "../components/RoadmapDistributionSection";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import xcannesApi from "../lib/xcannesApi";
+
+export default function Home() {
+  const { t } = useTranslation("common");
+  
+  // 📊 Charger toutes les paires dynamiquement depuis l'API
+  const [availablePairs, setAvailablePairs] = useState([
+    "XRP/RLUSD", "XCS/XRP", "XCS/RLUSD" // Fallback - 3 paires configurées
+  ]);
+  const [loadingPairs, setLoadingPairs] = useState(true);
+  
+  useEffect(() => {
+    const fetchPairs = async () => {
+      try {
+        const markets = await xcannesApi.getMarkets();
+        if (markets && markets.length > 0) {
+          // Convertir format backend (XCS_XRP) vers frontend (XCS/XRP)
+          const pairsList = markets.map(m => `${m.base}/${m.quote}`);
+          console.log(`✅ [Index] ${pairsList.length} paires chargées depuis l'API`);
+          setAvailablePairs(pairsList);
+        }
+      } catch (error) {
+        console.error("⚠️ [Index] Erreur chargement paires, utilisation fallback:", error);
+        // Garder les 5 paires par défaut
+      } finally {
+        setLoadingPairs(false);
+      }
+    };
+    
+    fetchPairs();
+  }, []);
+  
+  // Mémoriser pour éviter re-renders inutiles
+  const pairs = useMemo(() => availablePairs, [availablePairs]);
+
+  return (
+    <>
+      <SEOHead
+        title="XCannes - Digital Asset Exchange on XRP Ledger"
+        description="Trade XCS tokens instantly. Fast, secure, transparent blockchain exchange built on XRPL technology."
+        canonical="/"
+      />
+
+      <Header />
+
+      {/* HERO SECTION CORPORATE ELEGANT */}
+      <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-xcannes-background">
+        {/* Grid pattern overlay - subtle */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(52, 211, 153, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(52, 211, 153, 0.5) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 text-center">
+          {/* Badge Corporate - subtle pulse */}
+          <div className="inline-flex items-center gap-2 bg-black/30 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-8">
+            <span className="w-2 h-2 bg-xcannes-green rounded-full animate-pulse-slow" />
+            <span className="text-sm text-white/90 font-medium tracking-wide">
+              XRPL
+            </span>
+          </div>
+
+          {/* Main heading - Elegant typography */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-sans font-bold text-white mb-8 leading-tight tracking-tight">
+            {t("hero_title")}
+            <span className="block mt-3 bg-gradient-to-r from-white/95 via-white/60 via-xcannes-green/70 to-xcannes-green bg-clip-text text-transparent">
+              {t("hero_title_gradient")}
+            </span>
+          </h1>
+
+          {/* Subheading - 3 lignes corporate */}
+          <div className="max-w-3xl mx-auto mb-14 space-y-2">
+            <p className="text-xl text-white/90 font-light leading-relaxed">
+              {t("hero_description_line1")}
+            </p>
+            <p className="text-xl text-white/85 font-light leading-relaxed">
+              {t("hero_description_line2")}
+            </p>
+            <p className="text-xl text-white/75 font-light leading-relaxed">
+              {t("hero_description_line3")}
+            </p>
+          </div>
+
+          {/* CTA Buttons - Elegant hover */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
+            {/* CTA Primary - gradient hover */}
+            <Link href="/dex">
+              <button className="group relative px-10 py-4 bg-xcannes-green hover:bg-xcannes-green/90 text-white font-semibold text-base rounded-lg transition-all duration-300 hover:-translate-y-0.5">
+                {t("hero_cta_primary")}
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+              </button>
+            </Link>
+            
+            {/* CTA Secondary - border glow */}
+            <Link href="/dex">
+              <button className="group px-10 py-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-xcannes-green/50 text-white font-medium text-base rounded-lg transition-all duration-300">
+                {t("hero_cta_secondary")}
+                <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">→</span>
+              </button>
+            </Link>
+          </div>
+
+          {/* Stats - Corporate elegant avec depth */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              { 
+                value: t("stat_spread_value"), 
+                label: t("stat_spread_label"),
+                description: t("stat_spread_desc")
+              },
+              { 
+                value: t("stat_price_value"), 
+                label: t("stat_price_label"),
+                description: t("stat_price_desc")
+              },
+              { 
+                value: t("stat_speed_value"), 
+                label: t("stat_speed_label"),
+                description: t("stat_speed_desc")
+              },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="group relative bg-xcannes-background backdrop-blur-md border border-white/10 rounded-xl p-8 hover:border-xcannes-green/50 transition-all duration-300 hover:-translate-y-1"
+              >
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 bg-xcannes-green/0 group-hover:bg-xcannes-green/5 rounded-xl transition-all duration-300" />
+                
+                <div className="relative">
+                  <div className="text-5xl font-sans font-bold text-xcannes-green mb-3">
+                    {stat.value}
+                  </div>
+                  <div className="text-base text-white font-semibold mb-1">
+                    {stat.label}
+                  </div>
+                  <div className="text-sm text-white/60">
+                    {stat.description}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Price Ticker - Full Width - Toutes les paires dynamiques */}
+        <PriceTicker pairs={pairs} />
+      </main>
+
+      {/* CONTENT SECTIONS */}
+      <div className="bg-xcannes-background">
+        <WhyXcannesSection />
+        <XummSecuritySection />
+        <TokenomicsSimplified />
+        <RoadmapDistributionSection />
+        <BuyXCSSection />
+        <TrustlineBlock />
+        <FAQSection />
+      </div>
+
+      <FooterPro />
+    </>
+  );
+}
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
+}
