@@ -1,0 +1,81 @@
+/* ✅ Fonts optimisées via next/font (plus besoin de Google Fonts externe) */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-xcannes-background text-white !important;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+}
+
+/* ========= RTL SUPPORT (Right-To-Left) ========= */
+
+/* Support automatique pour les langues RTL (arabe, ourdou) */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Ajustements des marges/paddings en RTL */
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Flex reverse pour RTL */
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+/* Grid ajustements RTL si nécessaire */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* ========= ANIMATIONS ========= */
+
+/* Gradient animé pour hero */
+@keyframes gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 15s ease infinite;
+}
+
+/* Fade-in progressif */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
