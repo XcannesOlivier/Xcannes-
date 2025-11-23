@@ -5,6 +5,10 @@ out
 .env
 .DS_Store
 
+# Logs
+logs/
+*.log
+
 # Tailwind generated
 output.css
 
