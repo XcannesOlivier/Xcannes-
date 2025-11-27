@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
 export default function BuyXCSSection() {
@@ -37,12 +38,12 @@ export default function BuyXCSSection() {
               >
                 {t("buy_step1_button1")}
               </a>
-              <a
+              <Link
                 href="/activate-wallet"
                 className="justify-content text-sm font-[500] text-white bg-xcannes-green/80 px-4 py-2 rounded transition transform duration-300 hover:scale-105 text-center"
               >
                 {t("buy_step1_button2")}
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -80,12 +81,12 @@ export default function BuyXCSSection() {
             <p className="relative mb-4 text-sm text-white/70">
               {t("buy_step3_text")}
             </p>
-            <a
+            <Link
               href="/dex"
               className="relative inline-block text-sm font-[500] text-white bg-xcannes-green/80 px-4 py-2 rounded transition transform duration-300 hover:scale-105"
             >
               {t("buy_step3_button")}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

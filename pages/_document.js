@@ -34,7 +34,10 @@ export default function Document(props) {
   return (
     <Html lang={locale} dir={direction}>
       <Head>
-        <script src="https://xumm.app/assets/cdn/xumm.min.js"></script>
+        <script
+          src="https://xumm.app/assets/cdn/xumm.min.js"
+          async
+        ></script>
       </Head>
       <body>
         <Main />

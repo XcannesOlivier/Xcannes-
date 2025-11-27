@@ -56,11 +56,24 @@ export default function Dex() {
   useEffect(() => {
     const fetchPairs = async () => {
       try {
-        const markets = await xcannesApi.getMarkets();
-        if (markets && markets.length > 0) {
-          // Convertir format backend (XCS_XRP) vers frontend (XCS/XRP)
-          const pairsList = markets.map(m => `${m.base}/${m.quote}`);
+        const markets = await xcannesApi.getAllMarkets(); // ✅ Utiliser getAllMarkets() pour inclure Pyth
+        if (markets) {
+          // Priorité: display > pyth (pour éviter doublons entre display et trading)
+          const allPairs = [
+            ...(markets.display || []),  // Paires principales avec métadonnées
+            ...(markets.pyth || [])       // Paires Pyth (FOREX)
+          ];
+          
+          // Filtrer les paires actives, dédupliquer, et convertir format backend (XCS_XRP) vers frontend (XCS/XRP)
+          const pairsList = Array.from(new Set(
+            allPairs
+              .filter(m => m.active !== false)
+              .map(m => `${m.base}/${m.quote}`)
+          ));
+          
           setAvailablePairs(pairsList);
+          
+          console.log(`✅ ${pairsList.length} paires chargées:`, pairsList);
         }
       } catch (error) {
         console.error("Erreur chargement paires:", error);

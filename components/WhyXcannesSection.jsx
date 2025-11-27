@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 
@@ -125,12 +126,12 @@ export default function WhyXcannesSection() {
           <p className="text-white/60 mb-6 text-base">
             {t("why_cta_text")}
           </p>
-          <a
+          <Link
             href="/dex"
             className="inline-block px-8 py-4 bg-xcannes-green hover:bg-xcannes-green/90 text-white font-semibold rounded-lg transition-all duration-300 hover:-translate-y-0.5"
           >
             {t("why_cta_button")} →
-          </a>
+          </Link>
         </div>
       </div>
     </section>

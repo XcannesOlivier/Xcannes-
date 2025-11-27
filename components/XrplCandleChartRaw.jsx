@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { createChart } from "lightweight-charts";
 import { getBookIdFromPair } from "../utils/xrpl";
 import xcannesApi from "../lib/xcannesApi";
 import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ Hook WebSocket centralisé
 import { useCandles1m, compute24hPercentChange } from "../hooks/useCandles1m"; // ✅ Hook pour calcul % 24h
+import { useExternalPrice } from "../hooks/useExternalPrice"; // ✅ Hook pour prix live Pyth (crypto, forex, commodities)
+import { MARKET_STRUCTURE, getPairCategory } from "../utils/marketStructure"; // ✅ Structure des marchés
 
 export default function XrplCandleChartRaw({
   pair = "XCS/XRP",
@@ -47,8 +49,20 @@ export default function XrplCandleChartRaw({
   });
   const containerRef = useRef(null);
   
-  // ✅ WebSocket centralisé
+  // ✅ Détecter la catégorie de la paire
+  const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
+  const isXRPL = pairCategory === 'xrpl';
+  const isExternal = pairCategory && ['crypto', 'forex', 'commodity'].includes(pairCategory);
+  const isExotic = pairCategory === 'exotic';
+  
+  // ✅ WebSocket centralisé (XRPL uniquement)
   const { connected, orderbooks, subscribe, unsubscribe } = useXcannesWS();
+  
+  // ✅ Hook pour prix live Pyth (crypto, forex, commodities - pas exotic)
+  const { price: externalPrice, loading: loadingExternalPrice } = useExternalPrice(
+    isExternal && !isExotic ? pair : null,
+    pairCategory
+  );
   
   // ✅ Hook pour les bougies 1m (toujours 24h, indépendant du timeframe)
   const { candles1m, loading: loadingCandles1m } = useCandles1m(pair);
@@ -90,15 +104,89 @@ export default function XrplCandleChartRaw({
     low: null,
     volume: null,
   });
+  
+  // États pour le dropdown en cascade
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [expandedMarkets, setExpandedMarkets] = useState({});
+  const [expandedCurrencies, setExpandedCurrencies] = useState({});
+  const dropdownRef = useRef(null);
+  
+  // Fermer le dropdown si on clique à l'extérieur
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+        setExpandedMarkets({});
+        setExpandedCurrencies({});
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
+  const toggleMarket = (marketKey) => {
+    setExpandedMarkets(prev => ({
+      ...prev,
+      [marketKey]: !prev[marketKey]
+    }));
+  };
+  
+  const toggleCurrency = (marketKey, currency) => {
+    const key = `${marketKey}-${currency}`;
+    setExpandedCurrencies(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+  
+  const handlePairSelect = (selectedPair) => {
+    if (onPairChange) {
+      onPairChange(selectedPair);
+    }
+    setDropdownOpen(false);
+    setExpandedMarkets({});
+    setExpandedCurrencies({});
+  };
 
-  const intervalMap = {
+  const uniquePairs = useMemo(
+    () => Array.from(new Set(availablePairs)),
+    [availablePairs]
+  );
+  
+  // Filtrer les paires disponibles par marché et devise
+  const filteredMarketStructure = useMemo(() => {
+    const filtered = {};
+    
+    Object.entries(MARKET_STRUCTURE).forEach(([marketKey, market]) => {
+      const filteredCurrencies = {};
+      
+      Object.entries(market.currencies).forEach(([currency, pairs]) => {
+        const availablePairsForCurrency = pairs.filter(p => uniquePairs.includes(p));
+        if (availablePairsForCurrency.length > 0) {
+          filteredCurrencies[currency] = availablePairsForCurrency;
+        }
+      });
+      
+      if (Object.keys(filteredCurrencies).length > 0) {
+        filtered[marketKey] = {
+          label: market.label,
+          currencies: filteredCurrencies
+        };
+      }
+    });
+    
+    return filtered;
+  }, [uniquePairs]);
+
+  const intervalMap = useMemo(() => ({
     "1m": "1m",
     "5m": "5m",
     "15m": "15m",
     "1h": "1h",
     "4h": "4h",
     "1d": "1d",
-  };
+  }), []);
   
   // ✅ Convertir interval en secondes
   const getIntervalSeconds = useCallback((interval) => {
@@ -157,8 +245,9 @@ export default function XrplCandleChartRaw({
     
   }, [chartType]);
   
-  // ✅ Écouter les mises à jour de l'orderbook via le WebSocket centralisé
+  // ✅ Écouter les mises à jour de l'orderbook via le WebSocket centralisé (XRPL UNIQUEMENT)
   useEffect(() => {
+    if (!isXRPL) return; // Ignorer si ce n'est pas une paire XRPL
     if (!connected || !orderbooks) return;
     
     const book = getBookIdFromPair(pair);
@@ -178,10 +267,23 @@ export default function XrplCandleChartRaw({
       // ✅ Mettre à jour la bougie en cours
       updateCurrentCandle(midPrice);
     }
-  }, [orderbooks, connected, pair, updateCurrentCandle]);
+  }, [orderbooks, connected, pair, updateCurrentCandle, isXRPL]);
   
-  // ✅ S'abonner/désabonner au changement de paire
+  // ✅ Écouter les prix externes Pyth (CRYPTO, FOREX, COMMODITIES - pas EXOTIC)
   useEffect(() => {
+    if (!isExternal || isExotic) return; // Seulement pour paires externes non-exotiques
+    if (!externalPrice) return;
+    
+    console.log(`[Chart] 📈 Prix live Pyth reçu pour ${pair}:`, externalPrice);
+    
+    // Mettre à jour la bougie en cours avec le prix Pyth
+    updateCurrentCandle(externalPrice);
+  }, [externalPrice, pair, updateCurrentCandle, isExternal, isExotic]);
+  
+  // ✅ S'abonner/désabonner au changement de paire (XRPL UNIQUEMENT)
+  useEffect(() => {
+    if (!isXRPL) return; // Ignorer si ce n'est pas une paire XRPL
+    
     const book = getBookIdFromPair(pair);
     if (!book || !connected) return;
     
@@ -192,7 +294,7 @@ export default function XrplCandleChartRaw({
       console.log('[Chart] 🔌 Désabonnement de:', book.backendPair);
       unsubscribe('orderbook', book.backendPair);
     };
-  }, [pair, connected]); // ✅ Pas subscribe/unsubscribe dans les deps
+  }, [pair, connected, subscribe, unsubscribe, isXRPL]);
 
   // ✅ Calculer le % 24h à chaque mise à jour du prix live ou des bougies 1m
   useEffect(() => {
@@ -325,7 +427,7 @@ export default function XrplCandleChartRaw({
   };
 
   // Calculer MACD (Moving Average Convergence Divergence)
-  const calculateMACD = (data, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) => {
+  const calculateMACD = useCallback((data, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) => {
     if (data.length < slowPeriod + signalPeriod) return { macd: [], signal: [], histogram: [] };
 
     // Calculer EMA rapide et lente
@@ -384,7 +486,7 @@ export default function XrplCandleChartRaw({
       signal: signalLine,
       histogram: histogram,
     };
-  };
+  }, []);
 
   // Calculer VWAP (Volume Weighted Average Price)
   const calculateVWAP = (data) => {
@@ -459,7 +561,7 @@ export default function XrplCandleChartRaw({
       console.error("[XrplCandleChart] Erreur fetchMarketData:", error);
       return [];
     }
-  }, [pair, interval]);
+  }, [pair, interval, intervalMap]);
 
   // Fonction pour gérer le fullscreen
   const toggleFullscreen = useCallback(() => {
@@ -618,7 +720,7 @@ export default function XrplCandleChartRaw({
       if (!data.length) {
         setLoading(false);
         setNoDataMessage(
-          `Aucune donnée de trading disponible pour ${pair}. L'API de données historiques (data.xrplf.org) semble actuellement indisponible. Nous travaillons à implémenter une source de données alternative.`
+          `Aucune donnée de trading disponible pour ${pair}. L&rsquo;API de données historiques (data.xrplf.org) semble actuellement indisponible. Nous travaillons à implémenter une source de données alternative.`
         );
         return;
       }
@@ -1150,7 +1252,21 @@ export default function XrplCandleChartRaw({
       if (rsiChartRef.current) rsiChartRef.current.remove();
       if (macdChartRef.current) macdChartRef.current.remove();
     };
-  }, [pair, interval, showVolume, chartType, showBollinger, showRSI, showMACD, showVWAP, showSMA, showEMA, chartSettings]);
+  }, [
+    pair,
+    interval,
+    showVolume,
+    chartType,
+    showBollinger,
+    showRSI,
+    showMACD,
+    showVWAP,
+    showSMA,
+    showEMA,
+    chartSettings,
+    fetchMarketData,
+    calculateMACD,
+  ]);
 
   // Effet pour appliquer les changements de paramètres au graphique existant
   useEffect(() => {
@@ -1207,18 +1323,122 @@ export default function XrplCandleChartRaw({
 
           {/* Contrôles globaux uniquement */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {availablePairs.length > 0 && onPairChange && (
-              <select
-                value={pair}
-                onChange={(e) => onPairChange(e.target.value)}
-                className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium hover:border-white/20 transition-all"
-              >
-                {availablePairs.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </select>
+            {uniquePairs.length > 0 && onPairChange && (
+              <div ref={dropdownRef} className="relative">
+                {/* Bouton principal - affiche la paire actuelle */}
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium hover:border-white/20 transition-all flex items-center gap-2 min-w-[120px]"
+                >
+                  <span>{pair}</span>
+                  <svg 
+                    className={`w-3 h-3 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {/* Menu déroulant en cascade */}
+                {dropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 bg-black/95 border border-white/20 rounded-lg shadow-2xl z-50 min-w-[220px] max-h-[500px] overflow-y-auto">
+                    {Object.entries(filteredMarketStructure).map(([marketKey, market]) => {
+                      const isXrpl = marketKey === 'xrpl';
+                      const isExpanded = expandedMarkets[marketKey];
+                      
+                      return (
+                        <div key={marketKey} className="border-b border-white/10 last:border-b-0">
+                          {isXrpl ? (
+                            // XRPL: affichage direct sans sous-menu
+                            <div className="p-2">
+                              <div className="text-[10px] font-semibold text-white/60 px-2 py-1 uppercase tracking-wider">
+                                {market.label}
+                              </div>
+                              {Object.entries(market.currencies).map(([currency, pairs]) =>
+                                pairs.map((p) => (
+                                  <button
+                                    key={p}
+                                    onClick={() => handlePairSelect(p)}
+                                    className={`w-full text-left px-3 py-1.5 text-xs rounded hover:bg-white/10 transition-all ${
+                                      pair === p ? 'bg-xcannes-green/20 text-xcannes-green' : 'text-white/80'
+                                    }`}
+                                  >
+                                    {p}
+                                  </button>
+                                ))
+                              )}
+                            </div>
+                          ) : (
+                            // Autres marchés: avec menu en cascade
+                            <>
+                              <button
+                                onClick={() => toggleMarket(marketKey)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-white/80 hover:bg-white/5 transition-all"
+                              >
+                                <span>{market.label}</span>
+                                <svg 
+                                  className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                  fill="none" 
+                                  stroke="currentColor" 
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                              
+                              {isExpanded && (
+                                <div className="bg-black/40 px-2 pb-2">
+                                  {Object.entries(market.currencies).map(([currency, pairs]) => {
+                                    const currencyKey = `${marketKey}-${currency}`;
+                                    const isCurrencyExpanded = expandedCurrencies[currencyKey];
+                                    
+                                    return (
+                                      <div key={currency} className="mb-1">
+                                        <button
+                                          onClick={() => toggleCurrency(marketKey, currency)}
+                                          className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-white/70 hover:bg-white/5 rounded transition-all"
+                                        >
+                                          <span className="font-medium">{currency}</span>
+                                          <svg 
+                                            className={`w-2.5 h-2.5 transition-transform ${isCurrencyExpanded ? 'rotate-180' : ''}`}
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                          </svg>
+                                        </button>
+                                        
+                                        {isCurrencyExpanded && (
+                                          <div className="ml-2 mt-1 space-y-0.5">
+                                            {pairs.map((p) => (
+                                              <button
+                                                key={p}
+                                                onClick={() => handlePairSelect(p)}
+                                                className={`w-full text-left px-3 py-1.5 text-xs rounded hover:bg-white/10 transition-all ${
+                                                  pair === p ? 'bg-xcannes-green/20 text-xcannes-green' : 'text-white/70'
+                                                }`}
+                                              >
+                                                {p}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             )}
 
             {availableIntervals.length > 0 && onIntervalChange && (
@@ -1725,13 +1945,13 @@ export default function XrplCandleChartRaw({
               <p className="text-sm text-white/60 mb-4">{noDataMessage}</p>
               <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-4">
                 <p className="text-xs text-white/60 leading-relaxed">
-                  L'API data.xrplf.org ne répond plus correctement. Le Order
+                  L&rsquo;API data.xrplf.org ne répond plus correctement. Le Order
                   Book en temps réel fonctionne toujours via
                   wss://xrplcluster.com
                 </p>
               </div>
               <div className="text-xs text-white/40">
-                En attendant, consultez l'Order Book ci-dessous pour les prix en
+                En attendant, consultez l&rsquo;Order Book ci-dessous pour les prix en
                 temps réel
               </div>
             </div>

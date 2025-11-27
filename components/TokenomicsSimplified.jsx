@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
 export default function TokenomicsSimplified() {
@@ -133,18 +134,18 @@ export default function TokenomicsSimplified() {
             {t("tokenomics_simple_cta_text")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
+            <Link
               href="/dex"
               className="inline-block px-8 py-4 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-bold rounded-xl transition-all duration-300 transform hover:scale-105"
             >
               {t("tokenomics_simple_cta_primary")} →
-            </a>
-            <a
+            </Link>
+            <Link
               href="/whitepaper"
               className="inline-block px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/10 text-white font-semibold rounded-xl transition-all duration-300"
             >
               {t("tokenomics_simple_cta_secondary")}
-            </a>
+            </Link>
           </div>
         </div>
 

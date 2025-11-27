@@ -9,6 +9,7 @@ export default function Header() {
   const router = useRouter();
   const { t } = useTranslation("common");
   const isDex = router.pathname === "/dex";
+  const isStable = router.pathname === "/stable-exchange";
   const isHome = router.pathname === "/";
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,6 +52,15 @@ export default function Header() {
           {isDex ? t("nav_home") : t("nav_trading")}
         </Link>
 
+        <Link
+          href="/stable-exchange"
+          className={`hover:text-xcannes-green transition-colors duration-200 ${
+            isStable ? "text-xcannes-green" : ""
+          }`}
+        >
+          {t("nav_stable_exchange", "Stable Exchange")}
+        </Link>
+
         <LanguageSwitcher />
 
         {isDex && <XummConnectButton small />}
@@ -74,6 +84,16 @@ export default function Header() {
             className="hover:text-xcannes-green transition-colors"
           >
             {isDex ? t("nav_home") : t("nav_trading")}
+          </Link>
+
+          <Link
+            href="/stable-exchange"
+            onClick={() => setMenuOpen(false)}
+            className={`hover:text-xcannes-green transition-colors ${
+              isStable ? "text-xcannes-green" : ""
+            }`}
+          >
+            {t("nav_stable_exchange", "Stable Exchange")}
           </Link>
 
           <LanguageSwitcher />

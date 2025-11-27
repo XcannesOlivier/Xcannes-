@@ -1,146 +1,126 @@
-/**
- * Convertit format frontend (XCS/XRP) vers format backend (XCS_XRP)
- * @param {string} pair - Format: "XCS/XRP"
- * @returns {string} - Format: "XCS_XRP"
- */
-export const pairToBackendFormat = (pair) => {
-  return pair.replace("/", "_");
+import { Buffer } from "buffer";
+import xcannesApi from "../lib/xcannesApi";
+
+export const pairToBackendFormat = (pair) => pair.replace("/", "_");
+
+const RLUSD_HEX = "524C555344000000000000000000000000000000";
+const RLUSD_ISSUER = "rLSnM5KHoCZXgXX8jYzuqg1cRtmCE1XMhC";
+const XCS_ISSUER = "rBXXYQ3e4JmLtDaSUgmLvtKC5dYvmCggxX";
+const FALLBACK_ISSUERS = {
+  XCS: XCS_ISSUER,
+  RLUSD: RLUSD_ISSUER
 };
 
+const marketMetadata = new Map();
+let hydratePromise = null;
+
+async function hydrateMarkets() {
+  try {
+    const data = await xcannesApi.getAllMarkets();
+    const allMarkets = [
+      ...(data?.trading || []),
+      ...(data?.display || []),
+      ...(data?.pyth || []),
+    ];
+
+    allMarkets.forEach((market) => {
+      if (!market?.symbol || !market.base || !market.quote) return;
+      marketMetadata.set(market.symbol.toUpperCase(), {
+        base: market.base,
+        counter: market.quote,
+        baseIssuer: market.baseIssuer || null,
+        counterIssuer: market.quoteIssuer || null,
+        source: market.source || market.type || 'xrpl',
+      });
+    });
+  } catch (error) {
+    console.warn("[getBookIdFromPair] hydrateMarkets failed:", error?.message || error);
+  } finally {
+    hydratePromise = null;
+  }
+}
+
+function ensureMarketMetadata() {
+  if (typeof window === "undefined") return;
+  if (marketMetadata.size > 0 || hydratePromise) return;
+  hydratePromise = hydrateMarkets();
+}
+
+function normalizePair(pair) {
+  if (!pair) return null;
+  return pair.includes("_") ? pair : pair.replace("/", "_");
+}
+
+function resolveIssuer(currency, providedIssuer) {
+  if (currency === "RLUSD") return RLUSD_ISSUER;
+  return providedIssuer || FALLBACK_ISSUERS[currency] || null;
+}
+
+function buildTakerObject(currency, issuer) {
+  if (currency === "XRP") return { currency: "XRP" };
+  if (currency === "RLUSD") {
+    return { currency: RLUSD_HEX, issuer: RLUSD_ISSUER };
+  }
+  if (!issuer) {
+    console.warn(`[getBookIdFromPair] Issuer manquant pour ${currency}`);
+    return null;
+  }
+  if (currency.length > 3) {
+    const hex = Buffer.from(currency, "utf8").toString("hex").toUpperCase().padEnd(40, "0");
+    return { currency: hex, issuer };
+  }
+  return { currency, issuer };
+}
+
+function formatOrderbookUrl(takerGets, takerPays) {
+  const formatLeg = (leg) => {
+    if (leg.currency === "XRP") return "XRP";
+    if (leg.currency === RLUSD_HEX) return `${leg.issuer}_RLUSD`;
+    return `${leg.issuer}_${leg.currency}`;
+  };
+  return `${formatLeg(takerGets)}/${formatLeg(takerPays)}`;
+}
+
 export const getBookIdFromPair = (pair) => {
-  // RLUSD en hexadécimal
-  const RLUSD_HEX = "524C555344000000000000000000000000000000";
-  const RLUSD_ISSUER = "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De";
-  
-  // Issuers connus
-  const issuers = {
-    XCS: "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx",
-    USD: "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
-    EUR: "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
-    GBP: "r4GN9eEoz9K4BhMQXe4H1eYNtvtkwGdt8g",
-    CNY: "rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y",
-    BTC: "rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL",
-    ETH: "rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h",
-  };
+  if (!pair) return null;
+  ensureMarketMetadata();
 
-  // Si la paire contient RLUSD, gérer spécialement
-  if (pair.includes("RLUSD")) {
-    const [base, counter] = pair.split("/");
-    
-    let taker_gets, taker_pays;
-    
-    // RLUSD en base
-    if (base === "RLUSD") {
-      taker_gets = {
-        currency: RLUSD_HEX,
-        issuer: RLUSD_ISSUER,
-      };
-      
-      if (counter === "XRP") {
-        taker_pays = { currency: "XRP" };
-      } else {
-        taker_pays = {
-          currency: counter,
-          issuer: issuers[counter],
-        };
-      }
-    }
-    // RLUSD en counter
-    else {
-      if (base === "XRP") {
-        taker_gets = { currency: "XRP" };
-      } else {
-        taker_gets = {
-          currency: base,
-          issuer: issuers[base],
-        };
-      }
-      
-      taker_pays = {
-        currency: RLUSD_HEX,
-        issuer: RLUSD_ISSUER,
-      };
-    }
-    
-    // Construction URL
-    let url = "";
-    if (taker_gets.issuer) {
-      url += `${taker_gets.issuer}_${taker_gets.currency === RLUSD_HEX ? "RLUSD" : taker_gets.currency}/`;
-    } else {
-      url += "XRP/";
-    }
-    
-    if (taker_pays.issuer) {
-      url += `${taker_pays.issuer}_${taker_pays.currency === RLUSD_HEX ? "RLUSD" : taker_pays.currency}`;
-    } else {
-      url += "XRP";
-    }
-    
+  const backendPair = normalizePair(pair).toUpperCase();
+  const [rawBase, rawCounter] = backendPair.split("_");
+  if (!rawBase || !rawCounter) return null;
+
+  const meta = marketMetadata.get(backendPair) || null;
+  const base = meta?.base || rawBase;
+  const counter = meta?.counter || rawCounter;
+
+  const isExternalPair =
+    meta?.source === "pyth" ||
+    (!meta && base !== "XRP" && !FALLBACK_ISSUERS[base]);
+
+  // Pyth/external pair: aucun carnet XRPL requis, seul backendPair est utile
+  if (isExternalPair) {
     return {
-      taker_gets,
-      taker_pays,
-      url,
-      backendPair: `${base}_${counter}`,
+      backendPair,
+      source: 'pyth',
+      type: 'external'
     };
   }
 
-  // Génération dynamique pour toutes les autres paires
-  const [base, counter] = pair.split("/");
-  if (!base || !counter) return null;
+  const baseIssuer = resolveIssuer(base, meta?.baseIssuer);
+  const counterIssuer = resolveIssuer(counter, meta?.counterIssuer);
 
-  // Issuers connus (depuis dexPairs.json)
-  const knownIssuers = {
-    XCS: "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx",
-    USD: "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
-    EUR: "rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq",
-    GBP: "r4GN9eEoz9K4BhMQXe4H1eYNtvtkwGdt8g",
-    CNY: "rKiCet8SdvWxPXnAgYarFUXMh1zCPz432Y",
-    BTC: "rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL",
-    ETH: "rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h",
-    JPY: "rMAz5ZnK73nyNUL4foAvaxdreczCkG3vA6",
-    // Ajoutez d'autres issuers au besoin
-  };
+  const taker_gets = buildTakerObject(base, baseIssuer);
+  const taker_pays = buildTakerObject(counter, counterIssuer);
 
-  const getTakerObject = (currency) => {
-    if (currency === "XRP") {
-      return { currency: "XRP" };
-    }
-    
-    const issuer = knownIssuers[currency];
-    if (!issuer) {
-      console.warn(`Issuer inconnu pour ${currency}, paire ${pair} pourrait ne pas fonctionner`);
-      return null;
-    }
-    
-    return {
-      currency: currency,
-      issuer: issuer,
-    };
-  };
-
-  const takerGets = getTakerObject(base);
-  const takerPays = getTakerObject(counter);
-
-  if (!takerGets || !takerPays) return null;
-
-  // Construction de l'URL et format backend
-  let url = "";
-  if (takerGets.issuer) {
-    url += `${takerGets.issuer}_${takerGets.currency}/`;
-  } else {
-    url += "XRP/";
-  }
-  
-  if (takerPays.issuer) {
-    url += `${takerPays.issuer}_${takerPays.currency}`;
-  } else {
-    url += "XRP";
+  if (!taker_gets || !taker_pays) {
+    return meta ? { backendPair, source: meta.source || 'unknown' } : null;
   }
 
   return {
-    taker_gets: takerGets,
-    taker_pays: takerPays,
-    url: url,
-    backendPair: `${base}_${counter}`,
+    taker_gets,
+    taker_pays,
+    url: formatOrderbookUrl(taker_gets, taker_pays),
+    backendPair,
+    source: meta?.source || 'xrpl'
   };
 };

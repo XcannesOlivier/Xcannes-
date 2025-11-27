@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useXumm } from "../context/XummContext";
+import { getBookIdFromPair } from "../utils/xrpl";
 
 /**
  * Hook personnalisé pour gérer toute la logique de trading (TradeBox)
@@ -7,35 +8,76 @@ import { useXumm } from "../context/XummContext";
  */
 export default function useTrade(pair, currentPrice = 0.00001) {
   const { isConnected, wallet, balance, refreshBalance, signTransaction } = useXumm();
+  const [baseSymbol, counterSymbol] = useMemo(() => {
+    if (!pair) return ["", ""];
+    const [base, counter] = pair.split("/");
+    return [base || "", counter || ""];
+  }, [pair]);
 
-  // États de la TradeBox
+  const pairMetadata = useMemo(() => {
+    if (!pair) return null;
+    return getBookIdFromPair(pair);
+  }, [pair]);
+
+  const baseAsset = pairMetadata?.taker_gets || null;
+  const counterAsset = pairMetadata?.taker_pays || null;
+
   const [mode, setMode] = useState("BUY");
   const [orderType, setOrderType] = useState("market");
   const [amount, setAmount] = useState("");
   const [price, setPrice] = useState(currentPrice);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Balance : utiliser le vrai solde du contexte XUMM
-  const getBalance = useCallback(() => {
-    if (!balance) return 0;
+  const normalizeCurrencyCode = useCallback((code) => {
+    if (!code || code === "XRP") return code;
+    if (code.length === 40 && /^[0-9A-F]+$/i.test(code)) {
+      try {
+        let ascii = "";
+        for (let i = 0; i < code.length; i += 2) {
+          const chunk = code.substring(i, i + 2);
+          const value = parseInt(chunk, 16);
+          if (!Number.isFinite(value) || value === 0) continue;
+          ascii += String.fromCharCode(value);
+        }
+        return ascii.trim() || code;
+      } catch (error) {
+        console.warn("Impossible de décoder la devise XRPL:", error);
+        return code;
+      }
+    }
+    return code;
+  }, []);
 
-    // En mode BUY : retourner le solde XRP
+  const findTokenBalance = useCallback(
+    (symbol, issuer) => {
+      if (!balance?.tokens || !symbol) return 0;
+      return balance.tokens.reduce((acc, token) => {
+        const tokenCurrency = normalizeCurrencyCode(token.currency);
+        const tokenIssuer = token.issuer || null;
+        if (tokenCurrency === symbol && (!issuer || issuer === tokenIssuer)) {
+          const value = parseFloat(token.value);
+          return Number.isFinite(value) ? value : acc;
+        }
+        return acc;
+      }, 0);
+    },
+    [balance, normalizeCurrencyCode]
+  );
+
+  const spendableBalance = useMemo(() => {
+    if (!balance) return 0;
     if (mode === "BUY") {
+      if (counterSymbol === "XRP") {
+        return balance.xrp || 0;
+      }
+      return findTokenBalance(counterSymbol, counterAsset?.issuer || null);
+    }
+    // SELL mode
+    if (baseSymbol === "XRP") {
       return balance.xrp || 0;
     }
-
-    // En mode SELL : retourner le solde du token (ex: XCS)
-    if (pair && balance.tokens) {
-      const token = balance.tokens.find(t => 
-        t.currency === pair.base // ex: "XCS"
-      );
-      return token ? parseFloat(token.value) : 0;
-    }
-
-    return 0;
-  }, [balance, mode, pair]);
-
-  const userBalance = getBalance();
+    return findTokenBalance(baseSymbol, baseAsset?.issuer || null);
+  }, [balance, mode, baseSymbol, counterSymbol, baseAsset, counterAsset, findTokenBalance]);
 
   // Synchronisation automatique : si orderType = "market", le prix suit currentPrice
   useEffect(() => {
@@ -48,22 +90,47 @@ export default function useTrade(pair, currentPrice = 0.00001) {
    * Calcule le total de l'ordre (memoized pour performance)
    * Total se recalcule automatiquement quand amount ou price change
    */
+  const effectivePrice = useMemo(() => {
+    const value = orderType === "market" ? currentPrice : price;
+    return Number.isFinite(value) ? value : 0;
+  }, [currentPrice, orderType, price]);
+
   const total = useMemo(() => {
-    const val = parseFloat(amount);
-    if (!val || isNaN(val)) return "0.00";
-    const currentPriceValue = orderType === "market" ? currentPrice : price;
-    return (val * currentPriceValue).toFixed(6);
-  }, [amount, price, currentPrice, orderType]);
+    const baseAmount = parseFloat(amount);
+    if (!Number.isFinite(baseAmount) || baseAmount <= 0) return "0.00";
+    if (!Number.isFinite(effectivePrice) || effectivePrice <= 0) return "0.00";
+    return (baseAmount * effectivePrice).toFixed(6);
+  }, [amount, effectivePrice]);
 
   /**
    * Définit le montant basé sur un pourcentage du solde
    */
   const setPercent = useCallback(
     (percentage) => {
-      const val = ((userBalance * percentage) / 100).toFixed(2);
-      setAmount(val);
+      if (percentage <= 0) {
+        setAmount("");
+        return;
+      }
+      const ratio = percentage / 100;
+      if (mode === "BUY") {
+        if (!Number.isFinite(effectivePrice) || effectivePrice <= 0) return;
+        const counterValue = spendableBalance * ratio;
+        const baseValue = counterValue / effectivePrice;
+        if (!Number.isFinite(baseValue) || baseValue <= 0) {
+          setAmount("");
+          return;
+        }
+        setAmount(baseValue.toFixed(4));
+      } else {
+        const baseValue = spendableBalance * ratio;
+        if (!Number.isFinite(baseValue) || baseValue <= 0) {
+          setAmount("");
+          return;
+        }
+        setAmount(baseValue.toFixed(4));
+      }
     },
-    [userBalance]
+    [mode, spendableBalance, effectivePrice]
   );
 
   /**
@@ -81,8 +148,26 @@ export default function useTrade(pair, currentPrice = 0.00001) {
       return;
     }
 
-    if (parseFloat(amount) > userBalance) {
-      alert(`Solde insuffisant. Vous avez ${userBalance.toFixed(2)}`);
+    if (!pairMetadata || !baseAsset || !counterAsset) {
+      alert("Paire non supportée pour la création d'ordre.");
+      return;
+    }
+
+    if (!Number.isFinite(effectivePrice) || effectivePrice <= 0) {
+      alert("Prix invalide pour cette paire.");
+      return;
+    }
+
+    const baseAmount = parseFloat(amount);
+    const counterAmount = baseAmount * effectivePrice;
+    if (!Number.isFinite(baseAmount) || !Number.isFinite(counterAmount)) {
+      alert("Montant invalide.");
+      return;
+    }
+
+    const requiredBalance = mode === "BUY" ? counterAmount : baseAmount;
+    if (requiredBalance > spendableBalance + 1e-12) {
+      alert(`Solde insuffisant. Disponible: ${spendableBalance.toFixed(4)}`);
       return;
     }
 
@@ -92,8 +177,8 @@ export default function useTrade(pair, currentPrice = 0.00001) {
       const orderData = {
         mode,
         orderType,
-        amount: parseFloat(amount),
-        price: orderType === "limit" ? parseFloat(price) : currentPrice,
+        amount: baseAmount,
+        price: effectivePrice,
         pair,
         wallet,
         timestamp: new Date().toISOString(),
@@ -101,23 +186,38 @@ export default function useTrade(pair, currentPrice = 0.00001) {
 
       console.log("📊 Ordre placé:", orderData);
 
-      // Créer la transaction XRPL OfferCreate
+      const formatAmount = (asset, value) => {
+        if (!asset) return null;
+        if (asset.currency === "XRP" && !asset.issuer) {
+          return Math.round(value * 1_000_000).toString();
+        }
+        const normalizedValue = Number.isFinite(value) ? value : 0;
+        const decimalString = normalizedValue
+          .toFixed(8)
+          .replace(/\.?0+$/, "");
+        return {
+          currency: asset.currency,
+          issuer: asset.issuer,
+          value: decimalString === "" ? "0" : decimalString,
+        };
+      };
+
       const txjson = {
         TransactionType: "OfferCreate",
         Account: wallet,
-        TakerPays: mode === "BUY" ? {
-          currency: pair.base, // ex: "XCS"
-          value: orderData.amount.toString(),
-          issuer: pair.baseIssuer,
-        } : (orderData.amount * orderData.price * 1000000).toString(), // XRP en drops
-        TakerGets: mode === "BUY" ? 
-          (orderData.amount * orderData.price * 1000000).toString() : // XRP en drops
-          {
-            currency: pair.base,
-            value: orderData.amount.toString(),
-            issuer: pair.baseIssuer,
-          },
+        TakerPays:
+          mode === "BUY"
+            ? formatAmount(counterAsset, counterAmount)
+            : formatAmount(baseAsset, baseAmount),
+        TakerGets:
+          mode === "BUY"
+            ? formatAmount(baseAsset, baseAmount)
+            : formatAmount(counterAsset, counterAmount),
       };
+
+      if (!txjson.TakerPays || !txjson.TakerGets) {
+        throw new Error("Impossible de construire la transaction XRPL pour cette paire.");
+      }
 
       // Signer avec XUMM
       const result = await signTransaction(txjson);
@@ -125,7 +225,6 @@ export default function useTrade(pair, currentPrice = 0.00001) {
       if (result && result.signed) {
         alert("✅ Ordre placé avec succès!");
         setAmount("");
-        // Rafraîchir le solde
         if (refreshBalance) {
           refreshBalance();
         }
@@ -138,7 +237,20 @@ export default function useTrade(pair, currentPrice = 0.00001) {
     } finally {
       setIsProcessing(false);
     }
-  }, [isConnected, amount, userBalance, mode, orderType, price, currentPrice, pair, wallet, signTransaction, refreshBalance]);
+  }, [
+    isConnected,
+    amount,
+    pair,
+    pairMetadata,
+    baseAsset,
+    counterAsset,
+    effectivePrice,
+    mode,
+    spendableBalance,
+    wallet,
+    signTransaction,
+    refreshBalance,
+  ]);
 
   /**
    * Change le mode (BUY/SELL)
@@ -186,7 +298,7 @@ export default function useTrade(pair, currentPrice = 0.00001) {
     total, // Total calculé automatiquement
     isProcessing,
     isConnected,
-    balance: userBalance, // Vrai solde XRPL
+    balance: spendableBalance, // Solde dans la devise pertinente
 
     // Fonctions
     setPercent,

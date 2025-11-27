@@ -1,14 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/router";
 import { stripePromise } from "../lib/stripe";
 import { useXumm } from "../context/XummContext";
 import { useTranslation } from "next-i18next";
 import WalletDashboard from "./WalletDashboard";
 
+const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || "").replace(/\/$/, "");
+const apiUrl = (path) => `${API_BASE}${path}`;
+
 export default function SetupPanel() {
-  const router = useRouter();
   const { t } = useTranslation("common");
   const { isConnected } = useXumm();
   const [copied, setCopied] = useState(false);
@@ -65,7 +67,7 @@ export default function SetupPanel() {
       }
 
       // Créer la session de paiement
-      const res = await fetch("/api/create-checkout-session", {
+      const res = await fetch(apiUrl("/stripe/checkout-session"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,9 +146,11 @@ export default function SetupPanel() {
                   className="group bg-white/5 rounded-lg p-3 border border-white/10 hover:border-white/20 hover:bg-white/10 transition-all"
                 >
                   <div className="flex items-center justify-center h-12">
-                    <img
+                    <Image
                       src={method.logo}
                       alt={method.name}
+                      width={80}
+                      height={40}
                       className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-all"
                     />
                   </div>

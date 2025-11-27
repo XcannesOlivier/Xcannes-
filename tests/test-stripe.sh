@@ -61,18 +61,21 @@ echo ""
 echo "2️⃣ TEST API ENDPOINT"
 echo "─────────────────────────────────────────────────────"
 
+# Déterminer l'URL API backend
+API_BASE=${NEXT_PUBLIC_XCANNES_API_URL:-http://localhost:3001}
+
 # Vérifier que le serveur tourne
-if ! curl -s http://localhost:2500 > /dev/null; then
-    echo -e "${RED}❌ Serveur non accessible sur http://localhost:2500${NC}"
-    echo "   Démarrez le serveur avec: pm2 start xcannes-frontend"
+if ! curl -s "${API_BASE}/health" > /dev/null; then
+    echo -e "${RED}❌ API backend non accessible sur ${API_BASE}${NC}"
+    echo "   Démarrez le serveur avec: pm2 start xcannes-api"
     exit 1
 fi
 
 # Tester l'API
-echo "Testing POST /api/create-checkout-session..."
-RESPONSE=$(curl -s -X POST http://localhost:2500/api/create-checkout-session \
+echo "Testing POST /stripe/checkout-session..."
+RESPONSE=$(curl -s -X POST "${API_BASE}/stripe/checkout-session" \
   -H "Content-Type: application/json" \
-  -H "Origin: http://localhost:2500")
+  -H "Origin: ${API_BASE}")
 
 # Analyser la réponse
 if echo "$RESPONSE" | grep -q '"id":"cs_test_'; then
@@ -101,7 +104,7 @@ fi
 echo ""
 echo "3️⃣ STATUT DU SERVEUR"
 echo "─────────────────────────────────────────────────────"
-pm2 list | grep xcannes-frontend
+pm2 list | grep xcannes-api
 
 echo ""
 echo "═══════════════════════════════════════════════════════"
@@ -116,16 +119,16 @@ if [[ "$STRIPE_SECRET_KEY" == *"XXXX"* ]] || [[ "$NEXT_PUBLIC_STRIPE_PK" == *"XX
     echo "2. Éditez .env.local:"
     echo "   nano /root/xcannes-dex/Xcannes-/.env.local"
     echo "3. Redémarrez le serveur:"
-    echo "   pm2 restart xcannes-frontend --update-env"
+    echo "   pm2 restart xcannes-api --update-env"
     echo "4. Relancez ce test:"
     echo "   ./test-stripe.sh"
 else
     echo "✅ Configuration OK !"
     echo ""
     echo "Pour tester le paiement:"
-    echo "1. Ouvrez http://localhost:2500 dans votre navigateur"
-    echo "2. Cliquez sur 'Buy with Card / Apple Pay'"
-    echo "3. Utilisez la carte de test: 4242 4242 4242 4242"
+    echo "1. Ouvrez votre front-end XCANNES"
+    echo "2. Lancement d'un paiement déclenchera le backend ${API_BASE}/stripe/checkout-session"
+    echo "3. Carte de test: 4242 4242 4242 4242"
     echo "   Date: 12/28, CVV: 123, ZIP: 12345"
     echo ""
     echo "Dashboard Stripe: https://dashboard.stripe.com/test/payments"
