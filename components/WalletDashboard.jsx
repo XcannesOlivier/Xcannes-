@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useXumm } from "../context/XummContext";
 import XummQRModal from "./XummQRModal";
+
+const TRUSTLINE_DATA = {
+  issuer: "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx",
+  currency: "XCS",
+  limit: "2006400",
+};
 
 export default function WalletDashboard() {
   const { 
@@ -19,22 +25,12 @@ export default function WalletDashboard() {
   const [isCheckingTrustline, setIsCheckingTrustline] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const trustlineData = {
-    issuer: "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx",
-    currency: "XCS",
-    limit: "2006400",
-  };
+  const trustlineData = TRUSTLINE_DATA;
 
   const trustlineURL = `https://xrpl.services?issuer=${trustlineData.issuer}&currency=${trustlineData.currency}&limit=${trustlineData.limit}`;
 
   // Vérifier si la trustline XCS existe
-  useEffect(() => {
-    if (isConnected && balance) {
-      checkTrustline();
-    }
-  }, [isConnected, balance]);
-
-  const checkTrustline = () => {
+  const checkTrustline = useCallback(() => {
     if (!balance || !balance.tokens) {
       setHasTrustline(false);
       return;
@@ -48,7 +44,13 @@ export default function WalletDashboard() {
     );
 
     setHasTrustline(!!xcsToken);
-  };
+  }, [balance, trustlineData.currency, trustlineData.issuer]);
+
+  useEffect(() => {
+    if (isConnected && balance) {
+      checkTrustline();
+    }
+  }, [isConnected, balance, checkTrustline]);
 
   const handleRefresh = async () => {
     setIsCheckingTrustline(true);
@@ -418,7 +420,7 @@ export default function WalletDashboard() {
                 <p className="text-xs text-white/70 leading-relaxed">
                   💡 <strong>What is a Trustline?</strong><br/>
                   A trustline is like authorizing your wallet to hold a specific token. 
-                  It's a standard XRPL feature that protects you from receiving unwanted tokens. 
+                  It&rsquo;s a standard XRPL feature that protects you from receiving unwanted tokens. 
                   Creating a trustline requires a small XRP reserve (≈2 XRP).
                 </p>
               </div>

@@ -29,16 +29,26 @@ export default function Home() {
   useEffect(() => {
     const fetchPairs = async () => {
       try {
-        const markets = await xcannesApi.getMarkets();
-        if (markets && markets.length > 0) {
-          // Convertir format backend (XCS_XRP) vers frontend (XCS/XRP)
-          const pairsList = markets.map(m => `${m.base}/${m.quote}`);
-          console.log(`✅ [Index] ${pairsList.length} paires chargées depuis l'API`);
+        const markets = await xcannesApi.getAllMarkets();
+        if (markets) {
+          // Priorité: display > pyth (pour éviter doublons)
+          const allPairs = [
+            ...(markets.display || []),
+            ...(markets.pyth || [])
+          ];
+          
+          const pairsList = Array.from(new Set(
+            allPairs
+              .filter(m => m.active !== false)
+              .map(m => `${m.base}/${m.quote}`)
+          ));
+          
           setAvailablePairs(pairsList);
+          console.log(`✅ [Index] ${pairsList.length} paires chargées:`, pairsList);
         }
       } catch (error) {
         console.error("⚠️ [Index] Erreur chargement paires, utilisation fallback:", error);
-        // Garder les 5 paires par défaut
+        setAvailablePairs(["XRP/RLUSD", "XCS/XRP", "XCS/RLUSD"]);
       } finally {
         setLoadingPairs(false);
       }
@@ -60,8 +70,10 @@ export default function Home() {
 
       <Header />
 
+      <PriceTicker pairs={pairs} fixed={true} />
+
       {/* HERO SECTION CORPORATE ELEGANT */}
-      <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-xcannes-background">
+      <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-xcannes-background pt-16">
         {/* Grid pattern overlay - subtle */}
         <div
           className="absolute inset-0 opacity-[0.03]"

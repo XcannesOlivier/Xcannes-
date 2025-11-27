@@ -374,14 +374,14 @@ export default function Disclaimer() {
                       .
                     </p>
                     <p>
-                      • N'investissez{" "}
+                      • N&rsquo;investissez{" "}
                       <strong>
                         que ce que vous pouvez vous permettre de perdre
                       </strong>
                       .
                     </p>
                     <p>
-                      • Ce n'est <strong>pas un conseil financier</strong> -
+                      • Ce n&rsquo;est <strong>pas un conseil financier</strong> -
                       consultez un professionnel.
                     </p>
                   </div>
@@ -483,7 +483,7 @@ export default function Disclaimer() {
               className="inline-flex items-center gap-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold px-8 py-3 rounded-lg transition-all duration-300 hover:scale-105"
             >
               <span>←</span>
-              <span>Retour à l'accueil</span>
+              <span>Retour à l&rsquo;accueil</span>
             </Link>
             <Link
               href="/contact"

@@ -6,6 +6,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 const XummContext = createContext();
+const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || '').replace(/\/$/, '');
+const apiUrl = (path) => `${API_BASE}${path}`;
 
 export const XummProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");
@@ -36,7 +38,7 @@ export const XummProvider = ({ children }) => {
     setIsConnecting(true);
     try {
       // Appeler l'API pour créer un payload XUMM
-      const res = await fetch('/api/xumm/connect', {
+      const res = await fetch(apiUrl('/xumm/connect'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -85,7 +87,7 @@ export const XummProvider = ({ children }) => {
       }
 
       try {
-        const res = await fetch(`/api/xumm/check?uuid=${uuid}`);
+        const res = await fetch(apiUrl(`/xumm/check?uuid=${uuid}`));
         const data = await res.json();
 
         if (data.signed && data.wallet) {
@@ -110,7 +112,7 @@ export const XummProvider = ({ children }) => {
    */
   const fetchBalance = async (address) => {
     try {
-      const res = await fetch(`/api/xumm/balance?address=${address}`);
+      const res = await fetch(apiUrl(`/xumm/balance?address=${address}`));
       const data = await res.json();
 
       if (res.ok) {
@@ -144,7 +146,7 @@ export const XummProvider = ({ children }) => {
 
     setIsConnecting(true);
     try {
-      const res = await fetch('/api/xumm/sign', {
+      const res = await fetch(apiUrl('/xumm/sign'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ txjson }),
@@ -194,7 +196,7 @@ export const XummProvider = ({ children }) => {
         }
 
         try {
-          const res = await fetch(`/api/xumm/check?uuid=${uuid}`);
+          const res = await fetch(apiUrl(`/xumm/check?uuid=${uuid}`));
           const data = await res.json();
 
           if (data.signed) {

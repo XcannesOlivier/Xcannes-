@@ -6,6 +6,9 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
+const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || '').replace(/\/$/, '');
+const apiUrl = (path) => `${API_BASE}${path}`;
+
 export default function XummQRModal({ 
   isOpen, 
   onClose, 
@@ -14,36 +17,34 @@ export default function XummQRModal({
   onSuccess,
 }) {
   const [status, setStatus] = useState('loading'); // loading, waiting, signed, error
-  const [qrData, setQrData] = useState(null);
   const [countdown, setCountdown] = useState(300); // 5 minutes
 
   useEffect(() => {
-    if (isOpen && uuid) {
-      fetchQRCode();
-      startPolling();
-      startCountdown();
+    if (!isOpen || !uuid) {
+      return undefined;
     }
 
-    return () => {
-      // Cleanup
-    };
-  }, [isOpen, uuid]);
-
-  const fetchQRCode = async () => {
-    // Le QR code est déjà fourni lors de la création du payload
-    // On pourrait aussi le récupérer ici si nécessaire
     setStatus('waiting');
-  };
+    setCountdown(300);
 
-  const startPolling = () => {
-    const interval = setInterval(async () => {
+    let pollingInterval;
+    let pollingTimeout;
+    let countdownInterval;
+
+    const clearAll = () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+      if (pollingTimeout) clearTimeout(pollingTimeout);
+      if (countdownInterval) clearInterval(countdownInterval);
+    };
+
+    pollingInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/xumm/check?uuid=${uuid}`);
+        const res = await fetch(apiUrl(`/xumm/check?uuid=${uuid}`));
         const data = await res.json();
 
         if (data.signed) {
           setStatus('signed');
-          clearInterval(interval);
+          clearAll();
           if (onSuccess) {
             onSuccess(data);
           }
@@ -52,7 +53,7 @@ export default function XummQRModal({
           }, 2000);
         } else if (data.expired) {
           setStatus('error');
-          clearInterval(interval);
+          clearAll();
         }
       } catch (error) {
         console.error('Polling error:', error);
@@ -60,21 +61,25 @@ export default function XummQRModal({
     }, 2000); // Poll toutes les 2 secondes
 
     // Nettoyer après 5 minutes
-    setTimeout(() => clearInterval(interval), 300000);
-  };
+    pollingTimeout = setTimeout(() => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    }, 300000);
 
-  const startCountdown = () => {
-    const interval = setInterval(() => {
+    countdownInterval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
+          clearAll();
           setStatus('error');
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-  };
+
+    return clearAll;
+  }, [isOpen, uuid, onClose, onSuccess]);
 
   if (!isOpen) return null;
 
@@ -115,9 +120,12 @@ export default function XummQRModal({
               {/* QR Code */}
               <div className="bg-white p-4 rounded-xl mb-6 inline-block">
                 {uuid && (
-                  <img
+                  <Image
                     src={`https://xumm.app/sign/${uuid}`}
                     alt="XUMM QR Code"
+                    width={256}
+                    height={256}
+                    unoptimized
                     className="w-64 h-64 mx-auto"
                   />
                 )}
@@ -144,7 +152,7 @@ export default function XummQRModal({
               {/* Instructions */}
               <div className="mt-6 text-left bg-white/5 rounded-lg p-4">
                 <p className="text-xs text-white/60 mb-2">
-                  <strong className="text-white/80">Don't have XUMM?</strong>
+                  <strong className="text-white/80">Don&rsquo;t have XUMM?</strong>
                 </p>
                 <ol className="text-xs text-white/60 space-y-1 list-decimal list-inside">
                   <li>Download XUMM from App Store or Google Play</li>

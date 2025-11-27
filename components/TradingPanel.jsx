@@ -1,18 +1,31 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getBookIdFromPair } from "../utils/xrpl";
-import xcannesApi from "../lib/xcannesApi";
 import TokenAmountInput from "./TokenAmountInput";
 import { useTranslation } from "next-i18next";
 import useTrade from "../hooks/useTrade";
 import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ WebSocket
+import { useExternalPrice } from "../hooks/useExternalPrice"; // ✅ Prix live Pyth
+import { getPairCategory } from "../utils/marketStructure"; // ✅ Helper pour détecter la catégorie
 
 export default function TradingPanel({ pair }) {
   const { t } = useTranslation("common");
   
-  // ✅ WebSocket hook
-  const { connected, orderbooks, subscribe, unsubscribe } = useXcannesWS();
+  // ✅ Détection du type de paire (même logique que le graphique)
+  const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
+  const isXRPL = pairCategory === 'xrpl';
+  const isExternal = pairCategory && ['crypto', 'forex', 'commodity'].includes(pairCategory);
+  const isExotic = pairCategory === 'exotic';
+  
+  // ✅ WebSocket hook (XRPL seulement)
+  const { connected, orderbooks, trades, subscribe, unsubscribe } = useXcannesWS();
+  
+  // ✅ Prix live Pyth (crypto, forex, commodities - pas exotic)
+  const { price: externalPrice, loading: loadingExternalPrice } = useExternalPrice(
+    isExternal && !isExotic ? pair : null,
+    pairCategory
+  );
   
   // OrderBook & History states
   const [asks, setAsks] = useState([]);
@@ -21,35 +34,46 @@ export default function TradingPanel({ pair }) {
   const [loading, setLoading] = useState(true);
   const [book, setBook] = useState(null);
 
-  // Calcul du prix du marché actuel (mid-price)
-  const marketPrice =
-    asks[0] && bids[0] ? (asks[0].price + bids[0].price) / 2 : 0.00001;
-
-  // Hook de trading centralisé avec prix du marché en temps réel
-  const trade = useTrade(pair, marketPrice);
-
   // Fetch book info
   useEffect(() => {
     const b = getBookIdFromPair(pair);
     setBook(b);
   }, [pair]);
 
-  // ✅ S'abonner au WebSocket pour l'orderbook
+  // Calcul du prix du marché unifié : Pyth (externe) ou XRPL (mid-price orderbook)
+  const marketPrice = isExternal
+    ? (externalPrice || 0.00001)
+    : (asks[0] && bids[0] ? (asks[0].price + bids[0].price) / 2 : 0.00001);
+
+  // Hook de trading centralisé avec prix du marché en temps réel
+  const trade = useTrade(pair, marketPrice);
+
+  // ✅ S'abonner au WebSocket pour l'orderbook (XRPL uniquement)
   useEffect(() => {
+    if (!isXRPL) return; // Skip si paire externe
+    
     const bookData = getBookIdFromPair(pair);
     if (!bookData?.backendPair || !connected) return;
 
     console.log('[TradingPanel] 🔌 Abonnement orderbook:', bookData.backendPair);
     subscribe('orderbook', bookData.backendPair);
+    subscribe('trades', bookData.backendPair);
 
     return () => {
       console.log('[TradingPanel] 🔌 Désabonnement orderbook:', bookData.backendPair);
       unsubscribe('orderbook', bookData.backendPair);
+      unsubscribe('trades', bookData.backendPair);
     };
-  }, [pair, connected, subscribe, unsubscribe]);
+  }, [pair, connected, subscribe, unsubscribe, isXRPL]);
 
-  // ✅ Écouter les mises à jour WebSocket de l'orderbook
+  // ✅ Écouter les mises à jour WebSocket de l'orderbook (XRPL uniquement)
   useEffect(() => {
+    if (!isXRPL) {
+      // Pour les paires externes, pas de loading (données viennent de Pyth)
+      setLoading(false);
+      return;
+    }
+    
     const bookData = getBookIdFromPair(pair);
     if (!bookData?.backendPair) return;
 
@@ -69,42 +93,25 @@ export default function TradingPanel({ pair }) {
       
       console.log('[TradingPanel] 📊 Orderbook mis à jour via WebSocket');
     }
-  }, [orderbooks, pair]);
+  }, [orderbooks, pair, isXRPL]);
 
-  // ✅ Fetch initial Trade History (HTTP - garde pour l'instant)
-  const fetchTradeHistory = useCallback(async () => {
-    try {
-      const bookData = getBookIdFromPair(pair);
-      if (!bookData?.backendPair) return;
-
-      const response = await xcannesApi.getTrades(bookData.backendPair, 50);
-
-      if (response && response.trades && Array.isArray(response.trades)) {
-        const formattedTrades = response.trades.slice(0, 10).map((trade) => ({
-          price: parseFloat(trade.price),
-          amount: parseFloat(trade.amount),
-          executed_time: new Date(trade.timestamp || Date.now()),
-          type: trade.side === "buy" ? "buy" : "sell",
-        }));
-
-        setHistory(formattedTrades);
-      } else {
-        setHistory([]);
-      }
-    } catch (err) {
-      console.error("Erreur history:", err);
-      setHistory([]);
-    }
-  }, [pair]);
-
-  // ✅ Fetch initial trade history + polling (garde pour l'instant)
+  // ✅ Synchroniser l'historique des trades depuis le WebSocket (XRPL uniquement)
   useEffect(() => {
-    fetchTradeHistory();
-    const interval = setInterval(() => {
-      fetchTradeHistory();
-    }, 10000); // Polling 10s pour trades (à migrer vers WS plus tard)
-    return () => clearInterval(interval);
-  }, [pair, fetchTradeHistory]);
+    if (!isXRPL) return; // Skip si paire externe
+    
+    const bookData = getBookIdFromPair(pair);
+    if (!bookData?.backendPair) return;
+
+    const tradeEntries = trades.get(bookData.backendPair) || [];
+    const formattedTrades = tradeEntries.slice(0, 20).map((trade) => ({
+      price: Number(trade.price),
+      amount: Number(trade.amount),
+      executed_time: trade.timestamp instanceof Date ? trade.timestamp : new Date(trade.timestamp),
+      type: trade.side === "sell" ? "sell" : "buy",
+    }));
+
+    setHistory(formattedTrades);
+  }, [trades, pair, isXRPL]);
 
   const base = pair.split("/")[0];
   const counter = pair.split("/")[1];
@@ -228,10 +235,12 @@ export default function TradingPanel({ pair }) {
           {/* Submit Button */}
           <button
             onClick={trade.placeOrder}
-            disabled={trade.isProcessing || !trade.isConnected}
+            disabled={trade.isProcessing || !trade.isConnected || isExternal}
             className="bg-xcannes-green hover:scale-105 transition text-white px-4 py-2 rounded text-sm font-semibold w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {trade.isProcessing ? (
+            {isExternal ? (
+              "🔒 " + t("trading_read_only")
+            ) : trade.isProcessing ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 {t("trading_processing")}...
@@ -247,18 +256,54 @@ export default function TradingPanel({ pair }) {
           </button>
         </div>
 
-        {/* COLONNE 2 : OrderBook */}
+        {/* COLONNE 2 : OrderBook ou Prix Live */}
         <div className="p-4">
           <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wider mb-4">
-            {t("trading_orderbook")}
+            {isExternal ? t("trading_live_price") : t("trading_orderbook")}
           </h3>
 
-          {/* Headers */}
-          <div className="grid grid-cols-3 gap-2 mb-2 text-xs text-white/40 font-medium">
-            <div>{t("trading_orderbook_price")}</div>
-            <div className="text-right">{t("trading_orderbook_amount")}</div>
-            <div className="text-right">{t("trading_orderbook_total")}</div>
-          </div>
+          {isExternal ? (
+            /* Prix Live Pyth */
+            <div className="text-center py-12">
+              <div className="mb-6">
+                <div className="text-xs text-white/40 mb-2 uppercase tracking-wider">
+                  Prix Live Pyth Network
+                </div>
+                {loadingExternalPrice ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-6 h-6 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-sm text-white/60">Chargement...</span>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-4xl font-bold text-xcannes-green mb-1">
+                      ${externalPrice?.toFixed(2)}
+                    </div>
+                    <div className="text-xs text-white/40">
+                      Mis à jour toutes les 5s
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="text-xs text-white/60 mb-2">
+                  📊 Paire en lecture seule
+                </div>
+                <p className="text-xs text-white/40 leading-relaxed">
+                  Les paires externes (crypto, forex, commodities) affichent uniquement
+                  les données de marché en temps réel. Le trading n&apos;est pas disponible.
+                </p>
+              </div>
+            </div>
+          ) : (
+            /* OrderBook XRPL */
+            <>
+              {/* Headers */}
+              <div className="grid grid-cols-3 gap-2 mb-2 text-xs text-white/40 font-medium">
+                <div>{t("trading_orderbook_price")}</div>
+                <div className="text-right">{t("trading_orderbook_amount")}</div>
+                <div className="text-right">{t("trading_orderbook_total")}</div>
+              </div>
 
           {/* ASKS */}
           <div className="mb-3">
@@ -337,6 +382,8 @@ export default function TradingPanel({ pair }) {
               })}
             </div>
           </div>
+          </>
+          )}
         </div>
 
         {/* COLONNE 3 : Trade History */}

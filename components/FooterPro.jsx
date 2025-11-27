@@ -97,12 +97,12 @@ export default function FooterPro() {
               {t("footer_contact_title")}
             </h4>
             <p className="text-sm mb-4">
-              <a
+              <Link
                 href="/contact"
                 className="text-white/70 hover:text-xcannes-green transition-colors"
               >
                 {t("footer_contact_email")}
-              </a>
+              </Link>
             </p>
 
             {/* Réseaux sociaux minimalistes */}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useState } from "react";
 import { useTranslation } from "next-i18next";
 
@@ -82,12 +83,12 @@ export default function FAQSection() {
 
         <div className="text-center mt-12">
           <p className="text-white/60 mb-4">{t("faq_contact")}</p>
-          <a
+          <Link
             href="/contact"
             className="inline-block px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/10 text-white rounded-lg transition-all duration-300"
           >
             {t("faq_contact_button")} →
-          </a>
+          </Link>
         </div>
       </div>
     </section>

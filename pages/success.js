@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useXumm } from "../context/XummContext";
@@ -232,7 +233,7 @@ export default function SuccessPage() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-xcannes-green text-black font-semibold rounded-lg hover:bg-xcannes-green/90 transition-all duration-300 shadow-lg shadow-xcannes-green/20"
             >
@@ -250,8 +251,8 @@ export default function SuccessPage() {
                 />
               </svg>
               {t("success_home_button")}
-            </a>
-            <a
+            </Link>
+            <Link
               href="/dex"
               className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white/5 text-white font-semibold rounded-lg border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
             >
@@ -269,7 +270,7 @@ export default function SuccessPage() {
                 />
               </svg>
               {t("success_dex_button")}
-            </a>
+            </Link>
           </div>
 
           {/* Support Section */}
