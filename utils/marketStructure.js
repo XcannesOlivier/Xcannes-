@@ -15,27 +15,24 @@ export const MARKET_STRUCTURE = {
   forex: {
     label: "💱 FOREX",
     currencies: {
-      EUR: ["EUR/USD", "EUR/GBP", "EUR/JPY", "EUR/CHF", "EUR/AUD"],
-      GBP: ["GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/AUD"],
-      AUD: ["AUD/USD", "AUD/JPY"],
-      NZD: ["NZD/USD"],
-      USD: ["USD/CAD", "USD/CHF", "USD/JPY", "USD/HKD", "USD/SGD", "USD/MXN"],
+      EUR: ["EUR/USD", "EUR/GBP", "EUR/JPY", "EUR/CHF", "EUR/AUD", "EUR/CAD", "EUR/NZD", "EUR/NOK", "EUR/SEK"],
+      GBP: ["GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/AUD", "GBP/CAD", "GBP/NZD"],
+      AUD: ["AUD/USD", "AUD/JPY", "AUD/CAD", "AUD/CHF", "AUD/NZD"],
+      NZD: ["NZD/USD", "NZD/CAD", "NZD/CHF", "NZD/JPY"],
+      CAD: ["CAD/CHF", "CAD/JPY"],
+      USD: ["USD/CAD", "USD/CHF", "USD/JPY", "USD/HKD", "USD/SGD", "USD/MXN", "USD/CNH", "USD/ZAR", "USD/TRY", "USD/NOK", "USD/SEK"],
       CHF: ["CHF/JPY"]
     }
   },
   
   exotic: {
-    label: "🌍 EXOTIC (15 verified)",
+    label: "🌍 EXOTIC (9 pairs)",
     currencies: {
       "Latin America": [
         "USD/BRL", "USD/CLP", "USD/COP", "USD/PEN"
       ],
       "Asia": [
-        "USD/INR", "USD/IDR", "USD/PHP", "USD/KRW", 
-        "USD/TWD", "USD/CNH"
-      ],
-      "Other": [
-        "USD/ZAR", "USD/TRY", "USD/NOK", "USD/SEK", "USD/GEL"
+        "USD/INR", "USD/IDR", "USD/PHP", "USD/KRW", "USD/TWD"
       ]
     }
   },

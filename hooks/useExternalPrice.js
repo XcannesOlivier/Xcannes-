@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from 'react';
 import xcannesApi from '../lib/xcannesApi';
 
-const POLL_INTERVAL = 5000; // 5 secondes (le service Pyth update toutes les 10s)
+const POLL_INTERVAL = 2000; // 2 secondes (backend fetch toutes les 3s)
 const SUPPORTED_CATEGORIES = ['crypto', 'forex', 'commodity']; // Exclure 'exotic'
 
 /**

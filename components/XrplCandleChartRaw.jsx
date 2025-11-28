@@ -6,7 +6,6 @@ import { getBookIdFromPair } from "../utils/xrpl";
 import xcannesApi from "../lib/xcannesApi";
 import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ Hook WebSocket centralisé
 import { useCandles1m, compute24hPercentChange } from "../hooks/useCandles1m"; // ✅ Hook pour calcul % 24h
-import { useExternalPrice } from "../hooks/useExternalPrice"; // ✅ Hook pour prix live Pyth (crypto, forex, commodities)
 import { MARKET_STRUCTURE, getPairCategory } from "../utils/marketStructure"; // ✅ Structure des marchés
 
 export default function XrplCandleChartRaw({
@@ -17,6 +16,13 @@ export default function XrplCandleChartRaw({
   availablePairs = [],
   availableIntervals = ["1m", "5m", "15m", "1h", "4h", "1d"],
 }) {
+  // ✅ Guard: S'assurer qu'on est côté client
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
   const chartRef = useRef();
   const chartInstanceRef = useRef(null);
   const candleSeriesRef = useRef(null);
@@ -55,14 +61,8 @@ export default function XrplCandleChartRaw({
   const isExternal = pairCategory && ['crypto', 'forex', 'commodity'].includes(pairCategory);
   const isExotic = pairCategory === 'exotic';
   
-  // ✅ WebSocket centralisé (XRPL uniquement)
-  const { connected, orderbooks, subscribe, unsubscribe } = useXcannesWS();
-  
-  // ✅ Hook pour prix live Pyth (crypto, forex, commodities - pas exotic)
-  const { price: externalPrice, loading: loadingExternalPrice } = useExternalPrice(
-    isExternal && !isExotic ? pair : null,
-    pairCategory
-  );
+  // ✅ WebSocket centralisé (XRPL + Pyth)
+  const { connected, orderbooks, externalPrices, subscribe, unsubscribe } = useXcannesWS();
   
   // ✅ Hook pour les bougies 1m (toujours 24h, indépendant du timeframe)
   const { candles1m, loading: loadingCandles1m } = useCandles1m(pair);
@@ -269,16 +269,35 @@ export default function XrplCandleChartRaw({
     }
   }, [orderbooks, connected, pair, updateCurrentCandle, isXRPL]);
   
-  // ✅ Écouter les prix externes Pyth (CRYPTO, FOREX, COMMODITIES - pas EXOTIC)
+  // ✅ Écouter les prix externes Pyth via WebSocket (CRYPTO, FOREX, COMMODITIES - pas EXOTIC)
   useEffect(() => {
-    if (!isExternal || isExotic) return; // Seulement pour paires externes non-exotiques
-    if (!externalPrice) return;
+    if (!isExternal || isExotic) return;
+    if (!connected) return;
     
-    console.log(`[Chart] 📈 Prix live Pyth reçu pour ${pair}:`, externalPrice);
+    const symbol = pair.replace('/', '_'); // EUR/USD → EUR_USD
+    const externalPrice = externalPrices.get(symbol);
     
-    // Mettre à jour la bougie en cours avec le prix Pyth
-    updateCurrentCandle(externalPrice);
-  }, [externalPrice, pair, updateCurrentCandle, isExternal, isExotic]);
+    if (!externalPrice || !externalPrice.midPrice) return;
+    
+    console.log(`[Chart] 📈 Prix live Pyth WebSocket pour ${pair}:`, externalPrice.midPrice);
+    updateCurrentCandle(externalPrice.midPrice);
+  }, [externalPrices, pair, updateCurrentCandle, isExternal, isExotic, connected]);
+  
+  // ✅ S'abonner aux channels Pyth via WebSocket
+  useEffect(() => {
+    if (!isExternal || isExotic || !connected) return;
+    
+    const symbol = pair.replace('/', '_');
+    const channel = `${pairCategory}:${symbol}`; // forex:EUR_USD ou commodity:XAU_USD
+    
+    console.log(`[Chart] 🔌 Abonnement WebSocket Pyth:`, channel);
+    subscribe(channel, ''); // ⚠️ Passer '' car channel est déjà complet
+    
+    return () => {
+      console.log(`[Chart] 🔌 Désabonnement WebSocket Pyth:`, channel);
+      unsubscribe(channel, '');
+    };
+  }, [pair, pairCategory, isExternal, isExotic, connected, subscribe, unsubscribe]);
   
   // ✅ S'abonner/désabonner au changement de paire (XRPL UNIQUEMENT)
   useEffect(() => {
@@ -712,11 +731,74 @@ export default function XrplCandleChartRaw({
   useEffect(() => {
     let chart;
     let observer;
+    let fitContentTimeout = null;
+    let isActive = true;
+    const timeRangeHandlers = [];
+    const logicalRangeHandlers = [];
+
+    const unsubscribeTimeHandlers = () => {
+      if (!chartInstanceRef.current) return;
+      const timeScale = chartInstanceRef.current.timeScale?.();
+      if (!timeScale) return;
+      timeRangeHandlers.forEach((handler) => {
+        try {
+          timeScale.unsubscribeVisibleTimeRangeChange(handler);
+        } catch (_) {}
+      });
+      logicalRangeHandlers.forEach((handler) => {
+        try {
+          timeScale.unsubscribeVisibleLogicalRangeChange(handler);
+        } catch (_) {}
+      });
+      timeRangeHandlers.length = 0;
+      logicalRangeHandlers.length = 0;
+    };
+
+    const disposeCharts = () => {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      if (fitContentTimeout) {
+        clearTimeout(fitContentTimeout);
+        fitContentTimeout = null;
+      }
+      unsubscribeTimeHandlers();
+      if (rsiChartRef.current) {
+        try {
+          rsiChartRef.current.remove();
+        } catch (_) {}
+        rsiChartRef.current = null;
+      }
+      if (macdChartRef.current) {
+        try {
+          macdChartRef.current.remove();
+        } catch (_) {}
+        macdChartRef.current = null;
+      }
+      if (chartInstanceRef.current) {
+        try {
+          chartInstanceRef.current.remove();
+        } catch (_) {}
+        chartInstanceRef.current = null;
+      }
+      candleSeriesRef.current = null;
+      volumeSeriesRef.current = null;
+      vwapSeriesRef.current = null;
+      smaSeriesRef.current = { sma20: null, sma50: null, sma200: null };
+      emaSeriesRef.current = { ema20: null, ema50: null, ema200: null };
+      bollingerSeriesRef.current = { upper: null, middle: null, lower: null };
+      macdSeriesRef.current = { macd: null, signal: null, histogram: null };
+      rsiSeriesRef.current = null;
+      currentCandleRef.current = null;
+    };
 
     const setupChart = async () => {
+      disposeCharts();
       setLoading(true);
       setNoDataMessage(null);
       const data = await fetchMarketData();
+      if (!isActive) return;
       if (!data.length) {
         setLoading(false);
         setNoDataMessage(
@@ -867,7 +949,8 @@ export default function XrplCandleChartRaw({
       setLoading(false);
       
       // ✅ Forcer le recalcul de l'échelle des prix après chargement des données
-      setTimeout(() => {
+      fitContentTimeout = setTimeout(() => {
+        if (!isActive) return;
         if (chart && chart.timeScale) {
           chart.timeScale().fitContent();
         }
@@ -1076,12 +1159,14 @@ export default function XrplCandleChartRaw({
           );
 
           // Synchroniser les échelles de temps
-          chart.timeScale().subscribeVisibleTimeRangeChange(() => {
+          const syncRsiRange = () => {
             const timeRange = chart.timeScale().getVisibleRange();
             if (timeRange && rsiChartRef.current) {
               rsiChartRef.current.timeScale().setVisibleRange(timeRange);
             }
-          });
+          };
+          chart.timeScale().subscribeVisibleTimeRangeChange(syncRsiRange);
+          timeRangeHandlers.push(syncRsiRange);
 
           // Capturer la plage initiale après le premier rendu
           setTimeout(() => {
@@ -1092,7 +1177,7 @@ export default function XrplCandleChartRaw({
           }, 100);
 
           // Bloquer le zoom-out au-delà de la vue initiale
-          chart.timeScale().subscribeVisibleLogicalRangeChange((logicalRange) => {
+          const clampRange = (logicalRange) => {
             if (!initialVisibleRangeRef.current || !logicalRange) return;
 
             const currentRange = chart.timeScale().getVisibleRange();
@@ -1105,7 +1190,9 @@ export default function XrplCandleChartRaw({
             if (currentSpan > initialSpan * 1.05) {
               chart.timeScale().setVisibleRange(initialVisibleRangeRef.current);
             }
-          });
+          };
+          chart.timeScale().subscribeVisibleLogicalRangeChange(clampRange);
+          logicalRangeHandlers.push(clampRange);
         }
       }
 
@@ -1177,12 +1264,14 @@ export default function XrplCandleChartRaw({
           );
 
           // Synchroniser les échelles de temps
-          chart.timeScale().subscribeVisibleTimeRangeChange(() => {
+          const syncMacdRange = () => {
             const timeRange = chart.timeScale().getVisibleRange();
             if (timeRange && macdChartRef.current) {
               macdChartRef.current.timeScale().setVisibleRange(timeRange);
             }
-          });
+          };
+          chart.timeScale().subscribeVisibleTimeRangeChange(syncMacdRange);
+          timeRangeHandlers.push(syncMacdRange);
         }
       }
 
@@ -1243,14 +1332,11 @@ export default function XrplCandleChartRaw({
 
     setupChart();
 
+    setupChart();
+
     return () => {
-      if (observer) observer.disconnect();
-      if (chart) {
-        chart.remove();
-        chartInstanceRef.current = null;
-      }
-      if (rsiChartRef.current) rsiChartRef.current.remove();
-      if (macdChartRef.current) macdChartRef.current.remove();
+      isActive = false;
+      disposeCharts();
     };
   }, [
     pair,
@@ -1285,6 +1371,20 @@ export default function XrplCandleChartRaw({
       },
     });
   }, [chartSettings]);
+
+  // ✅ Guard: Ne pas render tant qu'on n'est pas côté client
+  if (!isClient) {
+    return (
+      <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-6 mb-6">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-white/60 text-sm">Loading chart...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 

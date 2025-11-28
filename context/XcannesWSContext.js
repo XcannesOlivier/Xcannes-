@@ -8,6 +8,7 @@ export const XcannesWSProvider = ({ children }) => {
   const [tickers, setTickers] = useState(new Map()); // Map<pair, ticker>
   const [orderbooks, setOrderbooks] = useState(new Map()); // Map<pair, orderbook>
   const [trades, setTrades] = useState(new Map()); // Map<pair, trades[]>
+  const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> pour forex/crypto/commodity
 
   const normalizeTrade = (trade) => {
     if (!trade || !trade.symbol) return null;
@@ -78,6 +79,44 @@ export const XcannesWSProvider = ({ children }) => {
 
     wsClient.on("orderbook", handleOrderbook);
 
+    // Écouter les prix externes Pyth (forex, crypto, commodity)
+    const handleForex = (message) => {
+      console.log('[XcannesWS] 📊 Forex reçu:', message);
+      if (message.data && message.data.symbol) {
+        setExternalPrices(prev => {
+          const next = new Map(prev);
+          next.set(message.data.symbol, message.data);
+          return next;
+        });
+      }
+    };
+
+    const handleCommodity = (message) => {
+      console.log('[XcannesWS] 🥇 Commodity reçu:', message);
+      if (message.data && message.data.symbol) {
+        setExternalPrices(prev => {
+          const next = new Map(prev);
+          next.set(message.data.symbol, message.data);
+          return next;
+        });
+      }
+    };
+
+    const handleCrypto = (message) => {
+      console.log('[XcannesWS] ₿ Crypto reçu:', message);
+      if (message.data && message.data.symbol) {
+        setExternalPrices(prev => {
+          const next = new Map(prev);
+          next.set(message.data.symbol, message.data);
+          return next;
+        });
+      }
+    };
+
+    wsClient.on("forex", handleForex);
+    wsClient.on("commodity", handleCommodity);
+    wsClient.on("crypto", handleCrypto);
+
     const handleTradesSnapshot = (message) => {
       if (!message?.data?.symbol || !Array.isArray(message.data.trades)) return;
       const symbol = message.data.symbol;
@@ -120,6 +159,9 @@ export const XcannesWSProvider = ({ children }) => {
       // Ne pas fermer la connexion (singleton partagé)
       wsClient.off("ticker", handleTicker);
       wsClient.off("orderbook", handleOrderbook);
+      wsClient.off("forex", handleForex);
+      wsClient.off("commodity", handleCommodity);
+      wsClient.off("crypto", handleCrypto);
       wsClient.off("trades", handleTradesSnapshot);
       wsClient.off("trade", handleTradeUpdate);
     };
@@ -138,6 +180,7 @@ export const XcannesWSProvider = ({ children }) => {
     tickers,
     orderbooks,
     trades,
+    externalPrices,
     subscribe,
     unsubscribe,
     ws: wsClient,
