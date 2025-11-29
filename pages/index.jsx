@@ -175,8 +175,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Price Ticker - Full Width - Toutes les paires dynamiques */}
-        <PriceTicker pairs={pairs} />
+       
       </main>
 
       {/* CONTENT SECTIONS */}
