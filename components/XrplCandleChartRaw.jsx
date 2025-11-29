@@ -5,8 +5,8 @@ import { createChart } from "lightweight-charts";
 import { getBookIdFromPair } from "../utils/xrpl";
 import xcannesApi from "../lib/xcannesApi";
 import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ Hook WebSocket centralisé
-import { useCandles1m, compute24hPercentChange } from "../hooks/useCandles1m"; // ✅ Hook pour calcul % 24h
 import { MARKET_STRUCTURE, getPairCategory } from "../utils/marketStructure"; // ✅ Structure des marchés
+import FxPairSelector from "../components/FxPairSelector";
 
 export default function XrplCandleChartRaw({
   pair = "XCS/XRP",
@@ -62,10 +62,7 @@ export default function XrplCandleChartRaw({
   const isExotic = pairCategory === 'exotic';
   
   // ✅ WebSocket centralisé (XRPL + Pyth)
-  const { connected, orderbooks, externalPrices, subscribe, unsubscribe } = useXcannesWS();
-  
-  // ✅ Hook pour les bougies 1m (toujours 24h, indépendant du timeframe)
-  const { candles1m, loading: loadingCandles1m } = useCandles1m(pair);
+  const { connected, orderbooks, externalPrices, subscribe, unsubscribe, tickers } = useXcannesWS();
   
   // ✅ Refs pour le temps réel
   const currentCandleRef = useRef(null); // Bougie en cours de formation
@@ -84,8 +81,6 @@ export default function XrplCandleChartRaw({
   const [showVWAP, setShowVWAP] = useState(false);
   const [showSMA, setShowSMA] = useState({ sma20: false, sma50: false, sma200: false });
   const [showEMA, setShowEMA] = useState({ ema20: false, ema50: false, ema200: false });
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [chartHeight, setChartHeight] = useState("500px");
   const [loading, setLoading] = useState(true);
   const [noDataMessage, setNoDataMessage] = useState(null);
   const [hideAllIndicators, setHideAllIndicators] = useState(false);
@@ -104,6 +99,13 @@ export default function XrplCandleChartRaw({
     low: null,
     volume: null,
   });
+
+  // FX EOD mode (Fawaz)
+  const [fxBase, setFxBase] = useState("EUR");
+  const [fxQuote, setFxQuote] = useState("USD");
+  const [fxInfo, setFxInfo] = useState({ price: null, changePercent: null });
+  const [fxLoading, setFxLoading] = useState(false);
+  const [isFxMode, setIsFxMode] = useState(false);
   
   // États pour le dropdown en cascade
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -187,6 +189,106 @@ export default function XrplCandleChartRaw({
     "4h": "4h",
     "1d": "1d",
   }), []);
+
+  // ✅ Réinitialiser le prix et le % quand on change de paire
+  useEffect(() => {
+    setCurrentPrice(null);
+    setPercent24h({ value: 0, percent: 0 });
+    currentCandleRef.current = null;
+    // Revenir en mode DEX dès qu'on change la paire principale
+    setIsFxMode(false);
+  }, [pair]);
+
+  // ✅ Charger un prix initial via l'API quand on change de paire
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadInitialPrice = async () => {
+      try {
+        const book = getBookIdFromPair(pair);
+        if (!book?.backendPair) return;
+
+        const ticker = await xcannesApi.getTicker(book.backendPair);
+        if (!ticker || cancelled) return;
+
+        const rawPrice =
+          ticker.lastPrice ??
+          ticker.price ??
+          ticker.bidPrice ??
+          ticker.askPrice ??
+          0;
+
+        const price = Number(rawPrice);
+        if (Number.isFinite(price) && price > 0) {
+          setCurrentPrice(price);
+        }
+
+        const changeVal = Number(
+          ticker.change24h ?? ticker.change ?? 0
+        );
+        const changePct = Number(
+          ticker.changePercent24h ?? ticker.changePercent ?? 0
+        );
+
+        if (Number.isFinite(changePct)) {
+          setPercent24h({
+            value: Number.isFinite(changeVal) ? changeVal : 0,
+            percent: changePct,
+          });
+        } else {
+          setPercent24h({ value: 0, percent: 0 });
+        }
+      } catch (err) {
+        console.error("[Chart] Erreur loadInitialPrice:", err);
+      }
+    };
+
+    loadInitialPrice();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pair]);
+
+  // ✅ Charger les données FX EOD (Fawaz) pour la paire sélectionnée dans le header FX
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadFx = async () => {
+      setFxLoading(true);
+      try {
+        const data = await xcannesApi.getFxEod(fxBase, fxQuote, 365);
+        if (cancelled || !data || !Array.isArray(data.candles) || data.candles.length === 0) {
+          setFxInfo({ price: null, changePercent: null });
+          return;
+        }
+        const candles = data.candles;
+        const last = candles[candles.length - 1];
+        const prev = candles.length > 1 ? candles[candles.length - 2] : null;
+        const lastClose = Number(last.close) || 0;
+        const prevClose = prev ? Number(prev.close) || 0 : null;
+        let changePct = null;
+        if (prevClose && prevClose !== 0) {
+          changePct = ((lastClose - prevClose) / prevClose) * 100;
+        }
+        setFxInfo({
+          price: lastClose,
+          changePercent: changePct,
+        });
+      } catch (err) {
+        console.error("[Chart FX] Erreur FX EOD:", err);
+        setFxInfo({ price: null, changePercent: null });
+      } finally {
+        if (!cancelled) setFxLoading(false);
+      }
+    };
+
+    loadFx();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fxBase, fxQuote]);
   
   // ✅ Convertir interval en secondes
   const getIntervalSeconds = useCallback((interval) => {
@@ -247,7 +349,7 @@ export default function XrplCandleChartRaw({
   
   // ✅ Écouter les mises à jour de l'orderbook via le WebSocket centralisé (XRPL UNIQUEMENT)
   useEffect(() => {
-    if (!isXRPL) return; // Ignorer si ce n'est pas une paire XRPL
+    if (!isXRPL || isFxMode) return; // Ignorer si ce n'est pas une paire XRPL ou en mode FX
     if (!connected || !orderbooks) return;
     
     const book = getBookIdFromPair(pair);
@@ -271,7 +373,7 @@ export default function XrplCandleChartRaw({
   
   // ✅ Écouter les prix externes Pyth via WebSocket (CRYPTO, FOREX, COMMODITIES - pas EXOTIC)
   useEffect(() => {
-    if (!isExternal || isExotic) return;
+    if (!isExternal || isExotic || isFxMode) return;
     if (!connected) return;
     
     const symbol = pair.replace('/', '_'); // EUR/USD → EUR_USD
@@ -285,23 +387,24 @@ export default function XrplCandleChartRaw({
   
   // ✅ S'abonner aux channels Pyth via WebSocket
   useEffect(() => {
-    if (!isExternal || isExotic || !connected) return;
+    if (!isExternal || isExotic || !connected || isFxMode) return;
     
     const symbol = pair.replace('/', '_');
-    const channel = `${pairCategory}:${symbol}`; // forex:EUR_USD ou commodity:XAU_USD
+    const channel = pairCategory; // 'forex', 'commodity' ou 'crypto'
     
-    console.log(`[Chart] 🔌 Abonnement WebSocket Pyth:`, channel);
-    subscribe(channel, ''); // ⚠️ Passer '' car channel est déjà complet
+    console.log(`[Chart] 🔌 Abonnement WebSocket Pyth:`, channel, symbol);
+    // Backend attend: channel = 'forex' | 'commodity' | 'crypto', pair = 'EUR_USD'...
+    subscribe(channel, symbol);
     
     return () => {
-      console.log(`[Chart] 🔌 Désabonnement WebSocket Pyth:`, channel);
-      unsubscribe(channel, '');
+      console.log(`[Chart] 🔌 Désabonnement WebSocket Pyth:`, channel, symbol);
+      unsubscribe(channel, symbol);
     };
   }, [pair, pairCategory, isExternal, isExotic, connected, subscribe, unsubscribe]);
   
   // ✅ S'abonner/désabonner au changement de paire (XRPL UNIQUEMENT)
   useEffect(() => {
-    if (!isXRPL) return; // Ignorer si ce n'est pas une paire XRPL
+    if (!isXRPL || isFxMode) return; // Ignorer si ce n'est pas une paire XRPL ou en mode FX
     
     const book = getBookIdFromPair(pair);
     if (!book || !connected) return;
@@ -315,24 +418,43 @@ export default function XrplCandleChartRaw({
     };
   }, [pair, connected, subscribe, unsubscribe, isXRPL]);
 
-  // ✅ Calculer le % 24h à chaque mise à jour du prix live ou des bougies 1m
+  // ✅ Mettre à jour le % 24h en fonction du ticker backend (source unique XRPL/Pyth)
   useEffect(() => {
-    if (!currentPrice || !candles1m || candles1m.length === 0) return;
-    
-    const result = compute24hPercentChange(candles1m, currentPrice);
-    setPercent24h({
-      value: result.value,
-      percent: result.percent,
-    });
-    
-    console.log('[Chart] 📊 % 24h calculé:', {
-      openPrice24h: result.openPrice24h,
-      currentPrice,
-      percent: result.percent.toFixed(2) + '%',
-      periodCovered: result.periodHours + 'h',
-      candlesCount: candles1m.length,
-    });
-  }, [currentPrice, candles1m]);
+    if (isFxMode) {
+      // En mode FX, % affiché vient de fxInfo
+      return;
+    }
+    const updateFromTicker = (ticker) => {
+      if (!ticker) return;
+
+      const changeVal = Number(
+        ticker.change24h ?? ticker.change ?? 0
+      );
+      const changePct = Number(
+        ticker.changePercent24h ?? ticker.changePercent ?? 0
+      );
+
+      if (!Number.isFinite(changePct)) {
+        setPercent24h({ value: 0, percent: 0 });
+        return;
+      }
+
+      setPercent24h({
+        value: Number.isFinite(changeVal) ? changeVal : 0,
+        percent: changePct,
+      });
+    };
+
+    const book = getBookIdFromPair(pair);
+    if (!book?.backendPair) {
+      setPercent24h({ value: 0, percent: 0 });
+      return;
+    }
+
+    const map = tickers instanceof Map ? tickers : new Map();
+    const ticker = map.get(book.backendPair);
+    updateFromTicker(ticker);
+  }, [tickers, pair, isFxMode]);
 
   // Calculer Bollinger Bands (SMA + écart-type)
   const calculateBollingerBands = (data, period = 20, stdDev = 2) => {
@@ -531,22 +653,40 @@ export default function XrplCandleChartRaw({
 
   const fetchMarketData = useCallback(async () => {
     try {
+      // Mode FX EOD: utiliser l'endpoint dédié
+      if (isFxMode) {
+        console.log(`[XrplCandleChart] Fetching FX EOD for ${fxBase}/${fxQuote}`);
+        const data = await xcannesApi.getFxEod(fxBase, fxQuote, 365);
+        const candles = data?.candles || [];
+        const formattedFx = candles.map((c) => ({
+          time: c.time,
+          open: Number(c.open),
+          high: Number(c.high),
+          low: Number(c.low),
+          close: Number(c.close),
+          volume: Number(c.volume || 0),
+        }));
+        return formattedFx.sort((a, b) => a.time - b.time);
+      }
+
       const book = getBookIdFromPair(pair);
       if (!book?.backendPair) {
         console.error(`Paire ${pair} non supportée`);
         return [];
       }
 
-      console.log(`[XrplCandleChart] Fetching data for ${pair} (${book.backendPair}), interval: ${intervalMap[interval]}`);
+      console.log(
+        `[XrplCandleChart] Fetching data for ${pair} (${book.backendPair}), interval: ${intervalMap[interval]}`
+      );
 
       // Limites adaptées selon le timeframe pour profiter de l'historique MongoDB
       const limits = {
-        "1m": 500,   // ~8 heures
-        "5m": 500,   // ~1.7 jours
-        "15m": 500,  // ~5 jours
-        "1h": 1000,  // ~42 jours (historique complet!)
-        "4h": 500,   // ~2.7 mois
-        "1d": 365    // ~1 an
+        "1m": 500, // ~8 heures
+        "5m": 500, // ~1.7 jours
+        "15m": 500, // ~5 jours
+        "1h": 1000, // ~42 jours (historique complet!)
+        "4h": 500, // ~2.7 mois
+        "1d": 365, // ~1 an
       };
 
       // Appel au backend Xcannes pour récupérer les klines
@@ -556,7 +696,10 @@ export default function XrplCandleChartRaw({
         limits[intervalMap[interval]] || 100
       );
 
-      console.log(`[XrplCandleChart] Received ${klines?.length || 0} candles:`, klines?.slice(0, 2));
+      console.log(
+        `[XrplCandleChart] Received ${klines?.length || 0} candles:`,
+        klines?.slice(0, 2)
+      );
 
       if (!klines || !Array.isArray(klines) || klines.length === 0) {
         console.warn(`[XrplCandleChart] No data returned for ${pair}`);
@@ -573,101 +716,28 @@ export default function XrplCandleChartRaw({
         volume: parseFloat(candle.volume || 0), // Ajouter le volume
       }));
 
-      console.log(`[XrplCandleChart] Formatted data (first 2):`, formattedData.slice(0, 2));
+      console.log(
+        `[XrplCandleChart] Formatted data (first 2):`,
+        formattedData.slice(0, 2)
+      );
 
       return formattedData.sort((a, b) => a.time - b.time);
     } catch (error) {
       console.error("[XrplCandleChart] Erreur fetchMarketData:", error);
       return [];
     }
-  }, [pair, interval, intervalMap]);
+  }, [pair, interval, intervalMap, isFxMode, fxBase, fxQuote]);
 
-  // Fonction pour gérer le fullscreen
-  const toggleFullscreen = useCallback(() => {
-    if (!containerRef.current) return;
-
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().then(() => {
-        setIsFullscreen(true);
-      }).catch((err) => {
-        console.error("Erreur fullscreen:", err);
-      });
-    } else {
-      document.exitFullscreen().then(() => {
-        setIsFullscreen(false);
-      });
-    }
-  }, []);
-
-  // Écouter les changements de fullscreen
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-      
-      // Redimensionner tous les graphiques après le changement de fullscreen
-      setTimeout(() => {
-        if (chartInstanceRef.current && chartRef.current) {
-          const newHeight = document.fullscreenElement ? window.innerHeight - 100 : 500;
-          chartInstanceRef.current.applyOptions({ 
-            width: chartRef.current.clientWidth,
-            height: newHeight
-          });
-        }
-        if (rsiChartRef.current) {
-          const container = document.getElementById("rsi-chart-container");
-          if (container) {
-            rsiChartRef.current.applyOptions({ width: container.clientWidth });
-          }
-        }
-        if (macdChartRef.current) {
-          const container = document.getElementById("macd-chart-container");
-          if (container) {
-            macdChartRef.current.applyOptions({ width: container.clientWidth });
-          }
-        }
-      }, 100);
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
-  }, []);
-
-  // Recalculer la hauteur du graphique quand les indicateurs changent
-  useEffect(() => {
-    if (!isFullscreen) {
-      setChartHeight("500px");
-      return;
-    }
-
-    // Calculer combien de panels sont affichés
-    let panelsHeight = 0;
-    if (showRSI) panelsHeight += 180; // 150px + borders/padding
-    if (showMACD) panelsHeight += 180;
-
-    // Recalculer la hauteur du graphique principal
-    const newHeight = window.innerHeight - 100 - panelsHeight;
-    setChartHeight(`${Math.max(newHeight, 300)}px`);
-    
-    setTimeout(() => {
-      if (chartInstanceRef.current && chartRef.current) {
-        chartInstanceRef.current.applyOptions({ 
-          width: chartRef.current.clientWidth,
-          height: Math.max(newHeight, 300)
-        });
-      }
-    }, 50);
-  }, [isFullscreen, showRSI, showMACD]);
-  
   // ✅ Effet pour gérer l'intervalle et le WebSocket temps réel
   useEffect(() => {
-    intervalSecondsRef.current = getIntervalSeconds(interval);
-  }, [interval, getIntervalSeconds]);
+    intervalSecondsRef.current = isFxMode
+      ? getIntervalSeconds("1d")
+      : getIntervalSeconds(interval);
+  }, [interval, getIntervalSeconds, isFxMode]);
   
   // ✅ Effet pour recharger les bougies 1m depuis MongoDB à chaque minute
   useEffect(() => {
-    if (interval !== "1m") return; // Seulement pour l'intervalle 1m
+    if (interval !== "1m" || isFxMode) return; // Seulement pour l'intervalle 1m en mode DEX
     
     const reloadCandles = async () => {
       try {
@@ -956,8 +1026,8 @@ export default function XrplCandleChartRaw({
         }
       }, 100);
 
-      // Ajouter le volume si activé (toujours afficher même si volume = 0)
-      if (showVolume) {
+      // Ajouter le volume si activé (XRPL uniquement, pas FX/Pyth)
+      if (showVolume && !isFxMode && !isExternal) {
         volumeSeriesRef.current = chart.addHistogramSeries({
           color: "#16b303",
           priceFormat: { type: "volume" },
@@ -1006,8 +1076,8 @@ export default function XrplCandleChartRaw({
         bollingerSeriesRef.current.lower.setData(bollinger.lower);
       }
 
-      // Ajouter le VWAP si activé
-      if (showVWAP && data.length > 0) {
+      // Ajouter le VWAP si activé (XRPL uniquement)
+      if (showVWAP && data.length > 0 && !isFxMode && !isExternal) {
         const vwapData = calculateVWAP(data);
         vwapSeriesRef.current = chart.addLineSeries({
           color: "#fbbf24", // Jaune/Or
@@ -1332,8 +1402,6 @@ export default function XrplCandleChartRaw({
 
     setupChart();
 
-    setupChart();
-
     return () => {
       isActive = false;
       disposeCharts();
@@ -1389,40 +1457,88 @@ export default function XrplCandleChartRaw({
   return (
     <div 
       ref={containerRef}
-      className={`bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden mb-6 ${
-        isFullscreen ? "!fixed inset-0 z-50 !m-0 rounded-none !bg-black" : ""
-      }`}
+      className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden mb-6"
     >
       {/* Header compact avec prix et contrôles globaux uniquement */}
-      <div className={`border-b border-white/10 ${isFullscreen ? "p-2" : "p-3"}`}>
+      <div className="border-b border-white/10 p-3">
         <div className="flex items-center justify-between gap-3">
           {/* Prix actuel */}
           <div className="flex items-center gap-3">
-            <h2 className={`font-orbitron font-bold text-white ${isFullscreen ? "text-base" : "text-lg"}`}>
-              {pair}
+            <h2 className="font-orbitron font-bold text-white text-lg">
+              {isFxMode ? `${fxBase}/${fxQuote}` : pair}
             </h2>
-            {currentPrice && (
+            {(isFxMode ? fxInfo.price : currentPrice) && (
               <div className="flex items-baseline gap-2">
-                <span className={`font-semibold text-white ${isFullscreen ? "text-sm" : "text-base"}`}>
-                  {currentPrice.toFixed(6)}
+                <span className="font-semibold text-white text-base">
+                  {(isFxMode ? fxInfo.price : currentPrice)?.toFixed(6)}
                 </span>
-                <span
-                  className={`text-xs font-medium ${
-                    percent24h.value >= 0
-                      ? "text-xcannes-green"
-                      : "text-red-500"
-                  }`}
-                  title="Évolution sur 24h (basée sur bougies 1m)"
-                >
-                  {percent24h.value >= 0 ? "+" : ""}
-                  {percent24h.percent.toFixed(2)}%
-                </span>
+                {(!isFxMode || fxInfo.changePercent != null) && (
+                  <span
+                    className={`text-xs font-medium ${
+                      (isFxMode ? fxInfo.changePercent : percent24h.percent) >= 0
+                        ? "text-xcannes-green"
+                        : "text-red-500"
+                    }`}
+                    title={
+                      isFxMode
+                        ? "Daily change (EOD Fawaz)"
+                        : "Évolution sur 24h"
+                    }
+                  >
+                    {(isFxMode ? fxInfo.changePercent : percent24h.percent) >= 0
+                      ? "+"
+                      : ""}
+                    {(isFxMode ? fxInfo.changePercent : percent24h.percent)?.toFixed(
+                      2
+                    )}
+                    %
+                  </span>
+                )}
               </div>
             )}
           </div>
 
-          {/* Contrôles globaux uniquement */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Contrôles globaux + sélecteur FX EOD */}
+          <div className="flex items-center gap-3 flex-wrap justify-end">
+            {/* Sélecteur FX EOD (Fawaz) */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-white/40 uppercase tracking-wide">
+                FX EOD
+              </span>
+              <FxPairSelector
+                base={fxBase}
+                quote={fxQuote}
+                onChange={({ base, quote }) => {
+                  setFxBase(base);
+                  setFxQuote(quote);
+                  setIsFxMode(true);
+                }}
+              />
+              {fxInfo.price != null && (
+                <div className="flex items-baseline gap-1 text-[11px]">
+                  <span className="text-white/70">
+                    {fxInfo.price.toFixed(4)}
+                  </span>
+                  {fxInfo.changePercent != null && (
+                    <span
+                      className={
+                        fxInfo.changePercent >= 0
+                          ? "text-xcannes-green"
+                          : "text-red-500"
+                      }
+                    >
+                      {fxInfo.changePercent >= 0 ? "+" : ""}
+                      {fxInfo.changePercent.toFixed(2)}%
+                    </span>
+                  )}
+                </div>
+              )}
+              {fxLoading && (
+                <div className="w-3 h-3 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
+              )}
+            </div>
+
+            {/* Contrôles DEX (paires + timeframes) */}
             {uniquePairs.length > 0 && onPairChange && (
               <div ref={dropdownRef} className="relative">
                 {/* Bouton principal - affiche la paire actuelle */}
@@ -1544,8 +1660,11 @@ export default function XrplCandleChartRaw({
             {availableIntervals.length > 0 && onIntervalChange && (
               <select
                 value={interval}
-                onChange={(e) => onIntervalChange(e.target.value)}
-                className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium hover:border-white/20 transition-all"
+                onChange={(e) =>
+                  !isFxMode && onIntervalChange(e.target.value)
+                }
+                disabled={isFxMode}
+                className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium disabled:opacity-40 hover:border-white/20 transition-all"
               >
                 {availableIntervals.map((int) => (
                   <option key={int} value={int}>
@@ -1602,37 +1721,6 @@ export default function XrplCandleChartRaw({
                 <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
                   <div className="text-[11px] font-semibold text-white/90">Réinitialiser</div>
                   <div className="text-[9px] text-white/50 mt-0.5">Ajuster le zoom automatiquement</div>
-                </div>
-              )}
-            </div>
-
-            {/* Fullscreen */}
-            <div className="relative group">
-              <button
-                onClick={toggleFullscreen}
-                className="p-2 transition-all flex items-center justify-center text-white/60 hover:text-white/80"
-              >
-                {isFullscreen ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
-                    <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
-                    <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
-                    <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-                    <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-                    <rect width="10" height="8" x="7" y="8" rx="1"/>
-                  </svg>
-                )}
-              </button>
-              {showTooltips && (
-                <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">{isFullscreen ? "Quitter" : "Plein écran"}</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">{isFullscreen ? "Appuyez sur Échap" : "Agrandir le graphique"}</div>
                 </div>
               )}
             </div>
@@ -1808,76 +1896,82 @@ export default function XrplCandleChartRaw({
             )}
           </div>
 
-          {/* Volume */}
-          <div className="relative group">
-            <button
-              onClick={() => setShowVolume(!showVolume)}
-              className={`w-full aspect-square transition-all flex items-center justify-center ${
-                showVolume
-                  ? "text-xcannes-green"
-                  : "text-white/60 hover:text-white/80"
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 17v-4" />
-                <path d="M7 17v-8" />
-                <path d="M11 17V9" />
-                <path d="M15 17v-6" />
-                <path d="M19 17v-10" />
-                <path d="M2 17h20" />
-              </svg>
-            </button>
-            {showTooltips && (
-              <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">Volume</div>
-                <div className="text-[9px] text-white/50 mt-0.5">Histogramme des volumes</div>
-              </div>
-            )}
-          </div>
+          {/* Volume (désactivé en mode FX EOD) */}
+          {!isFxMode && (
+            <div className="relative group">
+              <button
+                onClick={() => setShowVolume(!showVolume)}
+                className={`w-full aspect-square transition-all flex items-center justify-center ${
+                  showVolume
+                    ? "text-xcannes-green"
+                    : "text-white/60 hover:text-white/80"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 17v-4" />
+                  <path d="M7 17v-8" />
+                  <path d="M11 17V9" />
+                  <path d="M15 17v-6" />
+                  <path d="M19 17v-10" />
+                  <path d="M2 17h20" />
+                </svg>
+              </button>
+              {showTooltips && (
+                <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                  <div className="text-[11px] font-semibold text-white/90">Volume</div>
+                  <div className="text-[9px] text-white/50 mt-0.5">Histogramme des volumes</div>
+                </div>
+              )}
+            </div>
+          )}
           
-          {/* RSI */}
-          <div className="relative group">
-            <button
-              onClick={() => setShowRSI(!showRSI)}
-              className={`w-full aspect-square transition-all flex items-center justify-center ${
-                showRSI
-                  ? "text-xcannes-green"
-                  : "text-white/60 hover:text-white/80"
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 17c2-3 4-6 7-6s5 3 7 3 4-3 4-3" />
-                <path d="M3 21h18" />
-                <path d="M3 3h18" />
-              </svg>
-            </button>
-            {showTooltips && (
-              <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">RSI</div>
-                <div className="text-[9px] text-white/50 mt-0.5">Relative Strength Index</div>
-              </div>
-            )}
-          </div>
+          {/* RSI (désactivé en mode FX EOD) */}
+          {!isFxMode && (
+            <div className="relative group">
+              <button
+                onClick={() => setShowRSI(!showRSI)}
+                className={`w-full aspect-square transition-all flex items-center justify-center ${
+                  showRSI
+                    ? "text-xcannes-green"
+                    : "text-white/60 hover:text-white/80"
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 17c2-3 4-6 7-6s5 3 7 3 4-3 4-3" />
+                  <path d="M3 21h18" />
+                  <path d="M3 3h18" />
+                </svg>
+              </button>
+              {showTooltips && (
+                <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                  <div className="text-[11px] font-semibold text-white/90">RSI</div>
+                  <div className="text-[9px] text-white/50 mt-0.5">Relative Strength Index</div>
+                </div>
+              )}
+            </div>
+          )}
           
-          {/* MACD */}
-          <div className="relative group">
-            <button
-              onClick={() => setShowMACD(!showMACD)}
-              className={`w-full aspect-square text-[10px] font-bold transition-all flex items-center justify-center ${
-                showMACD
-                  ? "text-xcannes-green"
-                  : "text-white/60 hover:text-white/80"
-              }`}
-            >
-              MACD
-            </button>
-            {showTooltips && (
-              <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">MACD</div>
-                <div className="text-[9px] text-white/50 mt-0.5">Moving Average Convergence Divergence</div>
-              </div>
-            )}
-          </div>
+          {/* MACD (désactivé en mode FX EOD) */}
+          {!isFxMode && (
+            <div className="relative group">
+              <button
+                onClick={() => setShowMACD(!showMACD)}
+                className={`w-full aspect-square text-[10px] font-bold transition-all flex items-center justify-center ${
+                  showMACD
+                    ? "text-xcannes-green"
+                    : "text-white/60 hover:text-white/80"
+                }`}
+              >
+                MACD
+              </button>
+              {showTooltips && (
+                <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                  <div className="text-[11px] font-semibold text-white/90">MACD</div>
+                  <div className="text-[9px] text-white/50 mt-0.5">Moving Average Convergence Divergence</div>
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Bollinger Bands */}
           <div className="relative group">
@@ -2001,25 +2095,27 @@ export default function XrplCandleChartRaw({
             )}
           </div>
           
-          {/* VWAP */}
-          <div className="relative group">
-            <button
-              onClick={() => setShowVWAP(!showVWAP)}
-              className={`w-full aspect-square text-[10px] font-bold transition-all flex items-center justify-center ${
-                showVWAP
-                  ? "text-xcannes-green"
-                  : "text-white/60 hover:text-white/80"
-              }`}
-            >
-              VWAP
-            </button>
-            {showTooltips && (
-              <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">VWAP</div>
-                <div className="text-[9px] text-white/50 mt-0.5">Volume Weighted Average Price</div>
-              </div>
-            )}
-          </div>
+          {/* VWAP (désactivé en mode FX EOD) */}
+          {!isFxMode && (
+            <div className="relative group">
+              <button
+                onClick={() => setShowVWAP(!showVWAP)}
+                className={`w-full aspect-square text-[10px] font-bold transition-all flex items-center justify-center ${
+                  showVWAP
+                    ? "text-xcannes-green"
+                    : "text-white/60 hover:text-white/80"
+                }`}
+              >
+                VWAP
+              </button>
+              {showTooltips && (
+                <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                  <div className="text-[11px] font-semibold text-white/90">VWAP</div>
+                  <div className="text-[9px] text-white/50 mt-0.5">Volume Weighted Average Price</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Zone du graphique */}
@@ -2062,13 +2158,13 @@ export default function XrplCandleChartRaw({
           ref={chartRef}
           className="w-full relative z-0"
           style={{ 
-            height: chartHeight, 
-            minHeight: chartHeight 
+            height: "500px", 
+            minHeight: "500px" 
           }}
         />
 
-        {/* RSI Chart Container */}
-        {showRSI && (
+        {/* RSI Chart Container (désactivé en mode FX EOD) */}
+        {showRSI && !isFxMode && (
           <div className="w-full border-t border-white/10">
             <div className="px-4 py-2 bg-black/20">
               <span className="text-xs text-white/60 font-medium">RSI (14)</span>
@@ -2081,8 +2177,8 @@ export default function XrplCandleChartRaw({
           </div>
         )}
 
-        {/* MACD Chart Container */}
-        {showMACD && (
+        {/* MACD Chart Container (désactivé en mode FX EOD) */}
+        {showMACD && !isFxMode && (
           <div className="w-full border-t border-white/10">
             <div className="px-4 py-2 bg-black/20">
               <span className="text-xs text-white/60 font-medium">MACD (12, 26, 9)</span>
@@ -2099,8 +2195,7 @@ export default function XrplCandleChartRaw({
       </div>
 
       {/* Footer Stats */}
-      {!isFullscreen && (
-        <div className="p-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="p-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-xs text-white/40 mb-1">24h High</p>
             <p className="text-sm font-semibold text-white">
@@ -2128,7 +2223,6 @@ export default function XrplCandleChartRaw({
             <p className="text-sm font-semibold text-white">-</p>
           </div>
         </div>
-      )}
     </div>
   );
 }

@@ -112,7 +112,6 @@ export default function Dex() {
 
           {/* Graphique pleine largeur */}
           <XrplCandleChartRaw
-            key={`${selectedPair}-${interval}`}
             pair={selectedPair}
             interval={interval}
             onPairChange={setSelectedPair}

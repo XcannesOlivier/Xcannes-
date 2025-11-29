@@ -4,6 +4,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
+import WSStatus from "./WSStatus";
 
 export default function Header() {
   const router = useRouter();
@@ -62,6 +63,8 @@ export default function Header() {
         </Link>
 
         <LanguageSwitcher />
+
+        <WSStatus />
 
         {isDex && <XummConnectButton small />}
       </nav>
