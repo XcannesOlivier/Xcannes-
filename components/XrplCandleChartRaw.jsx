@@ -29,13 +29,18 @@ export default function XrplCandleChartRaw({
   const volumeSeriesRef = useRef(null);
   const timeScaleRef = useRef(null);
   const initialVisibleRangeRef = useRef(null);
-  const rsiChartRef = useRef(null);
-  const rsiSeriesRef = useRef(null);
-  const macdChartRef = useRef(null);
+  const rsiChartRef = useRef(null); // legacy (plus utilisé pour un chart séparé)
+  const rsiSeriesRef = useRef({
+    main: null,
+    overbought: null,
+    oversold: null,
+  });
+  const macdChartRef = useRef(null); // legacy (plus utilisé pour un chart séparé)
   const macdSeriesRef = useRef({
     macd: null,
     signal: null,
     histogram: null,
+    zeroLine: null,
   });
   const vwapSeriesRef = useRef(null);
   const smaSeriesRef = useRef({
@@ -106,6 +111,7 @@ export default function XrplCandleChartRaw({
   const [fxInfo, setFxInfo] = useState({ price: null, changePercent: null });
   const [fxLoading, setFxLoading] = useState(false);
   const [isFxMode, setIsFxMode] = useState(false);
+  const [pairMode, setPairMode] = useState("live"); // 'live' | 'eod'
   
   // États pour le dropdown en cascade
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -143,6 +149,7 @@ export default function XrplCandleChartRaw({
   };
   
   const handlePairSelect = (selectedPair) => {
+    setIsFxMode(false);
     if (onPairChange) {
       onPairChange(selectedPair);
     }
@@ -197,6 +204,7 @@ export default function XrplCandleChartRaw({
     currentCandleRef.current = null;
     // Revenir en mode DEX dès qu'on change la paire principale
     setIsFxMode(false);
+    setPairMode("live");
   }, [pair]);
 
   // ✅ Charger un prix initial via l'API quand on change de paire
@@ -858,8 +866,8 @@ export default function XrplCandleChartRaw({
       smaSeriesRef.current = { sma20: null, sma50: null, sma200: null };
       emaSeriesRef.current = { ema20: null, ema50: null, ema200: null };
       bollingerSeriesRef.current = { upper: null, middle: null, lower: null };
-      macdSeriesRef.current = { macd: null, signal: null, histogram: null };
-      rsiSeriesRef.current = null;
+      macdSeriesRef.current = { macd: null, signal: null, histogram: null, zeroLine: null };
+      rsiSeriesRef.current = { main: null, overbought: null, oversold: null };
       currentCandleRef.current = null;
     };
 
@@ -1167,182 +1175,111 @@ export default function XrplCandleChartRaw({
         emaSeriesRef.current.ema200.setData(ema200Data);
       }
 
-      // Ajouter le RSI si activé (panneau séparé)
+      // Ajouter le RSI en overlay dans le même chart (plus de panneau séparé)
       if (showRSI && data.length > 15) {
-        const rsiContainer = document.getElementById("rsi-chart-container");
-        if (rsiContainer) {
-          rsiChartRef.current = createChart(rsiContainer, {
-            width: rsiContainer.clientWidth || 800,
-            height: 150,
-            layout: {
-              background: { color: "#0a0f0d" },
-              textColor: "#9ca3af",
-            },
-            grid: {
-              vertLines: { color: "#1a1f1d" },
-              horzLines: { color: "#1a1f1d" },
-            },
-            timeScale: {
-              borderColor: "#2a2f2d",
-              visible: false,
-            },
-            rightPriceScale: {
-              borderColor: "#2a2f2d",
-              scaleMargins: {
-                top: 0.1,
-                bottom: 0.1,
-              },
-            },
-          });
+        const rsiData = calculateRSI(data, 14);
 
-          rsiSeriesRef.current = rsiChartRef.current.addLineSeries({
+        // Série principale RSI
+        if (!rsiSeriesRef.current.main) {
+          rsiSeriesRef.current.main = chart.addLineSeries({
             color: "#9333ea",
             lineWidth: 2,
             priceLineVisible: false,
-            lastValueVisible: true,
+            lastValueVisible: false,
+            priceScaleId: "rsi",
           });
 
-          const rsiData = calculateRSI(data, 14);
-          rsiSeriesRef.current.setData(rsiData);
+          // Price scale dédiée au RSI, en bas du chart
+          chart.priceScale("rsi").applyOptions({
+            position: "right",
+            scaleMargins: {
+              top: 0.75,
+              bottom: 0.02,
+            },
+          });
+        }
+        rsiSeriesRef.current.main.setData(rsiData);
 
-          // Lignes de référence RSI (30 et 70)
-          const overboughtLine = rsiChartRef.current.addLineSeries({
+        // Lignes 30 / 70
+        const boundsData = data.map((d) => ({ time: d.time, value: 70 }));
+        const lowerData = data.map((d) => ({ time: d.time, value: 30 }));
+
+        if (!rsiSeriesRef.current.overbought) {
+          rsiSeriesRef.current.overbought = chart.addLineSeries({
             color: "rgba(220, 38, 38, 0.5)",
             lineWidth: 1,
             lineStyle: 2,
             priceLineVisible: false,
             lastValueVisible: false,
+            priceScaleId: "rsi",
           });
-          overboughtLine.setData(
-            data.map((d) => ({ time: d.time, value: 70 }))
-          );
-
-          const oversoldLine = rsiChartRef.current.addLineSeries({
+        }
+        if (!rsiSeriesRef.current.oversold) {
+          rsiSeriesRef.current.oversold = chart.addLineSeries({
             color: "rgba(34, 197, 94, 0.5)",
             lineWidth: 1,
             lineStyle: 2,
             priceLineVisible: false,
             lastValueVisible: false,
+            priceScaleId: "rsi",
           });
-          oversoldLine.setData(
-            data.map((d) => ({ time: d.time, value: 30 }))
-          );
-
-          // Synchroniser les échelles de temps
-          const syncRsiRange = () => {
-            const timeRange = chart.timeScale().getVisibleRange();
-            if (timeRange && rsiChartRef.current) {
-              rsiChartRef.current.timeScale().setVisibleRange(timeRange);
-            }
-          };
-          chart.timeScale().subscribeVisibleTimeRangeChange(syncRsiRange);
-          timeRangeHandlers.push(syncRsiRange);
-
-          // Capturer la plage initiale après le premier rendu
-          setTimeout(() => {
-            const initialRange = chart.timeScale().getVisibleRange();
-            if (initialRange) {
-              initialVisibleRangeRef.current = initialRange;
-            }
-          }, 100);
-
-          // Bloquer le zoom-out au-delà de la vue initiale
-          const clampRange = (logicalRange) => {
-            if (!initialVisibleRangeRef.current || !logicalRange) return;
-
-            const currentRange = chart.timeScale().getVisibleRange();
-            if (!currentRange) return;
-
-            const initialSpan = initialVisibleRangeRef.current.to - initialVisibleRangeRef.current.from;
-            const currentSpan = currentRange.to - currentRange.from;
-
-            // Si on essaie de zoomer plus loin que la vue initiale, bloquer
-            if (currentSpan > initialSpan * 1.05) {
-              chart.timeScale().setVisibleRange(initialVisibleRangeRef.current);
-            }
-          };
-          chart.timeScale().subscribeVisibleLogicalRangeChange(clampRange);
-          logicalRangeHandlers.push(clampRange);
         }
+
+        rsiSeriesRef.current.overbought.setData(boundsData);
+        rsiSeriesRef.current.oversold.setData(lowerData);
       }
 
-      // Ajouter le MACD si activé (panneau séparé)
+      // Ajouter le MACD en overlay dans le même chart (plus de panneau séparé)
       if (showMACD && data.length > 35) {
-        const macdContainer = document.getElementById("macd-chart-container");
-        if (macdContainer) {
-          macdChartRef.current = createChart(macdContainer, {
-            width: macdContainer.clientWidth || 800,
-            height: 150,
-            layout: {
-              background: { color: "#0a0f0d" },
-              textColor: "#9ca3af",
-            },
-            grid: {
-              vertLines: { color: "#1a1f1d" },
-              horzLines: { color: "#1a1f1d" },
-            },
-            timeScale: {
-              borderColor: "#2a2f2d",
-              visible: false,
-            },
-            rightPriceScale: {
-              borderColor: "#2a2f2d",
-              scaleMargins: {
-                top: 0.1,
-                bottom: 0.1,
-              },
+        const macdData = calculateMACD(data, 12, 26, 9);
+
+        // Price scale dédiée au MACD, entre le prix et le RSI
+        if (!macdSeriesRef.current.macd) {
+          chart.priceScale("macd").applyOptions({
+            position: "right",
+            scaleMargins: {
+              top: 0.55,
+              bottom: 0.25,
             },
           });
 
-          const macdData = calculateMACD(data, 12, 26, 9);
-
-          // Ligne MACD (bleu)
-          macdSeriesRef.current.macd = macdChartRef.current.addLineSeries({
+          macdSeriesRef.current.macd = chart.addLineSeries({
             color: "#2196f3",
             lineWidth: 2,
             priceLineVisible: false,
-            lastValueVisible: true,
+            lastValueVisible: false,
+            priceScaleId: "macd",
           });
-          macdSeriesRef.current.macd.setData(macdData.macd);
 
-          // Ligne Signal (orange)
-          macdSeriesRef.current.signal = macdChartRef.current.addLineSeries({
+          macdSeriesRef.current.signal = chart.addLineSeries({
             color: "#ff9800",
-            lineWidth: 2,
+            lineWidth: 1,
             priceLineVisible: false,
-            lastValueVisible: true,
+            lastValueVisible: false,
+            priceScaleId: "macd",
           });
-          macdSeriesRef.current.signal.setData(macdData.signal);
 
-          // Histogramme (vert/rouge)
-          macdSeriesRef.current.histogram = macdChartRef.current.addHistogramSeries({
+          macdSeriesRef.current.histogram = chart.addHistogramSeries({
             priceFormat: { type: "price", precision: 6, minMove: 0.000001 },
-            priceScaleId: "",
+            priceScaleId: "macd",
           });
-          macdSeriesRef.current.histogram.setData(macdData.histogram);
 
-          // Ligne zéro de référence
-          const zeroLine = macdChartRef.current.addLineSeries({
+          macdSeriesRef.current.zeroLine = chart.addLineSeries({
             color: "rgba(255, 255, 255, 0.3)",
             lineWidth: 1,
             lineStyle: 2,
             priceLineVisible: false,
             lastValueVisible: false,
+            priceScaleId: "macd",
           });
-          zeroLine.setData(
-            macdData.macd.map((d) => ({ time: d.time, value: 0 }))
-          );
-
-          // Synchroniser les échelles de temps
-          const syncMacdRange = () => {
-            const timeRange = chart.timeScale().getVisibleRange();
-            if (timeRange && macdChartRef.current) {
-              macdChartRef.current.timeScale().setVisibleRange(timeRange);
-            }
-          };
-          chart.timeScale().subscribeVisibleTimeRangeChange(syncMacdRange);
-          timeRangeHandlers.push(syncMacdRange);
         }
+
+        macdSeriesRef.current.macd.setData(macdData.macd);
+        macdSeriesRef.current.signal.setData(macdData.signal);
+        macdSeriesRef.current.histogram.setData(macdData.histogram);
+        macdSeriesRef.current.zeroLine.setData(
+          macdData.macd.map((d) => ({ time: d.time, value: 0 }))
+        );
       }
 
       // Calculer les statistiques
@@ -1390,12 +1327,6 @@ export default function XrplCandleChartRaw({
 
       observer = new ResizeObserver(() => {
         chart.applyOptions({ width: chartRef.current.clientWidth });
-        if (rsiChartRef.current) {
-          rsiChartRef.current.applyOptions({ width: chartRef.current.clientWidth });
-        }
-        if (macdChartRef.current) {
-          macdChartRef.current.applyOptions({ width: chartRef.current.clientWidth });
-        }
       });
       observer.observe(chartRef.current);
     };
@@ -1460,21 +1391,21 @@ export default function XrplCandleChartRaw({
       className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden mb-6"
     >
       {/* Header compact avec prix et contrôles globaux uniquement */}
-      <div className="border-b border-white/10 p-3">
-        <div className="flex items-center justify-between gap-3">
+      <div className="border-b border-white/10 p-3 max-sm:p-2">
+        <div className="flex items-center justify-between gap-3 max-sm:gap-1.5 max-sm:flex-col max-sm:items-stretch">
           {/* Prix actuel */}
-          <div className="flex items-center gap-3">
-            <h2 className="font-orbitron font-bold text-white text-lg">
+          <div className="flex items-center gap-3 max-sm:gap-1.5 max-sm:justify-between max-sm:w-full">
+            <h2 className="font-orbitron font-bold text-white text-lg max-sm:text-sm">
               {isFxMode ? `${fxBase}/${fxQuote}` : pair}
             </h2>
             {(isFxMode ? fxInfo.price : currentPrice) && (
-              <div className="flex items-baseline gap-2">
-                <span className="font-semibold text-white text-base">
+              <div className="flex items-baseline gap-2 max-sm:gap-1">
+                <span className="font-semibold text-white text-base max-sm:text-xs">
                   {(isFxMode ? fxInfo.price : currentPrice)?.toFixed(6)}
                 </span>
                 {(!isFxMode || fxInfo.changePercent != null) && (
                   <span
-                    className={`text-xs font-medium ${
+                    className={`text-xs max-sm:text-[10px] font-medium ${
                       (isFxMode ? fxInfo.changePercent : percent24h.percent) >= 0
                         ? "text-xcannes-green"
                         : "text-red-500"
@@ -1499,52 +1430,46 @@ export default function XrplCandleChartRaw({
           </div>
 
           {/* Contrôles globaux + sélecteur FX EOD */}
-          <div className="flex items-center gap-3 flex-wrap justify-end">
-            {/* Sélecteur FX EOD (Fawaz) */}
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-white/40 uppercase tracking-wide">
-                FX EOD
-              </span>
-              <FxPairSelector
-                base={fxBase}
-                quote={fxQuote}
-                onChange={({ base, quote }) => {
-                  setFxBase(base);
-                  setFxQuote(quote);
+          <div className="flex items-center gap-3 max-sm:gap-1.5 flex-wrap justify-end max-sm:justify-between max-sm:w-full">
+            {/* Mode Live / FX EOD */}
+            <div className="inline-flex items-center rounded-full bg-black/60 border border-white/10 p-1 max-sm:px-1 max-sm:py-0.5 text-[11px] max-sm:text-[10px]">
+              <button
+                type="button"
+                onClick={() => {
+                  setPairMode("live");
+                  setIsFxMode(false);
+                }}
+                className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all ${
+                  pairMode === "live"
+                    ? "bg-xcannes-green text-black"
+                    : "text-white/60 hover:text-white/90"
+                }`}
+              >
+                Live
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPairMode("eod");
                   setIsFxMode(true);
                 }}
-              />
-              {fxInfo.price != null && (
-                <div className="flex items-baseline gap-1 text-[11px]">
-                  <span className="text-white/70">
-                    {fxInfo.price.toFixed(4)}
-                  </span>
-                  {fxInfo.changePercent != null && (
-                    <span
-                      className={
-                        fxInfo.changePercent >= 0
-                          ? "text-xcannes-green"
-                          : "text-red-500"
-                      }
-                    >
-                      {fxInfo.changePercent >= 0 ? "+" : ""}
-                      {fxInfo.changePercent.toFixed(2)}%
-                    </span>
-                  )}
-                </div>
-              )}
-              {fxLoading && (
-                <div className="w-3 h-3 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
-              )}
+                className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all ${
+                  pairMode === "eod"
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:text-white/90"
+                }`}
+              >
+                FX EOD
+              </button>
             </div>
 
-            {/* Contrôles DEX (paires + timeframes) */}
-            {uniquePairs.length > 0 && onPairChange && (
+            {/* Contrôles DEX (paires + timeframes) - mode Live */}
+            {pairMode === "live" && uniquePairs.length > 0 && onPairChange && (
               <div ref={dropdownRef} className="relative">
                 {/* Bouton principal - affiche la paire actuelle */}
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium hover:border-white/20 transition-all flex items-center gap-2 min-w-[120px]"
+                  className="bg-black/60 border border-white/10 px-3 py-1.5 max-sm:px-2 max-sm:py-1 rounded text-xs max-sm:text-[10px] text-white font-medium hover:border-white/20 transition-all flex items-center gap-2 max-sm:gap-1"
                 >
                   <span>{pair}</span>
                   <svg 
@@ -1657,14 +1582,33 @@ export default function XrplCandleChartRaw({
               </div>
             )}
 
-            {availableIntervals.length > 0 && onIntervalChange && (
+            {/* FX EOD selector - mode EOD */}
+            {pairMode === "eod" && (
+              <div className="flex items-center gap-2 max-sm:gap-1.5">
+                <FxPairSelector
+                  base={fxBase}
+                  quote={fxQuote}
+                  onChange={({ base, quote }) => {
+                    setFxBase(base);
+                    setFxQuote(quote);
+                    setIsFxMode(true);
+                    setPairMode("eod");
+                  }}
+                />
+                {fxLoading && (
+                  <div className="w-3 h-3 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
+                )}
+              </div>
+            )}
+
+            {pairMode === "live" && availableIntervals.length > 0 && onIntervalChange && (
               <select
                 value={interval}
                 onChange={(e) =>
                   !isFxMode && onIntervalChange(e.target.value)
                 }
                 disabled={isFxMode}
-                className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium disabled:opacity-40 hover:border-white/20 transition-all"
+                className="bg-black/60 border border-white/10 px-3 py-1.5 max-sm:px-2 max-sm:py-1 rounded text-xs max-sm:text-[10px] text-white font-medium disabled:opacity-40 hover:border-white/20 transition-all"
               >
                 {availableIntervals.map((int) => (
                   <option key={int} value={int}>
@@ -1674,97 +1618,102 @@ export default function XrplCandleChartRaw({
               </select>
             )}
 
-            {/* Type de chart */}
-            <div className="relative group">
-              <button
-                onClick={() => setChartType(chartType === "candle" ? "line" : "candle")}
-                className="p-2 transition-all flex items-center justify-center text-white/60 hover:text-white/80"
-              >
-                {chartType === "candle" ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 3v18h18" />
-                    <path d="M7 14l4-4 3 3 5-6" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
-                    <path d="M18 17V9"/>
-                    <path d="M13 17V5"/>
-                    <path d="M8 17v-3"/>
-                  </svg>
-                )}
-              </button>
-              {showTooltips && (
-                <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">{chartType === "candle" ? "Mode Ligne" : "Mode Bougies"}</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">{chartType === "candle" ? "Afficher en ligne" : "Afficher en chandeliers"}</div>
-                </div>
-              )}
-            </div>
-
-            {/* Reset */}
-            <div className="relative group">
-              <button
-                onClick={() => {
-                  if (timeScaleRef.current) timeScaleRef.current.fitContent();
-                }}
-                className="p-2 transition-all flex items-center justify-center text-white/60 hover:text-white/80"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                  <path d="M21 3v5h-5"/>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                  <path d="M3 21v-5h5"/>
-                </svg>
-              </button>
-              {showTooltips && (
-                <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">Réinitialiser</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">Ajuster le zoom automatiquement</div>
-                </div>
-              )}
-            </div>
-
-            {/* Settings */}
-            <div className="relative group">
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className={`p-2 transition-all flex items-center justify-center ${
-                  showSettings ? "text-xcannes-green" : "text-white/60 hover:text-white/80"
-                }`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-              </button>
-              {showTooltips && (
-                <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">Paramètres</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">Configuration du graphique</div>
-                </div>
-              )}
-              
-              {/* Dropdown menu des paramètres */}
-              {showSettings && (
-                <div className="absolute top-full mt-2 right-0 bg-black/95 border border-white/20 rounded-lg p-2.5 shadow-xl z-40 min-w-[170px]">
-                  <div className="text-[10px] font-semibold text-white/90 mb-2 pb-1.5 border-b border-white/10">
-                    Paramètres
+            {/* Type de chart (header uniquement en mode Live) */}
+            {pairMode === "live" && (
+              <div className="relative group">
+                <button
+                  onClick={() => setChartType(chartType === "candle" ? "line" : "candle")}
+                  className="p-2 max-sm:p-1.5 transition-all flex items-center justify-center text-white/60 hover:text-white/80"
+                >
+                  {chartType === "candle" ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3v18h18" />
+                      <path d="M7 14l4-4 3 3 5-6" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3v16a2 2 0 0 0 2 2h16"/>
+                      <path d="M18 17V9"/>
+                      <path d="M13 17V5"/>
+                      <path d="M8 17v-3"/>
+                    </svg>
+                  )}
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] font-semibold text-white/90">{chartType === "candle" ? "Mode Ligne" : "Mode Bougies"}</div>
+                    <div className="text-[9px] text-white/50 mt-0.5">{chartType === "candle" ? "Afficher en ligne" : "Afficher en chandeliers"}</div>
                   </div>
-                  
-                  {/* Option Grille */}
-                  <button
-                    onClick={() => setChartSettings({ ...chartSettings, showGrid: !chartSettings.showGrid })}
-                    className="flex items-center justify-between w-full px-1.5 py-1.5 text-[10px] rounded hover:bg-white/5 transition-all mb-0.5"
-                  >
-                    <span className="text-white/80">Grille</span>
-                    <div className={`w-7 h-3.5 rounded-full transition-all relative ${
-                      chartSettings.showGrid ? "bg-xcannes-green" : "bg-white/20"
-                    }`}>
-                      <div className={`absolute top-0.5 w-2.5 h-2.5 bg-white rounded-full transition-all ${
-                        chartSettings.showGrid ? "left-3.5" : "left-0.5"
-                      }`}></div>
+                )}
+              </div>
+            )}
+
+            {/* Reset (header uniquement en mode Live) */}
+            {pairMode === "live" && (
+              <div className="relative group">
+                <button
+                  onClick={() => {
+                    if (timeScaleRef.current) timeScaleRef.current.fitContent();
+                  }}
+                  className="p-2 max-sm:p-1.5 transition-all flex items-center justify-center text-white/60 hover:text-white/80"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M3 21v-5h5"/>
+                  </svg>
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] font-semibold text-white/90">Réinitialiser</div>
+                    <div className="text-[9px] text-white/50 mt-0.5">Ajuster le zoom automatiquement</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Settings (header uniquement en mode Live) */}
+            {pairMode === "live" && (
+              <div className="relative group">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={`p-2 transition-all flex items-center justify-center ${
+                    showSettings ? "text-xcannes-green" : "text-white/60 hover:text-white/80"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] font-semibold text-white/90">Paramètres</div>
+                    <div className="text-[9px] text-white/50 mt-0.5">Configuration du graphique</div>
+                  </div>
+                )}
+                
+                {/* Dropdown menu des paramètres */}
+                {showSettings && (
+                  <div className="absolute top-full mt-2 right-0 bg-black/95 border border-white/20 rounded-lg p-2.5 shadow-xl z-40 min-w-[170px]">
+                    <div className="text-[10px] font-semibold text-white/90 mb-2 pb-1.5 border-b border-white/10">
+                      Paramètres
                     </div>
+                    
+                    {/* Option Grille */}
+                    <button
+                      onClick={() => setChartSettings({ ...chartSettings, showGrid: !chartSettings.showGrid })}
+                      className="flex items-center justify-between w-full px-1.5 py-1.5 text-[10px] rounded hover:bg-white/5 transition-all mb-0.5"
+                    >
+                      <span className="text-white/80">Grille</span>
+                      <div className={`w-7 h-3.5 rounded-full transition-all relative ${
+                        chartSettings.showGrid ? "bg-xcannes-green" : "bg-white/20"
+                      }`}>
+                        <div className={`absolute top-0.5 w-2.5 h-2.5 bg-white rounded-full transition-all ${
+                          chartSettings.showGrid ? "left-3.5" : "left-0.5"
+                        }`}></div>
+                      </div>
                   </button>
                   
                   {/* Option Crosshair */}
@@ -1796,9 +1745,10 @@ export default function XrplCandleChartRaw({
                       }`}></div>
                     </div>
                   </button>
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -2116,6 +2066,144 @@ export default function XrplCandleChartRaw({
               )}
             </div>
           )}
+
+          {/* Outils header déplacés en mode FX EOD (toolbar verticale) */}
+          {pairMode === "eod" && (
+            <>
+              <div className="border-t border-white/10 my-2" />
+
+              {/* Type de chart */}
+              <div className="relative group">
+                <button
+                  onClick={() =>
+                    setChartType(chartType === "candle" ? "line" : "candle")
+                  }
+                  className="w-full aspect-square transition-all flex items-center justify-center text-white/60 hover:text-white/80"
+                >
+                  {chartType === "candle" ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 3v18h18" />
+                      <path d="M7 14l4-4 3 3 5-6" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+                      <path d="M18 17V9" />
+                      <path d="M13 17V5" />
+                      <path d="M8 17v-3" />
+                    </svg>
+                  )}
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] font-semibold text-white/90">
+                      {chartType === "candle" ? "Mode Ligne" : "Mode Bougies"}
+                    </div>
+                    <div className="text-[9px] text-white/50 mt-0.5">
+                      {chartType === "candle"
+                        ? "Afficher en ligne"
+                        : "Afficher en chandeliers"}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Reset view */}
+              <div className="relative group">
+                <button
+                  onClick={() => {
+                    if (timeScaleRef.current)
+                      timeScaleRef.current.fitContent();
+                  }}
+                  className="w-full aspect-square transition-all flex items-center justify-center text-white/60 hover:text-white/80"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                    <path d="M21 3v5h-5" />
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                    <path d="M3 21v-5h5" />
+                  </svg>
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] font-semibold text-white/90">
+                      Réinitialiser
+                    </div>
+                    <div className="text-[9px] text-white/50 mt-0.5">
+                      Ajuster le zoom automatiquement
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Settings */}
+              <div className="relative group">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={`w-full aspect-square transition-all flex items-center justify-center ${
+                    showSettings
+                      ? "text-xcannes-green"
+                      : "text-white/60 hover:text-white/80"
+                  }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] font-semibold text-white/90">
+                      Paramètres
+                    </div>
+                    <div className="text-[9px] text-white/50 mt-0.5">
+                      Configuration du graphique
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Zone du graphique */}
@@ -2127,9 +2215,9 @@ export default function XrplCandleChartRaw({
             <div className="text-center">
               <div className="w-8 h-8 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
               <p className="text-white/60 text-sm">Chargement des données...</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
         {noDataMessage && !loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
@@ -2157,60 +2245,32 @@ export default function XrplCandleChartRaw({
         <div
           ref={chartRef}
           className="w-full relative z-0"
-          style={{ 
-            height: "500px", 
-            minHeight: "500px" 
+          style={{
+            height: "500px",
+            minHeight: "500px",
           }}
         />
-
-        {/* RSI Chart Container (désactivé en mode FX EOD) */}
-        {showRSI && !isFxMode && (
-          <div className="w-full border-t border-white/10">
-            <div className="px-4 py-2 bg-black/20">
-              <span className="text-xs text-white/60 font-medium">RSI (14)</span>
-            </div>
-            <div
-              id="rsi-chart-container"
-              className="w-full relative z-0"
-              style={{ height: "150px", minHeight: "150px" }}
-            />
-          </div>
-        )}
-
-        {/* MACD Chart Container (désactivé en mode FX EOD) */}
-        {showMACD && !isFxMode && (
-          <div className="w-full border-t border-white/10">
-            <div className="px-4 py-2 bg-black/20">
-              <span className="text-xs text-white/60 font-medium">MACD (12, 26, 9)</span>
-            </div>
-            <div
-              id="macd-chart-container"
-              className="w-full relative z-0"
-              style={{ height: "150px", minHeight: "150px" }}
-            />
-          </div>
-        )}
         </div>
         </div>
       </div>
 
       {/* Footer Stats */}
-      <div className="p-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="p-4 max-sm:p-2 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 max-sm:gap-2">
           <div>
-            <p className="text-xs text-white/40 mb-1">24h High</p>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">24h High</p>
+            <p className="text-sm max-sm:text-xs font-semibold text-white">
               {stats24h.high ? stats24h.high.toFixed(6) : "-"}
             </p>
           </div>
           <div>
-            <p className="text-xs text-white/40 mb-1">24h Low</p>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">24h Low</p>
+            <p className="text-sm max-sm:text-xs font-semibold text-white">
               {stats24h.low ? stats24h.low.toFixed(6) : "-"}
             </p>
           </div>
           <div>
-            <p className="text-xs text-white/40 mb-1">24h Volume</p>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">24h Volume</p>
+            <p className="text-sm max-sm:text-xs font-semibold text-white">
               {stats24h.volume
                 ? stats24h.volume.toLocaleString(undefined, {
                     maximumFractionDigits: 0,
@@ -2219,8 +2279,8 @@ export default function XrplCandleChartRaw({
             </p>
           </div>
           <div>
-            <p className="text-xs text-white/40 mb-1">Market Cap</p>
-            <p className="text-sm font-semibold text-white">-</p>
+            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">Market Cap</p>
+            <p className="text-sm max-sm:text-xs font-semibold text-white">-</p>
           </div>
         </div>
     </div>
