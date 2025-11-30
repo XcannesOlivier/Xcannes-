@@ -10,6 +10,38 @@ const REGION_DEFS = {
   "Middle East & Africa": ["AED", "SAR", "QAR", "KWD", "EGP", "MAD", "ZAR", "KES", "NGN", "GHS"],
 };
 
+// Overrides explicites devise -> drapeau (multi-pays, cas spéciaux)
+const CURRENCY_FLAG_OVERRIDES = {
+  EUR: "🇪🇺",
+  XAF: "🌍",
+  XOF: "🌍",
+  XCD: "🌴",
+};
+
+// Convertit un code pays ISO-2 (ex: "AE") en emoji drapeau
+function countryCodeToFlag(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return "🏳️";
+  const codePoints = [...countryCode.toUpperCase()].map(
+    (c) => 0x1f1e6 + (c.charCodeAt(0) - 65)
+  );
+  return String.fromCodePoint(...codePoints);
+}
+
+function getFlag(code) {
+  if (!code) return "🏳️";
+  const upper = String(code).toUpperCase();
+
+  // Cas spéciaux d'abord
+  if (CURRENCY_FLAG_OVERRIDES[upper]) {
+    return CURRENCY_FLAG_OVERRIDES[upper];
+  }
+
+  // Pour la majorité des monnaies fiat, les 2 premières lettres
+  // correspondent au code pays ISO (AED -> AE, KES -> KE, etc.)
+  const countryGuess = upper.slice(0, 2);
+  return countryCodeToFlag(countryGuess);
+}
+
 export default function FxPairSelector({ base, quote, onChange }) {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,10 +163,18 @@ export default function FxPairSelector({ base, quote, onChange }) {
         onClick={() => openFor("base")}
         className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium hover:border-white/30 transition-all flex items-center gap-1 min-w-[80px]"
       >
-        <span>{base || "BASE"}</span>
-        <span className="text-white/40">
-          {baseEntry?.name ? `· ${baseEntry.name}` : ""}
-        </span>
+        <div className="flex items-center gap-1">
+          {/* Desktop/tablette large (>= md): code + nom complet */}
+          <span className="hidden md:inline text-xs text-white/80">
+            {base || "BASE"}
+            {baseEntry?.name ? ` – ${baseEntry.name}` : ""}
+          </span>
+          {/* Mobile + petite tablette (< md): drapeau + code ISO */}
+          <span className="inline-flex md:hidden items-center gap-1 text-[11px]">
+            <span>{getFlag(base || "")}</span>
+            <span>{base || "BASE"}</span>
+          </span>
+        </div>
         <svg
           className="w-3 h-3 ml-auto"
           fill="none"
@@ -158,10 +198,18 @@ export default function FxPairSelector({ base, quote, onChange }) {
         onClick={() => openFor("quote")}
         className="bg-black/60 border border-white/10 px-3 py-1.5 rounded text-xs text-white font-medium hover:border-white/30 transition-all flex items-center gap-1 min-w-[80px]"
       >
-        <span>{quote || "QUOTE"} </span>
-        <span className="text-white/40">
-          {quoteEntry?.name ? `· ${quoteEntry.name}` : ""}
-        </span>
+        <div className="flex items-center gap-1">
+          {/* Desktop/tablette large (>= md): code + nom complet */}
+          <span className="hidden md:inline text-xs text-white/80">
+            {quote || "QUOTE"}
+            {quoteEntry?.name ? ` – ${quoteEntry.name}` : ""}
+          </span>
+          {/* Mobile + petite tablette (< md): drapeau + code ISO */}
+          <span className="inline-flex md:hidden items-center gap-1 text-[11px]">
+            <span>{getFlag(quote || "")}</span>
+            <span>{quote || "QUOTE"}</span>
+          </span>
+        </div>
         <svg
           className="w-3 h-3 ml-auto"
           fill="none"

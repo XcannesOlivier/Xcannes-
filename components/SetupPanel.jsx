@@ -10,9 +10,10 @@ import WalletDashboard from "./WalletDashboard";
 const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || "").replace(/\/$/, "");
 const apiUrl = (path) => `${API_BASE}${path}`;
 
-export default function SetupPanel() {
+export default function SetupPanel({ variant = "card" }) {
   const { t } = useTranslation("common");
   const { isConnected } = useXumm();
+  const isSidebar = variant === "sidebar";
   const [copied, setCopied] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -33,6 +34,11 @@ export default function SetupPanel() {
   ];
 
   useEffect(() => {
+    if (isSidebar) {
+      setVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setVisible(true);
@@ -42,7 +48,7 @@ export default function SetupPanel() {
 
     if (blockRef.current) observer.observe(blockRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [isSidebar]);
 
   const handleCopy = async (text) => {
     try {
@@ -109,7 +115,11 @@ export default function SetupPanel() {
   return (
     <div
       ref={blockRef}
-      className={`bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden transition-all duration-500 ${
+      className={`${
+        isSidebar
+          ? "border-t border-white/10"
+          : "bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
+      } transition-all duration-500 ${
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
     >
