@@ -145,15 +145,14 @@ export default function Dex() {
 
       {/* Mobile bottom nav: Orderbook / Trading */}
       <div className="fixed inset-x-0 bottom-0 z-50 md:hidden pointer-events-none">
-        <div className="flex justify-center mb-3">
-          <div className="pointer-events-auto flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-black/80 border border-white/10 backdrop-blur-md w-[90%] max-w-md">
+        <div className="pointer-events-auto flex items-center justify-between gap-2 px-4 py-2 bg-black/85 border-t border-white/10 backdrop-blur-md w-full">
             <button
               type="button"
               onClick={() => {
                 setMobileOrderbookOpen(true);
                 setMobileTradingOpen(false);
               }}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-full transition-all ${
+              className={`flex-1 text-xs font-medium py-1.5 transition-all ${
                 mobileOrderbookOpen
                   ? "bg-xcannes-green text-black"
                   : "bg-white/5 text-white/70"
@@ -167,7 +166,7 @@ export default function Dex() {
                 setMobileTradingOpen(true);
                 setMobileOrderbookOpen(false);
               }}
-              className={`flex-1 text-xs font-medium py-1.5 rounded-full transition-all ${
+              className={`flex-1 text-xs font-medium py-1.5 transition-all ${
                 mobileTradingOpen
                   ? "bg-xcannes-green text-black"
                   : "bg-white/5 text-white/70"
@@ -175,7 +174,6 @@ export default function Dex() {
             >
               Trading
             </button>
-          </div>
         </div>
 
         {/* Mobile Orderbook bottom sheet */}

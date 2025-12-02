@@ -70,7 +70,7 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
           return {
             pair,
             backendPair: bookData.backendPair,
-            price: parseFloat(ticker.lastPrice || 0).toFixed(6),
+            price: parseFloat(ticker.lastPrice || 0).toFixed(4),
             change: change.toFixed(2),
             sparkline: sparklineData,
             isPositive: change >= 0,
@@ -137,7 +137,7 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
             tickerData.lastPrice ?? tickerData.price ?? tickerData.bidPrice ?? tickerData.askPrice;
           const parsedPrice = parseFloat(lastPrice);
           if (Number.isFinite(parsedPrice)) {
-            updated.price = parsedPrice.toFixed(6);
+            updated.price = parsedPrice.toFixed(4);
           }
 
           if (tickerData.changePercent24h !== undefined) {
@@ -175,7 +175,7 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
           if (Number.isFinite(bestAsk) && Number.isFinite(bestBid)) {
             const midPrice = (bestAsk + bestBid) / 2;
             if (Number.isFinite(midPrice)) {
-              updated.price = midPrice.toFixed(6);
+              updated.price = midPrice.toFixed(4);
             }
           }
         }
