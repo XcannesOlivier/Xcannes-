@@ -7,6 +7,7 @@ import xcannesApi from "../lib/xcannesApi";
 import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ Hook WebSocket centralisé
 import { MARKET_STRUCTURE, getPairCategory } from "../utils/marketStructure"; // ✅ Structure des marchés
 import FxPairSelector from "../components/FxPairSelector";
+import ChartFooter from "./ChartFooter";
 
 export default function XrplCandleChartRaw({
   pair = "XCS/XRP",
@@ -59,6 +60,8 @@ export default function XrplCandleChartRaw({
     lower: null,
   });
   const containerRef = useRef(null);
+  const [statusBar, setStatusBar] = useState(null);
+  const [crosshairPoint, setCrosshairPoint] = useState(null);
   
   // ✅ Détecter la catégorie de la paire
   const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
@@ -813,6 +816,8 @@ export default function XrplCandleChartRaw({
     let isActive = true;
     const timeRangeHandlers = [];
     const logicalRangeHandlers = [];
+    let crosshairHandler = null;
+    let clickHandler = null;
 
     const unsubscribeTimeHandlers = () => {
       if (!chartInstanceRef.current) return;
@@ -856,6 +861,16 @@ export default function XrplCandleChartRaw({
       }
       if (chartInstanceRef.current) {
         try {
+          if (crosshairHandler) {
+            try {
+              chartInstanceRef.current.unsubscribeCrosshairMove(crosshairHandler);
+            } catch (_) {}
+          }
+          if (clickHandler) {
+            try {
+              chartInstanceRef.current.unsubscribeClick(clickHandler);
+            } catch (_) {}
+          }
           chartInstanceRef.current.remove();
         } catch (_) {}
         chartInstanceRef.current = null;
@@ -885,9 +900,12 @@ export default function XrplCandleChartRaw({
         return;
       }
 
+      const containerWidth = chartRef.current?.clientWidth || 800;
+      const containerHeight = chartRef.current?.clientHeight || 500;
+
       chart = createChart(chartRef.current, {
-        width: chartRef.current.clientWidth || 800,
-        height: 500,
+        width: containerWidth,
+        height: containerHeight,
         layout: {
           background: { color: "#0a0f0d" },
           textColor: "#9ca3af",
@@ -960,6 +978,11 @@ export default function XrplCandleChartRaw({
           borderDownColor: "#dc2626",
           wickUpColor: "#16b303",
           wickDownColor: "#dc2626",
+          priceFormat: {
+            type: "price",
+            precision: 4,
+            minMove: 0.0001,
+          },
         });
       } else {
         // Mode ligne
@@ -968,6 +991,11 @@ export default function XrplCandleChartRaw({
           lineWidth: 2,
           priceLineVisible: true,
           lastValueVisible: true,
+          priceFormat: {
+            type: "price",
+            precision: 4,
+            minMove: 0.0001,
+          },
         });
       }
 
@@ -981,6 +1009,48 @@ export default function XrplCandleChartRaw({
           value: d.close
         }));
         candleSeriesRef.current.setData(lineData);
+      }
+
+      // Barre de statut OHLC (type Binance) + crosshair custom (utile sur mobile)
+      if (chart && candleSeriesRef.current) {
+        const updateStatusFromParam = (param) => {
+          const series = candleSeriesRef.current;
+          if (!series || !param) return;
+
+          const bar = param.seriesData.get(series);
+          if (!bar || !bar.time) {
+            // Ne rien effacer: garder la dernière valeur pour que la status line reste visible
+            return;
+          }
+
+          const { time, open, high, low, close } = bar;
+          const numericClose = Number(close ?? bar.value ?? 0);
+          const numericOpen = Number(open ?? numericClose);
+
+          setStatusBar({
+            time,
+            open: Number(open ?? numericClose),
+            high: Number(high ?? numericClose),
+            low: Number(low ?? numericClose),
+            close: numericClose,
+            isUp: numericClose >= numericOpen,
+          });
+
+          if (param.point) {
+            setCrosshairPoint({ x: param.point.x, y: param.point.y });
+          }
+        };
+
+        crosshairHandler = (param) => {
+          updateStatusFromParam(param);
+        };
+
+        clickHandler = (param) => {
+          updateStatusFromParam(param);
+        };
+
+        chart.subscribeCrosshairMove(crosshairHandler);
+        chart.subscribeClick(clickHandler);
       }
       
       // ✅ Initialiser la bougie courante avec la dernière bougie
@@ -1025,14 +1095,6 @@ export default function XrplCandleChartRaw({
 
       // Masquer le loading dès que le graphique a les données
       setLoading(false);
-      
-      // ✅ Forcer le recalcul de l'échelle des prix après chargement des données
-      fitContentTimeout = setTimeout(() => {
-        if (!isActive) return;
-        if (chart && chart.timeScale) {
-          chart.timeScale().fitContent();
-        }
-      }, 100);
 
       // Ajouter le volume si activé (XRPL uniquement, pas FX/Pyth)
       if (showVolume && !isFxMode && !isExternal) {
@@ -1310,23 +1372,126 @@ export default function XrplCandleChartRaw({
         });
       }
 
-      // 📅 Autozoom horizontal seulement (pas vertical)
-      const first = realData[0]?.time;
-      const last = realData[realData.length - 1]?.time;
+      // 📅 Autozoom horizontal seulement (pas vertical) - limiter à ~60 bougies visibles
+      const total = realData.length;
+      const visibleCount = Math.min(60, total);
+      const lastIndex = total - 1;
+      const firstIndex = Math.max(0, lastIndex - visibleCount + 1);
+      const first = realData[firstIndex]?.time;
+      const last = realData[lastIndex]?.time;
 
       if (first && last && chart?.timeScale) {
-        const margin = Math.floor((last - first) * 0.05);
+        const rawSpan = last - first;
+        const intervalSeconds = intervalSecondsRef.current || 60;
+        const fallbackSpan = intervalSeconds * visibleCount;
+        const span = rawSpan > 0 ? rawSpan : fallbackSpan;
+
+        // Marge asymétrique pour "pousser" les bougies vers le centre :
+        // un peu d'espace à gauche, plus d'espace à droite.
+        const leftMargin = Math.floor(span * 0.1);
+        const rightMargin = Math.floor(span * 0.3);
+
         chart.timeScale().setVisibleRange({
-          from: first - margin,
-          to: last + margin,
+          from: first - leftMargin,
+          to: last + rightMargin,
         });
+
+        // Initialiser la status line + crosshair au milieu de la fenêtre visible
+        const midIndex = Math.floor((firstIndex + lastIndex) / 2);
+        const midCandle = realData[midIndex];
+
+        if (midCandle && candleSeriesRef.current) {
+          const midClose = Number(midCandle.close ?? midCandle.value ?? 0);
+          const midOpen = Number(midCandle.open ?? midClose);
+
+          setTimeout(() => {
+            if (!isActive || !chart) return;
+            const ts = chart.timeScale();
+            const x = ts.timeToCoordinate(midCandle.time);
+            const y = candleSeriesRef.current.priceToCoordinate(midClose);
+
+            if (typeof x === "number" && typeof y === "number") {
+              setStatusBar({
+                time: midCandle.time,
+                open: midOpen,
+                high: Number(midCandle.high ?? midClose),
+                low: Number(midCandle.low ?? midClose),
+                close: midClose,
+                isUp: midClose >= midOpen,
+              });
+              setCrosshairPoint({ x, y });
+            }
+          }, 60);
+        }
+      }
+
+      // 🔒 Empêcher le scroll au-delà de la première / dernière bougie disponibles
+      const firstTime = realData[0]?.time;
+      const lastTime = realData[realData.length - 1]?.time;
+
+      if (firstTime && lastTime && chart?.timeScale) {
+        const timeScale = chart.timeScale();
+        const clampVisibleRange = (range) => {
+          if (!range) return;
+          let from = range.from;
+          let to = range.to;
+          let changed = false;
+
+          const intervalSeconds = intervalSecondsRef.current || 60;
+          const maxTo = lastTime + intervalSeconds * 10; // autoriser ~10 bougies de "future"
+
+          // Limite côté gauche : ne pas aller avant la première bougie
+          if (from < firstTime) {
+            from = firstTime;
+            changed = true;
+          }
+
+          // Limite côté droit : ne pas aller plus loin que 10 bougies après la dernière
+          if (to > maxTo) {
+            const shift = to - maxTo;
+            to = maxTo;
+            from = from - shift;
+            changed = true;
+          }
+
+          // Si en décalant on repasse avant la première bougie, on recale sur le début
+          if (from < firstTime) {
+            from = firstTime;
+          }
+
+          if (changed) {
+            try {
+              timeScale.setVisibleRange({ from, to });
+            } catch (_) {}
+          }
+        };
+
+        // Sur certains gestes (pinch/drag), seule la logical range change.
+        // On écoute donc à la fois la time range et la logical range et on recalcule à partir de la time range courante.
+        timeScale.subscribeVisibleTimeRangeChange(clampVisibleRange);
+        timeRangeHandlers.push(clampVisibleRange);
+
+        const logicalHandler = (logicalRange) => {
+          if (!logicalRange) return;
+          const currentRange = timeScale.getVisibleRange();
+          if (currentRange) {
+            clampVisibleRange(currentRange);
+          }
+        };
+
+        timeScale.subscribeVisibleLogicalRangeChange(logicalHandler);
+        logicalRangeHandlers.push(logicalHandler);
       }
 
       // ✅ SUPPRIMÉ: setVisibleRange sur priceScale (bloquait autoScale)
       // L'autoScale gérera automatiquement les prix visibles
 
       observer = new ResizeObserver(() => {
-        chart.applyOptions({ width: chartRef.current.clientWidth });
+        if (!chartRef.current || !chart) return;
+        chart.applyOptions({
+          width: chartRef.current.clientWidth,
+          height: chartRef.current.clientHeight,
+        });
       });
       observer.observe(chartRef.current);
     };
@@ -1388,7 +1553,7 @@ export default function XrplCandleChartRaw({
   return (
     <div 
       ref={containerRef}
-      className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden mb-6"
+      className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
     >
       {/* Header compact avec prix et contrôles globaux uniquement */}
       <div className="border-b border-white/10 p-3 max-sm:p-2">
@@ -1766,7 +1931,7 @@ export default function XrplCandleChartRaw({
         {/* Barre verticale gauche - Indicateurs et Overlays */}
         <div className="w-12 border-r border-white/10 flex flex-col gap-3 p-1.5">
           {/* Toggle Tooltips */}
-          <div className="relative group border-b border-white/10 pb-3">
+          <div className="relative group border-b border-white/10 pb-0 md:pb-3">
             <button
               onClick={() => setShowTooltips(!showTooltips)}
               className={`w-full aspect-square transition-all flex items-center justify-center ${
@@ -1797,7 +1962,7 @@ export default function XrplCandleChartRaw({
           </div>
 
           {/* Hide/Show All Indicators */}
-          <div className="relative group border-b border-white/10 pb-3">
+          <div className="relative group border-b border-white/10 pb-0 md:pb-3">
             <button
               onClick={() => {
                 const newState = !hideAllIndicators;
@@ -2070,7 +2235,7 @@ export default function XrplCandleChartRaw({
           {/* Outils header déplacés en mode FX EOD (toolbar verticale) */}
           {pairMode === "eod" && (
             <>
-              <div className="border-t border-white/10 my-2" />
+              <div className="border-t border-white/10 my-1 md:my-2" />
 
               {/* Type de chart */}
               <div className="relative group">
@@ -2210,6 +2375,55 @@ export default function XrplCandleChartRaw({
         <div className="flex-1">
           {/* Chart Container */}
           <div className="relative w-full">
+        {/* Status line OHLC en haut du chart */}
+        {statusBar && (
+          <div className="absolute top-0 left-0 right-0 z-10 flex flex-wrap items-center gap-3 px-3 py-1.5 text-[11px] font-mono">
+            <span className="text-white/50">
+              {new Date(statusBar.time * 1000).toLocaleString()}
+            </span>
+            <span className="text-white/60">
+              O{" "}
+              <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
+                {statusBar.open.toFixed(4)}
+              </span>
+            </span>
+            <span className="text-white/60">
+              H{" "}
+              <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
+                {statusBar.high.toFixed(4)}
+              </span>
+            </span>
+            <span className="text-white/60">
+              L{" "}
+              <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
+                {statusBar.low.toFixed(4)}
+              </span>
+            </span>
+            <span className="text-white/60">
+              C{" "}
+              <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
+                {statusBar.close.toFixed(4)}
+              </span>
+            </span>
+          </div>
+        )}
+
+        {/* Crosshair custom (utile sur mobile où la crosshair native est discrète) */}
+        {crosshairPoint && (
+          <div className="absolute inset-0 z-5 pointer-events-none">
+            {/* Ligne verticale */}
+            <div
+              className="absolute top-0 bottom-0 w-px bg-xcannes-green/60"
+              style={{ left: `${crosshairPoint.x}px` }}
+            />
+            {/* Ligne horizontale */}
+            <div
+              className="absolute left-0 right-0 h-px bg-xcannes-green/60"
+              style={{ top: `${crosshairPoint.y}px` }}
+            />
+          </div>
+        )}
+
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
             <div className="text-center">
@@ -2244,45 +2458,16 @@ export default function XrplCandleChartRaw({
 
         <div
           ref={chartRef}
-          className="w-full relative z-0"
-          style={{
-            height: "500px",
-            minHeight: "500px",
-          }}
+          className="w-full relative z-0 dex-chart-container"
         />
         </div>
         </div>
       </div>
 
-      {/* Footer Stats */}
-      <div className="p-4 max-sm:p-2 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 max-sm:gap-2">
-          <div>
-            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">24h High</p>
-            <p className="text-sm max-sm:text-xs font-semibold text-white">
-              {stats24h.high ? stats24h.high.toFixed(6) : "-"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">24h Low</p>
-            <p className="text-sm max-sm:text-xs font-semibold text-white">
-              {stats24h.low ? stats24h.low.toFixed(6) : "-"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">24h Volume</p>
-            <p className="text-sm max-sm:text-xs font-semibold text-white">
-              {stats24h.volume
-                ? stats24h.volume.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })
-                : "-"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs max-sm:text-[10px] text-white/40 mb-1 max-sm:mb-0.5">Market Cap</p>
-            <p className="text-sm max-sm:text-xs font-semibold text-white">-</p>
-          </div>
-        </div>
+      {/* Footer Stats: desktop sous le chart */}
+      <div className="hidden md:block">
+        <ChartFooter pair={pair} />
+      </div>
     </div>
   );
 }

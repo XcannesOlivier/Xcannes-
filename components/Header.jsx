@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import WSStatus from "./WSStatus";
 
-export default function Header() {
+export default function Header({ fixed = true }) {
   const router = useRouter();
   const { t } = useTranslation("common");
   const isDex = router.pathname === "/dex";
@@ -26,7 +26,9 @@ export default function Header() {
 
   return (
     <header
-      className={`w-full h-16 fixed top-0 left-0 z-50 px-6 flex items-center justify-between font-montserrat transition-all duration-300 border-b ${
+      className={`w-full h-16 ${
+        fixed ? "fixed top-0 left-0 z-50" : "relative z-20"
+      } px-6 flex items-center justify-between font-montserrat transition-all duration-300 border-b ${
         scrolled
           ? "bg-black/95 backdrop-blur-md border-white/10"
           : "bg-black/80 backdrop-blur-sm border-white/5"

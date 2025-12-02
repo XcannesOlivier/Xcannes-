@@ -5,6 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useXcannesWS } from "../context/XcannesWSContext";
 import { getBookIdFromPair } from "../utils/xrpl";
 import { getPairCategory } from "../utils/marketStructure";
+import ChartFooter from "./ChartFooter";
 
 export default function OrderbookSidebar({ pair }) {
   const { t } = useTranslation("common");
@@ -90,7 +91,7 @@ export default function OrderbookSidebar({ pair }) {
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div className="flex-1">
         {isXRPL ? (
           <div className="p-4 space-y-6">
             {/* Orderbook headers + listes (scrollables) */}
@@ -105,9 +106,9 @@ export default function OrderbookSidebar({ pair }) {
                 </div>
               </div>
 
-              <div className="max-h-[260px] overflow-y-auto pr-1 space-y-3">
+              <div className="space-y-3">
                 {/* Asks */}
-                <div>
+                <div className="sells-list max-h-[180px] overflow-y-auto overscroll-contain pr-1">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-1 h-1 rounded-full bg-red-500" />
                     <span className="text-[11px] font-semibold text-red-400">
@@ -150,8 +151,18 @@ export default function OrderbookSidebar({ pair }) {
                   </span>
                 </div>
 
+                {/* Spread */}
+                <div className="my-2 py-1 text-center border-y border-white/5">
+                  <span className="text-[11px] text-white/40">
+                    {t("trading_spread")}:{" "}
+                    {asks[0] && bids[0]
+                      ? (asks[0].price - bids[0].price).toFixed(6)
+                      : "-"}
+                  </span>
+                </div>
+
                 {/* Bids */}
-                <div>
+                <div className="buys-list max-h-[180px] overflow-y-auto overscroll-contain pr-1">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-1 h-1 rounded-full bg-xcannes-green" />
                     <span className="text-[11px] font-semibold text-xcannes-green">
@@ -202,7 +213,7 @@ export default function OrderbookSidebar({ pair }) {
                 <div className="text-right">{t("trading_time")}</div>
               </div>
 
-              <div className="space-y-1 max-h-[260px] overflow-y-auto pr-1">
+              <div className="recent-trades-list space-y-1 max-h-[140px] overflow-y-auto overscroll-contain pr-1">
                 {history.length === 0 ? (
                   <div className="text-center py-4">
                     <p className="text-[11px] text-white/40 mb-1">
@@ -250,6 +261,11 @@ export default function OrderbookSidebar({ pair }) {
             </p>
           </div>
         )}
+      </div>
+
+      {/* Chart Footer en bas de la colonne Orderbook sur mobile uniquement */}
+      <div className="md:hidden">
+        <ChartFooter pair={pair} />
       </div>
     </aside>
   );

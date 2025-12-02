@@ -10,7 +10,7 @@ const TRUSTLINE_DATA = {
   limit: "2006400",
 };
 
-export default function WalletDashboard() {
+export default function WalletDashboard({ preview = false }) {
   const { 
     wallet, 
     isConnected, 
@@ -21,56 +21,8 @@ export default function WalletDashboard() {
     closeQrModal,
   } = useXumm();
 
-  const [hasTrustline, setHasTrustline] = useState(false);
-  const [isCheckingTrustline, setIsCheckingTrustline] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const trustlineData = TRUSTLINE_DATA;
-
-  const trustlineURL = `https://xrpl.services?issuer=${trustlineData.issuer}&currency=${trustlineData.currency}&limit=${trustlineData.limit}`;
-
-  // Vérifier si la trustline XCS existe
-  const checkTrustline = useCallback(() => {
-    if (!balance || !balance.tokens) {
-      setHasTrustline(false);
-      return;
-    }
-
-    // Chercher la trustline XCS
-    const xcsToken = balance.tokens.find(
-      (token) => 
-        token.currency === trustlineData.currency && 
-        token.issuer === trustlineData.issuer
-    );
-
-    setHasTrustline(!!xcsToken);
-  }, [balance, trustlineData.currency, trustlineData.issuer]);
-
-  useEffect(() => {
-    if (isConnected && balance) {
-      checkTrustline();
-    }
-  }, [isConnected, balance, checkTrustline]);
-
-  const handleRefresh = async () => {
-    setIsCheckingTrustline(true);
-    if (refreshBalance) {
-      await refreshBalance();
-    }
-    setTimeout(() => {
-      setIsCheckingTrustline(false);
-    }, 1000);
-  };
-
-  const handleCopy = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Erreur copie:", err);
-    }
-  };
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | null
 
   const formatBalance = (value) => {
     if (!value && value !== 0) return "0";
@@ -80,372 +32,490 @@ export default function WalletDashboard() {
     });
   };
 
-  if (!isConnected) {
-    return null; // Ne pas afficher si pas connecté
+  // Construire un jeu de données de prévisualisation si preview=true
+  const effectiveIsConnected = preview ? true : isConnected;
+  const effectiveWallet = preview
+    ? "rPREVIEWWALLETxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    : wallet;
+  const effectiveBalance = preview
+    ? {
+        xrp: "12345.6789",
+        tokens: [
+          {
+            currency: TRUSTLINE_DATA.currency,
+            issuer: TRUSTLINE_DATA.issuer,
+            value: "250000",
+            limit: TRUSTLINE_DATA.limit,
+          },
+          {
+            currency: "USD",
+            issuer: "rUSDISSUERxxxxxx",
+            value: "1234.56",
+            limit: "1000000",
+          },
+        ],
+      }
+    : balance;
+
+  if (!effectiveIsConnected) {
+    return null; // Ne pas afficher si pas connecté (hors preview)
   }
 
-  // Récupérer le solde XCS si trustline existe
-  const xcsToken = balance?.tokens?.find(
-    (token) => token.currency === trustlineData.currency
-  );
-  const xcsBalance = xcsToken ? parseFloat(xcsToken.value) : 0;
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    if (refreshBalance) {
+      await refreshBalance();
+    }
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
+
+  const handleCopy = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      console.error("Erreur copie:", err);
+    }
+  };
+
+  const baseTokens = effectiveBalance?.tokens || [];
+  const xrpAmount = parseFloat(effectiveBalance?.xrp || 0) || 0;
+
+  const isStablecoin = (currency) =>
+    ["RLUSD", "USD", "USDC", "USDT", "EUR", "EURS", "EURT"].includes(currency);
+
+  const stableTokens = baseTokens.filter((t) => isStablecoin(t.currency));
+  const stableUsd = stableTokens.reduce((sum, t) => {
+    const v = parseFloat(t.value);
+    return sum + (Number.isFinite(v) ? v : 0);
+  }, 0);
+
+  const xcsToken = baseTokens.find((t) => t.currency === "XCS");
+  const xcsAmount = xcsToken ? parseFloat(xcsToken.value) || 0 : 0;
+
+  const totalLabel =
+    stableUsd > 0
+      ? `$${stableUsd.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`
+      : `${xrpAmount.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} XRP`;
+
+  const displayTokens = [
+    {
+      key: "XRP",
+      currency: "XRP",
+      issuer: "Native",
+      value: xrpAmount,
+      type: "native",
+    },
+    ...baseTokens.map((t) => ({
+      key: `${t.currency}:${t.issuer}`,
+      currency: t.currency,
+      issuer: t.issuer,
+      value: parseFloat(t.value) || 0,
+      type:
+        t.currency === "XCS"
+          ? "xcs"
+          : isStablecoin(t.currency)
+          ? "stable"
+          : "other",
+    })),
+    // Tokens de démo supplémentaires pour le layout
+    ...[
+      { currency: "BTC", issuer: "demo", value: 0.1234, type: "other" },
+      { currency: "ETH", issuer: "demo", value: 2.56, type: "other" },
+      { currency: "EUR.X", issuer: "demo", value: 5300, type: "stable" },
+      { currency: "RLUSD", issuer: "demo", value: 12000, type: "stable" },
+      { currency: "JPY.X", issuer: "demo", value: 1500000, type: "stable" },
+      { currency: "USDT", issuer: "demo", value: 3400, type: "stable" },
+      { currency: "USDC", issuer: "demo", value: 2750, type: "stable" },
+      { currency: "GBP.X", issuer: "demo", value: 2100, type: "stable" },
+      { currency: "CHF.X", issuer: "demo", value: 1800, type: "stable" },
+      { currency: "XAU.X", issuer: "demo", value: 3.2, type: "other" },
+    ].map((t) => ({
+      key: `demo:${t.currency}`,
+      currency: t.currency,
+      issuer: t.issuer,
+      value: t.value,
+      type: t.type,
+    })),
+  ];
+
+  const typeWeight = (t) => {
+    if (t.type === "native") return 0;
+    if (t.type === "xcs") return 1;
+    if (t.type === "stable") return 2;
+    return 3;
+  };
+
+  displayTokens.sort((a, b) => {
+    const wa = typeWeight(a);
+    const wb = typeWeight(b);
+    if (wa !== wb) return wa - wb;
+    return b.value - a.value;
+  });
 
   return (
     <>
-      <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden">
-        {/* Header avec wallet address */}
-        <div className="p-6 border-b border-white/10">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-3 h-3 bg-xcannes-green rounded-full animate-pulse"></div>
-                <h2 className="text-xl font-orbitron font-bold text-white">
-                  Wallet Dashboard
-                </h2>
+      <div className="bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden flex flex-col h-full">
+        {/* Header style "wallet app" */}
+        <div className="px-4 pt-5 pb-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">
+                Wallet
+              </p>
+              <p className="pt-10 text-2xl font-orbitron font-bold text-white">
+                {totalLabel}
+              </p>
+              <p className="mt-1 text-xs text-xcannes-green">
+                +0.00 · 0.00%
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-xcannes-green animate-pulse" />
+                <span className="text-[10px] text-white/50">
+                  {effectiveWallet.slice(0, 6)}...
+                  {effectiveWallet.slice(-4)}
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <p className="text-xs font-mono text-white/60 break-all">
-                  {wallet}
-                </p>
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={() => handleCopy(wallet)}
-                  className="text-white/40 hover:text-xcannes-green transition-colors text-sm"
+                  onClick={() => handleCopy(effectiveWallet)}
+                  className="text-[10px] text-white/40 hover:text-white transition-colors"
                   title="Copy address"
                 >
-                  📋
+                  Copy
+                </button>
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="text-[10px] text-white/40 hover:text-white transition-colors disabled:opacity-50"
+                  title="Refresh balance"
+                >
+                  <span
+                    className={
+                      isRefreshing ? "animate-spin inline-block" : ""
+                    }
+                  >
+                    🔄
+                  </span>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Balance Section */}
-        <div className="p-6 space-y-6">
-          {/* XRP Balance */}
-          <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-white/60">XRP Balance</p>
+        {/* Action row */}
+        <div className="px-4 py-3">
+          <div className="grid grid-cols-4 gap-2">
+            {[
+              { key: "send", label: "Send", icon: "↗" },
+              { key: "receive", label: "Receive", icon: "↙" },
+              { key: "swap", label: "Exchange", icon: "⇄" },
+              { key: "buy", label: "Buy", icon: "+" },
+            ].map((action) => (
               <button
-                onClick={handleRefresh}
-                disabled={isCheckingTrustline}
-                className="text-white/60 hover:text-white transition-colors disabled:opacity-50"
-                title="Refresh balance"
+                key={action.key}
+                type="button"
+                onClick={() => setActiveAction(action.key)}
+                className="flex flex-col items-center justify-center gap-1 rounded-xl bg-white/5 py-2 text-[11px] text-white/80 hover:bg-white/10 transition-colors"
               >
-                <span className={isCheckingTrustline ? "animate-spin inline-block" : ""}>
-                  🔄
+                <span className="w-7 h-7 rounded-full bg-blue-500/80 flex items-center justify-center text-sm">
+                  {action.icon}
                 </span>
+                <span>{action.label}</span>
               </button>
-            </div>
-            <p className="text-3xl font-orbitron font-bold text-white">
-              {formatBalance(balance?.xrp || 0)}
-              <span className="text-lg text-white/60 ml-2">XRP</span>
-            </p>
+            ))}
           </div>
+        </div>
 
-          {/* XCS Balance */}
-          <div className="bg-gradient-to-br from-xcannes-green/20 to-xcannes-green/10 border border-xcannes-green/30 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-white/60">XCS Balance</p>
-                {hasTrustline && (
-                  <span className="text-xs bg-xcannes-green/20 text-xcannes-green px-2 py-0.5 rounded-full">
-                    ✓ Trustline Active
-                  </span>
-                )}
-              </div>
-            </div>
-            
-            {hasTrustline ? (
-              <>
-                <p className="text-3xl font-orbitron font-bold text-white">
-                  {formatBalance(xcsBalance)}
-                  <span className="text-lg text-white/60 ml-2">XCS</span>
-                </p>
-                {xcsToken && (
-                  <div className="mt-3 pt-3 border-t border-xcannes-green/20">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-white/40">Trustline Limit:</span>
-                      <span className="text-white/60 font-mono">
-                        {formatBalance(xcsToken.limit)} XCS
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs mt-1">
-                      <span className="text-white/40">Available:</span>
-                      <span className="text-xcannes-green font-mono">
-                        {formatBalance(parseFloat(xcsToken.limit) - xcsBalance)} XCS
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="text-white/40 text-sm">
-                <p className="mb-2">⚠️ No trustline set</p>
-                <p className="text-xs">Create a trustline to receive XCS tokens</p>
-              </div>
-            )}
-          </div>
+        {/* Token list (XRP + XCS + stablecoins + autres) */}
+        <div className="p-4 space-y-2 flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
+          {displayTokens.map((token) => {
+            const isXrp = token.currency === "XRP";
+            const isXcs = token.currency === "XCS";
+            const isStable = token.type === "stable";
 
-          {/* All Active Trustlines */}
-          {balance?.tokens && balance.tokens.length > 0 && (
-            <div>
-              <p className="text-xs uppercase tracking-wider text-white/40 mb-3">
-                All Trustlines ({balance.tokens.length})
-              </p>
-              <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
-                {balance.tokens.map((token, index) => {
-                  const isXCS = token.currency === trustlineData.currency && 
-                               token.issuer === trustlineData.issuer;
-                  const tokenValue = parseFloat(token.value) || 0;
-                  const tokenLimit = parseFloat(token.limit) || 0;
-                  
-                  return (
-                    <div
-                      key={index}
-                      className={`
-                        ${isXCS 
-                          ? 'bg-xcannes-green/10 border-xcannes-green/30' 
-                          : 'bg-white/5 border-white/10'
-                        } 
-                        border rounded-lg p-3 hover:bg-white/10 transition-all
-                      `}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className={`text-sm font-semibold ${isXCS ? 'text-xcannes-green' : 'text-white'}`}>
-                              {token.currency}
-                              {isXCS && (
-                                <span className="ml-2 text-xs bg-xcannes-green/20 px-2 py-0.5 rounded-full">
-                                  XCS
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-white/40">Issuer:</p>
-                              <p className="text-xs text-white/60 font-mono truncate">
-                                {token.issuer.slice(0, 8)}...{token.issuer.slice(-6)}
-                              </p>
-                              <button
-                                onClick={() => handleCopy(token.issuer)}
-                                className="text-white/40 hover:text-xcannes-green text-xs flex-shrink-0"
-                                title="Copy issuer"
-                              >
-                                📋
-                              </button>
-                            </div>
-                            
-                            <div className="flex items-center gap-3 text-xs">
-                              <span className="text-white/40">
-                                Limit: <span className="text-white/60 font-mono">
-                                  {tokenLimit.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                                </span>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right flex-shrink-0">
-                          <p className={`text-base font-mono font-semibold ${
-                            tokenValue > 0 ? 'text-white' : 'text-white/40'
-                          }`}>
-                            {formatBalance(tokenValue)}
-                          </p>
-                          <p className={`text-xs mt-1 ${
-                            tokenValue > 0 
-                              ? 'text-xcannes-green' 
-                              : tokenValue < 0 
-                              ? 'text-red-400' 
-                              : 'text-white/40'
-                          }`}>
-                            {tokenValue > 0 ? '● Active' : tokenValue < 0 ? '● Debt' : '○ Empty'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+            const bgClass = isXrp
+              ? "bg-blue-500/15"
+              : isXcs
+              ? "bg-xcannes-green/15"
+              : isStable
+              ? "bg-emerald-500/10"
+              : "bg-white/5";
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-              <p className="text-xs text-white/40 mb-1">XRP</p>
-              <p className="text-lg font-bold text-blue-400">
-                {formatBalance(balance?.xrp || 0)}
-              </p>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-              <p className="text-xs text-white/40 mb-1">Trustlines</p>
-              <p className="text-lg font-bold text-white">
-                {balance?.tokens?.length || 0}
-              </p>
-            </div>
-            <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-              <p className="text-xs text-white/40 mb-1">Active</p>
-              <p className="text-lg font-bold text-xcannes-green">
-                {balance?.tokens?.filter(t => parseFloat(t.value) > 0).length || 0}
-              </p>
-            </div>
-          </div>
+            const badgeLabel = isXrp
+              ? "XRP · Native"
+              : isXcs
+              ? "XCANNES Token"
+              : isStable
+              ? "XRPL Stablecoin"
+              : "XRPL Token";
 
-          {/* Asset Summary */}
-          {balance && (
-            <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-4">
-              <p className="text-xs uppercase tracking-wider text-white/40 mb-3">
-                📊 Asset Summary
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-white/60">XRP Balance:</span>
-                  <span className="text-sm font-semibold text-blue-400">
-                    {formatBalance(balance.xrp)} XRP
-                  </span>
+            return (
+              <div
+                key={token.key}
+                className={`${bgClass} rounded-xl px-3 py-2.5 flex items-center gap-3`}
+              >
+                <div className="w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-sm font-semibold text-white">
+                  {token.currency[0] || "?"}
                 </div>
-                {hasTrustline && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/60">XCS Balance:</span>
-                    <span className="text-sm font-semibold text-xcannes-green">
-                      {formatBalance(xcsBalance)} XCS
-                    </span>
-                  </div>
-                )}
-                {balance.tokens && balance.tokens.filter(t => t.currency !== 'XCS' && parseFloat(t.value) > 0).length > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-white/60">Other Tokens:</span>
-                    <span className="text-sm font-semibold text-white">
-                      {balance.tokens.filter(t => t.currency !== 'XCS' && parseFloat(t.value) > 0).length} active
-                    </span>
-                  </div>
-                )}
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                  <span className="text-xs text-white/40">Total Trustlines:</span>
-                  <span className="text-xs text-white/60 font-mono">
-                    {balance.tokens?.length || 0} configured
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Trustline Setup Section (si pas de trustline) */}
-          {!hasTrustline && (
-            <div className="border-t border-white/10 pt-6 space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                <h3 className="text-lg font-orbitron font-bold text-white">
-                  Setup XCS Trustline
-                </h3>
-              </div>
-
-              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">⚠️</span>
-                  <div>
-                    <p className="text-sm font-semibold text-yellow-400 mb-1">
-                      Trustline Required
-                    </p>
-                    <p className="text-xs text-white/60">
-                      To receive and trade XCS tokens, you need to create a trustline. 
-                      This is a one-time setup that allows your wallet to hold XCS.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Trustline Info Cards */}
-              <div className="space-y-2">
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <p className="text-xs text-white/40 mb-1">Issuer Address</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-xs font-mono text-white truncate flex-1">
-                      {trustlineData.issuer}
-                    </p>
-                    <button
-                      onClick={() => handleCopy(trustlineData.issuer)}
-                      className="text-white/60 hover:text-xcannes-green transition-colors text-xs"
-                      title="Copy issuer"
-                    >
-                      📋
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                    <p className="text-xs text-white/40 mb-1">Currency</p>
-                    <p className="text-sm font-semibold text-xcannes-green">
-                      {trustlineData.currency}
-                    </p>
-                  </div>
-
-                  <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                    <p className="text-xs text-white/40 mb-1">Limit</p>
-                    <p className="text-sm font-semibold text-white">
-                      {parseInt(trustlineData.limit).toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Trustline Actions */}
-              <div className="space-y-2">
-                <a
-                  href={trustlineURL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between w-full bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold px-4 py-3 rounded-lg transition-all group"
-                >
-                  <span className="text-sm">🔗 Create Trustline (XRPL Services)</span>
-                  <span className="opacity-60 group-hover:opacity-100">→</span>
-                </a>
-
-                <button
-                  onClick={() => handleCopy(trustlineURL)}
-                  className="flex items-center justify-center gap-2 w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-lg transition-all text-sm"
-                >
-                  <span>{copied ? "✓" : "🌐"}</span>
-                  <span>
-                    {copied ? "URL Copied!" : "Copy Trustline URL"}
-                  </span>
-                </button>
-              </div>
-
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                <p className="text-xs text-white/70 leading-relaxed">
-                  💡 <strong>What is a Trustline?</strong><br/>
-                  A trustline is like authorizing your wallet to hold a specific token. 
-                  It&rsquo;s a standard XRPL feature that protects you from receiving unwanted tokens. 
-                  Creating a trustline requires a small XRP reserve (≈2 XRP).
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Success message if trustline exists */}
-          {hasTrustline && (
-            <div className="bg-xcannes-green/10 border border-xcannes-green/20 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">✅</span>
-                <div>
-                  <p className="text-sm font-semibold text-xcannes-green mb-1">
-                    Trustline Active
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white truncate">
+                    {token.currency}
                   </p>
-                  <p className="text-xs text-white/60">
-                    Your wallet is ready to receive and trade XCS tokens. 
-                    You can now purchase XCS with fiat or trade on the DEX.
+                  <p className="text-[11px] text-white/40 truncate">
+                    {badgeLabel}
                   </p>
                 </div>
+                <div className="text-right flex-shrink-0">
+                  <p className="text-sm font-mono text-white">
+                    {formatBalance(token.value)} {token.currency}
+                  </p>
+                  {isStable && (
+                    <p className="text-[11px] text-white/50">
+                      ≈ ${formatBalance(token.value)}
+                    </p>
+                  )}
+                  {isXrp && stableUsd > 0 && (
+                    <p className="text-[11px] text-white/40">
+                      + ${stableUsd.toFixed(2)} stables
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })}
         </div>
       </div>
+
+      {/* Modales d'action (UI only pour l'instant) */}
+      {activeAction === "send" && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-5">
+            <button
+              type="button"
+              onClick={() => setActiveAction(null)}
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            <h3 className="text-xl font-orbitron font-bold text-white mb-1">
+              Send assets
+            </h3>
+            <p className="text-xs text-white/50 mb-4">
+              Choisissez l&apos;actif, le montant et l&apos;adresse XRPL de destination.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] text-white/60 mb-1">
+                  Asset
+                </label>
+                <select className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80">
+                  {displayTokens.map((t) => (
+                    <option key={t.key} value={t.currency}>
+                      {t.currency}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] text-white/60 mb-1">
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.0001"
+                  placeholder="0.0000"
+                  className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-white/60 mb-1">
+                  Destination (XRPL address)
+                </label>
+                <input
+                  type="text"
+                  placeholder="rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                  className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80"
+                />
+              </div>
+              <button
+                type="button"
+                className="w-full mt-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold text-sm py-2.5 rounded-lg transition-all"
+              >
+                Continue (UI only)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeAction === "receive" && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-5">
+            <button
+              type="button"
+              onClick={() => setActiveAction(null)}
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            <h3 className="text-xl font-orbitron font-bold text-white mb-1">
+              Receive assets
+            </h3>
+            <p className="text-xs text-white/50 mb-4">
+              Utilisez cette adresse XRPL pour recevoir des fonds sur votre wallet XCANNES.
+            </p>
+            <div className="bg-black/40 border border-white/10 rounded-lg px-3 py-3 mb-3">
+              <p className="text-[11px] text-white/60 mb-1">Wallet address</p>
+              <p className="text-xs font-mono text-white break-all">
+                {effectiveWallet}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleCopy(effectiveWallet)}
+              className="w-full mb-2 bg-white/10 hover:bg-white/15 text-white text-sm py-2.5 rounded-lg transition-all"
+            >
+              Copy address
+            </button>
+            <p className="text-[11px] text-white/40">
+              Bientôt: QR code de réception et options de réseau détaillées.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {activeAction === "swap" && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-5">
+            <button
+              type="button"
+              onClick={() => setActiveAction(null)}
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            <h3 className="text-xl font-orbitron font-bold text-white mb-1">
+              Swap assets
+            </h3>
+            <p className="text-xs text-white/50 mb-4">
+              Interface de swap visuel entre vos actifs (maquette UI, logique à brancher).
+            </p>
+            <div className="space-y-3">
+              <div className="bg-black/40 border border-white/10 rounded-lg px-3 py-3">
+                <p className="text-[11px] text-white/60 mb-1">From</p>
+                <div className="flex items-center gap-2">
+                  <select className="flex-1 bg-black/60 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80">
+                    {displayTokens.map((t) => (
+                      <option key={t.key} value={t.currency}>
+                        {t.currency}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.0001"
+                    placeholder="0.0000"
+                    className="w-32 bg-black/60 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-center text-white/50 text-xs">
+                ⇄
+              </div>
+
+              <div className="bg-black/40 border border-white/10 rounded-lg px-3 py-3">
+                <p className="text-[11px] text-white/60 mb-1">To</p>
+                <div className="flex items-center gap-2">
+                  <select className="flex-1 bg-black/60 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80">
+                    {displayTokens.map((t) => (
+                      <option key={`${t.key}-to`} value={t.currency}>
+                        {t.currency}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Auto-calculated"
+                    disabled
+                    className="w-32 bg-black/40 border border-dashed border-white/15 rounded-lg px-3 py-2 text-sm text-white/50 outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all"
+              >
+                Preview swap (UI only)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeAction === "buy" && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+          <div className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-5">
+            <button
+              type="button"
+              onClick={() => setActiveAction(null)}
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+            <h3 className="text-xl font-orbitron font-bold text-white mb-1">
+              Buy crypto
+            </h3>
+            <p className="text-xs text-white/50 mb-4">
+              Cette interface accueillera l&apos;on-ramp (carte bancaire / virement) pour acheter des stables ou du XCS directement vers votre wallet XRPL.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] text-white/60 mb-1">
+                  Asset to buy
+                </label>
+                <select className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80">
+                  <option value="XCS">XCS</option>
+                  <option value="RLUSD">RLUSD</option>
+                  <option value="USDT">USDT</option>
+                  <option value="USDC">USDC</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[11px] text-white/60 mb-1">
+                  Fiat amount (placeholder)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="10"
+                  placeholder="100 USD"
+                  className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80"
+                />
+              </div>
+              <button
+                type="button"
+                className="w-full mt-2 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all"
+              >
+                Continue to provider (UI only)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal QR Code XUMM */}
       {qrModalData && (

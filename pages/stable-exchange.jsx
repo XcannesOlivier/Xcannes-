@@ -40,6 +40,29 @@ export default function StableExchange() {
     [pairs, selectedPairId]
   );
 
+  // Préparer les entrées du "tableau de change"
+  const boardEntries = useMemo(() => {
+    const baseEntries =
+      rateBoard.length > 0
+        ? rateBoard
+        : pairs.map((pair) => ({
+            pairId: pair.id,
+            label: pair.label,
+            from: pair.from.currency,
+            to: pair.to.currency,
+            rate: null,
+            inverseRate: null,
+            spreadPercent: null,
+            provider: pair.provider || null,
+            icon: pair.from?.icon || null,
+            timestamp: null,
+          }));
+
+    return baseEntries
+      .slice()
+      .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+  }, [rateBoard, pairs]);
+
   const loadPairs = useCallback(async () => {
     try {
       const res = await fetch(apiUrl("/stable-swap/pairs"));
@@ -393,63 +416,102 @@ export default function StableExchange() {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-5">
-                <p className="text-xs uppercase tracking-[0.35rem] text-white/40 mb-3">
-                  {t("stable_exchange_board_title", "Today’s reference rates")}
-                </p>
-                <div className="space-y-3">
-                  {(rateBoard.length > 0 ? rateBoard : pairs.map((pair) => ({
-                    pairId: pair.id,
-                    label: pair.label,
-                    from: pair.from.currency,
-                    to: pair.to.currency,
-                    rate: null,
-                    inverseRate: null,
-                    spreadPercent: null,
-                    provider: pair.provider || null,
-                    icon: pair.from?.icon || null,
-                  }))).map((entry) => (
-                    <div
-                      key={`${entry.pairId}-${entry.from}-${entry.to}`}
-                      className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex flex-col gap-2"
-                    >
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">
+              <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-0 overflow-hidden">
+                <div className="px-5 pt-4 pb-3 border-b border-white/10">
+                  <p className="text-xs uppercase tracking-[0.35rem] text-white/40">
+                    {t("stable_exchange_board_title", "Today’s reference rates")}
+                  </p>
+                  <p className="mt-1 text-[11px] text-white/40 font-mono">
+                    {t(
+                      "stable_exchange_board_subtitle",
+                      "Airport-style board · XRPL stable pairs"
+                    )}
+                  </p>
+                </div>
+
+                {/* Tableau type panneau d'aéroport */}
+                <div className="px-3 pb-3">
+                  {/* En-têtes */}
+                  <div className="grid grid-cols-[1.4fr_0.9fr_0.9fr_1.1fr_1.1fr_0.8fr] gap-2 px-2 py-2 text-[11px] uppercase tracking-[0.18em] text-white/40 border-b border-white/10">
+                    <span>{t("stable_exchange_board_pair", "Pair")}</span>
+                    <span className="text-right">
+                      {t("stable_exchange_board_from", "You give")}
+                    </span>
+                    <span className="text-right">
+                      {t("stable_exchange_board_to", "You get")}
+                    </span>
+                    <span className="text-right">
+                      {t("stable_exchange_rate_label", "Live rate")}
+                    </span>
+                    <span className="text-right">
+                      {t("stable_exchange_board_inverse", "Inverse")}
+                    </span>
+                    <span className="text-right">
+                      {t("stable_exchange_spread_label", "Spread")}
+                    </span>
+                  </div>
+
+                  {/* Lignes */}
+                  <div className="max-h-[420px] overflow-y-auto custom-scrollbar divide-y divide-white/5">
+                    {boardEntries.map((entry, index) => (
+                      <div
+                        key={`${entry.pairId}-${entry.from}-${entry.to}`}
+                        className={`grid grid-cols-[1.4fr_0.9fr_0.9fr_1.1fr_1.1fr_0.8fr] gap-2 px-2 py-2 text-xs items-center font-mono ${
+                          index % 2 === 0 ? "bg-white/2" : "bg-transparent"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-base">
                             {entry.icon || "💱"}
                           </span>
-                          <div className="flex flex-col leading-tight">
-                            <span className="font-semibold">
+                          <div className="flex flex-col leading-tight min-w-0">
+                            <span className="truncate text-white/90">
                               {entry.label || `${entry.from} → ${entry.to}`}
                             </span>
                             {entry.provider && (
-                              <span className="text-white/40 text-[11px] uppercase tracking-[0.2rem]">
+                              <span className="text-[9px] text-white/40 uppercase tracking-[0.18em]">
                                 {entry.provider}
                               </span>
                             )}
                           </div>
                         </div>
-                        {entry.timestamp && (
-                          <span className="text-white/30 text-xs">
-                            {t("stable_exchange_board_updated", "Updated")}{" "}
-                            {new Date(entry.timestamp).toLocaleTimeString()}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex justify-between text-xs text-white/50">
-                        <span>
-                          {t("stable_exchange_rate_label", "Live rate")}:{" "}
-                          {entry.rate ? formatNumber(entry.rate, { maximumFractionDigits: 6 }) : "—"}
+                        <span className="text-right text-white/70">
+                          {entry.from}
                         </span>
-                        <span>
-                          {t("stable_exchange_spread_label", "Spread")}:{" "}
+                        <span className="text-right text-white/70">
+                          {entry.to}
+                        </span>
+                        <span className="text-right text-white/90">
+                          {entry.rate
+                            ? formatNumber(entry.rate, {
+                                maximumFractionDigits: 6,
+                              })
+                            : "—"}
+                        </span>
+                        <span className="text-right text-white/60">
+                          {entry.inverseRate
+                            ? formatNumber(entry.inverseRate, {
+                                maximumFractionDigits: 6,
+                              })
+                            : "—"}
+                        </span>
+                        <span className="text-right text-white/60">
                           {entry.spreadPercent
                             ? `${(entry.spreadPercent * 100).toFixed(3)}%`
                             : "—"}
                         </span>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+
+                    {boardEntries.length === 0 && (
+                      <div className="px-2 py-6 text-center text-[11px] text-white/40">
+                        {t(
+                          "stable_exchange_board_empty",
+                          "No reference rates yet · waiting for liquidity desk…"
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

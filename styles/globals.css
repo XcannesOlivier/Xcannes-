@@ -9,6 +9,26 @@ body {
   font-family: var(--font-manrope), system-ui, sans-serif;
 }
 
+/* ====== DEX Chart: responsive hauteur mobile / desktop ====== */
+.dex-chart-container {
+  /* Smartphone : hauteur libre avec un minimum confortable */
+  height: auto;
+  min-height: 500px;
+}
+
+@media (min-width: 768px) {
+  .dex-chart-container {
+    height: 500px;
+    min-height: 450px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dex-chart-container {
+    height: 600px;
+  }
+}
+
 /* ========= RTL SUPPORT (Right-To-Left) ========= */
 
 /* Support automatique pour les langues RTL (arabe, ourdou) */

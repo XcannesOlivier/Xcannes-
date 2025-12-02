@@ -120,6 +120,7 @@ export default function SetupPanel({ variant = "card" }) {
           ? "border-t border-white/10"
           : "bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
       } transition-all duration-500 ${
+
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
     >
@@ -227,37 +228,6 @@ export default function SetupPanel({ variant = "card" }) {
 
         {/* COLONNE 2 : Wallet Dashboard */}
         <div className="p-6 space-y-4">
-          {/* Header minimaliste avec lien trustline */}
-          <div className="space-y-3 pb-4 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-xcannes-green"></div>
-              <h3 className="text-lg font-orbitron font-bold text-white">
-                {t("setup_trustline_title")}
-              </h3>
-            </div>
-
-            {/* Trustline rapide */}
-            <div className="flex gap-2">
-              <a
-                href={trustlineURL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold px-4 py-2.5 rounded-lg transition-all text-sm"
-              >
-                <span>🔗</span>
-                <span>{t("setup_trustline_button")}</span>
-              </a>
-
-              <button
-                onClick={() => handleCopy(trustlineURL)}
-                className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2.5 rounded-lg transition-all text-sm"
-                title="Copy trustline URL"
-              >
-                <span>{copied ? "✓" : "📋"}</span>
-              </button>
-            </div>
-          </div>
-
           {/* Dashboard ou message d'attente */}
           {isConnected ? (
             <WalletDashboard />
