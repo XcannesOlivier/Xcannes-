@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useXumm } from "../context/XummContext";
 import XummQRModal from "./XummQRModal";
+import { QRCodeCanvas } from "qrcode.react";
 
 const TRUSTLINE_DATA = {
   issuer: "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx",
@@ -19,6 +20,7 @@ export default function WalletDashboard({ preview = false }) {
     disconnect,
     qrModalData,
     closeQrModal,
+    connect,
   } = useXumm();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -125,25 +127,27 @@ export default function WalletDashboard({ preview = false }) {
           ? "stable"
           : "other",
     })),
-    // Tokens de démo supplémentaires pour le layout
-    ...[
-      { currency: "BTC", issuer: "demo", value: 0.1234, type: "other" },
-      { currency: "ETH", issuer: "demo", value: 2.56, type: "other" },
-      { currency: "EUR.X", issuer: "demo", value: 5300, type: "stable" },
-      { currency: "RLUSD", issuer: "demo", value: 12000, type: "stable" },
-      { currency: "JPY.X", issuer: "demo", value: 1500000, type: "stable" },
-      { currency: "USDT", issuer: "demo", value: 3400, type: "stable" },
-      { currency: "USDC", issuer: "demo", value: 2750, type: "stable" },
-      { currency: "GBP.X", issuer: "demo", value: 2100, type: "stable" },
-      { currency: "CHF.X", issuer: "demo", value: 1800, type: "stable" },
-      { currency: "XAU.X", issuer: "demo", value: 3.2, type: "other" },
-    ].map((t) => ({
-      key: `demo:${t.currency}`,
-      currency: t.currency,
-      issuer: t.issuer,
-      value: t.value,
-      type: t.type,
-    })),
+    // Tokens de démo supplémentaires pour le layout (preview uniquement)
+    ...(preview
+      ? [
+          { currency: "BTC", issuer: "demo", value: 0.1234, type: "other" },
+          { currency: "ETH", issuer: "demo", value: 2.56, type: "other" },
+          { currency: "EUR.X", issuer: "demo", value: 5300, type: "stable" },
+          { currency: "RLUSD", issuer: "demo", value: 12000, type: "stable" },
+          { currency: "JPY.X", issuer: "demo", value: 1500000, type: "stable" },
+          { currency: "USDT", issuer: "demo", value: 3400, type: "stable" },
+          { currency: "USDC", issuer: "demo", value: 2750, type: "stable" },
+          { currency: "GBP.X", issuer: "demo", value: 2100, type: "stable" },
+          { currency: "CHF.X", issuer: "demo", value: 1800, type: "stable" },
+          { currency: "XAU.X", issuer: "demo", value: 3.2, type: "other" },
+        ].map((t) => ({
+          key: `demo:${t.currency}`,
+          currency: t.currency,
+          issuer: t.issuer,
+          value: t.value,
+          type: t.type,
+        }))
+      : []),
   ];
 
   const typeWeight = (t) => {
@@ -162,7 +166,7 @@ export default function WalletDashboard({ preview = false }) {
 
   return (
     <>
-      <div className="bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden flex flex-col h-full">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Header style "wallet app" */}
         <div className="px-4 pt-5 pb-4">
           <div className="flex items-start justify-between gap-3">
@@ -176,6 +180,15 @@ export default function WalletDashboard({ preview = false }) {
               <p className="mt-1 text-xs text-xcannes-green">
                 +0.00 · 0.00%
               </p>
+              {preview && !isConnected && (
+                <button
+                  type="button"
+                  onClick={connect}
+                  className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-xcannes-green/90 text-black text-xs font-semibold hover:bg-xcannes-green transition-all md:hidden"
+                >
+                  <span>Connect with Xumm</span>
+                </button>
+              )}
             </div>
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-1">
@@ -373,8 +386,24 @@ export default function WalletDashboard({ preview = false }) {
               Receive assets
             </h3>
             <p className="text-xs text-white/50 mb-4">
-              Utilisez cette adresse XRPL pour recevoir des fonds sur votre wallet XCANNES.
+              Utilisez ce QR code ou l&apos;adresse XRPL ci-dessous pour recevoir des fonds sur votre wallet XCANNES.
             </p>
+
+            <div className="flex flex-col items-center mb-4">
+              <div className="bg-white rounded-xl p-3 mb-3">
+                <QRCodeCanvas
+                  value={effectiveWallet || ""}
+                  size={160}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-[11px] text-white/60 text-center max-w-xs">
+                Scan depuis votre application XRPL compatible (Xumm, etc.) ou copiez l&apos;adresse ci-dessous.
+              </p>
+            </div>
+
             <div className="bg-black/40 border border-white/10 rounded-lg px-3 py-3 mb-3">
               <p className="text-[11px] text-white/60 mb-1">Wallet address</p>
               <p className="text-xs font-mono text-white break-all">
@@ -388,9 +417,6 @@ export default function WalletDashboard({ preview = false }) {
             >
               Copy address
             </button>
-            <p className="text-[11px] text-white/40">
-              Bientôt: QR code de réception et options de réseau détaillées.
-            </p>
           </div>
         </div>
       )}
@@ -523,6 +549,8 @@ export default function WalletDashboard({ preview = false }) {
           isOpen={!!qrModalData}
           onClose={closeQrModal}
           uuid={qrModalData.uuid}
+          qrUrl={qrModalData.qrUrl}
+          deepLink={qrModalData.deepLink}
           type={qrModalData.type}
           onSuccess={(data) => {
             console.log("XUMM action completed:", data);

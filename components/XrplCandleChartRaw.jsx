@@ -917,16 +917,16 @@ export default function XrplCandleChartRaw({
         crosshair: {
           mode: chartSettings.showCrosshair ? 1 : 0,
           vertLine: {
-            color: "#16b303",
+            color: "#10b981ff",
             width: 1,
             style: 3,
-            labelBackgroundColor: "#16b303",
+            labelBackgroundColor: "#10b981ff",
           },
           horzLine: {
-            color: "#16b303",
+            color: "#10b981ff",
             width: 1,
             style: 3,
-            labelBackgroundColor: "#16b303",
+            labelBackgroundColor: "#10b981ff",
           },
         },
         timeScale: {
@@ -972,12 +972,13 @@ export default function XrplCandleChartRaw({
       // Créer la série selon le type de graphique
       if (chartType === "candle") {
         candleSeriesRef.current = chart.addCandlestickSeries({
-          upColor: "#16b303",
-          downColor: "#dc2626",
-          borderUpColor: "#16b303",
-          borderDownColor: "#dc2626",
-          wickUpColor: "#16b303",
-          wickDownColor: "#dc2626",
+          // Même palette que l'orderbook : vert xcannes-green, rouge xcannes-red
+          upColor: "#10b981c0",
+          downColor: "#f16262ff",
+          borderUpColor: "#10b981c0",
+          borderDownColor: "#f16262ff",
+          wickUpColor: "#10b981c0",
+          wickDownColor: "#f16262ff",
           priceFormat: {
             type: "price",
             precision: 4,
@@ -987,7 +988,7 @@ export default function XrplCandleChartRaw({
       } else {
         // Mode ligne
         candleSeriesRef.current = chart.addLineSeries({
-          color: "#16b303",
+          color: "#10b981c0",
           lineWidth: 2,
           priceLineVisible: true,
           lastValueVisible: true,
@@ -1099,7 +1100,7 @@ export default function XrplCandleChartRaw({
       // Ajouter le volume si activé (XRPL uniquement, pas FX/Pyth)
       if (showVolume && !isFxMode && !isExternal) {
         volumeSeriesRef.current = chart.addHistogramSeries({
-          color: "#16b303",
+          color: "#10b981c0",
           priceFormat: { type: "volume" },
           priceScaleId: "",
           scaleMargins: { top: 0.8, bottom: 0 },
@@ -1138,7 +1139,7 @@ export default function XrplCandleChartRaw({
 
         // Bande inférieure (vert semi-transparent)
         bollingerSeriesRef.current.lower = chart.addLineSeries({
-          color: "rgba(22, 179, 3, 0.8)",
+          color: "#10b981ff",
           lineWidth: 1,
           priceLineVisible: false,
           lastValueVisible: false,
@@ -1551,9 +1552,9 @@ export default function XrplCandleChartRaw({
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
+      className="bg-black/40 backdrop-blur-sm rounded-xl md:rounded-none overflow-hidden flex flex-col h-full"
     >
       {/* Header compact avec prix et contrôles globaux uniquement */}
       <div className="border-b border-white/10 p-3 max-sm:p-2">
@@ -1939,9 +1940,9 @@ export default function XrplCandleChartRaw({
       )}
 
       {/* Container avec barre latérale gauche */}
-      <div className="flex">
+      <div className="flex flex-1 min-h-0">
         {/* Barre verticale gauche - Indicateurs et Overlays */}
-        <div className="w-12 border-r border-white/10 flex flex-col gap-3 p-1.5">
+        <div className="w-12 border-l border-r border-white/10 flex flex-col gap-3 p-1.5">
           {/* Toggle Tooltips */}
           <div className="relative group border-b border-white/10 pb-0 md:pb-3">
             <button
@@ -2384,9 +2385,9 @@ export default function XrplCandleChartRaw({
         </div>
 
         {/* Zone du graphique */}
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col min-h-0 border-r border-white/10">
           {/* Chart Container */}
-          <div className="relative w-full">
+          <div className="relative w-full h-full">
         {/* Status line OHLC en haut du chart */}
         {statusBar && (
           <div className="absolute top-0 left-0 right-0 z-10 flex flex-wrap items-center gap-3 px-3 py-1.5 text-[11px] font-mono">
@@ -2425,12 +2426,12 @@ export default function XrplCandleChartRaw({
           <div className="absolute inset-0 z-5 pointer-events-none">
             {/* Ligne verticale */}
             <div
-              className="absolute top-0 bottom-0 w-px bg-xcannes-green/60"
+              className="absolute top-0 bottom-0 w-px bg-[#10b981ff]"
               style={{ left: `${crosshairPoint.x}px` }}
             />
             {/* Ligne horizontale */}
             <div
-              className="absolute left-0 right-0 h-px bg-xcannes-green/60"
+              className="absolute left-0 right-0 h-px bg-[#10b981ff]"
               style={{ top: `${crosshairPoint.y}px` }}
             />
           </div>

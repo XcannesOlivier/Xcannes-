@@ -112,7 +112,7 @@ export default function Dex() {
 
         <div className="w-full relative z-10">
           {/* Layout principal: sidebar gauche (orderbook) + chart centre + sidebar droite (trading) */}
-          <div className="grid grid-cols-1 md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(300px,360px)] gap-2 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(300px,360px)] gap-0 items-start">
             {/* Sidebar Orderbook + Trades (gauche) */}
             <div className="hidden md:block">
               <div className="sticky top-32 h-[calc(100vh-8rem)]">
@@ -121,7 +121,7 @@ export default function Dex() {
             </div>
 
             {/* Chart au centre */}
-            <div className="flex flex-col justify-end md:min-h-[calc(100vh-8rem)] pb-0 md:pb-0">
+            <div className="flex flex-col md:h-[calc(100vh-8rem)] pb-0 md:pb-0">
               <XrplCandleChartRaw
                 pair={selectedPair}
                 interval={interval}

@@ -81,7 +81,7 @@ export default function OrderbookSidebar({ pair }) {
   const maxBidAmount = Math.max(...bids.map((b) => b.amount || 0), 1);
 
   return (
-    <aside className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-r-xl rounded-l-none h-full flex flex-col">
+    <aside className="bg-black/40 backdrop-blur-sm rounded-l-xl rounded-r-none h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b border-white/10">
         <h2 className="text-sm font-semibold text-white/80 uppercase tracking-wider">
           {t("trading_orderbook")}
@@ -91,7 +91,7 @@ export default function OrderbookSidebar({ pair }) {
         </p>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {isXRPL ? (
           <div className="p-4 space-y-6">
             {/* Orderbook headers + listes (scrollables) */}
@@ -107,61 +107,7 @@ export default function OrderbookSidebar({ pair }) {
               </div>
 
               <div className="space-y-3">
-                {/* Asks */}
-                <div className="sells-list max-h-[180px] overflow-y-auto overscroll-contain pr-1">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="w-1 h-1 rounded-full bg-red-500" />
-                    <span className="text-[11px] font-semibold text-red-400">
-                      {t("trading_sells")}
-                    </span>
-                  </div>
-                  <div className="space-y-0.5">
-                    {asks.map((order, idx) => {
-                      const depthPercent = (order.amount / maxAskAmount) * 100;
-                      return (
-                        <div key={idx} className="relative">
-                          <div
-                            className="absolute inset-y-0 right-0 bg-red-500/10"
-                            style={{ width: `${depthPercent}%` }}
-                          />
-                          <div className="relative grid grid-cols-3 gap-2 py-0.5 text-[11px]">
-                            <div className="text-red-400 font-semibold">
-                              {order.price?.toFixed(6)}
-                            </div>
-                            <div className="text-white/70 text-right">
-                              {order.amount?.toFixed(2)}
-                            </div>
-                            <div className="text-white/50 text-right">
-                              {order.total?.toFixed(4)}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Spread */}
-                <div className="my-1 py-1 text-center border-y border-white/5">
-                  <span className="text-[11px] text-white/40">
-                    {t("trading_spread")}:{" "}
-                    {asks[0] && bids[0]
-                      ? (asks[0].price - bids[0].price).toFixed(6)
-                      : "-"}
-                  </span>
-                </div>
-
-                {/* Spread */}
-                <div className="my-2 py-1 text-center border-y border-white/5">
-                  <span className="text-[11px] text-white/40">
-                    {t("trading_spread")}:{" "}
-                    {asks[0] && bids[0]
-                      ? (asks[0].price - bids[0].price).toFixed(6)
-                      : "-"}
-                  </span>
-                </div>
-
-                {/* Bids */}
+                {/* Bids (offres d'achat) */}
                 <div className="buys-list max-h-[180px] overflow-y-auto overscroll-contain pr-1">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-1 h-1 rounded-full bg-xcannes-green" />
@@ -180,6 +126,50 @@ export default function OrderbookSidebar({ pair }) {
                           />
                           <div className="relative grid grid-cols-3 gap-2 py-0.5 text-[11px]">
                             <div className="text-xcannes-green font-semibold">
+                              {order.price?.toFixed(6)}
+                            </div>
+                            <div className="text-white/70 text-right">
+                              {order.amount?.toFixed(2)}
+                            </div>
+                            <div className="text-white/50 text-right">
+                              {order.total?.toFixed(4)}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Spread */}
+                <div className="my-2 py-1 text-center border-y border-white/5">
+                  <span className="text-[11px] text-white/40">
+                    {t("trading_spread")}:{" "}
+                    {asks[0] && bids[0]
+                      ? (asks[0].price - bids[0].price).toFixed(6)
+                      : "-"}
+                  </span>
+                </div>
+
+                {/* Asks (offres de vente) */}
+                <div className="sells-list max-h-[180px] overflow-y-auto overscroll-contain pr-1">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="w-1 h-1 rounded-full bg-red-500" />
+                    <span className="text-[11px] font-semibold text-red-400">
+                      {t("trading_sells")}
+                    </span>
+                  </div>
+                  <div className="space-y-0.5">
+                    {asks.map((order, idx) => {
+                      const depthPercent = (order.amount / maxAskAmount) * 100;
+                      return (
+                        <div key={idx} className="relative">
+                          <div
+                            className="absolute inset-y-0 right-0 bg-red-500/10"
+                            style={{ width: `${depthPercent}%` }}
+                          />
+                          <div className="relative grid grid-cols-3 gap-2 py-0.5 text-[11px]">
+                            <div className="text-red-400 font-semibold">
                               {order.price?.toFixed(6)}
                             </div>
                             <div className="text-white/70 text-right">

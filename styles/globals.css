@@ -18,14 +18,16 @@ body {
 
 @media (min-width: 768px) {
   .dex-chart-container {
-    height: 500px;
-    min-height: 450px;
+    /* Sur desktop, le conteneur prend toute la hauteur disponible
+       dans la colonne centrale (cf. flex + h-full dans le composant) */
+    height: 100%;
+    min-height: 0;
   }
 }
 
 @media (min-width: 1280px) {
   .dex-chart-container {
-    height: 600px;
+    height: 100%;
   }
 }
 
