@@ -1565,12 +1565,12 @@ export default function XrplCandleChartRaw({
             </h2>
             {(isFxMode ? fxInfo.price : currentPrice) && (
               <div className="flex items-baseline gap-2 max-sm:gap-1">
-                <span className="font-semibold text-white text-base max-sm:text-xs">
-                  {(isFxMode ? fxInfo.price : currentPrice)?.toFixed(6)}
+                <span className="font-semibold text-white text-base max-sm:text-sm">
+                  {(isFxMode ? fxInfo.price : currentPrice)?.toFixed(4)}
                 </span>
                 {(!isFxMode || fxInfo.changePercent != null) && (
                   <span
-                    className={`text-xs max-sm:text-[10px] font-medium ${
+                    className={`text-xs max-sm:text-sm font-medium ${
                       (isFxMode ? fxInfo.changePercent : percent24h.percent) >= 0
                         ? "text-xcannes-green"
                         : "text-red-500"
@@ -1597,7 +1597,7 @@ export default function XrplCandleChartRaw({
           {/* Contrôles globaux + sélecteur FX EOD */}
           <div className="flex items-center gap-3 max-sm:gap-1.5 flex-wrap justify-end max-sm:justify-between max-sm:w-full">
             {/* Mode Live / FX EOD */}
-            <div className="inline-flex items-center rounded-full bg-black/60 border border-white/10 p-1 max-sm:px-1 max-sm:py-0.5 text-[11px] max-sm:text-[10px]">
+            <div className="inline-flex items-center rounded-full bg-black/60 border border-white/10 p-1 max-sm:px-1 max-sm:py-0.5 text-[11px] max-sm:text-sm">
               <button
                 type="button"
                 onClick={() => {
@@ -1612,20 +1612,32 @@ export default function XrplCandleChartRaw({
               >
                 Live
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPairMode("eod");
-                  setIsFxMode(true);
-                }}
-                className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all ${
-                  pairMode === "eod"
-                    ? "bg-white/10 text-white"
-                    : "text-white/60 hover:text-white/90"
-                }`}
-              >
-                FX EOD
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPairMode("eod");
+                    setIsFxMode(true);
+                  }}
+                  className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all ${
+                    pairMode === "eod"
+                      ? "bg-white/10 text-white"
+                      : "text-white/60 hover:text-white/90"
+                  }`}
+                >
+                  EOD
+                </button>
+                {showTooltips && (
+                  <div className="hidden group-hover:block absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg px-2 py-1.5 shadow-xl z-30 whitespace-nowrap">
+                    <div className="text-[11px] max-sm:text-xs font-semibold text-white/90">
+                      End of Day
+                    </div>
+                    <div className="text-[9px] max-sm:text-[11px] text-white/50 mt-0.5">
+                      FX rates · 1 update / 24h
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Contrôles DEX (paires + timeframes) - mode Live */}
@@ -1634,7 +1646,7 @@ export default function XrplCandleChartRaw({
                 {/* Bouton principal - affiche la paire actuelle */}
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="bg-black/60 border border-white/10 px-3 py-1.5 max-sm:px-2 max-sm:py-1 rounded text-xs max-sm:text-[10px] text-white font-medium hover:border-white/20 transition-all flex items-center gap-2 max-sm:gap-1"
+                  className="bg-black/60 border border-white/10 px-3 py-1.5 max-sm:px-2 max-sm:py-1 rounded text-xs max-sm:text-sm text-white font-medium hover:border-white/20 transition-all flex items-center gap-2 max-sm:gap-1"
                 >
                   <span>{pair}</span>
                   <svg 
@@ -1649,7 +1661,7 @@ export default function XrplCandleChartRaw({
                 
                 {/* Menu déroulant en cascade */}
                 {dropdownOpen && (
-                  <div className="absolute top-full left-0 mt-1 bg-black/95 border border-white/20 rounded-lg shadow-2xl z-50 min-w-[220px] max-h-[500px] overflow-y-auto">
+                  <div className="absolute top-full left-0 mt-1 bg-black/95 border border-white/20 rounded-lg shadow-2xl z-50 min-w-[220px] max-h-[70vh] overflow-y-auto">
                     {Object.entries(filteredMarketStructure).map(([marketKey, market]) => {
                       const isXrpl = marketKey === 'xrpl';
                       const isExpanded = expandedMarkets[marketKey];
@@ -1773,7 +1785,7 @@ export default function XrplCandleChartRaw({
                   !isFxMode && onIntervalChange(e.target.value)
                 }
                 disabled={isFxMode}
-                className="bg-black/60 border border-white/10 px-3 py-1.5 max-sm:px-2 max-sm:py-1 rounded text-xs max-sm:text-[10px] text-white font-medium disabled:opacity-40 hover:border-white/20 transition-all"
+                className="bg-black/60 border border-white/10 px-3 py-1.5 max-sm:px-2 max-sm:py-1 rounded text-xs max-sm:text-sm text-white font-medium disabled:opacity-40 hover:border-white/20 transition-all"
               >
                 {availableIntervals.map((int) => (
                   <option key={int} value={int}>
@@ -1955,8 +1967,8 @@ export default function XrplCandleChartRaw({
             </button>
             {showTooltips && (
               <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">Masquer les tooltips</div>
-                <div className="text-[9px] text-white/50 mt-0.5">Désactiver les infobulles</div>
+                <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">Masquer les tooltips</div>
+                <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">Désactiver les infobulles</div>
               </div>
             )}
           </div>
@@ -2005,8 +2017,8 @@ export default function XrplCandleChartRaw({
             </button>
             {showTooltips && (
               <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">{hideAllIndicators ? "Afficher" : "Masquer"} tout</div>
-                <div className="text-[9px] text-white/50 mt-0.5">{hideAllIndicators ? "Réafficher les indicateurs" : "Cacher tous les indicateurs"}</div>
+                <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">{hideAllIndicators ? "Afficher" : "Masquer"} tout</div>
+                <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">{hideAllIndicators ? "Réafficher les indicateurs" : "Cacher tous les indicateurs"}</div>
               </div>
             )}
           </div>
@@ -2033,8 +2045,8 @@ export default function XrplCandleChartRaw({
               </button>
               {showTooltips && (
                 <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">Volume</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">Histogramme des volumes</div>
+                  <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">Volume</div>
+                  <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">Histogramme des volumes</div>
                 </div>
               )}
             </div>
@@ -2059,8 +2071,8 @@ export default function XrplCandleChartRaw({
               </button>
               {showTooltips && (
                 <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">RSI</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">Relative Strength Index</div>
+                  <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">RSI</div>
+                  <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">Relative Strength Index</div>
                 </div>
               )}
             </div>
@@ -2081,8 +2093,8 @@ export default function XrplCandleChartRaw({
               </button>
               {showTooltips && (
                 <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">MACD</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">Moving Average Convergence Divergence</div>
+                  <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">MACD</div>
+                  <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">Moving Average Convergence Divergence</div>
                 </div>
               )}
             </div>
@@ -2102,8 +2114,8 @@ export default function XrplCandleChartRaw({
             </button>
             {showTooltips && (
               <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                <div className="text-[11px] font-semibold text-white/90">Bollinger Bands</div>
-                <div className="text-[9px] text-white/50 mt-0.5">Bandes de volatilité</div>
+                <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">Bollinger Bands</div>
+                <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">Bandes de volatilité</div>
               </div>
             )}
           </div>
@@ -2225,8 +2237,8 @@ export default function XrplCandleChartRaw({
               </button>
               {showTooltips && (
                 <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">VWAP</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">Volume Weighted Average Price</div>
+                  <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">VWAP</div>
+                  <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">Volume Weighted Average Price</div>
                 </div>
               )}
             </div>
@@ -2281,10 +2293,10 @@ export default function XrplCandleChartRaw({
                 </button>
                 {showTooltips && (
                   <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                    <div className="text-[11px] font-semibold text-white/90">
+                    <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">
                       {chartType === "candle" ? "Mode Ligne" : "Mode Bougies"}
                     </div>
-                    <div className="text-[9px] text-white/50 mt-0.5">
+                    <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">
                       {chartType === "candle"
                         ? "Afficher en ligne"
                         : "Afficher en chandeliers"}
@@ -2321,10 +2333,10 @@ export default function XrplCandleChartRaw({
                 </button>
                 {showTooltips && (
                   <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                    <div className="text-[11px] font-semibold text-white/90">
+                    <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">
                       Réinitialiser
                     </div>
-                    <div className="text-[9px] text-white/50 mt-0.5">
+                    <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">
                       Ajuster le zoom automatiquement
                     </div>
                   </div>
@@ -2358,10 +2370,10 @@ export default function XrplCandleChartRaw({
                 </button>
                 {showTooltips && (
                   <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                    <div className="text-[11px] font-semibold text-white/90">
+                    <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">
                       Paramètres
                     </div>
-                    <div className="text-[9px] text-white/50 mt-0.5">
+                    <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">
                       Configuration du graphique
                     </div>
                   </div>
