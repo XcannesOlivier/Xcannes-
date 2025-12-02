@@ -229,7 +229,7 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
         <polyline
           points={points}
           fill="none"
-          stroke={isPositive ? "#16b303" : "#dc2626"}
+          stroke={isPositive ? "#10b981ff" : "#dc2626"}
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"

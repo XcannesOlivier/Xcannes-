@@ -3,7 +3,7 @@
  * Connexion wallet ou signature transaction
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || '').replace(/\/$/, '');
@@ -13,11 +13,14 @@ export default function XummQRModal({
   isOpen, 
   onClose, 
   uuid, 
+  qrUrl,
+  deepLink,
   type = 'connect', // 'connect' ou 'sign'
   onSuccess,
 }) {
   const [status, setStatus] = useState('loading'); // loading, waiting, signed, error
   const [countdown, setCountdown] = useState(300); // 5 minutes
+  const hasAutoOpenedRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen || !uuid) {
@@ -81,6 +84,22 @@ export default function XummQRModal({
     return clearAll;
   }, [isOpen, uuid, onClose, onSuccess]);
 
+  // 📱 Sur smartphone: ouvrir directement l'app XUMM via deep link
+  useEffect(() => {
+    if (!isOpen || !deepLink || hasAutoOpenedRef.current) return;
+    if (typeof window === "undefined") return;
+
+    const isSmallScreen = window.innerWidth <= 768;
+    if (!isSmallScreen) return;
+
+    hasAutoOpenedRef.current = true;
+    try {
+      window.location.href = deepLink;
+    } catch (error) {
+      console.error("Deep link XUMM failed:", error);
+    }
+  }, [isOpen, deepLink]);
+
   if (!isOpen) return null;
 
   return (
@@ -121,7 +140,7 @@ export default function XummQRModal({
               <div className="bg-white p-4 rounded-xl mb-6 inline-block">
                 {uuid && (
                   <Image
-                    src={`https://xumm.app/sign/${uuid}`}
+                    src={qrUrl || `https://xumm.app/sign/${uuid}`}
                     alt="XUMM QR Code"
                     width={256}
                     height={256}
@@ -133,7 +152,7 @@ export default function XummQRModal({
 
               {/* Deep Link Button */}
               <a
-                href={`https://xumm.app/sign/${uuid}`}
+                href={deepLink || `https://xumm.app/sign/${uuid}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold py-3 rounded-lg transition-all mb-4"
