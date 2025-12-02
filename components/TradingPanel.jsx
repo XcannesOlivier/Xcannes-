@@ -217,19 +217,6 @@ export default function TradingPanel({
             />
           </div>
 
-          {/* Percentage buttons */}
-          <div className="grid grid-cols-4 gap-1 mb-3">
-            {[25, 50, 75, 100].map((pct) => (
-              <button
-                key={pct}
-                onClick={() => trade.setPercent(pct)}
-                className="px-2 py-1 border border-white/10 rounded hover:bg-xcannes-green hover:text-black transition-all text-xs"
-              >
-                {pct}%
-              </button>
-            ))}
-          </div>
-
           {/* Price (if limit) */}
           {trade.orderType === "limit" && (
             <div className="mb-3">

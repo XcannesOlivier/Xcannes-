@@ -185,7 +185,6 @@ export default function Home() {
         <TokenomicsSimplified />
         <RoadmapDistributionSection />
         <BuyXCSSection />
-        <TrustlineBlock />
         <FAQSection />
       </div>
 

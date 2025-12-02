@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import Head from "next/head";
+import { useEffect, useState, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
@@ -52,7 +51,11 @@ export default function Dex() {
   const [mobileOrderbookOpen, setMobileOrderbookOpen] = useState(false);
   const [mobileTradingOpen, setMobileTradingOpen] = useState(false);
   const { wallet, isConnected } = useXumm();
-  
+  const tradingScrollPosRef = useRef(0);
+  const tradingScrollTimeRef = useRef(0);
+  const orderbookScrollPosRef = useRef(0);
+  const orderbookScrollTimeRef = useRef(0);
+
   // Charger les paires depuis l'API au montage
   useEffect(() => {
     const fetchPairs = async () => {
@@ -103,12 +106,13 @@ export default function Dex() {
 
       <PriceTicker pairs={pairs} fixed={true} />
 
-      <main className="relative w-full min-h-screen text-white pt-32 pb-0 mb-0 bg-cover bg-center bg-no-repeat bg-fixed font-montserrat font-[300] bg-xcannes-background">
+      {/* Conteneur principal pleine hauteur */}
+      <main className="relative w-full min-h-screen text-white pt-32 pb-36 md:pb-0 mb-0 bg-cover bg-center bg-no-repeat bg-fixed font-montserrat font-[300] bg-xcannes-background">
         <div className="absolute inset-0 bg-black/0 z-0" />
 
         <div className="w-full relative z-10">
           {/* Layout principal: sidebar gauche (orderbook) + chart centre + sidebar droite (trading) */}
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(300px,360px)] gap-2 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(300px,360px)] gap-2 items-start">
             {/* Sidebar Orderbook + Trades (gauche) */}
             <div className="hidden md:block">
               <div className="sticky top-32 h-[calc(100vh-8rem)]">
@@ -117,7 +121,7 @@ export default function Dex() {
             </div>
 
             {/* Chart au centre */}
-            <div className="flex flex-col justify-end min-h-[calc(100vh-8rem)]">
+            <div className="flex flex-col justify-end md:min-h-[calc(100vh-8rem)] pb-0 md:pb-0">
               <XrplCandleChartRaw
                 pair={selectedPair}
                 interval={interval}
@@ -136,19 +140,11 @@ export default function Dex() {
               </div>
             </div>
           </div>
-
-          {isConnected && (
-            <div className="my-12 text-center">
-              <p className="text-xs text-green-400 break-all">
-                {t("dex_wallet_connected")} {wallet}
-              </p>
-            </div>
-          )}
         </div>
       </main>
 
       {/* Mobile bottom nav: Orderbook / Trading */}
-      <div className="fixed inset-x-0 bottom-0 z-40 md:hidden pointer-events-none">
+      <div className="fixed inset-x-0 bottom-0 z-50 md:hidden pointer-events-none">
         <div className="flex justify-center mb-3">
           <div className="pointer-events-auto flex items-center justify-between gap-2 px-4 py-2 rounded-full bg-black/80 border border-white/10 backdrop-blur-md w-[90%] max-w-md">
             <button
@@ -183,7 +179,7 @@ export default function Dex() {
         </div>
 
         {/* Mobile Orderbook bottom sheet */}
-        <div className="fixed inset-0 z-40 md:hidden pointer-events-none">
+        <div className="fixed inset-0 z-50 md:hidden pointer-events-none">
           {/* Overlay */}
           <div
             className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
@@ -197,20 +193,18 @@ export default function Dex() {
               mobileOrderbookOpen ? "translate-y-0" : "translate-y-full"
             } pointer-events-auto`}
           >
-            <div className="h-[75vh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-white/10">
-                <span className="text-xs font-semibold text-white/80">
-                  Order Book
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setMobileOrderbookOpen(false)}
-                  className="text-white/60 hover:text-white text-sm"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden">
               <div className="h-full overflow-y-auto p-2">
+                <div className="flex items-center justify-center pt-2 pb-1">
+                  <button
+                    type="button"
+                    onClick={() => setMobileOrderbookOpen(false)}
+                    className="text-white/60 hover:text-white text-2xl leading-none"
+                    aria-label="Fermer le panneau orderbook"
+                  >
+                    ˅
+                  </button>
+                </div>
                 <OrderbookSidebar pair={selectedPair} />
               </div>
             </div>
@@ -218,7 +212,7 @@ export default function Dex() {
         </div>
 
         {/* Mobile Trading bottom sheet */}
-        <div className="fixed inset-0 z-40 md:hidden pointer-events-none">
+        <div className="fixed inset-0 z-50 md:hidden pointer-events-none">
           {/* Overlay */}
           <div
             className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
@@ -232,30 +226,28 @@ export default function Dex() {
               mobileTradingOpen ? "translate-y-0" : "translate-y-full"
             } pointer-events-auto`}
           >
-            <div className="h-[75vh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2 border-b border-white/10">
-                <span className="text-xs font-semibold text-white/80">
-                  Trading
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setMobileTradingOpen(false)}
-                  className="text-white/60 hover:text-white text-sm"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden">
               <div className="h-full overflow-y-auto p-2">
+                <div className="flex items-center justify-center pt-2 pb-1">
+                  <button
+                    type="button"
+                    onClick={() => setMobileTradingOpen(false)}
+                    className="text-white/60 hover:text-white text-2xl leading-none"
+                    aria-label="Fermer le panneau trading"
+                  >
+                    ˅
+                  </button>
+                </div>
                 <DexSidebar pair={selectedPair} />
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </>
   );
 }
+
 
 export async function getStaticProps({ locale }) {
   return {
