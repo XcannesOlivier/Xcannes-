@@ -27,6 +27,7 @@ export default function XrplCandleChartRaw({
   const chartRef = useRef();
   const chartInstanceRef = useRef(null);
   const candleSeriesRef = useRef(null);
+  const lineShadowSeriesRef = useRef(null);
   const volumeSeriesRef = useRef(null);
   const timeScaleRef = useRef(null);
   const initialVisibleRangeRef = useRef(null);
@@ -629,7 +630,7 @@ export default function XrplCandleChartRaw({
       histogram.push({
         time: signalLine[i].time,
         value: macdLine[macdIndex].value - signalLine[i].value,
-        color: macdLine[macdIndex].value >= signalLine[i].value ? "#16b303" : "#dc2626",
+        color: macdLine[macdIndex].value >= signalLine[i].value ? "#10b981c0" : "#f16262ff",
       });
     }
 
@@ -884,6 +885,7 @@ export default function XrplCandleChartRaw({
       macdSeriesRef.current = { macd: null, signal: null, histogram: null, zeroLine: null };
       rsiSeriesRef.current = { main: null, overbought: null, oversold: null };
       currentCandleRef.current = null;
+      lineShadowSeriesRef.current = null;
     };
 
     const setupChart = async () => {
@@ -985,8 +987,28 @@ export default function XrplCandleChartRaw({
             minMove: 0.0001,
           },
         });
+
+        // Données bougies
+        candleSeriesRef.current.setData(data);
       } else {
-        // Mode ligne
+        // Mode ligne : créer une area "ombre" + une ligne par-dessus
+        const lineData = data.map((d) => ({
+          time: d.time,
+          value: d.close,
+        }));
+
+        // Série d'ombre (area) sous la ligne
+        lineShadowSeriesRef.current = chart.addAreaSeries({
+          lineColor: "#10b981c0",
+          topColor: "rgba(16, 185, 129, 0.10)",
+          bottomColor: "rgba(16, 185, 129, 0.0)",
+          lineWidth: 2,
+          priceLineVisible: false,
+          lastValueVisible: false,
+        });
+        lineShadowSeriesRef.current.setData(lineData);
+
+        // Ligne principale
         candleSeriesRef.current = chart.addLineSeries({
           color: "#10b981c0",
           lineWidth: 2,
@@ -998,17 +1020,6 @@ export default function XrplCandleChartRaw({
             minMove: 0.0001,
           },
         });
-      }
-
-      // Préparer les données selon le type
-      if (chartType === "candle") {
-        candleSeriesRef.current.setData(data);
-      } else {
-        // Pour line chart, utiliser seulement close price
-        const lineData = data.map(d => ({
-          time: d.time,
-          value: d.close
-        }));
         candleSeriesRef.current.setData(lineData);
       }
 
@@ -1109,7 +1120,7 @@ export default function XrplCandleChartRaw({
         const volumeData = data.map((d) => ({
           time: d.time,
           value: d.volume || 0,
-          color: d.close >= d.open ? "#16b30340" : "#dc262640",
+          color: d.close >= d.open ? "#10b98136" : "#f1626238",
         }));
         volumeSeriesRef.current.setData(volumeData);
       }
