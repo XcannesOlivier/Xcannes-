@@ -496,7 +496,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
         >
           <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between gap-2">
             <div className="text-[10px] text-white/40 uppercase">
-              {activeField === "base" ? "Select base currency" : "Select quote currency"}
+              {activeField === "base" ? "Select your trustlines" : "Select quote currency"}
             </div>
             <button
               type="button"
