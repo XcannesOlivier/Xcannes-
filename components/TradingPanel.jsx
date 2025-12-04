@@ -6,7 +6,7 @@ import TokenAmountInput from "./TokenAmountInput";
 import { useTranslation } from "next-i18next";
 import useTrade from "../hooks/useTrade";
 import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ WebSocket
-import { useExternalPrice } from "../hooks/useExternalPrice"; // ✅ Prix live Pyth
+import { useExternalPriceWS } from "../hooks/useExternalPriceWS"; // ✅ Prix live Pyth (WebSocket temps réel)
 import { getPairCategory } from "../utils/marketStructure"; // ✅ Helper pour détecter la catégorie
 
 export default function TradingPanel({
@@ -26,8 +26,8 @@ export default function TradingPanel({
   // ✅ WebSocket hook (XRPL seulement)
   const { connected, orderbooks, trades, subscribe, unsubscribe } = useXcannesWS();
   
-  // ✅ Prix live Pyth (crypto, forex, commodities - pas exotic)
-  const { price: externalPrice, loading: loadingExternalPrice } = useExternalPrice(
+  // ✅ Prix live Pyth via WebSocket (crypto, forex, commodities - pas exotic)
+  const { price: externalPrice, loading: loadingExternalPrice } = useExternalPriceWS(
     isExternal && !isExotic ? pair : null,
     pairCategory
   );

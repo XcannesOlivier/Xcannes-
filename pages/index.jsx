@@ -31,10 +31,10 @@ export default function Home() {
       try {
         const markets = await xcannesApi.getAllMarkets();
         if (markets) {
-          // Priorité: display > pyth (pour éviter doublons)
+          // Priorité: trading (XRPL) > pyth (FOREX)
           const allPairs = [
-            ...(markets.display || []),
-            ...(markets.pyth || [])
+            ...(markets.trading || []),  // Paires XRPL
+            ...(markets.pyth || [])       // Paires Pyth
           ];
           
           const pairsList = Array.from(new Set(

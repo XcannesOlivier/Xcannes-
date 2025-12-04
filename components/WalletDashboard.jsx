@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useXumm } from "../context/XummContext";
 import XummQRModal from "./XummQRModal";
 import { QRCodeCanvas } from "qrcode.react";
+import { useWalletLines } from "../hooks/useWalletLines";
 
 const TRUSTLINE_DATA = {
   issuer: "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx",
@@ -112,9 +113,52 @@ export default function WalletDashboard({ preview = false }) {
       }
     : balance;
 
+  // Lignes de devises internes (stockées en base)
+  const {
+    lines: walletLines,
+    totalLockedXcs,
+    loading: walletLinesLoading,
+    error: walletLinesError,
+    addLine,
+    removeLine,
+  } = useWalletLines(effectiveIsConnected ? effectiveWallet : null);
+
   if (!effectiveIsConnected) {
     return null; // Ne pas afficher si pas connecté (hors preview)
   }
+
+  const handleAddWalletLine = async (currencyCode) => {
+    if (!effectiveIsConnected || !effectiveWallet) {
+      console.warn("Please connect your wallet first.");
+      return;
+    }
+    try {
+      await addLine(currencyCode);
+    } catch (err) {
+      console.error("Add wallet line error:", err);
+    }
+  };
+
+  const handleRemoveWalletLine = async (currencyCode) => {
+    if (!effectiveIsConnected || !effectiveWallet) {
+      console.warn("Please connect your wallet first.");
+      return;
+    }
+    const ok =
+      typeof window === "undefined"
+        ? true
+        : window.confirm(
+            `Remove line ${currencyCode} and unlock its XCS?`
+          );
+    if (!ok) {
+      return;
+    }
+    try {
+      await removeLine(currencyCode);
+    } catch (err) {
+      console.error("Remove wallet line error:", err);
+    }
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -186,6 +230,7 @@ export default function WalletDashboard({ preview = false }) {
 
   const xcsToken = baseTokens.find((t) => t.currency === "XCS");
   const xcsAmount = xcsToken ? parseFloat(xcsToken.value) || 0 : 0;
+  const xcsAvailable = Math.max(xcsAmount - (totalLockedXcs || 0), 0);
 
   const totalLabel =
     stableUsd > 0
@@ -372,7 +417,7 @@ export default function WalletDashboard({ preview = false }) {
     );
   };
 
-  const handleSendSubmit = useCallback(async () => {
+  const handleSendSubmit = async () => {
     if (!isConnected || !wallet) {
       alert("Please connect your Xumm wallet first.");
       return;
@@ -433,15 +478,7 @@ export default function WalletDashboard({ preview = false }) {
     } finally {
       setSendProcessing(false);
     }
-  }, [
-    isConnected,
-    wallet,
-    selectedSendToken,
-    sendAmount,
-    sendDestination,
-    signTransaction,
-    refreshBalance,
-  ]);
+  };
 
   return (
     <>
@@ -526,6 +563,76 @@ export default function WalletDashboard({ preview = false }) {
                 <span>{action.label}</span>
               </button>
             ))}
+          </div>
+
+          {/* Résumé des lignes de devises (XCS bloqués) */}
+          <div className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-[11px] text-white/70">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-semibold text-white/80">
+                World currency lines
+              </span>
+              {walletLinesLoading && (
+                <span className="text-white/40 text-[10px]">Loading…</span>
+              )}
+            </div>
+            {walletLinesError && (
+              <p className="text-[10px] text-red-400 mb-1">
+                {walletLinesError}
+              </p>
+            )}
+            <p className="mb-1">
+              XCS total:&nbsp;
+              <span className="font-mono">
+                {xcsAmount.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                XCS
+              </span>
+            </p>
+            <p className="mb-1">
+              XCS locked in lines:&nbsp;
+              <span className="font-mono">
+                {totalLockedXcs.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                XCS
+              </span>
+            </p>
+            <p className="mb-2">
+              XCS available:&nbsp;
+              <span className="font-mono">
+                {xcsAvailable.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                XCS
+              </span>
+            </p>
+            {walletLines.length > 0 ? (
+              <div className="flex flex-wrap gap-1">
+                {walletLines.map((line) => (
+                  <button
+                    key={line.currencyCode}
+                    type="button"
+                    onClick={() => handleRemoveWalletLine(line.currencyCode)}
+                    className="px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-[10px] hover:bg-red-500/20 hover:border-red-500/40 transition-colors"
+                    title="Click to remove this line"
+                  >
+                    {line.currencyCode} ·{" "}
+                    {Number(line.lockedXcs || 0).toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    XCS
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[10px] text-white/40">
+                No world currency lines yet.
+              </p>
+            )}
           </div>
         </div>
 
@@ -842,10 +949,14 @@ export default function WalletDashboard({ preview = false }) {
                                             <span className="font-semibold text-white/80">CHF</span>
                                             <span>Swiss Franc</span>
                                           </div>
-                                          <div className="flex gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleAddWalletLine("EUR")}
+                                            className="flex gap-2 text-left text-white/70 hover:text-white/100"
+                                          >
                                             <span className="font-semibold text-white/80">EUR</span>
-                                            <span>Euro</span>
-                                          </div>
+                                            <span>Euro · add line</span>
+                                          </button>
                                           <div className="flex gap-2">
                                             <span className="font-semibold text-white/80">FRF</span>
                                             <span>French Franc</span>

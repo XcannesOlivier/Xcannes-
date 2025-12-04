@@ -9,6 +9,7 @@ export const XcannesWSProvider = ({ children }) => {
   const [orderbooks, setOrderbooks] = useState(new Map()); // Map<pair, orderbook>
   const [trades, setTrades] = useState(new Map()); // Map<pair, trades[]>
   const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> pour forex/crypto/commodity
+  const [externalPricesVersion, setExternalPricesVersion] = useState(0); // ✅ Compteur pour forcer re-render
 
   const normalizeTrade = (trade) => {
     if (!trade || !trade.symbol) return null;
@@ -81,24 +82,26 @@ export const XcannesWSProvider = ({ children }) => {
 
     // Écouter les prix externes Pyth (forex, crypto, commodity)
     const handleForex = (message) => {
-      console.log('[XcannesWS] 📊 Forex reçu:', message);
+      console.log('[XcannesWS] 📊 Forex reçu:', message.data?.symbol || message);
       if (message.data && message.data.symbol) {
         setExternalPrices(prev => {
           const next = new Map(prev);
           next.set(message.data.symbol, message.data);
           return next;
         });
+        setExternalPricesVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
       }
     };
 
     const handleCommodity = (message) => {
-      console.log('[XcannesWS] 🥇 Commodity reçu:', message);
+      console.log('[XcannesWS] 🥇 Commodity reçu:', message.data?.symbol || message);
       if (message.data && message.data.symbol) {
         setExternalPrices(prev => {
           const next = new Map(prev);
           next.set(message.data.symbol, message.data);
           return next;
         });
+        setExternalPricesVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
       }
     };
 
@@ -110,6 +113,7 @@ export const XcannesWSProvider = ({ children }) => {
           next.set(message.data.symbol, message.data);
           return next;
         });
+        setExternalPricesVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
       }
     };
 
@@ -181,6 +185,7 @@ export const XcannesWSProvider = ({ children }) => {
     orderbooks,
     trades,
     externalPrices,
+    externalPricesVersion, // ✅ Exposer le compteur
     subscribe,
     unsubscribe,
     ws: wsClient,

@@ -64,7 +64,8 @@ export const getPairCategory = (pair) => {
   for (const [categoryKey, category] of Object.entries(MARKET_STRUCTURE)) {
     for (const [currency, pairs] of Object.entries(category.currencies)) {
       if (pairs.includes(pair)) {
-        return categoryKey;
+        // Normaliser 'commodities' → 'commodity' pour cohérence avec backend
+        return categoryKey === 'commodities' ? 'commodity' : categoryKey;
       }
     }
   }

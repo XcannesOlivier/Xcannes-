@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import Link from "next/link";
 import { createChart } from "lightweight-charts";
 import { getBookIdFromPair } from "../utils/xrpl";
 import xcannesApi from "../lib/xcannesApi";
@@ -8,6 +9,7 @@ import { useXcannesWS } from "../context/XcannesWSContext"; // ✅ Hook WebSocke
 import { MARKET_STRUCTURE, getPairCategory } from "../utils/marketStructure"; // ✅ Structure des marchés
 import FxPairSelector from "../components/FxPairSelector";
 import ChartFooter from "./ChartFooter";
+import PriceTicker from "./PriceTicker";
 
 export default function XrplCandleChartRaw({
   pair = "XCS/XRP",
@@ -71,7 +73,7 @@ export default function XrplCandleChartRaw({
   const isExotic = pairCategory === 'exotic';
   
   // ✅ WebSocket centralisé (XRPL + Pyth)
-  const { connected, orderbooks, externalPrices, subscribe, unsubscribe, tickers } = useXcannesWS();
+  const { connected, orderbooks, externalPrices, externalPricesVersion, subscribe, unsubscribe, tickers } = useXcannesWS();
   
   // ✅ Refs pour le temps réel
   const currentCandleRef = useRef(null); // Bougie en cours de formation
@@ -82,7 +84,7 @@ export default function XrplCandleChartRaw({
   const [currentPrice, setCurrentPrice] = useState(null);
   const [priceChange, setPriceChange] = useState({ value: 0, percent: 0 });
   const [percent24h, setPercent24h] = useState({ value: 0, percent: 0 }); // ✅ Nouveau: % 24h indépendant
-  const [showVolume, setShowVolume] = useState(true);
+  const [showVolume, setShowVolume] = useState(false); // ✅ Désactivé par défaut pour XRPL, l'utilisateur peut l'activer
   const [chartType, setChartType] = useState("candle"); // "candle" ou "line"
   const [showBollinger, setShowBollinger] = useState(false);
   const [showRSI, setShowRSI] = useState(false);
@@ -262,6 +264,43 @@ export default function XrplCandleChartRaw({
     };
   }, [pair]);
 
+  // ✅ NOUVEAU: Polling périodique du % 24h (comme PriceTicker) toutes les 30 secondes
+  useEffect(() => {
+    if (isFxMode) return; // En mode FX, % géré ailleurs
+    
+    let cancelled = false;
+    
+    const updatePercent24h = async () => {
+      try {
+        const book = getBookIdFromPair(pair);
+        if (!book?.backendPair || cancelled) return;
+
+        const ticker = await xcannesApi.getTicker(book.backendPair);
+        if (!ticker || cancelled) return;
+
+        const changeVal = Number(ticker.change24h ?? ticker.change ?? 0);
+        const changePct = Number(ticker.changePercent24h ?? ticker.changePercent ?? 0);
+
+        if (Number.isFinite(changePct)) {
+          setPercent24h({
+            value: Number.isFinite(changeVal) ? changeVal : 0,
+            percent: changePct,
+          });
+        }
+      } catch (err) {
+        console.error("[Chart] Erreur updatePercent24h:", err);
+      }
+    };
+
+    // Polling toutes les 3 secondes pour mise à jour ultra-rapide du %
+    const interval = setInterval(updatePercent24h, 3000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [pair, isFxMode]);
+
   // ✅ Charger les données FX EOD (Fawaz) pour la paire sélectionnée dans le header FX
   useEffect(() => {
     let cancelled = false;
@@ -312,6 +351,12 @@ export default function XrplCandleChartRaw({
   const updateCurrentCandle = useCallback((midPrice) => {
     if (!candleSeriesRef.current || !midPrice) return;
     
+    // ✅ Validation: prix doit être positif et réaliste
+    if (midPrice <= 0 || !isFinite(midPrice)) {
+      console.warn('[Chart] Prix invalide ignoré:', midPrice);
+      return;
+    }
+    
     const now = Math.floor(Date.now() / 1000);
     const intervalSeconds = intervalSecondsRef.current;
     const candleTime = Math.floor(now / intervalSeconds) * intervalSeconds;
@@ -361,15 +406,30 @@ export default function XrplCandleChartRaw({
   
   // ✅ Écouter les mises à jour de l'orderbook via le WebSocket centralisé (XRPL UNIQUEMENT)
   useEffect(() => {
-    if (!isXRPL || isFxMode) return; // Ignorer si ce n'est pas une paire XRPL ou en mode FX
-    if (!connected || !orderbooks) return;
+    if (!isXRPL || isFxMode) {
+      console.log(`[Chart] ⏭️ Skip XRPL listener - isXRPL:${isXRPL}, isFxMode:${isFxMode}`);
+      return;
+    }
+    if (!connected || !orderbooks) {
+      console.log(`[Chart] ⏸️ WebSocket XRPL - connected:${connected}, orderbooks:`, orderbooks ? 'present' : 'missing');
+      return;
+    }
     
     const book = getBookIdFromPair(pair);
-    if (!book) return;
+    if (!book) {
+      console.log(`[Chart] ⚠️ Pas de book pour ${pair}`);
+      return;
+    }
     
     // Récupérer l'orderbook pour cette paire depuis la Map
     const orderbookData = orderbooks.get(book.backendPair);
-    if (!orderbookData) return;
+    
+    console.log(`[Chart] 🔍 Checking orderbook for ${book.backendPair}:`, orderbookData ? 'present' : 'missing');
+    
+    if (!orderbookData) {
+      console.log(`[Chart] ⚠️ Pas d'orderbook pour ${book.backendPair}`);
+      return;
+    }
     
     const { bids, asks } = orderbookData;
     
@@ -378,34 +438,53 @@ export default function XrplCandleChartRaw({
       const bestAsk = parseFloat(asks[0].price);
       const midPrice = (bestBid + bestAsk) / 2;
       
+      console.log(`[Chart] 📊 XRPL midPrice pour ${pair}: ${midPrice} (bid: ${bestBid}, ask: ${bestAsk})`);
+      
       // ✅ Mettre à jour la bougie en cours
       updateCurrentCandle(midPrice);
+    } else {
+      console.log(`[Chart] ⚠️ Orderbook incomplet - bids:`, bids?.[0], 'asks:', asks?.[0]);
     }
-  }, [orderbooks, connected, pair, updateCurrentCandle, isXRPL]);
+  }, [orderbooks, connected, pair, isXRPL, isFxMode]);
   
   // ✅ Écouter les prix externes Pyth via WebSocket (CRYPTO, FOREX, COMMODITIES - pas EXOTIC)
   useEffect(() => {
-    if (!isExternal || isExotic || isFxMode) return;
-    if (!connected) return;
+    if (!isExternal || isExotic || isFxMode) {
+      console.log(`[Chart] ⏭️ Skip Pyth listener - isExternal:${isExternal}, isExotic:${isExotic}, isFxMode:${isFxMode}`);
+      return;
+    }
+    if (!connected) {
+      console.log(`[Chart] ⏸️ WebSocket non connecté`);
+      return;
+    }
     
     const symbol = pair.replace('/', '_'); // EUR/USD → EUR_USD
     const externalPrice = externalPrices.get(symbol);
     
-    if (!externalPrice || !externalPrice.midPrice) return;
+    console.log(`[Chart] 🔍 Checking externalPrice for ${symbol}:`, externalPrice);
+    
+    if (!externalPrice || !externalPrice.midPrice) {
+      console.log(`[Chart] ⚠️ Pas de prix Pyth pour ${symbol} - midPrice:`, externalPrice?.midPrice);
+      return;
+    }
     
     console.log(`[Chart] 📈 Prix live Pyth WebSocket pour ${pair}:`, externalPrice.midPrice);
     updateCurrentCandle(externalPrice.midPrice);
-  }, [externalPrices, pair, updateCurrentCandle, isExternal, isExotic, connected]);
+  }, [externalPrices, externalPricesVersion, pair, isExternal, isExotic, connected, isFxMode]); // ✅ Ajouter externalPricesVersion
   
   // ✅ S'abonner aux channels Pyth via WebSocket
   useEffect(() => {
     if (!isExternal || isExotic || !connected || isFxMode) return;
     
     const symbol = pair.replace('/', '_');
-    const channel = pairCategory; // 'forex', 'commodity' ou 'crypto'
+    // ✅ Utiliser la catégorie de la paire (forex, commodities, crypto)
+    // Attention: 'commodities' avec un S (pluriel)
+    let channel = pairCategory; // 'forex', 'commodities', 'crypto'
+    if (channel === 'commodities') {
+      channel = 'commodity'; // Backend utilise 'commodity' au singulier dans les broadcasts
+    }
     
     console.log(`[Chart] 🔌 Abonnement WebSocket Pyth:`, channel, symbol);
-    // Backend attend: channel = 'forex' | 'commodity' | 'crypto', pair = 'EUR_USD'...
     subscribe(channel, symbol);
     
     return () => {
@@ -429,44 +508,6 @@ export default function XrplCandleChartRaw({
       unsubscribe('orderbook', book.backendPair);
     };
   }, [pair, connected, subscribe, unsubscribe, isXRPL]);
-
-  // ✅ Mettre à jour le % 24h en fonction du ticker backend (source unique XRPL/Pyth)
-  useEffect(() => {
-    if (isFxMode) {
-      // En mode FX, % affiché vient de fxInfo
-      return;
-    }
-    const updateFromTicker = (ticker) => {
-      if (!ticker) return;
-
-      const changeVal = Number(
-        ticker.change24h ?? ticker.change ?? 0
-      );
-      const changePct = Number(
-        ticker.changePercent24h ?? ticker.changePercent ?? 0
-      );
-
-      if (!Number.isFinite(changePct)) {
-        setPercent24h({ value: 0, percent: 0 });
-        return;
-      }
-
-      setPercent24h({
-        value: Number.isFinite(changeVal) ? changeVal : 0,
-        percent: changePct,
-      });
-    };
-
-    const book = getBookIdFromPair(pair);
-    if (!book?.backendPair) {
-      setPercent24h({ value: 0, percent: 0 });
-      return;
-    }
-
-    const map = tickers instanceof Map ? tickers : new Map();
-    const ticker = map.get(book.backendPair);
-    updateFromTicker(ticker);
-  }, [tickers, pair, isFxMode]);
 
   // Calculer Bollinger Bands (SMA + écart-type)
   const calculateBollingerBands = (data, period = 20, stdDev = 2) => {
@@ -692,13 +733,14 @@ export default function XrplCandleChartRaw({
       );
 
       // Limites adaptées selon le timeframe pour profiter de l'historique MongoDB
+      // Mode Équilibré Premium: Compromis optimal performance/historique
       const limits = {
-        "1m": 500, // ~8 heures
-        "5m": 500, // ~1.7 jours
-        "15m": 500, // ~5 jours
-        "1h": 1000, // ~42 jours (historique complet!)
-        "4h": 500, // ~2.7 mois
-        "1d": 365, // ~1 an
+        "1m": 3000,  // ~50 heures (2+ jours)
+        "5m": 3000,  // ~10 jours
+        "15m": 3000, // ~31 jours (1 mois complet)
+        "1h": 5000,  // ~208 jours (~7 mois) - Excellent pour analyse technique
+        "4h": 2000,  // ~333 jours (~11 mois)
+        "1d": 400,   // ~1 an+
       };
 
       // Appel au backend Xcannes pour récupérer les klines
@@ -766,22 +808,20 @@ export default function XrplCandleChartRaw({
           candleSeriesRef.current.setData(lineData);
         }
         
-        // Mettre à jour la bougie courante
+        // Mettre à jour la bougie courante SEULEMENT si c'est la dernière bougie MongoDB
         const lastCandle = data[data.length - 1];
         const now = Math.floor(Date.now() / 1000);
         const intervalSeconds = intervalSecondsRef.current;
         const currentCandleTime = Math.floor(now / intervalSeconds) * intervalSeconds;
         
+        // ✅ FIX: Ne créer une bougie future QUE si on a un prix temps réel
+        // Sinon, on garde juste la référence à la dernière bougie MongoDB
         if (lastCandle.time === currentCandleTime) {
           currentCandleRef.current = { ...lastCandle };
         } else {
-          currentCandleRef.current = {
-            time: currentCandleTime,
-            open: lastCandle.close,
-            high: lastCandle.close,
-            low: lastCandle.close,
-            close: lastCandle.close,
-          };
+          // Ne PAS créer de bougie future ici, elle sera créée uniquement
+          // quand updateCurrentCandle() recevra un prix temps réel
+          currentCandleRef.current = null;
         }
         
         console.log('[Chart] ✅ Bougies 1m rechargées depuis MongoDB');
@@ -955,7 +995,7 @@ export default function XrplCandleChartRaw({
           mouseWheel: true,
           pressedMouseMove: true,
           horzTouchDrag: true,
-          vertTouchDrag: false,
+          vertTouchDrag: true, // ✅ Activé pour zoomer sur l'échelle des prix avec les doigts (iPhone)
         },
         rightPriceScale: {
           borderColor: "#2a2f2d",
@@ -965,6 +1005,11 @@ export default function XrplCandleChartRaw({
           },
           autoScale: true, // ✅ Activé
           mode: 0, // Mode normal (pas logarithmique)
+          // ✅ Formatter personnalisé pour afficher 4 digits sur la price scale
+          // Les données restent en 6 digits, seul l'affichage change
+          tickMarkFormatter: (price) => {
+            return price.toFixed(4);
+          },
         },
       });
 
@@ -983,8 +1028,8 @@ export default function XrplCandleChartRaw({
           wickDownColor: "#f16262ff",
           priceFormat: {
             type: "price",
-            precision: 4,
-            minMove: 0.0001,
+            precision: 6,
+            minMove: 0.000001,
           },
         });
 
@@ -1016,8 +1061,8 @@ export default function XrplCandleChartRaw({
           lastValueVisible: true,
           priceFormat: {
             type: "price",
-            precision: 4,
-            minMove: 0.0001,
+            precision: 6,
+            minMove: 0.000001,
           },
         });
         candleSeriesRef.current.setData(lineData);
@@ -1450,7 +1495,8 @@ export default function XrplCandleChartRaw({
           let changed = false;
 
           const intervalSeconds = intervalSecondsRef.current || 60;
-          const maxTo = lastTime + intervalSeconds * 10; // autoriser ~10 bougies de "future"
+          // ✅ FIX: Réduire à 2 bougies futures max pour éviter les bougies vides/aberrantes
+          const maxTo = lastTime + intervalSeconds * 2; // autoriser ~2 bougies de "future" seulement
 
           // Limite côté gauche : ne pas aller avant la première bougie
           if (from < firstTime) {
@@ -1458,7 +1504,7 @@ export default function XrplCandleChartRaw({
             changed = true;
           }
 
-          // Limite côté droit : ne pas aller plus loin que 10 bougies après la dernière
+          // Limite côté droit : ne pas aller plus loin que 2 bougies après la dernière
           if (to > maxTo) {
             const shift = to - maxTo;
             to = maxTo;
@@ -1567,6 +1613,32 @@ export default function XrplCandleChartRaw({
       ref={containerRef}
       className="bg-black/40 backdrop-blur-sm rounded-xl md:rounded-none overflow-hidden flex flex-col h-full"
     >
+      {/* Bouton retour flottant mobile uniquement */}
+      <Link
+        href="/"
+        className="md:hidden fixed top-0 left-0 z-50 text-white hover:text-xcannes-green transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-8 w-8"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </Link>
+
+      {/* PriceTicker mobile uniquement */}
+      <div className="md:hidden">
+        <PriceTicker pairs={availablePairs} fixed={false} />
+      </div>
+
       {/* Header compact avec prix et contrôles globaux uniquement */}
       <div className="border-b border-white/10 p-3 max-sm:p-2">
         <div className="flex items-center justify-between gap-3 max-sm:gap-1.5 max-sm:flex-col max-sm:items-stretch">
@@ -1578,7 +1650,7 @@ export default function XrplCandleChartRaw({
             {(isFxMode ? fxInfo.price : currentPrice) && (
               <div className="flex items-baseline gap-2 max-sm:gap-1">
                 <span className="font-semibold text-white text-base max-sm:text-sm">
-                  {(isFxMode ? fxInfo.price : currentPrice)?.toFixed(4)}
+                  {(isFxMode ? fxInfo.price : currentPrice)?.toFixed(6)}
                 </span>
                 {(!isFxMode || fxInfo.changePercent != null) && (
                   <span
@@ -1807,7 +1879,7 @@ export default function XrplCandleChartRaw({
               </select>
             )}
 
-            {/* Type de chart (header uniquement en mode Live) */}
+            {/* Type de chart (header en mode Live) */}
             {pairMode === "live" && (
               <div className="relative group">
                 <button
@@ -1837,7 +1909,7 @@ export default function XrplCandleChartRaw({
               </div>
             )}
 
-            {/* Reset (header uniquement en mode Live) */}
+            {/* Reset (header en mode Live) */}
             {pairMode === "live" && (
               <div className="relative group">
                 <button
@@ -1862,9 +1934,9 @@ export default function XrplCandleChartRaw({
               </div>
             )}
 
-            {/* Settings (header uniquement en mode Live) */}
+            {/* Settings (header desktop uniquement - mobile utilise toolbar) */}
             {pairMode === "live" && (
-              <div className="relative group">
+              <div className="relative group hidden md:block">
                 <button
                   onClick={() => setShowSettings(!showSettings)}
                   className={`p-2 transition-all flex items-center justify-center ${
@@ -2408,25 +2480,25 @@ export default function XrplCandleChartRaw({
             <span className="text-white/60">
               O{" "}
               <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
-                {statusBar.open.toFixed(4)}
+                {statusBar.open.toFixed(6)}
               </span>
             </span>
             <span className="text-white/60">
               H{" "}
               <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
-                {statusBar.high.toFixed(4)}
+                {statusBar.high.toFixed(6)}
               </span>
             </span>
             <span className="text-white/60">
               L{" "}
               <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
-                {statusBar.low.toFixed(4)}
+                {statusBar.low.toFixed(6)}
               </span>
             </span>
             <span className="text-white/60">
               C{" "}
               <span className={statusBar.isUp ? "text-xcannes-green" : "text-red-400"}>
-                {statusBar.close.toFixed(4)}
+                {statusBar.close.toFixed(6)}
               </span>
             </span>
           </div>
@@ -2488,8 +2560,8 @@ export default function XrplCandleChartRaw({
         </div>
       </div>
 
-      {/* Footer Stats: desktop sous le chart */}
-      <div className="hidden md:block">
+      {/* Footer Stats: visible sur tous les écrans */}
+      <div>
         <ChartFooter pair={pair} />
       </div>
     </div>
