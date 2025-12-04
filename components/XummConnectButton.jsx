@@ -1,23 +1,19 @@
-import { useState } from "react";
 import { useXumm } from "../context/XummContext";
 import { useTranslation } from "next-i18next";
-import WalletDashboard from "./WalletDashboard";
 
 export default function XummConnectButton({ small = false }) {
   const { wallet, isConnected, connect, disconnect } = useXumm();
   const { t } = useTranslation("common");
-  const [showDashboard, setShowDashboard] = useState(false);
 
   if (isConnected) {
     return (
       <>
         <div className="inline-flex items-center gap-3">
-          {/* Badge connecté - cliquable pour ouvrir dashboard */}
-          <button
-            onClick={() => setShowDashboard(true)}
+          {/* Badge connecté (info rapide, non cliquable) */}
+          <div
             className={`flex items-center gap-3 ${
               small ? "px-4 py-2" : "px-6 py-3"
-            } bg-xcannes-green/10 border border-xcannes-green/30 rounded-lg backdrop-blur-sm hover:bg-xcannes-green/20 transition-all duration-200 cursor-pointer group`}
+            } bg-xcannes-green/10 border border-xcannes-green/30 rounded-lg backdrop-blur-sm group`}
           >
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-xcannes-green animate-pulse" />
@@ -36,10 +32,7 @@ export default function XummConnectButton({ small = false }) {
             >
               {wallet.slice(0, 6)}...{wallet.slice(-4)}
             </span>
-            <span className="text-white/40 group-hover:text-white text-xs">
-              👁️
-            </span>
-          </button>
+          </div>
 
           {/* Bouton déconnexion */}
           <button
@@ -54,23 +47,6 @@ export default function XummConnectButton({ small = false }) {
           </button>
         </div>
 
-        {/* Modal Dashboard */}
-        {showDashboard && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-            <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              {/* Bouton fermer */}
-              <button
-                onClick={() => setShowDashboard(false)}
-                className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"
-                aria-label="Close dashboard"
-              >
-                ✕
-              </button>
-
-              <WalletDashboard />
-            </div>
-          </div>
-        )}
       </>
     );
   }

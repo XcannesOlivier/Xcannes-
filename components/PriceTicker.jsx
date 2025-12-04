@@ -55,12 +55,21 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
           const ticker = await getCachedOrFetch(bookData.backendPair);
           if (!ticker) return null;
 
+          // ✅ Récupérer le % avec validation stricte (comme Chart)
           const changeSource =
             ticker.changePercent24h ??
             ticker.changePercent ??
-            ticker.change ??
-            0;
-          const change = Number.parseFloat(changeSource) || 0;
+            ticker.change;
+          
+          // ✅ Ne convertir QUE si on a une valeur valide
+          // Sinon on garde null pour conserver l'ancienne valeur dans le merge
+          let change = null;
+          if (changeSource !== undefined && changeSource !== null) {
+            const parsed = Number.parseFloat(changeSource);
+            if (Number.isFinite(parsed)) {
+              change = parsed;
+            }
+          }
 
           const sparklineData =
             Array.isArray(ticker.sparkline24h) && ticker.sparkline24h.length > 0
@@ -71,10 +80,11 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
             pair,
             backendPair: bookData.backendPair,
             price: parseFloat(ticker.lastPrice || 0).toFixed(4),
-            change: change.toFixed(2),
+            change: change !== null ? change.toFixed(2) : '0.00', // Default initial seulement
             sparkline: sparklineData,
-            isPositive: change >= 0,
-            volume24h: ticker.volume24h || '0.0000'
+            isPositive: change !== null ? change >= 0 : true,
+            volume24h: ticker.volume24h || '0.0000',
+            hasValidChange: change !== null // ✅ Flag pour savoir si on a un % valide
           };
         } catch (error) {
           console.error(`[PriceTicker] Erreur ${pair}:`, error);
@@ -86,7 +96,38 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
       const validResults = results.filter((r) => r !== null);
 
       if (validResults.length > 0 && isMountedRef.current) {
-        setPricesData(validResults);
+        // ✅ Merge intelligent : conserver % et sparkline existants pour éviter les clignotements
+        setPricesData((prevData) => {
+          if (prevData.length === 0) {
+            return validResults; // Premier chargement
+          }
+          
+          // Merge avec conservation du % et sparkline si nécessaire
+          return validResults.map((newItem) => {
+            const existingItem = prevData.find(p => p.backendPair === newItem.backendPair);
+            
+            if (!existingItem) {
+              return newItem; // Nouvelle paire
+            }
+            
+            const merged = { ...newItem };
+            
+            // ✅ Conserver le % si le nouveau n'est pas valide
+            if (!newItem.hasValidChange && existingItem.change !== '0.00') {
+              merged.change = existingItem.change;
+              merged.isPositive = existingItem.isPositive;
+              merged.hasValidChange = true;
+            }
+            
+            // ✅ Conserver la sparkline existante pour éviter le clignotement
+            // La sparkline sera mise à jour uniquement via WebSocket (temps réel)
+            if (existingItem.sparkline && existingItem.sparkline.length > 0) {
+              merged.sparkline = existingItem.sparkline;
+            }
+            
+            return merged;
+          });
+        });
       }
     } catch (error) {
       console.error("[PriceTicker] Erreur fetch prices:", error);
@@ -127,6 +168,9 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
     const tickerMap = tickers instanceof Map ? tickers : new Map();
     const orderbookMap = orderbooks instanceof Map ? orderbooks : new Map();
 
+    // ✅ Ne mettre à jour que si on a réellement des tickers ou orderbooks
+    if (tickerMap.size === 0 && orderbookMap.size === 0) return;
+
     setPricesData((prev) =>
       prev.map((item) => {
         const updated = { ...item };
@@ -140,19 +184,23 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
             updated.price = parsedPrice.toFixed(4);
           }
 
-          if (tickerData.changePercent24h !== undefined) {
-            const percent = parseFloat(tickerData.changePercent24h);
+          // ✅ Mise à jour du % SEULEMENT si on a une valeur valide et finite
+          // On garde TOUJOURS le dernier % valide connu, jamais de reset à 0
+          const percentSource = 
+            tickerData.changePercent24h ?? 
+            tickerData.changePercent ?? 
+            tickerData.change;
+          
+          if (percentSource !== undefined && percentSource !== null) {
+            const percent = parseFloat(percentSource);
+            // Ne mettre à jour QUE si c'est un nombre valide et finite
             if (Number.isFinite(percent)) {
               updated.change = percent.toFixed(2);
               updated.isPositive = percent >= 0;
             }
-          } else if (tickerData.change !== undefined) {
-            const percent = parseFloat(tickerData.change);
-            if (Number.isFinite(percent)) {
-              updated.change = percent.toFixed(2);
-              updated.isPositive = percent >= 0;
-            }
+            // Sinon on garde updated.change tel quel (pas de reset)
           }
+          // Si percentSource est undefined/null, on garde la valeur existante
 
           if (Array.isArray(tickerData.sparkline24h) && tickerData.sparkline24h.length > 0) {
             updated.sparkline = tickerData.sparkline24h;
@@ -183,14 +231,15 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
         return updated;
       })
     );
-  }, [tickers, orderbooks, pricesData.length]);
+  }, [tickers, orderbooks]); // ✅ Retiré pricesData.length de la dépendance
 
-  // 📡 HTTP Polling pour charger les données initiales
+  // 📡 HTTP Polling pour charger les données initiales et rafraîchir le %
   useEffect(() => {
     // Fetch initial
     fetchPrices();
 
-    // Rafraîchir toutes les 30 secondes (le WebSocket gère le temps réel)
+    // ✅ Polling moins fréquent (30s) car WebSocket gère le temps réel
+    // On poll juste pour garder le % à jour et avoir un fallback si WS déconnecté
     const interval = setInterval(fetchPrices, 30000);
 
     return () => clearInterval(interval);

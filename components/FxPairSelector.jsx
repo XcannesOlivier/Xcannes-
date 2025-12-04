@@ -3,238 +3,12 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import xcannesApi from "../lib/xcannesApi";
 
-// Répartition des devises par région / sous-région (schéma proche ONU)
 const REGION_DEFS = {
-  // Europe
-  "Europe - Northern": [
-    "SEK", // Suède
-    "NOK", // Norvège
-    "DKK", // Danemark
-    "ISK", // Islande
-    "IMP", // Livre de l'île de Man
-    "GGP", // Livre de Guernesey
-  ],
-  "Europe - Western": [
-    "EUR", // Zone euro (coeur)
-    "GBP", // Royaume-Uni
-    "CHF", // Suisse
-    // Anciennes monnaies d'Europe de l'Ouest (pré-euro)
-    "DEM", // Deutsche Mark
-    "FRF", // Franc français
-    "BEF", // Franc belge
-    "NLG", // Florin néerlandais
-    "LUF", // Franc luxembourgeois
-    "IEP", // Livre irlandaise
-  ],
-  "Europe - Eastern": [
-    "PLN", // Pologne
-    "CZK", // Tchéquie
-    "HUF", // Hongrie
-    "RON", // Roumanie
-    "ROL", // Ancien leu roumain (legacy)
-    "BGN", // Bulgarie
-    "RUB", // Russie
-    "UAH", // Ukraine
-    "BYN", // Biélorussie
-    "BYR", // Ancien rouble biélorusse (legacy)
-    "MDL", // Moldavie
-    "SKK", // Ancienne couronne slovaque (legacy)
-  ],
-  "Europe - Southern": [
-    "ALL", // Albanie
-    "BAM", // Bosnie-Herzégovine
-    "HRK", // Croatie (legacy)
-    "MKD", // Macédoine du Nord
-    "RSD", // Serbie
-    "TRY", // Turquie (souvent classée Europe du Sud/Est)
-    // Anciennes monnaies d'Europe du Sud (pré-euro)
-    "ITL", // Lire italienne
-    "ESP", // Peseta espagnole
-    "PTE", // Escudo portugais
-    "GRD", // Drachme grecque
-    "VAL", // Lire de la Cité du Vatican (legacy)
-    "CYP", // Livre chypriote (legacy)
-    "GIP", // Livre de Gibraltar
-    "MTL", // Lire maltaise (legacy)
-  ],
-  // Amériques (conforme aux sous-régions ONU : Mexique en Amérique centrale)
-  "Americas - Northern": ["USD", "CAD"],
-  "Americas - Central": ["GTQ", "HNL", "BZD", "CRC", "MXN"],
-  "Americas - Caribbean": [
-    "XCD", // Dollar des Caraïbes orientales
-    "JMD", // Jamaïque
-    "TTD", // Trinité-et-Tobago
-    "BSD", // Bahamas
-    "BBD", // Barbade
-    "BMD", // Bermudes
-    "DOP", // République dominicaine
-    "HTG", // Haïti
-    "CUP", // Cuba
-    "CUC", // Peso convertible cubain (legacy)
-    "KYD", // Dollar des îles Caïmans
-  ],
-  "Americas - Southern": ["BRL", "ARS", "CLP", "COP", "PEN"],
-  // Ancienne monnaie d'Amérique centrale
-  "Americas - Central": ["GTQ", "HNL", "BZD", "CRC", "SVC", "NIO", "PAB"], // Salvadoran Colón + Nicaragua + Panama
-  // Ancienne monnaie d'Amérique du Sud
-  "Americas - Southern": ["BRL", "ARS", "CLP", "COP", "PEN", "UYU", "GYD", "FKP", "SRD"], // Uruguay, Guyana, Falklands, Suriname
-  // Asie (répartition inspirée des sous-régions ONU)
-  "Asia - Western": [
-    "AED",
-    "SAR",
-    "QAR",
-    "KWD",
-    "BHD", // Bahreïn
-    "OMR", // Oman
-    "JOD", // Jordanie
-    "ILS", // Israël
-    "SYP", // Syrie
-    "YER", // Yémen
-    "IQD", // Irak
-  ],
-  "Asia - Southern": [
-    "INR", // Inde
-    "PKR", // Pakistan
-    "BDT", // Bangladesh
-    "LKR", // Sri Lanka
-    "NPR", // Népal
-    "MVR", // Maldives
-    "AFN", // Afghanistan
-    "BTN", // Bhoutan
-  ],
-  "Asia - Eastern": [
-    "CNY",
-    "CNH",
-    "HKD",
-    "JPY",
-    "KRW",
-    "TWD", // Taïwan
-    "MOP", // Macao
-  ],
-  "Asia - South-Eastern": [
-    "SGD",
-    "THB",
-    "PHP",
-    "IDR",
-    "MYR",
-    "VND", // Vietnam
-    "KHR", // Cambodge
-    "MMK", // Myanmar
-    "LAK", // Laos
-    "BND", // Brunei
-  ],
-  "Asia - Central": [
-    "KZT", // Kazakhstan
-    "UZS", // Ouzbékistan
-    "TMT", // Turkménistan
-    "KGS", // Kirghizistan
-    "TJS", // Tadjikistan
-    "AZN", // Azerbaïdjan
-    "GEL", // Géorgie
-    "AMD", // Arménie
-    "TMM", // Ancien manat turkmène (legacy)
-  ],
-  // Océanie
-  "Oceania - Australia & New Zealand": ["AUD", "NZD"],
-  "Oceania - Melanesia": ["FJD"],
-  "Oceania - Micronesia": [],
-  "Oceania - Polynesia": [
-    "TVD", // Dollar de Tuvalu
-    "XPF", // Franc CFP (Polynésie française, etc.)
-    "SBD", // Solomon Islands Dollar (géographiquement Mélanésie, mais souvent groupé Pacifique)
-  ],
-  // Afrique
-  "Africa - Northern": [
-    "EGP", // Égypte
-    "LYD", // Libye
-    "MAD", // Maroc
-    "TND", // Tunisie
-    "DZD", // Algérie
-    "SDG", // Soudan (actuel)
-    "SDD", // Ancien dinar soudanais (legacy)
-  ],
-  "Africa - Western": [
-    "XOF", // UEMOA (BCEAO)
-    "NGN", // Nigeria
-    "GHS", // Ghana (actuel)
-    "GHC", // Ancien cedi ghanéen (legacy)
-    "GNF", // Guinée
-    "SLL", // Ancien Leone sierra-léonais
-    "SLE", // Nouveau Leone sierra-léonais
-    "LRD", // Liberia
-    "CVE", // Cap-Vert
-    "MRU", // Mauritanie
-    "GMD", // Gambie
-    "SHP", // Livre de Sainte-Hélène
-  ],
-  "Africa - Central": [
-    "XAF", // CEMAC (BEAC)
-    "CDF", // RD Congo
-    "STN", // Sao Tomé-et-Principe (nouveau dobra)
-    "STD", // Ancien Sao Tomé Dobra (legacy)
-  ],
-  "Africa - Eastern": [
-    "KES", // Kenya
-    "TZS", // Tanzanie
-    "UGX", // Ouganda
-    "ETB", // Éthiopie
-    "RWF", // Rwanda
-    "BIF", // Burundi
-    "SOS", // Somalie
-    "DJF", // Djibouti
-    "KMF", // Comores
-    "MUR", // Roupie mauricienne
-    "SSP", // South Sudanese Pound
-  ],
-  "Africa - Southern": [
-    "ZAR", // Afrique du Sud
-    "BWP", // Botswana
-    "NAD", // Namibie
-    "ZMW", // Zambie
-    "MWK", // Malawi
-    "AOA", // Angola
-    "LSL", // Lesotho
-    "SZL", // Eswatini
-    "MZN", // Mozambique
-    "ZWL", // Zimbabwe
-    "MGA", // Madagascar
-    "SCR", // Seychelles
-    "ZMK", // Ancien kwacha zambien
-    "ZWD", // Ancien dollar zimbabwéen
-    "MGF", // Ancien franc malgache
-  ],
+  Europe: ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK", "HUF"],
+  Americas: ["USD", "CAD", "BRL", "MXN", "ARS", "CLP", "COP", "PEN", "BZD", "GTQ", "HNL", "CRC"],
+  "Asia-Pacific": ["JPY", "CNY", "CNH", "HKD", "KRW", "INR", "SGD", "THB", "PHP", "IDR", "MYR", "AUD", "NZD", "FJD"],
+  "Middle East & Africa": ["AED", "SAR", "QAR", "KWD", "EGP", "MAD", "ZAR", "KES", "NGN", "GHS"],
 };
-
-// Ordre d'affichage des régions dans le modal (régions ONU -> sous-régions)
-const REGION_ORDER = [
-  // Europe
-  "Europe - Northern",
-  "Europe - Western",
-  "Europe - Southern",
-  "Europe - Eastern",
-  // Amériques
-  "Americas - Northern",
-  "Americas - Central",
-  "Americas - Caribbean",
-  "Americas - Southern",
-  // Asie
-  "Asia - Western",
-  "Asia - Central",
-  "Asia - Southern",
-  "Asia - Eastern",
-  "Asia - South-Eastern",
-  // Océanie
-  "Oceania - Australia & New Zealand",
-  "Oceania - Melanesia",
-  "Oceania - Micronesia",
-  "Oceania - Polynesia",
-  // Afrique
-  "Africa - Northern",
-  "Africa - Western",
-  "Africa - Central",
-  "Africa - Eastern",
-  "Africa - Southern",
-];
 
 // Overrides explicites devise -> drapeau (multi-pays, cas spéciaux)
 const CURRENCY_FLAG_OVERRIDES = {
@@ -283,22 +57,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
       try {
         const list = await xcannesApi.getFxCurrencies();
         if (!cancelled) {
-          let enriched = Array.isArray(list) ? list.slice() : [];
-
-          // ✅ S'assurer que l'USD existe toujours dans la liste EOD,
-          // même si l'API FX ne le renvoie pas explicitement
-          const hasUsd = enriched.some(
-            (c) => String(c.code || "").toUpperCase() === "USD"
-          );
-          if (!hasUsd) {
-            enriched.unshift({
-              code: "USD",
-              name: "US Dollar",
-              symbol: "$",
-            });
-          }
-
-          setCurrencies(enriched);
+          setCurrencies(list);
         }
       } catch (err) {
         console.error("[FxPairSelector] Erreur chargement devises:", err);
@@ -340,8 +99,6 @@ export default function FxPairSelector({ base, quote, onChange }) {
 
   const groupedByRegion = useMemo(() => {
     const groups = {};
-
-    // Construire les groupes bruts
     filtered.forEach((c) => {
       const code = c.code.toUpperCase();
       let region = "Other";
@@ -354,27 +111,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
       if (!groups[region]) groups[region] = [];
       groups[region].push(c);
     });
-
-    // Ordonner les devises à l'intérieur de chaque région par code ISO
-    Object.keys(groups).forEach((region) => {
-      groups[region].sort((a, b) => a.code.localeCompare(b.code));
-    });
-
-    // Construire un objet ordonné selon REGION_ORDER, puis les éventuelles régions restantes
-    const ordered = {};
-    REGION_ORDER.forEach((region) => {
-      if (groups[region]) {
-        ordered[region] = groups[region];
-      }
-    });
-    Object.keys(groups).forEach((region) => {
-      // Ne pas réintroduire "Other" : on cache les devises non mappées (ex: tokens crypto)
-      if (!REGION_ORDER.includes(region) && region !== "Other") {
-        ordered[region] = groups[region];
-      }
-    });
-
-    return ordered;
+    return groups;
   }, [filtered]);
 
   useEffect(() => {
@@ -433,7 +170,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
             {baseEntry?.name ? ` – ${baseEntry.name}` : ""}
           </span>
           {/* Mobile + petite tablette (< md): drapeau + code ISO */}
-          <span className="inline-flex md:hidden items-center gap-1 text-[11px]">
+          <span className="inline-flex md:hidden items-center gap-1 text-[14px]">
             <span>{getFlag(base || "")}</span>
             <span>{base || "BASE"}</span>
           </span>
@@ -468,7 +205,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
             {quoteEntry?.name ? ` – ${quoteEntry.name}` : ""}
           </span>
           {/* Mobile + petite tablette (< md): drapeau + code ISO */}
-          <span className="inline-flex md:hidden items-center gap-1 text-[11px]">
+          <span className="inline-flex md:hidden items-center gap-1 text-[14px]">
             <span>{getFlag(quote || "")}</span>
             <span>{quote || "QUOTE"}</span>
           </span>
@@ -496,7 +233,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
         >
           <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between gap-2">
             <div className="text-[10px] text-white/40 uppercase">
-              {activeField === "base" ? "Select your trustlines" : "Select quote currency"}
+              {activeField === "base" ? "Select base currency" : "Select quote currency"}
             </div>
             <button
               type="button"
@@ -512,6 +249,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
           </div>
           <div className="px-3 py-2 border-b border-white/10">
             <input
+              autoFocus
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search code or name..."
@@ -525,10 +263,29 @@ export default function FxPairSelector({ base, quote, onChange }) {
               Loading currencies...
             </div>
           ) : (
-            <div className="max-h-[50vh] md:max-h-[65vh] overflow-y-auto">
+            <div className="max-h-72 overflow-y-auto">
+              {/* Favorites */}
+              <div className="px-3 py-2 border-b border-white/10">
+                <div className="text-[10px] text-white/40 uppercase mb-1">
+                  Favorites
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {favorites.map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => handleSelect(code)}
+                      className="px-2 py-1 rounded border border-white/15 text-[11px] text-white/80 hover:border-xcannes-green hover:text-xcannes-green transition-all"
+                    >
+                      {code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* All currencies filtered */}
               <div className="px-3 py-2">
-                <div className="text-[10px] max-sm:text-sm text-white/40 uppercase mb-1">
+                <div className="text-[10px] text-white/40 uppercase mb-1">
                   All currencies
                 </div>
                 {filtered.length === 0 ? (
@@ -541,30 +298,26 @@ export default function FxPairSelector({ base, quote, onChange }) {
                       <button
                         type="button"
                         onClick={() =>
-                          setExpandedRegions((prev) => {
-                            const isCurrentlyOpen = !!prev[region];
-                            // Accordéon : soit on ferme tout, soit on n'ouvre que cette région
-                            if (isCurrentlyOpen) {
-                              return {};
-                            }
-                            return { [region]: true };
-                          })
+                          setExpandedRegions((prev) => ({
+                            ...prev,
+                            [region]: !prev[region],
+                          }))
                         }
-                        className="w-full flex items-center justify-between px-1.5 py-1 text-[10px] max-sm:text-base text-white/60 hover:bg-white/5 rounded"
+                        className="w-full flex items-center justify-between px-1.5 py-1 text-[10px] text-white/60 hover:bg-white/5 rounded"
                       >
                         <span className="font-semibold">{region}</span>
-                        <span className="text-white/40 text-[9px] max-sm:text-xs">
+                        <span className="text-white/40 text-[9px]">
                           {list.length}
                         </span>
                       </button>
-                      {expandedRegions[region] && (
+                      {(expandedRegions[region] ?? true) && (
                         <div className="mt-1">
                           {list.map((c) => (
                             <button
                               key={c.code}
                               type="button"
                               onClick={() => handleSelect(c.code)}
-                              className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-[11px] max-sm:text-base text-white/80"
+                              className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-[11px] text-white/80"
                             >
                               <span className="font-semibold mr-2">
                                 {c.code}
@@ -572,7 +325,7 @@ export default function FxPairSelector({ base, quote, onChange }) {
                               <span className="flex-1 text-left text-white/50 truncate">
                                 {c.name}
                               </span>
-                              <span className="text-white/30 text-[10px] max-sm:text-xs ml-1">
+                              <span className="text-white/30 text-[10px] ml-1">
                                 {c.symbol}
                               </span>
                             </button>

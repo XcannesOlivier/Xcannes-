@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Header from "../components/Header";
@@ -62,10 +63,10 @@ export default function Dex() {
       try {
         const markets = await xcannesApi.getAllMarkets(); // ✅ Utiliser getAllMarkets() pour inclure Pyth
         if (markets) {
-          // Priorité: display > pyth (pour éviter doublons entre display et trading)
+          // Priorité: trading (XRPL) > pyth (FOREX)
           const allPairs = [
-            ...(markets.display || []),  // Paires principales avec métadonnées
-            ...(markets.pyth || [])       // Paires Pyth (FOREX)
+            ...(markets.trading || []),  // Paires XRPL (XRP/RLUSD, XCS/XRP, XCS/RLUSD)
+            ...(markets.pyth || [])       // Paires Pyth (FOREX + métaux)
           ];
           
           // Filtrer les paires actives, dédupliquer, et convertir format backend (XCS_XRP) vers frontend (XCS/XRP)
@@ -90,6 +91,51 @@ export default function Dex() {
     
     fetchPairs();
   }, []);
+
+  // 🎯 Top 10 paires les plus importantes pour le PriceTicker (sans XCS pour l'instant)
+  const topPairs = useMemo(() => {
+    const importantPairs = [
+      "XRP/RLUSD",    // XRPL principale
+      "EUR/USD",      // Forex majeure
+      "GBP/USD",      // Forex majeure
+      "USD/JPY",      // Forex majeure
+      "USD/CHF",      // Forex majeure
+      "AUD/USD",      // Forex majeure
+      "BTC/USD",      // Crypto majeure
+      "ETH/USD",      // Crypto majeure
+      "XAU/USD",      // Or
+      "XAG/USD",      // Argent
+    ];
+    
+    // Filtrer seulement les paires disponibles dans availablePairs
+    return importantPairs.filter(pair => availablePairs.includes(pair));
+  }, [availablePairs]);
+
+  // Désactiver le scroll sur mobile (iPhone)
+  useEffect(() => {
+    // Détecter si on est sur mobile
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // Fixer le body pour empêcher le scroll
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+      
+      // Empêcher le bounce iOS
+      document.body.style.overscrollBehavior = 'none';
+      
+      return () => {
+        // Réactiver le scroll au démontage
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+        document.body.style.overscrollBehavior = '';
+      };
+    }
+  }, []);
   
   // Mémoriser les paires pour éviter les re-renders
   const pairs = useMemo(() => availablePairs, [availablePairs]);
@@ -102,12 +148,18 @@ export default function Dex() {
         canonical="/dex"
       />
 
-      <Header />
+      {/* Header desktop uniquement */}
+      <div className="hidden md:block">
+        <Header />
+      </div>
 
-      <PriceTicker pairs={pairs} fixed={true} />
+      {/* PriceTicker desktop uniquement */}
+      <div className="hidden md:block">
+        <PriceTicker pairs={topPairs} fixed={true} />
+      </div>
 
       {/* Conteneur principal pleine hauteur */}
-      <main className="relative w-full min-h-screen text-white pt-32 pb-36 md:pb-0 mb-0 bg-cover bg-center bg-no-repeat bg-fixed font-montserrat font-[300] bg-xcannes-background">
+      <main className="relative w-full min-h-screen text-white pt-0 md:pt-32 pb-36 md:pb-0 mb-0 bg-cover bg-center bg-no-repeat bg-fixed font-montserrat font-[300] bg-xcannes-background">
         <div className="absolute inset-0 bg-black/0 z-0" />
 
         <div className="w-full relative z-10">
