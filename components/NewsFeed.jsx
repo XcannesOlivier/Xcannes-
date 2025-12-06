@@ -25,7 +25,12 @@ export default function NewsFeed({ category = "finance" }) {
         setLoading(true);
         setError(null);
 
-        const url = `${API_BASE_URL}/news?locale=${currentLocale}&limit=20`;
+        // Récupérer le pays depuis localStorage (défaut: United Kingdom)
+        const selectedCountry = typeof window !== 'undefined' 
+          ? localStorage.getItem('selectedCountry') || 'United Kingdom'
+          : 'United Kingdom';
+
+        const url = `${API_BASE_URL}/news?country=${encodeURIComponent(selectedCountry)}&limit=20`;
         const response = await fetch(url);
         
         if (!response.ok) {
@@ -41,7 +46,7 @@ export default function NewsFeed({ category = "finance" }) {
           count: data.count
         });
         
-        console.log(`[NewsFeed] Loaded ${data.count} ${data.language} articles`);
+        console.log(`[NewsFeed] Loaded ${data.count} articles from ${selectedCountry}`);
       } catch (err) {
         console.error('[NewsFeed] Error fetching news:', err);
         setError('Unable to load news');
@@ -52,10 +57,21 @@ export default function NewsFeed({ category = "finance" }) {
 
     fetchNews();
     
+    // Event listener pour détecter les changements de pays
+    const handleCountryChange = () => {
+      fetchNews();
+    };
+    
+    window.addEventListener('countryChanged', handleCountryChange);
+    
     // Recharger toutes les 5 minutes pour avoir les nouvelles données
     const interval = setInterval(fetchNews, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [currentLocale]);
+    
+    return () => {
+      window.removeEventListener('countryChanged', handleCountryChange);
+      clearInterval(interval);
+    };
+  }, []); // Plus de dépendance à currentLocale
 
   // Auto-scroll doux
   useEffect(() => {
@@ -141,20 +157,20 @@ export default function NewsFeed({ category = "finance" }) {
       {/* Header avec stats */}
       <div className="p-3 border-b border-white/10">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="text-sm font-bold text-white">📰 Financial News</h3>
+          <h3 className="text-base md:text-sm font-bold text-white">📰 Financial News</h3>
           <div className="flex items-center gap-2">
             {loading && (
               <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin"></div>
             )}
             {/* Indicateur auto-scroll */}
             {autoScroll && news.length > 5 && (
-              <div className="text-xs text-xcannes-green/60 flex items-center gap-1">
+              <div className="text-sm md:text-xs text-xcannes-green/60 flex items-center gap-1">
                 <span>⬇️</span>
               </div>
             )}
           </div>
         </div>
-        <p className="text-xs text-white/50">
+        <p className="text-sm md:text-xs text-white/50">
           {stats.language} • {stats.count} articles • {totalCached} total cached
         </p>
       </div>
@@ -179,7 +195,7 @@ export default function NewsFeed({ category = "finance" }) {
             <div className="flex gap-3">
               {/* Image */}
               {article.image && (
-                <div className="flex-shrink-0 w-20 h-20 rounded overflow-hidden bg-white/5">
+                <div className="flex-shrink-0 w-24 h-24 md:w-20 md:h-20 rounded overflow-hidden bg-white/5">
                   <img
                     src={article.image}
                     alt={article.title}
@@ -193,11 +209,11 @@ export default function NewsFeed({ category = "finance" }) {
 
               {/* Contenu */}
               <div className="flex-1 min-w-0">
-                <h4 className="text-xs font-semibold text-white line-clamp-2 mb-1 group-hover:text-xcannes-green transition-colors">
+                <h4 className="text-sm md:text-xs font-semibold text-white line-clamp-2 mb-1 group-hover:text-xcannes-green transition-colors">
                   {article.title}
                 </h4>
                 
-                <div className="flex items-center gap-2 text-xs text-white/40">
+                <div className="flex items-center gap-2 text-sm md:text-xs text-white/40">
                   <span className="truncate">{article.source}</span>
                   {article.language && (
                     <>
@@ -207,16 +223,14 @@ export default function NewsFeed({ category = "finance" }) {
                   )}
                 </div>
 
-                {article.publishedAt && (
-                  <p className="text-xs text-white/30 mt-1">
-                    {new Date(article.publishedAt).toLocaleDateString(currentLocale, {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
-                )}
+                <p className="text-sm md:text-xs text-white/30 mt-1">
+                  {article.publishedAt && new Date(article.publishedAt).toLocaleDateString(currentLocale, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
               </div>
             </div>
           </a>
@@ -225,7 +239,7 @@ export default function NewsFeed({ category = "finance" }) {
 
       {/* Footer */}
       <div className="p-2 border-t border-white/10 text-center">
-        <p className="text-xs text-white/30">
+        <p className="text-sm md:text-xs text-white/30">
           Powered by GDELT • Updated every 15min
         </p>
       </div>

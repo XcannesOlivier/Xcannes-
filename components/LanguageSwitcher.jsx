@@ -42,7 +42,7 @@ const languagesByRegion = {
     icon: "🇨🇳",
     languages: [
       { code: "zh", label: "中文", flag: "🇨🇳", country: "China" },
-      { code: "wuu", label: "吴语", flag: "🇨🇳", country: "China (Wu)" },
+      { code: "wuu", label: "吴语", flag: "🇨🇳", country: "China" },
       { code: "ja", label: "日本語", flag: "🇯🇵", country: "Japan" },
       { code: "ko", label: "한국어", flag: "🇰🇷", country: "South Korea" },
       { code: "hi", label: "हिन्दी", flag: "🇮🇳", country: "India" },
@@ -115,7 +115,14 @@ export default function LanguageSwitcher() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const changeLanguage = (locale) => {
+  const changeLanguage = (locale, country) => {
+    // Stocker le pays dans localStorage pour que NewsFeed puisse le lire
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedCountry', country);
+      // Déclencher un event custom pour notifier NewsFeed
+      window.dispatchEvent(new CustomEvent('countryChanged', { detail: { country } }));
+    }
+    
     const { pathname, asPath, query } = router;
     router.push({ pathname, query }, asPath, { locale });
     setIsOpen(false);
@@ -165,7 +172,7 @@ export default function LanguageSwitcher() {
             {mainLanguages.map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => changeLanguage(lang.code)}
+                onClick={() => changeLanguage(lang.code, lang.country)}
                 className={`w-full flex items-center gap-1.5 px-2 py-1.5 transition-all duration-200 ${
                   currentLanguage.code === lang.code
                     ? "bg-xcannes-green/20 text-xcannes-green"
@@ -239,7 +246,7 @@ export default function LanguageSwitcher() {
                   {region.languages.map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => changeLanguage(lang.code)}
+                      onClick={() => changeLanguage(lang.code, lang.country)}
                       className={`w-full flex items-center gap-1.5 px-4 py-1 transition-all duration-200 ${
                         currentLanguage.code === lang.code
                           ? "bg-xcannes-green/20 text-xcannes-green"
