@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import Header from "../components/Header";
 import FooterPro from "../components/FooterPro";
 import Link from "next/link";
@@ -25,6 +26,19 @@ export default function Home() {
     "XRP/RLUSD", "XCS/XRP", "XCS/RLUSD" // Fallback - 3 paires configurées
   ]);
   const [loadingPairs, setLoadingPairs] = useState(true);
+
+  // container DOM pour portal (sert à fixer la bulle en dehors de tout conteneur transformé)
+  const [assistantContainer, setAssistantContainer] = useState(null);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.createElement("div");
+    el.id = "assistant-root";
+    document.body.appendChild(el);
+    setAssistantContainer(el);
+    return () => {
+      if (document.body.contains(el)) document.body.removeChild(el);
+    };
+  }, []);
   
   useEffect(() => {
     const fetchPairs = async () => {
@@ -189,6 +203,42 @@ export default function Home() {
       </div>
 
       <FooterPro />
+
+      {/* Bulle Assistant fixe en bas à droite (render via portal pour être indépendante des conteneurs) */}
+      {assistantContainer && createPortal(
+        <div style={{ position: 'fixed', right: '1.5rem', bottom: '1.5rem', zIndex: 9999 }}>
+          <button
+            type="button"
+            onClick={() => {
+              alert('Assistant IA - À venir');
+            }}
+            className="w-14 h-14 md:w-16 md:h-16 transition-all bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-white hover:from-[#5b5dd8] hover:to-[#4338ca] border-2 border-[#6366f1]/50 rounded-full flex items-center justify-center relative overflow-hidden shadow-2xl shadow-[#6366f1]/30"
+            aria-label="Assistant IA"
+            title="Assistant IA"
+          >
+            <span className="tracking-wider relative z-10 inline-block text-xl md:text-2xl" style={{ animation: 'irregularPulse 3s ease-in-out infinite' }}>•••</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" 
+                  style={{ animation: 'shimmer 2s ease-in-out infinite' }}></span>
+          </button>
+          <style jsx global>{`
+            @keyframes shimmer {
+              0% { transform: translateX(-100%) rotate(0deg); }
+              100% { transform: translateX(100%) rotate(360deg); }
+            }
+            @keyframes irregularPulse {
+              0% { transform: scale(1); }
+              15% { transform: scale(1.15); }
+              25% { transform: scale(1); }
+              40% { transform: scale(1.08); }
+              50% { transform: scale(1); }
+              75% { transform: scale(1.12); }
+              85% { transform: scale(1); }
+              100% { transform: scale(1); }
+            }
+          `}</style>
+        </div>,
+        assistantContainer
+      )}
     </>
   );
 }

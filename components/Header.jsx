@@ -68,7 +68,41 @@ export default function Header({ fixed = true }) {
 
         <WSStatus />
 
-        {isDex && <XummConnectButton small />}
+        {isDex && (
+          <>
+            {/* Bulle Assistant - Version desktop discrète */}
+            <button
+              type="button"
+              onClick={() => {
+                alert('Assistant IA - À venir');
+              }}
+              className="text-sm font-bold py-1 px-2 transition-all bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-white hover:from-[#5b5dd8] hover:to-[#4338ca] border border-[#6366f1]/50 rounded-xl flex items-center justify-center relative overflow-hidden shadow-md shadow-[#6366f1]/15"
+              aria-label="Assistant IA"
+              title="Assistant IA"
+            >
+              <span className="tracking-wider relative z-10 inline-block text-xs" style={{ animation: 'irregularPulse 3s ease-in-out infinite' }}>•••</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" 
+                    style={{ animation: 'shimmer 2s ease-in-out infinite' }}></span>
+              <style jsx>{`
+                @keyframes shimmer {
+                  0% { transform: translateX(-100%); }
+                  100% { transform: translateX(100%); }
+                }
+                @keyframes irregularPulse {
+                  0% { transform: scale(1); }
+                  15% { transform: scale(1.15); }
+                  25% { transform: scale(1); }
+                  40% { transform: scale(1.08); }
+                  50% { transform: scale(1); }
+                  75% { transform: scale(1.12); }
+                  85% { transform: scale(1); }
+                  100% { transform: scale(1); }
+                }
+              `}</style>
+            </button>
+            <XummConnectButton small />
+          </>
+        )}
       </nav>
 
       {/* Menu mobile minimaliste */}

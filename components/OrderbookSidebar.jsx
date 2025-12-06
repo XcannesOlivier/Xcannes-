@@ -6,11 +6,31 @@ import { useXcannesWS } from "../context/XcannesWSContext";
 import { getBookIdFromPair } from "../utils/xrpl";
 import { getPairCategory } from "../utils/marketStructure";
 import ChartFooter from "./ChartFooter";
+import NewsFeed from "./NewsFeed";
 
 export default function OrderbookSidebar({ pair }) {
   const { t } = useTranslation("common");
   const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
   const isXRPL = pairCategory === "xrpl";
+
+  // ✅ Extraire base/quote de la paire ET détecter si c'est une paire non-XRPL
+  const { isFxMode, fxBase, fxQuote } = useMemo(() => {
+    if (pair && pair.includes('/')) {
+      const parts = pair.split('/');
+      const base = parts[0] || '';
+      const quote = parts[1] || '';
+      
+      // Mode FX activé pour toutes les paires non-XRPL
+      const isNonXrpl = pairCategory !== "xrpl";
+      
+      return {
+        isFxMode: isNonXrpl,
+        fxBase: base,
+        fxQuote: quote
+      };
+    }
+    return { isFxMode: false, fxBase: '', fxQuote: '' };
+  }, [pair, pairCategory]);
 
   const { connected, orderbooks, trades, subscribe, unsubscribe } =
     useXcannesWS();
@@ -83,10 +103,15 @@ export default function OrderbookSidebar({ pair }) {
   return (
     <aside className="bg-black/40 backdrop-blur-sm rounded-l-xl rounded-r-none h-full flex flex-col overflow-hidden">
       <div className="p-4 border-b border-white/10">
-        <h2 className="text-sm font-semibold text-white/80 uppercase tracking-wider">
+        {/* Titre - SMARTPHONE : "Market", DESKTOP : "Order Book" */}
+        <h2 className="md:hidden text-lg font-semibold text-white/90 uppercase tracking-wider mb-2">
+          Order Book & Trades
+        </h2>
+        <h2 className="hidden md:block text-sm font-semibold text-white/80 uppercase tracking-wider">
           {t("trading_orderbook")}
         </h2>
-        <p className="text-[11px] text-white/40 mt-1">
+        {/* Police agrandie - SMARTPHONE UNIQUEMENT, normale - DESKTOP */}
+        <p className="text-sm md:text-[11px] text-white/40 md:text-white/40 mt-0 md:mt-1 font-normal md:font-normal">
           {pair} · {connected ? "Live XRPL" : "Offline"}
         </p>
       </div>
@@ -241,21 +266,18 @@ export default function OrderbookSidebar({ pair }) {
             </div>
           </div>
         ) : (
-          <div className="p-4 text-center text-[11px] text-white/50">
-            <p className="mb-2">
-              Orderbook XRPL disponible uniquement pour les paires XRPL.
-            </p>
-            <p className="text-white/40">
-              Les paires externes (crypto, forex, commodities) sont affichées
-              en lecture seule dans le graphique.
-            </p>
-          </div>
+          <NewsFeed category="finance" />
         )}
       </div>
 
       {/* Chart Footer en bas de la colonne Orderbook sur mobile uniquement */}
       <div className="md:hidden">
-        <ChartFooter pair={pair} />
+        <ChartFooter 
+          pair={pair}
+          fxMode={isFxMode}
+          fxBase={fxBase}
+          fxQuote={fxQuote}
+        />
       </div>
     </aside>
   );

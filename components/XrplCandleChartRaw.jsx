@@ -985,7 +985,7 @@ export default function XrplCandleChartRaw({
         },
         handleScale: {
           axisPressedMouseMove: {
-            time: false,
+            time: true,
             price: true,
           },
           mouseWheel: true,
@@ -1688,13 +1688,19 @@ export default function XrplCandleChartRaw({
                   setPairMode("live");
                   setIsFxMode(false);
                 }}
-                className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all ${
+                className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all relative overflow-hidden ${
                   pairMode === "live"
-                    ? "bg-xcannes-green text-black"
+                    ? "text-white"
                     : "text-white/60 hover:text-white/90"
                 }`}
               >
-                Live
+                <span className="relative z-10">Live</span>
+                {pairMode === "live" && (
+                  <span 
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-green-400/30 to-transparent"
+                    style={{ animation: 'liveSweep 3s ease-in-out infinite' }}
+                  />
+                )}
               </button>
               <div className="relative group">
                 <button
@@ -1703,13 +1709,19 @@ export default function XrplCandleChartRaw({
                     setPairMode("eod");
                     setIsFxMode(true);
                   }}
-                  className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all ${
+                  className={`px-3 py-1 max-sm:px-2 max-sm:py-0.5 rounded-full font-semibold transition-all relative overflow-hidden ${
                     pairMode === "eod"
                       ? "bg-white/10 text-white"
                       : "text-white/60 hover:text-white/90"
                   }`}
                 >
-                  EOD
+                  <span className="relative z-10">EOD</span>
+                  {pairMode === "eod" && (
+                    <span 
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"
+                      style={{ animation: 'eodSweep 3s ease-in-out infinite' }}
+                    />
+                  )}
                 </button>
                 {showTooltips && (
                   <div className="hidden group-hover:block absolute top-full mt-1 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg px-2 py-1.5 shadow-xl z-30 whitespace-nowrap">
@@ -2555,15 +2567,52 @@ export default function XrplCandleChartRaw({
         <div
           ref={chartRef}
           className="w-full relative z-0 dex-chart-container"
-        />
+        >
+          {/* Watermark "XCANNES-Dex" - SMARTPHONE UNIQUEMENT - dans le chart, au-dessus de la timescale */}
+          <div className="md:hidden absolute bottom-[29px] right-[76px] pointer-events-none select-none z-10">
+            <div 
+              className="font-sans text-white tracking-normal"
+              style={{ 
+                fontSize: '12px',
+                fontWeight: '400',
+              }}
+            >
+              XCANNES
+            </div>
+          </div>
+        </div>
         </div>
         </div>
       </div>
 
       {/* Footer Stats: visible sur tous les écrans */}
       <div>
-        <ChartFooter pair={pair} />
+        <ChartFooter 
+          pair={pair} 
+          fxMode={isFxMode}
+          fxBase={fxBase}
+          fxQuote={fxQuote}
+        />
       </div>
+
+      <style jsx>{`
+        @keyframes liveSweep {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        @keyframes eodSweep {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+      `}</style>
     </div>
   );
 }
