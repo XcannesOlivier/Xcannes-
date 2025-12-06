@@ -197,17 +197,46 @@ export default function Dex() {
 
       {/* Mobile bottom nav: Orderbook / Trading */}
       <div className="fixed inset-x-0 bottom-0 z-50 md:hidden pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-between gap-2 px-4 py-2 bg-black/85 border-t border-white/10 backdrop-blur-md w-full">
+        <div className="pointer-events-auto flex items-center justify-between gap-2 px-0 py-2 bg-black/85 border-t border-white/10 backdrop-blur-md w-full">
+            <button
+              type="button"
+              onClick={() => {
+                // TODO: Ouvrir l'assistant IA
+                alert('Assistant IA - À venir');
+              }}
+              className="flex-[0.5] text-lg font-bold py-0.5 px-1 transition-all bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-white hover:from-[#5b5dd8] hover:to-[#4338ca] border border-[#6366f1]/50 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg shadow-[#6366f1]/20"
+              aria-label="Assistant IA"
+            >
+              <span className="tracking-wider relative z-10 inline-block" style={{ animation: 'irregularPulse 3s ease-in-out infinite' }}>•••</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_ease-in-out_infinite]" 
+                    style={{ transform: 'translateX(-100%)', animation: 'shimmer 2s ease-in-out infinite' }}></span>
+              <style jsx>{`
+                @keyframes shimmer {
+                  0% { transform: translateX(-100%); }
+                  100% { transform: translateX(100%); }
+                }
+                @keyframes irregularPulse {
+                  0% { transform: scale(1); }
+                  15% { transform: scale(1.15); }
+                  25% { transform: scale(1); }
+                  40% { transform: scale(1.08); }
+                  50% { transform: scale(1); }
+                  75% { transform: scale(1.12); }
+                  85% { transform: scale(1); }
+                  100% { transform: scale(1); }
+                }
+              `}</style>
+            </button>
             <button
               type="button"
               onClick={() => {
                 setMobileOrderbookOpen(true);
                 setMobileTradingOpen(false);
               }}
-              className={`flex-1 text-xs font-medium py-1.5 transition-all ${
+              className={`flex-[0.6] text-sm font-medium py-1.5 transition-all border rounded-md ${
                 mobileOrderbookOpen
-                  ? "bg-xcannes-green text-black"
-                  : "bg-white/5 text-white/70"
+                  ? "bg-xcannes-green text-black border-xcannes-green"
+                  : "bg-white/5 text-white/70 border-white/20"
               }`}
             >
               Order Book
@@ -218,13 +247,24 @@ export default function Dex() {
                 setMobileTradingOpen(true);
                 setMobileOrderbookOpen(false);
               }}
-              className={`flex-1 text-xs font-medium py-1.5 transition-all ${
+              className={`flex-[0.8] text-lg font-semibold py-0.5 px-0 transition-all border rounded-md tracking-wide ${
                 mobileTradingOpen
-                  ? "bg-xcannes-green text-black"
-                  : "bg-white/5 text-white/70"
+                  ? "bg-[#3052ef] text-white border-[#3052ef]"
+                  : "bg-white/5 text-[#3052ef] border-[#3052ef]/60"
               }`}
             >
-              Trading
+              Wallet
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                // TODO: Ouvrir la page d'achat XCS
+                window.open('https://xcannes.com', '_blank');
+              }}
+              className="px-6 py-1 bg-xcannes-green hover:bg-xcannes-green/80 text-white rounded-full flex items-center justify-center transition-all font-bold text-base shrink-0"
+              aria-label="Acheter XCS"
+            >
+              Buy
             </button>
         </div>
 
@@ -243,18 +283,23 @@ export default function Dex() {
               mobileOrderbookOpen ? "translate-y-0" : "translate-y-full"
             } pointer-events-auto`}
           >
-            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden">
-              <div className="h-full overflow-y-auto p-2">
-                <div className="flex items-center justify-center pt-2 pb-1">
-                  <button
-                    type="button"
-                    onClick={() => setMobileOrderbookOpen(false)}
-                    className="text-white/60 hover:text-white text-2xl leading-none"
-                    aria-label="Fermer le panneau orderbook"
-                  >
-                    ˅
-                  </button>
+            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden flex flex-col">
+              {/* Header avec titre et bouton fermer */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+                <div className="flex flex-col">
+                  <h3 className="text-white font-normal text-lg">Market</h3>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileOrderbookOpen(false)}
+                  className="text-white/60 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all"
+                  aria-label="Fermer le panneau orderbook"
+                >
+                  ✕
+                </button>
+              </div>
+              {/* Contenu scrollable */}
+              <div className="flex-1 overflow-y-auto p-2">
                 <OrderbookSidebar pair={selectedPair} />
               </div>
             </div>
@@ -276,18 +321,21 @@ export default function Dex() {
               mobileTradingOpen ? "translate-y-0" : "translate-y-full"
             } pointer-events-auto`}
           >
-            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden">
-              <div className="h-full overflow-y-auto p-2">
-                <div className="flex items-center justify-center pt-2 pb-1">
-                  <button
-                    type="button"
-                    onClick={() => setMobileTradingOpen(false)}
-                    className="text-white/60 hover:text-white text-2xl leading-none"
-                    aria-label="Fermer le panneau trading"
-                  >
-                    ˅
-                  </button>
-                </div>
+            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden flex flex-col">
+              {/* Header avec titre et bouton fermer */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+                <h3 className="text-white font-medium text-base">XCANNES-Wallet</h3>
+                <button
+                  type="button"
+                  onClick={() => setMobileTradingOpen(false)}
+                  className="text-white/60 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all"
+                  aria-label="Fermer le panneau trading"
+                >
+                  ✕
+                </button>
+              </div>
+              {/* Contenu scrollable */}
+              <div className="flex-1 overflow-y-auto p-2">
                 <DexSidebar pair={selectedPair} />
               </div>
             </div>

@@ -45,6 +45,67 @@ const TOKEN_ICONS = {
   USDC: "＄",
 };
 
+// Drapeaux pour les devises (même logique que FxPairSelector)
+const CURRENCY_FLAG_OVERRIDES = {
+  EUR: "🇪🇺",
+  XAF: "🌍",
+  XOF: "🌍",
+  XCD: "🌴",
+  USD: "🇺🇸",
+  GBP: "🇬🇧",
+  JPY: "🇯🇵",
+  CHF: "🇨🇭",
+  CAD: "🇨🇦",
+  AUD: "🇦🇺",
+  NZD: "🇳🇿",
+  CNY: "🇨🇳",
+  INR: "🇮🇳",
+  BRL: "🇧🇷",
+  ZAR: "🇿🇦",
+  MXN: "🇲🇽",
+  SGD: "🇸🇬",
+  HKD: "🇭🇰",
+  KRW: "🇰🇷",
+  TRY: "🇹🇷",
+  RUB: "🇷🇺",
+  SEK: "🇸🇪",
+  NOK: "🇳🇴",
+  DKK: "🇩🇰",
+  PLN: "🇵🇱",
+  THB: "🇹🇭",
+  IDR: "🇮🇩",
+  MYR: "🇲🇾",
+  PHP: "🇵🇭",
+  CZK: "🇨🇿",
+  ILS: "🇮🇱",
+  CLP: "🇨🇱",
+  AED: "🇦🇪",
+  SAR: "🇸🇦",
+};
+
+function countryCodeToFlag(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return null;
+  const codePoints = [...countryCode.toUpperCase()].map(
+    (c) => 0x1f1e6 + (c.charCodeAt(0) - 65)
+  );
+  return String.fromCodePoint(...codePoints);
+}
+
+function getCurrencyFlag(code) {
+  if (!code) return null;
+  const upper = String(code).toUpperCase();
+  
+  // Cas spéciaux d'abord
+  if (CURRENCY_FLAG_OVERRIDES[upper]) {
+    return CURRENCY_FLAG_OVERRIDES[upper];
+  }
+  
+  // Pour la majorité des monnaies fiat, les 2 premières lettres
+  // correspondent au code pays ISO (AED -> AE, KES -> KE, etc.)
+  const countryGuess = upper.slice(0, 2);
+  return countryCodeToFlag(countryGuess);
+}
+
 function getTokenIcon(currency) {
   if (!currency) return "?";
   const normalized = String(currency).toUpperCase();
@@ -486,27 +547,63 @@ export default function WalletDashboard({ preview = false }) {
         {/* Header style "wallet app" */}
         <div className="px-4 pt-5 pb-4">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">
-                Wallet
-              </p>
+            <div className="flex-1">
+              {/* Bouton Connect - SMARTPHONE UNIQUEMENT - Au-dessus du dropdown */}
+              {preview && !isConnected && (
+                <button
+                  type="button"
+                  onClick={connect}
+                  className="mb-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#3052ef] text-white text-sm font-semibold hover:bg-[#2642d4] transition-all md:hidden"
+                >
+                  <span>Connect with Xumm</span>
+                </button>
+              )}
+              {/* Dropdown sélection de wallet avec adresse - SMARTPHONE */}
+              <div className="relative md:hidden">
+                <div className="flex items-center gap-2 px-2 py-1 bg-transparent border border-white/20 rounded hover:border-white/40 focus-within:border-xcannes-green transition-all">
+                  <span className="w-2 h-2 rounded-full bg-xcannes-green animate-pulse flex-shrink-0" />
+                  <select className="flex-1 text-xs uppercase tracking-[0.18em] text-white/80 bg-transparent focus:outline-none appearance-none cursor-pointer pr-4">
+                    <option value="current" className="bg-gray-900">
+                      {effectiveWallet.slice(0, 6)}...{effectiveWallet.slice(-4)}
+                    </option>
+                    <option value="wallet2" className="bg-gray-900">Add Wallet #2</option>
+                    <option value="wallet3" className="bg-gray-900">Add Wallet #3</option>
+                  </select>
+                  <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              {/* Label Wallet + Dropdown - DESKTOP */}
+              <div className="hidden md:block">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/40 mb-1">
+                  Wallet
+                </p>
+                <div className="relative">
+                  <div className="flex items-center gap-2 px-2 py-1 bg-transparent border border-white/20 rounded hover:border-white/40 focus-within:border-xcannes-green transition-all">
+                    <span className="w-2 h-2 rounded-full bg-xcannes-green animate-pulse flex-shrink-0" />
+                    <select className="flex-1 text-[10px] uppercase tracking-wider text-white/80 bg-transparent focus:outline-none appearance-none cursor-pointer pr-4">
+                      <option value="current" className="bg-gray-900">
+                        {effectiveWallet.slice(0, 6)}...{effectiveWallet.slice(-4)}
+                      </option>
+                      <option value="wallet2" className="bg-gray-900">Add Wallet #2</option>
+                      <option value="wallet3" className="bg-gray-900">Add Wallet #3</option>
+                    </select>
+                    <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
               <p className="pt-10 text-2xl font-orbitron font-bold text-white">
                 {totalLabel}
               </p>
               <p className="mt-1 text-xs text-xcannes-green">
                 +0.00 · 0.00%
               </p>
-              {preview && !isConnected && (
-                <button
-                  type="button"
-                  onClick={connect}
-                  className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-xcannes-green/90 text-black text-xs font-semibold hover:bg-xcannes-green transition-all md:hidden"
-                >
-                  <span>Connect with Xumm</span>
-                </button>
-              )}
             </div>
-            <div className="flex flex-col items-end gap-1">
+            {/* Adresse wallet + actions (Copy/Refresh) - DESKTOP UNIQUEMENT */}
+            <div className="hidden md:flex flex-col items-end gap-1">
               <div className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-xcannes-green animate-pulse" />
                 <span className="text-[10px] text-white/50">
@@ -564,76 +661,6 @@ export default function WalletDashboard({ preview = false }) {
               </button>
             ))}
           </div>
-
-          {/* Résumé des lignes de devises (XCS bloqués) */}
-          <div className="mt-3 rounded-xl bg-white/5 px-3 py-2 text-[11px] text-white/70">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-white/80">
-                World currency lines
-              </span>
-              {walletLinesLoading && (
-                <span className="text-white/40 text-[10px]">Loading…</span>
-              )}
-            </div>
-            {walletLinesError && (
-              <p className="text-[10px] text-red-400 mb-1">
-                {walletLinesError}
-              </p>
-            )}
-            <p className="mb-1">
-              XCS total:&nbsp;
-              <span className="font-mono">
-                {xcsAmount.toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}{" "}
-                XCS
-              </span>
-            </p>
-            <p className="mb-1">
-              XCS locked in lines:&nbsp;
-              <span className="font-mono">
-                {totalLockedXcs.toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}{" "}
-                XCS
-              </span>
-            </p>
-            <p className="mb-2">
-              XCS available:&nbsp;
-              <span className="font-mono">
-                {xcsAvailable.toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}{" "}
-                XCS
-              </span>
-            </p>
-            {walletLines.length > 0 ? (
-              <div className="flex flex-wrap gap-1">
-                {walletLines.map((line) => (
-                  <button
-                    key={line.currencyCode}
-                    type="button"
-                    onClick={() => handleRemoveWalletLine(line.currencyCode)}
-                    className="px-2 py-0.5 rounded-full bg-black/40 border border-white/10 text-[10px] hover:bg-red-500/20 hover:border-red-500/40 transition-colors"
-                    title="Click to remove this line"
-                  >
-                    {line.currencyCode} ·{" "}
-                    {Number(line.lockedXcs || 0).toLocaleString("en-US", {
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    XCS
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[10px] text-white/40">
-                No world currency lines yet.
-              </p>
-            )}
-          </div>
         </div>
 
         {/* Token list (XRP + XCS + stablecoins + autres) */}
@@ -643,13 +670,11 @@ export default function WalletDashboard({ preview = false }) {
             const isXcs = token.currency === "XCS";
             const isStable = token.type === "stable";
 
-            const bgClass = isXrp
-              ? "bg-blue-500/15"
-              : isXcs
-              ? "bg-xcannes-green/15"
-              : isStable
-              ? "bg-emerald-500/10"
-              : "bg-white/5";
+            // Obtenir le drapeau pour les devises
+            const currencyFlag = getCurrencyFlag(token.currency);
+            
+            // Fond neutre par défaut, ou transparent si on a un drapeau
+            const bgClass = currencyFlag ? "bg-black/20" : (isXrp ? "bg-blue-500/15" : isXcs ? "bg-xcannes-green/15" : "bg-white/5");
 
             const badgeLabel = isXrp
               ? "XRP · Native"
@@ -662,12 +687,43 @@ export default function WalletDashboard({ preview = false }) {
             return (
               <div
                 key={token.key}
-                className={`${bgClass} rounded-xl px-3 py-2.5 flex items-center gap-3`}
+                className={`${bgClass} rounded-xl px-3 py-2.5 flex items-center gap-3 relative overflow-hidden`}
               >
-                <div className="w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-sm font-semibold text-white">
-                  {getTokenIcon(token.currency)}
+                {/* Drapeau en arrière-plan PLEIN ÉCRAN - subtil */}
+                {currencyFlag && (
+                  <>
+                    {/* Mobile */}
+                    <div 
+                      className="absolute inset-0 flex items-center justify-center select-none pointer-events-none md:hidden"
+                      style={{ 
+                        fontSize: '140px',
+                        lineHeight: '1',
+                        opacity: token.currency === 'EUR' ? '0.16' : '0.12',
+                        filter: 'grayscale(0.3) brightness(0.7)',
+                        transform: 'rotate(-12deg) scale(1.8)',
+                      }}
+                    >
+                      {currencyFlag}
+                    </div>
+                    {/* Desktop - plus foncé */}
+                    <div 
+                      className="hidden md:flex absolute inset-0 items-center justify-center select-none pointer-events-none"
+                      style={{ 
+                        fontSize: '140px',
+                        lineHeight: '1',
+                        opacity: token.currency === 'EUR' ? '0.12' : '0.08',
+                        filter: 'grayscale(0.4) brightness(0.6)',
+                        transform: 'rotate(-12deg) scale(1.8)',
+                      }}
+                    >
+                      {currencyFlag}
+                    </div>
+                  </>
+                )}
+                <div className="w-8 h-8 rounded-full bg-black/40 flex items-center justify-center text-lg font-semibold text-white relative z-10">
+                  {currencyFlag || getTokenIcon(token.currency)}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 relative z-10">
                   <p className="text-sm text-white truncate">
                     {token.currency}
                   </p>
@@ -675,7 +731,7 @@ export default function WalletDashboard({ preview = false }) {
                     {badgeLabel}
                   </p>
                 </div>
-                <div className="text-right flex-shrink-0">
+                <div className="text-right flex-shrink-0 relative z-10">
                   <p className="text-sm font-mono text-white">
                     {formatBalance(token.value)} {token.currency}
                   </p>
