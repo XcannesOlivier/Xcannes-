@@ -1,6 +1,6 @@
 /**
  * 🏛️ Structure des marchés disponibles sur Xcannes DEX
- * Organisée par catégories : XRPL, Forex, Exotic, Crypto, Commodities
+ * Organisée sans sous-catégories : XRPL, Pyth (par défaut), Fawaz (EOD)
  */
 
 export const MARKET_STRUCTURE = {
@@ -12,62 +12,45 @@ export const MARKET_STRUCTURE = {
     }
   },
   
-  forex: {
-    label: "💱 FOREX",
+  // Paires de devises Pyth (sans doublons)
+  pyth: {
+    label: "💱 Devises",
     currencies: {
-      EUR: ["EUR/USD", "EUR/GBP", "EUR/JPY", "EUR/CHF", "EUR/AUD", "EUR/CAD", "EUR/NZD", "EUR/NOK", "EUR/SEK"],
-      GBP: ["GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/AUD", "GBP/CAD", "GBP/NZD"],
-      AUD: ["AUD/USD", "AUD/JPY", "AUD/CAD", "AUD/CHF", "AUD/NZD"],
-      NZD: ["NZD/USD", "NZD/CAD", "NZD/CHF", "NZD/JPY"],
-      CAD: ["CAD/CHF", "CAD/JPY"],
-      USD: ["USD/CAD", "USD/CHF", "USD/JPY", "USD/HKD", "USD/SGD", "USD/MXN", "USD/CNH", "USD/ZAR", "USD/TRY", "USD/NOK", "USD/SEK"],
-      CHF: ["CHF/JPY"]
-    }
-  },
-  
-  exotic: {
-    label: "🌍 EXOTIC (9 pairs)",
-    currencies: {
-      "Latin America": [
-        "USD/BRL", "USD/CLP", "USD/COP", "USD/PEN"
+      "Europe": [
+        "EUR/USD", "EUR/GBP", "EUR/JPY", "EUR/CHF", "EUR/AUD", "EUR/CAD", "EUR/NZD", "EUR/SEK", "EUR/NOK",
+        "GBP/USD", "GBP/JPY", "GBP/CHF", "GBP/AUD", "GBP/CAD", "GBP/NZD",
+        "CHF/JPY",
+        "USD/CHF", "USD/NOK", "USD/SEK"
       ],
-      "Asia": [
-        "USD/INR", "USD/IDR", "USD/PHP", "USD/KRW", "USD/TWD"
+      "Americas": [
+        "USD/CAD", "USD/BRL", "USD/MXN", "USD/CLP", "USD/COP", "USD/PEN",
+        "CAD/CHF", "CAD/JPY"
+      ],
+      "Asia-Pacific": [
+        "USD/JPY", "USD/CNH", "USD/HKD", "USD/SGD", "USD/KRW", "USD/TWD", "USD/INR", "USD/IDR", "USD/PHP",
+        "AUD/USD", "AUD/JPY", "AUD/CAD", "AUD/CHF", "AUD/NZD",
+        "NZD/USD", "NZD/CAD", "NZD/CHF", "NZD/JPY"
+      ],
+      "Other": [
+        "USD/ZAR", "USD/TRY"
       ]
     }
   },
-  
-  crypto: {
-    label: "₿ CRYPTO",
-    currencies: {
-      BTC: ["BTC/USD"],
-      ETH: ["ETH/USD"],
-      XRP: ["XRP/USD"]
-    }
-  },
-  
-  commodities: {
-    label: "🛢️ COMMODITIES",
-    currencies: {
-      Metals: ["XAU/USD", "XAG/USD", "XPT/USD", "XPD/USD"],
-      Energy: ["OIL/USD"]
-    }
-  }
 };
 
 /**
  * ✅ Helper pour détecter la catégorie d'une paire
  * @param {string} pair - Format: "EUR/USD", "XRP/RLUSD", etc.
- * @returns {string|null} - 'xrpl', 'forex', 'exotic', 'crypto', 'commodity', ou null
+ * @returns {string} - 'xrpl', 'fawaz', ou 'pyth' (par défaut pour les autres)
  */
 export const getPairCategory = (pair) => {
   for (const [categoryKey, category] of Object.entries(MARKET_STRUCTURE)) {
     for (const [currency, pairs] of Object.entries(category.currencies)) {
       if (pairs.includes(pair)) {
-        // Normaliser 'commodities' → 'commodity' pour cohérence avec backend
-        return categoryKey === 'commodities' ? 'commodity' : categoryKey;
+        return categoryKey;
       }
     }
   }
-  return null;
+  // Par défaut, tout ce qui n'est pas XRPL ou dans la liste Pyth est traité comme flux Pyth externe
+  return 'pyth';
 };

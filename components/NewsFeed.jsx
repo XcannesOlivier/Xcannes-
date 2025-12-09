@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://149.28.238.173:3001";
+import { apiUrl } from "../lib/runtimeConfig";
 
 export default function NewsFeed({ category = "finance" }) {
   const router = useRouter();
@@ -30,7 +29,7 @@ export default function NewsFeed({ category = "finance" }) {
           ? localStorage.getItem('selectedCountry') || 'United Kingdom'
           : 'United Kingdom';
 
-        const url = `${API_BASE_URL}/news?country=${encodeURIComponent(selectedCountry)}&limit=20`;
+        const url = apiUrl(`/news?country=${encodeURIComponent(selectedCountry)}&limit=20`);
         const response = await fetch(url);
         
         if (!response.ok) {

@@ -138,25 +138,37 @@ export default function PriceTicker({ pairs = [], fixed = false }) {
   useEffect(() => {
     if (!connected || pairs.length === 0) return;
 
-    const backendPairs = pairs
+    const channels = pairs
       .map((p) => {
         const bookData = getBookIdFromPair(p);
-        return bookData?.backendPair;
+        if (!bookData?.backendPair) return null;
+        return {
+          backendPair: bookData.backendPair,
+          source: bookData.source || "xrpl",
+        };
       })
       .filter(Boolean)
       .slice(0, 20);
 
-    backendPairs.forEach((backendPair) => {
+    channels.forEach(({ backendPair, source }) => {
+      // Toujours s'abonner au ticker (XRPL + Pyth)
       subscribe("ticker", backendPair);
-      subscribe("orderbook", backendPair);
+      // Ne demander l'orderbook qu'aux paires XRPL
+      if (source === "xrpl") {
+        subscribe("orderbook", backendPair);
+      }
     });
 
-    console.log(`✅ [PriceTicker] ${backendPairs.length} paires abonnées (ticker + orderbook)`);
+    console.log(
+      `✅ [PriceTicker] ${channels.length} paires abonnées (ticker + orderbook XRPL uniquement)`
+    );
 
     return () => {
-      backendPairs.forEach((backendPair) => {
+      channels.forEach(({ backendPair, source }) => {
         unsubscribe("ticker", backendPair);
-        unsubscribe("orderbook", backendPair);
+        if (source === "xrpl") {
+          unsubscribe("orderbook", backendPair);
+        }
       });
     };
   }, [connected, pairs, subscribe, unsubscribe]);

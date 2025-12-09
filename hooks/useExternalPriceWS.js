@@ -1,7 +1,7 @@
 /**
  * 🌐 Hook WebSocket pour les prix en temps réel des marchés externes (Pyth)
  * Alternative moderne à useExternalPrice avec streaming temps réel
- * Utilisé pour crypto, forex majeurs, commodities
+ * Utilisé pour les paires Pyth (flux unifié)
  */
 
 import { useState, useEffect } from 'react';
@@ -10,10 +10,9 @@ import { useXcannesWS } from '../context/XcannesWSContext';
 /**
  * Hook pour obtenir le prix live d'une paire externe via WebSocket
  * @param {string} pair - Format: "EUR/USD", "BTC/USD", "XAU/USD" ou "EUR_USD"
- * @param {string} category - Type de marché: 'crypto', 'forex', 'commodity'
  * @returns {Object} - { price: number|null, loading: boolean, error: string|null, data: Object|null }
  */
-export function useExternalPriceWS(pair, category) {
+export function useExternalPriceWS(pair) {
   const { externalPrices, externalPricesVersion, connected } = useXcannesWS();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,9 +21,9 @@ export function useExternalPriceWS(pair, category) {
   const symbol = pair ? pair.replace('/', '_').toUpperCase() : null;
 
   useEffect(() => {
-    if (!symbol || !category) {
+    if (!symbol) {
       setLoading(false);
-      setError('Symbole ou catégorie manquant');
+      setError('Symbole manquant');
       return;
     }
 
@@ -48,7 +47,7 @@ export function useExternalPriceWS(pair, category) {
 
       return () => clearTimeout(timeout);
     }
-  }, [symbol, category, connected, externalPricesVersion, externalPrices]);
+  }, [symbol, connected, externalPricesVersion, externalPrices]);
 
   // Récupérer le prix depuis le cache WebSocket
   const priceData = symbol ? externalPrices.get(symbol) : null;

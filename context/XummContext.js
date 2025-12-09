@@ -4,10 +4,9 @@
  */
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { apiUrl } from "../lib/runtimeConfig";
 
 const XummContext = createContext();
-const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || '').replace(/\/$/, '');
-const apiUrl = (path) => `${API_BASE}${path}`;
 
 export const XummProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");

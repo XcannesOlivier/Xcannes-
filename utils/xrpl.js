@@ -4,7 +4,7 @@ import xcannesApi from "../lib/xcannesApi";
 export const pairToBackendFormat = (pair) => pair.replace("/", "_");
 
 const RLUSD_HEX = "524C555344000000000000000000000000000000";
-const RLUSD_ISSUER = "rLSnM5KHoCZXgXX8jYzuqg1cRtmCE1XMhC";
+const RLUSD_ISSUER = "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De";
 const XCS_ISSUER = "rBXXYQ3e4JmLtDaSUgmLvtKC5dYvmCggxX";
 const FALLBACK_ISSUERS = {
   XCS: XCS_ISSUER,

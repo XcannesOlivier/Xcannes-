@@ -5,7 +5,7 @@ import { useTranslation } from "next-i18next";
 import { useXcannesWS } from "../context/XcannesWSContext";
 import { getBookIdFromPair } from "../utils/xrpl";
 import { getPairCategory } from "../utils/marketStructure";
-import ChartFooter from "./ChartFooter";
+import { ChartFooter } from "./XrplCandleChart";
 import NewsFeed from "./NewsFeed";
 
 export default function OrderbookSidebar({ pair }) {
