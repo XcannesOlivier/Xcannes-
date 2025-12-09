@@ -5,9 +5,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-
-const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || '').replace(/\/$/, '');
-const apiUrl = (path) => `${API_BASE}${path}`;
+import { apiUrl } from "../lib/runtimeConfig";
 
 export default function XummQRModal({ 
   isOpen, 

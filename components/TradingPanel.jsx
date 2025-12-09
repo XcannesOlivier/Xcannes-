@@ -20,16 +20,15 @@ export default function TradingPanel({
   // ✅ Détection du type de paire (même logique que le graphique)
   const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
   const isXRPL = pairCategory === 'xrpl';
-  const isExternal = pairCategory && ['crypto', 'forex', 'commodity'].includes(pairCategory);
-  const isExotic = pairCategory === 'exotic';
+  const isExternal = pairCategory === 'pyth';
+  const isFawaz = pairCategory === 'fawaz';
   
   // ✅ WebSocket hook (XRPL seulement)
   const { connected, orderbooks, trades, subscribe, unsubscribe } = useXcannesWS();
   
-  // ✅ Prix live Pyth via WebSocket (crypto, forex, commodities - pas exotic)
+  // ✅ Prix live Pyth via WebSocket (pas Fawaz/EOD)
   const { price: externalPrice, loading: loadingExternalPrice } = useExternalPriceWS(
-    isExternal && !isExotic ? pair : null,
-    pairCategory
+    isExternal && !isFawaz ? pair : null
   );
   
   // OrderBook & History states (conservés pour calcul du mid-price,

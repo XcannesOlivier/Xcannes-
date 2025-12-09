@@ -4,19 +4,13 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
-
-const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || "").replace(
-  /\/$/,
-  ""
-);
-
-const apiUrl = (path) => `${API_BASE}${path}`;
+import { apiUrl, getApiBaseUrl } from "../lib/runtimeConfig";
 
 if (typeof window !== "undefined") {
   // Debug simple pour vérifier la base API côté navigateur
   // (peut être retiré une fois la configuration validée)
   // eslint-disable-next-line no-console
-  console.log("[useWalletLines] API_BASE =", API_BASE);
+  console.log("[useWalletLines] API_BASE =", getApiBaseUrl());
 }
 
 export function useWalletLines(address) {

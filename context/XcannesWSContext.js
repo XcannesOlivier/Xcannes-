@@ -8,8 +8,9 @@ export const XcannesWSProvider = ({ children }) => {
   const [tickers, setTickers] = useState(new Map()); // Map<pair, ticker>
   const [orderbooks, setOrderbooks] = useState(new Map()); // Map<pair, orderbook>
   const [trades, setTrades] = useState(new Map()); // Map<pair, trades[]>
-  const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> pour forex/crypto/commodity
+  const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> unifié
   const [externalPricesVersion, setExternalPricesVersion] = useState(0); // ✅ Compteur pour forcer re-render
+  const [wsErrors, setWsErrors] = useState([]); // Derniers messages d'erreur WS (optionnel)
 
   const normalizeTrade = (trade) => {
     if (!trade || !trade.symbol) return null;
@@ -80,9 +81,9 @@ export const XcannesWSProvider = ({ children }) => {
 
     wsClient.on("orderbook", handleOrderbook);
 
-    // Écouter les prix externes Pyth (forex, crypto, commodity)
-    const handleForex = (message) => {
-      console.log('[XcannesWS] 📊 Forex reçu:', message.data?.symbol || message);
+    // Écouter les prix externes Pyth (canal unifié)
+    const handlePyth = (message) => {
+      console.log('[XcannesWS] 🌐 Pyth reçu:', message.data?.symbol || message);
       if (message.data && message.data.symbol) {
         setExternalPrices(prev => {
           const next = new Map(prev);
@@ -93,33 +94,7 @@ export const XcannesWSProvider = ({ children }) => {
       }
     };
 
-    const handleCommodity = (message) => {
-      console.log('[XcannesWS] 🥇 Commodity reçu:', message.data?.symbol || message);
-      if (message.data && message.data.symbol) {
-        setExternalPrices(prev => {
-          const next = new Map(prev);
-          next.set(message.data.symbol, message.data);
-          return next;
-        });
-        setExternalPricesVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
-      }
-    };
-
-    const handleCrypto = (message) => {
-      console.log('[XcannesWS] ₿ Crypto reçu:', message);
-      if (message.data && message.data.symbol) {
-        setExternalPrices(prev => {
-          const next = new Map(prev);
-          next.set(message.data.symbol, message.data);
-          return next;
-        });
-        setExternalPricesVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
-      }
-    };
-
-    wsClient.on("forex", handleForex);
-    wsClient.on("commodity", handleCommodity);
-    wsClient.on("crypto", handleCrypto);
+    wsClient.on("pyth", handlePyth);
 
     const handleTradesSnapshot = (message) => {
       if (!message?.data?.symbol || !Array.isArray(message.data.trades)) return;
@@ -158,16 +133,36 @@ export const XcannesWSProvider = ({ children }) => {
     wsClient.on("trades", handleTradesSnapshot);
     wsClient.on("trade", handleTradeUpdate);
 
+    // Gérer les messages d'erreur du serveur WS de manière non bloquante
+    const handleWsError = (message) => {
+      const msg =
+        message?.message ||
+        message?.data?.message ||
+        "WebSocket error (type \"error\")";
+
+      // Ne loguer en console que si debug explicite est activé
+      if (process.env.NEXT_PUBLIC_DEBUG_LOGS === "true") {
+        console.warn("[XcannesWS] WS error:", msg, message);
+      }
+
+      setWsErrors((prev) => {
+        const next = [...prev, { message: msg, timestamp: Date.now(), raw: message }];
+        // Garder uniquement les 20 dernières erreurs pour éviter la croissance infinie
+        return next.slice(-20);
+      });
+    };
+
+    wsClient.on("error", handleWsError);
+
     // Cleanup à la destruction
     return () => {
       // Ne pas fermer la connexion (singleton partagé)
       wsClient.off("ticker", handleTicker);
       wsClient.off("orderbook", handleOrderbook);
-      wsClient.off("forex", handleForex);
-      wsClient.off("commodity", handleCommodity);
-      wsClient.off("crypto", handleCrypto);
+      wsClient.off("pyth", handlePyth);
       wsClient.off("trades", handleTradesSnapshot);
       wsClient.off("trade", handleTradeUpdate);
+      wsClient.off("error", handleWsError);
     };
   }, []);
 
@@ -186,6 +181,7 @@ export const XcannesWSProvider = ({ children }) => {
     trades,
     externalPrices,
     externalPricesVersion, // ✅ Exposer le compteur
+    wsErrors,
     subscribe,
     unsubscribe,
     ws: wsClient,

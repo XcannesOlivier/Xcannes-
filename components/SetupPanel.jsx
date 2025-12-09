@@ -6,9 +6,7 @@ import { stripePromise } from "../lib/stripe";
 import { useXumm } from "../context/XummContext";
 import { useTranslation } from "next-i18next";
 import WalletDashboard from "./WalletDashboard";
-
-const API_BASE = (process.env.NEXT_PUBLIC_XCANNES_API_URL || "").replace(/\/$/, "");
-const apiUrl = (path) => `${API_BASE}${path}`;
+import { apiUrl } from "../lib/runtimeConfig";
 
 export default function SetupPanel({ variant = "card" }) {
   const { t } = useTranslation("common");

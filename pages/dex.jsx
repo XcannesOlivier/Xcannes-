@@ -16,7 +16,7 @@ import OrderbookSidebar from "../components/OrderbookSidebar";
 
 // 📈 Chart dynamique sans SSR
 const XrplCandleChartRaw = dynamic(
-  () => import("../components/XrplCandleChartRaw").then((mod) => mod.default),
+  () => import("../components/XrplCandleChart").then((mod) => mod.default),
   {
     ssr: false,
     loading: () => (
