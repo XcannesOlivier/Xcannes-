@@ -4,16 +4,183 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Design tokens (dark, financière, calme) ===== */
+
+:root {
+  /* Core background surfaces */
+  --bg-base: #05090f;
+  --bg-elevated: #040c13;
+  --bg-subtle: #101827;
+
+  /* Borders */
+  --border-subtle: rgba(148, 163, 184, 0.35);
+
+  /* Typography */
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+
+  /* Accents (global) */
+  --accent-primary: #22c55e; /* proche xcannes-green, légèrement adouci */
+  --accent-secondary: #38bdf8;
+
+  /* Accents spécifiques RLUSD / XCS (peu saturés) */
+  --accent-rlusd: #4ade80; /* vert stable RLUSD */
+  --accent-xcs: #fbbf24; /* or doux XCS */
+
+  /* Status / trading */
+  --success: #22c55e;
+  --error: #f97373;
+  --price-up: #4ade80;
+  --price-down: #fb7185;
+
+  /* Focus */
+  --focus-ring: #fbbf24;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --panel-padding-x: 1.25rem;
+  --panel-padding-y: 1rem;
+
+  /* Radius / borders */
+  --radius-small: 0.375rem;
+  --radius-medium: 0.75rem;
+  --border-thin: 1px solid var(--border-subtle);
+}
+
+.dark {
+  /* Même palette pour l'instant, prête pour variantes si besoin */
+  --bg-base: #05090f;
+  --bg-elevated: #0b1017;
+  --bg-subtle: #111827;
+}
+
+/* Utilitaires sémantiques basés sur les tokens */
+
+.bg-base {
+  background-color: var(--bg-base);
+}
+
+.bg-elevated {
+  background-color: var(--bg-elevated);
+}
+
+.bg-subtle {
+  background-color: var(--bg-subtle);
+}
+
+.border-subtle {
+  border-color: var(--border-subtle);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.accent-rlusd {
+  color: var(--accent-rlusd);
+}
+
+.accent-xcs {
+  color: var(--accent-xcs);
+}
+
+.bg-accent-rlusd {
+  background-color: var(--accent-rlusd);
+}
+
+.bg-accent-xcs {
+  background-color: var(--accent-xcs);
+}
+
+.border-accent-rlusd {
+  border-color: var(--accent-rlusd);
+}
+
+.text-price-up {
+  color: var(--price-up);
+}
+
+.text-price-down {
+  color: var(--price-down);
+}
+
+.focus-ring-token:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.panel-surface {
+  background-color: var(--bg-elevated);
+  border-radius: var(--radius-medium);
+  border: var(--border-thin);
+}
+
+/* Panel spécifique pour le chart : bordures desktop, fondu sur mobile */
+.chart-panel {
+  background-color: var(--bg-elevated);
+  border-radius: 0;
+  border: none;
+}
+
+@media (min-width: 1024px) {
+  .chart-panel {
+    border-left: var(--border-thin);
+    border-right: var(--border-thin);
+  }
+}
+
+.panel-header {
+  padding: calc(var(--panel-padding-y) * 0.75) var(--panel-padding-x);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.panel-body {
+  padding: var(--panel-padding-y) var(--panel-padding-x);
+}
+
 body {
   @apply bg-xcannes-background text-white !important;
   font-family: var(--font-manrope), system-ui, sans-serif;
+}
+
+@media (min-width: 768px) {
+  .statement-select {
+    color-scheme: dark;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .statement-select option {
+    background-color: #111827;
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 767px) {
+  .transaction-icon {
+    background-color: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
 }
 
 /* ====== DEX Chart: responsive hauteur mobile / desktop ====== */
 .dex-chart-container {
   /* Smartphone : hauteur libre avec un minimum confortable */
   height: auto;
-  min-height: 500px;
+  min-height: 400px;
 }
 
 @media (min-width: 768px) {
@@ -94,10 +261,70 @@ body {
   }
 }
 
+/* ====== EOD FX buttons flash (neutral + pulse) ====== */
+
+@keyframes eodFlashUp {
+  0% {
+    background-color: rgba(22, 163, 74, 0.6);
+  }
+  100% {
+    background-color: rgba(15, 23, 42, 0.7);
+  }
+}
+
+@keyframes eodFlashDown {
+  0% {
+    background-color: rgba(220, 38, 38, 0.6);
+  }
+  100% {
+    background-color: rgba(15, 23, 42, 0.7);
+  }
+}
+
+.eod-flash-up-a,
+.eod-flash-up-b {
+  animation: eodFlashUp var(--eod-flash-duration, 0.8s) ease-out;
+}
+
+.eod-flash-down-a,
+.eod-flash-down-b {
+  animation: eodFlashDown var(--eod-flash-duration, 0.8s) ease-out;
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
+  animation: fadeIn 1s ease-out forwards;
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* ====== PRICE TICKER (défilement horizontal) ====== */
+
+.price-ticker-viewport {
+  overflow: hidden;
+}
+
+.price-ticker-track {
+  animation: priceTickerScroll 60s linear infinite;
+  will-change: transform;
+}
+
+.price-ticker-track.paused {
+  animation-play-state: paused;
+}
+
+@keyframes priceTickerScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .price-ticker-track {
+    animation: priceTickerScroll 12s linear infinite;
+  }
 }

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useXumm } from "../context/XummContext";
-import XummConnectButton from "../components/XummConnectButton";
-import Header from "../components/Header";
-import FooterPro from "../components/FooterPro";
-import SEOHead from "../components/SEOHead";
+import XummConnectButton from "../components/xumm/XummConnectButton";
+import Header from "../components/componentsGlobal/Header";
+import FooterPro from "../components/componentsGlobal/FooterPro";
+import SEOHead from "../components/componentsGlobal/SEOHead";
 
 export default function SuccessPage() {
   const { t } = useTranslation("common");

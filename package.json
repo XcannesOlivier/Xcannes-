@@ -4,14 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 2500",
-    "build": "next build",
+    "build": "node -r ./scripts/exdev-rename-fallback.cjs ./node_modules/next/dist/bin/next build",
     "start": "next start -p 2500",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check:chart": "node components/dex/XrplCandleChart/checkChart.js"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@stripe/stripe-js": "^8.4.0",
     "aos": "^2.3.4",
     "axios": "^1.13.2",
+    "html5-qrcode": "^2.3.8",
     "i18next": "^24.2.3",
     "lightweight-charts": "^4.2.3",
     "micro": "^10.0.1",
