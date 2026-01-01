@@ -34,6 +34,10 @@ export default function Document(props) {
   return (
     <Html lang={locale} dir={direction}>
       <Head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <script
           src="https://xumm.app/assets/cdn/xumm.min.js"
           async

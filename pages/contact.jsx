@@ -3,9 +3,9 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import ReCAPTCHA from "react-google-recaptcha";
-import Header from "../components/Header";
-import FooterPro from "../components/FooterPro";
-import SEOHead from "../components/SEOHead";
+import Header from "../components/componentsGlobal/Header";
+import FooterPro from "../components/componentsGlobal/FooterPro";
+import SEOHead from "../components/componentsGlobal/SEOHead";
 
 export default function Contact() {
   const router = useRouter();

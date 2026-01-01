@@ -2,8 +2,8 @@ import Head from "next/head";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Header from "../components/Header";
-import FooterPro from "../components/FooterPro";
+import Header from "../components/componentsGlobal/Header";
+import FooterPro from "../components/componentsGlobal/FooterPro";
 
 export default function Disclaimer() {
   const { t } = useTranslation("common");

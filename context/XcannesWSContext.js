@@ -1,11 +1,13 @@
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
 import wsClient from "../lib/xcannesWebSocket";
 
 const XcannesWSContext = createContext();
+const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
 export const XcannesWSProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [tickers, setTickers] = useState(new Map()); // Map<pair, ticker>
+  const [tickersVersion, setTickersVersion] = useState(0); // ✅ Compteur pour forcer re-render
   const [orderbooks, setOrderbooks] = useState(new Map()); // Map<pair, orderbook>
   const [trades, setTrades] = useState(new Map()); // Map<pair, trades[]>
   const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> unifié
@@ -48,7 +50,9 @@ export const XcannesWSProvider = ({ children }) => {
       .connect()
       .then(() => {
         setConnected(true);
-        console.log("✅ [XcannesWSContext] WebSocket connecté");
+        if (DEBUG_LOGS) {
+          console.log("✅ [XcannesWSContext] WebSocket connecté");
+        }
       })
       .catch((err) => {
         console.error("❌ [XcannesWSContext] Erreur connexion:", err);
@@ -63,6 +67,7 @@ export const XcannesWSProvider = ({ children }) => {
           next.set(message.data.symbol, message.data);
           return next;
         });
+        setTickersVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
       }
     };
 
@@ -83,7 +88,11 @@ export const XcannesWSProvider = ({ children }) => {
 
     // Écouter les prix externes Pyth (canal unifié)
     const handlePyth = (message) => {
-      console.log('[XcannesWS] 🌐 Pyth reçu:', message.data?.symbol || message);
+      // Log détaillé volontairement désactivé pour éviter de saturer la console
+      // quand le flux Pyth envoie beaucoup de ticks.
+      // if (DEBUG_LOGS) {
+      //   console.log("[XcannesWS] 🌐 Pyth reçu:", message.data?.symbol || message);
+      // }
       if (message.data && message.data.symbol) {
         setExternalPrices(prev => {
           const next = new Map(prev);
@@ -95,6 +104,30 @@ export const XcannesWSProvider = ({ children }) => {
     };
 
     wsClient.on("pyth", handlePyth);
+
+    // ✅ Écouter le canal "eod-summary" agrégé (toutes les paires en un message)
+    const handleEodSummary = (message) => {
+      if (!message.data || !Array.isArray(message.data.pairs)) return;
+      
+      // Mettre à jour tous les tickers en une fois
+      setTickers(prev => {
+        const next = new Map(prev);
+        message.data.pairs.forEach(pair => {
+          if (pair && pair.symbol) {
+            next.set(pair.symbol, pair);
+          }
+        });
+        return next;
+      });
+      
+      setTickersVersion(v => v + 1);
+      
+      if (DEBUG_LOGS) {
+        console.log(`[XcannesWS] 📊 EOD Summary reçu: ${message.data.pairs.length} paires`);
+      }
+    };
+
+    wsClient.on("eod-summary", handleEodSummary);
 
     const handleTradesSnapshot = (message) => {
       if (!message?.data?.symbol || !Array.isArray(message.data.trades)) return;
@@ -160,23 +193,27 @@ export const XcannesWSProvider = ({ children }) => {
       wsClient.off("ticker", handleTicker);
       wsClient.off("orderbook", handleOrderbook);
       wsClient.off("pyth", handlePyth);
+      wsClient.off("eod-summary", handleEodSummary);
       wsClient.off("trades", handleTradesSnapshot);
       wsClient.off("trade", handleTradeUpdate);
       wsClient.off("error", handleWsError);
     };
   }, []);
 
-  const subscribe = (channel, pair) => {
+  // ✅ Mémoriser avec useCallback pour éviter re-création à chaque render
+  const subscribe = useCallback((channel, pair) => {
     wsClient.subscribe(channel, pair);
-  };
+  }, []);
 
-  const unsubscribe = (channel, pair) => {
+  const unsubscribe = useCallback((channel, pair) => {
     wsClient.unsubscribe(channel, pair);
-  };
+  }, []);
 
-  const value = {
+  // ✅ Mémoriser le value pour éviter re-création à chaque render
+  const value = useMemo(() => ({
     connected,
     tickers,
+    tickersVersion, // ✅ Exposer le compteur
     orderbooks,
     trades,
     externalPrices,
@@ -185,7 +222,7 @@ export const XcannesWSProvider = ({ children }) => {
     subscribe,
     unsubscribe,
     ws: wsClient,
-  };
+  }), [connected, tickers, tickersVersion, orderbooks, trades, externalPrices, externalPricesVersion, wsErrors, subscribe, unsubscribe]);
 
   return (
     <XcannesWSContext.Provider value={value}>

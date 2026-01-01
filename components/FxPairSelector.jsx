@@ -1,1 +1,2 @@
-export { default } from "./XrplCandleChart/components/FxPairSelector";
+export { default } from "./dex/XrplCandleChart/components/FxPairSelector";
+

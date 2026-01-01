@@ -2,8 +2,8 @@
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import WalletDashboard from "../components/WalletDashboard";
-import SEOHead from "../components/SEOHead";
+import WalletDashboard from "../components/componentsGlobal/WalletDashboard";
+import SEOHead from "../components/componentsGlobal/SEOHead";
 import { useXumm } from "../context/XummContext";
 
 export default function Wallet() {
@@ -19,10 +19,14 @@ export default function Wallet() {
           "Manage your XRPL wallet, trustlines, and assets on XCANNES"
         )}
       />
-      
-      <div className="min-h-screen bg-black text-white font-montserrat">
-        <WalletDashboard preview={!isConnected} />
-      </div>
+
+      <main className="min-h-[100svh] md:min-h-screen md:h-screen md:overflow-hidden bg-elevated text-white font-montserrat">
+        <div className="w-full md:max-w-5xl min-h-[100svh] md:h-full md:min-h-0 mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6">
+          <div className="bg-elevated backdrop-blur-sm min-h-[100svh] md:h-full md:min-h-0 md:overflow-hidden border-0 rounded-none md:border md:border-white/15 md:rounded-xl">
+            <WalletDashboard preview={!isConnected} variant="full" />
+          </div>
+        </div>
+      </main>
     </>
   );
 }

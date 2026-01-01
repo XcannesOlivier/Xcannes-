@@ -1,22 +1,28 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Header from "../components/Header";
-import DexSidebar from "../components/DexSidebar";
+import Header from "../components/componentsGlobal/Header";
+import DexSidebar from "../components/dex/DexSidebar";
 import { useXumm } from "../context/XummContext";
-import SEOHead from "../components/SEOHead";
-import PriceTicker from "../components/PriceTicker";
+import SEOHead from "../components/componentsGlobal/SEOHead";
+import PriceTicker from "../components/marketGlobal/PriceTicker";
 import xcannesApi from "../lib/xcannesApi";
-import OrderbookSidebar from "../components/OrderbookSidebar";
+import OrderbookSidebar from "../components/dex/OrderbookSidebar";
+import TradingLayoutV1A from "../components/dex/TradingLayoutV1A";
+import ExchangeSection from "../components/dex/ExchangeSections/ExchangeSection";
+import FooterPro from "../components/componentsGlobal/FooterPro";
+import { getPairCategory } from "../utils/marketStructure";
 
+const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 // 📈 Chart dynamique sans SSR
 const XrplCandleChartRaw = dynamic(
-  () => import("../components/XrplCandleChart").then((mod) => mod.default),
+  () => import("../components/dex/XrplCandleChart").then((mod) => mod.default),
   {
     ssr: false,
     loading: () => (
@@ -40,6 +46,9 @@ const XrplCandleChartRaw = dynamic(
   }
 );
 
+const ENABLE_NEW_TRADING_LAYOUT_V1A =
+  process.env.NEXT_PUBLIC_NEW_TRADING_LAYOUT_V1A !== "false";
+
 export default function Dex() {
   const { t } = useTranslation("common");
   const router = useRouter();
@@ -49,13 +58,36 @@ export default function Dex() {
   const [interval, setInterval] = useState("1d");
   const [availablePairs, setAvailablePairs] = useState(["XRP/RLUSD"]); // Défaut
   const [loadingPairs, setLoadingPairs] = useState(true);
-  const [mobileOrderbookOpen, setMobileOrderbookOpen] = useState(false);
-  const [mobileTradingOpen, setMobileTradingOpen] = useState(false);
   const { wallet, isConnected } = useXumm();
-  const tradingScrollPosRef = useRef(0);
-  const tradingScrollTimeRef = useRef(0);
-  const orderbookScrollPosRef = useRef(0);
-  const orderbookScrollTimeRef = useRef(0);
+  const [ordersOpen, setOrdersOpen] = useState(true);
+
+  // container DOM pour la bulle assistant IA (comme sur la home)
+  const [assistantContainer, setAssistantContainer] = useState(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const el = document.createElement("div");
+    el.id = "assistant-root-dex";
+    document.body.appendChild(el);
+    setAssistantContainer(el);
+    return () => {
+      if (document.body.contains(el)) document.body.removeChild(el);
+    };
+  }, []);
+
+  // Détecter le scroll pour ajuster la position du bouton sur mobile
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Charger les paires depuis l'API au montage
   useEffect(() => {
@@ -65,25 +97,32 @@ export default function Dex() {
         if (markets) {
           // Priorité: trading (XRPL) > pyth (FOREX)
           const allPairs = [
-            ...(markets.trading || []),  // Paires XRPL (XRP/RLUSD, XCS/XRP, XCS/RLUSD)
-            ...(markets.pyth || [])       // Paires Pyth (FOREX + métaux)
+            ...(markets.trading || []), // Paires XRPL (XRP/RLUSD, XCS/XRP, XCS/RLUSD)
+            ...(markets.pyth || []), // Paires Pyth (FOREX + métaux)
           ];
-          
+
           // Filtrer les paires actives, dédupliquer, et convertir format backend (XCS_XRP) vers frontend (XCS/XRP)
-          const pairsList = Array.from(new Set(
-            allPairs
-              .filter(m => m.active !== false)
-              .map(m => `${m.base}/${m.quote}`)
-          ));
+          let pairsList = Array.from(
+            new Set(
+              allPairs
+                .filter((m) => m.active !== false)
+                .map((m) => `${m.base}/${m.quote}`)
+            )
+          );
+
+          // Retirer explicitement la paire XCS/XRP de l'interface trading
+          pairsList = pairsList.filter((p) => p !== "XCS/XRP");
           
           setAvailablePairs(pairsList);
           
-          console.log(`✅ ${pairsList.length} paires chargées:`, pairsList);
+          if (DEBUG_LOGS) {
+            console.log(`✅ ${pairsList.length} paires chargées:`, pairsList);
+          }
         }
       } catch (error) {
         console.error("Erreur chargement paires:", error);
-        // Garder uniquement les 3 paires configurées en fallback
-        setAvailablePairs(["XRP/RLUSD", "XCS/XRP", "XCS/RLUSD"]);
+        // Garder uniquement les paires configurées en fallback (sans XCS/XRP)
+        setAvailablePairs(["XRP/RLUSD", "XCS/RLUSD"]);
       } finally {
         setLoadingPairs(false);
       }
@@ -92,53 +131,20 @@ export default function Dex() {
     fetchPairs();
   }, []);
 
-  // 🎯 Top 10 paires les plus importantes pour le PriceTicker (sans XCS pour l'instant)
-  const topPairs = useMemo(() => {
-    const importantPairs = [
-      "XRP/RLUSD",    // XRPL principale
-      "EUR/USD",      // Forex majeure
-      "GBP/USD",      // Forex majeure
-      "USD/JPY",      // Forex majeure
-      "USD/CHF",      // Forex majeure
-      "AUD/USD",      // Forex majeure
-      "BTC/USD",      // Crypto majeure
-      "ETH/USD",      // Crypto majeure
-      "XAU/USD",      // Or
-      "XAG/USD",      // Argent
-    ];
-    
-    // Filtrer seulement les paires disponibles dans availablePairs
-    return importantPairs.filter(pair => availablePairs.includes(pair));
-  }, [availablePairs]);
-
-  // Désactiver le scroll sur mobile (iPhone)
-  useEffect(() => {
-    // Détecter si on est sur mobile
-    const isMobile = window.innerWidth < 768;
-    
-    if (isMobile) {
-      // Fixer le body pour empêcher le scroll
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-      
-      // Empêcher le bounce iOS
-      document.body.style.overscrollBehavior = 'none';
-      
-      return () => {
-        // Réactiver le scroll au démontage
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-        document.body.style.overscrollBehavior = '';
-      };
-    }
-  }, []);
-  
   // Mémoriser les paires pour éviter les re-renders
-  const pairs = useMemo(() => availablePairs, [availablePairs]);
+  // Limiter aux 10 paires les plus utilisées, exclure XCS et la paire actuellement sélectionnée du PriceTicker
+  const tickerPairs = useMemo(
+    () =>
+      availablePairs
+        .filter((p) => !p.startsWith("XCS/"))
+        .slice(0, 10),
+    [availablePairs]
+  );
+
+  const isXrplPair = useMemo(
+    () => getPairCategory(selectedPair) === "xrpl",
+    [selectedPair]
+  );
 
   return (
     <>
@@ -155,193 +161,211 @@ export default function Dex() {
 
       {/* PriceTicker desktop uniquement */}
       <div className="hidden md:block">
-        <PriceTicker pairs={topPairs} fixed={true} />
+        <PriceTicker
+          pairs={tickerPairs}
+          fixed={true}
+          backgroundClass="bg-elevated"
+        />
       </div>
 
       {/* Conteneur principal pleine hauteur */}
-      <main className="relative w-full min-h-screen text-white pt-0 md:pt-32 pb-36 md:pb-0 mb-0 bg-cover bg-center bg-no-repeat bg-fixed font-montserrat font-[300] bg-xcannes-background">
-        <div className="absolute inset-0 bg-black/0 z-0" />
-
+      <main className="relative w-full min-h-screen text-primary pt-0 md:pt-32 pb-10 md:pb-0 mb-0 font-montserrat font-[300] bg-elevated">
         <div className="w-full relative z-10">
-          {/* Layout principal: sidebar gauche (orderbook) + chart centre + sidebar droite (trading) */}
-          <div className="grid grid-cols-1 md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(300px,360px)] gap-0 items-start">
-            {/* Sidebar Orderbook + Trades (gauche) */}
-            <div className="hidden md:block">
-              <div className="sticky top-32 h-[calc(100vh-8rem)]">
-                <OrderbookSidebar pair={selectedPair} />
+          {ENABLE_NEW_TRADING_LAYOUT_V1A ? (
+            <TradingLayoutV1A
+              pair={selectedPair}
+              interval={interval}
+              onPairChange={setSelectedPair}
+              onIntervalChange={setInterval}
+              availablePairs={availablePairs}
+              ChartComponent={XrplCandleChartRaw}
+            />
+          ) : (
+            <div className="max-w-[1600px] mx-auto px-3 sm:px-4 lg:px-6">
+              <div
+                className="
+                  grid gap-4
+                  grid-cols-1
+                  xl:grid-cols-[26%_74%]
+                  2xl:grid-cols-[21%_58%_21%]
+                  items-start
+                "
+              >
+                {/* Orders / Orderbook */}
+                <section
+                  className="
+                    order-2
+                    xl:order-1 xl:row-start-1 xl:col-span-1
+                    2xl:order-1 2xl:row-auto 2xl:col-span-1
+                  "
+                >
+                  <div className="mt-3 xl:mt-0">
+                    <div className="xl:sticky xl:top-32 xl:h-[calc(100vh-8rem)] panel-surface overflow-hidden">
+                      <OrderbookSidebar pair={selectedPair} />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Chart principal */}
+                <section
+                  className="
+                    order-1
+                    xl:order-2 xl:row-start-1 xl:col-span-1
+                    2xl:order-2 2xl:col-span-1
+                  "
+                >
+                  <div className="flex flex-col min-h-[50vh] xl:min-h-[65vh] 2xl:h-[calc(100vh-8rem)] max-sm:-mx-3">
+                    <XrplCandleChartRaw
+                      pair={selectedPair}
+                      interval={interval}
+                      onPairChange={setSelectedPair}
+                      onIntervalChange={setInterval}
+                      availablePairs={pairs}
+                    />
+                  </div>
+                </section>
+
+                {/* Wallet / Trading sidebar */}
+                <section
+                  className="
+                    order-3
+                    xl:order-3 xl:row-start-2 xl:col-span-2
+                    2xl:order-3 2xl:row-start-1 2xl:col-span-1
+                  "
+                >
+                  <div className="mt-3 xl:mt-0">
+                    <div className="xl:sticky xl:top-32 xl:h-[calc(100vh-8rem)] panel-surface overflow-hidden">
+                      <div className="h-full overflow-y-auto">
+                        <DexSidebar pair={selectedPair} />
+                      </div>
+                    </div>
+                  </div>
+                </section>
               </div>
             </div>
-
-            {/* Chart au centre */}
-            <div className="flex flex-col md:h-[calc(100vh-8rem)] pb-0 md:pb-0">
-              <XrplCandleChartRaw
-                pair={selectedPair}
-                interval={interval}
-                onPairChange={setSelectedPair}
-                onIntervalChange={setInterval}
-                availablePairs={pairs}
-              />
-            </div>
-
-            {/* Sidebar Trading + Setup (droite) */}
-            <div className="hidden md:block">
-              <div className="sticky top-32 h-[calc(100vh-8rem)]">
-                <div className="h-full overflow-y-auto">
-                  <DexSidebar pair={selectedPair} />
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
+
+        {/* Section EOD FX Markets (position adaptative) */}
+        {isXrplPair ? (
+          // Paires XRPL : EOD en dessous, comme avant
+          <ExchangeSection variant="embedded" />
+        ) : (
+          // Paires non-XRPL : EOD au-dessus sur mobile (voir md:hidden plus haut),
+          // et en dessous sur desktop pour garder la structure globale.
+          <div className="hidden md:block">
+            <ExchangeSection variant="embedded" />
+          </div>
+        )}
+
+        {/* Footer global pro */}
+        <FooterPro />
       </main>
 
-      {/* Mobile bottom nav: Orderbook / Trading */}
-      <div className="fixed inset-x-0 bottom-0 z-50 md:hidden pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-between gap-2 px-0 py-2 bg-black/85 border-t border-white/10 backdrop-blur-md w-full">
-            <button
-              type="button"
-              onClick={() => {
-                // TODO: Ouvrir l'assistant IA
-                alert('Assistant IA - À venir');
-              }}
-              className="flex-[0.5] text-lg font-bold py-0.5 px-1 transition-all bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-white hover:from-[#5b5dd8] hover:to-[#4338ca] border border-[#6366f1]/50 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-lg shadow-[#6366f1]/20"
-              aria-label="Assistant IA"
-            >
-              <span className="tracking-wider relative z-10 inline-block" style={{ animation: 'irregularPulse 3s ease-in-out infinite' }}>•••</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_ease-in-out_infinite]" 
-                    style={{ transform: 'translateX(-100%)', animation: 'shimmer 2s ease-in-out infinite' }}></span>
-              <style jsx>{`
-                @keyframes shimmer {
-                  0% { transform: translateX(-100%); }
-                  100% { transform: translateX(100%); }
-                }
-                @keyframes irregularPulse {
-                  0% { transform: scale(1); }
-                  15% { transform: scale(1.15); }
-                  25% { transform: scale(1); }
-                  40% { transform: scale(1.08); }
-                  50% { transform: scale(1); }
-                  75% { transform: scale(1.12); }
-                  85% { transform: scale(1); }
-                  100% { transform: scale(1); }
-                }
-              `}</style>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOrderbookOpen(true);
-                setMobileTradingOpen(false);
-              }}
-              className={`flex-[0.6] text-sm font-medium py-1.5 transition-all border rounded-md ${
-                mobileOrderbookOpen
-                  ? "bg-xcannes-green text-black border-xcannes-green"
-                  : "bg-white/5 text-white/70 border-white/20"
-              }`}
-            >
-              Order Book
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileTradingOpen(true);
-                setMobileOrderbookOpen(false);
-              }}
-              className={`flex-[0.8] text-lg font-semibold py-0.5 px-0 transition-all border rounded-md tracking-wide ${
-                mobileTradingOpen
-                  ? "bg-[#3052ef] text-white border-[#3052ef]"
-                  : "bg-white/5 text-[#3052ef] border-[#3052ef]/60"
-              }`}
-            >
-              Wallet
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                // TODO: Ouvrir la page d'achat XCS
-                window.open('https://xcannes.com', '_blank');
-              }}
-              className="px-6 py-1 bg-xcannes-green hover:bg-xcannes-green/80 text-white rounded-full flex items-center justify-center transition-all font-bold text-base shrink-0"
-              aria-label="Acheter XCS"
-            >
-              Buy
-            </button>
-        </div>
-
-        {/* Mobile Orderbook bottom sheet */}
-        <div className="fixed inset-0 z-50 md:hidden pointer-events-none">
-          {/* Overlay */}
-          <div
-            className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
-              mobileOrderbookOpen ? "opacity-100 pointer-events-auto" : "opacity-0"
-            }`}
-            onClick={() => setMobileOrderbookOpen(false)}
-          />
-          {/* Panel */}
-          <div
-            className={`absolute inset-x-0 bottom-0 transform transition-transform duration-300 ${
-              mobileOrderbookOpen ? "translate-y-0" : "translate-y-full"
-            } pointer-events-auto`}
-          >
-            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden flex flex-col">
-              {/* Header avec titre et bouton fermer */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
-                <div className="flex flex-col">
-                  <h3 className="text-white font-normal text-lg">Market</h3>
+      {/* Bulle Assistant fixe en bas à droite (même style que sur la home) */}
+      {assistantContainer &&
+        createPortal(
+          <div className={`fixed right-3 md:right-6 md:bottom-6 z-[9999] transition-all duration-300 ${
+            isScrolled ? 'bottom-3' : 'bottom-20'
+          }`}>
+            {assistantOpen && (
+              <div className="mb-3 w-[96vw] max-w-none md:max-w-md rounded-2xl border border-white/20 bg-base p-3 flex flex-col gap-2">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm md:text-xs font-semibold text-white">
+                    Assistant XCANNES
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setAssistantOpen(false)}
+                    className="text-white/60 hover:text-white text-sm md:text-xs"
+                    aria-label="Fermer le chat"
+                  >
+                    ✕
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileOrderbookOpen(false)}
-                  className="text-white/60 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all"
-                  aria-label="Fermer le panneau orderbook"
+                <div className="flex-1 min-h-[120px] max-h-60 overflow-y-auto rounded-lg border border-white/10 bg-base p-2 text-sm md:text-[11px] text-white/70">
+                  <p className="mb-1 text-white text-sm md:text-xs font-medium">
+                    Bonjour, je suis l&apos;assistant XCANNES.
+                  </p>
+                  <p className="text-sm md:text-xs text-white/60">
+                    Décrivez votre question de trading (pair XRPL, Pyth, EOD, carnet d&apos;ordres...)
+                    et je vous aiderai à comprendre ce que vous voyez à l&apos;écran.
+                  </p>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Écrire un message..."
+                    className="flex-1 rounded-lg bg-base border border-white/20 px-2 py-1 text-sm md:text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#6366f1]"
+                  />
+                  <button
+                    type="button"
+                    className="px-3 py-1 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-sm md:text-[11px] text-white font-medium hover:from-[#5b5dd8] hover:to-[#4338ca] transition-colors"
+                  >
+                    Envoyer
+                  </button>
+                </div>
+              </div>
+            )}
+            {!assistantOpen && (
+              <button
+                type="button"
+                onClick={() => setAssistantOpen(true)}
+                className="w-10 h-10 md:w-12 md:h-12 transition-all bg-transparent text-white hover:bg-white/10 border-2 border-white/30 rounded-full flex items-center justify-center relative overflow-hidden"
+                aria-label="Assistant IA"
+                title="Assistant IA"
+              >
+                <span
+                  className="tracking-wider relative z-10 inline-block text-lg md:text-xl"
+                  style={{ animation: "irregularPulse 3s ease-in-out infinite" }}
                 >
-                  ✕
-                </button>
-              </div>
-              {/* Contenu scrollable */}
-              <div className="flex-1 overflow-y-auto p-2">
-                <OrderbookSidebar pair={selectedPair} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Trading bottom sheet */}
-        <div className="fixed inset-0 z-50 md:hidden pointer-events-none">
-          {/* Overlay */}
-          <div
-            className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
-              mobileTradingOpen ? "opacity-100 pointer-events-auto" : "opacity-0"
-            }`}
-            onClick={() => setMobileTradingOpen(false)}
-          />
-          {/* Panel */}
-          <div
-            className={`absolute inset-x-0 bottom-0 transform transition-transform duration-300 ${
-              mobileTradingOpen ? "translate-y-0" : "translate-y-full"
-            } pointer-events-auto`}
-          >
-            <div className="h-[100dvh] bg-black/95 border-t border-white/20 rounded-t-2xl overflow-hidden flex flex-col">
-              {/* Header avec titre et bouton fermer */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
-                <h3 className="text-white font-medium text-base">XCANNES-Wallet</h3>
-                <button
-                  type="button"
-                  onClick={() => setMobileTradingOpen(false)}
-                  className="text-white/60 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-all"
-                  aria-label="Fermer le panneau trading"
-                >
-                  ✕
-                </button>
-              </div>
-              {/* Contenu scrollable */}
-              <div className="flex-1 overflow-y-auto p-2">
-                <DexSidebar pair={selectedPair} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                  •••
+                </span>
+                <span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  style={{ animation: "shimmer 2s ease-in-out infinite" }}
+                ></span>
+              </button>
+            )}
+            <style jsx global>{`
+              @keyframes shimmer {
+                0% {
+                  transform: translateX(-100%) rotate(0deg);
+                }
+                100% {
+                  transform: translateX(100%) rotate(360deg);
+                }
+              }
+              @keyframes irregularPulse {
+                0% {
+                  transform: scale(1);
+                }
+                15% {
+                  transform: scale(1.15);
+                }
+                25% {
+                  transform: scale(1);
+                }
+                40% {
+                  transform: scale(1.08);
+                }
+                50% {
+                  transform: scale(1);
+                }
+                75% {
+                  transform: scale(1.12);
+                }
+                85% {
+                  transform: scale(1);
+                }
+                100% {
+                  transform: scale(1);
+                }
+              }
+            `}</style>
+          </div>,
+          assistantContainer
+        )}
     </>
   );
 }

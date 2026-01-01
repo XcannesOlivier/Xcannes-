@@ -1,1 +1,2 @@
-export { default } from "./XrplCandleChart/components/ChartFooter";
+export { default } from "./dex/XrplCandleChart/components/ChartFooter";
+

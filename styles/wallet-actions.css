@@ -1,0 +1,334 @@
+/**
+ * Professional Trading Platform Wallet Action Buttons
+ * Design Philosophy: Clarity, trust, precision, responsiveness
+ * Inspired by: Binance, Kraken, TradingView
+ * No gradients, no emojis, no marketing patterns
+ * 
+ * Improvements:
+ * 1. Increased clickable area with pseudo-element (better mobile UX)
+ * 2. Buy/Sell as primary action (stronger visual weight)
+ * 3. Enhanced hover/active states (fast, discreet feedback)
+ * 4. Improved color semantics (low saturation, professional)
+ * 5. Better accessibility (focus-visible, keyboard support)
+ */
+
+/* Base button style - compact, tool-like, responsive */
+.wallet-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.5rem;
+  transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: visible; /* Allow focus outline to show */
+  
+  /* Improvement 1: Increased clickable area (mobile-friendly) */
+  /* Adds 8px padding on all sides invisibly */
+}
+
+.wallet-action-btn::after {
+  content: '';
+  position: absolute;
+  inset: -8px; /* Expands clickable area by 16px total */
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Subtle radial glow on hover */
+.wallet-action-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.04), transparent);
+  opacity: 0;
+  transition: opacity 120ms;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.wallet-action-btn:hover::before {
+  opacity: 1;
+}
+
+/* Improvement 3: Enhanced hover state - faster, more visible */
+.wallet-action-btn:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px); /* Subtle lift on hover */
+}
+
+/* Improvement 3: Active state - clear press feedback */
+.wallet-action-btn:active {
+  transform: translateY(0) scale(0.97); /* Press down effect */
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  transition-duration: 60ms; /* Faster response on click */
+}
+
+/* Improvement 5: Accessibility - enhanced focus-visible */
+.wallet-action-btn:focus-visible {
+  outline: 2px solid rgba(0, 255, 163, 0.5);
+  outline-offset: 3px;
+  border-color: rgba(0, 255, 163, 0.3);
+  z-index: 10; /* Ensure focus ring is visible */
+}
+
+/* Icon container - circular, minimal, responsive */
+.wallet-action-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  pointer-events: none; /* Icon shouldn't block clicks */
+}
+
+/* Improvement 3: Enhanced icon hover feedback */
+.wallet-action-btn:hover .wallet-action-icon {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.08);
+  transform: scale(1.05); /* Slight grow on hover */
+}
+
+.wallet-action-btn:active .wallet-action-icon {
+  transform: scale(0.95); /* Compress on click */
+}
+
+/* Label - clean, readable, responsive */
+.wallet-action-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  transition: color 120ms;
+  letter-spacing: 0.01em;
+  pointer-events: none; /* Label shouldn't block clicks */
+}
+
+.wallet-action-btn:hover .wallet-action-label {
+  color: rgba(255, 255, 255, 0.95); /* Stronger contrast on hover */
+}
+
+/* ============================================
+   Improvement 4: Color semantics - professional, low-saturation
+   ============================================ */
+
+/* Send - Blue-green (neutral transfer) */
+.wallet-action-send .wallet-action-icon {
+  background: rgba(56, 189, 248, 0.08);
+  color: #38BDF8;
+}
+
+.wallet-action-send:hover .wallet-action-icon {
+  background: rgba(56, 189, 248, 0.14);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.18);
+}
+
+.wallet-action-send:active .wallet-action-icon {
+  background: rgba(56, 189, 248, 0.2);
+}
+
+/* Receive - Green (incoming, positive) */
+.wallet-action-receive .wallet-action-icon {
+  background: rgba(34, 197, 94, 0.08);
+  color: #22C55E;
+}
+
+.wallet-action-receive:hover .wallet-action-icon {
+  background: rgba(34, 197, 94, 0.14);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.18);
+}
+
+.wallet-action-receive:active .wallet-action-icon {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+/* Convert - Cyan (exchange, swap) */
+.wallet-action-swap .wallet-action-icon {
+  background: rgba(6, 182, 212, 0.08);
+  color: #06B6D4;
+}
+
+.wallet-action-swap:hover .wallet-action-icon {
+  background: rgba(6, 182, 212, 0.14);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.18);
+}
+
+.wallet-action-swap:active .wallet-action-icon {
+  background: rgba(6, 182, 212, 0.2);
+}
+
+/* ============================================
+   Improvement 2: Send as PRIMARY ACTION
+   Most common wallet operation, deserves prominence
+   ============================================ */
+
+.wallet-action-send {
+  /* Subtle but permanent emphasis */
+  background: rgba(56, 189, 248, 0.05);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.wallet-action-send .wallet-action-icon {
+  background: rgba(56, 189, 248, 0.14); /* More visible background */
+  color: #5FC9F8; /* Slightly brighter blue */
+  border-color: rgba(56, 189, 248, 0.28);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); /* Permanent subtle glow */
+}
+
+.wallet-action-send:hover {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.38);
+}
+
+.wallet-action-send:hover .wallet-action-icon {
+  background: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.28); /* Stronger glow on hover */
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.wallet-action-send:active .wallet-action-icon {
+  background: rgba(56, 189, 248, 0.28);
+}
+
+.wallet-action-send .wallet-action-label {
+  color: rgba(95, 201, 248, 0.9); /* More visible label */
+  font-weight: 600; /* Slightly bolder */
+}
+
+.wallet-action-send:hover .wallet-action-label {
+  color: rgba(95, 201, 248, 1);
+}
+
+/* Buy/Sell - Violet (fiat operations) - SECONDARY */
+.wallet-action-buysell .wallet-action-icon {
+  background: rgba(139, 92, 246, 0.08);
+  color: #8B5CF6;
+}
+
+.wallet-action-buysell:hover .wallet-action-icon {
+  background: rgba(139, 92, 246, 0.14);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.18);
+}
+
+.wallet-action-buysell:active .wallet-action-icon {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+/* ============================================
+   Responsive adjustments - better mobile UX
+   ============================================ */
+@media (max-width: 640px) {
+  .wallet-action-btn {
+    padding: 0.875rem 0.5rem; /* Slightly larger padding on mobile */
+    gap: 0.375rem;
+  }
+
+  .wallet-action-icon {
+    width: 2.375rem; /* Larger icon on mobile */
+    height: 2.375rem;
+  }
+
+  .wallet-action-label {
+    font-size: 0.65rem;
+  }
+  
+  /* Improvement 1: Larger touch target on mobile */
+  .wallet-action-btn::after {
+    inset: -10px; /* 20px total expanded area on mobile */
+  }
+}
+
+/* ============================================
+   Improvement 5: Accessibility enhancements
+   ============================================ */
+
+/* Keyboard navigation - distinct focus state */
+.wallet-action-btn:focus-visible {
+  outline: 2px solid rgba(0, 255, 163, 0.6);
+  outline-offset: 3px;
+  border-color: rgba(0, 255, 163, 0.35);
+  z-index: 10;
+}
+
+/* Primary action (Send) has stronger focus */
+.wallet-action-send:focus-visible {
+  outline-color: rgba(95, 201, 248, 0.7);
+  border-color: rgba(95, 201, 248, 0.5);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .wallet-action-btn {
+    border-width: 2px;
+  }
+
+  .wallet-action-icon {
+    border-width: 2px;
+  }
+  
+  .wallet-action-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+  }
+  
+  /* Primary action (Send) even more visible in high contrast */
+  .wallet-action-send {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion support - instant feedback */
+@media (prefers-reduced-motion: reduce) {
+  .wallet-action-btn,
+  .wallet-action-icon,
+  .wallet-action-label,
+  .wallet-action-btn::before,
+  .wallet-action-btn::after {
+    transition: none;
+    animation: none;
+  }
+  
+  /* Still provide visual feedback, just without motion */
+  .wallet-action-btn:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .wallet-action-btn:active {
+    transform: none;
+    opacity: 0.8;
+  }
+}
+
+/* ============================================
+   Loading state (optional, for future use)
+   ============================================ */
+.wallet-action-btn[disabled],
+.wallet-action-btn.is-loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.wallet-action-btn[disabled] .wallet-action-icon,
+.wallet-action-btn.is-loading .wallet-action-icon {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
