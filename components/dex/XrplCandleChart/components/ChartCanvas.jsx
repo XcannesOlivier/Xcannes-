@@ -18,7 +18,7 @@ export default function ChartCanvas({
       <div className="relative w-full h-full">
         {/* Status line OHLC en haut du chart */}
         {statusBar && (
-          <div className="absolute top-0 left-0 right-0 z-30 flex flex-wrap items-center gap-3 px-3 py-1.5 text-[11px] font-mono">
+          <div className="absolute top-0 left-0 right-14 md:right-0 z-30 flex flex-wrap items-center gap-3 px-3 py-1.5 text-[10px] md:text-[11px] font-mono pointer-events-none">
             <span className="text-white/50">
               {new Date(statusBar.time * 1000).toLocaleString()}
             </span>

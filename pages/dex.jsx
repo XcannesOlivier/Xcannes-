@@ -269,7 +269,7 @@ export default function Dex() {
             isScrolled ? 'bottom-3' : 'bottom-20'
           }`}>
             {assistantOpen && (
-              <div className="mb-3 w-[96vw] max-w-none md:max-w-md rounded-2xl border border-white/20 bg-base p-3 flex flex-col gap-2">
+              <div className="mb-3 w-[96vw] max-w-none md:max-w-md rounded-2xl border border-white/10 bg-[#040c13]/90 backdrop-blur-xl p-3 flex flex-col gap-2 shadow-2xl">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm md:text-xs font-semibold text-white">
                     Assistant XCANNES
@@ -277,14 +277,14 @@ export default function Dex() {
                   <button
                     type="button"
                     onClick={() => setAssistantOpen(false)}
-                    className="text-white/60 hover:text-white text-sm md:text-xs"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded-md text-white/60 hover:text-white hover:bg-white/5 transition-colors text-sm md:text-xs"
                     aria-label="Fermer le chat"
                   >
                     ✕
                   </button>
                 </div>
-                <div className="flex-1 min-h-[120px] max-h-60 overflow-y-auto rounded-lg border border-white/10 bg-base p-2 text-sm md:text-[11px] text-white/70">
-                  <p className="mb-1 text-white text-sm md:text-xs font-medium">
+                <div className="flex-1 min-h-[120px] max-h-60 overflow-y-auto rounded-lg border border-white/10 bg-black/20 p-3 text-sm md:text-[11px] text-white/70">
+                  <p className="mb-1 text-white/90 text-sm md:text-xs font-medium">
                     Bonjour, je suis l&apos;assistant XCANNES.
                   </p>
                   <p className="text-sm md:text-xs text-white/60">
@@ -296,11 +296,11 @@ export default function Dex() {
                   <input
                     type="text"
                     placeholder="Écrire un message..."
-                    className="flex-1 rounded-lg bg-base border border-white/20 px-2 py-1 text-sm md:text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#6366f1]"
+                    className="flex-1 rounded-lg bg-black/25 border border-white/10 px-3 py-2 text-sm md:text-xs text-white/90 placeholder:text-white/35 focus:outline-none focus:border-xcannes-green/40 focus:ring-2 focus:ring-xcannes-green/10"
                   />
                   <button
                     type="button"
-                    className="px-3 py-1 rounded-lg bg-gradient-to-br from-[#6366f1] to-[#4f46e5] text-sm md:text-[11px] text-white font-medium hover:from-[#5b5dd8] hover:to-[#4338ca] transition-colors"
+                    className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm md:text-[11px] text-white/75 font-medium transition-colors"
                   >
                     Envoyer
                   </button>

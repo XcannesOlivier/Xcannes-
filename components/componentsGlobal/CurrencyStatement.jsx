@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import Image from "next/image";
+import { getCurrencyDescription } from "../../utils/currencyDescriptions";
 
 const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
@@ -19,193 +20,6 @@ const USD_STABLECOINS = [
 ];
 
 /**
- * Fonction pour obtenir la description complète d'une devise
- */
-const getCurrencyDescription = (code) => {
-  const descriptions = {
-    // Fiat - Principales
-    "USD": "US Dollar",
-    "EUR": "Euro",
-    "GBP": "British Pound",
-    "JPY": "Japanese Yen",
-    "CHF": "Swiss Franc",
-    "CAD": "Canadian Dollar",
-    "AUD": "Australian Dollar",
-    "NZD": "New Zealand Dollar",
-    "CNY": "Chinese Yuan",
-    "CNH": "Chinese Yuan Offshore",
-    "HKD": "Hong Kong Dollar",
-    "SGD": "Singapore Dollar",
-    "KRW": "South Korean Won",
-    "INR": "Indian Rupee",
-    "BRL": "Brazilian Real",
-    "MXN": "Mexican Peso",
-    "ZAR": "South African Rand",
-    "RUB": "Russian Ruble",
-    "TRY": "Turkish Lira",
-    "SEK": "Swedish Krona",
-    "NOK": "Norwegian Krone",
-    "DKK": "Danish Krone",
-    "PLN": "Polish Zloty",
-    "CZK": "Czech Koruna",
-    "HUF": "Hungarian Forint",
-    "RON": "Romanian Leu",
-    
-    // Moyen-Orient
-    "AED": "Emirati Dirham",
-    "SAR": "Saudi Arabian Riyal",
-    "QAR": "Qatari Riyal",
-    "KWD": "Kuwaiti Dinar",
-    "BHD": "Bahraini Dinar",
-    "OMR": "Omani Rial",
-    "JOD": "Jordanian Dinar",
-    "ILS": "Israeli Shekel",
-    "IQD": "Iraqi Dinar",
-    "SYP": "Syrian Pound",
-    "LBP": "Lebanese Pound",
-    "YER": "Yemeni Rial",
-    
-    // Asie
-    "THB": "Thai Baht",
-    "MYR": "Malaysian Ringgit",
-    "IDR": "Indonesian Rupiah",
-    "PHP": "Philippine Peso",
-    "VND": "Vietnamese Dong",
-    "PKR": "Pakistani Rupee",
-    "BDT": "Bangladeshi Taka",
-    "LKR": "Sri Lankan Rupee",
-    "NPR": "Nepalese Rupee",
-    "AFN": "Afghan Afghani",
-    "MMK": "Burmese Kyat",
-    "KHR": "Cambodian Riel",
-    "LAK": "Lao Kip",
-    "TWD": "Taiwan Dollar",
-    "MOP": "Macanese Pataca",
-    
-    // Amérique Latine & Caraïbes
-    "ARS": "Argentine Peso",
-    "CLP": "Chilean Peso",
-    "COP": "Colombian Peso",
-    "PEN": "Peruvian Sol",
-    "VES": "Venezuelan Bolivar",
-    "UYU": "Uruguayan Peso",
-    "PYG": "Paraguayan Guarani",
-    "BOB": "Bolivian Boliviano",
-    "CRC": "Costa Rican Colon",
-    "GTQ": "Guatemalan Quetzal",
-    "HNL": "Honduran Lempira",
-    "NIO": "Nicaraguan Cordoba",
-    "PAB": "Panamanian Balboa",
-    "DOP": "Dominican Peso",
-    "HTG": "Haitian Gourde",
-    "JMD": "Jamaican Dollar",
-    "TTD": "Trinidad and Tobago Dollar",
-    "BBD": "Barbadian Dollar",
-    "BSD": "Bahamian Dollar",
-    "BZD": "Belizean Dollar",
-    "SVC": "Salvadoran Colon",
-    "CUP": "Cuban Peso",
-    "CUC": "Cuban Convertible Peso",
-    
-    // Afrique
-    "EGP": "Egyptian Pound",
-    "MAD": "Moroccan Dirham",
-    "TND": "Tunisian Dinar",
-    "DZD": "Algerian Dinar",
-    "LYD": "Libyan Dinar",
-    "NGN": "Nigerian Naira",
-    "GHS": "Ghanaian Cedi",
-    "KES": "Kenyan Shilling",
-    "UGX": "Ugandan Shilling",
-    "TZS": "Tanzanian Shilling",
-    "ETB": "Ethiopian Birr",
-    "AOA": "Angolan Kwanza",
-    "MZN": "Mozambican Metical",
-    "ZMW": "Zambian Kwacha",
-    "BWP": "Botswana Pula",
-    "MUR": "Mauritian Rupee",
-    "SDD": "Sudanese Dinar",
-    "SDG": "Sudanese Pound",
-    "XOF": "West African CFA Franc",
-    "XAF": "Central African CFA Franc",
-    
-    // Europe de l'Est & autres
-    "ALL": "Albanian Lek",
-    "BGN": "Bulgarian Lev",
-    "HRK": "Croatian Kuna",
-    "RSD": "Serbian Dinar",
-    "BAM": "Bosnia-Herzegovina Convertible Mark",
-    "MKD": "Macedonian Denar",
-    "UAH": "Ukrainian Hryvnia",
-    "BYN": "Belarusian Ruble",
-    "BYR": "Belarusian Ruble",
-    "MDL": "Moldovan Leu",
-    "GEL": "Georgian Lari",
-    "AMD": "Armenian Dram",
-    "AZN": "Azerbaijani Manat",
-    "KZT": "Kazakhstani Tenge",
-    "UZS": "Uzbekistani Som",
-    "TJS": "Tajikistani Somoni",
-    "KGS": "Kyrgyzstani Som",
-    "TMT": "Turkmenistan Manat",
-    "MNT": "Mongolian Tugrik",
-    "ISK": "Icelandic Krona",
-    
-    // Océanie
-    "FJD": "Fijian Dollar",
-    "PGK": "Papua New Guinean Kina",
-    "SBD": "Solomon Islander Dollar",
-    "TOP": "Tongan Pa'anga",
-    "WST": "Samoan Tala",
-    "VUV": "Vanuatu Vatu",
-    "XPF": "CFP Franc",
-    
-    // Stablecoins
-    "RLUSD": "Ripple USD Stablecoin",
-    "USDT": "Tether USD Stablecoin",
-    "USDC": "USD Coin Stablecoin",
-    "BUSD": "Binance USD Stablecoin",
-    "DAI": "DAI Stablecoin",
-    "TUSD": "TrueUSD Stablecoin",
-    "USDP": "Pax Dollar Stablecoin",
-    "GUSD": "Gemini Dollar Stablecoin",
-    
-    // Cryptomonnaies
-    "XRP": "XRP Ledger Native Token",
-    "BTC": "Bitcoin",
-    "ETH": "Ethereum",
-    "BNB": "Binance Coin",
-    "SOL": "Solana",
-    "ADA": "Cardano",
-    "DOGE": "Dogecoin",
-    "MATIC": "Polygon",
-    "DOT": "Polkadot",
-    "LINK": "Chainlink",
-    "AVAX": "Avalanche",
-    "UNI": "Uniswap",
-    "ATOM": "Cosmos",
-    "XLM": "Stellar Lumens",
-    "ALGO": "Algorand",
-    "VET": "VeChain",
-    "ICP": "Internet Computer",
-    "FIL": "Filecoin",
-    "NEAR": "Near Protocol",
-    "APT": "Aptos",
-    "ARB": "Arbitrum",
-    "OP": "Optimism",
-    "XCS": "Xcannes Coin",
-    "SHIB": "Shiba Inu",
-    "TRX": "Tron",
-    "LTC": "Litecoin",
-    "BCH": "Bitcoin Cash",
-    "XMR": "Monero",
-    "ETC": "Ethereum Classic",
-  };
-  
-  return descriptions[code] || "Exchange Rate Account";
-};
-
-/**
  * Composant de relevé bancaire pour une devise spécifique
  */
 export default function CurrencyStatement({ 
@@ -214,6 +28,9 @@ export default function CurrencyStatement({
   issuer,
   walletAddress,
   transactions = [],
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
   period = "December 2025",
   isFullPage = false,
   variant = "default",
@@ -625,11 +442,11 @@ export default function CurrencyStatement({
       }}
     >
       <div
-        className={`relative w-full bg-gray-900 flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}
+        className={`relative w-full bg-elevated flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}
       >
         
         {/* Header avec Account Info intégré */}
-        <div className="border-b border-white/10 flex-shrink-0 bg-gray-900 px-4 md:px-6 py-3 md:py-4">
+        <div className="border-b border-white/10 flex-shrink-0 bg-elevated px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               {['XRP', 'RLUSD', 'XCS'].includes(currency) ? (
@@ -687,7 +504,7 @@ export default function CurrencyStatement({
                   }}
                 >
                   {availableMonths.map((month) => (
-                    <option key={month.value} value={month.value} className="bg-gray-900">
+                    <option key={month.value} value={month.value} className="bg-[#040c13]">
                       {month.label}
                     </option>
                   ))}
@@ -769,7 +586,7 @@ export default function CurrencyStatement({
           <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-gray-800/80 backdrop-blur-sm z-10">
+                <thead className="sticky top-0 bg-black/40 backdrop-blur-sm z-10">
                   <tr className="border-b border-white/10">
                     <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Date</th>
                     <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Description</th>
@@ -824,6 +641,17 @@ export default function CurrencyStatement({
             </div>
           </div>
 
+          {hasMore && (
+            <button
+              type="button"
+              onClick={() => onLoadMore && onLoadMore()}
+              disabled={loadingMore}
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
+            >
+              {loadingMore ? "Loading…" : "Load more"}
+            </button>
+          )}
+
           {/* Watermark */}
           <div className="hidden sm:block text-center py-3 md:py-4 border-t border-white/10">
             <div className="space-y-1">
@@ -842,7 +670,7 @@ export default function CurrencyStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="border-t border-white/10 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-gray-900/60">
+        <div className="border-t border-white/10 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-black/30">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => handleExport("pdf")}

@@ -27,6 +27,12 @@ export default function GlobalStatement({
   isFullPage = false,
   variant = "default",
   usdRates = {},
+  movements = [],
+  movementsLoading = false,
+  movementsError = null,
+  movementsHasMore = false,
+  movementsLoadingMore = false,
+  onLoadMoreMovements,
   onClose,
   onViewCurrency
 }) {
@@ -208,11 +214,11 @@ export default function GlobalStatement({
       }}
     >
       <div
-        className={`relative w-full bg-gray-900 flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}
+        className={`relative w-full bg-elevated flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}
       >
         
         {/* Header avec Account Info intégré */}
-        <div className="border-b border-white/10 flex-shrink-0 bg-gray-900 px-4 md:px-5 py-4">
+        <div className="border-b border-white/10 flex-shrink-0 bg-elevated px-4 md:px-5 py-4">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-3xl flex-shrink-0">🌍</span>
@@ -255,7 +261,7 @@ export default function GlobalStatement({
                   }}
                 >
                   {availableMonths.map((month) => (
-                    <option key={month.value} value={month.value} className="bg-gray-900">
+                    <option key={month.value} value={month.value} className="bg-[#040c13]">
                       {month.label}
                     </option>
                   ))}
@@ -303,7 +309,7 @@ export default function GlobalStatement({
           <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-gray-800/80 backdrop-blur-sm z-10">
+                <thead className="sticky top-0 bg-black/40 backdrop-blur-sm z-10">
                   <tr className="border-b border-white/10">
                     <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Asset</th>
                     <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Type</th>
@@ -383,6 +389,71 @@ export default function GlobalStatement({
               Generated on {new Date().toLocaleString("en-US")}
             </p>
           </div>
+        </div>
+
+        {/* Recent activity */}
+        <div className="border-t border-white/10 bg-black/20 px-3 sm:px-6 py-4">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <h3 className="text-sm font-semibold text-white/80">Recent activity</h3>
+            {movementsLoading && (
+              <span className="text-[10px] text-white/40">Loading…</span>
+            )}
+          </div>
+          {movementsError && (
+            <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
+              {movementsError}
+            </div>
+          )}
+          {!movementsError && (!movements || movements.length === 0) && (
+            <div className="text-xs text-white/40">No activity yet.</div>
+          )}
+          {!movementsError && Array.isArray(movements) && movements.length > 0 && (
+            <div className="space-y-1.5">
+              {movements.slice(0, 15).map((m) => {
+                const from = String(m?.fromCurrencyCode || "").toUpperCase();
+                const to = String(m?.toCurrencyCode || "").toUpperCase();
+                const amount = Number(m?.amountRlusd || 0);
+                const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
+                const when =
+                  createdAt && Number.isFinite(createdAt.getTime())
+                    ? createdAt.toLocaleString("en-US")
+                    : "";
+                return (
+                  <div
+                    key={m.movementId || `${when}:${from}:${to}:${amount}`}
+                    className="flex items-center justify-between gap-3 rounded-md bg-black/30 border border-white/10 px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <div className="text-[11px] text-white/70 truncate">
+                        {from && to ? `${from} → ${to}` : "Movement"}
+                      </div>
+                      <div className="text-[10px] text-white/30 truncate">{when}</div>
+                    </div>
+                    <div className="text-[11px] font-mono text-white/80">
+                      {Number.isFinite(amount)
+                        ? `${amount.toLocaleString("en-US", {
+                            maximumFractionDigits: 6,
+                          })} RLUSD`
+                        : "—"}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {movementsHasMore && (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => onLoadMoreMovements && onLoadMoreMovements()}
+                disabled={movementsLoadingMore}
+                className="w-full px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white/70 border border-white/15 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {movementsLoadingMore ? "Loading…" : "Load more"}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Footer Actions */}

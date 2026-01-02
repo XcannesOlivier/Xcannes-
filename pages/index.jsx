@@ -233,10 +233,10 @@ export default function Home() {
                 </button>
               </div>
               <div className="ai-message-area">
-                <p className="text-sm font-medium text-slate-800 mb-2">
+                <p className="text-sm font-medium text-white/90 mb-2">
                   Hello, I&apos;m the XCANNES assistant.
                 </p>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-xs text-white/60 leading-relaxed">
                   Ask questions about DEX operations, XRPL pairs, Pyth feeds, or EOD markets.
                   I&apos;ll guide you step by step.
                 </p>
@@ -419,15 +419,15 @@ export default function Home() {
                ============================================ */
 
             .ai-assistant-panel {
-              background: rgba(15, 23, 42, 0.95);
+              background: rgba(4, 12, 19, 0.92);
               backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px);
-              border: 1px solid rgba(6, 182, 212, 0.2);
+              border: 1px solid rgba(148, 163, 184, 0.18);
               border-radius: 16px;
               padding: 16px;
               box-shadow: 
                 0 8px 32px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(6, 182, 212, 0.1) inset;
+                0 0 0 1px rgba(255, 255, 255, 0.04) inset;
               
               /* Subtle fade-in animation */
               animation: aiPanelFadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -487,8 +487,8 @@ export default function Home() {
               max-height: 240px;
               overflow-y: auto;
               padding: 12px;
-              background: rgba(241, 245, 249, 0.95);
-              border: 1px solid rgba(6, 182, 212, 0.1);
+              background: rgba(0, 0, 0, 0.22);
+              border: 1px solid rgba(148, 163, 184, 0.18);
               border-radius: 8px;
             }
 
@@ -498,39 +498,39 @@ export default function Home() {
             }
 
             .ai-message-area::-webkit-scrollbar-track {
-              background: rgba(0, 0, 0, 0.05);
+              background: rgba(255, 255, 255, 0.04);
               border-radius: 2px;
             }
 
             .ai-message-area::-webkit-scrollbar-thumb {
-              background: rgba(6, 182, 212, 0.3);
+              background: rgba(255, 255, 255, 0.14);
               border-radius: 2px;
             }
 
             .ai-message-area::-webkit-scrollbar-thumb:hover {
-              background: rgba(6, 182, 212, 0.5);
+              background: rgba(255, 255, 255, 0.22);
             }
 
             /* Input field */
             .ai-input {
               flex: 1;
               padding: 8px 12px;
-              background: rgba(241, 245, 249, 0.95);
-              border: 1px solid rgba(6, 182, 212, 0.15);
+              background: rgba(0, 0, 0, 0.28);
+              border: 1px solid rgba(148, 163, 184, 0.2);
               border-radius: 8px;
               font-size: 13px;
-              color: #1e293b;
+              color: rgba(255, 255, 255, 0.9);
               transition: all 120ms;
             }
 
             .ai-input::placeholder {
-              color: rgba(30, 41, 59, 0.4);
+              color: rgba(255, 255, 255, 0.35);
             }
 
             .ai-input:focus {
               outline: none;
-              border-color: rgba(6, 182, 212, 0.4);
-              box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.08);
+              border-color: rgba(255, 255, 255, 0.28);
+              box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
             }
 
             /* Send button */
@@ -540,18 +540,18 @@ export default function Home() {
               justify-content: center;
               width: 36px;
               height: 36px;
-              background: rgba(6, 182, 212, 0.12);
-              border: 1px solid rgba(6, 182, 212, 0.25);
+              background: rgba(255, 255, 255, 0.06);
+              border: 1px solid rgba(255, 255, 255, 0.12);
               border-radius: 8px;
-              color: #06B6D4;
+              color: rgba(255, 255, 255, 0.75);
               cursor: pointer;
               transition: all 120ms;
             }
 
             .ai-send-btn:hover {
-              background: rgba(6, 182, 212, 0.18);
-              border-color: rgba(6, 182, 212, 0.4);
-              box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+              background: rgba(255, 255, 255, 0.1);
+              border-color: rgba(255, 255, 255, 0.2);
+              box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
             }
 
             .ai-send-btn:active {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,10 +21,10 @@ import CurrencyStatement from "./CurrencyStatement";
 import { getCurrencyDescription } from "../../utils/currencyDescriptions";
 import GlobalStatement from "./GlobalStatement";
 
-const TOKEN_ICONS = {
-  XRP: "✕",
-  XCS: "Ⓧ",
-  BTC: "₿",
+  const TOKEN_ICONS = {
+    XRP: "✕",
+    XCS: "Ⓧ",
+    BTC: "₿",
   ETH: "Ξ",
   USDT: "₮",
   USDC: "＄",
@@ -38,18 +38,6 @@ const CURRENCY_FLAG_OVERRIDES = {
   XOF: "🌍",
   XCD: "🌴",
 };
-
-const USD_STABLECOINS = [
-  "RLUSD",
-  "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
-];
 
 function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
@@ -297,8 +285,19 @@ export default function WalletDashboard({
   
   const xrpAmount = parseFloat(effectiveBalance?.xrp || 0) || 0;
 
-  const isStablecoin = useCallback((currency) =>
-    USD_STABLECOINS.includes(String(currency || "").toUpperCase()), []);
+  const USD_STABLECOINS = [
+    "RLUSD",
+    "USD",
+    "USDC",
+    "USDT",
+    "BUSD",
+    "DAI",
+    "TUSD",
+    "USDP",
+    "GUSD",
+  ];
+  const isStablecoin = (currency) =>
+    USD_STABLECOINS.includes(String(currency || "").toUpperCase());
 
   const stableUsd = baseTokens
     .filter((t) => isStablecoin(t.currency))
@@ -704,18 +703,18 @@ export default function WalletDashboard({
     setSelectedWallet(wallet || "");
   }, [wallet]);
 
-  const resolveUsdRate = useCallback(async (code, pythPairsMap) => {
-    const getTickerPrice = (ticker) => {
-      const priceSource =
-        ticker?.lastPrice ??
-        ticker?.price ??
-        ticker?.midPrice ??
-        ticker?.bidPrice ??
-        ticker?.askPrice;
-      const price = Number(priceSource);
-      return Number.isFinite(price) && price > 0 ? price : NaN;
-    };
+  const getTickerPrice = (ticker) => {
+    const priceSource =
+      ticker?.lastPrice ??
+      ticker?.price ??
+      ticker?.midPrice ??
+      ticker?.bidPrice ??
+      ticker?.askPrice;
+    const price = Number(priceSource);
+    return Number.isFinite(price) && price > 0 ? price : NaN;
+  };
 
+  const resolveUsdRate = async (code, pythPairsMap) => {
     const upper = String(code || "").toUpperCase();
     if (!upper) return NaN;
     if (upper === "USD" || upper === "RLUSD") return 1;
@@ -773,7 +772,7 @@ export default function WalletDashboard({
     }
 
     return NaN;
-  }, [isStablecoin]);
+  };
 
   const rateCodesKey = useMemo(() => {
     const codes = (augmentedTokens || [])

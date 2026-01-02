@@ -5,8 +5,8 @@ import { useXcannesWS } from "../../context/XcannesWSContext";
 import { getBookIdFromPair } from "../../utils/xrpl";
 import { getPairCategory } from "../../utils/marketStructure";
 import OrderbookSidebar from "./OrderbookSidebar";
-import InfoFeesPanel from "./InfoFeesPanel";
 import NewsFeed from "./NewsFeed";
+import { WalletInfoContent } from "../componentsGlobal/WalletInfoModal";
 
 /**
  * Onglets mobile (M1) pour la zone marché :
@@ -157,7 +157,9 @@ export default function MobileTradingTabs({ pair }) {
         {activeTab === "orderbook" ? (
           <OrderbookSidebar pair={pair} />
         ) : activeTab === "info" ? (
-          <InfoFeesPanel pair={pair} variant={infoVariant} />
+          <div className="panel-body">
+            <WalletInfoContent />
+          </div>
         ) : activeTab === "news" && isXRPL ? (
           <div className="panel-body h-[60vh]">
             <NewsFeed category="finance" />

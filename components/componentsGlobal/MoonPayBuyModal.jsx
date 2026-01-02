@@ -335,8 +335,8 @@ const MoonPayBuyModal = ({ isOpen, onClose, walletAddress, embedded = false }) =
       
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
-        <div 
-          className="relative w-full max-w-2xl bg-gray-900 border border-white/10 rounded-2xl overflow-hidden pointer-events-auto"
+        <div
+          className="relative w-full max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
