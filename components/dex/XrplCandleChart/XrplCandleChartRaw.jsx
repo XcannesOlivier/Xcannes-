@@ -141,8 +141,6 @@ export default function XrplCandleChartRaw({
     if (typeof window === "undefined") return;
     if (window.innerWidth < 768) {
       setChartType("line");
-      // Sur smartphone: désactiver la crosshair par défaut
-      setChartSettings((prev) => ({ ...prev, showCrosshair: false }));
     }
   }, []);
 
@@ -654,6 +652,20 @@ export default function XrplCandleChartRaw({
         };
 
         clickHandler = (param) => {
+          const isMobileScreen =
+            typeof window !== "undefined" && window.innerWidth < 768;
+
+          if (isMobileScreen) {
+            if (chartSettings.showCrosshair) {
+              setChartSettings((prev) => ({ ...prev, showCrosshair: false }));
+              return;
+            }
+
+            setChartSettings((prev) => ({ ...prev, showCrosshair: true }));
+            updateStatusFromParam(param);
+            return;
+          }
+
           updateStatusFromParam(param);
         };
 

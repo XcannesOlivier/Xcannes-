@@ -240,7 +240,7 @@ export default function ChartHeader({
                           : "text-muted hover:text-primary"
                       }`}
                     >
-                      EOD
+                      ADD
                     </button>
                   </div>
                 </div>
@@ -352,7 +352,7 @@ export default function ChartHeader({
                 {isFxMode && (
                   <div className="px-2 pt-2">
                     <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-muted">
-                      Devises EOD (Fawaz)
+                      Devises (ADD)
                     </div>
                     <FxPairSelector
                       base={fxBase}

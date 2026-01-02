@@ -113,7 +113,7 @@ export default function XummQRModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="relative bg-gray-900 border border-white/10 rounded-2xl p-6 max-w-md w-full">
+      <div className="relative bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}

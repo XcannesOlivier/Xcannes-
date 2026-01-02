@@ -222,6 +222,12 @@ export default function FxPairSelector({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [openInternal, alwaysOpen]);
 
+  useEffect(() => {
+    if (!alwaysOpen) return;
+    setActiveField("base");
+    setSearch("");
+  }, [alwaysOpen]);
+
   const handleSelect = (code) => {
     const upper = code.toUpperCase();
     

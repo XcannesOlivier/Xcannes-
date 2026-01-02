@@ -47,12 +47,15 @@ export default function Header({ fixed = true }) {
     >
       {/* Logo simple texte style banque suisse */}
       <Link href="/">
-        <div className="flex items-center gap-3 group">
-          <span className="text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white group-hover:text-xcannes-green transition-colors duration-300">
+        <div className="flex items-center gap-2 group whitespace-nowrap min-w-0">
+          <span className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white group-hover:text-xcannes-green transition-colors duration-300">
             XCANNES
           </span>
-          <span className="hidden md:inline text-xs text-white/40 font-light">
-            | Digital Asset Exchange
+          <span className="text-[10px] sm:text-[11px] text-white/40 font-light">
+            |
+          </span>
+          <span className="text-[10px] sm:text-[11px] text-white/60 font-light tracking-wide truncate">
+            Digital Asset Exchange
           </span>
         </div>
       </Link>

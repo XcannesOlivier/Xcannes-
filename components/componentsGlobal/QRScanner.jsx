@@ -95,7 +95,7 @@ export default function QRScanner({ isOpen, onScan, onClose }) {
 
   const content = (
     <div className="fixed inset-0 z-[10100] flex items-center justify-center p-4 bg-black/95">
-      <div className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-6">
+      <div className="relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-6 shadow-2xl">
         {/* Close Button */}
         <button
           onClick={onClose}

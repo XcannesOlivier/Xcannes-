@@ -20,9 +20,9 @@ export default function Wallet() {
         )}
       />
 
-      <main className="min-h-[100svh] md:min-h-screen md:h-screen md:overflow-hidden bg-elevated text-white font-montserrat">
-        <div className="w-full md:max-w-5xl min-h-[100svh] md:h-full md:min-h-0 mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6">
-          <div className="bg-elevated backdrop-blur-sm min-h-[100svh] md:h-full md:min-h-0 md:overflow-hidden border-0 rounded-none md:border md:border-white/15 md:rounded-xl">
+      <main className="h-[100svh] overflow-hidden md:min-h-screen md:h-screen md:overflow-hidden bg-elevated text-white font-montserrat">
+        <div className="w-full md:max-w-5xl h-[100svh] md:h-full md:min-h-0 mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6">
+          <div className="bg-elevated backdrop-blur-sm h-[100svh] overflow-hidden md:h-full md:min-h-0 md:overflow-hidden border-0 rounded-none md:border md:border-white/15 md:rounded-xl">
             <WalletDashboard preview={!isConnected} variant="full" />
           </div>
         </div>
