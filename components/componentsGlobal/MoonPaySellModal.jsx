@@ -333,7 +333,7 @@ const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) 
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
         onClick={step === 'iframe' ? null : onClose}
       />
       

@@ -404,25 +404,25 @@ export default function CurrencyStatement({
 
   const STATEMENT_LAYOUTS = {
     full: {
-      backdropClass: "bg-black/80 backdrop-blur-sm",
+      backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
         "w-full h-[100svh] max-h-[100svh] rounded-none border-0 md:max-w-4xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-5xl",
     },
     "dex-desktop": {
-      backdropClass: "bg-black/75 backdrop-blur-sm",
+      backdropClass: "bg-black/75 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-3 md:px-4",
       panelClass:
         "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]",
     },
     "dex-mobile": {
-      backdropClass: "bg-black/90 backdrop-blur-sm",
+      backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
         "w-full h-[100svh] max-h-[100svh] rounded-none border-0",
     },
     default: {
-      backdropClass: "bg-black/80 backdrop-blur-sm",
+      backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-4",
       panelClass:
         "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[92vh]",

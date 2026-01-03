@@ -113,8 +113,21 @@ export default function WalletSummary() {
   };
 
   return (
-    <div className="panel-surface bg-elevated backdrop-blur-sm h-full flex flex-col justify-between">
+    <div className="panel-surface bg-elevated md:backdrop-blur-sm h-full flex flex-col justify-between border-t border-white/10">
       <div className="p-4 pb-3 border-b border-subtle/60">
+        {/* Brand line (mobile) */}
+        <div className="md:hidden flex items-center gap-3 mb-3 min-w-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-xs font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">
+              XCANNES
+            </span>
+            <span className="text-[10px] font-light text-white/30">|</span>
+            <span className="text-[10px] font-light text-white/40 truncate max-w-[160px]">
+              Digital Asset Exchange
+            </span>
+          </div>
+        </div>
+
         {/* Header mobile : bouton Xumm + bouton Trade centré */}
         <div className="md:hidden flex items-center gap-3">
           <XummConnectButton
