@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
+import { bankButtonClassName } from "../componentsGlobal/bankButtonClassName";
 
 export default function WhyXcannesSection() {
   const { t } = useTranslation("common");
@@ -55,9 +56,9 @@ export default function WhyXcannesSection() {
     <section className="relative py-24 px-4 sm:px-6 overflow-hidden">
       <div className="relative max-w-7xl mx-auto">
         {/* Section Title */}
-        <h2 className="text-3xl sm:text-4xl font-orbitron font-[500] text-center mb-3 animate-slide-down bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(255,255,255,0.3)]">
+        <h2 className="text-3xl sm:text-4xl font-montserrat font-semibold text-center mb-3 animate-slide-down text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
           {t("why_title_part1")}{" "}
-          <span className="bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">{t("why_title_highlight")}</span>
+          <span className="text-white">{t("why_title_highlight")}</span>
           {t("why_title_part2")}
         </h2>
         
@@ -127,8 +128,8 @@ export default function WhyXcannesSection() {
             {t("why_cta_text")}
           </p>
           <Link
-            href="/dex"
-            className="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-xcannes-green hover:bg-xcannes-green/90 text-white font-semibold text-sm tracking-wide transition-all duration-200 hover:-translate-y-0.5"
+            href="/wallet"
+            className={bankButtonClassName({ tone: "blue", variant: "soft", size: "lg" })}
           >
             {t("why_cta_button")} →
           </Link>
