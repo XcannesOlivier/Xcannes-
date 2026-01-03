@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 import Image from "next/image";
 import { QRCodeCanvas } from "qrcode.react";
 import { useXumm } from "../../context/XummContext";
 import xcannesApi from "../../lib/xcannesApi";
 import { CRYPTO_ICONS } from "../dex/ExchangeSections/constants";
 import { useWalletLines } from "./hooks/useWalletLines";
+import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 import WalletCurrencySelector from "./WalletCurrencySelector";
+import WalletDashboardFooter from "./WalletDashboardFooter";
+import WalletInfoModal from "./WalletInfoModal";
 import XummConnectButton from "../xumm/XummConnectButton";
 import TokenAmountInput from "./TokenAmountInput";
 import QRScanner from "./QRScanner";
@@ -38,6 +40,18 @@ const CURRENCY_FLAG_OVERRIDES = {
   XOF: "🌍",
   XCD: "🌴",
 };
+
+const USD_STABLECOINS = [
+  "RLUSD",
+  "USD",
+  "USDC",
+  "USDT",
+  "BUSD",
+  "DAI",
+  "TUSD",
+  "USDP",
+  "GUSD",
+];
 
 function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
@@ -87,7 +101,7 @@ function renderTokenIcon(token) {
 const WALLET_LAYOUTS = {
   full: {
     isFullPage: true,
-    tokenListClass: "max-h-80 md:max-h-[650px]",
+    tokenListClass: "max-h-none",
     statementVariant: "full",
     showBrandTitle: true,
     showOpenFullWallet: false,
@@ -98,26 +112,26 @@ const WALLET_LAYOUTS = {
   },
   "dex-desktop": {
     isFullPage: false,
-    tokenListClass: "max-h-72 md:max-h-[420px]",
+    tokenListClass: "max-h-none",
     statementVariant: "dex-desktop",
     showBrandTitle: false,
     showOpenFullWallet: false,
     containerClass:
       "overflow-hidden",
-    headerClass: "bg-black/20",
-    actionRowClass: "bg-black/10",
+    headerClass: "",
+    actionRowClass: "",
     tokenRowClass: "rounded-lg",
   },
   "dex-mobile": {
     isFullPage: false,
     tokenListClass: "max-h-[calc(100svh-300px)] md:max-h-[420px]",
     statementVariant: "dex-mobile",
-    showBrandTitle: false,
+    showBrandTitle: true,
     showOpenFullWallet: true,
     containerClass:
-      "min-h-[100svh] rounded-2xl bg-gradient-to-b from-white/5 via-transparent to-transparent shadow-xl shadow-black/30 overflow-hidden",
-    headerClass: "bg-black/20",
-    actionRowClass: "bg-black/10",
+      "h-[100svh] rounded-none shadow-xl shadow-black/30 overflow-hidden border-t border-white/10",
+    headerClass: "",
+    actionRowClass: "",
     tokenRowClass:
       "rounded-xl bg-white/5 border-white/10 hover:bg-white/10",
   },
@@ -211,10 +225,13 @@ export default function WalletDashboard({
   const [fxCurrencies, setFxCurrencies] = useState([]);
   const [fxCurrenciesLoading, setFxCurrenciesLoading] = useState(false);
   const [showOtherQuoteCurrencies, setShowOtherQuoteCurrencies] = useState(false);
+  const [currencyLineCode, setCurrencyLineCode] = useState("");
+  const [currencyLineAllocatedRlusd, setCurrencyLineAllocatedRlusd] = useState("");
   
   // États pour les relevés bancaires
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
+  const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [usdRates, setUsdRates] = useState({});
   
@@ -225,6 +242,33 @@ export default function WalletDashboard({
       units: DEMO_RLUSD_TOTAL,
       rate: 1,
     },
+    EUR: { currency: "EUR", rlusd: 0, units: 0, rate: 0 },
+    USD: { currency: "USD", rlusd: 0, units: 0, rate: 0 },
+    GBP: { currency: "GBP", rlusd: 0, units: 0, rate: 0 },
+    CHF: { currency: "CHF", rlusd: 0, units: 0, rate: 0 },
+    JPY: { currency: "JPY", rlusd: 0, units: 0, rate: 0 },
+    CAD: { currency: "CAD", rlusd: 0, units: 0, rate: 0 },
+    AUD: { currency: "AUD", rlusd: 0, units: 0, rate: 0 },
+    SGD: { currency: "SGD", rlusd: 0, units: 0, rate: 0 },
+    HKD: { currency: "HKD", rlusd: 0, units: 0, rate: 0 },
+    SEK: { currency: "SEK", rlusd: 0, units: 0, rate: 0 },
+    NOK: { currency: "NOK", rlusd: 0, units: 0, rate: 0 },
+    DKK: { currency: "DKK", rlusd: 0, units: 0, rate: 0 },
+    PLN: { currency: "PLN", rlusd: 0, units: 0, rate: 0 },
+    CZK: { currency: "CZK", rlusd: 0, units: 0, rate: 0 },
+    HUF: { currency: "HUF", rlusd: 0, units: 0, rate: 0 },
+    MXN: { currency: "MXN", rlusd: 0, units: 0, rate: 0 },
+    INR: { currency: "INR", rlusd: 0, units: 0, rate: 0 },
+    ZAR: { currency: "ZAR", rlusd: 0, units: 0, rate: 0 },
+    TRY: { currency: "TRY", rlusd: 0, units: 0, rate: 0 },
+    IDR: { currency: "IDR", rlusd: 0, units: 0, rate: 0 },
+    PHP: { currency: "PHP", rlusd: 0, units: 0, rate: 0 },
+    KRW: { currency: "KRW", rlusd: 0, units: 0, rate: 0 },
+    TWD: { currency: "TWD", rlusd: 0, units: 0, rate: 0 },
+    AED: { currency: "AED", rlusd: 0, units: 0, rate: 0 },
+    BRL: { currency: "BRL", rlusd: 0, units: 0, rate: 0 },
+    XOF: { currency: "XOF", rlusd: 0, units: 0, rate: 0 },
+    XAF: { currency: "XAF", rlusd: 0, units: 0, rate: 0 },
   }));
   const [convertPreview, setConvertPreview] = useState("");
   const [convertProcessing, setConvertProcessing] = useState(false);
@@ -285,26 +329,18 @@ export default function WalletDashboard({
   
   const xrpAmount = parseFloat(effectiveBalance?.xrp || 0) || 0;
 
-  const USD_STABLECOINS = [
-    "RLUSD",
-    "USD",
-    "USDC",
-    "USDT",
-    "BUSD",
-    "DAI",
-    "TUSD",
-    "USDP",
-    "GUSD",
-  ];
-  const isStablecoin = (currency) =>
-    USD_STABLECOINS.includes(String(currency || "").toUpperCase());
+  const isStablecoin = useCallback((currency) => {
+    return USD_STABLECOINS.includes(String(currency || "").toUpperCase());
+  }, []);
 
-  const stableUsd = baseTokens
-    .filter((t) => isStablecoin(t.currency))
-    .reduce((sum, t) => {
-      const v = parseFloat(t.value);
-      return sum + (Number.isFinite(v) ? v : 0);
-    }, 0);
+  const stableUsd = useMemo(() => {
+    return baseTokens
+      .filter((t) => isStablecoin(t.currency))
+      .reduce((sum, t) => {
+        const v = parseFloat(t.value);
+        return sum + (Number.isFinite(v) ? v : 0);
+      }, 0);
+  }, [baseTokens, isStablecoin]);
 
   const displayTokens = useMemo(() => {
     // Mode démo: on affiche la "composition" virtuelle du capital RLUSD
@@ -329,7 +365,8 @@ export default function WalletDashboard({
         tokens.push({
           key: `DEMO:${upper}`,
           currency: upper,
-          issuer: "Demo",
+          issuer: upper === "RLUSD" ? "Demo" : "Trustline",
+          isTrustlineOnly: upper !== "RLUSD",
           value: Number.isFinite(units) ? units : 0,
           demoRlusdValue: Number.isFinite(rlusdValue) ? rlusdValue : 0,
         });
@@ -424,6 +461,7 @@ export default function WalletDashboard({
   }, [baseTokens, xrpAmount, isPreviewMode, demoLines]);
 
   // Trustlines (panneau avancé)
+  const backendWalletAddress = isPreviewMode ? null : effectiveWallet || null;
   const {
     lines: walletLines,
     totalLockedXcs,
@@ -431,13 +469,64 @@ export default function WalletDashboard({
     error: walletLinesError,
     addLine,
     removeLine,
-  } = useWalletLines(effectiveWallet || null);
+  } = useWalletLines(backendWalletAddress);
+
+  const {
+    lines: currencyLines,
+    summary: currencyLinesSummary,
+    loading: currencyLinesLoading,
+    error: currencyLinesError,
+    refresh: refreshCurrencyLines,
+    upsertCurrencyLine,
+    removeCurrencyLine,
+    convertAllocation: convertCurrencyAllocation,
+  } = useWalletCurrencyLines(backendWalletAddress);
 
   const handleRefresh = async () => {
     if (!refreshBalance) return;
     setIsRefreshing(true);
     await refreshBalance();
     setTimeout(() => setIsRefreshing(false), 800);
+  };
+
+  const handleUpsertCurrencyLine = async () => {
+    if (!backendWalletAddress) {
+      alert("Please connect your Xumm wallet first.");
+      return;
+    }
+
+    const code = String(currencyLineCode || "").trim().toUpperCase();
+    if (!code || code.length < 2) {
+      alert("Select a valid currency.");
+      return;
+    }
+    if (code === "RLUSD") {
+      alert("RLUSD is the pool (unallocated). Choose another currency.");
+      return;
+    }
+
+    const allocated = Number.parseFloat(currencyLineAllocatedRlusd);
+    if (!Number.isFinite(allocated) || allocated < 0) {
+      alert("Enter a valid allocated RLUSD amount (>= 0).");
+      return;
+    }
+
+    await upsertCurrencyLine({
+      currencyCode: code,
+      allocatedRlusd: allocated,
+    });
+
+    setCurrencyLineCode("");
+    setCurrencyLineAllocatedRlusd("");
+  };
+
+  const handleRemoveCurrencyLine = async (code) => {
+    if (!backendWalletAddress) return;
+    const currencyCode = String(code || "").trim().toUpperCase();
+    if (!currencyCode) return;
+    const ok = confirm(`Delete currency line ${currencyCode}?`);
+    if (!ok) return;
+    await removeCurrencyLine(currencyCode);
   };
   const openTrustlineEditor = (currency) => {
     const code = String(currency || "").toUpperCase();
@@ -484,7 +573,7 @@ export default function WalletDashboard({
     setEditingTrustlineLocked("");
   };
 
-  const renderTokenRow = (token) => {
+  const renderTokenRow = useCallback((token) => {
     const currencyCode = String(token.currency || "").toUpperCase();
     const rawValue = Number(token.value || 0);
     const demoRlusd =
@@ -552,7 +641,7 @@ export default function WalletDashboard({
         </div>
       </button>
     );
-  };
+  }, [isStablecoin, layout.tokenRowClass]);
 
   const augmentedTokens = useMemo(() => {
     // 1) Regrouper par devise pour éviter les doublons
@@ -581,6 +670,10 @@ export default function WalletDashboard({
     return Array.from(byCurrency.values());
   }, [displayTokens, walletLines]);
 
+  const tokenRows = useMemo(() => {
+    return (augmentedTokens || []).map(renderTokenRow);
+  }, [augmentedTokens, renderTokenRow]);
+
   const walletCurrencyOptions = useMemo(() => {
     const seen = new Set();
     const list = [];
@@ -592,6 +685,44 @@ export default function WalletDashboard({
     });
     return list;
   }, [augmentedTokens]);
+
+  const allocatedRlusdByCurrency = useMemo(() => {
+    const map = new Map();
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (!code) return;
+      const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0);
+      map.set(code, Number.isFinite(allocated) ? allocated : 0);
+    });
+    return map;
+  }, [currencyLines]);
+
+  const swapCurrencyOptions = useMemo(() => {
+    const candidates = new Set();
+    (walletCurrencyOptions || []).forEach((code) => {
+      const upper = String(code || "").toUpperCase();
+      if (upper) candidates.add(upper);
+    });
+    candidates.add("RLUSD");
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (code) candidates.add(code);
+    });
+
+    const weight = (code) => {
+      if (code === "RLUSD") return 0;
+      if (code === "XRP") return 1;
+      if (code === "XCS") return 2;
+      return 3;
+    };
+
+    return Array.from(candidates).sort((a, b) => {
+      const wa = weight(a);
+      const wb = weight(b);
+      if (wa !== wb) return wa - wb;
+      return a.localeCompare(b);
+    });
+  }, [walletCurrencyOptions, currencyLines]);
 
   const selectedSendToken =
     augmentedTokens.find((t) => t.key === sendAssetKey) ||
@@ -703,77 +834,6 @@ export default function WalletDashboard({
     setSelectedWallet(wallet || "");
   }, [wallet]);
 
-  const getTickerPrice = (ticker) => {
-    const priceSource =
-      ticker?.lastPrice ??
-      ticker?.price ??
-      ticker?.midPrice ??
-      ticker?.bidPrice ??
-      ticker?.askPrice;
-    const price = Number(priceSource);
-    return Number.isFinite(price) && price > 0 ? price : NaN;
-  };
-
-  const resolveUsdRate = async (code, pythPairsMap) => {
-    const upper = String(code || "").toUpperCase();
-    if (!upper) return NaN;
-    if (upper === "USD" || upper === "RLUSD") return 1;
-
-    if (isStablecoin(upper)) return 1;
-
-    if (CRYPTO_ICONS[upper] || ["XRP", "XCS", "BTC", "ETH"].includes(upper)) {
-      try {
-        const ticker = await xcannesApi.getTicker(`${upper}_RLUSD`);
-        const price = getTickerPrice(ticker);
-        if (Number.isFinite(price)) return price;
-      } catch (err) {
-        console.warn("USD rate XRPL error:", err);
-      }
-      return NaN;
-    }
-
-    try {
-      const directKey = `${upper}_USD`;
-      const inverseKey = `USD_${upper}`;
-      const direct = pythPairsMap.get(directKey);
-      const inverse = pythPairsMap.get(inverseKey);
-      if (direct) {
-        const ticker = await xcannesApi.getTicker(direct.symbol || directKey);
-        const price = getTickerPrice(ticker);
-        if (Number.isFinite(price)) return price;
-      }
-      if (inverse) {
-        const ticker = await xcannesApi.getTicker(inverse.symbol || inverseKey);
-        const price = getTickerPrice(ticker);
-        if (Number.isFinite(price) && price > 0) return 1 / price;
-      }
-    } catch (err) {
-      console.warn("USD rate Pyth error:", err);
-    }
-
-    try {
-      const fxResult = await xcannesApi.getFxEod("USD", upper, 30);
-      const candles = Array.isArray(fxResult?.candles)
-        ? fxResult.candles
-        : [];
-      const last = candles[candles.length - 1];
-      const close =
-        last && last.close != null
-          ? Number(last.close)
-          : last && last.price != null
-          ? Number(last.price)
-          : NaN;
-
-      if (Number.isFinite(close) && close > 0) {
-        return 1 / close;
-      }
-    } catch (err) {
-      console.warn("USD rate Fawaz error:", err);
-    }
-
-    return NaN;
-  };
-
   const rateCodesKey = useMemo(() => {
     const codes = (augmentedTokens || [])
       .filter((token) => {
@@ -788,6 +848,76 @@ export default function WalletDashboard({
 
   useEffect(() => {
     let cancelled = false;
+
+    const getTickerPrice = (ticker) => {
+      const priceSource =
+        ticker?.lastPrice ??
+        ticker?.price ??
+        ticker?.midPrice ??
+        ticker?.bidPrice ??
+        ticker?.askPrice;
+      const price = Number(priceSource);
+      return Number.isFinite(price) && price > 0 ? price : NaN;
+    };
+
+    const resolveUsdRate = async (code, pythPairsMap) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper) return NaN;
+      if (upper === "USD" || upper === "RLUSD") return 1;
+
+      if (isStablecoin(upper)) return 1;
+
+      if (CRYPTO_ICONS[upper] || ["XRP", "XCS", "BTC", "ETH"].includes(upper)) {
+        try {
+          const ticker = await xcannesApi.getTicker(`${upper}_RLUSD`);
+          const price = getTickerPrice(ticker);
+          if (Number.isFinite(price)) return price;
+        } catch (err) {
+          console.warn("USD rate XRPL error:", err);
+        }
+        return NaN;
+      }
+
+      try {
+        const directKey = `${upper}_USD`;
+        const inverseKey = `USD_${upper}`;
+        const direct = pythPairsMap.get(directKey);
+        const inverse = pythPairsMap.get(inverseKey);
+        if (direct) {
+          const ticker = await xcannesApi.getTicker(direct.symbol || directKey);
+          const price = getTickerPrice(ticker);
+          if (Number.isFinite(price)) return price;
+        }
+        if (inverse) {
+          const ticker = await xcannesApi.getTicker(inverse.symbol || inverseKey);
+          const price = getTickerPrice(ticker);
+          if (Number.isFinite(price) && price > 0) return 1 / price;
+        }
+      } catch (err) {
+        console.warn("USD rate Pyth error:", err);
+      }
+
+      try {
+        const fxResult = await xcannesApi.getFxEod("USD", upper, 30);
+        const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];
+        const last = candles[candles.length - 1];
+        const close =
+          last && last.close != null
+            ? Number(last.close)
+            : last && last.price != null
+            ? Number(last.price)
+            : NaN;
+
+        if (Number.isFinite(close) && close > 0) {
+          return 1 / close;
+        }
+      } catch (err) {
+        console.warn("USD rate Fawaz error:", err);
+      }
+
+      return NaN;
+    };
+
     const loadUsdRates = async () => {
       if (!rateCodesKey) {
         setUsdRates({});
@@ -823,7 +953,7 @@ export default function WalletDashboard({
     return () => {
       cancelled = true;
     };
-  }, [rateCodesKey, resolveUsdRate]);
+  }, [rateCodesKey, isStablecoin]);
 
   const totalUsd = useMemo(() => {
     const total = (augmentedTokens || []).reduce((sum, token) => {
@@ -960,11 +1090,12 @@ export default function WalletDashboard({
   };
 
   const loadKycStatus = async () => {
+    if (!effectiveWallet) return;
     try {
       const response = await fetch("/api/moonpay/kyc-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: wallet.address }),
+        body: JSON.stringify({ walletAddress: effectiveWallet }),
       });
       
       if (response.ok) {
@@ -978,11 +1109,11 @@ export default function WalletDashboard({
 
   // Charger le statut KYC au chargement si wallet connecté
   useEffect(() => {
-    if (effectiveIsConnected && wallet?.address) {
+    if (effectiveIsConnected && effectiveWallet) {
       loadKycStatus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveIsConnected, wallet?.address]);
+  }, [effectiveIsConnected, effectiveWallet]);
 
   const handleKycComplete = () => {
     setKycStatus("approved");
@@ -1043,25 +1174,25 @@ export default function WalletDashboard({
   }, [activeAction]);
 
   useEffect(() => {
-    if (!walletCurrencyOptions.length) return;
+    if (!swapCurrencyOptions.length) return;
     if (!convertBaseCurrency) {
-      const preferredBase = walletCurrencyOptions.includes("RLUSD")
+      const preferredBase = swapCurrencyOptions.includes("RLUSD")
         ? "RLUSD"
-        : walletCurrencyOptions.includes("XRP")
+        : swapCurrencyOptions.includes("XRP")
         ? "XRP"
-        : walletCurrencyOptions[0];
+        : swapCurrencyOptions[0];
       setConvertBaseCurrency(preferredBase);
     }
     if (!convertQuoteCurrency) {
       const preferredQuotes = ["RLUSD", "USD", "USDT", "USDC"];
       const fromWallet =
-        preferredQuotes.find((c) => walletCurrencyOptions.includes(c)) ||
-        (walletCurrencyOptions.length > 1
-          ? walletCurrencyOptions[1]
-          : walletCurrencyOptions[0]);
+        preferredQuotes.find((c) => swapCurrencyOptions.includes(c)) ||
+        (swapCurrencyOptions.length > 1
+          ? swapCurrencyOptions[1]
+          : swapCurrencyOptions[0]);
       setConvertQuoteCurrency(fromWallet);
     }
-  }, [walletCurrencyOptions, convertBaseCurrency, convertQuoteCurrency]);
+  }, [swapCurrencyOptions, convertBaseCurrency, convertQuoteCurrency]);
 
   const otherCurrencyOptions = useMemo(() => {
     if (!walletCurrencyOptions || walletCurrencyOptions.length === 0) return [];
@@ -1139,8 +1270,151 @@ export default function WalletDashboard({
   };
 
   const handleDemoConvert = async () => {
-    if (!isPreviewMode) {
-      alert("Real conversions are not wired yet – this button is only active in demo mode.");
+    if (isPreviewMode) {
+      const base = String(convertBaseCurrency || "").toUpperCase();
+      const quote = String(convertQuoteCurrency || "").toUpperCase();
+      const amountBase = Number(convertAmount || "0");
+
+      if (!base || !quote || base === quote) {
+        alert("Choisissez deux devises différentes.");
+        return;
+      }
+
+      if (!Number.isFinite(amountBase) || amountBase <= 0) {
+        alert("Entrez un montant valide dans la devise de base.");
+        return;
+      }
+
+      const baseLine =
+        demoLines[base] ||
+        (base === "RLUSD"
+          ? demoLines.RLUSD
+          : null);
+
+      if (!baseLine || !Number.isFinite(Number(baseLine.units || 0))) {
+        alert("Aucun solde démo disponible dans la devise de base sélectionnée.");
+        return;
+      }
+
+      const availableBaseUnits = Number(baseLine.units || 0);
+      if (amountBase > availableBaseUnits + 1e-8) {
+        alert(
+          `Montant trop élevé. Solde disponible en ${base}: ${availableBaseUnits.toLocaleString(
+            "en-US",
+            { maximumFractionDigits: 4 }
+          )}.`
+        );
+        return;
+      }
+
+      setConvertProcessing(true);
+      try {
+        const rlusdPerBase = await getRlusdPerUnit(base);
+        const rlusdPerQuote = await getRlusdPerUnit(quote);
+
+        if (
+          !Number.isFinite(rlusdPerBase) ||
+          rlusdPerBase <= 0 ||
+          !Number.isFinite(rlusdPerQuote) ||
+          rlusdPerQuote <= 0
+        ) {
+          alert("Impossible de récupérer les taux de conversion pour cette paire.");
+          return;
+        }
+
+        const rlusdValue = amountBase * rlusdPerBase;
+        const quoteUnits = rlusdValue / rlusdPerQuote;
+
+        const priceSource =
+          base === "RLUSD"
+            ? `1 RLUSD ≈ ${(
+                1 / rlusdPerQuote
+              ).toLocaleString("en-US", { maximumFractionDigits: 4 })} ${quote}`
+            : `Prix implicite via RLUSD (base=${base}, quote=${quote})`;
+
+        setDemoLines((prev) => {
+          const next = { ...prev };
+          const baseLineNext =
+            next[base] ||
+            (base === "RLUSD"
+              ? next.RLUSD || {
+                  currency: "RLUSD",
+                  rlusd: DEMO_RLUSD_TOTAL,
+                  units: DEMO_RLUSD_TOTAL,
+                  rate: 1,
+                }
+              : null);
+
+          if (!baseLineNext) {
+            return next;
+          }
+
+          const quoteLine = next[quote] || {
+            currency: quote,
+            rlusd: 0,
+            units: 0,
+            rate: 0,
+          };
+
+          const newBaseRlusd = Math.max(
+            0,
+            Number(baseLineNext.rlusd || 0) - rlusdValue
+          );
+          const newBaseUnits = Math.max(
+            0,
+            Number(baseLineNext.units || 0) - amountBase
+          );
+
+          next[base] = {
+            ...baseLineNext,
+            rlusd: newBaseRlusd,
+            units: newBaseUnits,
+            rate:
+              newBaseRlusd > 0 && newBaseUnits > 0
+                ? newBaseUnits / newBaseRlusd
+                : base === "RLUSD"
+                ? 1
+                : baseLineNext.rate || 0,
+          };
+
+          next[quote] = {
+            ...quoteLine,
+            rlusd: Number(quoteLine.rlusd || 0) + rlusdValue,
+            units: Number(quoteLine.units || 0) + quoteUnits,
+            rate:
+              Number(quoteLine.rlusd || 0) + rlusdValue > 0 &&
+              Number(quoteLine.units || 0) + quoteUnits > 0
+                ? (Number(quoteLine.units || 0) + quoteUnits) /
+                  (Number(quoteLine.rlusd || 0) + rlusdValue)
+                : quoteLine.rate || 0,
+          };
+
+          return next;
+        });
+
+        setConvertPreview(
+          `Démo: ${amountBase.toLocaleString("en-US", {
+            maximumFractionDigits: 4,
+          })} ${base} ≈ ${quoteUnits.toLocaleString("en-US", {
+            maximumFractionDigits: 2,
+          })} ${quote} (${priceSource})`
+        );
+        setConvertAmount("");
+      } catch (error) {
+        console.error("Demo convert error:", error);
+        alert(
+          "Erreur lors de la conversion démo: " +
+            (error?.message || String(error))
+        );
+      } finally {
+        setConvertProcessing(false);
+      }
+
+      return;
+    }
+
+    if (!effectiveIsConnected || !backendWalletAddress) {
+      alert("Please connect your Xumm wallet first.");
       return;
     }
 
@@ -1158,32 +1432,10 @@ export default function WalletDashboard({
       return;
     }
 
-    const baseLine =
-      demoLines[base] ||
-      (base === "RLUSD"
-        ? demoLines.RLUSD
-        : null);
-
-    if (!baseLine || !Number.isFinite(Number(baseLine.units || 0))) {
-      alert("Aucun solde démo disponible dans la devise de base sélectionnée.");
-      return;
-    }
-
-    const availableBaseUnits = Number(baseLine.units || 0);
-    if (amountBase > availableBaseUnits + 1e-8) {
-      alert(
-        `Montant trop élevé. Solde disponible en ${base}: ${availableBaseUnits.toLocaleString(
-          "en-US",
-          { maximumFractionDigits: 4 }
-        )}.`
-      );
-      return;
-    }
-
     setConvertProcessing(true);
     try {
       const rlusdPerBase = await getRlusdPerUnit(base);
-      const rlusdPerQuote = await getRlusdPerUnit(quote);
+      const rlusdPerQuote = quote === "RLUSD" ? 1 : await getRlusdPerUnit(quote);
 
       if (
         !Number.isFinite(rlusdPerBase) ||
@@ -1196,89 +1448,73 @@ export default function WalletDashboard({
       }
 
       const rlusdValue = amountBase * rlusdPerBase;
-      const quoteUnits = rlusdValue / rlusdPerQuote;
+      const epsilon = 1e-9;
 
-      const priceSource =
-        base === "RLUSD"
-          ? `1 RLUSD ≈ ${(
-              1 / rlusdPerQuote
-            ).toLocaleString("en-US", { maximumFractionDigits: 4 })} ${quote}`
-          : `Prix implicite via RLUSD (base=${base}, quote=${quote})`;
-
-      setDemoLines((prev) => {
-        const next = { ...prev };
-        const baseLineNext =
-          next[base] ||
-          (base === "RLUSD"
-            ? next.RLUSD || {
-                currency: "RLUSD",
-                rlusd: DEMO_RLUSD_TOTAL,
-                units: DEMO_RLUSD_TOTAL,
-                rate: 1,
-              }
-            : null);
-
-        if (!baseLineNext) {
-          return next;
+      if (base === "RLUSD") {
+        const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
+        if (Number.isFinite(unallocated) && unallocated + epsilon < rlusdValue) {
+          alert(
+            `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString(
+              "en-US",
+              { maximumFractionDigits: 6 }
+            )} RLUSD.`
+          );
+          return;
         }
+      } else {
+        const availableAllocated = allocatedRlusdByCurrency.get(base) || 0;
+        if (availableAllocated + epsilon < rlusdValue) {
+          const maxUnits =
+            availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
+          alert(
+            `Montant trop élevé. Allocation disponible en ${base}: ${maxUnits.toLocaleString(
+              "en-US",
+              { maximumFractionDigits: 6 }
+            )} ${base} (≈ ${availableAllocated.toLocaleString("en-US", {
+              maximumFractionDigits: 6,
+            })} RLUSD).`
+          );
+          return;
+        }
+      }
 
-        const quoteLine = next[quote] || {
-          currency: quote,
-          rlusd: 0,
-          units: 0,
-          rate: 0,
-        };
-
-        const newBaseRlusd = Math.max(
-          0,
-          Number(baseLineNext.rlusd || 0) - rlusdValue
-        );
-        const newBaseUnits = Math.max(
-          0,
-          Number(baseLineNext.units || 0) - amountBase
-        );
-
-        next[base] = {
-          ...baseLineNext,
-          rlusd: newBaseRlusd,
-          units: newBaseUnits,
-          rate:
-            newBaseRlusd > 0 && newBaseUnits > 0
-              ? newBaseUnits / newBaseRlusd
-              : base === "RLUSD"
-              ? 1
-              : baseLineNext.rate || 0,
-        };
-
-        next[quote] = {
-          ...quoteLine,
-          rlusd: Number(quoteLine.rlusd || 0) + rlusdValue,
-          units: Number(quoteLine.units || 0) + quoteUnits,
-          rate:
-            Number(quoteLine.rlusd || 0) + rlusdValue > 0 &&
-            Number(quoteLine.units || 0) + quoteUnits > 0
-              ? (Number(quoteLine.units || 0) + quoteUnits) /
-                (Number(quoteLine.rlusd || 0) + rlusdValue)
-              : quoteLine.rate || 0,
-        };
-
-        return next;
+      const result = await convertCurrencyAllocation({
+        fromCurrencyCode: base,
+        toCurrencyCode: quote,
+        amountRlusd: rlusdValue,
+        fromFxRate: rlusdPerBase,
+        toFxRate: rlusdPerQuote,
       });
 
-      setConvertPreview(
-        `Démo: ${amountBase.toLocaleString("en-US", {
-          maximumFractionDigits: 4,
-        })} ${base} ≈ ${quoteUnits.toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-        })} ${quote} (${priceSource})`
-      );
+      if (!result || result.error) {
+        throw new Error(result?.error || "Conversion failed");
+      }
+
+      if (quote === "RLUSD") {
+        setConvertPreview(
+          `Deallocated: ${amountBase.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} ${base} → ${rlusdValue.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} RLUSD (unallocated)`
+        );
+      } else {
+        const quoteUnits = rlusdValue / rlusdPerQuote;
+        setConvertPreview(
+          `Allocation: ${amountBase.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} ${base} → ${quoteUnits.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} ${quote} (≈ ${rlusdValue.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} RLUSD)`
+        );
+      }
+
       setConvertAmount("");
     } catch (error) {
-      console.error("Demo convert error:", error);
-      alert(
-        "Erreur lors de la conversion démo: " +
-          (error?.message || String(error))
-      );
+      console.error("Convert error:", error);
+      alert("Conversion error: " + (error?.message || String(error)));
     } finally {
       setConvertProcessing(false);
     }
@@ -1286,18 +1522,18 @@ export default function WalletDashboard({
 
   return (
     <>
-      <div className={`flex flex-col bg-elevated ${layout.containerClass}`}>
+      <div className={`flex flex-col bg-elevated h-full min-h-0 ${layout.containerClass}`}>
         {/* Header */}
-        <div className={`panel-header ${layout.headerClass}`}>
+        <div className={`panel-header ${layout.headerClass} flex flex-col shrink-0`}>
           {/* Titres discrets en haut */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2 md:mb-3">
             {layout.showBrandTitle ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">
                   XCANNES
                 </span>
                 <span className="text-[10px] font-light text-white/30">|</span>
-                <span className="hidden md:inline text-[10px] font-light text-white/40">
+                <span className="text-[10px] font-light text-white/40 truncate max-w-[160px] sm:max-w-none">
                   Digital Asset Exchange
                 </span>
               </div>
@@ -1432,7 +1668,7 @@ export default function WalletDashboard({
 
         {/* Action row: Send / Receive / Exchange / Buy / Trustlines */}
         <div
-          className={`px-3 py-3 border-b border-white/5 space-y-3 ${layout.actionRowClass}`}
+          className={`px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3 ${layout.actionRowClass}`}
         >
           <div className="grid grid-cols-4 gap-2 sm:gap-3">
             {/* Send */}
@@ -1531,10 +1767,10 @@ export default function WalletDashboard({
           </div>
           
           {/* KYC Status Panel - affiché uniquement si wallet connecté */}
-          {effectiveIsConnected && wallet?.address && (
+          {effectiveIsConnected && effectiveWallet && (
             <div className="mt-2">
               <KYCStatusPanel
-                walletAddress={wallet.address}
+                walletAddress={effectiveWallet}
                 kycStatus={kycStatus}
                 onVerifyClick={() => setKycModalOpen(true)}
               />
@@ -1543,56 +1779,33 @@ export default function WalletDashboard({
         </div>
 
         {/* Token list */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           <div
-            className={`p-3 overflow-y-auto overscroll-contain ${layout.tokenListClass}`}
+            className={`flex-1 min-h-0 p-3 overflow-y-auto overscroll-contain ${layout.tokenListClass} touch-pan-y`}
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
             {/* Mobile: toutes les devises avec scroll adapté */}
             <div className="space-y-1.5 md:hidden">
-              {augmentedTokens.map(renderTokenRow)}
+              {tokenRows}
             </div>
 
             {/* Desktop: liste complète */}
             <div className="hidden md:flex md:flex-col md:space-y-1.5">
-              {augmentedTokens.map(renderTokenRow)}
+              {tokenRows}
             </div>
           </div>
-
-          {/* Footer mobile: lien vers wallet complet, fixe en bas du dashboard */}
-          {!isFullPageView && layout.showOpenFullWallet && (
-            <div className="md:hidden px-3 pb-3">
-              <Link
-                href="/wallet"
-                className="block w-full text-center text-[11px] text-xcannes-green/90 hover:text-black bg-xcannes-green/10 hover:bg-xcannes-green rounded-md py-1.5 font-medium transition-colors"
-              >
-                Open full wallet
-              </Link>
-            </div>
-          )}
-
-          {/* Footer (wallet pleine page uniquement) */}
-          {isFullPageView && (
-            <div className="px-3 pb-3">
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/20 px-3 py-2 backdrop-blur-sm">
-                <div className="flex items-center gap-2 text-[11px] text-white/70">
-                  <span
-                    className={[
-                      "inline-flex h-2.5 w-2.5 rounded-full ring-4",
-                      xrplConnectionIndicator.dotClass,
-                      xrplConnectionIndicator.ringClass,
-                      xrplConnectionIndicator.pulse ? "animate-pulse" : "",
-                    ].join(" ")}
-                    aria-hidden="true"
-                  />
-                  <span className="font-medium">{xrplConnectionIndicator.label}</span>
-                </div>
-                <div className="text-[10px] text-white/40">
-                  Secured via XUMM
-                </div>
-              </div>
-            </div>
-          )}
         </div>
+
+        <WalletDashboardFooter
+          layout={layout}
+          xrplConnectionIndicator={xrplConnectionIndicator}
+          isFullPageView={isFullPageView}
+          onOpenInfo={() => setWalletInfoOpen(true)}
+        />
+        <WalletInfoModal
+          isOpen={walletInfoOpen}
+          onClose={() => setWalletInfoOpen(false)}
+        />
       </div>
 
       {/* Modales via Portal pour éviter les problèmes de z-index et overflow */}
@@ -1603,7 +1816,7 @@ export default function WalletDashboard({
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={() => setActiveAction(null)}
           />
           {/* Modale */}
@@ -1826,7 +2039,7 @@ export default function WalletDashboard({
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={() => setActiveAction(null)}
           />
           {/* Modale */}
@@ -2062,7 +2275,7 @@ export default function WalletDashboard({
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={() => setActiveAction(null)}
           />
           {/* Modale */}
@@ -2086,10 +2299,110 @@ export default function WalletDashboard({
                 Convert assets
               </h3>
               <p className="text-xs md:text-sm text-white/60">
-                Choisissez la devise de base et la devise de cotation. Le
-                calcul de conversion sera branché sur le DEX.
+                Conversion interne des allocations RLUSD (pool RLUSD ↔ devises).
               </p>
               {renderWalletMeta("mb-2")}
+              {!isPreviewMode && (
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[11px] font-semibold text-white/80">
+                      Currency lines (allocations RLUSD)
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        refreshCurrencyLines();
+                      }}
+                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[10px] text-white/60 border border-white/10 transition-colors"
+                      disabled={currencyLinesLoading}
+                    >
+                      Refresh
+                    </button>
+                  </div>
+
+                  {currencyLinesError && (
+                    <div className="text-[11px] text-red-400">
+                      {currencyLinesError}
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-3 gap-2 text-[10px] text-white/60">
+                    <div className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5">
+                      <div className="text-white/40">On-chain</div>
+                      <div className="font-mono text-white/80">
+                        {currencyLinesSummary?.rlusdOnChain == null
+                          ? "—"
+                          : Number(currencyLinesSummary.rlusdOnChain).toLocaleString(
+                              "en-US",
+                              { maximumFractionDigits: 6 }
+                            )}
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5">
+                      <div className="text-white/40">Allocated</div>
+                      <div className="font-mono text-white/80">
+                        {Number(currencyLinesSummary?.totalAllocatedRlusd || 0).toLocaleString(
+                          "en-US",
+                          { maximumFractionDigits: 6 }
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-black/30 px-2 py-1.5">
+                      <div className="text-white/40">Unallocated</div>
+                      <div className="font-mono text-white/80">
+                        {currencyLinesSummary?.unallocatedRlusd == null
+                          ? "—"
+                          : Number(currencyLinesSummary.unallocatedRlusd).toLocaleString(
+                              "en-US",
+                              { maximumFractionDigits: 6 }
+                            )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    {(currencyLines || []).length === 0 ? (
+                      <div className="text-[11px] text-white/40">
+                        No currency lines yet.
+                      </div>
+                    ) : (
+                      currencyLines.map((line) => {
+                        const code = String(line?.currencyCode || "").toUpperCase();
+                        const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
+                        return (
+                          <div
+                            key={code}
+                            className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5"
+                          >
+                            <div className="min-w-0">
+                              <div className="font-mono text-[11px] text-white/80">
+                                {code}
+                              </div>
+                              <div className="text-[10px] text-white/40">
+                                {allocated.toLocaleString("en-US", {
+                                  maximumFractionDigits: 6,
+                                })}{" "}
+                                RLUSD
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveCurrencyLine(code);
+                              }}
+                              className="px-2 py-1 rounded-md bg-red-500/15 hover:bg-red-500/25 text-[10px] text-red-200 border border-red-500/30 transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
             <div className="space-y-3">
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">
@@ -2101,7 +2414,7 @@ export default function WalletDashboard({
                   onChange={(e) => setConvertBaseCurrency(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {walletCurrencyOptions
+                  {swapCurrencyOptions
                     .filter(code => code !== convertQuoteCurrency)
                     .map((code) => (
                       <option key={code} value={code}>
@@ -2121,7 +2434,7 @@ export default function WalletDashboard({
                   onChange={(e) => setConvertQuoteCurrency(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {walletCurrencyOptions
+                  {swapCurrencyOptions
                     .filter(code => code !== convertBaseCurrency)
                     .map((code) => (
                       <option key={code} value={code}>
@@ -2148,6 +2461,40 @@ export default function WalletDashboard({
                 )}
               </div>
 
+              {!isPreviewMode && (
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3 space-y-2">
+                  <div className="text-[11px] font-semibold text-white/80">
+                    Add / set currency line
+                  </div>
+                  <WalletCurrencySelector
+                    value={currencyLineCode}
+                    onChange={setCurrencyLineCode}
+                    placeholder="Select currency..."
+                  />
+                  <TokenAmountInput
+                    value={currencyLineAllocatedRlusd}
+                    onChange={setCurrencyLineAllocatedRlusd}
+                    placeholder="Allocated (RLUSD)"
+                    token="RLUSD"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpsertCurrencyLine();
+                    }}
+                    className="w-full bg-white/5 hover:bg-white/10 text-white/80 font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed active:scale-95 border border-white/10"
+                    disabled={
+                      currencyLinesLoading ||
+                      !currencyLineCode ||
+                      String(currencyLineCode || "").toUpperCase() === "RLUSD"
+                    }
+                  >
+                    Save line
+                  </button>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={(e) => {
@@ -2156,18 +2503,18 @@ export default function WalletDashboard({
                 }}
                 className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10"
                 disabled={
-                  !isPreviewMode ||
                   convertProcessing ||
                   !convertBaseCurrency ||
                   !convertQuoteCurrency ||
-                  !convertAmount
+                  !convertAmount ||
+                  (!isPreviewMode && !effectiveIsConnected)
                 }
               >
                 {convertProcessing
-                  ? "Converting (demo)..."
+                  ? "Converting..."
                   : isPreviewMode
                   ? "Convert (demo, no real tx)"
-                  : "Convert (soon)"}
+                  : "Convert allocation"}
               </button>
             </div>
           </div>
@@ -2180,7 +2527,7 @@ export default function WalletDashboard({
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={() => setActiveAction(null)}
           />
           
@@ -2252,14 +2599,14 @@ export default function WalletDashboard({
                   <MoonPayBuyModal
                     isOpen={true}
                     onClose={() => setActiveAction(null)}
-                    walletAddress={wallet?.address || ""}
+                    walletAddress={effectiveWallet || ""}
                     embedded={true}
                   />
                 ) : (
                   <MoonPaySellModal
                     isOpen={true}
                     onClose={() => setActiveAction(null)}
-                    walletAddress={wallet?.address || ""}
+                    walletAddress={effectiveWallet || ""}
                     embedded={true}
                   />
                 )}
@@ -2274,7 +2621,7 @@ export default function WalletDashboard({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={handleCloseTrustlineEditor}
           />
           {/* Modale */}
@@ -2371,7 +2718,7 @@ export default function WalletDashboard({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={() => setActiveAction(null)}
           />
           {/* Modale */}
@@ -2556,7 +2903,7 @@ export default function WalletDashboard({
       {showSaveAddressPrompt && createPortal(
         <>
           <div 
-            className="fixed inset-0 z-[10000] bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
             onClick={() => {
               setShowSaveAddressPrompt(false);
               setAddressLabel("");
@@ -2630,7 +2977,7 @@ export default function WalletDashboard({
       <MoonPayKYCModal
         isOpen={kycModalOpen}
         onClose={() => setKycModalOpen(false)}
-        walletAddress={wallet?.address}
+        walletAddress={effectiveWallet}
         onKycComplete={handleKycComplete}
       />
 

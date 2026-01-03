@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Html5Qrcode } from "html5-qrcode";
 
 export default function QRScanner({ isOpen, onScan, onClose }) {
   const html5QrCodeRef = useRef(null);
@@ -25,6 +24,7 @@ export default function QRScanner({ isOpen, onScan, onClose }) {
     const startScanner = async () => {
       try {
         if (!mounted) return;
+        if (typeof window === "undefined") return;
         
         setError(null);
         setIsScanning(true);
@@ -33,6 +33,8 @@ export default function QRScanner({ isOpen, onScan, onClose }) {
         await new Promise(resolve => setTimeout(resolve, 100));
 
         if (!mounted) return;
+
+        const { Html5Qrcode } = await import("html5-qrcode");
 
         // Create scanner instance
         const html5QrCode = new Html5Qrcode("qr-reader");

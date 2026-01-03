@@ -111,7 +111,7 @@ export default function WalletInfoModal({ isOpen, onClose }) {
   return createPortal(
     <>
       <div
-        className="fixed inset-0 z-[11000] bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
         onClick={() => onClose && onClose()}
       />
       <div className="fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none">

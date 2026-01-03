@@ -125,7 +125,7 @@ export default function MoonPayKYCModal({ isOpen, onClose, walletAddress, onKycC
   const statusConfig = getStatusConfig();
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm">
       <div className="relative w-full max-w-2xl bg-elevated-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header XCannes */}
         <div className="relative bg-gradient-to-r from-purple-600/20 to-blue-600/20 border-b border-white/10 p-6">
