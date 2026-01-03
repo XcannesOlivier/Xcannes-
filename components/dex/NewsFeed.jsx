@@ -168,7 +168,7 @@ export default function NewsFeed({ category = "finance" }) {
       <div className="p-3 border-b border-white/10">
         <div className="flex items-center justify-between">
           <h3 className="hidden md:block text-base md:text-sm font-bold text-white">
-            News &amp; commentary
+            News aggregated from local media sources.
           </h3>
           {loading && (
             <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin"></div>
@@ -248,8 +248,8 @@ export default function NewsFeed({ category = "finance" }) {
         })}
       </div>
 
-      {/* Footer */}
-      <div className="p-2 border-t border-white/10 text-center">
+      {/* Footer (mobile uniquement) */}
+      <div className="p-2 border-t border-white/10 text-center md:hidden">
         <p className="text-sm md:text-xs text-white/30">
           News aggregated from local media sources.
         </p>

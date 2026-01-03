@@ -13,7 +13,7 @@ export default function PairsTableDesktop({
   return (
     <div className="hidden md:block max-h-[520px] overflow-y-auto rounded-xl bg-base">
       <table className="min-w-full text-sm">
-        <thead className="bg-base sticky top-0 z-10">
+        <thead className="bg-base sticky top-0 z-10 border-b border-white/10">
           <tr className="text-xs font-medium text-white/50 uppercase tracking-wide">
             <th className="px-4 py-3 text-left">
               {t("market", "Market")}

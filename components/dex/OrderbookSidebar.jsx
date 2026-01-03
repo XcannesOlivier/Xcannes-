@@ -8,11 +8,14 @@ import { getPairCategory } from "../../utils/marketStructure";
 import { ChartFooter } from "./XrplCandleChart";
 import NewsFeed from "./NewsFeed";
 import InfoFeesPanel from "./InfoFeesPanel";
+import WalletInfoModal from "../componentsGlobal/WalletInfoModal";
 
 export default function OrderbookSidebar({ pair, onPriceSelect }) {
   const { t } = useTranslation("common");
   const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
   const isXRPL = pairCategory === "xrpl";
+  const [desktopPanel, setDesktopPanel] = useState("orderbook"); // 'orderbook' | 'news'
+  const [walletInfoOpen, setWalletInfoOpen] = useState(false);
 
   // ✅ Extraire base/quote de la paire ET détecter si c'est une paire non-XRPL
   const { isFxMode, fxBase, fxQuote } = useMemo(() => {
@@ -207,6 +210,7 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
   const isLowLiquidity = orderbookStatus === "low_liquidity";
   const isMaintenance = orderbookStatus === "maintenance";
   const showXrplNoOrders = isXRPL && orderbookStatus === "none";
+  const showDesktopNews = isXRPL && desktopPanel === "news";
 
   const handleRowClick = (side, order, index) => {
     const price = Number(order?.price);
@@ -252,7 +256,7 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
               {pair} · {connected ? "Live XRPL" : "Offline"}
             </>
           ) : (
-            "News & commentary"
+            "News aggregated from local media sources."
           )}
         </p>
       </div>
@@ -260,6 +264,10 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
       <div className="flex-1 min-h-0 overflow-y-auto">
         {showNewsExternal ? (
           <div className="h-[60vh] lg:h-full">
+            <NewsFeed category="finance" />
+          </div>
+        ) : showDesktopNews ? (
+          <div className="h-full">
             <NewsFeed category="finance" />
           </div>
         ) : isMaintenance ? (
@@ -460,15 +468,63 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
         ) : null}
       </div>
 
+      {/* Footer */}
+      {showNewsExternal ? (
+        <div className="mt-auto shrink-0 bg-elevated sticky bottom-0 z-20">
+          <div className="px-3 py-2 flex items-center justify-end">
+            <button
+              type="button"
+              onClick={() => setWalletInfoOpen(true)}
+              className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
+              title="Wallet info & fees"
+            >
+              Info & Fees
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="hidden md:block mt-auto shrink-0 bg-elevated">
+          <div className="px-3 py-2 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                setDesktopPanel((prev) =>
+                  prev === "news" ? "orderbook" : "news"
+                )
+              }
+              className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
+            >
+              {showDesktopNews ? "ORDERBOOK" : "NEWS"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setWalletInfoOpen(true)}
+              className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
+              title="Wallet info & fees"
+            >
+              Info & Fees
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Chart Footer en bas de la colonne Orderbook sur mobile uniquement */}
-      <div className="md:hidden">
-        <ChartFooter 
-          pair={pair}
-          fxMode={isFxMode}
-          fxBase={fxBase}
-          fxQuote={fxQuote}
-        />
-      </div>
+      {!showNewsExternal && (
+        <div className="md:hidden">
+          <ChartFooter 
+            pair={pair}
+            fxMode={isFxMode}
+            fxBase={fxBase}
+            fxQuote={fxQuote}
+          />
+        </div>
+      )}
+
+      <WalletInfoModal
+        isOpen={walletInfoOpen}
+        onClose={() => setWalletInfoOpen(false)}
+      />
     </aside>
   );
 }

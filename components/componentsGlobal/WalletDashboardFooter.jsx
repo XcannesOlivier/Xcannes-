@@ -11,12 +11,16 @@ export default function WalletDashboardFooter({
   const showOpenFullWallet = !isFullPageView && layout?.showOpenFullWallet;
   const showTopBorder = layout?.statementVariant !== "dex-desktop";
   const showBottomBorder = layout?.statementVariant === "dex-mobile";
-  const showInfoButton = layout?.statementVariant !== "dex-mobile";
+  // Sur desktop DEX (wallet sidebar), on enlève le bouton Info & Fees
+  // car il est affiché dans le footer de la sidebar Orderbook.
+  const showInfoButton =
+    layout?.statementVariant !== "dex-mobile" &&
+    layout?.statementVariant !== "dex-desktop";
 
   return (
     <div
       className={[
-        "mt-auto shrink-0 z-20 bg-elevated shadow-[0_-10px_20px_rgba(0,0,0,0.55)]",
+        "mt-auto shrink-0 z-20 bg-elevated",
         showTopBorder ? "border-t border-white/10" : "",
         showBottomBorder ? "border-b border-white/10" : "",
       ].join(" ")}
@@ -62,7 +66,11 @@ export default function WalletDashboardFooter({
             </button>
           )}
 
-          <div className="hidden sm:block text-[10px] text-white/40">
+          <div
+            className={`${
+              isFullPageView ? "block" : "hidden sm:block"
+            } text-[10px] text-[#0f7fe1]/80`}
+          >
             Secured via XUMM
           </div>
         </div>
