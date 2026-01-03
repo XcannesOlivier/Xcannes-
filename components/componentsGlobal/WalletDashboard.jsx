@@ -15,10 +15,8 @@ import WalletInfoModal from "./WalletInfoModal";
 import XummConnectButton from "../xumm/XummConnectButton";
 import TokenAmountInput from "./TokenAmountInput";
 import QRScanner from "./QRScanner";
-import MoonPayKYCModal from "./MoonPayKYCModal";
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
-import { KYCStatusPanel } from "./KYCStatusBadge";
 import CurrencyStatement from "./CurrencyStatement";
 import { getCurrencyDescription } from "../../utils/currencyDescriptions";
 import GlobalStatement from "./GlobalStatement";
@@ -201,10 +199,8 @@ export default function WalletDashboard({
   const [walletLabel, setWalletLabel] = useState("");
   const [walletLabelDraft, setWalletLabelDraft] = useState("");
   const [isEditingWalletLabel, setIsEditingWalletLabel] = useState(false);
+  const [walletHeaderToast, setWalletHeaderToast] = useState("");
   
-  // États MoonPay KYC
-  const [kycModalOpen, setKycModalOpen] = useState(false);
-  const [kycStatus, setKycStatus] = useState("not_started"); // not_started | pending | approved | failed
   const [cashModalTab, setCashModalTab] = useState("buy"); // 'buy' | 'sell' - Onglet actif dans la modal Cash
   
   // États pour Payment Request
@@ -806,10 +802,25 @@ export default function WalletDashboard({
   const handleCopyAddress = async () => {
     if (!effectiveWallet || typeof navigator === "undefined") return;
     try {
-      await navigator.clipboard.writeText(effectiveWallet);
-      alert("Address copied to clipboard");
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(effectiveWallet);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = effectiveWallet;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setWalletHeaderToast("Adresse copiée");
+      setTimeout(() => setWalletHeaderToast(""), 1600);
     } catch (e) {
       console.error("Copy error:", e);
+      setWalletHeaderToast("Copie impossible");
+      setTimeout(() => setWalletHeaderToast(""), 2000);
     }
   };
 
@@ -1034,6 +1045,9 @@ export default function WalletDashboard({
     } catch (err) {
       console.error("Error saving wallet label:", err);
     }
+
+    setWalletHeaderToast("Nom enregistré");
+    setTimeout(() => setWalletHeaderToast(""), 1600);
   };
 
   const handleCancelWalletLabel = () => {
@@ -1087,38 +1101,6 @@ export default function WalletDashboard({
         <div className="font-mono break-all">{effectiveWallet}</div>
       </div>
     );
-  };
-
-  const loadKycStatus = async () => {
-    if (!effectiveWallet) return;
-    try {
-      const response = await fetch("/api/moonpay/kyc-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: effectiveWallet }),
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setKycStatus(data.status);
-      }
-    } catch (error) {
-      console.error("Error loading KYC status:", error);
-    }
-  };
-
-  // Charger le statut KYC au chargement si wallet connecté
-  useEffect(() => {
-    if (effectiveIsConnected && effectiveWallet) {
-      loadKycStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveIsConnected, effectiveWallet]);
-
-  const handleKycComplete = () => {
-    setKycStatus("approved");
-    setKycModalOpen(false);
-    // Optionnel: afficher une notification de succès
   };
 
   useEffect(() => {
@@ -1582,85 +1564,170 @@ export default function WalletDashboard({
             
             {/* Affichage du wallet connecté à la place du menu déroulant */}
             {effectiveIsConnected && effectiveWallet && (
-            <div className="flex items-start gap-2 mt-1">
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={handleOpenWalletLabelEditor}
-                  className="inline-flex items-center gap-2 bg-xcannes-green/10 border border-xcannes-green/30 rounded-md px-3 py-1.5 text-left hover:bg-xcannes-green/20 transition-colors"
-                  title="Rename wallet"
-                >
-                  <div className="w-2 h-2 rounded-full bg-xcannes-green animate-pulse" />
-                  <div className="min-w-0">
-                    <div className="text-[11px] text-white/80 font-semibold truncate">
-                      {walletLabel || "Wallet"}
-                    </div>
-                    <div className="text-[10px] text-white/60 font-mono truncate">
-                      {effectiveWallet.slice(0, 8)}...{effectiveWallet.slice(-6)}
-                    </div>
-                  </div>
-                </button>
+              <div className="w-full mt-2 px-2 flex justify-center">
+                <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className={`h-2 w-2 rounded-full ring-4 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
+                            xrplConnectionIndicator.pulse ? "animate-pulse" : ""
+                          }`}
+                          title={xrplConnectionIndicator.label}
+                          aria-label={xrplConnectionIndicator.label}
+                        />
+                        <span className="text-[12px] md:text-[13px] font-semibold text-white/85 truncate">
+                          {walletLabel || "Wallet"}
+                        </span>
+                      </div>
 
-                {isEditingWalletLabel && (
-                  <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-md px-2 py-1">
-                    <input
-                      type="text"
-                      value={walletLabelDraft}
-                      onChange={(e) => setWalletLabelDraft(e.target.value)}
-                      placeholder="Custom wallet name"
-                      className="w-40 bg-transparent text-[11px] text-white/80 outline-none placeholder:text-white/40"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleSaveWalletLabel();
-                        }
-                        if (e.key === "Escape") {
-                          handleCancelWalletLabel();
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleSaveWalletLabel}
-                      className="px-2 py-1 text-[10px] rounded bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30 transition-colors"
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCancelWalletLabel}
-                      className="px-2 py-1 text-[10px] rounded bg-white/5 hover:bg-white/10 text-white/60 border border-white/10 transition-colors"
-                    >
-                      Cancel
-                    </button>
+                      <div className="mt-1 flex items-center gap-2 min-w-0">
+                        <span className="font-mono text-[11px] text-white/55 truncate">
+                          {effectiveWallet.slice(0, 10)}…{effectiveWallet.slice(-8)}
+                        </span>
+                        {walletHeaderToast && (
+                          <span className="text-[10px] text-xcannes-green/90">
+                            {walletHeaderToast}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={handleOpenWalletLabelEditor}
+                        title="Renommer"
+                        className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
+                        aria-label="Renommer le wallet"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16.862 3.487a2.1 2.1 0 012.97 2.97L8.9 17.39a4 4 0 01-1.69 1l-3.42 1.14 1.14-3.42a4 4 0 011-1.69L16.862 3.487z"
+                          />
+                        </svg>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleCopyAddress}
+                        title="Copier l'adresse"
+                        className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
+                        aria-label="Copier l'adresse XRPL"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSwitchWallet}
+                        disabled={isConnecting}
+                        title="Changer de wallet"
+                        className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                        aria-label="Changer de wallet"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 1l4 4-4 4M21 5H9a4 4 0 00-4 4v1M7 23l-4-4 4-4M3 19h12a4 4 0 004-4v-1"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-                
-              <button
-                type="button"
-                onClick={handleSwitchWallet}
-                disabled={isConnecting}
-                title="Changer de wallet"
-                className="p-2 bg-white/5 hover:bg-xcannes-green/20 border border-white/10 hover:border-xcannes-green/40 text-white/60 hover:text-xcannes-green rounded-md transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 1l4 4-4 4M21 5H9a4 4 0 00-4 4v1M7 23l-4-4 4-4M3 19h12a4 4 0 004-4v-1" />
-                </svg>
-              </button>
-              {/* Bouton Copier - icône uniquement */}
-              <button
-                type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCopyAddress();
-                  }}
-                  title="Copier l'adresse"
-                  className="p-2 bg-white/5 hover:bg-xcannes-green/20 border border-white/10 hover:border-xcannes-green/40 text-white/60 hover:text-xcannes-green rounded-md transition-all active:scale-95"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
+
+                  {isEditingWalletLabel && (
+                    <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 rounded-lg bg-white/5 border border-white/10 px-2 py-2">
+                      <input
+                        type="text"
+                        value={walletLabelDraft}
+                        onChange={(e) => setWalletLabelDraft(e.target.value)}
+                        placeholder="Nom du wallet"
+                        className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSaveWalletLabel();
+                          }
+                          if (e.key === "Escape") {
+                            handleCancelWalletLabel();
+                          }
+                        }}
+                        autoFocus
+                      />
+
+                      <button
+                        type="button"
+                        onClick={handleSaveWalletLabel}
+                        className="p-2 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
+                        aria-label="Enregistrer"
+                        title="Enregistrer"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleCancelWalletLabel}
+                        className="p-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
+                        aria-label="Annuler"
+                        title="Annuler"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -1767,15 +1834,6 @@ export default function WalletDashboard({
           </div>
           
           {/* KYC Status Panel - affiché uniquement si wallet connecté */}
-          {effectiveIsConnected && effectiveWallet && (
-            <div className="mt-2">
-              <KYCStatusPanel
-                walletAddress={effectiveWallet}
-                kycStatus={kycStatus}
-                onVerifyClick={() => setKycModalOpen(true)}
-              />
-            </div>
-          )}
         </div>
 
         {/* Token list */}
@@ -2875,26 +2933,88 @@ export default function WalletDashboard({
       <QRScanner
         isOpen={paymentRequestScannerOpen}
         onScan={(data) => {
-          try {
-            const request = JSON.parse(data);
-            if (request.amount && request.currency && request.to) {
-              // Auto-fill send form with payment request data
-              setSendAmount(request.amount);
-              setSendDestination(request.to);
-              // Find the matching asset
-              const matchingToken = augmentedTokens.find(t => t.currency === request.currency);
+          const raw = String(data || "").trim();
+
+          const looksLikeXrplAddress =
+            /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(raw);
+
+          const tryParseUri = (value) => {
+            try {
+              // Accept xrpl:..., xrpl://..., https://...?... etc.
+              const cleaned = value.replace(/^xrpl:\/\//i, "xrpl://").replace(/^xrpl:/i, "xrpl://");
+              const url = new URL(cleaned);
+              const host = url.hostname || "";
+              const path = (url.pathname || "").replace(/^\/+/, "");
+              const params = url.searchParams;
+              const candidateFromUrl = params.get("to") || params.get("destination") || null;
+              const candidateFromHost = host && host !== "xrpl" ? host : null;
+              const candidateFromPath = path && path !== "xrpl:" ? path : null;
+              const to = candidateFromUrl || candidateFromHost || candidateFromPath;
+              const amount = params.get("amount") || params.get("value") || null;
+              const currency = params.get("currency") || params.get("ccy") || null;
+              return { to, amount, currency };
+            } catch (_) {
+              return null;
+            }
+          };
+
+          const applyPrefill = ({ to, amount, currency } = {}) => {
+            if (to) setSendDestination(to);
+            if (amount) setSendAmount(String(amount));
+            if (currency) {
+              const upper = String(currency).toUpperCase();
+              const matchingToken = augmentedTokens.find(
+                (t) => String(t.currency || "").toUpperCase() === upper
+              );
               if (matchingToken) {
                 setSendAssetKey(matchingToken.key);
               }
-              // Switch to manual tab with pre-filled data
-              setSendTab("manual");
-              setPaymentRequestScannerOpen(false);
-            } else {
-              alert("Invalid payment request QR code");
             }
-          } catch (err) {
-            alert("Unable to parse payment request");
+            setSendTab("manual");
+            setPaymentRequestScannerOpen(false);
+          };
+
+          try {
+            // 1) JSON: { amount, currency, to }
+            const request = JSON.parse(raw);
+            if (request && request.to) {
+              applyPrefill({
+                to: request.to,
+                amount: request.amount,
+                currency: request.currency,
+              });
+              return;
+            }
+          } catch (_) {
+            // ignore json parse
           }
+
+          // 2) XRPL address only
+          if (looksLikeXrplAddress) {
+            applyPrefill({ to: raw });
+            return;
+          }
+
+          // 3) URI/URL formats (xrpl://..., xrpl:..., https://...?to=... etc.)
+          const parsed = tryParseUri(raw);
+          if (parsed && parsed.to) {
+            applyPrefill(parsed);
+            return;
+          }
+
+          // 4) Xumm/Xaman payload links: open directly
+          if (/xumm\.app|xaman|xumm:\/\//i.test(raw)) {
+            const ok = confirm(
+              "This looks like a Xumm/Xaman request link. Open it now?"
+            );
+            if (ok && typeof window !== "undefined") {
+              window.location.href = raw;
+            }
+            setPaymentRequestScannerOpen(false);
+            return;
+          }
+
+          alert("QR code scanned, but format is not supported.");
         }}
         onClose={() => setPaymentRequestScannerOpen(false)}
       />
@@ -2972,14 +3092,6 @@ export default function WalletDashboard({
         </>,
         document.body
       )}
-
-      {/* Modal KYC MoonPay */}
-      <MoonPayKYCModal
-        isOpen={kycModalOpen}
-        onClose={() => setKycModalOpen(false)}
-        walletAddress={effectiveWallet}
-        onKycComplete={handleKycComplete}
-      />
 
       {/* Modal Global Statement */}
       {showGlobalStatement && (
