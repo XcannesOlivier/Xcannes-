@@ -1516,7 +1516,7 @@ export default function WalletDashboard({
                 </span>
                 <span className="text-[10px] font-light text-white/30">|</span>
                 <span className="text-[10px] font-light text-white/40 truncate max-w-[160px] sm:max-w-none">
-                  Digital Asset Exchange
+                  Global USD Wallet
                 </span>
               </div>
             ) : (
@@ -1542,7 +1542,7 @@ export default function WalletDashboard({
               {totalLabel}
             </p>
             <p className="text-[11px] text-xcannes-green">
-              ≈ 1.00 USD/RLUSD
+              ≈ 1.00 USD
             </p>
             
             {/* Bouton Global Statement - Toujours visible, même en démo */}
@@ -1550,7 +1550,7 @@ export default function WalletDashboard({
               onClick={() => setShowGlobalStatement(true)}
               className="mt-2 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105"
             >
-              📊 View Statement
+              Voir le relevé
             </button>
             
             <a 
@@ -1559,7 +1559,7 @@ export default function WalletDashboard({
               rel="noopener noreferrer"
               className="text-[10px] text-white/40 hover:text-xcannes-green/80 transition-colors"
             >
-              Stablecoin agréé par la NYDFS
+              Stablecoin USD régulé (détails)
             </a>
             
             {/* Affichage du wallet connecté à la place du menu déroulant */}

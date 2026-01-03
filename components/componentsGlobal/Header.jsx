@@ -55,7 +55,7 @@ export default function Header({ fixed = true }) {
             |
           </span>
           <span className="text-[10px] sm:text-[11px] text-white/60 font-light tracking-wide truncate">
-            Digital Asset Exchange
+            {t("header_tagline", "Digital Asset Exchange")}
           </span>
         </div>
       </Link>
@@ -76,7 +76,7 @@ export default function Header({ fixed = true }) {
             href="/dex"
             className="hover:text-xcannes-green transition-colors duration-200"
           >
-            Trading
+            {t("nav_trading", "Trading")}
           </Link>
         )}
 

@@ -1,22 +1,20 @@
-import Head from "next/head";
-import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Header from "../components/componentsGlobal/Header";
 import FooterPro from "../components/componentsGlobal/FooterPro";
 import Link from "next/link";
-import FAQSection from "../components/home/FAQSection";
-import TokenomicsSimplified from "../components/home/TokenomicsSimplified";
-import TrustlineBlock from "../components/home/TrustlineBlock";
-import BuyXCSSection from "../components/home/BuyXCSSection";
 import SEOHead from "../components/componentsGlobal/SEOHead";
 import PriceTicker from "../components/marketGlobal/PriceTicker";
 import WhyXcannesSection from "../components/home/WhyXcannesSection";
 import XummSecuritySection from "../components/home/XummSecuritySection";
-import RoadmapDistributionSection from "../components/home/RoadmapDistributionSection";
+import HomeUseCasesSection from "../components/home/HomeUseCasesSection";
+import HomeHowItWorksSection from "../components/home/HomeHowItWorksSection";
+import HomeLocalPaymentSection from "../components/home/HomeLocalPaymentSection";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import xcannesApi from "../lib/xcannesApi";
+import WalletProductSection from "../components/home/WalletProductSection";
+import { bankButtonClassName } from "../components/componentsGlobal/bankButtonClassName";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -89,8 +87,8 @@ export default function Home() {
   return (
     <>
       <SEOHead
-        title="XCannes - Digital Asset Exchange on XRP Ledger"
-        description="Trade XCS tokens instantly. Fast, secure, transparent blockchain exchange built on XRPL technology."
+        title="XCANNES - USD-backed multi-currency wallet on XRPL"
+        description="A non-custodial multi-currency wallet backed by USD stability on XRPL (via a regulated USD stablecoin). Send, pay, receive, and convert with real-time market data."
         canonical="/"
       />
 
@@ -99,132 +97,164 @@ export default function Home() {
       <PriceTicker
         pairs={pairs}
         fixed={true}
-        backgroundClass="bg-xcannes-background"
+        backgroundClass="bg-black/20 border-b border-white/10"
       />
 
-      {/* HERO SECTION CORPORATE ELEGANT */}
-      <main className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-xcannes-background pt-16">
-        {/* Grid pattern overlay - subtle */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(52, 211, 153, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(52, 211, 153, 0.5) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
+      <div className="pt-24 bg-xcannes-background">
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 text-center">
-          {/* Main heading - Elegant typography */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-sans font-bold text-white mb-8 leading-tight tracking-tight">
-            {t("hero_title")}
-            <span className="block mt-3 bg-gradient-to-r from-white/95 via-white/60 via-xcannes-green/70 to-xcannes-green bg-clip-text text-transparent">
-              {t("hero_title_gradient")}
-            </span>
-          </h1>
+        {/* HERO (more “private bank” tone) */}
+        <main className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,197,94,0.10),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.05),transparent_45%)]" />
 
-          {/* Subheading - 3 lignes corporate */}
-          <div className="max-w-3xl mx-auto mb-14 space-y-2">
-            <p className="text-xl text-white/90 font-light leading-relaxed">
-              {t("hero_description_line1")}
-            </p>
-            <p className="text-xl text-white/85 font-light leading-relaxed">
-              {t("hero_description_line2")}
-            </p>
-            <p className="text-xl text-white/75 font-light leading-relaxed">
-              {t("hero_description_line3")}
-            </p>
-          </div>
+          <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-24">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-5">
+                {t("hero_badge")}
+              </p>
 
-          {/* CTA Buttons - harmonisés */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
-            <Link href="/dex">
-              <button className="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-xcannes-green hover:bg-xcannes-green/90 text-white font-semibold text-sm tracking-wide transition-all duration-200 hover:-translate-y-0.5">
-                {t("hero_cta_primary")}
-              </button>
-            </Link>
-            <Link href="/dex">
-              <button className="inline-flex items-center justify-center px-8 py-3 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 text-white font-medium text-sm tracking-wide transition-all duration-200">
-                {t("hero_cta_secondary")}
-                <span className="inline-block ml-2 text-xs">→</span>
-              </button>
-            </Link>
-          </div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
+                {t("hero_title")}{" "}
+                <span className="text-xcannes-green">{t("hero_title_gradient")}</span>
+              </h1>
 
-          {/* Stats - Corporate elegant avec depth */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { 
-                value: t("stat_spread_value"), 
-                label: t("stat_spread_label"),
-                description: t("stat_spread_desc")
-              },
-              { 
-                value: t("stat_price_value"), 
-                label: t("stat_price_label"),
-                description: t("stat_price_desc")
-              },
-              { 
-                value: t("stat_speed_value"), 
-                label: t("stat_speed_label"),
-                description: t("stat_speed_desc")
-              },
-            ].map((stat, i) => (
-              <div
-                key={i}
-                className="group relative bg-xcannes-background backdrop-blur-md border border-white/10 rounded-xl p-8 hover:border-xcannes-green/50 transition-all duration-300 hover:-translate-y-1"
-              >
-                {/* Glow effect on hover */}
-                <div className="absolute inset-0 bg-xcannes-green/0 group-hover:bg-xcannes-green/5 rounded-xl transition-all duration-300" />
-                
-                <div className="relative">
-                  <div className="text-5xl font-sans font-bold text-xcannes-green mb-3">
-                    {stat.value}
-                  </div>
-                  <div className="text-base text-white font-semibold mb-1">
-                    {stat.label}
-                  </div>
-                  <div className="text-sm text-white/60">
-                    {stat.description}
-                  </div>
-                </div>
+              <div className="mt-6 space-y-2">
+                <p className="text-lg sm:text-xl text-white/80 font-light leading-relaxed">
+                  {t("hero_description_line1")}
+                </p>
+                <p className="text-base sm:text-lg text-white/65 font-light leading-relaxed">
+                  {t("hero_description_line2")}
+                </p>
+                <p className="text-base sm:text-lg text-white/55 font-light leading-relaxed">
+                  {t("hero_description_line3")}
+                </p>
               </div>
-            ))}
-          </div>
-        </div>
 
-       
-      </main>
+              <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <Link href="/wallet">
+                  <button className={bankButtonClassName({ tone: "blue", variant: "soft", size: "lg" })}>
+                    {t("hero_cta_primary")}
+                  </button>
+                </Link>
+                <Link href="/dex">
+                  <button className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}>
+                    {t("hero_cta_secondary")}
+                    <span className="inline-block ml-2 text-xs">→</span>
+                  </button>
+                </Link>
+              </div>
+
+              {/* Trust strip */}
+              <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  {
+                    title: t("home_trust_1_title", "Non-custodial"),
+                    desc: t("home_trust_1_desc", "Vous gardez le contrôle de vos clés."),
+                    icon: (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-xcannes-green">
+                        <path d="M12 11V7a4 4 0 0 0-8 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M5 11h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: t("home_trust_2_title", "Stabilité USD"),
+                    desc: t("home_trust_2_desc", "Valeur adossée au dollar via stablecoin régulé."),
+                    icon: (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-xcannes-green">
+                        <path d="M12 1v22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    title: t("home_trust_3_title", "Validation Xumm"),
+                    desc: t("home_trust_3_desc", "Biométrie et signature explicite."),
+                    icon: (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-xcannes-green">
+                        <path d="M12 3a9 9 0 1 0 9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ),
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex items-start gap-3 bg-black/20 border border-white/10 rounded-xl px-4 py-4"
+                  >
+                    <div className="mt-0.5 flex items-center justify-center w-9 h-9 rounded-lg bg-xcannes-green/10 border border-xcannes-green/20">
+                      {item.icon}
+                    </div>
+                    <div className="min-w-0 text-left">
+                      <div className="text-sm font-semibold text-white/90">{item.title}</div>
+                      <div className="text-xs text-white/55 leading-relaxed">{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Minimal metrics row */}
+              <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3">
+                {[
+                  {
+                    value: t("stat_spread_value"),
+                    label: t("stat_spread_label"),
+                    description: t("stat_spread_desc"),
+                  },
+                  {
+                    value: t("stat_price_value"),
+                    label: t("stat_price_label"),
+                    description: t("stat_price_desc"),
+                  },
+                  {
+                    value: t("stat_speed_value"),
+                    label: t("stat_speed_label"),
+                    description: t("stat_speed_desc"),
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-black/20 border border-white/10 rounded-xl px-5 py-4"
+                  >
+                    <div className="text-sm text-white/70">{stat.label}</div>
+                    <div className="mt-1 text-2xl font-semibold text-white">{stat.value}</div>
+                    <div className="mt-1 text-xs text-white/50">{stat.description}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
 
       {/* CONTENT SECTIONS */}
       <div className="bg-xcannes-background">
+        <HomeLocalPaymentSection availablePairs={availablePairs} />
+        <HomeUseCasesSection />
+        <HomeHowItWorksSection />
+        <WalletProductSection />
         <WhyXcannesSection />
         <XummSecuritySection />
-        <TokenomicsSimplified />
-        <RoadmapDistributionSection />
-        <BuyXCSSection />
-        <FAQSection />
       </div>
 
       <FooterPro />
 
-      {/* Professional AI Assistant - Bottom right floating button */}
+      {/* Support - Bottom right floating button */}
       {assistantContainer && createPortal(
         <div className="fixed right-3 bottom-3 md:right-6 md:bottom-6 z-[9999]">
           {assistantOpen && (
             <div className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-md">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="ai-badge">AI</div>
+                  <div className="ai-badge">{t("home_support_badge", "SUP")}</div>
                   <p className="text-sm font-semibold text-white/90">
-                    XCANNES Assistant
+                    {t("home_support_title", "Support XCANNES")}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setAssistantOpen(false)}
                   className="ai-close-btn"
-                  aria-label="Close assistant"
+                  aria-label={t("home_support_close", "Fermer")}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -234,22 +264,25 @@ export default function Home() {
               </div>
               <div className="ai-message-area">
                 <p className="text-sm font-medium text-white/90 mb-2">
-                  Hello, I&apos;m the XCANNES assistant.
+                  {t("home_support_msg_title", "Besoin d’aide ?")}
                 </p>
                 <p className="text-xs text-white/60 leading-relaxed">
-                  Ask questions about DEX operations, XRPL pairs, Pyth feeds, or EOD markets.
-                  I&apos;ll guide you step by step.
+                  {t(
+                    "home_support_msg_body",
+                    "Posez une question sur le wallet, les paiements, la conversion ou les marchés. Nous vous guidons étape par étape."
+                  )}
                 </p>
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Ask a question..."
+                  placeholder={t("home_support_placeholder", "Écrivez votre question…")}
                   className="ai-input"
                 />
                 <button
                   type="button"
                   className="ai-send-btn"
+                  aria-label={t("home_support_send", "Envoyer")}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -264,8 +297,8 @@ export default function Home() {
               type="button"
               onClick={() => setAssistantOpen(true)}
               className="w-10 h-10 md:w-12 md:h-12 transition-all bg-transparent text-white hover:bg-white/10 border-2 border-white/30 rounded-full flex items-center justify-center relative overflow-hidden"
-              aria-label="Assistant IA"
-              title="Assistant IA"
+              aria-label={t("home_support_open", "Ouvrir le support")}
+              title={t("home_support_open", "Ouvrir le support")}
             >
               <span
                 className="tracking-wider relative z-10 inline-block text-lg md:text-xl"
