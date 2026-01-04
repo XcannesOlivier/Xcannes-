@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
+const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
+
 /**
  * MoonPayBuyModal - Modal pour acheter des cryptos avec MoonPay
  * 
@@ -91,7 +93,9 @@ const MoonPayBuyModal = ({ isOpen, onClose, walletAddress, embedded = false }) =
 
       const { type, status } = event.data;
 
-      console.log('MoonPay message received:', event.data);
+      if (DEBUG_LOGS) {
+        console.log('MoonPay message received:', event.data);
+      }
 
       // Transaction complétée
       if (type === 'transaction_completed' || status === 'completed') {

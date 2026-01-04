@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
 
+const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
+
 /**
  * MoonPaySellModal - Modal pour vendre des cryptos contre fiat
  * 
@@ -96,7 +98,9 @@ const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) 
       if (!event.origin.includes('moonpay.com')) return;
 
       const { type, status } = event.data;
-      console.log('MoonPay sell message received:', event.data);
+      if (DEBUG_LOGS) {
+        console.log('MoonPay sell message received:', event.data);
+      }
 
       if (type === 'transaction_completed' || status === 'completed') {
         setStep('success');

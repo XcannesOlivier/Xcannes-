@@ -56,36 +56,36 @@ export function getTokenIcon(currency) {
 export const WALLET_LAYOUTS = {
   full: {
     isFullPage: true,
-    tokenListClass: "flex-1",
+    tokenListClass: "max-h-none",
     statementVariant: "full",
     showBrandTitle: true,
     showOpenFullWallet: false,
-    containerClass: "h-full min-h-0 overflow-hidden",
+    containerClass: "",
     headerClass: "",
     actionRowClass: "",
     tokenRowClass: "",
   },
   "dex-desktop": {
     isFullPage: false,
-    tokenListClass: "flex-1",
+    tokenListClass: "max-h-none",
     statementVariant: "dex-desktop",
     showBrandTitle: false,
     showOpenFullWallet: false,
-    containerClass: "h-full min-h-0 overflow-hidden",
+    containerClass: "overflow-hidden",
     headerClass: "",
     actionRowClass: "",
     tokenRowClass: "rounded-lg",
   },
   "dex-mobile": {
     isFullPage: false,
-    tokenListClass: "flex-1",
+    tokenListClass: "max-h-[calc(100svh-300px)] md:max-h-[420px]",
     statementVariant: "dex-mobile",
     showBrandTitle: true,
     showOpenFullWallet: true,
     containerClass:
-      "h-[720px] max-h-[82svh] rounded-2xl rounded-t-none border-t border-white/10 shadow-xl shadow-black/30 overflow-hidden",
-    headerClass: "bg-black/20",
-    actionRowClass: "bg-black/10",
+      "h-[100svh] rounded-none shadow-xl shadow-black/30 overflow-hidden border-t border-white/10",
+    headerClass: "",
+    actionRowClass: "",
     tokenRowClass: "rounded-xl bg-white/5 border-white/10 hover:bg-white/10",
   },
   default: {
@@ -100,3 +100,13 @@ export const WALLET_LAYOUTS = {
     tokenRowClass: "",
   },
 };
+
+export function resolveWalletLayout(variant, isFullPage) {
+  if (variant && WALLET_LAYOUTS[variant]) {
+    return WALLET_LAYOUTS[variant];
+  }
+  if (isFullPage) {
+    return WALLET_LAYOUTS.full;
+  }
+  return WALLET_LAYOUTS.default;
+}

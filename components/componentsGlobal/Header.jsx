@@ -3,7 +3,6 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
-import WSStatus from "./WSStatus";
 
 export default function Header({ fixed = true }) {
   const router = useRouter();
@@ -25,8 +24,8 @@ export default function Header({ fixed = true }) {
   const headerBgClass = (() => {
     // Pages avec gradient (DEX + Home) pour cohérence visuelle
     if (isDex || isHome) {
-      const toColor = isDex ? "#040c13" : "var(--bg-base)";
-      const gradientBase = `bg-gradient-to-b from-black via-black/95 to-[${toColor}]`;
+      const gradientToClass = isDex ? "to-[#040c13]" : "to-[var(--bg-base)]";
+      const gradientBase = `bg-gradient-to-b from-black via-black/95 ${gradientToClass}`;
 
       return scrolled
         ? `${gradientBase} backdrop-blur-md border-white/10`
