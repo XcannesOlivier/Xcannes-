@@ -104,7 +104,7 @@
   "setup_wallet_optional_text": "ヘッダーで接続するか、チェックアウト時にアドレスを提供してください。",
   "setup_processing": "処理中...",
   "setup_buy_button": "カード / Apple Payで購入",
-  "setup_powered_by": "Stripe提供 • 安全なチェックアウト",
+  "setup_powered_by": "安全なチェックアウト",
   "setup_trustline_title": "トラストラインを追加",
   "setup_trustline_issuer": "発行者",
   "setup_trustline_currency": "通貨",

@@ -277,7 +277,7 @@
   "stable_exchange_tip_refresh": "Les taux se rafraîchissent automatiquement selon la liquidité XRPL.",
   "stable_exchange_tip_xumm": "Connectez Xumm pour signer la conversion en moins de 3 secondes.",
   "setup_buy_button": "Acheter par Carte / Apple Pay",
-  "setup_powered_by": "Propulsé par Stripe • Paiement Sécurisé",
+  "setup_powered_by": "Paiement sécurisé",
   "setup_trustline_title": "Ajouter Trustline",
   "setup_trustline_issuer": "Émetteur",
   "setup_trustline_currency": "Devise",

@@ -104,7 +104,7 @@
   "setup_wallet_optional_text": "헤더에서 연결하거나 결제 시 주소를 제공하세요.",
   "setup_processing": "처리 중...",
   "setup_buy_button": "카드 / Apple Pay로 구매",
-  "setup_powered_by": "Stripe 제공 • 안전한 결제",
+  "setup_powered_by": "안전한 결제",
   "setup_trustline_title": "트러스트라인 추가",
   "setup_trustline_issuer": "발행자",
   "setup_trustline_currency": "통화",

@@ -277,7 +277,7 @@
   "stable_exchange_tip_refresh": "Rates refresh automatically as XRPL liquidity updates.",
   "stable_exchange_tip_xumm": "Connect Xumm to execute the transaction in under 3 seconds.",
   "setup_buy_button": "Buy with Card / Apple Pay",
-  "setup_powered_by": "Powered by Stripe • Secure Checkout",
+  "setup_powered_by": "Secure checkout",
   "setup_trustline_title": "Add Trustline",
   "setup_trustline_issuer": "Issuer",
   "setup_trustline_currency": "Currency",
