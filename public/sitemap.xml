@@ -41,7 +41,7 @@
     <priority>0.6</priority>
   </url>
 
-  <!-- Success Page (Stripe) -->
+  <!-- Success Page -->
   <url>
     <loc>https://xcannes.com/success</loc>
     <lastmod>2025-11-12</lastmod>

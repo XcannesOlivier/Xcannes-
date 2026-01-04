@@ -104,7 +104,7 @@
   "setup_wallet_optional_text": "Conéctate en el encabezado o proporciona la dirección al pagar.",
   "setup_processing": "Procesando...",
   "setup_buy_button": "Comprar con Tarjeta / Apple Pay",
-  "setup_powered_by": "Impulsado por Stripe • Pago Seguro",
+  "setup_powered_by": "Pago seguro",
   "setup_trustline_title": "Agregar Trustline",
   "setup_trustline_issuer": "Emisor",
   "setup_trustline_currency": "Moneda",

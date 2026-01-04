@@ -104,7 +104,7 @@
   "setup_wallet_optional_text": "在页眉连接或在结账时提供地址。",
   "setup_processing": "处理中...",
   "setup_buy_button": "使用卡 / Apple Pay 购买",
-  "setup_powered_by": "由 Stripe 提供支持 • 安全结账",
+  "setup_powered_by": "安全结账",
   "setup_trustline_title": "添加信任线",
   "setup_trustline_issuer": "发行者",
   "setup_trustline_currency": "货币",
