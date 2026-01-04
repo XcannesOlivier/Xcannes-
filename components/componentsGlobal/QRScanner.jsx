@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
+
 export default function QRScanner({ isOpen, onScan, onClose }) {
   const html5QrCodeRef = useRef(null);
   const readerIdRef = useRef(
@@ -98,7 +100,9 @@ export default function QRScanner({ isOpen, onScan, onClose }) {
           },
           (decodedText) => {
             // QR code scanné avec succès
-            console.log("QR Code scanned:", decodedText);
+            if (DEBUG_LOGS) {
+              console.log("QR Code scanned:", decodedText);
+            }
 
             // Dé-doublonnage simple (évite plusieurs callbacks rapprochés)
             if (decodedText && decodedText === lastDecodedRef.current) return;

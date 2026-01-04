@@ -1,10 +1,9 @@
 "use client";
 
-import { KYCStatusPanel } from "./KYCStatusBadge";
-
 export default function WalletDashboardActionRow({
   layout,
   onAction,
+  showKycPanel = false,
   effectiveIsConnected,
   walletAddress,
   kycStatus,
@@ -12,7 +11,7 @@ export default function WalletDashboardActionRow({
 }) {
   return (
     <div
-      className={`px-3 py-3 border-b border-white/5 space-y-3 ${layout.actionRowClass}`}
+      className={`px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3 ${layout.actionRowClass}`}
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button
@@ -106,16 +105,14 @@ export default function WalletDashboardActionRow({
         </button>
       </div>
 
-      {effectiveIsConnected && walletAddress && (
+      {showKycPanel && effectiveIsConnected && walletAddress ? (
         <div className="mt-2">
-          <KYCStatusPanel
-            walletAddress={walletAddress}
-            kycStatus={kycStatus}
-            onVerifyClick={onVerifyClick}
-          />
+          {/*
+            Intentionnellement non affiché par défaut dans WalletDashboard.
+            Si besoin, brancher KYCStatusPanel ici.
+          */}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
-
