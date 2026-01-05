@@ -1,7 +1,7 @@
 import Link from "next/link";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 export default function Header({ fixed = true }) {
@@ -12,6 +12,76 @@ export default function Header({ fixed = true }) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const withHardNavFallback = useCallback(
+    (href, { onBeforeFallback } = {}) =>
+      (e) => {
+        if (typeof window === "undefined") return;
+        if (!e || e.defaultPrevented) return;
+        if (e.button != null && e.button !== 0) return; // only left click
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // keep new-tab behavior
+
+        const rawHref =
+          e?.currentTarget?.getAttribute?.("href") || String(href || "");
+        if (!rawHref) return;
+
+        let didStart = false;
+        let didComplete = false;
+        let didError = false;
+        const events = router?.events;
+
+        const markStart = () => {
+          didStart = true;
+        };
+        const markComplete = () => {
+          didComplete = true;
+        };
+        const markError = () => {
+          didError = true;
+        };
+
+        if (events?.once) {
+          events.once("routeChangeStart", markStart);
+          events.once("routeChangeComplete", markComplete);
+          events.once("routeChangeError", markError);
+        }
+
+        const hrefUrl = new URL(rawHref, window.location.origin);
+        const currentPath = window.location.pathname + window.location.search + window.location.hash;
+        const targetPath = hrefUrl.pathname + hrefUrl.search + hrefUrl.hash;
+
+        const cleanup = () => {
+          if (!events?.off) return;
+          events.off("routeChangeStart", markStart);
+          events.off("routeChangeComplete", markComplete);
+          events.off("routeChangeError", markError);
+        };
+
+        const maybeFallback = () => {
+          cleanup();
+          if (didComplete) return;
+          if ((window.location.pathname + window.location.search + window.location.hash) !== currentPath) return;
+          if (currentPath === targetPath) return;
+          onBeforeFallback?.();
+          window.location.assign(hrefUrl.toString());
+        };
+
+        // If Next router doesn't even start, fallback quickly.
+        window.setTimeout(() => {
+          if (didStart) return;
+          maybeFallback();
+        }, 350);
+
+        // If router started but got stuck or errored, fallback a bit later.
+        window.setTimeout(() => {
+          if (didComplete) return;
+          if (didError || didStart) {
+            maybeFallback();
+          }
+        }, 1400);
+      },
+    [router?.events]
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +115,7 @@ export default function Header({ fixed = true }) {
       } px-6 flex items-center justify-between font-montserrat transition-all duration-300 border-b ${headerBgClass} text-white`}
     >
       {/* Logo simple texte style banque suisse */}
-      <Link href="/">
+      <Link href="/" onClick={withHardNavFallback("/")}>
         <div className="flex items-center gap-2 group whitespace-nowrap min-w-0">
           <span className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white group-hover:text-xcannes-green transition-colors duration-300">
             XCANNES
@@ -65,6 +135,7 @@ export default function Header({ fixed = true }) {
           <Link
             href="/"
             className="hover:text-xcannes-green transition-colors duration-200"
+            onClick={withHardNavFallback("/")}
           >
             {t("nav_home")}
           </Link>
@@ -74,6 +145,7 @@ export default function Header({ fixed = true }) {
           <Link
             href="/dex"
             className="hover:text-xcannes-green transition-colors duration-200"
+            onClick={withHardNavFallback("/dex")}
           >
             {t("nav_trading", "Trading")}
           </Link>
@@ -84,6 +156,7 @@ export default function Header({ fixed = true }) {
           className={`hover:text-xcannes-green transition-colors duration-200 ${
             router.pathname === "/wallet" ? "text-xcannes-green" : ""
           }`}
+          onClick={withHardNavFallback("/wallet")}
         >
           Wallet
         </Link>
@@ -106,7 +179,10 @@ export default function Header({ fixed = true }) {
           {!isHome && (
             <Link
               href="/"
-              onClick={() => setMenuOpen(false)}
+              onClick={(e) => {
+                setMenuOpen(false);
+                withHardNavFallback("/")(e);
+              }}
               className="hover:text-xcannes-green transition-colors"
             >
               {t("nav_home")}
@@ -116,7 +192,10 @@ export default function Header({ fixed = true }) {
           {!isDex && (
             <Link
               href="/dex"
-              onClick={() => setMenuOpen(false)}
+              onClick={(e) => {
+                setMenuOpen(false);
+                withHardNavFallback("/dex")(e);
+              }}
               className="hover:text-xcannes-green transition-colors"
             >
               Trading
@@ -125,7 +204,10 @@ export default function Header({ fixed = true }) {
 
           <Link
             href="/wallet"
-            onClick={() => setMenuOpen(false)}
+            onClick={(e) => {
+              setMenuOpen(false);
+              withHardNavFallback("/wallet")(e);
+            }}
             className={`hover:text-xcannes-green transition-colors ${
               router.pathname === "/wallet" ? "text-xcannes-green" : ""
             }`}

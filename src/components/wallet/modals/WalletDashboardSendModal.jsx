@@ -166,7 +166,9 @@ export default function WalletDashboardSendModal({
                     </p>
                   )}
                   <p className="mt-2 text-[10px] text-white/45">
-                    2 signatures Xumm: spread → XCANNES, puis paiement → destinataire.
+                    {Number(sendFxInfo.spreadFeeRlusd || 0) > 0
+                      ? "2 signatures Xumm: spread → XCANNES, puis paiement → destinataire."
+                      : "1 signature Xumm: paiement → destinataire."}
                   </p>
                 </div>
               )}

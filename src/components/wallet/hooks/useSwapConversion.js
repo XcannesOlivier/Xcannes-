@@ -376,6 +376,7 @@ export function useSwapConversion({
     }
 
     setConvertProcessing(true);
+    let spreadPaid = false;
     try {
       const rlusdPerBase = await getRlusdPerUnit(base);
       const rlusdPerQuote = quote === "RLUSD" ? 1 : await getRlusdPerUnit(quote);
@@ -428,8 +429,14 @@ export function useSwapConversion({
       const fxSourceTo = await getFxSource(quote);
 
       if (isFxConversion(base, quote) && spreadFee > 0) {
+        // Spread always gets paid on-chain first, then allocations are updated.
+        // This prevents backend allocation changes if the user cancels the Xumm signature.
+        await paySpreadRlusd(spreadFee);
+        spreadPaid = true;
+
         if (quote === "RLUSD") {
-          // 1) Deallocate gross amount (free RLUSD), 2) Pay spread on-chain.
+          // Sell FX -> RLUSD (unallocated). Gross deallocation includes the spread we just paid on-chain,
+          // so the user ends up with net = gross - spread.
           const result = await convertCurrencyAllocation?.({
             fromCurrencyCode: base,
             toCurrencyCode: "RLUSD",
@@ -442,10 +449,8 @@ export function useSwapConversion({
           if (!result || result.error) {
             throw new Error(result?.error || "Conversion failed");
           }
-          await paySpreadRlusd(spreadFee);
         } else if (base === "RLUSD") {
-          // 1) Pay spread on-chain, 2) Allocate net amount.
-          await paySpreadRlusd(spreadFee);
+          // Buy FX with RLUSD: allocate net amount.
           const result = await convertCurrencyAllocation?.({
             fromCurrencyCode: "RLUSD",
             toCurrencyCode: quote,
@@ -459,7 +464,7 @@ export function useSwapConversion({
             throw new Error(result?.error || "Conversion failed");
           }
         } else {
-          // FX->FX: move net to quote, then deallocate spread from base, then pay spread on-chain.
+          // FX -> FX: move net to quote, and remove spread from base (to RLUSD pool).
           const result1 = await convertCurrencyAllocation?.({
             fromCurrencyCode: base,
             toCurrencyCode: quote,
@@ -484,7 +489,6 @@ export function useSwapConversion({
           if (!result2 || result2.error) {
             throw new Error(result2?.error || "Conversion failed");
           }
-          await paySpreadRlusd(spreadFee);
         }
       } else {
         const result = await convertCurrencyAllocation?.({
@@ -543,7 +547,12 @@ export function useSwapConversion({
       setConvertAmount("");
     } catch (error) {
       console.error("Convert error:", error);
-      alert("Conversion error: " + (error?.message || String(error)));
+      const message = error?.message || String(error);
+      alert(
+        spreadPaid
+          ? `Conversion backend échouée après paiement du spread.\n\nDétail: ${message}`
+          : "Conversion error: " + message
+      );
     } finally {
       setConvertProcessing(false);
     }
