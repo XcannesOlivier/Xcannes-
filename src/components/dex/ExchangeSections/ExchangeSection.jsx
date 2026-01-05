@@ -4,11 +4,13 @@
 	import { useTranslation } from "next-i18next";
 	import { FxPairSelector } from "@/components/dex/XrplCandleChart";
 	import { useXcannesWS } from "@/context/XcannesWSContext";
-	import { useCustomPairs } from "./useCustomPairs";
-	import { useEodBasePairs } from "./hooks/useEodBasePairs";
-	import { useEodData } from "./hooks/useEodData";
-	import { useEodWsSubscription } from "./hooks/useEodWsSubscription";
+import { useCustomPairs } from "./useCustomPairs";
+import { useEodBasePairs } from "./hooks/useEodBasePairs";
+import { useEodData } from "./hooks/useEodData";
+import { useEodWsSubscription } from "./hooks/useEodWsSubscription";
 import { useFlashStates } from "./hooks/useFlashStates";
+import { applyDynamicSpreadToMid, applySpreadToMid, spreadFractionForPair } from "./spread";
+import { useXrplRlusdXrpSpreadSignal } from "./hooks/useXrplSpreadSignal";
 import ExchangeHeader from "./components/ExchangeHeader";
 import SearchAndAddBar from "./components/SearchAndAddBar";
 import PairsTableDesktop from "./components/PairsTableDesktop";
@@ -37,6 +39,14 @@ export default function ExchangeSection({ variant = "embedded" }) {
     tickers
   );
   const flashStates = useFlashStates(eodData);
+  const xrplSpreadSignal = useXrplRlusdXrpSpreadSignal({
+    tickers,
+    tickersVersion,
+    symbols: ["XRP_RLUSD", "RLUSD_XRP"],
+    alphaPct: 0.15,
+    alphaDelta: 0.25,
+    clampMaxPct: 0.2,
+  });
 
   useEodWsSubscription({
     connected,
@@ -53,7 +63,26 @@ export default function ExchangeSection({ variant = "embedded" }) {
 
   // Mise à jour live via le canal "eod-summary" agrégé (tickers temps réel)
   useEffect(() => {
-    if (!basePairs || basePairs.length === 0) return;
+    const pairsToUpdate = [];
+    const seen = new Set();
+
+    (customPairs || []).forEach((pair) => {
+      if (!pair?.base || !pair?.quote) return;
+      const key = `${pair.base}/${pair.quote}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      pairsToUpdate.push({ ...pair, source: pair.source || "eod" });
+    });
+
+    (basePairs || []).forEach((pair) => {
+      if (!pair?.base || !pair?.quote) return;
+      const key = `${pair.base}/${pair.quote}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      pairsToUpdate.push(pair);
+    });
+
+    if (pairsToUpdate.length === 0) return;
     const tickerMap = tickers instanceof Map ? tickers : new Map();
     if (tickerMap.size === 0) return;
 
@@ -62,28 +91,30 @@ export default function ExchangeSection({ variant = "embedded" }) {
       const next = { ...prev };
       let changed = false;
 
-      basePairs.forEach((pair) => {
-        if (pair.source !== "xrpl" && pair.source !== "pyth") return;
+      pairsToUpdate.forEach((pair) => {
         const symbol = pair.symbol;
-        if (!symbol) return;
-
-        const ticker = tickerMap.get(symbol);
-        if (!ticker) return;
+        const backendPair = symbol || `${pair.base}_${pair.quote}`;
+        const ticker = tickerMap.get(backendPair);
 
         const pairKey = `${pair.base}/${pair.quote}`;
         const existing = next[pairKey] || {};
 
+        // Mid price:
+        // - Pyth/XRPL: prefer live ticker if present
+        // - Fawaz/EOD: keep the last known mid from existing data (Forex may be closed)
         const priceSource =
-          ticker.lastPrice ??
-          ticker.price ??
-          ticker.midPrice ??
-          ticker.bidPrice ??
-          ticker.askPrice;
+          ticker?.lastPrice ??
+          ticker?.price ??
+          ticker?.midPrice ??
+          ticker?.bidPrice ??
+          ticker?.askPrice ??
+          existing.price ??
+          existing.close;
 
         const rawBid =
-          ticker.bidPrice ?? ticker.bid ?? ticker.bestBidPrice;
+          ticker?.bidPrice ?? ticker?.bid ?? ticker?.bestBidPrice;
         const rawAsk =
-          ticker.askPrice ?? ticker.ask ?? ticker.bestAskPrice;
+          ticker?.askPrice ?? ticker?.ask ?? ticker?.bestAskPrice;
 
         const priceNum =
           priceSource !== undefined && priceSource !== null
@@ -99,8 +130,40 @@ export default function ExchangeSection({ variant = "embedded" }) {
         }
 
         const price = priceNum;
-        const bid = Number.isFinite(bidNum) ? bidNum : price;
-        const ask = Number.isFinite(askNum) ? askNum : price;
+        let bid = Number.isFinite(bidNum) ? bidNum : price;
+        let ask = Number.isFinite(askNum) ? askNum : price;
+
+        // Paires XRPL: garder bid/ask natifs, mais elles peuvent servir de signal global ailleurs.
+        if (pair.source !== "xrpl") {
+          const baseSpread = spreadFractionForPair(pair.base, pair.quote);
+          const signalPct =
+            xrplSpreadSignal?.emaPct != null
+              ? Number(xrplSpreadSignal.emaPct)
+              : 0;
+          const signalDelta =
+            xrplSpreadSignal?.emaDelta != null
+              ? Number(xrplSpreadSignal.emaDelta)
+              : 0;
+
+          // Pricing "exchange-like": mid = FX reference (PYTH/FAWAZ),
+          // spread = exotism + factor * XRPL spread%, then asymmetric split.
+          const spreaded =
+            signalPct > 0
+              ? applyDynamicSpreadToMid(price, {
+                  base: pair.base,
+                  quote: pair.quote,
+                  xrplSpreadPct: signalPct,
+                  xrplSpreadDelta: signalDelta,
+                  factor: 1.0,
+                  pairKey,
+                  minMultiplier: 0.75,
+                  maxMultiplier: 3.0,
+                })
+              : applySpreadToMid(price, baseSpread);
+
+          bid = spreaded.bid;
+          ask = spreaded.ask;
+        }
 
         const prevPrice = Number(existing.price ?? existing.close ?? NaN);
         const prevBid = Number(existing.bid ?? NaN);
@@ -125,14 +188,22 @@ export default function ExchangeSection({ variant = "embedded" }) {
           price,
           bid,
           ask,
-          mode: "ticker",
+          mode: ticker ? "ticker" : existing.mode || (pair.source === "eod" ? "eod" : "ticker"),
         };
         changed = true;
       });
 
       return changed ? next : prev;
     });
-  }, [tickers, basePairs, tickersVersion, setEodData]);
+  }, [
+    tickers,
+    basePairs,
+    customPairs,
+    tickersVersion,
+    xrplSpreadSignal.emaDelta,
+    xrplSpreadSignal.emaPct,
+    setEodData,
+  ]);
 
   // Paires globales affichées : XRPL + Pyth (toujours présentes) + paires EOD personnalisées
   const allPairs = useMemo(() => {

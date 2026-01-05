@@ -14,6 +14,24 @@ const FALLBACK_ISSUERS = {
 const marketMetadata = new Map();
 let hydratePromise = null;
 
+export function encodeXrplCurrencyCode(currency = "") {
+  const code = String(currency || "").toUpperCase();
+  if (!code) return "";
+  if (code === "XRP") return "XRP";
+  if (code.length > 3) {
+    return Buffer.from(code, "utf8")
+      .toString("hex")
+      .toUpperCase()
+      .padEnd(40, "0");
+  }
+  return code;
+}
+
+export const XRPL_KNOWN_ISSUERS = {
+  RLUSD: RLUSD_ISSUER,
+  XCS: XCS_ISSUER,
+};
+
 async function hydrateMarkets() {
   try {
     const data = await xcannesApi.getAllMarkets();

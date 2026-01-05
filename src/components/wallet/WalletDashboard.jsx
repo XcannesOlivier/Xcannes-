@@ -3,8 +3,10 @@
 	import { useCallback, useEffect, useMemo, useState } from "react";
 	import { createPortal } from "react-dom";
 	import { useXumm } from "@/context/XummContext";
-	import xcannesApi from "@/lib/xcannesApi";
+import xcannesApi from "@/lib/xcannesApi";
 	import { CRYPTO_ICONS } from "@/components/dex/ExchangeSections/constants";
+import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
+import { computeSpreadQuote, XCANNES_SPREAD_WALLET_ADDRESS } from "@/utils/walletSpread";
 	import { useWalletLines } from "./hooks/useWalletLines";
 	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 	import { useConvertForm } from "./hooks/useConvertForm";
@@ -19,6 +21,7 @@ import { useSendForm } from "./hooks/useSendForm";
 import { useSwapConversion } from "./hooks/useSwapConversion";
 import { useSwapDemoLines } from "./hooks/useSwapDemoLines";
 import { useWalletTokens } from "./hooks/useWalletTokens";
+import { useRlusdPerUnitRates } from "./hooks/useRlusdPerUnitRates";
 import { useTrustlinesForm } from "./hooks/useTrustlinesForm";
 import { useUsdTotalLabel } from "./hooks/useUsdTotalLabel";
 import { useWalletMeta } from "./hooks/useWalletMeta";
@@ -63,6 +66,7 @@ export default function WalletDashboard({
     isConnected,
     isConnecting,
     balance,
+    isWalletActivated,
     refreshBalance,
     connect,
     disconnect,
@@ -191,6 +195,16 @@ export default function WalletDashboard({
   );
   
   const xrpAmount = parseFloat(effectiveBalance?.xrp || 0) || 0;
+  const hasOnChainRlusd = useMemo(() => {
+    return (baseTokens || []).some(
+      (t) => String(t?.currency || "").toUpperCase() === "RLUSD"
+    );
+  }, [baseTokens]);
+  const hasOnChainXcs = useMemo(() => {
+    return (baseTokens || []).some(
+      (t) => String(t?.currency || "").toUpperCase() === "XCS"
+    );
+  }, [baseTokens]);
 
   const isStablecoin = useCallback((currency) => {
     return USD_STABLECOINS.includes(String(currency || "").toUpperCase());
@@ -242,7 +256,7 @@ export default function WalletDashboard({
           key: "DEMO:XCS",
           currency: "XCS",
           issuer: "Trustline",
-          value: 0,
+          value: 250,
           demoRlusdValue: 0,
         });
         seen.add("XCS");
@@ -310,6 +324,22 @@ export default function WalletDashboard({
         currency: "XCS",
         issuer: "Trustline",
         value: 0,
+        isMissingTrustline: true,
+      });
+    }
+
+    // S'assurer qu'il y a toujours une ligne RLUSD visible,
+    // même si la trustline n'est pas encore installée.
+    const hasRlusd = tokens.some(
+      (t) => String(t.currency || "").toUpperCase() === "RLUSD"
+    );
+    if (!hasRlusd) {
+      tokens.push({
+        key: "RLUSD:auto",
+        currency: "RLUSD",
+        issuer: "Trustline",
+        value: 0,
+        isMissingTrustline: true,
       });
     }
 
@@ -345,7 +375,10 @@ export default function WalletDashboard({
     convertAllocation: convertCurrencyAllocation,
   } = useWalletCurrencyLines(backendWalletAddress);
 
-  const { handleUpsertCurrencyLine, handleRemoveCurrencyLine } =
+  const {
+    handleUpsertCurrencyLine: handleUpsertCurrencyLineReal,
+    handleRemoveCurrencyLine: handleRemoveCurrencyLineReal,
+  } =
     useCurrencyLinesActions({
       backendWalletAddress,
       currencyLineCode,
@@ -355,6 +388,178 @@ export default function WalletDashboard({
       upsertCurrencyLine,
       removeCurrencyLine,
     });
+
+  const demoCurrencyLines = useMemo(() => {
+    if (!isPreviewMode) return [];
+    const entries = Object.entries(demoLines || {});
+    return entries
+      .filter(([code]) => String(code || "").toUpperCase() !== "RLUSD")
+      .map(([code, line]) => ({
+        currencyCode: String(code || "").toUpperCase(),
+        allocatedRlusd: Number(line?.rlusd || 0),
+        fxSource: "DEMO",
+      }))
+      .sort((a, b) => a.currencyCode.localeCompare(b.currencyCode));
+  }, [demoLines, isPreviewMode]);
+
+  const demoCurrencyLinesSummary = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const unallocated = Number(demoLines?.RLUSD?.rlusd || 0);
+    const totalAllocated = Object.entries(demoLines || {}).reduce((sum, [code, line]) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper || upper === "RLUSD") return sum;
+      const value = Number(line?.rlusd || 0);
+      return sum + (Number.isFinite(value) ? value : 0);
+    }, 0);
+    const rlusdOnChain = unallocated + totalAllocated;
+    return {
+      rlusdOnChain,
+      totalAllocatedRlusd: totalAllocated,
+      unallocatedRlusd: unallocated,
+      invariantOk: true,
+      excessAllocatedRlusd: 0,
+    };
+  }, [demoLines, isPreviewMode]);
+
+  const effectiveCurrencyLines = isPreviewMode ? demoCurrencyLines : currencyLines;
+  const effectiveCurrencyLinesSummary = isPreviewMode
+    ? demoCurrencyLinesSummary
+    : currencyLinesSummary;
+  const effectiveCurrencyLinesLoading = isPreviewMode ? false : currencyLinesLoading;
+  const effectiveCurrencyLinesError = isPreviewMode ? null : currencyLinesError;
+  const effectiveRefreshCurrencyLines = isPreviewMode
+    ? () => {}
+    : refreshCurrencyLines;
+
+  const handleActivateCurrencyLine = useCallback(
+    async (code) => {
+      const currencyCode = String(code || "").trim().toUpperCase();
+      if (!currencyCode || currencyCode.length < 2) return;
+      if (currencyCode === "RLUSD" || currencyCode === "XRP" || currencyCode === "XCS") return;
+
+      if (isPreviewMode) {
+        setDemoLines((prev) => {
+          const next = { ...(prev || {}) };
+          if (next[currencyCode]) return next;
+          next[currencyCode] = { currency: currencyCode, rlusd: 0, units: 0, rate: 0 };
+          return next;
+        });
+        return;
+      }
+
+      if (!backendWalletAddress) {
+        alert("Please connect your Xumm wallet first.");
+        return;
+      }
+
+      await upsertCurrencyLine?.({ currencyCode, allocatedRlusd: 0 });
+    },
+    [backendWalletAddress, isPreviewMode, setDemoLines, upsertCurrencyLine]
+  );
+
+  const handleUpsertCurrencyLine = useCallback(async () => {
+    if (isPreviewMode) {
+      const code = String(currencyLineCode || "").trim().toUpperCase();
+      if (!code || code.length < 2) {
+        alert("Select a valid currency.");
+        return;
+      }
+      if (code === "RLUSD") {
+        alert("RLUSD is the pool (unallocated). Choose another currency.");
+        return;
+      }
+
+      const allocated = Number.parseFloat(currencyLineAllocatedRlusd);
+      if (!Number.isFinite(allocated) || allocated < 0) {
+        alert("Enter a valid allocated RLUSD amount (>= 0).");
+        return;
+      }
+
+      setDemoLines((prev) => {
+        const next = { ...(prev || {}) };
+        const existing = next[code] || { currency: code, rlusd: 0, units: 0, rate: 0 };
+        const existingUnits = Number(existing.units || 0);
+        const existingRlusd = Number(existing.rlusd || 0);
+        const existingPerUnit =
+          Number.isFinite(existingUnits) &&
+          existingUnits > 0 &&
+          Number.isFinite(existingRlusd) &&
+          existingRlusd > 0
+            ? existingRlusd / existingUnits
+            : null;
+        const perUnit = existingPerUnit || 1;
+        const units = allocated > 0 && perUnit > 0 ? allocated / perUnit : 0;
+        const pool = next.RLUSD || { currency: "RLUSD", rlusd: 0, units: 0, rate: 1 };
+        const poolRlusd = Number(pool.rlusd || 0);
+        const delta = allocated - (Number.isFinite(existingRlusd) ? existingRlusd : 0);
+        if (delta > 0 && poolRlusd + 1e-9 < delta) {
+          alert(
+            `Insufficient unallocated RLUSD (demo). Available: ${poolRlusd.toLocaleString("en-US", {
+              maximumFractionDigits: 6,
+            })} RLUSD.`
+          );
+          return prev;
+        }
+
+        next.RLUSD = {
+          ...pool,
+          rlusd: Math.max(0, poolRlusd - delta),
+          units: Math.max(0, poolRlusd - delta),
+          rate: 1,
+        };
+
+        next[code] = {
+          ...existing,
+          currency: code,
+          rlusd: allocated,
+          units,
+          rate: allocated > 0 ? units / allocated : Number(existing.rate || 0),
+        };
+        return next;
+      });
+
+      setCurrencyLineCode("");
+      setCurrencyLineAllocatedRlusd("");
+      return;
+    }
+
+    await handleUpsertCurrencyLineReal?.();
+  }, [
+    currencyLineAllocatedRlusd,
+    currencyLineCode,
+    handleUpsertCurrencyLineReal,
+    isPreviewMode,
+    setCurrencyLineAllocatedRlusd,
+    setCurrencyLineCode,
+    setDemoLines,
+  ]);
+
+  const handleRemoveCurrencyLine = useCallback(
+    async (code) => {
+      const currencyCode = String(code || "").trim().toUpperCase();
+      if (!currencyCode || currencyCode === "RLUSD") return;
+
+      if (isPreviewMode) {
+        const ok = confirm(`Delete currency line ${currencyCode}?`);
+        if (!ok) return;
+        setDemoLines((prev) => {
+          const next = { ...(prev || {}) };
+          const allocated = Number(next?.[currencyCode]?.rlusd || 0);
+          if (allocated > 0) {
+            const pool = next.RLUSD || { currency: "RLUSD", rlusd: 0, units: 0, rate: 1 };
+            const nextPoolRlusd = Math.max(0, Number(pool.rlusd || 0) + allocated);
+            next.RLUSD = { ...pool, rlusd: nextPoolRlusd, units: nextPoolRlusd, rate: 1 };
+          }
+          delete next[currencyCode];
+          return next;
+        });
+        return;
+      }
+
+      await handleRemoveCurrencyLineReal?.(currencyCode);
+    },
+    [handleRemoveCurrencyLineReal, isPreviewMode, setDemoLines]
+  );
 
   const handleRefresh = async () => {
     if (!refreshBalance) return;
@@ -408,19 +613,70 @@ export default function WalletDashboard({
     setEditingTrustlineLocked("");
   };
 
+  const handleInstallRequiredTrustline = useCallback(
+    async (currencyCode) => {
+      const code = String(currencyCode || "").toUpperCase();
+      if (!code) return;
+      if (!isConnected || !wallet) {
+        alert("Please connect your Xumm wallet first.");
+        return;
+      }
+
+      const issuer = XRPL_KNOWN_ISSUERS?.[code] || null;
+      if (!issuer) {
+        alert(`Missing issuer configuration for ${code}.`);
+        return;
+      }
+
+      const ok = confirm(
+        `Install XRPL trustline for ${code}?\n\nThis will open Xumm to sign a TrustSet transaction.`
+      );
+      if (!ok) return;
+
+      const currency = encodeXrplCurrencyCode(code);
+      const txjson = {
+        TransactionType: "TrustSet",
+        Account: wallet,
+        LimitAmount: {
+          currency,
+          issuer,
+          value: "1000000000",
+        },
+      };
+
+      try {
+        const result = await signTransaction(txjson);
+        if (result && result.signed) {
+          alert(`✅ Trustline ${code} submitted via Xumm.`);
+          if (refreshBalance) {
+            setTimeout(() => refreshBalance(), 2500);
+          }
+        } else {
+          alert("Transaction cancelled or expired.");
+        }
+      } catch (err) {
+        console.error("Install trustline error:", err);
+        alert("Error while preparing trustline: " + (err?.message || String(err)));
+      }
+    },
+    [isConnected, refreshBalance, signTransaction, wallet]
+  );
+
   const renderTokenRow = useCallback(
     (token) => (
       <WalletDashboardTokenRow
         key={token.key}
         token={token}
         tokenRowClass={layout.tokenRowClass}
+        onInstallTrustline={handleInstallRequiredTrustline}
+        isWalletActivated={isWalletActivated}
         onClick={() => {
           setSelectedStatementToken(token);
           setShowCurrencyStatement(true);
         }}
       />
     ),
-    [layout.tokenRowClass]
+    [handleInstallRequiredTrustline, isWalletActivated, layout.tokenRowClass]
   );
 
   const {
@@ -428,10 +684,62 @@ export default function WalletDashboard({
     allocatedRlusdByCurrency,
     swapCurrencyOptions,
   } = useWalletTokens({ displayTokens, walletLines, currencyLines });
+
+  const currencyLineCodes = useMemo(() => {
+    const codes = new Set();
+    (walletLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (code) codes.add(code);
+    });
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (code) codes.add(code);
+    });
+    // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
+    ["XRP", "XCS", "RLUSD"].forEach((c) => codes.delete(c));
+    return Array.from(codes);
+  }, [currencyLines, walletLines]);
+
+  const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
+    useRlusdPerUnitRates(currencyLineCodes);
+
+  const displayTokensWithCurrencyLines = useMemo(() => {
+    return (augmentedTokens || []).map((token) => {
+      const currency = String(token?.currency || "").toUpperCase();
+      if (!currency) return token;
+
+      // Pour les devises "UX" (off-chain), on affiche:
+      // - valeur principale en devise (units), basée sur l'allocation RLUSD et un taux indicatif
+      // - valeur secondaire "≈ RLUSD" = allocation RLUSD
+      if (!token?.isTrustlineOnly) return token;
+      if (currency === "XRP" || currency === "XCS" || currency === "RLUSD") return token;
+
+      const allocated =
+        allocatedRlusdByCurrency?.get?.(currency) ??
+        (Number.isFinite(Number(token?.allocatedRlusd)) ? Number(token.allocatedRlusd) : 0);
+
+      const rate = Number(rlusdPerUnitRates?.[currency]);
+      const units =
+        Number.isFinite(rate) && rate > 0 && Number.isFinite(allocated) && allocated > 0
+          ? allocated / rate
+          : 0;
+
+      return {
+        ...token,
+        value: units,
+        demoRlusdValue: Number.isFinite(allocated) ? allocated : 0,
+      };
+    });
+  }, [allocatedRlusdByCurrency, augmentedTokens, rlusdPerUnitRates]);
   const { handleDemoConvert } = useSwapConversion({
     isPreviewMode,
     effectiveIsConnected,
     backendWalletAddress,
+    walletAddress: wallet,
+    signTransaction,
+    refreshBalance,
+    hasOnChainRlusd,
+    spreadDestination: XCANNES_SPREAD_WALLET_ADDRESS,
     swapCurrencyOptions,
     convertBaseCurrency,
     convertQuoteCurrency,
@@ -444,9 +752,11 @@ export default function WalletDashboard({
     demoLines,
     setDemoLines,
     demoRlusdTotal: DEMO_RLUSD_TOTAL,
-    currencyLinesSummary,
+    currencyLinesSummary: effectiveCurrencyLinesSummary,
     allocatedRlusdByCurrency,
     convertCurrencyAllocation,
+    refreshCurrencyLines: effectiveRefreshCurrencyLines,
+    getAllMarkets: xcannesApi.getAllMarkets,
     getTicker: xcannesApi.getTicker,
     getFxEod: xcannesApi.getFxEod,
   });
@@ -455,6 +765,61 @@ export default function WalletDashboard({
     augmentedTokens.find((t) => t.key === sendAssetKey) ||
     augmentedTokens[0] ||
     null;
+
+  const sendFxInfo = useMemo(() => {
+    const code = String(selectedSendToken?.currency || "").toUpperCase();
+    if (!code) return null;
+    if (code === "XRP" || code === "RLUSD" || code === "XCS") return null;
+    if (!selectedSendToken?.isTrustlineOnly) return null;
+
+    const amountFx = Number.parseFloat(sendAmount || "0");
+    if (!Number.isFinite(amountFx) || amountFx <= 0) return null;
+
+    const demoLine = isPreviewMode ? demoLines?.[code] : null;
+    const demoUnits = Number(demoLine?.units || 0);
+    const demoRlusd = Number(demoLine?.rlusd || 0);
+    const demoPerUnit =
+      Number.isFinite(demoUnits) && demoUnits > 0 && Number.isFinite(demoRlusd) && demoRlusd > 0
+        ? demoRlusd / demoUnits
+        : null;
+
+    const rawRate = Number(rlusdPerUnitRates?.[code]);
+    const rlusdPerUnit = isPreviewMode
+      ? demoPerUnit || 1
+      : Number.isFinite(rawRate) && rawRate > 0
+        ? rawRate
+        : Number.NaN;
+    if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) return null;
+
+    const paymentRlusd = amountFx * rlusdPerUnit;
+    const spread = computeSpreadQuote({
+      base: code,
+      quote: "RLUSD",
+      amountRlusd: paymentRlusd,
+    });
+    const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
+
+    return {
+      currency: code,
+      fxSource: isPreviewMode ? "DEMO" : rlusdPerUnitSources?.[code] || null,
+      rlusdPerUnit,
+      amountFx,
+      paymentRlusd,
+      spreadFeeRlusd,
+      spreadTier: spread?.tier || null,
+      spreadPercentTotal:
+        spread?.isFx && Number.isFinite(Number(spread?.spreadFraction))
+          ? Number(spread.spreadFraction) * 100
+          : 0,
+    };
+  }, [
+    demoLines,
+    isPreviewMode,
+    rlusdPerUnitRates,
+    rlusdPerUnitSources,
+    selectedSendToken,
+    sendAmount,
+  ]);
 
   const {
     qrScannerOpen,
@@ -473,11 +838,29 @@ export default function WalletDashboard({
 
   const handleSendSubmit = async () => {
     if (!isConnected || !wallet) {
-      alert("Please connect your Xumm wallet first.");
-      return;
+      if (!isPreviewMode) {
+        alert("Please connect your Xumm wallet first.");
+        return;
+      }
     }
     if (!selectedSendToken) {
       alert("No asset selected.");
+      return;
+    }
+    if (
+      selectedSendToken?.currency === "RLUSD" &&
+      !hasOnChainRlusd &&
+      !isPreviewMode
+    ) {
+      alert("RLUSD trustline is not installed yet. Please install it first.");
+      return;
+    }
+    if (
+      selectedSendToken?.currency === "XCS" &&
+      !hasOnChainXcs &&
+      !isPreviewMode
+    ) {
+      alert("XCS trustline is not installed yet. Please install it first.");
       return;
     }
 
@@ -493,42 +876,247 @@ export default function WalletDashboard({
       return;
     }
 
-    let Amount;
-    if (selectedSendToken.currency === "XRP" && selectedSendToken.issuer === "Native") {
-      Amount = Math.round(amountNum * 1_000_000).toString();
-    } else {
-      const normalized = amountNum.toFixed(8).replace(/\.?0+$/, "") || "0";
-      Amount = {
-        currency: selectedSendToken.currency,
-        issuer: selectedSendToken.issuer,
-        value: normalized,
-      };
-    }
-
-    const txjson = {
-      TransactionType: "Payment",
-      Account: wallet,
-      Destination: dest,
-      Amount,
-    };
+    const currency = String(selectedSendToken.currency || "").toUpperCase();
+    const isFxSend =
+      selectedSendToken?.isTrustlineOnly &&
+      currency !== "XRP" &&
+      currency !== "RLUSD" &&
+      currency !== "XCS";
 
     setSendProcessing(true);
-    
-    // Fermer la modale immédiatement avant d'ouvrir Xumm
     setActiveAction(null);
-    
+
     try {
+      if (isFxSend) {
+        if (!backendWalletAddress && !isPreviewMode) {
+          alert("Please connect your Xumm wallet first.");
+          return;
+        }
+        if (!hasOnChainRlusd && !isPreviewMode) {
+          alert("RLUSD trustline is not installed yet. Please install it first.");
+          return;
+        }
+
+        const demoLine = isPreviewMode ? demoLines?.[currency] : null;
+        const demoUnits = Number(demoLine?.units || 0);
+        const demoRlusd = Number(demoLine?.rlusd || 0);
+        const demoPerUnit =
+          Number.isFinite(demoUnits) && demoUnits > 0 && Number.isFinite(demoRlusd) && demoRlusd > 0
+            ? demoRlusd / demoUnits
+            : null;
+
+        const rawRate = Number(rlusdPerUnitRates?.[currency]);
+        const rlusdPerUnit = isPreviewMode
+          ? demoPerUnit || 1
+          : Number.isFinite(rawRate) && rawRate > 0
+            ? rawRate
+            : Number.NaN;
+        if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) {
+          alert(`Impossible de récupérer le taux pour ${currency}.`);
+          return;
+        }
+
+        const paymentRlusd = amountNum * rlusdPerUnit;
+        const spread = computeSpreadQuote({ base: currency, quote: "RLUSD", amountRlusd: paymentRlusd });
+        const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
+        const totalToSpendRlusd = paymentRlusd + spreadFeeRlusd;
+
+        const ok = confirm(
+          `Paiement en RLUSD (affiché en ${currency}).\n\n` +
+            `Montant: ${amountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
+            `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n` +
+            (spreadFeeRlusd > 0
+              ? `Spread XCANNES (tier ${spread?.tier || "A"}): ≈ ${spreadFeeRlusd.toLocaleString("en-US", {
+                  maximumFractionDigits: 6,
+                })} RLUSD\n`
+              : "") +
+            `Total RLUSD à débiter: ≈ ${totalToSpendRlusd.toLocaleString("en-US", {
+              maximumFractionDigits: 6,
+            })} RLUSD\n\n` +
+            `2 signatures Xumm seront demandées (spread → XCANNES, puis paiement → destinataire).`
+        );
+        if (!ok) return;
+
+        if (isPreviewMode) {
+          // Demo: simulate 2 signatures + update demoLines balance.
+          const currentLine = demoLines?.[currency] || null;
+          const availableUnits = Number(currentLine?.units || 0);
+          if (availableUnits + 1e-9 < amountNum) {
+            alert(
+              `Solde démo insuffisant en ${currency}. Disponible: ${availableUnits.toLocaleString("en-US", {
+                maximumFractionDigits: 6,
+              })} ${currency}.`
+            );
+            return;
+          }
+
+          const availableRlusd = Number(currentLine?.rlusd || 0);
+          const totalDebitRlusd = totalToSpendRlusd;
+          if (availableRlusd + 1e-9 < totalDebitRlusd) {
+            alert(
+              `Allocation démo insuffisante (≈ RLUSD) pour couvrir paiement + spread. Disponible: ${availableRlusd.toLocaleString(
+                "en-US",
+                { maximumFractionDigits: 6 }
+              )} RLUSD.`
+            );
+            return;
+          }
+
+          setDemoLines((prev) => {
+            const next = { ...prev };
+            const line = next[currency] || { currency, rlusd: 0, units: 0, rate: 0 };
+            const newUnits = Math.max(0, Number(line.units || 0) - amountNum);
+            const newRlusd = Math.max(0, Number(line.rlusd || 0) - totalDebitRlusd);
+            next[currency] = {
+              ...line,
+              units: newUnits,
+              rlusd: newRlusd,
+              rate: newRlusd > 0 ? newUnits / newRlusd : 0,
+            };
+            return next;
+          });
+
+          alert(
+            `✅ (Demo) Signature 1/2 simulée: spread → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
+              `✅ (Demo) Signature 2/2 simulée: paiement → destinataire (${dest})`
+          );
+          setSendAmount("");
+          setSendDestination("");
+          return;
+        }
+
+        // 0) Déallocation interne pour garder l'invariant (allocations <= RLUSD on-chain)
+        const fxSource = rlusdPerUnitSources?.[currency] || null;
+        const deallocate = await convertCurrencyAllocation?.({
+          fromCurrencyCode: currency,
+          toCurrencyCode: "RLUSD",
+          amountRlusd: totalToSpendRlusd,
+          fromFxRate: rlusdPerUnit,
+          fromFxSource: fxSource,
+          toFxRate: 1,
+          toFxSource: "PYTH",
+        });
+        if (!deallocate || deallocate.error) {
+          throw new Error(deallocate?.error || "Failed to deallocate for payment");
+        }
+
+        // 1) Paiement spread → wallet entreprise XCANNES
+        if (spreadFeeRlusd > 0) {
+          const spreadValue = spreadFeeRlusd.toFixed(8).replace(/\.?0+$/, "") || "0";
+          const spreadTx = {
+            TransactionType: "Payment",
+            Account: wallet,
+            Destination: XCANNES_SPREAD_WALLET_ADDRESS,
+            Amount: {
+              currency: encodeXrplCurrencyCode("RLUSD"),
+              issuer: XRPL_KNOWN_ISSUERS.RLUSD,
+              value: spreadValue,
+            },
+          };
+          const spreadResult = await signTransaction(spreadTx);
+          if (!spreadResult?.signed) {
+            alert("Spread payment cancelled or expired.");
+            return;
+          }
+        }
+
+        // 2) Paiement principal → destinataire
+        const payValue = paymentRlusd.toFixed(8).replace(/\.?0+$/, "") || "0";
+        const payTx = {
+          TransactionType: "Payment",
+          Account: wallet,
+          Destination: dest,
+          Amount: {
+            currency: encodeXrplCurrencyCode("RLUSD"),
+            issuer: XRPL_KNOWN_ISSUERS.RLUSD,
+            value: payValue,
+          },
+        };
+
+        const payResult = await signTransaction(payTx);
+        if (payResult?.signed) {
+          alert("✅ Payment submitted via Xumm.");
+
+          const isAlreadySaved = savedAddresses.some((a) => a.address === dest);
+          if (!isAlreadySaved) {
+            setAddressToSave(dest);
+            setShowSaveAddressPrompt(true);
+          }
+
+          setSendAmount("");
+          setSendDestination("");
+          if (refreshBalance) setTimeout(() => refreshBalance(), 3000);
+          if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 3000);
+        } else {
+          alert("Transaction cancelled or expired.");
+        }
+
+        return;
+      }
+
+      if (isPreviewMode) {
+        // Demo: simulate a single on-chain payment by adjusting demoLines for RLUSD, otherwise keep UX simple.
+        if (currency === "RLUSD") {
+          const available = Number(demoLines?.RLUSD?.units || 0);
+          if (available + 1e-9 < amountNum) {
+            alert(
+              `Solde démo insuffisant en RLUSD. Disponible: ${available.toLocaleString("en-US", {
+                maximumFractionDigits: 6,
+              })} RLUSD.`
+            );
+            return;
+          }
+
+          setDemoLines((prev) => {
+            const next = { ...prev };
+            const line = next.RLUSD || {
+              currency: "RLUSD",
+              rlusd: DEMO_RLUSD_TOTAL,
+              units: DEMO_RLUSD_TOTAL,
+              rate: 1,
+            };
+            const newUnits = Math.max(0, Number(line.units || 0) - amountNum);
+            const newRlusd = Math.max(0, Number(line.rlusd || 0) - amountNum);
+            next.RLUSD = { ...line, units: newUnits, rlusd: newRlusd, rate: 1 };
+            return next;
+          });
+        }
+
+        alert(`✅ (Demo) Paiement simulé: ${amountNum} ${currency} → ${dest}`);
+        setSendAmount("");
+        setSendDestination("");
+        return;
+      }
+
+      let Amount;
+      if (selectedSendToken.currency === "XRP" && selectedSendToken.issuer === "Native") {
+        Amount = Math.round(amountNum * 1_000_000).toString();
+      } else {
+        const normalized = amountNum.toFixed(8).replace(/\.?0+$/, "") || "0";
+        Amount = {
+          currency: selectedSendToken.currency,
+          issuer: selectedSendToken.issuer,
+          value: normalized,
+        };
+      }
+
+      const txjson = {
+        TransactionType: "Payment",
+        Account: wallet,
+        Destination: dest,
+        Amount,
+      };
+
       const result = await signTransaction(txjson);
       if (result && result.signed) {
         alert("✅ Payment submitted via Xumm.");
-        
-        // Proposer de sauvegarder l'adresse si elle n'est pas déjà sauvegardée
-        const isAlreadySaved = savedAddresses.some(a => a.address === dest);
+
+        const isAlreadySaved = savedAddresses.some((a) => a.address === dest);
         if (!isAlreadySaved) {
           setAddressToSave(dest);
           setShowSaveAddressPrompt(true);
         }
-        
+
         setSendAmount("");
         setSendDestination("");
         if (refreshBalance) {
@@ -601,6 +1189,22 @@ export default function WalletDashboard({
     getFxEod: xcannesApi.getFxEod,
   });
 
+  const previewTotalLabel = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const total =
+      effectiveCurrencyLinesSummary?.rlusdOnChain != null
+        ? Number(effectiveCurrencyLinesSummary.rlusdOnChain)
+        : Object.entries(demoLines || {}).reduce((sum, [_code, line]) => {
+            const value = Number(line?.rlusd || 0);
+            return sum + (Number.isFinite(value) ? value : 0);
+          }, 0);
+    const safe = Number.isFinite(total) ? total : 0;
+    return `${safe.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })} USD`;
+  }, [demoLines, effectiveCurrencyLinesSummary, isPreviewMode]);
+
   const xrplConnectionIndicator = useXrplConnectionIndicator({
     isPreviewMode,
     isConnecting,
@@ -626,7 +1230,7 @@ export default function WalletDashboard({
           effectiveIsConnected={effectiveIsConnected}
           effectiveWallet={effectiveWallet}
           onDisconnect={disconnect}
-          totalLabel={totalLabel}
+          totalLabel={previewTotalLabel || totalLabel}
           onOpenGlobalStatement={() => setShowGlobalStatement(true)}
           xrplConnectionIndicator={xrplConnectionIndicator}
           walletLabel={walletLabel}
@@ -651,13 +1255,13 @@ export default function WalletDashboard({
 
         {/* Token list */}
         <div className="flex-1 flex flex-col min-h-0">
-          <WalletDashboardTokenList
-            layout={layout}
-            tokens={augmentedTokens}
-            renderTokenRow={renderTokenRow}
-            className="touch-pan-y"
-            style={{ WebkitOverflowScrolling: "touch" }}
-          />
+        <WalletDashboardTokenList
+          layout={layout}
+          tokens={isPreviewMode ? displayTokens : displayTokensWithCurrencyLines}
+          renderTokenRow={renderTokenRow}
+          className="touch-pan-y"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        />
         </div>
 
         <WalletDashboardFooter
@@ -683,6 +1287,7 @@ export default function WalletDashboard({
             renderWalletMeta={renderWalletMeta}
             augmentedTokens={augmentedTokens}
             selectedSendToken={selectedSendToken}
+            sendFxInfo={sendFxInfo}
             setSendAssetKey={setSendAssetKey}
             sendAmount={sendAmount}
             setSendAmount={setSendAmount}
@@ -722,11 +1327,15 @@ export default function WalletDashboard({
             renderWalletMeta={renderWalletMeta}
             isPreviewMode={isPreviewMode}
             effectiveIsConnected={effectiveIsConnected}
-            refreshCurrencyLines={refreshCurrencyLines}
-            currencyLinesLoading={currencyLinesLoading}
-            currencyLinesError={currencyLinesError}
-            currencyLinesSummary={currencyLinesSummary}
-            currencyLines={currencyLines}
+            hasOnChainRlusd={hasOnChainRlusd}
+            hasOnChainXcs={hasOnChainXcs}
+            onInstallTrustline={handleInstallRequiredTrustline}
+            onActivateCurrencyLine={handleActivateCurrencyLine}
+            refreshCurrencyLines={effectiveRefreshCurrencyLines}
+            currencyLinesLoading={effectiveCurrencyLinesLoading}
+            currencyLinesError={effectiveCurrencyLinesError}
+            currencyLinesSummary={effectiveCurrencyLinesSummary}
+            currencyLines={effectiveCurrencyLines}
             handleRemoveCurrencyLine={handleRemoveCurrencyLine}
             swapCurrencyOptions={swapCurrencyOptions}
             convertBaseCurrency={convertBaseCurrency}
@@ -821,6 +1430,7 @@ export default function WalletDashboard({
         effectiveWallet={effectiveWallet}
         isFullPageView={isFullPageView}
         statementVariant={statementVariant}
+        currencyLines={effectiveCurrencyLines}
         usdRates={usdRates}
         showGlobalStatement={showGlobalStatement}
         setShowGlobalStatement={setShowGlobalStatement}

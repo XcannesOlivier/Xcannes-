@@ -8,6 +8,7 @@ export default function WalletDashboardStatementModals({
   effectiveWallet,
   isFullPageView,
   statementVariant,
+  currencyLines,
   usdRates,
   showGlobalStatement,
   setShowGlobalStatement,
@@ -16,6 +17,20 @@ export default function WalletDashboardStatementModals({
   selectedStatementToken,
   setSelectedStatementToken,
 }) {
+  const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
+    const code = String(t?.currency || "").toUpperCase();
+    return code === "RLUSD" && !t?.isMissingTrustline;
+  });
+
+  const hasXcsTrustline = (augmentedTokens || []).some((t) => {
+    const code = String(t?.currency || "").toUpperCase();
+    return code === "XCS" && !t?.isMissingTrustline;
+  });
+
+  const xcannesCurrencyLinesCount = Array.isArray(currencyLines)
+    ? currencyLines.length
+    : 0;
+
   return (
     <>
       {showGlobalStatement ? (
@@ -44,6 +59,9 @@ export default function WalletDashboardStatementModals({
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}
+          hasRlusdTrustline={hasRlusdTrustline}
+          hasXcsTrustline={hasXcsTrustline}
+          xcannesCurrencyLinesCount={xcannesCurrencyLinesCount}
           transactions={[
             {
               date: "2025-12-28",

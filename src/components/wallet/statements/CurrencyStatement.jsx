@@ -35,12 +35,16 @@ export default function CurrencyStatement({
   isFullPage = false,
   variant = "default",
   usdRates = {},
+  hasRlusdTrustline = false,
+  hasXcsTrustline = false,
+  xcannesCurrencyLinesCount = 0,
   onClose 
 }) {
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
+  const [reserveOpen, setReserveOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,6 +77,44 @@ export default function CurrencyStatement({
     if (code === "XRP") return value * 0.5;
     return value;
   }, [balance, currency, usdRates]);
+
+  const xrpReserveDetails = useMemo(() => {
+    const code = String(currency || "").toUpperCase();
+    if (code !== "XRP") return null;
+
+    const activationXrp = 1;
+    const trustlinesExtraXrpTotal = 0.1;
+    const trustlineRlusdXrp = trustlinesExtraXrpTotal / 2;
+    const trustlineXcsXrp = trustlinesExtraXrpTotal / 2;
+    const totalReserveXrp = activationXrp + trustlinesExtraXrpTotal;
+
+    return {
+      totalReserveXrp,
+      activationXrp,
+      trustlineRlusdXrp,
+      trustlineXcsXrp,
+    };
+  }, [currency]);
+
+  const xcsReserveDetails = useMemo(() => {
+    const code = String(currency || "").toUpperCase();
+    if (code !== "XCS") return null;
+
+    const walletActivationXcs = 1;
+    const linesCount = Number(xcannesCurrencyLinesCount || 0);
+    const lockXcsPerLine = 0.2;
+    const xcannesLinesLockedXcs =
+      Number.isFinite(linesCount) && linesCount > 0 ? linesCount * lockXcsPerLine : 0;
+    const totalLockedXcs = walletActivationXcs + xcannesLinesLockedXcs;
+
+    return {
+      totalLockedXcs,
+      walletActivationXcs,
+      xcannesCurrencyLinesCount: Number.isFinite(linesCount) ? linesCount : 0,
+      lockXcsPerLine,
+      xcannesLinesLockedXcs,
+    };
+  }, [currency, xcannesCurrencyLinesCount]);
 
   // Générer les 12 derniers mois
   const generateMonths = () => {
@@ -519,6 +561,99 @@ export default function CurrencyStatement({
               <p className="text-[11px] text-white/50">
                 ≈ {formatAmount(estimatedUsd)} USD
               </p>
+
+              {xrpReserveDetails && (
+                <div className="mt-2 relative">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs text-white/50">Reserve</p>
+                      <p className="text-[11px] text-white/70 font-mono">
+                        {xrpReserveDetails.totalReserveXrp.toFixed(2)} XRP
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setReserveOpen((v) => !v)}
+                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                      aria-expanded={reserveOpen}
+                      aria-label="Reserve breakdown"
+                    >
+                      Details
+                    </button>
+                  </div>
+
+                  {reserveOpen && (
+                    <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
+                      <div className="text-[11px] text-white/70">
+                        <div className="flex items-center justify-between gap-2">
+                          <span>Activation wallet</span>
+                          <span className="font-mono">{xrpReserveDetails.activationXrp.toFixed(2)} XRP</span>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between gap-2">
+                          <span>Trustline RLUSD {hasRlusdTrustline ? "(active)" : "(à activer)"}</span>
+                          <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)} XRP</span>
+                        </div>
+                        <div className="mt-1 flex items-center justify-between gap-2">
+                          <span>Trustline XCS {hasXcsTrustline ? "(active)" : "(à activer)"}</span>
+                          <span className="font-mono">{xrpReserveDetails.trustlineXcsXrp.toFixed(2)} XRP</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {xcsReserveDetails && (
+                <div className="mt-2 relative">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs text-white/50">Reserve</p>
+                      <p className="text-[11px] text-white/70 font-mono">
+                        {xcsReserveDetails.totalLockedXcs.toFixed(2)} XCS
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setReserveOpen((v) => !v)}
+                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                      aria-expanded={reserveOpen}
+                      aria-label="Reserve breakdown"
+                    >
+                      Details
+                    </button>
+                  </div>
+
+                  {reserveOpen && (
+                    <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
+                      <div className="text-[11px] text-white/70">
+                        <div className="flex items-center justify-between gap-2">
+                          <span>Activation wallet XCANNES</span>
+                          <span className="font-mono">
+                            {xcsReserveDetails.walletActivationXcs.toFixed(2)} XCS
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-white/10 text-[11px] text-white/70">
+                        <div className="flex items-center justify-between gap-2">
+                          <span>
+                            Lignes de devises XCANNES ({xcsReserveDetails.xcannesCurrencyLinesCount} × {xcsReserveDetails.lockXcsPerLine.toFixed(2)} XCS)
+                          </span>
+                          <span className="font-mono">
+                            {xcsReserveDetails.xcannesLinesLockedXcs.toFixed(2)} XCS
+                          </span>
+                        </div>
+                        <p className="mt-1 text-[10px] text-white/45">
+                          Verrouillage XCS via escrow. Fermeture: 0.10 XCS remboursé, 0.10 XCS vers XCANNES.
+                        </p>
+                        <p className="mt-1 text-[10px] text-white/45">
+                          Inclut les lignes actives même si allocation = 0 RLUSD.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

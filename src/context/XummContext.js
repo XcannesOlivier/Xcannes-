@@ -13,19 +13,32 @@ export const XummProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [balance, setBalance] = useState(null);
+  const [isWalletActivated, setIsWalletActivated] = useState(null); // null | boolean
   const [qrModalData, setQrModalData] = useState(null);
 
   const fetchBalance = useCallback(
     async (address) => {
       try {
         const res = await fetch(apiUrl(`/xumm/balance?address=${address}`));
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
+          setIsWalletActivated(true);
           setBalance({
             xrp: data.xrp,
             tokens: data.tokens,
           });
+          return;
+        }
+
+        // Backend returns 404 when XRPL account is not activated (actNotFound).
+        if (
+          res.status === 404 &&
+          String(data?.message || "").toLowerCase().includes("not activated")
+        ) {
+          setIsWalletActivated(false);
+          setBalance({ xrp: 0, tokens: [] });
+          return;
         }
       } catch (error) {
         console.error("Fetch balance error:", error);
@@ -39,12 +52,14 @@ export const XummProvider = ({ children }) => {
       if (account) {
         setWallet(account);
         setIsConnected(true);
+        setIsWalletActivated(null);
         sessionStorage.setItem("xumm_wallet", account);
         fetchBalance(account);
       } else {
         setWallet("");
         setIsConnected(false);
         setBalance(null);
+        setIsWalletActivated(null);
         sessionStorage.removeItem("xumm_wallet");
       }
     },
@@ -242,6 +257,7 @@ export const XummProvider = ({ children }) => {
       isConnected, 
       isConnecting,
       balance,
+      isWalletActivated,
       qrModalData,
       connect, 
       disconnect,

@@ -3,6 +3,17 @@
 import { useMemo } from "react";
 
 export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
+  const allocatedRlusdByCurrency = useMemo(() => {
+    const map = new Map();
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (!code) return;
+      const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0);
+      map.set(code, Number.isFinite(allocated) ? allocated : 0);
+    });
+    return map;
+  }, [currencyLines]);
+
   const augmentedTokens = useMemo(() => {
     const byCurrency = new Map();
     (displayTokens || []).forEach((token) => {
@@ -25,8 +36,29 @@ export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
       });
     });
 
-    return Array.from(byCurrency.values());
-  }, [displayTokens, walletLines]);
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (!code || byCurrency.has(code)) return;
+      byCurrency.set(code, {
+        key: `CL:${code}`,
+        currency: code,
+        issuer: "Allocation",
+        value: 0,
+        isTrustlineOnly: true,
+      });
+    });
+
+    // Injecter l'allocation RLUSD connue (utile pour affichage "≈ RLUSD" côté UI)
+    const withAllocations = Array.from(byCurrency.values()).map((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return token;
+      const allocated = allocatedRlusdByCurrency.get(code);
+      if (allocated == null) return token;
+      return { ...token, allocatedRlusd: allocated };
+    });
+
+    return withAllocations;
+  }, [allocatedRlusdByCurrency, currencyLines, displayTokens, walletLines]);
 
   const walletCurrencyOptions = useMemo(() => {
     const seen = new Set();
@@ -39,17 +71,6 @@ export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
     });
     return list;
   }, [augmentedTokens]);
-
-  const allocatedRlusdByCurrency = useMemo(() => {
-    const map = new Map();
-    (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      if (!code) return;
-      const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0);
-      map.set(code, Number.isFinite(allocated) ? allocated : 0);
-    });
-    return map;
-  }, [currencyLines]);
 
   const swapCurrencyOptions = useMemo(() => {
     const candidates = new Set();
@@ -85,4 +106,3 @@ export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
     swapCurrencyOptions,
   };
 }
-

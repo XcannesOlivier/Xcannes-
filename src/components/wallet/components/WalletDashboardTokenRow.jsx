@@ -35,9 +35,12 @@ export default function WalletDashboardTokenRow({
   token,
   tokenRowClass = "",
   onClick,
+  onInstallTrustline,
+  isWalletActivated,
 }) {
   const currencyCode = String(token?.currency || "").toUpperCase();
   const rawValue = Number(token?.value || 0);
+  const isMissingTrustline = !!token?.isMissingTrustline;
   const demoRlusd =
     token?.demoRlusdValue != null && Number.isFinite(Number(token.demoRlusdValue))
       ? Number(token.demoRlusdValue)
@@ -49,53 +52,90 @@ export default function WalletDashboardTokenRow({
       : rawValue;
 
   return (
-    <button
-      key={token?.key}
-      type="button"
-      onClick={onClick}
-      className="w-full text-left"
-    >
-      <div
-        className={`flex items-center justify-between rounded-md bg-base hover:bg-slate-800/40 border border-slate-800/60 px-3 py-2 transition-colors cursor-pointer ${tokenRowClass}`}
+    <div className="w-full">
+      <button
+        key={token?.key}
+        type="button"
+        onClick={onClick}
+        className="w-full text-left"
       >
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden">
-            {renderTokenIcon(token)}
+        <div
+          className={`flex items-center justify-between rounded-md bg-base hover:bg-slate-800/40 border border-slate-800/60 px-3 py-2 transition-colors cursor-pointer ${tokenRowClass}`}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden">
+              {renderTokenIcon(token)}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs text-primary truncate">{token?.currency}</span>
+              <span className="text-[11px] text-muted truncate">
+                {token?.currency === "XRP"
+                  ? "XRP · Native"
+                  : token?.isTrustlineOnly
+                    ? `${getCurrencyDescription(token?.currency)} · RLUSD allocation`
+                    : isStablecoin(token?.currency)
+                      ? "XRPL Stablecoin"
+                      : token?.currency === "XCS"
+                        ? "XCannes Token"
+                        : "XRPL Token"}
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-xs text-primary truncate">{token?.currency}</span>
-            <span className="text-[11px] text-muted truncate">
-              {token?.currency === "XRP"
-                ? "XRP · Native"
-                : token?.isTrustlineOnly
-                  ? getCurrencyDescription(token?.currency)
-                  : isStablecoin(token?.currency)
-                    ? "XRPL Stablecoin"
-                    : token?.currency === "XCS"
-                      ? "XCannes Token"
-                      : "XRPL Token"}
+          <div className="text-right text-[12px] text-primary">
+            <div className="font-mono">
+              {Number.isFinite(displayValue)
+                ? displayValue.toLocaleString("en-US", {
+                    maximumFractionDigits: 4,
+                  })
+                : "0"}
+            </div>
+            <div className="mt-0.5 text-[10px] text-muted font-normal">
+              ≈{" "}
+              {Number.isFinite(demoRlusd)
+                ? demoRlusd.toLocaleString("en-US", {
+                    maximumFractionDigits: 2,
+                  })
+                : "0"}{" "}
+              RLUSD
+            </div>
+          </div>
+        </div>
+      </button>
+
+      {currencyCode === "XRP" && isWalletActivated === false && (
+        <div className="mt-1 rounded-md border border-blue-500/25 bg-blue-500/10 px-3 py-2">
+          <p className="text-[11px] text-blue-200/90">
+            Pour activer votre wallet sur le réseau XRPL, une réserve minimale de{" "}
+            <span className="font-mono">1 XRP</span> est requise.
+          </p>
+        </div>
+      )}
+
+      {isMissingTrustline && (currencyCode === "RLUSD" || currencyCode === "XCS") && (
+        <div className="mt-1 rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] text-amber-200/90">
+              Trustline non activée
             </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onInstallTrustline?.(currencyCode);
+              }}
+              className="text-[11px] text-amber-100 underline underline-offset-2 hover:text-amber-50"
+            >
+              Activer
+            </button>
           </div>
+          <p className="mt-1 text-[11px] text-amber-200/80">
+            {currencyCode === "RLUSD"
+              ? "Autorise RLUSD sur votre wallet."
+              : "Elle permet de détenir du XCS et payer les frais XCANNES."}
+          </p>
         </div>
-        <div className="text-right text-[12px] text-primary">
-          <div className="font-mono">
-            {Number.isFinite(displayValue)
-              ? displayValue.toLocaleString("en-US", {
-                  maximumFractionDigits: 4,
-                })
-              : "0"}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted font-normal">
-            ≈{" "}
-            {Number.isFinite(demoRlusd)
-              ? demoRlusd.toLocaleString("en-US", {
-                  maximumFractionDigits: 2,
-                })
-              : "0"}{" "}
-            RLUSD
-          </div>
-        </div>
-      </div>
-    </button>
+      )}
+    </div>
   );
 }

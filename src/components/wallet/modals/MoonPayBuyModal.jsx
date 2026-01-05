@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { useXumm } from "@/context/XummContext";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -16,6 +17,7 @@ const MoonPayBuyModal = ({ isOpen, onClose, walletAddress, embedded = false }) =
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
+  const { isWalletActivated, balance } = useXumm();
   
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
@@ -27,6 +29,19 @@ const MoonPayBuyModal = ({ isOpen, onClose, walletAddress, embedded = false }) =
     { code: 'RLUSD', name: 'RLUSD Stablecoin', min: 20 },
     { code: 'XRP', name: 'XRP (Ripple)', min: 50 },
   ];
+
+  const hasRlusdTrustline = useMemo(() => {
+    const tokens = balance?.tokens || [];
+    return tokens.some((t) => String(t?.currency || "").toUpperCase() === "RLUSD");
+  }, [balance?.tokens]);
+
+  const hasXcsTrustline = useMemo(() => {
+    const tokens = balance?.tokens || [];
+    return tokens.some((t) => String(t?.currency || "").toUpperCase() === "XCS");
+  }, [balance?.tokens]);
+
+  const needsActivation = isWalletActivated === false;
+  const needsTrustlines = isWalletActivated === true && (!hasRlusdTrustline || !hasXcsTrustline);
 
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
@@ -139,6 +154,16 @@ const MoonPayBuyModal = ({ isOpen, onClose, walletAddress, embedded = false }) =
             {/* Form */}
             {step === 'form' && (
               <div className="space-y-4">
+                {(needsActivation || needsTrustlines) && (
+                  <div className="bg-amber-500/10 border border-amber-500/25 rounded-lg p-3">
+                    <p className="text-xs text-amber-200">
+                      {needsActivation
+                        ? "Wallet non activé: le premier achat inclut aussi du XRP pour activer votre wallet (1 XRP) et permettre l’installation des trustlines RLUSD/XCS (+0.1 XRP)."
+                        : "Trustlines manquantes: le premier achat peut inclure +0.1 XRP pour installer RLUSD/XCS si nécessaire."}
+                    </p>
+                  </div>
+                )}
+
                 {/* Currency selector */}
                 <div>
                   <label className="block text-sm font-medium text-white/80 mb-2">

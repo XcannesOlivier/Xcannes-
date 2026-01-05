@@ -1,11 +1,17 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
+import { buildRlusdPaymentTxjson, computeSpreadQuote, isFxConversion, XCANNES_SPREAD_WALLET_ADDRESS } from "@/utils/walletSpread";
 
 export function useSwapConversion({
   isPreviewMode,
   effectiveIsConnected,
   backendWalletAddress,
+  walletAddress,
+  signTransaction,
+  refreshBalance,
+  hasOnChainRlusd,
+  spreadDestination,
   swapCurrencyOptions,
   convertBaseCurrency,
   convertQuoteCurrency,
@@ -21,6 +27,8 @@ export function useSwapConversion({
   currencyLinesSummary,
   allocatedRlusdByCurrency,
   convertCurrencyAllocation,
+  refreshCurrencyLines,
+  getAllMarkets,
   getTicker,
   getFxEod,
 }) {
@@ -57,6 +65,22 @@ export function useSwapConversion({
       if (!code) return Number.NaN;
       if (code === "RLUSD") return 1;
 
+      let pythPairsMap = null;
+      try {
+        const markets = await getAllMarkets?.();
+        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
+        const map = new Map();
+        pythPairs.forEach((pair) => {
+          const base = String(pair?.base || "").toUpperCase();
+          const quote = String(pair?.quote || "").toUpperCase();
+          if (!base || !quote) return;
+          map.set(`${base}_${quote}`, pair);
+        });
+        pythPairsMap = map;
+      } catch (_err) {
+        // ignore, fallback below
+      }
+
       const existing = demoLines?.[code];
       if (existing && Number(existing.units || 0) > 0) {
         const rlusd = Number(existing.rlusd || 0);
@@ -80,6 +104,39 @@ export function useSwapConversion({
         return 1;
       }
 
+      if (pythPairsMap) {
+        try {
+          const directKey = `${code}_USD`;
+          const inverseKey = `USD_${code}`;
+          const direct = pythPairsMap.get(directKey);
+          const inverse = pythPairsMap.get(inverseKey);
+
+          const extractTickerPrice = (ticker) => {
+            const priceSource =
+              ticker?.lastPrice ??
+              ticker?.price ??
+              ticker?.midPrice ??
+              ticker?.bidPrice ??
+              ticker?.askPrice;
+            const price = Number(priceSource);
+            return Number.isFinite(price) && price > 0 ? price : Number.NaN;
+          };
+
+          if (direct) {
+            const ticker = await getTicker?.(direct.symbol || directKey);
+            const price = extractTickerPrice(ticker);
+            if (Number.isFinite(price) && price > 0) return price;
+          }
+          if (inverse) {
+            const ticker = await getTicker?.(inverse.symbol || inverseKey);
+            const price = extractTickerPrice(ticker);
+            if (Number.isFinite(price) && price > 0) return 1 / price;
+          }
+        } catch (error) {
+          console.warn("getRlusdPerUnit Pyth error:", error);
+        }
+      }
+
       try {
         const baseForFx = "USD";
         const fxResult = await getFxEod?.(baseForFx, code, 30);
@@ -101,7 +158,65 @@ export function useSwapConversion({
 
       return 1;
     },
-    [demoLines, getTicker, getFxEod]
+    [demoLines, getAllMarkets, getFxEod, getTicker]
+  );
+
+  const getFxSource = useCallback(
+    async (currencyCode) => {
+      const code = String(currencyCode || "").toUpperCase();
+      if (!code) return null;
+      if (code === "RLUSD" || code === "USD") return "PYTH";
+      if (code === "XRP" || code === "XCS") return "XRPL";
+
+      try {
+        const markets = await getAllMarkets?.();
+        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
+        const keys = new Set(
+          pythPairs
+            .map((p) => `${String(p?.base || "").toUpperCase()}_${String(p?.quote || "").toUpperCase()}`)
+            .filter(Boolean)
+        );
+        const hasUsdPair = keys.has(`${code}_USD`) || keys.has(`USD_${code}`);
+        return hasUsdPair ? "PYTH" : "FAWAZ";
+      } catch (_err) {
+        return "FAWAZ";
+      }
+    },
+    [getAllMarkets]
+  );
+
+  const paySpreadRlusd = useCallback(
+    async (amountRlusd) => {
+      const destination = String(spreadDestination || XCANNES_SPREAD_WALLET_ADDRESS).trim();
+      if (!destination) {
+        throw new Error("Missing spread destination address");
+      }
+      if (!walletAddress || !signTransaction) {
+        throw new Error("Wallet not connected");
+      }
+      if (!hasOnChainRlusd) {
+        throw new Error("RLUSD trustline is not installed yet");
+      }
+
+      const txjson = buildRlusdPaymentTxjson({
+        account: walletAddress,
+        destination,
+        amountRlusd,
+      });
+      if (!txjson) throw new Error("Invalid RLUSD spread payment");
+
+      const result = await signTransaction(txjson);
+      if (!result?.signed) {
+        throw new Error("Spread payment cancelled or expired");
+      }
+
+      // Best effort refresh
+      if (refreshBalance) setTimeout(() => refreshBalance(), 2000);
+      if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 2500);
+
+      return result;
+    },
+    [hasOnChainRlusd, refreshBalance, refreshCurrencyLines, signTransaction, spreadDestination, walletAddress]
   );
 
   const handleDemoConvert = useCallback(async () => {
@@ -153,8 +268,11 @@ export function useSwapConversion({
           return;
         }
 
-        const rlusdValue = amountBase * rlusdPerBase;
-        const quoteUnits = rlusdValue / rlusdPerQuote;
+        const grossRlusd = amountBase * rlusdPerBase;
+        const spread = computeSpreadQuote({ base, quote, amountRlusd: grossRlusd });
+        const spreadFee = spread?.spreadFeeRlusd || 0;
+        const netRlusd = Math.max(0, grossRlusd - spreadFee);
+        const quoteUnits = netRlusd / rlusdPerQuote;
 
         const priceSource =
           base === "RLUSD"
@@ -187,7 +305,7 @@ export function useSwapConversion({
             rate: 0,
           };
 
-          const newBaseRlusd = Math.max(0, Number(baseLineNext.rlusd || 0) - rlusdValue);
+          const newBaseRlusd = Math.max(0, Number(baseLineNext.rlusd || 0) - grossRlusd);
           const newBaseUnits = Math.max(0, Number(baseLineNext.units || 0) - amountBase);
 
           next[base] = {
@@ -204,25 +322,28 @@ export function useSwapConversion({
 
           next[quote] = {
             ...quoteLine,
-            rlusd: Number(quoteLine.rlusd || 0) + rlusdValue,
+            rlusd: Number(quoteLine.rlusd || 0) + netRlusd,
             units: Number(quoteLine.units || 0) + quoteUnits,
             rate:
-              Number(quoteLine.rlusd || 0) + rlusdValue > 0 &&
+              Number(quoteLine.rlusd || 0) + netRlusd > 0 &&
               Number(quoteLine.units || 0) + quoteUnits > 0
                 ? (Number(quoteLine.units || 0) + quoteUnits) /
-                  (Number(quoteLine.rlusd || 0) + rlusdValue)
+                  (Number(quoteLine.rlusd || 0) + netRlusd)
                 : quoteLine.rate || 0,
           };
 
           return next;
         });
 
+        const spreadLabel = spread?.isFx
+          ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (tier ${spread.tier})`
+          : "";
         setConvertPreview(
           `Démo: ${amountBase.toLocaleString("en-US", {
             maximumFractionDigits: 4,
           })} ${base} ≈ ${quoteUnits.toLocaleString("en-US", {
             maximumFractionDigits: 2,
-          })} ${quote} (${priceSource})`
+          })} ${quote}${spreadLabel} (${priceSource})`
         );
         setConvertAmount("");
       } catch (error) {
@@ -269,12 +390,16 @@ export function useSwapConversion({
         return;
       }
 
-      const rlusdValue = amountBase * rlusdPerBase;
+      const grossRlusd = amountBase * rlusdPerBase;
+      const spread = computeSpreadQuote({ base, quote, amountRlusd: grossRlusd });
+      const spreadFee = spread?.spreadFeeRlusd || 0;
+      const netRlusd = Math.max(0, grossRlusd - spreadFee);
       const epsilon = 1e-9;
 
       if (base === "RLUSD") {
         const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
-        if (Number.isFinite(unallocated) && unallocated + epsilon < rlusdValue) {
+        // Must cover both the net allocation and the on-chain spread payment.
+        if (Number.isFinite(unallocated) && unallocated + epsilon < grossRlusd) {
           alert(
             `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString(
               "en-US",
@@ -285,7 +410,7 @@ export function useSwapConversion({
         }
       } else {
         const availableAllocated = allocatedRlusdByCurrency?.get(base) || 0;
-        if (availableAllocated + epsilon < rlusdValue) {
+        if (availableAllocated + epsilon < grossRlusd) {
           const maxUnits = availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
           alert(
             `Montant trop élevé. Allocation disponible en ${base}: ${maxUnits.toLocaleString(
@@ -299,36 +424,119 @@ export function useSwapConversion({
         }
       }
 
-      const result = await convertCurrencyAllocation?.({
-        fromCurrencyCode: base,
-        toCurrencyCode: quote,
-        amountRlusd: rlusdValue,
-        fromFxRate: rlusdPerBase,
-        toFxRate: rlusdPerQuote,
-      });
+      const fxSourceFrom = await getFxSource(base);
+      const fxSourceTo = await getFxSource(quote);
 
-      if (!result || result.error) {
-        throw new Error(result?.error || "Conversion failed");
+      if (isFxConversion(base, quote) && spreadFee > 0) {
+        if (quote === "RLUSD") {
+          // 1) Deallocate gross amount (free RLUSD), 2) Pay spread on-chain.
+          const result = await convertCurrencyAllocation?.({
+            fromCurrencyCode: base,
+            toCurrencyCode: "RLUSD",
+            amountRlusd: grossRlusd,
+            fromFxRate: rlusdPerBase,
+            fromFxSource: fxSourceFrom,
+            toFxRate: 1,
+            toFxSource: "PYTH",
+          });
+          if (!result || result.error) {
+            throw new Error(result?.error || "Conversion failed");
+          }
+          await paySpreadRlusd(spreadFee);
+        } else if (base === "RLUSD") {
+          // 1) Pay spread on-chain, 2) Allocate net amount.
+          await paySpreadRlusd(spreadFee);
+          const result = await convertCurrencyAllocation?.({
+            fromCurrencyCode: "RLUSD",
+            toCurrencyCode: quote,
+            amountRlusd: netRlusd,
+            fromFxRate: 1,
+            fromFxSource: "PYTH",
+            toFxRate: rlusdPerQuote,
+            toFxSource: fxSourceTo,
+          });
+          if (!result || result.error) {
+            throw new Error(result?.error || "Conversion failed");
+          }
+        } else {
+          // FX->FX: move net to quote, then deallocate spread from base, then pay spread on-chain.
+          const result1 = await convertCurrencyAllocation?.({
+            fromCurrencyCode: base,
+            toCurrencyCode: quote,
+            amountRlusd: netRlusd,
+            fromFxRate: rlusdPerBase,
+            fromFxSource: fxSourceFrom,
+            toFxRate: rlusdPerQuote,
+            toFxSource: fxSourceTo,
+          });
+          if (!result1 || result1.error) {
+            throw new Error(result1?.error || "Conversion failed");
+          }
+          const result2 = await convertCurrencyAllocation?.({
+            fromCurrencyCode: base,
+            toCurrencyCode: "RLUSD",
+            amountRlusd: spreadFee,
+            fromFxRate: rlusdPerBase,
+            fromFxSource: fxSourceFrom,
+            toFxRate: 1,
+            toFxSource: "PYTH",
+          });
+          if (!result2 || result2.error) {
+            throw new Error(result2?.error || "Conversion failed");
+          }
+          await paySpreadRlusd(spreadFee);
+        }
+      } else {
+        const result = await convertCurrencyAllocation?.({
+          fromCurrencyCode: base,
+          toCurrencyCode: quote,
+          amountRlusd: grossRlusd,
+          fromFxRate: rlusdPerBase,
+          fromFxSource: fxSourceFrom,
+          toFxRate: rlusdPerQuote,
+          toFxSource: fxSourceTo,
+        });
+
+        if (!result || result.error) {
+          throw new Error(result?.error || "Conversion failed");
+        }
       }
 
       if (quote === "RLUSD") {
+        const effectiveRlusd = isFxConversion(base, quote)
+          ? Math.max(0, grossRlusd - spreadFee)
+          : grossRlusd;
+        const spreadLabel =
+          isFxConversion(base, quote) && spreadFee > 0
+            ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
+                "en-US",
+                { maximumFractionDigits: 6 }
+              )} RLUSD)`
+            : "";
         setConvertPreview(
           `Deallocated: ${amountBase.toLocaleString("en-US", {
             maximumFractionDigits: 6,
-          })} ${base} → ${rlusdValue.toLocaleString("en-US", {
+          })} ${base} → ${effectiveRlusd.toLocaleString("en-US", {
             maximumFractionDigits: 6,
-          })} RLUSD (unallocated)`
+          })} RLUSD (unallocated${spreadLabel})`
         );
       } else {
-        const quoteUnits = rlusdValue / rlusdPerQuote;
+        const quoteUnits = (isFxConversion(base, quote) ? netRlusd : grossRlusd) / rlusdPerQuote;
+        const spreadLabel =
+          isFxConversion(base, quote) && spreadFee > 0
+            ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
+                "en-US",
+                { maximumFractionDigits: 6 }
+              )} RLUSD)`
+            : "";
         setConvertPreview(
           `Allocation: ${amountBase.toLocaleString("en-US", {
             maximumFractionDigits: 6,
           })} ${base} → ${quoteUnits.toLocaleString("en-US", {
             maximumFractionDigits: 6,
-          })} ${quote} (≈ ${rlusdValue.toLocaleString("en-US", {
+          })} ${quote} (≈ ${grossRlusd.toLocaleString("en-US", {
             maximumFractionDigits: 6,
-          })} RLUSD)`
+          })} RLUSD${spreadLabel})`
         );
       }
 
@@ -350,8 +558,10 @@ export function useSwapConversion({
     demoLines,
     demoRlusdTotal,
     effectiveIsConnected,
+    getFxSource,
     getRlusdPerUnit,
     isPreviewMode,
+    paySpreadRlusd,
     setConvertAmount,
     setConvertPreview,
     setConvertProcessing,
@@ -360,4 +570,3 @@ export function useSwapConversion({
 
   return { handleDemoConvert };
 }
-
