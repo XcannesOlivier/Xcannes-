@@ -1,5 +1,5 @@
 import Link from "next/link";
-	import { useEffect, useState } from "react";
+	import { useCallback, useEffect, useState } from "react";
 	import { useRouter } from "next/router";
 	import { useTranslation } from "next-i18next";
 	import { useXumm } from "@/context/XummContext";
@@ -39,6 +39,72 @@ export default function FooterPro() {
   }, []);
   */
 
+  const withHardNavFallback = useCallback(
+    (href) =>
+      (e) => {
+        if (typeof window === "undefined") return;
+        if (!e || e.defaultPrevented) return;
+        if (e.button != null && e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        const rawHref =
+          e?.currentTarget?.getAttribute?.("href") || String(href || "");
+        if (!rawHref) return;
+
+        let didStart = false;
+        let didComplete = false;
+        let didError = false;
+        const events = router?.events;
+        const markStart = () => {
+          didStart = true;
+        };
+        const markComplete = () => {
+          didComplete = true;
+        };
+        const markError = () => {
+          didError = true;
+        };
+
+        if (events?.once) {
+          events.once("routeChangeStart", markStart);
+          events.once("routeChangeComplete", markComplete);
+          events.once("routeChangeError", markError);
+        }
+
+        const hrefUrl = new URL(rawHref, window.location.origin);
+        const currentPath = window.location.pathname + window.location.search + window.location.hash;
+        const targetPath = hrefUrl.pathname + hrefUrl.search + hrefUrl.hash;
+
+        const cleanup = () => {
+          if (!events?.off) return;
+          events.off("routeChangeStart", markStart);
+          events.off("routeChangeComplete", markComplete);
+          events.off("routeChangeError", markError);
+        };
+
+        const maybeFallback = () => {
+          cleanup();
+          if (didComplete) return;
+          if ((window.location.pathname + window.location.search + window.location.hash) !== currentPath) return;
+          if (currentPath === targetPath) return;
+          window.location.assign(hrefUrl.toString());
+        };
+
+        window.setTimeout(() => {
+          if (didStart) return;
+          maybeFallback();
+        }, 350);
+
+        window.setTimeout(() => {
+          if (didComplete) return;
+          if (didError || didStart) {
+            maybeFallback();
+          }
+        }, 1400);
+      },
+    [router?.events]
+  );
+
   const gradientFromClass = isDex ? "from-[#040c13]" : "from-xcannes-background";
 
   return (
@@ -71,6 +137,7 @@ export default function FooterPro() {
                 <Link
                   href="/dex"
                   className="text-white/70 hover:text-xcannes-green transition-colors"
+                  onClick={withHardNavFallback("/dex")}
                 >
                   {t("footer_nav_trading")}
                 </Link>
@@ -79,6 +146,7 @@ export default function FooterPro() {
                 <Link
                   href="/whitepaper"
                   className="text-white/70 hover:text-xcannes-green transition-colors"
+                  onClick={withHardNavFallback("/whitepaper")}
                 >
                   {t("footer_nav_whitepaper")}
                 </Link>
@@ -87,6 +155,7 @@ export default function FooterPro() {
                 <Link
                   href="/disclaimer"
                   className="text-white/70 hover:text-xcannes-green transition-colors flex items-center justify-center gap-2"
+                  onClick={withHardNavFallback("/disclaimer")}
                 >
                   <span>🏛️</span>
                   <span>Legal Info</span>
@@ -104,6 +173,7 @@ export default function FooterPro() {
               <Link
                 href="/contact"
                 className="text-white/70 hover:text-xcannes-green transition-colors"
+                onClick={withHardNavFallback("/contact")}
               >
                 {t("footer_contact_email")}
               </Link>

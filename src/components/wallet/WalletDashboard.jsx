@@ -6,7 +6,11 @@
 import xcannesApi from "@/lib/xcannesApi";
 	import { CRYPTO_ICONS } from "@/components/dex/ExchangeSections/constants";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
-import { computeSpreadQuote, XCANNES_SPREAD_WALLET_ADDRESS } from "@/utils/walletSpread";
+import {
+  buildRlusdPaymentTxjson,
+  computeSpreadQuote,
+  XCANNES_SPREAD_WALLET_ADDRESS,
+} from "@/utils/walletSpread";
 	import { useWalletLines } from "./hooks/useWalletLines";
 	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 	import { useConvertForm } from "./hooks/useConvertForm";
@@ -920,6 +924,28 @@ export default function WalletDashboard({
         const spread = computeSpreadQuote({ base: currency, quote: "RLUSD", amountRlusd: paymentRlusd });
         const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
         const totalToSpendRlusd = paymentRlusd + spreadFeeRlusd;
+        const epsilon = 1e-9;
+
+        const availableAllocatedRlusd =
+          allocatedRlusdByCurrency?.get?.(currency) ??
+          (Number.isFinite(Number(selectedSendToken?.allocatedRlusd))
+            ? Number(selectedSendToken.allocatedRlusd)
+            : Number.NaN);
+        if (Number.isFinite(availableAllocatedRlusd) && availableAllocatedRlusd + epsilon < totalToSpendRlusd) {
+          const maxPaymentRlusd =
+            spread?.halfSpreadFraction != null && Number(spread.halfSpreadFraction) > 0
+              ? availableAllocatedRlusd / (1 + Number(spread.halfSpreadFraction))
+              : availableAllocatedRlusd;
+          const maxFx = maxPaymentRlusd > 0 ? maxPaymentRlusd / rlusdPerUnit : 0;
+          alert(
+            `Allocation insuffisante en ${currency} pour couvrir paiement + spread.\n\n` +
+              `Disponible: ≈ ${availableAllocatedRlusd.toLocaleString("en-US", {
+                maximumFractionDigits: 6,
+              })} RLUSD\n` +
+              `Maximum: ≈ ${maxFx.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}`
+          );
+          return;
+        }
 
         const ok = confirm(
           `Paiement en RLUSD (affiché en ${currency}).\n\n` +
@@ -933,7 +959,9 @@ export default function WalletDashboard({
             `Total RLUSD à débiter: ≈ ${totalToSpendRlusd.toLocaleString("en-US", {
               maximumFractionDigits: 6,
             })} RLUSD\n\n` +
-            `2 signatures Xumm seront demandées (spread → XCANNES, puis paiement → destinataire).`
+            (spreadFeeRlusd > 0
+              ? `2 signatures Xumm seront demandées (spread → XCANNES, puis paiement → destinataire).`
+              : `1 signature Xumm sera demandée (paiement → destinataire).`)
         );
         if (!ok) return;
 
@@ -985,57 +1013,65 @@ export default function WalletDashboard({
           return;
         }
 
-        // 0) Déallocation interne pour garder l'invariant (allocations <= RLUSD on-chain)
-        const fxSource = rlusdPerUnitSources?.[currency] || null;
-        const deallocate = await convertCurrencyAllocation?.({
-          fromCurrencyCode: currency,
-          toCurrencyCode: "RLUSD",
-          amountRlusd: totalToSpendRlusd,
-          fromFxRate: rlusdPerUnit,
-          fromFxSource: fxSource,
-          toFxRate: 1,
-          toFxSource: "PYTH",
-        });
-        if (!deallocate || deallocate.error) {
-          throw new Error(deallocate?.error || "Failed to deallocate for payment");
-        }
-
         // 1) Paiement spread → wallet entreprise XCANNES
+        const fxSource = rlusdPerUnitSources?.[currency] || null;
         if (spreadFeeRlusd > 0) {
-          const spreadValue = spreadFeeRlusd.toFixed(8).replace(/\.?0+$/, "") || "0";
-          const spreadTx = {
-            TransactionType: "Payment",
-            Account: wallet,
-            Destination: XCANNES_SPREAD_WALLET_ADDRESS,
-            Amount: {
-              currency: encodeXrplCurrencyCode("RLUSD"),
-              issuer: XRPL_KNOWN_ISSUERS.RLUSD,
-              value: spreadValue,
-            },
-          };
+          const spreadTx = buildRlusdPaymentTxjson({
+            account: wallet,
+            destination: XCANNES_SPREAD_WALLET_ADDRESS,
+            amountRlusd: spreadFeeRlusd,
+          });
+          if (!spreadTx) {
+            throw new Error("Invalid RLUSD spread payment");
+          }
           const spreadResult = await signTransaction(spreadTx);
           if (!spreadResult?.signed) {
             alert("Spread payment cancelled or expired.");
             return;
           }
+
+          // Déallocation backend minimale (spread payé) pour garder l'invariant
+          const deallocateSpread = await convertCurrencyAllocation?.({
+            fromCurrencyCode: currency,
+            toCurrencyCode: "RLUSD",
+            amountRlusd: spreadFeeRlusd,
+            fromFxRate: rlusdPerUnit,
+            fromFxSource: fxSource,
+            toFxRate: 1,
+            toFxSource: "PYTH",
+          });
+          if (!deallocateSpread || deallocateSpread.error) {
+            console.warn("Failed to deallocate spread (backend):", deallocateSpread?.error);
+          }
         }
 
         // 2) Paiement principal → destinataire
-        const payValue = paymentRlusd.toFixed(8).replace(/\.?0+$/, "") || "0";
-        const payTx = {
-          TransactionType: "Payment",
-          Account: wallet,
-          Destination: dest,
-          Amount: {
-            currency: encodeXrplCurrencyCode("RLUSD"),
-            issuer: XRPL_KNOWN_ISSUERS.RLUSD,
-            value: payValue,
-          },
-        };
+        const payTx = buildRlusdPaymentTxjson({
+          account: wallet,
+          destination: dest,
+          amountRlusd: paymentRlusd,
+        });
+        if (!payTx) {
+          throw new Error("Invalid RLUSD payment");
+        }
 
         const payResult = await signTransaction(payTx);
         if (payResult?.signed) {
           alert("✅ Payment submitted via Xumm.");
+
+          // 3) Déallocation backend du paiement (réduit l'allocation de la devise choisie)
+          const deallocatePayment = await convertCurrencyAllocation?.({
+            fromCurrencyCode: currency,
+            toCurrencyCode: "RLUSD",
+            amountRlusd: paymentRlusd,
+            fromFxRate: rlusdPerUnit,
+            fromFxSource: fxSource,
+            toFxRate: 1,
+            toFxSource: "PYTH",
+          });
+          if (!deallocatePayment || deallocatePayment.error) {
+            console.warn("Failed to deallocate payment (backend):", deallocatePayment?.error);
+          }
 
           const isAlreadySaved = savedAddresses.some((a) => a.address === dest);
           if (!isAlreadySaved) {
@@ -1048,7 +1084,11 @@ export default function WalletDashboard({
           if (refreshBalance) setTimeout(() => refreshBalance(), 3000);
           if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 3000);
         } else {
-          alert("Transaction cancelled or expired.");
+          alert(
+            spreadFeeRlusd > 0
+              ? "Payment cancelled or expired. (Spread was already paid.)"
+              : "Transaction cancelled or expired."
+          );
         }
 
         return;
