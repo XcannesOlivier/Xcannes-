@@ -1,5 +1,6 @@
 import xcannesApi from "@/lib/xcannesApi";
 import { buildSparklineFromCandles } from "./sparklineHelpers";
+import { applySpreadToMid, spreadFractionForPair } from "./spread";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -100,20 +101,18 @@ export async function loadPythData(base, quote, symbol, wsTicker) {
         ? Number(percentSource)
         : 0;
 
-    const rawBid = ticker.bidPrice ?? ticker.bid ?? ticker.bestBidPrice;
-    const rawAsk = ticker.askPrice ?? ticker.ask ?? ticker.bestAskPrice;
-
-    const bid = Number(rawBid);
-    const ask = Number(rawAsk);
+    const spread = spreadFractionForPair(base, quote);
+    const spreaded = applySpreadToMid(price, spread);
 
     return {
       price,
-      bid: Number.isFinite(bid) ? bid : price,
-      ask: Number.isFinite(ask) ? ask : price,
+      bid: spreaded.bid,
+      ask: spreaded.ask,
       change,
       changePercent,
       mode: "ticker",
       sparkline,
+      spread,
     };
   }
 

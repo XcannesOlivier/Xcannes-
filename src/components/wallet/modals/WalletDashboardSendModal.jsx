@@ -10,6 +10,7 @@ export default function WalletDashboardSendModal({
   renderWalletMeta,
   augmentedTokens,
   selectedSendToken,
+  sendFxInfo,
   setSendAssetKey,
   sendAmount,
   setSendAmount,
@@ -122,11 +123,53 @@ export default function WalletDashboardSendModal({
                 <TokenAmountInput
                   value={sendAmount}
                   onChange={setSendAmount}
-                  max={selectedSendToken ? selectedSendToken.value : undefined}
+                  max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
                   placeholder="0.0000"
                   token={selectedSendToken?.currency || "XRP"}
                 />
               </div>
+
+              {sendFxInfo && (
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <div className="text-[11px] font-semibold text-white/80">
+                    Paiement FX (on-chain en RLUSD)
+                  </div>
+                  <p className="mt-1 text-[11px] text-white/60">
+                    ≈{" "}
+                    <span className="font-mono">
+                      {Number(sendFxInfo.paymentRlusd || 0).toLocaleString("en-US", {
+                        maximumFractionDigits: 6,
+                      })}{" "}
+                      RLUSD
+                    </span>{" "}
+                    au destinataire
+                  </p>
+                  {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 && (
+                    <p className="mt-1 text-[11px] text-white/60">
+                      Spread XCANNES (tier{" "}
+                      <span className="font-mono">{sendFxInfo.spreadTier || "A"}</span>,{" "}
+                      {sendFxInfo.fxSource ? (
+                        <>
+                          source{" "}
+                          <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
+                        </>
+                      ) : (
+                        "source inconnue"
+                      )}
+                      ):{" "}
+                      <span className="font-mono">
+                        {Number(sendFxInfo.spreadFeeRlusd || 0).toLocaleString("en-US", {
+                          maximumFractionDigits: 6,
+                        })}{" "}
+                        RLUSD
+                      </span>
+                    </p>
+                  )}
+                  <p className="mt-2 text-[10px] text-white/45">
+                    2 signatures Xumm: spread → XCANNES, puis paiement → destinataire.
+                  </p>
+                </div>
+              )}
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">
                   Destination (XRPL address)

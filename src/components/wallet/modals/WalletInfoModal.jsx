@@ -26,6 +26,14 @@ export function WalletInfoContent({ withCloseGutter = false }) {
             <li>Convert between lines (allocation-only MVP, no on-chain FX).</li>
             <li>Statements show a unified view of your wallet activity.</li>
           </ul>
+          <p className="mt-3 text-[12px] text-white/45">
+            In the wallet list, you will see 2 types of “lines”:{" "}
+            <span className="font-mono">XRPL assets</span> (on-chain) and{" "}
+            <span className="font-mono">local currency lines</span> (off-chain
+            allocations). For local currency lines, the small{" "}
+            <span className="font-mono">≈ … RLUSD</span> value represents the
+            underlying allocation.
+          </p>
         </section>
 
         <section className="rounded-xl border border-white/10 bg-black/30 p-4">
@@ -53,8 +61,10 @@ export function WalletInfoContent({ withCloseGutter = false }) {
             </li>
           </ul>
           <p className="mt-2 text-[12px] text-white/45">
-            Note: à ce stade, le verrouillage est un concept applicatif (UX) et
-            peut évoluer vers un mécanisme on-chain (escrow) plus tard.
+            Note: le verrouillage sera géré via un mécanisme escrow. À la
+            fermeture d’une ligne, <span className="font-mono">50%</span> du
+            verrouillage revient au wallet (<span className="font-mono">0.10 XCS</span>)
+            et <span className="font-mono">50%</span> est versé au wallet de gestion XCANNES.
           </p>
         </section>
 
@@ -66,25 +76,28 @@ export function WalletInfoContent({ withCloseGutter = false }) {
               (ex: Payment, TrustSet).
             </li>
             <li>
-              Frais XCANNES: <span className="font-mono">1%</span> du montant de
-              la transaction (en <span className="font-mono">RLUSD</span>),
-              payable en <span className="font-mono">XCS</span> au prix du
-              moment.
+              XCANNES ne prélève pas de “fee” séparé. Le modèle est un{" "}
+              <span className="font-semibold">spread</span> appliqué uniquement
+              quand il y a une conversion FX (ex:{" "}
+              <span className="font-mono">EUR↔GBP</span>,{" "}
+              <span className="font-mono">RLUSD↔EUR</span>).
             </li>
             <li>
-              Spread de conversion: marge variable appliquée sur certains
-              conversions, selon les conditions de marché (liquidité/volatilité),
-              toujours affichée avant confirmation.
+              Spread FX: tiers <span className="font-mono">A/B/C</span> (ex:
+              <span className="font-mono">A=0.60%</span>,{" "}
+              <span className="font-mono">B=1.00%</span>,{" "}
+              <span className="font-mono">C=1.80%</span> “total”, bid/ask autour
+              du mid), prélevé en <span className="font-mono">RLUSD</span> et
+              envoyé on-chain vers un wallet entreprise XCANNES.
+            </li>
+            <li>
+              Convert interne: 1 signature Xumm (paiement du spread) ; paiement
+              entre 2 wallets: 2 signatures (spread puis paiement).
             </li>
           </ul>
           <p className="mt-2 text-[12px] text-white/45">
-            Formules:{" "}
-            <span className="font-mono">fee_rlusd = amount_rlusd × 0.01</span>{" "}
-            puis{" "}
-            <span className="font-mono">
-              fee_xcs = fee_rlusd / price(RLUSD_per_XCS)
-            </span>
-            .
+            Source de taux: paires “live” via Pyth quand disponible, sinon FX
+            EOD (coté 1×/jour).
           </p>
         </section>
 
@@ -97,6 +110,11 @@ export function WalletInfoContent({ withCloseGutter = false }) {
               RLUSD.
             </li>
             <li>L’allocation totale ne doit jamais dépasser RLUSD on-chain.</li>
+            <li>
+              Les montants en devise (EUR, USD, …) sont des valeurs indicatives
+              basées sur des taux marché; la valeur de référence reste{" "}
+              <span className="font-mono">RLUSD</span>.
+            </li>
           </ul>
         </section>
       </div>

@@ -1,5 +1,6 @@
 import xcannesApi from "@/lib/xcannesApi";
 import { buildSparklineFromCandles } from "./sparklineHelpers";
+import { applySpreadToMid, spreadFractionForPair } from "./spread";
 
 /**
  * Hook pour charger les données Fawaz
@@ -28,16 +29,19 @@ export async function loadFawazData(base, quote) {
     }
 
     const sparkline = buildSparklineFromCandles(candles);
+    const spread = spreadFractionForPair(base, quote);
+    const spreaded = applySpreadToMid(lastClose, spread);
 
     return {
+      price: lastClose,
       close: lastClose,
-      // Pour les paires purement EOD, on affiche le même prix en bid/ask
-      bid: lastClose,
-      ask: lastClose,
+      bid: spreaded.bid,
+      ask: spreaded.ask,
       change,
       changePercent,
       mode: "eod",
       sparkline,
+      spread,
     };
   }
 

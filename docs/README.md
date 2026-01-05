@@ -4,6 +4,7 @@
 
 - Présentation : `docs/overview/PROJECT_OVERVIEW.md`
 - Structure du frontend : `docs/architecture/FRONTEND_STRUCTURE.md`
+- Wallet (explicatif dev) : `docs/wallet/WALLET_XCANNES.md`
 - Wallet actions (notes) : `docs/notes/WALLET_ACTIONS_IMPROVEMENTS.md`
 - AI assistant button (notes) : `docs/notes/AI_ASSISTANT_BUTTON_DESIGN.md`
 - Audit fichiers morts : `docs/dev/UNUSED_FILES.md`

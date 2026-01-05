@@ -130,6 +130,12 @@ export default function PairsTableDesktop({
                           className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-subtle text-primary font-mono text-sm min-w-[110px] md:min-w-[140px] ${
                             flash?.flashBidClass || ""
                           }`}
+                          style={{
+                            "--eod-flash-duration":
+                              flash?.flashBidDurationS != null
+                                ? `${Number(flash.flashBidDurationS).toFixed(2)}s`
+                                : undefined,
+                          }}
                         >
                           {metrics.bid.toFixed(5)}
                         </div>
@@ -145,6 +151,12 @@ export default function PairsTableDesktop({
                           className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-subtle text-primary font-mono text-sm min-w-[110px] md:min-w-[140px] ${
                             flash?.flashAskClass || ""
                           }`}
+                          style={{
+                            "--eod-flash-duration":
+                              flash?.flashAskDurationS != null
+                                ? `${Number(flash.flashAskDurationS).toFixed(2)}s`
+                                : undefined,
+                          }}
                         >
                           {metrics.ask.toFixed(5)}
                         </div>

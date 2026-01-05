@@ -93,19 +93,24 @@ export default function PairsListMobile({
                         flashStates.get(pairKey)?.flashBidClass || ""
                       }`}
                       style={{
-                        "--eod-flash-duration": flashStates.get(pairKey)
-                          ? `${Math.min(
-                              1.5,
-                              0.4 +
-                                Math.min(
-                                  0.8,
-                                  Math.abs(
-                                    (flashStates.get(pairKey).bidDelta || 0) /
-                                      (metrics ? metrics.bid || 1 : 1)
-                                  ) * 4
-                                )
-                            ).toFixed(2)}s`
-                          : undefined,
+                        "--eod-flash-duration": (() => {
+                          const flash = flashStates.get(pairKey);
+                          if (!flash) return undefined;
+                          if (flash.flashBidDurationS != null) {
+                            return `${Number(flash.flashBidDurationS).toFixed(2)}s`;
+                          }
+                          return `${Math.min(
+                            1.5,
+                            0.6 +
+                              Math.min(
+                                0.9,
+                                Math.abs(
+                                  (flash.bidDelta || 0) /
+                                    (metrics ? metrics.bid || 1 : 1)
+                                ) * 20
+                              )
+                          ).toFixed(2)}s`;
+                        })(),
                       }}
                     >
                       {metrics ? metrics.bid.toFixed(5) : "--"}
@@ -115,19 +120,24 @@ export default function PairsListMobile({
                         flashStates.get(pairKey)?.flashAskClass || ""
                       }`}
                       style={{
-                        "--eod-flash-duration": flashStates.get(pairKey)
-                          ? `${Math.min(
-                              1.5,
-                              0.4 +
-                                Math.min(
-                                  0.8,
-                                  Math.abs(
-                                    (flashStates.get(pairKey).askDelta || 0) /
-                                      (metrics ? metrics.ask || 1 : 1)
-                                  ) * 4
-                                )
-                            ).toFixed(2)}s`
-                          : undefined,
+                        "--eod-flash-duration": (() => {
+                          const flash = flashStates.get(pairKey);
+                          if (!flash) return undefined;
+                          if (flash.flashAskDurationS != null) {
+                            return `${Number(flash.flashAskDurationS).toFixed(2)}s`;
+                          }
+                          return `${Math.min(
+                            1.5,
+                            0.6 +
+                              Math.min(
+                                0.9,
+                                Math.abs(
+                                  (flash.askDelta || 0) /
+                                    (metrics ? metrics.ask || 1 : 1)
+                                ) * 20
+                              )
+                          ).toFixed(2)}s`;
+                        })(),
                       }}
                     >
                       {metrics ? metrics.ask.toFixed(5) : "--"}
