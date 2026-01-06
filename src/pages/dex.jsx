@@ -55,7 +55,7 @@ export default function Dex() {
   const isDex = router.pathname === "/dex";
 
   const [selectedPair, setSelectedPair] = useState("XRP/RLUSD");
-  const [interval, setInterval] = useState("1d");
+  const [interval, setInterval] = useState("1m");
   const [availablePairs, setAvailablePairs] = useState(["XRP/RLUSD"]); // Défaut
   const [loadingPairs, setLoadingPairs] = useState(true);
   const { wallet, isConnected } = useXumm();

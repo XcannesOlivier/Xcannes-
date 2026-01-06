@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { Buffer } from "buffer";
 
 export default function WalletDashboardReceiveModal({
   open,
@@ -21,7 +23,108 @@ export default function WalletDashboardReceiveModal({
   setRequestMethod,
   requestToAddress,
   setRequestToAddress,
+  rlusdPerUnitRates,
+  rlusdPerUnitSources,
 }) {
+  const [generatedRequest, setGeneratedRequest] = useState(null);
+  const [generateError, setGenerateError] = useState(null);
+
+  const requestCurrencyCode = useMemo(
+    () => String(requestCurrency || "").trim().toUpperCase(),
+    [requestCurrency]
+  );
+
+  const selectedRequestToken = useMemo(() => {
+    return (
+      (augmentedTokens || []).find(
+        (t) => String(t?.currency || "").toUpperCase() === requestCurrencyCode
+      ) || null
+    );
+  }, [augmentedTokens, requestCurrencyCode]);
+
+  const isFxRequest = useMemo(() => {
+    if (!selectedRequestToken?.isTrustlineOnly) return false;
+    if (!requestCurrencyCode) return false;
+    return requestCurrencyCode !== "XRP" && requestCurrencyCode !== "RLUSD" && requestCurrencyCode !== "XCS";
+  }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
+
+  const handleGenerateRequest = () => {
+    setGenerateError(null);
+
+    const amount = Number.parseFloat(requestAmount || "0");
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setGenerateError("Please enter a valid amount.");
+      return;
+    }
+
+    if (!effectiveWallet) {
+      setGenerateError("Wallet address is missing.");
+      return;
+    }
+
+    const targetCurrencyCode = requestCurrencyCode || "RLUSD";
+    let amountRlusd = amount;
+    let fxRate = null;
+    let fxSource = null;
+
+    if (targetCurrencyCode === "RLUSD") {
+      amountRlusd = amount;
+      fxRate = 1;
+      fxSource = "PYTH";
+    } else if (isFxRequest) {
+      const rate = Number(rlusdPerUnitRates?.[targetCurrencyCode]);
+      if (!Number.isFinite(rate) || rate <= 0) {
+        setGenerateError(`Rate unavailable for ${targetCurrencyCode}.`);
+        return;
+      }
+      fxRate = rate;
+      fxSource = rlusdPerUnitSources?.[targetCurrencyCode] || null;
+      amountRlusd = amount * rate;
+    }
+
+    const req = {
+      schema: "xcannes-payreq-v1",
+      to: effectiveWallet,
+      targetCurrency: targetCurrencyCode,
+      displayAmount: amount,
+      displayCurrency: targetCurrencyCode,
+      amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
+      fxRate,
+      fxSource,
+      memo: requestMemo || "",
+      createdAt: new Date().toISOString(),
+    };
+
+    setGeneratedRequest(req);
+  };
+
+  const requestValue = useMemo(() => {
+    if (!generatedRequest) return "";
+    try {
+      return JSON.stringify(generatedRequest);
+    } catch {
+      return "";
+    }
+  }, [generatedRequest]);
+
+  const requestLink = useMemo(() => {
+    if (!generatedRequest) return "";
+    if (typeof window === "undefined") return "";
+    try {
+      const json = JSON.stringify(generatedRequest);
+      const base64url = Buffer.from(json, "utf8")
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/g, "");
+      const url = new URL("/pay", window.location.origin);
+      url.searchParams.set("req", base64url);
+      return url.toString();
+    } catch {
+      return "";
+    }
+  }, [generatedRequest]);
+
   if (!open) return null;
 
   return (
@@ -235,15 +338,85 @@ export default function WalletDashboardReceiveModal({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // TODO: Implement payment request generation
-                  alert(
-                    `Payment request feature coming soon!\nMethod: ${requestMethod}\nAmount: ${requestAmount} ${requestCurrency}`
-                  );
+                  handleGenerateRequest();
                 }}
                 className="w-full mt-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 border border-white/10"
               >
                 Generate Request
               </button>
+
+              {generateError && (
+                <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
+                  {generateError}
+                </div>
+              )}
+
+              {!!generatedRequest && !!requestValue && (
+                <div className="space-y-3">
+                  {requestMethod === "qr" ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="bg-black/60 border border-white/10 rounded-xl p-3">
+                        <QRCodeCanvas
+                          value={requestMethod === "qr" && requestLink ? requestLink : requestValue}
+                          size={180}
+                          bgColor="#000000"
+                          fgColor="#ffffff"
+                        />
+                      </div>
+                      {requestLink ? (
+                        <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
+                          {requestLink}
+                        </div>
+                      ) : (
+                        <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
+                          {requestValue}
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            await navigator.clipboard.writeText(requestLink || requestValue);
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        className="px-4 py-2 rounded-md bg-white/10 text-xs text-white/80 hover:bg-white/20 transition-colors active:scale-95"
+                      >
+                        Copy request
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
+                        {requestMethod === "link" && requestLink ? requestLink : requestValue}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            await navigator.clipboard.writeText(
+                              requestMethod === "link" && requestLink ? requestLink : requestValue
+                            );
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        className="w-full px-4 py-2 rounded-md bg-white/10 text-xs text-white/80 hover:bg-white/20 transition-colors active:scale-95"
+                      >
+                        Copy request
+                      </button>
+                    </div>
+                  )}
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
+                    {isFxRequest
+                      ? `Payment will settle on-chain in RLUSD, and be credited to the ${requestCurrencyCode} line for the receiver.`
+                      : `Payment request prepared for ${requestCurrencyCode || "RLUSD"}.`}
+                  </div>
+                </div>
+              )}
 
               {/* Info */}
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
@@ -265,4 +438,3 @@ export default function WalletDashboardReceiveModal({
     </>
   );
 }
-

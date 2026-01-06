@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useCallback } from "react";
 
 export default function WalletDashboardFooter({
   layout,
@@ -8,6 +10,7 @@ export default function WalletDashboardFooter({
   isFullPageView,
   onOpenInfo,
 }) {
+  const router = useRouter();
   const showOpenFullWallet = !isFullPageView && layout?.showOpenFullWallet;
   const showTopBorder = layout?.statementVariant !== "dex-desktop";
   const showBottomBorder = layout?.statementVariant === "dex-mobile";
@@ -16,6 +19,111 @@ export default function WalletDashboardFooter({
   const showInfoButton =
     layout?.statementVariant !== "dex-mobile" &&
     layout?.statementVariant !== "dex-desktop";
+
+  // Sur mobile (DEX), on veut un fallback "hard reload" si la navigation Next échoue
+  // (souvent visible comme: URL qui change mais page qui ne se met pas à jour).
+  const withHardNavFallback = useCallback(
+    (href) =>
+      (e) => {
+        if (typeof window === "undefined") return;
+        if (!e || e.defaultPrevented) return;
+        if (e.button != null && e.button !== 0) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        const rawHref =
+          e?.currentTarget?.getAttribute?.("href") || String(href || "");
+        if (!rawHref) return;
+
+        let didStart = false;
+        let didComplete = false;
+        let didError = false;
+        let didFallback = false;
+        const events = router?.events;
+        let quickFallbackTimer;
+        let stuckFallbackTimer;
+
+        const hrefUrl = new URL(rawHref, window.location.origin);
+        const targetPath = hrefUrl.pathname + hrefUrl.search + hrefUrl.hash;
+
+        const normalizeAsPath = (value) => {
+          if (!value) return "";
+          try {
+            const u = new URL(String(value), window.location.origin);
+            return u.pathname + u.search + u.hash;
+          } catch {
+            return String(value);
+          }
+        };
+
+        const stripLocalePrefix = (asPath) => {
+          const normalized = normalizeAsPath(asPath);
+          const locales = router?.locales || [];
+          for (const locale of locales) {
+            const prefix = `/${locale}`;
+            if (normalized === prefix) return "/";
+            if (normalized.startsWith(`${prefix}/`)) {
+              return normalized.slice(prefix.length) || "/";
+            }
+          }
+          return normalized;
+        };
+
+        const matchesTarget = (url) => {
+          const normalized = normalizeAsPath(url);
+          return stripLocalePrefix(normalized) === stripLocalePrefix(targetPath);
+        };
+
+        const cleanup = () => {
+          if (!events?.off) return;
+          events.off("routeChangeStart", markStart);
+          events.off("routeChangeComplete", markComplete);
+          events.off("routeChangeError", markError);
+          if (quickFallbackTimer) window.clearTimeout(quickFallbackTimer);
+          if (stuckFallbackTimer) window.clearTimeout(stuckFallbackTimer);
+        };
+
+        const doFallback = () => {
+          if (didFallback) return;
+          if (didComplete) return;
+          didFallback = true;
+          cleanup();
+          window.location.assign(hrefUrl.toString());
+        };
+
+        const markStart = (url) => {
+          if (!matchesTarget(url)) return;
+          didStart = true;
+        };
+        const markComplete = (url) => {
+          if (!matchesTarget(url)) return;
+          didComplete = true;
+          cleanup();
+        };
+        const markError = (url) => {
+          if (!matchesTarget(url)) return;
+          didError = true;
+          cleanup();
+          window.setTimeout(doFallback, 0);
+        };
+
+        if (events?.on) {
+          events.on("routeChangeStart", markStart);
+          events.on("routeChangeComplete", markComplete);
+          events.on("routeChangeError", markError);
+        }
+
+        quickFallbackTimer = window.setTimeout(() => {
+          if (didComplete) return;
+          if (!didStart) doFallback();
+        }, 450);
+
+        stuckFallbackTimer = window.setTimeout(() => {
+          if (didComplete) return;
+          if (didError || didStart) doFallback();
+        }, 2200);
+      },
+    [router?.events, router?.locales]
+  );
 
   return (
     <div
@@ -45,6 +153,7 @@ export default function WalletDashboardFooter({
           {showOpenFullWallet && (
             <Link
               href="/wallet"
+              onClick={withHardNavFallback("/wallet")}
               className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
             >
               Open full wallet

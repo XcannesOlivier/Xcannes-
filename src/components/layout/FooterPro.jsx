@@ -54,55 +54,92 @@ export default function FooterPro() {
         let didStart = false;
         let didComplete = false;
         let didError = false;
+        let didFallback = false;
         const events = router?.events;
-        const markStart = () => {
-          didStart = true;
-        };
-        const markComplete = () => {
-          didComplete = true;
-        };
-        const markError = () => {
-          didError = true;
-        };
-
-        if (events?.once) {
-          events.once("routeChangeStart", markStart);
-          events.once("routeChangeComplete", markComplete);
-          events.once("routeChangeError", markError);
-        }
+        let quickFallbackTimer;
+        let stuckFallbackTimer;
 
         const hrefUrl = new URL(rawHref, window.location.origin);
-        const currentPath = window.location.pathname + window.location.search + window.location.hash;
         const targetPath = hrefUrl.pathname + hrefUrl.search + hrefUrl.hash;
+
+        const normalizeAsPath = (value) => {
+          if (!value) return "";
+          try {
+            const u = new URL(String(value), window.location.origin);
+            return u.pathname + u.search + u.hash;
+          } catch {
+            return String(value);
+          }
+        };
+
+        const stripLocalePrefix = (asPath) => {
+          const normalized = normalizeAsPath(asPath);
+          const locales = router?.locales || [];
+          for (const locale of locales) {
+            const prefix = `/${locale}`;
+            if (normalized === prefix) return "/";
+            if (normalized.startsWith(`${prefix}/`)) {
+              return normalized.slice(prefix.length) || "/";
+            }
+          }
+          return normalized;
+        };
+
+        const matchesTarget = (url) => {
+          const normalized = normalizeAsPath(url);
+          return stripLocalePrefix(normalized) === stripLocalePrefix(targetPath);
+        };
 
         const cleanup = () => {
           if (!events?.off) return;
           events.off("routeChangeStart", markStart);
           events.off("routeChangeComplete", markComplete);
           events.off("routeChangeError", markError);
+          if (quickFallbackTimer) window.clearTimeout(quickFallbackTimer);
+          if (stuckFallbackTimer) window.clearTimeout(stuckFallbackTimer);
         };
 
-        const maybeFallback = () => {
-          cleanup();
+        const doFallback = () => {
+          if (didFallback) return;
           if (didComplete) return;
-          if ((window.location.pathname + window.location.search + window.location.hash) !== currentPath) return;
-          if (currentPath === targetPath) return;
+          didFallback = true;
+          cleanup();
           window.location.assign(hrefUrl.toString());
         };
 
-        window.setTimeout(() => {
-          if (didStart) return;
-          maybeFallback();
-        }, 350);
+        const markStart = (url) => {
+          if (!matchesTarget(url)) return;
+          didStart = true;
+        };
+        const markComplete = (url) => {
+          if (!matchesTarget(url)) return;
+          didComplete = true;
+          cleanup();
+        };
+        const markError = (url) => {
+          if (!matchesTarget(url)) return;
+          didError = true;
+          cleanup();
+          window.setTimeout(doFallback, 0);
+        };
 
-        window.setTimeout(() => {
+        if (events?.on) {
+          events.on("routeChangeStart", markStart);
+          events.on("routeChangeComplete", markComplete);
+          events.on("routeChangeError", markError);
+        }
+
+        quickFallbackTimer = window.setTimeout(() => {
           if (didComplete) return;
-          if (didError || didStart) {
-            maybeFallback();
-          }
-        }, 1400);
+          if (!didStart) doFallback();
+        }, 450);
+
+        stuckFallbackTimer = window.setTimeout(() => {
+          if (didComplete) return;
+          if (didError || didStart) doFallback();
+        }, 2200);
       },
-    [router?.events]
+    [router?.events, router?.locales]
   );
 
   const gradientFromClass = isDex ? "from-[#040c13]" : "from-xcannes-background";

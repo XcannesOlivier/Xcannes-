@@ -260,6 +260,24 @@ export default function ExchangeSection({ variant = "embedded" }) {
       ? "max-w-7xl mx-auto"
       : "max-w-[1600px] mx-auto px-3 sm:px-4 lg:px-6";
 
+  const handleTradeAction = (action, pair) => {
+    if (typeof window === "undefined") return;
+    const base = String(pair?.base || "").trim().toUpperCase();
+    const quote = String(pair?.quote || "").trim().toUpperCase();
+    if (!base || !quote) return;
+    window.dispatchEvent(
+      new CustomEvent("xcannes:wallet:open-convert", {
+        detail: {
+          action: String(action || "").toLowerCase(),
+          base,
+          quote,
+          pairKey: `${base}/${quote}`,
+          source: pair?.source || "unknown",
+        },
+      })
+    );
+  };
+
   return (
     <section id="eod-exchange-section" className={outerClass}>
       <div className={innerClass}>
@@ -324,6 +342,7 @@ export default function ExchangeSection({ variant = "embedded" }) {
           flashStates={flashStates}
           isCustomPair={isCustomPair}
           onRemoveCustomPair={handleRemoveCustomPair}
+          onTradeAction={handleTradeAction}
           t={t}
         />
 
@@ -334,6 +353,7 @@ export default function ExchangeSection({ variant = "embedded" }) {
           flashStates={flashStates}
           isCustomPair={isCustomPair}
           onRemoveCustomPair={handleRemoveCustomPair}
+          onTradeAction={handleTradeAction}
           t={t}
         />
         {variant === "embedded" && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { Buffer } from "buffer";
 
 export function usePaymentRequestScanner({
   augmentedTokens,
@@ -8,6 +9,7 @@ export function usePaymentRequestScanner({
   setSendAmount,
   setSendAssetKey,
   setSendTab,
+  setSendPaymentRequest,
 } = {}) {
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
   const [paymentRequestScannerOpen, setPaymentRequestScannerOpen] =
@@ -34,6 +36,26 @@ export function usePaymentRequestScanner({
             .replace(/^xrpl:\/\//i, "xrpl://")
             .replace(/^xrpl:/i, "xrpl://");
           const url = new URL(cleaned);
+          const reqParam =
+            url.searchParams.get("req") ||
+            url.searchParams.get("payreq") ||
+            url.searchParams.get("xcannes_payreq") ||
+            null;
+
+          if (reqParam) {
+            try {
+              const raw = String(reqParam || "").trim();
+              const padded =
+                raw.replace(/-/g, "+").replace(/_/g, "/") +
+                "===".slice((raw.length + 3) % 4);
+              const json = Buffer.from(padded, "base64").toString("utf8");
+              const parsed = JSON.parse(json);
+              return parsed && typeof parsed === "object" ? { request: parsed } : null;
+            } catch {
+              // fallthrough
+            }
+          }
+
           const host = url.hostname || "";
           const path = (url.pathname || "").replace(/^\/+/, "");
           const params = url.searchParams;
@@ -67,9 +89,73 @@ export function usePaymentRequestScanner({
       };
 
       try {
-        // 1) JSON: { amount, currency, to }
+        // 1) JSON
         const request = JSON.parse(raw);
         if (request && request.to) {
+          const schema = String(request.schema || request.kind || "").toLowerCase();
+          const isXcannesPayReq =
+            schema.includes("xcannes") || schema.includes("payreq") || Boolean(request.targetCurrency);
+
+          const targetCurrency = String(
+            request.targetCurrency ||
+              request.targetCurrencyCode ||
+              request.currency ||
+              ""
+          )
+            .trim()
+            .toUpperCase();
+
+          const displayAmount = request.displayAmount ?? request.amount ?? null;
+          const amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+          const fxRate = request.fxRate ?? null;
+          const fxSource = request.fxSource ?? null;
+          const memo = request.memo ?? null;
+
+          if (isXcannesPayReq && targetCurrency) {
+            const matchingToken = (augmentedTokens || []).find(
+              (t) => String(t.currency || "").toUpperCase() === targetCurrency
+            );
+            const rlusdToken = (augmentedTokens || []).find(
+              (t) => String(t.currency || "").toUpperCase() === "RLUSD"
+            );
+
+            // Prefer paying from the requested currency allocation when available, otherwise pay directly in RLUSD.
+            if (matchingToken && displayAmount != null) {
+              setSendAssetKey?.(matchingToken.key);
+              setSendAmount?.(String(displayAmount));
+            } else if (rlusdToken && amountRlusd != null) {
+              setSendAssetKey?.(rlusdToken.key);
+              setSendAmount?.(String(amountRlusd));
+            } else {
+              // fallback to previous behavior
+              applyPrefill({
+                to: request.to,
+                amount: request.amount,
+                currency: request.currency,
+              });
+              return;
+            }
+
+            setSendDestination?.(request.to);
+            setSendPaymentRequest?.({
+              schema: "xcannes-payreq-v1",
+              to: request.to,
+              targetCurrencyCode: targetCurrency || null,
+              displayAmount:
+                displayAmount != null ? Number(displayAmount) : null,
+              displayCurrency: targetCurrency || null,
+              amountRlusd:
+                amountRlusd != null ? Number(amountRlusd) : null,
+              fxRate: fxRate != null ? Number(fxRate) : null,
+              fxSource: fxSource != null ? String(fxSource) : null,
+              memo: memo != null ? String(memo) : null,
+            });
+            setSendTab?.("manual");
+            setPaymentRequestScannerOpen(false);
+            return;
+          }
+
+          // Legacy JSON: { amount, currency, to }
           applyPrefill({
             to: request.to,
             amount: request.amount,
@@ -89,6 +175,76 @@ export function usePaymentRequestScanner({
 
       // 3) URI/URL formats (xrpl://..., xrpl:..., https://...?to=... etc.)
       const parsed = tryParseUri(raw);
+      if (parsed?.request?.to) {
+        const request = parsed.request;
+        const schema = String(request.schema || request.kind || "").toLowerCase();
+        const isXcannesPayReq =
+          schema.includes("xcannes") || schema.includes("payreq") || Boolean(request.targetCurrency);
+
+        const targetCurrency = String(
+          request.targetCurrency ||
+            request.targetCurrencyCode ||
+            request.currency ||
+            ""
+        )
+          .trim()
+          .toUpperCase();
+
+        const displayAmount = request.displayAmount ?? request.amount ?? null;
+        const amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+        const fxRate = request.fxRate ?? null;
+        const fxSource = request.fxSource ?? null;
+        const memo = request.memo ?? null;
+
+        if (isXcannesPayReq && targetCurrency) {
+          const matchingToken = (augmentedTokens || []).find(
+            (t) => String(t.currency || "").toUpperCase() === targetCurrency
+          );
+          const rlusdToken = (augmentedTokens || []).find(
+            (t) => String(t.currency || "").toUpperCase() === "RLUSD"
+          );
+
+          if (matchingToken && displayAmount != null) {
+            setSendAssetKey?.(matchingToken.key);
+            setSendAmount?.(String(displayAmount));
+          } else if (rlusdToken && amountRlusd != null) {
+            setSendAssetKey?.(rlusdToken.key);
+            setSendAmount?.(String(amountRlusd));
+          } else {
+            applyPrefill({
+              to: request.to,
+              amount: request.amount,
+              currency: request.currency,
+            });
+            return;
+          }
+
+          setSendDestination?.(request.to);
+          setSendPaymentRequest?.({
+            schema: "xcannes-payreq-v1",
+            to: request.to,
+            targetCurrencyCode: targetCurrency || null,
+            displayAmount:
+              displayAmount != null ? Number(displayAmount) : null,
+            displayCurrency: targetCurrency || null,
+            amountRlusd: amountRlusd != null ? Number(amountRlusd) : null,
+            fxRate: fxRate != null ? Number(fxRate) : null,
+            fxSource: fxSource != null ? String(fxSource) : null,
+            memo: memo != null ? String(memo) : null,
+          });
+          setSendTab?.("manual");
+          setPaymentRequestScannerOpen(false);
+          return;
+        }
+
+        applyPrefill({
+          to: request.to,
+          amount: request.amount,
+          currency: request.currency,
+        });
+        return;
+      }
+
       if (parsed && parsed.to) {
         applyPrefill(parsed);
         return;
@@ -108,7 +264,14 @@ export function usePaymentRequestScanner({
 
       alert("QR code scanned, but format is not supported.");
     },
-    [augmentedTokens, setSendAmount, setSendAssetKey, setSendDestination, setSendTab]
+    [
+      augmentedTokens,
+      setSendAmount,
+      setSendAssetKey,
+      setSendDestination,
+      setSendPaymentRequest,
+      setSendTab,
+    ]
   );
 
   return {
@@ -120,4 +283,3 @@ export function usePaymentRequestScanner({
     handlePaymentRequestScan,
   };
 }
-

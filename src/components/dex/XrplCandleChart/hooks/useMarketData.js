@@ -20,6 +20,87 @@ const logError = (...args) => {
 };
 
 const candlesCache = new Map();
+const DESIRED_HISTORY_LIMIT = 10_000;
+const STATS_24H_1M_LIMIT = 24 * 60; // 1440 bougies 1m
+const REFRESH_1M_RECENT_LIMIT = 600; // 10h (refresh léger pour resync)
+
+function normalizeTimeSeconds(value) {
+  if (value == null) return null;
+  if (value instanceof Date) return Math.floor(value.getTime() / 1000);
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return null;
+    // timestamps en ms (souvent > 1e12) => convertir en secondes
+    if (value > 1e12) return Math.floor(value / 1000);
+    // garde-fou: parfois stocké en ms mais plus petit (ancien format)
+    if (value > 1e10) return Math.floor(value / 1000);
+    return Math.floor(value);
+  }
+  const raw = String(value);
+  const asNumber = Number(raw);
+  if (Number.isFinite(asNumber)) return normalizeTimeSeconds(asNumber);
+  const parsed = Date.parse(raw);
+  if (!Number.isNaN(parsed)) return Math.floor(parsed / 1000);
+  return null;
+}
+
+function formatKlines(klines) {
+  if (!Array.isArray(klines)) return [];
+  return klines
+    .map((candle) => {
+      const time = normalizeTimeSeconds(candle?.time);
+      if (time == null) return null;
+      return {
+        time,
+        open: parseFloat(candle.open),
+        high: parseFloat(candle.high),
+        low: parseFloat(candle.low),
+        close: parseFloat(candle.close),
+        volume: parseFloat(candle.volume || 0),
+      };
+    })
+    .filter(Boolean);
+}
+
+function resolveDisplayLimit(interval) {
+  // Le chart n'a plus de lazy-load d'historique: éviter de charger "toutes" les bougies (limit=0),
+  // sinon gros JSON + parsing/sort côté client, surtout au premier affichage.
+  switch (String(interval || "").toLowerCase()) {
+    case "1m":
+      return 1500; // ~25h
+    case "5m":
+      return 1200; // ~4j
+    case "15m":
+      return 1200; // ~12.5j
+    case "1h":
+      return 1000; // ~41j
+    case "4h":
+      return 800; // ~133j
+    case "1d":
+      return 730; // ~2 ans (TTL backend)
+    default:
+      return 800;
+  }
+}
+
+function mergeCandles(existing, incoming, maxCount) {
+  if (!Array.isArray(existing) || existing.length === 0) {
+    return Array.isArray(incoming) ? incoming.slice(-maxCount) : [];
+  }
+  if (!Array.isArray(incoming) || incoming.length === 0) {
+    return existing.slice(-maxCount);
+  }
+  const byTime = new Map();
+  for (const c of existing) {
+    if (!c || c.time == null) continue;
+    byTime.set(c.time, c);
+  }
+  for (const c of incoming) {
+    if (!c || c.time == null) continue;
+    byTime.set(c.time, c);
+  }
+  const merged = Array.from(byTime.values()).sort((a, b) => a.time - b.time);
+  return merged.length > maxCount ? merged.slice(merged.length - maxCount) : merged;
+}
 
 // Hook responsable des données: fetch historique, live, FX EOD, stats 24h, bougie courante
 export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuote }) {
@@ -99,9 +180,10 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
     }
   }, [externalPrices, externalPricesVersion, isFxMode, isExternal, isFawaz, pair, updateCurrentCandle]);
 
-  const fetchMarketData = useCallback(async () => {
+  const fetchMarketData = useCallback(async ({ mode = "initial" } = {}) => {
     const requestId = ++requestIdRef.current;
     try {
+      const isRefresh = mode === "refresh";
       if (isFxMode) {
         const formattedFx = await fetchFxEodCandles(fxBase, fxQuote, 365);
         if (requestId === requestIdRef.current) {
@@ -123,10 +205,14 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
       }
 
       const backendInterval = getBackendInterval(interval);
+      const initialLimit = resolveDisplayLimit(interval);
+      const requestedLimit = isRefresh
+        ? Math.min(interval === "1m" ? REFRESH_1M_RECENT_LIMIT : initialLimit, initialLimit)
+        : initialLimit;
       const klines = await xcannesApi.getKlines(
         backendBook.backendPair,
         backendInterval,
-        0 // 0 = aucune limite: récupérer toutes les bougies disponibles
+        requestedLimit
       );
 
       if (!klines || !Array.isArray(klines) || klines.length === 0) {
@@ -138,14 +224,15 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
         return;
       }
 
-      const formatted = klines.map((candle) => ({
-        time: candle.time,
-        open: parseFloat(candle.open),
-        high: parseFloat(candle.high),
-        low: parseFloat(candle.low),
-        close: parseFloat(candle.close),
-        volume: parseFloat(candle.volume || 0),
-      }));
+      const formatted = formatKlines(klines);
+      if (!formatted.length) {
+        if (requestId === requestIdRef.current) {
+          setNoDataMessage("Invalid candle timestamps");
+          setCandles([]);
+          setLoading(false);
+        }
+        return;
+      }
 
       let sorted = formatted.sort((a, b) => a.time - b.time);
       if (requestId !== requestIdRef.current) {
@@ -186,10 +273,55 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
         currentCandleRef.current = null;
       }
 
-      setCandles(sorted);
       const cacheKey = getCacheKey();
+      if (isRefresh) {
+        setCandles((prev) => mergeCandles(prev, sorted, DESIRED_HISTORY_LIMIT));
+      } else {
+        setCandles(sorted);
+      }
       if (cacheKey && requestId === requestIdRef.current) {
-        candlesCache.set(cacheKey, { candles: sorted });
+        if (isRefresh) {
+          const cachedPrev = candlesCache.get(cacheKey)?.candles || [];
+          candlesCache.set(cacheKey, { candles: mergeCandles(cachedPrev, sorted, DESIRED_HISTORY_LIMIT) });
+        } else {
+          candlesCache.set(cacheKey, { candles: sorted });
+        }
+      }
+      // Débloquer l'UI dès que les bougies sont prêtes; les stats 24h peuvent se remplir ensuite.
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
+
+      // Charger 10k bougies en arrière-plan (sans bloquer le premier affichage).
+      // Ne pas faire ça en mode refresh (sinon gros fetch périodique).
+      if (
+        !isRefresh &&
+        requestedLimit < DESIRED_HISTORY_LIMIT &&
+        Array.isArray(klines) &&
+        klines.length >= requestedLimit
+      ) {
+        const cachedCount = cacheKey ? candlesCache.get(cacheKey)?.candles?.length || 0 : 0;
+        if (cachedCount < DESIRED_HISTORY_LIMIT) {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+          const klinesFull = await xcannesApi.getKlines(
+            backendBook.backendPair,
+            backendInterval,
+            DESIRED_HISTORY_LIMIT
+          );
+          if (
+            requestId === requestIdRef.current &&
+            Array.isArray(klinesFull) &&
+            klinesFull.length > sorted.length
+          ) {
+            const formattedFull = formatKlines(klinesFull);
+            const sortedFull = formattedFull.sort((a, b) => a.time - b.time);
+            setCandles(sortedFull);
+            if (cacheKey) {
+              candlesCache.set(cacheKey, { candles: sortedFull });
+            }
+            sorted = sortedFull;
+          }
+        }
       }
 
       // Stats 24h basées sur l'historique.
@@ -197,28 +329,29 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
       // pour garder un fallback cohérent quel que soit le timeframe affiché.
       let statsCandles = sorted;
       if (isXRPL || isExternal) {
-        let klines1m = klines;
-
-        if (interval !== "1m") {
+        if (interval === "1m") {
+          if (sorted.length >= STATS_24H_1M_LIMIT) {
+            statsCandles = sorted.slice(sorted.length - STATS_24H_1M_LIMIT);
+          } else {
+            const klinesRaw1m = await xcannesApi.getKlines(
+              backendBook.backendPair,
+              "1m",
+              STATS_24H_1M_LIMIT
+            );
+            if (Array.isArray(klinesRaw1m) && klinesRaw1m.length > 0) {
+              statsCandles = formatKlines(klinesRaw1m);
+            }
+          }
+        } else {
           const klinesRaw1m = await xcannesApi.getKlines(
             backendBook.backendPair,
             "1m",
-            0 // récupérer toutes les bougies 1m disponibles pour les stats 24h
+            STATS_24H_1M_LIMIT
           );
-
           if (Array.isArray(klinesRaw1m) && klinesRaw1m.length > 0) {
-            klines1m = klinesRaw1m;
+            statsCandles = formatKlines(klinesRaw1m);
           }
         }
-
-        statsCandles = klines1m.map((candle) => ({
-          time: candle.time,
-          open: parseFloat(candle.open),
-          high: parseFloat(candle.high),
-          low: parseFloat(candle.low),
-          close: parseFloat(candle.close),
-          volume: parseFloat(candle.volume || 0),
-        }));
       }
 
       const stats = compute24hStatsFromCandles(statsCandles);
@@ -237,9 +370,6 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
         }
       }
 
-      if (requestId === requestIdRef.current) {
-        setLoading(false);
-      }
     } catch (error) {
       logError("[XrplCandleChart] fetchMarketData error", error);
       if (requestId === requestIdRef.current) {
@@ -265,7 +395,7 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
       setLoading(true);
       setCandles([]);
     }
-    fetchMarketData();
+    fetchMarketData({ mode: "initial" });
   }, [fetchMarketData, getCacheKey]);
 
   // Reload 1m depuis MongoDB avec cleanup
@@ -275,7 +405,7 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
     const intervalMs = 60 * 1000 * 5; // toutes les 5 minutes
     const timeoutId = setTimeout(() => {
       reloadIntervalRef.current = setInterval(() => {
-        fetchMarketData();
+        fetchMarketData({ mode: "refresh" });
       }, intervalMs);
     }, 1000);
 
