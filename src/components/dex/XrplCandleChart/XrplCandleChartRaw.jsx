@@ -173,16 +173,45 @@ export default function XrplCandleChartRaw({
   // Normalisation défensive des données de bougies pour le chart
   const sanitizeCandles = useCallback((source) => {
     if (!Array.isArray(source)) return [];
+    const normalizeTimeSeconds = (value) => {
+      if (value == null) return null;
+      if (value instanceof Date) return Math.floor(value.getTime() / 1000);
+      if (typeof value === "number") {
+        if (!Number.isFinite(value)) return null;
+        if (value > 1e12) return Math.floor(value / 1000);
+        if (value > 1e10) return Math.floor(value / 1000);
+        return Math.floor(value);
+      }
+      const raw = String(value);
+      const asNumber = Number(raw);
+      if (Number.isFinite(asNumber)) return normalizeTimeSeconds(asNumber);
+      const parsed = Date.parse(raw);
+      if (!Number.isNaN(parsed)) return Math.floor(parsed / 1000);
+      return null;
+    };
     return source
-      .filter((c) => c && c.time != null && Number.isFinite(Number(c.time)))
       .map((c) => {
-        const time = Number(c.time);
+        if (!c) return null;
+        const time = normalizeTimeSeconds(c.time);
+        if (time == null) return null;
         const open = Number.isFinite(Number(c.open)) ? Number(c.open) : 0;
         const high = Number.isFinite(Number(c.high)) ? Number(c.high) : open;
         const low = Number.isFinite(Number(c.low)) ? Number(c.low) : open;
         const close = Number.isFinite(Number(c.close)) ? Number(c.close) : open;
         const volume = Number.isFinite(Number(c.volume)) ? Number(c.volume) : 0;
         return { time, open, high, low, close, volume };
+      })
+      .filter(Boolean)
+      .map((c) => {
+        // Enlever les valeurs négatives aberrantes, sans casser les 0.
+        return {
+          ...c,
+          open: c.open < 0 ? 0 : c.open,
+          high: c.high < 0 ? 0 : c.high,
+          low: c.low < 0 ? 0 : c.low,
+          close: c.close < 0 ? 0 : c.close,
+          volume: c.volume < 0 ? 0 : c.volume,
+        };
       });
   }, []);
 

@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 	import { createPortal } from "react-dom";
 	import { QRCodeCanvas } from "qrcode.react";
 	import Image from "next/image";
 	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import { apiUrl } from "@/lib/runtimeConfig";
+import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";
 
 const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
@@ -27,10 +29,13 @@ export default function CurrencyStatement({
   balance, 
   issuer,
   walletAddress,
+  backendWalletAddress,
   transactions = [],
   hasMore = false,
   loadingMore = false,
   onLoadMore,
+  loading = false,
+  error = null,
   period = "December 2025",
   isFullPage = false,
   variant = "default",
@@ -45,6 +50,15 @@ export default function CurrencyStatement({
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
   const [reserveOpen, setReserveOpen] = useState(false);
+  const [ledgerTab, setLedgerTab] = useState("statement"); // statement | xrpl
+
+  const [xrplDirection, setXrplDirection] = useState("all"); // all | send | receive
+  const [xrplPayments, setXrplPayments] = useState([]);
+  const [xrplCursorNext, setXrplCursorNext] = useState(null);
+  const [xrplHasMore, setXrplHasMore] = useState(false);
+  const [xrplLoading, setXrplLoading] = useState(false);
+  const [xrplLoadingMore, setXrplLoadingMore] = useState(false);
+  const [xrplError, setXrplError] = useState(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -67,19 +81,138 @@ export default function CurrencyStatement({
     }
   }, [walletAddress]);
 
+  const normalizedCurrency = useMemo(
+    () => String(currency || "").toUpperCase(),
+    [currency]
+  );
+
+  const canFetchXrplPayments = useMemo(() => {
+    return (
+      typeof window !== "undefined" &&
+      typeof backendWalletAddress === "string" &&
+      backendWalletAddress.startsWith("r") &&
+      backendWalletAddress.length >= 25 &&
+      ["XRP", "RLUSD", "XCS"].includes(normalizedCurrency)
+    );
+  }, [backendWalletAddress, normalizedCurrency]);
+
+  const fetchXrplPayments = useCallback(
+    async ({ cursor, direction } = {}) => {
+      const url = new URL(apiUrl("/wallet/xrpl/payments"));
+      url.searchParams.set("address", backendWalletAddress);
+      url.searchParams.set("currencyCode", normalizedCurrency);
+      url.searchParams.set("limit", "100");
+
+      const dir = String(direction || "").trim().toLowerCase();
+      if (dir === "send" || dir === "receive") {
+        url.searchParams.set("direction", dir);
+      }
+      if (cursor) url.searchParams.set("cursor", String(cursor));
+
+      const res = await fetch(url.toString());
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          data?.error || `XRPL payments request failed (${res.status})`
+        );
+      }
+      return data;
+    },
+    [backendWalletAddress, normalizedCurrency]
+  );
+
+  const loadXrplFirstPage = useCallback(async () => {
+    if (!canFetchXrplPayments) return;
+    setXrplLoading(true);
+    setXrplError(null);
+    setXrplPayments([]);
+    setXrplHasMore(false);
+    setXrplCursorNext(null);
+
+    try {
+      const dir =
+        xrplDirection === "send" || xrplDirection === "receive"
+          ? xrplDirection
+          : null;
+      const data = await fetchXrplPayments({ direction: dir });
+      setXrplPayments(Array.isArray(data?.payments) ? data.payments : []);
+      setXrplHasMore(Boolean(data?.hasMore));
+      setXrplCursorNext(data?.cursorNext || null);
+    } catch (err) {
+      console.error("[wallet/xrpl/payments] load error:", err);
+      setXrplError(err?.message || "Failed to load XRPL payments");
+      setXrplPayments([]);
+      setXrplHasMore(false);
+      setXrplCursorNext(null);
+    } finally {
+      setXrplLoading(false);
+    }
+  }, [canFetchXrplPayments, fetchXrplPayments, xrplDirection]);
+
+  const loadXrplMore = useCallback(async () => {
+    if (!canFetchXrplPayments || !xrplHasMore || !xrplCursorNext) return;
+    if (xrplLoadingMore) return;
+    setXrplLoadingMore(true);
+    setXrplError(null);
+
+    try {
+      const dir =
+        xrplDirection === "send" || xrplDirection === "receive"
+          ? xrplDirection
+          : null;
+      const data = await fetchXrplPayments({
+        cursor: xrplCursorNext,
+        direction: dir,
+      });
+      const more = Array.isArray(data?.payments) ? data.payments : [];
+      setXrplPayments((prev) => [...(prev || []), ...more]);
+      setXrplHasMore(Boolean(data?.hasMore));
+      setXrplCursorNext(data?.cursorNext || null);
+    } catch (err) {
+      console.error("[wallet/xrpl/payments] load more error:", err);
+      setXrplError(err?.message || "Failed to load more XRPL payments");
+    } finally {
+      setXrplLoadingMore(false);
+    }
+  }, [
+    canFetchXrplPayments,
+    fetchXrplPayments,
+    xrplCursorNext,
+    xrplDirection,
+    xrplHasMore,
+    xrplLoadingMore,
+  ]);
+
+  useEffect(() => {
+    if (ledgerTab !== "xrpl") return;
+    loadXrplFirstPage();
+  }, [ledgerTab, loadXrplFirstPage]);
+
+  useEffect(() => {
+    // avoid mixing data between currencies
+    setLedgerTab("statement");
+    setXrplDirection("all");
+    setXrplPayments([]);
+    setXrplCursorNext(null);
+    setXrplHasMore(false);
+    setXrplLoading(false);
+    setXrplLoadingMore(false);
+    setXrplError(null);
+  }, [normalizedCurrency]);
+
   const estimatedUsd = useMemo(() => {
     const value = Number.parseFloat(balance || 0) || 0;
-    const code = String(currency || "").toUpperCase();
+    const code = normalizedCurrency;
     if (!code) return value;
     const rate = usdRates?.[code];
     if (Number.isFinite(rate)) return value * rate;
     if (USD_STABLECOINS.includes(code)) return value;
     if (code === "XRP") return value * 0.5;
     return value;
-  }, [balance, currency, usdRates]);
+  }, [balance, normalizedCurrency, usdRates]);
 
   const xrpReserveDetails = useMemo(() => {
-    const code = String(currency || "").toUpperCase();
+    const code = normalizedCurrency;
     if (code !== "XRP") return null;
 
     const activationXrp = 1;
@@ -94,10 +227,10 @@ export default function CurrencyStatement({
       trustlineRlusdXrp,
       trustlineXcsXrp,
     };
-  }, [currency]);
+  }, [normalizedCurrency]);
 
   const xcsReserveDetails = useMemo(() => {
-    const code = String(currency || "").toUpperCase();
+    const code = normalizedCurrency;
     if (code !== "XCS") return null;
 
     const walletActivationXcs = 1;
@@ -114,7 +247,7 @@ export default function CurrencyStatement({
       lockXcsPerLine,
       xcannesLinesLockedXcs,
     };
-  }, [currency, xcannesCurrencyLinesCount]);
+  }, [normalizedCurrency, xcannesCurrencyLinesCount]);
 
   // Générer les 12 derniers mois
   const generateMonths = () => {
@@ -673,64 +806,248 @@ export default function CurrencyStatement({
 
           {/* Filters */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex gap-1.5 flex-wrap">
-              <button
-                onClick={() => setFilter("all")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "all" 
-                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" 
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                All ({transactions.length})
-              </button>
-              <button
-                onClick={() => setFilter("credit")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "credit" 
-                    ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" 
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                Credits ({credits.length})
-              </button>
-              <button
-                onClick={() => setFilter("debit")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "debit" 
-                    ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30" 
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                Debits ({debits.length})
-              </button>
-              <button
-                onClick={() => setFilter("conversion")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "conversion" 
-                    ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30" 
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                Conversions ({transactions.filter(t => t.category === "exchange").length})
-              </button>
-            </div>
+            {canFetchXrplPayments && (
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setLedgerTab("statement")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    ledgerTab === "statement"
+                      ? "bg-white/10 text-white border border-white/15"
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  Statement
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLedgerTab("xrpl")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    ledgerTab === "xrpl"
+                      ? "bg-[#0f7fe1]/20 text-[#78b8ff] border border-[#0f7fe1]/30"
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  XRPL payments
+                </button>
+              </div>
+            )}
+
+            {ledgerTab === "xrpl" && canFetchXrplPayments ? (
+              <div className="flex gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setXrplDirection("all")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    xrplDirection === "all"
+                      ? "bg-white/10 text-white border border-white/15"
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setXrplDirection("receive")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    xrplDirection === "receive"
+                      ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30"
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  Receive
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setXrplDirection("send")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    xrplDirection === "send"
+                      ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30"
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  Send
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-1.5 flex-wrap">
+                <button
+                  onClick={() => setFilter("all")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    filter === "all" 
+                      ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" 
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  All ({transactions.length})
+                </button>
+                <button
+                  onClick={() => setFilter("credit")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    filter === "credit" 
+                      ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" 
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  Credits ({credits.length})
+                </button>
+                <button
+                  onClick={() => setFilter("debit")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    filter === "debit" 
+                      ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30" 
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  Debits ({debits.length})
+                </button>
+                <button
+                  onClick={() => setFilter("conversion")}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                    filter === "conversion" 
+                      ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30" 
+                      : "bg-white/5 text-white/60 hover:bg-white/10"
+                  }`}
+                >
+                  Conversions ({transactions.filter(t => t.category === "exchange").length})
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Transactions Table */}
           <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
+            {ledgerTab === "statement" && error && (
+              <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                {error}
+              </div>
+            )}
+            {ledgerTab === "xrpl" && xrplError && (
+              <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                {xrplError}
+              </div>
+            )}
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-black/40 backdrop-blur-sm z-10">
-                  <tr className="border-b border-white/10">
-                    <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Date</th>
-                    <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Description</th>
-                    <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Amount</th>
-                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">Balance</th>
-                  </tr>
+                  {ledgerTab === "xrpl" ? (
+                    <tr className="border-b border-white/10">
+                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Date</th>
+                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Counterparty</th>
+                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Amount</th>
+                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">Tx</th>
+                    </tr>
+                  ) : (
+                    <tr className="border-b border-white/10">
+                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Date</th>
+                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Description</th>
+                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Amount</th>
+                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">Balance</th>
+                    </tr>
+                  )}
                 </thead>
                 <tbody>
-                  {filteredTransactions.length === 0 ? (
+                  {ledgerTab === "xrpl" ? (
+                    xrplLoading ? (
+                      <tr>
+                        <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
+                          Loading…
+                        </td>
+                      </tr>
+                    ) : xrplPayments.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
+                          No XRPL payments found
+                        </td>
+                      </tr>
+                    ) : (
+                      xrplPayments.map((p) => {
+                        const createdAt = p?.createdAt ? new Date(p.createdAt) : null;
+                        const when =
+                          createdAt && Number.isFinite(createdAt.getTime())
+                            ? createdAt.toLocaleString("en-US")
+                            : "";
+                        const dir = String(p?.direction || "").toLowerCase();
+                        const isSend = dir === "send";
+                        const amount = Number(p?.value ?? 0);
+                        const txHash = String(p?.txHash || "");
+                        const counterparty = String(p?.counterparty || "");
+                        const explorerUrl = txHash ? `https://xrpscan.com/tx/${txHash}` : null;
+                        const payReq = extractXcannesPayReqFromMemos(p?.memos);
+                        const credited =
+                          payReq?.targetCurrencyCode || payReq?.targetCurrency || null;
+
+                        return (
+                          <tr
+                            key={txHash || `${when}:${counterparty}:${amount}`}
+                            className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                          >
+                            <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
+                              {when}
+                            </td>
+                            <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`text-[11px] font-semibold ${
+                                      isSend ? "text-red-300" : "text-emerald-300"
+                                    }`}
+                                  >
+                                    {isSend ? "Send" : "Receive"}
+                                  </span>
+                                  <span className="text-[11px] text-white/40">
+                                    {isSend ? "→" : "←"}
+                                  </span>
+                                  <span className="text-sm text-white/90 truncate">
+                                    {counterparty
+                                      ? `${counterparty.slice(0, 10)}...${counterparty.slice(-6)}`
+                                      : "—"}
+                                  </span>
+                                </div>
+                                {txHash ? (
+                                  <div className="text-[10px] text-white/35 font-mono truncate">
+                                    {txHash.slice(0, 10)}…{txHash.slice(-8)}
+                                  </div>
+                                ) : null}
+                                {!isSend && credited ? (
+                                  <div className="text-[10px] text-xcannes-green/80">
+                                    Crédité en {String(credited).toUpperCase()}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </td>
+                            <td className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${isSend ? "text-red-400" : "text-green-400"}`}>
+                              {isSend ? "−" : "+"}
+                              {Number.isFinite(amount)
+                                ? amount.toLocaleString("en-US", { maximumFractionDigits: 8 })
+                                : "0"}{" "}
+                              <span className="text-white/50">{normalizedCurrency}</span>
+                            </td>
+                            <td className="px-3 md:px-4 py-2.5 md:py-3 text-right text-[11px] hidden md:table-cell">
+                              {explorerUrl ? (
+                                <a
+                                  href={explorerUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-[#78b8ff] hover:underline underline-offset-2"
+                                >
+                                  View
+                                </a>
+                              ) : (
+                                <span className="text-white/30">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )
+                  ) : loading ? (
+                    <tr>
+                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
+                        Loading…
+                      </td>
+                    </tr>
+                  ) : filteredTransactions.length === 0 ? (
                     <tr>
                       <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
                         No transactions found
@@ -776,7 +1093,7 @@ export default function CurrencyStatement({
             </div>
           </div>
 
-          {hasMore && (
+          {ledgerTab === "statement" && hasMore && (
             <button
               type="button"
               onClick={() => onLoadMore && onLoadMore()}
@@ -784,6 +1101,17 @@ export default function CurrencyStatement({
               className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
             >
               {loadingMore ? "Loading…" : "Load more"}
+            </button>
+          )}
+
+          {ledgerTab === "xrpl" && xrplHasMore && (
+            <button
+              type="button"
+              onClick={() => loadXrplMore()}
+              disabled={xrplLoadingMore}
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
+            >
+              {xrplLoadingMore ? "Loading…" : "Load more"}
             </button>
           )}
 

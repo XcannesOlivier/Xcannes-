@@ -7,6 +7,7 @@ export default function PairsListMobile({
   flashStates,
   isCustomPair,
   onRemoveCustomPair,
+  onTradeAction,
   t,
 }) {
   return (
@@ -88,10 +89,13 @@ export default function PairsListMobile({
 
                 <div className="flex flex-col items-end gap-1">
                   <div className="flex gap-2">
-                    <div
+                    <button
+                      type="button"
+                      onClick={() => onTradeAction?.("sell", pair)}
+                      title={t("sell", "Sell")}
                       className={`inline-flex items-center px-3 py-1 rounded-full bg-subtle text-primary font-mono text-xs min-w-[84px] justify-center ${
                         flashStates.get(pairKey)?.flashBidClass || ""
-                      }`}
+                      } hover:bg-white/10 active:scale-[0.99] transition`}
                       style={{
                         "--eod-flash-duration": (() => {
                           const flash = flashStates.get(pairKey);
@@ -114,11 +118,14 @@ export default function PairsListMobile({
                       }}
                     >
                       {metrics ? metrics.bid.toFixed(5) : "--"}
-                    </div>
-                    <div
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onTradeAction?.("buy", pair)}
+                      title={t("buy", "Buy")}
                       className={`inline-flex items-center px-3 py-1 rounded-full bg-subtle text-primary font-mono text-xs min-w-[84px] justify-center ${
                         flashStates.get(pairKey)?.flashAskClass || ""
-                      }`}
+                      } hover:bg-white/10 active:scale-[0.99] transition`}
                       style={{
                         "--eod-flash-duration": (() => {
                           const flash = flashStates.get(pairKey);
@@ -141,7 +148,7 @@ export default function PairsListMobile({
                       }}
                     >
                       {metrics ? metrics.ask.toFixed(5) : "--"}
-                    </div>
+                    </button>
                   </div>
                 </div>
               </div>

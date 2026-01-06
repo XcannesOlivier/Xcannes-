@@ -8,6 +8,7 @@ export default function PairsTableDesktop({
   flashStates,
   isCustomPair,
   onRemoveCustomPair,
+  onTradeAction,
   t,
 }) {
   return (
@@ -126,10 +127,13 @@ export default function PairsTableDesktop({
                   <td className="px-4 py-4 text-right">
                     {metrics ? (
                       <div className="flex justify-end">
-                        <div
+                        <button
+                          type="button"
+                          onClick={() => onTradeAction?.("sell", pair)}
+                          title={t("sell", "Sell")}
                           className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-subtle text-primary font-mono text-sm min-w-[110px] md:min-w-[140px] ${
                             flash?.flashBidClass || ""
-                          }`}
+                          } hover:bg-white/10 active:scale-[0.99] transition`}
                           style={{
                             "--eod-flash-duration":
                               flash?.flashBidDurationS != null
@@ -138,7 +142,7 @@ export default function PairsTableDesktop({
                           }}
                         >
                           {metrics.bid.toFixed(5)}
-                        </div>
+                        </button>
                       </div>
                     ) : (
                       <span className="text-xs text-white/40">--</span>
@@ -147,10 +151,13 @@ export default function PairsTableDesktop({
                   <td className="px-4 py-4 text-right">
                     {metrics ? (
                       <div className="flex justify-end">
-                        <div
+                        <button
+                          type="button"
+                          onClick={() => onTradeAction?.("buy", pair)}
+                          title={t("buy", "Buy")}
                           className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-subtle text-primary font-mono text-sm min-w-[110px] md:min-w-[140px] ${
                             flash?.flashAskClass || ""
-                          }`}
+                          } hover:bg-white/10 active:scale-[0.99] transition`}
                           style={{
                             "--eod-flash-duration":
                               flash?.flashAskDurationS != null
@@ -159,7 +166,7 @@ export default function PairsTableDesktop({
                           }}
                         >
                           {metrics.ask.toFixed(5)}
-                        </div>
+                        </button>
                       </div>
                     ) : (
                       <span className="text-xs text-white/40">--</span>
