@@ -3,10 +3,15 @@
 import { useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Buffer } from "buffer";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
+import { createPortal } from "react-dom";
 
 export default function WalletDashboardReceiveModal({
   open,
   onClose,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
   receiveTab,
   setReceiveTab,
   renderWalletMeta,
@@ -127,7 +132,7 @@ export default function WalletDashboardReceiveModal({
 
   if (!open) return null;
 
-  return (
+  const content = (
     <>
       {/* Backdrop */}
       <div
@@ -155,6 +160,11 @@ export default function WalletDashboardReceiveModal({
             {receiveTab === "receive" ? "Receive assets" : "Request payment"}
           </h3>
           {renderWalletMeta?.("mb-2")}
+          <WalletNotConnectedNotice
+            show={isPreviewMode}
+            variant={noticeVariant}
+            contextLabel={noticeContextLabel}
+          />
 
           {/* Tabs */}
           <div className="flex gap-2 mb-3">
@@ -437,4 +447,7 @@ export default function WalletDashboardReceiveModal({
       </div>
     </>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

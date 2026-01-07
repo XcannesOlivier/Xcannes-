@@ -4,7 +4,6 @@ import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
 import Link from "next/link";
 import SEOHead from "@/components/layout/SEOHead";
-import PriceTicker from "@/components/marketGlobal/PriceTicker";
 import WhyXcannesSection from "@/components/home/WhyXcannesSection";
 import XummSecuritySection from "@/components/home/XummSecuritySection";
 import HomeUseCasesSection from "@/components/home/HomeUseCasesSection";
@@ -73,7 +72,7 @@ export default function Home() {
     
     fetchPairs();
   }, []);
-  
+
   // Mémoriser pour éviter re-renders inutiles
   // Limiter aux 10 paires les plus utilisées et exclure XCS_*
   const pairs = useMemo(
@@ -83,24 +82,18 @@ export default function Home() {
         .slice(0, 10),
     [availablePairs]
   );
-
+  
   return (
     <>
       <SEOHead
-        title="XCANNES - USD-backed multi-currency wallet on XRPL"
-        description="A non-custodial multi-currency wallet backed by USD stability on XRPL (via a regulated USD stablecoin). Send, pay, receive, and convert with real-time market data."
+        title="XCANNES - Multi-currency wallet with stable USD value"
+        description="A non-custodial multi-currency wallet with a local-currency experience and stable USD value in the background. Send, pay, receive, and convert with clarity."
         canonical="/"
       />
 
       <Header />
 
-      <PriceTicker
-        pairs={pairs}
-        fixed={true}
-        backgroundClass="bg-black/20 border-b border-white/10"
-      />
-
-      <div className="pt-24 bg-xcannes-background">
+      <div className="pt-16 bg-xcannes-background">
 
         {/* HERO (more “private bank” tone) */}
         <main className="relative overflow-hidden">
@@ -109,70 +102,67 @@ export default function Home() {
           <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-24">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-5">
-                {t("hero_badge")}
+                {t("home_v2_hero_badge", "XCANNES")}
               </p>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
-                {t("hero_title")}{" "}
-                <span className="text-xcannes-green">{t("hero_title_gradient")}</span>
+                {t("home_v2_hero_title", "Montants locaux.")}{" "}
+                <span className="text-xcannes-green">
+                  {t("home_v2_hero_title_emphasis", "Valeur stable.")}
+                </span>
               </h1>
 
-              <div className="mt-6 space-y-2">
-                <p className="text-lg sm:text-xl text-white/80 font-light leading-relaxed">
-                  {t("hero_description_line1")}
-                </p>
-                <p className="text-base sm:text-lg text-white/65 font-light leading-relaxed">
-                  {t("hero_description_line2")}
-                </p>
-                <p className="text-base sm:text-lg text-white/55 font-light leading-relaxed">
-                  {t("hero_description_line3")}
-                </p>
-              </div>
+              <p className="mt-6 text-lg sm:text-xl text-white/80 font-light leading-relaxed">
+                {t(
+                  "home_v2_hero_subtitle",
+                  "Payez, recevez et consultez vos montants dans la devise du pays, avec une valeur stable en USD en arrière‑plan."
+                )}
+              </p>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <Link href="/wallet">
                   <button className={bankButtonClassName({ tone: "blue", variant: "soft", size: "lg" })}>
-                    {t("hero_cta_primary")}
+                    {t("home_v2_hero_cta_primary", "Ouvrir le wallet")}
                   </button>
                 </Link>
-                <Link href="/dex">
-                  <button className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}>
-                    {t("hero_cta_secondary")}
+                <Link href="#demo">
+                  <button className={bankButtonClassName({ tone: "neutral", variant: "soft", size: "lg" })}>
+                    {t("home_v2_hero_cta_secondary", "Essayer la démo")}
                     <span className="inline-block ml-2 text-xs">→</span>
                   </button>
                 </Link>
               </div>
 
-              {/* Trust strip */}
+              {/* 3 essentials (keep light, avoid jargon) */}
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   {
-                    title: t("home_trust_1_title", "Non-custodial"),
-                    desc: t("home_trust_1_desc", "Vous gardez le contrôle de vos clés."),
+                    title: t("home_v2_hero_pillar_1_title", "Contrôle utilisateur"),
+                    desc: t("home_v2_hero_pillar_1_desc", "Validation explicite avant chaque action."),
                     icon: (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-xcannes-green">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
                         <path d="M12 11V7a4 4 0 0 0-8 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M5 11h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     ),
                   },
                   {
-                    title: t("home_trust_2_title", "Stabilité USD"),
-                    desc: t("home_trust_2_desc", "Valeur adossée au dollar via stablecoin régulé."),
+                    title: t("home_v2_hero_pillar_2_title", "Relevés & reçus"),
+                    desc: t("home_v2_hero_pillar_2_desc", "Suivez et prouvez vos mouvements par devise."),
                     icon: (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-xcannes-green">
-                        <path d="M12 1v22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
+                        <path d="M7 3h10a2 2 0 0 1 2 2v16l-3-2-2 2-2-2-2 2-3-2V5a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M9 7h6M9 11h6M9 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     ),
                   },
                   {
-                    title: t("home_trust_3_title", "Validation Xumm"),
-                    desc: t("home_trust_3_desc", "Biométrie et signature explicite."),
+                    title: t("home_v2_hero_pillar_3_title", "Conversion"),
+                    desc: t("home_v2_hero_pillar_3_desc", "Taux affiché clairement avant validation."),
                     icon: (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-xcannes-green">
-                        <path d="M12 3a9 9 0 1 0 9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
+                        <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     ),
                   },
@@ -181,43 +171,13 @@ export default function Home() {
                     key={item.title}
                     className="flex items-start gap-3 bg-black/20 border border-white/10 rounded-xl px-4 py-4"
                   >
-                    <div className="mt-0.5 flex items-center justify-center w-9 h-9 rounded-lg bg-xcannes-green/10 border border-xcannes-green/20">
+                    <div className="mt-0.5 flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10">
                       {item.icon}
                     </div>
                     <div className="min-w-0 text-left">
                       <div className="text-sm font-semibold text-white/90">{item.title}</div>
                       <div className="text-xs text-white/55 leading-relaxed">{item.desc}</div>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Minimal metrics row */}
-              <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3">
-                {[
-                  {
-                    value: t("stat_spread_value"),
-                    label: t("stat_spread_label"),
-                    description: t("stat_spread_desc"),
-                  },
-                  {
-                    value: t("stat_price_value"),
-                    label: t("stat_price_label"),
-                    description: t("stat_price_desc"),
-                  },
-                  {
-                    value: t("stat_speed_value"),
-                    label: t("stat_speed_label"),
-                    description: t("stat_speed_desc"),
-                  },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="bg-black/20 border border-white/10 rounded-xl px-5 py-4"
-                  >
-                    <div className="text-sm text-white/70">{stat.label}</div>
-                    <div className="mt-1 text-2xl font-semibold text-white">{stat.value}</div>
-                    <div className="mt-1 text-xs text-white/50">{stat.description}</div>
                   </div>
                 ))}
               </div>
@@ -229,11 +189,11 @@ export default function Home() {
       {/* CONTENT SECTIONS */}
       <div className="bg-xcannes-background">
         <HomeLocalPaymentSection availablePairs={availablePairs} />
-        <HomeUseCasesSection />
-        <HomeHowItWorksSection />
         <WalletProductSection />
-        <WhyXcannesSection />
+        <HomeUseCasesSection />
         <XummSecuritySection />
+        <HomeHowItWorksSection pairs={pairs} />
+        <WhyXcannesSection />
       </div>
 
       <FooterPro />

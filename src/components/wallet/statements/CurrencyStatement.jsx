@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 	import { QRCodeCanvas } from "qrcode.react";
 	import Image from "next/image";
 	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";
 
@@ -30,6 +31,9 @@ export default function CurrencyStatement({
   issuer,
   walletAddress,
   backendWalletAddress,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
   transactions = [],
   hasMore = false,
   loadingMore = false,
@@ -620,9 +624,9 @@ export default function CurrencyStatement({
         className={`relative w-full bg-elevated flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}
       >
         
-        {/* Header avec Account Info intégré */}
-        <div className="border-b border-white/10 flex-shrink-0 bg-elevated px-4 md:px-6 py-3 md:py-4">
-          <div className="flex items-start justify-between gap-3 mb-3">
+	        {/* Header avec Account Info intégré */}
+	        <div className="border-b border-white/10 flex-shrink-0 bg-elevated px-4 md:px-6 py-3 md:py-4">
+	          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               {['XRP', 'RLUSD', 'XCS'].includes(currency) ? (
                 <Image 
@@ -650,11 +654,18 @@ export default function CurrencyStatement({
             >
               ×
             </button>
-          </div>
-          
-          {/* Account Info dans le header */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
+	          </div>
+
+            <WalletNotConnectedNotice
+              show={isPreviewMode}
+              className="mb-3"
+              variant={noticeVariant}
+              contextLabel={noticeContextLabel}
+            />
+	          
+	          {/* Account Info dans le header */}
+	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+	            <div>
               <p className="text-xs text-white/50 mb-1">Account Holder</p>
               <p className="text-sm text-white font-semibold truncate">
                 {walletLabel || "Wallet"}

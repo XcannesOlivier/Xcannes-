@@ -75,7 +75,15 @@ export function useSwapDemoLines({ demoRlusdTotal }) {
     };
 
     const currencyCodes = Object.keys(base).filter((c) => c !== "RLUSD");
-    const total = Number.isFinite(Number(demoRlusdTotal)) ? Number(demoRlusdTotal) : 1000;
+    const total = Number.isFinite(Number(demoRlusdTotal))
+      ? Number(demoRlusdTotal)
+      : 1000;
+
+    // Pour le "preview wallet" (non connecté), on veut une UI à 0 partout.
+    // Donc si le total démo est 0 (ou négatif), on ne seed aucun montant.
+    if (total <= 0) {
+      return base;
+    }
     let allocatedSum = 0;
 
     currencyCodes.forEach((code) => {

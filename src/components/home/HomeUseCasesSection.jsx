@@ -5,36 +5,36 @@ export default function HomeUseCasesSection() {
 
   const cases = [
     {
-      key: "stability",
-      title: t("home_usecase_1_title", "Protéger sa valeur en USD"),
+      key: "statements",
+      title: t("home_v2_essentials_1_title", "Relevés & reçus"),
       desc: t(
-        "home_usecase_1_desc",
-        "Rester exposé à la stabilité du dollar tout en conservant une UX en monnaie locale."
+        "home_v2_essentials_1_desc",
+        "Suivre, prouver et exporter vos mouvements, par devise ou au global."
       ),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
-            d="M12 2v20"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M17 6H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H7"
+            d="M7 3h10a2 2 0 0 1 2 2v16l-3-2-2 2-2-2-2 2-3-2V5a2 2 0 0 1 2-2Z"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+          />
+          <path
+            d="M9 7h6M9 11h6M9 15h4"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
         </svg>
       ),
     },
     {
       key: "payments",
-      title: t("home_usecase_2_title", "Paiements & transferts"),
+      title: t("home_v2_essentials_2_title", "Payer / Recevoir"),
       desc: t(
-        "home_usecase_2_desc",
-        "Envoyer, recevoir et payer en quelques secondes, avec validation via Xumm."
+        "home_v2_essentials_2_desc",
+        "Demander (QR), recevoir et envoyer en quelques secondes, avec validation explicite."
       ),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -56,10 +56,10 @@ export default function HomeUseCasesSection() {
     },
     {
       key: "convert",
-      title: t("home_usecase_3_title", "Conversion simple"),
+      title: t("home_v2_essentials_3_title", "Conversion"),
       desc: t(
-        "home_usecase_3_desc",
-        "Convertir entre devises avec des taux marché (Pyth/XRPL) et une tarification claire."
+        "home_v2_essentials_3_desc",
+        "Taux affiché clairement avant validation."
       ),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -81,16 +81,22 @@ export default function HomeUseCasesSection() {
       ),
     },
     {
-      key: "markets",
-      title: t("home_usecase_4_title", "Marchés en temps réel"),
+      key: "buy_sell",
+      title: t("home_v2_essentials_4_title", "Acheter / Vendre"),
       desc: t(
-        "home_usecase_4_desc",
-        "Suivre les variations FX et XRPL, et accéder aux marchés quand vous en avez besoin."
+        "home_v2_essentials_4_desc",
+        "Accès fiat selon disponibilité par pays."
       ),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
-            d="M4 16l4-5 4 3 4-7 4 4"
+            d="M12 1v22"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
@@ -106,15 +112,15 @@ export default function HomeUseCasesSection() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">
-            {t("home_usecases_badge", "Cas d’usage")}
+            {t("home_v2_essentials_badge", "Essentiels")}
           </p>
           <h2 className="text-2xl sm:text-3xl font-montserrat font-semibold text-white">
-            {t("home_usecases_title", "Une expérience bancaire, une infrastructure moderne.")}
+            {t("home_v2_essentials_title", "L’essentiel, au quotidien.")}
           </h2>
           <p className="mt-3 text-sm sm:text-base text-white/65 max-w-2xl mx-auto">
             {t(
-              "home_usecases_subtitle",
-              "XCANNES privilégie la clarté, la stabilité et le contrôle utilisateur."
+              "home_v2_essentials_subtitle",
+              "Une interface claire, sérieuse, centrée usage."
             )}
           </p>
         </div>
@@ -126,7 +132,7 @@ export default function HomeUseCasesSection() {
               className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl p-5"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-xcannes-green/10 border border-xcannes-green/20 flex items-center justify-center text-xcannes-green">
+                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80">
                   {item.icon}
                 </div>
                 <div className="text-sm font-semibold text-white/90">
@@ -143,4 +149,3 @@ export default function HomeUseCasesSection() {
     </section>
   );
 }
-

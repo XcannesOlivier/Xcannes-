@@ -151,6 +151,22 @@
   padding: var(--panel-padding-y) var(--panel-padding-x);
 }
 
+.demo-wallet-theme-home {
+  --bg-base: #0a0f0d; /* match bg-xcannes-background */
+  --bg-elevated: #0b1410; /* warmer elevated surface */
+  --bg-subtle: #101c15;
+}
+
+.demo-wallet-theme-home .panel-header {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.demo-wallet-theme-dex {
+  --bg-base: #040c13;
+  --bg-elevated: #071420;
+  --bg-subtle: #0b1b2a;
+}
+
 body {
   @apply bg-xcannes-background text-white !important;
   font-family: var(--font-manrope), system-ui, sans-serif;

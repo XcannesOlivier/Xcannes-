@@ -9,6 +9,11 @@ export default function WalletDashboardStatementModals({
   augmentedTokens,
   backendWalletAddress,
   effectiveWallet,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
+  previewGlobalMovements,
+  previewCurrencyTransactions,
   isFullPageView,
   statementVariant,
   currencyLines,
@@ -213,50 +218,10 @@ export default function WalletDashboardStatementModals({
     loadCurrencyFirstPage(selectedStatementToken.currency);
   }, [loadCurrencyFirstPage, selectedStatementToken, showCurrencyStatement]);
 
-  const previewTransactions = useMemo(() => {
-    if (canFetchStatements) return null;
-    const token = selectedStatementToken;
-    if (!token) return null;
-    const runningBalance = Number.parseFloat(token.value || 0) || 0;
-    return [
-      {
-        date: "2025-12-28",
-        description: "Receive from rPa...",
-        category: "receive",
-        type: "credit",
-        amount: "250.00",
-        counterparty: "rPaFcPEbMBqSBZfY6h4oJE3dqKyb6c4oB1",
-        runningBalance,
-      },
-      {
-        date: "2025-12-27",
-        description: "Send to rMx...",
-        category: "send",
-        type: "debit",
-        amount: "50.00",
-        counterparty: "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De",
-        runningBalance: runningBalance - 250,
-      },
-      {
-        date: "2025-12-26",
-        description: "Exchange USD→EUR",
-        category: "exchange",
-        type: "credit",
-        amount: "100.00",
-        counterparty: "XCANNES DEX",
-        runningBalance: runningBalance - 200,
-      },
-      {
-        date: "2025-12-25",
-        description: "Buy via MoonPay",
-        category: "buy",
-        type: "credit",
-        amount: "200.00",
-        counterparty: "MoonPay",
-        runningBalance: runningBalance - 300,
-      },
-    ];
-  }, [canFetchStatements, selectedStatementToken]);
+  const previewMovements = canFetchStatements ? null : (previewGlobalMovements || []);
+  const previewTransactions = canFetchStatements
+    ? null
+    : (previewCurrencyTransactions || []);
 
   return (
     <>
@@ -264,11 +229,14 @@ export default function WalletDashboardStatementModals({
         <GlobalStatement
           tokens={augmentedTokens}
           walletAddress={effectiveWallet}
+          isPreviewMode={isPreviewMode}
+          noticeVariant={noticeVariant}
+          noticeContextLabel={noticeContextLabel}
           period="December 2025"
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}
-          movements={canFetchStatements ? globalMovements : []}
+          movements={canFetchStatements ? globalMovements : previewMovements}
           movementsLoading={canFetchStatements ? globalLoading : false}
           movementsError={canFetchStatements ? globalError : null}
           movementsHasMore={canFetchStatements ? globalHasMore : false}
@@ -290,6 +258,9 @@ export default function WalletDashboardStatementModals({
           issuer={selectedStatementToken.issuer}
           walletAddress={effectiveWallet}
           backendWalletAddress={backendWalletAddress}
+          isPreviewMode={isPreviewMode}
+          noticeVariant={noticeVariant}
+          noticeContextLabel={noticeContextLabel}
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}

@@ -22,6 +22,7 @@ export default function PriceTicker({
   pairs = [],
   fixed = false,
   backgroundClass,
+  mobileVariant = "marquee", // "marquee" | "scroll"
 }) {
   const { t } = useTranslation("common");
   const [pricesData, setPricesData] = useState([]);
@@ -191,17 +192,62 @@ export default function PriceTicker({
   })();
 
   const resolvedBgClass = backgroundClass || "bg-black/60";
+  const resolvedMobileVariant = mobileVariant === "scroll" ? "scroll" : "marquee";
 
   return (
     <div
-      className={`w-full backdrop-blur-xl overflow-hidden ${
+      className={`w-full min-w-0 max-w-full backdrop-blur-xl overflow-x-hidden ${
         fixed
           ? "fixed top-16 left-0 z-30"
           : ""
       } ${resolvedBgClass}`}
     >
+      {resolvedMobileVariant === "scroll" && (
+        <div
+          className="md:hidden w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          <div className="inline-flex items-center gap-3 whitespace-nowrap px-3 py-2 w-max">
+            {pricesData.slice(0, 20).map((item) => (
+              <div
+                key={item.backendPair || item.pair}
+                className="flex flex-none items-center gap-2 px-1 py-1"
+              >
+                <span className="hidden sm:inline-block">
+                  <SparklineMini
+                    values={item.sparkline}
+                    strokeColor={item.isPositive ? "#10b981ff" : "#dc2626"}
+                    width={40}
+                    height={18}
+                    className="inline-block"
+                  />
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-white/80 font-semibold text-[10px]">
+                    {item.pair}
+                  </span>
+                  <span className="text-white text-[10px] font-medium font-mono tabular-nums max-w-[72px] truncate text-right">
+                    {item.price}
+                  </span>
+                  <span
+                    className={`text-[10px] font-semibold font-mono tabular-nums w-11 text-right ${
+                      item.isPositive ? "text-xcannes-green" : "text-red-500"
+                    }`}
+                  >
+                    {item.isPositive ? "+" : ""}
+                    {item.change}%
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div
-        className="relative flex items-center py-2 md:py-2"
+        className={`relative flex items-center py-2 md:py-2 ${
+          resolvedMobileVariant === "scroll" ? "hidden md:flex" : ""
+        }`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}
@@ -213,36 +259,36 @@ export default function PriceTicker({
               isPaused ? "paused" : ""
             }`}
           >
-          {displayData.map((item) => (
-            <div
-              key={item.backendPair || item.pair}
-              className="flex items-center gap-3 px-2 py-1"
-            >
-              <SparklineMini
-                values={item.sparkline}
-                strokeColor={item.isPositive ? "#10b981ff" : "#dc2626"}
-                width={40}
-                height={20}
-                className="inline-block"
-              />
-              <div className="flex items-center gap-2">
-                <span className="text-white/80 font-semibold text-sm">
-                  {item.pair}
-                </span>
-                <span className="text-white text-sm font-medium font-mono w-20 text-right">
-                  {item.price}
-                </span>
-                <span
-                  className={`text-xs font-semibold font-mono w-14 text-right ${
-                    item.isPositive ? "text-xcannes-green" : "text-red-500"
-                  }`}
-                >
-                  {item.isPositive ? "+" : ""}
-                  {item.change}%
-                </span>
+            {displayData.map((item) => (
+              <div
+                key={item.backendPair || item.pair}
+                className="flex items-center gap-3 px-2 py-1"
+              >
+                <SparklineMini
+                  values={item.sparkline}
+                  strokeColor={item.isPositive ? "#10b981ff" : "#dc2626"}
+                  width={40}
+                  height={20}
+                  className="inline-block"
+                />
+                <div className="flex items-center gap-2">
+                  <span className="text-white/80 font-semibold text-sm">
+                    {item.pair}
+                  </span>
+                  <span className="text-white text-sm font-medium font-mono w-20 text-right">
+                    {item.price}
+                  </span>
+                  <span
+                    className={`text-xs font-semibold font-mono w-14 text-right ${
+                      item.isPositive ? "text-xcannes-green" : "text-red-500"
+                    }`}
+                  >
+                    {item.isPositive ? "+" : ""}
+                    {item.change}%
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </div>

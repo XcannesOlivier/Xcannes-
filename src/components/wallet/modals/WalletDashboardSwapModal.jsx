@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-	import TokenAmountInput from "@/components/ui/TokenAmountInput";
-import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
-	import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
-	import WalletDashboardCurrencyLineEditor from "../components/WalletDashboardCurrencyLineEditor";
+	import { useEffect, useMemo, useState } from "react";
+		import TokenAmountInput from "@/components/ui/TokenAmountInput";
+	import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
+		import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
+		import WalletDashboardCurrencyLineEditor from "../components/WalletDashboardCurrencyLineEditor";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
+import { createPortal } from "react-dom";
 
 export default function WalletDashboardSwapModal({
   open,
   onClose,
   renderWalletMeta,
   isPreviewMode,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
   effectiveIsConnected,
   hasOnChainRlusd,
   hasOnChainXcs,
@@ -62,7 +66,7 @@ export default function WalletDashboardSwapModal({
 
   if (!open) return null;
 
-  return (
+  const content = (
     <>
       {/* Backdrop */}
       <div
@@ -89,13 +93,18 @@ export default function WalletDashboardSwapModal({
           <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">
             Convert assets
           </h3>
-          <p className="text-xs md:text-sm text-white/60">
-            Conversion interne des allocations RLUSD (pool RLUSD ↔ devises).
-          </p>
-          {renderWalletMeta?.("mb-2")}
+	          <p className="text-xs md:text-sm text-white/60">
+	            Conversion interne des allocations RLUSD (pool RLUSD ↔ devises).
+	          </p>
+	          {renderWalletMeta?.("mb-2")}
+	          <WalletNotConnectedNotice
+              show={isPreviewMode}
+              variant={noticeVariant}
+              contextLabel={noticeContextLabel}
+            />
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
+	          <div className="grid grid-cols-2 gap-2">
+	            <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
@@ -362,4 +371,7 @@ export default function WalletDashboardSwapModal({
       </div>
     </>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }
