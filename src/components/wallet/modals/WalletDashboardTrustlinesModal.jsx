@@ -3,10 +3,14 @@
 import WalletDashboardTrustlinesAddForm from "../components/WalletDashboardTrustlinesAddForm";
 import WalletDashboardTrustlinesFooter from "../components/WalletDashboardTrustlinesFooter";
 import WalletDashboardTrustlinesList from "../components/WalletDashboardTrustlinesList";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 
 export default function WalletDashboardTrustlinesModal({
   open,
   onClose,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
   trustlineCode,
   setTrustlineCode,
   trustlineLocked,
@@ -50,6 +54,11 @@ export default function WalletDashboardTrustlinesModal({
           <p className="text-[11px] text-white/60 mb-2">
             Ajoutez ou supprimez vos lignes internes de suivi XCS.
           </p>
+          <WalletNotConnectedNotice
+            show={isPreviewMode}
+            variant={noticeVariant}
+            contextLabel={noticeContextLabel}
+          />
 
           {/* Formulaire ajout trustline */}
           <WalletDashboardTrustlinesAddForm

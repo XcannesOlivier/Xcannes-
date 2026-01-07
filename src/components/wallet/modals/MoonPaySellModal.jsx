@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -11,7 +12,17 @@ const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
  * @param {string} walletAddress - Adresse XRPL source
  * @param {boolean} embedded - Mode embedded (sans backdrop/header)
  */
-const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) => {
+const MoonPaySellModal = ({
+  isOpen,
+  onClose,
+  walletAddress,
+  embedded = false,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
+  demoMode = false,
+  onDemoSubmit,
+}) => {
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -58,6 +69,25 @@ const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) 
     setStep('loading');
 
     try {
+      if (demoMode) {
+        const res = await Promise.resolve(
+          onDemoSubmit?.({
+          currencyCode: String(currency || "RLUSD").toUpperCase(),
+          quoteCurrencyCode: String(quoteCurrency || "USD").toUpperCase(),
+          amount: parseFloat(amount),
+          })
+        );
+        if (res?.error) {
+          throw new Error(res.error);
+        }
+        setIframeUrl(null);
+        setStep('success');
+        setTimeout(() => {
+          onClose?.();
+        }, 1200);
+        return;
+      }
+
       const response = await fetch('/api/moonpay/generate-sell-url', {
         method: 'POST',
         headers: {
@@ -138,9 +168,22 @@ const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
     <div className={embedded ? "" : "p-4 md:p-5"}>
+      <WalletNotConnectedNotice
+        show={isPreviewMode}
+        className={embedded ? "mb-4" : "mb-4"}
+        variant={noticeVariant}
+        contextLabel={noticeContextLabel}
+      />
             {/* Form */}
             {step === 'form' && (
               <div className="space-y-4">
+                {demoMode && (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+                    <p className="text-xs text-emerald-200">
+                      Mode démo : la vente est simulée (aucune redirection MoonPay).
+                    </p>
+                  </div>
+                )}
                 {/* Currency selector */}
                 <div>
                   <label className="block text-sm font-medium text-white/80 mb-2">
@@ -233,7 +276,9 @@ const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) 
                 {/* Info box */}
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                   <p className="text-xs text-blue-400">
-                    💰 Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries.
+                    {demoMode
+                      ? "💰 Demo mode: the sell is simulated (no bank transfer)."
+                      : "💰 Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries."}
                   </p>
                 </div>
 
@@ -244,7 +289,11 @@ const MoonPaySellModal = ({ isOpen, onClose, walletAddress, embedded = false }) 
                   disabled={loading || !amount}
                   className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 border border-white/10"
                 >
-                  {loading ? 'Loading...' : 'Continue to Sell'}
+                  {loading
+                    ? 'Loading...'
+                    : demoMode
+                      ? "Simuler la vente"
+                      : 'Continue to Sell'}
                 </button>
               </div>
             )}

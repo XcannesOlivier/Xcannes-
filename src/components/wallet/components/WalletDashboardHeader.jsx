@@ -58,7 +58,6 @@ export default function WalletDashboardHeader({
         <p className="text-2xl md:text-3xl font-orbitron font-semibold text-white">
           {totalLabel}
         </p>
-        <p className="text-[11px] text-xcannes-green">≈ 1.00 USD</p>
 
         {/* Bouton Global Statement - Toujours visible, même en démo */}
         <button

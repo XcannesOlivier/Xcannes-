@@ -2,10 +2,18 @@
 
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
+import { createPortal } from "react-dom";
 
 export default function WalletDashboardCashModal({
   open,
   onClose,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
+  demoMode = false,
+  onDemoBuy,
+  onDemoSell,
   cashModalTab,
   setCashModalTab,
   renderWalletMeta,
@@ -13,7 +21,7 @@ export default function WalletDashboardCashModal({
 }) {
   if (!open) return null;
 
-  return (
+  const content = (
     <>
       {/* Backdrop */}
       <div
@@ -24,7 +32,7 @@ export default function WalletDashboardCashModal({
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-          className="relative w-full max-w-2xl bg-gray-900 border border-white/10 rounded-2xl overflow-hidden pointer-events-auto"
+          className="relative w-full max-w-2xl bg-gray-900 border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header avec onglets Buy/Sell */}
@@ -42,6 +50,13 @@ export default function WalletDashboardCashModal({
               </button>
             </div>
             <div className="px-4 pb-3">{renderWalletMeta?.()}</div>
+            <div className="px-4 pb-4">
+              <WalletNotConnectedNotice
+                show={isPreviewMode}
+                variant={noticeVariant}
+                contextLabel={noticeContextLabel}
+              />
+            </div>
 
             {/* Onglets Buy/Sell */}
             <div className="flex gap-2 px-4 pt-3">
@@ -95,13 +110,21 @@ export default function WalletDashboardCashModal({
           </div>
 
           {/* Contenu selon l'onglet actif */}
-          <div className="p-4 md:p-5">
+          <div
+            className="p-4 md:p-5 overflow-y-auto overscroll-contain flex-1 min-h-0"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {cashModalTab === "buy" ? (
               <MoonPayBuyModal
                 isOpen={true}
                 onClose={onClose}
                 walletAddress={walletAddress || ""}
                 embedded={true}
+                isPreviewMode={isPreviewMode}
+                demoMode={demoMode}
+                onDemoSubmit={onDemoBuy}
+                noticeVariant={noticeVariant}
+                noticeContextLabel={noticeContextLabel}
               />
             ) : (
               <MoonPaySellModal
@@ -109,6 +132,11 @@ export default function WalletDashboardCashModal({
                 onClose={onClose}
                 walletAddress={walletAddress || ""}
                 embedded={true}
+                isPreviewMode={isPreviewMode}
+                demoMode={demoMode}
+                onDemoSubmit={onDemoSell}
+                noticeVariant={noticeVariant}
+                noticeContextLabel={noticeContextLabel}
               />
             )}
           </div>
@@ -116,5 +144,7 @@ export default function WalletDashboardCashModal({
       </div>
     </>
   );
-}
 
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
+}

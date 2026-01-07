@@ -1,6 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 
 export function WalletInfoContent({ withCloseGutter = false }) {
   return (
@@ -122,7 +123,13 @@ export function WalletInfoContent({ withCloseGutter = false }) {
   );
 }
 
-export default function WalletInfoModal({ isOpen, onClose }) {
+export default function WalletInfoModal({
+  isOpen,
+  onClose,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
+}) {
   if (!isOpen) return null;
   if (typeof document === "undefined") return null;
 
@@ -147,6 +154,12 @@ export default function WalletInfoModal({ isOpen, onClose }) {
             ✕
           </button>
 
+          <WalletNotConnectedNotice
+            show={isPreviewMode}
+            className="mb-4"
+            variant={noticeVariant}
+            contextLabel={noticeContextLabel}
+          />
           <WalletInfoContent withCloseGutter />
         </div>
       </div>

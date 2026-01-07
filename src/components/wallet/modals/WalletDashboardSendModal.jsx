@@ -1,10 +1,15 @@
 "use client";
 
 	import TokenAmountInput from "@/components/ui/TokenAmountInput";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
+import { createPortal } from "react-dom";
 
 export default function WalletDashboardSendModal({
   open,
   onClose,
+  isPreviewMode = false,
+  noticeVariant = "preview",
+  noticeContextLabel = "",
   sendTab,
   setSendTab,
   renderWalletMeta,
@@ -24,7 +29,7 @@ export default function WalletDashboardSendModal({
 }) {
   if (!open) return null;
 
-  return (
+  const content = (
     <>
       {/* Backdrop */}
       <div
@@ -52,6 +57,11 @@ export default function WalletDashboardSendModal({
             {sendTab === "manual" ? "Send assets" : "Pay Request"}
           </h3>
           {renderWalletMeta?.("mb-2")}
+          <WalletNotConnectedNotice
+            show={isPreviewMode}
+            variant={noticeVariant}
+            contextLabel={noticeContextLabel}
+          />
 
           {/* Tabs */}
           <div className="flex gap-2 mb-3">
@@ -132,7 +142,7 @@ export default function WalletDashboardSendModal({
               {sendFxInfo && (
                 <div className="rounded-xl border border-white/10 bg-black/20 p-3">
                   <div className="text-[11px] font-semibold text-white/80">
-                    Paiement FX (on-chain en RLUSD)
+                    Paiement FX (base USD · règlement XRPL via RLUSD)
                   </div>
                   <p className="mt-1 text-[11px] text-white/60">
                     ≈{" "}
@@ -337,4 +347,7 @@ export default function WalletDashboardSendModal({
       </div>
     </>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

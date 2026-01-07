@@ -59,7 +59,8 @@ export default function WalletDashboard({
   isFullPage = false,
   variant,
 }) {
-  const DEMO_RLUSD_TOTAL = 1000;
+  // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
+  const DEMO_RLUSD_TOTAL = 0;
   const layout = useMemo(
     () => resolveWalletLayout(variant, isFullPage),
     [variant, isFullPage]
@@ -190,7 +191,7 @@ export default function WalletDashboard({
 
   const effectiveBalance = isPreviewMode
     ? {
-        xrp: "12345.6789",
+        xrp: "0",
         // En mode preview, on laisse la liste de devises vide
         // pour que les lignes soient créées via les trustlines.
         tokens: [],
@@ -264,7 +265,7 @@ export default function WalletDashboard({
           key: "DEMO:XCS",
           currency: "XCS",
           issuer: "Trustline",
-          value: 250,
+          value: 0,
           demoRlusdValue: 0,
         });
         seen.add("XCS");
@@ -1555,6 +1556,7 @@ export default function WalletDashboard({
         <WalletInfoModal
           isOpen={walletInfoOpen}
           onClose={() => setWalletInfoOpen(false)}
+          isPreviewMode={isPreviewMode}
         />
       </div>
 
@@ -1564,6 +1566,7 @@ export default function WalletDashboard({
           <WalletDashboardSendModal
             open={activeAction === "send"}
             onClose={() => setActiveAction(null)}
+            isPreviewMode={isPreviewMode}
             sendTab={sendTab}
             setSendTab={setSendTab}
             renderWalletMeta={renderWalletMeta}
@@ -1585,6 +1588,7 @@ export default function WalletDashboard({
           <WalletDashboardReceiveModal
             open={activeAction === "receive"}
             onClose={() => setActiveAction(null)}
+            isPreviewMode={isPreviewMode}
             receiveTab={receiveTab}
             setReceiveTab={setReceiveTab}
             renderWalletMeta={renderWalletMeta}
@@ -1638,33 +1642,36 @@ export default function WalletDashboard({
             convertProcessing={convertProcessing}
           />
 
-      <WalletDashboardCashModal
-        open={activeAction === "cash"}
-        onClose={() => setActiveAction(null)}
-        cashModalTab={cashModalTab}
-        setCashModalTab={setCashModalTab}
-        renderWalletMeta={renderWalletMeta}
-        walletAddress={effectiveWallet || ""}
-      />
+	      <WalletDashboardCashModal
+	        open={activeAction === "cash"}
+	        onClose={() => setActiveAction(null)}
+          isPreviewMode={isPreviewMode}
+	        cashModalTab={cashModalTab}
+	        setCashModalTab={setCashModalTab}
+	        renderWalletMeta={renderWalletMeta}
+	        walletAddress={effectiveWallet || ""}
+	      />
 
-      <WalletDashboardTrustlineCurrencyModal
-        open={activeAction === "trustlineCurrency" && !!editingTrustlineCurrency}
-        onClose={handleCloseTrustlineEditor}
-        editingTrustlineCurrency={editingTrustlineCurrency}
-        currentEditingLine={currentEditingLine}
-        editingTrustlineLocked={editingTrustlineLocked}
-        setEditingTrustlineLocked={setEditingTrustlineLocked}
-        handleSaveTrustlineCurrency={handleSaveTrustlineCurrency}
-        handleRemoveTrustlineCurrency={handleRemoveTrustlineCurrency}
-      />
+	      <WalletDashboardTrustlineCurrencyModal
+	        open={activeAction === "trustlineCurrency" && !!editingTrustlineCurrency}
+	        onClose={handleCloseTrustlineEditor}
+          isPreviewMode={isPreviewMode}
+	        editingTrustlineCurrency={editingTrustlineCurrency}
+	        currentEditingLine={currentEditingLine}
+	        editingTrustlineLocked={editingTrustlineLocked}
+	        setEditingTrustlineLocked={setEditingTrustlineLocked}
+	        handleSaveTrustlineCurrency={handleSaveTrustlineCurrency}
+	        handleRemoveTrustlineCurrency={handleRemoveTrustlineCurrency}
+	      />
 
-      <WalletDashboardTrustlinesModal
-        open={activeAction === "trustlines"}
-        onClose={() => setActiveAction(null)}
-        trustlineCode={trustlineCode}
-        setTrustlineCode={setTrustlineCode}
-        trustlineLocked={trustlineLocked}
-        setTrustlineLocked={setTrustlineLocked}
+	      <WalletDashboardTrustlinesModal
+	        open={activeAction === "trustlines"}
+	        onClose={() => setActiveAction(null)}
+          isPreviewMode={isPreviewMode}
+	        trustlineCode={trustlineCode}
+	        setTrustlineCode={setTrustlineCode}
+	        trustlineLocked={trustlineLocked}
+	        setTrustlineLocked={setTrustlineLocked}
         handleAddTrustline={handleAddTrustline}
         walletLinesLoading={walletLinesLoading}
         walletLinesError={walletLinesError}
@@ -1709,14 +1716,15 @@ export default function WalletDashboard({
         }}
       />
 
-      <WalletDashboardStatementModals
-        augmentedTokens={augmentedTokens}
-        backendWalletAddress={backendWalletAddress}
-        effectiveWallet={effectiveWallet}
-        isFullPageView={isFullPageView}
-        statementVariant={statementVariant}
-        currencyLines={effectiveCurrencyLines}
-        usdRates={usdRates}
+	      <WalletDashboardStatementModals
+	        augmentedTokens={augmentedTokens}
+	        backendWalletAddress={backendWalletAddress}
+	        effectiveWallet={effectiveWallet}
+          isPreviewMode={isPreviewMode}
+	        isFullPageView={isFullPageView}
+	        statementVariant={statementVariant}
+	        currencyLines={effectiveCurrencyLines}
+	        usdRates={usdRates}
         showGlobalStatement={showGlobalStatement}
         setShowGlobalStatement={setShowGlobalStatement}
         showCurrencyStatement={showCurrencyStatement}

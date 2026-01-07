@@ -131,48 +131,39 @@ export default function HomeLocalPaymentSection({ availablePairs = [] }) {
   }, [currency, availablePairs]);
 
   return (
-    <section className="relative py-16 md:py-20 px-4 sm:px-6">
+    <section id="simulation" className="relative py-16 md:py-20 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">
-              {t("home_localpay_badge", "Paiement local")}
+              {t("home_v2_sim_badge", "Simulation")}
             </p>
             <h2 className="text-2xl sm:text-3xl font-montserrat font-semibold text-white">
-              {t("home_localpay_title", "Le client paie dans sa monnaie.")}
+              {t("home_v2_sim_title", "Le client paie dans sa monnaie.")}
             </h2>
             <p className="mt-3 text-sm sm:text-base text-white/65 max-w-xl">
               {t(
-                "home_localpay_subtitle",
-                "Sur XCANNES, les montants, reçus et relevés sont présentés dans la devise du pays — tout en restant adossés à la stabilité USD."
+                "home_v2_sim_subtitle",
+                "Les montants, reçus et relevés sont présentés dans la devise du pays."
               )}
             </p>
 
             <div className="mt-6 space-y-2 text-sm text-white/65">
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green" />
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-white/30" />
                 <span>
                   {t(
-                    "home_localpay_point1",
-                    "Les prix et montants s’affichent en monnaie locale."
+                    "home_v2_sim_point1",
+                    "Affichage en monnaie locale."
                   )}
                 </span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green" />
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-white/30" />
                 <span>
                   {t(
-                    "home_localpay_point2",
-                    "Validation via Xumm/Xaman, signature explicite."
-                  )}
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green" />
-                <span>
-                  {t(
-                    "home_localpay_point3",
-                    "Conversions au taux marché (selon disponibilité des paires)."
+                    "home_v2_sim_point2",
+                    "Valeur de référence affichée en secondaire."
                   )}
                 </span>
               </div>
@@ -237,7 +228,7 @@ export default function HomeLocalPaymentSection({ availablePairs = [] }) {
 
               <div className="mt-2 flex items-baseline justify-between gap-3">
                 <div className="text-xs text-white/55">
-                  {t("home_localpay_backed_by", "Valeur adossée (USD)")}
+                  {t("home_v2_sim_reference_label", "Référence (USD)")}
                 </div>
                 <div className="text-sm font-semibold text-white/85">
                   {usdEquivalent !== null
@@ -249,8 +240,8 @@ export default function HomeLocalPaymentSection({ availablePairs = [] }) {
               <div className="mt-4 rounded-xl bg-black/25 border border-white/10 px-4 py-3">
                 <div className="text-[11px] text-white/55 leading-relaxed">
                   {t(
-                    "home_localpay_demo_note",
-                    "L’utilisateur interagit en monnaie locale. La stabilité est assurée par une base USD."
+                    "home_v2_sim_note",
+                    "L’utilisateur interagit en monnaie locale. La référence reste stable."
                   )}
                 </div>
               </div>

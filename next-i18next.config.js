@@ -1,4 +1,5 @@
 module.exports = {
+  fallbackLng: "en",
   i18n: {
     defaultLocale: "en",
     locales: [
