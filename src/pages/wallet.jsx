@@ -1,7 +1,7 @@
 "use client";
 
 	import { useTranslation } from "next-i18next";
-	import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+	import { getPageTranslations } from "@/i18n/getPageTranslations";
 	import WalletDashboard from "@/components/wallet/WalletDashboard";
 	import SEOHead from "@/components/layout/SEOHead";
 	import { useXumm } from "@/context/XummContext";
@@ -34,7 +34,7 @@ export default function Wallet() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...(await getPageTranslations(locale, ["common"])),
     },
   };
 }

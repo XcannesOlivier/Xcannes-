@@ -1,33 +1,33 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-	import { createPortal } from "react-dom";
-	import { QRCodeCanvas } from "qrcode.react";
-	import Image from "next/image";
-	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import { createPortal } from "react-dom";
+import { QRCodeCanvas } from "qrcode.react";
+import Image from "next/image";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";
+import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";import { useTranslation } from "next-i18next";
 
 const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
-  "RLUSD",
-  "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
-];
+"RLUSD",
+"USD",
+"USDC",
+"USDT",
+"BUSD",
+"DAI",
+"TUSD",
+"USDP",
+"GUSD"];
+
 
 /**
  * Composant de relevé bancaire pour une devise spécifique
  */
-export default function CurrencyStatement({ 
-  currency, 
-  balance, 
+export default function CurrencyStatement({
+  currency,
+  balance,
   issuer,
   walletAddress,
   backendWalletAddress,
@@ -47,8 +47,8 @@ export default function CurrencyStatement({
   hasRlusdTrustline = false,
   hasXcsTrustline = false,
   xcannesCurrencyLinesCount = 0,
-  onClose 
-}) {
+  onClose
+}) {const { t } = useTranslation("common");
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
@@ -96,8 +96,8 @@ export default function CurrencyStatement({
       typeof backendWalletAddress === "string" &&
       backendWalletAddress.startsWith("r") &&
       backendWalletAddress.length >= 25 &&
-      ["XRP", "RLUSD", "XCS"].includes(normalizedCurrency)
-    );
+      ["XRP", "RLUSD", "XCS"].includes(normalizedCurrency));
+
   }, [backendWalletAddress, normalizedCurrency]);
 
   const fetchXrplPayments = useCallback(
@@ -135,9 +135,9 @@ export default function CurrencyStatement({
 
     try {
       const dir =
-        xrplDirection === "send" || xrplDirection === "receive"
-          ? xrplDirection
-          : null;
+      xrplDirection === "send" || xrplDirection === "receive" ?
+      xrplDirection :
+      null;
       const data = await fetchXrplPayments({ direction: dir });
       setXrplPayments(Array.isArray(data?.payments) ? data.payments : []);
       setXrplHasMore(Boolean(data?.hasMore));
@@ -161,12 +161,12 @@ export default function CurrencyStatement({
 
     try {
       const dir =
-        xrplDirection === "send" || xrplDirection === "receive"
-          ? xrplDirection
-          : null;
+      xrplDirection === "send" || xrplDirection === "receive" ?
+      xrplDirection :
+      null;
       const data = await fetchXrplPayments({
         cursor: xrplCursorNext,
-        direction: dir,
+        direction: dir
       });
       const more = Array.isArray(data?.payments) ? data.payments : [];
       setXrplPayments((prev) => [...(prev || []), ...more]);
@@ -179,13 +179,13 @@ export default function CurrencyStatement({
       setXrplLoadingMore(false);
     }
   }, [
-    canFetchXrplPayments,
-    fetchXrplPayments,
-    xrplCursorNext,
-    xrplDirection,
-    xrplHasMore,
-    xrplLoadingMore,
-  ]);
+  canFetchXrplPayments,
+  fetchXrplPayments,
+  xrplCursorNext,
+  xrplDirection,
+  xrplHasMore,
+  xrplLoadingMore]
+  );
 
   useEffect(() => {
     if (ledgerTab !== "xrpl") return;
@@ -229,7 +229,7 @@ export default function CurrencyStatement({
       totalReserveXrp,
       activationXrp,
       trustlineRlusdXrp,
-      trustlineXcsXrp,
+      trustlineXcsXrp
     };
   }, [normalizedCurrency]);
 
@@ -241,7 +241,7 @@ export default function CurrencyStatement({
     const linesCount = Number(xcannesCurrencyLinesCount || 0);
     const lockXcsPerLine = 0.2;
     const xcannesLinesLockedXcs =
-      Number.isFinite(linesCount) && linesCount > 0 ? linesCount * lockXcsPerLine : 0;
+    Number.isFinite(linesCount) && linesCount > 0 ? linesCount * lockXcsPerLine : 0;
     const totalLockedXcs = walletActivationXcs + xcannesLinesLockedXcs;
 
     return {
@@ -249,7 +249,7 @@ export default function CurrencyStatement({
       walletActivationXcs,
       xcannesCurrencyLinesCount: Number.isFinite(linesCount) ? linesCount : 0,
       lockXcsPerLine,
-      xcannesLinesLockedXcs,
+      xcannesLinesLockedXcs
     };
   }, [normalizedCurrency, xcannesCurrencyLinesCount]);
 
@@ -257,7 +257,7 @@ export default function CurrencyStatement({
   const generateMonths = () => {
     const months = [];
     const currentDate = new Date();
-    
+
     for (let i = 0; i < 12; i++) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
       months.push({
@@ -266,9 +266,9 @@ export default function CurrencyStatement({
         displayLabel: date.toLocaleDateString('en-US', { month: 'long' }) // Juste le mois pour l'affichage
       });
     }
-    
-    months.push({ 
-      value: 'archives', 
+
+    months.push({
+      value: 'archives',
       label: 'Archives (12+ months)',
       displayLabel: 'Archives'
     });
@@ -281,16 +281,16 @@ export default function CurrencyStatement({
 
 
   // Calculer les statistiques
-  const credits = transactions.filter(t => t.type === "credit");
-  const debits = transactions.filter(t => t.type === "debit");
-  
+  const credits = transactions.filter((t) => t.type === "credit");
+  const debits = transactions.filter((t) => t.type === "debit");
+
   const totalCredits = credits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
   const totalDebits = debits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  
+
   const openingBalance = balance - totalCredits + totalDebits;
   const closingBalance = balance;
   const netChange = closingBalance - openingBalance;
-  const percentChange = openingBalance !== 0 ? ((netChange / openingBalance) * 100) : 0;
+  const percentChange = openingBalance !== 0 ? netChange / openingBalance * 100 : 0;
 
   // Statistiques supplémentaires
   const avgTransaction = transactions.length > 0 ? (totalCredits + totalDebits) / transactions.length : 0;
@@ -298,7 +298,7 @@ export default function CurrencyStatement({
     const amount = parseFloat(t.amount || 0);
     return amount > max ? amount : max;
   }, 0);
-  
+
   // Catégorisation par type
   const transactionsByCategory = transactions.reduce((acc, tx) => {
     const cat = tx.category || 'other';
@@ -310,17 +310,17 @@ export default function CurrencyStatement({
 
   // Données pour graphiques (fictives basées sur les transactions)
   const monthlyData = [
-    { day: '01', balance: openingBalance * 0.95 },
-    { day: '05', balance: openingBalance * 0.92 },
-    { day: '10', balance: openingBalance * 0.98 },
-    { day: '15', balance: openingBalance * 1.05 },
-    { day: '20', balance: openingBalance * 1.02 },
-    { day: '25', balance: openingBalance * 1.08 },
-    { day: '28', balance: closingBalance },
-  ];
+  { day: '01', balance: openingBalance * 0.95 },
+  { day: '05', balance: openingBalance * 0.92 },
+  { day: '10', balance: openingBalance * 0.98 },
+  { day: '15', balance: openingBalance * 1.05 },
+  { day: '20', balance: openingBalance * 1.02 },
+  { day: '25', balance: openingBalance * 1.08 },
+  { day: '28', balance: closingBalance }];
+
 
   // Filtrer les transactions
-  const filteredTransactions = transactions.filter(t => {
+  const filteredTransactions = transactions.filter((t) => {
     if (filter === "credit") return t.type === "credit";
     if (filter === "debit") return t.type === "debit";
     if (filter === "conversion") return t.category === "exchange";
@@ -340,7 +340,7 @@ export default function CurrencyStatement({
   const getTransactionIcon = (category) => {
     const icons = {
       buy: "+",
-      sell: "−",
+      sell: "−"
     };
     return icons[category] || null;
   };
@@ -387,7 +387,7 @@ export default function CurrencyStatement({
       "GHS": "🇬🇭", // Cedi ghanéen
       "MAD": "🇲🇦", // Dirham marocain
       "TND": "🇹🇳", // Dinar tunisien
-      
+
       // Afrique
       "XOF": "🇸🇳", // Franc CFA (Sénégal)
       "XAF": "🇨🇲", // Franc CFA (Cameroun)
@@ -399,7 +399,7 @@ export default function CurrencyStatement({
       "ZMW": "🇿🇲", // Kwacha zambien
       "AOA": "🇦🇴", // Kwanza angolais
       "MZN": "🇲🇿", // Metical mozambicain
-      
+
       // Amérique Latine
       "VES": "🇻🇪", // Bolivar vénézuélien
       "UYU": "🇺🇾", // Peso uruguayen
@@ -414,7 +414,7 @@ export default function CurrencyStatement({
       "HTG": "🇭🇹", // Gourde haïtienne
       "JMD": "🇯🇲", // Dollar jamaïcain
       "TTD": "🇹🇹", // Dollar de Trinité-et-Tobago
-      
+
       // Asie-Pacifique
       "VND": "🇻🇳", // Dong vietnamien
       "LAK": "🇱🇦", // Kip laotien
@@ -431,7 +431,7 @@ export default function CurrencyStatement({
       "TJS": "🇹🇯", // Somoni tadjik
       "KGS": "🇰🇬", // Som kirghiz
       "TWD": "🇹🇼", // Dollar taïwanais
-      
+
       // Moyen-Orient
       "ILS": "🇮🇱", // Shekel israélien
       "JOD": "🇯🇴", // Dinar jordanien
@@ -443,7 +443,7 @@ export default function CurrencyStatement({
       "SYP": "🇸🇾", // Livre syrienne
       "LBP": "🇱🇧", // Livre libanaise
       "YER": "🇾🇪", // Rial yéménite
-      
+
       // Europe de l'Est et autres
       "CZK": "🇨🇿", // Couronne tchèque
       "HUF": "🇭🇺", // Forint hongrois
@@ -461,14 +461,14 @@ export default function CurrencyStatement({
       "MKD": "🇲🇰", // Denar macédonien
       "BAM": "🇧🇦", // Mark convertible bosniaque
       "ISK": "🇮🇸", // Couronne islandaise
-      
+
       // Océanie et autres
       "FJD": "🇫🇯", // Dollar fidjien
       "PGK": "🇵🇬", // Kina papouasien
       "WST": "🇼🇸", // Tala samoan
       "TOP": "🇹🇴", // Pa'anga tongien
       "VUV": "🇻🇺", // Vatu vanuatais
-      
+
       // Stablecoins et tokens fiat
       "RLUSD": "🔵", // Ripple USD (Stablecoin)
       "BUSD": "🟡", // Binance USD
@@ -480,70 +480,70 @@ export default function CurrencyStatement({
       "FRAX": "🔲", // Frax
       "LUSD": "🟦", // Liquity USD
       "sUSD": "🔶", // Synthetix USD
-      
+
       // Cryptomonnaies
       "XRP": "⚡", // XRP Ledger
-      "BTC": "₿",  // Bitcoin
-      "ETH": "Ξ",  // Ethereum
+      "BTC": "₿", // Bitcoin
+      "ETH": "Ξ", // Ethereum
       "USDT": "₮", // Tether
       "USDC": "🔵", // USD Coin
       "BNB": "🔶", // Binance Coin
-      "SOL": "◎",  // Solana
-      "ADA": "₳",  // Cardano
-      "DOGE": "Ð",  // Dogecoin
+      "SOL": "◎", // Solana
+      "ADA": "₳", // Cardano
+      "DOGE": "Ð", // Dogecoin
       "MATIC": "🟣", // Polygon
-      "DOT": "⬤",  // Polkadot
+      "DOT": "⬤", // Polkadot
       "LINK": "🔗", // Chainlink
       "AVAX": "🔺", // Avalanche
       "UNI": "🦄", // Uniswap
-      "ATOM": "⚛️",  // Cosmos
+      "ATOM": "⚛️", // Cosmos
       "XLM": "🚀", // Stellar
-      "ALGO": "◬",  // Algorand
+      "ALGO": "◬", // Algorand
       "VET": "💎", // VeChain
-      "ICP": "∞",  // Internet Computer
+      "ICP": "∞", // Internet Computer
       "FIL": "📁", // Filecoin
-      "NEAR": "Ⓝ",  // Near Protocol
-      "APT": "🅰️",  // Aptos
+      "NEAR": "Ⓝ", // Near Protocol
+      "APT": "🅰️", // Aptos
       "ARB": "🔷", // Arbitrum
-      "OP": "🔴",  // Optimism
+      "OP": "🔴", // Optimism
       "SAND": "🏖️", // The Sandbox
       "MANA": "🎮", // Decentraland
       "XCS": "🌟", // Xcannes Coin
       "SHIB": "🐕", // Shiba Inu
       "TRX": "🔺", // Tron
-      "LTC": "Ł",  // Litecoin
-      "BCH": "₿",  // Bitcoin Cash
-      "XMR": "ɱ",  // Monero
-      "ETC": "Ξ",  // Ethereum Classic
-      "XTZ": "ꜩ",  // Tezos
+      "LTC": "Ł", // Litecoin
+      "BCH": "₿", // Bitcoin Cash
+      "XMR": "ɱ", // Monero
+      "ETC": "Ξ", // Ethereum Classic
+      "XTZ": "ꜩ", // Tezos
       "EOS": "🔷", // EOS
       "AAVE": "👻", // Aave
-      "MKR": "Ⓜ️",  // Maker
+      "MKR": "Ⓜ️", // Maker
       "COMP": "🏦", // Compound
       "SNX": "🔷", // Synthetix
       "CRV": "🌊", // Curve
       "SUSHI": "🍣", // SushiSwap
       "YFI": "💼", // Yearn Finance
       "BAT": "🦇", // Basic Attention Token
-      "ZRX": "Ⓩ",  // 0x
+      "ZRX": "Ⓩ", // 0x
       "ENJ": "🎮", // Enjin Coin
       "CHZ": "⚽", // Chiliz
       "THETA": "📺", // Theta
       "FTM": "👻", // Fantom
-      "HBAR": "ℏ",  // Hedera
+      "HBAR": "ℏ", // Hedera
       "EGLD": "🏔️", // MultiversX (Elrond)
       "FLR": "🔥", // Flare
       "XDC": "🌐", // XDC Network
       "KAVA": "🌾", // Kava
       "ZIL": "💎", // Zilliqa
-      "QTUM": "⬡",  // Qtum
+      "QTUM": "⬡", // Qtum
       "WAVES": "🌊", // Waves
       "ICX": "🔷", // ICON
       "ONT": "⭕", // Ontology
       "ZEC": "🛡️", // Zcash
       "DASH": "💸", // Dash
       "DCR": "🔷", // Decred
-      "XCS": "🌟", // Xcannes Coin
+      "XCS": "🌟" // Xcannes Coin
     };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
   };
@@ -551,26 +551,26 @@ export default function CurrencyStatement({
   // Fonction pour enrichir la description avec des drapeaux
   const enrichDescription = (description) => {
     if (!description) return description;
-    
+
     // Remplacer les codes de devises par leurs drapeaux + code
     let enriched = description;
-    
+
     // Chercher les patterns courants: "XXX → YYY" ou "XXX/YYY"
     const currencyPattern = /\b([A-Z]{3})\b/g;
     enriched = enriched.replace(currencyPattern, (match) => {
       const flag = getCurrencyFlag(match);
       return `${flag} ${match}`;
     });
-    
+
     return enriched;
   };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
     const date = new Date(dateStr);
-    const options = isMobileDate
-      ? { day: "2-digit", month: "2-digit" }
-      : { day: "2-digit", month: "2-digit", year: "numeric" };
+    const options = isMobileDate ?
+    { day: "2-digit", month: "2-digit" } :
+    { day: "2-digit", month: "2-digit", year: "numeric" };
     return date.toLocaleDateString("fr-FR", options);
   };
 
@@ -586,87 +586,87 @@ export default function CurrencyStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full h-[100svh] max-h-[100svh] rounded-none border-0 md:max-w-4xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-5xl",
+      "w-full h-[100svh] max-h-[100svh] rounded-none border-0 md:max-w-4xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-5xl"
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-3 md:px-4",
       panelClass:
-        "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]",
+      "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]"
     },
     "dex-mobile": {
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-        "w-full h-[100svh] max-h-[100svh] rounded-none border-0",
+      "w-full h-[100svh] max-h-[100svh] rounded-none border-0"
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-4",
       panelClass:
-        "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[92vh]",
-    },
+      "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[92vh]"
+    }
   };
 
   const resolvedLayout = STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
 
-  const content = (
-    <div
-      className={`fixed inset-0 z-[10200] flex ${resolvedLayout.wrapperClass} ${resolvedLayout.backdropClass}`}
-      onClick={(e) => {
-        // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
-    >
+  const content =
+  <div
+    className={`fixed inset-0 z-[10200] flex ${resolvedLayout.wrapperClass} ${resolvedLayout.backdropClass}`}
+    onClick={(e) => {
+      // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    }}>
+
       <div
-        className={`relative w-full bg-elevated flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}
-      >
+      className={`relative w-full bg-elevated flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}>
+
         
 	        {/* Header avec Account Info intégré */}
 	        <div className="border-b border-white/10 flex-shrink-0 bg-elevated px-4 md:px-6 py-3 md:py-4">
 	          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-              {['XRP', 'RLUSD', 'XCS'].includes(currency) ? (
-                <Image 
-                  src={`/symbols/${currency.toLowerCase()}.png`} 
-                  alt={currency}
-                  width={32}
-                  height={32}
-                  className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
-                />
-              ) : (
-                <span className="text-2xl md:text-3xl flex-shrink-0">{getCurrencyFlag(currency)}</span>
-              )}
+              {['XRP', 'RLUSD', 'XCS'].includes(currency) ?
+            <Image
+              src={`/symbols/${currency.toLowerCase()}.png`}
+              alt={currency}
+              width={32}
+              height={32}
+              className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md" /> :
+
+
+            <span className="text-2xl md:text-3xl flex-shrink-0">{getCurrencyFlag(currency)}</span>
+            }
               <div className="min-w-0 flex-1">
                 <h2 className="text-lg md:text-xl font-bold text-white truncate">
-                  {currency} Statement
-                </h2>
+                  {currency}{t("ui_statement_a87c93acb8", "Statement")}
+              </h2>
                 <p className="text-xs md:text-sm text-white/60 truncate">
                   {getCurrencyDescription(currency)}
                 </p>
               </div>
             </div>
             <button
-              onClick={onClose}
-              className="text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
-            >
+            onClick={onClose}
+            className="text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2">
+
               ×
             </button>
 	          </div>
 
             <WalletNotConnectedNotice
-              show={isPreviewMode}
-              className="mb-3"
-              variant={noticeVariant}
-              contextLabel={noticeContextLabel}
-            />
+          show={isPreviewMode}
+          className="mb-3"
+          variant={noticeVariant}
+          contextLabel={noticeContextLabel} />
+
 	          
 	          {/* Account Info dans le header */}
 	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 	            <div>
-              <p className="text-xs text-white/50 mb-1">Account Holder</p>
+              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_3eef963295", "Account Holder")}</p>
               <p className="text-sm text-white font-semibold truncate">
                 {walletLabel || "Wallet"}
               </p>
@@ -675,129 +675,129 @@ export default function CurrencyStatement({
               </p>
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">Statement Period</p>
+              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_6dedec11d9", "Statement Period")}</p>
               {/* Month Selector - Version simplifiée */}
               <div className="relative">
                 <select
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value === 'archives' ? 'archives' : parseInt(e.target.value))}
-                  className="statement-select w-full bg-black/40 border border-white/20 rounded-md px-3 py-1.5 text-sm text-white cursor-pointer hover:border-white/40 transition-colors appearance-none pr-8"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 8px center',
-                    backgroundSize: '12px',
-                  }}
-                >
-                  {availableMonths.map((month) => (
-                    <option key={month.value} value={month.value} className="bg-[#040c13]">
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value === 'archives' ? 'archives' : parseInt(e.target.value))}
+                className="statement-select w-full bg-black/40 border border-white/20 rounded-md px-3 py-1.5 text-sm text-white cursor-pointer hover:border-white/40 transition-colors appearance-none pr-8"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 8px center',
+                  backgroundSize: '12px'
+                }}>
+
+                  {availableMonths.map((month) =>
+                <option key={month.value} value={month.value} className="bg-[#040c13]">
                       {month.label}
                     </option>
-                  ))}
+                )}
                 </select>
               </div>
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">Balance</p>
+              <p className="text-xs text-white/50 mb-1">{t("ui_balance_445d830d72", "Balance")}</p>
               <p className="text-sm text-white font-semibold">
                 {formatAmount(balance)} {currency}
               </p>
               <p className="text-[11px] text-white/50">
-                ≈ {formatAmount(estimatedUsd)} USD
-              </p>
+                ≈ {formatAmount(estimatedUsd)}{t("ui_usd_506842b2ba", "USD")}
+            </p>
 
-              {xrpReserveDetails && (
-                <div className="mt-2 relative">
+              {xrpReserveDetails &&
+            <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs text-white/50">Reserve</p>
+                      <p className="text-xs text-white/50">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
-                        {xrpReserveDetails.totalReserveXrp.toFixed(2)} XRP
-                      </p>
+                        {xrpReserveDetails.totalReserveXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}
+                  </p>
                     </div>
                     <button
-                      type="button"
-                      onClick={() => setReserveOpen((v) => !v)}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
-                      aria-expanded={reserveOpen}
-                      aria-label="Reserve breakdown"
-                    >
-                      Details
-                    </button>
+                  type="button"
+                  onClick={() => setReserveOpen((v) => !v)}
+                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                  aria-expanded={reserveOpen}
+                  aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
+
+
+                </button>
                   </div>
 
-                  {reserveOpen && (
-                    <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
+                  {reserveOpen &&
+              <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
                       <div className="text-[11px] text-white/70">
                         <div className="flex items-center justify-between gap-2">
-                          <span>Activation wallet</span>
-                          <span className="font-mono">{xrpReserveDetails.activationXrp.toFixed(2)} XRP</span>
+                          <span>{t("ui_activation_wallet_1dcd314549", "Activation wallet")}</span>
+                          <span className="font-mono">{xrpReserveDetails.activationXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>Trustline RLUSD {hasRlusdTrustline ? "(active)" : "(à activer)"}</span>
-                          <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)} XRP</span>
+                          <span>{t("ui_trustline_rlusd_9c077313dc", "Trustline RLUSD")}{hasRlusdTrustline ? "(active)" : "(à activer)"}</span>
+                          <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>Trustline XCS {hasXcsTrustline ? "(active)" : "(à activer)"}</span>
-                          <span className="font-mono">{xrpReserveDetails.trustlineXcsXrp.toFixed(2)} XRP</span>
+                          <span>{t("ui_trustline_xcs_91682deeea", "Trustline XCS")}{hasXcsTrustline ? "(active)" : "(à activer)"}</span>
+                          <span className="font-mono">{xrpReserveDetails.trustlineXcsXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                       </div>
                     </div>
-                  )}
+              }
                 </div>
-              )}
+            }
 
-              {xcsReserveDetails && (
-                <div className="mt-2 relative">
+              {xcsReserveDetails &&
+            <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs text-white/50">Reserve</p>
+                      <p className="text-xs text-white/50">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
-                        {xcsReserveDetails.totalLockedXcs.toFixed(2)} XCS
-                      </p>
+                        {xcsReserveDetails.totalLockedXcs.toFixed(2)}{t("ui_xcs_3a4119a8c0", "XCS")}
+                  </p>
                     </div>
                     <button
-                      type="button"
-                      onClick={() => setReserveOpen((v) => !v)}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
-                      aria-expanded={reserveOpen}
-                      aria-label="Reserve breakdown"
-                    >
-                      Details
-                    </button>
+                  type="button"
+                  onClick={() => setReserveOpen((v) => !v)}
+                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                  aria-expanded={reserveOpen}
+                  aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
+
+
+                </button>
                   </div>
 
-                  {reserveOpen && (
-                    <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
+                  {reserveOpen &&
+              <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
                       <div className="text-[11px] text-white/70">
                         <div className="flex items-center justify-between gap-2">
-                          <span>Activation wallet XCANNES</span>
+                          <span>{t("ui_activation_wallet_xcannes_92757c7cdd", "Activation wallet XCANNES")}</span>
                           <span className="font-mono">
-                            {xcsReserveDetails.walletActivationXcs.toFixed(2)} XCS
-                          </span>
+                            {xcsReserveDetails.walletActivationXcs.toFixed(2)}{t("ui_xcs_3a4119a8c0", "XCS")}
+                    </span>
                         </div>
                       </div>
 
                       <div className="pt-2 border-t border-white/10 text-[11px] text-white/70">
                         <div className="flex items-center justify-between gap-2">
-                          <span>
-                            Lignes de devises XCANNES ({xcsReserveDetails.xcannesCurrencyLinesCount} × {xcsReserveDetails.lockXcsPerLine.toFixed(2)} XCS)
-                          </span>
+                          <span>{t("ui_lignes_de_currencies_xcannes_1f3927f668", "Lignes de devises XCANNES (")}
+                      {xcsReserveDetails.xcannesCurrencyLinesCount} × {xcsReserveDetails.lockXcsPerLine.toFixed(2)}{t("ui_xcs_f516c57c4d", "XCS)")}
+                    </span>
                           <span className="font-mono">
-                            {xcsReserveDetails.xcannesLinesLockedXcs.toFixed(2)} XCS
-                          </span>
+                            {xcsReserveDetails.xcannesLinesLockedXcs.toFixed(2)}{t("ui_xcs_3a4119a8c0", "XCS")}
+                    </span>
                         </div>
-                        <p className="mt-1 text-[10px] text-white/45">
-                          Verrouillage XCS via escrow. Fermeture: 0.10 XCS remboursé, 0.10 XCS vers XCANNES.
-                        </p>
-                        <p className="mt-1 text-[10px] text-white/45">
-                          Inclut les lignes actives même si allocation = 0 RLUSD.
-                        </p>
+                        <p className="mt-1 text-[10px] text-white/45">{t("ui_locking_xcs_via_escrow__2d99312708", "Verrouillage XCS via escrow. Fermeture: 0.10 XCS remboursé, 0.10 XCS vers XCANNES.")}
+
+                  </p>
+                        <p className="mt-1 text-[10px] text-white/45">{t("ui_inclut_les_lignes_actives_m__0e52afcff8", "Inclut les lignes actives même si allocation = 0 RLUSD.")}
+
+                  </p>
                       </div>
                     </div>
-                  )}
+              }
                 </div>
-              )}
+            }
             </div>
           </div>
         </div>
@@ -806,193 +806,193 @@ export default function CurrencyStatement({
         <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
           
           {/* Archive Notice */}
-          {selectedMonth === 'archives' && (
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 md:p-4">
+          {selectedMonth === 'archives' &&
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 md:p-4">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <span className="text-xl">📁</span>
-                <span><strong>Archives:</strong> Displaying transactions older than 12 months.</span>
+                <span><strong>{t("ui_archives_743254edfe", "Archives:")}</strong>{t("ui_displaying_transactions_olde_e408b4a17d", "Displaying transactions older than 12 months.")}</span>
               </p>
             </div>
-          )}
+        }
 
           {/* Filters */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            {canFetchXrplPayments && (
-              <div className="flex gap-1.5">
+            {canFetchXrplPayments &&
+          <div className="flex gap-1.5">
                 <button
-                  type="button"
-                  onClick={() => setLedgerTab("statement")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    ledgerTab === "statement"
-                      ? "bg-white/10 text-white border border-white/15"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  Statement
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLedgerTab("xrpl")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    ledgerTab === "xrpl"
-                      ? "bg-[#0f7fe1]/20 text-[#78b8ff] border border-[#0f7fe1]/30"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  XRPL payments
-                </button>
-              </div>
-            )}
+              type="button"
+              onClick={() => setLedgerTab("statement")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              ledgerTab === "statement" ?
+              "bg-white/10 text-white border border-white/15" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_statement_a87c93acb8", "Statement")}
 
-            {ledgerTab === "xrpl" && canFetchXrplPayments ? (
-              <div className="flex gap-1.5 flex-wrap">
+
+            </button>
                 <button
-                  type="button"
-                  onClick={() => setXrplDirection("all")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    xrplDirection === "all"
-                      ? "bg-white/10 text-white border border-white/15"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  All
+              type="button"
+              onClick={() => setLedgerTab("xrpl")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              ledgerTab === "xrpl" ?
+              "bg-[#0f7fe1]/20 text-[#78b8ff] border border-[#0f7fe1]/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_xrpl_payments_78947fa490", "XRPL payments")}
+
+
+            </button>
+              </div>
+          }
+
+            {ledgerTab === "xrpl" && canFetchXrplPayments ?
+          <div className="flex gap-1.5 flex-wrap">
+                <button
+              type="button"
+              onClick={() => setXrplDirection("all")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              xrplDirection === "all" ?
+              "bg-white/10 text-white border border-white/15" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_all_32cb8ed597", "All")}
+
+
+            </button>
+                <button
+              type="button"
+              onClick={() => setXrplDirection("receive")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              xrplDirection === "receive" ?
+              "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_receive_61ed481e18", "Receive")}
+
+
+            </button>
+                <button
+              type="button"
+              onClick={() => setXrplDirection("send")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              xrplDirection === "send" ?
+              "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_send_71ed97cd73", "Send")}
+
+
+            </button>
+              </div> :
+
+          <div className="flex gap-1.5 flex-wrap">
+                <button
+              onClick={() => setFilter("all")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              filter === "all" ?
+              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_all_0c90d41d71", "All (")}
+
+              {transactions.length})
                 </button>
                 <button
-                  type="button"
-                  onClick={() => setXrplDirection("receive")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    xrplDirection === "receive"
-                      ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  Receive
+              onClick={() => setFilter("credit")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              filter === "credit" ?
+              "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_credits_b8166276a0", "Credits (")}
+
+              {credits.length})
                 </button>
                 <button
-                  type="button"
-                  onClick={() => setXrplDirection("send")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    xrplDirection === "send"
-                      ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30"
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  Send
+              onClick={() => setFilter("debit")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              filter === "debit" ?
+              "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_debits_38c870b18f", "Debits (")}
+
+              {debits.length})
+                </button>
+                <button
+              onClick={() => setFilter("conversion")}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+              filter === "conversion" ?
+              "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30" :
+              "bg-white/5 text-white/60 hover:bg-white/10"}`
+              }>{t("ui_conversions_b604b5ef8b", "Conversions (")}
+
+              {transactions.filter((t) => t.category === "exchange").length})
                 </button>
               </div>
-            ) : (
-              <div className="flex gap-1.5 flex-wrap">
-                <button
-                  onClick={() => setFilter("all")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    filter === "all" 
-                      ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" 
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  All ({transactions.length})
-                </button>
-                <button
-                  onClick={() => setFilter("credit")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    filter === "credit" 
-                      ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" 
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  Credits ({credits.length})
-                </button>
-                <button
-                  onClick={() => setFilter("debit")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    filter === "debit" 
-                      ? "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30" 
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  Debits ({debits.length})
-                </button>
-                <button
-                  onClick={() => setFilter("conversion")}
-                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                    filter === "conversion" 
-                      ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30" 
-                      : "bg-white/5 text-white/60 hover:bg-white/10"
-                  }`}
-                >
-                  Conversions ({transactions.filter(t => t.category === "exchange").length})
-                </button>
-              </div>
-            )}
+          }
           </div>
 
           {/* Transactions Table */}
           <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
-            {ledgerTab === "statement" && error && (
-              <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+            {ledgerTab === "statement" && error &&
+          <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
                 {error}
               </div>
-            )}
-            {ledgerTab === "xrpl" && xrplError && (
-              <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+          }
+            {ledgerTab === "xrpl" && xrplError &&
+          <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
                 {xrplError}
               </div>
-            )}
+          }
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-black/40 backdrop-blur-sm z-10">
-                  {ledgerTab === "xrpl" ? (
-                    <tr className="border-b border-white/10">
-                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Date</th>
-                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Counterparty</th>
-                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Amount</th>
-                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">Tx</th>
+                  {ledgerTab === "xrpl" ?
+                <tr className="border-b border-white/10">
+                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_date_bb69dc2fa3", "Date")}</th>
+                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_counterparty_cf147b1ba8", "Counterparty")}</th>
+                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_amount_1843418f56", "Amount")}</th>
+                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_tx_a0c330d97d", "Tx")}</th>
+                    </tr> :
+
+                <tr className="border-b border-white/10">
+                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_date_bb69dc2fa3", "Date")}</th>
+                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_description_d37d7cf577", "Description")}</th>
+                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_amount_1843418f56", "Amount")}</th>
+                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_balance_445d830d72", "Balance")}</th>
                     </tr>
-                  ) : (
-                    <tr className="border-b border-white/10">
-                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Date</th>
-                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Description</th>
-                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">Amount</th>
-                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">Balance</th>
-                    </tr>
-                  )}
+                }
                 </thead>
                 <tbody>
-                  {ledgerTab === "xrpl" ? (
-                    xrplLoading ? (
-                      <tr>
-                        <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
-                          Loading…
-                        </td>
-                      </tr>
-                    ) : xrplPayments.length === 0 ? (
-                      <tr>
-                        <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
-                          No XRPL payments found
-                        </td>
-                      </tr>
-                    ) : (
-                      xrplPayments.map((p) => {
-                        const createdAt = p?.createdAt ? new Date(p.createdAt) : null;
-                        const when =
-                          createdAt && Number.isFinite(createdAt.getTime())
-                            ? createdAt.toLocaleString("en-US")
-                            : "";
-                        const dir = String(p?.direction || "").toLowerCase();
-                        const isSend = dir === "send";
-                        const amount = Number(p?.value ?? 0);
-                        const txHash = String(p?.txHash || "");
-                        const counterparty = String(p?.counterparty || "");
-                        const explorerUrl = txHash ? `https://xrpscan.com/tx/${txHash}` : null;
-                        const payReq = extractXcannesPayReqFromMemos(p?.memos);
-                        const credited =
-                          payReq?.targetCurrencyCode || payReq?.targetCurrency || null;
+                  {ledgerTab === "xrpl" ?
+                xrplLoading ?
+                <tr>
+                        <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_loading_948e39804b", "Loading…")}
 
-                        return (
-                          <tr
-                            key={txHash || `${when}:${counterparty}:${amount}`}
-                            className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                          >
+                  </td>
+                      </tr> :
+                xrplPayments.length === 0 ?
+                <tr>
+                        <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_no_xrpl_payments_found_ea91b30191", "No XRPL payments found")}
+
+                  </td>
+                      </tr> :
+
+                xrplPayments.map((p) => {
+                  const createdAt = p?.createdAt ? new Date(p.createdAt) : null;
+                  const when =
+                  createdAt && Number.isFinite(createdAt.getTime()) ?
+                  createdAt.toLocaleString("en-US") :
+                  "";
+                  const dir = String(p?.direction || "").toLowerCase();
+                  const isSend = dir === "send";
+                  const amount = Number(p?.value ?? 0);
+                  const txHash = String(p?.txHash || "");
+                  const counterparty = String(p?.counterparty || "");
+                  const explorerUrl = txHash ? `https://xrpscan.com/tx/${txHash}` : null;
+                  const payReq = extractXcannesPayReqFromMemos(p?.memos);
+                  const credited =
+                  payReq?.targetCurrencyCode || payReq?.targetCurrency || null;
+
+                  return (
+                    <tr
+                      key={txHash || `${when}:${counterparty}:${amount}`}
+                      className="border-b border-white/5 hover:bg-white/5 transition-colors">
+
                             <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
                               {when}
                             </td>
@@ -1000,92 +1000,93 @@ export default function CurrencyStatement({
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
                                   <span
-                                    className={`text-[11px] font-semibold ${
-                                      isSend ? "text-red-300" : "text-emerald-300"
-                                    }`}
-                                  >
+                              className={`text-[11px] font-semibold ${
+                              isSend ? "text-red-300" : "text-emerald-300"}`
+                              }>
+
                                     {isSend ? "Send" : "Receive"}
                                   </span>
                                   <span className="text-[11px] text-white/40">
                                     {isSend ? "→" : "←"}
                                   </span>
                                   <span className="text-sm text-white/90 truncate">
-                                    {counterparty
-                                      ? `${counterparty.slice(0, 10)}...${counterparty.slice(-6)}`
-                                      : "—"}
+                                    {counterparty ?
+                              `${counterparty.slice(0, 10)}...${counterparty.slice(-6)}` :
+                              "—"}
                                   </span>
                                 </div>
-                                {txHash ? (
-                                  <div className="text-[10px] text-white/35 font-mono truncate">
+                                {txHash ?
+                          <div className="text-[10px] text-white/35 font-mono truncate">
                                     {txHash.slice(0, 10)}…{txHash.slice(-8)}
-                                  </div>
-                                ) : null}
-                                {!isSend && credited ? (
-                                  <div className="text-[10px] text-xcannes-green/80">
-                                    Crédité en {String(credited).toUpperCase()}
-                                  </div>
-                                ) : null}
+                                  </div> :
+                          null}
+                                {!isSend && credited ?
+                          <div className="text-[10px] text-xcannes-green/80">
+                                    {t("credited_in", "Credited in")}{" "}
+                                    {String(credited).toUpperCase()}
+                                  </div> :
+                          null}
                               </div>
                             </td>
                             <td className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${isSend ? "text-red-400" : "text-green-400"}`}>
                               {isSend ? "−" : "+"}
-                              {Number.isFinite(amount)
-                                ? amount.toLocaleString("en-US", { maximumFractionDigits: 8 })
-                                : "0"}{" "}
+                              {Number.isFinite(amount) ?
+                        amount.toLocaleString("en-US", { maximumFractionDigits: 8 }) :
+                        "0"}{" "}
                               <span className="text-white/50">{normalizedCurrency}</span>
                             </td>
                             <td className="px-3 md:px-4 py-2.5 md:py-3 text-right text-[11px] hidden md:table-cell">
-                              {explorerUrl ? (
-                                <a
-                                  href={explorerUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="text-[#78b8ff] hover:underline underline-offset-2"
-                                >
-                                  View
-                                </a>
-                              ) : (
-                                <span className="text-white/30">—</span>
-                              )}
+                              {explorerUrl ?
+                        <a
+                          href={explorerUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[#78b8ff] hover:underline underline-offset-2">
+
+                                  {t("view", "View")}
+                                </a> :
+
+                        <span className="text-white/30">—</span>
+                        }
                             </td>
-                          </tr>
-                        );
-                      })
-                    )
-                  ) : loading ? (
-                    <tr>
-                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
-                        Loading…
-                      </td>
-                    </tr>
-                  ) : filteredTransactions.length === 0 ? (
-                    <tr>
-                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">
-                        No transactions found
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredTransactions.map((tx, idx) => {
-                      const icon = getTransactionIcon(tx.category);
-                      return (
-                        <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          </tr>);
+
+                }) :
+
+                loading ?
+                <tr>
+                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_loading_948e39804b", "Loading…")}
+
+                  </td>
+                    </tr> :
+                filteredTransactions.length === 0 ?
+                <tr>
+                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_no_transactions_found_af217af8de", "No transactions found")}
+
+                  </td>
+                    </tr> :
+
+                filteredTransactions.map((tx, idx) => {
+                  const icon = getTransactionIcon(tx.category);
+                  return (
+                    <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                           <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
                             {formatDate(tx.date)}
                           </td>
                           <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
                             <div className="flex items-center gap-2">
-                              {icon ? (
-                                <span className="transaction-icon text-lg flex-shrink-0">
+                              {icon ?
+                          <span className="transaction-icon text-lg flex-shrink-0">
                                   {icon}
-                                </span>
-                              ) : null}
+                                </span> :
+                          null}
                               <div className="min-w-0">
                                 <p className="text-sm text-white/90 truncate">{enrichDescription(tx.description)}</p>
-                                {tx.counterparty && (
-                                  <p className="text-xs text-white/40 font-mono truncate hidden md:block">
+                                {tx.counterparty &&
+                            <p className="text-xs text-white/40 font-mono truncate hidden md:block">
                                     {tx.counterparty.slice(0, 10)}...{tx.counterparty.slice(-6)}
                                   </p>
-                                )}
+                            }
                               </div>
                             </div>
                           </td>
@@ -1095,48 +1096,48 @@ export default function CurrencyStatement({
                           <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
                             {formatAmount(tx.runningBalance)}
                           </td>
-                        </tr>
-                      );
-                    })
-                  )}
+                        </tr>);
+
+                })
+                }
                 </tbody>
               </table>
             </div>
           </div>
 
-          {ledgerTab === "statement" && hasMore && (
-            <button
-              type="button"
-              onClick={() => onLoadMore && onLoadMore()}
-              disabled={loadingMore}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
-            >
+          {ledgerTab === "statement" && hasMore &&
+        <button
+          type="button"
+          onClick={() => onLoadMore && onLoadMore()}
+          disabled={loadingMore}
+          className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
+
               {loadingMore ? "Loading…" : "Load more"}
             </button>
-          )}
+        }
 
-          {ledgerTab === "xrpl" && xrplHasMore && (
-            <button
-              type="button"
-              onClick={() => loadXrplMore()}
-              disabled={xrplLoadingMore}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
-            >
+          {ledgerTab === "xrpl" && xrplHasMore &&
+        <button
+          type="button"
+          onClick={() => loadXrplMore()}
+          disabled={xrplLoadingMore}
+          className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
+
               {xrplLoadingMore ? "Loading…" : "Load more"}
             </button>
-          )}
+        }
 
           {/* Watermark */}
           <div className="hidden sm:block text-center py-3 md:py-4 border-t border-white/10">
             <div className="space-y-1">
-              <p className="text-xs text-white/20 font-mono hidden md:block">
-                Generated on {new Date().toLocaleString("en-US")}
+              <p className="text-xs text-white/20 font-mono hidden md:block">{t("ui_generated_on_ae324c9048", "Generated on")}
+              {new Date().toLocaleString("en-US")}
               </p>
-              <p className="text-xs text-white/20 font-mono">
-                🔐 Verified on XRP Ledger
-              </p>
-              <p className="text-[10px] text-white/10 font-mono break-all">
-                Doc ID: {Math.random().toString(36).substring(2, 15).toUpperCase()}-
+              <p className="text-xs text-white/20 font-mono">{t("ui_verified_on_xrp_ledger_334f28ce50", "🔐 Verified on XRP Ledger")}
+
+            </p>
+              <p className="text-[10px] text-white/10 font-mono break-all">{t("ui_doc_id_654e3bbaa5", "Doc ID:")}
+              {Math.random().toString(36).substring(2, 15).toUpperCase()}-
                 {new Date().getTime().toString(36).toUpperCase()}
               </p>
             </div>
@@ -1147,23 +1148,23 @@ export default function CurrencyStatement({
         <div className="border-t border-white/10 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-black/30">
           <div className="flex gap-2 flex-wrap">
             <button
-              onClick={() => handleExport("pdf")}
-              disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
-            >
+            onClick={() => handleExport("pdf")}
+            disabled={exportFormat === "pdf"}
+            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
+
               {exportFormat === "pdf" ? "..." : "📄 PDF"}
             </button>
             <button
-              onClick={() => window.print()}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70 border border-white/15"
-            >
-              🖨️ Print
-            </button>
+            onClick={() => window.print()}
+            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">{t("ui_print_1313eff37c", "🖨️ Print")}
+
+
+          </button>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
+
 
   if (typeof document === "undefined") {
     return null;

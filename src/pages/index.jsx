@@ -10,7 +10,7 @@ import HomeUseCasesSection from "@/components/home/HomeUseCasesSection";
 import HomeHowItWorksSection from "@/components/home/HomeHowItWorksSection";
 import HomeLocalPaymentSection from "@/components/home/HomeLocalPaymentSection";
 import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getPageTranslations } from "@/i18n/getPageTranslations";
 import xcannesApi from "@/lib/xcannesApi";
 import WalletProductSection from "@/components/home/WalletProductSection";
 import { bankButtonClassName } from "@/components/ui/bankButtonClassName";
@@ -19,10 +19,10 @@ const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
 export default function Home() {
   const { t } = useTranslation("common");
-  
+
   // 📊 Charger toutes les paires dynamiquement depuis l'API
   const [availablePairs, setAvailablePairs] = useState([
-    "XRP/RLUSD", "XCS/XRP", "XCS/RLUSD" // Fallback - 3 paires configurées
+  "XRP/RLUSD", "XCS/XRP", "XCS/RLUSD" // Fallback - 3 paires configurées
   ]);
   const [loadingPairs, setLoadingPairs] = useState(true);
 
@@ -39,7 +39,7 @@ export default function Home() {
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
-  
+
   useEffect(() => {
     const fetchPairs = async () => {
       try {
@@ -47,16 +47,16 @@ export default function Home() {
         if (markets) {
           // Priorité: trading (XRPL) > pyth (FOREX)
           const allPairs = [
-            ...(markets.trading || []),  // Paires XRPL
-            ...(markets.pyth || [])       // Paires Pyth
+          ...(markets.trading || []), // Paires XRPL
+          ...(markets.pyth || []) // Paires Pyth
           ];
-          
+
           const pairsList = Array.from(new Set(
-            allPairs
-              .filter(m => m.active !== false)
-              .map(m => `${m.base}/${m.quote}`)
+            allPairs.
+            filter((m) => m.active !== false).
+            map((m) => `${m.base}/${m.quote}`)
           ));
-          
+
           setAvailablePairs(pairsList);
           if (DEBUG_LOGS) {
             console.log(`✅ [Index] ${pairsList.length} paires chargées:`, pairsList);
@@ -69,7 +69,7 @@ export default function Home() {
         setLoadingPairs(false);
       }
     };
-    
+
     fetchPairs();
   }, []);
 
@@ -77,19 +77,19 @@ export default function Home() {
   // Limiter aux 10 paires les plus utilisées et exclure XCS_*
   const pairs = useMemo(
     () =>
-      availablePairs
-        .filter((p) => !p.startsWith("XCS/"))
-        .slice(0, 10),
+    availablePairs.
+    filter((p) => !p.startsWith("XCS/")).
+    slice(0, 10),
     [availablePairs]
   );
-  
+
   return (
     <>
       <SEOHead
-        title="XCANNES - Multi-currency wallet with stable USD value"
+        title={t("ui_xcannes_multi_currency_walle_51c5a96da0", "XCANNES - Multi-currency wallet with stable USD value")}
         description="A non-custodial multi-currency wallet with a local-currency experience and stable USD value in the background. Send, pay, receive, and convert with clarity."
-        canonical="/"
-      />
+        canonical="/" />
+
 
       <Header />
 
@@ -136,41 +136,41 @@ export default function Home() {
               {/* 3 essentials (keep light, avoid jargon) */}
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  {
-                    title: t("home_v2_hero_pillar_1_title", "Contrôle utilisateur"),
-                    desc: t("home_v2_hero_pillar_1_desc", "Validation explicite avant chaque action."),
-                    icon: (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
+                {
+                  title: t("home_v2_hero_pillar_1_title", "Contrôle utilisateur"),
+                  desc: t("home_v2_hero_pillar_1_desc", "Validation explicite avant chaque action."),
+                  icon:
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
                         <path d="M12 11V7a4 4 0 0 0-8 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M5 11h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                    ),
-                  },
-                  {
-                    title: t("home_v2_hero_pillar_2_title", "Relevés & reçus"),
-                    desc: t("home_v2_hero_pillar_2_desc", "Suivez et prouvez vos mouvements par devise."),
-                    icon: (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
+
+                },
+                {
+                  title: t("home_v2_hero_pillar_2_title", "Relevés & reçus"),
+                  desc: t("home_v2_hero_pillar_2_desc", "Suivez et prouvez vos mouvements par devise."),
+                  icon:
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
                         <path d="M7 3h10a2 2 0 0 1 2 2v16l-3-2-2 2-2-2-2 2-3-2V5a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M9 7h6M9 11h6M9 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                    ),
-                  },
-                  {
-                    title: t("home_v2_hero_pillar_3_title", "Conversion"),
-                    desc: t("home_v2_hero_pillar_3_desc", "Taux affiché clairement avant validation."),
-                    icon: (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
+
+                },
+                {
+                  title: t("home_v2_hero_pillar_3_title", "Conversion"),
+                  desc: t("home_v2_hero_pillar_3_desc", "Taux affiché clairement avant validation."),
+                  icon:
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-white/80">
                         <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                    ),
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex items-start gap-3 bg-black/20 border border-white/10 rounded-xl px-4 py-4"
-                  >
+
+                }].
+                map((item) =>
+                <div
+                  key={item.title}
+                  className="flex items-start gap-3 bg-black/20 border border-white/10 rounded-xl px-4 py-4">
+
                     <div className="mt-0.5 flex items-center justify-center w-9 h-9 rounded-lg bg-white/5 border border-white/10">
                       {item.icon}
                     </div>
@@ -179,7 +179,7 @@ export default function Home() {
                       <div className="text-xs text-white/55 leading-relaxed">{item.desc}</div>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -201,8 +201,8 @@ export default function Home() {
       {/* Support - Bottom right floating button */}
       {assistantContainer && createPortal(
         <div className="fixed right-3 bottom-3 md:right-6 md:bottom-6 z-[9999]">
-          {assistantOpen && (
-            <div className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-md">
+          {assistantOpen &&
+          <div className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-md">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <div className="ai-badge">{t("home_support_badge", "SUP")}</div>
@@ -211,11 +211,11 @@ export default function Home() {
                   </p>
                 </div>
                 <button
-                  type="button"
-                  onClick={() => setAssistantOpen(false)}
-                  className="ai-close-btn"
-                  aria-label={t("home_support_close", "Fermer")}
-                >
+                type="button"
+                onClick={() => setAssistantOpen(false)}
+                className="ai-close-btn"
+                aria-label={t("home_support_close", "Fermer")}>
+
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -228,22 +228,22 @@ export default function Home() {
                 </p>
                 <p className="text-xs text-white/60 leading-relaxed">
                   {t(
-                    "home_support_msg_body",
-                    "Posez une question sur le wallet, les paiements, la conversion ou les marchés. Nous vous guidons étape par étape."
-                  )}
+                  "home_support_msg_body",
+                  "Posez une question sur le wallet, les paiements, la conversion ou les marchés. Nous vous guidons étape par étape."
+                )}
                 </p>
               </div>
               <div className="mt-3 flex items-center gap-2">
                 <input
-                  type="text"
-                  placeholder={t("home_support_placeholder", "Écrivez votre question…")}
-                  className="ai-input"
-                />
+                type="text"
+                placeholder={t("home_support_placeholder", "Write your question…")}
+                className="ai-input" />
+
                 <button
-                  type="button"
-                  className="ai-send-btn"
-                  aria-label={t("home_support_send", "Envoyer")}
-                >
+                type="button"
+                className="ai-send-btn"
+                aria-label={t("home_support_send", "Envoyer")}>
+
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -251,27 +251,27 @@ export default function Home() {
                 </button>
               </div>
             </div>
-          )}
-          {!assistantOpen && (
-            <button
-              type="button"
-              onClick={() => setAssistantOpen(true)}
-              className="w-10 h-10 md:w-12 md:h-12 transition-all bg-transparent text-white hover:bg-white/10 border-2 border-white/30 rounded-full flex items-center justify-center relative overflow-hidden"
-              aria-label={t("home_support_open", "Ouvrir le support")}
-              title={t("home_support_open", "Ouvrir le support")}
-            >
+          }
+          {!assistantOpen &&
+          <button
+            type="button"
+            onClick={() => setAssistantOpen(true)}
+            className="w-10 h-10 md:w-12 md:h-12 transition-all bg-transparent text-white hover:bg-white/10 border-2 border-white/30 rounded-full flex items-center justify-center relative overflow-hidden"
+            aria-label={t("home_support_open", "Ouvrir le support")}
+            title={t("home_support_open", "Ouvrir le support")}>
+
               <span
-                className="tracking-wider relative z-10 inline-block text-lg md:text-xl"
-                style={{ animation: "irregularPulse 3s ease-in-out infinite" }}
-              >
+              className="tracking-wider relative z-10 inline-block text-lg md:text-xl"
+              style={{ animation: "irregularPulse 3s ease-in-out infinite" }}>
+
                 •••
               </span>
               <span
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                style={{ animation: "shimmer 2s ease-in-out infinite" }}
-              ></span>
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+              style={{ animation: "shimmer 2s ease-in-out infinite" }}>
+            </span>
             </button>
-          )}
+          }
           <style jsx global>{`
             @keyframes shimmer {
               0% {
@@ -619,14 +619,14 @@ export default function Home() {
         </div>,
         assistantContainer
       )}
-    </>
-  );
+    </>);
+
 }
 
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
-    },
+      ...(await getPageTranslations(locale, ["common"]))
+    }
   };
 }

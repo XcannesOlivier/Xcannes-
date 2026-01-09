@@ -1,25 +1,25 @@
 "use client";
 
-	import React, { useEffect, useRef, useState, useMemo, useReducer, useCallback } from "react";
-	import Link from "next/link";
-	import { createChart } from "lightweight-charts";
-	import xcannesApi from "@/lib/xcannesApi";
-	import { MARKET_STRUCTURE, getPairCategory } from "@/utils/marketStructure"; // ✅ Structure des marchés
-	import { useXcannesWS } from "@/context/XcannesWSContext";
-	import PriceTicker from "@/components/marketGlobal/PriceTicker";
-	import {
-	  calculateBollingerBands,
-	  calculateEMA,
-	  calculateSMA,
-	  calculateRSI,
+import React, { useEffect, useRef, useState, useMemo, useReducer, useCallback } from "react";
+import Link from "next/link";
+import { createChart } from "lightweight-charts";
+import xcannesApi from "@/lib/xcannesApi";
+import { MARKET_STRUCTURE, getPairCategory } from "@/utils/marketStructure"; // ✅ Structure des marchés
+import { useXcannesWS } from "@/context/XcannesWSContext";
+import PriceTicker from "@/components/marketGlobal/PriceTicker";
+import {
+  calculateBollingerBands,
+  calculateEMA,
+  calculateSMA,
+  calculateRSI,
   calculateMACD,
-  calculateVWAP,
-} from "./indicators";
+  calculateVWAP } from
+"./indicators";
 import ChartHeader from "./components/ChartHeader";
 import useMarketData from "./hooks/useMarketData";
 import IndicatorsToolbar from "./components/IndicatorsToolbar";
 import ChartFooter from "./components/ChartFooter";
-	import ChartCanvas from "./components/ChartCanvas";
+import ChartCanvas from "./components/ChartCanvas";import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {
@@ -32,15 +32,15 @@ export default function XrplCandleChartRaw({
   onPairChange,
   onIntervalChange,
   availablePairs = [],
-  availableIntervals = ["1m", "5m", "15m", "1h", "4h", "1d"],
-}) {
+  availableIntervals = ["1m", "5m", "15m", "1h", "4h", "1d"]
+}) {const { t } = useTranslation("common");
   // ✅ Guard: S'assurer qu'on est côté client
   const [isClient, setIsClient] = useState(typeof window !== "undefined");
-  
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-  
+
   const chartRef = useRef();
   const chartInstanceRef = useRef(null);
   const candleSeriesRef = useRef(null);
@@ -51,30 +51,30 @@ export default function XrplCandleChartRaw({
   const rsiSeriesRef = useRef({
     main: null,
     overbought: null,
-    oversold: null,
+    oversold: null
   });
   const macdChartRef = useRef(null); // legacy (plus utilisé pour un chart séparé)
   const macdSeriesRef = useRef({
     macd: null,
     signal: null,
     histogram: null,
-    zeroLine: null,
+    zeroLine: null
   });
   const vwapSeriesRef = useRef(null);
   const smaSeriesRef = useRef({
     sma20: null,
     sma50: null,
-    sma200: null,
+    sma200: null
   });
   const emaSeriesRef = useRef({
     ema20: null,
     ema50: null,
-    ema200: null,
+    ema200: null
   });
   const bollingerSeriesRef = useRef({
     upper: null,
     middle: null,
-    lower: null,
+    lower: null
   });
   const containerRef = useRef(null);
   const oldestTimeRef = useRef(null);
@@ -108,11 +108,11 @@ export default function XrplCandleChartRaw({
       showSMA: { sma20: false, sma50: false, sma200: false },
       showEMA: { ema20: false, ema50: false, ema200: false },
       hideAllIndicators: false,
-      showTooltips: true,
+      showTooltips: true
     }
   );
   const { showVolume, showBollinger, showRSI, showMACD, showVWAP, showSMA, showEMA, hideAllIndicators, showTooltips } =
-    indicatorsState;
+  indicatorsState;
 
   const setIndicator = useCallback((key) => (value) => dispatchIndicators({ type: "SET", key, value }), []);
   const setShowVolume = useCallback((v) => dispatchIndicators({ type: "SET", key: "showVolume", value: v }), []);
@@ -127,13 +127,13 @@ export default function XrplCandleChartRaw({
   );
   const setShowSMA = useCallback((obj) => dispatchIndicators({ type: "SET_SMA", value: obj }), []);
   const setShowEMA = useCallback((obj) => dispatchIndicators({ type: "SET_EMA", value: obj }), []);
-  
+
   // États pour les paramètres du graphique
   const [showSettings, setShowSettings] = useState(false);
   const [chartSettings, setChartSettings] = useState({
     showGrid: true,
     showCrosshair: true,
-    autoScale: true,
+    autoScale: true
   });
 
   // Sur smartphone, démarrer en mode "line" pour un look plus lisible
@@ -167,7 +167,7 @@ export default function XrplCandleChartRaw({
     isFawaz,
     currentCandleRef,
     intervalSecondsRef,
-    updateCurrentCandle,
+    updateCurrentCandle
   } = useMarketData({ pair, interval, isFxMode, fxBase, fxQuote });
 
   // Normalisation défensive des données de bougies pour le chart
@@ -189,30 +189,30 @@ export default function XrplCandleChartRaw({
       if (!Number.isNaN(parsed)) return Math.floor(parsed / 1000);
       return null;
     };
-    return source
-      .map((c) => {
-        if (!c) return null;
-        const time = normalizeTimeSeconds(c.time);
-        if (time == null) return null;
-        const open = Number.isFinite(Number(c.open)) ? Number(c.open) : 0;
-        const high = Number.isFinite(Number(c.high)) ? Number(c.high) : open;
-        const low = Number.isFinite(Number(c.low)) ? Number(c.low) : open;
-        const close = Number.isFinite(Number(c.close)) ? Number(c.close) : open;
-        const volume = Number.isFinite(Number(c.volume)) ? Number(c.volume) : 0;
-        return { time, open, high, low, close, volume };
-      })
-      .filter(Boolean)
-      .map((c) => {
-        // Enlever les valeurs négatives aberrantes, sans casser les 0.
-        return {
-          ...c,
-          open: c.open < 0 ? 0 : c.open,
-          high: c.high < 0 ? 0 : c.high,
-          low: c.low < 0 ? 0 : c.low,
-          close: c.close < 0 ? 0 : c.close,
-          volume: c.volume < 0 ? 0 : c.volume,
-        };
-      });
+    return source.
+    map((c) => {
+      if (!c) return null;
+      const time = normalizeTimeSeconds(c.time);
+      if (time == null) return null;
+      const open = Number.isFinite(Number(c.open)) ? Number(c.open) : 0;
+      const high = Number.isFinite(Number(c.high)) ? Number(c.high) : open;
+      const low = Number.isFinite(Number(c.low)) ? Number(c.low) : open;
+      const close = Number.isFinite(Number(c.close)) ? Number(c.close) : open;
+      const volume = Number.isFinite(Number(c.volume)) ? Number(c.volume) : 0;
+      return { time, open, high, low, close, volume };
+    }).
+    filter(Boolean).
+    map((c) => {
+      // Enlever les valeurs négatives aberrantes, sans casser les 0.
+      return {
+        ...c,
+        open: c.open < 0 ? 0 : c.open,
+        high: c.high < 0 ? 0 : c.high,
+        low: c.low < 0 ? 0 : c.low,
+        close: c.close < 0 ? 0 : c.close,
+        volume: c.volume < 0 ? 0 : c.volume
+      };
+    });
   }, []);
 
   // Réinitialiser les moyennes mobiles (SMA/EMA)
@@ -221,11 +221,11 @@ export default function XrplCandleChartRaw({
   useEffect(() => {
     dispatchIndicators({
       type: "SET_SMA",
-      value: { sma20: false, sma50: false, sma200: false },
+      value: { sma20: false, sma50: false, sma200: false }
     });
     dispatchIndicators({
       type: "SET_EMA",
-      value: { ema20: false, ema50: false, ema200: false },
+      value: { ema20: false, ema50: false, ema200: false }
     });
   }, [pair]);
 
@@ -237,7 +237,7 @@ export default function XrplCandleChartRaw({
   const [expandedMarkets, setExpandedMarkets] = useState({});
   const [expandedCurrencies, setExpandedCurrencies] = useState({});
   const dropdownRef = useRef(null);
-  
+
   // Fermer le dropdown si on clique à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -247,7 +247,7 @@ export default function XrplCandleChartRaw({
         setExpandedCurrencies({});
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -272,22 +272,22 @@ export default function XrplCandleChartRaw({
       return next;
     });
   }, [dropdownOpen, isFxMode]);
-  
+
   const toggleMarket = (marketKey) => {
-    setExpandedMarkets(prev => ({
+    setExpandedMarkets((prev) => ({
       ...prev,
       [marketKey]: !prev[marketKey]
     }));
   };
-  
+
   const toggleCurrency = (marketKey, currency) => {
     const key = `${marketKey}-${currency}`;
-    setExpandedCurrencies(prev => ({
+    setExpandedCurrencies((prev) => ({
       ...prev,
       [key]: !prev[key]
     }));
   };
-  
+
   const handlePairSelect = (selectedPair) => {
     const category = getPairCategory(selectedPair);
     const isFxPair = category !== "xrpl";
@@ -317,21 +317,21 @@ export default function XrplCandleChartRaw({
     () => Array.from(new Set(availablePairs)),
     [availablePairs]
   );
-  
+
   // Filtrer les paires disponibles par marché et devise
   const filteredMarketStructure = useMemo(() => {
     const filtered = {};
-    
+
     Object.entries(MARKET_STRUCTURE).forEach(([marketKey, market]) => {
       const filteredCurrencies = {};
-      
+
       Object.entries(market.currencies).forEach(([currency, pairs]) => {
-        const availablePairsForCurrency = pairs.filter(p => uniquePairs.includes(p));
+        const availablePairsForCurrency = pairs.filter((p) => uniquePairs.includes(p));
         if (availablePairsForCurrency.length > 0) {
           filteredCurrencies[currency] = availablePairsForCurrency;
         }
       });
-      
+
       if (Object.keys(filteredCurrencies).length > 0) {
         filtered[marketKey] = {
           label: market.label,
@@ -339,7 +339,7 @@ export default function XrplCandleChartRaw({
         };
       }
     });
-    
+
     return filtered;
   }, [uniquePairs]);
 
@@ -362,11 +362,11 @@ export default function XrplCandleChartRaw({
         const prevClose = prev ? Number(prev.close) || 0 : null;
         let changePct = null;
         if (prevClose && prevClose !== 0) {
-          changePct = ((lastClose - prevClose) / prevClose) * 100;
+          changePct = (lastClose - prevClose) / prevClose * 100;
         }
         setFxInfo({
           price: lastClose,
-          changePercent: changePct,
+          changePercent: changePct
         });
       } catch (err) {
         logError("[Chart FX] Erreur FX EOD:", err);
@@ -482,7 +482,7 @@ export default function XrplCandleChartRaw({
       const containerHeight = chartRef.current?.clientHeight || 500;
 
       const isMobileScreen =
-        typeof window !== "undefined" && window.innerWidth < 768;
+      typeof window !== "undefined" && window.innerWidth < 768;
       // Garder la ligne de prix actuelle visible sur tous les écrans
       const priceLineVisibleMain = true;
       const lastValueVisibleMain = true;
@@ -497,32 +497,32 @@ export default function XrplCandleChartRaw({
         if (typeof window !== "undefined" && window.getComputedStyle) {
           const root = window.getComputedStyle(document.documentElement);
           bgColor =
-            root.getPropertyValue("--bg-elevated")?.trim() || bgColor;
+          root.getPropertyValue("--bg-elevated")?.trim() || bgColor;
           textColor =
-            root.getPropertyValue("--text-secondary")?.trim() || textColor;
+          root.getPropertyValue("--text-secondary")?.trim() || textColor;
           gridColor =
-            root.getPropertyValue("--bg-subtle")?.trim() || gridColor;
+          root.getPropertyValue("--bg-subtle")?.trim() || gridColor;
           borderColor =
-            root.getPropertyValue("--border-subtle")?.trim() || borderColor;
+          root.getPropertyValue("--border-subtle")?.trim() || borderColor;
         }
       } catch (_) {
+
         // Fallback silencieux si les tokens ne sont pas disponibles
       }
-
       chart = createChart(chartRef.current, {
         width: containerWidth,
         height: containerHeight,
         layout: {
           background: { color: bgColor },
-          textColor,
+          textColor
         },
         grid: {
           vertLines: {
-            color: chartSettings.showGrid ? gridColor : "transparent",
+            color: chartSettings.showGrid ? gridColor : "transparent"
           },
           horzLines: {
-            color: chartSettings.showGrid ? gridColor : "transparent",
-          },
+            color: chartSettings.showGrid ? gridColor : "transparent"
+          }
         },
         crosshair: {
           mode: chartSettings.showCrosshair ? 1 : 0,
@@ -530,14 +530,14 @@ export default function XrplCandleChartRaw({
             color: "#10b981ff",
             width: 1,
             style: 3,
-            labelBackgroundColor: "#10b981ff",
+            labelBackgroundColor: "#10b981ff"
           },
           horzLine: {
             color: "#10b981ff",
             width: 1,
             style: 3,
-            labelBackgroundColor: "#10b981ff",
-          },
+            labelBackgroundColor: "#10b981ff"
+          }
         },
         timeScale: {
           borderColor,
@@ -549,27 +549,27 @@ export default function XrplCandleChartRaw({
           // ✅ fixLeftEdge supprimé (bloquait le recalcul)
           lockVisibleTimeRangeOnResize: true,
           rightBarStaysOnScroll: true,
-          shiftVisibleRangeOnNewBar: true,
+          shiftVisibleRangeOnNewBar: true
         },
         handleScale: {
           axisPressedMouseMove: {
             time: true,
-            price: true,
+            price: true
           },
           mouseWheel: true,
-          pinch: true,
+          pinch: true
         },
         handleScroll: {
           mouseWheel: true,
           pressedMouseMove: true,
           horzTouchDrag: true,
-          vertTouchDrag: true,
+          vertTouchDrag: true
         },
         rightPriceScale: {
           borderColor,
           scaleMargins: {
             top: 0.1, // Marge haute raisonnable
-            bottom: showVolume ? 0.25 : 0.1, // Espace pour volume si activé
+            bottom: showVolume ? 0.25 : 0.1 // Espace pour volume si activé
           },
           autoScale: true, // ✅ Activé
           mode: 0, // Mode normal (pas logarithmique)
@@ -577,8 +577,8 @@ export default function XrplCandleChartRaw({
           // Les données restent en pleine précision, seul l'affichage change
           tickMarkFormatter: (price) => {
             return price.toFixed(5);
-          },
-        },
+          }
+        }
       });
 
       chartInstanceRef.current = chart;
@@ -599,8 +599,8 @@ export default function XrplCandleChartRaw({
           priceFormat: {
             type: "price",
             precision: 5,
-            minMove: 0.00001,
-          },
+            minMove: 0.00001
+          }
         });
 
         // Données bougies
@@ -609,14 +609,14 @@ export default function XrplCandleChartRaw({
         // Mode ligne : une seule série area (ligne + ombre)
         const lineData = data.map((d) => ({
           time: d.time,
-          value: d.close,
+          value: d.close
         }));
 
         candleSeriesRef.current = chart.addAreaSeries({
           lineColor: "#10b981c0",
-          topColor: isMobileScreen
-            ? "rgba(16, 185, 129, 0.18)"
-            : "rgba(16, 185, 129, 0.10)",
+          topColor: isMobileScreen ?
+          "rgba(16, 185, 129, 0.18)" :
+          "rgba(16, 185, 129, 0.10)",
           bottomColor: "rgba(16, 185, 129, 0.0)",
           lineWidth: 2,
           priceLineVisible: priceLineVisibleMain,
@@ -624,8 +624,8 @@ export default function XrplCandleChartRaw({
           priceFormat: {
             type: "price",
             precision: 5,
-            minMove: 0.00001,
-          },
+            minMove: 0.00001
+          }
         });
         candleSeriesRef.current.setData(lineData);
       }
@@ -659,7 +659,7 @@ export default function XrplCandleChartRaw({
             high: Number(high ?? numericClose),
             low: Number(low ?? numericClose),
             close: numericClose,
-            isUp: numericClose >= numericOpen,
+            isUp: numericClose >= numericOpen
           });
         };
 
@@ -682,7 +682,7 @@ export default function XrplCandleChartRaw({
 
         clickHandler = (param) => {
           const isMobileScreen =
-            typeof window !== "undefined" && window.innerWidth < 768;
+          typeof window !== "undefined" && window.innerWidth < 768;
 
           if (isMobileScreen) {
             if (chartSettings.showCrosshair) {
@@ -701,20 +701,20 @@ export default function XrplCandleChartRaw({
         chart.subscribeCrosshairMove(crosshairHandler);
         chart.subscribeClick(clickHandler);
       }
-      
+
       // Ajouter le volume si activé (XRPL uniquement, pas FX/Pyth)
       if (showVolume && !isFxMode && !isExternal) {
         volumeSeriesRef.current = chart.addHistogramSeries({
           color: "#10b981c0",
           priceFormat: { type: "volume" },
           priceScaleId: "",
-          scaleMargins: { top: 0.8, bottom: 0 },
+          scaleMargins: { top: 0.8, bottom: 0 }
         });
 
         const volumeData = data.map((d) => ({
           time: d.time,
           value: d.volume || 0,
-          color: d.close >= d.open ? "#10b98136" : "#f1626238",
+          color: d.close >= d.open ? "#10b98136" : "#f1626238"
         }));
         volumeSeriesRef.current.setData(volumeData);
       }
@@ -728,7 +728,7 @@ export default function XrplCandleChartRaw({
           color: "rgba(239, 83, 80, 0.8)",
           lineWidth: 1,
           priceLineVisible: false,
-          lastValueVisible: false,
+          lastValueVisible: false
         });
         bollingerSeriesRef.current.upper.setData(bollinger.upper);
 
@@ -738,7 +738,7 @@ export default function XrplCandleChartRaw({
           lineWidth: 1,
           lineStyle: 2, // Dashed
           priceLineVisible: false,
-          lastValueVisible: false,
+          lastValueVisible: false
         });
         bollingerSeriesRef.current.middle.setData(bollinger.middle);
 
@@ -747,7 +747,7 @@ export default function XrplCandleChartRaw({
           color: "#10b981ff",
           lineWidth: 1,
           priceLineVisible: false,
-          lastValueVisible: false,
+          lastValueVisible: false
         });
         bollingerSeriesRef.current.lower.setData(bollinger.lower);
       }
@@ -761,7 +761,7 @@ export default function XrplCandleChartRaw({
           lineStyle: 0, // Solid
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "VWAP",
+          title: "VWAP"
         });
         vwapSeriesRef.current.setData(vwapData);
       }
@@ -774,7 +774,7 @@ export default function XrplCandleChartRaw({
           lineWidth: 2,
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "SMA 20",
+          title: "SMA 20"
         });
         smaSeriesRef.current.sma20.setData(sma20Data);
       }
@@ -786,7 +786,7 @@ export default function XrplCandleChartRaw({
           lineWidth: 2,
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "SMA 50",
+          title: "SMA 50"
         });
         smaSeriesRef.current.sma50.setData(sma50Data);
       }
@@ -798,7 +798,7 @@ export default function XrplCandleChartRaw({
           lineWidth: 2,
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "SMA 200",
+          title: "SMA 200"
         });
         smaSeriesRef.current.sma200.setData(sma200Data);
       }
@@ -812,7 +812,7 @@ export default function XrplCandleChartRaw({
           lineStyle: 0, // Solid
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "EMA 20",
+          title: "EMA 20"
         });
         emaSeriesRef.current.ema20.setData(ema20Data);
       }
@@ -825,7 +825,7 @@ export default function XrplCandleChartRaw({
           lineStyle: 0, // Solid
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "EMA 50",
+          title: "EMA 50"
         });
         emaSeriesRef.current.ema50.setData(ema50Data);
       }
@@ -838,7 +838,7 @@ export default function XrplCandleChartRaw({
           lineStyle: 0, // Solid
           priceLineVisible: false,
           lastValueVisible: true,
-          title: "EMA 200",
+          title: "EMA 200"
         });
         emaSeriesRef.current.ema200.setData(ema200Data);
       }
@@ -854,7 +854,7 @@ export default function XrplCandleChartRaw({
             lineWidth: 2,
             priceLineVisible: false,
             lastValueVisible: false,
-            priceScaleId: "rsi",
+            priceScaleId: "rsi"
           });
 
           // Price scale dédiée au RSI, en bas du chart
@@ -862,8 +862,8 @@ export default function XrplCandleChartRaw({
             position: "right",
             scaleMargins: {
               top: 0.75,
-              bottom: 0.02,
-            },
+              bottom: 0.02
+            }
           });
         }
         rsiSeriesRef.current.main.setData(rsiData);
@@ -879,7 +879,7 @@ export default function XrplCandleChartRaw({
             lineStyle: 2,
             priceLineVisible: false,
             lastValueVisible: false,
-            priceScaleId: "rsi",
+            priceScaleId: "rsi"
           });
         }
         if (!rsiSeriesRef.current.oversold) {
@@ -889,7 +889,7 @@ export default function XrplCandleChartRaw({
             lineStyle: 2,
             priceLineVisible: false,
             lastValueVisible: false,
-            priceScaleId: "rsi",
+            priceScaleId: "rsi"
           });
         }
 
@@ -907,8 +907,8 @@ export default function XrplCandleChartRaw({
             position: "right",
             scaleMargins: {
               top: 0.55,
-              bottom: 0.25,
-            },
+              bottom: 0.25
+            }
           });
 
           macdSeriesRef.current.macd = chart.addLineSeries({
@@ -916,7 +916,7 @@ export default function XrplCandleChartRaw({
             lineWidth: 2,
             priceLineVisible: false,
             lastValueVisible: false,
-            priceScaleId: "macd",
+            priceScaleId: "macd"
           });
 
           macdSeriesRef.current.signal = chart.addLineSeries({
@@ -924,12 +924,12 @@ export default function XrplCandleChartRaw({
             lineWidth: 1,
             priceLineVisible: false,
             lastValueVisible: false,
-            priceScaleId: "macd",
+            priceScaleId: "macd"
           });
 
           macdSeriesRef.current.histogram = chart.addHistogramSeries({
             priceFormat: { type: "price", precision: 5, minMove: 0.00001 },
-            priceScaleId: "macd",
+            priceScaleId: "macd"
           });
 
           macdSeriesRef.current.zeroLine = chart.addLineSeries({
@@ -938,7 +938,7 @@ export default function XrplCandleChartRaw({
             lineStyle: 2,
             priceLineVisible: false,
             lastValueVisible: false,
-            priceScaleId: "macd",
+            priceScaleId: "macd"
           });
         }
 
@@ -982,9 +982,9 @@ export default function XrplCandleChartRaw({
           try {
             chart.timeScale().setVisibleRange({ from, to });
           } catch (_) {
+
             // Ignorer les erreurs internes de lightweight-charts si la lib rejette la plage
-          }
-        }
+          }}
 
         // Initialiser la status line + crosshair au milieu de la fenêtre visible
         const midIndex = Math.floor((firstIndex + lastIndex) / 2);
@@ -1012,7 +1012,7 @@ export default function XrplCandleChartRaw({
                 high: Number(midCandle.high ?? midClose),
                 low: Number(midCandle.low ?? midClose),
                 close: midClose,
-                isUp: midClose >= midOpen,
+                isUp: midClose >= midOpen
               });
               setCrosshairPoint({ x, y });
             }
@@ -1089,7 +1089,7 @@ export default function XrplCandleChartRaw({
         if (!chartRef.current || !chart) return;
         chart.applyOptions({
           width: chartRef.current.clientWidth,
-          height: chartRef.current.clientHeight,
+          height: chartRef.current.clientHeight
         });
       });
       observer.observe(chartRef.current);
@@ -1106,18 +1106,18 @@ export default function XrplCandleChartRaw({
     // Ajouter ces dépendances causerait des re-renders inutiles du chart.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    pair,
-    interval,
-    showVolume,
-    chartType,
-    showBollinger,
-    showRSI,
-    showMACD,
-    showVWAP,
-    showSMA,
-    showEMA,
-    chartSettings,
-  ]);
+  pair,
+  interval,
+  showVolume,
+  chartType,
+  showBollinger,
+  showRSI,
+  showMACD,
+  showVWAP,
+  showSMA,
+  showEMA,
+  chartSettings]
+  );
 
   // Mettre à jour les séries lorsque les données changent sans recréer le chart
   useEffect(() => {
@@ -1135,7 +1135,7 @@ export default function XrplCandleChartRaw({
     } else {
       const lineData = data.map((d) => ({
         time: d.time,
-        value: d.close,
+        value: d.close
       }));
 
       // Mettre à jour la série area (ligne + ombre)
@@ -1150,14 +1150,14 @@ export default function XrplCandleChartRaw({
     chartInstanceRef.current.applyOptions({
       grid: {
         vertLines: { color: chartSettings.showGrid ? "#1a1f1d" : "transparent" },
-        horzLines: { color: chartSettings.showGrid ? "#1a1f1d" : "transparent" },
+        horzLines: { color: chartSettings.showGrid ? "#1a1f1d" : "transparent" }
       },
       crosshair: {
-        mode: chartSettings.showCrosshair ? 1 : 0,
+        mode: chartSettings.showCrosshair ? 1 : 0
       },
       rightPriceScale: {
-        autoScale: chartSettings.autoScale,
-      },
+        autoScale: chartSettings.autoScale
+      }
     });
 
     // Si la crosshair est désactivée (par ex. sur smartphone),
@@ -1179,54 +1179,54 @@ export default function XrplCandleChartRaw({
           <div className="h-10 bg-white/5 rounded-lg border border-white/10 animate-pulse" />
           <div className="h-64 md:h-80 bg-white/5 rounded-lg border border-white/10 animate-pulse" />
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   const mobileWatermark = null;
 
-  const noDataContent = (
-    <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
+  const noDataContent =
+  <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
       <div className="text-center max-w-md px-6">
         <div className="text-6xl mb-4">⚠️</div>
-        <p className="text-lg font-semibold text-white mb-2">Service de données indisponible</p>
+        <p className="text-lg font-semibold text-white mb-2">{t("ui_service_de_donn_es_indisponi_42cacb1f89", "Service de données indisponible")}</p>
         <p className="text-sm text-white/60 mb-4">{noDataMessage}</p>
         <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-4">
-          <p className="text-xs text-white/60 leading-relaxed">
-            L&rsquo;API data.xrplf.org ne répond plus correctement. Le Order Book en temps réel fonctionne toujours via
-            wss://xrplcluster.com
-          </p>
+          <p className="text-xs text-white/60 leading-relaxed">{t("ui_l_api_data_xrplf_org_ne_r_po_2427381aa5", "L’API data.xrplf.org ne répond plus correctement. Le Order Book en temps réel fonctionne toujours via wss://xrplcluster.com")}
+
+
+        </p>
         </div>
-        <div className="text-xs text-white/40">
-          En attendant, consultez l&rsquo;Order Book ci-dessous pour les prix en temps réel
-        </div>
+        <div className="text-xs text-white/40">{t("ui_en_attendant_consultez_l_ord_be84ec6208", "En attendant, consultez l’Order Book ci-dessous pour les prix en temps réel")}
+
       </div>
-    </div>
-  );
+      </div>
+    </div>;
+
 
   return (
     <div
       ref={containerRef}
-      className="rounded-xl md:rounded-none flex flex-col h-full"
-    >
+      className="rounded-xl md:rounded-none flex flex-col h-full">
+
       {/* Bouton retour flottant mobile uniquement */}
       <Link
         href="/"
-        className="md:hidden fixed top-0 left-0 z-50 text-white hover:text-xcannes-green transition-colors"
-      >
+        className="md:hidden fixed top-0 left-0 z-50 text-white hover:text-xcannes-green transition-colors">
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-8 w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          strokeWidth={2.5}
-        >
+          strokeWidth={2.5}>
+
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M15 19l-7-7 7-7"
-          />
+            d="M15 19l-7-7 7-7" />
+
         </svg>
       </Link>
 
@@ -1265,16 +1265,16 @@ export default function XrplCandleChartRaw({
         showSettings={showSettings}
         setShowSettings={setShowSettings}
         chartSettings={chartSettings}
-        setChartSettings={setChartSettings}
-      />
+        setChartSettings={setChartSettings} />
+
 
       {/* Modal overlay pour fermer le menu settings en cliquant en dehors */}
-      {showSettings && (
-        <div 
-          className="fixed inset-0 z-30" 
-          onClick={() => setShowSettings(false)}
-        />
-      )}
+      {showSettings &&
+      <div
+        className="fixed inset-0 z-30"
+        onClick={() => setShowSettings(false)} />
+
+      }
 
       {/* Container avec barre latérale gauche (masquée sur mobile) */}
       <div className="flex flex-1 min-h-0">
@@ -1298,8 +1298,8 @@ export default function XrplCandleChartRaw({
             setShowSMA={setShowSMA}
             showEMA={showEMA}
             setShowEMA={setShowEMA}
-            isFxMode={isFxMode}
-          />
+            isFxMode={isFxMode} />
+
         </div>
         <ChartCanvas
           chartRef={chartRef}
@@ -1310,46 +1310,46 @@ export default function XrplCandleChartRaw({
           noDataContent={noDataMessage ? noDataContent : null}
           interval={interval}
           chartClassName="w-full relative z-0 dex-chart-container"
-          watermark={mobileWatermark}
-        />
+          watermark={mobileWatermark} />
+
       </div>
 
       {/* Timeframes mobile sous le chart */}
       {pairMode === "live" &&
-        availableIntervals.length > 0 &&
-        typeof onIntervalChange === "function" && (
-          <div className="sm:hidden px-3 py-2 bg-elevated">
+      availableIntervals.length > 0 &&
+      typeof onIntervalChange === "function" &&
+      <div className="sm:hidden px-3 py-2 bg-elevated">
             <div className="flex gap-2 justify-center overflow-x-auto no-scrollbar">
               {availableIntervals.map((int) => {
-                const isActive = interval === int;
-                return (
-                  <button
-                    key={int}
-                    type="button"
-                    onClick={() => !isFxMode && onIntervalChange(int)}
-                    className={`px-3 py-1.5 rounded-full font-medium whitespace-nowrap ${
-                      isActive
-                        ? "bg-black/50 text-white text-[20px]"
-                        : "text-muted text-[16px]"
-                    }`}
-                  >
+            const isActive = interval === int;
+            return (
+              <button
+                key={int}
+                type="button"
+                onClick={() => !isFxMode && onIntervalChange(int)}
+                className={`px-3 py-1.5 rounded-full font-medium whitespace-nowrap ${
+                isActive ?
+                "bg-black/50 text-white text-[20px]" :
+                "text-muted text-[16px]"}`
+                }>
+
                     {int}
-                  </button>
-                );
-              })}
+                  </button>);
+
+          })}
             </div>
           </div>
-        )}
+      }
 
       {/* Footer Stats: desktop / tablette uniquement (mobile l'a déjà dans OrderbookSidebar) */}
       <div className="mt-0 hidden md:block">
-        <ChartFooter 
-          pair={pair} 
+        <ChartFooter
+          pair={pair}
           fxMode={isFxMode}
           fxBase={fxBase}
           fxQuote={fxQuote}
-          stats24h={stats24h}
-        />
+          stats24h={stats24h} />
+
       </div>
 
       <style jsx>{`
@@ -1370,6 +1370,6 @@ export default function XrplCandleChartRaw({
           }
         }
       `}</style>
-    </div>
-  );
+    </div>);
+
 }

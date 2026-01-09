@@ -23,10 +23,10 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
       const parts = pair.split('/');
       const base = parts[0] || '';
       const quote = parts[1] || '';
-      
+
       // Mode FX activé pour toutes les paires non-XRPL
       const isNonXrpl = pairCategory !== "xrpl";
-      
+
       return {
         isFxMode: isNonXrpl,
         fxBase: base,
@@ -37,7 +37,7 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
   }, [pair, pairCategory]);
 
   const { connected, orderbooks, trades, subscribe, unsubscribe } =
-    useXcannesWS();
+  useXcannesWS();
 
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
@@ -49,7 +49,7 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
     totalDepthBase: 0,
     totalDepthQuote: 0,
     spreadPercent: null,
-    midPrice: null,
+    midPrice: null
   });
   const [selectedRow, setSelectedRow] = useState(null);
 
@@ -83,11 +83,11 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
     const rawBids = Array.isArray(ob.bids) ? ob.bids : [];
 
     const formatOrders = (orders) =>
-      orders.slice(0, 10).map((order) => ({
-        price: parseFloat(order.price),
-        amount: parseFloat(order.amount),
-        total: parseFloat(order.price) * parseFloat(order.amount),
-      }));
+    orders.slice(0, 10).map((order) => ({
+      price: parseFloat(order.price),
+      amount: parseFloat(order.amount),
+      total: parseFloat(order.price) * parseFloat(order.amount)
+    }));
 
     setAsks(formatOrders(rawAsks));
     setBids(formatOrders(rawBids));
@@ -111,11 +111,11 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
         status = "none";
       } else {
         const totalDepthBase =
-          rawBids.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0) +
-          rawAsks.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0);
+        rawBids.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0) +
+        rawAsks.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0);
         const fewLevels = rawAsks.length + rawBids.length < 6;
         status =
-          fewLevels || totalDepthBase < 100 ? "low_liquidity" : "available";
+        fewLevels || totalDepthBase < 100 ? "low_liquidity" : "available";
       }
     }
 
@@ -126,57 +126,57 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
 
     let midPrice = ob.mid_price ?? ob.midPrice ?? null;
     if (
-      midPrice == null &&
-      bestAskPrice != null &&
-      bestBidPrice != null &&
-      Number.isFinite(bestAskPrice) &&
-      Number.isFinite(bestBidPrice)
-    ) {
+    midPrice == null &&
+    bestAskPrice != null &&
+    bestBidPrice != null &&
+    Number.isFinite(bestAskPrice) &&
+    Number.isFinite(bestBidPrice))
+    {
       midPrice = (bestAskPrice + bestBidPrice) / 2;
     }
 
     let spreadPercent = ob.spread_percent ?? ob.spreadPercent ?? null;
     if (
-      spreadPercent == null &&
-      midPrice &&
-      bestAskPrice != null &&
-      bestBidPrice != null &&
-      midPrice > 0
-    ) {
+    spreadPercent == null &&
+    midPrice &&
+    bestAskPrice != null &&
+    bestBidPrice != null &&
+    midPrice > 0)
+    {
       spreadPercent =
-        ((bestAskPrice - bestBidPrice) / midPrice) * 100;
+      (bestAskPrice - bestBidPrice) / midPrice * 100;
     }
 
     setOrderbookStatus(status);
     setOrderbookMeta({
       orderCountBids:
-        ob.order_count_bids ??
-        (Array.isArray(rawBids) ? rawBids.length : 0),
+      ob.order_count_bids ?? (
+      Array.isArray(rawBids) ? rawBids.length : 0),
       orderCountAsks:
-        ob.order_count_asks ??
-        (Array.isArray(rawAsks) ? rawAsks.length : 0),
+      ob.order_count_asks ?? (
+      Array.isArray(rawAsks) ? rawAsks.length : 0),
       totalDepthBase:
-        rawBids.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0) +
-        rawAsks.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0),
+      rawBids.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0) +
+      rawAsks.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0),
       totalDepthQuote:
-        rawBids.reduce(
-          (sum, o) =>
-            sum +
-            (parseFloat(o.amount || 0) * parseFloat(o.price || 0) || 0),
-          0
-        ) +
-        rawAsks.reduce(
-          (sum, o) =>
-            sum +
-            (parseFloat(o.amount || 0) * parseFloat(o.price || 0) || 0),
-          0
-        ),
+      rawBids.reduce(
+        (sum, o) =>
+        sum + (
+        parseFloat(o.amount || 0) * parseFloat(o.price || 0) || 0),
+        0
+      ) +
+      rawAsks.reduce(
+        (sum, o) =>
+        sum + (
+        parseFloat(o.amount || 0) * parseFloat(o.price || 0) || 0),
+        0
+      ),
       spreadPercent:
-        spreadPercent != null && Number.isFinite(spreadPercent)
-          ? spreadPercent
-          : null,
+      spreadPercent != null && Number.isFinite(spreadPercent) ?
+      spreadPercent :
+      null,
       midPrice:
-        midPrice != null && Number.isFinite(midPrice) ? midPrice : null,
+      midPrice != null && Number.isFinite(midPrice) ? midPrice : null
     });
   }, [orderbooks, pair, isXRPL]);
 
@@ -192,10 +192,10 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
       price: Number(trade.price),
       amount: Number(trade.amount),
       executed_time:
-        trade.timestamp instanceof Date
-          ? trade.timestamp
-          : new Date(trade.timestamp),
-      type: trade.side === "sell" ? "sell" : "buy",
+      trade.timestamp instanceof Date ?
+      trade.timestamp :
+      new Date(trade.timestamp),
+      type: trade.side === "sell" ? "sell" : "buy"
     }));
 
     setHistory(formattedTrades);
@@ -218,10 +218,10 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
 
     setSelectedRow((prev) => {
       const isSame =
-        prev &&
-        prev.side === side &&
-        prev.index === index &&
-        prev.price === price;
+      prev &&
+      prev.side === side &&
+      prev.index === index &&
+      prev.price === price;
 
       if (isSame) {
         // Désélection : signaler que le prix venant du carnet n'est plus utilisé
@@ -251,50 +251,50 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
         </h2>
         {/* Police agrandie - SMARTPHONE UNIQUEMENT, normale - DESKTOP */}
         <p className="text-sm md:text-[11px] text-muted mt-0 md:mt-1 font-normal md:font-normal">
-          {isXRPL ? (
-            <>
+          {isXRPL ?
+          <>
               {pair} · {connected ? "Live XRPL" : "Offline"}
-            </>
-          ) : (
-            "News aggregated from local media sources."
-          )}
+            </> :
+
+          "News aggregated from local media sources."
+          }
         </p>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {showNewsExternal ? (
-          <div className="h-[60vh] lg:h-full">
+        {showNewsExternal ?
+        <div className="h-[60vh] lg:h-full">
             <NewsFeed category="finance" />
-          </div>
-        ) : showDesktopNews ? (
-          <div className="h-full">
+          </div> :
+        showDesktopNews ?
+        <div className="h-full">
             <NewsFeed category="finance" />
-          </div>
-        ) : isMaintenance ? (
-          <div className="p-4 space-y-4 text-sm text-secondary">
+          </div> :
+        isMaintenance ?
+        <div className="p-4 space-y-4 text-sm text-secondary">
             <div className="rounded-md bg-amber-500/5 border border-amber-500/30 px-3 py-2">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-amber-200 mb-1">
-                Orderbook maintenance
-              </p>
-              <p className="text-[13px] text-secondary">
-                The orderbook for this pair is temporarily unavailable. Data may be delayed or incomplete. Trading actions linked to this book should be considered read-only.
-              </p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-amber-200 mb-1">{t("ui_orderbook_maintenance_fa1de2fea3", "Orderbook maintenance")}
+
+            </p>
+              <p className="text-[13px] text-secondary">{t("ui_the_orderbook_for_this_pair__b0082e870e", "The orderbook for this pair is temporarily unavailable. Data may be delayed or incomplete. Trading actions linked to this book should be considered read-only.")}
+
+            </p>
             </div>
             <InfoFeesPanel pair={pair} variant="maintenance" />
-          </div>
-        ) : showXrplNoOrders ? (
-          <div className="p-4 space-y-3">
+          </div> :
+        showXrplNoOrders ?
+        <div className="p-4 space-y-3">
             <InfoFeesPanel pair={pair} variant="xrpl_no_orders" />
-          </div>
-        ) : isXRPL ? (
-          <div className="p-4 space-y-6">
+          </div> :
+        isXRPL ?
+        <div className="p-4 space-y-6">
             {/* Orderbook headers + listes (scrollables) */}
             <div>
-              {isLowLiquidity && (
-                <div className="mb-3 rounded-md bg-amber-500/5 border border-amber-500/30 px-3 py-2 text-[11px] text-amber-200">
-                  Low liquidity – spreads may be wide.
-                </div>
-              )}
+              {isLowLiquidity &&
+            <div className="mb-3 rounded-md bg-amber-500/5 border border-amber-500/30 px-3 py-2 text-[11px] text-amber-200">{t("ui_low_liquidity_spreads_may_be_4fa281270f", "Low liquidity – spreads may be wide.")}
+
+            </div>
+            }
               <div className="grid grid-cols-3 gap-2 mb-2 text-[11px] text-muted font-medium">
                 <div>{t("trading_orderbook_price")}</div>
                 <div className="text-right">
@@ -316,26 +316,26 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
                   </div>
                   <div className="space-y-0.5">
                     {bids.map((order, idx) => {
-                      const depthPercent = (order.amount / maxBidAmount) * 100;
-                      const isSelected =
-                        selectedRow &&
-                        selectedRow.side === "bid" &&
-                        selectedRow.index === idx &&
-                        selectedRow.price === order.price;
-                      return (
-                        <div
-                          key={idx}
-                          className={`relative cursor-pointer border-l-2 ${
-                            isSelected
-                              ? "border-xcannes-green bg-subtle"
-                              : "border-transparent hover:bg-subtle"
-                          }`}
-                          onClick={() => handleRowClick("bid", order, idx)}
-                        >
+                    const depthPercent = order.amount / maxBidAmount * 100;
+                    const isSelected =
+                    selectedRow &&
+                    selectedRow.side === "bid" &&
+                    selectedRow.index === idx &&
+                    selectedRow.price === order.price;
+                    return (
+                      <div
+                        key={idx}
+                        className={`relative cursor-pointer border-l-2 ${
+                        isSelected ?
+                        "border-xcannes-green bg-subtle" :
+                        "border-transparent hover:bg-subtle"}`
+                        }
+                        onClick={() => handleRowClick("bid", order, idx)}>
+
                           <div
-                            className="absolute inset-y-0 right-0 bg-xcannes-green/10"
-                            style={{ width: `${depthPercent}%` }}
-                          />
+                          className="absolute inset-y-0 right-0 bg-xcannes-green/10"
+                          style={{ width: `${depthPercent}%` }} />
+
                           <div className="relative grid grid-cols-3 gap-2 py-0.5 text-[11px]">
                             <div className="text-price-up font-semibold">
                               {order.price?.toFixed(6)}
@@ -347,9 +347,9 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
                               {order.total?.toFixed(4)}
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        </div>);
+
+                  })}
                   </div>
                 </div>
 
@@ -357,9 +357,9 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
                 <div className="my-2 py-1 text-center border-y border-subtle">
                   <span className="text-[11px] text-muted">
                     {t("trading_spread")}:{" "}
-                    {asks[0] && bids[0]
-                      ? (asks[0].price - bids[0].price).toFixed(6)
-                      : "-"}
+                    {asks[0] && bids[0] ?
+                  (asks[0].price - bids[0].price).toFixed(6) :
+                  "-"}
                   </span>
                 </div>
 
@@ -373,26 +373,26 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
                   </div>
                   <div className="space-y-0.5">
                     {asks.map((order, idx) => {
-                      const depthPercent = (order.amount / maxAskAmount) * 100;
-                      const isSelected =
-                        selectedRow &&
-                        selectedRow.side === "ask" &&
-                        selectedRow.index === idx &&
-                        selectedRow.price === order.price;
-                      return (
-                        <div
-                          key={idx}
-                          className={`relative cursor-pointer border-l-2 ${
-                            isSelected
-                              ? "border-xcannes-green bg-subtle"
-                              : "border-transparent hover:bg-subtle"
-                          }`}
-                          onClick={() => handleRowClick("ask", order, idx)}
-                        >
+                    const depthPercent = order.amount / maxAskAmount * 100;
+                    const isSelected =
+                    selectedRow &&
+                    selectedRow.side === "ask" &&
+                    selectedRow.index === idx &&
+                    selectedRow.price === order.price;
+                    return (
+                      <div
+                        key={idx}
+                        className={`relative cursor-pointer border-l-2 ${
+                        isSelected ?
+                        "border-xcannes-green bg-subtle" :
+                        "border-transparent hover:bg-subtle"}`
+                        }
+                        onClick={() => handleRowClick("ask", order, idx)}>
+
                           <div
-                            className="absolute inset-y-0 right-0 bg-red-500/10"
-                            style={{ width: `${depthPercent}%` }}
-                          />
+                          className="absolute inset-y-0 right-0 bg-red-500/10"
+                          style={{ width: `${depthPercent}%` }} />
+
                           <div className="relative grid grid-cols-3 gap-2 py-0.5 text-[11px]">
                             <div className="text-price-down font-semibold">
                               {order.price?.toFixed(6)}
@@ -404,9 +404,9 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
                               {order.total?.toFixed(4)}
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        </div>);
+
+                  })}
                   </div>
                 </div>
               </div>
@@ -429,25 +429,25 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
               </div>
 
               <div className="recent-trades-list space-y-1 max-h-[140px] overflow-y-auto overscroll-contain pr-1">
-                {history.length === 0 ? (
-                  <div className="text-center py-4">
+                {history.length === 0 ?
+              <div className="text-center py-4">
                     <p className="text-[11px] text-muted mb-1">
                       {t("trading_no_trades")}
                     </p>
-                  </div>
-                ) : (
-                  history.map((tx, idx) => (
-                    <div
-                      key={idx}
-                      className="grid grid-cols-3 gap-2 py-1 hover:bg-white/5 rounded transition-colors"
-                    >
+                  </div> :
+
+              history.map((tx, idx) =>
+              <div
+                key={idx}
+                className="grid grid-cols-3 gap-2 py-1 hover:bg-white/5 rounded transition-colors">
+
                       <div
-                        className={`text-[11px] font-semibold ${
-                          tx.type === "buy"
-                            ? "text-price-up"
-                            : "text-price-down"
-                        }`}
-                      >
+                  className={`text-[11px] font-semibold ${
+                  tx.type === "buy" ?
+                  "text-price-up" :
+                  "text-price-down"}`
+                  }>
+
                         {tx.price?.toFixed(6)}
                       </div>
                       <div className="text-[11px] text-secondary text-right">
@@ -455,76 +455,76 @@ export default function OrderbookSidebar({ pair, onPriceSelect }) {
                       </div>
                       <div className="text-[11px] text-muted text-right">
                         {tx.executed_time.toLocaleTimeString("fr-FR", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                    hour: "2-digit",
+                    minute: "2-digit"
+                  })}
                       </div>
                     </div>
-                  ))
-                )}
+              )
+              }
               </div>
             </div>
-          </div>
-        ) : null}
+          </div> :
+        null}
       </div>
 
       {/* Footer */}
-      {showNewsExternal ? (
-        <div className="mt-auto shrink-0 bg-elevated sticky bottom-0 z-20">
+      {showNewsExternal ?
+      <div className="mt-auto shrink-0 bg-elevated sticky bottom-0 z-20">
           <div className="px-3 py-2 flex items-center justify-end">
             <button
-              type="button"
-              onClick={() => setWalletInfoOpen(true)}
-              className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
-              title="Wallet info & fees"
-            >
-              Info & Fees
-            </button>
+            type="button"
+            onClick={() => setWalletInfoOpen(true)}
+            className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
+            title={t("ui_wallet_info_fees_190ccbf57d", "Wallet info & fees")}>{t("ui_info_fees_e39e77e039", "Info & Fees")}
+
+
+          </button>
           </div>
-        </div>
-      ) : (
-        <div className="hidden md:block mt-auto shrink-0 bg-elevated">
+        </div> :
+
+      <div className="hidden md:block mt-auto shrink-0 bg-elevated">
           <div className="px-3 py-2 flex items-center justify-between gap-2">
             <button
-              type="button"
-              onClick={() =>
-                setDesktopPanel((prev) =>
-                  prev === "news" ? "orderbook" : "news"
-                )
-              }
-              className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
-            >
+            type="button"
+            onClick={() =>
+            setDesktopPanel((prev) =>
+            prev === "news" ? "orderbook" : "news"
+            )
+            }
+            className="text-[12px] font-medium text-white/85 hover:text-white transition-colors">
+
               {showDesktopNews ? "ORDERBOOK" : "NEWS"}
             </button>
 
             <button
-              type="button"
-              onClick={() => setWalletInfoOpen(true)}
-              className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
-              title="Wallet info & fees"
-            >
-              Info & Fees
-            </button>
+            type="button"
+            onClick={() => setWalletInfoOpen(true)}
+            className="text-[12px] font-medium text-white/85 hover:text-white transition-colors"
+            title={t("ui_wallet_info_fees_190ccbf57d", "Wallet info & fees")}>{t("ui_info_fees_e39e77e039", "Info & Fees")}
+
+
+          </button>
           </div>
         </div>
-      )}
+      }
 
       {/* Chart Footer en bas de la colonne Orderbook sur mobile uniquement */}
-      {!showNewsExternal && (
-        <div className="md:hidden">
-          <ChartFooter 
-            pair={pair}
-            fxMode={isFxMode}
-            fxBase={fxBase}
-            fxQuote={fxQuote}
-          />
+      {!showNewsExternal &&
+      <div className="md:hidden">
+          <ChartFooter
+          pair={pair}
+          fxMode={isFxMode}
+          fxBase={fxBase}
+          fxQuote={fxQuote} />
+
         </div>
-      )}
+      }
 
       <WalletInfoModal
         isOpen={walletInfoOpen}
-        onClose={() => setWalletInfoOpen(false)}
-      />
-    </aside>
-  );
+        onClose={() => setWalletInfoOpen(false)} />
+
+    </aside>);
+
 }

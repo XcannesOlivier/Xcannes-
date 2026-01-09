@@ -1,7 +1,7 @@
 import SEOHead from "@/components/layout/SEOHead";
 import DemoWalletDashboard from "@/components/demo-wallet/DemoWalletDashboard";
 import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getPageTranslations } from "@/i18n/getPageTranslations";
 import Link from "next/link";
 
 export default function DemoWalletsComparePage() {
@@ -73,7 +73,7 @@ export default function DemoWalletsComparePage() {
 export async function getStaticProps({ locale }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common"])),
+      ...(await getPageTranslations(locale, ["common"])),
     },
   };
 }

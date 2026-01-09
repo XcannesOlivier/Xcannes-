@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
+import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -21,13 +21,13 @@ const MoonPaySellModal = ({
   noticeVariant = "preview",
   noticeContextLabel = "",
   demoMode = false,
-  onDemoSubmit,
-}) => {
+  onDemoSubmit
+}) => {const { t } = useTranslation("common");
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
-  
+
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
   const [amount, setAmount] = useState('');
@@ -35,16 +35,16 @@ const MoonPaySellModal = ({
 
   // Cryptos supportées pour la vente (RLUSD en priorité)
   const supportedCurrencies = [
-    { code: 'RLUSD', name: 'RLUSD Stablecoin', min: 20 },
-    { code: 'XRP', name: 'XRP (Ripple)', min: 10 },
-  ];
+  { code: 'RLUSD', name: 'RLUSD Stablecoin', min: 20 },
+  { code: 'XRP', name: 'XRP (Ripple)', min: 10 }];
+
 
   // Devises fiat supportées
   const supportedFiatCurrencies = [
-    { code: 'USD', symbol: '$', name: 'US Dollar' },
-    { code: 'EUR', symbol: '€', name: 'Euro' },
-    { code: 'GBP', symbol: '£', name: 'British Pound' },
-  ];
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' }];
+
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -58,7 +58,7 @@ const MoonPaySellModal = ({
       return;
     }
 
-    const selectedCurrency = supportedCurrencies.find(c => c.code === currency);
+    const selectedCurrency = supportedCurrencies.find((c) => c.code === currency);
     if (parseFloat(amount) < selectedCurrency.min) {
       setError(`Minimum amount is ${selectedCurrency.min} ${currency}`);
       return;
@@ -72,9 +72,9 @@ const MoonPaySellModal = ({
       if (demoMode) {
         const res = await Promise.resolve(
           onDemoSubmit?.({
-          currencyCode: String(currency || "RLUSD").toUpperCase(),
-          quoteCurrencyCode: String(quoteCurrency || "USD").toUpperCase(),
-          amount: parseFloat(amount),
+            currencyCode: String(currency || "RLUSD").toUpperCase(),
+            quoteCurrencyCode: String(quoteCurrency || "USD").toUpperCase(),
+            amount: parseFloat(amount)
           })
         );
         if (res?.error) {
@@ -91,14 +91,14 @@ const MoonPaySellModal = ({
       const response = await fetch('/api/moonpay/generate-sell-url', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           walletAddress,
           baseCurrencyCode: currency, // Crypto à vendre
           quoteCurrencyCode: quoteCurrency, // Fiat à recevoir
-          baseCurrencyAmount: parseFloat(amount),
-        }),
+          baseCurrencyAmount: parseFloat(amount)
+        })
       });
 
       const data = await response.json();
@@ -166,65 +166,73 @@ const MoonPaySellModal = ({
   if (!isOpen) return null;
 
   // Mode embedded: retourner seulement le contenu
-  const renderContent = () => (
-    <div className={embedded ? "" : "p-4 md:p-5"}>
+  const renderContent = () =>
+  <div className={embedded ? "" : "p-4 md:p-5"}>
       <WalletNotConnectedNotice
-        show={isPreviewMode}
-        className={embedded ? "mb-4" : "mb-4"}
-        variant={noticeVariant}
-        contextLabel={noticeContextLabel}
-      />
+      show={isPreviewMode}
+      className={embedded ? "mb-4" : "mb-4"}
+      variant={noticeVariant}
+      contextLabel={noticeContextLabel} />
+
             {/* Form */}
-            {step === 'form' && (
-              <div className="space-y-4">
-                {demoMode && (
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-                    <p className="text-xs text-emerald-200">
-                      Mode démo : la vente est simulée (aucune redirection MoonPay).
-                    </p>
-                  </div>
-                )}
+            {step === 'form' &&
+    <div className="space-y-4">
+	                {demoMode &&
+	      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+	                    <p className="text-xs text-emerald-200">
+	                      {t(
+	                        "moonpay_sell_demo_notice",
+	                        "Demo mode: the sell is simulated (no MoonPay redirect)."
+	                      )}
+	                    </p>
+	                  </div>
+	      }
                 {/* Currency selector */}
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
-                    Select cryptocurrency to sell
-                  </label>
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
-                  >
-                    {supportedCurrencies.map((curr) => (
-                      <option key={curr.code} value={curr.code}>
+	                <div>
+	                  <label className="block text-sm font-medium text-white/80 mb-2">
+	                    {t(
+	                      "moonpay_select_crypto_to_sell",
+	                      "Select cryptocurrency to sell"
+	                    )}
+	                  </label>
+	                  <select
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+          className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none">
+
+                    {supportedCurrencies.map((curr) =>
+          <option key={curr.code} value={curr.code}>
                         {curr.name}
                       </option>
-                    ))}
+          )}
                   </select>
                 </div>
 
                 {/* Amount input */}
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
-                    Amount to sell
-                  </label>
+	                <div>
+	                  <label className="block text-sm font-medium text-white/80 mb-2">
+	                    {t("moonpay_amount_to_sell", "Amount to sell")}
+	                  </label>
                   <div className="relative">
                     <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      placeholder="0.00"
-                      step="0.01"
-                      min="0"
-                      className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none pr-16"
-                    />
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none pr-16" />
+
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
                       {currency}
                     </span>
                   </div>
-                  <p className="text-xs text-white/40 mt-1">
-                    Minimum: {supportedCurrencies.find(c => c.code === currency)?.min} {currency}
-                  </p>
-                </div>
+	                  <p className="text-xs text-white/40 mt-1">
+	                    {t("moonpay_minimum_prefix", "Minimum:")}{" "}
+	                    {supportedCurrencies.find((c) => c.code === currency)?.min}{" "}
+	                    {currency}
+	                  </p>
+	                </div>
 
                 {/* Arrow down */}
                 <div className="flex justify-center">
@@ -234,147 +242,158 @@ const MoonPaySellModal = ({
                 </div>
 
                 {/* Fiat currency selector */}
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
-                    Receive in
-                  </label>
+	                <div>
+	                  <label className="block text-sm font-medium text-white/80 mb-2">
+	                    {t("moonpay_receive_in", "Receive in")}
+	                  </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {supportedFiatCurrencies.map((fiat) => (
-                      <button
-                        key={fiat.code}
-                        type="button"
-                        onClick={() => setQuoteCurrency(fiat.code)}
-                        className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                          quoteCurrency === fiat.code
-                            ? 'bg-xcannes-green text-black'
-                            : 'bg-black/40 text-white/60 border border-white/10 hover:bg-black/60'
-                        }`}
-                      >
+                    {supportedFiatCurrencies.map((fiat) =>
+          <button
+            key={fiat.code}
+            type="button"
+            onClick={() => setQuoteCurrency(fiat.code)}
+            className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+            quoteCurrency === fiat.code ?
+            'bg-xcannes-green text-black' :
+            'bg-black/40 text-white/60 border border-white/10 hover:bg-black/60'}`
+            }>
+
                         <span className="block text-lg mb-1">{fiat.symbol}</span>
                         <span className="text-xs">{fiat.code}</span>
                       </button>
-                    ))}
+          )}
                   </div>
                 </div>
 
                 {/* Wallet address display */}
-                <div className="bg-black/40 border border-white/10 rounded-lg p-3">
-                  <p className="text-xs text-white/60 mb-1">From wallet</p>
-                  <p className="text-sm text-white/90 font-mono break-all">
-                    {walletAddress}
-                  </p>
-                </div>
+	                <div className="bg-black/40 border border-white/10 rounded-lg p-3">
+	                  <p className="text-xs text-white/60 mb-1">
+	                    {t("moonpay_from_wallet", "From wallet")}
+	                  </p>
+	                  <p className="text-sm text-white/90 font-mono break-all">
+	                    {walletAddress}
+	                  </p>
+	                </div>
 
                 {/* Error message */}
-                {error && (
-                  <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                {error &&
+      <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
                     <XCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-400">{error}</p>
                   </div>
-                )}
+      }
 
                 {/* Info box */}
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                   <p className="text-xs text-blue-400">
-                    {demoMode
-                      ? "💰 Demo mode: the sell is simulated (no bank transfer)."
-                      : "💰 Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries."}
+                    {demoMode ?
+          "💰 Demo mode: the sell is simulated (no bank transfer)." :
+          "💰 Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries."}
                   </p>
                 </div>
 
                 {/* Continue button */}
                 <button
-                  type="button"
-                  onClick={generateSellUrl}
-                  disabled={loading || !amount}
-                  className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 border border-white/10"
-                >
-                  {loading
-                    ? 'Loading...'
-                    : demoMode
-                      ? "Simuler la vente"
-                      : 'Continue to Sell'}
+        type="button"
+        onClick={generateSellUrl}
+        disabled={loading || !amount}
+        className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 border border-white/10">
+
+                  {loading ?
+        'Loading...' :
+        demoMode ?
+        "Simuler la vente" :
+        'Continue to Sell'}
                 </button>
               </div>
-            )}
+    }
 
             {/* Loading */}
-            {step === 'loading' && (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
-                <p className="text-white/80">Loading MoonPay widget...</p>
-              </div>
-            )}
+	            {step === 'loading' &&
+	    <div className="flex flex-col items-center justify-center py-12">
+	                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4"></div>
+	                <p className="text-white/80">
+	                  {t("moonpay_loading_widget", "Loading MoonPay widget...")}
+	                </p>
+	              </div>
+	    }
 
             {/* MoonPay iframe */}
-            {step === 'iframe' && iframeUrl && (
-              <div className="relative" style={{ height: '600px' }}>
-                <iframe
-                  src={iframeUrl}
-                  className="w-full h-full rounded-lg"
-                  allow="payment"
-                  title="MoonPay Sell Widget"
-                />
+            {step === 'iframe' && iframeUrl &&
+    <div className="relative" style={{ height: '600px' }}>
+	                <iframe
+	        src={iframeUrl}
+	        className="w-full h-full rounded-lg"
+	        allow="payment"
+	        title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")} />
+
                 <button
-                  type="button"
-                  onClick={onClose}
-                  className="absolute top-2 right-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors"
-                >
-                  Close
-                </button>
+        type="button"
+        onClick={onClose}
+        className="absolute top-2 right-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors">
+
+	                  {t("close", "Close")}
+	                </button>
               </div>
-            )}
+    }
 
             {/* Success */}
-            {step === 'success' && (
-              <div className="flex flex-col items-center justify-center py-12">
+            {step === 'success' &&
+    <div className="flex flex-col items-center justify-center py-12">
                 <CheckCircleIcon className="w-16 h-16 text-green-400 mb-4" />
-                <h4 className="text-xl font-bold text-white mb-2">Sale Completed!</h4>
-                <p className="text-white/60 text-center mb-4">
-                  Your funds will be transferred to your bank account.
-                </p>
+	                <h4 className="text-xl font-bold text-white mb-2">
+	                  {t("moonpay_sell_success_title", "Sale Completed!")}
+	                </h4>
+	                <p className="text-white/60 text-center mb-4">
+	                  {t(
+	                    "moonpay_sell_success_body",
+	                    "Your funds will be transferred to your bank account."
+	                  )}
+	                </p>
                 <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all"
-                >
-                  Close
-                </button>
+        type="button"
+        onClick={onClose}
+        className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all">
+
+	                  {t("close", "Close")}
+	                </button>
               </div>
-            )}
+    }
 
             {/* Error */}
-            {step === 'error' && (
-              <div className="flex flex-col items-center justify-center py-12">
+            {step === 'error' &&
+    <div className="flex flex-col items-center justify-center py-12">
                 <XCircleIcon className="w-16 h-16 text-red-400 mb-4" />
-                <h4 className="text-xl font-bold text-white mb-2">Something went wrong</h4>
+	                <h4 className="text-xl font-bold text-white mb-2">
+	                  {t("moonpay_error_title", "Something went wrong")}
+	                </h4>
                 <p className="text-white/60 text-center mb-4">
                   {error || 'Please try again later.'}
                 </p>
                 <div className="flex gap-3">
                   <button
-                    type="button"
-                    onClick={() => {
-                      setStep('form');
-                      setError(null);
-                      setIframeUrl(null);
-                    }}
-                    className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
-                  >
-                    Try Again
-                  </button>
+          type="button"
+          onClick={() => {
+            setStep('form');
+            setError(null);
+            setIframeUrl(null);
+          }}
+          className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors">
+
+	                    {t("try_again", "Try Again")}
+	                  </button>
                   <button
-                    type="button"
-                    onClick={onClose}
-                    className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all"
-                  >
-                    Close
-                  </button>
+          type="button"
+          onClick={onClose}
+          className="px-6 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all">
+
+	                    {t("close", "Close")}
+	                  </button>
                 </div>
               </div>
-            )}
-    </div>
-  );
+    }
+    </div>;
+
 
   // Mode embedded: retourner seulement le contenu
   if (embedded) {
@@ -385,44 +404,44 @@ const MoonPaySellModal = ({
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={step === 'iframe' ? null : onClose}
-      />
+        onClick={step === 'iframe' ? null : onClose} />
+
       
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
           className="relative w-full max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
-          onClick={(e) => e.stopPropagation()}
-        >
+          onClick={(e) => e.stopPropagation()}>
+
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
             <div>
-              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                Sell Crypto for Fiat
+              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_sell_crypto_for_fiat_1167ce7e08", "Sell Crypto for Fiat")}
+
               </h3>
-              <p className="text-xs text-white/60 mt-1">
-                Powered by MoonPay • Instant bank transfer
+              <p className="text-xs text-white/60 mt-1">{t("ui_powered_by_moonpay_instant_b_9e94ccf50e", "Powered by MoonPay • Instant bank transfer")}
+
               </p>
             </div>
-            {step !== 'iframe' && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-white/60 hover:text-white transition-colors text-xl"
-              >
+            {step !== 'iframe' &&
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-white/60 hover:text-white transition-colors text-xl">
+
                 ✕
               </button>
-            )}
+            }
           </div>
 
           {/* Content */}
           {renderContent()}
         </div>
       </div>
-    </>
-  );
+    </>);
+
 };
 
 export default MoonPaySellModal;

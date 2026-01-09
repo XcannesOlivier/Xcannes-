@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardFooter({
   layout,
@@ -11,6 +12,7 @@ export default function WalletDashboardFooter({
   onOpenInfo,
 }) {
   const router = useRouter();
+  const { t } = useTranslation("common");
   const showOpenFullWallet = !isFullPageView && layout?.showOpenFullWallet;
   const showTopBorder = layout?.statementVariant !== "dex-desktop";
   const showBottomBorder = layout?.statementVariant === "dex-mobile";
@@ -145,7 +147,7 @@ export default function WalletDashboardFooter({
             aria-hidden="true"
           />
           <span className="font-medium truncate">
-            {xrplConnectionIndicator?.label || "XRPL"}
+            {xrplConnectionIndicator?.label || t("xrpl_label", "XRPL")}
           </span>
         </div>
 
@@ -156,7 +158,7 @@ export default function WalletDashboardFooter({
               onClick={withHardNavFallback("/wallet")}
               className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
             >
-              Open full wallet
+              {t("wallet_footer_open_full_wallet", "Open full wallet")}
             </Link>
           )}
 
@@ -165,13 +167,15 @@ export default function WalletDashboardFooter({
               type="button"
               onClick={onOpenInfo}
               className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
-              title="Wallet info & fees"
+              title={t("wallet_footer_info_title", "Wallet info & fees")}
             >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
                 i
               </span>
-              <span className="hidden sm:inline">Info & Fees</span>
-              <span className="sm:hidden">Info</span>
+              <span className="hidden sm:inline">
+                {t("wallet_footer_info_fees", "Info & Fees")}
+              </span>
+              <span className="sm:hidden">{t("wallet_footer_info", "Info")}</span>
             </button>
           )}
 
@@ -180,7 +184,7 @@ export default function WalletDashboardFooter({
               isFullPageView ? "block" : "hidden sm:block"
             } text-[10px] text-[#0f7fe1]/80`}
           >
-            Secured via XUMM
+            {t("wallet_footer_secured_xumm", "Secured via XUMM")}
           </div>
         </div>
       </div>

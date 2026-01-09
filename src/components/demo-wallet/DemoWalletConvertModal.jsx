@@ -147,7 +147,7 @@ export default function DemoWalletConvertModal({
               onChange={(e) => setAmount(e.target.value)}
               inputMode="decimal"
               className="w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm text-white/90 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/40"
-              placeholder={t("demo_amount_placeholder", "Ex: 25")}
+              placeholder={t("demo_amount_placeholder", "e.g. 25")}
             />
             {normalizedAmount != null && normalizedAmount > 0 ? (
               <div className="text-[11px] text-white/45">
