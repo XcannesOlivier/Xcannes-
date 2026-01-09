@@ -1,12 +1,12 @@
 "use client";
 
-	import { useEffect, useMemo, useState } from "react";
-	import { useXcannesWS } from "@/context/XcannesWSContext";
-	import { getBookIdFromPair } from "@/utils/xrpl";
-	import { getPairCategory } from "@/utils/marketStructure";
-	import OrderbookSidebar from "@/components/dex/panels/OrderbookSidebar";
-	import NewsFeed from "@/components/dex/panels/NewsFeed";
-	import { WalletInfoContent } from "@/components/wallet/modals/WalletInfoModal";
+import { useEffect, useMemo, useState } from "react";
+import { useXcannesWS } from "@/context/XcannesWSContext";
+import { getBookIdFromPair } from "@/utils/xrpl";
+import { getPairCategory } from "@/utils/marketStructure";
+import OrderbookSidebar from "@/components/dex/panels/OrderbookSidebar";
+import NewsFeed from "@/components/dex/panels/NewsFeed";
+import { WalletInfoContent } from "@/components/wallet/modals/WalletInfoModal";
 
 /**
  * Onglets mobile (M1) pour la zone marché :
@@ -15,8 +15,8 @@
  * - Trades
  *
  * Utilisé uniquement sous 1024px dans TradingLayoutV1A.
- */
-export default function MobileTradingTabs({ pair }) {
+ */import { useTranslation } from "next-i18next";
+export default function MobileTradingTabs({ pair }) {const { t } = useTranslation("common");
   const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
   const isXRPL = pairCategory === "xrpl";
 
@@ -94,38 +94,38 @@ export default function MobileTradingTabs({ pair }) {
     const bookData = getBookIdFromPair(pair);
     if (!bookData?.backendPair) return [];
     const list = trades.get(bookData.backendPair) || [];
-    return list
-      .map((trade) => {
-        const price = Number(trade.price);
-        const amount = Number(trade.amount);
-        const executed_time =
-          trade.timestamp instanceof Date
-            ? trade.timestamp
-            : new Date(trade.timestamp);
-        if (!Number.isFinite(price) || !Number.isFinite(amount)) return null;
-        return {
-          price,
-          amount,
-          executed_time,
-          type: trade.side === "sell" ? "sell" : "buy",
-        };
-      })
-      .filter(Boolean)
-      .slice(0, 40);
+    return list.
+    map((trade) => {
+      const price = Number(trade.price);
+      const amount = Number(trade.amount);
+      const executed_time =
+      trade.timestamp instanceof Date ?
+      trade.timestamp :
+      new Date(trade.timestamp);
+      if (!Number.isFinite(price) || !Number.isFinite(amount)) return null;
+      return {
+        price,
+        amount,
+        executed_time,
+        type: trade.side === "sell" ? "sell" : "buy"
+      };
+    }).
+    filter(Boolean).
+    slice(0, 40);
   }, [trades, pair, isXRPL]);
 
   const tabs = useMemo(
     () => [
-      {
-        key: "orderbook",
-        label: isXRPL ? "Orderbook" : "Live News",
-      },
-      { key: "info", label: "Info & Fees" },
-      // Sur XRPL, on préfère un onglet "News" plutôt que "Trades" sur mobile
-      isXRPL
-        ? { key: "news", label: "News" }
-        : { key: "trades", label: "Trades" },
-    ],
+    {
+      key: "orderbook",
+      label: isXRPL ? "Orderbook" : "Live News"
+    },
+    { key: "info", label: "Info & Fees" },
+    // Sur XRPL, on préfère un onglet "News" plutôt que "Trades" sur mobile
+    isXRPL ?
+    { key: "news", label: "News" } :
+    { key: "trades", label: "Trades" }],
+
     [isXRPL]
   );
 
@@ -141,52 +141,52 @@ export default function MobileTradingTabs({ pair }) {
               type="button"
               onClick={() => setActiveTab(tab.key)}
               className={`flex-1 py-2 text-xs uppercase tracking-[0.14em] border-b-2 focus-ring-token ${
-                isActive
-                  ? "border-accent-rlusd text-primary"
-                  : "border-transparent text-muted hover:text-secondary"
-              }`}
-            >
+              isActive ?
+              "border-accent-rlusd text-primary" :
+              "border-transparent text-muted hover:text-secondary"}`
+              }>
+
               {tab.label}
-            </button>
-          );
+            </button>);
+
         })}
       </div>
 
       {/* Content */}
       <div className="mt-2">
-        {activeTab === "orderbook" ? (
-          <OrderbookSidebar pair={pair} />
-        ) : activeTab === "info" ? (
-          <div className="panel-body">
+        {activeTab === "orderbook" ?
+        <OrderbookSidebar pair={pair} /> :
+        activeTab === "info" ?
+        <div className="panel-body">
             <WalletInfoContent />
-          </div>
-        ) : activeTab === "news" && isXRPL ? (
-          <div className="panel-body h-[60vh]">
+          </div> :
+        activeTab === "news" && isXRPL ?
+        <div className="panel-body h-[60vh]">
             <NewsFeed category="finance" />
-          </div>
-        ) : (
-          <div className="panel-body">
-            {tradesHistory.length === 0 ? (
-              <p className="text-[11px] text-muted">
-                No recent trades for this pair.
-              </p>
-            ) : (
-              <div className="space-y-1 max-h-64 overflow-y-auto">
+          </div> :
+
+        <div className="panel-body">
+            {tradesHistory.length === 0 ?
+          <p className="text-[11px] text-muted">{t("ui_no_recent_trades_for_this_pa_08b852cc3c", "No recent trades for this pair.")}
+
+          </p> :
+
+          <div className="space-y-1 max-h-64 overflow-y-auto">
                 <div className="grid grid-cols-3 gap-2 mb-1 text-[11px] text-muted font-medium">
-                  <div>Price</div>
-                  <div className="text-right">Amount</div>
-                  <div className="text-right">Time</div>
+                  <div>{t("ui_price_8c023f79dc", "Price")}</div>
+                  <div className="text-right">{t("ui_amount_a2d3548923", "Amount")}</div>
+                  <div className="text-right">{t("ui_time_afd513de61", "Time")}</div>
                 </div>
-                {tradesHistory.map((tx, idx) => (
-                  <div
-                    key={idx}
-                    className="grid grid-cols-3 gap-2 py-1 hover:bg-white/5 rounded transition-colors text-[11px]"
-                  >
+                {tradesHistory.map((tx, idx) =>
+            <div
+              key={idx}
+              className="grid grid-cols-3 gap-2 py-1 hover:bg-white/5 rounded transition-colors text-[11px]">
+
                     <div
-                      className={`font-semibold ${
-                        tx.type === "buy" ? "text-price-up" : "text-price-down"
-                      }`}
-                    >
+                className={`font-semibold ${
+                tx.type === "buy" ? "text-price-up" : "text-price-down"}`
+                }>
+
                       {tx.price.toFixed(6)}
                     </div>
                     <div className="text-secondary text-right">
@@ -194,17 +194,17 @@ export default function MobileTradingTabs({ pair }) {
                     </div>
                     <div className="text-muted text-right">
                       {tx.executed_time.toLocaleTimeString("fr-FR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
                     </div>
                   </div>
-                ))}
-              </div>
             )}
+              </div>
+          }
           </div>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/router";
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "next-i18next";
 
 // Langues principales toujours visibles
 const mainLanguages = [
@@ -96,13 +97,23 @@ const getAllLanguages = () => {
 
 export default function LanguageSwitcher() {
   const router = useRouter();
+  const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const [openRegion, setOpenRegion] = useState(null);
   const dropdownRef = useRef(null);
 
-  const allLanguages = getAllLanguages();
+  const supportedLocales = new Set(router?.locales || []);
+  const allLanguages = getAllLanguages().filter((lang) =>
+    supportedLocales.size ? supportedLocales.has(lang.code) : true
+  );
   const currentLanguage =
-    allLanguages.find((lang) => lang.code === router.locale) || allLanguages[0];
+    allLanguages.find((lang) => lang.code === router.locale) ||
+    allLanguages[0] || {
+      code: router?.locale || router?.defaultLocale || "en",
+      label: "Language",
+      flag: "🌐",
+      country: "",
+    };
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -119,6 +130,10 @@ export default function LanguageSwitcher() {
     // Stocker le pays dans localStorage pour que NewsFeed puisse le lire
     if (typeof window !== 'undefined') {
       localStorage.setItem('selectedCountry', country);
+      localStorage.setItem("NEXT_LOCALE", locale);
+      document.cookie = `NEXT_LOCALE=${encodeURIComponent(
+        locale
+      )}; path=/; max-age=31536000; samesite=lax`;
       // Déclencher un event custom pour notifier NewsFeed
       window.dispatchEvent(new CustomEvent('countryChanged', { detail: { country } }));
     }
@@ -138,7 +153,7 @@ export default function LanguageSwitcher() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg transition-all duration-300"
-        aria-label="Change language"
+        aria-label={t("langswitcher_aria_label", "Change language")}
       >
         <span className="text-lg">{currentLanguage.flag}</span>
         <span className="hidden sm:inline text-[11px] font-medium text-white/80">
@@ -166,10 +181,14 @@ export default function LanguageSwitcher() {
           <div className="border-b-2 border-white/20">
             <div className="px-2 py-1 bg-white/10">
               <span className="text-[9px] font-bold text-white/60 uppercase tracking-wide">
-                Main
+                {t("langswitcher_main_label", "Main")}
               </span>
             </div>
-            {mainLanguages.map((lang) => (
+            {mainLanguages
+              .filter((lang) =>
+                supportedLocales.size ? supportedLocales.has(lang.code) : true
+              )
+              .map((lang) => (
               <button
                 key={lang.code}
                 onClick={() => changeLanguage(lang.code, lang.country)}
@@ -205,15 +224,20 @@ export default function LanguageSwitcher() {
 
           <div className="px-2 py-1 bg-white/5">
             <span className="text-[9px] font-bold text-white/60 uppercase tracking-wide">
-              Regions
+              {t("langswitcher_regions_label", "Regions")}
             </span>
           </div>
 
-          {Object.entries(languagesByRegion).map(([regionKey, region]) => (
-            <div
-              key={regionKey}
-              className="border-b border-white/10 last:border-b-0"
-            >
+          {Object.entries(languagesByRegion).map(([regionKey, region]) => {
+            const regionLanguages = region.languages.filter((lang) =>
+              supportedLocales.size ? supportedLocales.has(lang.code) : true
+            );
+            if (!regionLanguages.length) return null;
+            return (
+              <div
+                key={regionKey}
+                className="border-b border-white/10 last:border-b-0"
+              >
               <button
                 onClick={() => toggleRegion(regionKey)}
                 className="w-full flex items-center justify-between px-2 py-1.5 bg-white/5 hover:bg-white/10 transition-all duration-200"
@@ -243,7 +267,7 @@ export default function LanguageSwitcher() {
 
               {openRegion === regionKey && (
                 <div className="bg-black/50">
-                  {region.languages.map((lang) => (
+                  {regionLanguages.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => changeLanguage(lang.code, lang.country)}
@@ -279,8 +303,9 @@ export default function LanguageSwitcher() {
                   ))}
                 </div>
               )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

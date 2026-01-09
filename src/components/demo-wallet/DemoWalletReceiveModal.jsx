@@ -199,7 +199,7 @@ export default function DemoWalletReceiveModal({
                 onChange={(e) => setRequestAmount(e.target.value)}
                 inputMode="decimal"
                 className="w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm text-white/90 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/40"
-                placeholder={t("demo_amount_placeholder", "Ex: 25")}
+                placeholder={t("demo_amount_placeholder", "e.g. 25")}
               />
             </div>
             <div className="space-y-1">
@@ -228,7 +228,7 @@ export default function DemoWalletReceiveModal({
               value={requestMemo}
               onChange={(e) => setRequestMemo(e.target.value)}
               className="w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm text-white/90 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/40"
-              placeholder={t("demo_send_memo_placeholder", "Ex: déjeuner")}
+              placeholder={t("demo_send_memo_placeholder", "e.g. lunch")}
             />
           </div>
 

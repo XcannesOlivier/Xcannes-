@@ -1,10 +1,10 @@
-export default function TokenAmountInput({
+import { useTranslation } from "next-i18next";export default function TokenAmountInput({
   value,
   onChange,
   max,
   placeholder = "0.00",
-  token = "XCS",
-}) {
+  token = "XCS"
+}) {const { t } = useTranslation("common");
   const handleInput = (e) => {
     const raw = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
     if (raw.split(".").length > 2) return; // une seule virgule
@@ -31,23 +31,23 @@ export default function TokenAmountInput({
         value={value ?? ""}
         onChange={handleInput}
         onClick={(e) => e.stopPropagation()}
-        onFocus={(e) => e.stopPropagation()}
-      />
-      {typeof max === "number" && max > 0 && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleMaxClick();
-          }}
-          className="text-[11px] uppercase tracking-wide text-white/50 hover:text-xcannes-green transition-colors mr-1 active:scale-95"
-        >
-          Max
-        </button>
-      )}
+        onFocus={(e) => e.stopPropagation()} />
+
+      {typeof max === "number" && max > 0 &&
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleMaxClick();
+        }}
+        className="text-[11px] uppercase tracking-wide text-white/50 hover:text-xcannes-green transition-colors mr-1 active:scale-95">{t("ui_max_4a27fb9fbf", "Max")}
+
+
+      </button>
+      }
       <span className="text-xcannes-green font-bold text-sm uppercase tracking-wider whitespace-nowrap">
         {token}
       </span>
-    </div>
-  );
+    </div>);
+
 }

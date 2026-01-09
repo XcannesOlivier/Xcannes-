@@ -1,10 +1,10 @@
 "use client";
 
-	import { useEffect, useState } from "react";
-	import Image from "next/image";
-	import xcannesApi from "@/lib/xcannesApi";
-	import { useXcannesWS } from "@/context/XcannesWSContext";
-	import { getBookIdFromPair } from "@/utils/xrpl";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import xcannesApi from "@/lib/xcannesApi";
+import { useXcannesWS } from "@/context/XcannesWSContext";
+import { getBookIdFromPair } from "@/utils/xrpl";import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {
@@ -15,7 +15,7 @@ const logError = (...args) => {
 const CRYPTO_ICON_PATHS = {
   XRP: "/symbols/xrp.png",
   RLUSD: "/symbols/rlusd.png",
-  XCS: "/symbols/xcs.png",
+  XCS: "/symbols/xcs.png"
 };
 
 // Fonction pour obtenir le drapeau d'une devise
@@ -23,7 +23,7 @@ const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
   XAF: "🌍",
   XOF: "🌍",
-  XCD: "🌴",
+  XCD: "🌴"
 };
 
 function countryCodeToFlag(countryCode) {
@@ -48,45 +48,45 @@ function getFlag(code) {
 const ASSET_ICONS = {
   XRP: "✕",
   RLUSD: "$",
-  DEFAULT: "💎",
+  DEFAULT: "💎"
 };
 
 // Liste des devises fiat connues (pour utiliser les drapeaux)
 const FIAT_CURRENCIES = [
-  'USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD', 'CNY', 'CNH',
-  'HKD', 'SGD', 'KRW', 'INR', 'RUB', 'BRL', 'MXN', 'ZAR', 'TRY', 'SEK',
-  'NOK', 'DKK', 'PLN', 'THB', 'IDR', 'MYR', 'PHP', 'CZK', 'HUF', 'RON',
-  'ILS', 'AED', 'SAR', 'QAR', 'KWD', 'EGP', 'MAD', 'NGN', 'KES', 'GHS'
-];
+'USD', 'EUR', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'NZD', 'CNY', 'CNH',
+'HKD', 'SGD', 'KRW', 'INR', 'RUB', 'BRL', 'MXN', 'ZAR', 'TRY', 'SEK',
+'NOK', 'DKK', 'PLN', 'THB', 'IDR', 'MYR', 'PHP', 'CZK', 'HUF', 'RON',
+'ILS', 'AED', 'SAR', 'QAR', 'KWD', 'EGP', 'MAD', 'NGN', 'KES', 'GHS'];
+
 
 function getAssetIcon(code) {
   if (!code) return ASSET_ICONS.DEFAULT;
   const upper = String(code).toUpperCase();
-  
+
   // Si c'est une devise fiat connue, utiliser le drapeau
   if (FIAT_CURRENCIES.includes(upper)) {
     return getFlag(upper);
   }
-  
+
   return ASSET_ICONS[upper] || ASSET_ICONS.DEFAULT;
 }
 
 function getAssetName(code) {
   if (!code) return code;
   const upper = String(code).toUpperCase();
-  
+
   const names = {
     XRP: "Ripple",
-    RLUSD: "RLUSD Stablecoin",
+    RLUSD: "RLUSD Stablecoin"
   };
-  
+
   return names[upper] || code;
 }
 
 // ✅ Fonction intelligente : utilise les icônes PNG pour crypto, drapeaux pour fiat, ou icône texte
 function getSmartIcon(code, currencyInfo) {
   const upper = String(code || "").toUpperCase();
-  
+
   // Si c'est une crypto avec icône disponible, retourner le composant Image
   if (CRYPTO_ICON_PATHS[upper]) {
     return (
@@ -95,11 +95,11 @@ function getSmartIcon(code, currencyInfo) {
         alt={upper}
         width={20}
         height={20}
-        className="w-5 h-5 object-cover rounded-md"
-      />
-    );
+        className="w-5 h-5 object-cover rounded-md" />);
+
+
   }
-  
+
   // Si on a des infos de devise fiat, utiliser le drapeau
   if (currencyInfo && currencyInfo.code) {
     return <span className="text-xl max-sm:text-lg">{getFlag(currencyInfo.code)}</span>;
@@ -117,18 +117,18 @@ function getSmartName(code, currencyInfo) {
   return getAssetName(code);
 }
 
-export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: providedStats }) {
+export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: providedStats }) {const { t } = useTranslation("common");
   const { tickers } = useXcannesWS();
-  
+
   // ✅ Auto-détection du fxMode si non fourni mais que fxBase/fxQuote sont présents
-  const actualFxMode = fxMode !== undefined ? fxMode : (fxBase && fxQuote && pair && !pair.includes('XRP') && !pair.includes('XCS') && !pair.includes('RLUSD'));
+  const actualFxMode = fxMode !== undefined ? fxMode : fxBase && fxQuote && pair && !pair.includes('XRP') && !pair.includes('XCS') && !pair.includes('RLUSD');
   const actualFxBase = fxBase || 'EUR';
   const actualFxQuote = fxQuote || 'USD';
-  
+
   const [stats, setStats] = useState({
     high24h: null,
     low24h: null,
-    volume24h: null,
+    volume24h: null
   });
   const [isXrplPair, setIsXrplPair] = useState(false);
   const [isPythPair, setIsPythPair] = useState(false);
@@ -149,8 +149,8 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
         const list = await xcannesApi.getFxCurrencies();
         if (cancelled) return;
 
-        const baseInfo = list.find(c => c.code === actualFxBase);
-        const quoteInfo = list.find(c => c.code === actualFxQuote);
+        const baseInfo = list.find((c) => c.code === actualFxBase);
+        const quoteInfo = list.find((c) => c.code === actualFxQuote);
 
         setCurrencies({
           base: baseInfo || { code: actualFxBase, name: actualFxBase },
@@ -160,7 +160,7 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
         logError('[ChartFooter] Erreur chargement devises:', err);
         setCurrencies({
           base: { code: actualFxBase, name: actualFxBase },
-          quote: { code: actualFxQuote, name: actualFxQuote },
+          quote: { code: actualFxQuote, name: actualFxQuote }
         });
       }
     };
@@ -192,7 +192,7 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
     setStats({
       high24h: providedStats.high ?? providedStats.high24h ?? null,
       low24h: providedStats.low ?? providedStats.low24h ?? null,
-      volume24h: providedStats.volume ?? providedStats.volume24h ?? null,
+      volume24h: providedStats.volume ?? providedStats.volume24h ?? null
     });
   }, [providedStats]);
 
@@ -208,24 +208,24 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
         const ticker = await xcannesApi.getTicker(book.backendPair);
         if (!ticker || cancelled) return;
         const highSource =
-          ticker.high24h ??
-          ticker.high_price ??
-          ticker.highPrice ??
-          ticker.high;
+        ticker.high24h ??
+        ticker.high_price ??
+        ticker.highPrice ??
+        ticker.high;
         const lowSource =
-          ticker.low24h ??
-          ticker.low_price ??
-          ticker.lowPrice ??
-          ticker.low;
+        ticker.low24h ??
+        ticker.low_price ??
+        ticker.lowPrice ??
+        ticker.low;
         const volumeSource =
-          ticker.volume24h ??
-          ticker.volume ??
-          ticker.quoteVolume ??
-          ticker.quote_volume;
+        ticker.volume24h ??
+        ticker.volume ??
+        ticker.quoteVolume ??
+        ticker.quote_volume;
         setStats({
           high24h: highSource != null ? Number(highSource) : null,
           low24h: lowSource != null ? Number(lowSource) : null,
-          volume24h: volumeSource != null ? Number(volumeSource) : null,
+          volume24h: volumeSource != null ? Number(volumeSource) : null
         });
       } catch (err) {
         logError('[ChartFooter] Erreur stats 24h:', err);
@@ -248,20 +248,20 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
     if (!wsTicker) return;
 
     const highSource =
-      wsTicker.high24h ??
-      wsTicker.high_price ??
-      wsTicker.highPrice ??
-      wsTicker.high;
+    wsTicker.high24h ??
+    wsTicker.high_price ??
+    wsTicker.highPrice ??
+    wsTicker.high;
     const lowSource =
-      wsTicker.low24h ??
-      wsTicker.low_price ??
-      wsTicker.lowPrice ??
-      wsTicker.low;
+    wsTicker.low24h ??
+    wsTicker.low_price ??
+    wsTicker.lowPrice ??
+    wsTicker.low;
     const volumeSource =
-      wsTicker.volume24h ??
-      wsTicker.volume ??
-      wsTicker.quote_volume ??
-      wsTicker.quoteVolume;
+    wsTicker.volume24h ??
+    wsTicker.volume ??
+    wsTicker.quote_volume ??
+    wsTicker.quoteVolume;
 
     // Stabiliser High / Low / Volume pour éviter les clignotements
     setStats((prev) => {
@@ -270,35 +270,35 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
       const prevVolume = prev?.volume24h ?? null;
 
       const highNum =
-        highSource !== undefined && highSource !== null
-          ? Number(highSource)
-          : NaN;
+      highSource !== undefined && highSource !== null ?
+      Number(highSource) :
+      NaN;
       const lowNum =
-        lowSource !== undefined && lowSource !== null
-          ? Number(lowSource)
-          : NaN;
+      lowSource !== undefined && lowSource !== null ?
+      Number(lowSource) :
+      NaN;
       const volumeNum =
-        volumeSource !== undefined && volumeSource !== null
-          ? Number(volumeSource)
-          : NaN;
+      volumeSource !== undefined && volumeSource !== null ?
+      Number(volumeSource) :
+      NaN;
 
       const nextHigh =
-        Number.isFinite(highNum) && highNum > 0
-          ? highNum
-          : prevHigh;
+      Number.isFinite(highNum) && highNum > 0 ?
+      highNum :
+      prevHigh;
       const nextLow =
-        Number.isFinite(lowNum) && lowNum > 0
-          ? lowNum
-          : prevLow;
+      Number.isFinite(lowNum) && lowNum > 0 ?
+      lowNum :
+      prevLow;
       const nextVolume =
-        Number.isFinite(volumeNum) && volumeNum >= 0
-          ? volumeNum
-          : prevVolume;
+      Number.isFinite(volumeNum) && volumeNum >= 0 ?
+      volumeNum :
+      prevVolume;
 
       return {
         high24h: nextHigh ?? null,
         low24h: nextLow ?? null,
-        volume24h: nextVolume ?? null,
+        volume24h: nextVolume ?? null
       };
     });
   }, [pair, tickers, stats.high24h, stats.low24h, stats.volume24h, providedStats]);
@@ -333,33 +333,33 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
 
         <div className="flex flex-wrap gap-2 text-[11px] max-sm:text-xs">
           <div className="px-2 py-1 rounded-md bg-elevated">
-            <span className="text-muted mr-1">24h High</span>
+            <span className="text-muted mr-1">{t("ui_24h_high_ed16d75f72", "24h High")}</span>
             <span className="font-mono text-primary">
-              {stats.high24h != null
-                ? Number(stats.high24h).toFixed(5)
-                : "—"}
+              {stats.high24h != null ?
+              Number(stats.high24h).toFixed(5) :
+              "—"}
             </span>
           </div>
           <div className="px-2 py-1 rounded-md bg-elevated">
-            <span className="text-muted mr-1">24h Low</span>
+            <span className="text-muted mr-1">{t("ui_24h_low_ebbb84750e", "24h Low")}</span>
             <span className="font-mono text-primary">
-              {stats.low24h != null
-                ? Number(stats.low24h).toFixed(5)
-                : "—"}
+              {stats.low24h != null ?
+              Number(stats.low24h).toFixed(5) :
+              "—"}
             </span>
           </div>
-          {showVolume && (
-            <div className="px-2 py-1 rounded-md bg-elevated">
-              <span className="text-muted mr-1">24h Volume</span>
+          {showVolume &&
+          <div className="px-2 py-1 rounded-md bg-elevated">
+              <span className="text-muted mr-1">{t("ui_24h_volume_21cd876868", "24h Volume")}</span>
               <span className="font-mono text-primary">
-                {stats.volume24h != null
-                  ? Number(stats.volume24h).toFixed(2)
-                  : "—"}
+                {stats.volume24h != null ?
+              Number(stats.volume24h).toFixed(2) :
+              "—"}
               </span>
             </div>
-          )}
+          }
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }

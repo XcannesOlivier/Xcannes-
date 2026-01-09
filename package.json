@@ -7,7 +7,14 @@
     "build": "node -r ./scripts/exdev-rename-fallback.cjs ./node_modules/next/dist/bin/next build",
     "start": "next start -p 2500",
     "lint": "next lint",
-    "check:chart": "node src/components/dex/XrplCandleChart/checkChart.cjs"
+    "check:chart": "node src/components/dex/XrplCandleChart/checkChart.cjs",
+    "i18n:sync": "node scripts/sync-locales.cjs",
+    "i18n:translate": "node scripts/translate-locales-openai.cjs",
+    "i18n:audit": "node scripts/i18n-audit.cjs",
+    "i18n:codemod": "node scripts/i18n-codemod.cjs",
+    "i18n:translate:argos": "python3 scripts/translate-locales-argos.py",
+    "i18n:normalize-en": "python3 scripts/normalize-en-to-english.py",
+    "i18n:translate:marian": "python3 scripts/translate-locales-marian.py"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -25,6 +32,10 @@
     "tailwindcss": "^3.4.18"
   },
   "devDependencies": {
+    "@babel/parser": "^7.28.0",
+    "@babel/types": "^7.28.0",
+    "@babel/generator": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
     "autoprefixer": "^10.4.22",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",

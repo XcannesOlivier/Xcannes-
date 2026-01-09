@@ -1,8 +1,8 @@
 "use client";
 
-	import { useEffect, useMemo, useState, useRef } from "react";
-	import xcannesApi from "@/lib/xcannesApi";
-	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import { useEffect, useMemo, useState, useRef } from "react";
+import xcannesApi from "@/lib/xcannesApi";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {
@@ -13,33 +13,33 @@ const REGION_DEFS = {
   Europe: ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK", "HUF"],
   Americas: ["USD", "CAD", "BRL", "MXN", "ARS", "CLP", "COP", "PEN", "BZD", "GTQ", "HNL", "CRC"],
   "Asia-Pacific": ["JPY", "CNY", "CNH", "HKD", "KRW", "INR", "SGD", "THB", "PHP", "IDR", "MYR", "AUD", "NZD", "FJD"],
-  "Middle East & Africa": ["AED", "SAR", "QAR", "KWD", "EGP", "MAD", "ZAR", "KES", "NGN", "GHS"],
+  "Middle East & Africa": ["AED", "SAR", "QAR", "KWD", "EGP", "MAD", "ZAR", "KES", "NGN", "GHS"]
 };
 
 const DETAILED_REGIONS = [
-  "Europe - Northern",
-  "Europe - Western",
-  "Europe - Southern",
-  "Europe - Eastern",
-  "Europe - Legacy (pre-euro)",
-  "Americas - Northern",
-  "Americas - Central",
-  "Americas - Caribbean",
-  "Americas - Southern",
-  "Asia - Western",
-  "Asia - Central",
-  "Asia - Southern",
-  "Asia - Eastern",
-  "Asia - South-Eastern",
-  "Oceania - Australia & New Zealand",
-  "Oceania - Melanesia",
-  "Oceania - Polynesia",
-  "Africa - Northern",
-  "Africa - Western",
-  "Africa - Central",
-  "Africa - Eastern",
-  "Africa - Southern",
-];
+"Europe - Northern",
+"Europe - Western",
+"Europe - Southern",
+"Europe - Eastern",
+"Europe - Legacy (pre-euro)",
+"Americas - Northern",
+"Americas - Central",
+"Americas - Caribbean",
+"Americas - Southern",
+"Asia - Western",
+"Asia - Central",
+"Asia - Southern",
+"Asia - Eastern",
+"Asia - South-Eastern",
+"Oceania - Australia & New Zealand",
+"Oceania - Melanesia",
+"Oceania - Polynesia",
+"Africa - Northern",
+"Africa - Western",
+"Africa - Central",
+"Africa - Eastern",
+"Africa - Southern"];
+
 
 // Mapping des régions détaillées vers les codes de devises
 const DETAILED_REGION_CURRENCIES = {
@@ -48,20 +48,20 @@ const DETAILED_REGION_CURRENCIES = {
   "Europe - Southern": ["ALL", "GIP", "MKD", "RSD"],
   "Europe - Eastern": ["BGN", "BYN", "CZK", "HUF", "MDL", "PLN", "RON", "RUB", "UAH"],
   "Europe - Legacy (pre-euro)": [
-    "BEF", // Franc belge
-    "FRF", // Franc français
-    "IEP", // Livre irlandaise
-    "LUF", // Franc luxembourgeois
-    "CYP", // Livre chypriote
-    "HRK", // Kuna croate
-    "ITL", // Lire italienne
-    "MTL", // Lire maltaise
-    "PTF", // Escudo portugais (PTE)
-    "SIT", // Tolar slovène
-    "VAL", // Lire du Vatican
-    "BYR", // Ancien rouble biélorusse
-    "ROL", // Ancien leu roumain
-    "SKK", // Couronne slovaque
+  "BEF", // Franc belge
+  "FRF", // Franc français
+  "IEP", // Livre irlandaise
+  "LUF", // Franc luxembourgeois
+  "CYP", // Livre chypriote
+  "HRK", // Kuna croate
+  "ITL", // Lire italienne
+  "MTL", // Lire maltaise
+  "PTF", // Escudo portugais (PTE)
+  "SIT", // Tolar slovène
+  "VAL", // Lire du Vatican
+  "BYR", // Ancien rouble biélorusse
+  "ROL", // Ancien leu roumain
+  "SKK" // Couronne slovaque
   ],
   "Americas - Northern": ["CAD", "USD"],
   "Americas - Central": ["BZD", "CRC", "GTQ", "HNL", "NIO", "PAB", "SVC"],
@@ -79,7 +79,7 @@ const DETAILED_REGION_CURRENCIES = {
   "Africa - Western": ["CVE", "GHS", "GMD", "GNF", "LRD", "NGN", "SHP", "SLE", "SLL"],
   "Africa - Central": ["CDF", "STN", "XAF"],
   "Africa - Eastern": ["BIF", "DJF", "ETB", "KES", "KMF", "MUR", "RWF", "SOS", "SSP", "TZS", "UGX"],
-  "Africa - Southern": ["AOA", "BWP", "MGA", "MWK", "MZN", "NAD", "SCR", "SZL", "ZAR", "ZWL"],
+  "Africa - Southern": ["AOA", "BWP", "MGA", "MWK", "MZN", "NAD", "SCR", "SZL", "ZAR", "ZWL"]
 };
 
 // Overrides explicites devise -> drapeau (multi-pays, cas spéciaux)
@@ -87,7 +87,7 @@ const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
   XAF: "🌍",
   XOF: "🌍",
-  XCD: "🌴",
+  XCD: "🌴"
 };
 
 // Convertit un code pays ISO-2 (ex: "AE") en emoji drapeau
@@ -119,8 +119,8 @@ export default function FxPairSelector({
   quote,
   value,
   onChange,
-  alwaysOpen = false,
-}) {
+  alwaysOpen = false
+}) {const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -138,8 +138,8 @@ export default function FxPairSelector({
   const popupRef = useRef(null);
   const [favoritesExpanded, setFavoritesExpanded] = useState(false);
 
-  const resolvedBase = (value && value.base) || base || "";
-  const resolvedQuote = (value && value.quote) || quote || "";
+  const resolvedBase = value && value.base || base || "";
+  const resolvedQuote = value && value.quote || quote || "";
 
   useEffect(() => {
     let cancelled = false;
@@ -230,21 +230,21 @@ export default function FxPairSelector({
 
   const handleSelect = (code) => {
     const upper = code.toUpperCase();
-    
+
     // Empêcher USD/USD
     if (activeField === "base" && upper === "USD") {
       // Si on sélectionne USD comme base, ne rien faire
       return;
     }
     if (
-      activeField === "quote" &&
-      upper === "USD" &&
-      resolvedBase.toUpperCase() === "USD"
-    ) {
+    activeField === "quote" &&
+    upper === "USD" &&
+    resolvedBase.toUpperCase() === "USD")
+    {
       // Si on sélectionne USD comme quote et que base est déjà USD, ne rien faire
       return;
     }
-    
+
     if (activeField === "base") {
       // Sélection de la devise de base
       const nextBase = upper;
@@ -315,11 +315,11 @@ export default function FxPairSelector({
   return (
     <div
       className={
-        alwaysOpen
-          ? "relative flex flex-col gap-2"
-          : "relative flex flex-col gap-2"
-      }
-    >
+      alwaysOpen ?
+      "relative flex flex-col gap-2" :
+      "relative flex flex-col gap-2"
+      }>
+
       {/* Ligne des boutons avec drapeaux */}
       <div className="flex items-center gap-2">
         {/* Base selector */}
@@ -327,13 +327,13 @@ export default function FxPairSelector({
           type="button"
           onClick={() => openFor("base")}
           className={
-            "bg-subtle border px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" +
-            (alwaysOpen ? " flex-1" : "") +
-            (isDropdownOpen && activeField === "base"
-              ? " border-emerald-400 text-emerald-300"
-              : " border-subtle text-primary hover:border-accent-rlusd/60")
-          }
-        >
+          "bg-subtle border px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" + (
+          alwaysOpen ? " flex-1" : "") + (
+          isDropdownOpen && activeField === "base" ?
+          " border-emerald-400 text-emerald-300" :
+          " border-subtle text-primary hover:border-accent-rlusd/60")
+          }>
+
           <div className="flex items-center gap-1">
             {/* Desktop: drapeau + code ISO */}
             <span className="hidden md:inline-flex items-center gap-1.5 text-base">
@@ -350,14 +350,14 @@ export default function FxPairSelector({
             className="w-3 h-3 ml-auto"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+            viewBox="0 0 24 24">
+
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+              d="M19 9l-7 7-7-7" />
+
           </svg>
         </button>
 
@@ -368,13 +368,13 @@ export default function FxPairSelector({
           type="button"
           onClick={() => openFor("quote")}
           className={
-            "bg-subtle border px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" +
-            (alwaysOpen ? " flex-1" : "") +
-            (isDropdownOpen && activeField === "quote"
-              ? " border-sky-400 text-sky-300"
-              : " border-subtle text-primary hover:border-accent-rlusd/60")
-          }
-        >
+          "bg-subtle border px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" + (
+          alwaysOpen ? " flex-1" : "") + (
+          isDropdownOpen && activeField === "quote" ?
+          " border-sky-400 text-sky-300" :
+          " border-subtle text-primary hover:border-accent-rlusd/60")
+          }>
+
           <div className="flex items-center gap-1">
             {/* Desktop: drapeau + code ISO */}
             <span className="hidden md:inline-flex items-center gap-1.5 text-base">
@@ -391,21 +391,21 @@ export default function FxPairSelector({
             className="w-3 h-3 ml-auto"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+            viewBox="0 0 24 24">
+
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+              d="M19 9l-7 7-7-7" />
+
           </svg>
         </button>
       </div>
 
       {/* Ligne des noms complets (desktop uniquement) */}
-      {resolvedBase && resolvedQuote && (
-        <div className="hidden md:flex items-center gap-2 text-[11px] text-white/60 -mt-1 pl-1">
+      {resolvedBase && resolvedQuote &&
+      <div className="hidden md:flex items-center gap-2 text-[11px] text-white/60 -mt-1 pl-1">
           <span className="flex-1 text-left">
             {baseEntry?.name || getCurrencyDescription(resolvedBase)}
           </span>
@@ -414,187 +414,187 @@ export default function FxPairSelector({
             {quoteEntry?.name || getCurrencyDescription(resolvedQuote)}
           </span>
         </div>
-      )}
+      }
 
       {/* Dropdown */}
-      {isDropdownOpen && (
-        <div
-          ref={popupRef}
-          className={
-            alwaysOpen
-              ? "mt-2 w-full bg-base border border-subtle rounded-lg shadow-2xl"
-              : "absolute z-50 top-full mt-2 right-0 w-96 max-w-[90vw] md:max-w-[95vw] bg-base border border-subtle rounded-lg shadow-2xl"
-          }
-        >
+      {isDropdownOpen &&
+      <div
+        ref={popupRef}
+        className={
+        alwaysOpen ?
+        "mt-2 w-full bg-base border border-subtle rounded-lg shadow-2xl" :
+        "absolute z-50 top-full mt-2 right-0 w-96 max-w-[90vw] md:max-w-[95vw] bg-base border border-subtle rounded-lg shadow-2xl"
+        }>
+
           <div className="px-3 py-2 border-b border-subtle flex items-center justify-between gap-2">
             <div className="flex flex-col gap-0.5">
               <span
-                className={
-                  "text-[10px] font-semibold uppercase tracking-[0.16em]" +
-                  (activeField === "base"
-                    ? " text-emerald-300"
-                    : " text-sky-300")
-                }
-              >
+              className={
+              "text-[10px] font-semibold uppercase tracking-[0.16em]" + (
+              activeField === "base" ?
+              " text-emerald-300" :
+              " text-sky-300")
+              }>
+
                 {activeField === "base" ? "BASE (FROM)" : "QUOTE (TO)"}
               </span>
               <span className="text-[10px] text-muted uppercase">
-                {activeField === "base"
-                  ? "Select base currency"
-                  : "Select quote currency"}
+                {activeField === "base" ?
+              "Select base currency" :
+              "Select quote currency"}
               </span>
             </div>
-            {!alwaysOpen && (
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenInternal(false);
-                  setActiveField(null);
-                  setSearch("");
-                }}
-                className="text-muted hover:text-primary text-xs px-1"
-              >
+            {!alwaysOpen &&
+          <button
+            type="button"
+            onClick={() => {
+              setOpenInternal(false);
+              setActiveField(null);
+              setSearch("");
+            }}
+            className="text-muted hover:text-primary text-xs px-1">
+
                 ✕
               </button>
-            )}
+          }
           </div>
           <div className="px-3 py-2 border-b border-subtle">
             <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search code or name..."
-              className="w-full bg-subtle border border-subtle rounded px-2 py-1.5 text-sm md:text-xs text-primary placeholder:text-muted focus:outline-none focus:border-accent-rlusd"
-            />
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("ui_search_code_or_name_1ed4e95837", "Search code or name...")}
+            className="w-full bg-subtle border border-subtle rounded px-2 py-1.5 text-sm md:text-xs text-primary placeholder:text-muted focus:outline-none focus:border-accent-rlusd" />
+
           </div>
 
-          {loading ? (
-            <div className="px-3 py-4 text-sm md:text-xs text-muted flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
-              Loading currencies...
-            </div>
-          ) : (
-            <div className={alwaysOpen ? "max-h-96 overflow-y-auto" : "max-h-80 overflow-y-auto"}>
+          {loading ?
+        <div className="px-3 py-4 text-sm md:text-xs text-muted flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />{t("ui_loading_currencies_6796a767dd", "Loading currencies...")}
+
+        </div> :
+
+        <div className={alwaysOpen ? "max-h-96 overflow-y-auto" : "max-h-80 overflow-y-auto"}>
               {/* Favorites (collapsible, max 5) */}
-              {favorites.length > 0 && (
-                <div className="px-3 py-2 border-b border-subtle">
+              {favorites.length > 0 &&
+          <div className="px-3 py-2 border-b border-subtle">
                   <button
-                    type="button"
-                    onClick={() => setFavoritesExpanded((v) => !v)}
-                    className="flex items-center justify-between w-full mb-1"
-                  >
+              type="button"
+              onClick={() => setFavoritesExpanded((v) => !v)}
+              className="flex items-center justify-between w-full mb-1">
+
                     <div className="flex items-center gap-1">
-                      <span className="text-xs md:text-[10px] text-muted uppercase">
-                        Favorites
-                      </span>
+                      <span className="text-xs md:text-[10px] text-muted uppercase">{t("ui_favorites_1cc397670e", "Favorites")}
+
+                </span>
                       <span className="text-[9px] text-muted">
                         ({favorites.length}/5)
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          clearFavorites();
-                        }}
-                        className="text-xs md:text-[10px] text-muted hover:text-primary transition-colors"
-                        title="Clear favorites"
-                      >
-                        Clear
-                      </button>
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearFavorites();
+                  }}
+                  className="text-xs md:text-[10px] text-muted hover:text-primary transition-colors"
+                  title={t("ui_clear_favorites_c448f101b4", "Clear favorites")}>{t("ui_clear_0c0415464e", "Clear")}
+
+
+                </button>
                       <svg
-                        className={`w-3 h-3 text-muted transition-transform ${
-                          favoritesExpanded ? "rotate-180" : ""
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
+                  className={`w-3 h-3 text-muted transition-transform ${
+                  favoritesExpanded ? "rotate-180" : ""}`
+                  }
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+
                         <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7" />
+
                       </svg>
                     </div>
                   </button>
-                  {favoritesExpanded && (
-                    <div className="flex flex-wrap gap-1">
-                      {favorites.map((code) => (
-                        <button
-                          key={code}
-                          type="button"
-                          onClick={() => handleSelect(code)}
-                          className="px-2 py-1 rounded-full border border-subtle text-sm md:text-[11px] text-secondary hover:border-accent-rlusd hover:text-accent-rlusd transition-all"
-                        >
+                  {favoritesExpanded &&
+            <div className="flex flex-wrap gap-1">
+                      {favorites.map((code) =>
+              <button
+                key={code}
+                type="button"
+                onClick={() => handleSelect(code)}
+                className="px-2 py-1 rounded-full border border-subtle text-sm md:text-[11px] text-secondary hover:border-accent-rlusd hover:text-accent-rlusd transition-all">
+
                           {code}
                         </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
               )}
+                    </div>
+            }
+                </div>
+          }
 
               {/* All currencies filtered */}
               <div className="px-3 py-2">
-                <div className="text-xs md:text-[10px] text-muted uppercase mb-1">
-                  All currencies
-                </div>
+                <div className="text-xs md:text-[10px] text-muted uppercase mb-1">{t("ui_all_currencies_6155623249", "All currencies")}
+
+            </div>
                 
                 {/* Detailed regions list */}
-                {!search && (
-                  <div className="mb-3 border-b border-white/10 pb-2">
+                {!search &&
+            <div className="mb-3 border-b border-white/10 pb-2">
                     {DETAILED_REGIONS.map((region) => {
-                      const currencyCodes = DETAILED_REGION_CURRENCIES[region] || [];
-                      const availableCurrencies = currencyCodes
-                        .map(code => byCode.get(code))
-                        .filter(c => c != null);
-                      const isExpanded = expandedDetailedRegions[region];
-                      
-                      return (
-                        <div key={region} className="mb-1">
+                const currencyCodes = DETAILED_REGION_CURRENCIES[region] || [];
+                const availableCurrencies = currencyCodes.
+                map((code) => byCode.get(code)).
+                filter((c) => c != null);
+                const isExpanded = expandedDetailedRegions[region];
+
+                return (
+                  <div key={region} className="mb-1">
                           <button
-                            type="button"
-                            onClick={() =>
-                              setExpandedDetailedRegions((prev) => ({
-                                // Fermer toutes les autres régions et toggle celle-ci
-                                [region]: !prev[region],
-                              }))
-                            }
-                            className="w-full flex items-center justify-between px-2 py-1.5 text-sm md:text-[11px] text-secondary hover:bg-subtle rounded"
-                          >
+                      type="button"
+                      onClick={() =>
+                      setExpandedDetailedRegions((prev) => ({
+                        // Fermer toutes les autres régions et toggle celle-ci
+                        [region]: !prev[region]
+                      }))
+                      }
+                      className="w-full flex items-center justify-between px-2 py-1.5 text-sm md:text-[11px] text-secondary hover:bg-subtle rounded">
+
                             <span>{region}</span>
                             <div className="flex items-center gap-1">
                               <span className="text-muted text-[10px] md:text-[9px]">
                                 {availableCurrencies.length}
                               </span>
                               <svg
-                                className={`w-3 h-3 transition-transform ${
-                                  isExpanded ? 'rotate-180' : ''
-                                }`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
+                          className={`w-3 h-3 transition-transform ${
+                          isExpanded ? 'rotate-180' : ''}`
+                          }
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24">
+
                                 <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 9l-7 7-7-7"
-                                />
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7" />
+
                               </svg>
                             </div>
                           </button>
-                          {isExpanded && availableCurrencies.length > 0 && (
-                            <div className="mt-1 ml-2 pl-2 border-l border-subtle">
-                              {availableCurrencies.map((c) => (
-                                <button
-                                  key={c.code}
-                                  type="button"
-                                  onClick={() => handleSelect(c.code)}
-                                  className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-subtle text-sm md:text-[11px] text-secondary"
-                                >
+                          {isExpanded && availableCurrencies.length > 0 &&
+                    <div className="mt-1 ml-2 pl-2 border-l border-subtle">
+                              {availableCurrencies.map((c) =>
+                      <button
+                        key={c.code}
+                        type="button"
+                        onClick={() => handleSelect(c.code)}
+                        className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-subtle text-sm md:text-[11px] text-secondary">
+
                                   <span className="font-semibold mr-2">
                                     {c.code}
                                   </span>
@@ -602,30 +602,30 @@ export default function FxPairSelector({
                                     {c.name}
                                   </span>
                                 </button>
-                              ))}
+                      )}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                    }
+                        </div>);
+
+              })}
                   </div>
-                )}
+            }
                 
                 {/* Si recherche active, afficher les résultats filtrés */}
                 {search && (
-                  filtered.length === 0 ? (
-                    <div className="text-sm md:text-[11px] text-muted py-2">
+            filtered.length === 0 ?
+            <div className="text-sm md:text-[11px] text-muted py-2">
                       {"No result for \""}{search}{"\""}
-                    </div>
-                  ) : (
-                    <div className="mt-2">
-                      {filtered.map((c) => (
-                        <button
-                          key={c.code}
-                          type="button"
-                          onClick={() => handleSelect(c.code)}
-                          className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-subtle text-sm md:text-[11px] text-secondary"
-                        >
+                    </div> :
+
+            <div className="mt-2">
+                      {filtered.map((c) =>
+              <button
+                key={c.code}
+                type="button"
+                onClick={() => handleSelect(c.code)}
+                className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-subtle text-sm md:text-[11px] text-secondary">
+
                           <span className="font-semibold mr-2">
                             {c.code}
                           </span>
@@ -633,15 +633,15 @@ export default function FxPairSelector({
                             {c.name}
                           </span>
                         </button>
-                      ))}
-                    </div>
-                  )
-                )}
+              )}
+                    </div>)
+
+            }
               </div>
             </div>
-          )}
+        }
         </div>
-      )}
-    </div>
-  );
+      }
+    </div>);
+
 }

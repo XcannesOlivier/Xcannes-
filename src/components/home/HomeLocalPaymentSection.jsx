@@ -194,7 +194,7 @@ export default function HomeLocalPaymentSection({ availablePairs = [] }) {
                   onChange={(e) => setAmount(e.target.value)}
                   inputMode="decimal"
                   className="w-full rounded-lg bg-black/30 border border-white/10 px-4 py-3 text-white/90 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/40"
-                  placeholder={t("home_localpay_amount_placeholder", "Ex: 120")}
+                  placeholder={t("home_localpay_amount_placeholder", "e.g. 120")}
                 />
               </div>
 

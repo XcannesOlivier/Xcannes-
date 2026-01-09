@@ -7,6 +7,8 @@ import SEOHead from "@/components/layout/SEOHead";
 import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { useTranslation } from "next-i18next";
+import { getPageTranslations } from "@/i18n/getPageTranslations";
 
 function decodePayReq(value) {
   const raw = String(value || "").trim();
@@ -23,6 +25,7 @@ function decodePayReq(value) {
 
 export default function PayRequestPage() {
   const router = useRouter();
+  const { t } = useTranslation("common");
   const reqParam = router?.query?.req;
 
   const [error, setError] = useState(null);
@@ -124,7 +127,10 @@ export default function PayRequestPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to create Xumm connection");
+        throw new Error(
+          data?.error ||
+            t("pay_error_create_connection", "Failed to create Xumm connection")
+        );
       }
 
       const payload = {
@@ -150,9 +156,12 @@ export default function PayRequestPage() {
       });
     } catch (e) {
       setPhase("idle");
-      setError(e?.message || "Failed to create Xumm connection");
+      setError(
+        e?.message ||
+          t("pay_error_create_connection", "Failed to create Xumm connection")
+      );
     }
-  }, [normalizedRequest, pollXumm]);
+  }, [normalizedRequest, pollXumm, t]);
 
   const startPay = useCallback(async () => {
     if (!normalizedRequest) return;
@@ -164,14 +173,16 @@ export default function PayRequestPage() {
     }
 
     if (!normalizedRequest.to || !normalizedRequest.to.startsWith("r")) {
-      setError("Invalid destination address.");
+      setError(
+        t("pay_error_invalid_destination", "Invalid destination address.")
+      );
       return;
     }
     if (
       !Number.isFinite(normalizedRequest.amountRlusd) ||
       normalizedRequest.amountRlusd <= 0
     ) {
-      setError("Invalid amount.");
+      setError(t("pay_error_invalid_amount", "Invalid amount."));
       return;
     }
 
@@ -181,7 +192,9 @@ export default function PayRequestPage() {
       amountRlusd: normalizedRequest.amountRlusd,
     });
     if (!txjson) {
-      setError("Unable to build RLUSD payment.");
+      setError(
+        t("pay_error_build_payment", "Unable to build RLUSD payment.")
+      );
       return;
     }
 
@@ -211,7 +224,10 @@ export default function PayRequestPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data?.error || "Failed to create Xumm payment");
+        throw new Error(
+          data?.error ||
+            t("pay_error_create_payment", "Failed to create Xumm payment")
+        );
       }
 
       const payload = {
@@ -235,50 +251,59 @@ export default function PayRequestPage() {
       });
     } catch (e) {
       setPhase("idle");
-      setError(e?.message || "Payment failed.");
+      setError(e?.message || t("pay_error_payment_failed", "Payment failed."));
     }
-  }, [normalizedRequest, payerAddress, pollXumm, startConnect]);
+  }, [normalizedRequest, payerAddress, pollXumm, startConnect, t]);
 
   return (
     <>
       <SEOHead
-        title="Payment request - XCANNES"
-        description="XCANNES payment request"
+        title={t("pay_seo_title", "Payment request - XCANNES")}
+        description={t("pay_seo_description", "XCANNES payment request")}
         canonical="/pay"
       />
       <main className="min-h-screen bg-elevated text-white font-montserrat px-4 py-10">
         <div className="max-w-xl mx-auto bg-black/40 border border-white/10 rounded-2xl p-5">
-          <h1 className="text-xl font-orbitron font-bold">XCANNES payment request</h1>
+          <h1 className="text-xl font-orbitron font-bold">
+            {t("pay_page_title", "XCANNES payment request")}
+          </h1>
 
           {!normalizedRequest ? (
             <p className="mt-4 text-sm text-white/60">
-              Invalid or missing request.
+              {t("pay_invalid_request", "Invalid or missing request.")}
             </p>
           ) : (
             <div className="mt-4 space-y-3">
               <div className="text-sm text-white/70">
-                To: <span className="font-mono">{normalizedRequest.to}</span>
+                {t("pay_to_label", "To:")}{" "}
+                <span className="font-mono">{normalizedRequest.to}</span>
               </div>
               <div className="text-sm text-white/70">
-                Amount:{" "}
+                {t("pay_amount_label", "Amount:")}{" "}
                 <span className="font-mono">
                   {normalizedRequest.displayAmount} {normalizedRequest.displayCurrency}
                 </span>
               </div>
               {normalizedRequest.amountRlusd != null && (
                 <div className="text-[11px] text-white/50">
-                  Settles on-chain in RLUSD:{" "}
+                  {t(
+                    "pay_settles_rlusd_label",
+                    "Settles on-chain in RLUSD:"
+                  )}{" "}
                   <span className="font-mono">{normalizedRequest.amountRlusd}</span>
                 </div>
               )}
               {normalizedRequest.memo ? (
                 <div className="text-[11px] text-white/50">
-                  Note: {normalizedRequest.memo}
+                  {t("pay_note_label", "Note:")} {normalizedRequest.memo}
                 </div>
               ) : null}
 
               <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[11px] text-white/60">
-                This payment will settle on-chain in RLUSD. The receiver will be credited in{" "}
+                {t(
+                  "pay_settlement_info_prefix",
+                  "This payment will settle on-chain in RLUSD. The receiver will be credited in"
+                )}{" "}
                 <span className="font-semibold text-xcannes-green/90">
                   {normalizedRequest.targetCurrency || "RLUSD"}
                 </span>
@@ -287,7 +312,7 @@ export default function PayRequestPage() {
 
               {payerAddress ? (
                 <div className="text-[11px] text-white/50">
-                  Connected wallet:{" "}
+                  {t("pay_connected_wallet_label", "Connected wallet:")}{" "}
                   <span className="font-mono">
                     {payerAddress.slice(0, 10)}…{payerAddress.slice(-8)}
                   </span>
@@ -300,7 +325,7 @@ export default function PayRequestPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={activePayload.qrUrl}
-                      alt="Xumm QR"
+                      alt={t("pay_qr_alt", "Xumm QR")}
                       className="w-[220px] h-[220px] object-contain"
                     />
                   </div>
@@ -312,14 +337,14 @@ export default function PayRequestPage() {
                       }}
                       className="px-4 py-2 rounded-lg bg-[#0f7fe1]/20 hover:bg-[#0f7fe1]/30 text-[#78b8ff] border border-[#0f7fe1]/30 text-sm font-semibold"
                     >
-                      Open in Xumm
+                      {t("pay_open_in_xumm", "Open in Xumm")}
                     </button>
                   ) : null}
 
                   <div className="text-[11px] text-white/45">
                     {activePayload.kind === "connect"
-                      ? "Scan to connect your wallet"
-                      : "Scan to approve the payment"}
+                      ? t("pay_scan_connect", "Scan to connect your wallet")
+                      : t("pay_scan_approve", "Scan to approve the payment")}
                   </div>
                 </div>
               ) : null}
@@ -332,13 +357,13 @@ export default function PayRequestPage() {
 
               {phase === "success" ? (
                 <div className="mt-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-[12px] text-emerald-200">
-                  ✅ Payment submitted via Xumm.
+                  {t("pay_success_banner", "✅ Payment submitted via Xumm.")}
                 </div>
               ) : null}
 
               {phase === "expired" ? (
                 <div className="mt-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[12px] text-amber-200">
-                  ⏳ Request expired. Please retry.
+                  {t("pay_expired_banner", "⏳ Request expired. Please retry.")}
                 </div>
               ) : null}
 
@@ -350,12 +375,15 @@ export default function PayRequestPage() {
                   className="w-full px-4 py-2.5 rounded-lg bg-xcannes-green/90 hover:bg-xcannes-green text-black font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {phase === "connect_poll" || phase === "connect_qr"
-                    ? "Waiting for connection…"
+                    ? t("pay_waiting_connection", "Waiting for connection…")
                     : phase === "pay_poll" || phase === "pay_qr"
-                      ? "Waiting for approval…"
+                      ? t("pay_waiting_approval", "Waiting for approval…")
                       : payerAddress
-                        ? "Pay with Xumm"
-                        : "Connect & pay with Xumm"}
+                        ? t("pay_pay_with_xumm", "Pay with Xumm")
+                        : t(
+                            "pay_connect_and_pay",
+                            "Connect & pay with Xumm"
+                          )}
                 </button>
 
                 {!payerAddress ? (
@@ -365,7 +393,7 @@ export default function PayRequestPage() {
                     disabled={phase === "connect_poll" || phase === "connect_qr"}
                     className="w-full px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 border border-white/10 font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Connect only
+                    {t("pay_connect_only", "Connect only")}
                   </button>
                 ) : null}
 
@@ -380,7 +408,7 @@ export default function PayRequestPage() {
                   }}
                   className="w-full px-4 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 border border-white/10 font-semibold transition-colors"
                 >
-                  Reset
+                  {t("pay_reset", "Reset")}
                 </button>
               </div>
             </div>
@@ -389,4 +417,12 @@ export default function PayRequestPage() {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps({ locale }) {
+  return {
+    props: {
+      ...(await getPageTranslations(locale, ["common"])),
+    },
+  };
 }
