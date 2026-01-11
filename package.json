@@ -11,6 +11,8 @@
     "i18n:sync": "node scripts/sync-locales.cjs",
     "i18n:translate": "node scripts/translate-locales-openai.cjs",
     "i18n:audit": "node scripts/i18n-audit.cjs",
+    "i18n:sample": "node scripts/i18n-sample.cjs",
+    "i18n:realign": "node scripts/i18n-realign-keys.cjs",
     "i18n:codemod": "node scripts/i18n-codemod.cjs",
     "i18n:translate:argos": "python3 scripts/translate-locales-argos.py",
     "i18n:normalize-en": "python3 scripts/normalize-en-to-english.py",

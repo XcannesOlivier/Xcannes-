@@ -139,9 +139,9 @@ export default function WalletDashboardSwapModal({
               <div className="text-[12px] font-semibold text-amber-200">{t("ui_trustlines_required_d39ef28613", "Trustlines requises")}
 
           </div>
-              <p className="mt-1 text-[11px] text-amber-200/80">{t("ui_for_utiliser_pleinement_le__5439f003e6", "Pour utiliser pleinement le wallet, installez les trustlines XRPL pour")}
+              <p className="mt-1 text-[11px] text-amber-200/80">{t("ui_to_fully_use_wallet_5439f003e6", "Pour utiliser pleinement le wallet, installez les trustlines XRPL pour")}
 
-            <span className="font-mono">{t("ui_rlusd_03b00d11bf", "RLUSD")}</span>{t("ui_et_620aeaa4b1", "et")}{" "}
+            <span className="font-mono">{t("ui_rlusd_03b00d11bf", "RLUSD")}</span>{t("ui_and_620aeaa4b1", "et")}{" "}
                 <span className="font-mono">{t("ui_xcs_f295b34180", "XCS")}</span>.
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -263,7 +263,7 @@ export default function WalletDashboardSwapModal({
             </div> :
 
         <div className="space-y-3">
-              <p className="text-xs text-white/60">{t("ui_choisissez_les_currencies_que_v_41eea71853", "Choisissez les devises que vous souhaitez activer. Une ligne peut exister avec")}
+              <p className="text-xs text-white/60">{t("ui_choose_currencies_to_activate_41eea71853", "Choisissez les devises que vous souhaitez activer. Une ligne peut exister avec")}
 
             <span className="font-mono">{t("ui_0_rlusd_14d1aaec1c", "0 RLUSD")}</span>.
               </p>

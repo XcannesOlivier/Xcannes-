@@ -51,7 +51,7 @@ export default function WalletDashboardTrustlinesModal({
           <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">{t("ui_trustlines_59e1e35db4", "Trustlines")}
 
           </h3>
-          <p className="text-[11px] text-white/60 mb-2">{t("ui_ajoutez_ou_supprimez_vos_lig_f40801cee4", "Ajoutez ou supprimez vos lignes internes de suivi XCS.")}
+          <p className="text-[11px] text-white/60 mb-2">{t("ui_add_or_remove_your_lines_f40801cee4", "Ajoutez ou supprimez vos lignes internes de suivi XCS.")}
 
           </p>
           <WalletNotConnectedNotice

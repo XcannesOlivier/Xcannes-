@@ -41,7 +41,7 @@ export default function WalletDashboardTrustlineCurrencyForm({
             e.stopPropagation();
             onSave?.();
           }}
-          className="flex-1 px-3 py-2 rounded-lg bg-xcannes-green text-black text-sm font-semibold hover:bg-xcannes-green/90 transition-colors active:scale-95">{t("ui_enregistrer_9c004489ad", "Enregistrer")}
+          className="flex-1 px-3 py-2 rounded-lg bg-xcannes-green text-black text-sm font-semibold hover:bg-xcannes-green/90 transition-colors active:scale-95">{t("ui_save_9c004489ad", "Enregistrer")}
 
 
         </button>
@@ -52,7 +52,7 @@ export default function WalletDashboardTrustlineCurrencyForm({
             e.stopPropagation();
             onRemove?.();
           }}
-          className="flex-1 px-3 py-2 rounded-lg bg-red-500/80 text-white text-sm font-semibold hover:bg-red-500 transition-colors active:scale-95">{t("ui_delete_la_trustline_298bb3739d", "Supprimer la trustline")}
+          className="flex-1 px-3 py-2 rounded-lg bg-red-500/80 text-white text-sm font-semibold hover:bg-red-500 transition-colors active:scale-95">{t("ui_delete_trustline_298bb3739d", "Supprimer la trustline")}
 
 
         </button>

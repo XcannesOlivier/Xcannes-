@@ -38,7 +38,7 @@ export default function WalletDashboardTrustlinesAddForm({
             e.stopPropagation();
             onSubmit?.();
           }}
-          className="w-full md:w-auto md:ml-auto px-3 py-2 rounded-lg bg-xcannes-green text-black text-sm font-semibold hover:bg-xcannes-green/90 transition-colors active:scale-95">{t("ui_validate_cr_er_la_ligne_9cd7c14952", "Valider & créer la ligne")}
+          className="w-full md:w-auto md:ml-auto px-3 py-2 rounded-lg bg-xcannes-green text-black text-sm font-semibold hover:bg-xcannes-green/90 transition-colors active:scale-95">{t("ui_validate_create_line_9cd7c14952", "Valider & créer la ligne")}
 
 
         </button>

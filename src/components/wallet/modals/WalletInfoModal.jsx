@@ -48,24 +48,24 @@ export function WalletInfoContent({ withCloseGutter = false }) {const { t } = us
           </p>
           <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
             <li>{t("ui_activation_wallet_7d13181510", "Activation wallet:")}
-              <span className="font-mono">{t("ui_1_xcs_4d45c847fc", "1 XCS")}</span>{" "}{t("ui_r_serve_bloqu_e_529137c552", "(réserve bloquée).")}
+              <span className="font-mono">{t("ui_1_xcs_4d45c847fc", "1 XCS")}</span>{" "}{t("ui_reserve_blocked_529137c552", "(réserve bloquée).")}
 
             </li>
-            <li>{t("ui_cr_ation_d_une_ligne_de_devi_48e7a5e551", "Création d’une ligne de devise:")}
+            <li>{t("ui_creating_currency_line_48e7a5e551", "Création d’une ligne de devise:")}
               {" "}
               <span className="font-mono">{t("ui_0_20_xcs_cd5bfa5a79", "0.20 XCS")}</span>{t("ui_bloqu_cac6cc1f3b", "bloqué.")}
             </li>
-            <li>{t("ui_suppression_d_une_ligne_le_x_df25674a3d", "Suppression d’une ligne: le XCS correspondant peut être “libéré” à")}
+            <li>{t("ui_line_deletion_xcs_released_df25674a3d", "Suppression d’une ligne: le XCS correspondant peut être “libéré” à")}
               {" "}
               <span className="font-mono">50%</span>{t("ui_refund_4e5e3d305c", "(refund")}{" "}
               <span className="font-mono">{t("ui_0_10_xcs_ad2ec0a991", "0.10 XCS")}</span>).
             </li>
           </ul>
-          <p className="mt-2 text-[12px] text-white/45">{t("ui_note_le_locking_sera_g__31ee4c3f81", "Note: le verrouillage sera géré via un mécanisme escrow. À la fermeture d’une ligne,")}
+          <p className="mt-2 text-[12px] text-white/45">{t("ui_note_locking_via_escrow_31ee4c3f81", "Note: le verrouillage sera géré via un mécanisme escrow. À la fermeture d’une ligne,")}
 
-            <span className="font-mono">50%</span>{t("ui_du_locking_revient_au_w_1c3e249e22", "du verrouillage revient au wallet (")}
-            <span className="font-mono">{t("ui_0_10_xcs_ad2ec0a991", "0.10 XCS")}</span>{t("ui_et_5aee655a93", ") et")}
-            <span className="font-mono">50%</span>{t("ui_est_vers_au_wallet_de_gestio_c7338e7db3", "est versé au wallet de gestion XCANNES.")}
+            <span className="font-mono">50%</span>{t("ui_lock_returns_to_wallet_1c3e249e22", "du verrouillage revient au wallet (")}
+            <span className="font-mono">{t("ui_0_10_xcs_ad2ec0a991", "0.10 XCS")}</span>{t("ui_and_5aee655a93", ") et")}
+            <span className="font-mono">50%</span>{t("ui_paid_to_management_wallet_c7338e7db3", "est versé au wallet de gestion XCANNES.")}
           </p>
         </section>
 
@@ -88,7 +88,7 @@ export function WalletInfoContent({ withCloseGutter = false }) {const { t } = us
               <span className="font-mono">{t("ui_a_0_60_462cd3b75c", "A=0.60%")}</span>,{" "}
               <span className="font-mono">{t("ui_b_1_00_d712ad6d37", "B=1.00%")}</span>,{" "}
               <span className="font-mono">{t("ui_c_1_80_0cb90046ff", "C=1.80%")}</span>{t("ui_total_bid_ask_autour_du_mid__fb93bb89c0", "“total”, bid/ask autour du mid), prélevé en")}
-              <span className="font-mono">{t("ui_rlusd_5933874327", "RLUSD")}</span>{t("ui_et_envoy_on_chain_vers_un_wa_d9e8e01d57", "et envoyé on-chain vers un wallet entreprise XCANNES.")}
+              <span className="font-mono">{t("ui_rlusd_5933874327", "RLUSD")}</span>{t("ui_sent_onchain_to_company_wallet_d9e8e01d57", "et envoyé on-chain vers un wallet entreprise XCANNES.")}
 
             </li>
             <li>{t("ui_convert_interne_1_signature__c7b5a8e4dd", "Convert interne: 1 signature Xumm (paiement du spread) ; paiement entre 2 wallets: 2 signatures (spread puis paiement).")}
@@ -106,12 +106,12 @@ export function WalletInfoContent({ withCloseGutter = false }) {const { t } = us
           <h4 className="text-sm font-semibold text-white/80">{t("ui_important_af28edf1c1", "Important")}</h4>
           <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
             <li>{t("ui_xrpl_est_la_source_de_v_rit__bf1084eac7", "XRPL est la source de vérité pour les soldes on-chain.")}</li>
-            <li>{t("ui_les_lignes_de_currencies_repr_s_155e16f839", "Les lignes de devises représentent une répartition interne de RLUSD.")}
+            <li>{t("ui_currency_lines_represent_rlusd_155e16f839", "Les lignes de devises représentent une répartition interne de RLUSD.")}
 
 
             </li>
             <li>{t("ui_l_allocation_totale_ne_doit__dcf11e3d6c", "L’allocation totale ne doit jamais dépasser RLUSD on-chain.")}</li>
-            <li>{t("ui_les_montants_en_currency_eur_u_73d7ff4e8d", "Les montants en devise (EUR, USD, …) sont des valeurs indicatives basées sur des taux marché; la valeur de référence reste")}
+            <li>{t("ui_amounts_in_currency_indicative_73d7ff4e8d", "Les montants en devise (EUR, USD, …) sont des valeurs indicatives basées sur des taux marché; la valeur de référence reste")}
 
               {" "}
               <span className="font-mono">{t("ui_rlusd_5933874327", "RLUSD")}</span>.

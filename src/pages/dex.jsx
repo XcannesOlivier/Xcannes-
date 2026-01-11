@@ -197,6 +197,12 @@ export default function Dex() {
 
 
 
+
+
+
+
+
+
                 {/* Orders / Orderbook */}
                 <section
                 className="
@@ -204,6 +210,10 @@ export default function Dex() {
                     xl:order-1 xl:row-start-1 xl:col-span-1
                     2xl:order-1 2xl:row-auto 2xl:col-span-1
                   ">
+
+
+
+
 
 
 
@@ -228,6 +238,10 @@ export default function Dex() {
 
 
 
+
+
+
+
                   <div className="flex flex-col min-h-[50vh] xl:min-h-[65vh] 2xl:h-[calc(100vh-8rem)] max-sm:-mx-3">
                     <XrplCandleChartRaw
                     pair={selectedPair}
@@ -246,6 +260,10 @@ export default function Dex() {
                     xl:order-3 xl:row-start-2 xl:col-span-2
                     2xl:order-3 2xl:row-start-1 2xl:col-span-1
                   ">
+
+
+
+
 
 
 
@@ -296,16 +314,16 @@ export default function Dex() {
                 type="button"
                 onClick={() => setAssistantOpen(false)}
                 className="inline-flex items-center justify-center w-7 h-7 rounded-md text-white/60 hover:text-white hover:bg-white/5 transition-colors text-sm md:text-xs"
-                aria-label={t("ui_close_le_chat_d6b0b8eaa8", "Fermer le chat")}>
+                aria-label={t("ui_close_chat_d6b0b8eaa8", "Fermer le chat")}>
 
                     ✕
                   </button>
                 </div>
                 <div className="flex-1 min-h-[120px] max-h-60 overflow-y-auto rounded-lg border border-white/10 bg-black/20 p-3 text-sm md:text-[11px] text-white/70">
-                  <p className="mb-1 text-white/90 text-sm md:text-xs font-medium">{t("ui_hello_je_suis_l_assistant__e7c9e94d03", "Bonjour, je suis l'assistant XCANNES.")}
+                  <p className="mb-1 text-white/90 text-sm md:text-xs font-medium">{t("ui_hello_xcannes_assistant_e7c9e94d03", "Bonjour, je suis l'assistant XCANNES.")}
 
               </p>
-                  <p className="text-sm md:text-xs text-white/60">{t("ui_d_crivez_your_question_de_t_cc5c9669ff", "Décrivez votre question de trading (pair XRPL, Pyth, EOD, carnet d'ordres...) et je vous aiderai à comprendre ce que vous voyez à l'écran.")}
+                  <p className="text-sm md:text-xs text-white/60">{t("ui_describe_trading_question_cc5c9669ff", "Décrivez votre question de trading (pair XRPL, Pyth, EOD, carnet d'ordres...) et je vous aiderai à comprendre ce que vous voyez à l'écran.")}
 
 
               </p>
@@ -313,7 +331,7 @@ export default function Dex() {
                 <div className="mt-2 flex items-center gap-2">
                   <input
                 type="text"
-                placeholder={t("ui_write_un_message_5f2f86490f", "Écrire un message...")}
+                placeholder={t("ui_write_message_5f2f86490f", "Écrire un message...")}
                 className="flex-1 rounded-lg bg-black/25 border border-white/10 px-3 py-2 text-sm md:text-xs text-white/90 placeholder:text-white/35 focus:outline-none focus:border-xcannes-green/40 focus:ring-2 focus:ring-xcannes-green/10" />
 
                   <button

@@ -780,7 +780,7 @@ export default function CurrencyStatement({
 
                       <div className="pt-2 border-t border-white/10 text-[11px] text-white/70">
                         <div className="flex items-center justify-between gap-2">
-                          <span>{t("ui_lignes_de_currencies_xcannes_1f3927f668", "Lignes de devises XCANNES (")}
+                          <span>{t("ui_xcannes_currency_lines_1f3927f668", "Lignes de devises XCANNES (")}
                       {xcsReserveDetails.xcannesCurrencyLinesCount} × {xcsReserveDetails.lockXcsPerLine.toFixed(2)}{t("ui_xcs_f516c57c4d", "XCS)")}
                     </span>
                           <span className="font-mono">

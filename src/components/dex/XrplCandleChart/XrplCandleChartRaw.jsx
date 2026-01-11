@@ -507,9 +507,9 @@ export default function XrplCandleChartRaw({
         }
       } catch (_) {
 
+
         // Fallback silencieux si les tokens ne sont pas disponibles
-      }
-      chart = createChart(chartRef.current, {
+      }chart = createChart(chartRef.current, {
         width: containerWidth,
         height: containerHeight,
         layout: {
@@ -983,9 +983,9 @@ export default function XrplCandleChartRaw({
             chart.timeScale().setVisibleRange({ from, to });
           } catch (_) {
 
+
             // Ignorer les erreurs internes de lightweight-charts si la lib rejette la plage
           }}
-
         // Initialiser la status line + crosshair au milieu de la fenêtre visible
         const midIndex = Math.floor((firstIndex + lastIndex) / 2);
         const midCandle = realData[midIndex];
@@ -1197,7 +1197,7 @@ export default function XrplCandleChartRaw({
 
         </p>
         </div>
-        <div className="text-xs text-white/40">{t("ui_en_attendant_consultez_l_ord_be84ec6208", "En attendant, consultez l’Order Book ci-dessous pour les prix en temps réel")}
+        <div className="text-xs text-white/40">{t("ui_meanwhile_check_orderbook_be84ec6208", "En attendant, consultez l’Order Book ci-dessous pour les prix en temps réel")}
 
       </div>
       </div>
