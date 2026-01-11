@@ -30,10 +30,11 @@
   "contact_title": "Contactez-nous",
   "contact_website_title": "Site web",
   "credited_in": "Crédité en",
+  "currency_rlusd_code": "RLUSD",
+  "currency_usd_code": "USD",
   "delete": "Supprimer",
   "demo_amount_placeholder": "ex. 25",
   "demo_back_to_global": "Retour",
-  "demo_badge": "Mode démo",
   "demo_cash_amount_placeholder": "ex. 100",
   "demo_cash_amount_usd": "Montant en USD",
   "demo_cash_cta_buy": "Acheter (démo)",
@@ -82,7 +83,6 @@
   "demo_lines_title": "Lignes (devises locales)",
   "demo_manage_lines": "Gérer les lignes",
   "demo_no_lines": "Aucune ligne pour le moment.",
-  "demo_note": "Essayez des transferts entre deux portefeuilles fictifs. La valeur est affichée en devise locale et adossée à l’USD.",
   "demo_notice_desc": "Tout est fictif : aucune transaction réelle, aucune connexion à un portefeuille XRPL.",
   "demo_notice_title": "Mode démo",
   "demo_open_statement": "Ouvrir le relevé",
@@ -168,10 +168,8 @@
   "demo_trustlines_title": "Lignes de devises (démo)",
   "demo_view_statement": "Voir le relevé",
   "demo_wallet_label": "Portefeuille",
-  "dex_chart_loading": "Chargement du graphique...",
   "dex_seo_description": "Plateforme d’échange décentralisée pour XCS. Trading en temps réel sur XRPL avec les paires XCS/XRP, XCS/RLUSD, XRP/RLUSD.",
   "dex_seo_title": "DEX XCANNES - Échange crypto instantané",
-  "dex_title": "XCS aujourd’hui",
   "eod_markets_subtitle": "170+ devises avec des paires entièrement personnalisables sur chaque devise ISO",
   "eod_markets_title": "Marchés FX mondiaux",
   "footer_branding": "Plateforme d’échange d’actifs numériques",
@@ -394,7 +392,6 @@
   "success_wallet_connected_title": "Portefeuille connecté",
   "success_wallet_required_text": "Pour recevoir vos tokens XCS, veuillez connecter votre portefeuille XRPL.",
   "success_wallet_required_title": "Connexion du portefeuille requise",
-  "trading_buy": "Acheter",
   "trading_buys": "ACHATS",
   "trading_no_trades": "Aucune transaction récente",
   "trading_orderbook": "Carnet d’ordres",
@@ -402,7 +399,6 @@
   "trading_orderbook_price": "Prix",
   "trading_orderbook_total": "Total",
   "trading_recent_trades": "Transactions récentes",
-  "trading_sell": "Vendre",
   "trading_sells": "VENTES",
   "trading_spread": "Spread",
   "trading_time": "Heure",
@@ -511,180 +507,110 @@
   "ui_copy_xrpl_address_4f63ed10fc": "Copier l’adresse XRPL",
   "ui_copy_request_32a3f4409b": "Copier la demande",
   "ui_core_features_fe8d86dd76": "Fonctionnalités principales",
-
   "ui_counterparty_cf147b1ba8": "Contrepartie",
-
   "ui_creating_currency_line_48e7a5e551": "Création d’une ligne de devise :",
   "ui_create_currency_lines_eur_gb_3cb882c93c": "Créer des lignes de devises (EUR / GBP / …) pour allouer du RLUSD en interne.",
-
   "ui_create_or_import_your_xrpl_w_beefeca97d": "Créer ou importer votre portefeuille XRPL",
-
   "ui_credits_b8166276a0": "Crédits (",
-
   "ui_crosshair_5734deb624": "Réticule",
-
   "ui_crypto_fiat_7ec0396100": "Crypto → Fiat",
-
   "ui_currencies_5e5bf1a8a1": "Devises",
   "ui_currencies_add_d324e3ae6f": "Devises (AJOUTER)",
-
   "ui_currency_1ed55673be": "Devise",
-
   "ui_currency_lines_267fc2eff3": "Lignes de devises",
   "ui_currency_lines_allocations_r_d87a98865f": "Lignes de devises (allocations RLUSD)",
-
   "ui_currently_locked_6e8b9f74e1": "Actuellement verrouillé :",
-
   "ui_disable_tooltips_778babce4d": "Désactiver les infobulles",
-
   "ui_disconnect_2c9c62cc27": "Déconnecter",
-
   "ui_describe_trading_question_cc5c9669ff": "Décrivez votre question de trading (paire XRPL, Pyth, EOD, carnet d’ordres...) et je vous aiderai à comprendre ce que vous voyez à l’écran.",
-
   "ui_date_bb69dc2fa3": "Date",
-
   "ui_debits_38c870b18f": "Débits (",
-
   "ui_delaware_llc_7ccc90dd1a": "🏛️ LLC du Delaware",
-
   "ui_delete_trustline_298bb3739d": "Supprimer la trustline",
-
   "ui_demo_mode_activations_are_si_2dad62366e": "Mode démo : les activations sont simulées (aucune transaction on-chain).",
-
   "ui_description_d37d7cf577": "Description",
-
   "ui_destination_xrpl_address_9c2b94554c": "Destination (adresse XRPL)",
-
   "ui_details_e9615e470d": "Détails",
-
   "ui_displaying_transactions_olde_e408b4a17d": "Affichage des transactions de plus de 12 mois.",
-
   "ui_doc_id_654e3bbaa5": "ID du document :",
   "ui_don_t_have_xumm_2d15c229cb": "Vous n’avez pas XUMM ?",
   "ui_download_xumm_from_app_store_37f4713089": "Téléchargez XUMM depuis l’App Store ou Google Play",
-
   "ui_lock_returns_to_wallet_1c3e249e22": "le verrou retourne au portefeuille (",
-
   "ui_e_g_exchange_friend_11008b5e9e": "ex. : échange, ami, …",
-
   "ui_ein_tax_id_b75781b844": "EIN (identifiant fiscal)",
-
   "ui_ema_0e6795183e": "EMA",
   "ui_ema_200_d9c5c416e5": "EMA 200",
   "ui_ema_20_258a56d889": "EMA 20",
   "ui_ema_50_87d20ea71c": "EMA 50",
-
   "ui_email_b5eb68bc3b": "Email :",
-
   "ui_meanwhile_check_orderbook_be84ec6208": "En attendant, consultez le carnet d’ordres ci-dessous pour les prix en temps réel",
-
   "ui_save_2d42b7df0f": "Enregistrer",
   "ui_save_404be3f4a5": "Enregistrer",
   "ui_save_9c004489ad": "Enregistrer",
-
   "ui_est_requise_38539df503": "est requis.",
-
   "ui_paid_to_management_wallet_c7338e7db3": "est versé au portefeuille de gestion XCANNES.",
-
   "ui_and_5aee655a93": ") et",
   "ui_and_620aeaa4b1": "et",
-
   "ui_sent_onchain_to_company_wallet_d9e8e01d57": "et envoyé on-chain vers un portefeuille de l’entreprise XCANNES.",
-
   "ui_eur_gbp_1865864628": "EUR ↔ GBP",
-
   "ui_ex_1f3a886dcf": "(ex. :",
-
   "ui_expired_d6b299ad78": "Expiré",
   "ui_expires_in_969e0da47a": "Expire dans",
-
   "ui_exponential_moving_average_70156ca8b0": "Moyenne mobile exponentielle",
-
   "ui_export_pdf_9c8d16b4fe": "📄 Exporter en PDF",
-
   "ui_favorites_1cc397670e": "Favoris",
-
   "ui_fees_580613eea6": "Frais",
   "ui_fees_overview_dad941c3c7": "Aperçu des frais",
-
+  "ui_festival_de_cannes_6bfe021fac": "Festival de Cannes",
   "ui_fiat_crypto_21ae637b23": "Fiat → Crypto",
-
   "ui_fiat_gateway_2b14cbec79": "Passerelle fiat",
-
   "ui_file_number_643dcf200a": "Numéro de dossier",
-
+  "ui_firefox_c359393414": "Firefox:",
   "ui_for_activate_your_wallet_su_75416099a8": "Pour activer votre portefeuille sur le réseau XRPL, une réserve minimale de",
-
   "ui_for_large_amounts_consider_s_9c360945af": "• Pour des montants élevés, envisagez de fractionner les opérations et de surveiller les spreads.",
-
   "ui_to_fully_use_wallet_5439f003e6": "Pour utiliser pleinement le portefeuille, installez les trustlines XRPL pour",
-
   "ui_manage_xcs_lock_0d49af4c57": "Gérer le verrou XCS pour cette devise. Cette action n’altère pas directement votre solde on-chain, uniquement le suivi interne.",
-
   "ui_generate_request_58584f23a2": "Générer une demande",
-
   "ui_generated_on_3827d9035f": "Généré le",
   "ui_generated_on_ae324c9048": "Généré le",
-
   "ui_global_statement_13e29aa8aa": "Relevé global",
-
   "ui_global_usd_wallet_202f7e48be": "Portefeuille USD global",
-
   "ui_google_play_3c43341c63": "Google Play",
-
+  "ui_grid_46093641b8": "Grille",
   "ui_highly_volatile_speculative_52608daf33": "hautement volatil et spéculatif",
+  "ui_hello_xcannes_assistant_e7c9e94d03": "Bonjour, je suis l’assistant XCANNES.",
+  "ui_hide_tooltips_987307ecea": "Masquer les info-bulles",
+  "ui_volume_histogram_3ba39baf94": "Histogramme de volume",
   "ui_hold_assets_on_chain_xrp_rlu_6e9344f999": "Détenir des actifs on-chain (XRP / RLUSD / XCS).",
   "ui_how_this_pair_works_386b06bbdc": "Fonctionnement de cette paire",
-
   "ui_how_to_enable_camera_c08cd802b3": "Comment activer la caméra :",
-
   "ui_important_af28edf1c1": "Important",
-
   "ui_in_the_wallet_list_you_will__7a5642d046": "Dans la liste des portefeuilles, vous verrez 2 types de « lignes » :",
-
   "ui_inclut_les_lignes_actives_m__0e52afcff8": "Inclut les lignes actives même si l’allocation = 0 RLUSD.",
-
   "ui_incorporation_date_2f96f98865": "Date d’incorporation",
-
   "ui_info_fees_e39e77e039": "Infos & frais",
-
   "ui_install_trustline_rlusd_35e926ab5c": "Installer la trustline RLUSD",
   "ui_install_trustline_xcs_5a6044d70e": "Installer la trustline XCS",
-
   "ui_interval_f42aefd35a": "Intervalle :",
-
   "ui_is_a_legally_registered_enti_98ec38f8f4": "est une entité légalement enregistrée dans l’État du Delaware, États-Unis, opérant en conformité avec les réglementations applicables.",
-
   "ui_l_allocation_totale_ne_doit__dcf11e3d6c": "L’allocation totale ne doit jamais dépasser le RLUSD on-chain.",
-
   "ui_l_api_data_xrplf_org_ne_r_po_2427381aa5": "L’API data.xrplf.org ne répond plus correctement. Le carnet d’ordres en temps réel fonctionne toujours via wss://xrplcluster.com",
-
   "ui_label_optional_3b6a3c454c": "Libellé (optionnel)",
-
   "ui_learn_more_about_this_pair_db681646e0": "En savoir plus sur cette paire",
-
   "ui_legal_compliance_transparenc_63cca5a815": "Conformité légale & transparence",
-
   "ui_legal_conditions_and_risk_wa_1a3ed6a1e9": "Conditions légales et avertissements sur les risques",
-
   "ui_legal_documentation_781292209b": "Documentation légale",
-
   "ui_legal_entity_details_and_reg_b780519ab3": "Détails de l’entité légale et enregistrement",
-
   "ui_legal_information_compliance_eb7289cbc6": "Informations légales & conformité",
-
   "ui_legal_information_disclaimer_1ceae5d05b": "Informations légales & avertissement - XCANNES LLC (XCS)",
   "ui_cryptocurrencies_are_assets_1bc9fd3df6": "• Les cryptomonnaies sont des actifs",
   "ui_currency_lines_represent_rlusd_155e16f839": "Les lignes de devises représentent une distribution interne de RLUSD.",
   "ui_amounts_in_currency_indicative_73d7ff4e8d": "Les montants en devise (EUR, USD, …) sont des valeurs indicatives basées sur les taux du marché ; la valeur de référence reste",
   "ui_xcannes_currency_lines_1f3927f668": "Lignes de devises XCANNES (",
-
+  "ui_limited_liability_company_ee1db9fb1f": "Société à responsabilité limitée",
   "ui_link_c2c8a504d7": "🔗 Lien",
-
   "ui_liquidity_can_vary_significa_5d7871e2a0": "• La liquidité peut varier fortement selon les paires et les sessions.",
-
   "ui_live_a633f195c7": "En direct",
-
   "ui_loading_1386baebe9": "Chargement…",
   "ui_loading_948e39804b": "Chargement…",
   "ui_loading_chart_0accd0c4e9": "Chargement du graphique...",
@@ -692,34 +618,20 @@
   "ui_loading_currencies_9af59a0977": "Chargement des devises...",
   "ui_loading_news_1acd983fe2": "Chargement des actualités...",
   "ui_loading_trustlines_b02f5c6b6c": "Chargement des trustlines…",
-
   "ui_local_currency_lines_2b186f452e": "lignes de devises locales",
-
   "ui_locked_xcs_157387001c": "XCS verrouillés",
   "ui_locked_xcs_68d65407f8": "XCS verrouillés",
-
   "ui_locking_xcs_via_escrow__2d99312708": "Verrouiller des XCS via un escrow. À la fermeture : 0,10 XCS remboursé, 0,10 XCS versé à XCANNES.",
-
   "ui_low_liquidity_spreads_may_be_4fa281270f": "Faible liquidité – les spreads peuvent être élevés.",
-
   "ui_macd_04d227f185": "MACD",
-
   "ui_manual_send_d5de1bf948": "Envoi manuel",
-
   "ui_max_4a27fb9fbf": "Max",
-
   "ui_memo_optional_d9594474c7": "Mémo (optionnel)",
-
   "ui_minimum_amounts_small_trades_55a4ae323a": "• Montants minimums : les petites transactions peuvent être arrondies ou regroupées afin de limiter l’impact des frais.",
-
   "ui_mode_6f09dd56a0": "Mode",
-
   "ui_moving_average_convergence_d_c7d386ca76": "Convergence / divergence des moyennes mobiles",
-
   "ui_only_invest_c88600673f": "• Investissez uniquement",
-
   "ui_network_fees_paid_on_the_und_0a0cfaaa02": "• Frais réseau : payés sur le réseau sous-jacent (XRPL ou externe) lors des mouvements d’actifs.",
-
   "ui_news_aggregated_from_local_m_95cf04e755": "Actualités agrégées depuis des sources locales.",
   "ui_no_currencies_found_b70888825e": "Aucune devise trouvée.",
   "ui_no_currency_lines_yet_9630af229d": "Aucune ligne de devise pour le moment.",
@@ -867,13 +779,14 @@
   "ui_verified_on_xrp_ledger_334f28ce50": "🔐 Vérifié sur le XRP Ledger",
   "ui_verify_on_delaware_registry_899aca1343": "Vérifier sur le registre du Delaware",
   "ui_version_3_0_a329baad3e": "📜 Version 3.0",
-  "ui_via_escrow_340f6d0b2b": "(via escrow).",
+  "ui_via_escrow_340f6d0b2b": "(via séquestre).",
   "ui_view_official_ein_document_i_10bf03b40c": "📄 Voir le document EIN officiel (IRS)",
   "ui_see_statement_9771dff7ec": "Voir le relevé",
   "ui_volume_36828512d7": "Volume",
   "ui_volume_weighted_average_pric_efd0f4bb24": "Prix moyen pondéré par le volume",
   "ui_you_can_c92b54f33e": "• Vous pouvez",
   "ui_vwap_d0acb01a82": "VWAP",
+  "ui_wall_street_journal_3d3879b3d4": "Wall Street Journal",
   "ui_wallet_connect_2e772de308": "Portefeuille connecté",
   "ui_wallet_info_fees_190ccbf57d": "Informations & frais du portefeuille",
   "ui_wallet_no_custodial_on_xrp_4e8c91bea3": "Portefeuille non custodial sur XRPL + un UX-ledger pour distribuer le RLUSD dans des lignes de devises.",
@@ -936,16 +849,66 @@
   "whitepaper_s1_p1": "XCANNES (XCS) est un jeton numérique conçu pour s’intégrer à l’écosystème économique de Cannes et de sa région.",
   "whitepaper_s1_p2": "XCANNES vise à accompagner la transition numérique de la ville tout en restant accessible aux résidents comme aux visiteurs.",
   "whitepaper_s1_title": "1. XCANNES, une monnaie numérique dédiée à Cannes et sa région",
+  "whitepaper_s2_li1": "Transactions rapides : validation en 3 à 5 secondes.",
+  "whitepaper_s2_li2": "Frais ultra-faibles : moins de 0,0002 € par transaction.",
+  "whitepaper_s2_li3": "Écologique : pas de minage, consommation énergétique réduite.",
+  "whitepaper_s2_li4": "Fiabilité éprouvée : en service depuis 2012, jamais compromis.",
+  "whitepaper_s2_li5": "Scalable : jusqu’à 1 500 transactions par seconde.",
+  "whitepaper_s2_li6": "Interopérable : compatible avec d’autres actifs numériques.",
+  "whitepaper_s2_p1": "XCANNES (XCS) est construit sur le XRP Ledger (XRPL), un registre distribué haute performance reconnu pour sa sécurité, sa rapidité et ses faibles coûts.",
+  "whitepaper_s2_p2": "⚜️ XRPL fournit à XCANNES une infrastructure robuste, rapide et scalable — parfaitement adaptée à une ville moderne comme Cannes.",
   "whitepaper_s2_title": "2. Pourquoi le XRP Ledger (XRPL) ?",
+  "whitepaper_s3_li1": "Un moyen de paiement universel dans les commerces, hôtels, restaurants et services locaux.",
+  "whitepaper_s3_li2": "Accès privilégié à des offres et expériences exclusives en XCS.",
+  "whitepaper_s3_li3": "Utilisation potentielle lors d’événements majeurs (Festival de Cannes, etc.).",
+  "whitepaper_s3_li4": "Développement futur vers le e-commerce et les services numériques.",
+  "whitepaper_s3_p1": "XCANNES a été conçu pour soutenir et moderniser l’économie locale.",
+  "whitepaper_s3_p2": "XCANNES est plus qu’un token : c’est un levier économique et un outil d’innovation.",
   "whitepaper_s3_title": "3. Un token conçu pour l’économie locale",
+  "whitepaper_s4_li1_label": "Offre totale fixe :",
+  "whitepaper_s4_li1_text": "2 006 400 XCS. Aucun nouveau token ne peut être créé après l’émission initiale.",
+  "whitepaper_s4_li2_label": "Divisibilité :",
+  "whitepaper_s4_li2_text": "Jusqu’à 6 décimales pour les micro-transactions.",
+  "whitepaper_s4_li3_label": "Système de burn :",
+  "whitepaper_s4_li3_text": "Une fraction des frais est brûlée à chaque transaction (déflation contrôlée).",
+  "whitepaper_s4_li4_label": "Distribution stratégique :",
+  "whitepaper_s4_li4_sub1": "Tokens alloués aux partenaires et institutions locales.",
+  "whitepaper_s4_li4_sub2": "Libération progressive des tokens pour éviter la volatilité.",
+  "whitepaper_s4_p1": "⚜️ Cette structure garantit une gestion saine et une adoption durable.",
   "whitepaper_s4_title": "4. Économie du token XCANNES (XCS)",
+  "whitepaper_s5_buy_li1": "Sur le site officiel via le bouton « Acheter maintenant ».",
+  "whitepaper_s5_buy_li2": "Sur des DEX compatibles XRPL comme Sologenic ou Orchestra Finance.",
+  "whitepaper_s5_buy_li3": "Prochainement sur des CEX après listing.",
+  "whitepaper_s5_buy_title": "Comment acheter des XCS ?",
+  "whitepaper_s5_p1": "⚜️ Pour une sécurité maximale, privilégiez les portefeuilles hardware.",
+  "whitepaper_s5_store_li1": "Portefeuilles froids (Ledger Nano X/S, Decent…).",
+  "whitepaper_s5_store_li2": "Portefeuilles XRPL compatibles (Xaman/XUMM, GateHub…).",
+  "whitepaper_s5_store_title": "Où stocker les XCS ?",
   "whitepaper_s5_title": "5. Où acheter et stocker XCANNES ?",
+  "whitepaper_s6_li1": "Registre XRPL public : transparence et traçabilité.",
+  "whitepaper_s6_li2": "Aucune promesse de rendement : XCS n’est pas un produit spéculatif.",
+  "whitepaper_s6_li3": "Cadre conforme aux meilleures pratiques (KYC/AML).",
   "whitepaper_s6_title": "6. Sécurité et conformité réglementaire",
+  "whitepaper_s7_li1": "📍 Phase 1 : Lancement et partenariats locaux",
+  "whitepaper_s7_li2": "📱 Phase 2 : E-commerce & applications mobiles",
+  "whitepaper_s7_li3": "🌍 Phase 3 : Adoption large et paiements avancés",
+  "whitepaper_s7_p1": "XCANNES évoluera avec les besoins du territoire.",
   "whitepaper_s7_title": "7. Feuille de route et développements futurs",
+  "whitepaper_s8_p1": "XCANNES est bien plus qu’un simple token.",
+  "whitepaper_s8_p2": "🌍 Avec XCS, Cannes modernise ses échanges.",
+  "whitepaper_s8_p3": "⚜️ Une crypto à l’image de Cannes : prestigieuse et utile.",
   "whitepaper_s8_title": "8. Conclusion",
   "whitepaper_scroll_top": "⬆️ Retour en haut",
   "whitepaper_subtitle": "L’identité numérique et financière de Cannes et de sa région",
   "whitepaper_title": "📘 Livre blanc officiel - XCANNES (XCS)",
+  "whitepaper_toc_1": "1. XCANNES, une monnaie numérique dédiée",
+  "whitepaper_toc_2": "2. Pourquoi le XRP Ledger (XRPL) ?",
+  "whitepaper_toc_3": "3. Un token pour l’économie locale",
+  "whitepaper_toc_4": "4. Économie du token",
+  "whitepaper_toc_5": "5. Où acheter et stocker XCS",
+  "whitepaper_toc_6": "6. Sécurité et conformité",
+  "whitepaper_toc_7": "7. Feuille de route",
+  "whitepaper_toc_8": "8. Conclusion",
   "whitepaper_toc_title": "📑 Table des matières",
   "whitepaper_version": "📅 Version 1.0 — 02/02/2025",
   "xrpl_label": "XRPL",

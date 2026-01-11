@@ -1,105 +1,110 @@
 {
-  "ui_pay_a_payment_request_0a5c61fa4c": "Zapłać żądanie płatności",
-  "ui_payment_for_82ec86ac25": "Płatność za...",
-  "ui_payment_fx_base_usd_r_gleme_4818b8a6c3": "Płatność FX (baza USD · rozliczenie XRPL przez RLUSD)",
-  "ui_lose_all_investment_7d2205a73e": "utracić całość inwestycji",
-  "ui_powered_by_moonpay_instant_b_9e94ccf50e": "Obsługiwane przez MoonPay • Natychmiastowy przelew bankowy",
-  "ui_powered_by_moonpay_secure_ch_0bcfb2aeb5": "Obsługiwane przez MoonPay • Bezpieczny checkout",
-  "ui_preparing_67f5f84ff4": "Przygotowywanie...",
-  "ui_price_8c023f79dc": "Cena",
-  "ui_print_1313eff37c": "🖨️ Drukuj",
-  "ui_print_eb5de3a228": "🖨️ Drukuj",
-  "ui_qr_code_7614ee32a0": "📱 Kod QR",
-  "ui_can_afford_to_lose_c39a6a53d3": "które możesz sobie pozwolić stracić",
-  "ui_quick_add_e62e925d4f": "Szybkie dodanie",
-  "ui_quote_e3761255be": "Kurs",
-  "ui_reset_77f2efd6da": "Resetuj",
-  "ui_reserve_blocked_529137c552": "(rezerwa zablokowana).",
-  "ui_receive_127eab0703": "Odbierz",
-  "ui_receive_61ed481e18": "Odbierz",
-  "ui_receive_b7d6ae4037": "Odbierz",
-  "ui_recent_activity_de80b9813c": "Ostatnia aktywność",
-  "ui_recipient_wallet_address_1724bca6de": "Adres portfela odbiorcy",
-  "ui_refresh_e781061534": "Odśwież",
-  "ui_refund_4e5e3d305c": "(zwrot",
-  "ui_reg_no_10157026_e69505fd0c": "Nr rejestracyjny 10157026",
-  "ui_registered_agent_49e49193ed": "Zarejestrowany agent",
-  "ui_relative_strength_index_03b135dd75": "Wskaźnik siły względnej",
-  "ui_rename_86c8307e14": "Zmień nazwę",
-  "ui_rename_wallet_8fecb8eee2": "Zmień nazwę portfela",
-  "ui_request_payment_c62b99fb16": "Poproś o płatność",
-  "ui_reserve_2d584ec9c7": "Rezerwa",
-  "ui_reserve_breakdown_de2c3de53e": "Struktura rezerwy",
-  "ui_risks_tips_01c3443955": "Ryzyka i wskazówki",
-  "ui_rlusd_03b00d11bf": "RLUSD",
-  "ui_rlusd_5933874327": "RLUSD",
-  "ui_rlusd_6a0d57ec4d": "≈ … RLUSD",
-  "ui_rlusd_eur_23dc8f699b": "RLUSD ↔ EUR",
-  "ui_rlusd_f36819f8e2": "RLUSD",
-  "ui_rlusd_ff5048a674": "RLUSD",
-  "ui_rsi_aee5216e2c": "RSI",
-  "ui_save_47661c12f6": "Zapisz",
-  "ui_save_line_dd4ea383b8": "Zapisz linię",
-  "ui_save_this_address_7ef65aa11c": "Zapisać ten adres?",
-  "ui_scan_a_qr_code_to_pay_a_merc_a5eaca7464": "Zeskanuj kod QR, aby natychmiast zapłacić sprzedawcy, znajomemu lub za usługę. Dane płatności zostaną wypełnione automatycznie.",
-  "ui_scan_qr_code_12fa63d927": "Skanuj kod QR",
-  "ui_scan_qr_code_44b98df9b6": "Skanuj kod QR",
-  "ui_scan_qr_code_481606b590": "Skanuj kod QR",
-  "ui_scan_request_44801f50d1": "Skanuj żądanie",
-  "ui_scan_this_qr_code_to_f780225746": "Zeskanuj ten kod QR, aby",
-  "ui_scan_this_qr_code_with_xumm__a467eb8cd5": "Zeskanuj ten kod QR aplikacją XUMM",
-  "ui_logout_wallet_558f860cac": "Wyloguj z portfela",
-
-  "view": "Zobacz",
-  "view_statement": "Zobacz wyciąg",
-
-  "wallet_connect": "Połącz portfel",
-  "wallet_connected": "Połączony",
-  "wallet_disconnect": "Rozłącz",
-  "wallet_footer_info": "Informacje",
-  "wallet_footer_info_fees": "Informacje i opłaty",
-  "wallet_footer_info_title": "Informacje i opłaty portfela",
-  "wallet_footer_open_full_wallet": "Otwórz pełny portfel",
-  "wallet_footer_secured_xumm": "Zabezpieczone przez XUMM",
-  "wallet_locked_xcs_label": "Zablokowane XCS:",
-  "wallet_not_connected_desc": "Jesteś w trybie podglądu. Połącz portfel, aby włączyć tę funkcję.",
-  "wallet_not_connected_title": "Portfel niepołączony",
-  "wallet_page_description": "Zarządzaj swoim portfelem XRPL, trustline i aktywami w XCANNES",
-  "wallet_page_title": "Portfel - XCANNES",
-
-  "whitepaper_button_dex": "DEX",
-  "whitepaper_meta_title": "Whitepaper - XCANNES (XCS)",
-
-  "whitepaper_scroll_top": "⬆️ Powrót na górę",
-  "whitepaper_subtitle": "Cyfrowa i finansowa tożsamość Cannes i jego regionu",
-  "whitepaper_title": "📘 Oficjalny whitepaper - XCANNES (XCS)",
-  "whitepaper_toc_title": "📑 Spis treści",
-  "whitepaper_version": "📅 Wersja 1.0 — 02.02.2025",
-
-  "xrpl_label": "XRPL",
-
-  "xumm_setup_body": "Nie masz jeszcze Xumm? Zainstaluj aplikację i utwórz portfel w kilka minut.",
-  "xumm_setup_create": "Otwórz stronę Xumm",
-  "xumm_setup_existing": "Mam już Xumm",
-  "xumm_setup_title": "Xumm wymagany do połączenia portfela"
-}
-{
+  "add": "Dodaj",
+  "add_custom_pair": "Dodaj niestandardową parę",
+  "add_custom_pair_hint": "Wprowadź kody walut oddzielone /",
+  "add_pair": "Dodaj parę",
+  "buy": "Kup",
+  "change_24h": "Zmiana 24h",
+  "close": "Zamknij",
+  "contact_back_dex": "Powrót do DEX",
+  "contact_back_home": "Powrót do strony głównej",
+  "contact_company_location": "Lokalizacja",
+  "contact_company_name": "Nazwa firmy",
+  "contact_company_reg": "Numer rejestracyjny",
+  "contact_company_title": "Informacje o firmie",
+  "contact_email_title": "E-mail",
+  "contact_form_email": "E-mail",
+  "contact_form_email_placeholder": "twoj@email.com",
+  "contact_form_error_text": "Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie lub skontaktuj się z nami bezpośrednio.",
+  "contact_form_error_title": "Wysyłanie nie powiodło się",
+  "contact_form_message": "Wiadomość",
+  "contact_form_message_placeholder": "Twoja wiadomość...",
+  "contact_form_name": "Imię",
+  "contact_form_name_placeholder": "Twoje imię",
+  "contact_form_send": "Wyślij wiadomość",
+  "contact_form_sending": "Wysyłanie...",
+  "contact_form_success_text": "Otrzymaliśmy Twoją wiadomość i odpowiemy tak szybko, jak to możliwe.",
+  "contact_form_success_title": "Wiadomość wysłana!",
+  "contact_form_title": "Formularz kontaktowy",
+  "contact_subtitle": "Odpowiemy w ciągu 24-48 godzin",
+  "contact_title": "Skontaktuj się z nami",
+  "contact_website_title": "Strona internetowa",
+  "credited_in": "Uznano w",
+  "currency_rlusd_code": "RLUSD",
+  "currency_usd_code": "USD",
+  "delete": "Usuń",
+  "demo_amount_placeholder": "Kwota",
+  "demo_back_to_global": "Powrót do widoku globalnego",
+  "demo_cash_amount_placeholder": "Kwota w USD",
+  "demo_cash_amount_usd": "Kwota USD",
+  "demo_cash_cta_buy": "Kup krypto",
+  "demo_cash_cta_sell": "Sprzedaj krypto",
+  "demo_cash_note": "Symulacja: faktyczne transakcje wymagają weryfikacji KYC",
+  "demo_cash_subtitle": "Kup lub sprzedaj krypto za USD",
+  "demo_cash_tab_buy": "Kup",
+  "demo_cash_tab_sell": "Sprzedaj",
+  "demo_cash_title": "Fiat ↔ Crypto",
+  "demo_cash_usd_balance": "Saldo USD",
+  "demo_close": "Zamknij",
+  "demo_compare_badge": "Zobacz różnicę",
+  "demo_compare_close": "Zamknij porównanie",
+  "demo_compare_desc": "Zobacz, jak XCANNES wypada w porównaniu z tradycyjnymi giełdami",
+  "demo_compare_h1": "Porównanie z tradycyjnymi giełdami",
+  "demo_compare_subtitle": "Przejrzystość, bezpieczeństwo i zero ukrytych opłat",
+  "demo_compare_title": "Dlaczego XCANNES?",
+  "demo_convert_amount": "Kwota",
+  "demo_convert_cta": "Konwertuj",
+  "demo_convert_from": "Z",
+  "demo_convert_subtitle": "Wymieniaj aktywa natychmiast",
+  "demo_convert_title": "Konwertuj",
+  "demo_convert_to": "Na",
+  "demo_copied": "Skopiowano!",
+  "demo_copy_address": "Kopiuj adres",
+  "demo_copy_token": "Kopiuj token",
+  "demo_currency_line_label": "Waluta demo",
+  "demo_currency_statement_subtitle": "Historia transakcji dla tej waluty",
+  "demo_currency_statement_title": "Wyciąg walutowy",
+  "demo_error_amount": "Nieprawidłowa kwota",
+  "demo_error_amount_too_small": "Kwota jest za mała",
+  "demo_error_generic": "Wystąpił błąd. Spróbuj ponownie.",
+  "demo_error_insufficient": "Niewystarczające saldo",
+  "demo_error_pair": "Nieprawidłowa para handlowa",
+  "demo_error_rates_stale": "Kursy wymiany są nieaktualne. Spróbuj ponownie.",
+  "demo_error_unsupported": "Ta operacja nie jest obsługiwana w trybie demo",
+  "demo_evt_buy": "Kupno",
+  "demo_evt_convert": "Konwersja",
+  "demo_evt_sell": "Sprzedaż",
+  "demo_evt_send": "Wysłano",
+  "demo_footer_compare_cta": "Porównaj z tradycyjnymi giełdami",
+  "demo_footer_note": "Tryb demo - Wszystkie operacje są symulowane",
+  "demo_from": "Od",
+  "demo_global_statement_subtitle": "Wszystkie Twoje transakcje w jednym miejscu",
+  "demo_global_statement_title": "Wyciąg globalny",
+  "demo_lines_title": "Linie walutowe",
+  "demo_manage_lines": "Zarządzaj liniami",
+  "demo_no_lines": "Brak aktywnych linii walutowych",
+  "demo_notice_desc": "Wszystkie dane i operacje są symulowane w celach demonstracyjnych",
+  "demo_notice_title": "Tryb demonstracyjny",
+  "demo_open_statement": "Otwórz wyciąg",
+  "demo_pay_cta": "Wyślij płatność",
+  "demo_pay_title": "Wyślij na adres XRPL",
+  "demo_payreq_amount": "Kwota",
+  "demo_payreq_generate": "Generuj żądanie",
+  "demo_payreq_title": "Żądanie płatności",
+  "demo_payreq_to": "Do",
+  "demo_payreq_token": "Token",
   "demo_quote": "Podgląd",
   "demo_quote_backed": "Baza USD",
   "demo_quote_fee": "opłata",
   "demo_quote_hint": "Wpisz kwotę, aby zobaczyć estymację.",
-
   "demo_receive": "Odbierz",
   "demo_receive_address": "Adres",
   "demo_receive_tab_receive": "Odbierz",
   "demo_receive_tab_request": "Żądanie płatności",
   "demo_receive_title": "Odbierz aktywa (demo)",
-
   "demo_reset": "Resetuj",
-
   "demo_scan_desc": "Wklej token żądania płatności (demo).",
   "demo_scan_parse": "Załaduj żądanie",
-
   "demo_send_amount": "Kwota",
   "demo_send_cta": "Wyślij (demo)",
   "demo_send_currency": "Waluta",
@@ -109,7 +114,6 @@
   "demo_send_tab_manual": "Wysyłka ręczna",
   "demo_send_tab_scan": "Skanuj żądanie",
   "demo_send_title": "Wyślij (demo)",
-
   "demo_stmt_account_holder": "Właściciel konta",
   "demo_stmt_asset_fx": "Linia waluty",
   "demo_stmt_asset_usd": "Baza USD",
@@ -146,12 +150,10 @@
   "demo_stmt_type_usd": "Stablecoin USD",
   "demo_stmt_view": "Zobacz wyciąg",
   "demo_stmt_wallet": "Portfel",
-
   "demo_tab_convert": "Konwertuj",
   "demo_tab_send": "Wyślij",
   "demo_to": "Do",
   "demo_to_wallet": "Kontrahent",
-
   "demo_trustlines_add": "Dodaj walutę",
   "demo_trustlines_add_cta": "Dodaj",
   "demo_trustlines_balance": "Saldo",
@@ -164,21 +166,16 @@
   "demo_trustlines_quick": "Szybkie dodanie",
   "demo_trustlines_subtitle": "Dodawaj/usuwaj fikcyjne linie walut (off-chain).",
   "demo_trustlines_title": "Linie walut (demo)",
-
   "demo_view_statement": "Zobacz wyciąg",
   "demo_wallet_label": "Portfel",
-
-  "dex_chart_loading": "Ładowanie wykresu...",
   "dex_seo_description": "Zdecentralizowana platforma wymiany dla XCS. Handel w czasie rzeczywistym na XRPL z parami XCS/XRP, XCS/RLUSD, XRP/RLUSD.",
   "dex_seo_title": "DEX XCANNES - Natychmiastowa wymiana krypto",
-  "dex_title": "XCS dzisiaj",
-
   "eod_markets_subtitle": "Ponad 170 walut z w pełni konfigurowalnymi parami dla każdej waluty ISO",
   "eod_markets_title": "Globalne rynki FX",
-
   "footer_branding": "Platforma wymiany aktywów cyfrowych",
   "footer_contact_email": "contact@xcannes.com",
   "footer_contact_title": "Kontakt",
+  "footer_copyright": "© 2025 XCANNES LLC. Wszelkie prawa zastrzeżone.",
   "footer_created": "Stworzone, aby uprościć Web3",
   "footer_nav_legal": "Informacje prawne",
   "footer_nav_title": "Nawigacja",
@@ -189,43 +186,32 @@
   "footer_xrpl_checking": "Sprawdzanie XRPL...",
   "footer_xrpl_connected": "XRPL połączony",
   "footer_xrpl_disconnected": "XRPL rozłączony",
-
   "header_tagline": "Platforma wymiany aktywów cyfrowych",
-
   "home_feature_currencylines_cta": "Zarządzaj liniami",
   "home_feature_currencylines_desc": "Włączaj/wyłączaj linie walut (EUR, MXN…) i alokuj bazę USD, z blokadą XCS do aktywacji funkcji.",
   "home_feature_currencylines_title": "Linie walut i blokada XCS",
-
   "home_feature_dex_cta": "Otwórz DEX",
   "home_feature_dex_desc": "Dane w czasie rzeczywistym (WebSocket): księgi zleceń, transakcje, świece i wskaźniki (XRPL + FX).",
   "home_feature_dex_title": "DEX i wykresy",
-
   "home_feature_moonpay_cta": "Otwórz Kup/Sprzedaj",
   "home_feature_moonpay_desc": "Wejście i wyjście fiat przez MoonPay (dostępność zależna od kraju).",
   "home_feature_moonpay_title": "Kup / Sprzedaj (fiat)",
-
   "home_feature_news_cta": "Zobacz wiadomości",
   "home_feature_news_desc": "Agregowany strumień wiadomości z lokalnych źródeł dla kontekstu rynkowego.",
   "home_feature_news_title": "Lokalne wiadomości",
-
   "home_feature_payreq_cta": "Utwórz żądanie",
   "home_feature_payreq_desc": "Utwórz żądanie i otrzymuj płatności w kilka sekund, zatwierdzane przez Xaman.",
   "home_feature_payreq_title": "Żądania płatności (QR)",
-
   "home_feature_pricing_cta": "Zobacz rynki",
   "home_feature_pricing_desc": "FX w czasie rzeczywistym (Pyth) z dziennym fallbackiem (EOD) i przejrzystymi spreadami.",
   "home_feature_pricing_title": "Kursy i źródła",
-
   "home_feature_statements_cta": "Zobacz wyciąg",
   "home_feature_statements_desc": "Wyciągi globalne i według waluty, z potwierdzeniami/eksportami dla płatności, transferów i konwersji.",
   "home_feature_statements_title": "Wyciągi i potwierdzenia",
-
   "home_features_badge": "Kluczowe funkcje",
   "home_features_note_rlusd": "Uwaga: baza jest stabilna w USD. Rozliczenie on-chain odbywa się przez RLUSD (regulowany stablecoin USD na XRPL).",
   "home_features_subtitle": "Doświadczenie w lokalnej walucie z wartością opartą na USD — oraz narzędzia używane na co dzień.",
-  "home_features_title": "Wszystko, co najważniejsze, w jednym miejscu."
-}
-{
+  "home_features_title": "Wszystko, co najważniejsze, w jednym miejscu.",
   "home_localpay_amount_label": "Kwota",
   "home_localpay_amount_placeholder": "np. 120",
   "home_localpay_currency_label": "Waluta",
@@ -234,7 +220,6 @@
   "home_localpay_demo_rate_loading": "Kurs…",
   "home_localpay_demo_title": "Symulacja płatności",
   "home_localpay_you_pay": "Klient płaci",
-
   "home_support_badge": "SUP",
   "home_support_close": "Zamknij",
   "home_support_msg_body": "Zadaj pytanie dotyczące portfela, płatności, konwersji lub rynków. Poprowadzimy Cię krok po kroku.",
@@ -243,20 +228,17 @@
   "home_support_placeholder": "Napisz swoje pytanie…",
   "home_support_send": "Wyślij",
   "home_support_title": "Wsparcie XCANNES",
-
   "home_v2_demo_action_convert_desc": "Konwertuj między walutami po kursie pokazanym przed zatwierdzeniem.",
   "home_v2_demo_action_convert_title": "KONWERTUJ",
   "home_v2_demo_action_pay_desc": "Żądanie płatności (QR) i płatność w kilka sekund.",
   "home_v2_demo_action_pay_title": "ZAPŁAĆ",
   "home_v2_demo_action_send_desc": "Wyślij w wyświetlanej walucie: wartość pozostaje stabilna w USD.",
   "home_v2_demo_action_send_title": "WYŚLIJ",
-
   "home_v2_demo_badge": "Demo portfela (interfejs konta)",
   "home_v2_demo_cta_primary": "Otwórz portfel",
   "home_v2_demo_preview_title": "Interaktywne demo",
   "home_v2_demo_subtitle": "Kwoty są wyświetlane w walucie lokalnej. Wartość pozostaje stabilna w USD.",
   "home_v2_demo_title": "Interfejs konta wielowalutowego.",
-
   "home_v2_demo_try_1": "Wyciągi: przeglądaj szczegóły globalne i według waluty.",
   "home_v2_demo_try_2": "Żądanie płatności: kliknij „Odbierz”, aby wygenerować żądanie (QR).",
   "home_v2_demo_try_3": "Płatność: kliknij „Wyślij”, a następnie zeskanuj żądanie, aby zasymulować płatność.",
@@ -264,7 +246,6 @@
   "home_v2_demo_try_subtitle": "Ta sama logika interfejsu, ale fikcyjna: brak prawdziwych transakcji.",
   "home_v2_demo_try_tip": "Wskazówka: użyj „Resetuj”, aby zacząć od nowa.",
   "home_v2_demo_try_title": "Wypróbuj demo",
-
   "home_v2_essentials_1_desc": "Śledź, potwierdzaj i eksportuj operacje — według waluty lub globalnie.",
   "home_v2_essentials_1_title": "Wyciągi i potwierdzenia",
   "home_v2_essentials_2_desc": "Żądaj (QR), odbieraj i wysyłaj w kilka sekund, z wyraźnym zatwierdzeniem.",
@@ -273,17 +254,14 @@
   "home_v2_essentials_3_title": "Konwersja",
   "home_v2_essentials_4_desc": "Dostęp do fiat w zależności od kraju.",
   "home_v2_essentials_4_title": "Kup / Sprzedaj",
-
   "home_v2_essentials_badge": "Podstawy",
   "home_v2_essentials_subtitle": "Przejrzysty, profesjonalny interfejs skupiony na użyteczności.",
   "home_v2_essentials_title": "Najważniejsze, na co dzień.",
-
   "home_v2_final_cta_demo": "Wypróbuj demo",
   "home_v2_final_cta_markets": "Zobacz rynki",
   "home_v2_final_cta_primary": "Otwórz portfel",
   "home_v2_final_subtitle": "Łatwe do zrozumienia. Gotowe do użycia.",
   "home_v2_final_title": "Zacznij od demo, a następnie otwórz portfel.",
-
   "home_v2_hero_badge": "XCANNES",
   "home_v2_hero_cta_primary": "Otwórz portfel",
   "home_v2_hero_cta_secondary": "Wypróbuj demo",
@@ -293,11 +271,9 @@
   "home_v2_hero_pillar_2_title": "Wyciągi i potwierdzenia",
   "home_v2_hero_pillar_3_desc": "Kurs pokazany wyraźnie przed zatwierdzeniem.",
   "home_v2_hero_pillar_3_title": "Konwersja",
-
   "home_v2_hero_subtitle": "Płać, odbieraj i przeglądaj kwoty w walucie kraju",
   "home_v2_hero_title": "Kwoty lokalne.",
   "home_v2_hero_title_emphasis": "Stabilna wartość.",
-
   "home_v2_infra_badge": "Infrastruktura (opcjonalnie)",
   "home_v2_infra_cta": "Przeczytaj o architekturze",
   "home_v2_infra_point1": "Rozliczenie: XRPL",
@@ -307,7 +283,6 @@
   "home_v2_infra_subtitle": "Dla zaawansowanych: rozliczenie, stabilna jednostka, źródła cen.",
   "home_v2_infra_ticker_label": "Rynki (drugorzędne)",
   "home_v2_infra_title": "Infrastruktura (szczegóły)",
-
   "home_v2_security_badge": "Bezpieczeństwo i kontrola",
   "home_v2_security_cta_details": "Szczegóły",
   "home_v2_security_cta_install": "Zainstaluj aplikację",
@@ -316,17 +291,14 @@
   "home_v2_security_modal_note": "Wskazówka: poświęć chwilę na sprawdzenie każdego ekranu przed zatwierdzeniem.",
   "home_v2_security_modal_subtitle": "Masz kontrolę: zatwierdzanie biometryczne i wyraźny podpis.",
   "home_v2_security_modal_title": "Szczegóły bezpieczeństwa i zatwierdzania",
-
   "home_v2_security_step_1_desc": "Zeskanuj kod QR z aplikacji zatwierdzającej, bez udostępniania kluczy prywatnych.",
   "home_v2_security_step_1_title": "Bezpieczne połączenie",
   "home_v2_security_step_2_desc": "Widzisz, co zatwierdzasz, a następnie podpisujesz biometrycznie.",
   "home_v2_security_step_2_title": "Sprawdź i podpisz",
   "home_v2_security_step_3_desc": "Otrzymujesz potwierdzenie w kilka sekund.",
   "home_v2_security_step_3_title": "Potwierdzenie",
-
   "home_v2_security_subtitle": "Zatwierdzanie przez aplikację Xaman (dawniej XUMM). Każda akcja jest podpisywana na Twoim urządzeniu.",
   "home_v2_security_title": "Ty zatwierdzasz. Ty masz kontrolę.",
-
   "home_v2_sim_badge": "Symulacja",
   "home_v2_sim_note": "Użytkownik działa w walucie lokalnej. Wartość referencyjna pozostaje stabilna.",
   "home_v2_sim_point1": "Wyświetlane w walucie lokalnej.",
@@ -334,14 +306,11 @@
   "home_v2_sim_reference_label": "Referencja (USD)",
   "home_v2_sim_subtitle": "Kwoty, potwierdzenia i wyciągi są wyświetlane w walucie lokalnej.",
   "home_v2_sim_title": "Klient płaci w swojej walucie.",
-
   "langswitcher_aria_label": "Zmień język",
   "langswitcher_main_label": "Główny",
   "langswitcher_regions_label": "Regiony",
-
   "loading": "Ładowanie…",
   "market": "Rynek",
-
   "moonpay_amount_to_sell": "Kwota do sprzedaży",
   "moonpay_buy_activation_notice": "Portfel nieaktywowany: pierwsza transakcja obejmuje także XRP do aktywacji portfela (1 XRP) oraz instalacji trustline RLUSD/XCS (+0,1 XRP).",
   "moonpay_buy_demo_notice": "Tryb demo: zakup jest symulowany (brak przekierowania do MoonPay).",
@@ -352,9 +321,7 @@
   "moonpay_destination_wallet": "Portfel docelowy",
   "moonpay_error_title": "Coś poszło nie tak",
   "moonpay_from_wallet": "Z portfela",
-  "moonpay_loading_widget": "Ładowanie widżetu MoonPay..."
-}
-{
+  "moonpay_loading_widget": "Ładowanie widżetu MoonPay...",
   "moonpay_minimum_prefix": "Minimum:",
   "moonpay_minimum_prefix_usd": "Minimum: $",
   "moonpay_receive_in": "Otrzymaj w",
@@ -365,13 +332,10 @@
   "moonpay_sell_success_title": "Sprzedaż zakończona!",
   "moonpay_widget_title_buy": "Widget MoonPay",
   "moonpay_widget_title_sell": "Widget sprzedaży MoonPay",
-
   "nav_home": "Strona główna",
   "nav_trading": "Trading",
   "nav_wallet": "Portfel",
-
   "no_pairs_found": "Nie znaleziono par",
-
   "pay_amount_label": "Kwota:",
   "pay_connect_and_pay": "Połącz i zapłać przez Xumm",
   "pay_connect_only": "Tylko połącz",
@@ -400,14 +364,11 @@
   "pay_to_label": "Do:",
   "pay_waiting_approval": "Oczekiwanie na zatwierdzenie…",
   "pay_waiting_connection": "Oczekiwanie na połączenie…",
-
   "remove": "Usuń",
   "search_pairs": "Szukaj par walutowych...",
   "sell": "Sprzedaj",
-
   "seo_default_description": "Handluj i zarządzaj aktywami na XRPL w szybkim, bezpiecznym i przejrzystym środowisku.",
   "seo_default_title": "XCANNES - Platforma aktywów cyfrowych",
-
   "success_dex_button": "Przejdź do DEX",
   "success_home_button": "Powrót na stronę główną",
   "success_next_steps_title": "Następne kroki",
@@ -431,8 +392,6 @@
   "success_wallet_connected_title": "Portfel połączony",
   "success_wallet_required_text": "Aby otrzymać tokeny XCS, połącz swój portfel XRPL.",
   "success_wallet_required_title": "Wymagane połączenie portfela",
-
-  "trading_buy": "Kup",
   "trading_buys": "KUPNO",
   "trading_no_trades": "Brak ostatnich transakcji",
   "trading_orderbook": "Księga zleceń",
@@ -440,356 +399,209 @@
   "trading_orderbook_price": "Cena",
   "trading_orderbook_total": "Suma",
   "trading_recent_trades": "Ostatnie transakcje",
-  "trading_sell": "Sprzedaj",
   "trading_sells": "SPRZEDAŻ",
   "trading_spread": "Spread",
   "trading_time": "Czas",
   "trading_unknown_pair": "Wybrana para",
-
-  "try_again": "Spróbuj ponownie"
-}
-{
+  "try_again": "Spróbuj ponownie",
   "ui_0_10_xcs_ad2ec0a991": "0,10 XCS",
   "ui_0_20_xcs_37887114e0": "0,20 XCS",
   "ui_0_20_xcs_cd5bfa5a79": "0,20 XCS",
   "ui_0_rlusd_14d1aaec1c": "0 RLUSD",
-
   "ui_1_installez_xumm_on_your_m_c547f9ed37": "1. Zainstaluj Xumm na urządzeniu mobilnym.",
   "ui_1_xcs_4d45c847fc": "1 XCS",
   "ui_1_xrp_5436c63b66": "1 XRP",
-
   "ui_2025_xcannes_llc_all_droits_175b1d1aaf": "© 2025 XCANNES LLC. Wszelkie prawa zastrzeżone.",
-
   "ui_24h_high_ed16d75f72": "Maks. 24h",
   "ui_24h_low_ebbb84750e": "Min. 24h",
   "ui_24h_volume_21cd876868": "Wolumen 24h",
-
   "ui_2_open_app_and_create_wallet_09babc8e9b": "2. Otwórz aplikację i utwórz portfel.",
   "ui_3_come_back_and_connect_09ed783355": "3. Wróć tutaj i zaloguj się przez kod QR.",
-
   "ui_a_0_60_462cd3b75c": "A = 0,60 %",
   "ui_a_b_c_04f974d21b": "A / B / C",
-
   "ui_account_holder_1bfc3cd21c": "Posiadacz konta",
   "ui_account_holder_3eef963295": "Posiadacz konta",
-
   "ui_action_96db311a48": "Akcja",
-
   "ui_activate_7f2974ed87": "Aktywuj",
   "ui_activate_currency_line_32843c5eeb": "Aktywuj linię waluty",
-
   "ui_activate_une_ligne_implique_u_b625857cd9": "Aktywacja linii oznacza zablokowanie",
   "ui_activation_wallet_1dcd314549": "Aktywacja portfela",
   "ui_activation_wallet_7d13181510": "Aktywacja portfela:",
   "ui_activation_wallet_xcannes_92757c7cdd": "Aktywacja portfela XCANNES",
-
   "ui_add_90615be412": "DODAJ",
-  "ui_add_set_currency_line_777a38797b": "Dodaj / ustaw linię waluty",
-
-  "ui_address_2ef763fa89": "Adres",
-
   "ui_add_or_remove_your_lines_f40801cee4": "Dodaj lub usuń wewnętrzne linie śledzenia XCS.",
-
+  "ui_add_set_currency_line_777a38797b": "Dodaj / ustaw linię waluty",
+  "ui_address_2ef763fa89": "Adres",
   "ui_adjust_zoom_automatically_31f714860e": "Automatycznie dopasuj powiększenie",
-
   "ui_all_0c90d41d71": "Wszystkie (",
   "ui_all_32cb8ed597": "Wszystkie",
   "ui_all_currencies_6155623249": "Wszystkie waluty",
-
   "ui_allocated_9efb034adc": "Przydzielone",
   "ui_allocated_rlusd_4946b7a160": "Przydzielone (RLUSD)",
-
   "ui_always_double_check_the_pair_5e85260d05": "• Zawsze sprawdzaj kierunek pary (BAZA / KWOTOWANA) przed wysłaniem lub konwersją.",
-
   "ui_amount_1843418f56": "Kwota",
   "ui_amount_52a20b2992": "Kwota",
   "ui_amount_52cea2dd3d": "Kwota",
   "ui_amount_7668986206": "Kwota",
   "ui_amount_a2d3548923": "Kwota",
-
+  "ui_amounts_in_currency_indicative_73d7ff4e8d": "Kwoty w walucie (EUR, USD, …) są wartościami orientacyjnymi opartymi na kursach rynkowych; wartość referencyjna pozostaje",
+  "ui_and_5aee655a93": ") oraz",
+  "ui_and_620aeaa4b1": "i",
   "ui_app_store_bbc2185535": "App Store",
-
   "ui_appliqu_uniquement_quand_il__d0c9824222": "stosowane wyłącznie przy konwersji FX (np.:",
-
   "ui_archives_743254edfe": "Archiwa:",
-
   "ui_asset_e3ae76ddf7": "Aktyw",
   "ui_asset_e5170a7a06": "Aktyw",
-
   "ui_assistant_ia_48e9d9815a": "Asystent AI",
   "ui_assistant_ia_f1719273f5": "Asystent AI",
   "ui_assistant_xcannes_9d301c0d6a": "Asystent XCANNES",
-
   "ui_au_recipient_67dcc85cec": "do odbiorcy",
-
   "ui_auto_scale_27fa19a5df": "Skala automatyczna",
-
   "ui_available_currencies_267b159a9a": "Dostępne waluty",
-
   "ui_b_1_00_d712ad6d37": "B = 1,00 %",
-
   "ui_back_l_home_2ed294cda3": "Powrót na stronę główną",
-
   "ui_balance_0ad2d5b8eb": "Saldo",
   "ui_balance_340cdcff7a": "Saldo:",
   "ui_balance_445d830d72": "Saldo",
-
   "ui_bandes_de_volatilit_a531496ff2": "Pasma zmienności",
-
   "ui_base_6d4184e1ef": "Baza",
-
   "ui_bb_5c468c1bf0": "BB",
-
   "ui_bloqu_cac6cc1f3b": "Zablokowane.",
-
   "ui_bollinger_bands_6ea612aa19": "Wstęgi Bollingera",
-
   "ui_buy_crypto_f72f8661b9": "Kup kryptowaluty",
   "ui_buy_crypto_with_fiat_f09c7b4228": "Kup kryptowaluty za fiat",
-
   "ui_buy_sell_ec2ec12982": "Kup / Sprzedaj",
   "ui_buy_sell_fce5963198": "Kup / Sprzedaj",
-
   "ui_c_1_80_0cb90046ff": "C = 1,80 %",
-
+  "ui_can_afford_to_lose_c39a6a53d3": "które możesz sobie pozwolić stracić",
   "ui_cancel_d2d2058892": "Anuluj",
   "ui_cancel_fbca985028": "Anuluj",
-
-  "ui_cannes_a168ee5056": "CANNES"
-}
-{
-  "ui_this_is_not_d2b7c91b54": "• To nie jest",
+  "ui_cannes_a168ee5056": "CANNES",
   "ui_change_wallet_0a2d485467": "Zmień portfel",
   "ui_change_wallet_3a2195cf75": "Zmień portfel",
-
+  "ui_chart_configuration_2087a61aa4": "Konfiguracja wykresu",
   "ui_choose_currencies_to_activate_41eea71853": "Wybierz waluty, które chcesz aktywować. Linia może istnieć z",
   "ui_chrome_safari_ccea2d8ed8": "Chrome / Safari:",
-
   "ui_clear_0c0415464e": "Wyczyść",
   "ui_clear_favorites_c448f101b4": "Wyczyść ulubione",
-
   "ui_close_08378568ba": "Zamknij",
   "ui_close_1726ddb05f": "Zamknij",
   "ui_close_492abf031d": "Zamknij",
   "ui_close_9061dbe683": "Zamknij",
-  "ui_close_ed73c869c7": "Zamknij",
   "ui_close_chat_d6b0b8eaa8": "Zamknij czat",
-
+  "ui_close_ed73c869c7": "Zamknij",
   "ui_company_information_54e39aebe6": "🏛️ Informacje o firmie",
-
   "ui_compatible_with_xrpl_payment_be47f01f33": "Kompatybilne z żądaniami płatności XRPL, kodami QR Xaman (XUMM) oraz standardowymi adresami kryptowalut.",
-
   "ui_complete_legal_information_c_b4f3ab45b2": "Pełne informacje prawne, dane rejestracyjne firmy oraz warunki użytkowania.",
-
-  "ui_chart_configuration_2087a61aa4": "Konfiguracja wykresu",
-
   "ui_connect_your_wallet_to_activ_ec68e6f427": "Połącz portfel, aby aktywować linie walut.",
   "ui_connect_your_wallet_xrpl_73361356ca": "Połącz portfel XRPL",
-
   "ui_consult_professional_97c28cbb94": "- skonsultuj się z profesjonalistą.",
-
   "ui_contact_et_support_5cff667ee2": "Kontakt i wsparcie",
+  "ui_contact_us_1ad93ce64f": "Skontaktuj się z nami",
   "ui_contact_xcannes_0ab0a4c3d1": "Kontakt - XCANNES",
-
   "ui_conversion_interne_des_alloc_1470ceb745": "Wewnętrzna konwersja alokacji RLUSD (pula RLUSD ↔ waluty).",
-
   "ui_conversions_b604b5ef8b": "Konwersje (",
   "ui_convert_8408e969ec": "Konwertuj",
   "ui_convert_assets_cfc8bae6b0": "Konwertuj aktywa",
-
   "ui_convert_between_lines_alloca_8439f5b49f": "Konwersja między liniami (tylko alokacja – MVP, bez FX on-chain).",
-
   "ui_convert_e0fbc97f15": "Konwertuj",
-
   "ui_convert_interne_1_signature__c7b5a8e4dd": "Konwersja wewnętrzna: 1 podpis Xumm (opłata spreadu); płatność między 2 portfelami: 2 podpisy (spread, potem płatność).",
-
   "ui_copy_address_779691d570": "Kopiuj adres",
   "ui_copy_address_82d1cf6e94": "Kopiuj adres",
-  "ui_copy_xrpl_address_4f63ed10fc": "Kopiuj adres XRPL",
   "ui_copy_request_32a3f4409b": "Kopiuj żądanie",
-
+  "ui_copy_xrpl_address_4f63ed10fc": "Kopiuj adres XRPL",
   "ui_core_features_fe8d86dd76": "Główne funkcje",
-
   "ui_counterparty_cf147b1ba8": "Kontrahent",
-
-  "ui_creating_currency_line_48e7a5e551": "Tworzenie linii waluty:",
   "ui_create_currency_lines_eur_gb_3cb882c93c": "Utwórz linie walut (EUR / GBP / …), aby wewnętrznie alokować RLUSD.",
-
   "ui_create_or_import_your_xrpl_w_beefeca97d": "Utwórz lub zaimportuj portfel XRPL",
-
+  "ui_creating_currency_line_48e7a5e551": "Tworzenie linii waluty:",
   "ui_credits_b8166276a0": "Uznania (",
-
   "ui_crosshair_5734deb624": "Celownik",
-
   "ui_crypto_fiat_7ec0396100": "Krypto → Fiat",
-
+  "ui_cryptocurrencies_are_assets_1bc9fd3df6": "• Kryptowaluty są aktywami",
   "ui_currencies_5e5bf1a8a1": "Waluty",
   "ui_currencies_add_d324e3ae6f": "Waluty (DODAJ)",
-
   "ui_currency_1ed55673be": "Waluta",
-
   "ui_currency_lines_267fc2eff3": "Linie walut",
   "ui_currency_lines_allocations_r_d87a98865f": "Linie walut (alokacje RLUSD)",
-
+  "ui_currency_lines_represent_rlusd_155e16f839": "Linie walutowe reprezentują wewnętrzną dystrybucję RLUSD.",
   "ui_currently_locked_6e8b9f74e1": "Aktualnie zablokowane:",
-
-  "ui_disable_tooltips_778babce4d": "Wyłącz podpowiedzi",
-
-  "ui_disconnect_2c9c62cc27": "Rozłącz",
-
-  "ui_describe_trading_question_cc5c9669ff": "Opisz swoje pytanie dotyczące tradingu (para XRPL, Pyth, EOD, księga zleceń...), a pomogę Ci zrozumieć to, co widzisz na ekranie.",
-
   "ui_date_bb69dc2fa3": "Data",
-
   "ui_debits_38c870b18f": "Obciążenia (",
-
   "ui_delaware_llc_7ccc90dd1a": "🏛️ Spółka LLC z Delaware",
-
   "ui_delete_trustline_298bb3739d": "Usuń trustline",
-
   "ui_demo_mode_activations_are_si_2dad62366e": "Tryb demo: aktywacje są symulowane (brak transakcji on-chain).",
-
+  "ui_describe_trading_question_cc5c9669ff": "Opisz swoje pytanie dotyczące tradingu (para XRPL, Pyth, EOD, księga zleceń...), a pomogę Ci zrozumieć to, co widzisz na ekranie.",
   "ui_description_d37d7cf577": "Opis",
-
   "ui_destination_xrpl_address_9c2b94554c": "Adres docelowy (XRPL)",
-
   "ui_details_e9615e470d": "Szczegóły",
-
+  "ui_disable_tooltips_778babce4d": "Wyłącz podpowiedzi",
+  "ui_disconnect_2c9c62cc27": "Rozłącz",
   "ui_displaying_transactions_olde_e408b4a17d": "Wyświetlane są transakcje starsze niż 12 miesięcy.",
-
-  "ui_doc_id_654e3bbaa5": "ID dokumentu:"
-}
-{
+  "ui_doc_id_654e3bbaa5": "ID dokumentu:",
   "ui_don_t_have_xumm_2d15c229cb": "Nie masz XUMM?",
   "ui_download_xumm_from_app_store_37f4713089": "Pobierz XUMM z App Store lub Google Play",
-
-  "ui_lock_returns_to_wallet_1c3e249e22": "blokada wraca do portfela (",
-
   "ui_e_g_exchange_friend_11008b5e9e": "np.: giełda, znajomy, …",
-
   "ui_ein_tax_id_b75781b844": "EIN (numer identyfikacji podatkowej)",
-
   "ui_ema_0e6795183e": "EMA",
   "ui_ema_200_d9c5c416e5": "EMA 200",
   "ui_ema_20_258a56d889": "EMA 20",
   "ui_ema_50_87d20ea71c": "EMA 50",
-
   "ui_email_b5eb68bc3b": "E-mail:",
-
-  "ui_meanwhile_check_orderbook_be84ec6208": "W międzyczasie sprawdź księgę zleceń poniżej, aby zobaczyć ceny w czasie rzeczywistym",
-
-  "ui_save_2d42b7df0f": "Zapisz",
-  "ui_save_404be3f4a5": "Zapisz",
-  "ui_save_9c004489ad": "Zapisz",
-
   "ui_est_requise_38539df503": "jest wymagane.",
-
-  "ui_paid_to_management_wallet_c7338e7db3": "jest przekazywane do portfela zarządzającego XCANNES.",
-
-  "ui_and_5aee655a93": ") oraz",
-  "ui_and_620aeaa4b1": "i",
-
-  "ui_sent_onchain_to_company_wallet_d9e8e01d57": "i wysyłane on-chain do portfela firmowego XCANNES.",
-
   "ui_eur_gbp_1865864628": "EUR ↔ GBP",
-
   "ui_ex_1f3a886dcf": "(np.:",
-
   "ui_expired_d6b299ad78": "Wygasło",
   "ui_expires_in_969e0da47a": "Wygasa za",
-
   "ui_exponential_moving_average_70156ca8b0": "Wykładnicza średnia krocząca",
-
   "ui_export_pdf_9c8d16b4fe": "📄 Eksportuj PDF",
-
   "ui_favorites_1cc397670e": "Ulubione",
-
   "ui_fees_580613eea6": "Opłaty",
   "ui_fees_overview_dad941c3c7": "Przegląd opłat",
-
+  "ui_festival_de_cannes_6bfe021fac": "Festiwal Filmowy w Cannes",
   "ui_fiat_crypto_21ae637b23": "Fiat → Krypto",
-
   "ui_fiat_gateway_2b14cbec79": "Bramka fiat",
-
   "ui_file_number_643dcf200a": "Numer sprawy",
-
+  "ui_firefox_c359393414": "Firefox",
   "ui_for_activate_your_wallet_su_75416099a8": "Aby aktywować portfel w sieci XRPL, wymagana jest minimalna rezerwa",
-
   "ui_for_large_amounts_consider_s_9c360945af": "• Przy dużych kwotach rozważ podział operacji i monitorowanie spreadów.",
-
-  "ui_to_fully_use_wallet_5439f003e6": "Aby w pełni korzystać z portfela, zainstaluj trustline XRPL dla",
-
-  "ui_manage_xcs_lock_0d49af4c57": "Zarządzaj blokadą XCS dla tej waluty. Ta operacja nie zmienia bezpośrednio salda on-chain, a jedynie śledzenie wewnętrzne.",
-
   "ui_generate_request_58584f23a2": "Generuj żądanie",
-
   "ui_generated_on_3827d9035f": "Wygenerowano",
   "ui_generated_on_ae324c9048": "Wygenerowano",
-
   "ui_global_statement_13e29aa8aa": "Wyciąg globalny",
-
   "ui_global_usd_wallet_202f7e48be": "Globalny portfel USD",
-
   "ui_google_play_3c43341c63": "Google Play",
-
-  "ui_highly_volatile_speculative_52608daf33": "wysoce zmienny i spekulacyjny"
-}
-{
+  "ui_grid_46093641b8": "Siatka",
+  "ui_hello_xcannes_assistant_e7c9e94d03": "Witaj, Asystent XCANNES",
+  "ui_hide_tooltips_987307ecea": "Ukryj podpowiedzi",
+  "ui_highly_volatile_speculative_52608daf33": "wysoce zmienny i spekulacyjny",
   "ui_hold_assets_on_chain_xrp_rlu_6e9344f999": "Przechowuj aktywa on-chain (XRP / RLUSD / XCS).",
-
   "ui_how_this_pair_works_386b06bbdc": "Jak działa ta para",
-
   "ui_how_to_enable_camera_c08cd802b3": "Jak włączyć aparat:",
-
   "ui_important_af28edf1c1": "Ważne",
-
   "ui_in_the_wallet_list_you_will__7a5642d046": "Na liście portfeli zobaczysz dwa typy „linii”:",
-
   "ui_inclut_les_lignes_actives_m__0e52afcff8": "Zawiera aktywne linie nawet jeśli alokacja = 0 RLUSD.",
-
   "ui_incorporation_date_2f96f98865": "Data rejestracji spółki",
-
   "ui_info_fees_e39e77e039": "Informacje i opłaty",
-
   "ui_install_trustline_rlusd_35e926ab5c": "Zainstaluj trustline RLUSD",
   "ui_install_trustline_xcs_5a6044d70e": "Zainstaluj trustline XCS",
-
   "ui_interval_f42aefd35a": "Interwał:",
-
   "ui_is_a_legally_registered_enti_98ec38f8f4": "jest podmiotem prawnie zarejestrowanym w stanie Delaware (USA) i działa zgodnie z obowiązującymi przepisami.",
-
   "ui_l_allocation_totale_ne_doit__dcf11e3d6c": "Całkowita alokacja nigdy nie może przekroczyć RLUSD on-chain.",
-
   "ui_l_api_data_xrplf_org_ne_r_po_2427381aa5": "API data.xrplf.org nie odpowiada już poprawnie. Księga zleceń w czasie rzeczywistym nadal działa przez wss://xrplcluster.com",
-
   "ui_label_optional_3b6a3c454c": "Etykieta (opcjonalnie)",
-
   "ui_learn_more_about_this_pair_db681646e0": "Dowiedz się więcej o tej parze",
-
   "ui_legal_compliance_transparenc_63cca5a815": "Zgodność prawna i przejrzystość",
-
   "ui_legal_conditions_and_risk_wa_1a3ed6a1e9": "Warunki prawne i ostrzeżenia o ryzyku",
-
   "ui_legal_documentation_781292209b": "Dokumentacja prawna",
-
   "ui_legal_entity_details_and_reg_b780519ab3": "Dane podmiotu prawnego i rejestracja",
-
   "ui_legal_information_compliance_eb7289cbc6": "Informacje prawne i zgodność",
-
-  "ui_legal_information_disclaimer_1ceae5d05b": "Informacje prawne i zastrzeżenie odpowiedzialności - XCANNES LLC (XCS)"
-}
-{
-  "ui_cryptocurrencies_are_assets_1bc9fd3df6": "• Kryptowaluty są aktywami",
-  "ui_currency_lines_represent_rlusd_155e16f839": "Linie walutowe reprezentują wewnętrzną dystrybucję RLUSD.",
-  "ui_amounts_in_currency_indicative_73d7ff4e8d": "Kwoty w walucie (EUR, USD, …) są wartościami orientacyjnymi opartymi na kursach rynkowych; wartość referencyjna pozostaje",
-  "ui_xcannes_currency_lines_1f3927f668": "Linie walutowe XCANNES (",
-
+  "ui_legal_information_disclaimer_1ceae5d05b": "Informacje prawne i zastrzeżenie odpowiedzialności - XCANNES LLC (XCS)",
+  "ui_limited_liability_company_ee1db9fb1f": "Spółka z ograniczoną odpowiedzialnością",
+  "ui_line_deletion_xcs_released_df25674a3d": "Usunięcie linii: XCS zwolnione",
   "ui_link_c2c8a504d7": "🔗 Link",
-
   "ui_liquidity_can_vary_significa_5d7871e2a0": "• Płynność może znacznie różnić się w zależności od pary i sesji.",
-
   "ui_live_a633f195c7": "Na żywo",
-
   "ui_loading_1386baebe9": "Ładowanie…",
   "ui_loading_948e39804b": "Ładowanie…",
   "ui_loading_chart_0accd0c4e9": "Ładowanie wykresu...",
@@ -797,36 +609,25 @@
   "ui_loading_currencies_9af59a0977": "Ładowanie walut...",
   "ui_loading_news_1acd983fe2": "Ładowanie wiadomości...",
   "ui_loading_trustlines_b02f5c6b6c": "Ładowanie trustline…",
-
   "ui_local_currency_lines_2b186f452e": "lokalne linie walutowe",
-
+  "ui_lock_returns_to_wallet_1c3e249e22": "blokada wraca do portfela (",
   "ui_locked_xcs_157387001c": "Zablokowane XCS",
   "ui_locked_xcs_68d65407f8": "Zablokowane XCS",
-
   "ui_locking_xcs_via_escrow__2d99312708": "Blokowanie XCS poprzez escrow. Przy zamknięciu: 0,10 XCS zwracane, 0,10 XCS przekazywane do XCANNES.",
-
+  "ui_logout_wallet_558f860cac": "Wyloguj z portfela",
+  "ui_lose_all_investment_7d2205a73e": "utracić całość inwestycji",
   "ui_low_liquidity_spreads_may_be_4fa281270f": "Niska płynność – spready mogą być szerokie.",
-
   "ui_macd_04d227f185": "MACD",
-
+  "ui_manage_xcs_lock_0d49af4c57": "Zarządzaj blokadą XCS dla tej waluty. Ta operacja nie zmienia bezpośrednio salda on-chain, a jedynie śledzenie wewnętrzne.",
   "ui_manual_send_d5de1bf948": "Wysyłka ręczna",
-
   "ui_max_4a27fb9fbf": "Maks",
-
+  "ui_meanwhile_check_orderbook_be84ec6208": "W międzyczasie sprawdź księgę zleceń poniżej, aby zobaczyć ceny w czasie rzeczywistym",
   "ui_memo_optional_d9594474c7": "Memo (opcjonalnie)",
-
   "ui_minimum_amounts_small_trades_55a4ae323a": "• Minimalne kwoty: małe transakcje mogą być zaokrąglane lub agregowane, aby ograniczyć wpływ opłat.",
-
   "ui_mode_6f09dd56a0": "Tryb",
-
   "ui_moving_average_convergence_d_c7d386ca76": "Zbieżność/Rozbieżność Średnich Kroczących",
-
-  "ui_only_invest_c88600673f": "• Inwestuj tylko",
-
   "ui_network_fees_paid_on_the_und_0a0cfaaa02": "• Opłaty sieciowe: pobierane w sieci bazowej (XRPL lub zewnętrznej) przy przemieszczaniu aktywów.",
-
   "ui_news_aggregated_from_local_m_95cf04e755": "Wiadomości agregowane z lokalnych źródeł.",
-
   "ui_no_currencies_found_b70888825e": "Nie znaleziono walut.",
   "ui_no_currency_lines_yet_9630af229d": "Brak linii walutowych.",
   "ui_no_news_available_4b27c89c76": "Brak dostępnych wiadomości",
@@ -834,39 +635,23 @@
   "ui_no_transactions_found_af217af8de": "Nie znaleziono transakcji",
   "ui_no_wallet_lines_yet_use_the__394682b12c": "Brak linii w portfelu. Użyj formularza powyżej, aby dodać nową.",
   "ui_no_xrpl_payments_found_ea91b30191": "Nie znaleziono płatności XRPL",
-
-  "ui_wallet_name_b4c2f054b9": "Nazwa portfela",
-
+  "ui_not_financial_advice_49221f7a7e": "nie stanowi porady finansowej",
   "ui_note_locking_via_escrow_31ee4c3f81": "Uwaga: blokada jest zarządzana przez mechanizm escrow. Gdy linia zostanie zamknięta,",
-
   "ui_notification_5765a22267": "🔔 Powiadomienie",
-
-  "ui_contact_us_1ad93ce64f": "Skontaktuj się z nami",
-
   "ui_off_chain_allocations_for_lo_07b1acc670": "(alokacje off-chain). Dla lokalnych linii walutowych niewielka",
-
   "ui_official_email_53074980fe": "Oficjalny e-mail",
-
   "ui_on_chain_and_0836c903ca": "(on-chain) oraz",
   "ui_on_chain_da60620342": "On-chain",
-
+  "ui_only_invest_c88600673f": "• Inwestuj tylko",
   "ui_open_in_xumm_app_7606fbe837": "Otwórz w aplikacji XUMM",
-
   "ui_or_upload_a_qr_image_works_e_df6baa8039": "Lub prześlij obraz QR (działa nawet przez HTTP):",
-
   "ui_orderbook_maintenance_fa1de2fea3": "Konserwacja księgi zleceń",
-
   "ui_our_registration_details_are_2447160d5e": "🔒 Nasze dane rejestracyjne są publicznie weryfikowalne na stronie Division of Corporations stanu Delaware.",
-
+  "ui_paid_to_management_wallet_c7338e7db3": "jest przekazywane do portfela zarządzającego XCANNES.",
   "ui_parameters_da2b8022f7": "Parametry",
-
-  "ui_not_financial_advice_49221f7a7e": "nie stanowi porady finansowej"
-}
-{
   "ui_pay_a_payment_request_0a5c61fa4c": "Zapłać żądanie płatności",
   "ui_payment_for_82ec86ac25": "Płatność za...",
   "ui_payment_fx_base_usd_r_gleme_4818b8a6c3": "Płatność FX (baza USD · rozliczenie XRPL przez RLUSD)",
-  "ui_lose_all_investment_7d2205a73e": "utracić całość inwestycji",
   "ui_powered_by_moonpay_instant_b_9e94ccf50e": "Obsługiwane przez MoonPay • Natychmiastowy przelew bankowy",
   "ui_powered_by_moonpay_secure_ch_0bcfb2aeb5": "Obsługiwane przez MoonPay • Bezpieczny checkout",
   "ui_preparing_67f5f84ff4": "Przygotowywanie...",
@@ -874,11 +659,8 @@
   "ui_print_1313eff37c": "🖨️ Drukuj",
   "ui_print_eb5de3a228": "🖨️ Drukuj",
   "ui_qr_code_7614ee32a0": "📱 Kod QR",
-  "ui_can_afford_to_lose_c39a6a53d3": "które możesz sobie pozwolić stracić",
   "ui_quick_add_e62e925d4f": "Szybkie dodanie",
   "ui_quote_e3761255be": "Kurs",
-  "ui_reset_77f2efd6da": "Resetuj",
-  "ui_reserve_blocked_529137c552": "(rezerwa zablokowana).",
   "ui_receive_127eab0703": "Odbierz",
   "ui_receive_61ed481e18": "Odbierz",
   "ui_receive_b7d6ae4037": "Odbierz",
@@ -893,7 +675,10 @@
   "ui_rename_wallet_8fecb8eee2": "Zmień nazwę portfela",
   "ui_request_payment_c62b99fb16": "Poproś o płatność",
   "ui_reserve_2d584ec9c7": "Rezerwa",
+  "ui_reserve_blocked_529137c552": "(rezerwa zablokowana).",
   "ui_reserve_breakdown_de2c3de53e": "Struktura rezerwy",
+  "ui_reset_77f2efd6da": "Resetuj",
+  "ui_risk_warning_a07ec4c290": "Ostrzeżenie o ryzyku",
   "ui_risks_tips_01c3443955": "Ryzyka i wskazówki",
   "ui_rlusd_03b00d11bf": "RLUSD",
   "ui_rlusd_5933874327": "RLUSD",
@@ -902,7 +687,12 @@
   "ui_rlusd_f36819f8e2": "RLUSD",
   "ui_rlusd_ff5048a674": "RLUSD",
   "ui_rsi_aee5216e2c": "RSI",
+  "ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a": "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_ae36b8d4d2": "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "ui_save_2d42b7df0f": "Zapisz",
+  "ui_save_404be3f4a5": "Zapisz",
   "ui_save_47661c12f6": "Zapisz",
+  "ui_save_9c004489ad": "Zapisz",
   "ui_save_line_dd4ea383b8": "Zapisz linię",
   "ui_save_this_address_7ef65aa11c": "Zapisać ten adres?",
   "ui_scan_a_qr_code_to_pay_a_merc_a5eaca7464": "Zeskanuj kod QR, aby natychmiast zapłacić sprzedawcy, znajomemu lub za usługę. Dane płatności zostaną wypełnione automatycznie.",
@@ -912,11 +702,132 @@
   "ui_scan_request_44801f50d1": "Skanuj żądanie",
   "ui_scan_this_qr_code_to_f780225746": "Zeskanuj ten kod QR, aby",
   "ui_scan_this_qr_code_with_xumm__a467eb8cd5": "Zeskanuj ten kod QR aplikacją XUMM",
-  "ui_logout_wallet_558f860cac": "Wyloguj z portfela",
-
+  "ui_search_code_or_name_1ed4e95837": "Szukaj kodu lub nazwy",
+  "ui_search_currency_045b7c357f": "Szukaj waluty",
+  "ui_see_statement_9771dff7ec": "Zobacz wyciąg",
+  "ui_select_a_currency_to_activat_776d6af637": "Wybierz walutę, aby aktywować linię",
+  "ui_select_currency_4a478fe10a": "Wybierz walutę",
+  "ui_select_currency_68f9a8a5be": "Wybierz walutę",
+  "ui_select_saved_address_60c28f89c1": "Wybierz zapisany adres",
+  "ui_sell_crypto_c12d62c0d6": "Sprzedaj krypto",
+  "ui_sell_crypto_for_fiat_1167ce7e08": "Sprzedaj krypto za fiat",
+  "ui_send_504b64a87b": "Wyślij",
+  "ui_send_71ed97cd73": "Wyślij",
+  "ui_send_bee4f9e2f5": "Wyślij",
+  "ui_send_request_via_19ac1c6506": "Wyślij żądanie przez",
+  "ui_sent_onchain_to_company_wallet_d9e8e01d57": "i wysyłane on-chain do portfela firmowego XCANNES.",
+  "ui_service_de_donn_es_indisponi_42cacb1f89": "Usługa danych niedostępna",
+  "ui_service_fees_may_apply_on_co_875857711c": "Opłaty serwisowe mogą obowiązywać przy konwersji",
+  "ui_show_ou_hide_les_ema_b754ebc2c8": "Pokaż/ukryj EMA",
+  "ui_show_ou_hide_les_sma_218ea8603f": "Pokaż/ukryj SMA",
+  "ui_simple_moving_average_c9d1d5de2b": "Prosta średnia krocząca",
+  "ui_site_officiel_e58deb83b5": "Oficjalna strona",
+  "ui_skip_95d6fefee9": "Pomiń",
+  "ui_sma_200_a2a85ad033": "SMA 200",
+  "ui_sma_20_71b3b70782": "SMA 20",
+  "ui_sma_50_feb2611636": "SMA 50",
+  "ui_sma_b12342ef30": "SMA",
+  "ui_sort_by_balance_17aed9021c": "Sortuj według salda",
+  "ui_sort_by_name_2590e44f12": "Sortuj według nazwy",
+  "ui_source_507c065942": "Źródło",
+  "ui_source_de_rate_paires_live_v_6b7123ea24": "Źródło kursów par na żywo przez XRPL",
+  "ui_spread_8f9f9fc2e9": "Spread",
+  "ui_spread_fx_tiers_88afacafd8": "Spread FX (poziomy)",
+  "ui_spread_xcannes_tier_7ad17576d3": "Spread XCANNES (poziom)",
+  "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32": "Stablecoin USD - Regulowany - Szczegóły",
+  "ui_state_of_incorporation_ca40f96cb4": "Stan rejestracji",
+  "ui_statement_a87c93acb8": "Wyciąg",
+  "ui_statement_period_4674b18f25": "Okres wyciągu",
+  "ui_statement_period_6dedec11d9": "Okres wyciągu",
+  "ui_statements_show_a_unified_vi_6ef7ea3ce7": "Wyciągi pokazują zunifikowany widok wszystkich Twoich transakcji",
+  "ui_success_aeeca91403": "Sukces",
+  "ui_support_xcannes_com_3964c9095f": "support@xcannes.com",
+  "ui_tab_to_add_activate_new_line_1965097add": "Zakładka do dodania/aktywacji nowej linii",
+  "ui_tap_the_icon_permissions_cam_3c2f8b49ec": "Dotknij ikony uprawnień aparatu",
+  "ui_tap_the_or_icon_in_address_b_a73a7d8dd4": "Dotknij ikony lub w pasku adresu",
+  "ui_terms_of_use_disclaimer_399eab8038": "Warunki użytkowania i zastrzeżenia",
+  "ui_the_orderbook_for_this_pair__b0082e870e": "Księga zleceń dla tej pary jest aktualizowana na żywo",
+  "ui_the_request_has_expired_plea_1059f904c6": "Żądanie wygasło. Wygeneruj nowe.",
+  "ui_then_close_and_reopen_this_s_8c994bb219": "Następnie zamknij i otwórz tę stronę ponownie",
+  "ui_this_is_not_d2b7c91b54": "• To nie jest",
+  "ui_time_afd513de61": "Czas",
+  "ui_tip_use_the_b06aa04f1f": "Wskazówka: Użyj",
+  "ui_to_fully_use_wallet_5439f003e6": "Aby w pełni korzystać z portfela, zainstaluj trustline XRPL dla",
+  "ui_toggle_menu_9e88e70e51": "Przełącz menu",
+  "ui_total_assets_918e935125": "Suma aktywów",
+  "ui_total_bid_ask_autour_du_mid__fb93bb89c0": "Całkowita oferta/zapytanie wokół mid",
+  "ui_total_locked_xcs_9519342799": "Całkowite zablokowane XCS",
+  "ui_tout_f1aa36c8e3": "Wszystko",
+  "ui_trustline_5274231985": "Trustline",
+  "ui_trustline_no_activ_e_ed72075f65": "Trustline nieaktywny",
+  "ui_trustline_rlusd_9c077313dc": "Trustline RLUSD",
+  "ui_trustline_xcs_91682deeea": "Trustline XCS",
+  "ui_trustlines_59e1e35db4": "Trustlines",
+  "ui_trustlines_required_d39ef28613": "Wymagane Trustlines",
+  "ui_twitter_1014f5d22d": "Twitter",
+  "ui_tx_a0c330d97d": "Tx",
+  "ui_type_c5068d5570": "Typ",
+  "ui_unallocated_00e808616c": "Nieprzydzielone",
+  "ui_updated_13_november_2025_460e9c58bf": "Zaktualizowano 13 listopada 2025",
+  "ui_usa_b577bec637": "USA",
+  "ui_usd_506842b2ba": "USD",
+  "ui_usd_fb11d8df09": "USD",
+  "ui_usd_value_6925fe3f7e": "Wartość USD",
+  "ui_validate_create_line_9cd7c14952": "Zatwierdź i utwórz linię",
+  "ui_value_represents_the_underly_94a3198fdf": "Wartość reprezentuje bazowe aktywa XRPL",
+  "ui_verified_on_xrp_ledger_334f28ce50": "Zweryfikowano w XRP Ledger",
+  "ui_verify_on_delaware_registry_899aca1343": "Sprawdź w rejestrze Delaware",
+  "ui_version_3_0_a329baad3e": "Wersja 3.0",
+  "ui_via_escrow_340f6d0b2b": "przez Escrow",
+  "ui_view_official_ein_document_i_10bf03b40c": "Zobacz oficjalny dokument EIN w IRS",
+  "ui_volume_36828512d7": "Wolumen",
+  "ui_volume_histogram_3ba39baf94": "Histogram wolumenu",
+  "ui_volume_weighted_average_pric_efd0f4bb24": "Średnia cena ważona wolumenem",
+  "ui_vwap_d0acb01a82": "VWAP",
+  "ui_wall_street_journal_3d3879b3d4": "Wall Street Journal",
+  "ui_wallet_connect_2e772de308": "Połącz portfel",
+  "ui_wallet_info_fees_190ccbf57d": "Informacje o portfelu i opłaty",
+  "ui_wallet_name_b4c2f054b9": "Nazwa portfela",
+  "ui_wallet_no_custodial_on_xrp_4e8c91bea3": "Portfel bez depozytariusza na XRP Ledger",
+  "ui_we_are_committed_to_transpar_d292ba8bf6": "Jesteśmy zobowiązani do przejrzystości i zgodności",
+  "ui_website_f0096ff250": "Strona internetowa",
+  "ui_would_you_like_to_save_this__117bb9f717": "Czy chcesz zapisać ten adres?",
+  "ui_write_message_5f2f86490f": "Napisz wiadomość",
+  "ui_wsj_bd2a3597f5": "WSJ",
+  "ui_www_xcannes_com_bd6ba86eea": "www.xcannes.com",
+  "ui_xcannes_30015bef4b": "XCANNES",
+  "ui_xcannes_3cdc66a392": "XCANNES",
+  "ui_xcannes_4358ba4add": "XCANNES",
+  "ui_xcannes_43b38baa2c": "XCANNES",
+  "ui_xcannes_cf26c62438": "XCANNES",
+  "ui_xcannes_com_b16eef4f0a": "xcannes.com",
+  "ui_xcannes_currency_lines_1f3927f668": "Linie walutowe XCANNES (",
+  "ui_xcannes_demo_payreq_fd58f93304": "Żądanie płatności demo XCANNES",
+  "ui_xcannes_llc_d15ac6c561": "XCANNES LLC",
+  "ui_xcannes_multi_currency_walle_51c5a96da0": "XCANNES - Wielowalutowy portfel XRPL",
+  "ui_xcannes_ne_pr_l_ve_pas_de_fe_b3ee902ca3": "XCANNES nie pobiera opłat od transakcji",
+  "ui_xcannes_utilise_un_locked_3de1d1a1e5": "XCANNES wykorzystuje system Locked XCS",
+  "ui_xcannes_wallet_how_it_works_0397d0e570": "XCANNES Wallet - Jak to działa",
+  "ui_xcannesdao_gmail_com_19cab31510": "xcannesdao@gmail.com",
+  "ui_xcannesdao_gmail_com_d56c0bbb6b": "xcannesdao@gmail.com",
+  "ui_xcs_03b4acfd2b": "XCS",
+  "ui_xcs_3a4119a8c0": "XCS",
+  "ui_xcs_57effc1747": "XCS",
+  "ui_xcs_f295b34180": "XCS",
+  "ui_xcs_f516c57c4d": "XCS",
+  "ui_xcs_lock_activation_currency_c083456cb4": "Blokada XCS - Aktywacja linii walutowej",
+  "ui_xcs_token_xrpl_native_issuer_274ab72595": "Token XCS - natywny emitent XRPL",
+  "ui_xrp_034964b994": "XRP",
+  "ui_xrpl_assets_c7b3e7185a": "Aktywa XRPL",
+  "ui_xrpl_b8df117953": "XRPL",
+  "ui_xrpl_est_la_source_de_v_rit__bf1084eac7": "XRPL jest źródłem prawdy dla wszystkich transakcji",
+  "ui_xrpl_network_fee_on_chain_pa_975e8f666a": "Opłata sieciowa XRPL (płatność on-chain)",
+  "ui_xrpl_payments_78947fa490": "Płatności XRPL",
+  "ui_xrpl_request_af2d8335ae": "Żądanie XRPL",
+  "ui_xumm_qr_code_282d93fd60": "Kod QR XUMM",
+  "ui_you_can_c92b54f33e": "Możesz",
   "view": "Zobacz",
   "view_statement": "Zobacz wyciąg",
-
   "wallet_connect": "Połącz portfel",
   "wallet_connected": "Połączony",
   "wallet_disconnect": "Rozłącz",
@@ -930,18 +841,77 @@
   "wallet_not_connected_title": "Portfel niepołączony",
   "wallet_page_description": "Zarządzaj swoim portfelem XRPL, trustline i aktywami w XCANNES",
   "wallet_page_title": "Portfel - XCANNES",
-
   "whitepaper_button_dex": "DEX",
   "whitepaper_meta_title": "Whitepaper - XCANNES (XCS)",
-
+  "whitepaper_s1_li1": "Bezpieczeństwo i przejrzystość dzięki XRP Ledger",
+  "whitepaper_s1_li2": "Natychmiastowe rozliczenia on-chain",
+  "whitepaper_s1_li3": "Zerowe opłaty handlowe - tylko opłaty sieciowe XRPL",
+  "whitepaper_s1_p1": "XCANNES to zdecentralizowana giełda (DEX) zbudowana na XRP Ledger, oferująca błyskawiczne, przejrzyste i bezpieczne transakcje bez pośredników.",
+  "whitepaper_s1_p2": "W przeciwieństwie do scentralizowanych giełd, XCANNES zapewnia pełną kontrolę nad środkami, wykorzystując natywne funkcje XRPL do handlu wielowalutowego i rozliczeń w czasie rzeczywistym.",
+  "whitepaper_s1_title": "Wprowadzenie",
+  "whitepaper_s2_li1": "Handel wieloma walutami (XRP, RLUSD, XCS, EUR, USD...)",
+  "whitepaper_s2_li2": "Portfel bez depozytariusza z integracją XUMM",
+  "whitepaper_s2_li3": "Konwersje wewnętrzne jednym podpisem",
+  "whitepaper_s2_li4": "Księga zleceń i wykresy na żywo",
+  "whitepaper_s2_li5": "Wyciągi wielowalutowe",
+  "whitepaper_s2_li6": "Bramy fiat (Kup/Sprzedaj krypto)",
+  "whitepaper_s2_p1": "XCANNES wykorzystuje XRP Ledger jako podstawową warstwę rozliczeniową, zapewniając natychmiastowe transakcje i transparentność on-chain.",
+  "whitepaper_s2_p2": "Wszyscy użytkownicy zachowują pełną kontrolę nad swoimi prywatnymi kluczami przez XUMM - nigdy nie przechowujemy środków.",
+  "whitepaper_s2_title": "Podstawowe funkcje",
+  "whitepaper_s3_li1": "Opłata sieciowa XRPL: ~0,00001 XRP (~$0,000025) za transakcję",
+  "whitepaper_s3_li2": "Spread FX: 0,5% na konwersje fiat",
+  "whitepaper_s3_li3": "Opłata MoonPay: ~4,5% (bramy fiat)",
+  "whitepaper_s3_li4": "Zero opłat handlowych XCANNES",
+  "whitepaper_s3_p1": "XCANNES działa w modelu bez opłat dla handlu on-chain. Jedynymi kosztami są natywne opłaty sieciowe XRPL, które są mikrotransakcyjne.",
+  "whitepaper_s3_p2": "Wszystkie kursy walut i spready są wyświetlane z góry - brak ukrytych opłat.",
+  "whitepaper_s3_title": "Model ekonomiczny",
+  "whitepaper_s4_li1_label": "Token użytkowy",
+  "whitepaper_s4_li1_text": "XCS jest tokenem natywnym XCANNES używanym do aktywacji linii walutowych",
+  "whitepaper_s4_li2_label": "Mechanizm blokady",
+  "whitepaper_s4_li2_text": "Użytkownicy blokują XCS (0,10-1,00 XCS) przez Escrow, aby aktywować linie Trustline",
+  "whitepaper_s4_li3_label": "Zwolnienie przy usunięciu",
+  "whitepaper_s4_li3_text": "Zablokowane XCS są automatycznie zwalniane, gdy linia walutowa jest usuwana",
+  "whitepaper_s4_li4_label": "Emisja i dystrybucja",
+  "whitepaper_s4_li4_sub1": "Całkowita podaż: 100 000 000 XCS",
+  "whitepaper_s4_li4_sub2": "Emitent: XCANNES LLC (zweryfikowany)",
+  "whitepaper_s4_p1": "XCS (XCANNES Token) jest tokenem użytkowym XRPL używanym w ekosystemie XCANNES do aktywacji linii walutowych i zarządzania dostępem.",
+  "whitepaper_s4_title": "Token XCS",
+  "whitepaper_s5_buy_li1": "DEX on-chain (XRPL order books)",
+  "whitepaper_s5_buy_li2": "Bramy fiat (MoonPay)",
+  "whitepaper_s5_buy_li3": "Giełdy scentralizowane",
+  "whitepaper_s5_buy_title": "Gdzie kupić XCS",
+  "whitepaper_s5_p1": "XCS można kupować, sprzedawać i przechowywać bezpośrednio na XRP Ledger przez XCANNES DEX lub dowolny portfel XRPL.",
+  "whitepaper_s5_store_li1": "XUMM (zalecany)",
+  "whitepaper_s5_store_li2": "Dowolny portfel kompatybilny z XRPL",
+  "whitepaper_s5_store_title": "Gdzie przechowywać XCS",
+  "whitepaper_s5_title": "Jak nabyć i przechowywać XCS",
+  "whitepaper_s6_li1": "Platforma multi-chain (wsparcie Ethereum, Solana)",
+  "whitepaper_s6_li2": "Zaawansowane narzędzia handlowe (zlecenia warunkowe, handel botami)",
+  "whitepaper_s6_li3": "Zarządzanie społecznościowe (DAO)",
+  "whitepaper_s6_title": "Przyszły rozwój",
+  "whitepaper_s7_li1": "Nie przechowujemy Twoich kluczy - Ty zachowujesz pełną kontrolę",
+  "whitepaper_s7_li2": "Wszystkie transakcje są rozliczane on-chain i zweryfikowane przez XRPL",
+  "whitepaper_s7_li3": "Open-source i audytowalny",
+  "whitepaper_s7_p1": "XCANNES jest zarejestrowana jako XCANNES LLC w Delaware, USA (EIN dostępny publicznie).",
+  "whitepaper_s7_title": "Bezpieczeństwo i zgodność",
+  "whitepaper_s8_p1": "XCANNES redefiniuje handel kryptowalutami, łącząc moc XRP Ledger z intuicyjnym doświadczeniem użytkownika.",
+  "whitepaper_s8_p2": "Zero opłat handlowych, natychmiastowe rozliczenia i pełna kontrola nad środkami sprawiają, że XCANNES jest prawdziwie zdecentralizowaną alternatywą dla scentralizowanych giełd.",
+  "whitepaper_s8_p3": "Dołącz do nas w budowaniu przyszłości finansów.",
+  "whitepaper_s8_title": "Podsumowanie",
   "whitepaper_scroll_top": "⬆️ Powrót na górę",
   "whitepaper_subtitle": "Cyfrowa i finansowa tożsamość Cannes i jego regionu",
   "whitepaper_title": "📘 Oficjalny whitepaper - XCANNES (XCS)",
+  "whitepaper_toc_1": "Wprowadzenie",
+  "whitepaper_toc_2": "Podstawowe funkcje",
+  "whitepaper_toc_3": "Model ekonomiczny",
+  "whitepaper_toc_4": "Token XCS",
+  "whitepaper_toc_5": "Jak nabyć i przechowywać XCS",
+  "whitepaper_toc_6": "Przyszły rozwój",
+  "whitepaper_toc_7": "Bezpieczeństwo i zgodność",
+  "whitepaper_toc_8": "Podsumowanie",
   "whitepaper_toc_title": "📑 Spis treści",
   "whitepaper_version": "📅 Wersja 1.0 — 02.02.2025",
-
   "xrpl_label": "XRPL",
-
   "xumm_setup_body": "Nie masz jeszcze Xumm? Zainstaluj aplikację i utwórz portfel w kilka minut.",
   "xumm_setup_create": "Otwórz stronę Xumm",
   "xumm_setup_existing": "Mam już Xumm",
