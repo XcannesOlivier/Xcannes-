@@ -358,30 +358,30 @@ export default function Disclaimer() {
               <div className="flex items-start gap-4">
                 <span className="text-4xl">⚠️</span>
                 <div className="flex-1">
-                  <h2 className="text-xl font-orbitron font-bold text-xcannes-green mb-3">{t("ui_warning_on_les_risque_a07ec4c290", "Avertissement sur les Risques")}
+                  <h2 className="text-xl font-orbitron font-bold text-xcannes-green mb-3">{t("ui_risk_warning_a07ec4c290", "Avertissement sur les Risques")}
 
                   </h2>
                   <div className="text-white/70 space-y-2 text-sm leading-relaxed">
-                    <p>{t("ui_les_cryptocurrencies_are_des__1bc9fd3df6", "• Les cryptomonnaies sont des actifs")}
+                    <p>{t("ui_cryptocurrencies_are_assets_1bc9fd3df6", "• Les cryptomonnaies sont des actifs")}
                       {" "}
-                      <strong>{t("ui_hautement_volatils_et_sp_cul_52608daf33", "hautement volatils et spéculatifs")}</strong>.
+                      <strong>{t("ui_highly_volatile_speculative_52608daf33", "hautement volatils et spéculatifs")}</strong>.
                     </p>
-                    <p>{t("ui_vous_pouvez_c92b54f33e", "• Vous pouvez")}
+                    <p>{t("ui_you_can_c92b54f33e", "• Vous pouvez")}
                       {" "}
-                      <strong>{t("ui_perdre_la_totality_de_your_i_7d2205a73e", "perdre la totalité de votre investissement")}
+                      <strong>{t("ui_lose_all_investment_7d2205a73e", "perdre la totalité de votre investissement")}
 
                       </strong>
                       .
                     </p>
-                    <p>{t("ui_n_investissez_c88600673f", "• N’investissez")}
+                    <p>{t("ui_only_invest_c88600673f", "• N’investissez")}
                       {" "}
-                      <strong>{t("ui_que_ce_que_vous_pouvez_vous__c39a6a53d3", "que ce que vous pouvez vous permettre de perdre")}
+                      <strong>{t("ui_can_afford_to_lose_c39a6a53d3", "que ce que vous pouvez vous permettre de perdre")}
 
                       </strong>
                       .
                     </p>
-                    <p>{t("ui_ce_n_est_d2b7c91b54", "• Ce n’est")}
-                      <strong>{t("ui_pas_un_conseil_financier_49221f7a7e", "pas un conseil financier")}</strong>{t("ui_consultez_un_professionnel_97c28cbb94", "- consultez un professionnel.")}
+                    <p>{t("ui_this_is_not_d2b7c91b54", "• Ce n’est")}
+                      <strong>{t("ui_not_financial_advice_49221f7a7e", "pas un conseil financier")}</strong>{t("ui_consult_professional_97c28cbb94", "- consultez un professionnel.")}
 
                     </p>
                   </div>
@@ -490,7 +490,7 @@ export default function Disclaimer() {
               className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 font-medium px-8 py-3 rounded-lg transition-all duration-300">
 
               <span>💬</span>
-              <span>{t("ui_nous_contact_1ad93ce64f", "Nous contacter")}</span>
+              <span>{t("ui_contact_us_1ad93ce64f", "Nous contacter")}</span>
             </Link>
           </div>
 

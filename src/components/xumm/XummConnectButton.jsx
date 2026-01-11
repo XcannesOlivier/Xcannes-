@@ -20,9 +20,9 @@ function markXummAccountKnown() {
     localStorage.setItem(XUMM_ACCOUNT_STORAGE_KEY, "has_account");
   } catch (err) {
 
+
     // Ignore storage errors (private mode, etc.)
   }}
-
 function isXummBrowser() {
   if (typeof navigator === "undefined") return false;
   return /xumm|xaman/i.test(navigator.userAgent || "");
@@ -128,7 +128,7 @@ export default function XummConnectButton({
             className={`${
             small ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm"} bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400 border border-white/10 hover:border-red-500/40 rounded-lg font-medium transition-all duration-300`
             }
-            aria-label={t("ui_se_d_connect_du_wallet_558f860cac", "Se déconnecter du wallet")}>
+            aria-label={t("ui_logout_wallet_558f860cac", "Se déconnecter du wallet")}>
 
             <span className="hidden sm:inline">{t("wallet_disconnect")}</span>
             <span className="sm:hidden">✕</span>
@@ -172,8 +172,8 @@ export default function XummConnectButton({
               </p>
               <ol className="mt-3 space-y-1 text-xs text-white/60">
                 <li>{t("ui_1_installez_xumm_on_your_m_c547f9ed37", "1. Installez Xumm sur votre mobile.")}</li>
-                <li>{t("ui_2_ouvrez_l_app_et_creez_votr_09babc8e9b", "2. Ouvrez l'app et creez votre wallet.")}</li>
-                <li>{t("ui_3_revenez_ici_et_connectez_v_09ed783355", "3. Revenez ici et connectez-vous via QR code.")}</li>
+                <li>{t("ui_2_open_app_and_create_wallet_09babc8e9b", "2. Ouvrez l'app et creez votre wallet.")}</li>
+                <li>{t("ui_3_come_back_and_connect_09ed783355", "3. Revenez ici et connectez-vous via QR code.")}</li>
               </ol>
               <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <a

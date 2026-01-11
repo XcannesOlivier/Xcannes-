@@ -482,8 +482,8 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
               </button>
               {showTooltips &&
             <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">{t("ui_r_initialiser_77f2efd6da", "Réinitialiser")}</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">{t("ui_ajuster_le_zoom_automatically_31f714860e", "Ajuster le zoom automatiquement")}</div>
+                  <div className="text-[11px] font-semibold text-white/90">{t("ui_reset_77f2efd6da", "Réinitialiser")}</div>
+                  <div className="text-[9px] text-white/50 mt-0.5">{t("ui_adjust_zoom_automatically_31f714860e", "Ajuster le zoom automatiquement")}</div>
                 </div>
             }
             </div>
@@ -518,8 +518,8 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
               </button>
               {showTooltips &&
             <div className="hidden group-hover:block absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-                  <div className="text-[11px] font-semibold text-white/90">{t("ui_param_tres_da2b8022f7", "Paramètres")}</div>
-                  <div className="text-[9px] text-white/50 mt-0.5">{t("ui_configuration_du_chart_2087a61aa4", "Configuration du graphique")}</div>
+                  <div className="text-[11px] font-semibold text-white/90">{t("ui_parameters_da2b8022f7", "Paramètres")}</div>
+                  <div className="text-[9px] text-white/50 mt-0.5">{t("ui_chart_configuration_2087a61aa4", "Configuration du graphique")}</div>
                 </div>
             }
 
@@ -530,7 +530,7 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
               role="menu"
               className="absolute top-full mt-2 right-0 bg-black/95 border border-white/20 rounded-lg p-2.5 shadow-xl z-40 min-w-[170px]">
 
-                  <div className="text-[10px] font-semibold text-white/90 mb-2 pb-1.5 border-b border-white/10">{t("ui_param_tres_da2b8022f7", "Paramètres")}
+                  <div className="text-[10px] font-semibold text-white/90 mb-2 pb-1.5 border-b border-white/10">{t("ui_parameters_da2b8022f7", "Paramètres")}
 
               </div>
 
@@ -539,7 +539,7 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
                 onClick={() => setChartSettings({ ...chartSettings, showGrid: !chartSettings.showGrid })}
                 className="flex items-center justify-between w-full px-1.5 py-1.5 text-[10px] rounded hover:bg-white/5 transition-all mb-0.5">
 
-                    <span className="text-white/80">{t("ui_grille_46093641b8", "Grille")}</span>
+                    <span className="text-white/80">{t("ui_grid_46093641b8", "Grille")}</span>
                     <div
                   className={`w-7 h-3.5 rounded-full transition-all relative ${
                   chartSettings.showGrid ? "bg-xcannes-green" : "bg-white/20"}`

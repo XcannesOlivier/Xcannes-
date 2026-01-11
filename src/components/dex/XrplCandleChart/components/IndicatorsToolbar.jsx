@@ -59,10 +59,10 @@ import { useTranslation } from "next-i18next";export default function Indicators
         </button>
         {showTooltips &&
         <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
-            <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">{t("ui_hide_les_tooltips_987307ecea", "Masquer les tooltips")}
+            <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">{t("ui_hide_tooltips_987307ecea", "Masquer les tooltips")}
 
           </div>
-            <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">{t("ui_d_activate_les_infobulles_778babce4d", "Désactiver les infobulles")}
+            <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">{t("ui_disable_tooltips_778babce4d", "Désactiver les infobulles")}
 
           </div>
           </div>
@@ -162,7 +162,7 @@ import { useTranslation } from "next-i18next";export default function Indicators
           {showTooltips &&
         <div className="hidden group-hover:block absolute left-full ml-2 top-0 bg-black/95 border border-white/20 rounded-lg p-2 shadow-xl z-30 whitespace-nowrap">
               <div className="text-[11px] max-sm:text-sm font-semibold text-white/90">{t("ui_volume_36828512d7", "Volume")}</div>
-              <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">{t("ui_histogramme_des_volumes_3ba39baf94", "Histogramme des volumes")}</div>
+              <div className="text-[9px] max-sm:text-xs text-white/50 mt-0.5">{t("ui_volume_histogram_3ba39baf94", "Histogramme des volumes")}</div>
             </div>
         }
         </div>

@@ -45,7 +45,7 @@ export default function WalletDashboardTrustlineCurrencyModal({
           <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">
             {editingTrustlineCurrency}{t("ui_trustline_5274231985", "trustline")}
           </h3>
-	          <p className="text-[11px] text-white/60">{t("ui_g_rez_le_locking_xcs_po_0d49af4c57", "Gérez le verrouillage XCS pour cette devise. Cette action ne modifie pas directement votre solde on-chain, seulement le suivi interne.")}
+	          <p className="text-[11px] text-white/60">{t("ui_manage_xcs_lock_0d49af4c57", "Gérez le verrouillage XCS pour cette devise. Cette action ne modifie pas directement votre solde on-chain, seulement le suivi interne.")}
 
 
           </p>

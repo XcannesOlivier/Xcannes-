@@ -44,7 +44,7 @@ export default function WalletDashboardHeader({
         <button
           type="button"
           onClick={() => onDisconnect?.()}
-          className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/60 hover:text-red-400 rounded-md transition-colors">{t("ui_d_connect_2c9c62cc27", "Déconnecter")}
+          className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/60 hover:text-red-400 rounded-md transition-colors">{t("ui_disconnect_2c9c62cc27", "Déconnecter")}
 
 
         </button> :
@@ -63,7 +63,7 @@ export default function WalletDashboardHeader({
         <button
           type="button"
           onClick={onOpenGlobalStatement}
-          className="mt-2 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105">{t("ui_voir_le_relev_9771dff7ec", "Voir le relevé")}
+          className="mt-2 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105">{t("ui_see_statement_9771dff7ec", "Voir le relevé")}
 
 
         </button>
@@ -114,7 +114,7 @@ export default function WalletDashboardHeader({
                   onClick={onOpenWalletLabelEditor}
                   title={t("ui_rename_86c8307e14", "Renommer")}
                   className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
-                  aria-label={t("ui_rename_le_wallet_8fecb8eee2", "Renommer le wallet")}>
+                  aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
 
                     <svg
                     className="w-4 h-4"
@@ -134,9 +134,9 @@ export default function WalletDashboardHeader({
                   <button
                   type="button"
                   onClick={onCopyAddress}
-                  title={t("ui_copy_l_adresse_82d1cf6e94", "Copier l'adresse")}
+                  title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
                   className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
-                  aria-label={t("ui_copy_l_adresse_xrpl_4f63ed10fc", "Copier l'adresse XRPL")}>
+                  aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
 
                     <svg
                     className="w-4 h-4"
@@ -157,9 +157,9 @@ export default function WalletDashboardHeader({
                   type="button"
                   onClick={onSwitchWallet}
                   disabled={isConnecting}
-                  title={t("ui_changer_de_wallet_0a2d485467", "Changer de wallet")}
+                  title={t("ui_change_wallet_0a2d485467", "Changer de wallet")}
                   className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-                  aria-label={t("ui_changer_de_wallet_3a2195cf75", "Changer de wallet")}>
+                  aria-label={t("ui_change_wallet_3a2195cf75", "Changer de wallet")}>
 
                     <svg
                     className="w-4 h-4"
@@ -184,7 +184,7 @@ export default function WalletDashboardHeader({
                 type="text"
                 value={walletLabelDraft}
                 onChange={(e) => onWalletLabelDraftChange?.(e.target.value)}
-                placeholder={t("ui_nom_du_wallet_b4c2f054b9", "Nom du wallet")}
+                placeholder={t("ui_wallet_name_b4c2f054b9", "Nom du wallet")}
                 className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -201,8 +201,8 @@ export default function WalletDashboardHeader({
                 type="button"
                 onClick={onSaveWalletLabel}
                 className="p-2 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
-                aria-label={t("ui_enregistrer_404be3f4a5", "Enregistrer")}
-                title={t("ui_enregistrer_2d42b7df0f", "Enregistrer")}>
+                aria-label={t("ui_save_404be3f4a5", "Enregistrer")}
+                title={t("ui_save_2d42b7df0f", "Enregistrer")}>
 
                     <svg
                   className="w-4 h-4"

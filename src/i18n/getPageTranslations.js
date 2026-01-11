@@ -1,4 +1,5 @@
-import nextI18NextConfig from "../../next-i18next.config";
+// Use server-safe config without non-serializable functions
+import nextI18NextConfig from "../../next-i18next.server.config";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 export async function getPageTranslations(locale, namespaces = ["common"]) {
