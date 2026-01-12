@@ -9,7 +9,7 @@ export default function WalletNotConnectedNotice({
   contextLabel = "",
 }) {
   const { t } = useTranslation("common");
-  if (!show) return null;
+  if (!show || variant === "demo") return null;
 
   const isDemo = variant === "demo";
   const title = isDemo

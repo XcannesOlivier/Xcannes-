@@ -19,7 +19,7 @@ export default function DemoWalletModalShell({
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
           className={[
-          "relative w-full bg-gray-900 border border-white/10 rounded-2xl p-4 md:p-5 space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+          "relative w-full bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
           maxWidthClassName].
           join(" ")}
           style={{ WebkitOverflowScrolling: "touch" }}

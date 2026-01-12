@@ -128,7 +128,7 @@ export default function WalletProductSection() {
           <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden">
             <div className="px-5 py-4 border-b border-white/10">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm text-white/70 min-w-0">
+                <p className="text-base text-white/70 min-w-0">
                   {t("home_v2_demo_preview_title", "Démo interactive (fictive)")}
                 </p>
                 <div className="inline-flex rounded-lg bg-black/20 border border-white/10 p-1 flex-shrink-0">
@@ -146,7 +146,9 @@ export default function WalletProductSection() {
                           : "border-transparent text-white/60 hover:text-white",
                       ].join(" ")}
                     >
-                      <span className="md:hidden">{id}</span>
+                      <span className="md:hidden">
+                        {t("demo_wallet_label", "Wallet")} {id}
+                      </span>
                       <span className="hidden md:inline">
                         {t("demo_wallet_label", "Wallet")} {id}
                       </span>

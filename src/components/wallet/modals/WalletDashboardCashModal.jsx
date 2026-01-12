@@ -2,7 +2,6 @@
 
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardCashModal({
@@ -32,15 +31,27 @@ export default function WalletDashboardCashModal({
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-2xl bg-gray-900 border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto"
+        className="relative w-full max-w-2xl bg-elevated border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto"
         onClick={(e) => e.stopPropagation()}>
 
           {/* Header avec onglets Buy/Sell */}
           <div className="border-b border-white/10">
             <div className="flex items-center justify-between p-4 pb-0">
-              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_fiat_gateway_2b14cbec79", "Fiat Gateway")}
-
-            </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+                  {t("ui_fiat_gateway_2b14cbec79", "Fiat Gateway")}
+                </h3>
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
+                {isPreviewMode && noticeVariant !== "demo" ? (
+                  <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                    {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+              </div>
               <button
               type="button"
               onClick={onClose}
@@ -50,13 +61,6 @@ export default function WalletDashboardCashModal({
               </button>
             </div>
             <div className="px-4 pb-3">{renderWalletMeta?.()}</div>
-            <div className="px-4 pb-4">
-              <WalletNotConnectedNotice
-              show={isPreviewMode}
-              variant={noticeVariant}
-              contextLabel={noticeContextLabel} />
-
-            </div>
 
             {/* Onglets Buy/Sell */}
             <div className="flex gap-2 px-4 pt-3">

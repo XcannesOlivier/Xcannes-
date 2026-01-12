@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Buffer } from "buffer";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardReceiveModal({
@@ -142,7 +141,7 @@ export default function WalletDashboardReceiveModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+        className="relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
         style={{ WebkitOverflowScrolling: "touch" }}
         onClick={(e) => e.stopPropagation()}>
 
@@ -156,14 +155,22 @@ export default function WalletDashboardReceiveModal({
 
             ✕
           </button>
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">
-            {receiveTab === "receive" ? "Receive assets" : "Request payment"}
-          </h3>
+          <div className="flex items-center gap-2 mb-1 pr-6">
+            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+              {receiveTab === "receive" ? "Receive assets" : "Request payment"}
+            </h3>
+            {noticeVariant === "demo" ? (
+              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("demo_notice_title", "Mode démo")}
+              </span>
+            ) : null}
+            {isPreviewMode && noticeVariant !== "demo" ? (
+              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("wallet_not_connected_title", "Wallet not connected")}
+              </span>
+            ) : null}
+          </div>
           {renderWalletMeta?.("mb-2")}
-          <WalletNotConnectedNotice
-          show={isPreviewMode}
-          variant={noticeVariant}
-          contextLabel={noticeContextLabel} />
 
 
           {/* Tabs */}
@@ -299,28 +306,6 @@ export default function WalletDashboardReceiveModal({
                 "bg-xcannes-green/20 border-xcannes-green/40 text-xcannes-green" :
                 "bg-white/5 border-white/10 text-white/60"} border`
                 }>{t("ui_link_c2c8a504d7", "🔗 Link")}
-
-
-              </button>
-                  <button
-                type="button"
-                onClick={() => setRequestMethod("xrpl")}
-                className={`px-3 py-2 text-xs rounded-lg transition-colors ${
-                requestMethod === "xrpl" ?
-                "bg-xcannes-green/20 border-xcannes-green/40 text-xcannes-green" :
-                "bg-white/5 border-white/10 text-white/60"} border`
-                }>{t("ui_xrpl_request_af2d8335ae", "💎 XRPL Request")}
-
-
-              </button>
-                  <button
-                type="button"
-                onClick={() => setRequestMethod("notification")}
-                className={`px-3 py-2 text-xs rounded-lg transition-colors ${
-                requestMethod === "notification" ?
-                "bg-xcannes-green/20 border-xcannes-green/40 text-xcannes-green" :
-                "bg-white/5 border-white/10 text-white/60"} border`
-                }>{t("ui_notification_5765a22267", "🔔 Notification")}
 
 
               </button>

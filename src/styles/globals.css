@@ -152,9 +152,9 @@
 }
 
 .demo-wallet-theme-home {
-  --bg-base: #0a0f0d; /* match bg-xcannes-background */
-  --bg-elevated: #0b1410; /* warmer elevated surface */
-  --bg-subtle: #101c15;
+  --bg-base: rgba(255, 255, 255, 0.04);
+  --bg-elevated: rgba(255, 255, 255, 0.05);
+  --bg-subtle: rgba(255, 255, 255, 0.08);
 }
 
 .demo-wallet-theme-home .panel-header {
