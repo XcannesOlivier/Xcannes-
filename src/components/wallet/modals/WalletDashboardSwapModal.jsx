@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
-import WalletDashboardCurrencyLineEditor from "../components/WalletDashboardCurrencyLineEditor";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardSwapModal({
@@ -76,7 +74,7 @@ export default function WalletDashboardSwapModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+        className="relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
         style={{ WebkitOverflowScrolling: "touch" }}
         onClick={(e) => e.stopPropagation()}>
 
@@ -90,17 +88,24 @@ export default function WalletDashboardSwapModal({
 
             ✕
           </button>
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">{t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
-
-        </h3>
-	          <p className="text-xs md:text-sm text-white/60">{t("ui_conversion_interne_des_alloc_1470ceb745", "Conversion interne des allocations RLUSD (pool RLUSD ↔ devises).")}
-
-        </p>
+          <div className="flex items-center gap-2 mb-1 pr-6">
+            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+              {view === "lines"
+                ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
+                : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
+            </h3>
+            {noticeVariant === "demo" ? (
+              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("demo_notice_title", "Mode démo")}
+              </span>
+            ) : null}
+            {isPreviewMode && noticeVariant !== "demo" ? (
+              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("wallet_not_connected_title", "Wallet not connected")}
+              </span>
+            ) : null}
+          </div>
 	          {renderWalletMeta?.("mb-2")}
-	          <WalletNotConnectedNotice
-          show={isPreviewMode}
-          variant={noticeVariant}
-          contextLabel={noticeContextLabel} />
 
 
 	          <div className="grid grid-cols-2 gap-2">
@@ -263,9 +268,10 @@ export default function WalletDashboardSwapModal({
             </div> :
 
         <div className="space-y-3">
-              <p className="text-xs text-white/60">{t("ui_choose_currencies_to_activate_41eea71853", "Choisissez les devises que vous souhaitez activer. Une ligne peut exister avec")}
-
-            <span className="font-mono">{t("ui_0_rlusd_14d1aaec1c", "0 RLUSD")}</span>.
+              <p className="text-xs text-white/60">
+                {t("ui_choose_currencies_to_activate_41eea71853", "Choisissez les devises que vous souhaitez activer. Une ligne peut exister avec")}{" "}
+                <span className="font-mono">{t("ui_0_rlusd_14d1aaec1c", "0 RLUSD")}</span>
+            .
               </p>
 
               <div className="rounded-xl border border-white/10 bg-black/20 p-3">
@@ -277,16 +283,13 @@ export default function WalletDashboardSwapModal({
 
             </p>
             }
-                {isPreviewMode &&
-            <p className="mt-1 text-[10px] text-white/45">{t("ui_demo_mode_activations_are_si_2dad62366e", "Demo mode: activations are simulated (no on-chain tx).")}
 
-            </p>
-            }
                 <div className="mt-2 grid grid-cols-1 gap-2">
                   <WalletCurrencySelector
                 value={activateCurrencyCode}
                 onChange={setActivateCurrencyCode}
-                placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")} />
+                placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
+                quickOptions={suggestedCurrencies} />
 
                   <button
                 type="button"
@@ -309,39 +312,6 @@ export default function WalletDashboardSwapModal({
 
               </button>
                 </div>
-                <div className="mt-3 text-[11px] font-semibold text-white/80">{t("ui_quick_add_e62e925d4f", "Quick add")}
-
-            </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {suggestedCurrencies.map((code) => {
-                const upper = String(code || "").toUpperCase();
-                const disabled =
-                !canMutateLines ||
-                currencyLinesLoading ||
-                existingCurrencyLinesSet.has(upper);
-                return (
-                  <button
-                    key={upper}
-                    type="button"
-                    disabled={disabled}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onActivateCurrencyLine?.(upper);
-                    }}
-                    className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-                    title={
-                    existingCurrencyLinesSet.has(upper) ?
-                    "Already active" :
-                    canMutateLines ?
-                    "Activate currency line" :
-                    "Connect wallet to activate"
-                    }>
-
-                        {upper}
-                      </button>);
-
-              })}
-                </div>
                 <p className="mt-2 text-[10px] text-white/45">{t("ui_activate_une_ligne_implique_u_b625857cd9", "Activer une ligne implique un verrouillage de")}
               {" "}
                   <span className="font-mono">{t("ui_0_20_xcs_37887114e0", "0.20 XCS")}</span>{t("ui_via_escrow_340f6d0b2b", "(via escrow).")}
@@ -356,14 +326,6 @@ export default function WalletDashboardSwapModal({
             onRefresh={refreshCurrencyLines}
             onDelete={handleRemoveCurrencyLine} />
 
-
-              <WalletDashboardCurrencyLineEditor
-            currencyLinesLoading={currencyLinesLoading}
-            currencyLineCode={currencyLineCode}
-            setCurrencyLineCode={setCurrencyLineCode}
-            currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}
-            setCurrencyLineAllocatedRlusd={setCurrencyLineAllocatedRlusd}
-            onSave={handleUpsertCurrencyLine} />
 
             </div>
         }

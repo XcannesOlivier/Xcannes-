@@ -1,15 +1,31 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 
-export function WalletInfoContent({ withCloseGutter = false }) {const { t } = useTranslation("common");
+export function WalletInfoContent({
+  withCloseGutter = false,
+  isPreviewMode = false,
+  noticeVariant = "preview"
+}) {const { t } = useTranslation("common");
   return (
     <>
       <div className={withCloseGutter ? "pr-8" : ""}>
-        <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_xcannes_wallet_how_it_works_0397d0e570", "XCANNES Wallet — How it works")}
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_xcannes_wallet_how_it_works_0397d0e570", "XCANNES Wallet — How it works")}
 
-        </h3>
+          </h3>
+          {noticeVariant === "demo" ? (
+            <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+              {t("demo_notice_title", "Mode démo")}
+            </span>
+          ) : null}
+          {isPreviewMode && noticeVariant !== "demo" ? (
+            <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+              {t("wallet_not_connected_title", "Wallet not connected")}
+            </span>
+          ) : null}
+        </div>
         <p className="mt-1 text-sm text-white/60">{t("ui_wallet_no_custodial_on_xrp_4e8c91bea3", "Wallet non-custodial sur XRPL + un “ledger UX” pour répartir RLUSD en lignes de devises.")}
 
 
@@ -154,13 +170,10 @@ export default function WalletInfoModal({
             ✕
           </button>
 
-          <WalletNotConnectedNotice
-            show={isPreviewMode}
-            className="mb-4"
-            variant={noticeVariant}
-            contextLabel={noticeContextLabel} />
-
-          <WalletInfoContent withCloseGutter />
+          <WalletInfoContent
+            withCloseGutter
+            isPreviewMode={isPreviewMode}
+            noticeVariant={noticeVariant} />
         </div>
       </div>
     </>,

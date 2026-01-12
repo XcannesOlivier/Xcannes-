@@ -1,7 +1,7 @@
 "use client";
 
 import WalletDashboardTrustlineCurrencyForm from "../components/WalletDashboardTrustlineCurrencyForm";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardTrustlineCurrencyModal({
   open,
@@ -28,7 +28,7 @@ export default function WalletDashboardTrustlineCurrencyModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-          className="relative w-full max-w-md bg-gray-900 border-0 md:border md:border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+          className="relative w-full max-w-md bg-elevated border-0 md:border md:border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(e) => e.stopPropagation()}>
 
@@ -42,18 +42,25 @@ export default function WalletDashboardTrustlineCurrencyModal({
 
             ✕
           </button>
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">
-            {editingTrustlineCurrency}{t("ui_trustline_5274231985", "trustline")}
-          </h3>
+          <div className="flex items-center gap-2 mb-1 pr-6">
+            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+              {editingTrustlineCurrency}{t("ui_trustline_5274231985", "trustline")}
+            </h3>
+            {noticeVariant === "demo" ? (
+              <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("demo_notice_title", "Mode démo")}
+              </span>
+            ) : null}
+            {isPreviewMode && noticeVariant !== "demo" ? (
+              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("wallet_not_connected_title", "Wallet not connected")}
+              </span>
+            ) : null}
+          </div>
 	          <p className="text-[11px] text-white/60">{t("ui_manage_xcs_lock_0d49af4c57", "Gérez le verrouillage XCS pour cette devise. Cette action ne modifie pas directement votre solde on-chain, seulement le suivi interne.")}
 
 
           </p>
-	          <WalletNotConnectedNotice
-            show={isPreviewMode}
-            variant={noticeVariant}
-            contextLabel={noticeContextLabel} />
-
           <WalletDashboardTrustlineCurrencyForm
             currentEditingLine={currentEditingLine}
             editingTrustlineLocked={editingTrustlineLocked}

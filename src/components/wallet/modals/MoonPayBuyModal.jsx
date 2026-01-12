@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useXumm } from "@/context/XummContext";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -181,25 +181,10 @@ const MoonPayBuyModal = ({
   // Mode embedded: retourner seulement le contenu
   const renderContent = () =>
   <div className={embedded ? "" : "p-4 md:p-5"}>
-      <WalletNotConnectedNotice
-      show={isPreviewMode}
-      className={embedded ? "mb-4" : "mb-4"}
-      variant={noticeVariant}
-      contextLabel={noticeContextLabel} />
-
             {/* Form */}
             {step === 'form' &&
     <div className="space-y-4">
-	                {demoMode &&
-	      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
-	                    <p className="text-xs text-emerald-200">
-	                      {t(
-	                        "moonpay_buy_demo_notice",
-	                        "Demo mode: the purchase is simulated (no MoonPay redirect)."
-	                      )}
-	                    </p>
-	                  </div>
-	      }
+
                 {(needsActivation || needsTrustlines) &&
 	      <div className="bg-amber-500/10 border border-amber-500/25 rounded-lg p-3">
 	                    <p className="text-xs text-amber-200">
@@ -449,9 +434,21 @@ const MoonPayBuyModal = ({
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
             <div>
-              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_buy_crypto_with_fiat_f09c7b4228", "Buy Crypto with Fiat")}
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_buy_crypto_with_fiat_f09c7b4228", "Buy Crypto with Fiat")}
 
-              </h3>
+                </h3>
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
+                {isPreviewMode && noticeVariant !== "demo" ? (
+                  <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                    {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+              </div>
               <p className="text-xs text-white/60 mt-1">{t("ui_powered_by_moonpay_secure_ch_0bcfb2aeb5", "Powered by MoonPay • Secure checkout")}
 
               </p>

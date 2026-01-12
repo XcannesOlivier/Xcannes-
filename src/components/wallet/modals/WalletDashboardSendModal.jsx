@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
+import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardSendModal({
@@ -23,10 +24,43 @@ export default function WalletDashboardSendModal({
   sendDestination,
   setSendDestination,
   setQrScannerOpen,
-  setPaymentRequestScannerOpen,
+  handlePaymentRequestScan,
   handleSendSubmit,
-  sendProcessing
+  sendProcessing,
+  enableSaveAddress = false
 }) {const { t } = useTranslation("common");
+  const [saveNewAddress, setSaveNewAddress] = useState(false);
+  const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
+  const [requestText, setRequestText] = useState("");
+  const payreqFileInputId = "payreq-qr-file";
+
+  const normalizedDestination = useMemo(
+    () => String(sendDestination || "").trim(),
+    [sendDestination]
+  );
+  const isSavedDestination = useMemo(() => {
+    return (savedAddresses || []).some(
+      (addr) => addr.address === normalizedDestination
+    );
+  }, [savedAddresses, normalizedDestination]);
+  const canSaveDestination =
+    enableSaveAddress && normalizedDestination && !isSavedDestination;
+
+  useEffect(() => {
+    if (!open) {
+      setSaveNewAddress(false);
+      setSaveNewAddressLabel("");
+      setRequestText("");
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!canSaveDestination) {
+      setSaveNewAddress(false);
+      setSaveNewAddressLabel("");
+    }
+  }, [canSaveDestination]);
+
   if (!open) return null;
 
   const content =
@@ -39,7 +73,7 @@ export default function WalletDashboardSendModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-md bg-gray-900 border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+        className="relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
         style={{ WebkitOverflowScrolling: "touch" }}
         onClick={(e) => e.stopPropagation()}>
 
@@ -53,29 +87,26 @@ export default function WalletDashboardSendModal({
 
             ✕
           </button>
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">
-            {sendTab === "manual" ? "Send assets" : "Pay Request"}
-          </h3>
+          <div className="flex items-center gap-2 mb-1 pr-6">
+            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+              {sendTab === "manual" ? "Send assets" : "Pay Request"}
+            </h3>
+            {noticeVariant === "demo" ? (
+              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("demo_notice_title", "Mode démo")}
+              </span>
+            ) : null}
+            {isPreviewMode && noticeVariant !== "demo" ? (
+              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("wallet_not_connected_title", "Wallet not connected")}
+              </span>
+            ) : null}
+          </div>
           {renderWalletMeta?.("mb-2")}
-          <WalletNotConnectedNotice
-          show={isPreviewMode}
-          variant={noticeVariant}
-          contextLabel={noticeContextLabel} />
 
 
           {/* Tabs */}
           <div className="flex gap-2 mb-3">
-            <button
-            type="button"
-            onClick={() => setSendTab("manual")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
-            sendTab === "manual" ?
-            "bg-xcannes-green text-black font-semibold" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_manual_send_d5de1bf948", "Manual Send")}
-
-
-          </button>
             <button
             type="button"
             onClick={() => setSendTab("scan-request")}
@@ -87,13 +118,19 @@ export default function WalletDashboardSendModal({
 
 
           </button>
+            <button
+            type="button"
+            onClick={() => setSendTab("manual")}
+            className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
+            sendTab === "manual" ?
+            "bg-xcannes-green text-black font-semibold" :
+            "bg-white/5 text-white/60 hover:bg-white/10"}`
+            }>{t("ui_manual_send_d5de1bf948", "Manual Send")}
+
+
+          </button>
           </div>
 
-          <p className="text-xs md:text-sm text-white/50 mb-2 md:mb-4">
-            {sendTab === "manual" ?
-          "Choisissez l'actif, le montant et l'adresse XRPL de destination." :
-          "Scannez un QR code de demande de paiement."}
-          </p>
 
           {/* Tab Content: Manual Send */}
           {sendTab === "manual" &&
@@ -187,35 +224,27 @@ export default function WalletDashboardSendModal({
 
             </label>
 
-                {/* Dropdown pour adresses sauvegardées */}
-                {(savedAddresses || []).length > 0 &&
-            <div className="mb-2">
-                    <select
-                onChange={(e) => {
-                  if (e.target.value) {
-                    setSendDestination(e.target.value);
-                  }
-                }}
-                className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80">
-
-                      <option value="">{t("ui_select_saved_address_60c28f89c1", "Select saved address...")}</option>
-                      {savedAddresses.map((addr, idx) =>
-                <option key={idx} value={addr.address}>
-                          {addr.label} ({addr.address.slice(0, 8)}...
-                          {addr.address.slice(-6)})
-                        </option>
-                )}
-                    </select>
-                  </div>
-            }
-
-                <div className="flex gap-2">
-                  <input
-                type="text"
-                value={sendDestination}
-                onChange={(e) => setSendDestination(e.target.value)}
-                placeholder={t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
-                className="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80" />
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <input
+                    type="text"
+                    list="saved-addresses"
+                    value={sendDestination}
+                    onChange={(e) => setSendDestination(e.target.value)}
+                    placeholder={(savedAddresses || []).length > 0 ?
+                    t("ui_select_saved_address_60c28f89c1", "Select saved address...") :
+                    t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
+                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80" />
+                      <datalist id="saved-addresses">
+                        {(savedAddresses || []).map((addr, idx) =>
+                  <option
+                    key={idx}
+                    value={addr.address}
+                    label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`} />
+                  )}
+                      </datalist>
+                    </div>
 
                   <button
                 type="button"
@@ -240,13 +269,48 @@ export default function WalletDashboardSendModal({
 
                     </svg>
                   </button>
+                  </div>
+
+                  {canSaveDestination ?
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
+                      <label className="flex items-center gap-2 text-[11px] text-white/60">
+                        <input
+                      type="checkbox"
+                      checked={saveNewAddress}
+                      onChange={(e) => setSaveNewAddress(e.target.checked)}
+                      className="accent-xcannes-green" />
+                        {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
+                      </label>
+                      {saveNewAddress ?
+                <div className="space-y-1">
+                          <div className="text-[11px] text-white/60">
+                            {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
+                          </div>
+                          <input
+                      type="text"
+                      value={saveNewAddressLabel}
+                      onChange={(e) => setSaveNewAddressLabel(e.target.value)}
+                      placeholder={t("ui_e_g_exchange_friend_11008b5e9e", "e.g., Exchange, Friend, ...")}
+                      className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80" />
+                        </div> :
+                null}
+                    </div> :
+              null}
                 </div>
               </div>
               <button
             type="button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              handleSendSubmit();
+              const result = await handleSendSubmit?.({
+                saveDestination:
+                  saveNewAddress && canSaveDestination ? normalizedDestination : "",
+                saveLabel: saveNewAddressLabel
+              });
+              if (result?.ok) {
+                setSaveNewAddress(false);
+                setSaveNewAddressLabel("");
+              }
             }}
             disabled={sendProcessing}
             className="w-full mt-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10">
@@ -259,88 +323,56 @@ export default function WalletDashboardSendModal({
           {/* Tab Content: Scan Request */}
           {sendTab === "scan-request" &&
         <div className="space-y-6">
-              {/* Header explicatif */}
-              <div className="bg-gradient-to-br from-xcannes-green/10 to-emerald-600/10 border border-xcannes-green/20 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 bg-xcannes-green/20 rounded-full flex items-center justify-center">
-                    <svg
-                  className="w-6 h-6 text-xcannes-green"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
+              <QRScanner
+              isOpen={sendTab === "scan-request"}
+              onScan={handlePaymentRequestScan}
+              embedded={true}
+              showClose={false}
+              fileInputId={payreqFileInputId}
+              className="bg-black/30 border-white/10" />
 
-                      <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-white font-semibold text-sm mb-1">{t("ui_pay_a_payment_request_0a5c61fa4c", "Pay a Payment Request")}
-
-                </h3>
-                    <p className="text-white/70 text-xs leading-relaxed">{t("ui_scan_a_qr_code_to_pay_a_merc_a5eaca7464", "Scan a QR code to pay a merchant, friend, or service instantly. The payment details will be filled automatically.")}
-
-
-
-                </p>
-                  </div>
-                </div>
+              <div className="flex items-center gap-3 text-[11px] text-white/35">
+                <span className="h-px flex-1 bg-white/10" />
+                <span>{t("ui_or_8a4c1f83bd", "ou")}</span>
+                <span className="h-px flex-1 bg-white/10" />
               </div>
 
-              {/* Bouton principal de scan */}
-              <div className="text-center py-6">
+              <div className="rounded-lg border border-white/5 bg-white/5 p-3 space-y-2">
+                <div className="text-[11px] text-white/45">
+                  {t("demo_payreq_token", "Request token")}
+                </div>
                 <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPaymentRequestScannerOpen(true);
-              }}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-xcannes-green to-emerald-600 hover:from-xcannes-green/90 hover:to-emerald-600/90 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-xcannes-green/30">
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const input = document.getElementById(payreqFileInputId);
+                  input?.click();
+                }}
+                className="inline-flex items-center gap-2 text-[11px] text-white/55 hover:text-white/70 transition-colors">
 
-                  <svg
-                className="w-7 h-7 text-black"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                    +
+                  </span>
+                  {t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Upload a QR image")}
+                </button>
+                <textarea
+                value={requestText}
+                onChange={(e) => setRequestText(e.target.value)}
+                className="w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono"
+                placeholder="xcannes-payreq:... / JSON" />
+                <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePaymentRequestScan?.(requestText);
+                }}
+                disabled={!requestText.trim()}
+                className="w-full px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
 
-                    <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-
-                  </svg>
-                  <span className="text-black font-bold text-base">{t("ui_scan_qr_code_44b98df9b6", "Scan QR Code")}
-
-              </span>
+                  {t("demo_scan_parse", "Load request")}
                 </button>
               </div>
 
-              {/* Info supplémentaire */}
-              <div className="bg-black/20 border border-white/5 rounded-lg p-3">
-                <div className="flex items-start gap-2">
-                  <svg
-                className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
-
-                    <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-
-                  </svg>
-                  <p className="text-white/60 text-xs leading-relaxed">{t("ui_compatible_with_xrpl_payment_be47f01f33", "Compatible with XRPL payment requests, Xaman (XUMM) QR codes, and standard crypto addresses.")}
-
-
-              </p>
-                </div>
-              </div>
             </div>
         }
         </div>

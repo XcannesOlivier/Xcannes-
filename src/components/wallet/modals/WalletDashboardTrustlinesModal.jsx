@@ -3,7 +3,7 @@
 import WalletDashboardTrustlinesAddForm from "../components/WalletDashboardTrustlinesAddForm";
 import WalletDashboardTrustlinesFooter from "../components/WalletDashboardTrustlinesFooter";
 import WalletDashboardTrustlinesList from "../components/WalletDashboardTrustlinesList";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardTrustlinesModal({
   open,
@@ -34,7 +34,7 @@ export default function WalletDashboardTrustlinesModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-3 pointer-events-none">
         <div
-          className="relative w-full max-w-md sm:max-w-lg md:max-w-2xl bg-gray-900 border-0 md:border md:border-white/10 rounded-2xl p-4 md:p-5 lg:p-7 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+          className="relative w-full max-w-md sm:max-w-lg md:max-w-2xl bg-elevated border-0 md:border md:border-white/10 rounded-2xl p-4 md:p-5 lg:p-7 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(e) => e.stopPropagation()}>
 
@@ -48,17 +48,24 @@ export default function WalletDashboardTrustlinesModal({
 
             ✕
           </button>
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white mb-1 pr-6">{t("ui_trustlines_59e1e35db4", "Trustlines")}
+          <div className="flex items-center gap-2 mb-1 pr-6">
+            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_trustlines_59e1e35db4", "Trustlines")}
 
-          </h3>
+            </h3>
+            {noticeVariant === "demo" ? (
+              <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("demo_notice_title", "Mode démo")}
+              </span>
+            ) : null}
+            {isPreviewMode && noticeVariant !== "demo" ? (
+              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                {t("wallet_not_connected_title", "Wallet not connected")}
+              </span>
+            ) : null}
+          </div>
           <p className="text-[11px] text-white/60 mb-2">{t("ui_add_or_remove_your_lines_f40801cee4", "Ajoutez ou supprimez vos lignes internes de suivi XCS.")}
 
           </p>
-          <WalletNotConnectedNotice
-            show={isPreviewMode}
-            variant={noticeVariant}
-            contextLabel={noticeContextLabel} />
-
 
           {/* Formulaire ajout trustline */}
           <WalletDashboardTrustlinesAddForm

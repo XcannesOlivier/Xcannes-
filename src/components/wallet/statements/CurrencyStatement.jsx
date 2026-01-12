@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";import { useTranslation } from "next-i18next";
 
@@ -640,9 +639,21 @@ export default function CurrencyStatement({
             <span className="text-2xl md:text-3xl flex-shrink-0">{getCurrencyFlag(currency)}</span>
             }
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg md:text-xl font-bold text-white truncate">
-                  {currency}{t("ui_statement_a87c93acb8", "Statement")}
-              </h2>
+                <div className="flex items-center gap-2 min-w-0">
+                  <h2 className="text-lg md:text-xl font-bold text-white truncate">
+                    {currency} {t("ui_statement_a87c93acb8", "Statement")}
+                  </h2>
+                  {noticeVariant === "demo" ? (
+                    <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                      {t("demo_notice_title", "Mode démo")}
+                    </span>
+                  ) : null}
+                  {isPreviewMode && noticeVariant !== "demo" ? (
+                    <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                      {t("wallet_not_connected_title", "Wallet not connected")}
+                    </span>
+                  ) : null}
+                </div>
                 <p className="text-xs md:text-sm text-white/60 truncate">
                   {getCurrencyDescription(currency)}
                 </p>
@@ -655,12 +666,6 @@ export default function CurrencyStatement({
               ×
             </button>
 	          </div>
-
-            <WalletNotConnectedNotice
-          show={isPreviewMode}
-          className="mb-3"
-          variant={noticeVariant}
-          contextLabel={noticeContextLabel} />
 
 	          
 	          {/* Account Info dans le header */}

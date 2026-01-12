@@ -991,8 +991,6 @@ export default function WalletDashboard({
   const {
     qrScannerOpen,
     setQrScannerOpen,
-    paymentRequestScannerOpen,
-    setPaymentRequestScannerOpen,
     handleAddressScan,
     handlePaymentRequestScan,
   } = usePaymentRequestScanner({
@@ -1004,16 +1002,30 @@ export default function WalletDashboard({
     setSendPaymentRequest,
   });
 
-  const handleSendSubmit = async () => {
+  const handleSendSubmit = async ({ saveDestination = "", saveLabel = "" } = {}) => {
+    const normalizedSaveDestination = String(saveDestination || "").trim();
+    const handleAddressSave = (dest) => {
+      const normalizedDest = String(dest || "").trim();
+      if (!normalizedDest) return;
+      const isAlreadySaved = savedAddresses.some((a) => a.address === normalizedDest);
+      if (!isAlreadySaved && normalizedSaveDestination === normalizedDest) {
+        saveAddress(normalizedDest, saveLabel);
+        return;
+      }
+      if (!isAlreadySaved) {
+        setAddressToSave(normalizedDest);
+        setShowSaveAddressPrompt(true);
+      }
+    };
     if (!isConnected || !wallet) {
       if (!isPreviewMode) {
         alert("Please connect your Xumm wallet first.");
-        return;
+        return { ok: false };
       }
     }
     if (!selectedSendToken) {
       alert("No asset selected.");
-      return;
+      return { ok: false };
     }
     if (
       selectedSendToken?.currency === "RLUSD" &&
@@ -1021,7 +1033,7 @@ export default function WalletDashboard({
       !isPreviewMode
     ) {
       alert("RLUSD trustline is not installed yet. Please install it first.");
-      return;
+      return { ok: false };
     }
     if (
       selectedSendToken?.currency === "XCS" &&
@@ -1029,19 +1041,19 @@ export default function WalletDashboard({
       !isPreviewMode
     ) {
       alert("XCS trustline is not installed yet. Please install it first.");
-      return;
+      return { ok: false };
     }
 
     const amountNum = parseFloat(sendAmount);
     if (!Number.isFinite(amountNum) || amountNum <= 0) {
       alert("Please enter a valid amount.");
-      return;
+      return { ok: false };
     }
 
     const dest = (sendDestination || "").trim();
     if (!dest || !dest.startsWith("r") || dest.length < 25) {
       alert("Please enter a valid XRPL destination address.");
-      return;
+      return { ok: false };
     }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
@@ -1058,11 +1070,11 @@ export default function WalletDashboard({
       if (isFxSend) {
         if (!backendWalletAddress && !isPreviewMode) {
           alert("Please connect your Xumm wallet first.");
-          return;
+          return { ok: false };
         }
         if (!hasOnChainRlusd && !isPreviewMode) {
           alert("RLUSD trustline is not installed yet. Please install it first.");
-          return;
+          return { ok: false };
         }
 
         const demoLine = isPreviewMode ? demoLines?.[currency] : null;
@@ -1083,7 +1095,7 @@ export default function WalletDashboard({
             `Cette demande est libellée en ${requestTargetCurrency}.\n` +
               `Veuillez sélectionner ${requestTargetCurrency} comme devise d’envoi.`
           );
-          return;
+          return { ok: false };
         }
 
         const requestedFxRate =
@@ -1103,7 +1115,7 @@ export default function WalletDashboard({
             : Number.NaN;
         if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) {
           alert(`Impossible de récupérer le taux pour ${currency}.`);
-          return;
+          return { ok: false };
         }
 
         const paymentRlusd = amountNum * rlusdPerUnit;
@@ -1120,7 +1132,7 @@ export default function WalletDashboard({
                 `Calculé: ≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n\n` +
                 `Scannez à nouveau la demande ou vérifiez le taux.`
             );
-            return;
+            return { ok: false };
           }
         }
 
@@ -1147,7 +1159,7 @@ export default function WalletDashboard({
               })} RLUSD\n` +
               `Maximum: ≈ ${maxFx.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}`
           );
-          return;
+          return { ok: false };
         }
 
         const ok = confirm(
@@ -1166,7 +1178,7 @@ export default function WalletDashboard({
               ? `2 signatures Xumm seront demandées (spread → XCANNES, puis paiement → destinataire).`
               : `1 signature Xumm sera demandée (paiement → destinataire).`)
         );
-        if (!ok) return;
+        if (!ok) return { ok: false };
 
         if (isPreviewMode) {
           // Demo: simulate 2 signatures + update demoLines balance.
@@ -1178,7 +1190,7 @@ export default function WalletDashboard({
                 maximumFractionDigits: 6,
               })} ${currency}.`
             );
-            return;
+            return { ok: false };
           }
 
           const availableRlusd = Number(currentLine?.rlusd || 0);
@@ -1190,7 +1202,7 @@ export default function WalletDashboard({
                 { maximumFractionDigits: 6 }
               )} RLUSD.`
             );
-            return;
+            return { ok: false };
           }
 
           setDemoLines((prev) => {
@@ -1211,9 +1223,10 @@ export default function WalletDashboard({
             `✅ (Demo) Signature 1/2 simulée: spread → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
               `✅ (Demo) Signature 2/2 simulée: paiement → destinataire (${dest})`
           );
+          handleAddressSave(dest);
           setSendAmount("");
           setSendDestination("");
-          return;
+          return { ok: true };
         }
 
         // 1) Paiement spread → wallet entreprise XCANNES
@@ -1233,7 +1246,7 @@ export default function WalletDashboard({
           const spreadResult = await signTransaction(spreadTx);
           if (!spreadResult?.signed) {
             alert("Spread payment cancelled or expired.");
-            return;
+            return { ok: false };
           }
 
           // Déallocation backend minimale (spread payé) pour garder l'invariant
@@ -1292,27 +1305,22 @@ export default function WalletDashboard({
           if (!deallocatePayment || deallocatePayment.error) {
             console.warn("Failed to deallocate payment (backend):", deallocatePayment?.error);
           }
-
-          const isAlreadySaved = savedAddresses.some((a) => a.address === dest);
-          if (!isAlreadySaved) {
-            setAddressToSave(dest);
-            setShowSaveAddressPrompt(true);
-          }
+          handleAddressSave(dest);
 
           setSendAmount("");
           setSendDestination("");
           setSendPaymentRequest(null);
           if (refreshBalance) setTimeout(() => refreshBalance(), 3000);
           if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 3000);
+          return { ok: true };
         } else {
           alert(
             spreadFeeRlusd > 0
               ? "Payment cancelled or expired. (Spread was already paid.)"
               : "Transaction cancelled or expired."
           );
+          return { ok: false };
         }
-
-        return;
       }
 
       if (isPreviewMode) {
@@ -1325,7 +1333,7 @@ export default function WalletDashboard({
                 maximumFractionDigits: 6,
               })} RLUSD.`
             );
-            return;
+            return { ok: false };
           }
 
           setDemoLines((prev) => {
@@ -1344,9 +1352,10 @@ export default function WalletDashboard({
         }
 
         alert(`✅ (Demo) Paiement simulé: ${amountNum} ${currency} → ${dest}`);
+        handleAddressSave(dest);
         setSendAmount("");
         setSendDestination("");
-        return;
+        return { ok: true };
       }
 
       let Amount;
@@ -1392,12 +1401,7 @@ export default function WalletDashboard({
       const result = await signTransaction(txjson);
       if (result && result.signed) {
         alert("✅ Payment submitted via Xumm.");
-
-        const isAlreadySaved = savedAddresses.some((a) => a.address === dest);
-        if (!isAlreadySaved) {
-          setAddressToSave(dest);
-          setShowSaveAddressPrompt(true);
-        }
+        handleAddressSave(dest);
 
         setSendAmount("");
         setSendDestination("");
@@ -1405,12 +1409,15 @@ export default function WalletDashboard({
         if (refreshBalance) {
           setTimeout(() => refreshBalance(), 3000);
         }
+        return { ok: true };
       } else {
         alert("Transaction cancelled or expired.");
+        return { ok: false };
       }
     } catch (err) {
       console.error("Send payment error:", err);
       alert("Error while preparing payment: " + (err?.message || String(err)));
+      return { ok: false };
     } finally {
       setSendProcessing(false);
     }
@@ -1580,9 +1587,10 @@ export default function WalletDashboard({
             sendDestination={sendDestination}
             setSendDestination={setSendDestination}
             setQrScannerOpen={setQrScannerOpen}
-            setPaymentRequestScannerOpen={setPaymentRequestScannerOpen}
+            handlePaymentRequestScan={handlePaymentRequestScan}
             handleSendSubmit={handleSendSubmit}
             sendProcessing={sendProcessing}
+            enableSaveAddress={true}
           />
 
           <WalletDashboardReceiveModal
@@ -1688,13 +1696,6 @@ export default function WalletDashboard({
         isOpen={qrScannerOpen}
         onScan={handleAddressScan}
         onClose={() => setQrScannerOpen(false)}
-      />
-      
-      {/* QR Scanner Modal for Payment Request */}
-      <QRScanner
-        isOpen={paymentRequestScannerOpen}
-        onScan={handlePaymentRequestScan}
-        onClose={() => setPaymentRequestScannerOpen(false)}
       />
 
       <WalletDashboardSaveAddressPrompt

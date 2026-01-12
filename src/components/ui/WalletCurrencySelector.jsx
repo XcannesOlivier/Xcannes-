@@ -44,13 +44,15 @@ export default function WalletCurrencySelector({
   value,
   onChange,
   placeholder = "Select currency...",
-  extraOptions = []
+  extraOptions = [],
+  quickOptions = []
 }) {const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const popupRef = useRef(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -77,17 +79,28 @@ export default function WalletCurrencySelector({
   useEffect(() => {
     if (!open) return;
     const handleClick = (e) => {
-      if (!popupRef.current) return;
-      if (!popupRef.current.contains(e.target)) {
-        setOpen(false);
-      }
+      if (popupRef.current && popupRef.current.contains(e.target)) return;
+      if (triggerRef.current && triggerRef.current.contains(e.target)) return;
+      setOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
+  const normalizedQuickOptions = useMemo(() => {
+    return (quickOptions || [])
+      .map((item) => {
+        if (!item) return null;
+        if (typeof item === "string") {
+          return { code: item, name: item };
+        }
+        return { code: item.code, name: item.name || item.code };
+      })
+      .filter(Boolean);
+  }, [quickOptions]);
+
   const mergedCurrencies = useMemo(() => {
-    const extras = (extraOptions || []).map((item) => ({
+    const extras = [...(extraOptions || []), ...normalizedQuickOptions].map((item) => ({
       code: item.code,
       name: item.name || item.code
     }));
@@ -102,7 +115,7 @@ export default function WalletCurrencySelector({
       }
     });
     return Array.from(baseMap.values());
-  }, [currencies, extraOptions]);
+  }, [currencies, extraOptions, normalizedQuickOptions]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -138,6 +151,7 @@ export default function WalletCurrencySelector({
           e.stopPropagation();
           setOpen((v) => !v);
         }}
+        ref={triggerRef}
         className="w-full bg-black/40 border border-white/15 rounded-md px-3 py-2 text-xs text-white/80 flex items-center justify-between gap-2 hover:border-xcannes-green/70 transition-colors active:scale-98">
 
         <div className="flex items-center gap-2">
@@ -173,9 +187,14 @@ export default function WalletCurrencySelector({
         onClick={(e) => e.stopPropagation()}>
 
           <div className="px-3 pt-2 pb-1 border-b border-subtle space-y-2">
+            {normalizedQuickOptions.length > 0 ?
+          <div className="text-[10px] font-semibold text-white/60">
+                {t("ui_quick_add_e62e925d4f", "Quick add")}
+              </div> :
+          null}
             {/* Raccourci pour les devises les plus utilisées */}
             <div className="flex items-center gap-1 overflow-x-auto">
-              {POPULAR_CURRENCIES.map((c) =>
+              {(normalizedQuickOptions.length > 0 ? normalizedQuickOptions : POPULAR_CURRENCIES).map((c) =>
             <button
               key={c.code}
               type="button"

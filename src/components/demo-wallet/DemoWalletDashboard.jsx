@@ -253,12 +253,13 @@ export default function DemoWalletDashboard({
   const activeAccent = demoAccents[activeWalletId] || demoAccents.A;
   const panelRingClass = isHomeTheme ? "ring-white/10" : activeAccent.ring;
 
-  const noticeContextLabel = `${t("demo_wallet_label", "Wallet")} ${activeWalletId}`;
+  const walletContextLabel = `${t("demo_wallet_label", "Wallet")} ${activeWalletId}`;
   const effectiveWallet = getWalletAddress(state, activeWalletId);
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
-    walletLabel: `DEMO — ${noticeContextLabel}`
+    walletLabel: walletContextLabel
   });
+  const demoNoticeContextLabel = "";
 
   const demoSavedAddresses = useMemo(() => {
     const address = getWalletAddress(state, otherWalletId);
@@ -306,7 +307,7 @@ export default function DemoWalletDashboard({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest
-  } = useSendForm({ defaultSendTab: "manual" });
+  } = useSendForm({ defaultSendTab: "scan-request" });
 
   const { receiveTab, setReceiveTab } = useReceiveForm();
 
@@ -528,8 +529,6 @@ export default function DemoWalletDashboard({
   const {
     qrScannerOpen,
     setQrScannerOpen,
-    paymentRequestScannerOpen,
-    setPaymentRequestScannerOpen,
     handleAddressScan,
     handlePaymentRequestScan
   } = usePaymentRequestScanner({
@@ -718,20 +717,20 @@ export default function DemoWalletDashboard({
   };
 
   const handleSendSubmit = async () => {
-    if (!selectedSendToken) return;
+    if (!selectedSendToken) return { ok: false };
     const amountNum = Number.parseFloat(sendAmount || "0");
-    if (!Number.isFinite(amountNum) || amountNum <= 0) return;
+    if (!Number.isFinite(amountNum) || amountNum <= 0) return { ok: false };
 
     const dest = String(sendDestination || "").trim();
     if (sendPaymentRequest?.to && dest !== String(sendPaymentRequest.to).trim()) {
       alert("Payment request destination mismatch (demo).");
-      return;
+      return { ok: false };
     }
     const toWalletId =
     dest === getWalletAddress(state, otherWalletId) ? otherWalletId : null;
     if (!toWalletId) {
       alert("Demo: destination must be Wallet A/B address.");
-      return;
+      return { ok: false };
     }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
@@ -744,7 +743,7 @@ export default function DemoWalletDashboard({
       alert(
         `This request is in ${requestTargetCurrency}.\nPlease select ${requestTargetCurrency} to pay.`
       );
-      return;
+      return { ok: false };
     }
 
     const isFxSend =
@@ -766,10 +765,11 @@ export default function DemoWalletDashboard({
       });
       if (res?.error) {
         alert(res.error);
-        return;
+        return { ok: false };
       }
       setActiveAction(null);
       setSendPaymentRequest(null);
+      return { ok: true };
     } finally {
       setSendProcessing(false);
     }
@@ -1067,7 +1067,7 @@ export default function DemoWalletDashboard({
               "px-3 py-1.5 text-xs rounded-md transition-colors border",
               activeWalletId === id ?
               id === "A" ?
-              "bg-xcannes-green/10 border-xcannes-green/30 text-xcannes-green" :
+              "bg-white/5 border-white/15 text-white hover:bg-white/10" :
               "bg-xcannes-blue-light/10 border-xcannes-blue-light/30 text-xcannes-blue-light" :
               "border-transparent text-white/60 hover:text-white"].
               join(" ")}>
@@ -1236,7 +1236,12 @@ export default function DemoWalletDashboard({
                 className="w-full text-left"
                 title={t("demo_open_statement", "Ouvrir le relevé")}>
 
-                  <div className="flex items-center justify-between rounded-md bg-base border border-white/10 px-3 py-2 hover:border-white/20 transition-colors">
+                  <div
+                    className={[
+                      "flex items-center justify-between rounded-md border border-white/10 px-3 py-2 hover:border-white/20 transition-colors",
+                      isHomeTheme ? "bg-black/20" : "bg-base",
+                    ].join(" ")}
+                  >
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden rounded-md bg-white/5 border border-white/10">
                         {getCurrencyFlag(row.code)}
@@ -1273,7 +1278,12 @@ export default function DemoWalletDashboard({
 
       </div>
 
-      <div className="shrink-0 border-t border-white/10 bg-elevated/80 backdrop-blur px-3 py-2">
+      <div
+        className={[
+          "shrink-0 border-t border-white/10 px-3 py-2",
+          isHomeTheme ? "bg-elevated" : "bg-elevated/80 backdrop-blur",
+        ].join(" ")}
+      >
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"
@@ -1294,7 +1304,7 @@ export default function DemoWalletDashboard({
                 <span className="text-[11px] text-white/40">↗</span>
               </a>
             }
-            <div className="text-[11px] text-white/45">
+            <div className="text-xs text-white/45">
               {t("demo_footer_note", "Données fictives")}
             </div>
           </div>
@@ -1306,7 +1316,7 @@ export default function DemoWalletDashboard({
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={noticeContextLabel}
+        noticeContextLabel={demoNoticeContextLabel}
         sendTab={sendTab}
         setSendTab={setSendTab}
         renderWalletMeta={renderWalletMeta}
@@ -1320,9 +1330,10 @@ export default function DemoWalletDashboard({
         sendDestination={sendDestination}
         setSendDestination={setSendDestination}
         setQrScannerOpen={setQrScannerOpen}
-        setPaymentRequestScannerOpen={setPaymentRequestScannerOpen}
+        handlePaymentRequestScan={handlePaymentRequestScan}
         handleSendSubmit={handleSendSubmit}
-        sendProcessing={sendProcessing} />
+        sendProcessing={sendProcessing}
+        enableSaveAddress={false} />
 
 
       <WalletDashboardReceiveModal
@@ -1330,7 +1341,7 @@ export default function DemoWalletDashboard({
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={noticeContextLabel}
+        noticeContextLabel={demoNoticeContextLabel}
         receiveTab={receiveTab}
         setReceiveTab={setReceiveTab}
         renderWalletMeta={renderWalletMeta}
@@ -1363,7 +1374,7 @@ export default function DemoWalletDashboard({
         renderWalletMeta={renderWalletMeta}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={noticeContextLabel}
+        noticeContextLabel={demoNoticeContextLabel}
         effectiveIsConnected={false}
         hasOnChainRlusd={true}
         hasOnChainXcs={true}
@@ -1397,7 +1408,7 @@ export default function DemoWalletDashboard({
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={noticeContextLabel}
+        noticeContextLabel={demoNoticeContextLabel}
         demoMode={true}
         onDemoBuy={async ({ amount }) => {
           await sleep(getDemoLatencyMs());
@@ -1446,7 +1457,7 @@ export default function DemoWalletDashboard({
         effectiveWallet={effectiveWallet}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={noticeContextLabel}
+        noticeContextLabel={demoNoticeContextLabel}
         previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={false}
@@ -1466,11 +1477,6 @@ export default function DemoWalletDashboard({
         onScan={handleAddressScan}
         onClose={() => setQrScannerOpen(false)} />
 
-
-      <QRScanner
-        isOpen={paymentRequestScannerOpen}
-        onScan={handlePaymentRequestScan}
-        onClose={() => setPaymentRequestScannerOpen(false)} />
 
     </div>);
 

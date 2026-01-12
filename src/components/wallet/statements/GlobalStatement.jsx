@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import WalletNotConnectedNotice from "../components/WalletNotConnectedNotice";import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
 
 const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
@@ -226,9 +226,21 @@ export default function GlobalStatement({
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-3xl flex-shrink-0">🌍</span>
-              <h2 className="text-xl font-bold text-white truncate">{t("ui_global_statement_13e29aa8aa", "Global Statement")}
-
-            </h2>
+              <div className="flex items-center gap-2 min-w-0">
+                <h2 className="text-xl font-bold text-white truncate">
+                  {t("ui_global_statement_13e29aa8aa", "Global Statement")}
+                </h2>
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
+                {isPreviewMode && noticeVariant !== "demo" ? (
+                  <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                    {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+              </div>
             </div>
             <button
             onClick={onClose}
@@ -237,12 +249,6 @@ export default function GlobalStatement({
               ✕
             </button>
           </div>
-
-          <WalletNotConnectedNotice
-          show={isPreviewMode}
-          className="mb-4"
-          variant={noticeVariant}
-          contextLabel={noticeContextLabel} />
 
           
           {/* Account Info dans le header */}

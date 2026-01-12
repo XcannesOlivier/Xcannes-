@@ -16,7 +16,13 @@
     "i18n:codemod": "node scripts/i18n-codemod.cjs",
     "i18n:translate:argos": "python3 scripts/translate-locales-argos.py",
     "i18n:normalize-en": "python3 scripts/normalize-en-to-english.py",
-    "i18n:translate:marian": "python3 scripts/translate-locales-marian.py"
+    "i18n:translate:marian": "python3 scripts/translate-locales-marian.py",
+    "translations:status": "node scripts/status.js",
+    "translations:compare": "node scripts/compare-translations.js",
+    "translations:sync": "node scripts/sync-missing-keys.js all",
+    "translations:untranslated": "node scripts/find-untranslated.js",
+    "translations:report": "node scripts/generate-html-report.js",
+    "translations:fix": "node scripts/fix-json-advanced.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
