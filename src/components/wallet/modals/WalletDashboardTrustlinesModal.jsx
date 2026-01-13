@@ -34,7 +34,10 @@ export default function WalletDashboardTrustlinesModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-3 pointer-events-none">
         <div
-          className="relative w-full max-w-md sm:max-w-lg md:max-w-2xl bg-elevated border-0 md:border md:border-white/10 rounded-2xl p-4 md:p-5 lg:p-7 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+          className={[
+            "relative w-full max-w-md sm:max-w-lg md:max-w-2xl bg-elevated border-0 md:border md:border-white/10 rounded-2xl p-4 md:p-5 lg:p-7 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+            noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+          ].join(" ")}
           style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(e) => e.stopPropagation()}>
 

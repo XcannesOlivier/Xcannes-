@@ -31,7 +31,10 @@ export default function WalletDashboardCashModal({
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-2xl bg-elevated border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto"
+        className={[
+          "relative w-full max-w-2xl bg-elevated border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto",
+          noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+        ].join(" ")}
         onClick={(e) => e.stopPropagation()}>
 
           {/* Header avec onglets Buy/Sell */}

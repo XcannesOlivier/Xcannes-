@@ -90,6 +90,7 @@ export default function DemoWalletTrustlinesModal({
             }
             setCode("");
           }}
+          title={t("demo_tt_trustline_add", "Ajouter une devise locale.")}
           className="w-full px-4 py-2 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 border border-xcannes-green/25 text-xcannes-green text-sm font-semibold transition-colors"
         >
           {t("demo_trustlines_add_cta", "Add")}
@@ -111,6 +112,7 @@ export default function DemoWalletTrustlinesModal({
                   const res = onEnableCurrency?.(String(c).toUpperCase());
                   if (res?.error) setError(res.error);
                 }}
+                title={t("demo_tt_trustline_quick_add", "Ajouter cette devise.")}
                 className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs transition-colors"
               >
                 {String(c).toUpperCase()}
@@ -182,4 +184,3 @@ export default function DemoWalletTrustlinesModal({
     </DemoWalletModalShell>
   );
 }
-
