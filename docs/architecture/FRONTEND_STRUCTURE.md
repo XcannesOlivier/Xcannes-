@@ -3,6 +3,9 @@
 Objectif: éviter un dossier `components` “fourre-tout” en regroupant par domaine.
 Emplacement: `docs/architecture/`.
 
+> **Status:** ACTIVE  
+> **Last Reviewed:** 2026-01-13
+
 ## Dossiers principaux
 
 - `src/pages/` : routes Next.js
@@ -18,10 +21,14 @@ Emplacement: `docs/architecture/`.
   - `src/components/dex/panels/` : panneaux DEX (orderbook, fees, news)
 - `src/components/home/` : sections de la home
 - `src/components/marketGlobal/` : ticker + mini-chart
+- `src/components/demo-wallet/` : wallet démo (UI fictive, page compare A/B)
+- `src/components/demo/` : réservé (dossier vide actuellement)
 - `src/components/xumm/` : connexion/QR Xumm
 - `src/context/` : contexts React (Xumm, WS…)
+- `src/i18n/` : helpers i18n (ex: `getPageTranslations`)
 - `src/lib/` : clients/services (API, websocket, config runtime…)
 - `src/utils/` : helpers purs (market stats, XRPL helpers…)
+- `src/styles/` : CSS globaux (ex: wallet actions)
 
 ## Règle simple
 

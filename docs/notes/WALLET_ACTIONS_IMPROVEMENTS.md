@@ -2,6 +2,9 @@
 
 Prototype HTML (si besoin) : `docs/notes/WALLET_ACTIONS_SEND_PRIMARY.html`
 
+> **Status:** DESIGN NOTE (implémenté)  
+> **Last Reviewed:** 2026-01-13
+
 ## 🎯 Design Goal
 Professional, responsive, and mature trading platform buttons with **"Send"** as the primary action.
 

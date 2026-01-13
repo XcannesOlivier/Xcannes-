@@ -2,6 +2,10 @@
 
 Notes de design (frontend).
 
+> **Status:** DESIGN SPEC (non branché)  
+> **Last Reviewed:** 2026-01-13  
+> **Implementation note:** La home utilise encore un bouton “•••” avec `shimmer`/`irregularPulse` (voir `src/pages/index.jsx`). Les styles `.ai-assistant-btn`/`.ai-icon`/`.ai-beta-badge` sont présents dans ce fichier mais le markup ne les utilise pas encore. Pour appliquer cette spec, remplacer le bouton actuel par la structure `.ai-assistant-btn` + icône + badge, et supprimer les spans de shimmer/pulse.
+
 ## 🎯 Design Goal
 Create a floating AI assistant button that is **professional, non-intrusive, and clearly distinct** from financial actions in a trading platform interface.
 
