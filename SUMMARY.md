@@ -1,5 +1,9 @@
 # 📋 Résumé de l'intervention - Traductions XCANNES
 
+> **Status:** ARCHIVED  
+> **Last Reviewed:** 2026-01-13  
+> **Note:** Résumé historique d’une intervention de traduction. Certains scripts/fichiers cités (ex: `TRANSLATION_REPORT.md`, `compare-translations.js`) ne sont plus présents. Pour l’état actuel, utiliser `npm run translations:status` et `Xcannes-/scripts/README.md`.
+
 ## ✅ Travail effectué
 
 ### 1. Diagnostic complet

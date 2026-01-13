@@ -1,5 +1,8 @@
 # Wallet XCANNES — Document explicatif (dev)
 
+> **Status:** ACTIVE  
+> **Last Reviewed:** 2026-01-13
+
 Ce document sert de **base de référence** pour continuer le développement du wallet XCANNES (frontend).  
 Il décrit ce qui existe dans le code, ce qui est “spécification UX”, et ce qui reste à clarifier.
 
@@ -94,9 +97,10 @@ Source: `Xcannes-/src/components/wallet/WalletDashboard.jsx` (`handleSendSubmit`
 ### 3.6 Receive
 
 - Affiche un QR code avec l’adresse XRPL.
-- “Request payment” existe en UI mais la génération est marquée TODO.
+- “Request payment” génère un payload `xcannes-payreq-v1` (base64) et un lien `/pay?req=...` (QR ou lien partageable).
+- La page `/pay` ( `src/pages/pay.jsx`) décode la demande, lance la connexion Xumm puis signe un paiement RLUSD.
 
-Source: `Xcannes-/src/components/wallet/modals/WalletDashboardReceiveModal.jsx`
+Source: `Xcannes-/src/components/wallet/modals/WalletDashboardReceiveModal.jsx`, `Xcannes-/src/pages/pay.jsx`
 
 ### 3.7 Convert (allocations RLUSD)
 
