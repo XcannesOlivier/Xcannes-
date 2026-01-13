@@ -69,7 +69,10 @@ export default function QRScanner({
         window.location.hostname === "127.0.0.1";
         if (!isSecure) {
           setError(
-            "Camera is blocked on HTTP. Use HTTPS (or localhost) or upload a QR image below."
+            t(
+              "ui_camera_blocked_http_7d6a0c9b2e",
+              "Camera is blocked on HTTP. Use HTTPS (or localhost) or upload a QR image below."
+            )
           );
           setIsScanning(false);
           return;
@@ -77,7 +80,10 @@ export default function QRScanner({
 
         if (!navigator?.mediaDevices?.getUserMedia) {
           setError(
-            "Camera is not available on this device. You can upload a QR image below."
+            t(
+              "ui_camera_unavailable_device_4f2a90f1c3",
+              "Camera is not available on this device. You can upload a QR image below."
+            )
           );
           setIsScanning(false);
           return;
@@ -137,13 +143,28 @@ export default function QRScanner({
         // Messages d'erreur personnalisés
         const errStr = err.toString();
         if (errStr.includes('NotAllowedError') || errStr.includes('Permission')) {
-          setError("Camera access denied. Please allow camera access in your browser settings and try again.");
+          setError(
+            t(
+              "ui_camera_access_denied_5b9f8c2a10",
+              "Camera access denied. Please allow camera access in your browser settings and try again."
+            )
+          );
         } else if (errStr.includes('NotFoundError')) {
-          setError("No camera found on this device.");
+          setError(t("ui_camera_not_found_9a1c3b4d5e", "No camera found on this device."));
         } else if (errStr.includes('NotReadableError')) {
-          setError("Camera is already in use by another application.");
+          setError(
+            t(
+              "ui_camera_in_use_6d8f2a1c0b",
+              "Camera is already in use by another application."
+            )
+          );
         } else {
-          setError("Unable to access camera. Please check permissions and try again.");
+          setError(
+            t(
+              "ui_camera_access_failed_2c4e6f8a1b",
+              "Unable to access camera. Please check permissions and try again."
+            )
+          );
         }
 
         setIsScanning(false);
@@ -181,7 +202,12 @@ export default function QRScanner({
       onScan(decodedText);
     } catch (err) {
       console.error("QR scanFile error:", err);
-      setError("Unable to decode this image. Try a clearer screenshot.");
+      setError(
+        t(
+          "ui_qr_decode_failed_3b5d7f9a2c",
+          "Unable to decode this image. Try a clearer screenshot."
+        )
+      );
       setIsStarting(false);
     }
   };

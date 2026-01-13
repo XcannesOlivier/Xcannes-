@@ -575,12 +575,19 @@ export default function DemoWalletDashboard({
       if (Number.isFinite(requestedRlusd) && requestedRlusd > 0) {
         const diff = Math.abs(paymentRlusd - requestedRlusd);
         if (diff > Math.max(0.01, requestedRlusd * 0.005)) {
+          const requestedLabel = requestedRlusd.toLocaleString(locale, {
+            maximumFractionDigits: 6
+          });
+          const computedLabel = paymentRlusd.toLocaleString(locale, {
+            maximumFractionDigits: 6
+          });
           return {
-            error:
-            `Payment request mismatch (demo).\n\n` +
-            `Requested: ≈ ${requestedRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n` +
-            `Computed: ≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n\n` +
-            `Rescan the request or retry.`
+            error: t("demo_error_payment_request_mismatch", {
+              defaultValue:
+                "Demande de paiement incohérente (démo).\n\nDemandé : ≈ {{requested}} RLUSD\nCalculé : ≈ {{computed}} RLUSD\n\nResscanez la demande ou réessayez.",
+              requested: requestedLabel,
+              computed: computedLabel
+            })
           };
         }
       }
@@ -705,13 +712,23 @@ export default function DemoWalletDashboard({
 
     const dest = String(sendDestination || "").trim();
     if (sendPaymentRequest?.to && dest !== String(sendPaymentRequest.to).trim()) {
-      alert("Payment request destination mismatch (demo).");
+      alert(
+        t(
+          "demo_error_request_destination_mismatch",
+          "La destination de la demande de paiement ne correspond pas (démo)."
+        )
+      );
       return { ok: false };
     }
     const toWalletId =
       dest === getWalletAddress(state, otherWalletId) ? otherWalletId : null;
     if (!toWalletId) {
-      alert("Demo: destination must be Wallet A/B address.");
+      alert(
+        t(
+          "demo_error_destination_wallet_required",
+          "Démo : la destination doit être une adresse Wallet A/B."
+        )
+      );
       return { ok: false };
     }
 
@@ -721,7 +738,11 @@ export default function DemoWalletDashboard({
       .toUpperCase();
     if (requestTargetCurrency && requestTargetCurrency !== currency) {
       alert(
-        `This request is in ${requestTargetCurrency}.\nPlease select ${requestTargetCurrency} to pay.`
+        t("demo_error_request_currency_mismatch", {
+          defaultValue:
+            "Cette demande est en {{currency}}.\nVeuillez sélectionner {{currency}} pour payer.",
+          currency: requestTargetCurrency
+        })
       );
       return { ok: false };
     }
@@ -804,15 +825,22 @@ export default function DemoWalletDashboard({
     const feeUsd = usdGross * 60 / 10_000;
     const usdNet = Math.max(0, usdGross - feeUsd);
     const toAmount = usdNet / quoteUsd;
+    const amountLabel = toAmount.toLocaleString(locale, { maximumFractionDigits: 6 });
+    const usdLabel = usdNet.toLocaleString(locale, { maximumFractionDigits: 2 });
+    const feeLabel = feeUsd.toLocaleString(locale, { maximumFractionDigits: 2 });
+    const baseLabel = t("demo_quote_backed", "USD base");
+    const feeLabelText = t("demo_quote_fee", "fee");
     setConvertPreview(
-      `≈ ${toAmount.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${quote} · USD base ${usdNet.toLocaleString("en-US", { maximumFractionDigits: 2 })} · fee ${feeUsd.toLocaleString("en-US", { maximumFractionDigits: 2 })}`
+      `≈ ${amountLabel} ${quote} · ${baseLabel} ${usdLabel} · ${feeLabelText} ${feeLabel}`
     );
   }, [
   convertAmount,
   convertBaseCurrency,
   convertQuoteCurrency,
+  locale,
   rlusdPerUnitRates,
-  setConvertPreview]
+  setConvertPreview,
+  t]
   );
 
   const handleDemoConvert = () => {
@@ -942,7 +970,7 @@ export default function DemoWalletDashboard({
       let amount = 0;
       let type = "credit";
       let category = "other";
-      let description = "Movement";
+      let description = t("demo_statement_movement", "Mouvement");
       let counterparty = "";
 
       if (evt.kind === "send" && String(evt.currency).toUpperCase() === currency) {
@@ -950,38 +978,52 @@ export default function DemoWalletDashboard({
         if (evt.from === activeWalletId) {
           type = "debit";
           counterparty = getWalletAddress(state, evt.to);
-          description = `Send to Wallet ${evt.to}`;
+          description = t("demo_statement_send_to_wallet", {
+            defaultValue: "Envoyer vers le wallet {{walletId}}",
+            walletId: evt.to
+          });
           running -= amount;
         } else {
           type = "credit";
           counterparty = getWalletAddress(state, evt.from);
-          description = `Receive from Wallet ${evt.from}`;
+          description = t("demo_statement_receive_from_wallet", {
+            defaultValue: "Recevoir depuis le wallet {{walletId}}",
+            walletId: evt.from
+          });
           running += amount;
         }
       } else if (evt.kind === "convert") {
-        category = "conversion";
+        category = "exchange";
         if (String(evt.fromCurrency).toUpperCase() === currency) {
           type = "debit";
           amount = Number(evt.fromAmount || 0);
-          description = `Exchange ${evt.fromCurrency} → ${evt.toCurrency}`;
+          description = t("demo_statement_exchange", {
+            defaultValue: "Conversion {{fromCurrency}} → {{toCurrency}}",
+            fromCurrency: evt.fromCurrency,
+            toCurrency: evt.toCurrency
+          });
           running -= amount;
         } else if (String(evt.toCurrency).toUpperCase() === currency) {
           type = "credit";
           amount = Number(evt.toAmount || 0);
-          description = `Exchange ${evt.fromCurrency} → ${evt.toCurrency}`;
+          description = t("demo_statement_exchange", {
+            defaultValue: "Conversion {{fromCurrency}} → {{toCurrency}}",
+            fromCurrency: evt.fromCurrency,
+            toCurrency: evt.toCurrency
+          });
           running += amount;
         }
       } else if (evt.kind === "buy" && currency === "RLUSD") {
         category = "buy";
         type = "credit";
         amount = Number(evt.amount || 0);
-        description = "Buy via MoonPay (demo)";
+        description = t("demo_statement_buy_moonpay", "Achat via MoonPay (démo)");
         running += amount;
       } else if (evt.kind === "sell" && currency === "RLUSD") {
         category = "sell";
         type = "debit";
         amount = Number(evt.amount || 0);
-        description = "Sell via MoonPay (demo)";
+        description = t("demo_statement_sell_moonpay", "Vente via MoonPay (démo)");
         running -= amount;
       } else if (
       evt.kind === "spread_fee" &&
@@ -991,7 +1033,7 @@ export default function DemoWalletDashboard({
         category = "fee";
         type = "debit";
         amount = Number(evt.amount || 0);
-        description = "XCANNES fee (spread)";
+        description = t("demo_statement_fee_spread", "Frais XCANNES (spread)");
         running -= amount;
       }
 
@@ -1007,7 +1049,7 @@ export default function DemoWalletDashboard({
     });
 
     setPreviewCurrencyTransactions(txs.reverse()); // newest first
-  }, [activeWallet?.allocations, activeWalletId, selectedStatementToken, state, state.events]);
+  }, [activeWallet?.allocations, activeWalletId, selectedStatementToken, state, state.events, t]);
 
   return (
     <div

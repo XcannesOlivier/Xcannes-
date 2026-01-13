@@ -27,7 +27,7 @@ export default function GlobalStatement({
   isPreviewMode = false,
   noticeVariant = "preview",
   noticeContextLabel = "",
-  period = "December 2025",
+  period = "",
   isFullPage = false,
   variant = "default",
   usdRates = {},
@@ -39,9 +39,20 @@ export default function GlobalStatement({
   onLoadMoreMovements,
   onClose,
   onViewCurrency
-}) {const { t } = useTranslation("common");
+}) {const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const [sortBy, setSortBy] = useState("balance"); // balance, change, name
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
+  const defaultPeriod = t(
+    "ui_statement_period_default_5f4c8a7d2b",
+    "December 2025"
+  );
+  const archivesLabel = t("ui_archives_label_3c1f8a7b2e", "Archives");
+  const archivesLongLabel = t(
+    "ui_archives_12plus_7b3c9a1d5e",
+    "Archives (12+ months)"
+  );
+  const fallbackPeriod = period || defaultPeriod;
 
   const walletLabel = useMemo(() => {
     if (typeof window === "undefined" || !walletAddress) return "";
@@ -64,22 +75,22 @@ export default function GlobalStatement({
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
       months.push({
         value: i,
-        label: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        displayLabel: date.toLocaleDateString('en-US', { month: 'long' }) // Juste le mois pour l'affichage
+        label: date.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
+        displayLabel: date.toLocaleDateString(locale, { month: 'long' }) // Juste le mois pour l'affichage
       });
     }
 
     months.push({
       value: 'archives',
-      label: 'Archives (12+ months)',
-      displayLabel: 'Archives'
+      label: archivesLongLabel,
+      displayLabel: archivesLabel
     });
     return months;
   };
 
   const availableMonths = generateMonths();
-  const currentPeriod = selectedMonth === 'archives' ? 'Archives' : availableMonths[selectedMonth]?.label || period;
-  const currentDisplayPeriod = selectedMonth === 'archives' ? 'Archives' : availableMonths[selectedMonth]?.displayLabel || period.split(' ')[0]; // Affiche juste le mois
+  const currentPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.label || fallbackPeriod;
+  const currentDisplayPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.displayLabel || String(fallbackPeriod).split(' ')[0]; // Affiche juste le mois
 
   const isUsdStablecoin = (currency) =>
   USD_STABLECOINS.includes(String(currency || "").toUpperCase());
@@ -114,7 +125,7 @@ export default function GlobalStatement({
   });
 
   const formatAmount = (amount) => {
-    return parseFloat(amount || 0).toLocaleString("en-US", {
+    return parseFloat(amount || 0).toLocaleString(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
@@ -170,12 +181,30 @@ export default function GlobalStatement({
   };
 
   const getCategoryBadge = (token) => {
-    if (token.currency === "XRP") return { label: "Native", color: "blue" };
-    if (token.currency === "XCS") return { label: "Platform", color: "green" };
+    if (token.currency === "XRP") {
+      return {
+        label: t("ui_label_native_2d7a1c9b4e", "Native"),
+        color: "blue"
+      };
+    }
+    if (token.currency === "XCS") {
+      return {
+        label: t("ui_label_platform_7c1a9d3b5e", "Platform"),
+        color: "green"
+      };
+    }
     if (isUsdStablecoin(token.currency))
-    return { label: "Stablecoin", color: "purple" };
-    if (token.isTrustlineOnly) return { label: "Exchange Rate", color: "orange" };
-    return { label: "Token", color: "gray" };
+    return {
+      label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
+      color: "purple"
+    };
+    if (token.isTrustlineOnly) {
+      return {
+        label: t("ui_label_exchange_rate_5a1c7b9d3e", "Exchange Rate"),
+        color: "orange"
+      };
+    }
+    return { label: t("ui_label_token_1c7b3a9d5e", "Token"), color: "gray" };
   };
 
   const STATEMENT_LAYOUTS = {
@@ -256,7 +285,7 @@ export default function GlobalStatement({
             <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_1bfc3cd21c", "Account Holder")}</p>
               <p className="text-sm text-white font-semibold truncate">
-                {walletLabel || "Wallet"}
+                {walletLabel || t("nav_wallet", "Wallet")}
               </p>
               <p className="text-[11px] text-white/50 font-mono break-all">
                 {walletAddress}
@@ -358,7 +387,9 @@ export default function GlobalStatement({
                             <div className="min-w-0">
                               <p className="text-white font-medium text-xs sm:text-sm truncate">{token.currency}</p>
                               <p className="text-[9px] sm:text-xs text-white/40 truncate">
-                                {token.currency === "XRP" ? "Native" : token.issuer?.slice(0, 8) + "..."}
+                                {token.currency === "XRP" ?
+                                  t("ui_label_native_2d7a1c9b4e", "Native") :
+                                  token.issuer?.slice(0, 8) + "..."}
                               </p>
                             </div>
                           </div>
@@ -405,7 +436,7 @@ export default function GlobalStatement({
           {/* Watermark */}
           <div className="hidden sm:block text-center py-3 sm:py-4">
             <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{t("ui_generated_on_3827d9035f", "Generated on")}
-            {new Date().toLocaleString("en-US")}
+            {new Date().toLocaleString(locale)}
             </p>
           </div>
         </div>
@@ -440,7 +471,7 @@ export default function GlobalStatement({
             const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
             const when =
             createdAt && Number.isFinite(createdAt.getTime()) ?
-            createdAt.toLocaleString("en-US") :
+            createdAt.toLocaleString(locale) :
             "";
             return (
               <div
@@ -449,7 +480,9 @@ export default function GlobalStatement({
 
                       <div className="min-w-0">
                         <div className="text-[11px] text-white/70 truncate">
-                          {from && to ? `${from} → ${to}` : "Movement"}
+                          {from && to ?
+                            `${from} → ${to}` :
+                            t("ui_movement_7a2c1b9d5e", "Movement")}
                         </div>
                         <div className="text-[10px] text-white/30 truncate">
                           {when}
@@ -457,7 +490,7 @@ export default function GlobalStatement({
                       </div>
                       <div className="text-[11px] font-mono text-white/80">
                         {Number.isFinite(amount) ?
-                  `${amount.toLocaleString("en-US", {
+                  `${amount.toLocaleString(locale, {
                     maximumFractionDigits: 6
                   })} RLUSD` :
                   "—"}
@@ -476,7 +509,9 @@ export default function GlobalStatement({
             disabled={movementsLoadingMore}
             className="w-full px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white/70 border border-white/15 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
 
-                  {movementsLoadingMore ? "Loading…" : "Load more"}
+                  {movementsLoadingMore ?
+                    t("ui_loading_1386baebe9", "Loading…") :
+                    t("ui_load_more_3f7a1c9d5b", "Load more")}
                 </button>
               </div>
         }
@@ -487,7 +522,14 @@ export default function GlobalStatement({
         <div className="border-t border-white/10 px-3 sm:px-6 py-3 sm:py-4 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
           <div className="flex gap-2 flex-wrap">
             <button
-            onClick={() => alert("Export PDF functionality to be implemented")}
+            onClick={() =>
+              alert(
+                t("ui_export_in_progress_6c2a1d8b4f", {
+                  defaultValue:
+                    "Export {{format}} in progress... (feature to be implemented).",
+                  format: "PDF"
+                })
+              )}
             className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15">{t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
 
 

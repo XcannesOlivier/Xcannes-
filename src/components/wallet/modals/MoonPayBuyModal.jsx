@@ -57,18 +57,33 @@ const MoonPayBuyModal = ({
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
     if (!walletAddress) {
-      setError('Wallet address is required');
+      setError(
+        t(
+          "moonpay_error_wallet_required_5f2a1c9d3e",
+          "Wallet address is required."
+        )
+      );
       return;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      setError('Please enter a valid amount');
+      setError(
+        t(
+          "moonpay_error_invalid_amount_8c3b1a6d2f",
+          "Please enter a valid amount."
+        )
+      );
       return;
     }
 
     const selectedCurrency = supportedCurrencies.find((c) => c.code === currency);
     if (amountType === 'fiat' && parseFloat(amount) < selectedCurrency.min) {
-      setError(`Minimum amount is $${selectedCurrency.min} USD`);
+      setError(
+        t("moonpay_error_minimum_usd_7a1b3c5d8e", {
+          defaultValue: "Minimum amount is ${{amount}} USD.",
+          amount: selectedCurrency.min,
+        })
+      );
       return;
     }
 
@@ -112,18 +127,35 @@ const MoonPayBuyModal = ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to generate buy URL');
+        throw new Error(
+          data.message ||
+            t(
+              "moonpay_error_generate_buy_url_4d2c9a1f7b",
+              "Failed to generate buy URL."
+            )
+        );
       }
 
       if (data.success && data.url) {
         setIframeUrl(data.url);
         setStep('iframe');
       } else {
-        throw new Error('Invalid response from server');
+        throw new Error(
+          t(
+            "moonpay_error_invalid_response_6b2d8c1a9f",
+            "Invalid response from server."
+          )
+        );
       }
     } catch (err) {
       console.error('Error generating buy URL:', err);
-      setError(err.message || 'Failed to load MoonPay widget');
+      setError(
+        err.message ||
+          t(
+            "moonpay_error_load_widget_3c1a7d8b2e",
+            "Failed to load MoonPay widget."
+          )
+      );
       setStep('error');
     } finally {
       setLoading(false);
@@ -152,7 +184,12 @@ const MoonPayBuyModal = ({
 
       // Transaction échouée
       if (type === 'transaction_failed' || status === 'failed') {
-        setError('Transaction failed. Please try again.');
+        setError(
+          t(
+            "moonpay_error_transaction_failed_9a2c1b7d5e",
+            "Transaction failed. Please try again."
+          )
+        );
         setStep('error');
       }
 
@@ -251,7 +288,15 @@ const MoonPayBuyModal = ({
                 {/* Amount input */}
                 <div>
                   <label className="block text-sm font-medium text-white/80 mb-2">
-                    {amountType === 'fiat' ? 'Amount in USD' : `Amount in ${currency}`}
+                    {amountType === 'fiat'
+                      ? t(
+                          "moonpay_amount_in_usd_2f7a1c9d3b",
+                          "Amount in USD"
+                        )
+                      : t("moonpay_amount_in_currency_8b1c7d2a9e", {
+                          defaultValue: "Amount in {{currency}}",
+                          currency,
+                        })}
                   </label>
                   <div className="relative">
                     <input
@@ -300,8 +345,14 @@ const MoonPayBuyModal = ({
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                   <p className="text-xs text-blue-400">
                     {demoMode ?
-          "ℹ️ Demo mode: no MoonPay redirect. The buy is simulated." :
-          "ℹ️ You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer."}
+          `ℹ️ ${t(
+            "moonpay_info_buy_demo_1b7d2c9a5e",
+            "Demo mode: no MoonPay redirect. The buy is simulated."
+          )}` :
+          `ℹ️ ${t(
+            "moonpay_info_buy_live_3c8a1d6b2f",
+            "You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer."
+          )}`}
                   </p>
                 </div>
 
@@ -313,10 +364,10 @@ const MoonPayBuyModal = ({
         className="w-full py-3 bg-xcannes-green hover:bg-xcannes-green/90 disabled:bg-white/10 disabled:text-white/40 text-black font-semibold rounded-lg transition-all duration-200 hover:scale-105 border border-white/10">
 
                   {loading ?
-        'Loading...' :
+        t("moonpay_action_loading_7c2b1d9a3e", "Loading...") :
         demoMode ?
-        "Simuler l’achat" :
-        'Continue to MoonPay'}
+        t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy") :
+        t("moonpay_action_continue_buy_8d2a1c6b9f", "Continue to MoonPay")}
                 </button>
               </div>
     }
@@ -384,7 +435,11 @@ const MoonPayBuyModal = ({
 	                  {t("moonpay_error_title", "Something went wrong")}
 	                </h4>
                 <p className="text-white/60 text-center mb-4">
-                  {error || 'Please try again later.'}
+                  {error ||
+                    t(
+                      "moonpay_error_try_again_later_6f2b1c9d8a",
+                      "Please try again later."
+                    )}
                 </p>
                 <div className="flex gap-3">
                   <button

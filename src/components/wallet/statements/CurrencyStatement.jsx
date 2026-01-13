@@ -39,7 +39,7 @@ export default function CurrencyStatement({
   onLoadMore,
   loading = false,
   error = null,
-  period = "December 2025",
+  period = "",
   isFullPage = false,
   variant = "default",
   usdRates = {},
@@ -47,7 +47,8 @@ export default function CurrencyStatement({
   hasXcsTrustline = false,
   xcannesCurrencyLinesCount = 0,
   onClose
-}) {const { t } = useTranslation("common");
+}) {const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
@@ -62,6 +63,16 @@ export default function CurrencyStatement({
   const [xrplLoading, setXrplLoading] = useState(false);
   const [xrplLoadingMore, setXrplLoadingMore] = useState(false);
   const [xrplError, setXrplError] = useState(null);
+  const defaultPeriod = t(
+    "ui_statement_period_default_5f4c8a7d2b",
+    "December 2025"
+  );
+  const archivesLabel = t("ui_archives_label_3c1f8a7b2e", "Archives");
+  const archivesLongLabel = t(
+    "ui_archives_12plus_7b3c9a1d5e",
+    "Archives (12+ months)"
+  );
+  const fallbackPeriod = period || defaultPeriod;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -143,7 +154,13 @@ export default function CurrencyStatement({
       setXrplCursorNext(data?.cursorNext || null);
     } catch (err) {
       console.error("[wallet/xrpl/payments] load error:", err);
-      setXrplError(err?.message || "Failed to load XRPL payments");
+      setXrplError(
+        err?.message ||
+          t(
+            "ui_xrpl_payments_load_failed_9b3c1a7d5e",
+            "Failed to load XRPL payments."
+          )
+      );
       setXrplPayments([]);
       setXrplHasMore(false);
       setXrplCursorNext(null);
@@ -173,7 +190,13 @@ export default function CurrencyStatement({
       setXrplCursorNext(data?.cursorNext || null);
     } catch (err) {
       console.error("[wallet/xrpl/payments] load more error:", err);
-      setXrplError(err?.message || "Failed to load more XRPL payments");
+      setXrplError(
+        err?.message ||
+          t(
+            "ui_xrpl_payments_load_more_failed_2a7c1b9d5e",
+            "Failed to load more XRPL payments."
+          )
+      );
     } finally {
       setXrplLoadingMore(false);
     }
@@ -261,22 +284,22 @@ export default function CurrencyStatement({
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
       months.push({
         value: i,
-        label: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-        displayLabel: date.toLocaleDateString('en-US', { month: 'long' }) // Juste le mois pour l'affichage
+        label: date.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
+        displayLabel: date.toLocaleDateString(locale, { month: 'long' }) // Juste le mois pour l'affichage
       });
     }
 
     months.push({
       value: 'archives',
-      label: 'Archives (12+ months)',
-      displayLabel: 'Archives'
+      label: archivesLongLabel,
+      displayLabel: archivesLabel
     });
     return months;
   };
 
   const availableMonths = generateMonths();
-  const currentPeriod = selectedMonth === 'archives' ? 'Archives' : availableMonths[selectedMonth]?.label || period;
-  const currentDisplayPeriod = selectedMonth === 'archives' ? 'Archives' : availableMonths[selectedMonth]?.displayLabel || period.split(' ')[0]; // Affiche juste le mois
+  const currentPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.label || fallbackPeriod;
+  const currentDisplayPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.displayLabel || String(fallbackPeriod).split(' ')[0]; // Affiche juste le mois
 
 
   // Calculer les statistiques
@@ -330,7 +353,13 @@ export default function CurrencyStatement({
   const handleExport = (format) => {
     setExportFormat(format);
     setTimeout(() => {
-      alert(`Export ${format.toUpperCase()} en cours... (fonctionnalité à implémenter)`);
+      alert(
+        t("ui_export_in_progress_6c2a1d8b4f", {
+          defaultValue:
+            "Export {{format}} in progress... (feature to be implemented).",
+          format: String(format || "").toUpperCase()
+        })
+      );
       setExportFormat(null);
     }, 500);
   };
@@ -565,16 +594,16 @@ export default function CurrencyStatement({
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return "N/A";
+    if (!dateStr) return t("ui_not_available_9c2a1f7b3d", "N/A");
     const date = new Date(dateStr);
     const options = isMobileDate ?
     { day: "2-digit", month: "2-digit" } :
     { day: "2-digit", month: "2-digit", year: "numeric" };
-    return date.toLocaleDateString("fr-FR", options);
+    return date.toLocaleDateString(locale, options);
   };
 
   const formatAmount = (amount) => {
-    return parseFloat(amount || 0).toLocaleString("en-US", {
+    return parseFloat(amount || 0).toLocaleString(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 6
     });
@@ -673,7 +702,7 @@ export default function CurrencyStatement({
 	            <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_3eef963295", "Account Holder")}</p>
               <p className="text-sm text-white font-semibold truncate">
-                {walletLabel || "Wallet"}
+                {walletLabel || t("nav_wallet", "Wallet")}
               </p>
               <p className="text-[11px] text-white/50 font-mono break-all">
                 {walletAddress}
@@ -739,11 +768,21 @@ export default function CurrencyStatement({
                           <span className="font-mono">{xrpReserveDetails.activationXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>{t("ui_trustline_rlusd_9c077313dc", "Trustline RLUSD")}{hasRlusdTrustline ? "(active)" : "(à activer)"}</span>
+                          <span>
+                            {t("ui_trustline_rlusd_9c077313dc", "Trustline RLUSD")}{" "}
+                            {hasRlusdTrustline ?
+                              t("ui_status_active_short_4c8b1a7d2e", "(active)") :
+                              t("ui_status_to_activate_short_7a1c4d9b2e", "(to activate)")}
+                          </span>
                           <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>{t("ui_trustline_xcs_91682deeea", "Trustline XCS")}{hasXcsTrustline ? "(active)" : "(à activer)"}</span>
+                          <span>
+                            {t("ui_trustline_xcs_91682deeea", "Trustline XCS")}{" "}
+                            {hasXcsTrustline ?
+                              t("ui_status_active_short_4c8b1a7d2e", "(active)") :
+                              t("ui_status_to_activate_short_7a1c4d9b2e", "(to activate)")}
+                          </span>
                           <span className="font-mono">{xrpReserveDetails.trustlineXcsXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                       </div>
@@ -981,7 +1020,7 @@ export default function CurrencyStatement({
                   const createdAt = p?.createdAt ? new Date(p.createdAt) : null;
                   const when =
                   createdAt && Number.isFinite(createdAt.getTime()) ?
-                  createdAt.toLocaleString("en-US") :
+                  createdAt.toLocaleString(locale) :
                   "";
                   const dir = String(p?.direction || "").toLowerCase();
                   const isSend = dir === "send";
@@ -1009,7 +1048,9 @@ export default function CurrencyStatement({
                               isSend ? "text-red-300" : "text-emerald-300"}`
                               }>
 
-                                    {isSend ? "Send" : "Receive"}
+                                    {isSend ?
+                                      t("ui_send_71ed97cd73", "Send") :
+                                      t("ui_receive_61ed481e18", "Receive")}
                                   </span>
                                   <span className="text-[11px] text-white/40">
                                     {isSend ? "→" : "←"}
@@ -1036,7 +1077,7 @@ export default function CurrencyStatement({
                             <td className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${isSend ? "text-red-400" : "text-green-400"}`}>
                               {isSend ? "−" : "+"}
                               {Number.isFinite(amount) ?
-                        amount.toLocaleString("en-US", { maximumFractionDigits: 8 }) :
+                        amount.toLocaleString(locale, { maximumFractionDigits: 8 }) :
                         "0"}{" "}
                               <span className="text-white/50">{normalizedCurrency}</span>
                             </td>
@@ -1117,7 +1158,9 @@ export default function CurrencyStatement({
           disabled={loadingMore}
           className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
 
-              {loadingMore ? "Loading…" : "Load more"}
+              {loadingMore ?
+                t("ui_loading_1386baebe9", "Loading…") :
+                t("ui_load_more_3f7a1c9d5b", "Load more")}
             </button>
         }
 
@@ -1128,7 +1171,9 @@ export default function CurrencyStatement({
           disabled={xrplLoadingMore}
           className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
 
-              {xrplLoadingMore ? "Loading…" : "Load more"}
+              {xrplLoadingMore ?
+                t("ui_loading_1386baebe9", "Loading…") :
+                t("ui_load_more_3f7a1c9d5b", "Load more")}
             </button>
         }
 
@@ -1136,7 +1181,7 @@ export default function CurrencyStatement({
           <div className="hidden sm:block text-center py-3 md:py-4 border-t border-white/10">
             <div className="space-y-1">
               <p className="text-xs text-white/20 font-mono hidden md:block">{t("ui_generated_on_ae324c9048", "Generated on")}
-              {new Date().toLocaleString("en-US")}
+              {new Date().toLocaleString(locale)}
               </p>
               <p className="text-xs text-white/20 font-mono">{t("ui_verified_on_xrp_ledger_334f28ce50", "🔐 Verified on XRP Ledger")}
 
@@ -1157,7 +1202,9 @@ export default function CurrencyStatement({
             disabled={exportFormat === "pdf"}
             className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
 
-              {exportFormat === "pdf" ? "..." : "📄 PDF"}
+              {exportFormat === "pdf" ?
+                t("ui_loading_1386baebe9", "Loading…") :
+                t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
             </button>
             <button
             onClick={() => window.print()}

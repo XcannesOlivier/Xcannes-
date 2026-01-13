@@ -92,7 +92,9 @@ export default function WalletDashboardSendModal({
           </button>
           <div className="flex items-center gap-2 mb-1 pr-6">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {sendTab === "manual" ? "Send assets" : "Pay Request"}
+              {sendTab === "manual"
+                ? t("ui_send_assets_title_2c9b1a7d5e", "Send assets")
+                : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
             </h3>
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
@@ -208,13 +210,13 @@ export default function WalletDashboardSendModal({
             <p className="mt-1 text-[11px] text-white/60">{t("ui_spread_xcannes_tier_7ad17576d3", "Spread XCANNES (tier")}
               {" "}
                       <span className="font-mono">{sendFxInfo.spreadTier || "A"}</span>,{" "}
-                      {sendFxInfo.fxSource ?
+                  {sendFxInfo.fxSource ?
               <>{t("ui_source_507c065942", "source")}
                 {" "}
                           <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
                         </> :
 
-              "source inconnue"
+              t("ui_source_unknown_4c1a7d9b2e", "unknown source")
               }
                       ):{" "}
                       <span className="font-mono">
@@ -227,8 +229,14 @@ export default function WalletDashboardSendModal({
             }
                   <p className="mt-2 text-[10px] text-white/45">
                     {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
-              "2 signatures Xumm: spread → XCANNES, puis paiement → destinataire." :
-              "1 signature Xumm: paiement → destinataire."}
+              t(
+                "ui_xumm_signatures_two_8d1c7a2b9e",
+                "2 Xumm signatures: spread → XCANNES, then payment → recipient."
+              ) :
+              t(
+                "ui_xumm_signatures_one_5b2c1a7d9f",
+                "1 Xumm signature: payment → recipient."
+              )}
                   </p>
                 </div>
           }
@@ -332,7 +340,9 @@ export default function WalletDashboardSendModal({
             disabled={sendProcessing}
             className="w-full mt-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10">
 
-                {sendProcessing ? "Sending..." : "Send"}
+                {sendProcessing
+                  ? t("ui_sending_3b8c1a7d5e", "Sending...")
+                  : t("ui_send_504b64a87b", "Send")}
               </button>
             </div>
         }
@@ -376,7 +386,10 @@ export default function WalletDashboardSendModal({
                 value={requestText}
                 onChange={(e) => setRequestText(e.target.value)}
                 className="w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono"
-                placeholder="xcannes-payreq:... / JSON" />
+                placeholder={t(
+                  "ui_payreq_placeholder_3a9c1b7d2e",
+                  "xcannes-payreq:... / JSON"
+                )} />
                 <button
                 type="button"
                 onClick={(e) => {
