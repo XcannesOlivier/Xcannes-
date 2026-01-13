@@ -13,8 +13,8 @@ import {
   ensureAllocation,
   getDemoRatesUsdPerUnit,
   getWalletAddress,
-  walletUsdTotal } from
-"./DemoWalletModel";
+  walletUsdTotal
+} from "./DemoWalletModel";
 import WalletDashboardSendModal from "@/components/wallet/modals/WalletDashboardSendModal";
 import WalletDashboardReceiveModal from "@/components/wallet/modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "@/components/wallet/modals/WalletDashboardSwapModal";
@@ -70,11 +70,6 @@ function getCurrencyFlag(code) {
   return countryCodeToFlag(upper.slice(0, 2));
 }
 
-function safeNumber(value) {
-  const num = Number(value);
-  return Number.isFinite(num) ? num : null;
-}
-
 function formatMoney(locale, amount, currency) {
   const safeLocale = locale || "en";
   try {
@@ -99,18 +94,6 @@ function formatUnits(locale, amount) {
   }
 }
 
-function formatShortDate(locale, ts) {
-  try {
-    return new Intl.DateTimeFormat(locale || "en", {
-      year: "numeric",
-      month: "short",
-      day: "2-digit"
-    }).format(new Date(ts));
-  } catch {
-    return new Date(ts).toISOString().slice(0, 10);
-  }
-}
-
 const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 const DEMO_LATENCY_MS_MIN = 450;
 const DEMO_LATENCY_MS_MAX = 1100;
@@ -131,6 +114,12 @@ function getDemoLatencyMs() {
   return Math.max(0, Math.floor(min + Math.random() * (max - min)));
 }
 
+const DEMO_NATIVE_CURRENCIES = new Set(["XRP", "RLUSD", "XCS"]);
+
+function isDemoNativeCurrency(code) {
+  return DEMO_NATIVE_CURRENCIES.has(String(code || "").toUpperCase());
+}
+
 function getMinUnitsForCurrency(currencyCode) {
   const code = String(currencyCode || "").toUpperCase();
   if (code === "XRP") return 0.000001;
@@ -139,11 +128,11 @@ function getMinUnitsForCurrency(currencyCode) {
 
 function extractTickerPrice(ticker) {
   const priceSource =
-  ticker?.lastPrice ??
-  ticker?.price ??
-  ticker?.midPrice ??
-  ticker?.bidPrice ??
-  ticker?.askPrice;
+    ticker?.lastPrice ??
+    ticker?.price ??
+    ticker?.midPrice ??
+    ticker?.bidPrice ??
+    ticker?.askPrice;
   const price = Number(priceSource);
   return Number.isFinite(price) && price > 0 ? price : Number.NaN;
 }
@@ -171,24 +160,19 @@ async function resolveUsdPerUnit(code, pythPairsMap) {
       if (Number.isFinite(price) && price > 0) return { rate: 1 / price, source: "PYTH" };
     }
   } catch (_err) {
-
     // fallback below
   }
   try {
     const fxResult = await xcannesApi.getFxEod("USD", upper, 30);
     const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];
     const last = candles[candles.length - 1];
-    const close =
-    last && last.close != null ?
-    Number(last.close) :
-    last && last.price != null ?
-    Number(last.price) :
-    Number.NaN;
+    let close = Number.NaN;
+    if (last && last.close != null) close = Number(last.close);
+    else if (last && last.price != null) close = Number(last.price);
 
     // API returns USD->QUOTE (QUOTE per USD), so USD per 1 QUOTE is 1/close.
     if (Number.isFinite(close) && close > 0) return { rate: 1 / close, source: "FAWAZ" };
   } catch (_err) {
-
     // ignore
   }
   return { rate: Number.NaN, source: null };
@@ -238,6 +222,7 @@ export default function DemoWalletDashboard({
   const [ratesLastOkTs, setRatesLastOkTs] = useState(() => Date.now());
   const [ratesNowTs, setRatesNowTs] = useState(() => Date.now());
   const [state, setState] = useState(() => buildDefaultDemoState());
+  const [isHydrated, setIsHydrated] = useState(false);
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
   const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
@@ -266,34 +251,37 @@ export default function DemoWalletDashboard({
     const address = getWalletAddress(state, otherWalletId);
     if (!address) return [];
     return [
-    {
-      label: otherWallet?.label || `${t("demo_wallet_label", "Wallet")} ${otherWalletId}`,
-      address
-    }];
-
+      {
+        label: otherWallet?.label || `${t("demo_wallet_label", "Wallet")} ${otherWalletId}`,
+        address
+      }
+    ];
   }, [otherWallet?.label, otherWalletId, state, t]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       const raw = window.localStorage.getItem(DEMO_STATE_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (!isValidDemoState(parsed)) return;
-      setState(ensureFeeWallet(parsed));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (isValidDemoState(parsed)) setState(ensureFeeWallet(parsed));
+      }
     } catch (err) {
       console.warn("[demo-wallet] failed to load persisted state:", err);
+    } finally {
+      setIsHydrated(true);
     }
   }, []);
 
   useEffect(() => {
+    if (!isHydrated) return;
     if (typeof window === "undefined") return;
     try {
       window.localStorage.setItem(DEMO_STATE_STORAGE_KEY, JSON.stringify(state));
     } catch (err) {
       console.warn("[demo-wallet] failed to persist state:", err);
     }
-  }, [state]);
+  }, [isHydrated, state]);
 
   const {
     sendTab,
@@ -360,9 +348,9 @@ export default function DemoWalletDashboard({
     const codes = new Set(["USD", "RLUSD", "XRP", "XCS"]);
     const wallets = state?.wallets || {};
     Object.values(wallets).forEach((wallet) => {
-      Object.keys(wallet?.allocations || {}).forEach((code) =>
-      codes.add(String(code || "").toUpperCase())
-      );
+      Object.keys(wallet?.allocations || {}).forEach((code) => {
+        codes.add(String(code || "").toUpperCase());
+      });
     });
     if (convertBaseCurrency) codes.add(String(convertBaseCurrency).toUpperCase());
     if (convertQuoteCurrency) codes.add(String(convertQuoteCurrency).toUpperCase());
@@ -430,15 +418,15 @@ export default function DemoWalletDashboard({
 
   const tokens = useMemo(() => {
     const allocations = activeWallet?.allocations || {};
-    return Object.entries(allocations).
-    map(([code, units]) => {
-      const upper = String(code || "").toUpperCase();
-      const unitsNum = Number(units) || 0;
-      const rate = usdPerUnitRates?.[upper] ?? null;
-      const usdValue = Number.isFinite(Number(rate)) ? unitsNum * Number(rate) : null;
-      return { code: upper, units: unitsNum, usdValue };
-    }).
-    sort((a, b) => (b.usdValue || 0) - (a.usdValue || 0));
+    return Object.entries(allocations)
+      .map(([code, units]) => {
+        const upper = String(code || "").toUpperCase();
+        const unitsNum = Number(units) || 0;
+        const rate = usdPerUnitRates?.[upper] ?? null;
+        const usdValue = Number.isFinite(Number(rate)) ? unitsNum * Number(rate) : null;
+        return { code: upper, units: unitsNum, usdValue };
+      })
+      .sort((a, b) => (b.usdValue || 0) - (a.usdValue || 0));
   }, [activeWallet?.allocations, usdPerUnitRates]);
 
   const rlusdPerUnitRates = useMemo(
@@ -452,14 +440,13 @@ export default function DemoWalletDashboard({
     const entries = Object.entries(allocations).map(([code, units]) => {
       const currency = String(code || "").toUpperCase();
       const value = Number(units) || 0;
-      const isTrustlineOnly =
-      currency !== "XRP" && currency !== "RLUSD" && currency !== "XCS";
+      const isTrustlineOnly = !isDemoNativeCurrency(currency);
       const rlusdPerUnit = Number(rlusdPerUnitRates?.[currency] || 0);
-      const demoRlusdValue = isTrustlineOnly ?
-      value * (rlusdPerUnit || 0) :
-      currency === "XRP" ?
-      value * Number(rlusdPerUnitRates?.XRP || 0) :
-      value;
+      const demoRlusdValue = isTrustlineOnly
+        ? value * (rlusdPerUnit || 0)
+        : currency === "XRP"
+          ? value * Number(rlusdPerUnitRates?.XRP || 0)
+          : value;
 
       return {
         key: currency,
@@ -478,9 +465,7 @@ export default function DemoWalletDashboard({
 
   const selectedSendToken = useMemo(() => {
     if (!augmentedTokens.length) return null;
-    return (
-      augmentedTokens.find((t) => t.key === sendAssetKey) || augmentedTokens[0]);
-
+    return augmentedTokens.find((token) => token.key === sendAssetKey) || augmentedTokens[0];
   }, [augmentedTokens, sendAssetKey]);
 
   useEffect(() => {
@@ -494,11 +479,7 @@ export default function DemoWalletDashboard({
     if (!Number.isFinite(amountFx) || amountFx <= 0) return null;
 
     const code = String(selectedSendToken.currency || "").toUpperCase();
-    const isFxSend =
-    selectedSendToken?.isTrustlineOnly &&
-    code !== "XRP" &&
-    code !== "RLUSD" &&
-    code !== "XCS";
+    const isFxSend = selectedSendToken?.isTrustlineOnly && !isDemoNativeCurrency(code);
     if (!isFxSend) return null;
 
     const rlusdPerUnit = Number(rlusdPerUnitRates?.[code] || 0);
@@ -521,9 +502,9 @@ export default function DemoWalletDashboard({
       spreadFeeRlusd,
       spreadTier: spread?.tier || null,
       spreadPercentTotal:
-      spread?.isFx && Number.isFinite(Number(spread?.spreadFraction)) ?
-      Number(spread.spreadFraction) * 100 :
-      0
+        spread?.isFx && Number.isFinite(Number(spread?.spreadFraction))
+          ? Number(spread.spreadFraction) * 100
+          : 0
     };
   }, [rlusdPerUnitRates, selectedSendToken, sendAmount]);
 
@@ -728,18 +709,16 @@ export default function DemoWalletDashboard({
       return { ok: false };
     }
     const toWalletId =
-    dest === getWalletAddress(state, otherWalletId) ? otherWalletId : null;
+      dest === getWalletAddress(state, otherWalletId) ? otherWalletId : null;
     if (!toWalletId) {
       alert("Demo: destination must be Wallet A/B address.");
       return { ok: false };
     }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
-    const requestTargetCurrency = String(
-      sendPaymentRequest?.targetCurrencyCode || ""
-    ).
-    trim().
-    toUpperCase();
+    const requestTargetCurrency = String(sendPaymentRequest?.targetCurrencyCode || "")
+      .trim()
+      .toUpperCase();
     if (requestTargetCurrency && requestTargetCurrency !== currency) {
       alert(
         `This request is in ${requestTargetCurrency}.\nPlease select ${requestTargetCurrency} to pay.`
@@ -747,11 +726,7 @@ export default function DemoWalletDashboard({
       return { ok: false };
     }
 
-    const isFxSend =
-    selectedSendToken?.isTrustlineOnly &&
-    currency !== "XRP" &&
-    currency !== "RLUSD" &&
-    currency !== "XCS";
+    const isFxSend = selectedSendToken?.isTrustlineOnly && !isDemoNativeCurrency(currency);
 
     setSendProcessing(true);
     try {
@@ -777,14 +752,14 @@ export default function DemoWalletDashboard({
   };
 
   const currencyLines = useMemo(() => {
-    return (augmentedTokens || []).
-    filter((tok) => tok.isTrustlineOnly).
-    map((tok) => {
-      const code = String(tok.currency || "").toUpperCase();
-      const rate = Number(rlusdPerUnitRates?.[code] || 0);
-      const allocatedRlusd = rate > 0 ? Number(tok.value || 0) * rate : 0;
-      return { currencyCode: code, allocatedRlusd };
-    });
+    return (augmentedTokens || [])
+      .filter((token) => token.isTrustlineOnly)
+      .map((token) => {
+        const code = String(token.currency || "").toUpperCase();
+        const rate = Number(rlusdPerUnitRates?.[code] || 0);
+        const allocatedRlusd = rate > 0 ? Number(token.value || 0) * rate : 0;
+        return { currencyCode: code, allocatedRlusd };
+      });
   }, [augmentedTokens, rlusdPerUnitRates]);
 
   const currencyLinesSummary = useMemo(() => {
