@@ -57,12 +57,22 @@ export default function WalletDashboardReceiveModal({
 
     const amount = Number.parseFloat(requestAmount || "0");
     if (!Number.isFinite(amount) || amount <= 0) {
-      setGenerateError("Please enter a valid amount.");
+      setGenerateError(
+        t(
+          "ui_request_error_invalid_amount_5bd214c9a7",
+          "Please enter a valid amount."
+        )
+      );
       return;
     }
 
     if (!effectiveWallet) {
-      setGenerateError("Wallet address is missing.");
+      setGenerateError(
+        t(
+          "ui_request_error_missing_wallet_4f7a2c9b1e",
+          "Wallet address is missing."
+        )
+      );
       return;
     }
 
@@ -78,7 +88,12 @@ export default function WalletDashboardReceiveModal({
     } else if (isFxRequest) {
       const rate = Number(rlusdPerUnitRates?.[targetCurrencyCode]);
       if (!Number.isFinite(rate) || rate <= 0) {
-        setGenerateError(`Rate unavailable for ${targetCurrencyCode}.`);
+        setGenerateError(
+          t("ui_request_error_rate_unavailable_8c2e1a7b5d", {
+            defaultValue: "Rate unavailable for {{currency}}.",
+            currency: targetCurrencyCode,
+          })
+        );
         return;
       }
       fxRate = rate;
@@ -160,7 +175,12 @@ export default function WalletDashboardReceiveModal({
           </button>
           <div className="flex items-center gap-2 mb-1 pr-6">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {receiveTab === "receive" ? "Receive assets" : "Request payment"}
+              {receiveTab === "receive"
+                ? t(
+                    "ui_receive_assets_title_b3c7f4d2a1",
+                    "Receive assets"
+                  )
+                : t("ui_request_payment_c62b99fb16", "Request Payment")}
             </h3>
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
@@ -203,9 +223,15 @@ export default function WalletDashboardReceiveModal({
           </div>
 
           <p className="text-xs md:text-sm text-white/50 mb-3">
-            {receiveTab === "receive" ?
-          "Partagez cette adresse XRPL pour recevoir des fonds." :
-          "Créez une demande de paiement à envoyer à un autre wallet."}
+            {receiveTab === "receive"
+              ? t(
+                  "ui_receive_assets_desc_1b7f2c9d4e",
+                  "Share this XRPL address to receive funds."
+                )
+              : t(
+                  "ui_request_payment_desc_9c2b1a7d4f",
+                  "Create a payment request to send to another wallet."
+                )}
           </p>
 
           {/* Tab Content: Receive */}
@@ -409,9 +435,17 @@ export default function WalletDashboardReceiveModal({
                     </div>
             }
                   <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
-                    {isFxRequest ?
-              `Payment will settle on-chain in RLUSD, and be credited to the ${requestCurrencyCode} line for the receiver.` :
-              `Payment request prepared for ${requestCurrencyCode || "RLUSD"}.`}
+                    {isFxRequest
+                      ? t("ui_request_settlement_note_6a1c9d2f3b", {
+                          defaultValue:
+                            "Payment will settle on-chain in RLUSD, and be credited to the {{currency}} line for the receiver.",
+                          currency: requestCurrencyCode,
+                        })
+                      : t("ui_request_prepared_for_5d2a8b1c3f", {
+                          defaultValue:
+                            "Payment request prepared for {{currency}}.",
+                          currency: requestCurrencyCode || "RLUSD",
+                        })}
                   </div>
                 </div>
           }
@@ -420,13 +454,25 @@ export default function WalletDashboardReceiveModal({
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                 <p className="text-xs text-blue-400">
                   {requestMethod === "qr" &&
-              "Generate a QR code that can be scanned to pay you."}
+                    t(
+                      "ui_request_info_qr_4b1c8d2a6f",
+                      "Generate a QR code that can be scanned to pay you."
+                    )}
                   {requestMethod === "link" &&
-              "Create a shareable link for this payment request."}
+                    t(
+                      "ui_request_info_link_9a2b6c1d4f",
+                      "Create a shareable link for this payment request."
+                    )}
                   {requestMethod === "xrpl" &&
-              "Use XRPL native payment request (Payment Channel)."}
+                    t(
+                      "ui_request_info_xrpl_2c7b1a9d5e",
+                      "Use XRPL native payment request (Payment Channel)."
+                    )}
                   {requestMethod === "notification" &&
-              "Send a notification to the specified wallet address."}
+                    t(
+                      "ui_request_info_notification_7d1a4c9b2e",
+                      "Send a notification to the specified wallet address."
+                    )}
                 </p>
               </div>
             </div>

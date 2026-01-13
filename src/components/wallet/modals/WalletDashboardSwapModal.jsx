@@ -256,11 +256,17 @@ export default function WalletDashboardSwapModal({
             !isPreviewMode && !effectiveIsConnected
             }>
 
-                {convertProcessing ?
-            "Converting..." :
-            isPreviewMode ?
-            "Convert (demo, no real tx)" :
-            "Convert allocation"}
+                {convertProcessing
+                  ? t("ui_converting_71c2b9a4e5", "Converting...")
+                  : isPreviewMode
+                    ? t(
+                        "ui_convert_demo_no_tx_4d8a1c7b2e",
+                        "Convert (demo, no real tx)"
+                      )
+                    : t(
+                        "ui_convert_allocation_6b2c1a9d5e",
+                        "Convert allocation"
+                      )}
               </button>
 
               {!isPreviewMode &&

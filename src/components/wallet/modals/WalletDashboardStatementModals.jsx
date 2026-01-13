@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
@@ -25,6 +26,7 @@ export default function WalletDashboardStatementModals({
   selectedStatementToken,
   setSelectedStatementToken,
 }) {
+  const { t } = useTranslation("common");
   const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
     const code = String(t?.currency || "").toUpperCase();
     return code === "RLUSD" && !t?.isMissingTrustline;
@@ -72,10 +74,16 @@ export default function WalletDashboardStatementModals({
     const res = await fetch(url.toString());
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(data?.error || `Statement request failed (${res.status})`);
+      throw new Error(
+        data?.error ||
+          t("ui_statement_request_failed_4c2b1a7d9e", {
+            defaultValue: "Statement request failed ({{status}}).",
+            status: res.status,
+          })
+      );
     }
     return data;
-  }, []);
+  }, [t]);
 
   const loadGlobalFirstPage = useCallback(async () => {
     if (!canFetchStatements) return;
@@ -91,7 +99,10 @@ export default function WalletDashboardStatementModals({
       setGlobalCursorNext(data?.cursorNext || null);
     } catch (err) {
       console.error("[wallet/statement] global load error:", err);
-      setGlobalError(err?.message || "Failed to load statement");
+      setGlobalError(
+        err?.message ||
+          t("ui_statement_load_failed_9b1c7a2d5e", "Failed to load statement.")
+      );
       setGlobalMovements([]);
       setGlobalHasMore(false);
       setGlobalCursorNext(null);
@@ -117,7 +128,13 @@ export default function WalletDashboardStatementModals({
       setGlobalCursorNext(data?.cursorNext || null);
     } catch (err) {
       console.error("[wallet/statement] global load more error:", err);
-      setGlobalError(err?.message || "Failed to load more movements");
+      setGlobalError(
+        err?.message ||
+          t(
+            "ui_statement_load_more_movements_failed_2a7c1b9d5e",
+            "Failed to load more movements."
+          )
+      );
     } finally {
       setGlobalLoadingMore(false);
     }
@@ -157,7 +174,13 @@ export default function WalletDashboardStatementModals({
         setCurrencyBalanceAfterNext(data?.balanceAfterRlusdNext ?? null);
       } catch (err) {
         console.error("[wallet/statement] currency load error:", err);
-        setCurrencyError(err?.message || "Failed to load statement");
+        setCurrencyError(
+          err?.message ||
+            t(
+              "ui_statement_load_failed_9b1c7a2d5e",
+              "Failed to load statement."
+            )
+        );
         setCurrencyTransactions([]);
         setCurrencyHasMore(false);
         setCurrencyCursorNext(null);
@@ -192,7 +215,13 @@ export default function WalletDashboardStatementModals({
         setCurrencyBalanceAfterNext(data?.balanceAfterRlusdNext ?? null);
       } catch (err) {
         console.error("[wallet/statement] currency load more error:", err);
-        setCurrencyError(err?.message || "Failed to load more transactions");
+        setCurrencyError(
+          err?.message ||
+            t(
+              "ui_statement_load_more_transactions_failed_1c7b2a9d5e",
+              "Failed to load more transactions."
+            )
+        );
       } finally {
         setCurrencyLoadingMore(false);
       }
