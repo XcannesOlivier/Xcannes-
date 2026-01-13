@@ -257,7 +257,8 @@ export default function DemoWalletDashboard({
   const effectiveWallet = getWalletAddress(state, activeWalletId);
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
-    walletLabel: walletContextLabel
+    walletLabel: walletContextLabel,
+    addressTitle: t("demo_tt_wallet_address", "Adresse XRPL du wallet.")
   });
   const demoNoticeContextLabel = "";
 
@@ -1080,12 +1081,16 @@ export default function DemoWalletDashboard({
         }
 
         <div className="mt-4 flex flex-col items-center gap-2">
-          <p className="text-2xl md:text-3xl font-orbitron font-semibold text-white">
+          <p
+            className="text-2xl md:text-3xl font-orbitron font-semibold text-white"
+            title={t("demo_tt_balance", "Total converti en USD (démo).")}
+          >
             {formatMoney(locale, displayAmount, displayCurrency)}
           </p>
           <button
             type="button"
             onClick={() => setShowGlobalStatement(true)}
+            title={t("demo_tt_statement", "Voir le relevé global.")}
             className="mt-1 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105">
 
             {t("demo_view_statement", "Voir le relevé")}
@@ -1106,6 +1111,7 @@ export default function DemoWalletDashboard({
               setSendDestination(getWalletAddress(state, otherWalletId));
               setActiveAction("send");
             }}
+            title={t("demo_tt_send", "Envoyer un paiement dans la devise choisie.")}
             className="wallet-action-btn wallet-action-send group">
 
             <div className="wallet-action-icon">
@@ -1131,6 +1137,7 @@ export default function DemoWalletDashboard({
               setReceiveTab("receive");
               setActiveAction("receive");
             }}
+            title={t("demo_tt_receive", "Recevoir des fonds ou créer une demande.")}
             className="wallet-action-btn wallet-action-receive group">
 
             <div className="wallet-action-icon">
@@ -1153,6 +1160,7 @@ export default function DemoWalletDashboard({
           <button
             type="button"
             onClick={() => setActiveAction("swap")}
+            title={t("demo_tt_convert", "Convertir entre devises internes (démo).")}
             className="wallet-action-btn wallet-action-swap group">
 
             <div className="wallet-action-icon">
@@ -1180,6 +1188,7 @@ export default function DemoWalletDashboard({
               setCashModalTab("buy");
               setActiveAction("cash");
             }}
+            title={t("demo_tt_cash", "Acheter ou vendre des cryptos (démo).")}
             className="wallet-action-btn wallet-action-buysell group">
 
             <div className="wallet-action-icon">
@@ -1210,6 +1219,7 @@ export default function DemoWalletDashboard({
             <button
               type="button"
               onClick={() => setActiveAction("swap")}
+              title={t("demo_tt_manage_lines", "Gérer les lignes de devises.")}
               className="text-[11px] text-xcannes-green/80 hover:text-xcannes-green transition-colors">
 
               {t("demo_manage_lines", "Gérer les lignes")} →
@@ -1288,6 +1298,7 @@ export default function DemoWalletDashboard({
           <button
             type="button"
             onClick={handleReset}
+            title={t("demo_tt_reset", "Réinitialiser la démo.")}
             className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-colors">
 
             {t("demo_reset", "Réinitialiser")}
@@ -1298,6 +1309,7 @@ export default function DemoWalletDashboard({
               href="/demo-wallets"
               target="_blank"
               rel="noopener noreferrer"
+              title={t("demo_tt_compare", "Comparer les deux wallets.")}
               className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-colors">
 
                 {t("demo_footer_compare_cta", "Comparer Wallet A/B")}

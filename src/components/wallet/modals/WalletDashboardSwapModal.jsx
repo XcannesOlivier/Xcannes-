@@ -11,6 +11,7 @@ export default function WalletDashboardSwapModal({
   onClose,
   renderWalletMeta,
   isPreviewMode,
+  defaultView = "convert",
   noticeVariant = "preview",
   noticeContextLabel = "",
   effectiveIsConnected,
@@ -43,8 +44,8 @@ export default function WalletDashboardSwapModal({
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   useEffect(() => {
-    if (open) setView("convert");
-  }, [open]);
+    if (open) setView(defaultView || "convert");
+  }, [defaultView, open]);
 
   const existingCurrencyLinesSet = useMemo(() => {
     const set = new Set();
@@ -74,7 +75,10 @@ export default function WalletDashboardSwapModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+        className={[
+          "relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+          noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+        ].join(" ")}
         style={{ WebkitOverflowScrolling: "touch" }}
         onClick={(e) => e.stopPropagation()}>
 

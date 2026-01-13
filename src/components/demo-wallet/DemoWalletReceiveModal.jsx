@@ -125,6 +125,7 @@ export default function DemoWalletReceiveModal({
         <button
           type="button"
           onClick={() => setReceiveTab?.("receive")}
+          title={t("demo_tt_receive_tab", "Afficher l'adresse pour recevoir.")}
           className={[
             "flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors border",
             receiveTab === "receive"
@@ -137,6 +138,7 @@ export default function DemoWalletReceiveModal({
         <button
           type="button"
           onClick={() => setReceiveTab?.("request")}
+          title={t("demo_tt_request_tab", "Créer une demande de paiement.")}
           className={[
             "flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors border",
             receiveTab === "request"
@@ -179,6 +181,7 @@ export default function DemoWalletReceiveModal({
             <button
               type="button"
               onClick={() => handleCopy(walletAddress)}
+              title={t("demo_tt_copy_address", "Copier l'adresse du wallet.")}
               className="w-full px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs transition-colors"
             >
               {copied
@@ -237,6 +240,7 @@ export default function DemoWalletReceiveModal({
           <button
             type="button"
             onClick={handleGenerate}
+            title={t("demo_tt_generate_request", "Générer un code de demande.")}
             className="w-full px-4 py-2 rounded-lg bg-xcannes-green/20 hover:bg-xcannes-green/30 border border-xcannes-green/25 text-xcannes-green text-sm font-semibold transition-colors"
           >
             {t("demo_payreq_generate", "Generate Request")}
@@ -271,6 +275,7 @@ export default function DemoWalletReceiveModal({
                 <button
                   type="button"
                   onClick={() => handleCopy(requestToken)}
+                  title={t("demo_tt_copy_request", "Copier le code de demande.")}
                   className="w-full px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs transition-colors"
                 >
                   {copied

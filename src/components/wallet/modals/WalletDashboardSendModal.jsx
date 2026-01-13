@@ -73,7 +73,10 @@ export default function WalletDashboardSendModal({
       {/* Modale */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-        className="relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto"
+        className={[
+          "relative w-full max-w-md bg-elevated border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+          noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+        ].join(" ")}
         style={{ WebkitOverflowScrolling: "touch" }}
         onClick={(e) => e.stopPropagation()}>
 
@@ -110,6 +113,7 @@ export default function WalletDashboardSendModal({
             <button
             type="button"
             onClick={() => setSendTab("scan-request")}
+            title={t("ui_send_tab_payreq_tip", "Payer via un code de demande.")}
             className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
             sendTab === "scan-request" ?
             "bg-xcannes-green text-black font-semibold" :
@@ -121,6 +125,7 @@ export default function WalletDashboardSendModal({
             <button
             type="button"
             onClick={() => setSendTab("manual")}
+            title={t("ui_send_tab_manual_tip", "Envoyer manuellement à une adresse.")}
             className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
             sendTab === "manual" ?
             "bg-xcannes-green text-black font-semibold" :
@@ -136,7 +141,11 @@ export default function WalletDashboardSendModal({
           {sendTab === "manual" &&
         <div className="space-y-3">
               <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_asset_e5170a7a06", "Asset")}
+                <label
+                  className="block text-[11px] md:text-xs text-white/60 mb-1"
+                  title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
+                >
+                  {t("ui_asset_e5170a7a06", "Asset")}
 
             </label>
                 <select
@@ -164,7 +173,11 @@ export default function WalletDashboardSendModal({
             }
               </div>
               <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_amount_52cea2dd3d", "Amount")}
+                <label
+                  className="block text-[11px] md:text-xs text-white/60 mb-1"
+                  title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
+                >
+                  {t("ui_amount_52cea2dd3d", "Amount")}
 
             </label>
                 <TokenAmountInput
@@ -220,7 +233,11 @@ export default function WalletDashboardSendModal({
                 </div>
           }
               <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_destination_xrpl_address_9c2b94554c", "Destination (XRPL address)")}
+                <label
+                  className="block text-[11px] md:text-xs text-white/60 mb-1"
+                  title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
+                >
+                  {t("ui_destination_xrpl_address_9c2b94554c", "Destination (XRPL address)")}
 
             </label>
 

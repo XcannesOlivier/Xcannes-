@@ -65,6 +65,7 @@ export default function DemoWalletCashModal({
         <button
           type="button"
           onClick={() => setTab?.("buy")}
+          title={t("demo_tt_cash_buy_tab", "Simuler un achat de crypto.")}
           className={[
             "flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors border",
             tab === "buy"
@@ -77,6 +78,7 @@ export default function DemoWalletCashModal({
         <button
           type="button"
           onClick={() => setTab?.("sell")}
+          title={t("demo_tt_cash_sell_tab", "Simuler une vente de crypto.")}
           className={[
             "flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors border",
             tab === "sell"
@@ -158,6 +160,7 @@ export default function DemoWalletCashModal({
           size: "md",
           className: "w-full",
         })}
+        title={t("demo_tt_cash_cta", "Valider l'opération.")}
       >
         {tab === "sell"
           ? t("demo_cash_cta_sell", "Sell (demo)")

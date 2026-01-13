@@ -48,6 +48,7 @@ import WalletDashboardTrustlineCurrencyModal from "./modals/WalletDashboardTrust
 import WalletDashboardTrustlinesModal from "./modals/WalletDashboardTrustlinesModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { useTranslation } from "next-i18next";
 import {
   resolveWalletLayout,
   USD_STABLECOINS,
@@ -59,6 +60,7 @@ export default function WalletDashboard({
   isFullPage = false,
   variant,
 }) {
+  const { t } = useTranslation("common");
   // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
   const DEMO_RLUSD_TOTAL = 0;
   const layout = useMemo(
@@ -92,6 +94,7 @@ export default function WalletDashboard({
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | 'trustlines' | null
+  const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const { receiveTab, setReceiveTab } = useReceiveForm();
   const {
     sendTab,
@@ -132,6 +135,21 @@ export default function WalletDashboard({
     walletAddress: effectiveWallet,
     walletLabel,
   });
+
+  const handleAction = useCallback(
+    (nextAction) => {
+      if (nextAction === "swap") {
+        setSwapDefaultView("convert");
+      }
+      setActiveAction(nextAction);
+    },
+    []
+  );
+
+  const handleOpenCurrencyLines = useCallback(() => {
+    setSwapDefaultView("lines");
+    setActiveAction("swap");
+  }, []);
   
   const [cashModalTab, setCashModalTab] = useState("buy"); // 'buy' | 'sell' - Onglet actif dans la modal Cash
   
@@ -487,6 +505,7 @@ export default function WalletDashboard({
       setConvertBaseCurrency(desiredBase);
       setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
       setConvertAmount("");
+      setSwapDefaultView("convert");
       setActiveAction("swap");
 
       // Best effort: s'assurer que les lignes existent (fiat) pour que l'option soit utilisable.
@@ -507,6 +526,7 @@ export default function WalletDashboard({
     setConvertAmount,
     setConvertBaseCurrency,
     setConvertQuoteCurrency,
+    setSwapDefaultView,
   ]);
 
   const handleUpsertCurrencyLine = useCallback(async () => {
@@ -1539,7 +1559,7 @@ export default function WalletDashboard({
         {/* Action row: Send / Receive / Exchange / Buy / Trustlines */}
         <WalletDashboardActionRow
           layout={layout}
-          onAction={setActiveAction}
+          onAction={handleAction}
           showKycPanel={false}
         />
 
@@ -1549,6 +1569,9 @@ export default function WalletDashboard({
           layout={layout}
           tokens={isPreviewMode ? displayTokens : displayTokensWithCurrencyLines}
           renderTokenRow={renderTokenRow}
+          headerTitle={t("demo_lines_title", "Balances by currency")}
+          headerActionLabel={t("home_feature_currencylines_cta", "Manage lines")}
+          onHeaderAction={handleOpenCurrencyLines}
           className="touch-pan-y"
           style={{ WebkitOverflowScrolling: "touch" }}
         />
@@ -1622,6 +1645,7 @@ export default function WalletDashboard({
             onClose={() => setActiveAction(null)}
             renderWalletMeta={renderWalletMeta}
             isPreviewMode={isPreviewMode}
+            defaultView={swapDefaultView}
             effectiveIsConnected={effectiveIsConnected}
             hasOnChainRlusd={hasOnChainRlusd}
             hasOnChainXcs={hasOnChainXcs}

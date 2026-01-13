@@ -6,7 +6,8 @@ export function useWalletMeta({
   walletAddress,
   walletLabel,
   addressBadge,
-  addressBadgeClassName = ""
+  addressBadgeClassName = "",
+  addressTitle = ""
 } = {}) {
   const renderWalletMeta = useCallback(
     (className = "") => {
@@ -17,7 +18,9 @@ export function useWalletMeta({
             {walletLabel || "Wallet"}
           </div>
           <div className="font-mono flex flex-wrap items-center gap-2">
-            <span className="break-all">{walletAddress}</span>
+            <span className="break-all" title={addressTitle || undefined}>
+              {walletAddress}
+            </span>
             {addressBadge ? (
               <span
                 className={[
@@ -34,7 +37,7 @@ export function useWalletMeta({
         </div>
       );
     },
-    [walletAddress, walletLabel, addressBadge, addressBadgeClassName]
+    [walletAddress, walletLabel, addressBadge, addressBadgeClassName, addressTitle]
   );
 
   return { renderWalletMeta };

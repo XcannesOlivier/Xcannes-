@@ -262,13 +262,17 @@ export default function DemoWalletStatementsModal({
 
           {walletEvents.length ? (
             <div className="rounded-xl border border-white/10 bg-black/15 p-4">
-              <div className="text-[12px] text-white/70 font-semibold">
+              <div
+                className="text-[12px] text-white/70 font-semibold"
+                title={t("demo_tt_recent_activity", "Voir les dernières opérations.")}
+              >
                 {t("demo_stmt_recent_activity", "Recent activity")}
               </div>
               <div className="mt-2 space-y-2">
                 {walletEvents.slice(0, 3).map((evt) => (
                   <div
                     key={evt.id}
+                    title={t("demo_tt_recent_item", "Voir le détail de l'opération.")}
                     className="flex items-start justify-between gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2"
                   >
                     <div className="min-w-0">
@@ -338,6 +342,7 @@ export default function DemoWalletStatementsModal({
                   key={item.key}
                   type="button"
                   onClick={() => setTab(item.key)}
+                  title={t(`demo_tt_stmt_tab_${item.key}`, "Filtrer les opérations.")}
                   className={[
                     "px-3 py-1.5 rounded-lg text-xs transition-colors border",
                     tab === item.key

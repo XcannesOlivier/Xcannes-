@@ -76,6 +76,7 @@ export default function DemoWalletSendModal({
         <button
           type="button"
           onClick={() => setSendTab?.("manual")}
+          title={t("demo_tt_send_manual", "Envoi manuel d'une transaction.")}
           className={[
           "flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors border",
           sendTab === "manual" ?
@@ -88,6 +89,7 @@ export default function DemoWalletSendModal({
         <button
           type="button"
           onClick={() => setSendTab?.("scan-request")}
+          title={t("demo_tt_send_request", "Payer via un code de demande.")}
           className={[
           "flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors border",
           sendTab === "scan-request" ?
@@ -193,7 +195,8 @@ export default function DemoWalletSendModal({
             variant: "soft",
             size: "md",
             className: "w-full"
-          })}>
+          })}
+          title={t("demo_tt_send_cta", "Valider l'envoi.")}>
 
             {t("demo_send_cta", "Envoyer (démo)")} → {counterpartyLabel}
           </button>
@@ -227,6 +230,7 @@ export default function DemoWalletSendModal({
               setError(t("demo_error_generic", "Action impossible (démo)."));
             }
           }}
+          title={t("demo_tt_request_cta", "Charger une demande de paiement.")}
           className="w-full px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs transition-colors">
 
             {t("demo_scan_parse", "Charger la demande")}
@@ -295,7 +299,8 @@ export default function DemoWalletSendModal({
             variant: "soft",
             size: "md",
             className: "w-full"
-          })}>
+          })}
+          title={t("demo_tt_pay_cta", "Valider le paiement.")}>
 
             {t("demo_pay_cta", "Payer (démo)")} →
             {" "}
