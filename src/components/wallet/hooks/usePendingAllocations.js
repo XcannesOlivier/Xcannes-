@@ -3,10 +3,25 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 
-export function usePendingAllocations(address) {
+export function usePendingAllocations(address, { signTransaction } = {}) {
   const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const requestWalletSignature = useCallback(async () => {
+    if (!signTransaction) {
+      setError("Xumm signature required. Please connect your wallet.");
+      return null;
+    }
+
+    const result = await signTransaction({ TransactionType: "SignIn" });
+    if (!result?.signed || !result?.uuid) {
+      setError("Signature cancelled or expired.");
+      return null;
+    }
+
+    return result.uuid;
+  }, [signTransaction]);
 
   const fetchPending = useCallback(async () => {
     if (!address) {
@@ -39,10 +54,14 @@ export function usePendingAllocations(address) {
   const activatePending = useCallback(
     async (currencyCode) => {
       if (!address || !currencyCode) return null;
+
+      const xummUuid = await requestWalletSignature();
+      if (!xummUuid) return null;
+
       const res = await fetch(apiUrl("/wallet/pending-allocations/activate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, currencyCode }),
+        body: JSON.stringify({ address, currencyCode, xummUuid }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {
@@ -50,7 +69,7 @@ export function usePendingAllocations(address) {
       }
       return data;
     },
-    [address]
+    [address, requestWalletSignature]
   );
 
   useEffect(() => {

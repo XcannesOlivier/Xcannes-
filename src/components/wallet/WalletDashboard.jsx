@@ -391,7 +391,7 @@ export default function WalletDashboard({
     error: walletLinesError,
     addLine,
     removeLine,
-  } = useWalletLines(backendWalletAddress);
+  } = useWalletLines(backendWalletAddress, { signTransaction });
 
   const {
     lines: currencyLines,
@@ -402,7 +402,7 @@ export default function WalletDashboard({
     upsertCurrencyLine,
     removeCurrencyLine,
     convertAllocation: convertCurrencyAllocation,
-  } = useWalletCurrencyLines(backendWalletAddress);
+  } = useWalletCurrencyLines(backendWalletAddress, { signTransaction });
 
   const {
     pending: pendingAllocations,
@@ -410,7 +410,7 @@ export default function WalletDashboard({
     error: pendingAllocationsError,
     refresh: refreshPendingAllocations,
     activatePending: activatePendingAllocations,
-  } = usePendingAllocations(backendWalletAddress);
+  } = usePendingAllocations(backendWalletAddress, { signTransaction });
 
   const {
     handleUpsertCurrencyLine: handleUpsertCurrencyLineReal,
@@ -1385,6 +1385,7 @@ export default function WalletDashboard({
             fromFxSource: fxSource,
             toFxRate: 1,
             toFxSource: "PYTH",
+            xummUuid: spreadResult?.uuid || null,
           });
           if (!deallocateSpread || deallocateSpread.error) {
             console.warn("Failed to deallocate spread (backend):", deallocateSpread?.error);
@@ -1428,6 +1429,7 @@ export default function WalletDashboard({
             fromFxSource: fxSource,
             toFxRate: 1,
             toFxSource: "PYTH",
+            xummUuid: payResult?.uuid || null,
           });
           if (!deallocatePayment || deallocatePayment.error) {
             console.warn("Failed to deallocate payment (backend):", deallocatePayment?.error);

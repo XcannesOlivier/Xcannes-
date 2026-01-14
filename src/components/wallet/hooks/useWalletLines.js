@@ -1,11 +1,26 @@
 import { useState, useCallback, useEffect } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 
-export function useWalletLines(address) {
+export function useWalletLines(address, { signTransaction } = {}) {
   const [lines, setLines] = useState([]);
   const [totalLockedXcs, setTotalLockedXcs] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const requestWalletSignature = useCallback(async () => {
+    if (!signTransaction) {
+      setError("Xumm signature required. Please connect your wallet.");
+      return null;
+    }
+
+    const result = await signTransaction({ TransactionType: "SignIn" });
+    if (!result?.signed || !result?.uuid) {
+      setError("Signature cancelled or expired.");
+      return null;
+    }
+
+    return result.uuid;
+  }, [signTransaction]);
 
   const fetchLines = useCallback(async () => {
     if (!address) {
@@ -47,6 +62,9 @@ export function useWalletLines(address) {
         setLoading(true);
         setError(null);
 
+        const xummUuid = await requestWalletSignature();
+        if (!xummUuid) return;
+
         const res = await fetch(apiUrl("/wallet/lines"), {
           method: "POST",
           headers: {
@@ -56,6 +74,7 @@ export function useWalletLines(address) {
             address,
             currencyCode,
             lockedXcs,
+            xummUuid,
           }),
         });
 
@@ -73,7 +92,7 @@ export function useWalletLines(address) {
         setLoading(false);
       }
     },
-    [address, fetchLines]
+    [address, fetchLines, requestWalletSignature]
   );
 
   const removeLine = useCallback(
@@ -84,6 +103,9 @@ export function useWalletLines(address) {
         setLoading(true);
         setError(null);
 
+        const xummUuid = await requestWalletSignature();
+        if (!xummUuid) return;
+
         const res = await fetch(apiUrl("/wallet/lines"), {
           method: "DELETE",
           headers: {
@@ -92,6 +114,7 @@ export function useWalletLines(address) {
           body: JSON.stringify({
             address,
             currencyCode,
+            xummUuid,
           }),
         });
 
@@ -109,7 +132,7 @@ export function useWalletLines(address) {
         setLoading(false);
       }
     },
-    [address, fetchLines]
+    [address, fetchLines, requestWalletSignature]
   );
 
   useEffect(() => {
