@@ -219,7 +219,7 @@ export const XummProvider = ({ children }) => {
             clearInterval(interval);
             setIsConnecting(false);
             setQrModalData(null);
-            resolve(data);
+            resolve({ ...data, uuid });
           } else if (data.expired) {
             clearInterval(interval);
             setIsConnecting(false);

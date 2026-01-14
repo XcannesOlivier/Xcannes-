@@ -431,8 +431,9 @@ export function useSwapConversion({
       if (isFxConversion(base, quote) && spreadFee > 0) {
         // Spread always gets paid on-chain first, then allocations are updated.
         // This prevents backend allocation changes if the user cancels the Xumm signature.
-        await paySpreadRlusd(spreadFee);
+        const spreadSignature = await paySpreadRlusd(spreadFee);
         spreadPaid = true;
+        const xummUuid = spreadSignature?.uuid || null;
 
         if (quote === "RLUSD") {
           // Sell FX -> RLUSD (unallocated). Gross deallocation includes the spread we just paid on-chain,
@@ -445,6 +446,7 @@ export function useSwapConversion({
             fromFxSource: fxSourceFrom,
             toFxRate: 1,
             toFxSource: "PYTH",
+            xummUuid,
           });
           if (!result || result.error) {
             throw new Error(result?.error || "Conversion failed");
@@ -459,6 +461,7 @@ export function useSwapConversion({
             fromFxSource: "PYTH",
             toFxRate: rlusdPerQuote,
             toFxSource: fxSourceTo,
+            xummUuid,
           });
           if (!result || result.error) {
             throw new Error(result?.error || "Conversion failed");
@@ -473,6 +476,7 @@ export function useSwapConversion({
             fromFxSource: fxSourceFrom,
             toFxRate: rlusdPerQuote,
             toFxSource: fxSourceTo,
+            xummUuid,
           });
           if (!result1 || result1.error) {
             throw new Error(result1?.error || "Conversion failed");
@@ -485,6 +489,7 @@ export function useSwapConversion({
             fromFxSource: fxSourceFrom,
             toFxRate: 1,
             toFxSource: "PYTH",
+            xummUuid,
           });
           if (!result2 || result2.error) {
             throw new Error(result2?.error || "Conversion failed");
