@@ -109,7 +109,7 @@ export default function WalletDashboardStatementModals({
     } finally {
       setGlobalLoading(false);
     }
-  }, [backendWalletAddress, canFetchStatements, fetchStatement]);
+  }, [backendWalletAddress, canFetchStatements, fetchStatement, t]);
 
   const loadGlobalMore = useCallback(async () => {
     if (!canFetchStatements || !globalHasMore || !globalCursorNext) return;
@@ -145,6 +145,7 @@ export default function WalletDashboardStatementModals({
     globalCursorNext,
     globalHasMore,
     globalLoadingMore,
+    t,
   ]);
 
   const loadCurrencyFirstPage = useCallback(
@@ -189,7 +190,7 @@ export default function WalletDashboardStatementModals({
         setCurrencyLoading(false);
       }
     },
-    [backendWalletAddress, canFetchStatements, fetchStatement]
+    [backendWalletAddress, canFetchStatements, fetchStatement, t]
   );
 
   const loadCurrencyMore = useCallback(
@@ -234,6 +235,7 @@ export default function WalletDashboardStatementModals({
       currencyHasMore,
       currencyLoadingMore,
       fetchStatement,
+      t,
     ]
   );
 

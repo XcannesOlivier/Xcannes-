@@ -498,9 +498,8 @@ export default function WalletDashboard({
       const quote = String(detail.quote || "").trim().toUpperCase();
       if (!base || !quote) return;
 
-      // Mapping demandé: BUY => base/quote, SELL => inversé.
-      const desiredBase = action === "sell" ? quote : base;
-      const desiredQuote = action === "sell" ? base : quote;
+      const desiredBase = action === "buy" ? quote : base;
+      const desiredQuote = action === "buy" ? base : quote;
 
       setConvertBaseCurrency(desiredBase);
       setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
@@ -1647,6 +1646,8 @@ export default function WalletDashboard({
             isPreviewMode={isPreviewMode}
             defaultView={swapDefaultView}
             effectiveIsConnected={effectiveIsConnected}
+            walletAddress={effectiveWallet}
+            onConnectWallet={connect}
             hasOnChainRlusd={hasOnChainRlusd}
             hasOnChainXcs={hasOnChainXcs}
             onInstallTrustline={handleInstallRequiredTrustline}
@@ -1672,6 +1673,7 @@ export default function WalletDashboard({
             handleUpsertCurrencyLine={handleUpsertCurrencyLine}
             handleDemoConvert={handleDemoConvert}
             convertProcessing={convertProcessing}
+            rlusdPerUnitRates={rlusdPerUnitRates}
           />
 
 	      <WalletDashboardCashModal

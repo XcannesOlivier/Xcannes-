@@ -14,7 +14,8 @@ export default function XummQRModal({
   qrUrl,
   deepLink,
   type = 'connect', // 'connect' ou 'sign'
-  onSuccess
+  onSuccess,
+  zIndexClassName = "z-50"
 }) {const { t } = useTranslation("common");
   const [status, setStatus] = useState('loading'); // loading, waiting, signed, error
   const [countdown, setCountdown] = useState(300); // 5 minutes
@@ -112,7 +113,7 @@ export default function XummQRModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm">
+    <div className={`fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm`}>
       <div className="relative bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl">
         {/* Close Button */}
         <button

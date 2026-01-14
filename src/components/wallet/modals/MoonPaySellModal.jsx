@@ -194,7 +194,7 @@ const MoonPaySellModal = ({
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, t]);
 
   // Reset au changement de devise
   useEffect(() => {

@@ -1429,7 +1429,8 @@ export default function DemoWalletDashboard({
         setCurrencyLineAllocatedRlusd={setCurrencyLineAllocatedRlusd}
         handleUpsertCurrencyLine={handleUpsertCurrencyLine}
         handleDemoConvert={handleDemoConvert}
-        convertProcessing={convertProcessing} />
+        convertProcessing={convertProcessing}
+        rlusdPerUnitRates={rlusdPerUnitRates} />
 
 
       <WalletDashboardCashModal

@@ -167,7 +167,7 @@ export default function CurrencyStatement({
     } finally {
       setXrplLoading(false);
     }
-  }, [canFetchXrplPayments, fetchXrplPayments, xrplDirection]);
+  }, [canFetchXrplPayments, fetchXrplPayments, xrplDirection, t]);
 
   const loadXrplMore = useCallback(async () => {
     if (!canFetchXrplPayments || !xrplHasMore || !xrplCursorNext) return;
@@ -206,7 +206,8 @@ export default function CurrencyStatement({
   xrplCursorNext,
   xrplDirection,
   xrplHasMore,
-  xrplLoadingMore]
+  xrplLoadingMore,
+  t]
   );
 
   useEffect(() => {
