@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
-import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { useTranslation } from "next-i18next";
+import { apiUrl } from "@/lib/runtimeConfig";
+import XummQRModal from "@/components/xumm/XummQRModal";
+import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
 
 export default function WalletDashboardSwapModal({
   open,
@@ -15,6 +18,8 @@ export default function WalletDashboardSwapModal({
   noticeVariant = "preview",
   noticeContextLabel = "",
   effectiveIsConnected,
+  walletAddress,
+  onConnectWallet,
   hasOnChainRlusd,
   hasOnChainXcs,
   onInstallTrustline,
@@ -39,12 +44,15 @@ export default function WalletDashboardSwapModal({
   setCurrencyLineAllocatedRlusd,
   handleUpsertCurrencyLine,
   handleDemoConvert,
-  convertProcessing
+  convertProcessing,
+  rlusdPerUnitRates
 }) {const { t } = useTranslation("common");
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   useEffect(() => {
-    if (open) setView(defaultView || "convert");
+    if (!open) return;
+    const nextView = defaultView || "convert";
+    setView(nextView);
   }, [defaultView, open]);
 
   const existingCurrencyLinesSet = useMemo(() => {
@@ -62,6 +70,284 @@ export default function WalletDashboardSwapModal({
   );
 
   const canMutateLines = isPreviewMode || !!effectiveIsConnected;
+  const previewRequestId = useRef(0);
+  const [previewState, setPreviewState] = useState({ status: "idle", error: null });
+  const [previewAmount, setPreviewAmount] = useState(null);
+  const [previewMeta, setPreviewMeta] = useState(null);
+  const [dexModalData, setDexModalData] = useState(null);
+  const [dexSubmitting, setDexSubmitting] = useState(false);
+  const [dexConfirming, setDexConfirming] = useState(false);
+  const [dexError, setDexError] = useState(null);
+
+  const baseCode = useMemo(
+    () => String(convertBaseCurrency || "").trim().toUpperCase(),
+    [convertBaseCurrency]
+  );
+  const quoteCode = useMemo(
+    () => String(convertQuoteCurrency || "").trim().toUpperCase(),
+    [convertQuoteCurrency]
+  );
+  const amountValue = useMemo(
+    () => Number.parseFloat(convertAmount || ""),
+    [convertAmount]
+  );
+
+  const isXrplCore = (code) => code === "XRP" || code === "XCS";
+
+  const conversionRoute = useMemo(() => {
+    if (!baseCode || !quoteCode || baseCode === quoteCode) {
+      return { type: "none" };
+    }
+
+    const dexEligible =
+      (isXrplCore(baseCode) && quoteCode === "RLUSD") ||
+      (baseCode === "RLUSD" && isXrplCore(quoteCode));
+
+    if (dexEligible) {
+      const xrplBase = isXrplCore(baseCode) ? baseCode : quoteCode;
+      const side = baseCode === "RLUSD" ? "buy" : "sell";
+      const amountType = baseCode === "RLUSD" ? "quote" : "base";
+      const outputCurrency = baseCode === "RLUSD" ? quoteCode : "RLUSD";
+      return {
+        type: "dex",
+        dex: {
+          pair: `${xrplBase}/RLUSD`,
+          side,
+          amountType,
+          outputCurrency,
+        },
+      };
+    }
+
+    if (isXrplCore(baseCode) || isXrplCore(quoteCode)) {
+      return {
+        type: "unsupported",
+        error: t(
+          "ui_xrpl_bridge_required_1a2b3c4d5e",
+          "XRPL assets require RLUSD as an intermediary."
+        ),
+      };
+    }
+
+    return { type: "allocation" };
+  }, [baseCode, quoteCode, t]);
+
+  const formatAmount = (value, digits = 6) => {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return "-";
+    return num.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: digits,
+    });
+  };
+
+  const requestJson = async (path, { method = "GET", body } = {}) => {
+    const res = await fetch(apiUrl(path), {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : null,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.error || data.message || "Request failed");
+    }
+    return data;
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    setDexError(null);
+    setPreviewState({ status: "idle", error: null });
+    setPreviewAmount(null);
+    setPreviewMeta(null);
+
+    if (!baseCode || !quoteCode || baseCode === quoteCode) {
+      return;
+    }
+
+    if (!Number.isFinite(amountValue) || amountValue <= 0) {
+      return;
+    }
+
+    if (conversionRoute.type === "unsupported") {
+      setPreviewState({ status: "error", error: conversionRoute.error });
+      return;
+    }
+
+    if (conversionRoute.type === "allocation") {
+      const rlusdPerBase = baseCode === "RLUSD"
+        ? 1
+        : Number(rlusdPerUnitRates?.[baseCode]);
+      const rlusdPerQuote = quoteCode === "RLUSD"
+        ? 1
+        : Number(rlusdPerUnitRates?.[quoteCode]);
+
+      if (!Number.isFinite(rlusdPerBase) || rlusdPerBase <= 0) {
+        setPreviewState({
+          status: "error",
+          error: t(
+            "ui_rate_unavailable_base_5c1a9b7d2e",
+            "Rate unavailable for base currency."
+          ),
+        });
+        return;
+      }
+      if (!Number.isFinite(rlusdPerQuote) || rlusdPerQuote <= 0) {
+        setPreviewState({
+          status: "error",
+          error: t(
+            "ui_rate_unavailable_quote_8b2c1a9d5e",
+            "Rate unavailable for quote currency."
+          ),
+        });
+        return;
+      }
+
+      const grossRlusd = amountValue * rlusdPerBase;
+      const spread = computeSpreadQuote({
+        base: baseCode,
+        quote: quoteCode,
+        amountRlusd: grossRlusd,
+      });
+      const spreadFee = Number(spread?.spreadFeeRlusd || 0);
+      const netRlusd = Math.max(0, grossRlusd - spreadFee);
+      const quoteUnits =
+        quoteCode === "RLUSD" ? netRlusd : netRlusd / rlusdPerQuote;
+
+      setPreviewState({ status: "done", error: null });
+      setPreviewAmount(quoteUnits);
+      setPreviewMeta({
+        route: "allocation",
+        spreadFeeRlusd: spreadFee,
+        spreadPercent: Number(spread?.spreadFraction || 0) * 100,
+        isFx: isFxConversion(baseCode, quoteCode),
+      });
+      return;
+    }
+
+    if (conversionRoute.type === "dex") {
+      const requestId = ++previewRequestId.current;
+      setPreviewState({ status: "loading", error: null });
+
+      const timeoutId = setTimeout(async () => {
+        try {
+          const data = await requestJson("/dex/orders/preview", {
+            method: "POST",
+            body: {
+              pair: conversionRoute.dex.pair,
+              side: conversionRoute.dex.side,
+              amountType: conversionRoute.dex.amountType,
+              baseAmount: conversionRoute.dex.amountType === "base" ? amountValue : undefined,
+              quoteAmount: conversionRoute.dex.amountType === "quote" ? amountValue : undefined,
+              slippageBps: 100,
+            },
+          });
+          if (previewRequestId.current !== requestId) return;
+          if (!data?.liquidityOk) {
+            setPreviewState({
+              status: "error",
+              error: t(
+                "ui_no_liquidity_order_8b7a2d9f1c",
+                "No liquidity available for this amount."
+              ),
+            });
+            return;
+          }
+          const outputAmount =
+            conversionRoute.dex.amountType === "quote"
+              ? data.baseAmount
+              : data.quoteAmount;
+          setPreviewState({ status: "done", error: null });
+          setPreviewAmount(outputAmount);
+          setPreviewMeta({
+            route: "dex",
+            worstPrice: data.worstPrice,
+            avgPrice: data.avgPrice,
+          });
+        } catch (error) {
+          if (previewRequestId.current !== requestId) return;
+          setPreviewState({
+            status: "error",
+            error: error?.message || "Preview unavailable",
+          });
+        }
+      }, 250);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    amountValue,
+    baseCode,
+    conversionRoute,
+    open,
+    quoteCode,
+    rlusdPerUnitRates,
+    t,
+  ]);
+
+  const handleDexSubmit = async () => {
+    if (conversionRoute.type !== "dex") return;
+    if (!Number.isFinite(amountValue) || amountValue <= 0) {
+      setDexError(
+        t("ui_invalid_amount_45a9c0c3df", "Enter a valid amount.")
+      );
+      return;
+    }
+    if (!walletAddress || !effectiveIsConnected) {
+      setDexError(
+        t("ui_wallet_required_trade_18f7e1d2a9", "Connect your wallet to trade.")
+      );
+      return;
+    }
+
+    setDexSubmitting(true);
+    setDexError(null);
+    try {
+      const data = await requestJson("/dex/orders", {
+        method: "POST",
+        body: {
+          address: walletAddress,
+          pair: conversionRoute.dex.pair,
+          side: conversionRoute.dex.side,
+          amountType: conversionRoute.dex.amountType,
+          baseAmount: conversionRoute.dex.amountType === "base" ? amountValue : undefined,
+          quoteAmount: conversionRoute.dex.amountType === "quote" ? amountValue : undefined,
+          slippageBps: 100,
+          returnUrl: window.location.href,
+        },
+      });
+      setDexModalData({
+        orderId: data.orderId,
+        uuid: data.uuid,
+        qrUrl: data.qrUrl,
+        deepLink: data.deepLink,
+      });
+      setConvertAmount("");
+    } catch (error) {
+      setDexError(error?.message || "Failed to create order");
+    } finally {
+      setDexSubmitting(false);
+    }
+  };
+
+  const handleDexConfirm = async () => {
+    if (!dexModalData?.orderId || !dexModalData?.uuid) return;
+    setDexConfirming(true);
+    try {
+      await requestJson("/dex/orders/confirm", {
+        method: "POST",
+        body: {
+          orderId: dexModalData.orderId,
+          uuid: dexModalData.uuid,
+        },
+      });
+    } catch (error) {
+      setDexError(error?.message || "Failed to confirm order");
+    } finally {
+      setDexConfirming(false);
+      setDexModalData(null);
+    }
+  };
 
   if (!open) return null;
 
@@ -233,41 +519,120 @@ export default function WalletDashboardSwapModal({
               onChange={setConvertAmount}
               placeholder="0.0000"
               token={convertBaseCurrency || "XRP"} />
-
-                {convertPreview &&
-            <p className="mt-1 text-[11px] text-white/60">
-                    {convertPreview}
-                  </p>
-            }
               </div>
 
-              <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDemoConvert();
-            }}
-            className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10"
-            disabled={
-            convertProcessing ||
-            !convertBaseCurrency ||
-            !convertQuoteCurrency ||
-            !convertAmount ||
-            !isPreviewMode && !effectiveIsConnected
-            }>
+              <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
+                <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
+                  {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
+                </div>
+                <div className="text-sm text-primary">
+                  {formatAmount(previewAmount, 6)} {convertQuoteCurrency || "-"}
+                </div>
+                {previewMeta?.route === "dex" ? (
+                  <div className="text-[10px] text-white/45">
+                    {"IOC"}
+                    {" · "}
+                    {t("ui_slippage_1pct_0fdafce1d0", "Slippage")} 1%
+                  </div>
+                ) : null}
+                {previewMeta?.route === "allocation" &&
+                previewMeta?.isFx &&
+                previewMeta?.spreadFeeRlusd > 0 ? (
+                    <div className="text-[10px] text-white/45">
+                      {t("ui_spread_fee_6c2a8d5e1b", "Spread")}:{" "}
+                      {previewMeta.spreadPercent.toFixed(2)}% (≈{" "}
+                      {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
+                      {"RLUSD"}
+                      {")"}
+                    </div>
+                ) : null}
+              </div>
 
-                {convertProcessing
-                  ? t("ui_converting_71c2b9a4e5", "Converting...")
-                  : isPreviewMode
-                    ? t(
-                        "ui_convert_demo_no_tx_4d8a1c7b2e",
-                        "Convert (demo, no real tx)"
-                      )
-                    : t(
-                        "ui_convert_allocation_6b2c1a9d5e",
-                        "Convert allocation"
-                      )}
-              </button>
+              {previewState.status === "loading" ? (
+                <div className="text-[11px] text-white/50">
+                  {t("ui_loading_orderbook_08e2c6ff6b", "Refreshing orderbook...")}
+                </div>
+              ) : null}
+
+              {previewState.status === "error" ? (
+                <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                  {previewState.error}
+                </div>
+              ) : null}
+
+              {dexError ? (
+                <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                  {dexError}
+                </div>
+              ) : null}
+
+              {conversionRoute.type === "dex" && isPreviewMode ? (
+                <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                  {t(
+                    "ui_wallet_required_trade_18f7e1d2a9",
+                    "Connect your wallet to trade."
+                  )}
+                </div>
+              ) : null}
+
+              {convertPreview ? (
+                <p className="text-[11px] text-white/60">
+                  {convertPreview}
+                </p>
+              ) : null}
+
+              {!effectiveIsConnected && !isPreviewMode ? (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onConnectWallet?.();
+                  }}
+                  className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10"
+                >
+                  {t("wallet_connect_cta", "Connect wallet")}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (conversionRoute.type === "dex") {
+                      handleDexSubmit();
+                      return;
+                    }
+                    handleDemoConvert();
+                  }}
+                  className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10"
+                  disabled={
+                    conversionRoute.type === "dex"
+                      ? dexSubmitting ||
+                        dexConfirming ||
+                        previewState.status !== "done" ||
+                        !effectiveIsConnected
+                      : convertProcessing ||
+                        !convertBaseCurrency ||
+                        !convertQuoteCurrency ||
+                        !convertAmount ||
+                        conversionRoute.type !== "allocation"
+                  }>
+                  {conversionRoute.type === "dex"
+                    ? dexSubmitting
+                      ? t("ui_preparing_67f5f84ff4", "Preparing...")
+                      : t("ui_convert_8408e969ec", "Convert")
+                    : convertProcessing
+                      ? t("ui_converting_71c2b9a4e5", "Converting...")
+                      : isPreviewMode
+                        ? t(
+                            "ui_convert_demo_no_tx_4d8a1c7b2e",
+                            "Convert (demo, no real tx)"
+                          )
+                        : t(
+                            "ui_convert_allocation_6b2c1a9d5e",
+                            "Convert allocation"
+                          )}
+                </button>
+              )}
 
               {!isPreviewMode &&
           <div className="text-[10px] text-white/45">{t("ui_tip_use_the_b06aa04f1f", "Tip: use the")}
@@ -341,9 +706,18 @@ export default function WalletDashboardSwapModal({
         }
         </div>
       </div>
+      <XummQRModal
+        isOpen={Boolean(dexModalData?.uuid)}
+        onClose={() => setDexModalData(null)}
+        uuid={dexModalData?.uuid}
+        qrUrl={dexModalData?.qrUrl}
+        deepLink={dexModalData?.deepLink}
+        type="sign"
+        onSuccess={handleDexConfirm}
+        zIndexClassName="z-[11000]"
+      />
     </>;
 
 
-  if (typeof document === "undefined") return null;
-  return createPortal(content, document.body);
+  return content;
 }

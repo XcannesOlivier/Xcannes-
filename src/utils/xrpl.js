@@ -4,8 +4,8 @@ import xcannesApi from "@/lib/xcannesApi";
 export const pairToBackendFormat = (pair) => pair.replace("/", "_");
 
 const RLUSD_HEX = "524C555344000000000000000000000000000000";
-const RLUSD_ISSUER = "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De";
-const XCS_ISSUER = "rBXXYQ3e4JmLtDaSUgmLvtKC5dYvmCggxX";
+const RLUSD_ISSUER = (process.env.NEXT_PUBLIC_RLUSD_ISSUER || "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De").trim();
+const XCS_ISSUER = (process.env.NEXT_PUBLIC_XCS_ISSUER || "rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx").trim();
 const FALLBACK_ISSUERS = {
   XCS: XCS_ISSUER,
   RLUSD: RLUSD_ISSUER
