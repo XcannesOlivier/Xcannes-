@@ -1,6 +1,21 @@
 /** @type {import('next').NextConfig} */
 const { i18n } = require("./next-i18next.config");
 
+const securityHeaders = [
+  {
+    key: "X-DNS-Prefetch-Control",
+    value: "on",
+  },
+  {
+    key: "X-Frame-Options",
+    value: "SAMEORIGIN",
+  },
+  {
+    key: "X-Content-Type-Options",
+    value: "nosniff",
+  },
+];
+
 const nextConfig = {
   reactStrictMode: true,
   i18n,
@@ -94,21 +109,27 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: "/_next/static/:path*",
         headers: [
           {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
+      },
+      {
+        source:
+          "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/:path*",
+        headers: securityHeaders,
       },
     ];
   },
