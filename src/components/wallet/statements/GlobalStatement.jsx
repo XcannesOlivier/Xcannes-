@@ -1,9 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
+import {
+  buildCsvString,
+  downloadTextFile,
+  escapeHtml,
+  openPrintWindow,
+  sha256Hex
+} from "@/utils/statementExport";
 
 const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
@@ -43,6 +50,8 @@ export default function GlobalStatement({
   const locale = i18n?.language || "en";
   const [sortBy, setSortBy] = useState("balance"); // balance, change, name
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
+  const [exportFormat, setExportFormat] = useState(null);
+  const [docHash, setDocHash] = useState("");
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025"
@@ -130,6 +139,281 @@ export default function GlobalStatement({
       maximumFractionDigits: 2
     });
   };
+
+  const ledgerEvidenceCount = useMemo(() => {
+    return (movements || []).filter((m) => m?.txHash).length;
+  }, [movements]);
+
+  const ledgerLastIndex = useMemo(() => {
+    const indexes = (movements || [])
+      .map((m) => Number(m?.ledgerIndex))
+      .filter((v) => Number.isFinite(v));
+    if (!indexes.length) return null;
+    return Math.max(...indexes);
+  }, [movements]);
+
+  const ledgerStatus = useMemo(() => {
+    if (isPreviewMode) return "preview";
+    if (ledgerEvidenceCount > 0) return "verified";
+    if (Array.isArray(movements) && movements.length > 0) return "offchain";
+    return "available";
+  }, [isPreviewMode, ledgerEvidenceCount, movements]);
+
+  const ledgerStatusLabel = useMemo(() => {
+    if (ledgerStatus === "verified") {
+      return t("ui_verified_on_xrp_ledger_334f28ce50", "Verified on XRP Ledger");
+    }
+    if (ledgerStatus === "available") {
+      return t(
+        "ui_ledger_available_no_tx_f4",
+        "Ledger available (no transactions yet)"
+      );
+    }
+    if (ledgerStatus === "offchain") {
+      return t(
+        "ui_ledger_offchain_allocations_f4",
+        "Ledger validation unavailable for off-chain allocations"
+      );
+    }
+    return t(
+      "ui_ledger_preview_unavailable_f4",
+      "Ledger validation unavailable (preview)"
+    );
+  }, [ledgerStatus, t]);
+
+  const statementHashInput = useMemo(() => {
+    const safeTotal = Number.isFinite(Number(totalBalance)) ? Number(totalBalance) : 0;
+    const tokenPayload = (tokens || []).map((token) => ({
+      currency: token?.currency || "",
+      value: Number.isFinite(Number(token?.value)) ? Number(token.value) : 0,
+      issuer: token?.issuer || "",
+      isTrustlineOnly: Boolean(token?.isTrustlineOnly)
+    }));
+    const movementPayload = (movements || []).map((m) => ({
+      kind: m?.kind || "",
+      fromCurrencyCode: m?.fromCurrencyCode || "",
+      toCurrencyCode: m?.toCurrencyCode || "",
+      amountRlusd: Number.isFinite(Number(m?.amountRlusd)) ? Number(m.amountRlusd) : 0,
+      fxRate: Number.isFinite(Number(m?.fxRate)) ? Number(m.fxRate) : null,
+      fxSource: m?.fxSource || "",
+      txHash: m?.txHash || "",
+      note: m?.note || "",
+      createdAt: m?.createdAt || ""
+    }));
+    return JSON.stringify({
+      version: 1,
+      type: "global_statement",
+      walletAddress: walletAddress || "",
+      period: currentPeriod || fallbackPeriod,
+      totalBalance: safeTotal,
+      tokens: tokenPayload,
+      movements: movementPayload
+    });
+  }, [currentPeriod, fallbackPeriod, movements, tokens, totalBalance, walletAddress]);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (typeof window === "undefined") return () => {};
+    (async () => {
+      const hash = await sha256Hex(statementHashInput);
+      if (!cancelled) setDocHash(hash);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [statementHashInput]);
+
+  const buildPrintHtml = useCallback(() => {
+    const generatedAt = new Date().toLocaleString(locale);
+    const docHashLabel = docHash || "-";
+    const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
+    const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
+    const totalBalanceDisplay = Number.isFinite(Number(totalBalance)) ?
+    `$${formatAmount(totalBalance)}` :
+    "-";
+    const balancesRows = (sortedTokens || []).map((token) => {
+      const usdValue = getUsdValue(token);
+      return `
+        <tr>
+          <td>${escapeHtml(String(token?.currency || "").toUpperCase())}</td>
+          <td class="right">${escapeHtml(formatAmount(token?.value))}</td>
+          <td class="right">${Number.isFinite(usdValue) ? escapeHtml(`$${formatAmount(usdValue)}`) : "-"}</td>
+        </tr>
+      `;
+    }).join("");
+    const balancesEmpty = `
+      <tr>
+        <td colspan="3" class="muted">${escapeHtml(
+          t("ui_no_balances_found_2c7a1d9b5e", "No balances available")
+        )}</td>
+      </tr>
+    `;
+    const movementRows = (movements || []).map((m) => {
+      const from = String(m?.fromCurrencyCode || "").toUpperCase();
+      const to = String(m?.toCurrencyCode || "").toUpperCase();
+      const amount = Number(m?.amountRlusd || 0);
+      const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
+      const when =
+      createdAt && Number.isFinite(createdAt.getTime()) ?
+      createdAt.toLocaleString(locale) :
+      "";
+      return `
+        <tr>
+          <td>${escapeHtml(when)}</td>
+          <td>${escapeHtml(m?.kind || "")}</td>
+          <td>${escapeHtml(from)}</td>
+          <td>${escapeHtml(to)}</td>
+          <td class="right">${escapeHtml(
+            Number.isFinite(amount) ?
+            amount.toLocaleString(locale, { maximumFractionDigits: 6 }) :
+            "-"
+          )}</td>
+          <td>${escapeHtml(m?.txHash || "")}</td>
+        </tr>
+      `;
+    }).join("");
+    const movementsEmpty = `
+      <tr>
+        <td colspan="6" class="muted">${escapeHtml(
+          t("ui_no_movements_found_2b7c1a9d5e", "No movements available")
+        )}</td>
+      </tr>
+    `;
+
+    return `
+      <h1>${escapeHtml(t("ui_global_statement_13e29aa8aa", "Global Statement"))}</h1>
+      <div class="meta">
+        <div><strong>${escapeHtml(t("ui_account_holder_3eef963295", "Account Holder"))}:</strong> ${escapeHtml(walletLabelText)}</div>
+        <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
+        <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
+        <div><strong>${escapeHtml(t("ui_total_balance_label_2c7a1d9b5e", "Total balance (USD)"))}:</strong> ${escapeHtml(totalBalanceDisplay)}</div>
+        <div><strong>${escapeHtml(t("ui_generated_on_3827d9035f", "Generated on"))}:</strong> ${escapeHtml(generatedAt)}</div>
+        <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
+        <div><strong>${escapeHtml(t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index"))}:</strong> ${escapeHtml(ledgerIndexLabel)}</div>
+        <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
+      </div>
+      <h2>${escapeHtml(t("ui_balances_label_1c7a2d9b5e", "Balances"))}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>${escapeHtml(t("ui_currency_label_2f7a1c9b5e", "Currency"))}</th>
+            <th class="right">${escapeHtml(t("ui_balance_label_7f2a1b9c5e", "Balance"))}</th>
+            <th class="right">${escapeHtml(t("ui_usd_value_label_1a7c9d3b5e", "USD value"))}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${balancesRows || balancesEmpty}
+        </tbody>
+      </table>
+      <h2>${escapeHtml(t("ui_recent_activity_de80b9813c", "Recent activity"))}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>${escapeHtml(t("ui_date_label_7a2c1b9d5e", "Date"))}</th>
+            <th>${escapeHtml(t("ui_type_label_8b1a4d2c7e", "Type"))}</th>
+            <th>${escapeHtml(t("ui_from_label_2c7a1d9b5e", "From"))}</th>
+            <th>${escapeHtml(t("ui_to_label_7b2c1a9d5e", "To"))}</th>
+            <th class="right">${escapeHtml(t("ui_amount_rlusd_label_2c7a1d9b5e", "Amount (RLUSD)"))}</th>
+            <th>${escapeHtml(t("ui_tx_hash_label_2b7c1a9d5e", "Tx hash"))}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${movementRows || movementsEmpty}
+        </tbody>
+      </table>
+    `;
+  }, [
+  currentPeriod,
+  docHash,
+  fallbackPeriod,
+  formatAmount,
+  getUsdValue,
+  ledgerLastIndex,
+  ledgerStatusLabel,
+  locale,
+  movements,
+  sortedTokens,
+  t,
+  totalBalance,
+  walletAddress,
+  walletLabel]);
+
+  const handleExportPdf = useCallback(() => {
+    setExportFormat("pdf");
+    try {
+      const suffix = docHash ? docHash.slice(0, 12) : "draft";
+      const ok = openPrintWindow({
+        title: `XCANNES Global Statement ${suffix}`,
+        bodyHtml: buildPrintHtml()
+      });
+      if (!ok && typeof window !== "undefined") {
+        window.alert(
+          t(
+            "ui_popup_blocked_1c7a9d3b5e",
+            "Popup blocked. Please allow popups to export or print."
+          )
+        );
+      }
+    } finally {
+      setExportFormat(null);
+    }
+  }, [buildPrintHtml, docHash, t]);
+
+  const handlePrint = useCallback(() => {
+    const suffix = docHash ? docHash.slice(0, 12) : "draft";
+    const ok = openPrintWindow({
+      title: `XCANNES Global Statement ${suffix}`,
+      bodyHtml: buildPrintHtml()
+    });
+    if (!ok && typeof window !== "undefined") {
+      window.alert(
+        t(
+          "ui_popup_blocked_1c7a9d3b5e",
+          "Popup blocked. Please allow popups to export or print."
+        )
+      );
+    }
+  }, [buildPrintHtml, docHash, t]);
+
+  const handleExportCsv = useCallback(() => {
+    setExportFormat("csv");
+    try {
+      const suffix = docHash ? docHash.slice(0, 12) : "draft";
+      const headers = [
+      "created_at",
+      "kind",
+      "from_currency",
+      "to_currency",
+      "amount_rlusd",
+      "fx_rate",
+      "fx_source",
+      "tx_hash",
+      "total_balance_usd",
+      "ledger_status",
+      "doc_hash"];
+      const rows = (movements || []).map((m) => ([
+        m?.createdAt || "",
+        m?.kind || "",
+        m?.fromCurrencyCode || "",
+        m?.toCurrencyCode || "",
+        Number.isFinite(Number(m?.amountRlusd)) ? Number(m.amountRlusd) : "",
+        Number.isFinite(Number(m?.fxRate)) ? Number(m.fxRate) : "",
+        m?.fxSource || "",
+        m?.txHash || "",
+        Number.isFinite(Number(totalBalance)) ? Number(totalBalance) : "",
+        ledgerStatus,
+        docHash || ""
+      ]));
+      const csv = buildCsvString(headers, rows);
+      downloadTextFile({
+        filename: `xcannes-statement-global-${suffix}.csv`,
+        content: csv,
+        type: "text/csv;charset=utf-8"
+      });
+    } finally {
+      setExportFormat(null);
+    }
+  }, [docHash, ledgerStatus, movements, totalBalance]);
 
   const getCurrencyFlag = (currency) => {
     const flags = {
@@ -435,9 +719,22 @@ export default function GlobalStatement({
 
           {/* Watermark */}
           <div className="hidden sm:block text-center py-3 sm:py-4">
-            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{t("ui_generated_on_3827d9035f", "Generated on")}
-            {new Date().toLocaleString(locale)}
-            </p>
+            <div className="space-y-1">
+              <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{t("ui_generated_on_3827d9035f", "Generated on")}
+              {new Date().toLocaleString(locale)}
+              </p>
+              <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{ledgerStatusLabel}</p>
+              {ledgerLastIndex != null ?
+            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
+                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
+                  {ledgerLastIndex}
+                </p> :
+            null}
+              <p className="text-[9px] sm:text-xs text-white/10 font-mono px-2 break-all">
+                {t("ui_document_hash_label_9b5c1a2d7e", "Document hash:")}{" "}
+                {docHash || "-"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -522,20 +819,29 @@ export default function GlobalStatement({
         <div className="border-t border-white/10 px-3 sm:px-6 py-3 sm:py-4 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
           <div className="flex gap-2 flex-wrap">
             <button
-            onClick={() =>
-              alert(
-                t("ui_export_in_progress_6c2a1d8b4f", {
-                  defaultValue:
-                    "Export {{format}} in progress... (feature to be implemented).",
-                  format: "PDF"
-                })
-              )}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15">{t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+            onClick={handleExportPdf}
+            disabled={exportFormat === "pdf"}
+            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15 disabled:opacity-50">
+
+              {exportFormat === "pdf" ?
+              t("ui_loading_1386baebe9", "Loading…") :
+              t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
 
 
           </button>
             <button
-            onClick={() => window.print()}
+            onClick={handleExportCsv}
+            disabled={exportFormat === "csv"}
+            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15 disabled:opacity-50">
+
+              {exportFormat === "csv" ?
+              t("ui_loading_1386baebe9", "Loading…") :
+              t("ui_export_csv_2f8a1b9d5e", "Export CSV")}
+
+
+          </button>
+            <button
+            onClick={handlePrint}
             className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15">{t("ui_print_eb5de3a228", "🖨️ Print")}
 
 
