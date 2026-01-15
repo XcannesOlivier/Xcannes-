@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Buffer } from "buffer";
 import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 export default function WalletDashboardReceiveModal({
   open,
@@ -77,39 +78,51 @@ export default function WalletDashboardReceiveModal({
     }
 
     const targetCurrencyCode = requestCurrencyCode || "RLUSD";
-    let amountRlusd = amount;
+    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
+    let amountRlusd = null;
     let fxRate = null;
     let fxSource = null;
 
-    if (targetCurrencyCode === "RLUSD") {
+    if (targetCurrencyUpper === "RLUSD") {
       amountRlusd = amount;
       fxRate = 1;
       fxSource = "PYTH";
     } else if (isFxRequest) {
-      const rate = Number(rlusdPerUnitRates?.[targetCurrencyCode]);
+      const rate = Number(rlusdPerUnitRates?.[targetCurrencyUpper]);
       if (!Number.isFinite(rate) || rate <= 0) {
         setGenerateError(
           t("ui_request_error_rate_unavailable_8c2e1a7b5d", {
             defaultValue: "Rate unavailable for {{currency}}.",
-            currency: targetCurrencyCode,
+            currency: targetCurrencyUpper,
           })
         );
         return;
       }
       fxRate = rate;
-      fxSource = rlusdPerUnitSources?.[targetCurrencyCode] || null;
+      fxSource = rlusdPerUnitSources?.[targetCurrencyUpper] || null;
       amountRlusd = amount * rate;
     }
+
+    const issuerCandidate = String(selectedRequestToken?.issuer || "").trim();
+    const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuerCandidate);
+    const knownIssuer =
+      targetCurrencyUpper === "RLUSD"
+        ? XRPL_KNOWN_ISSUERS.RLUSD
+        : targetCurrencyUpper === "XCS"
+          ? XRPL_KNOWN_ISSUERS.XCS
+          : null;
+    const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
     const req = {
       schema: "xcannes-payreq-v1",
       to: effectiveWallet,
-      targetCurrency: targetCurrencyCode,
+      targetCurrency: targetCurrencyUpper,
       displayAmount: amount,
-      displayCurrency: targetCurrencyCode,
+      displayCurrency: targetCurrencyUpper,
       amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
       fxRate,
       fxSource,
+      issuer,
       memo: requestMemo || "",
       createdAt: new Date().toISOString()
     };

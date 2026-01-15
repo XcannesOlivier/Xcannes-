@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { Buffer } from "buffer";
 import SEOHead from "@/components/layout/SEOHead";
-import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
+import { buildRlusdPaymentTxjson, normalizeXrplIouValue } from "@/utils/walletSpread";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
@@ -21,6 +22,14 @@ function decodePayReq(value) {
   } catch {
     return null;
   }
+}
+
+const XRPL_ADDRESS_REGEX = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+
+function normalizeIssuer(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  return XRPL_ADDRESS_REGEX.test(raw) ? raw : null;
 }
 
 export default function PayRequestPage() {
@@ -43,14 +52,43 @@ export default function PayRequestPage() {
     if (!request) return null;
     const to = String(request.to || "").trim();
     const targetCurrency = String(
-      request.targetCurrency || request.targetCurrencyCode || request.displayCurrency || ""
+      request.targetCurrency ||
+        request.targetCurrencyCode ||
+        request.displayCurrency ||
+        request.currency ||
+        ""
     )
       .trim()
       .toUpperCase();
-    const displayAmount = Number(request.displayAmount ?? request.amount ?? 0);
+    const displayAmountRaw = request.displayAmount ?? request.amount ?? null;
+    const displayAmount =
+      displayAmountRaw != null ? Number(displayAmountRaw) : null;
+    const displayCurrency = String(
+      request.displayCurrency ||
+        request.displayCurrencyCode ||
+        targetCurrency ||
+        ""
+    )
+      .trim()
+      .toUpperCase();
     const fxRate = request.fxRate != null ? Number(request.fxRate) : null;
     const fxSource = request.fxSource != null ? String(request.fxSource) : null;
     const memo = request.memo != null ? String(request.memo) : "";
+    const issuer = normalizeIssuer(
+      request.issuer ||
+        request.targetIssuer ||
+        request.settlementIssuer ||
+        request.paymentIssuer ||
+        ""
+    );
+    const settlementCurrency = String(
+      request.settlementCurrency || request.paymentCurrency || ""
+    )
+      .trim()
+      .toUpperCase();
+    const settlementIssuer = normalizeIssuer(
+      request.settlementIssuer || request.paymentIssuer || ""
+    );
 
     let amountRlusd = request.amountRlusd != null ? Number(request.amountRlusd) : null;
     if (!Number.isFinite(amountRlusd) || amountRlusd <= 0) {
@@ -67,13 +105,82 @@ export default function PayRequestPage() {
       to,
       targetCurrency: targetCurrency || null,
       displayAmount: Number.isFinite(displayAmount) ? displayAmount : null,
-      displayCurrency: targetCurrency || null,
+      displayCurrency: displayCurrency || targetCurrency || null,
       amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
       fxRate: Number.isFinite(fxRate) ? fxRate : null,
       fxSource,
       memo,
+      issuer,
+      settlementCurrency: settlementCurrency || null,
+      settlementIssuer,
     };
   }, [request]);
+
+  const settlement = useMemo(() => {
+    if (!normalizedRequest) return null;
+    const target = String(normalizedRequest.targetCurrency || "").toUpperCase();
+    const explicitCurrency = String(normalizedRequest.settlementCurrency || "").toUpperCase();
+    const explicitIssuer = normalizeIssuer(normalizedRequest.settlementIssuer);
+    const issuer = normalizeIssuer(normalizedRequest.issuer);
+    let currency = null;
+    let issuerAddress = null;
+
+    const pickIssuer = (code) => {
+      if (explicitIssuer) return explicitIssuer;
+      if (code === "RLUSD") return XRPL_KNOWN_ISSUERS.RLUSD || issuer || null;
+      if (code === "XCS") return XRPL_KNOWN_ISSUERS.XCS || issuer || null;
+      return issuer || null;
+    };
+
+    if (explicitCurrency) {
+      currency = explicitCurrency;
+      if (currency !== "XRP") {
+        issuerAddress = pickIssuer(currency);
+      }
+    } else if (target === "XRP") {
+      currency = "XRP";
+    } else if (target === "XCS") {
+      currency = "XCS";
+      issuerAddress = pickIssuer("XCS");
+    } else if (target === "RLUSD") {
+      currency = "RLUSD";
+      issuerAddress = pickIssuer("RLUSD");
+    } else if (issuer) {
+      currency = target || null;
+      issuerAddress = issuer;
+    } else if (
+      (Number.isFinite(normalizedRequest.amountRlusd) && normalizedRequest.amountRlusd > 0) ||
+      (Number.isFinite(normalizedRequest.fxRate) && normalizedRequest.fxRate > 0)
+    ) {
+      currency = "RLUSD";
+      issuerAddress = pickIssuer("RLUSD");
+    }
+
+    const kind = currency === "RLUSD" ? "rlusd" : currency ? "asset" : "unknown";
+    let amount = null;
+    if (kind === "rlusd") {
+      amount = normalizedRequest.amountRlusd;
+      if (!Number.isFinite(amount) || amount <= 0) {
+        const displayAmount = normalizedRequest.displayAmount;
+        if (target === "RLUSD" && Number.isFinite(displayAmount) && displayAmount > 0) {
+          amount = displayAmount;
+        } else if (Number.isFinite(displayAmount) && displayAmount > 0 && Number.isFinite(normalizedRequest.fxRate) && normalizedRequest.fxRate > 0) {
+          amount = displayAmount * normalizedRequest.fxRate;
+        }
+      }
+    } else if (kind === "asset") {
+      amount = Number.isFinite(normalizedRequest.displayAmount)
+        ? normalizedRequest.displayAmount
+        : null;
+    }
+
+    return {
+      currency,
+      issuer: issuerAddress || null,
+      amount,
+      kind,
+    };
+  }, [normalizedRequest]);
 
   const stopPolling = useCallback(() => {
     if (pollTimerRef.current) {
@@ -178,40 +285,75 @@ export default function PayRequestPage() {
       );
       return;
     }
-    if (
-      !Number.isFinite(normalizedRequest.amountRlusd) ||
-      normalizedRequest.amountRlusd <= 0
-    ) {
+    if (!settlement || settlement.kind === "unknown" || !settlement.currency) {
+      setError(
+        t("pay_error_invalid_request", "Unsupported payment request.")
+      );
+      return;
+    }
+    if (!Number.isFinite(settlement.amount) || settlement.amount <= 0) {
       setError(t("pay_error_invalid_amount", "Invalid amount."));
       return;
     }
 
-    const txjson = buildRlusdPaymentTxjson({
-      account: payerAddress,
-      destination: normalizedRequest.to,
-      amountRlusd: normalizedRequest.amountRlusd,
-    });
-    if (!txjson) {
-      setError(
-        t("pay_error_build_payment", "Unable to build RLUSD payment.")
-      );
-      return;
+    let txjson;
+    if (settlement.currency === "RLUSD") {
+      txjson = buildRlusdPaymentTxjson({
+        account: payerAddress,
+        destination: normalizedRequest.to,
+        amountRlusd: settlement.amount,
+      });
+      if (!txjson) {
+        setError(
+          t("pay_error_build_payment", "Unable to build RLUSD payment.")
+        );
+        return;
+      }
+      const memoPayload = {
+        xcannes: "payreq",
+        schema: "xcannes-payreq-v1",
+        v: 1,
+        targetCurrencyCode: normalizedRequest.targetCurrency || null,
+        displayAmount: normalizedRequest.displayAmount,
+        displayCurrencyCode: normalizedRequest.displayCurrency,
+        amountRlusd: settlement.amount,
+        fxRate: normalizedRequest.fxRate,
+        fxSource: normalizedRequest.fxSource,
+        note: normalizedRequest.memo || null,
+      };
+      const memos = buildXrplJsonMemo(memoPayload);
+      if (memos) txjson.Memos = memos;
+    } else if (settlement.currency === "XRP") {
+      const drops = Math.round(settlement.amount * 1_000_000).toString();
+      txjson = {
+        TransactionType: "Payment",
+        Account: payerAddress,
+        Destination: normalizedRequest.to,
+        Amount: drops,
+      };
+    } else {
+      if (!settlement.issuer) {
+        setError(
+          t("pay_error_invalid_request", "Missing issuer for requested asset.")
+        );
+        return;
+      }
+      const value = normalizeXrplIouValue(settlement.amount);
+      if (!value) {
+        setError(t("pay_error_invalid_amount", "Invalid amount."));
+        return;
+      }
+      txjson = {
+        TransactionType: "Payment",
+        Account: payerAddress,
+        Destination: normalizedRequest.to,
+        Amount: {
+          currency: encodeXrplCurrencyCode(settlement.currency),
+          issuer: settlement.issuer,
+          value,
+        },
+      };
     }
-
-    const memoPayload = {
-      xcannes: "payreq",
-      schema: "xcannes-payreq-v1",
-      v: 1,
-      targetCurrencyCode: normalizedRequest.targetCurrency || null,
-      displayAmount: normalizedRequest.displayAmount,
-      displayCurrencyCode: normalizedRequest.displayCurrency,
-      amountRlusd: normalizedRequest.amountRlusd,
-      fxRate: normalizedRequest.fxRate,
-      fxSource: normalizedRequest.fxSource,
-      note: normalizedRequest.memo || null,
-    };
-    const memos = buildXrplJsonMemo(memoPayload);
-    if (memos) txjson.Memos = memos;
 
     setPhase("pay_poll");
     setActivePayload(null);
@@ -253,7 +395,7 @@ export default function PayRequestPage() {
       setPhase("idle");
       setError(e?.message || t("pay_error_payment_failed", "Payment failed."));
     }
-  }, [normalizedRequest, payerAddress, pollXumm, startConnect, t]);
+  }, [normalizedRequest, payerAddress, pollXumm, settlement, startConnect, t]);
 
   return (
     <>
@@ -284,13 +426,13 @@ export default function PayRequestPage() {
                   {normalizedRequest.displayAmount} {normalizedRequest.displayCurrency}
                 </span>
               </div>
-              {normalizedRequest.amountRlusd != null && (
+              {settlement?.currency === "RLUSD" && settlement.amount != null && (
                 <div className="text-[11px] text-white/50">
                   {t(
                     "pay_settles_rlusd_label",
                     "Settles on-chain in RLUSD:"
                   )}{" "}
-                  <span className="font-mono">{normalizedRequest.amountRlusd}</span>
+                  <span className="font-mono">{settlement.amount}</span>
                 </div>
               )}
               {normalizedRequest.memo ? (
@@ -299,16 +441,18 @@ export default function PayRequestPage() {
                 </div>
               ) : null}
 
-              <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[11px] text-white/60">
-                {t(
-                  "pay_settlement_info_prefix",
-                  "This payment will settle on-chain in RLUSD. The receiver will be credited in"
-                )}{" "}
-                <span className="font-semibold text-xcannes-green/90">
-                  {normalizedRequest.targetCurrency || "RLUSD"}
-                </span>
-                .
-              </div>
+              {settlement?.currency === "RLUSD" ? (
+                <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[11px] text-white/60">
+                  {t(
+                    "pay_settlement_info_prefix",
+                    "This payment will settle on-chain in RLUSD. The receiver will be credited in"
+                  )}{" "}
+                  <span className="font-semibold text-xcannes-green/90">
+                    {normalizedRequest.targetCurrency || "RLUSD"}
+                  </span>
+                  .
+                </div>
+              ) : null}
 
               {payerAddress ? (
                 <div className="text-[11px] text-white/50">
