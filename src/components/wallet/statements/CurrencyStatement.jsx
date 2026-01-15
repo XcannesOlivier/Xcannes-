@@ -673,21 +673,21 @@ export default function CurrencyStatement({
     return enriched;
   };
 
-  const formatDate = (dateStr) => {
+  const formatDate = useCallback((dateStr) => {
     if (!dateStr) return t("ui_not_available_9c2a1f7b3d", "N/A");
     const date = new Date(dateStr);
     const options = isMobileDate ?
     { day: "2-digit", month: "2-digit" } :
     { day: "2-digit", month: "2-digit", year: "numeric" };
     return date.toLocaleDateString(locale, options);
-  };
+  }, [isMobileDate, locale, t]);
 
-  const formatAmount = (amount) => {
+  const formatAmount = useCallback((amount) => {
     return parseFloat(amount || 0).toLocaleString(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 6
     });
-  };
+  }, [locale]);
 
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
