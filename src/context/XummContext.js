@@ -154,7 +154,7 @@ export const XummProvider = ({ children }) => {
   /**
    * Signer une transaction
    */
-  const signTransaction = async (txjson) => {
+  const signTransaction = async (txjson, { action } = {}) => {
     if (!isConnected) {
       alert('Please connect your wallet first');
       return null;
@@ -162,10 +162,15 @@ export const XummProvider = ({ children }) => {
 
     setIsConnecting(true);
     try {
+      const payload = {
+        txjson,
+        ...(action ? { action } : {}),
+      };
+
       const res = await fetch(apiUrl('/xumm/sign'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ txjson }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();

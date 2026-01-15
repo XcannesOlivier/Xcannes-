@@ -7,7 +7,8 @@ export default function WalletDashboardTrustlinesAddForm({
   setTrustlineCode,
   trustlineLocked,
   setTrustlineLocked,
-  onSubmit
+  onSubmit,
+  minLockedXcs = 0.2
 }) {const { t } = useTranslation("common");
   return (
     <div className="mb-3 space-y-2">
@@ -23,7 +24,7 @@ export default function WalletDashboardTrustlinesAddForm({
 
         <input
           type="number"
-          min="0"
+          min={minLockedXcs}
           step="0.0001"
           value={trustlineLocked}
           onChange={(e) => setTrustlineLocked(e.target.value)}

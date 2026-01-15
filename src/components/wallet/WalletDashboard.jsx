@@ -9,7 +9,9 @@ import { apiUrl } from "@/lib/runtimeConfig";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import {
   buildRlusdPaymentTxjson,
+  buildXcsPaymentTxjson,
   computeSpreadQuote,
+  XCANNES_ACTIVATION_WALLET_ADDRESS,
   XCANNES_SPREAD_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 	import { useWalletLines } from "./hooks/useWalletLines";
@@ -55,6 +57,14 @@ import {
   USD_STABLECOINS,
   WALLET_LABEL_STORAGE_KEY,
 } from "./walletDashboardConfig";
+
+const DEFAULT_ACTIVATION_FEE_XCS = 0.2;
+const ACTIVATION_FEE_XCS = (() => {
+  const raw = Number.parseFloat(
+    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_XCS || ""
+  );
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ACTIVATION_FEE_XCS;
+})();
 
 export default function WalletDashboard({
   preview = false,
@@ -468,6 +478,41 @@ export default function WalletDashboard({
     ? () => {}
     : refreshCurrencyLines;
 
+  const payActivationFee = useCallback(async (action) => {
+    if (!wallet || !signTransaction) {
+      alert("Please connect your Xumm wallet first.");
+      return null;
+    }
+
+    const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();
+    if (!destination) {
+      alert("Activation wallet not configured.");
+      return null;
+    }
+
+    const txjson = buildXcsPaymentTxjson({
+      account: wallet,
+      destination,
+      amountXcs: ACTIVATION_FEE_XCS,
+    });
+    if (!txjson) {
+      alert("Unable to build activation fee payment.");
+      return null;
+    }
+
+    const result = await signTransaction(txjson, { action });
+    if (!result?.signed || !result?.uuid) {
+      alert("Activation payment cancelled or expired.");
+      return null;
+    }
+
+    if (refreshBalance) {
+      setTimeout(() => refreshBalance(), 2500);
+    }
+
+    return result.uuid;
+  }, [refreshBalance, signTransaction, wallet]);
+
   const handleActivateCurrencyLine = useCallback(
     async (code) => {
       const currencyCode = String(code || "").trim().toUpperCase();
@@ -489,9 +534,51 @@ export default function WalletDashboard({
         return;
       }
 
-      await upsertCurrencyLine?.({ currencyCode, allocatedRlusd: 0 });
+      const alreadyActive = (currencyLines || []).some(
+        (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
+      );
+      if (alreadyActive) return;
+
+      if (isWalletActivated === false) {
+        alert(
+          t("ui_wallet_activation_required_f4", {
+            defaultValue: "Wallet must be activated to create currency lines.",
+          })
+        );
+        return;
+      }
+
+      if (!hasOnChainRlusd) {
+        alert("RLUSD trustline is not installed yet. Please install it first.");
+        return;
+      }
+
+      if (!hasOnChainXcs) {
+        alert("XCS trustline is not installed yet. Please install it first.");
+        return;
+      }
+
+      const xummUuid = await payActivationFee("wallet:currency-lines:upsert");
+      if (!xummUuid) return;
+
+      await upsertCurrencyLine?.({
+        currencyCode,
+        allocatedRlusd: 0,
+        xummUuid,
+      });
     },
-    [backendWalletAddress, isPreviewMode, setDemoLines, upsertCurrencyLine]
+    [
+      backendWalletAddress,
+      currencyLines,
+      hasOnChainRlusd,
+      hasOnChainXcs,
+      isPreviewMode,
+      isWalletActivated,
+      payActivationFee,
+      setDemoLines,
+      t,
+      upsertCurrencyLine,
+    ]
   );
 
   const pendingActivationItems = useMemo(() => {
@@ -527,9 +614,26 @@ export default function WalletDashboard({
         ) || null;
       if (!entry) return;
 
+      if (isWalletActivated === false) {
+        alert(
+          t("ui_wallet_activation_required_f4", {
+            defaultValue: "Wallet must be activated to create currency lines.",
+          })
+        );
+        return;
+      }
+
       const hasLine = (currencyLines || []).some(
         (line) => String(line?.currencyCode || "").toUpperCase() === code
       );
+      if (!hasOnChainRlusd) {
+        alert("RLUSD trustline is not installed yet. Please install it first.");
+        return;
+      }
+      if (!hasLine && !hasOnChainXcs) {
+        alert("XCS trustline is not installed yet. Please install it first.");
+        return;
+      }
 
       const totalRlusd = Number(entry?.totalAmountRlusd ?? 0);
       const totalDisplay = Number(entry?.totalDisplayAmount ?? NaN);
@@ -559,7 +663,17 @@ export default function WalletDashboard({
 
       setPendingActivationCurrency(code);
       try {
-        await activatePendingAllocations?.(code);
+        let activationUuid = null;
+        if (!hasLine) {
+          activationUuid = await payActivationFee(
+            "wallet:pending-allocations:activate"
+          );
+          if (!activationUuid) return;
+        }
+
+        await activatePendingAllocations?.(code, {
+          xummUuid: activationUuid,
+        });
         await refreshPendingAllocations?.();
         await refreshCurrencyLines?.();
         if (refreshBalance) {
@@ -583,7 +697,11 @@ export default function WalletDashboard({
       backendWalletAddress,
       currencyLines,
       formatPendingAmount,
+      hasOnChainRlusd,
+      hasOnChainXcs,
+      isWalletActivated,
       isPreviewMode,
+      payActivationFee,
       pendingAllocations,
       refreshBalance,
       refreshCurrencyLines,
@@ -615,14 +733,6 @@ export default function WalletDashboard({
       setSwapDefaultView("convert");
       setActiveAction("swap");
 
-      // Best effort: s'assurer que les lignes existent (fiat) pour que l'option soit utilisable.
-      // Ne pas bloquer l'ouverture de la modale.
-      window.setTimeout(() => {
-        Promise.all([
-          handleActivateCurrencyLine(desiredBase),
-          handleActivateCurrencyLine(desiredQuote),
-        ]).catch(() => {});
-      }, 0);
     };
 
     window.addEventListener("xcannes:wallet:open-convert", handler);
@@ -767,8 +877,8 @@ export default function WalletDashboard({
     const code = String(editingTrustlineCurrency || "").toUpperCase();
     if (!code) return;
     const locked = Number(editingTrustlineLocked || "0");
-    if (!Number.isFinite(locked) || locked < 0) {
-      alert("Enter a valid non-negative locked XCS amount.");
+    if (!Number.isFinite(locked) || locked < ACTIVATION_FEE_XCS) {
+      alert(`Enter a locked XCS amount >= ${ACTIVATION_FEE_XCS}.`);
       return;
     }
     await addLine(code, locked);
@@ -1370,7 +1480,9 @@ export default function WalletDashboard({
           if (!spreadTx) {
             throw new Error("Invalid RLUSD spread payment");
           }
-          const spreadResult = await signTransaction(spreadTx);
+          const spreadResult = await signTransaction(spreadTx, {
+            action: "wallet:convert",
+          });
           if (!spreadResult?.signed) {
             alert("Spread payment cancelled or expired.");
             return { ok: false };
@@ -1416,7 +1528,9 @@ export default function WalletDashboard({
         const memos = buildXrplJsonMemo(memoPayload);
         if (memos) payTx.Memos = memos;
 
-        const payResult = await signTransaction(payTx);
+        const payResult = await signTransaction(payTx, {
+          action: "wallet:convert",
+        });
         if (payResult?.signed) {
           alert("✅ Payment submitted via Xumm.");
 
@@ -1587,7 +1701,11 @@ export default function WalletDashboard({
       return;
     }
     const locked = Number(trustlineLocked || "0");
-    await addLine(code, Number.isFinite(locked) ? locked : 0);
+    if (!Number.isFinite(locked) || locked < ACTIVATION_FEE_XCS) {
+      alert(`Enter a locked XCS amount >= ${ACTIVATION_FEE_XCS}.`);
+      return;
+    }
+    await addLine(code, locked);
     setTrustlineCode("");
     setTrustlineLocked("");
   };
@@ -1851,6 +1969,7 @@ export default function WalletDashboard({
             isPreviewMode={isPreviewMode}
             defaultView={swapDefaultView}
             effectiveIsConnected={effectiveIsConnected}
+            isWalletActivated={isWalletActivated}
             walletAddress={effectiveWallet}
             onConnectWallet={connect}
             hasOnChainRlusd={hasOnChainRlusd}
@@ -1879,6 +1998,7 @@ export default function WalletDashboard({
             handleDemoConvert={handleDemoConvert}
             convertProcessing={convertProcessing}
             rlusdPerUnitRates={rlusdPerUnitRates}
+            activationFeeXcs={ACTIVATION_FEE_XCS}
           />
 
 	      <WalletDashboardCashModal
@@ -1901,6 +2021,7 @@ export default function WalletDashboard({
 	        setEditingTrustlineLocked={setEditingTrustlineLocked}
 	        handleSaveTrustlineCurrency={handleSaveTrustlineCurrency}
 	        handleRemoveTrustlineCurrency={handleRemoveTrustlineCurrency}
+          minLockedXcs={ACTIVATION_FEE_XCS}
 	      />
 
 	      <WalletDashboardTrustlinesModal
@@ -1917,6 +2038,7 @@ export default function WalletDashboard({
         walletLines={walletLines}
         totalLockedXcs={totalLockedXcs}
         openTrustlineEditor={openTrustlineEditor}
+        minLockedXcs={ACTIVATION_FEE_XCS}
       />
         </>,
         document.body

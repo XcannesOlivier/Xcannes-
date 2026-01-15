@@ -48,9 +48,7 @@ Source: `Xcannes-/src/components/wallet/hooks/useWalletCurrencyLines.js` (endpoi
 
 Activation des lignes:
 - Une ligne de devise est “activée” dès qu’elle existe (créée dans Convert, ou auto-créée si l’utilisateur reçoit un mouvement sur une devise non encore présente), **même si `allocatedRlusd = 0`**.
-- Le verrouillage associé est **0.20 XCS par ligne activée**.
-- Le wallet XCANNES requiert aussi une **activation** de **1 XCS** (affichée dans le statement `XCS`).
-- Fermeture d’une ligne: **refund 50%** au wallet utilisateur (**0.10 XCS**) et **50%** vers le wallet de gestion XCANNES (mécanisme via escrow).
+- Frais d’activation: **paiement on-chain de 0.20 XCS** vers le wallet XCANNES (uniquement si la ligne n’existe pas déjà).
 
 ## 3) Flux produit (UX)
 
@@ -140,7 +138,7 @@ Quand `preview=true` et qu’aucun wallet n’est connecté:
 - Le solde est simulé (XRP + `demoLines`).
 - Certaines actions backend sont désactivées (pas d’adresse à envoyer au backend).
 - Convert + Send FX peuvent être testés en **mode fictif** (spread appliqué, signatures simulées).
-- Les lignes de devises sont **pré-remplies** avec des montants fictifs, et la page “Currency lines” permet d’ajouter/supprimer/modifier des lignes en démo (verrouillage XCS simulé).
+- Les lignes de devises sont **pré-remplies** avec des montants fictifs, et la page “Currency lines” permet d’ajouter/supprimer/modifier des lignes en démo (activation simulée, pas de paiement XCS).
 
 Source: `Xcannes-/src/components/wallet/WalletDashboard.jsx`
 
@@ -153,9 +151,9 @@ Source: `Xcannes-/src/components/wallet/WalletDashboard.jsx`
 ## 6) “Info & Fees” (spécification UX à confirmer)
 
 La modale “Info & Fees” décrit (spécification produit actuelle):
-- “XCS lock” (activation + création/suppression de lignes)
+- Frais d’activation: **0.20 XCS** par nouvelle ligne (paiement on-chain vers XCANNES)
 - Frais XRPL (network fee)
-- **XCANNES ne prélève pas de “fee” séparé**: le modèle est **spread uniquement** sur les conversions FX.
+- Le modèle de conversion FX reste basé sur un **spread** (prélevé en RLUSD).
 
 Règles de spread (wallet):
 - Le spread s’applique **uniquement quand il y a conversion FX** (ex: EUR↔GBP, RLUSD↔EUR, etc.).

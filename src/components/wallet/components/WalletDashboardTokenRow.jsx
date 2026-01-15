@@ -114,7 +114,7 @@ export default function WalletDashboardTokenRow({
       {isMissingTrustline && (currencyCode === "RLUSD" || currencyCode === "XCS") &&
       <div className="mt-1 rounded-md border border-amber-500/25 bg-amber-500/10 px-3 py-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] text-amber-200/90">{t("ui_trustline_no_activ_e_ed72075f65", "Trustline non activée")}
+            <span className="text-[11px] text-amber-200/90">{t("ui_currency_not_activated_f4", "Currency not activated")}
 
           </span>
             <button

@@ -5,7 +5,8 @@ export default function WalletDashboardTrustlineCurrencyForm({
   editingTrustlineLocked,
   setEditingTrustlineLocked,
   onSave,
-  onRemove
+  onRemove,
+  minLockedXcs = 0.2
 }) {const { t } = useTranslation("common");
   return (
     <>
@@ -25,7 +26,7 @@ export default function WalletDashboardTrustlineCurrencyForm({
         <label className="block text-[11px] text-white/60 mb-1">{t("ui_locked_xcs_68d65407f8", "Locked XCS")}</label>
         <input
           type="number"
-          min="0"
+          min={minLockedXcs}
           step="0.0001"
           value={editingTrustlineLocked}
           onChange={(e) => setEditingTrustlineLocked(e.target.value)}

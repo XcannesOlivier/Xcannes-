@@ -7,6 +7,10 @@ export const XCANNES_SPREAD_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||
   "rGt44i8APV6KMLCCkuaJpY19RVkj2JhnHC";
 
+export const XCANNES_ACTIVATION_WALLET_ADDRESS =
+  (process.env.NEXT_PUBLIC_XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim() ||
+  XCANNES_SPREAD_WALLET_ADDRESS;
+
 export function isFxConversion(base, quote) {
   const b = String(base || "").toUpperCase();
   const q = String(quote || "").toUpperCase();
@@ -79,3 +83,22 @@ export function buildRlusdPaymentTxjson({ account, destination, amountRlusd }) {
   };
 }
 
+export function buildXcsPaymentTxjson({ account, destination, amountXcs }) {
+  const value = normalizeXrplIouValue(amountXcs);
+  if (!value) return null;
+
+  const currency = encodeXrplCurrencyCode("XCS");
+  const issuer = XRPL_KNOWN_ISSUERS.XCS;
+  if (!currency || !issuer) return null;
+
+  return {
+    TransactionType: "Payment",
+    Account: account,
+    Destination: destination,
+    Amount: {
+      currency,
+      issuer,
+      value,
+    },
+  };
+}

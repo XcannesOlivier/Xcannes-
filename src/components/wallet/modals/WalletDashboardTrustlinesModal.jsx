@@ -20,7 +20,8 @@ export default function WalletDashboardTrustlinesModal({
   walletLinesError,
   walletLines,
   totalLockedXcs,
-  openTrustlineEditor
+  openTrustlineEditor,
+  minLockedXcs = 0.2
 }) {const { t } = useTranslation("common");
   if (!open) return null;
 
@@ -76,6 +77,7 @@ export default function WalletDashboardTrustlinesModal({
             setTrustlineCode={setTrustlineCode}
             trustlineLocked={trustlineLocked}
             setTrustlineLocked={setTrustlineLocked}
+            minLockedXcs={minLockedXcs}
             onSubmit={handleAddTrustline} />
 
 
