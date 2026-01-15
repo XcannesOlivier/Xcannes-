@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from "next-i18next";
+import { useXumm } from "@/context/XummContext";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -35,6 +36,7 @@ const MoonPaySellModal = ({
   demoMode = false,
   onDemoSubmit
 }) => {const { t } = useTranslation("common");
+  const { signTransaction } = useXumm();
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -101,6 +103,31 @@ const MoonPaySellModal = ({
     };
   }, [isOpen]);
 
+  const requestXummSignature = async () => {
+    if (!signTransaction) {
+      setError(
+        t(
+          "moonpay_error_signature_required",
+          "XUMM signature required. Please connect your wallet."
+        )
+      );
+      return null;
+    }
+
+    const result = await signTransaction({ TransactionType: "SignIn" });
+    if (!result?.signed || !result?.uuid) {
+      setError(
+        t(
+          "moonpay_error_signature_cancelled",
+          "Signature cancelled or expired."
+        )
+      );
+      return null;
+    }
+
+    return result.uuid;
+  };
+
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -126,7 +153,6 @@ const MoonPaySellModal = ({
 
     setLoading(true);
     setError(null);
-    setStep('loading');
 
     try {
       if (demoMode) {
@@ -148,6 +174,11 @@ const MoonPaySellModal = ({
         return;
       }
 
+      const xummUuid = await requestXummSignature();
+      if (!xummUuid) return;
+
+      setStep('loading');
+
       const response = await fetch('/api/moonpay/generate-sell-url', {
         method: 'POST',
         headers: {
@@ -157,7 +188,8 @@ const MoonPaySellModal = ({
           walletAddress,
           baseCurrencyCode: currency, // Crypto à vendre
           quoteCurrencyCode: quoteCurrency, // Fiat à recevoir
-          baseCurrencyAmount: parseFloat(amount)
+          baseCurrencyAmount: parseFloat(amount),
+          xummUuid
         })
       });
 
