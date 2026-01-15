@@ -40,7 +40,7 @@ const MoonPayBuyModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
-  const { isWalletActivated, balance } = useXumm();
+  const { isWalletActivated, balance, signTransaction } = useXumm();
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
@@ -138,6 +138,31 @@ const MoonPayBuyModal = ({
     };
   }, [isOpen]);
 
+  const requestXummSignature = async () => {
+    if (!signTransaction) {
+      setError(
+        t(
+          "moonpay_error_signature_required",
+          "XUMM signature required. Please connect your wallet."
+        )
+      );
+      return null;
+    }
+
+    const result = await signTransaction({ TransactionType: "SignIn" });
+    if (!result?.signed || !result?.uuid) {
+      setError(
+        t(
+          "moonpay_error_signature_cancelled",
+          "Signature cancelled or expired."
+        )
+      );
+      return null;
+    }
+
+    return result.uuid;
+  };
+
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
     if (!walletAddress) {
@@ -173,7 +198,6 @@ const MoonPayBuyModal = ({
 
     setLoading(true);
     setError(null);
-    setStep('loading');
 
     try {
       if (demoMode) {
@@ -196,6 +220,11 @@ const MoonPayBuyModal = ({
         return;
       }
 
+      const xummUuid = await requestXummSignature();
+      if (!xummUuid) return;
+
+      setStep('loading');
+
       const response = await fetch('/api/moonpay/generate-buy-url', {
         method: 'POST',
         headers: {
@@ -206,7 +235,8 @@ const MoonPayBuyModal = ({
           currencyCode: currency,
           baseCurrencyCode: fiatCurrency,
           baseCurrencyAmount: amountType === 'fiat' ? parseFloat(amount) : undefined,
-          quoteCurrencyAmount: amountType === 'crypto' ? parseFloat(amount) : undefined
+          quoteCurrencyAmount: amountType === 'crypto' ? parseFloat(amount) : undefined,
+          xummUuid
         })
       });
 

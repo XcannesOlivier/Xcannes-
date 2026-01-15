@@ -7,7 +7,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { walletAddress, currencyCode, baseCurrencyCode, baseCurrencyAmount, options } = req.body;
+  const {
+    walletAddress,
+    currencyCode,
+    baseCurrencyCode,
+    baseCurrencyAmount,
+    quoteCurrencyAmount,
+    xummUuid,
+    options,
+  } = req.body;
 
   if (!walletAddress) {
     return res.status(400).json({ error: 'Wallet address required' });
@@ -26,6 +34,8 @@ export default async function handler(req, res) {
         currencyCode,
         baseCurrencyCode,
         baseCurrencyAmount,
+        quoteCurrencyAmount,
+        xummUuid,
         options,
       }),
     });
