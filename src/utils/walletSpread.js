@@ -1,7 +1,7 @@
 "use client";
 
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
-import { spreadFractionForPair, currencyTier } from "@/components/dex/ExchangeSections/spread";
+import { spreadFractionForPair, currencyTier } from "@/utils/marketSpread";
 
 export const XCANNES_SPREAD_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||

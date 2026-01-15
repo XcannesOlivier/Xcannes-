@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useXumm } from "@/context/XummContext";
 import { useTranslation } from "next-i18next";

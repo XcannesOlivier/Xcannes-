@@ -9,7 +9,7 @@ import { useEodBasePairs } from "./hooks/useEodBasePairs";
 import { useEodData } from "./hooks/useEodData";
 import { useEodWsSubscription } from "./hooks/useEodWsSubscription";
 import { useFlashStates } from "./hooks/useFlashStates";
-import { applyDynamicSpreadToMid, applySpreadToMid, spreadFractionForPair } from "./spread";
+import { applyDynamicSpreadToMid, applySpreadToMid, spreadFractionForPair } from "@/utils/marketSpread";
 import { useXrplRlusdXrpSpreadSignal } from "./hooks/useXrplSpreadSignal";
 import ExchangeHeader from "./components/ExchangeHeader";
 import SearchAndAddBar from "./components/SearchAndAddBar";

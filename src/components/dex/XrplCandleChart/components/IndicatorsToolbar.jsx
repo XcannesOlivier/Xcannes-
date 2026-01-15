@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 // Barre verticale d’indicateurs (version existante, extraite)
 import { useTranslation } from "next-i18next";export default function IndicatorsToolbar({
   showTooltips,

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useXcannesWS } from "@/context/XcannesWSContext";
-import { getBookIdFromPair } from "@/utils/xrpl";
+import { getBookIdFromPair } from "@/lib/marketMetadata";
 import { getPairCategory } from "@/utils/marketStructure";
 import OrderbookSidebar from "@/components/dex/panels/OrderbookSidebar";
 import NewsFeed from "@/components/dex/panels/NewsFeed";

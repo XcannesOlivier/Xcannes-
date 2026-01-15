@@ -7,8 +7,7 @@ import DemoWalletModalShell from "./DemoWalletModalShell";
 import DemoWalletDemoNotice from "./DemoWalletDemoNotice";
 import {
   listWalletCurrencyEvents,
-  listWalletEvents,
-  walletUsdTotal,
+  listWalletEvents
 } from "./DemoWalletModel";
 
 const EMPTY_ALLOCATIONS = Object.freeze({});

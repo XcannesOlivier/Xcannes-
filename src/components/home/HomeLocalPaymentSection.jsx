@@ -2,7 +2,7 @@
 	import { useTranslation } from "next-i18next";
 	import { useRouter } from "next/router";
 	import xcannesApi from "@/lib/xcannesApi";
-	import { getBookIdFromPair } from "@/utils/xrpl";
+	import { getBookIdFromPair } from "@/lib/marketMetadata";
 
 const FALLBACK_USD_RATES = {
   EUR: 1.08,

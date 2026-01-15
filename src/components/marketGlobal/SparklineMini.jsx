@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 // Sparkline minimaliste réutilisable pour les mini courbes de prix.
 // Accepte un tableau de valeurs numériques (non normalisées) et
 // normalise automatiquement pour le tracé.
@@ -70,4 +68,3 @@ export default function SparklineMini({
     </svg>
   );
 }
-

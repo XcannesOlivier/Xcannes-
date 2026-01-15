@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { QRCodeCanvas } from "qrcode.react";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { apiUrl } from "@/lib/runtimeConfig";
