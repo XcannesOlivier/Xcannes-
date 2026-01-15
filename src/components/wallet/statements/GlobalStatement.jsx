@@ -101,10 +101,13 @@ export default function GlobalStatement({
   const currentPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.label || fallbackPeriod;
   const currentDisplayPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.displayLabel || String(fallbackPeriod).split(' ')[0]; // Affiche juste le mois
 
-  const isUsdStablecoin = (currency) =>
-  USD_STABLECOINS.includes(String(currency || "").toUpperCase());
+  const isUsdStablecoin = useCallback(
+    (currency) =>
+    USD_STABLECOINS.includes(String(currency || "").toUpperCase()),
+    []
+  );
 
-  const getUsdValue = (token) => {
+  const getUsdValue = useCallback((token) => {
     const value = parseFloat(token.value || 0);
     if (!Number.isFinite(value)) return null;
     if (value === 0) return 0;
@@ -114,7 +117,7 @@ export default function GlobalStatement({
     if (isUsdStablecoin(code)) return value;
     if (code === "XRP") return value * 0.5;
     return null;
-  };
+  }, [isUsdStablecoin, usdRates]);
 
   // Calculer les totaux
   const totalBalance = tokens.reduce((sum, token) => {
@@ -133,12 +136,12 @@ export default function GlobalStatement({
     return 0;
   });
 
-  const formatAmount = (amount) => {
+  const formatAmount = useCallback((amount) => {
     return parseFloat(amount || 0).toLocaleString(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
-  };
+  }, [locale]);
 
   const ledgerEvidenceCount = useMemo(() => {
     return (movements || []).filter((m) => m?.txHash).length;
