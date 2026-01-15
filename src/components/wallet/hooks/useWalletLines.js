@@ -7,13 +7,16 @@ export function useWalletLines(address, { signTransaction } = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const requestWalletSignature = useCallback(async () => {
+  const requestWalletSignature = useCallback(async (action) => {
     if (!signTransaction) {
       setError("Xumm signature required. Please connect your wallet.");
       return null;
     }
 
-    const result = await signTransaction({ TransactionType: "SignIn" });
+    const result = await signTransaction(
+      { TransactionType: "SignIn" },
+      { action }
+    );
     if (!result?.signed || !result?.uuid) {
       setError("Signature cancelled or expired.");
       return null;
@@ -62,7 +65,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
         setLoading(true);
         setError(null);
 
-        const xummUuid = await requestWalletSignature();
+        const xummUuid = await requestWalletSignature("wallet:lines:upsert");
         if (!xummUuid) return;
 
         const res = await fetch(apiUrl("/wallet/lines"), {
@@ -103,7 +106,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
         setLoading(true);
         setError(null);
 
-        const xummUuid = await requestWalletSignature();
+        const xummUuid = await requestWalletSignature("wallet:lines:delete");
         if (!xummUuid) return;
 
         const res = await fetch(apiUrl("/wallet/lines"), {

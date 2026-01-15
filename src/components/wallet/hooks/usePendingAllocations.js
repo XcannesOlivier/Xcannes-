@@ -8,13 +8,16 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const requestWalletSignature = useCallback(async () => {
+  const requestWalletSignature = useCallback(async (action) => {
     if (!signTransaction) {
       setError("Xumm signature required. Please connect your wallet.");
       return null;
     }
 
-    const result = await signTransaction({ TransactionType: "SignIn" });
+    const result = await signTransaction(
+      { TransactionType: "SignIn" },
+      { action }
+    );
     if (!result?.signed || !result?.uuid) {
       setError("Signature cancelled or expired.");
       return null;
@@ -52,16 +55,18 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
   }, [address]);
 
   const activatePending = useCallback(
-    async (currencyCode) => {
+    async (currencyCode, { xummUuid } = {}) => {
       if (!address || !currencyCode) return null;
 
-      const xummUuid = await requestWalletSignature();
-      if (!xummUuid) return null;
+      const signatureUuid =
+        xummUuid ||
+        (await requestWalletSignature("wallet:pending-allocations:activate"));
+      if (!signatureUuid) return null;
 
       const res = await fetch(apiUrl("/wallet/pending-allocations/activate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, currencyCode, xummUuid }),
+        body: JSON.stringify({ address, currencyCode, xummUuid: signatureUuid }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {

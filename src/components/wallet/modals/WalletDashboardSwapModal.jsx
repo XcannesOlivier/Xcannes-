@@ -18,6 +18,7 @@ export default function WalletDashboardSwapModal({
   noticeVariant = "preview",
   noticeContextLabel = "",
   effectiveIsConnected,
+  isWalletActivated,
   walletAddress,
   onConnectWallet,
   hasOnChainRlusd,
@@ -45,7 +46,8 @@ export default function WalletDashboardSwapModal({
   handleUpsertCurrencyLine,
   handleDemoConvert,
   convertProcessing,
-  rlusdPerUnitRates
+  rlusdPerUnitRates,
+  activationFeeXcs
 }) {const { t } = useTranslation("common");
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
@@ -69,7 +71,20 @@ export default function WalletDashboardSwapModal({
     []
   );
 
-  const canMutateLines = isPreviewMode || !!effectiveIsConnected;
+  const canMutateLines =
+    isPreviewMode ||
+    (effectiveIsConnected &&
+      isWalletActivated === true &&
+      hasOnChainRlusd &&
+      hasOnChainXcs);
+  const activationFeeLabel = useMemo(() => {
+    const value = Number(activationFeeXcs);
+    const safe = Number.isFinite(value) && value > 0 ? value : 0.2;
+    return safe.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, [activationFeeXcs]);
   const previewRequestId = useRef(0);
   const [previewState, setPreviewState] = useState({ status: "idle", error: null });
   const [previewAmount, setPreviewAmount] = useState(null);
@@ -654,9 +669,13 @@ export default function WalletDashboardSwapModal({
 
             </div>
                 {!canMutateLines &&
-            <p className="mt-1 text-[10px] text-white/45">{t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.")}
-
-            </p>
+            <p className="mt-1 text-[10px] text-white/45">
+                  {!effectiveIsConnected ?
+              t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.") :
+              isWalletActivated === false ?
+              t("ui_wallet_activation_required_f4", "Wallet must be activated to create currency lines.") :
+              t("ui_trustlines_required_currency_lines_f4", "RLUSD and XCS trustlines are required to create currency lines.")}
+                </p>
             }
 
                 <div className="mt-2 grid grid-cols-1 gap-2">
@@ -687,10 +706,13 @@ export default function WalletDashboardSwapModal({
 
               </button>
                 </div>
-                <p className="mt-2 text-[10px] text-white/45">{t("ui_activate_une_ligne_implique_u_b625857cd9", "Activer une ligne implique un verrouillage de")}
-              {" "}
-                  <span className="font-mono">{t("ui_0_20_xcs_37887114e0", "0.20 XCS")}</span>{t("ui_via_escrow_340f6d0b2b", "(via escrow).")}
-            </p>
+                <p className="mt-2 text-[10px] text-white/45">
+                  {t("ui_activation_fee_xcs_company_wallet_f4", {
+                    defaultValue:
+                      "Activation fee: {{amount}} XCS paid to the XCANNES wallet.",
+                    amount: activationFeeLabel,
+                  })}
+                </p>
               </div>
 
               <WalletDashboardCurrencyLinesPanel

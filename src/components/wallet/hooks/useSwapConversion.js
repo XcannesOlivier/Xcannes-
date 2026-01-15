@@ -205,7 +205,9 @@ export function useSwapConversion({
       });
       if (!txjson) throw new Error("Invalid RLUSD spread payment");
 
-      const result = await signTransaction(txjson);
+      const result = await signTransaction(txjson, {
+        action: "wallet:convert",
+      });
       if (!result?.signed) {
         throw new Error("Spread payment cancelled or expired");
       }

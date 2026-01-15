@@ -14,7 +14,8 @@ export default function WalletDashboardTrustlineCurrencyModal({
   editingTrustlineLocked,
   setEditingTrustlineLocked,
   handleSaveTrustlineCurrency,
-  handleRemoveTrustlineCurrency
+  handleRemoveTrustlineCurrency,
+  minLockedXcs = 0.2
 }) {const { t } = useTranslation("common");
   if (!open) return null;
 
@@ -68,6 +69,7 @@ export default function WalletDashboardTrustlineCurrencyModal({
             currentEditingLine={currentEditingLine}
             editingTrustlineLocked={editingTrustlineLocked}
             setEditingTrustlineLocked={setEditingTrustlineLocked}
+            minLockedXcs={minLockedXcs}
             onSave={handleSaveTrustlineCurrency}
             onRemove={handleRemoveTrustlineCurrency} />
 

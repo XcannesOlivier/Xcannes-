@@ -13,13 +13,16 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const requestWalletSignature = useCallback(async () => {
+  const requestWalletSignature = useCallback(async (action) => {
     if (!signTransaction) {
       setError("Xumm signature required. Please connect your wallet.");
       return null;
     }
 
-    const result = await signTransaction({ TransactionType: "SignIn" });
+    const result = await signTransaction(
+      { TransactionType: "SignIn" },
+      { action }
+    );
     if (!result?.signed || !result?.uuid) {
       setError("Signature cancelled or expired.");
       return null;
@@ -73,15 +76,17 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
   }, [address]);
 
   const upsertCurrencyLine = useCallback(
-    async ({ currencyCode, allocatedRlusd, fxRate, fxSource } = {}) => {
+    async ({ currencyCode, allocatedRlusd, fxRate, fxSource, xummUuid } = {}) => {
       if (!address || !currencyCode) return;
 
       try {
         setLoading(true);
         setError(null);
 
-        const xummUuid = await requestWalletSignature();
-        if (!xummUuid) return;
+        const signatureUuid =
+          xummUuid ||
+          (await requestWalletSignature("wallet:currency-lines:upsert"));
+        if (!signatureUuid) return;
 
         const res = await fetch(apiUrl("/wallet/currency-lines"), {
           method: "POST",
@@ -94,7 +99,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
             allocatedRlusd,
             fxRate,
             fxSource,
-            xummUuid,
+            xummUuid: signatureUuid,
           }),
         });
 
@@ -131,7 +136,9 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
         setLoading(true);
         setError(null);
 
-        const xummUuid = await requestWalletSignature();
+        const xummUuid = await requestWalletSignature(
+          "wallet:currency-lines:delete"
+        );
         if (!xummUuid) return;
 
         const res = await fetch(apiUrl("/wallet/currency-lines"), {
@@ -188,7 +195,8 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
         setLoading(true);
         setError(null);
 
-        const signatureUuid = xummUuid || (await requestWalletSignature());
+        const signatureUuid =
+          xummUuid || (await requestWalletSignature("wallet:convert"));
         if (!signatureUuid) return;
 
         const res = await fetch(apiUrl("/wallet/convert"), {

@@ -8,6 +8,17 @@ export function WalletInfoContent({
   isPreviewMode = false,
   noticeVariant = "preview"
 }) {const { t } = useTranslation("common");
+  const activationFeeValue = Number.parseFloat(
+    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_XCS || ""
+  );
+  const activationFeeLabel = (
+    Number.isFinite(activationFeeValue) && activationFeeValue > 0
+      ? activationFeeValue
+      : 0.2
+  ).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
   return (
     <>
       <div className={withCloseGutter ? "pr-8" : ""}>
@@ -54,34 +65,18 @@ export function WalletInfoContent({
         </section>
 
         <section className="rounded-xl border border-white/10 bg-black/30 p-4">
-          <h4 className="text-sm font-semibold text-white/80">{t("ui_xcs_lock_activation_currency_c083456cb4", "XCS lock (activation + currency lines)")}
-
+          <h4 className="text-sm font-semibold text-white/80">
+            {t("ui_activation_fee_xcs_title_f4", "Activation fee (XCS)")}
           </h4>
-          <p className="mt-2 text-[13px] text-white/70">{t("ui_xcannes_utilise_un_locked_3de1d1a1e5", "XCANNES utilise un verrouillage de XCS comme “engagement” pour activer les fonctionnalités avancées et/ou pour créer des lignes de devises.")}
-
-
-
+          <p className="mt-2 text-[13px] text-white/70">
+            {t("ui_activation_fee_xcs_body_f4", {
+              defaultValue:
+                "Creating a new currency line requires a one-time payment of {{amount}} XCS to the XCANNES wallet.",
+              amount: activationFeeLabel,
+            })}
           </p>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
-            <li>{t("ui_activation_wallet_7d13181510", "Activation wallet:")}
-              <span className="font-mono">{t("ui_1_xcs_4d45c847fc", "1 XCS")}</span>{" "}{t("ui_reserve_blocked_529137c552", "(réserve bloquée).")}
-
-            </li>
-            <li>{t("ui_creating_currency_line_48e7a5e551", "Création d’une ligne de devise:")}
-              {" "}
-              <span className="font-mono">{t("ui_0_20_xcs_cd5bfa5a79", "0.20 XCS")}</span>{t("ui_bloqu_cac6cc1f3b", "bloqué.")}
-            </li>
-            <li>{t("ui_line_deletion_xcs_released_df25674a3d", "Suppression d’une ligne: le XCS correspondant peut être “libéré” à")}
-              {" "}
-              <span className="font-mono">50%</span>{t("ui_refund_4e5e3d305c", "(refund")}{" "}
-              <span className="font-mono">{t("ui_0_10_xcs_ad2ec0a991", "0.10 XCS")}</span>).
-            </li>
-          </ul>
-          <p className="mt-2 text-[12px] text-white/45">{t("ui_note_locking_via_escrow_31ee4c3f81", "Note: le verrouillage sera géré via un mécanisme escrow. À la fermeture d’une ligne,")}
-
-            <span className="font-mono">50%</span>{t("ui_lock_returns_to_wallet_1c3e249e22", "du verrouillage revient au wallet (")}
-            <span className="font-mono">{t("ui_0_10_xcs_ad2ec0a991", "0.10 XCS")}</span>{t("ui_and_5aee655a93", ") et")}
-            <span className="font-mono">50%</span>{t("ui_paid_to_management_wallet_c7338e7db3", "est versé au wallet de gestion XCANNES.")}
+          <p className="mt-2 text-[12px] text-white/45">
+            {t("ui_activation_fee_xcs_note_f4", "No escrow/lock: the fee is paid on-chain at activation.")}
           </p>
         </section>
 
