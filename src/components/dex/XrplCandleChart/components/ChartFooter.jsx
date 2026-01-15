@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import xcannesApi from "@/lib/xcannesApi";
 import { useXcannesWS } from "@/context/XcannesWSContext";
-import { getBookIdFromPair } from "@/utils/xrpl";import { useTranslation } from "next-i18next";
+import { getBookIdFromPair } from "@/lib/marketMetadata";import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {

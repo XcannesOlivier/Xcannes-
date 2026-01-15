@@ -7,7 +7,7 @@
 	import SparklineMini from "./SparklineMini";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
-	import { getBookIdFromPair } from "@/utils/xrpl";
+	import { getBookIdFromPair } from "@/lib/marketMetadata";
 
 // 🔄 REST Polling interval (4 secondes)
 const POLLING_INTERVAL_MS = 4000;

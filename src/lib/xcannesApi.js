@@ -4,6 +4,7 @@
  */
 
 import { getApiBaseUrl } from "./runtimeConfig";
+import LruCache from "../utils/lruCache";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -17,6 +18,7 @@ const API_CONFIG = {
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
   CACHE_TTL: 5000,
+  CACHE_MAX_ENTRIES: 200,
 };
 
 const API_ENDPOINTS = {
@@ -35,7 +37,10 @@ const API_ENDPOINTS = {
 class XcannesAPI {
   constructor() {
     this.baseURL = BACKEND_CONFIG.API_URL;
-    this.cache = new Map();
+    this.cache = new LruCache({
+      maxEntries: API_CONFIG.CACHE_MAX_ENTRIES,
+      defaultTtlMs: API_CONFIG.CACHE_TTL,
+    });
     this.healthStatus = { isHealthy: true, lastCheck: 0 };
   }
 
@@ -112,24 +117,11 @@ class XcannesAPI {
    * Gestion du cache
    */
   getFromCache(key) {
-    const cached = this.cache.get(key);
-    if (!cached) return null;
-    
-    const isExpired = Date.now() - cached.timestamp > cached.ttl;
-    if (isExpired) {
-      this.cache.delete(key);
-      return null;
-    }
-    
-    return cached.data;
+    return this.cache.get(key);
   }
 
   setCache(key, data, ttl) {
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      ttl,
-    });
+    this.cache.set(key, data, ttl);
   }
 
   clearCache() {

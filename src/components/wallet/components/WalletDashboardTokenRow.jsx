@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CRYPTO_ICONS } from "@/components/dex/ExchangeSections/constants";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import {
   getCurrencyFlag,

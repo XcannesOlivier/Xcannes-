@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import Header from "@/components/layout/Header";

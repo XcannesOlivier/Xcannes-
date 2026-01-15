@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import FxPairSelector from "./FxPairSelector";
 
 // En-tête compact original du chart (prix + sélecteurs)

@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useMemo, useReducer, useCallback } from "react";
+import { useEffect, useRef, useState, useMemo, useReducer, useCallback } from "react";
 import Link from "next/link";
 import { createChart } from "lightweight-charts";
 import xcannesApi from "@/lib/xcannesApi";
 import { MARKET_STRUCTURE, getPairCategory } from "@/utils/marketStructure"; // ✅ Structure des marchés
-import { useXcannesWS } from "@/context/XcannesWSContext";
-import PriceTicker from "@/components/marketGlobal/PriceTicker";
 import {
   calculateBollingerBands,
   calculateEMA,

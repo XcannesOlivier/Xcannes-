@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import wsClient from "@/lib/xcannesWebSocket";
 
 const XcannesWSContext = createContext();

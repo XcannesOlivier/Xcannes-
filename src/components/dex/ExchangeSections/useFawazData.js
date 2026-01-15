@@ -1,6 +1,6 @@
 import xcannesApi from "@/lib/xcannesApi";
 import { buildSparklineFromCandles } from "./sparklineHelpers";
-import { applySpreadToMid, spreadFractionForPair } from "./spread";
+import { applySpreadToMid, spreadFractionForPair } from "@/utils/marketSpread";
 
 /**
  * Hook pour charger les données Fawaz

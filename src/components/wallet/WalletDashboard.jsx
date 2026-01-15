@@ -5,7 +5,7 @@
 	import { useXumm } from "@/context/XummContext";
 import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
-	import { CRYPTO_ICONS } from "@/components/dex/ExchangeSections/constants";
+	import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import {
   buildRlusdPaymentTxjson,

@@ -3,7 +3,7 @@
  */
 
 import Image from "next/image";
-import { CURRENCY_FLAGS, CRYPTO_ICONS } from "./constants";
+import { CURRENCY_FLAGS, CRYPTO_ICONS } from "@/utils/marketConstants";
 
 function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";

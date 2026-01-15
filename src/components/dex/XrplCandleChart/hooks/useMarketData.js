@@ -1,7 +1,8 @@
 "use client";
 
 	import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-	import { getBookIdFromPair } from "@/utils/xrpl";
+import { getBookIdFromPair } from "@/lib/marketMetadata";
+import LruCache from "@/utils/lruCache";
 	import xcannesApi from "@/lib/xcannesApi";
 	import { getPairCategory } from "@/utils/marketStructure";
 	import { useXcannesWS } from "@/context/XcannesWSContext";
@@ -19,7 +20,12 @@ const logError = (...args) => {
   if (DEBUG_LOGS) console.error(...args);
 };
 
-const candlesCache = new Map();
+const CANDLES_CACHE_MAX_ENTRIES = 20;
+const CANDLES_CACHE_TTL_MS = 10 * 60 * 1000;
+const candlesCache = new LruCache({
+  maxEntries: CANDLES_CACHE_MAX_ENTRIES,
+  defaultTtlMs: CANDLES_CACHE_TTL_MS,
+});
 const DESIRED_HISTORY_LIMIT = 10_000;
 const STATS_24H_1M_LIMIT = 24 * 60; // 1440 bougies 1m
 const REFRESH_1M_RECENT_LIMIT = 600; // 10h (refresh léger pour resync)
