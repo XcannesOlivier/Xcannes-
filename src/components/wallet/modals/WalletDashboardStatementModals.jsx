@@ -13,6 +13,7 @@ export default function WalletDashboardStatementModals({
   isPreviewMode = false,
   noticeVariant = "preview",
   noticeContextLabel = "",
+  walletId = "",
   previewGlobalMovements,
   previewCurrencyTransactions,
   isFullPageView,
@@ -263,6 +264,7 @@ export default function WalletDashboardStatementModals({
           isPreviewMode={isPreviewMode}
           noticeVariant={noticeVariant}
           noticeContextLabel={noticeContextLabel}
+          walletId={walletId}
           period="December 2025"
           isFullPage={isFullPageView}
           variant={statementVariant}
@@ -292,6 +294,7 @@ export default function WalletDashboardStatementModals({
           isPreviewMode={isPreviewMode}
           noticeVariant={noticeVariant}
           noticeContextLabel={noticeContextLabel}
+          walletId={walletId}
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}

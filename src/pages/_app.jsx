@@ -8,9 +8,9 @@ import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket
 import XummQRModal from "@/components/xumm/XummQRModal";
 
 function XummModalLayer({ children }) {
-  const { qrModalData, closeQrModal } = useXumm();
+  const { qrModalData, closeQrModal, isConnecting } = useXumm();
 
-  const isOpen = Boolean(qrModalData && qrModalData.uuid);
+  const isOpen = Boolean(isConnecting || (qrModalData && qrModalData.uuid));
 
   return (
     <>

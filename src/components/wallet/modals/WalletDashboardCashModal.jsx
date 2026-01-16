@@ -10,6 +10,7 @@ export default function WalletDashboardCashModal({
   isPreviewMode = false,
   noticeVariant = "preview",
   noticeContextLabel = "",
+  walletId = "",
   demoMode = false,
   onDemoBuy,
   onDemoSell,
@@ -32,7 +33,8 @@ export default function WalletDashboardCashModal({
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
         className={[
-          "relative w-full max-w-2xl bg-elevated border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto",
+          "relative w-full max-w-2xl border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[92vh] pointer-events-auto",
+          noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
           noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
         ].join(" ")}
         onClick={(e) => e.stopPropagation()}>
@@ -70,10 +72,10 @@ export default function WalletDashboardCashModal({
               <button
               type="button"
               onClick={() => setCashModalTab("buy")}
-              className={`flex-1 px-4 py-3 rounded-t-lg font-semibold text-sm transition-all ${
+              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 border ${
               cashModalTab === "buy" ?
-              "bg-gradient-to-br from-green-500 to-xcannes-green text-white shadow-lg" :
-              "bg-black/20 text-white/50 hover:bg-black/40 hover:text-white/80"}`
+              "bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02]" :
+              "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
               }>
 
                 <div className="flex items-center justify-center gap-2">
@@ -93,10 +95,10 @@ export default function WalletDashboardCashModal({
               <button
               type="button"
               onClick={() => setCashModalTab("sell")}
-              className={`flex-1 px-4 py-3 rounded-t-lg font-semibold text-sm transition-all ${
+              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 border ${
               cashModalTab === "sell" ?
-              "bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg" :
-              "bg-black/20 text-white/50 hover:bg-black/40 hover:text-white/80"}`
+              "bg-orange-500/20 text-orange-400 border-orange-500/40 hover:bg-orange-500/30 hover:scale-[1.02]" :
+              "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
               }>
 
                 <div className="flex items-center justify-center gap-2">

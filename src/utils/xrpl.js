@@ -18,6 +18,16 @@ export function encodeXrplCurrencyCode(currency = "") {
   return code;
 }
 
+export function decodeXrplCurrencyCode(currency = "") {
+  const raw = String(currency || "").trim();
+  if (!raw) return "";
+  if (!/^[0-9A-Fa-f]{40}$/.test(raw)) return raw.toUpperCase();
+  const decoded = Buffer.from(raw, "hex").toString("utf8").replace(/\0+$/g, "");
+  if (!decoded) return raw.toUpperCase();
+  if (!/^[\x20-\x7E]+$/.test(decoded)) return raw.toUpperCase();
+  return decoded.trim().toUpperCase();
+}
+
 export const XRPL_KNOWN_ISSUERS = {
   RLUSD: RLUSD_ISSUER,
   XCS: XCS_ISSUER,

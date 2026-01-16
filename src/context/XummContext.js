@@ -5,8 +5,39 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 
 const XummContext = createContext();
+const XUMM_PENDING_CONNECT_KEY = "xcannes_xumm_pending_connect";
+
+function getPendingConnectUuid() {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(XUMM_PENDING_CONNECT_KEY);
+  } catch (err) {
+    return null;
+  }
+}
+
+function setPendingConnectUuid(uuid) {
+  if (typeof window === "undefined") return;
+  try {
+    if (uuid) {
+      localStorage.setItem(XUMM_PENDING_CONNECT_KEY, uuid);
+    }
+  } catch (err) {
+    // Ignore storage errors (private mode, etc.)
+  }
+}
+
+function clearPendingConnectUuid() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(XUMM_PENDING_CONNECT_KEY);
+  } catch (err) {
+    // Ignore storage errors (private mode, etc.)
+  }
+}
 
 export const XummProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");
@@ -24,9 +55,15 @@ export const XummProvider = ({ children }) => {
 
         if (res.ok) {
           setIsWalletActivated(true);
+          const tokens = Array.isArray(data?.tokens)
+            ? data.tokens.map((token) => ({
+                ...token,
+                currency: decodeXrplCurrencyCode(token?.currency),
+              }))
+            : [];
           setBalance({
             xrp: data.xrp,
-            tokens: data.tokens,
+            tokens,
           });
           return;
         }
@@ -66,6 +103,37 @@ export const XummProvider = ({ children }) => {
     [fetchBalance]
   );
 
+  const checkPendingConnect = useCallback(async () => {
+    if (isConnected) {
+      clearPendingConnectUuid();
+      return;
+    }
+
+    const pendingUuid = getPendingConnectUuid();
+    if (!pendingUuid) return;
+
+    try {
+      const res = await fetch(apiUrl(`/xumm/check?uuid=${pendingUuid}`));
+      const data = await res.json();
+
+      if (data.signed && data.wallet) {
+        updateWallet(data.wallet);
+        clearPendingConnectUuid();
+        setIsConnecting(false);
+        setQrModalData(null);
+        return;
+      }
+
+      if (data.expired) {
+        clearPendingConnectUuid();
+        setIsConnecting(false);
+        setQrModalData(null);
+      }
+    } catch (error) {
+      console.error("Pending connect check error:", error);
+    }
+  }, [isConnected, updateWallet]);
+
   /**
    * Connecter via QR code XUMM (nouvelle méthode)
    */
@@ -94,6 +162,7 @@ export const XummProvider = ({ children }) => {
         deepLink: data.deepLink,
         type: 'connect',
       });
+      setPendingConnectUuid(data.uuid);
 
       // Attendre la signature
       pollConnection(data.uuid);
@@ -130,10 +199,12 @@ export const XummProvider = ({ children }) => {
           updateWallet(data.wallet);
           setIsConnecting(false);
           setQrModalData(null);
+          clearPendingConnectUuid();
         } else if (data.expired) {
           clearInterval(interval);
           setIsConnecting(false);
           setQrModalData(null);
+          clearPendingConnectUuid();
           alert('Connection expired. Please try again.');
         }
       } catch (error) {
@@ -240,6 +311,7 @@ export const XummProvider = ({ children }) => {
   };
 
   const disconnect = () => {
+    clearPendingConnectUuid();
     updateWallet(null);
   };
 
@@ -255,6 +327,22 @@ export const XummProvider = ({ children }) => {
       updateWallet(savedWallet);
     }
   }, [updateWallet]);
+
+  useEffect(() => {
+    checkPendingConnect();
+
+    const handleVisibility = () => {
+      if (document.hidden) return;
+      checkPendingConnect();
+    };
+
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", handleVisibility);
+      return () => {
+        document.removeEventListener("visibilitychange", handleVisibility);
+      };
+    }
+  }, [checkPendingConnect]);
 
   return (
     <XummContext.Provider value={{ 

@@ -47,7 +47,7 @@ export default function XummConnectButton({
   connectLabel,
   connectedLabel
 }) {
-  const { wallet, isConnected, connect, disconnect } = useXumm();
+  const { wallet, isConnected, isConnecting, connect, disconnect } = useXumm();
   const { t } = useTranslation("common");
   const [showSetupModal, setShowSetupModal] = useState(false);
 
@@ -241,10 +241,13 @@ export default function XummConnectButton({
       <>
         <button
           onClick={handleConnectClick}
-          className={className || connectClass}
+          disabled={isConnecting}
+          className={`${className || connectClass} disabled:opacity-60 disabled:cursor-not-allowed`}
           aria-label={t("ui_connect_your_wallet_xrpl_73361356ca", "Connecter votre wallet XRPL")}>
 
-          {connectLabel || t("wallet_connect")}
+          {isConnecting
+            ? t("ui_connecting_2c59b8f12e", "Connecting...")
+            : (connectLabel || t("wallet_connect"))}
         </button>
         {setupModal}
       </>);
@@ -255,10 +258,13 @@ export default function XummConnectButton({
     <>
       <button
         onClick={handleConnectClick}
-        className={className || connectClass}
+        disabled={isConnecting}
+        className={`${className || connectClass} disabled:opacity-60 disabled:cursor-not-allowed`}
         aria-label={t("ui_connect_your_wallet_xrpl_73361356ca", "Connecter votre wallet XRPL")}>
 
-        {connectLabel || t("wallet_connect")}
+        {isConnecting
+          ? t("ui_connecting_2c59b8f12e", "Connecting...")
+          : (connectLabel || t("wallet_connect"))}
       </button>
       {setupModal}
     </>);

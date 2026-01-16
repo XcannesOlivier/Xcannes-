@@ -34,6 +34,7 @@ export default function GlobalStatement({
   isPreviewMode = false,
   noticeVariant = "preview",
   noticeContextLabel = "",
+  walletId = "",
   period = "",
   isFullPage = false,
   variant = "default",
@@ -523,6 +524,8 @@ export default function GlobalStatement({
 
   const resolvedLayout = STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
 
+  const modalBgClass = noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated";
+
   const content =
   <div
     className={`fixed inset-0 z-[10200] flex ${resolvedLayout.wrapperClass} ${resolvedLayout.backdropClass}`}
@@ -534,11 +537,11 @@ export default function GlobalStatement({
     }}>
 
       <div
-      className={`relative w-full bg-elevated flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}>
+      className={`relative w-full ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}>
 
         
         {/* Header avec Account Info intégré */}
-        <div className="border-b border-white/10 flex-shrink-0 bg-elevated px-4 md:px-5 py-4">
+        <div className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4`}>
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-3xl flex-shrink-0">🌍</span>

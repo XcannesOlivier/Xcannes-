@@ -1346,6 +1346,7 @@ export default function DemoWalletDashboard({
         isPreviewMode={true}
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
+        walletId={activeWalletId}
         sendTab={sendTab}
         setSendTab={setSendTab}
         renderWalletMeta={renderWalletMeta}
@@ -1371,6 +1372,7 @@ export default function DemoWalletDashboard({
         isPreviewMode={true}
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
+        walletId={activeWalletId}
         receiveTab={receiveTab}
         setReceiveTab={setReceiveTab}
         renderWalletMeta={renderWalletMeta}
@@ -1404,6 +1406,7 @@ export default function DemoWalletDashboard({
         isPreviewMode={true}
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
+        walletId={activeWalletId}
         effectiveIsConnected={false}
         hasOnChainRlusd={true}
         hasOnChainXcs={true}
@@ -1439,6 +1442,7 @@ export default function DemoWalletDashboard({
         isPreviewMode={true}
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
+        walletId={activeWalletId}
         demoMode={true}
         onDemoBuy={async ({ amount }) => {
           await sleep(getDemoLatencyMs());
@@ -1488,6 +1492,7 @@ export default function DemoWalletDashboard({
         isPreviewMode={true}
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
+        walletId={activeWalletId}
         previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={false}
