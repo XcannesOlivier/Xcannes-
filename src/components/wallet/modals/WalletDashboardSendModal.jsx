@@ -29,10 +29,18 @@ export default function WalletDashboardSendModal({
   handleSendSubmit,
   sendProcessing,
   enableSaveAddress = false
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
+  const blueActionBtnBase =
+    "rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/80 text-black font-semibold transition-all duration-200 hover:bg-[#38BDF8] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
+  const blueActionBtnMuted =
+    "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95";
+  const blueTabInactive =
+    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [requestText, setRequestText] = useState("");
+  const [isDesktop, setIsDesktop] = useState(false);
   const payreqFileInputId = "payreq-qr-file";
 
   const normalizedDestination = useMemo(
@@ -54,6 +62,19 @@ export default function WalletDashboardSendModal({
       setRequestText("");
     }
   }, [open]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(min-width: 768px)");
+    const handleChange = () => setIsDesktop(media.matches);
+    handleChange();
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
+    }
+    media.addListener(handleChange);
+    return () => media.removeListener(handleChange);
+  }, []);
 
   useEffect(() => {
     if (!canSaveDestination) {
@@ -92,19 +113,19 @@ export default function WalletDashboardSendModal({
 
             ✕
           </button>
-          <div className="flex items-center gap-2 mb-1 pr-6">
+          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
               {sendTab === "manual"
                 ? t("ui_send_assets_title_2c9b1a7d5e", "Send assets")
                 : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
             </h3>
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
             {isPreviewMode && noticeVariant !== "demo" ? (
-              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                 {t("wallet_not_connected_title", "Wallet not connected")}
               </span>
             ) : null}
@@ -118,11 +139,9 @@ export default function WalletDashboardSendModal({
             type="button"
             onClick={() => setSendTab("scan-request")}
             title={t("ui_send_tab_payreq_tip", "Payer via un code de demande.")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
-            sendTab === "scan-request" ?
-            "bg-xcannes-green text-black font-semibold" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_scan_request_44801f50d1", "Scan Request")}
+            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+            sendTab === "scan-request" ? blueActionBtnMuted : blueTabInactive
+            }`}>{t("ui_scan_request_44801f50d1", "Scan Request")}
 
 
           </button>
@@ -130,11 +149,9 @@ export default function WalletDashboardSendModal({
             type="button"
             onClick={() => setSendTab("manual")}
             title={t("ui_send_tab_manual_tip", "Envoyer manuellement à une adresse.")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
-            sendTab === "manual" ?
-            "bg-xcannes-green text-black font-semibold" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_manual_send_d5de1bf948", "Manual Send")}
+            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+            sendTab === "manual" ? blueActionBtnMuted : blueTabInactive
+            }`}>{t("ui_manual_send_d5de1bf948", "Manual Send")}
 
 
           </button>
@@ -153,7 +170,7 @@ export default function WalletDashboardSendModal({
 
             </label>
                 <select
-              className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               value={selectedSendToken ? selectedSendToken.key : ""}
               onChange={(e) => setSendAssetKey(e.target.value)}
               onClick={(e) => e.stopPropagation()}>
@@ -279,11 +296,11 @@ export default function WalletDashboardSendModal({
                   e.stopPropagation();
                   setQrScannerOpen(true);
                 }}
-                className="md:hidden px-3 py-2.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 border border-xcannes-green/40 rounded-lg transition-colors"
+                className={`md:hidden px-3 py-2.5 ${blueActionBtnBase}`}
                 title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}>
 
                     <svg
-                  className="w-5 h-5 text-xcannes-green"
+                  className="w-5 h-5 text-black"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24">
@@ -340,7 +357,7 @@ export default function WalletDashboardSendModal({
               }
             }}
             disabled={sendProcessing}
-            className="w-full mt-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10">
+            className={`w-full mt-2 text-sm py-2.5 ${blueActionBtnBase}`}>
 
                 {sendProcessing
                   ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -352,6 +369,7 @@ export default function WalletDashboardSendModal({
           {/* Tab Content: Scan Request */}
           {sendTab === "scan-request" &&
         <div className="space-y-6">
+              {!isDesktop &&
               <QRScanner
               isOpen={sendTab === "scan-request"}
               onScan={handlePaymentRequestScan}
@@ -360,34 +378,40 @@ export default function WalletDashboardSendModal({
               fileInputId={payreqFileInputId}
               className="bg-black/30 border-white/10" />
 
-              <div className="flex items-center gap-3 text-[11px] text-white/35">
+              }
+
+              {!isDesktop &&
+              <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
                 <span className="h-px flex-1 bg-white/10" />
                 <span>{t("ui_or_8a4c1f83bd", "ou")}</span>
                 <span className="h-px flex-1 bg-white/10" />
               </div>
+              }
 
-              <div className="rounded-lg border border-white/5 bg-white/5 p-3 space-y-2">
-                <div className="text-[11px] text-white/45">
-                  {t("demo_payreq_token", "Request token")}
+              <div className="rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3">
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
+                  <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
+                    {t("demo_payreq_token", "Request token")}
+                  </div>
+                  <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const input = document.getElementById(payreqFileInputId);
+                    input?.click();
+                  }}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/5 text-white/80 transition-colors hover:bg-white/10 hover:text-white">
+
+                    <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                      +
+                    </span>
+                    {t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Upload a QR image")}
+                  </button>
                 </div>
-                <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const input = document.getElementById(payreqFileInputId);
-                  input?.click();
-                }}
-                className="inline-flex items-center gap-2 text-[11px] text-white/55 hover:text-white/70 transition-colors">
-
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                    +
-                  </span>
-                  {t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Upload a QR image")}
-                </button>
                 <textarea
                 value={requestText}
                 onChange={(e) => setRequestText(e.target.value)}
-                className="w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono"
+                className="w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50"
                 placeholder={t(
                   "ui_payreq_placeholder_3a9c1b7d2e",
                   "xcannes-payreq:... / JSON"
@@ -399,7 +423,7 @@ export default function WalletDashboardSendModal({
                   handlePaymentRequestScan?.(requestText);
                 }}
                 disabled={!requestText.trim()}
-                className="w-full px-3 py-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                className={`w-full px-3 py-2 text-xs md:py-2.5 ${blueActionBtnBase}`}>
 
                   {t("demo_scan_parse", "Load request")}
                 </button>

@@ -31,7 +31,14 @@ export default function WalletDashboardReceiveModal({
   setRequestToAddress,
   rlusdPerUnitRates,
   rlusdPerUnitSources
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
+  const greenActionBtnBase =
+    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
+  const greenActionBtnMuted =
+    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-[#22C55E]/80 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-[#22C55E] hover:scale-105 active:scale-95";
+  const greenTabInactive =
+    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
 
@@ -188,7 +195,7 @@ export default function WalletDashboardReceiveModal({
 
             ✕
           </button>
-          <div className="flex items-center gap-2 mb-1 pr-6">
+          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
               {receiveTab === "receive"
                 ? t(
@@ -198,12 +205,12 @@ export default function WalletDashboardReceiveModal({
                 : t("ui_request_payment_c62b99fb16", "Request Payment")}
             </h3>
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
             {isPreviewMode && noticeVariant !== "demo" ? (
-              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                 {t("wallet_not_connected_title", "Wallet not connected")}
               </span>
             ) : null}
@@ -216,22 +223,18 @@ export default function WalletDashboardReceiveModal({
             <button
             type="button"
             onClick={() => setReceiveTab("receive")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
-            receiveTab === "receive" ?
-            "bg-xcannes-green text-black font-semibold" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_receive_b7d6ae4037", "Receive")}
+            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+            receiveTab === "receive" ? greenActionBtnMuted : greenTabInactive
+            }`}>{t("ui_receive_b7d6ae4037", "Receive")}
 
 
           </button>
             <button
             type="button"
             onClick={() => setReceiveTab("request")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm rounded-lg transition-colors ${
-            receiveTab === "request" ?
-            "bg-xcannes-green text-black font-semibold" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_request_payment_c62b99fb16", "Request Payment")}
+            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+            receiveTab === "request" ? greenActionBtnMuted : greenTabInactive
+            }`}>{t("ui_request_payment_c62b99fb16", "Request Payment")}
 
 
           </button>
@@ -269,7 +272,7 @@ export default function WalletDashboardReceiveModal({
               e.stopPropagation();
               handleCopyAddress();
             }}
-            className="px-4 py-2 rounded-md bg-white/10 text-xs text-white/80 hover:bg-white/20 transition-colors active:scale-95">{t("ui_copy_address_779691d570", "Copy address")}
+            className={`px-4 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_copy_address_779691d570", "Copy address")}
 
 
           </button>
@@ -300,7 +303,7 @@ export default function WalletDashboardReceiveModal({
                   <select
                 value={requestCurrency}
                 onChange={(e) => setRequestCurrency(e.target.value)}
-                className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80">
+                className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80">
 
                     {(augmentedTokens || []).map((t) =>
                 <option key={t.key} value={t.currency}>
@@ -334,22 +337,18 @@ export default function WalletDashboardReceiveModal({
                   <button
                 type="button"
                 onClick={() => setRequestMethod("qr")}
-                className={`px-3 py-2 text-xs rounded-lg transition-colors ${
-                requestMethod === "qr" ?
-                "bg-xcannes-green/20 border-xcannes-green/40 text-xcannes-green" :
-                "bg-white/5 border-white/10 text-white/60"} border`
-                }>{t("ui_qr_code_7614ee32a0", "📱 QR Code")}
+                className={`px-3 py-2 text-xs ${
+                requestMethod === "qr" ? greenActionBtnBase : greenActionBtnMuted
+                }`}>{t("ui_qr_code_7614ee32a0", "📱 QR Code")}
 
 
               </button>
                   <button
                 type="button"
                 onClick={() => setRequestMethod("link")}
-                className={`px-3 py-2 text-xs rounded-lg transition-colors ${
-                requestMethod === "link" ?
-                "bg-xcannes-green/20 border-xcannes-green/40 text-xcannes-green" :
-                "bg-white/5 border-white/10 text-white/60"} border`
-                }>{t("ui_link_c2c8a504d7", "🔗 Link")}
+                className={`px-3 py-2 text-xs ${
+                requestMethod === "link" ? greenActionBtnBase : greenActionBtnMuted
+                }`}>{t("ui_link_c2c8a504d7", "🔗 Link")}
 
 
               </button>
@@ -379,7 +378,7 @@ export default function WalletDashboardReceiveModal({
               e.stopPropagation();
               handleGenerateRequest();
             }}
-            className="w-full mt-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 border border-white/10">{t("ui_generate_request_58584f23a2", "Generate Request")}
+            className={`w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}>{t("ui_generate_request_58584f23a2", "Generate Request")}
 
 
           </button>
@@ -421,7 +420,7 @@ export default function WalletDashboardReceiveModal({
 
                     // ignore
                   }}}
-                className="px-4 py-2 rounded-md bg-white/10 text-xs text-white/80 hover:bg-white/20 transition-colors active:scale-95">{t("ui_copy_request_32a3f4409b", "Copy request")}
+                className={`px-4 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_copy_request_32a3f4409b", "Copy request")}
 
 
               </button>
@@ -443,7 +442,7 @@ export default function WalletDashboardReceiveModal({
 
                     // ignore
                   }}}
-                className="w-full px-4 py-2 rounded-md bg-white/10 text-xs text-white/80 hover:bg-white/20 transition-colors active:scale-95">{t("ui_copy_request_32a3f4409b", "Copy request")}
+                className={`w-full px-4 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_copy_request_32a3f4409b", "Copy request")}
 
 
               </button>

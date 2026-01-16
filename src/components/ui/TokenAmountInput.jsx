@@ -1,10 +1,13 @@
-import { useTranslation } from "next-i18next";export default function TokenAmountInput({
+import { useTranslation } from "next-i18next";
+export default function TokenAmountInput({
   value,
   onChange,
   max,
   placeholder = "0.00",
-  token = "XCS"
-}) {const { t } = useTranslation("common");
+  token = "XCS",
+  tokenClassName = ""
+}) {
+  const { t } = useTranslation("common");
   const handleInput = (e) => {
     const raw = e.target.value.replace(",", ".").replace(/[^0-9.]/g, "");
     if (raw.split(".").length > 2) return; // une seule virgule
@@ -45,7 +48,7 @@ import { useTranslation } from "next-i18next";export default function TokenAmoun
 
       </button>
       }
-      <span className="text-xcannes-green font-bold text-sm uppercase tracking-wider whitespace-nowrap">
+      <span className={`font-bold text-sm uppercase tracking-wider whitespace-nowrap ${tokenClassName || "text-xcannes-green"}`}>
         {token}
       </span>
     </div>);

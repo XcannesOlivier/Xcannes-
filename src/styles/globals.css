@@ -260,6 +260,16 @@ body {
     background-color: #111827;
     color: #ffffff;
   }
+
+  .xcannes-select {
+    color-scheme: dark;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .xcannes-select option {
+    background-color: #111827;
+    color: #ffffff;
+  }
 }
 
 @media (max-width: 767px) {

@@ -45,7 +45,8 @@ export default function WalletCurrencySelector({
   onChange,
   placeholder = "Select currency...",
   extraOptions = [],
-  quickOptions = []
+  quickOptions = [],
+  showQuickAdd = true
 }) {const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -152,7 +153,7 @@ export default function WalletCurrencySelector({
           setOpen((v) => !v);
         }}
         ref={triggerRef}
-        className="w-full bg-black/40 border border-white/15 rounded-md px-3 py-2 text-xs text-white/80 flex items-center justify-between gap-2 hover:border-xcannes-green/70 transition-colors active:scale-98">
+        className="w-full bg-black/40 border border-white/15 rounded-md px-3 py-2 text-xs text-white/80 flex items-center justify-between gap-2 hover:border-[#06B6D4]/70 transition-colors active:scale-98">
 
         <div className="flex items-center gap-2">
           <span className="text-sm">
@@ -187,28 +188,32 @@ export default function WalletCurrencySelector({
         onClick={(e) => e.stopPropagation()}>
 
           <div className="px-3 pt-2 pb-1 border-b border-subtle space-y-2">
-            {normalizedQuickOptions.length > 0 ?
-          <div className="text-[10px] font-semibold text-white/60">
-                {t("ui_quick_add_e62e925d4f", "Quick add")}
-              </div> :
-          null}
-            {/* Raccourci pour les devises les plus utilisées */}
-            <div className="flex items-center gap-1 overflow-x-auto">
-              {(normalizedQuickOptions.length > 0 ? normalizedQuickOptions : POPULAR_CURRENCIES).map((c) =>
-            <button
-              key={c.code}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSelect(c.code);
-              }}
-              className="flex items-center gap-1 rounded-full border border-subtle bg-subtle/60 px-2 py-1 text-[11px] text-primary hover:border-accent-rlusd shrink-0 active:scale-95">
+            {showQuickAdd ?
+            <>
+                {normalizedQuickOptions.length > 0 ?
+              <div className="text-[10px] font-semibold text-white/60">
+                    {t("ui_quick_add_e62e925d4f", "Quick add")}
+                  </div> :
+              null}
+                {/* Raccourci pour les devises les plus utilisées */}
+                <div className="flex items-center gap-1 overflow-x-auto">
+                  {(normalizedQuickOptions.length > 0 ? normalizedQuickOptions : POPULAR_CURRENCIES).map((c) =>
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelect(c.code);
+                  }}
+                  className="flex items-center gap-1 rounded-full border border-subtle bg-subtle/60 px-2 py-1 text-[11px] text-primary hover:border-accent-rlusd shrink-0 active:scale-95">
 
-                  <span className="text-sm">{getFlag(c.code)}</span>
-                  <span className="font-mono">{c.code}</span>
-                </button>
-            )}
-            </div>
+                      <span className="text-sm">{getFlag(c.code)}</span>
+                      <span className="font-mono">{c.code}</span>
+                    </button>
+                )}
+                </div>
+              </> :
+            null}
             <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
