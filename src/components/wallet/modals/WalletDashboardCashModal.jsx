@@ -42,17 +42,17 @@ export default function WalletDashboardCashModal({
           {/* Header avec onglets Buy/Sell */}
           <div className="border-b border-white/10">
             <div className="flex items-center justify-between p-4 pb-0">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
                   {t("ui_fiat_gateway_2b14cbec79", "Fiat Gateway")}
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
                 {isPreviewMode && noticeVariant !== "demo" ? (
-                  <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}

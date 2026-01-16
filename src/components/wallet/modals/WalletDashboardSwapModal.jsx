@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
+import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 import XummQRModal from "@/components/xumm/XummQRModal";
@@ -49,7 +50,14 @@ export default function WalletDashboardSwapModal({
   convertProcessing,
   rlusdPerUnitRates,
   activationFeeXcs
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
+  const blueActionBtnBase =
+    "rounded-lg border border-[#06B6D4]/40 bg-[#06B6D4]/80 text-black font-semibold transition-all duration-200 hover:bg-[#06B6D4] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
+  const blueActionBtnMuted =
+    "rounded-lg border border-[#06B6D4]/30 bg-[#06B6D4]/10 text-[#06B6D4]/70 font-semibold transition-all duration-200 hover:bg-[#06B6D4]/20 hover:text-[#06B6D4] hover:scale-105 active:scale-95";
+  const blueTabInactive =
+    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   useEffect(() => {
@@ -395,19 +403,19 @@ export default function WalletDashboardSwapModal({
 
             ✕
           </button>
-          <div className="flex items-center gap-2 mb-1 pr-6">
+          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
               {view === "lines"
                 ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
                 : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
             </h3>
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
             {isPreviewMode && noticeVariant !== "demo" ? (
-              <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                 {t("wallet_not_connected_title", "Wallet not connected")}
               </span>
             ) : null}
@@ -422,11 +430,9 @@ export default function WalletDashboardSwapModal({
               e.stopPropagation();
               setView("convert");
             }}
-            className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-            view === "convert" ?
-            "bg-xcannes-green text-black" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_convert_8408e969ec", "Convert")}
+            className={`px-3 py-2 text-xs ${
+            view === "convert" ? blueActionBtnMuted : blueTabInactive
+            }`}>{t("ui_convert_8408e969ec", "Convert")}
 
 
           </button>
@@ -436,11 +442,9 @@ export default function WalletDashboardSwapModal({
               e.stopPropagation();
               setView("lines");
             }}
-            className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-            view === "lines" ?
-            "bg-xcannes-green text-black" :
-            "bg-white/5 text-white/60 hover:bg-white/10"}`
-            }>{t("ui_currency_lines_267fc2eff3", "Currency lines")}
+            className={`px-3 py-2 text-xs ${
+            view === "lines" ? blueActionBtnMuted : blueTabInactive
+            }`}>{t("ui_currency_lines_267fc2eff3", "Currency lines")}
 
 
           </button>
@@ -464,7 +468,7 @@ export default function WalletDashboardSwapModal({
                 e.stopPropagation();
                 onInstallTrustline?.("RLUSD");
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] text-amber-100 transition-colors active:scale-95">{t("ui_install_trustline_rlusd_35e926ab5c", "Installer trustline RLUSD")}
+              className={`px-2.5 py-1.5 text-[11px] ${blueActionBtnBase}`}>{t("ui_install_trustline_rlusd_35e926ab5c", "Installer trustline RLUSD")}
 
 
             </button>
@@ -476,7 +480,7 @@ export default function WalletDashboardSwapModal({
                 e.stopPropagation();
                 onInstallTrustline?.("XCS");
               }}
-              className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-[11px] text-amber-100 transition-colors active:scale-95">{t("ui_install_trustline_xcs_5a6044d70e", "Installer trustline XCS")}
+              className={`px-2.5 py-1.5 text-[11px] ${blueActionBtnBase}`}>{t("ui_install_trustline_xcs_5a6044d70e", "Installer trustline XCS")}
 
 
             </button>
@@ -492,7 +496,7 @@ export default function WalletDashboardSwapModal({
 
             </label>
                 <select
-              className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               value={convertBaseCurrency}
               onChange={(e) => setConvertBaseCurrency(e.target.value)}
               onClick={(e) => e.stopPropagation()}>
@@ -512,7 +516,7 @@ export default function WalletDashboardSwapModal({
 
             </label>
                 <select
-              className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               value={convertQuoteCurrency}
               onChange={(e) => setConvertQuoteCurrency(e.target.value)}
               onClick={(e) => e.stopPropagation()}>
@@ -535,7 +539,8 @@ export default function WalletDashboardSwapModal({
               value={convertAmount}
               onChange={setConvertAmount}
               placeholder="0.0000"
-              token={convertBaseCurrency || "XRP"} />
+              token={convertBaseCurrency || "XRP"}
+              tokenClassName={baseCode === "RLUSD" ? "text-white" : ""} />
               </div>
 
               <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
@@ -605,7 +610,7 @@ export default function WalletDashboardSwapModal({
                     e.stopPropagation();
                     onConnectWallet?.();
                   }}
-                  className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10"
+                  className={`w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
                 >
                   {t("wallet_connect_cta", "Connect wallet")}
                 </button>
@@ -620,7 +625,7 @@ export default function WalletDashboardSwapModal({
                     }
                     handleDemoConvert();
                   }}
-                  className="w-full mt-1 bg-xcannes-green/80 hover:bg-xcannes-green text-black font-semibold text-sm py-2.5 rounded-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 active:scale-95 border border-white/10"
+                  className={`w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
                   disabled={
                     conversionRoute.type === "dex"
                       ? dexSubmitting ||
@@ -661,9 +666,10 @@ export default function WalletDashboardSwapModal({
 
         <div className="space-y-3">
               <p className="text-xs text-white/60">
-                {t("ui_choose_currencies_to_activate_41eea71853", "Choisissez les devises que vous souhaitez activer. Une ligne peut exister avec")}{" "}
-                <span className="font-mono">{t("ui_0_rlusd_14d1aaec1c", "0 RLUSD")}</span>
-            .
+                {t(
+                  "ui_choose_currencies_to_activate_41eea71853",
+                  "Choisissez les devises que vous souhaitez activer."
+                )}
               </p>
 
               <div className="rounded-xl border border-white/10 bg-black/20 p-3">
@@ -685,7 +691,8 @@ export default function WalletDashboardSwapModal({
                 value={activateCurrencyCode}
                 onChange={setActivateCurrencyCode}
                 placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
-                quickOptions={suggestedCurrencies} />
+                quickOptions={suggestedCurrencies}
+                showQuickAdd={false} />
 
                   <button
                 type="button"
@@ -703,7 +710,7 @@ export default function WalletDashboardSwapModal({
                   onActivateCurrencyLine?.(upper);
                   setActivateCurrencyCode("");
                 }}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/70 border border-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+                className={`w-full px-3 py-2 text-xs ${blueActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
 
 
               </button>
@@ -711,7 +718,7 @@ export default function WalletDashboardSwapModal({
                 <p className="mt-2 text-[10px] text-white/45">
                   {t("ui_activation_fee_xcs_company_wallet_f4", {
                     defaultValue:
-                      "Activation fee: {{amount}} XCS paid to the XCANNES wallet.",
+                      "Activation fee: {{amount}} XCS.",
                     amount: activationFeeLabel,
                   })}
                 </p>
@@ -743,5 +750,5 @@ export default function WalletDashboardSwapModal({
     </>;
 
 
-  return content;
+  return createPortal(content, document.body);
 }

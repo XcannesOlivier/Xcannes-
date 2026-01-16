@@ -11,6 +11,7 @@ import {
   openPrintWindow,
   sha256Hex
 } from "@/utils/statementExport";
+import StatementMonthSelect from "./StatementMonthSelect";
 
 const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
@@ -550,12 +551,12 @@ export default function GlobalStatement({
                   {t("ui_global_statement_13e29aa8aa", "Global Statement")}
                 </h2>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
                 {isPreviewMode && noticeVariant !== "demo" ? (
-                  <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
@@ -584,25 +585,19 @@ export default function GlobalStatement({
             <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_4674b18f25", "Statement Period")}</p>
               {/* Month Selector - simplifié */}
-              <div className="relative">
-                <select
+              <StatementMonthSelect
                 value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value === 'archives' ? 'archives' : parseInt(e.target.value))}
-                className="statement-select w-full bg-black/40 border border-white/20 rounded-md px-3 py-1.5 text-sm text-white cursor-pointer hover:border-white/40 transition-colors appearance-none pr-8"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 8px center',
-                  backgroundSize: '12px'
-                }}>
-
-                  {availableMonths.map((month) =>
-                <option key={month.value} value={month.value} className="bg-[#040c13]">
-                      {month.label}
-                    </option>
-                )}
-                </select>
-              </div>
+                onChange={(nextValue) => {
+                  if (nextValue === "archives") {
+                    setSelectedMonth("archives");
+                    return;
+                  }
+                  const parsed = Number.parseInt(nextValue, 10);
+                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                }}
+                options={availableMonths}
+                menuClassName={modalBgClass}
+              />
             </div>
             <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_total_assets_918e935125", "Total Assets")}</p>

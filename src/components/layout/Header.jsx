@@ -128,14 +128,19 @@ export default function Header({ fixed = true }) {
   }, []);
 
   const headerBgClass = (() => {
-    // Pages avec gradient (DEX + Home) pour cohérence visuelle
-    if (isDex || isHome) {
-      const gradientToClass = isDex ? "to-[#040c13]" : "to-[var(--bg-base)]";
-      const gradientBase = `bg-gradient-to-b from-black via-black/95 ${gradientToClass}`;
-
+    // DEX: gradient sombre pour conserver l'ambiance graphique
+    if (isDex) {
+      const gradientBase = "bg-gradient-to-b from-black via-black/95 to-[#040c13]";
       return scrolled ?
       `${gradientBase} backdrop-blur-md border-white/10` :
       `${gradientBase} backdrop-blur-sm border-white/5`;
+    }
+
+    // Home: fond noir uniforme (pas de teinte bleue)
+    if (isHome) {
+      return scrolled ?
+      "bg-black backdrop-blur-md border-white/10" :
+      "bg-black backdrop-blur-sm border-white/5";
     }
 
     // Autres pages : header sombre classique

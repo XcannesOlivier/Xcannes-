@@ -373,7 +373,7 @@ const MoonPayBuyModal = ({
 	                  <select
           value={currency}
           onChange={(e) => setCurrency(e.target.value)}
-          className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none">
+          className="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none">
 
                     {supportedCurrencies.map((curr) =>
           <option key={curr.code} value={curr.code}>
@@ -392,7 +392,7 @@ const MoonPayBuyModal = ({
           value={fiatCurrency}
           onChange={(e) => setFiatCurrency(e.target.value)}
           disabled={fiatLoading || fiatCurrencies.length === 0}
-          className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60">
+          className="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60">
 
                     {fiatCurrencies.length === 0 ?
           <option value="">
@@ -625,12 +625,12 @@ const MoonPayBuyModal = ({
 
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold border border-emerald-400/40 rounded-full px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
                 {isPreviewMode && noticeVariant !== "demo" ? (
-                  <span className="inline-flex items-center text-amber-200 text-xs md:text-sm font-semibold border border-amber-400/40 rounded-full px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
