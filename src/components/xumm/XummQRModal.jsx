@@ -19,7 +19,7 @@ export default function XummQRModal({
 }) {const { t } = useTranslation("common");
   const [status, setStatus] = useState('loading'); // loading, waiting, signed, error
   const [countdown, setCountdown] = useState(300); // 5 minutes
-  const hasAutoOpenedRef = useRef(false);
+  const lastAutoOpenedRef = useRef(null);
 
   useEffect(() => {
     if (!isOpen || !uuid) {
@@ -92,23 +92,56 @@ export default function XummQRModal({
   };
   const isMobile = isMobileDevice();
 
+  const resolveXummLinks = () => {
+    const raw = deepLink || (uuid ? `https://xumm.app/sign/${uuid}` : "");
+    if (!raw) return { appLink: "", webLink: "" };
+    const isScheme = /^xumm:\/\//i.test(raw) || /^xaman:\/\//i.test(raw);
+    if (isScheme) {
+      const webLink = raw.replace(/^xumm:\/\//i, "https://").replace(/^xaman:\/\//i, "https://");
+      return { appLink: raw, webLink };
+    }
+    const scheme = /xaman/i.test(raw) ? "xaman://" : "xumm://";
+    const appLink = raw.replace(/^https?:\/\//i, scheme);
+    return { appLink, webLink: raw };
+  };
+
+  const openXummApp = ({ allowFallback = true } = {}) => {
+    const { appLink, webLink } = resolveXummLinks();
+    if (!appLink) return;
+    let didHide = false;
+    const onVisibility = () => {
+      if (document.hidden) {
+        didHide = true;
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility, { once: true });
+    window.location.href = appLink;
+    if (allowFallback && webLink && webLink !== appLink) {
+      setTimeout(() => {
+        if (didHide || document.visibilityState !== 'visible') return;
+        window.location.href = webLink;
+      }, 1500);
+    }
+  };
+
   useEffect(() => {
     if (!isOpen) {
-      hasAutoOpenedRef.current = false;
+      lastAutoOpenedRef.current = null;
       return;
     }
 
-    if (hasAutoOpenedRef.current) return;
-    if (!deepLink) return;
     if (!isMobile) return;
+    if (!uuid && !deepLink) return;
+    const marker = uuid || deepLink;
+    if (lastAutoOpenedRef.current === marker) return;
 
-    hasAutoOpenedRef.current = true;
+    lastAutoOpenedRef.current = marker;
     const timer = setTimeout(() => {
-      window.location.href = deepLink;
-    }, 350);
+      openXummApp({ allowFallback: false });
+    }, 200);
 
     return () => clearTimeout(timer);
-  }, [isOpen, deepLink, isMobile, type]);
+  }, [isOpen, isMobile, uuid, deepLink, type]);
 
   if (!isOpen) return null;
 
@@ -165,7 +198,7 @@ export default function XummQRModal({
             <button
               type="button"
               onClick={() => {
-                window.location.href = deepLink || `https://xumm.app/sign/${uuid}`;
+                openXummApp({ allowFallback: true });
               }}
               className="block w-full bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold py-3 rounded-lg transition-all mb-4">{t("ui_open_in_xumm_app_7606fbe837", "Open in XUMM App")}
 
@@ -173,7 +206,7 @@ export default function XummQRModal({
             </button> :
 
             <a
-              href={deepLink || `https://xumm.app/sign/${uuid}`}
+              href={resolveXummLinks().webLink || `https://xumm.app/sign/${uuid}`}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold py-3 rounded-lg transition-all mb-4">{t("ui_open_in_xumm_app_7606fbe837", "Open in XUMM App")}

@@ -45,11 +45,19 @@ const MoonPayBuyModal = ({
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
   const [amount, setAmount] = useState('');
-  const [amountType, setAmountType] = useState('fiat'); // 'fiat' | 'crypto'
+  const amountType = 'fiat';
   const [fiatCurrency, setFiatCurrency] = useState('USD');
   const [fiatCurrencies, setFiatCurrencies] = useState([]);
   const [fiatLoading, setFiatLoading] = useState(false);
   const [fiatError, setFiatError] = useState(null);
+  const resolveFiatErrorMessage = (data) => {
+    if (!data) return 'Failed to load fiat currencies';
+    if (typeof data === 'string') return data;
+    if (typeof data?.error === 'string') return data.error;
+    if (data?.error?.message) return data.error.message;
+    if (data?.message) return data.message;
+    return 'Failed to load fiat currencies';
+  };
 
   // Cryptos supportées par MoonPay (RLUSD en priorité)
   const supportedCurrencies = [
@@ -101,7 +109,7 @@ const MoonPayBuyModal = ({
         const response = await fetch('/api/moonpay/fiat-currencies');
         const data = await response.json();
         if (!response.ok) {
-          throw new Error(data?.error || 'Failed to load fiat currencies');
+          throw new Error(resolveFiatErrorMessage(data));
         }
         const list = data?.currencies || data?.data || data || [];
         const normalized = Array.isArray(list) ?
@@ -327,7 +335,7 @@ const MoonPayBuyModal = ({
   // Reset au changement de devise
   useEffect(() => {
     setError(null);
-  }, [currency, amount, amountType, fiatCurrency]);
+  }, [currency, amount, fiatCurrency]);
 
   if (!isOpen) return null;
 
@@ -408,34 +416,6 @@ const MoonPayBuyModal = ({
 	                    {fiatError}
 	                  </p>
                   }
-                </div>
-
-                {/* Amount type toggle */}
-                <div className="flex gap-2">
-                  <button
-          type="button"
-          onClick={() => setAmountType('fiat')}
-          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          amountType === 'fiat' ?
-          'bg-xcannes-green text-black' :
-          'bg-black/40 text-white/60 border border-white/10 hover:bg-black/60'}`
-          }>
-
-	                    {t("moonpay_buy_with_fiat", "Buy with {{currency}}", {
-	                      currency: fiatCurrency,
-	                    })}
-	                  </button>
-                  <button
-          type="button"
-          onClick={() => setAmountType('crypto')}
-          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          amountType === 'crypto' ?
-          'bg-xcannes-green text-black' :
-          'bg-black/40 text-white/60 border border-white/10 hover:bg-black/60'}`
-          }>
-
-	                    {t("buy", "Buy")} {currency}
-	                  </button>
                 </div>
 
                 {/* Amount input */}

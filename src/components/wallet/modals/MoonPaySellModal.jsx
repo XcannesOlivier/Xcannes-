@@ -49,6 +49,14 @@ const MoonPaySellModal = ({
   const [fiatCurrencies, setFiatCurrencies] = useState([]);
   const [fiatLoading, setFiatLoading] = useState(false);
   const [fiatError, setFiatError] = useState(null);
+  const resolveFiatErrorMessage = (data) => {
+    if (!data) return 'Failed to load fiat currencies';
+    if (typeof data === 'string') return data;
+    if (typeof data?.error === 'string') return data.error;
+    if (data?.error?.message) return data.error.message;
+    if (data?.message) return data.message;
+    return 'Failed to load fiat currencies';
+  };
 
   // Cryptos supportées pour la vente (RLUSD en priorité)
   const supportedCurrencies = [
@@ -66,7 +74,7 @@ const MoonPaySellModal = ({
         const response = await fetch('/api/moonpay/fiat-currencies');
         const data = await response.json();
         if (!response.ok) {
-          throw new Error(data?.error || 'Failed to load fiat currencies');
+          throw new Error(resolveFiatErrorMessage(data));
         }
         const list = data?.currencies || data?.data || data || [];
         const normalized = Array.isArray(list) ?
