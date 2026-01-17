@@ -47,12 +47,12 @@ export default function WalletDashboardCashModal({
                   {t("ui_fiat_gateway_2b14cbec79", "Fiat Gateway")}
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
                 {isPreviewMode && noticeVariant !== "demo" ? (
-                  <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
@@ -97,7 +97,7 @@ export default function WalletDashboardCashModal({
               onClick={() => setCashModalTab("sell")}
               className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 border ${
               cashModalTab === "sell" ?
-              "bg-orange-500/20 text-orange-400 border-orange-500/40 hover:bg-orange-500/30 hover:scale-[1.02]" :
+              "bg-violet-500/20 text-violet-500 border-violet-500/40 hover:bg-violet-500/30 hover:scale-[1.02]" :
               "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
               }>
 

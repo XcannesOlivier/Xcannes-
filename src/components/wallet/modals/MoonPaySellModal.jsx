@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
+import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { useXumm } from "@/context/XummContext";
 
@@ -285,6 +287,24 @@ const MoonPaySellModal = ({
     setError(null);
   }, [currency, amount, quoteCurrency]);
 
+  const continueLabel = loading
+    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
+    : demoMode
+      ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
+      : t("moonpay_action_continue_sell_2c8a1d6b4f", "Continue to Sell");
+  const continueDisabled = loading || !amount || fiatCurrencies.length === 0;
+  const fiatPlaceholder = fiatLoading
+    ? t("moonpay_fiat_loading", "Loading fiat currencies...")
+    : t("moonpay_fiat_unavailable", "Fiat currencies unavailable");
+  const fiatOptions =
+    fiatCurrencies.length === 0
+      ? [{ value: "", label: fiatPlaceholder }]
+      : fiatCurrencies.map((fiat) => ({
+          value: fiat.code,
+          label: `${fiat.name || fiat.code} (${fiat.code})`,
+        }));
+  const fiatSelectValue = fiatCurrencies.length === 0 ? "" : quoteCurrency;
+
   if (!isOpen) return null;
 
   // Mode embedded: retourner seulement le contenu
@@ -301,17 +321,17 @@ const MoonPaySellModal = ({
 	                      "Select cryptocurrency to sell"
 	                    )}
 	                  </label>
-	                  <select
+                  <ModalSelect
           value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          className="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none">
-
-                    {supportedCurrencies.map((curr) =>
-          <option key={curr.code} value={curr.code}>
-                        {curr.name}
-                      </option>
-          )}
-                  </select>
+          onChange={setCurrency}
+          options={supportedCurrencies.map((curr) => ({
+            value: curr.code,
+            label: curr.name,
+          }))}
+          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
+          menuClassName="bg-elevated"
+          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
+        />
                 </div>
 
                 {/* Amount input */}
@@ -347,24 +367,16 @@ const MoonPaySellModal = ({
 	                  <label className="block text-sm font-medium text-white/80 mb-2">
 	                    {t("moonpay_receive_in", "Receive in")}
 	                  </label>
-                  <select
-          value={quoteCurrency}
-          onChange={(e) => setQuoteCurrency(e.target.value)}
+                  <ModalSelect
+          value={fiatSelectValue}
+          onChange={setQuoteCurrency}
+          options={fiatOptions}
+          placeholder={fiatPlaceholder}
           disabled={fiatLoading || fiatCurrencies.length === 0}
-          className="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60">
-
-                    {fiatCurrencies.length === 0 ?
-          <option value="">
-                        {fiatLoading ?
-            t("moonpay_fiat_loading", "Loading fiat currencies...") :
-            t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
-                      </option> :
-          fiatCurrencies.map((fiat) =>
-          <option key={fiat.code} value={fiat.code}>
-                        {fiat.name || fiat.code} ({fiat.code})
-                      </option>
-          )}
-                  </select>
+          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
+          menuClassName="bg-elevated"
+          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
+        />
                   {fiatError && !fiatLoading &&
                   <p className="text-xs text-red-400 mt-1">
 	                    {fiatError}
@@ -410,17 +422,19 @@ const MoonPaySellModal = ({
                 </div>
 
                 {/* Continue button */}
+                <SwipeConfirmButton
+        label={continueLabel}
+        onConfirm={generateSellUrl}
+        disabled={continueDisabled}
+        variant="xcannesGreen"
+        className="md:hidden" />
                 <button
         type="button"
         onClick={generateSellUrl}
-        disabled={loading || !amount || fiatCurrencies.length === 0}
-        className="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 text-white font-semibold rounded-lg transition-all duration-200 hover:scale-105 border border-white/10">
+        disabled={continueDisabled}
+        className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-[#10B981]/10 disabled:text-[#10B981]/60 disabled:border-[#10B981]/25 disabled:hover:scale-100">
 
-                  {loading ?
-        t("moonpay_action_loading_7c2b1d9a3e", "Loading...") :
-        demoMode ?
-        t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell") :
-        t("moonpay_action_continue_sell_2c8a1d6b4f", "Continue to Sell")}
+                  {continueLabel}
                 </button>
               </div>
     }
@@ -544,12 +558,12 @@ const MoonPaySellModal = ({
 
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-emerald-400 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-xcannes-green text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
                 {isPreviewMode && noticeVariant !== "demo" ? (
-                  <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none">
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}

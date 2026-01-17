@@ -267,8 +267,8 @@ body {
   }
 
   .xcannes-select option {
-    background-color: #111827;
-    color: #ffffff;
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-primary) !important;
   }
 }
 
