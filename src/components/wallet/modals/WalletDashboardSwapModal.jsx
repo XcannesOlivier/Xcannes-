@@ -51,7 +51,8 @@ export default function WalletDashboardSwapModal({
   handleDemoConvert,
   convertProcessing,
   rlusdPerUnitRates,
-  activationFeeXcs
+  activationFeeXcs,
+  simulateDexInDemo = false
 }) {
   const { t } = useTranslation("common");
   const blueActionBtnBase =
@@ -158,6 +159,9 @@ export default function WalletDashboardSwapModal({
     return { type: "allocation" };
   }, [baseCode, quoteCode, t]);
 
+  const demoDexFallback = simulateDexInDemo && conversionRoute.type === "dex";
+  const effectiveRouteType = demoDexFallback ? "allocation" : conversionRoute.type;
+
   const formatAmount = (value, digits = 6) => {
     const num = Number(value);
     if (!Number.isFinite(num)) return "-";
@@ -195,12 +199,12 @@ export default function WalletDashboardSwapModal({
       return;
     }
 
-    if (conversionRoute.type === "unsupported") {
+    if (effectiveRouteType === "unsupported") {
       setPreviewState({ status: "error", error: conversionRoute.error });
       return;
     }
 
-    if (conversionRoute.type === "allocation") {
+    if (effectiveRouteType === "allocation") {
       const rlusdPerBase = baseCode === "RLUSD"
         ? 1
         : Number(rlusdPerUnitRates?.[baseCode]);
@@ -251,7 +255,7 @@ export default function WalletDashboardSwapModal({
       return;
     }
 
-    if (conversionRoute.type === "dex") {
+    if (effectiveRouteType === "dex") {
       const requestId = ++previewRequestId.current;
       setPreviewState({ status: "loading", error: null });
 
@@ -305,6 +309,7 @@ export default function WalletDashboardSwapModal({
     amountValue,
     baseCode,
     conversionRoute,
+    effectiveRouteType,
     open,
     quoteCode,
     rlusdPerUnitRates,
@@ -375,7 +380,7 @@ export default function WalletDashboardSwapModal({
     }
   };
 
-  const isDexRoute = conversionRoute.type === "dex";
+  const isDexRoute = effectiveRouteType === "dex";
   const convertButtonDisabled = isDexRoute
     ? dexSubmitting ||
       dexConfirming ||
@@ -385,7 +390,7 @@ export default function WalletDashboardSwapModal({
       !convertBaseCurrency ||
       !convertQuoteCurrency ||
       !convertAmount ||
-      conversionRoute.type !== "allocation";
+      effectiveRouteType !== "allocation";
   const convertButtonLabel = isDexRoute
     ? dexSubmitting
       ? t("ui_preparing_67f5f84ff4", "Preparing...")
@@ -623,7 +628,7 @@ export default function WalletDashboardSwapModal({
                 </div>
               ) : null}
 
-              {conversionRoute.type === "dex" && isPreviewMode ? (
+              {isDexRoute && isPreviewMode ? (
                 <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
                   {t(
                     "ui_wallet_required_trade_18f7e1d2a9",

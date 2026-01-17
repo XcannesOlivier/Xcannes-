@@ -95,13 +95,53 @@ function formatUnits(locale, amount) {
 }
 
 const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
+const DEMO_PENDING_REQUEST_KEY = "xcannes_demo_wallet_pending_request_v1";
 const DEMO_LATENCY_MS_MIN = 450;
 const DEMO_LATENCY_MS_MAX = 1100;
 const DEMO_RATES_REFRESH_MS = 15_000;
 const DEMO_RATES_STALE_AFTER_MS = 30_000;
+const DEMO_PENDING_REQUEST_TTL_MS = 10 * 60 * 1000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function readPendingDemoRequest() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(DEMO_PENDING_REQUEST_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    if (!parsed.request || !parsed.toWalletId) return null;
+    const ts = Number(parsed.ts || 0);
+    if (ts && Date.now() - ts > DEMO_PENDING_REQUEST_TTL_MS) {
+      window.localStorage.removeItem(DEMO_PENDING_REQUEST_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writePendingDemoRequest(detail) {
+  if (typeof window === "undefined") return;
+  try {
+    const payload = { ...detail, ts: Date.now() };
+    window.localStorage.setItem(DEMO_PENDING_REQUEST_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore
+  }
+}
+
+function clearPendingDemoRequest() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(DEMO_PENDING_REQUEST_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 function newDemoEventId(prefix = "demo") {
@@ -544,6 +584,16 @@ export default function DemoWalletDashboard({
     setSendPaymentRequest
   });
 
+  const handlePendingDemoRequest = useCallback((detail) => {
+    if (!detail?.request) return false;
+    if (detail.toWalletId !== activeWalletId) return false;
+    setSendTab("manual");
+    setActiveAction("send");
+    handlePaymentRequestScan?.(JSON.stringify(detail.request));
+    clearPendingDemoRequest();
+    return true;
+  }, [activeWalletId, handlePaymentRequestScan, setActiveAction, setSendTab]);
+
   const handleDemoRequestGenerated = useCallback((request) => {
     if (!request || typeof window === "undefined") return;
     const detail = {
@@ -552,21 +602,25 @@ export default function DemoWalletDashboard({
       toWalletId: otherWalletId
     };
     window.dispatchEvent(new CustomEvent("xcannes:demo-wallet:request", { detail }));
+    writePendingDemoRequest(detail);
   }, [activeWalletId, otherWalletId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const handler = (event) => {
       const detail = event?.detail || {};
-      if (!detail?.request) return;
-      if (detail.toWalletId !== activeWalletId) return;
-      setSendTab("manual");
-      setActiveAction("send");
-      handlePaymentRequestScan?.(JSON.stringify(detail.request));
+      handlePendingDemoRequest(detail);
     };
     window.addEventListener("xcannes:demo-wallet:request", handler);
     return () => window.removeEventListener("xcannes:demo-wallet:request", handler);
-  }, [activeWalletId, handlePaymentRequestScan, setActiveAction, setSendTab]);
+  }, [handlePendingDemoRequest]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const pending = readPendingDemoRequest();
+    if (!pending) return;
+    handlePendingDemoRequest(pending);
+  }, [activeWalletId, handlePendingDemoRequest]);
 
   const handleReset = () => {
     setState(buildDefaultDemoState());
@@ -576,6 +630,7 @@ export default function DemoWalletDashboard({
     setShowGlobalStatement(false);
     setShowCurrencyStatement(false);
     setSelectedStatementToken(null);
+    setSendPaymentRequest(null);
   };
 
   const submitSend = ({ amount, currency, memo, toWalletId, isFxSend, paymentRequest }) => {
@@ -1405,7 +1460,10 @@ export default function DemoWalletDashboard({
 
       <WalletDashboardSendModal
         open={activeAction === "send"}
-        onClose={() => setActiveAction(null)}
+        onClose={() => {
+          setActiveAction(null);
+          setSendPaymentRequest(null);
+        }}
         isPreviewMode={true}
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
@@ -1471,6 +1529,7 @@ export default function DemoWalletDashboard({
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
         walletId={activeWalletId}
+        simulateDexInDemo={true}
         effectiveIsConnected={false}
         hasOnChainRlusd={true}
         hasOnChainXcs={true}

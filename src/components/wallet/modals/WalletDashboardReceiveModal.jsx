@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Buffer } from "buffer";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
@@ -57,6 +57,18 @@ export default function WalletDashboardReceiveModal({
       ) || null);
 
   }, [augmentedTokens, requestCurrencyCode]);
+
+  useEffect(() => {
+    if (!open) {
+      setGeneratedRequest(null);
+      setGenerateError(null);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    setGeneratedRequest(null);
+    setGenerateError(null);
+  }, [effectiveWallet, requestAmount, requestCurrency, requestMemo, requestToAddress]);
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;

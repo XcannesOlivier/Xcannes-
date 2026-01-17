@@ -395,16 +395,14 @@ export default function WalletDashboardSendModal({
           {/* Tab Content: Scan Request */}
           {sendTab === "scan-request" &&
         <div className="space-y-6">
-              {!isDesktop &&
               <QRScanner
               isOpen={sendTab === "scan-request"}
               onScan={handlePaymentRequestScan}
               embedded={true}
               showClose={false}
               fileInputId={payreqFileInputId}
+              enableCamera={!isDesktop}
               className="bg-black/30 border-white/10" />
-
-              }
 
               {!isDesktop &&
               <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
