@@ -32,7 +32,8 @@ export default function WalletDashboardReceiveModal({
   requestToAddress,
   setRequestToAddress,
   rlusdPerUnitRates,
-  rlusdPerUnitSources
+  rlusdPerUnitSources,
+  onRequestGenerated
 }) {
   const { t } = useTranslation("common");
   const greenActionBtnBase =
@@ -138,6 +139,7 @@ export default function WalletDashboardReceiveModal({
     };
 
     setGeneratedRequest(req);
+    onRequestGenerated?.(req);
   };
 
   const requestValue = useMemo(() => {

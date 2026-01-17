@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import {
@@ -200,7 +200,9 @@ export default function DemoWalletDashboard({
   defaultWalletId = "A",
   theme = "default",
   showWalletSwitcher = true,
-  showCompareLink = false
+  showCompareLink = false,
+  demoState,
+  setDemoState
 }) {
   const { t } = useTranslation("common");
   const router = useRouter();
@@ -210,6 +212,14 @@ export default function DemoWalletDashboard({
   const isDexTheme = theme === "dex";
   const resolvedDefaultWalletId = defaultWalletId === "B" ? "B" : "A";
   const fallbackUsdPerUnit = useMemo(() => getDemoRatesUsdPerUnit(), []);
+  const fallbackRates = useMemo(
+    () => ({
+      USD: 1,
+      RLUSD: 1,
+      ...fallbackUsdPerUnit
+    }),
+    [fallbackUsdPerUnit]
+  );
   const [usdPerUnitRates, setUsdPerUnitRates] = useState(() => ({
     USD: 1,
     RLUSD: 1,
@@ -221,8 +231,11 @@ export default function DemoWalletDashboard({
   }));
   const [ratesLastOkTs, setRatesLastOkTs] = useState(() => Date.now());
   const [ratesNowTs, setRatesNowTs] = useState(() => Date.now());
-  const [state, setState] = useState(() => buildDefaultDemoState());
+  const [localState, setLocalState] = useState(() => buildDefaultDemoState());
   const [isHydrated, setIsHydrated] = useState(false);
+  const isExternalState = demoState && typeof setDemoState === "function";
+  const state = isExternalState ? demoState : localState;
+  const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
   const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
@@ -259,6 +272,7 @@ export default function DemoWalletDashboard({
   }, [otherWallet?.label, otherWalletId, state, t]);
 
   useEffect(() => {
+    if (isExternalState) return;
     if (typeof window === "undefined") return;
     try {
       const raw = window.localStorage.getItem(DEMO_STATE_STORAGE_KEY);
@@ -271,9 +285,10 @@ export default function DemoWalletDashboard({
     } finally {
       setIsHydrated(true);
     }
-  }, []);
+  }, [isExternalState, setState]);
 
   useEffect(() => {
+    if (isExternalState) return;
     if (!isHydrated) return;
     if (typeof window === "undefined") return;
     try {
@@ -281,7 +296,7 @@ export default function DemoWalletDashboard({
     } catch (err) {
       console.warn("[demo-wallet] failed to persist state:", err);
     }
-  }, [isHydrated, state]);
+  }, [isExternalState, isHydrated, state]);
 
   const {
     sendTab,
@@ -408,10 +423,14 @@ export default function DemoWalletDashboard({
   }, [requiredRateCodes]);
 
   const ratesAreStale = ratesNowTs - ratesLastOkTs > DEMO_RATES_STALE_AFTER_MS;
+  const effectiveUsdPerUnitRates = useMemo(
+    () => ratesAreStale ? { ...fallbackRates, ...usdPerUnitRates } : usdPerUnitRates,
+    [fallbackRates, ratesAreStale, usdPerUnitRates]
+  );
 
   const usdTotal = useMemo(
-    () => walletUsdTotal(activeWallet, usdPerUnitRates),
-    [activeWallet, usdPerUnitRates]
+    () => walletUsdTotal(activeWallet, effectiveUsdPerUnitRates),
+    [activeWallet, effectiveUsdPerUnitRates]
   );
   const displayCurrency = "USD";
   const displayAmount = usdTotal;
@@ -422,16 +441,16 @@ export default function DemoWalletDashboard({
       .map(([code, units]) => {
         const upper = String(code || "").toUpperCase();
         const unitsNum = Number(units) || 0;
-        const rate = usdPerUnitRates?.[upper] ?? null;
+        const rate = effectiveUsdPerUnitRates?.[upper] ?? null;
         const usdValue = Number.isFinite(Number(rate)) ? unitsNum * Number(rate) : null;
         return { code: upper, units: unitsNum, usdValue };
       })
       .sort((a, b) => (b.usdValue || 0) - (a.usdValue || 0));
-  }, [activeWallet?.allocations, usdPerUnitRates]);
+  }, [activeWallet?.allocations, effectiveUsdPerUnitRates]);
 
   const rlusdPerUnitRates = useMemo(
-    () => ratesAreStale ? {} : usdPerUnitRates,
-    [ratesAreStale, usdPerUnitRates]
+    () => effectiveUsdPerUnitRates,
+    [effectiveUsdPerUnitRates]
   );
   const rlusdPerUnitSources = useMemo(() => ({ ...usdPerUnitSources }), [usdPerUnitSources]);
 
@@ -442,11 +461,14 @@ export default function DemoWalletDashboard({
       const value = Number(units) || 0;
       const isTrustlineOnly = !isDemoNativeCurrency(currency);
       const rlusdPerUnit = Number(rlusdPerUnitRates?.[currency] || 0);
+      const nativeRate = Number(rlusdPerUnitRates?.[currency] || 0);
       const demoRlusdValue = isTrustlineOnly
         ? value * (rlusdPerUnit || 0)
-        : currency === "XRP"
-          ? value * Number(rlusdPerUnitRates?.XRP || 0)
-          : value;
+        : currency === "RLUSD"
+          ? value
+          : nativeRate > 0
+            ? value * nativeRate
+            : value;
 
       return {
         key: currency,
@@ -522,6 +544,30 @@ export default function DemoWalletDashboard({
     setSendPaymentRequest
   });
 
+  const handleDemoRequestGenerated = useCallback((request) => {
+    if (!request || typeof window === "undefined") return;
+    const detail = {
+      request,
+      fromWalletId: activeWalletId,
+      toWalletId: otherWalletId
+    };
+    window.dispatchEvent(new CustomEvent("xcannes:demo-wallet:request", { detail }));
+  }, [activeWalletId, otherWalletId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (event) => {
+      const detail = event?.detail || {};
+      if (!detail?.request) return;
+      if (detail.toWalletId !== activeWalletId) return;
+      setSendTab("manual");
+      setActiveAction("send");
+      handlePaymentRequestScan?.(JSON.stringify(detail.request));
+    };
+    window.addEventListener("xcannes:demo-wallet:request", handler);
+    return () => window.removeEventListener("xcannes:demo-wallet:request", handler);
+  }, [activeWalletId, handlePaymentRequestScan, setActiveAction, setSendTab]);
+
   const handleReset = () => {
     setState(buildDefaultDemoState());
     setActiveWalletId(resolvedDefaultWalletId);
@@ -548,18 +594,9 @@ export default function DemoWalletDashboard({
     let fxRate = null;
 
     if (isFxSend) {
-      if (ratesAreStale) {
-        return {
-          error: t(
-            "demo_error_rates_stale",
-            "Rates temporarily unavailable (demo). Please retry."
-          )
-        };
-      }
-
       const requestedFxRate =
       paymentRequest?.fxRate != null ? Number(paymentRequest.fxRate) : Number.NaN;
-      const rawRate = Number(usdPerUnitRates?.[currency]);
+      const rawRate = Number(effectiveUsdPerUnitRates?.[currency]);
       const effectiveRate =
       Number.isFinite(requestedFxRate) && requestedFxRate > 0 ? requestedFxRate : rawRate;
       if (!Number.isFinite(effectiveRate) || effectiveRate <= 0) {
@@ -621,7 +658,7 @@ export default function DemoWalletDashboard({
       currencyCode: currency,
       amountUnits: amount,
       memo,
-      ratesUsdPerUnit: usdPerUnitRates
+      ratesUsdPerUnit: effectiveUsdPerUnitRates
     });
     if (!result.ok) {
       const message =
@@ -675,14 +712,6 @@ export default function DemoWalletDashboard({
         )
       };
     }
-    if (ratesAreStale) {
-      return {
-        error: t(
-          "demo_error_rates_stale",
-          "Rates temporarily unavailable (demo). Please retry."
-        )
-      };
-    }
     const nextState = clone(state);
     const result = applyDemoConvert({
       state: nextState,
@@ -690,7 +719,7 @@ export default function DemoWalletDashboard({
       fromCurrencyCode: from,
       toCurrencyCode: to,
       amountUnits: amount,
-      ratesUsdPerUnit: usdPerUnitRates
+      ratesUsdPerUnit: effectiveUsdPerUnitRates
     });
     if (!result.ok) {
       const message =
@@ -896,16 +925,39 @@ export default function DemoWalletDashboard({
     if (!code || !Number.isFinite(allocated) || allocated < 0) return;
     const rate = Number(rlusdPerUnitRates?.[code] || 0);
     if (!rate || code === "RLUSD") return;
-    const units = allocated / rate;
     const nextState = clone(state);
     const wallet = nextState.wallets?.[activeWalletId];
     if (!wallet) return;
+    const prevUnits = Number(wallet.allocations?.[code] || 0);
+    const prevAllocated = Number.isFinite(prevUnits) ? prevUnits * rate : 0;
+    const deltaAllocated = allocated - prevAllocated;
+    const currentRlusd = Number(wallet.allocations?.RLUSD || 0);
+    const nextRlusd = currentRlusd - deltaAllocated;
+
+    if (nextRlusd + 1e-9 < 0) {
+      alert(t("demo_error_insufficient", "Solde insuffisant (démo)."));
+      return;
+    }
+
+    const units = allocated / rate;
+    wallet.allocations.RLUSD = Number(Math.max(0, nextRlusd).toFixed(6));
     wallet.allocations[code] = Number(units.toFixed(6));
     setState(nextState);
   };
 
+  const walletEvents = useMemo(() => {
+    return (state.events || []).filter((evt) => {
+      if (!evt) return false;
+      if (evt.kind === "send") {
+        return evt.from === activeWalletId || evt.to === activeWalletId;
+      }
+      if (evt.wallet) return evt.wallet === activeWalletId;
+      return false;
+    });
+  }, [activeWalletId, state.events]);
+
   const previewGlobalMovements = useMemo(() => {
-    return (state.events || []).map((evt) => {
+    return (walletEvents || []).map((evt) => {
       if (evt.kind === "convert") {
         return {
           movementId: evt.id,
@@ -948,7 +1000,7 @@ export default function DemoWalletDashboard({
         amountRlusd: evt.amount || 0
       };
     });
-  }, [rlusdPerUnitRates, state.events]);
+  }, [rlusdPerUnitRates, walletEvents]);
 
   useEffect(() => {
     if (!selectedStatementToken) {
@@ -956,18 +1008,13 @@ export default function DemoWalletDashboard({
       return;
     }
     const currency = String(selectedStatementToken.currency || "").toUpperCase();
-    const events = (state.events || []).slice().reverse(); // oldest -> newest
+    const events = walletEvents || []; // newest -> oldest
     let running = Number(activeWallet?.allocations?.[currency]) || 0;
     const txs = [];
 
     events.forEach((evt) => {
-      const involves =
-      evt.currency && String(evt.currency).toUpperCase() === currency ||
-      evt.fromCurrency && String(evt.fromCurrency).toUpperCase() === currency ||
-      evt.toCurrency && String(evt.toCurrency).toUpperCase() === currency;
-      if (!involves) return;
-
       let amount = 0;
+      let delta = 0;
       let type = "credit";
       let category = "other";
       let description = t("demo_statement_movement", "Mouvement");
@@ -976,55 +1023,59 @@ export default function DemoWalletDashboard({
       if (evt.kind === "send" && String(evt.currency).toUpperCase() === currency) {
         amount = Number(evt.amount || 0);
         if (evt.from === activeWalletId) {
+          delta = -amount;
           type = "debit";
           counterparty = getWalletAddress(state, evt.to);
           description = t("demo_statement_send_to_wallet", {
             defaultValue: "Envoyer vers le wallet {{walletId}}",
             walletId: evt.to
           });
-          running -= amount;
-        } else {
+        } else if (evt.to === activeWalletId) {
+          delta = amount;
           type = "credit";
           counterparty = getWalletAddress(state, evt.from);
           description = t("demo_statement_receive_from_wallet", {
             defaultValue: "Recevoir depuis le wallet {{walletId}}",
             walletId: evt.from
           });
-          running += amount;
+        } else {
+          return;
         }
       } else if (evt.kind === "convert") {
         category = "exchange";
         if (String(evt.fromCurrency).toUpperCase() === currency) {
           type = "debit";
           amount = Number(evt.fromAmount || 0);
+          delta = -amount;
           description = t("demo_statement_exchange", {
             defaultValue: "Conversion {{fromCurrency}} → {{toCurrency}}",
             fromCurrency: evt.fromCurrency,
             toCurrency: evt.toCurrency
           });
-          running -= amount;
         } else if (String(evt.toCurrency).toUpperCase() === currency) {
           type = "credit";
           amount = Number(evt.toAmount || 0);
+          delta = amount;
           description = t("demo_statement_exchange", {
             defaultValue: "Conversion {{fromCurrency}} → {{toCurrency}}",
             fromCurrency: evt.fromCurrency,
             toCurrency: evt.toCurrency
           });
-          running += amount;
+        } else {
+          return;
         }
       } else if (evt.kind === "buy" && currency === "RLUSD") {
         category = "buy";
         type = "credit";
         amount = Number(evt.amount || 0);
+        delta = amount;
         description = t("demo_statement_buy_moonpay", "Achat via MoonPay (démo)");
-        running += amount;
       } else if (evt.kind === "sell" && currency === "RLUSD") {
         category = "sell";
         type = "debit";
         amount = Number(evt.amount || 0);
+        delta = -amount;
         description = t("demo_statement_sell_moonpay", "Vente via MoonPay (démo)");
-        running -= amount;
       } else if (
       evt.kind === "spread_fee" &&
       String(evt.currency).toUpperCase() === currency &&
@@ -1033,9 +1084,13 @@ export default function DemoWalletDashboard({
         category = "fee";
         type = "debit";
         amount = Number(evt.amount || 0);
+        delta = -amount;
         description = t("demo_statement_fee_spread", "Frais XCANNES (spread)");
-        running -= amount;
+      } else {
+        return;
       }
+
+      if (!Number.isFinite(amount) || amount <= 0) return;
 
       txs.push({
         date: new Date(evt.ts).toISOString(),
@@ -1046,10 +1101,18 @@ export default function DemoWalletDashboard({
         amount,
         runningBalance: running
       });
+      running -= delta;
     });
 
-    setPreviewCurrencyTransactions(txs.reverse()); // newest first
-  }, [activeWallet?.allocations, activeWalletId, selectedStatementToken, state, state.events, t]);
+    setPreviewCurrencyTransactions(txs);
+  }, [
+    activeWallet?.allocations,
+    activeWalletId,
+    selectedStatementToken,
+    state,
+    t,
+    walletEvents
+  ]);
 
   return (
     <div
@@ -1396,7 +1459,8 @@ export default function DemoWalletDashboard({
         requestToAddress={requestToAddress}
         setRequestToAddress={setRequestToAddress}
         rlusdPerUnitRates={rlusdPerUnitRates}
-        rlusdPerUnitSources={rlusdPerUnitSources} />
+        rlusdPerUnitSources={rlusdPerUnitSources}
+        onRequestGenerated={handleDemoRequestGenerated} />
 
 
       <WalletDashboardSwapModal
@@ -1498,7 +1562,7 @@ export default function DemoWalletDashboard({
         isFullPageView={false}
         statementVariant={"default"}
         currencyLines={currencyLines}
-        usdRates={usdPerUnitRates}
+        usdRates={effectiveUsdPerUnitRates}
         showGlobalStatement={showGlobalStatement}
         setShowGlobalStatement={setShowGlobalStatement}
         showCurrencyStatement={showCurrencyStatement}
