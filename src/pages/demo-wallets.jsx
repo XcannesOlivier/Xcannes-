@@ -3,9 +3,58 @@ import DemoWalletDashboard from "@/components/demo-wallet/DemoWalletDashboard";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { buildDefaultDemoState } from "@/components/demo-wallet/DemoWalletModel";
+
+const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
+
+function isValidDemoState(value) {
+  if (!value || typeof value !== "object") return false;
+  const wallets = value.wallets;
+  if (!wallets || typeof wallets !== "object") return false;
+  if (!wallets.A || !wallets.B) return false;
+  if (!wallets.A.allocations || !wallets.B.allocations) return false;
+  return true;
+}
+
+function ensureFeeWallet(state) {
+  if (!state || typeof state !== "object") return state;
+  if (!state.wallets || typeof state.wallets !== "object") return state;
+  if (state.wallets.FEE) return state;
+  const base = buildDefaultDemoState();
+  state.wallets.FEE = base.wallets.FEE;
+  return state;
+}
 
 export default function DemoWalletsComparePage() {
   const { t } = useTranslation("common");
+  const [demoState, setDemoState] = useState(() => buildDefaultDemoState());
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(DEMO_STATE_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (isValidDemoState(parsed)) setDemoState(ensureFeeWallet(parsed));
+      }
+    } catch (err) {
+      console.warn("[demo-wallets] failed to load persisted state:", err);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(DEMO_STATE_STORAGE_KEY, JSON.stringify(demoState));
+    } catch (err) {
+      console.warn("[demo-wallets] failed to persist state:", err);
+    }
+  }, [demoState, isHydrated]);
 
   return (
     <>
@@ -53,6 +102,8 @@ export default function DemoWalletsComparePage() {
                 theme="home"
                 showWalletSwitcher={false}
                 showCompareLink={false}
+                demoState={demoState}
+                setDemoState={setDemoState}
               />
             </div>
             <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden min-h-[680px]">
@@ -61,6 +112,8 @@ export default function DemoWalletsComparePage() {
                 theme="dex"
                 showWalletSwitcher={false}
                 showCompareLink={false}
+                demoState={demoState}
+                setDemoState={setDemoState}
               />
             </div>
           </div>
