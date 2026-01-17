@@ -921,12 +921,12 @@ export default function CurrencyStatement({
                     {currency} {t("ui_statement_a87c93acb8", "Statement")}
                   </h2>
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
                   {isPreviewMode && noticeVariant !== "demo" ? (
-                    <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                       {t("wallet_not_connected_title", "Wallet not connected")}
                     </span>
                   ) : null}

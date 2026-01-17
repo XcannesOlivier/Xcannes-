@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Buffer } from "buffer";
+import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
+import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
@@ -205,12 +207,12 @@ export default function WalletDashboardReceiveModal({
                 : t("ui_request_payment_c62b99fb16", "Request Payment")}
             </h3>
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
             {isPreviewMode && noticeVariant !== "demo" ? (
-              <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                 {t("wallet_not_connected_title", "Wallet not connected")}
               </span>
             ) : null}
@@ -272,7 +274,7 @@ export default function WalletDashboardReceiveModal({
               e.stopPropagation();
               handleCopyAddress();
             }}
-            className={`px-4 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_copy_address_779691d570", "Copy address")}
+            className={`px-4 py-2 text-xs ${greenActionBtnMuted}`}>{t("ui_copy_address_779691d570", "Copy address")}
 
 
           </button>
@@ -293,24 +295,24 @@ export default function WalletDashboardReceiveModal({
                 value={requestAmount}
                 onChange={(e) => setRequestAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80" />
+                className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-base md:text-sm text-white outline-none focus:border-xcannes-green/80" />
 
                 </div>
                 <div>
                   <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_currency_1ed55673be", "Currency")}
 
               </label>
-                  <select
+                  <ModalSelect
                 value={requestCurrency}
-                onChange={(e) => setRequestCurrency(e.target.value)}
-                className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80">
-
-                    {(augmentedTokens || []).map((t) =>
-                <option key={t.key} value={t.currency}>
-                        {t.currency}
-                      </option>
-                )}
-                  </select>
+                onChange={setRequestCurrency}
+                options={(augmentedTokens || []).map((token) => ({
+                  value: token.currency,
+                  label: token.currency,
+                }))}
+                buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
+                menuClassName="bg-elevated"
+                selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
+              />
                 </div>
               </div>
 
@@ -338,7 +340,7 @@ export default function WalletDashboardReceiveModal({
                 type="button"
                 onClick={() => setRequestMethod("qr")}
                 className={`px-3 py-2 text-xs ${
-                requestMethod === "qr" ? greenActionBtnBase : greenActionBtnMuted
+                requestMethod === "qr" ? greenActionBtnMuted : greenTabInactive
                 }`}>{t("ui_qr_code_7614ee32a0", "📱 QR Code")}
 
 
@@ -347,7 +349,7 @@ export default function WalletDashboardReceiveModal({
                 type="button"
                 onClick={() => setRequestMethod("link")}
                 className={`px-3 py-2 text-xs ${
-                requestMethod === "link" ? greenActionBtnBase : greenActionBtnMuted
+                requestMethod === "link" ? greenActionBtnMuted : greenTabInactive
                 }`}>{t("ui_link_c2c8a504d7", "🔗 Link")}
 
 
@@ -372,13 +374,18 @@ export default function WalletDashboardReceiveModal({
           }
 
               {/* Generate Button */}
+              <SwipeConfirmButton
+              label={t("ui_generate_request_58584f23a2", "Generate Request")}
+              onConfirm={handleGenerateRequest}
+              variant="green"
+              className="mt-2 md:hidden" />
               <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               handleGenerateRequest();
             }}
-            className={`w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}>{t("ui_generate_request_58584f23a2", "Generate Request")}
+            className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnMuted}`}>{t("ui_generate_request_58584f23a2", "Generate Request")}
 
 
           </button>

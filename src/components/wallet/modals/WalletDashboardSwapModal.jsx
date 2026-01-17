@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
+import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
+import ModalSelect from "@/components/ui/ModalSelect";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
 import { createPortal } from "react-dom";
@@ -373,6 +375,46 @@ export default function WalletDashboardSwapModal({
     }
   };
 
+  const isDexRoute = conversionRoute.type === "dex";
+  const convertButtonDisabled = isDexRoute
+    ? dexSubmitting ||
+      dexConfirming ||
+      previewState.status !== "done" ||
+      !effectiveIsConnected
+    : convertProcessing ||
+      !convertBaseCurrency ||
+      !convertQuoteCurrency ||
+      !convertAmount ||
+      conversionRoute.type !== "allocation";
+  const convertButtonLabel = isDexRoute
+    ? dexSubmitting
+      ? t("ui_preparing_67f5f84ff4", "Preparing...")
+      : t("ui_convert_8408e969ec", "Convert")
+    : convertProcessing
+      ? t("ui_converting_71c2b9a4e5", "Converting...")
+      : isPreviewMode
+        ? t("ui_convert_8408e969ec", "Convert")
+        : t("ui_convert_allocation_6b2c1a9d5e", "Convert allocation");
+  const handleConvertAction = () => {
+    if (isDexRoute) {
+      handleDexSubmit();
+      return;
+    }
+    handleDemoConvert();
+  };
+  const activateLineDisabled =
+    !canMutateLines ||
+    currencyLinesLoading ||
+    !activateCurrencyCode ||
+    existingCurrencyLinesSet.has(
+      String(activateCurrencyCode || "").toUpperCase()
+    );
+  const handleActivateLine = () => {
+    const upper = String(activateCurrencyCode || "").toUpperCase();
+    onActivateCurrencyLine?.(upper);
+    setActivateCurrencyCode("");
+  };
+
   if (!open) return null;
 
   const content =
@@ -410,12 +452,12 @@ export default function WalletDashboardSwapModal({
                 : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
             </h3>
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-emerald-400 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
             {isPreviewMode && noticeVariant !== "demo" ? (
-              <span className="inline-flex items-center text-amber-200 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                 {t("wallet_not_connected_title", "Wallet not connected")}
               </span>
             ) : null}
@@ -495,52 +537,45 @@ export default function WalletDashboardSwapModal({
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
 
             </label>
-                <select
-              className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                <ModalSelect
               value={convertBaseCurrency}
-              onChange={(e) => setConvertBaseCurrency(e.target.value)}
-              onClick={(e) => e.stopPropagation()}>
-
-                  {(swapCurrencyOptions || []).
-              filter((code) => code !== convertQuoteCurrency).
-              map((code) =>
-              <option key={code} value={code}>
-                        {code}
-                      </option>
-              )}
-                </select>
+              onChange={setConvertBaseCurrency}
+              options={(swapCurrencyOptions || [])
+                .filter((code) => code !== convertQuoteCurrency)
+                .map((code) => ({ value: code, label: code }))}
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+              menuClassName="bg-elevated"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+            />
               </div>
 
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_quote_e3761255be", "Quote")}
 
             </label>
-                <select
-              className="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                <ModalSelect
               value={convertQuoteCurrency}
-              onChange={(e) => setConvertQuoteCurrency(e.target.value)}
-              onClick={(e) => e.stopPropagation()}>
-
-                  {(swapCurrencyOptions || []).
-              filter((code) => code !== convertBaseCurrency).
-              map((code) =>
-              <option key={code} value={code}>
-                        {code}
-                      </option>
-              )}
-                </select>
+              onChange={setConvertQuoteCurrency}
+              options={(swapCurrencyOptions || [])
+                .filter((code) => code !== convertBaseCurrency)
+                .map((code) => ({ value: code, label: code }))}
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+              menuClassName="bg-elevated"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+            />
               </div>
 
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_amount_52a20b2992", "Amount")}
 
             </label>
-                <TokenAmountInput
+              <TokenAmountInput
               value={convertAmount}
               onChange={setConvertAmount}
               placeholder="0.0000"
               token={convertBaseCurrency || "XRP"}
-              tokenClassName={baseCode === "RLUSD" ? "text-white" : ""} />
+              tokenClassName="text-white"
+              containerClassName="focus-within:!border-[#06B6D4]/80" />
               </div>
 
               <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
@@ -615,45 +650,26 @@ export default function WalletDashboardSwapModal({
                   {t("wallet_connect_cta", "Connect wallet")}
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (conversionRoute.type === "dex") {
-                      handleDexSubmit();
-                      return;
-                    }
-                    handleDemoConvert();
-                  }}
-                  className={`w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
-                  disabled={
-                    conversionRoute.type === "dex"
-                      ? dexSubmitting ||
-                        dexConfirming ||
-                        previewState.status !== "done" ||
-                        !effectiveIsConnected
-                      : convertProcessing ||
-                        !convertBaseCurrency ||
-                        !convertQuoteCurrency ||
-                        !convertAmount ||
-                        conversionRoute.type !== "allocation"
-                  }>
-                  {conversionRoute.type === "dex"
-                    ? dexSubmitting
-                      ? t("ui_preparing_67f5f84ff4", "Preparing...")
-                      : t("ui_convert_8408e969ec", "Convert")
-                    : convertProcessing
-                      ? t("ui_converting_71c2b9a4e5", "Converting...")
-                      : isPreviewMode
-                        ? t(
-                            "ui_convert_demo_no_tx_4d8a1c7b2e",
-                            "Convert (demo, no real tx)"
-                          )
-                        : t(
-                            "ui_convert_allocation_6b2c1a9d5e",
-                            "Convert allocation"
-                          )}
-                </button>
+                <>
+                  <SwipeConfirmButton
+                    label={convertButtonLabel}
+                    onConfirm={handleConvertAction}
+                    disabled={convertButtonDisabled}
+                    variant="cyan"
+                    className="mt-1 md:hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleConvertAction();
+                    }}
+                    className={`hidden md:block w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
+                    disabled={convertButtonDisabled}
+                  >
+                    {convertButtonLabel}
+                  </button>
+                </>
               )}
 
               {!isPreviewMode &&
@@ -694,23 +710,20 @@ export default function WalletDashboardSwapModal({
                 quickOptions={suggestedCurrencies}
                 showQuickAdd={false} />
 
+                  <SwipeConfirmButton
+                label={t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+                onConfirm={handleActivateLine}
+                disabled={activateLineDisabled}
+                variant="cyan"
+                className="md:hidden" />
                   <button
                 type="button"
-                disabled={
-                !canMutateLines ||
-                currencyLinesLoading ||
-                !activateCurrencyCode ||
-                existingCurrencyLinesSet.has(
-                  String(activateCurrencyCode || "").toUpperCase()
-                )
-                }
+                disabled={activateLineDisabled}
                 onClick={(e) => {
                   e.stopPropagation();
-                  const upper = String(activateCurrencyCode || "").toUpperCase();
-                  onActivateCurrencyLine?.(upper);
-                  setActivateCurrencyCode("");
+                  handleActivateLine();
                 }}
-                className={`w-full px-3 py-2 text-xs ${blueActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+                className={`hidden md:block w-full px-3 py-2 text-xs ${blueActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
 
 
               </button>
