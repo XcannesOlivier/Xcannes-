@@ -12,7 +12,8 @@ export default function QRScanner({
   embedded = false,
   showClose = true,
   className = "",
-  fileInputId
+  fileInputId,
+  enableCamera = true
 }) {const { t } = useTranslation("common");
   const html5QrCodeRef = useRef(null);
   const readerIdRef = useRef(
@@ -47,6 +48,15 @@ export default function QRScanner({
   useEffect(() => {
     if (!isOpen) {
       // Cleanup when closing
+      stopScanner().catch(console.error);
+      setError(null);
+      setIsScanning(false);
+      setIsStarting(false);
+      lastDecodedRef.current = "";
+      return;
+    }
+
+    if (!enableCamera) {
       stopScanner().catch(console.error);
       setError(null);
       setIsScanning(false);
@@ -180,7 +190,7 @@ export default function QRScanner({
       stopScanner().catch(console.error);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  }, [enableCamera, isOpen]);
 
   if (!isOpen) return null;
 
