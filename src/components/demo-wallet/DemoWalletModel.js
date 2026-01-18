@@ -7,6 +7,7 @@ const DEFAULT_RATES_USD_PER_UNIT = {
   MXN: 0.058,
   ARS: 0.0012,
   BRL: 0.2,
+  AED: 0.272,
   NGN: 0.001,
   INR: 0.012,
   PHP: 0.018,
@@ -23,7 +24,13 @@ const DEFAULT_DEMO_WALLETS = {
       XCS: 250,
       RLUSD: 1000,
       EUR: 420,
+      GBP: 210,
       MXN: 6200,
+      ARS: 54000,
+      BRL: 980,
+      AED: 0,
+      NGN: 85000,
+      INR: 120000,
       PHP: 3100,
       XAF: 180000,
     },
@@ -38,8 +45,14 @@ const DEFAULT_DEMO_WALLETS = {
       RLUSD: 500,
       EUR: 120,
       GBP: 75,
+      MXN: 4100,
       ARS: 85000,
+      BRL: 620,
+      AED: 0,
       NGN: 120000,
+      INR: 90000,
+      PHP: 2200,
+      XAF: 135000,
     },
   },
   FEE: {
@@ -76,6 +89,30 @@ export function buildDefaultDemoState() {
     wallets: clone(DEFAULT_DEMO_WALLETS),
     events: [],
   };
+}
+
+export function migrateDemoState(state) {
+  if (!state || typeof state !== "object") return state;
+  const base = buildDefaultDemoState();
+  const wallets = state.wallets || {};
+
+  Object.entries(wallets).forEach(([walletId, wallet]) => {
+    if (!wallet || typeof wallet !== "object") return;
+    const target = base.wallets[walletId] || {};
+    const { allocations, ...rest } = wallet;
+    Object.assign(target, rest);
+    if (!target.allocations || typeof target.allocations !== "object") {
+      target.allocations = {};
+    }
+    Object.entries(allocations || {}).forEach(([code, value]) => {
+      target.allocations[code] = value;
+    });
+    base.wallets[walletId] = target;
+  });
+
+  base.events = Array.isArray(state.events) ? clone(state.events) : [];
+
+  return base;
 }
 
 export function walletUsdTotal(wallet, ratesUsdPerUnit) {

@@ -53,6 +53,8 @@ import WalletInfoModal from "./modals/WalletInfoModal";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
+  getCurrencyFlag,
+  getTokenIcon,
   resolveWalletLayout,
   USD_STABLECOINS,
   WALLET_LABEL_STORAGE_KEY,
@@ -973,6 +975,54 @@ export default function WalletDashboard({
     allocatedRlusdByCurrency,
     swapCurrencyOptions,
   } = useWalletTokens({ displayTokens, walletLines, currencyLines });
+
+  const selectLabelByAssetKey = useMemo(() => {
+    const labels = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const amount = Number(token?.value || 0);
+      const amountLabel = Number.isFinite(amount)
+        ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
+        : "0";
+      const label = `${code} Balance ${amountLabel}`;
+      if (token?.key) labels[token.key] = label;
+      labels[code] = label;
+    });
+    return labels;
+  }, [augmentedTokens]);
+
+  const selectLabelMobileByAssetKey = useMemo(() => {
+    const labels = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const amount = Number(token?.value || 0);
+      const amountLabel = Number.isFinite(amount)
+        ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
+        : "0";
+      const label = `${code}  (${amountLabel})`;
+      if (token?.key) labels[token.key] = label;
+      labels[code] = label;
+    });
+    return labels;
+  }, [augmentedTokens]);
+
+  const selectIconByAssetKey = useMemo(() => {
+    const icons = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const icon = CRYPTO_ICONS?.[code]
+        ? { src: CRYPTO_ICONS[code], alt: code }
+        : token?.isTrustlineOnly
+          ? getCurrencyFlag(code)
+          : getTokenIcon(code);
+      if (token?.key) icons[token.key] = icon;
+      icons[code] = icon;
+    });
+    return icons;
+  }, [augmentedTokens]);
 
   const swapCurrencyOptionsForModal = useMemo(() => {
     const candidates = new Set((swapCurrencyOptions || []).map((c) => String(c || "").toUpperCase()).filter(Boolean));
@@ -1928,6 +1978,9 @@ export default function WalletDashboard({
             setSendAssetKey={setSendAssetKey}
             sendAmount={sendAmount}
             setSendAmount={setSendAmount}
+            selectLabelByAssetKey={selectLabelByAssetKey}
+            selectIconByAssetKey={selectIconByAssetKey}
+            selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
             savedAddresses={savedAddresses}
             sendDestination={sendDestination}
             setSendDestination={setSendDestination}
@@ -1951,6 +2004,9 @@ export default function WalletDashboard({
             setRequestAmount={setRequestAmount}
             requestCurrency={requestCurrency}
             setRequestCurrency={setRequestCurrency}
+            selectLabelByCurrency={selectLabelByAssetKey}
+            selectIconByCurrency={selectIconByAssetKey}
+            selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
             augmentedTokens={augmentedTokens}
             requestMemo={requestMemo}
             setRequestMemo={setRequestMemo}
@@ -1990,6 +2046,9 @@ export default function WalletDashboard({
             convertAmount={convertAmount}
             setConvertAmount={setConvertAmount}
             convertPreview={convertPreview}
+            selectLabelByCurrency={selectLabelByAssetKey}
+            selectIconByCurrency={selectIconByAssetKey}
+            selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
             currencyLineCode={currencyLineCode}
             setCurrencyLineCode={setCurrencyLineCode}
             currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}
