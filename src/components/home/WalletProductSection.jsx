@@ -157,7 +157,7 @@ export default function WalletProductSection() {
                 </div>
               </div>
             </div>
-            <div className="h-[680px] overflow-hidden">
+            <div className="h-[680px] md:h-[720px] overflow-hidden">
               <DemoWalletDashboard
                 key={demoWalletId}
                 defaultWalletId={demoWalletId}

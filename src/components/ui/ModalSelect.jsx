@@ -12,6 +12,10 @@ export default function ModalSelect({
   menuClassName = "",
   optionClassName = "",
   selectClassName = "",
+  useNativeSelect = true,
+  hideMobileSelectedRight = false,
+  useMobileSelectedLabel = false,
+  showMobileOptionRight = false,
   disabled = false,
 }) {
   const [open, setOpen] = useState(false);
@@ -66,10 +70,17 @@ export default function ModalSelect({
 
   const selectedLeft = selected?.labelLeft ?? selected?.label ?? placeholder;
   const selectedRight = selected?.labelRight ?? null;
+  const customMenuClassName = useNativeSelect ? "relative hidden md:block" : "relative";
+  const mobileSelectedLabel = useMobileSelectedLabel
+    ? selected?.labelMobile ?? selectedLeft
+    : selectedLeft;
+  const showMobileSelectedRight = !hideMobileSelectedRight && !useMobileSelectedLabel;
+  const selectedRightClassName =
+    hideMobileSelectedRight || useMobileSelectedLabel ? "hidden md:inline" : "";
 
   return (
     <>
-      <div className="relative hidden md:block">
+      <div className={customMenuClassName}>
         <button
           type="button"
           ref={triggerRef}
@@ -84,11 +95,14 @@ export default function ModalSelect({
           <span className="flex items-center gap-2 min-w-0 flex-1">
             {renderIcon(selected?.icon)}
             <span className="flex items-center gap-2 min-w-0 flex-1">
-              <span className="truncate">
+              <span className="truncate md:hidden">
+                {mobileSelectedLabel}
+              </span>
+              <span className="truncate hidden md:inline">
                 {selectedLeft}
               </span>
               {selectedRight ? (
-                <span className="ml-auto text-white/60 tabular-nums">
+                <span className={`ml-auto text-white/60 tabular-nums ${selectedRightClassName}`}>
                   {selectedRight}
                 </span>
               ) : null}
@@ -119,7 +133,12 @@ export default function ModalSelect({
           >
             {options.map((opt) => {
               const left = opt.labelLeft ?? opt.label;
+              const mobileLeft = opt.labelMobile ?? left;
+              const optionLeft = showMobileOptionRight ? left : mobileLeft;
               const right = opt.labelRight ?? null;
+              const rightClassName = showMobileOptionRight
+                ? "ml-auto text-white/50 tabular-nums"
+                : "ml-auto text-white/50 tabular-nums hidden md:inline";
               return (
               <button
                 key={String(opt.value)}
@@ -130,9 +149,10 @@ export default function ModalSelect({
                 <span className="flex items-center gap-2">
                   {renderIcon(opt.icon)}
                   <span className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="truncate">{left}</span>
+                    <span className="truncate md:hidden">{optionLeft}</span>
+                    <span className="truncate hidden md:inline">{left}</span>
                     {right ? (
-                      <span className="ml-auto text-white/50 tabular-nums">
+                      <span className={rightClassName}>
                         {right}
                       </span>
                     ) : null}
@@ -144,26 +164,63 @@ export default function ModalSelect({
           </div>
         )}
       </div>
-      <select
-        className={`md:hidden ${selectClassName}`}
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        onClick={(e) => e.stopPropagation()}
-        disabled={disabled}
-      >
-        {options.map((opt) => {
-          const label =
-            opt.labelMobile ||
-            (typeof opt.icon === "string" || typeof opt.icon === "number"
-              ? `${opt.icon} ${opt.label}`
-              : opt.label);
-          return (
-            <option key={String(opt.value)} value={opt.value}>
-              {label}
-            </option>
-          );
-        })}
-      </select>
+      {useNativeSelect ? (
+      <div className="relative md:hidden">
+        <div
+          className={`pointer-events-none w-full flex items-center justify-between gap-2 ${selectClassName} ${
+            disabled ? "opacity-60" : ""
+          }`}
+          aria-hidden="true"
+        >
+          <span className="flex items-center gap-2 min-w-0 flex-1">
+            {renderIcon(selected?.icon)}
+            <span className="flex items-center gap-2 min-w-0 flex-1">
+              <span className={`truncate ${selected ? "" : "text-white/50"}`}>
+                {mobileSelectedLabel}
+              </span>
+              {showMobileSelectedRight && selectedRight ? (
+                <span className="ml-auto text-white/60 tabular-nums">
+                  {selectedRight}
+                </span>
+              ) : null}
+            </span>
+          </span>
+          <svg
+            className="w-3 h-3 text-white/60"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
+        <select
+          className={`absolute inset-0 w-full h-full opacity-0 ${selectClassName}`}
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          disabled={disabled}
+        >
+          {options.map((opt) => {
+            const label =
+              opt.labelMobile ||
+              (typeof opt.icon === "string" || typeof opt.icon === "number"
+                ? `${opt.icon} ${opt.label}`
+                : opt.label);
+            return (
+              <option key={String(opt.value)} value={opt.value}>
+                {label}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      ) : null}
     </>
   );
 }

@@ -582,7 +582,7 @@ export default function DemoWalletDashboard({
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
       const amountLabel = formatUnits(locale, token.value || 0);
-      const label = `${balanceLabel} ${amountLabel}`;
+      const label = `${balanceLabel} = ${amountLabel}`;
       if (token.key) labels[token.key] = label;
       labels[code] = label;
     });
@@ -595,7 +595,7 @@ export default function DemoWalletDashboard({
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
       const amountLabel = formatUnits(locale, token.value || 0);
-      const label = `${code}  (${amountLabel})`;
+      const label = `${code} (${amountLabel})`;
       if (token.key) labels[token.key] = label;
       labels[code] = label;
     });
@@ -1493,7 +1493,7 @@ export default function DemoWalletDashboard({
                     ].join(" ")}
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden rounded-md bg-white/5 border border-white/10">
+                      <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden rounded-md">
                         {renderDemoTokenIcon(row.code)}
                       </div>
                       <div className="flex flex-col min-w-0">

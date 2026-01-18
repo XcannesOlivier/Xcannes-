@@ -348,9 +348,11 @@ export default function WalletDashboardReceiveModal({
                       labelLeft,
                   };
                 })}
+                useNativeSelect={false}
                 buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                 menuClassName="bg-elevated"
                 selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
+                hideMobileSelectedRight={receiveTab === "request"}
               />
                 </div>
               </div>
