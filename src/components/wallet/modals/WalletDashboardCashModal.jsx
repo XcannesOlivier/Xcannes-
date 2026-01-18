@@ -17,6 +17,12 @@ export default function WalletDashboardCashModal({
   cashModalTab,
   setCashModalTab,
   renderWalletMeta,
+  availableTokens,
+  rlusdPerUnitRates,
+  selectLabelByCurrency,
+  selectLabelRightByCurrency,
+  selectIconByCurrency,
+  selectLabelMobileByCurrency,
   walletAddress
 }) {const { t } = useTranslation("common");
   if (!open) return null;
@@ -144,6 +150,12 @@ export default function WalletDashboardCashModal({
             isPreviewMode={isPreviewMode}
             demoMode={demoMode}
             onDemoSubmit={onDemoSell}
+            availableTokens={availableTokens}
+            rlusdPerUnitRates={rlusdPerUnitRates}
+            selectLabelByCurrency={selectLabelByCurrency}
+            selectLabelRightByCurrency={selectLabelRightByCurrency}
+            selectIconByCurrency={selectIconByCurrency}
+            selectLabelMobileByCurrency={selectLabelMobileByCurrency}
             noticeVariant={noticeVariant}
             noticeContextLabel={noticeContextLabel} />
 

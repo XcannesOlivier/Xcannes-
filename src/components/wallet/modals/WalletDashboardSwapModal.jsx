@@ -437,11 +437,10 @@ export default function WalletDashboardSwapModal({
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
         className={[
-          "relative w-full max-w-md md:max-w-lg border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 md:space-y-4 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+          "relative w-full max-w-md md:max-w-lg border border-white/10 rounded-2xl max-h-[92vh] overflow-hidden flex flex-col pointer-events-auto",
           noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
           noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
         ].join(" ")}
-        style={{ WebkitOverflowScrolling: "touch" }}
         onClick={(e) => e.stopPropagation()}>
 
           <button
@@ -454,52 +453,55 @@ export default function WalletDashboardSwapModal({
 
             ✕
           </button>
-          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {view === "lines"
-                ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
-                : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
-            </h3>
-            {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                {t("demo_notice_title", "Mode démo")}
-              </span>
-            ) : null}
-            {isPreviewMode && noticeVariant !== "demo" ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t("wallet_not_connected_title", "Wallet not connected")}
-              </span>
-            ) : null}
-          </div>
-	          {renderWalletMeta?.("mb-2")}
+          <div
+          className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-3 md:space-y-4"
+          style={{ WebkitOverflowScrolling: "touch" }}>
+            <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
+              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+                {view === "lines"
+                  ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
+                  : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
+              </h3>
+              {noticeVariant === "demo" ? (
+                <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  {t("demo_notice_title", "Mode démo")}
+                </span>
+              ) : null}
+              {isPreviewMode && noticeVariant !== "demo" ? (
+                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                  {t("wallet_not_connected_title", "Wallet not connected")}
+                </span>
+              ) : null}
+            </div>
+	            {renderWalletMeta?.("mb-2")}
 
 
-	          <div className="grid grid-cols-2 gap-2">
-	            <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setView("convert");
-            }}
-            className={`px-3 py-2 text-xs ${
-            view === "convert" ? blueActionBtnMuted : blueTabInactive
-            }`}>{t("ui_convert_8408e969ec", "Convert")}
+	            <div className="grid grid-cols-2 gap-2">
+	              <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setView("convert");
+              }}
+              className={`px-3 py-2 text-xs ${
+              view === "convert" ? blueActionBtnMuted : blueTabInactive
+              }`}>{t("ui_convert_8408e969ec", "Convert")}
 
 
-          </button>
-            <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setView("lines");
-            }}
-            className={`px-3 py-2 text-xs ${
-            view === "lines" ? blueActionBtnMuted : blueTabInactive
-            }`}>{t("ui_currency_lines_267fc2eff3", "Currency lines")}
+            </button>
+              <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setView("lines");
+              }}
+              className={`px-3 py-2 text-xs ${
+              view === "lines" ? blueActionBtnMuted : blueTabInactive
+              }`}>{t("ui_currency_lines_267fc2eff3", "Currency lines")}
 
 
-          </button>
-          </div>
+            </button>
+            </div>
 
           {!isPreviewMode && (!hasOnChainRlusd || !hasOnChainXcs) &&
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
@@ -781,12 +783,22 @@ export default function WalletDashboardSwapModal({
             currencyLinesError={currencyLinesError}
             currencyLinesSummary={currencyLinesSummary}
             currencyLines={currencyLines}
+            selectIconByCurrency={selectIconByCurrency}
             onRefresh={refreshCurrencyLines}
             onDelete={handleRemoveCurrencyLine} />
 
 
             </div>
         }
+          </div>
+          {view === "lines" ? (
+            <div className="border-t border-white/10 px-4 md:px-5 py-2 text-[10px] text-white/45">
+              {t(
+                "ui_currency_lines_footer_tip_f4",
+                "Besoin d'une nouvelle devise ? Activez une ligne en quelques secondes."
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
       <XummQRModal

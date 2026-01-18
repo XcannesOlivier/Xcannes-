@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -36,7 +36,13 @@ const MoonPaySellModal = ({
   noticeVariant = "preview",
   noticeContextLabel = "",
   demoMode = false,
-  onDemoSubmit
+  onDemoSubmit,
+  availableTokens,
+  rlusdPerUnitRates,
+  selectLabelByCurrency,
+  selectLabelRightByCurrency,
+  selectIconByCurrency,
+  selectLabelMobileByCurrency
 }) => {const { t } = useTranslation("common");
   const { signTransaction } = useXumm();
   const [iframeUrl, setIframeUrl] = useState(null);
@@ -60,10 +66,110 @@ const MoonPaySellModal = ({
     return 'Failed to load fiat currencies';
   };
 
-  // Cryptos supportées pour la vente (RLUSD en priorité)
-  const supportedCurrencies = [
-  { code: 'RLUSD', name: 'RLUSD Stablecoin' },
-  { code: 'XRP', name: 'XRP (Ripple)' }];
+  const supportedCurrencies = useMemo(() => {
+    const seen = new Set();
+    const options = [];
+    (availableTokens || []).forEach((token) => {
+      const currencyRaw = token?.currency;
+      const currency = String(currencyRaw || "").toUpperCase();
+      if (!currency || currency === "XCS" || seen.has(currency)) return;
+      seen.add(currency);
+      const labelLeft =
+        selectLabelByCurrency?.[currencyRaw] ||
+        selectLabelByCurrency?.[currency] ||
+        currency;
+      const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
+      const amountValue = Number(token?.value || 0);
+      const amountLabel = Number.isFinite(amountValue)
+        ? amountValue.toLocaleString("en-US", { maximumFractionDigits: 4 })
+        : "0";
+      const fallbackRight = `${balanceLabel} = ${amountLabel}`;
+      let labelRight =
+        selectLabelRightByCurrency?.[currencyRaw] ||
+        selectLabelRightByCurrency?.[currency] ||
+        fallbackRight;
+      let labelMobile =
+        selectLabelMobileByCurrency?.[currencyRaw] ||
+        selectLabelMobileByCurrency?.[currency] ||
+        labelLeft;
+      options.push({
+        code: currency,
+        label: labelLeft,
+        labelLeft,
+        labelRight,
+        labelMobile,
+        icon:
+          selectIconByCurrency?.[currencyRaw] ||
+          selectIconByCurrency?.[currency] ||
+          null,
+      });
+    });
+
+    if (options.length > 0) return options;
+    return [
+      {
+        code: 'RLUSD',
+        label: 'RLUSD Stablecoin',
+        labelLeft: 'RLUSD Stablecoin',
+        labelMobile: 'RLUSD Stablecoin'
+      },
+      {
+        code: 'XRP',
+        label: 'XRP (Ripple)',
+        labelLeft: 'XRP (Ripple)',
+        labelMobile: 'XRP (Ripple)'
+      }
+    ];
+  }, [
+    availableTokens,
+    selectLabelByCurrency,
+    selectLabelRightByCurrency,
+    selectIconByCurrency,
+    selectLabelMobileByCurrency,
+    t
+  ]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!supportedCurrencies.length) return;
+    setCurrency((prev) => {
+      const current = String(prev || "").toUpperCase();
+      if (supportedCurrencies.some((curr) => curr.code === current)) {
+        return current;
+      }
+      return supportedCurrencies[0].code;
+    });
+  }, [isOpen, supportedCurrencies]);
+
+  const selectedToken = useMemo(() => {
+    const current = String(currency || "").toUpperCase();
+    if (!current) return null;
+    return (
+      (availableTokens || []).find(
+        (token) => String(token?.currency || "").toUpperCase() === current
+      ) || null
+    );
+  }, [availableTokens, currency]);
+
+  const amountValue = Number.parseFloat(amount || "");
+  const currencyUpper = String(currency || "").toUpperCase();
+  const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
+  const rlusdRate = isCurrencyLine ? Number(rlusdPerUnitRates?.[currencyUpper]) : Number.NaN;
+  const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
+  const conversionMissing =
+    isCurrencyLine && hasValidAmount && (!Number.isFinite(rlusdRate) || rlusdRate <= 0);
+  const rlusdEquivalent =
+    isCurrencyLine && hasValidAmount && !conversionMissing
+      ? amountValue * rlusdRate
+      : null;
+  const baseCurrencyCode = isCurrencyLine ? "RLUSD" : currencyUpper;
+  const baseCurrencyAmount = isCurrencyLine
+    ? Number.isFinite(rlusdEquivalent)
+      ? Number(rlusdEquivalent.toFixed(6))
+      : Number.NaN
+    : hasValidAmount
+      ? amountValue
+      : Number.NaN;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -151,7 +257,25 @@ const MoonPaySellModal = ({
       return;
     }
 
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!hasValidAmount) {
+      setError(
+        t(
+          "moonpay_error_invalid_amount_8c3b1a6d2f",
+          "Please enter a valid amount."
+        )
+      );
+      return;
+    }
+    if (conversionMissing) {
+      setError(
+        t(
+          "ui_rate_unavailable_base_5c1a9b7d2e",
+          "Rate unavailable for base currency."
+        )
+      );
+      return;
+    }
+    if (!Number.isFinite(baseCurrencyAmount) || baseCurrencyAmount <= 0) {
       setError(
         t(
           "moonpay_error_invalid_amount_8c3b1a6d2f",
@@ -168,9 +292,9 @@ const MoonPaySellModal = ({
       if (demoMode) {
         const res = await Promise.resolve(
           onDemoSubmit?.({
-            currencyCode: String(currency || "RLUSD").toUpperCase(),
+            currencyCode: String(baseCurrencyCode || "RLUSD").toUpperCase(),
             quoteCurrencyCode: String(quoteCurrency || "USD").toUpperCase(),
-            amount: parseFloat(amount)
+            amount: baseCurrencyAmount
           })
         );
         if (res?.error) {
@@ -196,9 +320,9 @@ const MoonPaySellModal = ({
         },
         body: JSON.stringify({
           walletAddress,
-          baseCurrencyCode: currency, // Crypto à vendre
+          baseCurrencyCode, // Crypto à vendre
           quoteCurrencyCode: quoteCurrency, // Fiat à recevoir
-          baseCurrencyAmount: parseFloat(amount),
+          baseCurrencyAmount,
           xummUuid
         })
       });
@@ -292,7 +416,8 @@ const MoonPaySellModal = ({
     : demoMode
       ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
       : t("moonpay_action_continue_sell_2c8a1d6b4f", "Continue to Sell");
-  const continueDisabled = loading || !amount || fiatCurrencies.length === 0;
+  const continueDisabled =
+    loading || !hasValidAmount || fiatCurrencies.length === 0 || conversionMissing;
   const fiatPlaceholder = fiatLoading
     ? t("moonpay_fiat_loading", "Loading fiat currencies...")
     : t("moonpay_fiat_unavailable", "Fiat currencies unavailable");
@@ -326,8 +451,19 @@ const MoonPaySellModal = ({
           onChange={setCurrency}
           options={supportedCurrencies.map((curr) => ({
             value: curr.code,
-            label: curr.name,
+            label: curr.label || curr.name || curr.code,
+            labelLeft: curr.labelLeft || curr.label || curr.name || curr.code,
+            labelRight: curr.labelRight || null,
+            labelMobile:
+              curr.labelMobile ||
+              curr.labelLeft ||
+              curr.label ||
+              curr.name ||
+              curr.code,
+            icon: curr.icon || null,
           }))}
+          useNativeSelect={false}
+          showMobileOptionRight={true}
           buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
           menuClassName="bg-elevated"
           selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
@@ -353,6 +489,22 @@ const MoonPaySellModal = ({
                       {currency}
                     </span>
                   </div>
+                  {isCurrencyLine && hasValidAmount && (
+                    <p
+                      className={`mt-1 text-xs ${
+                        conversionMissing ? "text-red-400" : "text-white/50"
+                      }`}
+                    >
+                      {conversionMissing
+                        ? t(
+                            "ui_rate_unavailable_base_5c1a9b7d2e",
+                            "Rate unavailable for base currency."
+                          )
+                        : `≈ ${Number(rlusdEquivalent || 0).toLocaleString("en-US", {
+                            maximumFractionDigits: 2,
+                          })} ${t("ui_rlusd_ff5048a674", "RLUSD")}`}
+                    </p>
+                  )}
 	                </div>
 
                 {/* Arrow down */}

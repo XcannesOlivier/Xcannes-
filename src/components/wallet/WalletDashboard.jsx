@@ -831,8 +831,6 @@ export default function WalletDashboard({
       if (!currencyCode || currencyCode === "RLUSD") return;
 
       if (isPreviewMode) {
-        const ok = confirm(`Delete currency line ${currencyCode}?`);
-        if (!ok) return;
         setDemoLines((prev) => {
           const next = { ...(prev || {}) };
           const allocated = Number(next?.[currencyCode]?.rlusd || 0);
@@ -2082,6 +2080,12 @@ export default function WalletDashboard({
 	        cashModalTab={cashModalTab}
 	        setCashModalTab={setCashModalTab}
 	        renderWalletMeta={renderWalletMeta}
+	        availableTokens={augmentedTokens}
+	        rlusdPerUnitRates={rlusdPerUnitRates}
+	        selectLabelByCurrency={selectLabelByAssetKey}
+	        selectLabelRightByCurrency={selectLabelRightByAssetKey}
+	        selectIconByCurrency={selectIconByAssetKey}
+	        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
 	        walletAddress={effectiveWallet || ""}
 	      />
 
