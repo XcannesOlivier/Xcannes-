@@ -4,6 +4,7 @@ import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useXumm } from "@/context/XummContext";
 import { useTranslation } from "next-i18next";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -63,8 +64,8 @@ const MoonPayBuyModal = ({
 
   // Cryptos supportées par MoonPay (RLUSD en priorité)
   const supportedCurrencies = [
-  { code: 'RLUSD', name: 'RLUSD Stablecoin' },
-  { code: 'XRP', name: 'XRP (Ripple)' }];
+  { code: 'RLUSD', name: 'RLUSD Stablecoin', icon: CRYPTO_ICONS.RLUSD },
+  { code: 'XRP', name: 'XRP (Ripple)', icon: CRYPTO_ICONS.XRP }];
 
   const PRODUCT_MIN_USD = 5;
 
@@ -396,7 +397,9 @@ const MoonPayBuyModal = ({
           options={supportedCurrencies.map((curr) => ({
             value: curr.code,
             label: curr.name,
+            icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
           }))}
+          useNativeSelect={false}
           buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
           menuClassName="bg-elevated"
           selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"

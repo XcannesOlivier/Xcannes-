@@ -1722,6 +1722,12 @@ export default function DemoWalletDashboard({
         cashModalTab={cashModalTab}
         setCashModalTab={setCashModalTab}
         renderWalletMeta={renderWalletMeta}
+        availableTokens={augmentedTokens}
+        rlusdPerUnitRates={rlusdPerUnitRates}
+        selectLabelByCurrency={selectLabelByAssetKey}
+        selectLabelRightByCurrency={selectLabelRightByAssetKey}
+        selectIconByCurrency={selectIconByAssetKey}
+        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
         walletAddress={effectiveWallet || ""} />
 
 
