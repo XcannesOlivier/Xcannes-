@@ -52,6 +52,7 @@ export default function WalletDashboardSwapModal({
   convertProcessing,
   rlusdPerUnitRates,
   selectLabelByCurrency,
+  selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   activationFeeXcs,
@@ -550,15 +551,20 @@ export default function WalletDashboardSwapModal({
               onChange={setConvertBaseCurrency}
               options={(swapCurrencyOptions || [])
                 .filter((code) => code !== convertQuoteCurrency)
-                .map((code) => ({
-                  value: code,
-                  icon: selectIconByCurrency?.[code] || null,
-                  label: selectLabelByCurrency?.[code] || code,
-                  labelMobile:
-                    selectLabelMobileByCurrency?.[code] ||
-                    selectLabelByCurrency?.[code] ||
-                    code,
-                }))}
+                .map((code) => {
+                  const labelLeft = selectLabelByCurrency?.[code] || code;
+                  const labelRight = selectLabelRightByCurrency?.[code] || null;
+                  return {
+                    value: code,
+                    icon: selectIconByCurrency?.[code] || null,
+                    label: labelLeft,
+                    labelLeft,
+                    labelRight,
+                    labelMobile:
+                      selectLabelMobileByCurrency?.[code] ||
+                      labelLeft,
+                  };
+                })}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
               menuClassName="bg-elevated"
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
@@ -574,15 +580,20 @@ export default function WalletDashboardSwapModal({
               onChange={setConvertQuoteCurrency}
               options={(swapCurrencyOptions || [])
                 .filter((code) => code !== convertBaseCurrency)
-                .map((code) => ({
-                  value: code,
-                  icon: selectIconByCurrency?.[code] || null,
-                  label: selectLabelByCurrency?.[code] || code,
-                  labelMobile:
-                    selectLabelMobileByCurrency?.[code] ||
-                    selectLabelByCurrency?.[code] ||
-                    code,
-                }))}
+                .map((code) => {
+                  const labelLeft = selectLabelByCurrency?.[code] || code;
+                  const labelRight = selectLabelRightByCurrency?.[code] || null;
+                  return {
+                    value: code,
+                    icon: selectIconByCurrency?.[code] || null,
+                    label: labelLeft,
+                    labelLeft,
+                    labelRight,
+                    labelMobile:
+                      selectLabelMobileByCurrency?.[code] ||
+                      labelLeft,
+                  };
+                })}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
               menuClassName="bg-elevated"
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"

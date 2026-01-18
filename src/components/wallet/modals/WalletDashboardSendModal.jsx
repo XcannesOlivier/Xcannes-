@@ -24,6 +24,7 @@ export default function WalletDashboardSendModal({
   sendAmount,
   setSendAmount,
   selectLabelByAssetKey,
+  selectLabelRightByAssetKey,
   selectIconByAssetKey,
   selectLabelMobileByAssetKey,
   savedAddresses,
@@ -198,23 +199,30 @@ export default function WalletDashboardSendModal({
                 <ModalSelect
               value={selectedSendToken ? selectedSendToken.key : ""}
               onChange={setSendAssetKey}
-              options={(augmentedTokens || []).map((token) => ({
-                value: token.key,
-                icon:
-                  selectIconByAssetKey?.[token.key] ||
-                  selectIconByAssetKey?.[token.currency] ||
-                  null,
-                label:
+              options={(augmentedTokens || []).map((token) => {
+                const labelLeft =
                   selectLabelByAssetKey?.[token.key] ||
                   selectLabelByAssetKey?.[token.currency] ||
-                  token.currency,
-                labelMobile:
-                  selectLabelMobileByAssetKey?.[token.key] ||
-                  selectLabelMobileByAssetKey?.[token.currency] ||
-                  selectLabelByAssetKey?.[token.key] ||
-                  selectLabelByAssetKey?.[token.currency] ||
-                  token.currency,
-              }))}
+                  token.currency;
+                const labelRight =
+                  selectLabelRightByAssetKey?.[token.key] ||
+                  selectLabelRightByAssetKey?.[token.currency] ||
+                  null;
+                return {
+                  value: token.key,
+                  icon:
+                    selectIconByAssetKey?.[token.key] ||
+                    selectIconByAssetKey?.[token.currency] ||
+                    null,
+                  label: labelLeft,
+                  labelLeft,
+                  labelRight,
+                  labelMobile:
+                    selectLabelMobileByAssetKey?.[token.key] ||
+                    selectLabelMobileByAssetKey?.[token.currency] ||
+                    labelLeft,
+                };
+              })}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px] appearance-none cursor-pointer"
               menuClassName="bg-elevated"
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px] appearance-none cursor-pointer"
