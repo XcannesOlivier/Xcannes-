@@ -997,7 +997,7 @@ export default function WalletDashboard({
       const amountLabel = Number.isFinite(amount)
         ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
         : "0";
-      const label = `${balanceLabel} ${amountLabel}`;
+      const label = `${balanceLabel} = ${amountLabel}`;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
@@ -1013,7 +1013,7 @@ export default function WalletDashboard({
       const amountLabel = Number.isFinite(amount)
         ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
         : "0";
-      const label = `${code}  (${amountLabel})`;
+      const label = `${code} (${amountLabel})`;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
