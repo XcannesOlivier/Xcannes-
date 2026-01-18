@@ -18,7 +18,7 @@ export default function SEOHead({
   const { t } = useTranslation("common");
 
   const resolvedTitle =
-    title || t("seo_default_title", "XCANNES - Digital Asset Exchange");
+    title || t("seo_default_title", "XCANNES | Compte multi-devises");
   const resolvedDescription =
     description ||
     t(

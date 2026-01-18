@@ -14,7 +14,7 @@ export default function WalletNotConnectedNotice({
   const isDemo = variant === "demo";
   const title = isDemo
     ? t("demo_notice_title", "Mode démo")
-    : t("wallet_not_connected_title", "Portefeuille non connecté");
+    : t("wallet_not_connected_title", "Wallet non connecté");
 
   const desc = isDemo
     ? t(
@@ -23,7 +23,7 @@ export default function WalletNotConnectedNotice({
       )
     : t(
         "wallet_not_connected_desc",
-        "Vous êtes en mode aperçu. Connectez votre portefeuille pour activer cette fonctionnalité."
+        "Vous êtes en mode aperçu. Connectez votre wallet pour activer cette fonctionnalité."
       );
 
   return (

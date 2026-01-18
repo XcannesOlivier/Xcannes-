@@ -8,7 +8,6 @@ import WhyXcannesSection from "@/components/home/WhyXcannesSection";
 import XummSecuritySection from "@/components/home/XummSecuritySection";
 import HomeUseCasesSection from "@/components/home/HomeUseCasesSection";
 import HomeHowItWorksSection from "@/components/home/HomeHowItWorksSection";
-import HomeLocalPaymentSection from "@/components/home/HomeLocalPaymentSection";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import xcannesApi from "@/lib/xcannesApi";
@@ -188,7 +187,6 @@ export default function Home() {
 
       {/* CONTENT SECTIONS */}
       <div className="bg-xcannes-background">
-        <HomeLocalPaymentSection availablePairs={availablePairs} />
         <WalletProductSection />
         <HomeUseCasesSection />
         <XummSecuritySection />

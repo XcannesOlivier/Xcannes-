@@ -32,7 +32,7 @@ export default function WalletDashboardHeader({
 
           </span>
             <span className="text-[10px] font-light text-white/30">|</span>
-            <span className="text-[10px] font-light text-white/40 truncate max-w-[160px] sm:max-w-none">{t("ui_global_usd_wallet_202f7e48be", "Global USD Wallet")}
+            <span className="text-[10px] font-light text-white/40 truncate max-w-[160px] sm:max-w-none">{t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
 
           </span>
           </div> :
