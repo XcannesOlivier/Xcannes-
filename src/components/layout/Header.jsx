@@ -1,7 +1,7 @@
 import Link from "next/link";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 export default function Header({ fixed = true }) {
@@ -11,7 +11,9 @@ export default function Header({ fixed = true }) {
   const isHome = router.pathname === "/";
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const settingsRef = useRef(null);
 
   const withHardNavFallback = useCallback(
     (href, { onBeforeFallback } = {}) =>
@@ -127,6 +129,24 @@ export default function Header({ fixed = true }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const handleClickOutside = (event) => {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setSettingsOpen(false);
+      }
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setSettingsOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [settingsOpen]);
+
   const headerBgClass = (() => {
     // DEX: gradient sombre pour conserver l'ambiance graphique
     if (isDex) {
@@ -202,7 +222,45 @@ export default function Header({ fixed = true }) {
           {t("nav_wallet", "Wallet")}
         </Link>
 
-        <LanguageSwitcher />
+        <div ref={settingsRef} className="relative">
+          <button
+            onClick={() => setSettingsOpen((open) => !open)}
+            aria-haspopup="true"
+            aria-expanded={settingsOpen}
+            aria-controls="header-settings-menu"
+            aria-label={t("ui_parameters_da2b8022f7", "Paramètres")}
+            className={`p-2 transition-all flex items-center justify-center ${
+              settingsOpen ? "text-xcannes-green" : "text-white/70 hover:text-white"
+            }`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+          {settingsOpen && (
+            <div
+              id="header-settings-menu"
+              role="menu"
+              className="absolute right-0 top-full mt-2 min-w-[240px] bg-black/95 backdrop-blur-xl border border-white/20 rounded-xl p-3 shadow-2xl z-40"
+            >
+              <div className="text-[10px] font-semibold text-white/90 mb-2 pb-1.5 border-b border-white/10">
+                {t("ui_parameters_da2b8022f7", "Paramètres")}
+              </div>
+              <LanguageSwitcher variant="inline" />
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Menu mobile minimaliste */}
@@ -256,7 +314,7 @@ export default function Header({ fixed = true }) {
             {t("nav_wallet", "Wallet")}
           </Link>
 
-          <LanguageSwitcher />
+          <LanguageSwitcher onSelect={() => setMenuOpen(false)} />
         </div>
       }
     </header>);

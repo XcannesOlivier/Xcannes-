@@ -346,16 +346,14 @@ const MoonPayBuyModal = ({
       ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
       : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continue to MoonPay");
   const continueDisabled = loading || !amount || fiatCurrencies.length === 0;
-  const fiatPlaceholder = fiatLoading
-    ? t("moonpay_fiat_loading", "Loading fiat currencies...")
-    : t("moonpay_fiat_unavailable", "Fiat currencies unavailable");
+  const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
+  const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
+  const showFiatError = fiatError && !fiatLoading;
   const fiatOptions =
-    fiatCurrencies.length === 0
-      ? [{ value: "", label: fiatPlaceholder }]
-      : fiatCurrencies.map((fiat) => ({
-          value: fiat.code,
-          label: `${fiat.name || fiat.code} (${fiat.code})`,
-        }));
+    fiatCurrencies.map((fiat) => ({
+      value: fiat.code,
+      label: `${fiat.name || fiat.code} (${fiat.code})`,
+    }));
   const fiatSelectValue = fiatCurrencies.length === 0 ? "" : fiatCurrency;
 
   if (!isOpen) return null;
@@ -421,16 +419,22 @@ const MoonPayBuyModal = ({
           menuClassName="bg-elevated"
           selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
         />
-                  {fiatLoading &&
-                  <p className="text-xs text-white/50 mt-1">
-	                    {t("moonpay_fiat_loading", "Loading fiat currencies...")}
-	                  </p>
-                  }
-                  {fiatError && !fiatLoading &&
-                  <p className="text-xs text-red-400 mt-1">
-	                    {fiatError}
-	                  </p>
-                  }
+                  {fiatLoading && (
+                    <p className="text-xs text-white/50 mt-1">
+                      {t("moonpay_fiat_loading", "Loading fiat currencies...")}
+                    </p>
+                  )}
+                  {showFiatError && (
+                    <p className="text-xs text-red-400 mt-1">{fiatError}</p>
+                  )}
+                  {!fiatLoading && !fiatError && fiatUnavailable && (
+                    <p className="text-xs text-white/50 mt-1">
+                      {t(
+                        "moonpay_fiat_unavailable",
+                        "Fiat currencies unavailable"
+                      )}
+                    </p>
+                  )}
                 </div>
 
                 {/* Amount input */}
