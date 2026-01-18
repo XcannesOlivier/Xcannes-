@@ -185,7 +185,7 @@ export default function Header({ fixed = true }) {
             |
           </span>
           <span className="text-[10px] sm:text-[11px] text-white/60 font-light tracking-wide truncate">
-            {t("header_tagline", "Digital Asset Exchange")}
+            {t("header_tagline", "Compte multi-devises")}
           </span>
         </div>
       </Link>
@@ -208,7 +208,7 @@ export default function Header({ fixed = true }) {
           className="hover:text-xcannes-green transition-colors duration-200"
           onClick={withHardNavFallback("/dex")}>
 
-            {t("nav_trading", "Trading")}
+            {t("nav_trading", "Markets")}
           </Link>
         }
 
@@ -297,7 +297,7 @@ export default function Header({ fixed = true }) {
           }}
           className="hover:text-xcannes-green transition-colors">
 
-              {t("nav_trading", "Trading")}
+              {t("nav_trading", "Markets")}
             </Link>
         }
 
