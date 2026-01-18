@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
@@ -13,6 +14,7 @@ import {
   ensureAllocation,
   getDemoRatesUsdPerUnit,
   getWalletAddress,
+  migrateDemoState,
   walletUsdTotal
 } from "./DemoWalletModel";
 import WalletDashboardSendModal from "@/components/wallet/modals/WalletDashboardSendModal";
@@ -30,6 +32,7 @@ import { useCurrencyLinesForm } from "@/components/wallet/hooks/useCurrencyLines
 import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
 import { computeSpreadQuote } from "@/utils/walletSpread";
 import xcannesApi from "@/lib/xcannesApi";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 const DEMO_WALLET_ACCENTS = {
   A: {
@@ -70,6 +73,23 @@ function getCurrencyFlag(code) {
   return countryCodeToFlag(upper.slice(0, 2));
 }
 
+function renderDemoTokenIcon(code) {
+  const upper = String(code || "").toUpperCase();
+  const iconSrc = CRYPTO_ICONS?.[upper];
+  if (iconSrc) {
+    return (
+      <Image
+        src={iconSrc}
+        alt={upper}
+        width={20}
+        height={20}
+        className="w-5 h-5 object-contain"
+      />
+    );
+  }
+  return getCurrencyFlag(upper);
+}
+
 function formatMoney(locale, amount, currency) {
   const safeLocale = locale || "en";
   try {
@@ -101,6 +121,7 @@ const DEMO_LATENCY_MS_MAX = 1100;
 const DEMO_RATES_REFRESH_MS = 15_000;
 const DEMO_RATES_STALE_AFTER_MS = 30_000;
 const DEMO_PENDING_REQUEST_TTL_MS = 10 * 60 * 1000;
+const DEMO_TOKEN_PRIORITY = { XRP: 0, XCS: 1, RLUSD: 2 };
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -227,15 +248,6 @@ function isValidDemoState(value) {
   return true;
 }
 
-function ensureFeeWallet(state) {
-  if (!state || typeof state !== "object") return state;
-  if (!state.wallets || typeof state.wallets !== "object") return state;
-  if (state.wallets.FEE) return state;
-  const base = buildDefaultDemoState();
-  state.wallets.FEE = base.wallets.FEE;
-  return state;
-}
-
 export default function DemoWalletDashboard({
   defaultWalletId = "A",
   theme = "default",
@@ -318,7 +330,7 @@ export default function DemoWalletDashboard({
       const raw = window.localStorage.getItem(DEMO_STATE_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (isValidDemoState(parsed)) setState(ensureFeeWallet(parsed));
+        if (isValidDemoState(parsed)) setState(migrateDemoState(parsed));
       }
     } catch (err) {
       console.warn("[demo-wallet] failed to load persisted state:", err);
@@ -485,7 +497,20 @@ export default function DemoWalletDashboard({
         const usdValue = Number.isFinite(Number(rate)) ? unitsNum * Number(rate) : null;
         return { code: upper, units: unitsNum, usdValue };
       })
-      .sort((a, b) => (b.usdValue || 0) - (a.usdValue || 0));
+      .sort((a, b) => {
+        const aPriority =
+          Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, a.code)
+            ? DEMO_TOKEN_PRIORITY[a.code]
+            : Number.POSITIVE_INFINITY;
+        const bPriority =
+          Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, b.code)
+            ? DEMO_TOKEN_PRIORITY[b.code]
+            : Number.POSITIVE_INFINITY;
+        if (aPriority !== bPriority) return aPriority - bPriority;
+        const diff = (b.usdValue || 0) - (a.usdValue || 0);
+        if (diff !== 0) return diff;
+        return a.code.localeCompare(b.code);
+      });
   }, [activeWallet?.allocations, effectiveUsdPerUnitRates]);
 
   const rlusdPerUnitRates = useMemo(
@@ -521,9 +546,63 @@ export default function DemoWalletDashboard({
       };
     });
     return entries.sort(
-      (a, b) => Number(b.demoRlusdValue || 0) - Number(a.demoRlusdValue || 0)
+      (a, b) => {
+        const aPriority =
+          Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, a.currency)
+            ? DEMO_TOKEN_PRIORITY[a.currency]
+            : Number.POSITIVE_INFINITY;
+        const bPriority =
+          Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, b.currency)
+            ? DEMO_TOKEN_PRIORITY[b.currency]
+            : Number.POSITIVE_INFINITY;
+        if (aPriority !== bPriority) return aPriority - bPriority;
+        const diff =
+          Number(b.demoRlusdValue || 0) - Number(a.demoRlusdValue || 0);
+        if (diff !== 0) return diff;
+        return String(a.currency || "").localeCompare(String(b.currency || ""));
+      }
     );
   }, [activeWallet?.allocations, rlusdPerUnitRates]);
+
+  const selectLabelByAssetKey = useMemo(() => {
+    const labels = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const amountLabel = formatUnits(locale, token.value || 0);
+      const label = `${code} Balance ${amountLabel}`;
+      if (token.key) labels[token.key] = label;
+      labels[code] = label;
+    });
+    return labels;
+  }, [augmentedTokens, locale]);
+
+  const selectLabelMobileByAssetKey = useMemo(() => {
+    const labels = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const amountLabel = formatUnits(locale, token.value || 0);
+      const label = `${code}  (${amountLabel})`;
+      if (token.key) labels[token.key] = label;
+      labels[code] = label;
+    });
+    return labels;
+  }, [augmentedTokens, locale]);
+
+  const selectIconByAssetKey = useMemo(() => {
+    const icons = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const icon = CRYPTO_ICONS?.[code]
+        ? { src: CRYPTO_ICONS[code], alt: code }
+        : getCurrencyFlag(code);
+      if (token.key) icons[token.key] = icon;
+      icons[code] = icon;
+    });
+    return icons;
+  }, [augmentedTokens]);
 
   const selectedSendToken = useMemo(() => {
     if (!augmentedTokens.length) return null;
@@ -884,7 +963,18 @@ export default function DemoWalletDashboard({
     codes.add("RLUSD");
     codes.add("XRP");
     codes.add("XCS");
-    return Array.from(codes).filter(Boolean).sort((a, b) => a.localeCompare(b));
+    return Array.from(codes).filter(Boolean).sort((a, b) => {
+      const aPriority =
+        Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, a)
+          ? DEMO_TOKEN_PRIORITY[a]
+          : Number.POSITIVE_INFINITY;
+      const bPriority =
+        Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, b)
+          ? DEMO_TOKEN_PRIORITY[b]
+          : Number.POSITIVE_INFINITY;
+      if (aPriority !== bPriority) return aPriority - bPriority;
+      return a.localeCompare(b);
+    });
   }, [augmentedTokens]);
 
   useEffect(() => {
@@ -1185,10 +1275,13 @@ export default function DemoWalletDashboard({
 
             </span>
             <span className="text-[10px] font-light text-white/30">|</span>
-            <span className="text-[10px] font-light text-white/40 truncate">
+            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/70 uppercase truncate">
               {t("demo_wallet_label", "Wallet")} {activeWalletId}
             </span>
           </div>
+          <span className="text-[10px] font-semibold text-xcannes-green uppercase tracking-[0.18em]">
+            {t("demo_wallet_badge", "Demo wallet")}
+          </span>
         </div>
 
         {showWalletSwitcher &&
@@ -1389,7 +1482,7 @@ export default function DemoWalletDashboard({
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden rounded-md bg-white/5 border border-white/10">
-                        {getCurrencyFlag(row.code)}
+                        {renderDemoTokenIcon(row.code)}
                       </div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-xs text-primary truncate">{row.code}</span>
@@ -1477,6 +1570,9 @@ export default function DemoWalletDashboard({
         setSendAssetKey={setSendAssetKey}
         sendAmount={sendAmount}
         setSendAmount={setSendAmount}
+        selectLabelByAssetKey={selectLabelByAssetKey}
+        selectIconByAssetKey={selectIconByAssetKey}
+        selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
         savedAddresses={demoSavedAddresses}
         sendDestination={sendDestination}
         setSendDestination={setSendDestination}
@@ -1509,6 +1605,9 @@ export default function DemoWalletDashboard({
         setRequestAmount={setRequestAmount}
         requestCurrency={requestCurrency}
         setRequestCurrency={setRequestCurrency}
+        selectLabelByCurrency={selectLabelByAssetKey}
+        selectIconByCurrency={selectIconByAssetKey}
+        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
         augmentedTokens={augmentedTokens}
         requestMemo={requestMemo}
         setRequestMemo={setRequestMemo}
@@ -1549,6 +1648,9 @@ export default function DemoWalletDashboard({
         convertAmount={convertAmount}
         setConvertAmount={setConvertAmount}
         convertPreview={convertPreview}
+        selectLabelByCurrency={selectLabelByAssetKey}
+        selectIconByCurrency={selectIconByAssetKey}
+        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
         currencyLineCode={currencyLineCode}
         setCurrencyLineCode={setCurrencyLineCode}
         currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}

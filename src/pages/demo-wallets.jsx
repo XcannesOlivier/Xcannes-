@@ -4,7 +4,7 @@ import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { buildDefaultDemoState } from "@/components/demo-wallet/DemoWalletModel";
+import { buildDefaultDemoState, migrateDemoState } from "@/components/demo-wallet/DemoWalletModel";
 
 const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 
@@ -15,15 +15,6 @@ function isValidDemoState(value) {
   if (!wallets.A || !wallets.B) return false;
   if (!wallets.A.allocations || !wallets.B.allocations) return false;
   return true;
-}
-
-function ensureFeeWallet(state) {
-  if (!state || typeof state !== "object") return state;
-  if (!state.wallets || typeof state.wallets !== "object") return state;
-  if (state.wallets.FEE) return state;
-  const base = buildDefaultDemoState();
-  state.wallets.FEE = base.wallets.FEE;
-  return state;
 }
 
 export default function DemoWalletsComparePage() {
@@ -37,7 +28,7 @@ export default function DemoWalletsComparePage() {
       const raw = window.localStorage.getItem(DEMO_STATE_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (isValidDemoState(parsed)) setDemoState(ensureFeeWallet(parsed));
+        if (isValidDemoState(parsed)) setDemoState(migrateDemoState(parsed));
       }
     } catch (err) {
       console.warn("[demo-wallets] failed to load persisted state:", err);
@@ -96,7 +87,7 @@ export default function DemoWalletsComparePage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-10">
-            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden min-h-[680px]">
+            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden h-[760px]">
               <DemoWalletDashboard
                 defaultWalletId="A"
                 theme="home"
@@ -106,7 +97,7 @@ export default function DemoWalletsComparePage() {
                 setDemoState={setDemoState}
               />
             </div>
-            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden min-h-[680px]">
+            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden h-[760px]">
               <DemoWalletDashboard
                 defaultWalletId="B"
                 theme="dex"

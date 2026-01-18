@@ -24,6 +24,9 @@ export default function WalletDashboardReceiveModal({
   setRequestAmount,
   requestCurrency,
   setRequestCurrency,
+  selectLabelByCurrency,
+  selectIconByCurrency,
+  selectLabelMobileByCurrency,
   augmentedTokens,
   requestMemo,
   setRequestMemo,
@@ -321,7 +324,20 @@ export default function WalletDashboardReceiveModal({
                 onChange={setRequestCurrency}
                 options={(augmentedTokens || []).map((token) => ({
                   value: token.currency,
-                  label: token.currency,
+                  icon:
+                    selectIconByCurrency?.[token.currency] ||
+                    selectIconByCurrency?.[String(token.currency || "").toUpperCase()] ||
+                    null,
+                  label:
+                    selectLabelByCurrency?.[token.currency] ||
+                    selectLabelByCurrency?.[String(token.currency || "").toUpperCase()] ||
+                    token.currency,
+                  labelMobile:
+                    selectLabelMobileByCurrency?.[token.currency] ||
+                    selectLabelMobileByCurrency?.[String(token.currency || "").toUpperCase()] ||
+                    selectLabelByCurrency?.[token.currency] ||
+                    selectLabelByCurrency?.[String(token.currency || "").toUpperCase()] ||
+                    token.currency,
                 }))}
                 buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                 menuClassName="bg-elevated"

@@ -51,6 +51,9 @@ export default function WalletDashboardSwapModal({
   handleDemoConvert,
   convertProcessing,
   rlusdPerUnitRates,
+  selectLabelByCurrency,
+  selectIconByCurrency,
+  selectLabelMobileByCurrency,
   activationFeeXcs,
   simulateDexInDemo = false
 }) {
@@ -547,7 +550,15 @@ export default function WalletDashboardSwapModal({
               onChange={setConvertBaseCurrency}
               options={(swapCurrencyOptions || [])
                 .filter((code) => code !== convertQuoteCurrency)
-                .map((code) => ({ value: code, label: code }))}
+                .map((code) => ({
+                  value: code,
+                  icon: selectIconByCurrency?.[code] || null,
+                  label: selectLabelByCurrency?.[code] || code,
+                  labelMobile:
+                    selectLabelMobileByCurrency?.[code] ||
+                    selectLabelByCurrency?.[code] ||
+                    code,
+                }))}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
               menuClassName="bg-elevated"
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
@@ -563,7 +574,15 @@ export default function WalletDashboardSwapModal({
               onChange={setConvertQuoteCurrency}
               options={(swapCurrencyOptions || [])
                 .filter((code) => code !== convertBaseCurrency)
-                .map((code) => ({ value: code, label: code }))}
+                .map((code) => ({
+                  value: code,
+                  icon: selectIconByCurrency?.[code] || null,
+                  label: selectLabelByCurrency?.[code] || code,
+                  labelMobile:
+                    selectLabelMobileByCurrency?.[code] ||
+                    selectLabelByCurrency?.[code] ||
+                    code,
+                }))}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
               menuClassName="bg-elevated"
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"

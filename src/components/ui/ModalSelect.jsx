@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { isValidElement, useEffect, useMemo, useRef, useState } from "react";
 
 export default function ModalSelect({
   value,
@@ -37,6 +38,32 @@ export default function ModalSelect({
     setOpen(false);
   };
 
+  const renderIcon = (icon) => {
+    if (!icon) return null;
+    if (isValidElement(icon)) {
+      return <span className="text-base leading-none">{icon}</span>;
+    }
+    if (typeof icon === "string" || typeof icon === "number") {
+      return (
+        <span className="text-base leading-none" aria-hidden="true">
+          {icon}
+        </span>
+      );
+    }
+    if (icon?.src) {
+      return (
+        <Image
+          src={icon.src}
+          alt={icon.alt || ""}
+          width={18}
+          height={18}
+          className="w-4 h-4 object-contain"
+        />
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <div className="relative hidden md:block">
@@ -51,8 +78,11 @@ export default function ModalSelect({
           }}
           className={`w-full flex items-center justify-between gap-2 ${buttonClassName}`}
         >
-          <span className="truncate">
-            {selected ? selected.label : placeholder}
+          <span className="flex items-center gap-2 min-w-0">
+            {renderIcon(selected?.icon)}
+            <span className="truncate">
+              {selected ? selected.label : placeholder}
+            </span>
           </span>
           <svg
             className={`w-3 h-3 transition-transform ${
@@ -84,7 +114,10 @@ export default function ModalSelect({
                 onClick={() => handleSelect(opt.value)}
                 className={`w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 ${optionClassName}`}
               >
-                {opt.label}
+                <span className="flex items-center gap-2">
+                  {renderIcon(opt.icon)}
+                  <span className="truncate">{opt.label}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -97,11 +130,18 @@ export default function ModalSelect({
         onClick={(e) => e.stopPropagation()}
         disabled={disabled}
       >
-        {options.map((opt) => (
-          <option key={String(opt.value)} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
+        {options.map((opt) => {
+          const label =
+            opt.labelMobile ||
+            (typeof opt.icon === "string" || typeof opt.icon === "number"
+              ? `${opt.icon} ${opt.label}`
+              : opt.label);
+          return (
+            <option key={String(opt.value)} value={opt.value}>
+              {label}
+            </option>
+          );
+        })}
       </select>
     </>
   );
