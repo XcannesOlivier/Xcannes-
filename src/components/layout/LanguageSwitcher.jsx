@@ -95,12 +95,13 @@ const getAllLanguages = () => {
   return allLangs;
 };
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
   const router = useRouter();
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const [openRegion, setOpenRegion] = useState(null);
   const dropdownRef = useRef(null);
+  const isInline = variant === "inline";
 
   const supportedLocales = new Set(router?.locales || []);
   const allLanguages = getAllLanguages().filter((lang) =>
@@ -116,6 +117,7 @@ export default function LanguageSwitcher() {
     };
 
   useEffect(() => {
+    if (isInline) return;
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -124,7 +126,7 @@ export default function LanguageSwitcher() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isInline]);
 
   const changeLanguage = (locale, country) => {
     // Stocker le pays dans localStorage pour que NewsFeed puisse le lire
@@ -138,6 +140,7 @@ export default function LanguageSwitcher() {
       window.dispatchEvent(new CustomEvent('countryChanged', { detail: { country } }));
     }
     
+    onSelect?.();
     const { pathname, asPath, query } = router;
     router.push({ pathname, query }, asPath, { locale });
     setIsOpen(false);
@@ -149,35 +152,46 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <div ref={dropdownRef} className="relative text-[11px]">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg transition-all duration-300"
-        aria-label={t("langswitcher_aria_label", "Change language")}
-      >
-        <span className="text-lg">{currentLanguage.flag}</span>
-        <span className="hidden sm:inline text-[11px] font-medium text-white/80">
-          {currentLanguage.code.toUpperCase()}
-        </span>
-        <svg
-          className={`w-4 h-4 text-white/60 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <div
+      ref={dropdownRef}
+      className={`${isInline ? "w-full text-[11px]" : "relative text-[11px]"}`}
+    >
+      {!isInline && (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg transition-all duration-300"
+          aria-label={t("langswitcher_aria_label", "Change language")}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
+          <span className="text-lg">{currentLanguage.flag}</span>
+          <span className="hidden sm:inline text-[11px] font-medium text-white/80">
+            {currentLanguage.code.toUpperCase()}
+          </span>
+          <svg
+            className={`w-4 h-4 text-white/60 transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+      )}
 
-      {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-30 bg-black/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50 animate-fadeIn max-h-[400px] overflow-y-auto">
+      {(isInline || isOpen) && (
+        <div
+          className={`${
+            isInline
+              ? "w-full bg-transparent border-0 shadow-none rounded-none"
+              : "absolute right-0 top-full mt-2 w-30 bg-black/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl z-50 animate-fadeIn"
+          } overflow-hidden max-h-[400px] overflow-y-auto`}
+        >
           <div className="border-b-2 border-white/20">
             <div className="px-2 py-1 bg-white/10">
               <span className="text-[9px] font-bold text-white/60 uppercase tracking-wide">
