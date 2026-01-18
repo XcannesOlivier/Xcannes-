@@ -64,6 +64,9 @@ export default function ModalSelect({
     return null;
   };
 
+  const selectedLeft = selected?.labelLeft ?? selected?.label ?? placeholder;
+  const selectedRight = selected?.labelRight ?? null;
+
   return (
     <>
       <div className="relative hidden md:block">
@@ -78,10 +81,17 @@ export default function ModalSelect({
           }}
           className={`w-full flex items-center justify-between gap-2 ${buttonClassName}`}
         >
-          <span className="flex items-center gap-2 min-w-0">
+          <span className="flex items-center gap-2 min-w-0 flex-1">
             {renderIcon(selected?.icon)}
-            <span className="truncate">
-              {selected ? selected.label : placeholder}
+            <span className="flex items-center gap-2 min-w-0 flex-1">
+              <span className="truncate">
+                {selectedLeft}
+              </span>
+              {selectedRight ? (
+                <span className="ml-auto text-white/60 tabular-nums">
+                  {selectedRight}
+                </span>
+              ) : null}
             </span>
           </span>
           <svg
@@ -107,7 +117,10 @@ export default function ModalSelect({
             style={{ WebkitOverflowScrolling: "touch" }}
             onClick={(e) => e.stopPropagation()}
           >
-            {options.map((opt) => (
+            {options.map((opt) => {
+              const left = opt.labelLeft ?? opt.label;
+              const right = opt.labelRight ?? null;
+              return (
               <button
                 key={String(opt.value)}
                 type="button"
@@ -116,10 +129,18 @@ export default function ModalSelect({
               >
                 <span className="flex items-center gap-2">
                   {renderIcon(opt.icon)}
-                  <span className="truncate">{opt.label}</span>
+                  <span className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="truncate">{left}</span>
+                    {right ? (
+                      <span className="ml-auto text-white/50 tabular-nums">
+                        {right}
+                      </span>
+                    ) : null}
+                  </span>
                 </span>
               </button>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

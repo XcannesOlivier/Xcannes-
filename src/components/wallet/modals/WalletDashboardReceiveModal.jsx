@@ -25,6 +25,7 @@ export default function WalletDashboardReceiveModal({
   requestCurrency,
   setRequestCurrency,
   selectLabelByCurrency,
+  selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   augmentedTokens,
@@ -322,23 +323,31 @@ export default function WalletDashboardReceiveModal({
                   <ModalSelect
                 value={requestCurrency}
                 onChange={setRequestCurrency}
-                options={(augmentedTokens || []).map((token) => ({
-                  value: token.currency,
-                  icon:
-                    selectIconByCurrency?.[token.currency] ||
-                    selectIconByCurrency?.[String(token.currency || "").toUpperCase()] ||
-                    null,
-                  label:
+                options={(augmentedTokens || []).map((token) => {
+                  const currencyUpper = String(token.currency || "").toUpperCase();
+                  const labelLeft =
                     selectLabelByCurrency?.[token.currency] ||
-                    selectLabelByCurrency?.[String(token.currency || "").toUpperCase()] ||
-                    token.currency,
-                  labelMobile:
-                    selectLabelMobileByCurrency?.[token.currency] ||
-                    selectLabelMobileByCurrency?.[String(token.currency || "").toUpperCase()] ||
-                    selectLabelByCurrency?.[token.currency] ||
-                    selectLabelByCurrency?.[String(token.currency || "").toUpperCase()] ||
-                    token.currency,
-                }))}
+                    selectLabelByCurrency?.[currencyUpper] ||
+                    token.currency;
+                  const labelRight =
+                    selectLabelRightByCurrency?.[token.currency] ||
+                    selectLabelRightByCurrency?.[currencyUpper] ||
+                    null;
+                  return {
+                    value: token.currency,
+                    icon:
+                      selectIconByCurrency?.[token.currency] ||
+                      selectIconByCurrency?.[currencyUpper] ||
+                      null,
+                    label: labelLeft,
+                    labelLeft,
+                    labelRight,
+                    labelMobile:
+                      selectLabelMobileByCurrency?.[token.currency] ||
+                      selectLabelMobileByCurrency?.[currencyUpper] ||
+                      labelLeft,
+                  };
+                })}
                 buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                 menuClassName="bg-elevated"
                 selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"

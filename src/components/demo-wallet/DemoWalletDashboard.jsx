@@ -569,13 +569,25 @@ export default function DemoWalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
+      if (token.key) labels[token.key] = code;
+      labels[code] = code;
+    });
+    return labels;
+  }, [augmentedTokens]);
+
+  const selectLabelRightByAssetKey = useMemo(() => {
+    const labels = {};
+    const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
       const amountLabel = formatUnits(locale, token.value || 0);
-      const label = `${code} Balance ${amountLabel}`;
+      const label = `${balanceLabel} ${amountLabel}`;
       if (token.key) labels[token.key] = label;
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens, locale]);
+  }, [augmentedTokens, locale, t]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};
@@ -1571,6 +1583,7 @@ export default function DemoWalletDashboard({
         sendAmount={sendAmount}
         setSendAmount={setSendAmount}
         selectLabelByAssetKey={selectLabelByAssetKey}
+        selectLabelRightByAssetKey={selectLabelRightByAssetKey}
         selectIconByAssetKey={selectIconByAssetKey}
         selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
         savedAddresses={demoSavedAddresses}
@@ -1606,6 +1619,7 @@ export default function DemoWalletDashboard({
         requestCurrency={requestCurrency}
         setRequestCurrency={setRequestCurrency}
         selectLabelByCurrency={selectLabelByAssetKey}
+        selectLabelRightByCurrency={selectLabelRightByAssetKey}
         selectIconByCurrency={selectIconByAssetKey}
         selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
         augmentedTokens={augmentedTokens}
@@ -1649,6 +1663,7 @@ export default function DemoWalletDashboard({
         setConvertAmount={setConvertAmount}
         convertPreview={convertPreview}
         selectLabelByCurrency={selectLabelByAssetKey}
+        selectLabelRightByCurrency={selectLabelRightByAssetKey}
         selectIconByCurrency={selectIconByAssetKey}
         selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
         currencyLineCode={currencyLineCode}

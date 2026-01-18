@@ -981,16 +981,28 @@ export default function WalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
+      if (token?.key) labels[token.key] = code;
+      labels[code] = code;
+    });
+    return labels;
+  }, [augmentedTokens]);
+
+  const selectLabelRightByAssetKey = useMemo(() => {
+    const labels = {};
+    const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
       const amount = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amount)
         ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
         : "0";
-      const label = `${code} Balance ${amountLabel}`;
+      const label = `${balanceLabel} ${amountLabel}`;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens]);
+  }, [augmentedTokens, t]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};
@@ -1979,6 +1991,7 @@ export default function WalletDashboard({
             sendAmount={sendAmount}
             setSendAmount={setSendAmount}
             selectLabelByAssetKey={selectLabelByAssetKey}
+            selectLabelRightByAssetKey={selectLabelRightByAssetKey}
             selectIconByAssetKey={selectIconByAssetKey}
             selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
             savedAddresses={savedAddresses}
@@ -2005,6 +2018,7 @@ export default function WalletDashboard({
             requestCurrency={requestCurrency}
             setRequestCurrency={setRequestCurrency}
             selectLabelByCurrency={selectLabelByAssetKey}
+            selectLabelRightByCurrency={selectLabelRightByAssetKey}
             selectIconByCurrency={selectIconByAssetKey}
             selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
             augmentedTokens={augmentedTokens}
@@ -2047,6 +2061,7 @@ export default function WalletDashboard({
             setConvertAmount={setConvertAmount}
             convertPreview={convertPreview}
             selectLabelByCurrency={selectLabelByAssetKey}
+            selectLabelRightByCurrency={selectLabelRightByAssetKey}
             selectIconByCurrency={selectIconByAssetKey}
             selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
             currencyLineCode={currencyLineCode}
