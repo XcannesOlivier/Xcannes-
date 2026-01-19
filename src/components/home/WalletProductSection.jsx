@@ -17,7 +17,8 @@ export default function WalletProductSection() {
         "Suivez, prouvez et exportez les mouvements, par devise ou globalement."
       ),
       orderClassName: "order-5 lg:order-7",
-      iconClassName: "text-[#22C55E] bg-[rgba(34,197,94,0.08)] sm:text-white/80 sm:bg-white/5",
+      iconClassName: "text-[#22C55E] bg-[rgba(34,197,94,0.08)] md:text-white/80 md:bg-white/5 md:group-hover:text-[#22C55E] md:group-hover:bg-[rgba(34,197,94,0.14)]",
+      borderHoverClassName: "group-hover:border-[#22C55E]/40",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
@@ -44,7 +45,8 @@ export default function WalletProductSection() {
         "Demandez (QR), recevez et envoyez en quelques secondes, avec validation explicite."
       ),
       orderClassName: "order-1 lg:order-2",
-      iconClassName: "text-[#5FC9F8] bg-[rgba(56,189,248,0.14)] sm:text-white/80 sm:bg-white/5",
+      iconClassName: "text-[#5FC9F8] bg-[rgba(56,189,248,0.14)] md:text-white/80 md:bg-white/5 md:group-hover:text-[#5FC9F8] md:group-hover:bg-[rgba(56,189,248,0.2)]",
+      borderHoverClassName: "group-hover:border-[#5FC9F8]/40",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
@@ -71,7 +73,8 @@ export default function WalletProductSection() {
         "Recevoir des fonds ou créer une demande."
       ),
       orderClassName: "order-2 lg:order-4",
-      iconClassName: "text-[#22C55E] bg-[rgba(34,197,94,0.08)] sm:text-white/80 sm:bg-white/5",
+      iconClassName: "text-[#22C55E] bg-[rgba(34,197,94,0.08)] md:text-white/80 md:bg-white/5 md:group-hover:text-[#22C55E] md:group-hover:bg-[rgba(34,197,94,0.14)]",
+      borderHoverClassName: "group-hover:border-[#22C55E]/40",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <line
@@ -101,7 +104,8 @@ export default function WalletProductSection() {
         "Taux clairement affiché avant validation."
       ),
       orderClassName: "order-3 lg:order-5",
-      iconClassName: "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] sm:text-white/80 sm:bg-white/5",
+      iconClassName: "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] md:text-white/80 md:bg-white/5 md:group-hover:text-[#06B6D4] md:group-hover:bg-[rgba(6,182,212,0.14)]",
+      borderHoverClassName: "group-hover:border-[#06B6D4]/40",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <polyline
@@ -146,6 +150,8 @@ export default function WalletProductSection() {
         "Mise en place simple, fonctionnement clair."
       ),
       orderClassName: "order-6 lg:order-8",
+      iconClassName: "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] md:text-white/80 md:bg-white/5 md:group-hover:text-[#8B5CF6] md:group-hover:bg-[rgba(139,92,246,0.14)]",
+      borderHoverClassName: "group-hover:border-[#8B5CF6]/40",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
@@ -181,7 +187,8 @@ export default function WalletProductSection() {
         "Accès fiat selon la disponibilité du pays."
       ),
       orderClassName: "order-4 lg:order-6",
-      iconClassName: "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] sm:text-white/80 sm:bg-white/5",
+      iconClassName: "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] md:text-white/80 md:bg-white/5 md:group-hover:text-[#8B5CF6] md:group-hover:bg-[rgba(139,92,246,0.14)]",
+      borderHoverClassName: "group-hover:border-[#8B5CF6]/40",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <rect
@@ -268,6 +275,7 @@ export default function WalletProductSection() {
                       ? "bg-transparent border-none rounded-none shadow-none"
                       : "bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl",
                     "group p-5 lg:flex lg:items-start lg:gap-6",
+                    action.borderHoverClassName,
                     action.orderClassName,
                   ]
                     .filter(Boolean)
