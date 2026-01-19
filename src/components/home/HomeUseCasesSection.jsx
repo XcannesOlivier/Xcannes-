@@ -31,7 +31,7 @@ export default function HomeUseCasesSection() {
     },
     {
       key: "payments",
-      title: t("home_v2_essentials_2_title", "Payer / Recevoir"),
+      title: t("home_v2_essentials_2_title", "Payer / Envoyer"),
       desc: t(
         "home_v2_essentials_2_desc",
         "Demander (QR), recevoir et envoyer en quelques secondes, avec validation explicite."

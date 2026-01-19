@@ -23,13 +23,6 @@ export default function WhyXcannesSection() {
             {t("home_v2_final_cta_primary", "Ouvrir le wallet")}
           </Link>
           <Link
-            href="#demo"
-            className={bankButtonClassName({ tone: "neutral", variant: "soft", size: "lg" })}
-          >
-            {t("home_v2_final_cta_demo", "Essayer la démo")}
-            <span className="inline-block ml-2 text-xs">→</span>
-          </Link>
-          <Link
             href="/dex"
             className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}
           >
