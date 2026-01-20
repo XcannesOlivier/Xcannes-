@@ -1,9 +1,13 @@
-	import Link from "next/link";
-	import { useTranslation } from "next-i18next";
-	import PriceTicker from "@/components/marketGlobal/PriceTicker";
-	import { bankButtonClassName } from "@/components/ui/bankButtonClassName";
+import Link from "next/link";
+import { useTranslation } from "next-i18next";
+import PriceTicker from "@/components/marketGlobal/PriceTicker";
+import { bankButtonClassName } from "@/components/ui/bankButtonClassName";
 
-export default function HomeHowItWorksSection({ pairs = [] }) {
+export default function HomeHowItWorksSection({
+  pairs = [],
+  showCta = true,
+  ctaHref = "/infrastructure",
+}) {
   const { t } = useTranslation("common");
 
   return (
@@ -24,15 +28,17 @@ export default function HomeHowItWorksSection({ pairs = [] }) {
               )}
             </p>
 
-            <div className="mt-8">
-              <Link
-                href="/whitepaper"
-                className={bankButtonClassName({ tone: "neutral", variant: "soft", size: "md" })}
-              >
-                {t("home_v2_infra_cta", "Lire l’architecture")}
-                <span className="inline-block ml-2 text-xs">→</span>
-              </Link>
-            </div>
+            {showCta ? (
+              <div className="mt-8">
+                <Link
+                  href={ctaHref}
+                  className={bankButtonClassName({ tone: "neutral", variant: "soft", size: "md" })}
+                >
+                  {t("home_v2_infra_cta", "Lire l’architecture")}
+                  <span className="inline-block ml-2 text-xs">→</span>
+                </Link>
+              </div>
+            ) : null}
           </div>
 
           <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl px-5 py-5 min-w-0">

@@ -1292,7 +1292,7 @@ export default function DemoWalletDashboard({
             </span>
           </div>
           <span className="text-[10px] font-semibold text-xcannes-green uppercase tracking-[0.18em]">
-            {t("demo_wallet_badge", "Demo wallet")}
+            {t("demo_notice_title", "Demo mode")}
           </span>
         </div>
 

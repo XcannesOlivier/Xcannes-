@@ -257,7 +257,26 @@ export default function Header({ fixed = true }) {
               <div className="text-[10px] font-semibold text-white/90 mb-2 pb-1.5 border-b border-white/10">
                 {t("ui_parameters_da2b8022f7", "Paramètres")}
               </div>
-              <LanguageSwitcher variant="inline" />
+              <div className="space-y-2">
+                <Link
+                  href="/infrastructure"
+                  onClick={(e) => {
+                    setSettingsOpen(false);
+                    withHardNavFallback("/infrastructure")(e);
+                  }}
+                  className={`flex items-center justify-between rounded-lg px-2.5 py-2 text-[12px] transition-colors ${
+                    router.pathname === "/infrastructure"
+                      ? "text-xcannes-green bg-white/5"
+                      : "text-white/80 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  <span>{t("nav_infrastructure", "Infrastructure")}</span>
+                  <span className="text-[11px] text-white/40">→</span>
+                </Link>
+                <div className="flex items-center justify-end rounded-lg px-2.5 py-2 bg-white/5">
+                  <LanguageSwitcher onSelect={() => setSettingsOpen(false)} />
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -312,6 +331,19 @@ export default function Header({ fixed = true }) {
           }>
 
             {t("nav_wallet", "Wallet")}
+          </Link>
+
+          <Link
+            href="/infrastructure"
+            onClick={(e) => {
+              setMenuOpen(false);
+              withHardNavFallback("/infrastructure")(e);
+            }}
+            className={`hover:text-xcannes-green transition-colors ${
+              router.pathname === "/infrastructure" ? "text-xcannes-green" : ""
+            }`}
+          >
+            {t("nav_infrastructure", "Infrastructure")}
           </Link>
 
           <LanguageSwitcher onSelect={() => setMenuOpen(false)} />
