@@ -1,12 +1,27 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 
+const DEMO_CARD_EVENT = "xcannes:demo-wallet:card";
+const DEMO_CARD_CTA_EVENT = "xcannes:demo-wallet:cta";
+const FLASH_DURATION_MS = 5000;
+const FLASH_STYLES = {
+  pay: { backgroundColor: "rgba(95, 201, 248, 0.12)", borderColor: "#5FC9F8" },
+  receive_request: { backgroundColor: "rgba(34, 197, 94, 0.12)", borderColor: "#22C55E" },
+  convert: { backgroundColor: "rgba(6, 182, 212, 0.12)", borderColor: "#06B6D4" },
+  buy: { backgroundColor: "rgba(139, 92, 246, 0.12)", borderColor: "#8B5CF6" },
+  statements: { backgroundColor: "rgba(34, 197, 94, 0.12)", borderColor: "#22C55E" },
+  config: { backgroundColor: "rgba(139, 92, 246, 0.12)", borderColor: "#8B5CF6" }
+};
+
 export default function WalletEssentialsCards({ variant = "home" }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const [modalRoot, setModalRoot] = useState(null);
   const [activeActionKey, setActiveActionKey] = useState(null);
+  const [flashByKey, setFlashByKey] = useState({});
+  const flashTimers = useRef({});
   const isCompact = variant === "compare";
+  const locale = i18n?.language || "en";
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -27,6 +42,441 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeActionKey]);
+
+  const formatAmount = useCallback(
+    (value) => {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return null;
+      return num.toLocaleString(locale, {
+        maximumFractionDigits: 6
+      });
+    },
+    [locale]
+  );
+
+  const formatWalletLabel = useCallback(
+    (walletId) => {
+      if (!walletId) return t("demo_wallet_label", "Wallet");
+      return `${t("demo_wallet_label", "Wallet")} ${walletId}`;
+    },
+    [t]
+  );
+  const buildStatementCtaLabel = useCallback(
+    (currency, wallet) =>
+      t("demo_card_cta_statement_currency", {
+        defaultValue: "Relevé {{currency}} · {{wallet}}",
+        currency,
+        wallet
+      }),
+    [t]
+  );
+  const buildStatementGlobalCtaLabel = useCallback(
+    (wallet) =>
+      t("demo_card_cta_statement_global", {
+        defaultValue: "Relevé global · {{wallet}}",
+        wallet
+      }),
+    [t]
+  );
+  const buildOpenSendCtaLabel = useCallback(
+    (wallet) =>
+      t("demo_card_cta_open_send", {
+        defaultValue: "Ouvrir Envoyer · {{wallet}}",
+        wallet
+      }),
+    [t]
+  );
+  const buildOpenLinesCtaLabel = useCallback(
+    (wallet) =>
+      t("demo_card_cta_open_lines", {
+        defaultValue: "Gérer les lignes · {{wallet}}",
+        wallet
+      }),
+    [t]
+  );
+  const dispatchDemoCta = useCallback((detail) => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent(DEMO_CARD_CTA_EVENT, { detail }));
+  }, []);
+
+  const buildFlash = useCallback(
+    (detail = {}) => {
+      const action = detail?.action;
+      if (!action) return null;
+
+      const cardKeyMap = {
+        send: "pay",
+        request: "receive_request",
+        convert: "convert",
+        buy: "buy",
+        sell: "buy",
+        statement_global: "statements",
+        statement_currency: "statements",
+        trustline_add: "config",
+        trustline_remove: "config",
+        trustline_update: "config"
+      };
+
+      const cardKey = cardKeyMap[action];
+      if (!cardKey) return null;
+
+      const currency =
+        String(detail.currency || detail.fromCurrency || detail.toCurrency || "")
+          .trim()
+          .toUpperCase();
+
+      if (action === "send") {
+        const amountLabel = formatAmount(detail.amount);
+        const fromWallet = formatWalletLabel(detail.fromWalletId);
+        const toWallet = formatWalletLabel(detail.toWalletId);
+        const ctas = [];
+        if (currency && detail.toWalletId) {
+          ctas.push({
+            label: buildStatementCtaLabel(currency, toWallet),
+            detail: {
+              action: "open_statement_currency",
+              walletId: detail.toWalletId,
+              currency
+            }
+          });
+        }
+        if (currency && detail.fromWalletId) {
+          ctas.push({
+            label: buildStatementCtaLabel(currency, fromWallet),
+            detail: {
+              action: "open_statement_currency",
+              walletId: detail.fromWalletId,
+              currency
+            }
+          });
+        }
+        return {
+          cardKey,
+          title: t("demo_card_flash_send_title", "Envoi simulé"),
+          desc: t("demo_card_flash_send_desc", {
+            defaultValue:
+              "Vous avez envoyé {{amount}} {{currency}} vers {{toWallet}}. Relevé {{currency}}: crédit chez {{toWallet}}, débit chez {{fromWallet}}.",
+            amount: amountLabel || "—",
+            currency: currency || "",
+            toWallet,
+            fromWallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "request") {
+        const amountLabel = formatAmount(detail.amount);
+        const otherWallet = formatWalletLabel(detail.toWalletId);
+        const hasAmount = Boolean(amountLabel) && Boolean(currency);
+        const ctas = detail.toWalletId
+          ? [
+            {
+              label: buildOpenSendCtaLabel(otherWallet),
+              detail: {
+                action: "open_send",
+                walletId: detail.toWalletId,
+                sendTab: "scan-request",
+                usePendingRequest: true
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_request_title", "Demande créée"),
+          desc: hasAmount
+            ? t("demo_card_flash_request_desc", {
+              defaultValue:
+                "Demande de {{amount}} {{currency}}. Sur {{otherWallet}}, ouvrez Envoyer > Scan Request pour payer.",
+              amount: amountLabel,
+              currency,
+              otherWallet
+            })
+            : t("demo_card_flash_request_desc_short", {
+              defaultValue:
+                "Demande créée. Sur {{otherWallet}}, ouvrez Envoyer > Scan Request pour payer.",
+              otherWallet
+            }),
+          ctas
+        };
+      }
+
+      if (action === "convert") {
+        const fromAmount = formatAmount(detail.fromAmount);
+        const toAmount = formatAmount(detail.toAmount);
+        const fromCurrency = String(detail.fromCurrency || "").toUpperCase();
+        const toCurrency = String(detail.toCurrency || "").toUpperCase();
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = [];
+        if (toCurrency && detail.walletId) {
+          ctas.push({
+            label: buildStatementCtaLabel(toCurrency, wallet),
+            detail: {
+              action: "open_statement_currency",
+              walletId: detail.walletId,
+              currency: toCurrency
+            }
+          });
+        }
+        if (fromCurrency && detail.walletId) {
+          ctas.push({
+            label: buildStatementCtaLabel(fromCurrency, wallet),
+            detail: {
+              action: "open_statement_currency",
+              walletId: detail.walletId,
+              currency: fromCurrency
+            }
+          });
+        }
+        return {
+          cardKey,
+          title: t("demo_card_flash_convert_title", "Conversion simulée"),
+          desc: t("demo_card_flash_convert_desc", {
+            defaultValue:
+              "{{fromAmount}} {{fromCurrency}} → {{toAmount}} {{toCurrency}}. Relevé {{fromCurrency}}: débit, relevé {{toCurrency}}: crédit.",
+            fromAmount: fromAmount || "—",
+            fromCurrency,
+            toAmount: toAmount || "—",
+            toCurrency
+          }),
+          ctas
+        };
+      }
+
+      if (action === "buy") {
+        const amountLabel = formatAmount(detail.amount);
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId
+          ? [
+            {
+              label: buildStatementCtaLabel("RLUSD", wallet),
+              detail: {
+                action: "open_statement_currency",
+                walletId: detail.walletId,
+                currency: "RLUSD"
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_buy_title", "Achat simulé"),
+          desc: t("demo_card_flash_buy_desc", {
+            defaultValue: "+{{amount}} RLUSD. Vérifiez le relevé RLUSD dans {{wallet}}.",
+            amount: amountLabel || "—",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "sell") {
+        const amountLabel = formatAmount(detail.amount);
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId
+          ? [
+            {
+              label: buildStatementCtaLabel("RLUSD", wallet),
+              detail: {
+                action: "open_statement_currency",
+                walletId: detail.walletId,
+                currency: "RLUSD"
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_sell_title", "Vente simulée"),
+          desc: t("demo_card_flash_sell_desc", {
+            defaultValue: "-{{amount}} RLUSD. Vérifiez le relevé RLUSD dans {{wallet}}.",
+            amount: amountLabel || "—",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "statement_currency") {
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId && currency
+          ? [
+            {
+              label: buildStatementCtaLabel(currency, wallet),
+              detail: {
+                action: "open_statement_currency",
+                walletId: detail.walletId,
+                currency
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_statement_currency_title", {
+            defaultValue: "Relevé {{currency}}",
+            currency: currency || ""
+          }),
+          desc: t("demo_card_flash_statement_currency_desc", {
+            defaultValue:
+              "Historique des crédits/débits {{currency}} dans {{wallet}}.",
+            currency: currency || "",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "statement_global") {
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId
+          ? [
+            {
+              label: buildStatementGlobalCtaLabel(wallet),
+              detail: {
+                action: "open_statement_global",
+                walletId: detail.walletId
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_statement_title", "Relevé ouvert"),
+          desc: t("demo_card_flash_statement_desc", {
+            defaultValue: "Relevé global ouvert dans {{wallet}}. Consultez les mouvements et exportez le PDF/CSV.",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "trustline_add") {
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId
+          ? [
+            {
+              label: buildOpenLinesCtaLabel(wallet),
+              detail: {
+                action: "open_swap",
+                walletId: detail.walletId,
+                swapView: "lines"
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_trustline_add_title", "Ligne activée"),
+          desc: t("demo_card_flash_trustline_add_desc", {
+            defaultValue: "Dans {{wallet}}, la ligne {{currency}} est active. Vous pouvez convertir ou allouer.",
+            currency: currency || "",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "trustline_remove") {
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId
+          ? [
+            {
+              label: buildOpenLinesCtaLabel(wallet),
+              detail: {
+                action: "open_swap",
+                walletId: detail.walletId,
+                swapView: "lines"
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_trustline_remove_title", "Ligne supprimée"),
+          desc: t("demo_card_flash_trustline_remove_desc", {
+            defaultValue: "Dans {{wallet}}, la ligne {{currency}} est retirée. Convertissez à 0 pour la réactiver.",
+            currency: currency || "",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      if (action === "trustline_update") {
+        const amountLabel = formatAmount(detail.amount);
+        const wallet = formatWalletLabel(detail.walletId);
+        const ctas = detail.walletId
+          ? [
+            {
+              label: buildOpenLinesCtaLabel(wallet),
+              detail: {
+                action: "open_swap",
+                walletId: detail.walletId,
+                swapView: "lines"
+              }
+            }
+          ]
+          : [];
+        return {
+          cardKey,
+          title: t("demo_card_flash_trustline_update_title", "Allocation mise à jour"),
+          desc: t("demo_card_flash_trustline_update_desc", {
+            defaultValue: "Dans {{wallet}}, {{currency}} allouée à {{amount}} RLUSD.",
+            currency: currency || "",
+            amount: amountLabel || "—",
+            wallet
+          }),
+          ctas
+        };
+      }
+
+      return null;
+    },
+    [
+      buildOpenLinesCtaLabel,
+      buildOpenSendCtaLabel,
+      buildStatementCtaLabel,
+      buildStatementGlobalCtaLabel,
+      formatAmount,
+      formatWalletLabel,
+      t
+    ]
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const handleFlash = (event) => {
+      const flash = buildFlash(event?.detail || {});
+      if (!flash) return;
+
+      setFlashByKey((prev) => ({
+        ...prev,
+        [flash.cardKey]: { title: flash.title, desc: flash.desc, ctas: flash.ctas || [] }
+      }));
+
+      if (flashTimers.current[flash.cardKey]) {
+        clearTimeout(flashTimers.current[flash.cardKey]);
+      }
+
+      flashTimers.current[flash.cardKey] = setTimeout(() => {
+        setFlashByKey((prev) => {
+          const next = { ...prev };
+          delete next[flash.cardKey];
+          return next;
+        });
+      }, FLASH_DURATION_MS);
+    };
+
+    window.addEventListener(DEMO_CARD_EVENT, handleFlash);
+    return () => {
+      window.removeEventListener(DEMO_CARD_EVENT, handleFlash);
+      Object.values(flashTimers.current).forEach((timer) => clearTimeout(timer));
+      flashTimers.current = {};
+    };
+  }, [buildFlash]);
 
   const actions = [
     {
@@ -407,6 +857,19 @@ export default function WalletEssentialsCards({ variant = "home" }) {
 
       <div className={gridClassName}>
         {visibleActions.map((action) => {
+          const flash = flashByKey[action.key];
+          const flashClasses = "";
+          const flashStyle =
+            flash && !action.isPlain ? (FLASH_STYLES[action.key] || {}) : undefined;
+          const flashCtas = flash?.ctas || [];
+          const ctaStyle = flashStyle
+            ? { borderColor: flashStyle.borderColor, color: flashStyle.borderColor }
+            : undefined;
+          const ctaContainerClassName = isCompact
+            ? "mt-2 flex flex-wrap gap-2 justify-center"
+            : "mt-2 flex flex-wrap gap-2";
+          const ctaButtonClassName =
+            "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80 hover:text-white transition-colors";
           const cardClasses = [
             action.isPlain
               ? "bg-transparent border-none rounded-none shadow-none"
@@ -419,10 +882,13 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             action.isPlain
               ? ""
               : "w-full text-left cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+            flash ? flashClasses : ""
           ]
             .filter(Boolean)
             .join(" ");
 
+          const effectiveTitle = flash?.title || action.title;
+          const effectiveDesc = flash?.desc || action.desc;
           const cardContent = (
             <>
               <div className={titleRowClassName}>
@@ -447,7 +913,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                       : titleClassName
                   }
                 >
-                  {action.title}
+                  {effectiveTitle}
                 </div>
               </div>
               <p
@@ -457,9 +923,27 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   action.isPlain ? "text-white/60 text-sm" : descClassName,
                 ].join(" ")}
               >
-                {action.desc}
+                {effectiveDesc}
               </p>
-              {!action.isPlain && (
+              {flashCtas.length > 0 && !action.isPlain && (
+                <div className={ctaContainerClassName}>
+                  {flashCtas.map((cta) => (
+                    <button
+                      key={cta.label}
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        dispatchDemoCta(cta.detail);
+                      }}
+                      className={ctaButtonClassName}
+                      style={ctaStyle}
+                    >
+                      {cta.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {!action.isPlain && !flash && (
                 <div className={ctaClassName}>
                   <span>
                     {t("home_v2_essentials_modal_cta", "En savoir plus")}
@@ -516,7 +1000,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
 
           if (action.isPlain) {
             return (
-              <div key={action.key} className={cardClasses}>
+              <div key={action.key} className={cardClasses} style={flashStyle}>
                 {cardContent}
               </div>
             );
@@ -528,6 +1012,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               type="button"
               onClick={() => setActiveActionKey(action.key)}
               className={cardClasses}
+              style={flashStyle}
               aria-haspopup="dialog"
               aria-expanded={activeActionKey === action.key}
             >

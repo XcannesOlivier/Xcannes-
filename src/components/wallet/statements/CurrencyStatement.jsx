@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
@@ -27,6 +27,7 @@ const USD_STABLECOINS = [
 "TUSD",
 "USDP",
 "GUSD"];
+const HIGHLIGHT_DURATION_MS = 5000;
 
 
 /**
@@ -55,6 +56,7 @@ export default function CurrencyStatement({
   hasRlusdTrustline = false,
   hasXcsTrustline = false,
   xcannesCurrencyLinesCount = 0,
+  highlightTransactionId = null,
   onClose
 }) {const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -65,6 +67,9 @@ export default function CurrencyStatement({
   const [reserveOpen, setReserveOpen] = useState(false);
   const [ledgerTab, setLedgerTab] = useState("statement"); // statement | xrpl
   const [docHash, setDocHash] = useState("");
+  const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
+  const highlightRowRef = useRef(null);
+  const highlightTimerRef = useRef(null);
 
   const [xrplDirection, setXrplDirection] = useState("all"); // all | send | receive
   const [xrplPayments, setXrplPayments] = useState([]);
@@ -93,6 +98,23 @@ export default function CurrencyStatement({
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+
+  useEffect(() => {
+    if (!highlightTransactionId) return undefined;
+    setHighlightedTransactionId(highlightTransactionId);
+    if (highlightTimerRef.current) {
+      clearTimeout(highlightTimerRef.current);
+    }
+    highlightTimerRef.current = setTimeout(() => {
+      setHighlightedTransactionId(null);
+    }, HIGHLIGHT_DURATION_MS);
+    return () => {
+      if (highlightTimerRef.current) {
+        clearTimeout(highlightTimerRef.current);
+      }
+    };
+  }, [highlightTransactionId]);
+
   const walletLabel = useMemo(() => {
     if (typeof window === "undefined" || !walletAddress) return "";
     try {
@@ -359,6 +381,16 @@ export default function CurrencyStatement({
     if (filter === "conversion") return t.category === "exchange";
     return true;
   });
+
+  useEffect(() => {
+    if (!highlightedTransactionId || ledgerTab !== "statement") return;
+    const node = highlightRowRef.current;
+    if (!node) return;
+    const raf = requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [filter, highlightedTransactionId, ledgerTab, transactions]);
 
   const ledgerEvidenceCount = useMemo(() => {
     return (xrplPayments || []).filter((p) => p?.txHash).length;
@@ -1356,8 +1388,18 @@ export default function CurrencyStatement({
 
                 filteredTransactions.map((tx, idx) => {
                   const icon = getTransactionIcon(tx.category);
+                  const transactionId = tx?.id || null;
+                  const isHighlighted =
+                    highlightedTransactionId && transactionId === highlightedTransactionId;
+                  const rowClassName = isHighlighted
+                    ? "border-b border-white/5 bg-xcannes-green/10 transition-colors"
+                    : "border-b border-white/5 hover:bg-white/5 transition-colors";
                   return (
-                    <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <tr
+                      key={idx}
+                      ref={isHighlighted ? highlightRowRef : null}
+                      className={rowClassName}
+                    >
                           <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
                             {formatDate(tx.date)}
                           </td>
