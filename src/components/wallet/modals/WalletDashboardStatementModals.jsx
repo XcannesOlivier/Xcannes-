@@ -20,6 +20,7 @@ export default function WalletDashboardStatementModals({
   statementVariant,
   currencyLines,
   usdRates,
+  highlightTransactionId,
   showGlobalStatement,
   setShowGlobalStatement,
   showCurrencyStatement,
@@ -316,6 +317,7 @@ export default function WalletDashboardStatementModals({
           loading={canFetchStatements ? currencyLoading : false}
           error={canFetchStatements ? currencyError : null}
           period="December 2025"
+          highlightTransactionId={highlightTransactionId}
           onClose={() => {
             setShowCurrencyStatement(false);
             setSelectedStatementToken(null);

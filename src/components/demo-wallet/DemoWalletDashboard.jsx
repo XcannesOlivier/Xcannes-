@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import {
@@ -116,6 +116,9 @@ function formatUnits(locale, amount) {
 
 const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 const DEMO_PENDING_REQUEST_KEY = "xcannes_demo_wallet_pending_request_v1";
+const DEMO_CARD_EVENT = "xcannes:demo-wallet:card";
+const DEMO_CARD_CTA_EVENT = "xcannes:demo-wallet:cta";
+const DEMO_CARD_FLASH_DURATION_MS = 5000;
 const DEMO_LATENCY_MS_MIN = 450;
 const DEMO_LATENCY_MS_MAX = 1100;
 const DEMO_RATES_REFRESH_MS = 15_000;
@@ -290,11 +293,18 @@ export default function DemoWalletDashboard({
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
+  const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [previewCurrencyTransactions, setPreviewCurrencyTransactions] = useState([]);
+  const [statementHighlightByWallet, setStatementHighlightByWallet] = useState({});
+  const pendingCtaRef = useRef(null);
+  const pendingCardQueueRef = useRef({});
+  const flushTimersRef = useRef([]);
+  const prevActiveActionRef = useRef(activeAction);
+  const wasStatementOpenRef = useRef(false);
 
   const activeWallet = state.wallets[activeWalletId];
   const otherWalletId = activeWalletId === "A" ? "B" : "A";
@@ -311,6 +321,42 @@ export default function DemoWalletDashboard({
     addressTitle: t("demo_tt_wallet_address", "Adresse XRPL du wallet.")
   });
   const demoNoticeContextLabel = "";
+  const announceDemoCard = useCallback((detail) => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent(DEMO_CARD_EVENT, { detail }));
+  }, []);
+  const recordStatementHighlight = useCallback((walletId, currency, eventId) => {
+    if (!walletId || !currency || !eventId) return;
+    const walletKey = String(walletId).trim().toUpperCase();
+    const currencyKey = String(currency).trim().toUpperCase();
+    setStatementHighlightByWallet((prev) => {
+      const next = { ...prev };
+      const walletMap = { ...(next[walletKey] || {}) };
+      walletMap[currencyKey] = { eventId, ts: Date.now() };
+      next[walletKey] = walletMap;
+      return next;
+    });
+  }, []);
+  const enqueueDemoCard = useCallback((modalKey, detail) => {
+    if (!modalKey || !detail) return;
+    const current = pendingCardQueueRef.current;
+    if (!current[modalKey]) current[modalKey] = [];
+    current[modalKey].push(detail);
+  }, []);
+  const flushDemoCards = useCallback((modalKey) => {
+    if (!modalKey) return;
+    const current = pendingCardQueueRef.current;
+    const queue = current[modalKey];
+    if (!queue || !queue.length) return;
+    current[modalKey] = [];
+    queue.forEach((detail, index) => {
+      const timer = setTimeout(
+        () => announceDemoCard(detail),
+        index * DEMO_CARD_FLASH_DURATION_MS
+      );
+      flushTimersRef.current.push(timer);
+    });
+  }, [announceDemoCard]);
 
   const demoSavedAddresses = useMemo(() => {
     const address = getWalletAddress(state, otherWalletId);
@@ -685,6 +731,92 @@ export default function DemoWalletDashboard({
     return true;
   }, [activeWalletId, handlePaymentRequestScan, setActiveAction, setSendTab]);
 
+  const runDemoCta = useCallback((detail) => {
+    const action = detail?.action;
+    if (!action) return;
+    const currency = String(detail.currency || "").trim().toUpperCase();
+    const closeStatements = () => {
+      setShowGlobalStatement(false);
+      setShowCurrencyStatement(false);
+      setSelectedStatementToken(null);
+    };
+    const openCurrencyStatement = (code) => {
+      const upper = String(code || "").trim().toUpperCase();
+      if (!upper) return;
+      const token =
+        (augmentedTokens || []).find(
+          (tok) => String(tok.currency || "").toUpperCase() === upper
+        ) || {
+          currency: upper,
+          value: Number(activeWallet?.allocations?.[upper] || 0)
+        };
+      setSelectedStatementToken(token);
+      setShowCurrencyStatement(true);
+    };
+
+    if (action === "open_statement_currency") {
+      setActiveAction(null);
+      closeStatements();
+      openCurrencyStatement(currency);
+      return;
+    }
+
+    if (action === "open_statement_global") {
+      setActiveAction(null);
+      setShowCurrencyStatement(false);
+      setSelectedStatementToken(null);
+      setShowGlobalStatement(true);
+      return;
+    }
+
+    if (action === "open_send") {
+      closeStatements();
+      if (detail.usePendingRequest) {
+        const pending = readPendingDemoRequest();
+        if (pending && pending.toWalletId === activeWalletId) {
+          handlePendingDemoRequest(pending);
+          return;
+        }
+      }
+      setSendTab(detail.sendTab || "manual");
+      setActiveAction("send");
+      return;
+    }
+
+    if (action === "open_receive") {
+      closeStatements();
+      setReceiveTab(detail.receiveTab || "receive");
+      setActiveAction("receive");
+      return;
+    }
+
+    if (action === "open_swap") {
+      closeStatements();
+      setSwapDefaultView(detail.swapView || "convert");
+      setActiveAction("swap");
+      return;
+    }
+
+    if (action === "open_cash") {
+      closeStatements();
+      setCashModalTab(detail.cashTab === "sell" ? "sell" : "buy");
+      setActiveAction("cash");
+    }
+  }, [
+    activeWallet?.allocations,
+    activeWalletId,
+    augmentedTokens,
+    handlePendingDemoRequest,
+    setActiveAction,
+    setCashModalTab,
+    setReceiveTab,
+    setSendTab,
+    setSelectedStatementToken,
+    setShowCurrencyStatement,
+    setShowGlobalStatement,
+    setSwapDefaultView
+  ]);
+
   const handleDemoRequestGenerated = useCallback((request) => {
     if (!request || typeof window === "undefined") return;
     const detail = {
@@ -694,7 +826,21 @@ export default function DemoWalletDashboard({
     };
     window.dispatchEvent(new CustomEvent("xcannes:demo-wallet:request", { detail }));
     writePendingDemoRequest(detail);
-  }, [activeWalletId, otherWalletId]);
+    const requestAmount = request?.displayAmount ?? request?.amount ?? request?.amountRlusd;
+    const requestCurrency =
+      request?.displayCurrency ||
+      request?.targetCurrency ||
+      request?.targetCurrencyCode ||
+      request?.currency;
+    enqueueDemoCard("receive", {
+      action: "request",
+      walletId: activeWalletId,
+      fromWalletId: activeWalletId,
+      toWalletId: otherWalletId,
+      amount: requestAmount,
+      currency: requestCurrency
+    });
+  }, [activeWalletId, enqueueDemoCard, otherWalletId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -713,6 +859,85 @@ export default function DemoWalletDashboard({
     handlePendingDemoRequest(pending);
   }, [activeWalletId, handlePendingDemoRequest]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = (event) => {
+      const detail = event?.detail || {};
+      const action = detail?.action;
+      if (!action) return;
+      const targetWalletId = detail.walletId
+        ? String(detail.walletId).trim().toUpperCase()
+        : null;
+
+      if (targetWalletId) {
+        if (isExternalState) {
+          if (resolvedDefaultWalletId !== targetWalletId) return;
+        } else if (activeWalletId !== targetWalletId) {
+          pendingCtaRef.current = { ...detail, walletId: targetWalletId };
+          setActiveWalletId(targetWalletId);
+          return;
+        }
+      }
+
+      runDemoCta(detail);
+    };
+
+    window.addEventListener(DEMO_CARD_CTA_EVENT, handler);
+    return () => window.removeEventListener(DEMO_CARD_CTA_EVENT, handler);
+  }, [activeWalletId, isExternalState, resolvedDefaultWalletId, runDemoCta]);
+
+  useEffect(() => {
+    const pending = pendingCtaRef.current;
+    if (!pending) return;
+    const targetWalletId = pending.walletId
+      ? String(pending.walletId).trim().toUpperCase()
+      : null;
+    if (targetWalletId && targetWalletId !== activeWalletId) return;
+    pendingCtaRef.current = null;
+    runDemoCta(pending);
+  }, [activeWalletId, runDemoCta]);
+
+  useEffect(() => {
+    const prev = prevActiveActionRef.current;
+    if (prev && prev !== activeAction) {
+      flushDemoCards(prev);
+    }
+    prevActiveActionRef.current = activeAction;
+  }, [activeAction, flushDemoCards]);
+
+  useEffect(() => {
+    if (showGlobalStatement) {
+      enqueueDemoCard("statement", {
+        action: "statement_global",
+        walletId: activeWalletId
+      });
+    }
+  }, [activeWalletId, enqueueDemoCard, showGlobalStatement]);
+
+  useEffect(() => {
+    if (!showCurrencyStatement || !selectedStatementToken) return;
+    enqueueDemoCard("statement", {
+      action: "statement_currency",
+      walletId: activeWalletId,
+      currency: selectedStatementToken.currency
+    });
+  }, [activeWalletId, enqueueDemoCard, selectedStatementToken, showCurrencyStatement]);
+
+  useEffect(() => {
+    const isStatementOpen = showGlobalStatement || showCurrencyStatement;
+    if (wasStatementOpenRef.current && !isStatementOpen) {
+      flushDemoCards("statement");
+    }
+    wasStatementOpenRef.current = isStatementOpen;
+  }, [flushDemoCards, showCurrencyStatement, showGlobalStatement]);
+
+  useEffect(() => {
+    return () => {
+      flushTimersRef.current.forEach((timer) => clearTimeout(timer));
+      flushTimersRef.current = [];
+    };
+  }, []);
+
   const handleReset = () => {
     setState(buildDefaultDemoState());
     setActiveWalletId(resolvedDefaultWalletId);
@@ -721,6 +946,7 @@ export default function DemoWalletDashboard({
     setShowGlobalStatement(false);
     setShowCurrencyStatement(false);
     setSelectedStatementToken(null);
+    setStatementHighlightByWallet({});
     setSendPaymentRequest(null);
   };
 
@@ -815,6 +1041,13 @@ export default function DemoWalletDashboard({
       t("demo_error_generic", "Action impossible (démo).");
       return { error: message };
     }
+    const sendEvent = result?.event || null;
+    if (sendEvent?.id) {
+      recordStatementHighlight(activeWalletId, currency, sendEvent.id);
+      if (toWalletId) {
+        recordStatementHighlight(toWalletId, currency, sendEvent.id);
+      }
+    }
 
     if (isFxSend && spreadFeeUnits > 0) {
       const fromWallet = nextState.wallets?.[activeWalletId];
@@ -877,7 +1110,7 @@ export default function DemoWalletDashboard({
       return { error: message };
     }
     setState(nextState);
-    return { ok: true };
+    return { ok: true, event: result?.event || nextState?.events?.[0] || null };
   };
 
   const handleSendSubmit = async () => {
@@ -939,6 +1172,14 @@ export default function DemoWalletDashboard({
         alert(res.error);
         return { ok: false };
       }
+      enqueueDemoCard("send", {
+        action: "send",
+        walletId: activeWalletId,
+        fromWalletId: activeWalletId,
+        toWalletId,
+        amount: amountNum,
+        currency
+      });
       setActiveAction(null);
       setSendPaymentRequest(null);
       return { ok: true };
@@ -1041,6 +1282,23 @@ export default function DemoWalletDashboard({
         await sleep(getDemoLatencyMs());
         const res = submitConvert({ amount: amt, from, to });
         if (res?.error) alert(res.error);
+        if (res?.ok) {
+          const event = res.event || {};
+          if (event?.id) {
+            const fromCode = event.fromCurrency || from;
+            const toCode = event.toCurrency || to;
+            if (fromCode) recordStatementHighlight(activeWalletId, fromCode, event.id);
+            if (toCode) recordStatementHighlight(activeWalletId, toCode, event.id);
+          }
+          enqueueDemoCard("swap", {
+            action: "convert",
+            walletId: activeWalletId,
+            fromAmount: event.fromAmount ?? amt,
+            toAmount: event.toAmount ?? null,
+            fromCurrency: event.fromCurrency ?? from,
+            toCurrency: event.toCurrency ?? to
+          });
+        }
         setActiveAction(null);
       } finally {
         setConvertProcessing(false);
@@ -1055,7 +1313,14 @@ export default function DemoWalletDashboard({
       walletId: activeWalletId,
       currencyCode: code
     });
-    if (res.ok) setState(nextState);
+    if (res.ok) {
+      setState(nextState);
+      enqueueDemoCard("swap", {
+        action: "trustline_add",
+        walletId: activeWalletId,
+        currency: code
+      });
+    }
   };
 
   const handleRemoveCurrencyLine = (code) => {
@@ -1074,6 +1339,11 @@ export default function DemoWalletDashboard({
       return;
     }
     setState(nextState);
+    enqueueDemoCard("swap", {
+      action: "trustline_remove",
+      walletId: activeWalletId,
+      currency: code
+    });
   };
 
   const handleUpsertCurrencyLine = () => {
@@ -1100,6 +1370,12 @@ export default function DemoWalletDashboard({
     wallet.allocations.RLUSD = Number(Math.max(0, nextRlusd).toFixed(6));
     wallet.allocations[code] = Number(units.toFixed(6));
     setState(nextState);
+    enqueueDemoCard("swap", {
+      action: "trustline_update",
+      walletId: activeWalletId,
+      currency: code,
+      amount: allocated
+    });
   };
 
   const walletEvents = useMemo(() => {
@@ -1250,6 +1526,7 @@ export default function DemoWalletDashboard({
       if (!Number.isFinite(amount) || amount <= 0) return;
 
       txs.push({
+        id: evt.id,
         date: new Date(evt.ts).toISOString(),
         category,
         type,
@@ -1270,6 +1547,14 @@ export default function DemoWalletDashboard({
     t,
     walletEvents
   ]);
+
+  const highlightTransactionId = useMemo(() => {
+    if (!selectedStatementToken) return null;
+    const walletKey = String(activeWalletId || "").trim().toUpperCase();
+    const currencyKey = String(selectedStatementToken.currency || "").trim().toUpperCase();
+    const walletMap = statementHighlightByWallet[walletKey] || {};
+    return walletMap?.[currencyKey]?.eventId || null;
+  }, [activeWalletId, selectedStatementToken, statementHighlightByWallet]);
 
   return (
     <div
@@ -1399,7 +1684,10 @@ export default function DemoWalletDashboard({
 
           <button
             type="button"
-            onClick={() => setActiveAction("swap")}
+            onClick={() => {
+              setSwapDefaultView("convert");
+              setActiveAction("swap");
+            }}
             title={t("demo_tt_convert", "Convertir entre devises internes (démo).")}
             className="wallet-action-btn wallet-action-swap group">
 
@@ -1458,7 +1746,10 @@ export default function DemoWalletDashboard({
             </div>
             <button
               type="button"
-              onClick={() => setActiveAction("swap")}
+              onClick={() => {
+                setSwapDefaultView("lines");
+                setActiveAction("swap");
+              }}
               title={t("demo_tt_manage_lines", "Gérer les lignes de devises.")}
               className="text-[11px] text-xcannes-green/80 hover:text-xcannes-green transition-colors">
 
@@ -1637,6 +1928,7 @@ export default function DemoWalletDashboard({
       <WalletDashboardSwapModal
         open={activeAction === "swap"}
         onClose={() => setActiveAction(null)}
+        defaultView={swapDefaultView}
         renderWalletMeta={renderWalletMeta}
         isPreviewMode={true}
         noticeVariant="demo"
@@ -1695,7 +1987,17 @@ export default function DemoWalletDashboard({
             memo: "MoonPay (demo)"
           });
           if (!res.ok) return { error: t("demo_error_generic", "Action impossible (démo).") };
+          const event = res?.event || null;
+          if (event?.id) {
+            recordStatementHighlight(activeWalletId, "RLUSD", event.id);
+          }
           setState(nextState);
+          enqueueDemoCard("cash", {
+            action: "buy",
+            walletId: activeWalletId,
+            amount: Number(amount),
+            currency: "RLUSD"
+          });
           return { ok: true };
         }}
         onDemoSell={async ({ amount }) => {
@@ -1716,7 +2018,17 @@ export default function DemoWalletDashboard({
               t("demo_error_generic", "Action impossible (démo).")
             };
           }
+          const event = res?.event || null;
+          if (event?.id) {
+            recordStatementHighlight(activeWalletId, "RLUSD", event.id);
+          }
           setState(nextState);
+          enqueueDemoCard("cash", {
+            action: "sell",
+            walletId: activeWalletId,
+            amount: Number(amount),
+            currency: "RLUSD"
+          });
           return { ok: true };
         }}
         cashModalTab={cashModalTab}
@@ -1745,6 +2057,7 @@ export default function DemoWalletDashboard({
         statementVariant={"default"}
         currencyLines={currencyLines}
         usdRates={effectiveUsdPerUnitRates}
+        highlightTransactionId={highlightTransactionId}
         showGlobalStatement={showGlobalStatement}
         setShowGlobalStatement={setShowGlobalStatement}
         showCurrencyStatement={showCurrencyStatement}

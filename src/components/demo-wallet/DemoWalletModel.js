@@ -191,7 +191,7 @@ export function applyDemoSend({
   toWallet.allocations[currency] = Number((toBalance + amount).toFixed(6));
 
   const usdValue = amount * usdPerUnit;
-  pushEvent(state, {
+  const event = {
     id: newId(),
     ts: Date.now(),
     kind: "send",
@@ -201,9 +201,10 @@ export function applyDemoSend({
     amount,
     usdValue,
     memo: String(memo || "").slice(0, 80),
-  });
+  };
+  pushEvent(state, event);
 
-  return { ok: true };
+  return { ok: true, event };
 }
 
 export function applyDemoConvert({
@@ -249,7 +250,7 @@ export function applyDemoConvert({
   const prevTo = safeNumber(wallet.allocations[toCurrency]) ?? 0;
   wallet.allocations[toCurrency] = Number((prevTo + toAmount).toFixed(6));
 
-  pushEvent(state, {
+  const event = {
     id: newId(),
     ts: Date.now(),
     kind: "convert",
@@ -262,9 +263,10 @@ export function applyDemoConvert({
     feeUsd,
     usdNet,
     spreadBps,
-  });
+  };
+  pushEvent(state, event);
 
-  return { ok: true };
+  return { ok: true, event };
 }
 
 export function applyDemoBuySell({
@@ -292,7 +294,7 @@ export function applyDemoBuySell({
     (side === "sell" ? current - amount : current + amount).toFixed(6)
   );
 
-  pushEvent(state, {
+  const event = {
     id: newId(),
     ts: Date.now(),
     kind: side === "sell" ? "sell" : "buy",
@@ -301,9 +303,10 @@ export function applyDemoBuySell({
     amount,
     usdValue: amount,
     memo: String(memo || "").slice(0, 80),
-  });
+  };
+  pushEvent(state, event);
 
-  return { ok: true };
+  return { ok: true, event };
 }
 
 export function applyDemoEnableCurrency({ state, walletId, currencyCode }) {
