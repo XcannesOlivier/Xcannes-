@@ -1,5 +1,7 @@
 import SEOHead from "@/components/layout/SEOHead";
 import DemoWalletDashboard from "@/components/demo-wallet/DemoWalletDashboard";
+import WalletEssentialsCards from "@/components/home/WalletEssentialsCards";
+import SupportAssistantWidget from "@/components/layout/SupportAssistantWidget";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import Link from "next/link";
@@ -60,34 +62,18 @@ export default function DemoWalletsComparePage() {
 
       <Link
         href="/"
-        className="fixed top-4 right-4 z-50 inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/30 border border-white/10 text-white/70 hover:text-white hover:bg-black/40 transition-colors"
+        className="fixed top-2 right-2 sm:top-3 sm:right-3 z-50 inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/30 border border-white/10 text-white/70 hover:text-white hover:bg-black/40 transition-colors"
         aria-label={t("demo_compare_close", "Retour à l’accueil")}
         title={t("demo_compare_close", "Retour à l’accueil")}
       >
         ✕
       </Link>
 
-      <main className="min-h-screen bg-xcannes-background px-4 sm:px-6 pt-10 pb-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-end justify-between gap-4 mb-6">
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-2">
-                {t("demo_compare_badge", "Démo")}
-              </p>
-              <h1 className="text-2xl sm:text-3xl font-montserrat font-semibold text-white">
-                {t("demo_compare_h1", "Wallet A / Wallet B")}
-              </h1>
-              <p className="mt-2 text-sm text-white/60 max-w-2xl">
-                {t(
-                  "demo_compare_subtitle",
-                  "Démo fictive : comparez les deux wallets côte à côte. Aucune transaction réelle."
-                )}
-              </p>
-            </div>
-          </div>
+      <main className="min-h-screen lg:h-screen bg-xcannes-background px-2 sm:px-3 lg:px-4 py-6 lg:py-4 lg:overflow-hidden">
+        <div className="max-w-[1560px] min-[1600px]:max-w-none mx-auto h-full min-h-0">
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-10">
-            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden h-[760px]">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px_minmax(0,1fr)] min-[1600px]:grid-cols-[minmax(0,620px)_minmax(320px,1fr)_minmax(0,620px)] gap-4 pb-10 lg:pb-0 h-full min-h-0">
+            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden h-full min-h-0">
               <DemoWalletDashboard
                 defaultWalletId="A"
                 theme="home"
@@ -97,7 +83,10 @@ export default function DemoWalletsComparePage() {
                 setDemoState={setDemoState}
               />
             </div>
-            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden h-[760px]">
+            <div className="hidden lg:block h-full min-h-0 w-full">
+              <WalletEssentialsCards variant="compare" />
+            </div>
+            <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden h-full min-h-0">
               <DemoWalletDashboard
                 defaultWalletId="B"
                 theme="dex"
@@ -110,6 +99,8 @@ export default function DemoWalletsComparePage() {
           </div>
         </div>
       </main>
+
+      <SupportAssistantWidget />
     </>
   );
 }

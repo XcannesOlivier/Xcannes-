@@ -365,6 +365,28 @@ body {
   }
 }
 
+@keyframes essentialsSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes essentialsFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* ====== EOD FX buttons flash (neutral + pulse) ====== */
 
 @keyframes eodFlashUp {
@@ -401,6 +423,14 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-essentials-slide-in {
+  animation: essentialsSlideIn 0.55s ease-out;
+}
+
+.animate-essentials-fade {
+  animation: essentialsFadeIn 0.4s ease-out;
 }
 
 /* ====== PRICE TICKER (défilement horizontal) ====== */

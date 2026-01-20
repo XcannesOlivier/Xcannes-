@@ -22,13 +22,6 @@ export default function WhyXcannesSection() {
           >
             {t("home_v2_final_cta_primary", "Ouvrir le wallet")}
           </Link>
-          <Link
-            href="/dex"
-            className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}
-          >
-            {t("home_v2_final_cta_markets", "Voir les marchés")}
-            <span className="inline-block ml-2 text-xs">→</span>
-          </Link>
         </div>
       </div>
     </section>
