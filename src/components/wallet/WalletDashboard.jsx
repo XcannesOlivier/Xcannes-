@@ -109,6 +109,7 @@ export default function WalletDashboard({
   const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | 'trustlines' | null
   const [pendingActivationCurrency, setPendingActivationCurrency] = useState(null);
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
+  const [swapLockedView, setSwapLockedView] = useState(null);
   const { receiveTab, setReceiveTab } = useReceiveForm();
   const {
     sendTab,
@@ -154,6 +155,7 @@ export default function WalletDashboard({
     (nextAction) => {
       if (nextAction === "swap") {
         setSwapDefaultView("convert");
+        setSwapLockedView(null);
       }
       setActiveAction(nextAction);
     },
@@ -162,6 +164,7 @@ export default function WalletDashboard({
 
   const handleOpenCurrencyLines = useCallback(() => {
     setSwapDefaultView("lines");
+    setSwapLockedView("lines");
     setActiveAction("swap");
   }, []);
   
@@ -733,6 +736,7 @@ export default function WalletDashboard({
       setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
       setConvertAmount("");
       setSwapDefaultView("convert");
+      setSwapLockedView(null);
       setActiveAction("swap");
 
     };
@@ -746,6 +750,7 @@ export default function WalletDashboard({
     setConvertBaseCurrency,
     setConvertQuoteCurrency,
     setSwapDefaultView,
+    setSwapLockedView,
   ]);
 
   const handleUpsertCurrencyLine = useCallback(async () => {
@@ -2030,13 +2035,14 @@ export default function WalletDashboard({
             rlusdPerUnitSources={rlusdPerUnitSources}
           />
 
-          <WalletDashboardSwapModal
-            open={activeAction === "swap"}
-            onClose={() => setActiveAction(null)}
-            renderWalletMeta={renderWalletMeta}
-            isPreviewMode={isPreviewMode}
-            defaultView={swapDefaultView}
-            effectiveIsConnected={effectiveIsConnected}
+            <WalletDashboardSwapModal
+              open={activeAction === "swap"}
+              onClose={() => setActiveAction(null)}
+              renderWalletMeta={renderWalletMeta}
+              isPreviewMode={isPreviewMode}
+              defaultView={swapDefaultView}
+              lockedView={swapLockedView}
+              effectiveIsConnected={effectiveIsConnected}
             isWalletActivated={isWalletActivated}
             walletAddress={effectiveWallet}
             onConnectWallet={connect}

@@ -18,6 +18,7 @@ export default function WalletDashboardSwapModal({
   renderWalletMeta,
   isPreviewMode,
   defaultView = "convert",
+  lockedView = null,
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
@@ -69,9 +70,9 @@ export default function WalletDashboardSwapModal({
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   useEffect(() => {
     if (!open) return;
-    const nextView = defaultView || "convert";
+    const nextView = lockedView || defaultView || "convert";
     setView(nextView);
-  }, [defaultView, open]);
+  }, [defaultView, lockedView, open]);
 
   const existingCurrencyLinesSet = useMemo(() => {
     const set = new Set();
@@ -476,32 +477,34 @@ export default function WalletDashboardSwapModal({
 	            {renderWalletMeta?.("mb-2")}
 
 
-	            <div className="grid grid-cols-2 gap-2">
-	              <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setView("convert");
-              }}
-              className={`px-3 py-2 text-xs ${
-              view === "convert" ? blueActionBtnMuted : blueTabInactive
-              }`}>{t("ui_convert_8408e969ec", "Convert")}
-
-
-            </button>
-              <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setView("lines");
-              }}
-              className={`px-3 py-2 text-xs ${
-              view === "lines" ? blueActionBtnMuted : blueTabInactive
-              }`}>{t("ui_currency_lines_267fc2eff3", "Currency lines")}
-
-
-            </button>
-            </div>
+            {!lockedView ? (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setView("convert");
+                  }}
+                  className={`px-3 py-2 text-xs ${
+                    view === "convert" ? blueActionBtnMuted : blueTabInactive
+                  }`}
+                >
+                  {t("ui_convert_8408e969ec", "Convert")}
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setView("lines");
+                  }}
+                  className={`px-3 py-2 text-xs ${
+                    view === "lines" ? blueActionBtnMuted : blueTabInactive
+                  }`}
+                >
+                  {t("ui_currency_lines_267fc2eff3", "Currency lines")}
+                </button>
+              </div>
+            ) : null}
 
           {!isPreviewMode && (!hasOnChainRlusd || !hasOnChainXcs) &&
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
@@ -722,13 +725,6 @@ export default function WalletDashboardSwapModal({
             </div> :
 
         <div className="space-y-3">
-              <p className="text-xs text-white/60">
-                {t(
-                  "ui_choose_currencies_to_activate_41eea71853",
-                  "Choisissez les devises que vous souhaitez activer."
-                )}
-              </p>
-
               <div className="rounded-xl border border-white/10 bg-black/20 p-3">
                 <div className="text-[11px] font-semibold text-white/80">{t("ui_available_currencies_267b159a9a", "Available currencies")}
 

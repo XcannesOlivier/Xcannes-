@@ -294,6 +294,7 @@ export default function DemoWalletDashboard({
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
+  const [swapLockedView, setSwapLockedView] = useState(null);
   const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
@@ -793,6 +794,7 @@ export default function DemoWalletDashboard({
     if (action === "open_swap") {
       closeStatements();
       setSwapDefaultView(detail.swapView || "convert");
+      setSwapLockedView(null);
       setActiveAction("swap");
       return;
     }
@@ -814,7 +816,8 @@ export default function DemoWalletDashboard({
     setSelectedStatementToken,
     setShowCurrencyStatement,
     setShowGlobalStatement,
-    setSwapDefaultView
+    setSwapDefaultView,
+    setSwapLockedView
   ]);
 
   const handleDemoRequestGenerated = useCallback((request) => {
@@ -1390,6 +1393,16 @@ export default function DemoWalletDashboard({
   }, [activeWalletId, state.events]);
 
   const previewGlobalMovements = useMemo(() => {
+    const resolveEventUsdValue = (evt) => {
+      const usdValue = Number(evt?.usdValue);
+      if (Number.isFinite(usdValue)) return usdValue;
+      const code = String(evt?.currency || "").toUpperCase();
+      const rate = Number(rlusdPerUnitRates?.[code] || 0);
+      const amount = Number(evt?.amount || 0);
+      if (code === "RLUSD") return amount;
+      return rate > 0 ? amount * rate : amount;
+    };
+
     return (walletEvents || []).map((evt) => {
       if (evt.kind === "convert") {
         return {
@@ -1417,12 +1430,14 @@ export default function DemoWalletDashboard({
         };
       }
       if (evt.kind === "buy" || evt.kind === "sell") {
+        const evtCurrency = String(evt.currency || "RLUSD").toUpperCase();
+        const amountRlusd = resolveEventUsdValue(evt);
         return {
           movementId: evt.id,
           createdAt: new Date(evt.ts).toISOString(),
-          fromCurrencyCode: evt.kind === "buy" ? "USD" : "RLUSD",
-          toCurrencyCode: "RLUSD",
-          amountRlusd: evt.amount || 0
+          fromCurrencyCode: evt.kind === "buy" ? "USD" : evtCurrency,
+          toCurrencyCode: evt.kind === "buy" ? evtCurrency : "USD",
+          amountRlusd
         };
       }
       return {
@@ -1497,13 +1512,19 @@ export default function DemoWalletDashboard({
         } else {
           return;
         }
-      } else if (evt.kind === "buy" && currency === "RLUSD") {
+      } else if (
+        evt.kind === "buy" &&
+        String(evt.currency || "").toUpperCase() === currency
+      ) {
         category = "buy";
         type = "credit";
         amount = Number(evt.amount || 0);
         delta = amount;
         description = t("demo_statement_buy_moonpay", "Achat via MoonPay (démo)");
-      } else if (evt.kind === "sell" && currency === "RLUSD") {
+      } else if (
+        evt.kind === "sell" &&
+        String(evt.currency || "").toUpperCase() === currency
+      ) {
         category = "sell";
         type = "debit";
         amount = Number(evt.amount || 0);
@@ -1686,6 +1707,7 @@ export default function DemoWalletDashboard({
             type="button"
             onClick={() => {
               setSwapDefaultView("convert");
+              setSwapLockedView(null);
               setActiveAction("swap");
             }}
             title={t("demo_tt_convert", "Convertir entre devises internes (démo).")}
@@ -1748,12 +1770,13 @@ export default function DemoWalletDashboard({
               type="button"
               onClick={() => {
                 setSwapDefaultView("lines");
+                setSwapLockedView("lines");
                 setActiveAction("swap");
               }}
               title={t("demo_tt_manage_lines", "Gérer les lignes de devises.")}
               className="text-[11px] text-xcannes-green/80 hover:text-xcannes-green transition-colors">
 
-              {t("demo_manage_lines", "Gérer les lignes")} →
+              {t("demo_manage_lines", "Gérer les lignes de devises")} →
             </button>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
@@ -1929,6 +1952,7 @@ export default function DemoWalletDashboard({
         open={activeAction === "swap"}
         onClose={() => setActiveAction(null)}
         defaultView={swapDefaultView}
+        lockedView={swapLockedView}
         renderWalletMeta={renderWalletMeta}
         isPreviewMode={true}
         noticeVariant="demo"

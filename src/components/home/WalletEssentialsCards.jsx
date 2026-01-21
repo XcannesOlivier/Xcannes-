@@ -10,6 +10,7 @@ const FLASH_STYLES = {
   receive_request: { backgroundColor: "rgba(34, 197, 94, 0.12)", borderColor: "#22C55E" },
   convert: { backgroundColor: "rgba(6, 182, 212, 0.12)", borderColor: "#06B6D4" },
   buy: { backgroundColor: "rgba(139, 92, 246, 0.12)", borderColor: "#8B5CF6" },
+  lines: { backgroundColor: "rgba(245, 158, 11, 0.12)", borderColor: "#F59E0B" },
   statements: { backgroundColor: "rgba(34, 197, 94, 0.12)", borderColor: "#22C55E" },
   config: { backgroundColor: "rgba(139, 92, 246, 0.12)", borderColor: "#8B5CF6" }
 };
@@ -19,6 +20,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const [modalRoot, setModalRoot] = useState(null);
   const [activeActionKey, setActiveActionKey] = useState(null);
   const [flashByKey, setFlashByKey] = useState({});
+  const [returnCardKey, setReturnCardKey] = useState(null);
   const flashTimers = useRef({});
   const isCompact = variant === "compare";
   const locale = i18n?.language || "en";
@@ -112,9 +114,9 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         sell: "buy",
         statement_global: "statements",
         statement_currency: "statements",
-        trustline_add: "config",
-        trustline_remove: "config",
-        trustline_update: "config"
+        trustline_add: "lines",
+        trustline_remove: "lines",
+        trustline_update: "lines"
       };
 
       const cardKey = cardKeyMap[action];
@@ -452,22 +454,33 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       const flash = buildFlash(event?.detail || {});
       if (!flash) return;
 
+      const isMobile =
+        window.matchMedia("(max-width: 1023px)").matches &&
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      if (flash.cardKey && isMobile) {
+        setReturnCardKey(flash.cardKey);
+      }
+
+      if (flashTimers.current[flash.cardKey]) {
+        clearTimeout(flashTimers.current[flash.cardKey]);
+        delete flashTimers.current[flash.cardKey];
+      }
+
       setFlashByKey((prev) => ({
         ...prev,
         [flash.cardKey]: { title: flash.title, desc: flash.desc, ctas: flash.ctas || [] }
       }));
 
-      if (flashTimers.current[flash.cardKey]) {
-        clearTimeout(flashTimers.current[flash.cardKey]);
+      if (!isMobile) {
+        flashTimers.current[flash.cardKey] = setTimeout(() => {
+          setFlashByKey((prev) => {
+            const next = { ...prev };
+            delete next[flash.cardKey];
+            return next;
+          });
+          delete flashTimers.current[flash.cardKey];
+        }, FLASH_DURATION_MS);
       }
-
-      flashTimers.current[flash.cardKey] = setTimeout(() => {
-        setFlashByKey((prev) => {
-          const next = { ...prev };
-          delete next[flash.cardKey];
-          return next;
-        });
-      }, FLASH_DURATION_MS);
     };
 
     window.addEventListener(DEMO_CARD_EVENT, handleFlash);
@@ -478,13 +491,37 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     };
   }, [buildFlash]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const handleReturnCta = (event) => {
+      const detail = event?.detail || {};
+      if (detail.action === "return_wallet") {
+        const targetKey = detail.cardKey || returnCardKey;
+        if (targetKey) {
+          setFlashByKey((prev) => {
+            const next = { ...prev };
+            delete next[targetKey];
+            return next;
+          });
+          if (flashTimers.current[targetKey]) {
+            clearTimeout(flashTimers.current[targetKey]);
+            delete flashTimers.current[targetKey];
+          }
+        }
+        setReturnCardKey(null);
+      }
+    };
+    window.addEventListener(DEMO_CARD_CTA_EVENT, handleReturnCta);
+    return () => window.removeEventListener(DEMO_CARD_CTA_EVENT, handleReturnCta);
+  }, []);
+
   const actions = [
     {
       key: "statements",
       title: t("home_v2_essentials_1_title", "Relevés d'opération"),
       desc: t(
         "home_v2_essentials_1_desc",
-        "Suivez, prouvez et exportez les mouvements, par devise ou globalement."
+        "Suivez les mouvements, par devise ou globalement."
       ),
       modalPoints: [
         t(
@@ -500,7 +537,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           "Historique clair pour le suivi comptable."
         ),
       ],
-      orderClassName: "order-5 lg:order-7",
+      orderClassName: "order-6 lg:order-8",
       iconClassName:
         "text-[#22C55E] bg-[rgba(34,197,94,0.08)] group-hover:bg-[rgba(34,197,94,0.14)]",
       borderHoverClassName: "group-hover:border-[#22C55E]/40",
@@ -527,7 +564,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       title: t("home_v2_essentials_2_title", "Payer / Envoyer"),
       desc: t(
         "home_v2_essentials_2_desc",
-        "Demandez (QR), recevez et envoyez en quelques secondes, avec validation explicite."
+        "Demandez (QR), recevez et envoyez en quelques secondes."
       ),
       modalPoints: [
         t(
@@ -690,7 +727,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           "Notifications et sécurité configurables."
         ),
       ],
-      orderClassName: "order-6 lg:order-8",
+      orderClassName: "order-7 lg:order-9",
       iconClassName:
         "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] group-hover:bg-[rgba(139,92,246,0.14)]",
       borderHoverClassName: "group-hover:border-[#8B5CF6]/40",
@@ -770,6 +807,43 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       ),
     },
     {
+      key: "lines",
+      title: t("home_v2_essentials_lines_title", "Lignes de devises"),
+      desc: t(
+        "home_v2_essentials_lines_desc",
+        "Activez et gérez vos devises locales en quelques étapes."
+      ),
+      modalPoints: [
+        t(
+          "home_v2_essentials_lines_modal_point_1",
+          "Activez une devise pour l'utiliser dans le wallet."
+        ),
+        t(
+          "home_v2_essentials_lines_modal_point_2",
+          "Allouez et ajustez vos montants en RLUSD."
+        ),
+        t(
+          "home_v2_essentials_lines_modal_point_3",
+          "Gérez les lignes actives et leur disponibilité."
+        ),
+      ],
+      orderClassName: "order-5 lg:order-7",
+      iconClassName:
+        "text-[#F59E0B] bg-[rgba(245,158,11,0.08)] group-hover:bg-[rgba(245,158,11,0.14)]",
+      borderHoverClassName: "group-hover:border-[#F59E0B]/40",
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M5 6h14M5 12h14M5 18h10"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <circle cx="19" cy="18" r="2" stroke="currentColor" strokeWidth="2" />
+        </svg>
+      ),
+    },
+    {
       key: "demo_intro",
       title: t(
         "home_v2_demo_card_title",
@@ -817,7 +891,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     ? "h-full w-full flex flex-col min-h-0 gap-4"
     : "";
   const gridClassName = isCompact
-    ? "grid grid-cols-1 grid-rows-6 gap-2 flex-1 min-h-0"
+    ? "grid grid-cols-1 grid-rows-7 gap-2 flex-1 min-h-0"
     : "grid sm:grid-cols-2 lg:grid-cols-1 gap-4";
   const cardPaddingClassName = isCompact ? "p-3" : "p-5";
   const layoutClassName = isCompact
@@ -862,6 +936,15 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           const flashStyle =
             flash && !action.isPlain ? (FLASH_STYLES[action.key] || {}) : undefined;
           const flashCtas = flash?.ctas || [];
+          const showReturnCta = Boolean(returnCardKey === action.key && flash);
+          const returnCta = showReturnCta
+            ? {
+              label: t("demo_card_cta_return_wallet", "Revenir au wallet"),
+              detail: { action: "return_wallet", cardKey: action.key },
+              className: "md:hidden"
+            }
+            : null;
+          const effectiveCtas = returnCta ? [...flashCtas, returnCta] : flashCtas;
           const ctaStyle = flashStyle
             ? { borderColor: flashStyle.borderColor, color: flashStyle.borderColor }
             : undefined;
@@ -925,9 +1008,9 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               >
                 {effectiveDesc}
               </p>
-              {flashCtas.length > 0 && !action.isPlain && (
+              {effectiveCtas.length > 0 && !action.isPlain && (
                 <div className={ctaContainerClassName}>
-                  {flashCtas.map((cta) => (
+                  {effectiveCtas.map((cta) => (
                     <button
                       key={cta.label}
                       type="button"
@@ -935,7 +1018,9 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                         event.stopPropagation();
                         dispatchDemoCta(cta.detail);
                       }}
-                      className={ctaButtonClassName}
+                      className={[ctaButtonClassName, cta.className]
+                        .filter(Boolean)
+                        .join(" ")}
                       style={ctaStyle}
                     >
                       {cta.label}
@@ -1000,7 +1085,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
 
           if (action.isPlain) {
             return (
-              <div key={action.key} className={cardClasses} style={flashStyle}>
+              <div
+                key={action.key}
+                className={cardClasses}
+                style={flashStyle}
+                data-essentials-card-key={action.key}
+              >
                 {cardContent}
               </div>
             );
@@ -1015,6 +1105,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               style={flashStyle}
               aria-haspopup="dialog"
               aria-expanded={activeActionKey === action.key}
+              data-essentials-card-key={action.key}
             >
               {cardContent}
             </button>
@@ -1038,7 +1129,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId || undefined}
-              className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#050c12]/95 p-5 shadow-2xl animate-essentials-slide-in md:animate-essentials-fade motion-reduce:animate-none"
+              className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#050c12]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4">

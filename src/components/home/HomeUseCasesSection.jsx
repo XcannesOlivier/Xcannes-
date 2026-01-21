@@ -34,7 +34,7 @@ export default function HomeUseCasesSection() {
       title: t("home_v2_essentials_2_title", "Payer / Envoyer"),
       desc: t(
         "home_v2_essentials_2_desc",
-        "Demander (QR), recevoir et envoyer en quelques secondes, avec validation explicite."
+        "Demander (QR), recevoir et envoyer en quelques secondes."
       ),
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
