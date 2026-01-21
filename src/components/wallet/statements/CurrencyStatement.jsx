@@ -705,6 +705,44 @@ export default function CurrencyStatement({
 
     return enriched;
   };
+  const simplifyMobileDescription = useCallback(
+    (description, category) => {
+      if (!description) return description;
+      const safeDescription = String(description).trim();
+      const lower = safeDescription.toLowerCase();
+      if (category !== "exchange") {
+        if (lower.includes("moonpay")) {
+          if (lower.includes("achat")) return "achat";
+          if (lower.includes("vente")) return "vente";
+        }
+        if (lower.startsWith("achat")) return "achat";
+        if (lower.startsWith("vente")) return "vente";
+        if (lower.startsWith("recevoir") || lower.startsWith("reçu") || lower.startsWith("recu")) {
+          return "reçu";
+        }
+        if (lower.startsWith("envoyer") || lower.startsWith("envoyé") || lower.startsWith("envoye")) {
+          return "envoyé";
+        }
+        if (lower.includes("recevoir") && lower.includes("wallet")) return "reçu";
+        if (lower.includes("envoyer") && lower.includes("wallet")) return "envoyé";
+        return enrichDescription(safeDescription);
+      }
+      const arrowMatch = safeDescription.match(/([A-Z]{3})\s*(?:→|->)\s*([A-Z]{3})/);
+      if (arrowMatch) {
+        return enrichDescription(`${arrowMatch[1]} → ${arrowMatch[2]}`);
+      }
+      const slashMatch = safeDescription.match(/([A-Z]{3})\s*\/\s*([A-Z]{3})/);
+      if (slashMatch) {
+        return enrichDescription(`${slashMatch[1]} → ${slashMatch[2]}`);
+      }
+      const firstCurrencyIndex = safeDescription.search(/\b[A-Z]{3}\b/);
+      const trimmed = firstCurrencyIndex >= 0
+        ? safeDescription.slice(firstCurrencyIndex)
+        : safeDescription.replace(/^\s*conversion\s*/i, "").trim();
+      return enrichDescription(trimmed);
+    },
+    [enrichDescription]
+  );
 
   const formatDate = useCallback((dateStr) => {
     if (!dateStr) return t("ui_not_available_9c2a1f7b3d", "N/A");
@@ -1411,7 +1449,11 @@ export default function CurrencyStatement({
                                 </span> :
                           null}
                               <div className="min-w-0">
-                                <p className="text-sm text-white/90 truncate">{enrichDescription(tx.description)}</p>
+                                <p className="text-sm text-white/90 truncate">
+                                  {isMobileDate ?
+                                    simplifyMobileDescription(tx.description, tx.category) :
+                                    enrichDescription(tx.description)}
+                                </p>
                                 {tx.counterparty &&
                             <p className="text-xs text-white/40 font-mono truncate hidden md:block">
                                     {tx.counterparty.slice(0, 10)}...{tx.counterparty.slice(-6)}
@@ -1505,7 +1547,7 @@ export default function CurrencyStatement({
             </button>
             <button
             onClick={handlePrint}
-            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">{t("ui_print_1313eff37c", "🖨️ Print")}
+            className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">{t("ui_print_1313eff37c", "🖨️ Print")}
 
 
           </button>

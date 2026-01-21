@@ -1316,14 +1316,14 @@ export default function DemoWalletDashboard({
       walletId: activeWalletId,
       currencyCode: code
     });
-    if (res.ok) {
-      setState(nextState);
-      enqueueDemoCard("swap", {
-        action: "trustline_add",
-        walletId: activeWalletId,
-        currency: code
-      });
-    }
+    if (!res.ok) return false;
+    setState(nextState);
+    enqueueDemoCard("swap", {
+      action: "trustline_add",
+      walletId: activeWalletId,
+      currency: code
+    });
+    return true;
   };
 
   const handleRemoveCurrencyLine = (code) => {
@@ -1339,7 +1339,7 @@ export default function DemoWalletDashboard({
         t("demo_trustlines_delete_disabled", "Convertissez vers 0 avant suppression.") :
         t("demo_error_generic", "Action impossible (démo).")
       );
-      return;
+      return false;
     }
     setState(nextState);
     enqueueDemoCard("swap", {
@@ -1347,6 +1347,8 @@ export default function DemoWalletDashboard({
       walletId: activeWalletId,
       currency: code
     });
+    setActiveAction(null);
+    return true;
   };
 
   const handleUpsertCurrencyLine = () => {

@@ -51,16 +51,16 @@ export function useCurrencyLinesActions({
 
   const handleRemoveCurrencyLine = useCallback(
     async (code) => {
-      if (!backendWalletAddress) return;
+      if (!backendWalletAddress) return false;
       const currencyCode = String(code || "").trim().toUpperCase();
-      if (!currencyCode) return;
+      if (!currencyCode) return false;
       const ok = confirm(`Delete currency line ${currencyCode}?`);
-      if (!ok) return;
+      if (!ok) return false;
       await removeCurrencyLine?.(currencyCode);
+      return true;
     },
     [backendWalletAddress, removeCurrencyLine]
   );
 
   return { handleUpsertCurrencyLine, handleRemoveCurrencyLine };
 }
-
