@@ -124,7 +124,7 @@ export default function SupportAssistantWidget() {
           </button>
           <div
             className={[
-              "absolute right-12 md:right-14 whitespace-nowrap rounded-full border border-white/10 bg-black/70 px-3 py-1 text-[11px] text-white/80 shadow-lg transition-all duration-200",
+              "absolute right-12 md:right-14 whitespace-nowrap rounded-full border border-black/10 bg-white px-4 py-2 text-[12px] text-black/90 shadow-xl transition-all duration-200",
               showPrompt
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-1 pointer-events-none",

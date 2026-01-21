@@ -419,10 +419,32 @@ export default function WalletDashboardSwapModal({
     existingCurrencyLinesSet.has(
       String(activateCurrencyCode || "").toUpperCase()
     );
-  const handleActivateLine = () => {
+  const handleActivateLine = async () => {
     const upper = String(activateCurrencyCode || "").toUpperCase();
-    onActivateCurrencyLine?.(upper);
-    setActivateCurrencyCode("");
+    let didActivate = false;
+    try {
+      const result = await onActivateCurrencyLine?.(upper);
+      didActivate = Boolean(result);
+    } catch (error) {
+      console.error("[wallet/swap] activate currency line failed:", error);
+    } finally {
+      setActivateCurrencyCode("");
+    }
+    if (didActivate) {
+      onClose?.();
+    }
+  };
+  const handleDeleteLine = async (code) => {
+    let didDelete = false;
+    try {
+      const result = await handleRemoveCurrencyLine?.(code);
+      didDelete = Boolean(result);
+    } catch (error) {
+      console.error("[wallet/swap] delete currency line failed:", error);
+    }
+    if (didDelete) {
+      onClose?.();
+    }
   };
 
   if (!open) return null;
@@ -781,7 +803,7 @@ export default function WalletDashboardSwapModal({
             currencyLines={currencyLines}
             selectIconByCurrency={selectIconByCurrency}
             onRefresh={refreshCurrencyLines}
-            onDelete={handleRemoveCurrencyLine} />
+            onDelete={handleDeleteLine} />
 
 
             </div>

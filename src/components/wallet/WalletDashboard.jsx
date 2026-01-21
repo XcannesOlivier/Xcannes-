@@ -521,8 +521,8 @@ export default function WalletDashboard({
   const handleActivateCurrencyLine = useCallback(
     async (code) => {
       const currencyCode = String(code || "").trim().toUpperCase();
-      if (!currencyCode || currencyCode.length < 2) return;
-      if (currencyCode === "RLUSD" || currencyCode === "XRP" || currencyCode === "XCS") return;
+      if (!currencyCode || currencyCode.length < 2) return false;
+      if (currencyCode === "RLUSD" || currencyCode === "XRP" || currencyCode === "XCS") return false;
 
       if (isPreviewMode) {
         setDemoLines((prev) => {
@@ -531,18 +531,18 @@ export default function WalletDashboard({
           next[currencyCode] = { currency: currencyCode, rlusd: 0, units: 0, rate: 0 };
           return next;
         });
-        return;
+        return true;
       }
 
       if (!backendWalletAddress) {
         alert("Please connect your Xumm wallet first.");
-        return;
+        return false;
       }
 
       const alreadyActive = (currencyLines || []).some(
         (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
       );
-      if (alreadyActive) return;
+      if (alreadyActive) return false;
 
       if (isWalletActivated === false) {
         alert(
@@ -550,27 +550,28 @@ export default function WalletDashboard({
             defaultValue: "Wallet must be activated to create currency lines.",
           })
         );
-        return;
+        return false;
       }
 
       if (!hasOnChainRlusd) {
         alert("RLUSD trustline is not installed yet. Please install it first.");
-        return;
+        return false;
       }
 
       if (!hasOnChainXcs) {
         alert("XCS trustline is not installed yet. Please install it first.");
-        return;
+        return false;
       }
 
       const xummUuid = await payActivationFee("wallet:currency-lines:upsert");
-      if (!xummUuid) return;
+      if (!xummUuid) return false;
 
       await upsertCurrencyLine?.({
         currencyCode,
         allocatedRlusd: 0,
         xummUuid,
       });
+      return true;
     },
     [
       backendWalletAddress,
@@ -833,7 +834,7 @@ export default function WalletDashboard({
   const handleRemoveCurrencyLine = useCallback(
     async (code) => {
       const currencyCode = String(code || "").trim().toUpperCase();
-      if (!currencyCode || currencyCode === "RLUSD") return;
+      if (!currencyCode || currencyCode === "RLUSD") return false;
 
       if (isPreviewMode) {
         setDemoLines((prev) => {
@@ -847,10 +848,11 @@ export default function WalletDashboard({
           delete next[currencyCode];
           return next;
         });
-        return;
+        return true;
       }
 
-      await handleRemoveCurrencyLineReal?.(currencyCode);
+      const result = await handleRemoveCurrencyLineReal?.(currencyCode);
+      return Boolean(result);
     },
     [handleRemoveCurrencyLineReal, isPreviewMode, setDemoLines]
   );

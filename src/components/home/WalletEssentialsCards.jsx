@@ -1,18 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import Image from "next/image";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
+import { getCurrencyFlag } from "@/components/wallet/walletDashboardConfig";
 
 const DEMO_CARD_EVENT = "xcannes:demo-wallet:card";
 const DEMO_CARD_CTA_EVENT = "xcannes:demo-wallet:cta";
-const FLASH_DURATION_MS = 5000;
 const FLASH_STYLES = {
-  pay: { backgroundColor: "rgba(95, 201, 248, 0.12)", borderColor: "#5FC9F8" },
-  receive_request: { backgroundColor: "rgba(34, 197, 94, 0.12)", borderColor: "#22C55E" },
-  convert: { backgroundColor: "rgba(6, 182, 212, 0.12)", borderColor: "#06B6D4" },
-  buy: { backgroundColor: "rgba(139, 92, 246, 0.12)", borderColor: "#8B5CF6" },
-  lines: { backgroundColor: "rgba(245, 158, 11, 0.12)", borderColor: "#F59E0B" },
-  statements: { backgroundColor: "rgba(34, 197, 94, 0.12)", borderColor: "#22C55E" },
-  config: { backgroundColor: "rgba(139, 92, 246, 0.12)", borderColor: "#8B5CF6" }
+  pay: { backgroundColor: "rgba(95, 201, 248, 0.06)", borderColor: "rgba(95, 201, 248, 0.55)" },
+  receive_request: { backgroundColor: "rgba(34, 197, 94, 0.06)", borderColor: "rgba(34, 197, 94, 0.55)" },
+  convert: { backgroundColor: "rgba(6, 182, 212, 0.06)", borderColor: "rgba(6, 182, 212, 0.55)" },
+  buy: { backgroundColor: "rgba(139, 92, 246, 0.06)", borderColor: "rgba(139, 92, 246, 0.55)" },
+  lines: { backgroundColor: "rgba(245, 158, 11, 0.06)", borderColor: "rgba(245, 158, 11, 0.55)" },
+  statements: { backgroundColor: "rgba(34, 197, 94, 0.06)", borderColor: "rgba(34, 197, 94, 0.55)" },
+  config: { backgroundColor: "rgba(139, 92, 246, 0.06)", borderColor: "rgba(139, 92, 246, 0.55)" }
 };
 
 export default function WalletEssentialsCards({ variant = "home" }) {
@@ -96,6 +98,23 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       }),
     [t]
   );
+  const renderStatementCtaIcon = useCallback((currency) => {
+    const code = String(currency || "").toUpperCase();
+    if (!code) return "?";
+    const iconSrc = CRYPTO_ICONS?.[code];
+    if (iconSrc) {
+      return (
+        <Image
+          src={iconSrc}
+          alt={code}
+          width={16}
+          height={16}
+          className="w-4 h-4 object-contain"
+        />
+      );
+    }
+    return getCurrencyFlag(code);
+  }, []);
   const dispatchDemoCta = useCallback((detail) => {
     if (typeof window === "undefined") return;
     window.dispatchEvent(new CustomEvent(DEMO_CARD_CTA_EVENT, { detail }));
@@ -471,16 +490,6 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         [flash.cardKey]: { title: flash.title, desc: flash.desc, ctas: flash.ctas || [] }
       }));
 
-      if (!isMobile) {
-        flashTimers.current[flash.cardKey] = setTimeout(() => {
-          setFlashByKey((prev) => {
-            const next = { ...prev };
-            delete next[flash.cardKey];
-            return next;
-          });
-          delete flashTimers.current[flash.cardKey];
-        }, FLASH_DURATION_MS);
-      }
     };
 
     window.addEventListener(DEMO_CARD_EVENT, handleFlash);
@@ -514,6 +523,30 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     window.addEventListener(DEMO_CARD_CTA_EVENT, handleReturnCta);
     return () => window.removeEventListener(DEMO_CARD_CTA_EVENT, handleReturnCta);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const hasFlash = Object.keys(flashByKey).length > 0;
+    if (!hasFlash) return undefined;
+
+    const handleOutsideFlash = (event) => {
+      const isMobile =
+        window.matchMedia("(max-width: 1023px)").matches &&
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      if (isMobile) return;
+      const target = event.target;
+      if (target instanceof Element && target.closest('[data-essentials-flash="true"]')) {
+        return;
+      }
+      setFlashByKey({});
+      setReturnCardKey(null);
+      Object.values(flashTimers.current).forEach((timer) => clearTimeout(timer));
+      flashTimers.current = {};
+    };
+
+    document.addEventListener("mousedown", handleOutsideFlash);
+    return () => document.removeEventListener("mousedown", handleOutsideFlash);
+  }, [flashByKey]);
 
   const actions = [
     {
@@ -894,7 +927,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     ? "grid grid-cols-1 grid-rows-7 gap-2 flex-1 min-h-0"
     : "grid sm:grid-cols-2 lg:grid-cols-1 gap-4";
   const cardPaddingClassName = isCompact ? "p-3" : "p-5";
-  const layoutClassName = isCompact
+  const baseLayoutClassName = isCompact
     ? "space-y-2"
     : "lg:flex lg:items-start lg:gap-6";
   const titleRowClassName = isCompact
@@ -948,18 +981,32 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           const ctaStyle = flashStyle
             ? { borderColor: flashStyle.borderColor, color: flashStyle.borderColor }
             : undefined;
-          const ctaContainerClassName = isCompact
-            ? "mt-2 flex flex-wrap gap-2 justify-center"
-            : "mt-2 flex flex-wrap gap-2";
+          const hasStatementCtas = Boolean(
+            flash &&
+            effectiveCtas.some(
+              (cta) => cta?.detail?.action === "open_statement_currency"
+            )
+          );
+          const ctaContainerClassName = hasStatementCtas
+            ? "mt-2 flex flex-col gap-2"
+            : isCompact
+              ? "mt-2 flex flex-wrap gap-2 justify-center"
+              : "mt-2 flex flex-wrap gap-2";
           const ctaButtonClassName =
             "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80 hover:text-white transition-colors";
+          const cardLayoutClassName = !isCompact && flash ? "" : baseLayoutClassName;
+          const descLayoutClassName = !isCompact && flash
+            ? ""
+            : !isCompact
+              ? "lg:mt-0 lg:flex-1"
+              : "";
           const cardClasses = [
             action.isPlain
               ? "bg-transparent border-none rounded-none shadow-none"
               : "bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl",
             "group",
             cardPaddingClassName,
-            layoutClassName,
+            cardLayoutClassName,
             action.borderHoverClassName,
             action.orderClassName,
             action.isPlain
@@ -1002,7 +1049,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               <p
                 className={[
                   "mt-2",
-                  !isCompact ? "lg:mt-0 lg:flex-1" : "",
+                  descLayoutClassName,
                   action.isPlain ? "text-white/60 text-sm" : descClassName,
                 ].join(" ")}
               >
@@ -1010,22 +1057,120 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               </p>
               {effectiveCtas.length > 0 && !action.isPlain && (
                 <div className={ctaContainerClassName}>
-                  {effectiveCtas.map((cta) => (
-                    <button
-                      key={cta.label}
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        dispatchDemoCta(cta.detail);
-                      }}
-                      className={[ctaButtonClassName, cta.className]
-                        .filter(Boolean)
-                        .join(" ")}
-                      style={ctaStyle}
-                    >
-                      {cta.label}
-                    </button>
-                  ))}
+                  {effectiveCtas.map((cta) => {
+                    const isReturnCta = cta?.detail?.action === "return_wallet";
+                    const isStatementCta = Boolean(
+                      flash &&
+                      cta?.detail?.action === "open_statement_currency" &&
+                      cta?.detail?.currency
+                    );
+                    if (isReturnCta) {
+                      const returnStyle = ctaStyle
+                        ? { borderColor: ctaStyle.borderColor }
+                        : undefined;
+                      return (
+                        <button
+                          key={cta.label}
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            dispatchDemoCta(cta.detail);
+                          }}
+                          className={["w-full text-left", cta.className]
+                            .filter(Boolean)
+                            .join(" ")}
+                          title={cta.label}
+                        >
+                          <div
+                            className="flex items-center justify-between rounded-md border border-white/10 bg-base px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white/80 transition-colors"
+                            style={returnStyle}
+                          >
+                            <span>{cta.label}</span>
+                            <span className="inline-flex text-white/70">
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M6 9l6 6 6-6"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    }
+                    if (isStatementCta) {
+                      const currency = String(cta.detail.currency || "").toUpperCase();
+                      const walletLabel = formatWalletLabel(cta.detail.walletId);
+                      const statementRowStyle = ctaStyle
+                        ? { borderColor: ctaStyle.borderColor }
+                        : undefined;
+                      const statementAccentStyle = ctaStyle
+                        ? { color: ctaStyle.borderColor }
+                        : undefined;
+                      return (
+                        <button
+                          key={cta.label}
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            dispatchDemoCta(cta.detail);
+                          }}
+                          className="w-full text-left"
+                          title={cta.label}
+                        >
+                          <div
+                            className="flex items-center justify-between rounded-md border border-white/10 bg-base px-3 py-2 hover:border-white/20 transition-colors"
+                            style={statementRowStyle}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-7 h-7 flex items-center justify-center text-[12px] font-semibold text-primary overflow-hidden rounded-md border border-white/10 bg-white/5">
+                                {renderStatementCtaIcon(currency)}
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-xs text-primary truncate">
+                                  {currency}
+                                </span>
+                                <span className="text-[11px] text-muted truncate">
+                                  {walletLabel}
+                                </span>
+                              </div>
+                            </div>
+                            <span
+                              className="text-[10px] font-semibold uppercase tracking-[0.18em] text-xcannes-green/80"
+                              style={statementAccentStyle}
+                            >
+                              {t("demo_card_cta_statement_short", "Relevé")}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    }
+                    return (
+                      <button
+                        key={cta.label}
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          dispatchDemoCta(cta.detail);
+                        }}
+                        className={[ctaButtonClassName, cta.className]
+                          .filter(Boolean)
+                          .join(" ")}
+                        style={ctaStyle}
+                      >
+                        {cta.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
               {!action.isPlain && !flash && (
@@ -1089,6 +1234,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 key={action.key}
                 className={cardClasses}
                 style={flashStyle}
+                data-essentials-flash={flash ? "true" : undefined}
                 data-essentials-card-key={action.key}
               >
                 {cardContent}
@@ -1105,6 +1251,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               style={flashStyle}
               aria-haspopup="dialog"
               aria-expanded={activeActionKey === action.key}
+              data-essentials-flash={flash ? "true" : undefined}
               data-essentials-card-key={action.key}
             >
               {cardContent}

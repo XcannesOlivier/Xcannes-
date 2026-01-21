@@ -843,7 +843,7 @@ export default function GlobalStatement({
           </button>
             <button
             onClick={handlePrint}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15">{t("ui_print_eb5de3a228", "🖨️ Print")}
+            className="hidden md:inline-flex md:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15">{t("ui_print_eb5de3a228", "🖨️ Print")}
 
 
           </button>
