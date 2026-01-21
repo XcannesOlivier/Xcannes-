@@ -276,7 +276,7 @@ export default function Home() {
                 if (e.target === e.currentTarget) setSpeedModalOpen(false);
               }}
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl">
+              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h4 className="text-lg font-semibold text-white">
@@ -338,7 +338,7 @@ export default function Home() {
                 if (e.target === e.currentTarget) setSecurityModalOpen(false);
               }}
             >
-              <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl max-h-[85vh] overflow-hidden flex flex-col">
+              <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl max-h-[85vh] overflow-hidden flex flex-col animate-essentials-slide-in motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h4 className="text-lg font-semibold text-white">
@@ -547,7 +547,7 @@ export default function Home() {
                 if (e.target === e.currentTarget) setFeesModalOpen(false);
               }}
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl">
+              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h4 className="text-lg font-semibold text-white">
@@ -613,7 +613,7 @@ export default function Home() {
                 if (e.target === e.currentTarget) setValueModalOpen(false);
               }}
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl">
+              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h4 className="text-lg font-semibold text-white">

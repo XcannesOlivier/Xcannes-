@@ -65,6 +65,9 @@ const DEFAULT_DEMO_WALLETS = {
   },
 };
 
+const DEMO_EVENT_SPREAD_BPS = 60;
+const DEMO_EVENTS_MONTHS = 12;
+
 function safeNumber(value) {
   const num = Number(value);
   return Number.isFinite(num) ? num : null;
@@ -80,14 +83,281 @@ function newId() {
   return `demo_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
+function createSeededRandom(seed) {
+  let t = Number(seed) || 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let x = Math.imul(t ^ (t >>> 15), 1 | t);
+    x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function clampNumber(value, min, max) {
+  if (!Number.isFinite(value)) return min;
+  if (max != null && value > max) return max;
+  if (min != null && value < min) return min;
+  return value;
+}
+
+function formatUnits(value) {
+  return Number(Number(value).toFixed(6));
+}
+
+function buildDemoTimestamp(nextIndex, rand) {
+  const monthsAgo = nextIndex % DEMO_EVENTS_MONTHS;
+  const now = new Date();
+  const date = new Date(now.getTime());
+  date.setMonth(now.getMonth() - monthsAgo);
+  const maxDay = monthsAgo === 0 ? now.getDate() : 26;
+  const safeMax = Math.max(1, maxDay);
+  date.setDate(1 + Math.floor(rand() * safeMax));
+  date.setHours(9 + Math.floor(rand() * 9), Math.floor(rand() * 60), Math.floor(rand() * 60), 0);
+  return date.getTime();
+}
+
+function buildSendEvent({
+  fromWalletId,
+  toWalletId,
+  currency,
+  amount,
+  ratesUsdPerUnit,
+  memo,
+  ts,
+}) {
+  const usdPerUnit = ratesUsdPerUnit?.[currency] ?? 0;
+  return {
+    id: newId(),
+    ts,
+    kind: "send",
+    from: fromWalletId,
+    to: toWalletId,
+    currency,
+    amount: formatUnits(amount),
+    usdValue: formatUnits(amount * usdPerUnit),
+    memo: memo ? String(memo).slice(0, 80) : "",
+  };
+}
+
+function buildConvertEvent({
+  walletId,
+  fromCurrency,
+  toCurrency,
+  amount,
+  ratesUsdPerUnit,
+  spreadBps = DEMO_EVENT_SPREAD_BPS,
+  ts,
+}) {
+  const fromUsdPerUnit = ratesUsdPerUnit?.[fromCurrency] ?? null;
+  const toUsdPerUnit = ratesUsdPerUnit?.[toCurrency] ?? null;
+  if (!fromUsdPerUnit || !toUsdPerUnit) return null;
+  const usdGross = amount * fromUsdPerUnit;
+  const feeUsd = (usdGross * spreadBps) / 10_000;
+  const usdNet = Math.max(0, usdGross - feeUsd);
+  const toAmount = usdNet / toUsdPerUnit;
+  return {
+    id: newId(),
+    ts,
+    kind: "convert",
+    wallet: walletId,
+    fromCurrency,
+    toCurrency,
+    fromAmount: formatUnits(amount),
+    toAmount: formatUnits(toAmount),
+    usdGross: formatUnits(usdGross),
+    feeUsd: formatUnits(feeUsd),
+    usdNet: formatUnits(usdNet),
+    spreadBps,
+  };
+}
+
+function buildCashEvent({
+  walletId,
+  side,
+  currency,
+  amount,
+  ratesUsdPerUnit,
+  memo,
+  ts,
+}) {
+  const usdPerUnit = ratesUsdPerUnit?.[currency] ?? 0;
+  return {
+    id: newId(),
+    ts,
+    kind: side === "sell" ? "sell" : "buy",
+    wallet: walletId,
+    currency,
+    amount: formatUnits(amount),
+    usdValue: formatUnits(amount * usdPerUnit),
+    memo: memo ? String(memo).slice(0, 80) : "",
+  };
+}
+
+function resolveWalletAllocation(wallet, currency) {
+  const allocation = safeNumber(wallet?.allocations?.[currency]);
+  return allocation && allocation > 0 ? allocation : 0;
+}
+
+function pickDemoAmount(allocation, { factor, min, maxFraction = 0.25, maxAbsolute = 5000 }) {
+  if (!Number.isFinite(allocation) || allocation <= 0) return 0;
+  const base = allocation * factor;
+  const maxByFraction = allocation * maxFraction;
+  const capped = clampNumber(base, min, Math.min(maxByFraction, maxAbsolute));
+  return formatUnits(capped);
+}
+
+function buildDemoEvents(wallets, ratesUsdPerUnit) {
+  if (!wallets?.A || !wallets?.B) return [];
+  const rand = createSeededRandom(0xcafebabe);
+  let index = 0;
+  const nextTs = () => {
+    const ts = buildDemoTimestamp(index, rand);
+    index += 1;
+    return ts;
+  };
+
+  const events = [];
+  const walletA = wallets.A;
+  const walletB = wallets.B;
+  const currencyCodes = Object.keys(walletA?.allocations || {})
+    .map((code) => String(code).toUpperCase())
+    .filter((code) => code && code !== "FEE");
+
+  currencyCodes.forEach((currency) => {
+    const allocA = resolveWalletAllocation(walletA, currency);
+    const allocB = resolveWalletAllocation(walletB, currency);
+    if (!allocA || !allocB) return;
+
+    const debitAmount = pickDemoAmount(allocA, { factor: 0.015, min: 0.2 });
+    const creditAmount = pickDemoAmount(allocB, { factor: 0.012, min: 0.2 });
+    if (debitAmount) {
+      events.push(
+        buildSendEvent({
+          fromWalletId: "A",
+          toWalletId: "B",
+          currency,
+          amount: debitAmount,
+          ratesUsdPerUnit,
+          memo: "Payment",
+          ts: nextTs(),
+        })
+      );
+    }
+    if (creditAmount) {
+      events.push(
+        buildSendEvent({
+          fromWalletId: "B",
+          toWalletId: "A",
+          currency,
+          amount: creditAmount,
+          ratesUsdPerUnit,
+          memo: "Settlement",
+          ts: nextTs(),
+        })
+      );
+    }
+  });
+
+  currencyCodes
+    .filter((code) => code !== "RLUSD")
+    .forEach((currency, idx) => {
+      const walletId = idx % 2 === 0 ? "A" : "B";
+      const wallet = wallets[walletId];
+      const allocation = resolveWalletAllocation(wallet, currency);
+      if (!allocation) return;
+      const amount = pickDemoAmount(allocation, { factor: 0.003, min: 0.1 });
+      const event = buildConvertEvent({
+        walletId,
+        fromCurrency: currency,
+        toCurrency: "RLUSD",
+        amount,
+        ratesUsdPerUnit,
+        spreadBps: DEMO_EVENT_SPREAD_BPS,
+        ts: nextTs(),
+      });
+      if (event) events.push(event);
+    });
+
+  ["A", "B"].forEach((walletId) => {
+    const wallet = wallets[walletId];
+    const rlusdAllocation = resolveWalletAllocation(wallet, "RLUSD");
+    const xrpAllocation = resolveWalletAllocation(wallet, "XRP");
+    if (rlusdAllocation) {
+      const amount = pickDemoAmount(rlusdAllocation, {
+        factor: 0.08,
+        min: 25,
+        maxAbsolute: 180,
+      });
+      events.push(
+        buildCashEvent({
+          walletId,
+          side: "buy",
+          currency: "RLUSD",
+          amount,
+          ratesUsdPerUnit,
+          memo: "MoonPay (demo)",
+          ts: nextTs(),
+        })
+      );
+    }
+    if (xrpAllocation) {
+      const amount = pickDemoAmount(xrpAllocation, {
+        factor: 0.5,
+        min: 2,
+        maxAbsolute: 25,
+      });
+      events.push(
+        buildCashEvent({
+          walletId,
+          side: "buy",
+          currency: "XRP",
+          amount,
+          ratesUsdPerUnit,
+          memo: "MoonPay (demo)",
+          ts: nextTs(),
+        })
+      );
+    }
+  });
+
+  const sellMap = {
+    A: ["EUR", "MXN", "INR", "XAF"],
+    B: ["GBP", "BRL", "PHP", "NGN"],
+  };
+  Object.entries(sellMap).forEach(([walletId, currencies]) => {
+    currencies
+      .map((code) => String(code).toUpperCase())
+      .filter((code) => currencyCodes.includes(code))
+      .forEach((currency) => {
+        const allocation = resolveWalletAllocation(wallets[walletId], currency);
+        if (!allocation) return;
+        const amount = pickDemoAmount(allocation, { factor: 0.007, min: 0.2 });
+        events.push(
+          buildCashEvent({
+            walletId,
+            side: "sell",
+            currency,
+            amount,
+            ratesUsdPerUnit,
+            memo: "MoonPay (demo)",
+            ts: nextTs(),
+          })
+        );
+      });
+  });
+
+  return events.sort((a, b) => b.ts - a.ts);
+}
+
 export function getDemoRatesUsdPerUnit(overrides = {}) {
   return { ...DEFAULT_RATES_USD_PER_UNIT, ...(overrides || {}) };
 }
 
 export function buildDefaultDemoState() {
+  const wallets = clone(DEFAULT_DEMO_WALLETS);
   return {
-    wallets: clone(DEFAULT_DEMO_WALLETS),
-    events: [],
+    wallets,
+    events: buildDemoEvents(wallets, DEFAULT_RATES_USD_PER_UNIT),
   };
 }
 
@@ -110,7 +380,8 @@ export function migrateDemoState(state) {
     base.wallets[walletId] = target;
   });
 
-  base.events = Array.isArray(state.events) ? clone(state.events) : [];
+  const incomingEvents = Array.isArray(state.events) ? clone(state.events) : [];
+  base.events = incomingEvents.length ? incomingEvents : base.events;
 
   return base;
 }

@@ -1,11 +1,103 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import DemoWalletDashboard from "@/components/demo-wallet/DemoWalletDashboard";
 import WalletEssentialsCards from "@/components/home/WalletEssentialsCards";
 
+const DEMO_CARD_EVENT = "xcannes:demo-wallet:card";
+const DEMO_CARD_CTA_EVENT = "xcannes:demo-wallet:cta";
+const DEMO_CARD_KEY_BY_ACTION = {
+  send: "pay",
+  request: "receive_request",
+  convert: "convert",
+  buy: "buy",
+  sell: "buy",
+  statement_global: "statements",
+  statement_currency: "statements",
+  trustline_add: "lines",
+  trustline_remove: "lines",
+  trustline_update: "lines"
+};
+
 export default function WalletProductSection() {
   const { t } = useTranslation("common");
   const [demoWalletId, setDemoWalletId] = useState("A");
+  const cardsRef = useRef(null);
+  const walletRef = useRef(null);
+  const scrollOriginRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const isElementVisible = (element) => {
+      if (!element) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.bottom > 0 && rect.top < window.innerHeight;
+    };
+
+    const handleDemoCard = (event) => {
+      const cardsEl = cardsRef.current;
+      const walletEl = walletRef.current;
+      if (!cardsEl || !walletEl) return;
+
+      const isMobile =
+        window.matchMedia("(max-width: 1023px)").matches &&
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      if (!isMobile) return;
+      if (!isElementVisible(walletEl)) {
+        scrollOriginRef.current = null;
+        return;
+      }
+
+      const detail = event?.detail || {};
+      const cardKey = detail.cardKey || DEMO_CARD_KEY_BY_ACTION[detail.action];
+      const targetEl = cardKey
+        ? cardsEl.querySelector(`[data-essentials-card-key="${cardKey}"]`)
+        : null;
+      const scrollTarget = targetEl || cardsEl;
+      if (isElementVisible(scrollTarget)) {
+        scrollOriginRef.current = null;
+        return;
+      }
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      const behavior = prefersReducedMotion ? "auto" : "smooth";
+
+      scrollOriginRef.current = window.scrollY;
+      scrollTarget.scrollIntoView({ behavior, block: "center" });
+    };
+
+    const handleReturnToWallet = (event) => {
+      const detail = event?.detail || {};
+      if (detail.action !== "return_wallet") return;
+      const walletEl = walletRef.current;
+      if (!walletEl) return;
+      const isMobile =
+        window.matchMedia("(max-width: 1023px)").matches &&
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+      if (!isMobile) return;
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      const behavior = prefersReducedMotion ? "auto" : "smooth";
+      const origin = scrollOriginRef.current;
+      scrollOriginRef.current = null;
+      if (origin != null) {
+        window.scrollTo({ top: Math.max(0, origin), behavior });
+      } else {
+        walletEl.scrollIntoView({ behavior, block: "start" });
+      }
+    };
+
+    window.addEventListener(DEMO_CARD_EVENT, handleDemoCard);
+    window.addEventListener(DEMO_CARD_CTA_EVENT, handleReturnToWallet);
+    return () => {
+      window.removeEventListener(DEMO_CARD_EVENT, handleDemoCard);
+      window.removeEventListener(DEMO_CARD_CTA_EVENT, handleReturnToWallet);
+    };
+  }, []);
 
   return (
     <section id="demo" className="relative py-24 px-4 sm:px-6 overflow-hidden">
@@ -27,13 +119,16 @@ export default function WalletProductSection() {
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           <div className="flex flex-col gap-8">
-            <div className="order-1 lg:order-2">
+            <div className="order-1 lg:order-2" ref={cardsRef}>
               <WalletEssentialsCards variant="home" />
             </div>
 
           </div>
 
-          <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+          <div
+            className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+            ref={walletRef}
+          >
             <div className="px-5 py-4 border-b border-white/10">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-base text-white/70 min-w-0">

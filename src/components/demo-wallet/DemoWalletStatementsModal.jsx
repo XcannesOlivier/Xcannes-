@@ -281,9 +281,9 @@ export default function DemoWalletStatementsModal({
                           : evt.kind === "convert"
                             ? `${t("demo_evt_convert", "Conversion")} · ${evt.fromCurrency} → ${evt.toCurrency}`
                             : evt.kind === "buy"
-                              ? `${t("demo_evt_buy", "Buy")} · USD`
+                              ? `${t("demo_evt_buy", "Buy")} · ${String(evt.currency || "USD").toUpperCase()}`
                               : evt.kind === "sell"
-                                ? `${t("demo_evt_sell", "Sell")} · USD`
+                                ? `${t("demo_evt_sell", "Sell")} · ${String(evt.currency || "USD").toUpperCase()}`
                                 : evt.kind}
                       </div>
                       <div className="mt-0.5 text-[11px] text-white/45 truncate">

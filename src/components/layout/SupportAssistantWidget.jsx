@@ -172,10 +172,10 @@ export default function SupportAssistantWidget() {
         }
 
         .ai-assistant-panel {
-          background: rgba(4, 12, 19, 0.92);
+          background: rgba(0, 0, 0, 0.2);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(148, 163, 184, 0.18);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 16px;
           padding: 16px;
           box-shadow:
@@ -236,7 +236,7 @@ export default function SupportAssistantWidget() {
           max-height: 240px;
           overflow-y: auto;
           padding: 12px;
-          background: rgba(0, 0, 0, 0.22);
+          background: #0a0f0d;
           border: 1px solid rgba(148, 163, 184, 0.18);
           border-radius: 8px;
         }
@@ -262,7 +262,7 @@ export default function SupportAssistantWidget() {
         .ai-input {
           flex: 1;
           padding: 8px 12px;
-          background: rgba(0, 0, 0, 0.28);
+          background: #0a0f0d;
           border: 1px solid rgba(148, 163, 184, 0.2);
           border-radius: 8px;
           font-size: 13px;
