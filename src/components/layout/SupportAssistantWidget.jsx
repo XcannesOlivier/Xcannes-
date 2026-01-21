@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 
-export default function SupportAssistantWidget() {
+export default function SupportAssistantWidget({ mode = "support" }) {
   const { t } = useTranslation("common");
+  const isTrading = mode === "trading";
   const [assistantContainer, setAssistantContainer] = useState(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -20,33 +22,93 @@ export default function SupportAssistantWidget() {
   }, []);
 
   useEffect(() => {
+    let timeoutId;
     const intervalId = window.setInterval(() => {
       if (assistantOpen) return;
       setShowPrompt(true);
-      window.setTimeout(() => setShowPrompt(false), 2000);
+      timeoutId = window.setTimeout(() => setShowPrompt(false), 2000);
     }, 20000);
 
-    return () => window.clearInterval(intervalId);
+    return () => {
+      window.clearInterval(intervalId);
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
   }, [assistantOpen]);
+
+  useEffect(() => {
+    if (!isTrading || typeof window === "undefined") return;
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isTrading]);
 
   if (!assistantContainer) return null;
 
+  const wrapperClassName = isTrading
+    ? `fixed right-3 md:right-6 md:bottom-6 z-[9999] transition-all duration-300 ${
+        isScrolled ? "bottom-3" : "bottom-20"
+      }`
+    : "fixed right-3 bottom-3 md:right-6 md:bottom-6 z-[9999]";
+
+  const openLabel = isTrading
+    ? t("ui_assistant_ia_48e9d9815a", "Assistant IA")
+    : t("home_support_open", "Ouvrir le support");
+  const openTitle = isTrading
+    ? t("ui_assistant_ia_f1719273f5", "Assistant IA")
+    : t("home_support_open", "Ouvrir le support");
+  const panelVariant = isTrading ? "trading" : "support";
+  const showBadge = false;
+  const panelTitle = isTrading
+    ? t("ui_assistant_xcannes_9d301c0d6a", "Assistant XCANNES")
+    : t("home_support_title", "Support XCANNES");
+  const closeLabel = isTrading
+    ? t("ui_close_chat_d6b0b8eaa8", "Fermer le chat")
+    : t("home_support_close", "Fermer");
+  const messageTitle = isTrading
+    ? t(
+        "ui_hello_xcannes_assistant_e7c9e94d03",
+        "Bonjour, je suis l'assistant XCANNES."
+      )
+    : t("home_support_msg_title", "Besoin d’aide ?");
+  const messageBody = isTrading
+    ? t(
+        "ui_describe_trading_question_cc5c9669ff",
+        "Décrivez votre question de trading (pair XRPL, Pyth, EOD, carnet d'ordres...) et je vous aiderai à comprendre ce que vous voyez à l'écran."
+      )
+    : t(
+        "home_support_msg_body",
+        "Posez une question sur le wallet, les paiements, la conversion ou les marchés. Nous vous guidons étape par étape."
+      );
+  const placeholderText = isTrading
+    ? t("ui_write_message_5f2f86490f", "Écrire un message...")
+    : t("home_support_placeholder", "Write your question…");
+  const sendLabel = isTrading
+    ? t("ui_send_504b64a87b", "Envoyer")
+    : t("home_support_send", "Envoyer");
+
   return createPortal(
-    <div className="fixed right-3 bottom-3 md:right-6 md:bottom-6 z-[9999]">
+    <div className={wrapperClassName}>
       {assistantOpen && (
-        <div className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-md">
+        <div
+          className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-md"
+          data-variant={panelVariant}
+        >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="ai-badge">{t("home_support_badge", "SUP")}</div>
+              {showBadge && <div className="ai-badge">{badgeLabel}</div>}
               <p className="text-sm font-semibold text-white/90">
-                {t("home_support_title", "Support XCANNES")}
+                {panelTitle}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setAssistantOpen(false)}
               className="ai-close-btn"
-              aria-label={t("home_support_close", "Fermer")}
+              aria-label={closeLabel}
             >
               <svg
                 width="14"
@@ -64,26 +126,23 @@ export default function SupportAssistantWidget() {
           </div>
           <div className="ai-message-area">
             <p className="text-sm font-medium text-white/90 mb-2">
-              {t("home_support_msg_title", "Besoin d’aide ?")}
+              {messageTitle}
             </p>
             <p className="text-xs text-white/60 leading-relaxed">
-              {t(
-                "home_support_msg_body",
-                "Posez une question sur le wallet, les paiements, la conversion ou les marchés. Nous vous guidons étape par étape."
-              )}
+              {messageBody}
             </p>
           </div>
           <div className="mt-3 flex items-center gap-2">
             <input
               type="text"
-              placeholder={t("home_support_placeholder", "Write your question…")}
+              placeholder={placeholderText}
               className="ai-input"
             />
 
             <button
               type="button"
               className="ai-send-btn"
-              aria-label={t("home_support_send", "Envoyer")}
+              aria-label={sendLabel}
             >
               <svg
                 width="16"
@@ -108,8 +167,8 @@ export default function SupportAssistantWidget() {
             type="button"
             onClick={() => setAssistantOpen(true)}
             className="w-10 h-10 md:w-12 md:h-12 transition-all bg-transparent text-white hover:bg-white/10 border-2 border-white/30 rounded-full flex items-center justify-center relative overflow-hidden"
-            aria-label={t("home_support_open", "Ouvrir le support")}
-            title={t("home_support_open", "Ouvrir le support")}
+            aria-label={openLabel}
+            title={openTitle}
           >
             <span
               className="tracking-wider relative z-10 inline-block text-lg md:text-xl"
@@ -172,17 +231,61 @@ export default function SupportAssistantWidget() {
         }
 
         .ai-assistant-panel {
-          background: rgba(0, 0, 0, 0.2);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          padding: 16px;
-          box-shadow:
+          --assistant-panel-bg: #080c0a;
+          --assistant-panel-border: rgba(255, 255, 255, 0.1);
+          --assistant-panel-shadow:
             0 8px 32px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+          --assistant-panel-blur: 0px;
+          --assistant-badge-bg: rgba(6, 182, 212, 0.15);
+          --assistant-badge-border: rgba(6, 182, 212, 0.3);
+          --assistant-badge-color: #06b6d4;
+          --assistant-message-bg: #0a0f0d;
+          --assistant-message-border: rgba(148, 163, 184, 0.18);
+          --assistant-input-bg: #0a0f0d;
+          --assistant-input-border: rgba(148, 163, 184, 0.2);
+          --assistant-input-border-focus: rgba(255, 255, 255, 0.28);
+          --assistant-input-ring: rgba(16, 185, 129, 0.12);
+          --assistant-send-bg: rgba(255, 255, 255, 0.06);
+          --assistant-send-border: rgba(255, 255, 255, 0.12);
+          --assistant-send-color: rgba(255, 255, 255, 0.75);
+          --assistant-send-hover-bg: rgba(255, 255, 255, 0.1);
+          --assistant-send-hover-border: rgba(255, 255, 255, 0.2);
+          --assistant-send-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+
+          background: var(--assistant-panel-bg);
+          backdrop-filter: blur(var(--assistant-panel-blur));
+          -webkit-backdrop-filter: blur(var(--assistant-panel-blur));
+          border: 1px solid var(--assistant-panel-border);
+          border-radius: 16px;
+          padding: 16px;
+          box-shadow: var(--assistant-panel-shadow);
 
           animation: aiPanelFadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ai-assistant-panel[data-variant="trading"] {
+          --assistant-panel-bg: rgba(4, 12, 19, 0.9);
+          --assistant-panel-border: rgba(255, 255, 255, 0.1);
+          --assistant-panel-shadow:
+            0 12px 32px rgba(0, 0, 0, 0.35),
+            0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+          --assistant-panel-blur: 12px;
+          --assistant-badge-bg: rgba(16, 185, 129, 0.2);
+          --assistant-badge-border: rgba(16, 185, 129, 0.4);
+          --assistant-badge-color: #10b981;
+          --assistant-message-bg: rgba(0, 0, 0, 0.2);
+          --assistant-message-border: rgba(255, 255, 255, 0.1);
+          --assistant-input-bg: rgba(0, 0, 0, 0.25);
+          --assistant-input-border: rgba(255, 255, 255, 0.12);
+          --assistant-input-border-focus: rgba(16, 185, 129, 0.45);
+          --assistant-input-ring: rgba(16, 185, 129, 0.12);
+          --assistant-send-bg: rgba(255, 255, 255, 0.05);
+          --assistant-send-border: rgba(255, 255, 255, 0.1);
+          --assistant-send-color: rgba(255, 255, 255, 0.75);
+          --assistant-send-hover-bg: rgba(255, 255, 255, 0.12);
+          --assistant-send-hover-border: rgba(255, 255, 255, 0.22);
+          --assistant-send-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
         }
 
         @keyframes aiPanelFadeIn {
@@ -201,12 +304,12 @@ export default function SupportAssistantWidget() {
           align-items: center;
           justify-content: center;
           padding: 2px 6px;
-          background: rgba(6, 182, 212, 0.15);
-          border: 1px solid rgba(6, 182, 212, 0.3);
+          background: var(--assistant-badge-bg);
+          border: 1px solid var(--assistant-badge-border);
           border-radius: 4px;
           font-size: 10px;
           font-weight: 700;
-          color: #06b6d4;
+          color: var(--assistant-badge-color);
           letter-spacing: 0.5px;
         }
 
@@ -236,8 +339,8 @@ export default function SupportAssistantWidget() {
           max-height: 240px;
           overflow-y: auto;
           padding: 12px;
-          background: #0a0f0d;
-          border: 1px solid rgba(148, 163, 184, 0.18);
+          background: var(--assistant-message-bg);
+          border: 1px solid var(--assistant-message-border);
           border-radius: 8px;
         }
 
@@ -262,8 +365,8 @@ export default function SupportAssistantWidget() {
         .ai-input {
           flex: 1;
           padding: 8px 12px;
-          background: #0a0f0d;
-          border: 1px solid rgba(148, 163, 184, 0.2);
+          background: var(--assistant-input-bg);
+          border: 1px solid var(--assistant-input-border);
           border-radius: 8px;
           font-size: 13px;
           color: rgba(255, 255, 255, 0.9);
@@ -276,8 +379,8 @@ export default function SupportAssistantWidget() {
 
         .ai-input:focus {
           outline: none;
-          border-color: rgba(255, 255, 255, 0.28);
-          box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+          border-color: var(--assistant-input-border-focus);
+          box-shadow: 0 0 0 3px var(--assistant-input-ring);
         }
 
         .ai-send-btn {
@@ -286,18 +389,18 @@ export default function SupportAssistantWidget() {
           justify-content: center;
           width: 36px;
           height: 36px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: var(--assistant-send-bg);
+          border: 1px solid var(--assistant-send-border);
           border-radius: 8px;
-          color: rgba(255, 255, 255, 0.75);
+          color: var(--assistant-send-color);
           cursor: pointer;
           transition: all 120ms;
         }
 
         .ai-send-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.2);
-          box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+          background: var(--assistant-send-hover-bg);
+          border-color: var(--assistant-send-hover-border);
+          box-shadow: var(--assistant-send-hover-shadow);
         }
 
         .ai-send-btn:active {
