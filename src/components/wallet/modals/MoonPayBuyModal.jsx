@@ -38,7 +38,8 @@ const MoonPayBuyModal = ({
   noticeContextLabel = "",
   demoMode = false,
   onDemoSubmit
-}) => {const { t } = useTranslation("common");
+}) => {
+  const { t } = useTranslation("common");
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

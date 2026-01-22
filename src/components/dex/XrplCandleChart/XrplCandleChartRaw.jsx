@@ -17,7 +17,8 @@ import ChartHeader from "./components/ChartHeader";
 import useMarketData from "./hooks/useMarketData";
 import IndicatorsToolbar from "./components/IndicatorsToolbar";
 import ChartFooter from "./components/ChartFooter";
-import ChartCanvas from "./components/ChartCanvas";import { useTranslation } from "next-i18next";
+import ChartCanvas from "./components/ChartCanvas";
+import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {
@@ -31,7 +32,8 @@ export default function XrplCandleChartRaw({
   onIntervalChange,
   availablePairs = [],
   availableIntervals = ["1m", "5m", "15m", "1h", "4h", "1d"]
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   // ✅ Guard: S'assurer qu'on est côté client
   const [isClient, setIsClient] = useState(typeof window !== "undefined");
 

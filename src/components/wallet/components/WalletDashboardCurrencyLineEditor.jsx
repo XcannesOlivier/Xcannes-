@@ -1,7 +1,8 @@
 "use client";
 
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
-import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";import { useTranslation } from "next-i18next";
+import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardCurrencyLineEditor({
   currencyLinesLoading,
@@ -10,7 +11,8 @@ export default function WalletDashboardCurrencyLineEditor({
   currencyLineAllocatedRlusd,
   setCurrencyLineAllocatedRlusd,
   onSave
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const disabled =
   currencyLinesLoading ||
   !currencyLineCode ||

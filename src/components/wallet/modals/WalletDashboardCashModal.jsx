@@ -2,7 +2,8 @@
 
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
-import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { createPortal } from "react-dom";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardCashModal({
   open,
@@ -24,7 +25,8 @@ export default function WalletDashboardCashModal({
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   walletAddress
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   if (!open) return null;
 
   const content =

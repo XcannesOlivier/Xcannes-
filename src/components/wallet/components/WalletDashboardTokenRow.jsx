@@ -7,7 +7,8 @@ import {
   getCurrencyFlag,
   getTokenIcon,
   USD_STABLECOINS } from
-"../walletDashboardConfig";import { useTranslation } from "next-i18next";
+"../walletDashboardConfig";
+import { useTranslation } from "next-i18next";
 
 function renderTokenIcon(token) {
   const code = String(token?.currency || "").toUpperCase();
@@ -37,7 +38,8 @@ export default function WalletDashboardTokenRow({
   onClick,
   onInstallTrustline,
   isWalletActivated
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const currencyCode = String(token?.currency || "").toUpperCase();
   const rawValue = Number(token?.value || 0);
   const isMissingTrustline = !!token?.isMissingTrustline;

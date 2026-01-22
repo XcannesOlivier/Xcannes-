@@ -7,7 +7,8 @@ export function WalletInfoContent({
   withCloseGutter = false,
   isPreviewMode = false,
   noticeVariant = "preview"
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const activationFeeValue = Number.parseFloat(
     process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_XCS || ""
   );
@@ -140,7 +141,8 @@ export default function WalletInfoModal({
   isPreviewMode = false,
   noticeVariant = "preview",
   noticeContextLabel = ""
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   if (!isOpen) return null;
   if (typeof document === "undefined") return null;
 

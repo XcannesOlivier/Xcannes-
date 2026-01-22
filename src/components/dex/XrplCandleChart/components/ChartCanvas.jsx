@@ -12,7 +12,8 @@ export default function ChartCanvas({
   watermark,
   noDataContent,
   chartClassName = ""
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   return (
     <div className="flex-1 flex flex-col min-h-0 md:border-l md:border-white/10">
       <div className="relative w-full h-full">

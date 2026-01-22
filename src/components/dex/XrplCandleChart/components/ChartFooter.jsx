@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import xcannesApi from "@/lib/xcannesApi";
 import { useXcannesWS } from "@/context/XcannesWSContext";
-import { getBookIdFromPair } from "@/lib/marketMetadata";import { useTranslation } from "next-i18next";
+import { getBookIdFromPair } from "@/lib/marketMetadata";
+import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {
@@ -117,7 +118,8 @@ function getSmartName(code, currencyInfo) {
   return getAssetName(code);
 }
 
-export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: providedStats }) {const { t } = useTranslation("common");
+export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: providedStats }) {
+  const { t } = useTranslation("common");
   const { tickers } = useXcannesWS();
 
   // ✅ Auto-détection du fxMode si non fourni mais que fxBase/fxQuote sont présents

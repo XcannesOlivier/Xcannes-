@@ -59,7 +59,8 @@ export default function CurrencyStatement({
   xcannesCurrencyLinesCount = 0,
   highlightTransactionId = null,
   onClose
-}) {const { t, i18n } = useTranslation("common");
+}) {
+  const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);

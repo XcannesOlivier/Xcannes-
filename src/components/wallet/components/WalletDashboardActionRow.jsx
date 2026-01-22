@@ -1,4 +1,5 @@
-"use client";import { useTranslation } from "next-i18next";
+"use client";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardActionRow({
   layout,
@@ -8,7 +9,8 @@ export default function WalletDashboardActionRow({
   walletAddress,
   kycStatus,
   onVerifyClick
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   return (
     <div
       className={`px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3 ${layout.actionRowClass}`}>

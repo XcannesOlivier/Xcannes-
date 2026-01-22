@@ -1,6 +1,7 @@
 "use client";
 
-import XummConnectButton from "@/components/xumm/XummConnectButton";import { useTranslation } from "next-i18next";
+import XummConnectButton from "@/components/xumm/XummConnectButton";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardHeader({
   layout,
@@ -21,7 +22,8 @@ export default function WalletDashboardHeader({
   onWalletLabelDraftChange,
   onSaveWalletLabel,
   onCancelWalletLabel
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   return (
     <div className={`panel-header ${layout.headerClass} flex flex-col shrink-0`}>
       {/* Titres discrets en haut */}

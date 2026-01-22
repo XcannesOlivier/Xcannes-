@@ -16,7 +16,8 @@ export default function WalletDashboardTrustlineCurrencyModal({
   handleSaveTrustlineCurrency,
   handleRemoveTrustlineCurrency,
   minLockedXcs = 0.2
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   if (!open) return null;
 
   return (

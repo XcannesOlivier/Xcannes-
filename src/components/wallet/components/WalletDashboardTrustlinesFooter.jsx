@@ -1,6 +1,8 @@
-"use client";import { useTranslation } from "next-i18next";
+"use client";
+import { useTranslation } from "next-i18next";
 
-export default function WalletDashboardTrustlinesFooter({ totalLockedXcs, onClose }) {const { t } = useTranslation("common");
+export default function WalletDashboardTrustlinesFooter({ totalLockedXcs, onClose }) {
+  const { t } = useTranslation("common");
   return (
     <div className="mt-2 pt-2 border-t border-white/10 space-y-2">
       <p className="text-[11px] text-white/60">{t("ui_total_locked_xcs_9519342799", "Total locked XCS:")}

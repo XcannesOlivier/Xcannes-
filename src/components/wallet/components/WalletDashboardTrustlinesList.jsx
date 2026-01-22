@@ -1,11 +1,13 @@
-"use client";import { useTranslation } from "next-i18next";
+"use client";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardTrustlinesList({
   walletLinesLoading,
   walletLinesError,
   walletLines,
   onEdit
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   return (
     <div className="flex-1 min-h-0 overflow-y-auto pr-1">
       {walletLinesLoading &&

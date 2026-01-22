@@ -1,6 +1,7 @@
 "use client";
 
-import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { createPortal } from "react-dom";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardSaveAddressPrompt({
   open,
@@ -9,7 +10,8 @@ export default function WalletDashboardSaveAddressPrompt({
   setAddressLabel,
   onClose,
   onSave
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   if (!open) return null;
   if (typeof document === "undefined") return null;
 

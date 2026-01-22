@@ -1,6 +1,7 @@
 "use client";
 
-import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";import { useTranslation } from "next-i18next";
+import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardTrustlinesAddForm({
   trustlineCode,
@@ -9,7 +10,8 @@ export default function WalletDashboardTrustlinesAddForm({
   setTrustlineLocked,
   onSubmit,
   minLockedXcs = 0.2
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   return (
     <div className="mb-3 space-y-2">
       <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr] gap-2">
