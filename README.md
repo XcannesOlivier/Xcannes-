@@ -14,8 +14,9 @@
 
 ## Documentation
 
-- Index : `docs/README.md`
-- Structure du code : `docs/architecture/FRONTEND_STRUCTURE.md`
+- Overview : `docs/OVERVIEW.md`
+- Wallet : `docs/WALLET.md`
+- Dev notes : `docs/DEV.md`
 
 ## i18n (traductions)
 
