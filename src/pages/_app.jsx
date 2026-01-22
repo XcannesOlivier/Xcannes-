@@ -8,9 +8,9 @@ import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket
 import XummQRModal from "@/components/xumm/XummQRModal";
 
 function XummModalLayer({ children }) {
-  const { qrModalData, closeQrModal, isConnecting } = useXumm();
+  const { qrModalData, closeQrModal } = useXumm();
 
-  const isOpen = Boolean(isConnecting || (qrModalData && qrModalData.uuid));
+  const isOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
 
   return (
     <>
@@ -22,6 +22,8 @@ function XummModalLayer({ children }) {
         qrUrl={qrModalData?.qrUrl}
         deepLink={qrModalData?.deepLink}
         type={qrModalData?.type || "connect"}
+        status={qrModalData?.status}
+        enablePolling={false}
       />
     </>
   );

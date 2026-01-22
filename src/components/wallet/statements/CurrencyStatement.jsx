@@ -28,6 +28,7 @@ const USD_STABLECOINS = [
 "USDP",
 "GUSD"];
 const HIGHLIGHT_DURATION_MS = 5000;
+const XRPL_HISTORY_DAYS = 365;
 
 
 /**
@@ -148,6 +149,7 @@ export default function CurrencyStatement({
       url.searchParams.set("address", backendWalletAddress);
       url.searchParams.set("currencyCode", normalizedCurrency);
       url.searchParams.set("limit", "100");
+      url.searchParams.set("days", String(XRPL_HISTORY_DAYS));
 
       const dir = String(direction || "").trim().toLowerCase();
       if (dir === "send" || dir === "receive") {
@@ -1338,11 +1340,23 @@ export default function CurrencyStatement({
                   const isSend = dir === "send";
                   const amount = Number(p?.value ?? 0);
                   const txHash = String(p?.txHash || "");
-                  const counterparty = String(p?.counterparty || "");
+                  const counterparty = String(p?.counterparty || "").trim();
+                  const counterpartyShort =
+                  counterparty ?
+                  `${counterparty.slice(0, 10)}...${counterparty.slice(-6)}` :
+                  "";
                   const explorerUrl = txHash ? `https://xrpscan.com/tx/${txHash}` : null;
                   const payReq = extractXcannesPayReqFromMemos(p?.memos);
                   const credited =
                   payReq?.targetCurrencyCode || payReq?.targetCurrency || null;
+                  const desc = isSend ?
+                  t("demo_stmt_desc_send", "Send") :
+                  t("demo_stmt_desc_receive", "Receive");
+                  const metaPrefix = isSend ?
+                  t("demo_stmt_to", "to") :
+                  t("demo_stmt_from", "from");
+                  const meta = counterpartyShort ? `${metaPrefix} ${counterpartyShort}` : "";
+                  const metaTitle = counterparty ? `${metaPrefix} ${counterparty}` : "";
 
                   return (
                     <tr
@@ -1354,27 +1368,16 @@ export default function CurrencyStatement({
                             </td>
                             <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
                               <div className="min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span
-                              className={`text-[11px] font-semibold ${
-                              isSend ? "text-red-300" : "text-emerald-300"}`
-                              }>
-
-                                    {isSend ?
-                                      t("ui_send_71ed97cd73", "Send") :
-                                      t("ui_receive_61ed481e18", "Receive")}
-                                  </span>
-                                  <span className="text-[11px] text-white/40">
-                                    {isSend ? "→" : "←"}
-                                  </span>
-                                  <span className="text-sm text-white/90 truncate">
-                                    {counterparty ?
-                              `${counterparty.slice(0, 10)}...${counterparty.slice(-6)}` :
-                              "—"}
-                                  </span>
+                                <div className="text-[12px] text-white/85 font-semibold">
+                                  {desc}
+                                </div>
+                                <div
+                          className="text-[11px] text-white/45 truncate"
+                          title={metaTitle || undefined}>
+                                  {meta || "—"}
                                 </div>
                                 {txHash ?
-                          <div className="text-[10px] text-white/35 font-mono truncate">
+                          <div className="text-[10px] text-white/35 font-mono truncate md:hidden">
                                     {txHash.slice(0, 10)}…{txHash.slice(-8)}
                                   </div> :
                           null}
