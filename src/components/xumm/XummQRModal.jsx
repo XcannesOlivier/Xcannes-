@@ -15,28 +15,61 @@ export default function XummQRModal({
   deepLink,
   type = 'connect', // 'connect' ou 'sign'
   onSuccess,
+  status: statusProp,
+  enablePolling = true,
   zIndexClassName = "z-50"
 }) {const { t } = useTranslation("common");
-  const [status, setStatus] = useState('loading'); // loading, waiting, signed, error
-  const [countdown, setCountdown] = useState(300); // 5 minutes
+  const [localStatus, setLocalStatus] = useState('loading'); // loading, waiting, signed, error
+  const [localCountdown, setLocalCountdown] = useState(300); // 5 minutes
   const lastAutoOpenedRef = useRef(null);
+  const isControlled = statusProp != null;
+  const displayStatus = isControlled ? statusProp : localStatus;
 
   useEffect(() => {
     if (!isOpen || !uuid) {
       return undefined;
     }
 
-    setStatus('waiting');
-    setCountdown(300);
+    if (!isControlled) {
+      setLocalStatus('waiting');
+    }
+    setLocalCountdown(300);
 
-    let pollingInterval;
-    let pollingTimeout;
     let countdownInterval;
 
     const clearAll = () => {
+      if (countdownInterval) clearInterval(countdownInterval);
+    };
+
+    if (displayStatus === 'waiting') {
+      countdownInterval = setInterval(() => {
+        setLocalCountdown((prev) => {
+          if (prev <= 1) {
+            clearAll();
+            if (!isControlled) {
+              setLocalStatus('error');
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return clearAll;
+  }, [displayStatus, isControlled, isOpen, uuid]);
+
+  useEffect(() => {
+    if (!isOpen || !uuid || isControlled || !enablePolling) {
+      return undefined;
+    }
+
+    let pollingInterval;
+    let pollingTimeout;
+
+    const clearPolling = () => {
       if (pollingInterval) clearInterval(pollingInterval);
       if (pollingTimeout) clearTimeout(pollingTimeout);
-      if (countdownInterval) clearInterval(countdownInterval);
     };
 
     pollingInterval = setInterval(async () => {
@@ -45,8 +78,8 @@ export default function XummQRModal({
         const data = await res.json();
 
         if (data.signed) {
-          setStatus('signed');
-          clearAll();
+          setLocalStatus('signed');
+          clearPolling();
           if (onSuccess) {
             onSuccess(data);
           }
@@ -54,8 +87,8 @@ export default function XummQRModal({
             onClose();
           }, 2000);
         } else if (data.expired) {
-          setStatus('error');
-          clearAll();
+          setLocalStatus('error');
+          clearPolling();
         }
       } catch (error) {
         console.error('Polling error:', error);
@@ -69,19 +102,8 @@ export default function XummQRModal({
       }
     }, 300000);
 
-    countdownInterval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearAll();
-          setStatus('error');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return clearAll;
-  }, [isOpen, uuid, onClose, onSuccess]);
+    return clearPolling;
+  }, [enablePolling, isControlled, isOpen, onClose, onSuccess, uuid]);
 
   const isMobileDevice = () => {
     if (typeof navigator === 'undefined') return false;
@@ -160,7 +182,7 @@ export default function XummQRModal({
 
         {/* Content */}
         <div className="text-center">
-          {status === 'loading' &&
+          {displayStatus === 'loading' &&
           <>
               <div className="w-16 h-16 border-4 border-xcannes-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <h3 className="text-xl font-orbitron font-bold text-white mb-2">{t("ui_preparing_67f5f84ff4", "Preparing...")}
@@ -169,7 +191,7 @@ export default function XummQRModal({
             </>
           }
 
-          {status === 'waiting' &&
+          {displayStatus === 'waiting' &&
           <>
               <h3 className="text-2xl font-orbitron font-bold text-white mb-4">
                 {type === 'connect' ? 'Connect Wallet' : 'Sign Transaction'}
@@ -220,7 +242,7 @@ export default function XummQRModal({
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{t("ui_expires_in_969e0da47a", "Expires in")}{Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}</span>
+                <span>{t("ui_expires_in_969e0da47a", "Expires in")}{Math.floor(localCountdown / 60)}:{(localCountdown % 60).toString().padStart(2, '0')}</span>
               </div>
 
               {/* Instructions */}
@@ -237,7 +259,7 @@ export default function XummQRModal({
             </>
           }
 
-          {status === 'signed' &&
+          {displayStatus === 'signed' &&
           <>
               <div className="w-20 h-20 bg-xcannes-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-12 h-12 text-xcannes-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +277,7 @@ export default function XummQRModal({
             </>
           }
 
-          {status === 'error' &&
+          {displayStatus === 'error' &&
           <>
               <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

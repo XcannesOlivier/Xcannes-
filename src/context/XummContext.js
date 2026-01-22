@@ -3,12 +3,89 @@
  * Version 2.0 avec vrai SDK et QR code
  */
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 
 const XummContext = createContext();
 const XUMM_PENDING_CONNECT_KEY = "xcannes_xumm_pending_connect";
+const XUMM_TICKET_QUERY_KEY = "xummTicket";
+
+function generateXummTicket() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `xumm_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function appendTicketToUrl(url, ticket) {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set(XUMM_TICKET_QUERY_KEY, ticket);
+    return parsed.toString();
+  } catch (err) {
+    return url;
+  }
+}
+
+function isMobileDevice() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const isMobileUa = /android|iphone|ipad|ipod|mobile/i.test(ua);
+  const isIpadOs = /Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1;
+  return isMobileUa || isIpadOs;
+}
+
+function resolveXummLinks({ deepLink, uuid } = {}) {
+  const raw = deepLink || (uuid ? `https://xumm.app/sign/${uuid}` : "");
+  if (!raw) return { appLink: "", webLink: "" };
+
+  const isScheme = /^xumm:\/\//i.test(raw) || /^xaman:\/\//i.test(raw);
+  if (isScheme) {
+    const webLink = raw.replace(/^xumm:\/\//i, "https://").replace(/^xaman:\/\//i, "https://");
+    return { appLink: raw, webLink };
+  }
+  const scheme = /xaman/i.test(raw) ? "xaman://" : "xumm://";
+  const appLink = raw.replace(/^https?:\/\//i, scheme);
+  return { appLink, webLink: raw };
+}
+
+function preloadQrImage(url) {
+  if (!url || typeof Image === "undefined") {
+    return Promise.resolve(false);
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const done = () => resolve(true);
+    img.onload = done;
+    img.onerror = done;
+    img.src = url;
+  });
+}
+
+async function tryOpenXummApp({ deepLink, uuid, timeoutMs = 3000 } = {}) {
+  if (typeof window === "undefined" || typeof document === "undefined") return false;
+  const { appLink } = resolveXummLinks({ deepLink, uuid });
+  if (!appLink) return false;
+
+  let didHide = false;
+  const onVisibility = () => {
+    if (document.hidden) {
+      didHide = true;
+    }
+  };
+
+  document.addEventListener("visibilitychange", onVisibility, { once: true });
+  window.location.href = appLink;
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      resolve(didHide || document.hidden);
+    }, timeoutMs);
+  });
+}
 
 function getPendingConnectUuid() {
   if (typeof window === "undefined") return null;
@@ -46,6 +123,71 @@ export const XummProvider = ({ children }) => {
   const [balance, setBalance] = useState(null);
   const [isWalletActivated, setIsWalletActivated] = useState(null); // null | boolean
   const [qrModalData, setQrModalData] = useState(null);
+  const pollIntervalRef = useRef(null);
+  const autoCloseTimeoutRef = useRef(null);
+  const pendingSignatureResolveRef = useRef(null);
+  const qrPreloadTokenRef = useRef(null);
+
+  const clearPolling = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+  }, []);
+
+  const clearAutoClose = useCallback(() => {
+    if (autoCloseTimeoutRef.current) {
+      clearTimeout(autoCloseTimeoutRef.current);
+      autoCloseTimeoutRef.current = null;
+    }
+  }, []);
+
+  const resolvePendingSignature = useCallback((payload) => {
+    if (!pendingSignatureResolveRef.current) return;
+    const resolve = pendingSignatureResolveRef.current;
+    pendingSignatureResolveRef.current = null;
+    resolve(payload);
+  }, []);
+
+  const updateQrStatus = useCallback((status) => {
+    setQrModalData((prev) => (prev ? { ...prev, status } : prev));
+  }, []);
+
+  const closeQrModal = useCallback(() => {
+    clearPolling();
+    clearAutoClose();
+    resolvePendingSignature(null);
+    qrPreloadTokenRef.current = null;
+    setQrModalData(null);
+    setIsConnecting(false);
+  }, [clearAutoClose, clearPolling, resolvePendingSignature]);
+
+  const scheduleQrClose = useCallback((delayMs = 2000) => {
+    clearAutoClose();
+    autoCloseTimeoutRef.current = setTimeout(() => {
+      closeQrModal();
+    }, delayMs);
+  }, [clearAutoClose, closeQrModal]);
+
+  const showQrModalNow = useCallback(() => {
+    setQrModalData((prev) => (prev ? { ...prev, visible: true } : prev));
+  }, []);
+
+  const showQrModalWhenReady = useCallback(
+    async (qrUrl) => {
+      if (!qrUrl) {
+        showQrModalNow();
+        return;
+      }
+
+      const token = `qr_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      qrPreloadTokenRef.current = token;
+      await preloadQrImage(qrUrl);
+      if (qrPreloadTokenRef.current !== token) return;
+      showQrModalNow();
+    },
+    [showQrModalNow]
+  );
 
   const fetchBalance = useCallback(
     async (address) => {
@@ -84,6 +226,20 @@ export const XummProvider = ({ children }) => {
     []
   );
 
+  const updateWalletSession = useCallback(async (address, active) => {
+    if (!address) return;
+    const endpoint = active ? "/wallet/session/connect" : "/wallet/session/disconnect";
+    try {
+      await fetch(apiUrl(endpoint), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
+    } catch (error) {
+      console.warn("Wallet session update failed:", error);
+    }
+  }, []);
+
   const updateWallet = useCallback(
     (account) => {
       if (account) {
@@ -92,6 +248,7 @@ export const XummProvider = ({ children }) => {
         setIsWalletActivated(null);
         sessionStorage.setItem("xumm_wallet", account);
         fetchBalance(account);
+        updateWalletSession(account, true);
       } else {
         setWallet("");
         setIsConnected(false);
@@ -100,7 +257,7 @@ export const XummProvider = ({ children }) => {
         sessionStorage.removeItem("xumm_wallet");
       }
     },
-    [fetchBalance]
+    [fetchBalance, updateWalletSession]
   );
 
   const checkPendingConnect = useCallback(async () => {
@@ -117,22 +274,41 @@ export const XummProvider = ({ children }) => {
       const data = await res.json();
 
       if (data.signed && data.wallet) {
+        clearPolling();
         updateWallet(data.wallet);
         clearPendingConnectUuid();
         setIsConnecting(false);
-        setQrModalData(null);
+        updateQrStatus("signed");
+        scheduleQrClose(2000);
         return;
       }
 
       if (data.expired) {
+        clearPolling();
         clearPendingConnectUuid();
         setIsConnecting(false);
-        setQrModalData(null);
+        updateQrStatus("error");
+        showQrModalNow();
+        return;
+      }
+
+      if (qrModalData?.visible === false) {
+        showQrModalWhenReady(qrModalData?.qrUrl);
       }
     } catch (error) {
       console.error("Pending connect check error:", error);
     }
-  }, [isConnected, updateWallet]);
+  }, [
+    clearPolling,
+    isConnected,
+    qrModalData?.qrUrl,
+    qrModalData?.visible,
+    scheduleQrClose,
+    showQrModalNow,
+    showQrModalWhenReady,
+    updateQrStatus,
+    updateWallet,
+  ]);
 
   /**
    * Connecter via QR code XUMM (nouvelle méthode)
@@ -140,12 +316,15 @@ export const XummProvider = ({ children }) => {
   const connect = async () => {
     setIsConnecting(true);
     try {
+      const ticket = generateXummTicket();
+      const returnUrl = appendTicketToUrl(window.location.href, ticket);
       // Appeler l'API pour créer un payload XUMM
       const res = await fetch(apiUrl('/xumm/connect'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          returnUrl: window.location.href,
+          returnUrl,
+          ticket,
         }),
       });
 
@@ -155,17 +334,32 @@ export const XummProvider = ({ children }) => {
         throw new Error(data.error || 'Failed to create XUMM connection');
       }
 
-      // Afficher le modal QR code
+      const isMobile = isMobileDevice();
+
+      // Préparer les données pour le QR (affichage si besoin)
+      clearPolling();
+      clearAutoClose();
       setQrModalData({
         uuid: data.uuid,
         qrUrl: data.qrUrl,
         deepLink: data.deepLink,
         type: 'connect',
+        status: 'waiting',
+        visible: false,
       });
       setPendingConnectUuid(data.uuid);
 
       // Attendre la signature
       pollConnection(data.uuid);
+
+      if (isMobile) {
+        const opened = await tryOpenXummApp({ deepLink: data.deepLink, uuid: data.uuid });
+        if (!opened) {
+          showQrModalWhenReady(data.qrUrl);
+        }
+      } else {
+        showQrModalWhenReady(data.qrUrl);
+      }
     } catch (error) {
       console.error('XUMM connect error:', error);
       alert(`Connection failed: ${error.message}`);
@@ -176,17 +370,19 @@ export const XummProvider = ({ children }) => {
   /**
    * Polling pour vérifier la connexion
    */
-  const pollConnection = async (uuid) => {
+  const pollConnection = useCallback(async (uuid) => {
     const maxAttempts = 150; // 5 minutes (2s interval)
     let attempts = 0;
 
-    const interval = setInterval(async () => {
+    clearPolling();
+    pollIntervalRef.current = setInterval(async () => {
       attempts++;
 
       if (attempts >= maxAttempts) {
-        clearInterval(interval);
+        clearPolling();
         setIsConnecting(false);
-        setQrModalData(null);
+        clearPendingConnectUuid();
+        updateQrStatus("error");
         return;
       }
 
@@ -195,23 +391,23 @@ export const XummProvider = ({ children }) => {
         const data = await res.json();
 
         if (data.signed && data.wallet) {
-          clearInterval(interval);
+          clearPolling();
           updateWallet(data.wallet);
-          setIsConnecting(false);
-          setQrModalData(null);
           clearPendingConnectUuid();
+          setIsConnecting(false);
+          updateQrStatus("signed");
+          scheduleQrClose(2000);
         } else if (data.expired) {
-          clearInterval(interval);
-          setIsConnecting(false);
-          setQrModalData(null);
+          clearPolling();
           clearPendingConnectUuid();
-          alert('Connection expired. Please try again.');
+          setIsConnecting(false);
+          updateQrStatus("error");
         }
       } catch (error) {
         console.error('Polling error:', error);
       }
     }, 2000);
-  };
+  }, [clearPolling, scheduleQrClose, updateQrStatus, updateWallet]);
 
   /**
    * Rafraîchir le solde
@@ -251,12 +447,18 @@ export const XummProvider = ({ children }) => {
       }
 
       // Afficher le modal QR code
+      clearPolling();
+      clearAutoClose();
       setQrModalData({
         uuid: data.uuid,
         qrUrl: data.qrUrl,
         deepLink: data.deepLink,
         type: 'sign',
+        status: 'waiting',
+        visible: false,
       });
+
+      showQrModalWhenReady(data.qrUrl);
 
       // Attendre la signature
       return await pollSignature(data.uuid);
@@ -276,14 +478,17 @@ export const XummProvider = ({ children }) => {
       const maxAttempts = 150;
       let attempts = 0;
 
-      const interval = setInterval(async () => {
+      resolvePendingSignature(null);
+      pendingSignatureResolveRef.current = resolve;
+      clearPolling();
+      pollIntervalRef.current = setInterval(async () => {
         attempts++;
 
         if (attempts >= maxAttempts) {
-          clearInterval(interval);
+          clearPolling();
           setIsConnecting(false);
-          setQrModalData(null);
-          resolve(null);
+          updateQrStatus("error");
+          resolvePendingSignature(null);
           return;
         }
 
@@ -292,16 +497,16 @@ export const XummProvider = ({ children }) => {
           const data = await res.json();
 
           if (data.signed) {
-            clearInterval(interval);
+            clearPolling();
             setIsConnecting(false);
-            setQrModalData(null);
-            resolve({ ...data, uuid });
+            updateQrStatus("signed");
+            scheduleQrClose(2000);
+            resolvePendingSignature({ ...data, uuid });
           } else if (data.expired) {
-            clearInterval(interval);
+            clearPolling();
             setIsConnecting(false);
-            setQrModalData(null);
-            alert('Signature expired. Please try again.');
-            resolve(null);
+            updateQrStatus("error");
+            resolvePendingSignature(null);
           }
         } catch (error) {
           console.error('Polling error:', error);
@@ -310,15 +515,99 @@ export const XummProvider = ({ children }) => {
     });
   };
 
-  const disconnect = () => {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const ticket = url.searchParams.get(XUMM_TICKET_QUERY_KEY);
+    if (!ticket || isConnected) {
+      if (ticket) {
+        url.searchParams.delete(XUMM_TICKET_QUERY_KEY);
+        window.history.replaceState({}, document.title, url.toString());
+      }
+      return;
+    }
+
+    url.searchParams.delete(XUMM_TICKET_QUERY_KEY);
+    window.history.replaceState({}, document.title, url.toString());
+
+    const resolveTicket = async () => {
+      setIsConnecting(true);
+      clearPolling();
+      clearAutoClose();
+      updateQrStatus("waiting");
+
+      try {
+        const res = await fetch(
+          apiUrl(`/xumm/resolve?ticket=${encodeURIComponent(ticket)}`)
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.uuid) {
+          setIsConnecting(false);
+          return;
+        }
+
+        setPendingConnectUuid(data.uuid);
+        setQrModalData({
+          uuid: data.uuid,
+          qrUrl: null,
+          deepLink: null,
+          type: "connect",
+          status: "waiting",
+          visible: false,
+        });
+
+        const statusRes = await fetch(
+          apiUrl(`/xumm/check?uuid=${encodeURIComponent(data.uuid)}`)
+        );
+        const statusData = await statusRes.json().catch(() => ({}));
+
+        if (statusRes.ok && statusData.signed && statusData.wallet) {
+          updateWallet(statusData.wallet);
+          clearPendingConnectUuid();
+          setIsConnecting(false);
+          updateQrStatus("signed");
+          scheduleQrClose(2000);
+          return;
+        }
+
+        if (statusData.expired) {
+          clearPendingConnectUuid();
+          setIsConnecting(false);
+          updateQrStatus("error");
+          showQrModalNow();
+          return;
+        }
+
+        showQrModalNow();
+        pollConnection(data.uuid);
+      } catch (error) {
+        console.error("Ticket resolve error:", error);
+        setIsConnecting(false);
+        showQrModalNow();
+      }
+    };
+
+    resolveTicket();
+  }, [
+    clearAutoClose,
+    clearPolling,
+    isConnected,
+    pollConnection,
+    scheduleQrClose,
+    showQrModalNow,
+    showQrModalWhenReady,
+    updateQrStatus,
+    updateWallet,
+  ]);
+
+  const disconnect = useCallback(() => {
+    if (wallet) {
+      updateWalletSession(wallet, false);
+    }
     clearPendingConnectUuid();
     updateWallet(null);
-  };
-
-  const closeQrModal = () => {
-    setQrModalData(null);
-    setIsConnecting(false);
-  };
+  }, [updateWallet, updateWalletSession, wallet]);
 
   useEffect(() => {
     // Récupère le wallet sauvegardé si existe
