@@ -3,11 +3,13 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import { apiUrl } from "@/lib/runtimeConfig";import { useTranslation } from "next-i18next";
+import { apiUrl } from "@/lib/runtimeConfig";
+import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
-export default function NewsFeed({ category = "finance" }) {const { t } = useTranslation("common");
+export default function NewsFeed({ category = "finance" }) {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const currentLocale = router.locale || "en";
 

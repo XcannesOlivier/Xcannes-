@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { createPortal } from "react-dom";
+import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -14,7 +15,8 @@ export default function QRScanner({
   className = "",
   fileInputId,
   enableCamera = true
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const html5QrCodeRef = useRef(null);
   const readerIdRef = useRef(
     `qr-reader-${Math.random().toString(36).slice(2, 10)}`

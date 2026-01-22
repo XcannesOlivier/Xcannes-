@@ -1,4 +1,5 @@
-"use client";import { useTranslation } from "next-i18next";
+"use client";
+import { useTranslation } from "next-i18next";
 
 export default function DemoWalletModalShell({
   open,
@@ -7,7 +8,8 @@ export default function DemoWalletModalShell({
   subtitle,
   children,
   maxWidthClassName = "max-w-md"
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   if (!open) return null;
 
   return (

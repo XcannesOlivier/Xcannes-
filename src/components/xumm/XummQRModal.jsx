@@ -5,7 +5,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { apiUrl } from "@/lib/runtimeConfig";import { useTranslation } from "next-i18next";
+import { apiUrl } from "@/lib/runtimeConfig";
+import { useTranslation } from "next-i18next";
 
 export default function XummQRModal({
   isOpen,
@@ -18,7 +19,8 @@ export default function XummQRModal({
   status: statusProp,
   enablePolling = true,
   zIndexClassName = "z-50"
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const [localStatus, setLocalStatus] = useState('loading'); // loading, waiting, signed, error
   const [localCountdown, setLocalCountdown] = useState(300); // 5 minutes
   const lastAutoOpenedRef = useRef(null);

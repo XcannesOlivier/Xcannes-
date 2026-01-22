@@ -43,7 +43,8 @@ const MoonPaySellModal = ({
   selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency
-}) => {const { t } = useTranslation("common");
+}) => {
+  const { t } = useTranslation("common");
   const { signTransaction } = useXumm();
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);

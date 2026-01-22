@@ -1,4 +1,5 @@
-"use client";import { useTranslation } from "next-i18next";
+"use client";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardTrustlineCurrencyForm({
   currentEditingLine,
@@ -7,7 +8,8 @@ export default function WalletDashboardTrustlineCurrencyForm({
   onSave,
   onRemove,
   minLockedXcs = 0.2
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   return (
     <>
       {currentEditingLine &&

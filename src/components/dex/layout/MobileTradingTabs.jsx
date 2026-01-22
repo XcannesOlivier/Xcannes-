@@ -16,7 +16,8 @@ import { WalletInfoContent } from "@/components/wallet/modals/WalletInfoModal";
  *
  * Utilisé uniquement sous 1024px dans TradingLayoutV1A.
  */import { useTranslation } from "next-i18next";
-export default function MobileTradingTabs({ pair }) {const { t } = useTranslation("common");
+export default function MobileTradingTabs({ pair }) {
+  const { t } = useTranslation("common");
   const pairCategory = useMemo(() => getPairCategory(pair), [pair]);
   const isXRPL = pairCategory === "xrpl";
 

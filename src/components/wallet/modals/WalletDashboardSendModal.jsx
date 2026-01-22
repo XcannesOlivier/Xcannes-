@@ -5,7 +5,8 @@ import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import QRScanner from "../components/QRScanner";
-import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { createPortal } from "react-dom";
+import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardSendModal({
   open,

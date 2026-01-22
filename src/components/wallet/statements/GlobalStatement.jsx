@@ -48,7 +48,8 @@ export default function GlobalStatement({
   onLoadMoreMovements,
   onClose,
   onViewCurrency
-}) {const { t, i18n } = useTranslation("common");
+}) {
+  const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const [sortBy, setSortBy] = useState("balance"); // balance, change, name
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.

@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import xcannesApi from "@/lib/xcannesApi";
-import { getCurrencyDescription } from "@/utils/currencyDescriptions";import { useTranslation } from "next-i18next";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import { useTranslation } from "next-i18next";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const logError = (...args) => {
@@ -120,7 +121,8 @@ export default function FxPairSelector({
   value,
   onChange,
   alwaysOpen = false
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

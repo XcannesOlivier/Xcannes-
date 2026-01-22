@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import xcannesApi from "@/lib/xcannesApi";import { useTranslation } from "next-i18next";
+import xcannesApi from "@/lib/xcannesApi";
+import { useTranslation } from "next-i18next";
 
 const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
@@ -47,7 +48,8 @@ export default function WalletCurrencySelector({
   extraOptions = [],
   quickOptions = [],
   showQuickAdd = true
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

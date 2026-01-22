@@ -5,7 +5,8 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Buffer } from "buffer";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
-import { createPortal } from "react-dom";import { useTranslation } from "next-i18next";
+import { createPortal } from "react-dom";
+import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 export default function WalletDashboardReceiveModal({

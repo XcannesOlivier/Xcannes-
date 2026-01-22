@@ -40,7 +40,8 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
   setShowSettings,
   chartSettings,
   setChartSettings
-}) {const { t } = useTranslation("common");
+}) {
+  const { t } = useTranslation("common");
   // Accessibilité : fermer les menus sur Escape
   useEffect(() => {
     const onKeyDown = (e) => {
