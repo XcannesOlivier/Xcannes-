@@ -173,7 +173,7 @@ export default function Home() {
                   ),
                   descClassName: "text-[13px]",
                   className:
-                    "order-first sm:order-none lg:order-first lg:col-span-3 relative overflow-hidden border-xcannes-green/40 hover:border-xcannes-green/80 before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-xcannes-green/60 before:to-transparent after:absolute after:inset-x-4 after:bottom-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-xcannes-green/50 after:to-transparent",
+                    "order-first sm:order-none lg:order-first lg:col-span-3",
                   iconWrapperClassName: "w-10 h-10 lg:w-11 lg:h-11",
                   link: {
                     label: t("home_v2_hero_pillar_4_link", "Détails"),

@@ -1,5 +1,5 @@
 /**
- * Constantes pour ExchangeSection
+ * Constantes de marche
  */
 
 // Paires populaires par défaut (les plus échangées)

@@ -1341,8 +1341,8 @@ export default function XrplCandleChartRaw({
           </div>
       }
 
-      {/* Footer Stats: desktop / tablette uniquement (mobile l'a déjà dans OrderbookSidebar) */}
-      <div className="mt-0 hidden md:block">
+      {/* Footer Stats (hide on small screens) */}
+      <div className="mt-0 hidden sm:block">
         <ChartFooter
           pair={pair}
           fxMode={isFxMode}

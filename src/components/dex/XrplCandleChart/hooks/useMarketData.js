@@ -441,7 +441,7 @@ export default function useMarketData({ pair, interval, isFxMode, fxBase, fxQuot
   // ✅ Correctif ciblé pour les paires PYTH :
   // si percent24h reste à 0 (pas de variation fournie par le tickerKey),
   // on récupère le ticker en utilisant le backendPair réel de la paire
-  // (même logique que EODExchangeSection) et on applique uniquement le %
+  // puis on applique uniquement le %
   useEffect(() => {
     if (!isExternal || isFxMode) return;
     if (Math.abs(percent24h?.percent || 0) > 0.0001) return;

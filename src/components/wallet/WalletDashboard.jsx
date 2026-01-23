@@ -716,7 +716,7 @@ export default function WalletDashboard({
     ]
   );
 
-  // Ouvrir le convert (swap modal) depuis d'autres briques UI (ex: ExchangeSection).
+  // Ouvrir le convert (swap modal) depuis d'autres briques UI.
   // Event detail:
   // - action: "buy" | "sell"
   // - base, quote: codes devises (ex: EUR/USD)
