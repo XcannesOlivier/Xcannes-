@@ -21,7 +21,7 @@ export default function DexSidebar() {
     return () => media.removeListener(update);
   }, []);
 
-  const walletVariant = isDesktop ? "dex-desktop" : "dex-mobile";
+  const walletVariant = isDesktop ? "full" : "default";
 
   return (
     <aside className="h-full flex flex-col min-h-0 overflow-hidden">

@@ -1,31 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import Image from "next/image";
-import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import { getCurrencyFlag } from "@/components/wallet/walletDashboardConfig";
-
-const DEMO_CARD_EVENT = "xcannes:demo-wallet:card";
-const DEMO_CARD_CTA_EVENT = "xcannes:demo-wallet:cta";
-const FLASH_STYLES = {
-  pay: { backgroundColor: "rgba(95, 201, 248, 0.06)", borderColor: "rgba(95, 201, 248, 0.55)" },
-  receive_request: { backgroundColor: "rgba(34, 197, 94, 0.06)", borderColor: "rgba(34, 197, 94, 0.55)" },
-  convert: { backgroundColor: "rgba(6, 182, 212, 0.06)", borderColor: "rgba(6, 182, 212, 0.55)" },
-  buy: { backgroundColor: "rgba(139, 92, 246, 0.06)", borderColor: "rgba(139, 92, 246, 0.55)" },
-  lines: { backgroundColor: "rgba(245, 158, 11, 0.06)", borderColor: "rgba(245, 158, 11, 0.55)" },
-  statements: { backgroundColor: "rgba(34, 197, 94, 0.06)", borderColor: "rgba(34, 197, 94, 0.55)" },
-  config: { backgroundColor: "rgba(139, 92, 246, 0.06)", borderColor: "rgba(139, 92, 246, 0.55)" }
-};
 
 export default function WalletEssentialsCards({ variant = "home" }) {
-  const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
   const [modalRoot, setModalRoot] = useState(null);
   const [activeActionKey, setActiveActionKey] = useState(null);
-  const [flashByKey, setFlashByKey] = useState({});
-  const [returnCardKey, setReturnCardKey] = useState(null);
-  const flashTimers = useRef({});
   const isCompact = variant === "compare";
-  const locale = i18n?.language || "en";
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -46,507 +27,6 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeActionKey]);
-
-  const formatAmount = useCallback(
-    (value) => {
-      const num = Number(value);
-      if (!Number.isFinite(num)) return null;
-      return num.toLocaleString(locale, {
-        maximumFractionDigits: 6
-      });
-    },
-    [locale]
-  );
-
-  const formatWalletLabel = useCallback(
-    (walletId) => {
-      if (!walletId) return t("demo_wallet_label", "Wallet");
-      return `${t("demo_wallet_label", "Wallet")} ${walletId}`;
-    },
-    [t]
-  );
-  const buildStatementCtaLabel = useCallback(
-    (currency, wallet) =>
-      t("demo_card_cta_statement_currency", {
-        defaultValue: "Relevé {{currency}} · {{wallet}}",
-        currency,
-        wallet
-      }),
-    [t]
-  );
-  const buildStatementGlobalCtaLabel = useCallback(
-    (wallet) =>
-      t("demo_card_cta_statement_global", {
-        defaultValue: "Relevé global · {{wallet}}",
-        wallet
-      }),
-    [t]
-  );
-  const buildOpenSendCtaLabel = useCallback(
-    (wallet) =>
-      t("demo_card_cta_open_send", {
-        defaultValue: "Ouvrir Envoyer · {{wallet}}",
-        wallet
-      }),
-    [t]
-  );
-  const buildOpenLinesCtaLabel = useCallback(
-    (wallet) =>
-      t("demo_card_cta_open_lines", {
-        defaultValue: "Gérer les lignes · {{wallet}}",
-        wallet
-      }),
-    [t]
-  );
-  const renderStatementCtaIcon = useCallback((currency) => {
-    const code = String(currency || "").toUpperCase();
-    if (!code) return "?";
-    const iconSrc = CRYPTO_ICONS?.[code];
-    if (iconSrc) {
-      return (
-        <Image
-          src={iconSrc}
-          alt={code}
-          width={16}
-          height={16}
-          className="w-4 h-4 object-contain"
-        />
-      );
-    }
-    return getCurrencyFlag(code);
-  }, []);
-  const dispatchDemoCta = useCallback((detail) => {
-    if (typeof window === "undefined") return;
-    window.dispatchEvent(new CustomEvent(DEMO_CARD_CTA_EVENT, { detail }));
-  }, []);
-
-  const buildFlash = useCallback(
-    (detail = {}) => {
-      const action = detail?.action;
-      if (!action) return null;
-
-      const cardKeyMap = {
-        send: "pay",
-        request: "receive_request",
-        convert: "convert",
-        buy: "buy",
-        sell: "buy",
-        statement_global: "statements",
-        statement_currency: "statements",
-        trustline_add: "lines",
-        trustline_remove: "lines",
-        trustline_update: "lines"
-      };
-
-      const cardKey = cardKeyMap[action];
-      if (!cardKey) return null;
-
-      const currency =
-        String(detail.currency || detail.fromCurrency || detail.toCurrency || "")
-          .trim()
-          .toUpperCase();
-
-      if (action === "send") {
-        const amountLabel = formatAmount(detail.amount);
-        const fromWallet = formatWalletLabel(detail.fromWalletId);
-        const toWallet = formatWalletLabel(detail.toWalletId);
-        const ctas = [];
-        if (currency && detail.toWalletId) {
-          ctas.push({
-            label: buildStatementCtaLabel(currency, toWallet),
-            detail: {
-              action: "open_statement_currency",
-              walletId: detail.toWalletId,
-              currency
-            }
-          });
-        }
-        if (currency && detail.fromWalletId) {
-          ctas.push({
-            label: buildStatementCtaLabel(currency, fromWallet),
-            detail: {
-              action: "open_statement_currency",
-              walletId: detail.fromWalletId,
-              currency
-            }
-          });
-        }
-        return {
-          cardKey,
-          title: t("demo_card_flash_send_title", "Envoi simulé"),
-          desc: t("demo_card_flash_send_desc", {
-            defaultValue:
-              "Vous avez envoyé {{amount}} {{currency}} vers {{toWallet}}. Relevé {{currency}}: crédit chez {{toWallet}}, débit chez {{fromWallet}}.",
-            amount: amountLabel || "—",
-            currency: currency || "",
-            toWallet,
-            fromWallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "request") {
-        const amountLabel = formatAmount(detail.amount);
-        const otherWallet = formatWalletLabel(detail.toWalletId);
-        const hasAmount = Boolean(amountLabel) && Boolean(currency);
-        const ctas = detail.toWalletId
-          ? [
-            {
-              label: buildOpenSendCtaLabel(otherWallet),
-              detail: {
-                action: "open_send",
-                walletId: detail.toWalletId,
-                sendTab: "scan-request",
-                usePendingRequest: true
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_request_title", "Demande créée"),
-          desc: hasAmount
-            ? t("demo_card_flash_request_desc", {
-              defaultValue:
-                "Demande de {{amount}} {{currency}}. Sur {{otherWallet}}, ouvrez Envoyer > Scan Request pour payer.",
-              amount: amountLabel,
-              currency,
-              otherWallet
-            })
-            : t("demo_card_flash_request_desc_short", {
-              defaultValue:
-                "Demande créée. Sur {{otherWallet}}, ouvrez Envoyer > Scan Request pour payer.",
-              otherWallet
-            }),
-          ctas
-        };
-      }
-
-      if (action === "convert") {
-        const fromAmount = formatAmount(detail.fromAmount);
-        const toAmount = formatAmount(detail.toAmount);
-        const fromCurrency = String(detail.fromCurrency || "").toUpperCase();
-        const toCurrency = String(detail.toCurrency || "").toUpperCase();
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = [];
-        if (toCurrency && detail.walletId) {
-          ctas.push({
-            label: buildStatementCtaLabel(toCurrency, wallet),
-            detail: {
-              action: "open_statement_currency",
-              walletId: detail.walletId,
-              currency: toCurrency
-            }
-          });
-        }
-        if (fromCurrency && detail.walletId) {
-          ctas.push({
-            label: buildStatementCtaLabel(fromCurrency, wallet),
-            detail: {
-              action: "open_statement_currency",
-              walletId: detail.walletId,
-              currency: fromCurrency
-            }
-          });
-        }
-        return {
-          cardKey,
-          title: t("demo_card_flash_convert_title", "Conversion simulée"),
-          desc: t("demo_card_flash_convert_desc", {
-            defaultValue:
-              "{{fromAmount}} {{fromCurrency}} → {{toAmount}} {{toCurrency}}. Relevé {{fromCurrency}}: débit, relevé {{toCurrency}}: crédit.",
-            fromAmount: fromAmount || "—",
-            fromCurrency,
-            toAmount: toAmount || "—",
-            toCurrency
-          }),
-          ctas
-        };
-      }
-
-      if (action === "buy") {
-        const amountLabel = formatAmount(detail.amount);
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId
-          ? [
-            {
-              label: buildStatementCtaLabel("RLUSD", wallet),
-              detail: {
-                action: "open_statement_currency",
-                walletId: detail.walletId,
-                currency: "RLUSD"
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_buy_title", "Achat simulé"),
-          desc: t("demo_card_flash_buy_desc", {
-            defaultValue: "+{{amount}} RLUSD. Vérifiez le relevé RLUSD dans {{wallet}}.",
-            amount: amountLabel || "—",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "sell") {
-        const amountLabel = formatAmount(detail.amount);
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId
-          ? [
-            {
-              label: buildStatementCtaLabel("RLUSD", wallet),
-              detail: {
-                action: "open_statement_currency",
-                walletId: detail.walletId,
-                currency: "RLUSD"
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_sell_title", "Vente simulée"),
-          desc: t("demo_card_flash_sell_desc", {
-            defaultValue: "-{{amount}} RLUSD. Vérifiez le relevé RLUSD dans {{wallet}}.",
-            amount: amountLabel || "—",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "statement_currency") {
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId && currency
-          ? [
-            {
-              label: buildStatementCtaLabel(currency, wallet),
-              detail: {
-                action: "open_statement_currency",
-                walletId: detail.walletId,
-                currency
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_statement_currency_title", {
-            defaultValue: "Relevé {{currency}}",
-            currency: currency || ""
-          }),
-          desc: t("demo_card_flash_statement_currency_desc", {
-            defaultValue:
-              "Historique des crédits/débits {{currency}} dans {{wallet}}.",
-            currency: currency || "",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "statement_global") {
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId
-          ? [
-            {
-              label: buildStatementGlobalCtaLabel(wallet),
-              detail: {
-                action: "open_statement_global",
-                walletId: detail.walletId
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_statement_title", "Relevé ouvert"),
-          desc: t("demo_card_flash_statement_desc", {
-            defaultValue: "Relevé global ouvert dans {{wallet}}. Consultez les mouvements et exportez le PDF/CSV.",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "trustline_add") {
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId
-          ? [
-            {
-              label: buildOpenLinesCtaLabel(wallet),
-              detail: {
-                action: "open_swap",
-                walletId: detail.walletId,
-                swapView: "lines"
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_trustline_add_title", "Ligne activée"),
-          desc: t("demo_card_flash_trustline_add_desc", {
-            defaultValue: "Dans {{wallet}}, la ligne {{currency}} est active. Vous pouvez convertir ou allouer.",
-            currency: currency || "",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "trustline_remove") {
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId
-          ? [
-            {
-              label: buildOpenLinesCtaLabel(wallet),
-              detail: {
-                action: "open_swap",
-                walletId: detail.walletId,
-                swapView: "lines"
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_trustline_remove_title", "Ligne supprimée"),
-          desc: t("demo_card_flash_trustline_remove_desc", {
-            defaultValue: "Dans {{wallet}}, la ligne {{currency}} est retirée. Convertissez à 0 pour la réactiver.",
-            currency: currency || "",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      if (action === "trustline_update") {
-        const amountLabel = formatAmount(detail.amount);
-        const wallet = formatWalletLabel(detail.walletId);
-        const ctas = detail.walletId
-          ? [
-            {
-              label: buildOpenLinesCtaLabel(wallet),
-              detail: {
-                action: "open_swap",
-                walletId: detail.walletId,
-                swapView: "lines"
-              }
-            }
-          ]
-          : [];
-        return {
-          cardKey,
-          title: t("demo_card_flash_trustline_update_title", "Allocation mise à jour"),
-          desc: t("demo_card_flash_trustline_update_desc", {
-            defaultValue: "Dans {{wallet}}, {{currency}} allouée à {{amount}} RLUSD.",
-            currency: currency || "",
-            amount: amountLabel || "—",
-            wallet
-          }),
-          ctas
-        };
-      }
-
-      return null;
-    },
-    [
-      buildOpenLinesCtaLabel,
-      buildOpenSendCtaLabel,
-      buildStatementCtaLabel,
-      buildStatementGlobalCtaLabel,
-      formatAmount,
-      formatWalletLabel,
-      t
-    ]
-  );
-
-  useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-
-    const handleFlash = (event) => {
-      const flash = buildFlash(event?.detail || {});
-      if (!flash) return;
-
-      const isMobile =
-        window.matchMedia("(max-width: 1023px)").matches &&
-        window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-      if (flash.cardKey && isMobile) {
-        setReturnCardKey(flash.cardKey);
-      }
-
-      if (flashTimers.current[flash.cardKey]) {
-        clearTimeout(flashTimers.current[flash.cardKey]);
-        delete flashTimers.current[flash.cardKey];
-      }
-
-      setFlashByKey((prev) => ({
-        ...prev,
-        [flash.cardKey]: { title: flash.title, desc: flash.desc, ctas: flash.ctas || [] }
-      }));
-
-    };
-
-    window.addEventListener(DEMO_CARD_EVENT, handleFlash);
-    return () => {
-      window.removeEventListener(DEMO_CARD_EVENT, handleFlash);
-      Object.values(flashTimers.current).forEach((timer) => clearTimeout(timer));
-      flashTimers.current = {};
-    };
-  }, [buildFlash]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-    const handleReturnCta = (event) => {
-      const detail = event?.detail || {};
-      if (detail.action === "return_wallet") {
-        const targetKey = detail.cardKey || returnCardKey;
-        if (targetKey) {
-          setFlashByKey((prev) => {
-            const next = { ...prev };
-            delete next[targetKey];
-            return next;
-          });
-          if (flashTimers.current[targetKey]) {
-            clearTimeout(flashTimers.current[targetKey]);
-            delete flashTimers.current[targetKey];
-          }
-        }
-        setReturnCardKey(null);
-      }
-    };
-    window.addEventListener(DEMO_CARD_CTA_EVENT, handleReturnCta);
-    return () => window.removeEventListener(DEMO_CARD_CTA_EVENT, handleReturnCta);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-    const hasFlash = Object.keys(flashByKey).length > 0;
-    if (!hasFlash) return undefined;
-
-    const handleOutsideFlash = (event) => {
-      const isMobile =
-        window.matchMedia("(max-width: 1023px)").matches &&
-        window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-      if (isMobile) return;
-      const target = event.target;
-      if (target instanceof Element && target.closest('[data-essentials-flash="true"]')) {
-        return;
-      }
-      setFlashByKey({});
-      setReturnCardKey(null);
-      Object.values(flashTimers.current).forEach((timer) => clearTimeout(timer));
-      flashTimers.current = {};
-    };
-
-    document.addEventListener("mousedown", handleOutsideFlash);
-    return () => document.removeEventListener("mousedown", handleOutsideFlash);
-  }, [flashByKey]);
 
   const actions = [
     {
@@ -841,7 +321,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "lines",
-      title: t("home_v2_essentials_lines_title", "Lignes de devises"),
+      title: t("home_v2_essentials_lines_title", "Lignes de comptes"),
       desc: t(
         "home_v2_essentials_lines_desc",
         "Activez et gérez vos devises locales en quelques étapes."
@@ -886,7 +366,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         "home_v2_demo_card_desc",
         "Démo interactive, sans transaction réelle."
       ),
-      orderClassName: "order-last lg:order-1",
+      orderClassName: "order-last lg:order-1 lg:-mb-2",
+      plainTitleClassName:
+        "text-white/90 font-montserrat font-semibold text-base tracking-normal",
+      plainDescClassName: "text-white/60 text-[15px] sm:text-sm",
       showArrow: true,
       isPlain: true,
       icon: (
@@ -964,46 +447,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
 
       <div className={gridClassName}>
         {visibleActions.map((action) => {
-          const flash = flashByKey[action.key];
-          const flashClasses = "";
-          const flashStyle =
-            flash && !action.isPlain ? (FLASH_STYLES[action.key] || {}) : undefined;
-          const flashCtas = flash?.ctas || [];
-          const showReturnCta = Boolean(returnCardKey === action.key && flash);
-          const returnCta = showReturnCta
-            ? {
-              label: t("demo_card_cta_return_wallet", "Revenir au wallet"),
-              detail: { action: "return_wallet", cardKey: action.key },
-              className: "md:hidden"
-            }
-            : null;
-          const effectiveCtas = returnCta ? [...flashCtas, returnCta] : flashCtas;
-          const ctaStyle = flashStyle
-            ? { borderColor: flashStyle.borderColor, color: flashStyle.borderColor }
-            : undefined;
-          const hasStatementCtas = Boolean(
-            flash &&
-            effectiveCtas.some(
-              (cta) => cta?.detail?.action === "open_statement_currency"
-            )
-          );
-          const ctaContainerClassName = hasStatementCtas
-            ? "mt-2 flex flex-col gap-2"
-            : isCompact
-              ? "mt-2 flex flex-wrap gap-2 justify-center"
-              : "mt-2 flex flex-wrap gap-2";
-          const ctaButtonClassName =
-            "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-white/80 hover:text-white transition-colors";
-          const cardLayoutClassName = !isCompact && flash ? "" : baseLayoutClassName;
-          const descLayoutClassName = !isCompact && flash
-            ? ""
-            : !isCompact
-              ? "lg:mt-0 lg:flex-1"
-              : "";
+          const cardLayoutClassName = baseLayoutClassName;
+          const descLayoutClassName = !isCompact ? "lg:mt-0 lg:flex-1" : "";
           const cardClasses = [
             action.isPlain
               ? "bg-transparent border-none rounded-none shadow-none"
-              : "bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl",
+            : "bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl",
             "group",
             cardPaddingClassName,
             cardLayoutClassName,
@@ -1012,13 +461,11 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             action.isPlain
               ? ""
               : "w-full text-left cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:border-white/20 hover:bg-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
-            flash ? flashClasses : ""
           ]
             .filter(Boolean)
             .join(" ");
-
-          const effectiveTitle = flash?.title || action.title;
-          const effectiveDesc = flash?.desc || action.desc;
+          const effectiveTitle = action.title;
+          const effectiveDesc = action.desc;
           const cardContent = (
             <>
               <div className={titleRowClassName}>
@@ -1039,7 +486,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 <div
                   className={
                     action.isPlain
-                      ? "text-white/90 font-montserrat font-semibold text-sm sm:text-base tracking-normal"
+                      ? action.plainTitleClassName ||
+                        "text-white/90 font-montserrat font-semibold text-sm sm:text-base tracking-normal"
                       : titleClassName
                   }
                 >
@@ -1050,130 +498,14 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 className={[
                   "mt-2",
                   descLayoutClassName,
-                  action.isPlain ? "text-white/60 text-sm" : descClassName,
+                  action.isPlain
+                    ? action.plainDescClassName || "text-white/60 text-sm"
+                    : descClassName,
                 ].join(" ")}
               >
                 {effectiveDesc}
               </p>
-              {effectiveCtas.length > 0 && !action.isPlain && (
-                <div className={ctaContainerClassName}>
-                  {effectiveCtas.map((cta) => {
-                    const isReturnCta = cta?.detail?.action === "return_wallet";
-                    const isStatementCta = Boolean(
-                      flash &&
-                      cta?.detail?.action === "open_statement_currency" &&
-                      cta?.detail?.currency
-                    );
-                    if (isReturnCta) {
-                      const returnStyle = ctaStyle
-                        ? { borderColor: ctaStyle.borderColor }
-                        : undefined;
-                      return (
-                        <button
-                          key={cta.label}
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            dispatchDemoCta(cta.detail);
-                          }}
-                          className={["w-full text-left", cta.className]
-                            .filter(Boolean)
-                            .join(" ")}
-                          title={cta.label}
-                        >
-                          <div
-                            className="flex items-center justify-between rounded-md border border-white/10 bg-base px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-white/80 transition-colors"
-                            style={returnStyle}
-                          >
-                            <span>{cta.label}</span>
-                            <span className="inline-flex text-white/70">
-                              <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  d="M6 9l6 6 6-6"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    }
-                    if (isStatementCta) {
-                      const currency = String(cta.detail.currency || "").toUpperCase();
-                      const walletLabel = formatWalletLabel(cta.detail.walletId);
-                      const statementRowStyle = ctaStyle
-                        ? { borderColor: ctaStyle.borderColor }
-                        : undefined;
-                      const statementAccentStyle = ctaStyle
-                        ? { color: ctaStyle.borderColor }
-                        : undefined;
-                      return (
-                        <button
-                          key={cta.label}
-                          type="button"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            dispatchDemoCta(cta.detail);
-                          }}
-                          className="w-full text-left"
-                          title={cta.label}
-                        >
-                          <div
-                            className="flex items-center justify-between rounded-md border border-white/10 bg-base px-3 py-2 hover:border-white/20 transition-colors"
-                            style={statementRowStyle}
-                          >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className="w-7 h-7 flex items-center justify-center text-[12px] font-semibold text-primary overflow-hidden rounded-md border border-white/10 bg-white/5">
-                                {renderStatementCtaIcon(currency)}
-                              </div>
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-xs text-primary truncate">
-                                  {currency}
-                                </span>
-                                <span className="text-[11px] text-muted truncate">
-                                  {walletLabel}
-                                </span>
-                              </div>
-                            </div>
-                            <span
-                              className="text-[10px] font-semibold uppercase tracking-[0.18em] text-xcannes-green/80"
-                              style={statementAccentStyle}
-                            >
-                              {t("demo_card_cta_statement_short", "Relevé")}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    }
-                    return (
-                      <button
-                        key={cta.label}
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          dispatchDemoCta(cta.detail);
-                        }}
-                        className={[ctaButtonClassName, cta.className]
-                          .filter(Boolean)
-                          .join(" ")}
-                        style={ctaStyle}
-                      >
-                        {cta.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-              {!action.isPlain && !flash && (
+              {!action.isPlain && (
                 <div className={ctaClassName}>
                   <span>
                     {t("home_v2_essentials_modal_cta", "En savoir plus")}
@@ -1233,9 +565,6 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               <div
                 key={action.key}
                 className={cardClasses}
-                style={flashStyle}
-                data-essentials-flash={flash ? "true" : undefined}
-                data-essentials-card-key={action.key}
               >
                 {cardContent}
               </div>
@@ -1248,11 +577,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               type="button"
               onClick={() => setActiveActionKey(action.key)}
               className={cardClasses}
-              style={flashStyle}
               aria-haspopup="dialog"
               aria-expanded={activeActionKey === action.key}
-              data-essentials-flash={flash ? "true" : undefined}
-              data-essentials-card-key={action.key}
             >
               {cardContent}
             </button>

@@ -128,18 +128,14 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isInline]);
 
-  const changeLanguage = (locale, country) => {
-    // Stocker le pays dans localStorage pour que NewsFeed puisse le lire
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedCountry', country);
+  const changeLanguage = (locale) => {
+    if (typeof window !== "undefined") {
       localStorage.setItem("NEXT_LOCALE", locale);
       document.cookie = `NEXT_LOCALE=${encodeURIComponent(
         locale
       )}; path=/; max-age=31536000; samesite=lax`;
-      // Déclencher un event custom pour notifier NewsFeed
-      window.dispatchEvent(new CustomEvent('countryChanged', { detail: { country } }));
     }
-    
+
     onSelect?.();
     const { pathname, asPath, query } = router;
     router.push({ pathname, query }, asPath, { locale });
@@ -205,7 +201,7 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
               .map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => changeLanguage(lang.code, lang.country)}
+                onClick={() => changeLanguage(lang.code)}
                 className={`w-full flex items-center gap-1.5 px-2 py-1.5 transition-all duration-200 ${
                   currentLanguage.code === lang.code
                     ? "bg-xcannes-green/20 text-xcannes-green"
@@ -284,7 +280,7 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
                   {regionLanguages.map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => changeLanguage(lang.code, lang.country)}
+                  onClick={() => changeLanguage(lang.code)}
                       className={`w-full flex items-center gap-1.5 px-4 py-1 transition-all duration-200 ${
                         currentLanguage.code === lang.code
                           ? "bg-xcannes-green/20 text-xcannes-green"

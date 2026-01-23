@@ -11,12 +11,9 @@ import { useXumm } from "@/context/XummContext";
 import SEOHead from "@/components/layout/SEOHead";
 import PriceTicker from "@/components/marketGlobal/PriceTicker";
 import xcannesApi from "@/lib/xcannesApi";
-import OrderbookSidebar from "@/components/dex/panels/OrderbookSidebar";
 import TradingLayoutV1A from "@/components/dex/layout/TradingLayoutV1A";
-import ExchangeSection from "@/components/dex/ExchangeSections/ExchangeSection";
 import FooterPro from "@/components/layout/FooterPro";
 import SupportAssistantWidget from "@/components/layout/SupportAssistantWidget";
-import { getPairCategory } from "@/utils/marketStructure";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 // 📈 Chart dynamique sans SSR
@@ -112,11 +109,6 @@ export default function Dex() {
     [availablePairs]
   );
 
-  const isXrplPair = useMemo(
-    () => getPairCategory(selectedPair) === "xrpl",
-    [selectedPair]
-  );
-
   return (
     <>
       <SEOHead
@@ -157,8 +149,7 @@ export default function Dex() {
               className="
                   grid gap-4
                   grid-cols-1
-                  xl:grid-cols-[26%_74%]
-                  2xl:grid-cols-[21%_58%_21%]
+                  xl:grid-cols-[64%_36%]
                   items-start
                 ">
 
@@ -174,35 +165,10 @@ export default function Dex() {
 
 
 
-                {/* Orders / Orderbook */}
-                <section
-                className="
-                    order-2
-                    xl:order-1 xl:row-start-1 xl:col-span-1
-                    2xl:order-1 2xl:row-auto 2xl:col-span-1
-                  ">
-
-
-
-
-
-
-
-
-
-                  <div className="mt-3 xl:mt-0">
-                    <div className="xl:sticky xl:top-32 xl:h-[calc(100vh-8rem)] panel-surface overflow-hidden">
-                      <OrderbookSidebar pair={selectedPair} />
-                    </div>
-                  </div>
-                </section>
-
                 {/* Chart principal */}
                 <section
                 className="
                     order-1
-                    xl:order-2 xl:row-start-1 xl:col-span-1
-                    2xl:order-2 2xl:col-span-1
                   ">
 
 
@@ -227,9 +193,7 @@ export default function Dex() {
                 {/* Wallet / Trading sidebar */}
                 <section
                 className="
-                    order-3
-                    xl:order-3 xl:row-start-2 xl:col-span-2
-                    2xl:order-3 2xl:row-start-1 2xl:col-span-1
+                    order-2
                   ">
 
 
@@ -252,18 +216,6 @@ export default function Dex() {
             </div>
           }
         </div>
-
-        {/* Section EOD FX Markets (position adaptative) */}
-        {isXrplPair ?
-        // Paires XRPL : EOD en dessous, comme avant
-        <ExchangeSection variant="embedded" /> :
-
-        // Paires non-XRPL : EOD au-dessus sur mobile (voir md:hidden plus haut),
-        // et en dessous sur desktop pour garder la structure globale.
-        <div className="hidden md:block">
-            <ExchangeSection variant="embedded" />
-          </div>
-        }
 
         {/* Footer global pro */}
         <FooterPro />

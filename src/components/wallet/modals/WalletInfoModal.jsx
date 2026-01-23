@@ -38,7 +38,7 @@ export function WalletInfoContent({
             </span>
           ) : null}
         </div>
-        <p className="mt-1 text-sm text-white/60">{t("ui_wallet_no_custodial_on_xrp_4e8c91bea3", "Wallet non-custodial sur XRPL + un “ledger UX” pour répartir RLUSD en lignes de devises.")}
+        <p className="mt-1 text-sm text-white/60">{t("ui_wallet_no_custodial_on_xrp_4e8c91bea3", "Wallet non-custodial sur XRPL + un “ledger UX” pour répartir RLUSD en lignes de comptes.")}
 
 
         </p>
@@ -118,7 +118,7 @@ export function WalletInfoContent({
           <h4 className="text-sm font-semibold text-white/80">{t("ui_important_af28edf1c1", "Important")}</h4>
           <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
             <li>{t("ui_xrpl_est_la_source_de_v_rit__bf1084eac7", "XRPL est la source de vérité pour les soldes on-chain.")}</li>
-            <li>{t("ui_currency_lines_represent_rlusd_155e16f839", "Les lignes de devises représentent une répartition interne de RLUSD.")}
+            <li>{t("ui_currency_lines_represent_rlusd_155e16f839", "Les lignes de comptes représentent une répartition interne de RLUSD.")}
 
 
             </li>
