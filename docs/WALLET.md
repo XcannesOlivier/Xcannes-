@@ -33,6 +33,7 @@ L'UI propose d'installer les trustlines RLUSD/XCS via `TrustSet` quand besoin.
 ## Flux principaux
 
 - Connect : `/xumm/connect` + polling `/xumm/check`.
+- Disconnect : `/wallet/session/disconnect` avec `sessionToken` (TTL backup).
 - Refresh balance : `/xumm/balance`.
 - Send : `Payment` XRPL signe via Xumm.
 - Receive : QR + `xcannes-payreq-v1` (page `/pay`).
