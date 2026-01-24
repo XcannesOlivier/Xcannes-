@@ -10,6 +10,7 @@ import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 const XummContext = createContext();
 const XUMM_PENDING_CONNECT_KEY = "xcannes_xumm_pending_connect";
 const XUMM_TICKET_QUERY_KEY = "xummTicket";
+const WALLET_SESSION_TOKEN_KEY = "xcannes_wallet_session_token";
 
 function generateXummTicket() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -111,6 +112,35 @@ function clearPendingConnectUuid() {
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(XUMM_PENDING_CONNECT_KEY);
+  } catch (err) {
+    // Ignore storage errors (private mode, etc.)
+  }
+}
+
+function getSessionToken() {
+  if (typeof window === "undefined") return null;
+  try {
+    return sessionStorage.getItem(WALLET_SESSION_TOKEN_KEY);
+  } catch (err) {
+    return null;
+  }
+}
+
+function setSessionToken(token) {
+  if (typeof window === "undefined") return;
+  try {
+    if (token) {
+      sessionStorage.setItem(WALLET_SESSION_TOKEN_KEY, token);
+    }
+  } catch (err) {
+    // Ignore storage errors (private mode, etc.)
+  }
+}
+
+function clearSessionToken() {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.removeItem(WALLET_SESSION_TOKEN_KEY);
   } catch (err) {
     // Ignore storage errors (private mode, etc.)
   }
@@ -226,15 +256,27 @@ export const XummProvider = ({ children }) => {
     []
   );
 
-  const updateWalletSession = useCallback(async (address, active) => {
+  const updateWalletSession = useCallback(async (address, active, { xummUuid } = {}) => {
     if (!address) return;
     const endpoint = active ? "/wallet/session/connect" : "/wallet/session/disconnect";
+    const payload = active
+      ? { address, xummUuid: xummUuid || getPendingConnectUuid() }
+      : { address, sessionToken: getSessionToken() };
+    if (active && !payload.xummUuid) return;
+    if (!active && !payload.sessionToken) return;
     try {
-      await fetch(apiUrl(endpoint), {
+      const res = await fetch(apiUrl(endpoint), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify(payload),
       });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && active && data.sessionToken) {
+        setSessionToken(data.sessionToken);
+      }
+      if (res.ok && !active) {
+        clearSessionToken();
+      }
     } catch (error) {
       console.warn("Wallet session update failed:", error);
     }
@@ -323,6 +365,7 @@ export const XummProvider = ({ children }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: "wallet:session:connect",
           returnUrl,
           ticket,
         }),
@@ -601,11 +644,12 @@ export const XummProvider = ({ children }) => {
     updateWallet,
   ]);
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
     if (wallet) {
-      updateWalletSession(wallet, false);
+      await updateWalletSession(wallet, false);
     }
     clearPendingConnectUuid();
+    clearSessionToken();
     updateWallet(null);
   }, [updateWallet, updateWalletSession, wallet]);
 
