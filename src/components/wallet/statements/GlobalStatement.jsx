@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
+import { apiUrl } from "@/lib/runtimeConfig";
 import {
   buildCsvString,
   downloadTextFile,
@@ -13,7 +14,6 @@ import {
 } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
 
-const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
 "RLUSD",
 "USD",
@@ -55,6 +55,7 @@ export default function GlobalStatement({
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [exportFormat, setExportFormat] = useState(null);
   const [docHash, setDocHash] = useState("");
+  const [walletLabel, setWalletLabel] = useState("");
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025"
@@ -66,16 +67,34 @@ export default function GlobalStatement({
   );
   const fallbackPeriod = period || defaultPeriod;
 
-  const walletLabel = useMemo(() => {
-    if (typeof window === "undefined" || !walletAddress) return "";
-    try {
-      const raw = localStorage.getItem(WALLET_LABEL_STORAGE_KEY);
-      const labels = raw ? JSON.parse(raw) : {};
-      return labels[walletAddress] || "";
-    } catch (err) {
-      console.error("Error loading wallet label:", err);
-      return "";
+  useEffect(() => {
+    let cancelled = false;
+    if (!walletAddress) {
+      setWalletLabel("");
+      return () => {};
     }
+
+    const loadLabel = async () => {
+      try {
+        const res = await fetch(
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to load wallet label");
+        }
+        if (cancelled) return;
+        setWalletLabel(String(data?.label || "").trim());
+      } catch (err) {
+        console.error("Error loading wallet label:", err);
+        if (!cancelled) setWalletLabel("");
+      }
+    };
+
+    loadLabel();
+    return () => {
+      cancelled = true;
+    };
   }, [walletAddress]);
 
   // Générer les 12 derniers mois

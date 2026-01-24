@@ -1,6 +1,6 @@
 "use client";
 
-	import { useEffect, useState, useRef, useCallback } from "react";
+	import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 	import { useTranslation } from "next-i18next";
 	import xcannesApi from "@/lib/xcannesApi";
 	import { extractPercentChange } from "@/utils/marketStats";
@@ -8,6 +8,7 @@
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 	import { getBookIdFromPair } from "@/lib/marketMetadata";
+	import { useXcannesWS } from "@/context/XcannesWSContext";
 
 // 🔄 REST Polling interval (4 secondes)
 const POLLING_INTERVAL_MS = 4000;
@@ -25,19 +26,113 @@ export default function PriceTicker({
   mobileVariant = "marquee", // "marquee" | "scroll"
 }) {
   const { t } = useTranslation("common");
+  const { connected, tickers, tickersVersion, subscribe, unsubscribe } = useXcannesWS();
   const [pricesData, setPricesData] = useState([]);
   const isMountedRef = useRef(true);
   const [isPaused, setIsPaused] = useState(false);
   const pollingIntervalRef = useRef(null);
+  const subscriptionsRef = useRef(new Set());
+  const limitedPairs = useMemo(() => pairs.slice(0, 20), [pairs]);
+  const resolvedPairs = useMemo(() => {
+    return limitedPairs
+      .map((pair) => {
+        const bookData = getBookIdFromPair(pair);
+        if (!bookData?.backendPair) {
+          return null;
+        }
+        return {
+          pair,
+          backendPair: bookData.backendPair,
+          source: bookData.source || "xrpl",
+        };
+      })
+      .filter(Boolean);
+  }, [limitedPairs]);
+
+  const mergePricesData = useCallback((prevData, validResults) => {
+    if (prevData.length === 0) {
+      return validResults;
+    }
+    
+    let hasChanges = false;
+
+    const mergedResults = validResults.map((newItem) => {
+      const existingItem = prevData.find(p => p.backendPair === newItem.backendPair);
+      
+      if (!existingItem) {
+        hasChanges = true;
+        return newItem;
+      }
+      
+      const merged = { ...newItem };
+      
+      // Conserver le % si le nouveau n'est pas valide
+      if (!newItem.hasValidChange && existingItem.change !== '0.00') {
+        merged.change = existingItem.change;
+        merged.isPositive = existingItem.isPositive;
+        merged.hasValidChange = true;
+      }
+      
+      // Conserver la sparkline existante pour éviter le clignotement
+      if (existingItem.sparkline && existingItem.sparkline.length > 0) {
+        merged.sparkline = existingItem.sparkline;
+      }
+
+      // Détecter les changements réels
+      if (
+        merged.price !== existingItem.price ||
+        merged.change !== existingItem.change ||
+        merged.isPositive !== existingItem.isPositive ||
+        merged.volume24h !== existingItem.volume24h
+      ) {
+        hasChanges = true;
+      }
+      
+      return merged;
+    });
+
+    if (!hasChanges && prevData.length === mergedResults.length) {
+      return prevData;
+    }
+
+    return mergedResults;
+  }, []);
+
+  const buildTickerItem = useCallback((pairInfo, ticker) => {
+    if (!ticker) return null;
+
+    const changeObj = extractPercentChange(ticker);
+    const changePercent = changeObj ? changeObj.percent : null;
+
+    const sparklineData =
+      Array.isArray(ticker.sparkline24h) && ticker.sparkline24h.length > 0
+        ? ticker.sparkline24h
+        : [Number.parseFloat(ticker.lastPrice || 0)];
+
+    const priceNum = Number.parseFloat(ticker.lastPrice || 0);
+    const price = Number.isFinite(priceNum) ? priceNum.toFixed(5) : "0.00000";
+
+    return {
+      pair: pairInfo.pair,
+      backendPair: pairInfo.backendPair,
+      source: pairInfo.source || "xrpl",
+      price,
+      change: changePercent !== null ? changePercent.toFixed(2) : "0.00",
+      sparkline: sparklineData,
+      isPositive: changePercent !== null ? changePercent >= 0 : true,
+      volume24h: ticker.volume24h || '0.0000',
+      hasValidChange: changePercent !== null,
+      basePrice24h: changeObj?.basePrice24h || null,
+      lastPrice24h: changeObj?.lastPrice24h || null,
+    };
+  }, []);
 
   // � Récupérer les prix via REST API (polling toutes les 4s)
   const fetchPrices = useCallback(async () => {
-    if (!isMountedRef.current || isPaused) return;
+    if (!isMountedRef.current || isPaused || connected) return;
     
     try {
       // Limiter le nombre de paires traitées côté frontend
-      const limitedPairs = pairs.slice(0, 20);
-
       const pricesPromises = limitedPairs.map(async (pair) => {
         try {
           const bookData = getBookIdFromPair(pair);
@@ -66,27 +161,14 @@ export default function PriceTicker({
 
           if (!ticker) return null;
 
-          const changeObj = extractPercentChange(ticker);
-          const changePercent = changeObj ? changeObj.percent : null;
-
-          const sparklineData =
-            Array.isArray(ticker.sparkline24h) && ticker.sparkline24h.length > 0
-              ? ticker.sparkline24h
-              : [Number.parseFloat(ticker.lastPrice || 0)];
-
-          return {
-            pair,
-            backendPair: bookData.backendPair,
-            source: bookData.source || "xrpl",
-            price: parseFloat(ticker.lastPrice || 0).toFixed(5),
-            change: changePercent !== null ? changePercent.toFixed(2) : "0.00",
-            sparkline: sparklineData,
-            isPositive: changePercent !== null ? changePercent >= 0 : true,
-            volume24h: ticker.volume24h || '0.0000',
-            hasValidChange: changePercent !== null,
-            basePrice24h: changeObj?.basePrice24h || null,
-            lastPrice24h: changeObj?.lastPrice24h || null,
-          };
+          return buildTickerItem(
+            {
+              pair,
+              backendPair: bookData.backendPair,
+              source: bookData.source || "xrpl",
+            },
+            ticker
+          );
         } catch (error) {
           console.error(`[PriceTicker] Erreur ${pair}:`, error);
           return null;
@@ -97,64 +179,66 @@ export default function PriceTicker({
       const validResults = results.filter((r) => r !== null);
 
       if (validResults.length > 0 && isMountedRef.current) {
-        setPricesData((prevData) => {
-          if (prevData.length === 0) {
-            return validResults; // Premier chargement
-          }
-          
-          let hasChanges = false;
-
-          // Merge intelligent avec conservation des données
-          const mergedResults = validResults.map((newItem) => {
-            const existingItem = prevData.find(p => p.backendPair === newItem.backendPair);
-            
-            if (!existingItem) {
-              hasChanges = true;
-              return newItem;
-            }
-            
-            const merged = { ...newItem };
-            
-            // Conserver le % si le nouveau n'est pas valide
-            if (!newItem.hasValidChange && existingItem.change !== '0.00') {
-              merged.change = existingItem.change;
-              merged.isPositive = existingItem.isPositive;
-              merged.hasValidChange = true;
-            }
-            
-            // Conserver la sparkline existante pour éviter le clignotement
-            if (existingItem.sparkline && existingItem.sparkline.length > 0) {
-              merged.sparkline = existingItem.sparkline;
-            }
-
-            // Détecter les changements réels
-            if (
-              merged.price !== existingItem.price ||
-              merged.change !== existingItem.change ||
-              merged.isPositive !== existingItem.isPositive ||
-              merged.volume24h !== existingItem.volume24h
-            ) {
-              hasChanges = true;
-            }
-            
-            return merged;
-          });
-
-          if (!hasChanges && prevData.length === mergedResults.length) {
-            return prevData;
-          }
-
-          return mergedResults;
-        });
+        setPricesData((prevData) => mergePricesData(prevData, validResults));
       }
     } catch (error) {
       console.error("[PriceTicker] Erreur fetch prices:", error);
     }
-  }, [pairs, isPaused]);
+  }, [limitedPairs, isPaused, connected, buildTickerItem, mergePricesData]);
+
+  useEffect(() => {
+    if (!connected) {
+      subscriptionsRef.current.forEach((pairKey) => {
+        unsubscribe("ticker", pairKey);
+      });
+      subscriptionsRef.current.clear();
+      return;
+    }
+
+    const desiredPairs = new Set(resolvedPairs.map((pairInfo) => pairInfo.backendPair));
+
+    desiredPairs.forEach((pairKey) => {
+      if (!subscriptionsRef.current.has(pairKey)) {
+        subscribe("ticker", pairKey);
+        subscriptionsRef.current.add(pairKey);
+      }
+    });
+
+    subscriptionsRef.current.forEach((pairKey) => {
+      if (!desiredPairs.has(pairKey)) {
+        unsubscribe("ticker", pairKey);
+        subscriptionsRef.current.delete(pairKey);
+      }
+    });
+  }, [connected, resolvedPairs, subscribe, unsubscribe]);
+
+  useEffect(() => {
+    if (!connected || !isMountedRef.current || isPaused) return;
+    if (resolvedPairs.length === 0) return;
+
+    const wsResults = resolvedPairs
+      .map((pairInfo) => {
+        const ticker = tickers?.get?.(pairInfo.backendPair);
+        return buildTickerItem(pairInfo, ticker);
+      })
+      .filter(Boolean);
+
+    if (wsResults.length > 0) {
+      setPricesData((prevData) => mergePricesData(prevData, wsResults));
+    }
+  }, [
+    connected,
+    tickers,
+    tickersVersion,
+    resolvedPairs,
+    isPaused,
+    buildTickerItem,
+    mergePricesData
+  ]);
 
   // 🔄 REST Polling : Charger les prix toutes les 4 secondes
   useEffect(() => {
-    if (pairs.length === 0) return;
+    if (limitedPairs.length === 0 || connected) return;
 
     // Fetch initial
     fetchPrices();
@@ -165,7 +249,7 @@ export default function PriceTicker({
     }, POLLING_INTERVAL_MS);
 
     if (DEBUG_LOGS) {
-      console.log(`✅ [PriceTicker] REST polling activé (${POLLING_INTERVAL_MS}ms) pour ${pairs.length} paires`);
+      console.log(`✅ [PriceTicker] REST polling activé (${POLLING_INTERVAL_MS}ms) pour ${limitedPairs.length} paires`);
     }
 
     return () => {
@@ -174,7 +258,16 @@ export default function PriceTicker({
         pollingIntervalRef.current = null;
       }
     };
-  }, [pairs, fetchPrices]);
+  }, [limitedPairs, connected, fetchPrices]);
+
+  useEffect(() => {
+    return () => {
+      subscriptionsRef.current.forEach((pairKey) => {
+        unsubscribe("ticker", pairKey);
+      });
+      subscriptionsRef.current.clear();
+    };
+  }, [unsubscribe]);
 
   // Cleanup on unmount
   useEffect(() => {

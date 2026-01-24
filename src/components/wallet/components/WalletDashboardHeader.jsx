@@ -18,6 +18,7 @@ export default function WalletDashboardHeader({
   onSwitchWallet,
   isConnecting,
   isEditingWalletLabel,
+  isWalletLabelRequired,
   walletLabelDraft,
   onWalletLabelDraftChange,
   onSaveWalletLabel,
@@ -221,27 +222,29 @@ export default function WalletDashboardHeader({
                     </svg>
                   </button>
 
+                  {!isWalletLabelRequired &&
                   <button
-                type="button"
-                onClick={onCancelWalletLabel}
-                className="p-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
-                aria-label={t("ui_cancel_d2d2058892", "Annuler")}
-                title={t("ui_cancel_fbca985028", "Annuler")}>
+                    type="button"
+                    onClick={onCancelWalletLabel}
+                    className="p-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
+                    aria-label={t("ui_cancel_d2d2058892", "Annuler")}
+                    title={t("ui_cancel_fbca985028", "Annuler")}>
 
                     <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
 
                       <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12" />
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12" />
 
                     </svg>
                   </button>
+                  }
                 </div>
             }
             </div>

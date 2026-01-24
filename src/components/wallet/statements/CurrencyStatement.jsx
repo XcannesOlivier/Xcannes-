@@ -16,7 +16,6 @@ import {
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
 
-const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
 const USD_STABLECOINS = [
 "RLUSD",
 "USD",
@@ -69,6 +68,7 @@ export default function CurrencyStatement({
   const [reserveOpen, setReserveOpen] = useState(false);
   const [ledgerTab, setLedgerTab] = useState("statement"); // statement | xrpl
   const [docHash, setDocHash] = useState("");
+  const [walletLabel, setWalletLabel] = useState("");
   const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
@@ -117,16 +117,34 @@ export default function CurrencyStatement({
     };
   }, [highlightTransactionId]);
 
-  const walletLabel = useMemo(() => {
-    if (typeof window === "undefined" || !walletAddress) return "";
-    try {
-      const raw = localStorage.getItem(WALLET_LABEL_STORAGE_KEY);
-      const labels = raw ? JSON.parse(raw) : {};
-      return labels[walletAddress] || "";
-    } catch (err) {
-      console.error("Error loading wallet label:", err);
-      return "";
+  useEffect(() => {
+    let cancelled = false;
+    if (!walletAddress) {
+      setWalletLabel("");
+      return () => {};
     }
+
+    const loadLabel = async () => {
+      try {
+        const res = await fetch(
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to load wallet label");
+        }
+        if (cancelled) return;
+        setWalletLabel(String(data?.label || "").trim());
+      } catch (err) {
+        console.error("Error loading wallet label:", err);
+        if (!cancelled) setWalletLabel("");
+      }
+    };
+
+    loadLabel();
+    return () => {
+      cancelled = true;
+    };
   }, [walletAddress]);
 
   const normalizedCurrency = useMemo(

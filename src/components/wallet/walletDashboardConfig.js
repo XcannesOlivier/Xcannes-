@@ -7,8 +7,6 @@ export const TOKEN_ICONS = {
   USDC: "＄",
 };
 
-export const WALLET_LABEL_STORAGE_KEY = "xcannes_wallet_labels";
-
 export const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
   XAF: "🌍",

@@ -56,7 +56,6 @@ import {
   getTokenIcon,
   resolveWalletLayout,
   USD_STABLECOINS,
-  WALLET_LABEL_STORAGE_KEY,
 } from "./walletDashboardConfig";
 
 const DEFAULT_ACTIVATION_FEE_RLUSD = 1;
@@ -155,6 +154,7 @@ export default function WalletDashboard({
     walletLabelDraft,
     setWalletLabelDraft,
     isEditingWalletLabel,
+    isWalletLabelRequired,
     walletHeaderToast,
     flashWalletHeaderToast,
     openWalletLabelEditor: handleOpenWalletLabelEditor,
@@ -163,7 +163,7 @@ export default function WalletDashboard({
   } = useWalletLabel({
     walletAddress: effectiveWallet,
     isConnected: effectiveIsConnected,
-    storageKey: WALLET_LABEL_STORAGE_KEY,
+    defaultLabel: t("nav_wallet", "Wallet"),
     signTransaction,
     activationDestination: XCANNES_ACTIVATION_WALLET_ADDRESS,
     renameFeeRlusd: WALLET_LABEL_FEE_RLUSD,
@@ -175,13 +175,23 @@ export default function WalletDashboard({
 
   const handleAction = useCallback(
     (nextAction) => {
+      if (effectiveIsConnected && isWalletLabelRequired) {
+        flashWalletHeaderToast("Nom du wallet requis.", 2000);
+        handleOpenWalletLabelEditor();
+        return;
+      }
       if (nextAction === "swap") {
         setSwapDefaultView("convert");
         setSwapLockedView(null);
       }
       setActiveAction(nextAction);
     },
-    []
+    [
+      effectiveIsConnected,
+      flashWalletHeaderToast,
+      handleOpenWalletLabelEditor,
+      isWalletLabelRequired,
+    ]
   );
 
   const handleOpenCurrencyLines = useCallback(() => {
@@ -438,7 +448,6 @@ export default function WalletDashboard({
     refresh: refreshCurrencyLines,
     upsertCurrencyLine,
     removeCurrencyLine,
-    convertAllocation: convertCurrencyAllocation,
   } = useWalletCurrencyLines(backendWalletAddress, { signTransaction });
 
   const {
@@ -451,7 +460,6 @@ export default function WalletDashboard({
 
   const {
     handleUpsertCurrencyLine: handleUpsertCurrencyLineReal,
-    handleRemoveCurrencyLine: handleRemoveCurrencyLineReal,
   } =
     useCurrencyLinesActions({
       backendWalletAddress,
@@ -505,7 +513,7 @@ export default function WalletDashboard({
     ? () => {}
     : refreshCurrencyLines;
 
-  const payActivationFee = useCallback(async (action) => {
+  const payActivationFee = useCallback(async ({ action, memoPayload } = {}) => {
     if (!wallet || !signTransaction) {
       alert("Please connect your Xumm wallet first.");
       return null;
@@ -529,6 +537,11 @@ export default function WalletDashboard({
     if (!txjson) {
       alert("Unable to build activation fee payment.");
       return null;
+    }
+
+    if (memoPayload) {
+      const memos = buildXrplJsonMemo(memoPayload);
+      if (memos) txjson.Memos = memos;
     }
 
     const result = await signTransaction(txjson, { action });
@@ -584,14 +597,22 @@ export default function WalletDashboard({
         return false;
       }
 
-      const xummUuid = await payActivationFee("wallet:currency-lines:upsert");
+      const memoPayload = {
+        xcannes: "currency_line",
+        schema: "xcannes-currency-line-v1",
+        v: 1,
+        action: "activate",
+        currencyCode,
+      };
+      const xummUuid = await payActivationFee({
+        action: "wallet:currency-lines:upsert",
+        memoPayload,
+      });
       if (!xummUuid) return false;
 
-      await upsertCurrencyLine?.({
-        currencyCode,
-        allocatedRlusd: 0,
-        xummUuid,
-      });
+      if (refreshCurrencyLines) {
+        setTimeout(() => refreshCurrencyLines(), 3500);
+      }
       return true;
     },
     [
@@ -601,9 +622,9 @@ export default function WalletDashboard({
       isPreviewMode,
       isWalletActivated,
       payActivationFee,
+      refreshCurrencyLines,
       setDemoLines,
       t,
-      upsertCurrencyLine,
     ]
   );
 
@@ -687,9 +708,16 @@ export default function WalletDashboard({
       try {
         let activationUuid = null;
         if (!hasLine) {
-          activationUuid = await payActivationFee(
-            "wallet:pending-allocations:activate"
-          );
+          activationUuid = await payActivationFee({
+            action: "wallet:pending-allocations:activate",
+            memoPayload: {
+              xcannes: "currency_line",
+              schema: "xcannes-currency-line-v1",
+              v: 1,
+              action: "activate",
+              currencyCode: code,
+            },
+          });
           if (!activationUuid) return;
         }
 
@@ -866,10 +894,36 @@ export default function WalletDashboard({
         return true;
       }
 
-      const result = await handleRemoveCurrencyLineReal?.(currencyCode);
-      return Boolean(result);
+      const line = (currencyLines || []).find(
+        (entry) => String(entry?.currencyCode || "").toUpperCase() === currencyCode
+      );
+      const allocated = Number(line?.allocatedRlusd || 0);
+      if (Number.isFinite(allocated) && allocated > 0) {
+        alert("La ligne doit être à zéro pour être supprimée.");
+        return false;
+      }
+
+      const ok = confirm(`Supprimer la ligne ${currencyCode} ?`);
+      if (!ok) return false;
+
+      const xummUuid = await payActivationFee({
+        action: "wallet:currency-lines:delete",
+        memoPayload: {
+          xcannes: "currency_line",
+          schema: "xcannes-currency-line-v1",
+          v: 1,
+          action: "delete",
+          currencyCode,
+        },
+      });
+      if (!xummUuid) return false;
+
+      if (refreshCurrencyLines) {
+        setTimeout(() => refreshCurrencyLines(), 3500);
+      }
+      return true;
     },
-    [handleRemoveCurrencyLineReal, isPreviewMode, setDemoLines]
+    [currencyLines, isPreviewMode, payActivationFee, refreshCurrencyLines, setDemoLines]
   );
 
   const handleRefresh = async () => {
@@ -1225,7 +1279,6 @@ export default function WalletDashboard({
     signTransaction,
     refreshBalance,
     hasOnChainRlusd,
-    spreadDestination: XCANNES_SPREAD_WALLET_ADDRESS,
     swapCurrencyOptions,
     convertBaseCurrency,
     convertQuoteCurrency,
@@ -1240,7 +1293,6 @@ export default function WalletDashboard({
     demoRlusdTotal: DEMO_RLUSD_TOTAL,
     currencyLinesSummary: effectiveCurrencyLinesSummary,
     allocatedRlusdByCurrency,
-    convertCurrencyAllocation,
     refreshCurrencyLines: effectiveRefreshCurrencyLines,
     getAllMarkets: xcannesApi.getAllMarkets,
     getTicker: xcannesApi.getTicker,
@@ -1562,27 +1614,28 @@ export default function WalletDashboard({
           if (!spreadTx) {
             throw new Error("Invalid RLUSD spread payment");
           }
+          const spreadMemoPayload = {
+            xcannes: "payreq",
+            schema: "xcannes-payreq-v1",
+            v: 1,
+            origin: "spread",
+            targetCurrencyCode: currency,
+            displayAmount: spreadFeeRlusd,
+            displayCurrencyCode: "RLUSD",
+            amountRlusd: spreadFeeRlusd,
+            fxRate: rlusdPerUnit,
+            fxSource,
+            note: "spread",
+          };
+          const spreadMemos = buildXrplJsonMemo(spreadMemoPayload);
+          if (spreadMemos) spreadTx.Memos = spreadMemos;
+
           const spreadResult = await signTransaction(spreadTx, {
             action: "wallet:convert",
           });
           if (!spreadResult?.signed) {
             alert("Spread payment cancelled or expired.");
             return { ok: false };
-          }
-
-          // Déallocation backend minimale (spread payé) pour garder l'invariant
-          const deallocateSpread = await convertCurrencyAllocation?.({
-            fromCurrencyCode: currency,
-            toCurrencyCode: "RLUSD",
-            amountRlusd: spreadFeeRlusd,
-            fromFxRate: rlusdPerUnit,
-            fromFxSource: fxSource,
-            toFxRate: 1,
-            toFxSource: "PYTH",
-            xummUuid: spreadResult?.uuid || null,
-          });
-          if (!deallocateSpread || deallocateSpread.error) {
-            console.warn("Failed to deallocate spread (backend):", deallocateSpread?.error);
           }
         }
 
@@ -1598,7 +1651,9 @@ export default function WalletDashboard({
 
         const memoPayload = {
           xcannes: "payreq",
+          schema: "xcannes-payreq-v1",
           v: 1,
+          origin: sendPaymentRequest ? "payreq" : "manual",
           targetCurrencyCode: currency,
           displayAmount: amountNum,
           displayCurrencyCode: currency,
@@ -1616,20 +1671,6 @@ export default function WalletDashboard({
         if (payResult?.signed) {
           alert("✅ Payment submitted via Xumm.");
 
-          // 3) Déallocation backend du paiement (réduit l'allocation de la devise choisie)
-          const deallocatePayment = await convertCurrencyAllocation?.({
-            fromCurrencyCode: currency,
-            toCurrencyCode: "RLUSD",
-            amountRlusd: paymentRlusd,
-            fromFxRate: rlusdPerUnit,
-            fromFxSource: fxSource,
-            toFxRate: 1,
-            toFxSource: "PYTH",
-            xummUuid: payResult?.uuid || null,
-          });
-          if (!deallocatePayment || deallocatePayment.error) {
-            console.warn("Failed to deallocate payment (backend):", deallocatePayment?.error);
-          }
           handleAddressSave(dest);
 
           setSendAmount("");
@@ -1710,7 +1751,9 @@ export default function WalletDashboard({
           .toUpperCase();
         const memoPayload = {
           xcannes: "payreq",
+          schema: "xcannes-payreq-v1",
           v: 1,
+          origin: "payreq",
           targetCurrencyCode: target || null,
           displayAmount: sendPaymentRequest?.displayAmount ?? null,
           displayCurrencyCode: (sendPaymentRequest?.displayCurrency ?? target) || null,
@@ -1859,6 +1902,7 @@ export default function WalletDashboard({
           onSwitchWallet={handleSwitchWallet}
           isConnecting={isConnecting}
           isEditingWalletLabel={isEditingWalletLabel}
+          isWalletLabelRequired={isWalletLabelRequired}
           walletLabelDraft={walletLabelDraft}
           onWalletLabelDraftChange={setWalletLabelDraft}
           onSaveWalletLabel={handleSaveWalletLabel}
