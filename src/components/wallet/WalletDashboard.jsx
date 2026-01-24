@@ -9,7 +9,6 @@ import { apiUrl } from "@/lib/runtimeConfig";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import {
   buildRlusdPaymentTxjson,
-  buildXcsPaymentTxjson,
   computeSpreadQuote,
   XCANNES_ACTIVATION_WALLET_ADDRESS,
   XCANNES_SPREAD_WALLET_ADDRESS,
@@ -60,12 +59,32 @@ import {
   WALLET_LABEL_STORAGE_KEY,
 } from "./walletDashboardConfig";
 
-const DEFAULT_ACTIVATION_FEE_XCS = 0.2;
-const ACTIVATION_FEE_XCS = (() => {
+const DEFAULT_ACTIVATION_FEE_RLUSD = 1;
+const ACTIVATION_FEE_RLUSD = (() => {
   const raw = Number.parseFloat(
+    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_RLUSD || ""
+  );
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ACTIVATION_FEE_RLUSD;
+})();
+
+const DEFAULT_WALLET_LABEL_FEE_RLUSD = 1;
+const WALLET_LABEL_FEE_RLUSD = (() => {
+  const raw = Number.parseFloat(
+    process.env.NEXT_PUBLIC_WALLET_LABEL_FEE_RLUSD || ""
+  );
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_WALLET_LABEL_FEE_RLUSD;
+})();
+
+const DEFAULT_MIN_LOCKED_XCS = 0.2;
+const MIN_LOCKED_XCS = (() => {
+  const raw = Number.parseFloat(
+    process.env.NEXT_PUBLIC_WALLET_LINE_MIN_LOCKED_XCS || ""
+  );
+  if (Number.isFinite(raw) && raw > 0) return raw;
+  const fallback = Number.parseFloat(
     process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_XCS || ""
   );
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ACTIVATION_FEE_XCS;
+  return Number.isFinite(fallback) && fallback > 0 ? fallback : DEFAULT_MIN_LOCKED_XCS;
 })();
 
 export default function WalletDashboard({
@@ -145,6 +164,9 @@ export default function WalletDashboard({
     walletAddress: effectiveWallet,
     isConnected: effectiveIsConnected,
     storageKey: WALLET_LABEL_STORAGE_KEY,
+    signTransaction,
+    activationDestination: XCANNES_ACTIVATION_WALLET_ADDRESS,
+    renameFeeRlusd: WALLET_LABEL_FEE_RLUSD,
   });
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
@@ -488,6 +510,10 @@ export default function WalletDashboard({
       alert("Please connect your Xumm wallet first.");
       return null;
     }
+    if (!hasOnChainRlusd) {
+      alert("RLUSD trustline is not installed yet. Please install it first.");
+      return null;
+    }
 
     const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();
     if (!destination) {
@@ -495,10 +521,10 @@ export default function WalletDashboard({
       return null;
     }
 
-    const txjson = buildXcsPaymentTxjson({
+    const txjson = buildRlusdPaymentTxjson({
       account: wallet,
       destination,
-      amountXcs: ACTIVATION_FEE_XCS,
+      amountRlusd: ACTIVATION_FEE_RLUSD,
     });
     if (!txjson) {
       alert("Unable to build activation fee payment.");
@@ -516,7 +542,7 @@ export default function WalletDashboard({
     }
 
     return result.uuid;
-  }, [refreshBalance, signTransaction, wallet]);
+  }, [hasOnChainRlusd, refreshBalance, signTransaction, wallet]);
 
   const handleActivateCurrencyLine = useCallback(
     async (code) => {
@@ -558,11 +584,6 @@ export default function WalletDashboard({
         return false;
       }
 
-      if (!hasOnChainXcs) {
-        alert("XCS trustline is not installed yet. Please install it first.");
-        return false;
-      }
-
       const xummUuid = await payActivationFee("wallet:currency-lines:upsert");
       if (!xummUuid) return false;
 
@@ -577,7 +598,6 @@ export default function WalletDashboard({
       backendWalletAddress,
       currencyLines,
       hasOnChainRlusd,
-      hasOnChainXcs,
       isPreviewMode,
       isWalletActivated,
       payActivationFee,
@@ -634,10 +654,6 @@ export default function WalletDashboard({
       );
       if (!hasOnChainRlusd) {
         alert("RLUSD trustline is not installed yet. Please install it first.");
-        return;
-      }
-      if (!hasLine && !hasOnChainXcs) {
-        alert("XCS trustline is not installed yet. Please install it first.");
         return;
       }
 
@@ -704,7 +720,6 @@ export default function WalletDashboard({
       currencyLines,
       formatPendingAmount,
       hasOnChainRlusd,
-      hasOnChainXcs,
       isWalletActivated,
       isPreviewMode,
       payActivationFee,
@@ -884,8 +899,8 @@ export default function WalletDashboard({
     const code = String(editingTrustlineCurrency || "").toUpperCase();
     if (!code) return;
     const locked = Number(editingTrustlineLocked || "0");
-    if (!Number.isFinite(locked) || locked < ACTIVATION_FEE_XCS) {
-      alert(`Enter a locked XCS amount >= ${ACTIVATION_FEE_XCS}.`);
+    if (!Number.isFinite(locked) || locked < MIN_LOCKED_XCS) {
+      alert(`Enter a locked XCS amount >= ${MIN_LOCKED_XCS}.`);
       return;
     }
     await addLine(code, locked);
@@ -1768,8 +1783,8 @@ export default function WalletDashboard({
       return;
     }
     const locked = Number(trustlineLocked || "0");
-    if (!Number.isFinite(locked) || locked < ACTIVATION_FEE_XCS) {
-      alert(`Enter a locked XCS amount >= ${ACTIVATION_FEE_XCS}.`);
+    if (!Number.isFinite(locked) || locked < MIN_LOCKED_XCS) {
+      alert(`Enter a locked XCS amount >= ${MIN_LOCKED_XCS}.`);
       return;
     }
     await addLine(code, locked);
@@ -2049,7 +2064,6 @@ export default function WalletDashboard({
             walletAddress={effectiveWallet}
             onConnectWallet={connect}
             hasOnChainRlusd={hasOnChainRlusd}
-            hasOnChainXcs={hasOnChainXcs}
             onInstallTrustline={handleInstallRequiredTrustline}
             onActivateCurrencyLine={handleActivateCurrencyLine}
             refreshCurrencyLines={effectiveRefreshCurrencyLines}
@@ -2078,7 +2092,7 @@ export default function WalletDashboard({
             handleDemoConvert={handleDemoConvert}
             convertProcessing={convertProcessing}
             rlusdPerUnitRates={rlusdPerUnitRates}
-            activationFeeXcs={ACTIVATION_FEE_XCS}
+            activationFeeRlusd={ACTIVATION_FEE_RLUSD}
           />
 
 	      <WalletDashboardCashModal
@@ -2107,7 +2121,7 @@ export default function WalletDashboard({
 	        setEditingTrustlineLocked={setEditingTrustlineLocked}
 	        handleSaveTrustlineCurrency={handleSaveTrustlineCurrency}
 	        handleRemoveTrustlineCurrency={handleRemoveTrustlineCurrency}
-          minLockedXcs={ACTIVATION_FEE_XCS}
+          minLockedXcs={MIN_LOCKED_XCS}
 	      />
 
 	      <WalletDashboardTrustlinesModal
@@ -2124,7 +2138,7 @@ export default function WalletDashboard({
         walletLines={walletLines}
         totalLockedXcs={totalLockedXcs}
         openTrustlineEditor={openTrustlineEditor}
-        minLockedXcs={ACTIVATION_FEE_XCS}
+        minLockedXcs={MIN_LOCKED_XCS}
       />
         </>,
         document.body

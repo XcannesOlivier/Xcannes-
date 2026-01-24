@@ -10,12 +10,12 @@ export function WalletInfoContent({
 }) {
   const { t } = useTranslation("common");
   const activationFeeValue = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_XCS || ""
+    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_RLUSD || ""
   );
   const activationFeeLabel = (
     Number.isFinite(activationFeeValue) && activationFeeValue > 0
       ? activationFeeValue
-      : 0.2
+      : 1
   ).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -67,12 +67,12 @@ export function WalletInfoContent({
 
         <section className="rounded-xl border border-white/10 bg-black/30 p-4">
           <h4 className="text-sm font-semibold text-white/80">
-            {t("ui_activation_fee_xcs_title_f4", "Activation fee (XCS)")}
+            {t("ui_activation_fee_xcs_title_f4", "Activation fee (RLUSD)")}
           </h4>
           <p className="mt-2 text-[13px] text-white/70">
             {t("ui_activation_fee_xcs_body_f4", {
               defaultValue:
-                "Creating a new currency line requires a one-time payment of {{amount}} XCS to the XCANNES wallet.",
+                "Creating a new currency line requires a one-time payment of {{amount}} RLUSD to the XCANNES wallet.",
               amount: activationFeeLabel,
             })}
           </p>

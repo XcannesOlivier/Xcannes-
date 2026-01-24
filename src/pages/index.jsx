@@ -597,7 +597,7 @@ export default function Home() {
                 <div className="mt-4 text-xs text-white/45">
                   {t(
                     "home_v2_hero_fees_modal_note",
-                    "Activation d'une nouvelle devise : paiement unique en XCS."
+                    "Activation d'une nouvelle devise : paiement unique en RLUSD."
                   )}
                 </div>
               </div>
