@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { buildRlusdPaymentTxjson, computeSpreadQuote, isFxConversion, XCANNES_SPREAD_WALLET_ADDRESS } from "@/utils/walletSpread";
+import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import {
+  buildRlusdPaymentTxjson,
+  computeSpreadQuote,
+  XCANNES_ACTIVATION_WALLET_ADDRESS
+} from "@/utils/walletSpread";
 
 export function useSwapConversion({
   isPreviewMode,
@@ -11,7 +16,6 @@ export function useSwapConversion({
   signTransaction,
   refreshBalance,
   hasOnChainRlusd,
-  spreadDestination,
   swapCurrencyOptions,
   convertBaseCurrency,
   convertQuoteCurrency,
@@ -26,7 +30,6 @@ export function useSwapConversion({
   demoRlusdTotal,
   currencyLinesSummary,
   allocatedRlusdByCurrency,
-  convertCurrencyAllocation,
   refreshCurrencyLines,
   getAllMarkets,
   getTicker,
@@ -185,42 +188,6 @@ export function useSwapConversion({
     [getAllMarkets]
   );
 
-  const paySpreadRlusd = useCallback(
-    async (amountRlusd) => {
-      const destination = String(spreadDestination || XCANNES_SPREAD_WALLET_ADDRESS).trim();
-      if (!destination) {
-        throw new Error("Missing spread destination address");
-      }
-      if (!walletAddress || !signTransaction) {
-        throw new Error("Wallet not connected");
-      }
-      if (!hasOnChainRlusd) {
-        throw new Error("RLUSD trustline is not installed yet");
-      }
-
-      const txjson = buildRlusdPaymentTxjson({
-        account: walletAddress,
-        destination,
-        amountRlusd,
-      });
-      if (!txjson) throw new Error("Invalid RLUSD spread payment");
-
-      const result = await signTransaction(txjson, {
-        action: "wallet:convert",
-      });
-      if (!result?.signed) {
-        throw new Error("Spread payment cancelled or expired");
-      }
-
-      // Best effort refresh
-      if (refreshBalance) setTimeout(() => refreshBalance(), 2000);
-      if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 2500);
-
-      return result;
-    },
-    [hasOnChainRlusd, refreshBalance, refreshCurrencyLines, signTransaction, spreadDestination, walletAddress]
-  );
-
   const handleDemoConvert = useCallback(async () => {
     if (isPreviewMode) {
       const base = String(convertBaseCurrency || "").toUpperCase();
@@ -272,7 +239,7 @@ export function useSwapConversion({
 
         const grossRlusd = amountBase * rlusdPerBase;
         const spread = computeSpreadQuote({ base, quote, amountRlusd: grossRlusd });
-        const spreadFee = spread?.spreadFeeRlusd || 0;
+        const spreadFee = Number(spread?.spreadFeeRlusd || 0);
         const netRlusd = Math.max(0, grossRlusd - spreadFee);
         const quoteUnits = netRlusd / rlusdPerQuote;
 
@@ -337,9 +304,13 @@ export function useSwapConversion({
           return next;
         });
 
-        const spreadLabel = spread?.isFx
-          ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (tier ${spread.tier})`
-          : "";
+        const spreadLabel =
+          spread?.isFx && spreadFee > 0
+            ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
+                "en-US",
+                { maximumFractionDigits: 6 }
+              )} RLUSD)`
+            : "";
         setConvertPreview(
           `Démo: ${amountBase.toLocaleString("en-US", {
             maximumFractionDigits: 4,
@@ -362,6 +333,14 @@ export function useSwapConversion({
       alert("Please connect your Xumm wallet first.");
       return;
     }
+    if (!walletAddress || !signTransaction) {
+      alert("Please connect your Xumm wallet first.");
+      return;
+    }
+    if (!hasOnChainRlusd) {
+      alert("RLUSD trustline is not installed yet.");
+      return;
+    }
 
     const base = String(convertBaseCurrency || "").toUpperCase();
     const quote = String(convertQuoteCurrency || "").toUpperCase();
@@ -378,7 +357,6 @@ export function useSwapConversion({
     }
 
     setConvertProcessing(true);
-    let spreadPaid = false;
     try {
       const rlusdPerBase = await getRlusdPerUnit(base);
       const rlusdPerQuote = quote === "RLUSD" ? 1 : await getRlusdPerUnit(quote);
@@ -395,13 +373,13 @@ export function useSwapConversion({
 
       const grossRlusd = amountBase * rlusdPerBase;
       const spread = computeSpreadQuote({ base, quote, amountRlusd: grossRlusd });
-      const spreadFee = spread?.spreadFeeRlusd || 0;
+      const spreadFee = Number(spread?.spreadFeeRlusd || 0);
       const netRlusd = Math.max(0, grossRlusd - spreadFee);
+      const amountQuote = netRlusd / rlusdPerQuote;
       const epsilon = 1e-9;
 
+      const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
       if (base === "RLUSD") {
-        const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
-        // Must cover both the net allocation and the on-chain spread payment.
         if (Number.isFinite(unallocated) && unallocated + epsilon < grossRlusd) {
           alert(
             `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString(
@@ -411,7 +389,9 @@ export function useSwapConversion({
           );
           return;
         }
-      } else {
+      }
+
+      if (base !== "RLUSD") {
         const availableAllocated = allocatedRlusdByCurrency?.get(base) || 0;
         if (availableAllocated + epsilon < grossRlusd) {
           const maxUnits = availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
@@ -427,139 +407,84 @@ export function useSwapConversion({
         }
       }
 
-      const fxSourceFrom = await getFxSource(base);
-      const fxSourceTo = await getFxSource(quote);
-
-      if (isFxConversion(base, quote) && spreadFee > 0) {
-        // Spread always gets paid on-chain first, then allocations are updated.
-        // This prevents backend allocation changes if the user cancels the Xumm signature.
-        const spreadSignature = await paySpreadRlusd(spreadFee);
-        spreadPaid = true;
-        const xummUuid = spreadSignature?.uuid || null;
-
-        if (quote === "RLUSD") {
-          // Sell FX -> RLUSD (unallocated). Gross deallocation includes the spread we just paid on-chain,
-          // so the user ends up with net = gross - spread.
-          const result = await convertCurrencyAllocation?.({
-            fromCurrencyCode: base,
-            toCurrencyCode: "RLUSD",
-            amountRlusd: grossRlusd,
-            fromFxRate: rlusdPerBase,
-            fromFxSource: fxSourceFrom,
-            toFxRate: 1,
-            toFxSource: "PYTH",
-            xummUuid,
-          });
-          if (!result || result.error) {
-            throw new Error(result?.error || "Conversion failed");
-          }
-        } else if (base === "RLUSD") {
-          // Buy FX with RLUSD: allocate net amount.
-          const result = await convertCurrencyAllocation?.({
-            fromCurrencyCode: "RLUSD",
-            toCurrencyCode: quote,
-            amountRlusd: netRlusd,
-            fromFxRate: 1,
-            fromFxSource: "PYTH",
-            toFxRate: rlusdPerQuote,
-            toFxSource: fxSourceTo,
-            xummUuid,
-          });
-          if (!result || result.error) {
-            throw new Error(result?.error || "Conversion failed");
-          }
-        } else {
-          // FX -> FX: move net to quote, and remove spread from base (to RLUSD pool).
-          const result1 = await convertCurrencyAllocation?.({
-            fromCurrencyCode: base,
-            toCurrencyCode: quote,
-            amountRlusd: netRlusd,
-            fromFxRate: rlusdPerBase,
-            fromFxSource: fxSourceFrom,
-            toFxRate: rlusdPerQuote,
-            toFxSource: fxSourceTo,
-            xummUuid,
-          });
-          if (!result1 || result1.error) {
-            throw new Error(result1?.error || "Conversion failed");
-          }
-          const result2 = await convertCurrencyAllocation?.({
-            fromCurrencyCode: base,
-            toCurrencyCode: "RLUSD",
-            amountRlusd: spreadFee,
-            fromFxRate: rlusdPerBase,
-            fromFxSource: fxSourceFrom,
-            toFxRate: 1,
-            toFxSource: "PYTH",
-            xummUuid,
-          });
-          if (!result2 || result2.error) {
-            throw new Error(result2?.error || "Conversion failed");
-          }
-        }
-      } else {
-        const result = await convertCurrencyAllocation?.({
-          fromCurrencyCode: base,
-          toCurrencyCode: quote,
-          amountRlusd: grossRlusd,
-          fromFxRate: rlusdPerBase,
-          fromFxSource: fxSourceFrom,
-          toFxRate: rlusdPerQuote,
-          toFxSource: fxSourceTo,
-        });
-
-        if (!result || result.error) {
-          throw new Error(result?.error || "Conversion failed");
-        }
+      const fxSource = await getFxSource(base);
+      const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();
+      if (!destination) {
+        throw new Error("Missing activation wallet address");
       }
 
-      if (quote === "RLUSD") {
-        const effectiveRlusd = isFxConversion(base, quote)
-          ? Math.max(0, grossRlusd - spreadFee)
-          : grossRlusd;
-        const spreadLabel =
-          isFxConversion(base, quote) && spreadFee > 0
-            ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
-                "en-US",
-                { maximumFractionDigits: 6 }
-              )} RLUSD)`
-            : "";
-        setConvertPreview(
-          `Deallocated: ${amountBase.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
-          })} ${base} → ${effectiveRlusd.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
-          })} RLUSD (unallocated${spreadLabel})`
-        );
-      } else {
-        const quoteUnits = (isFxConversion(base, quote) ? netRlusd : grossRlusd) / rlusdPerQuote;
-        const spreadLabel =
-          isFxConversion(base, quote) && spreadFee > 0
-            ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
-                "en-US",
-                { maximumFractionDigits: 6 }
-              )} RLUSD)`
-            : "";
-        setConvertPreview(
-          `Allocation: ${amountBase.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
-          })} ${base} → ${quoteUnits.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
-          })} ${quote} (≈ ${grossRlusd.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
-          })} RLUSD${spreadLabel})`
-        );
+      if (!Number.isFinite(netRlusd) || netRlusd <= 0) {
+        alert("Montant trop faible après spread.");
+        return;
       }
+      if (!Number.isFinite(spreadFee) || spreadFee <= 0) {
+        alert("Frais de conversion invalides.");
+        return;
+      }
+
+      const memoPayload = {
+        xcannes: "conversion",
+        schema: "xcannes-convert-v1",
+        v: 1,
+        base,
+        quote,
+        amountBase,
+        amountQuote,
+        amountRlusd: netRlusd,
+        amountRlusdGross: grossRlusd,
+        fxRate: rlusdPerBase,
+        fxSource: fxSource || null,
+        spreadRlusd: spreadFee > 0 ? spreadFee : null,
+        spreadTier: spread?.tier || null,
+      };
+
+      const txjson = buildRlusdPaymentTxjson({
+        account: walletAddress,
+        destination,
+        amountRlusd: spreadFee,
+      });
+      if (!txjson) {
+        throw new Error("Invalid RLUSD fee payment");
+      }
+
+      const memos = buildXrplJsonMemo(memoPayload);
+      if (!memos) {
+        throw new Error("Invalid conversion memo");
+      }
+      txjson.Memos = memos;
+
+      const result = await signTransaction(txjson, {
+        action: "wallet:convert",
+      });
+      if (!result?.signed) {
+        alert("Conversion cancelled or expired.");
+        return;
+      }
+
+      const spreadLabel =
+        spread?.isFx && spreadFee > 0
+          ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
+              "en-US",
+              { maximumFractionDigits: 6 }
+            )} RLUSD)`
+          : "";
+      setConvertPreview(
+        `Conversion envoyée: ${amountBase.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} ${base} → ${amountQuote.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} ${quote} (≈ ${netRlusd.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} RLUSD${spreadLabel})`
+      );
 
       setConvertAmount("");
+      if (refreshBalance) setTimeout(() => refreshBalance(), 2000);
+      if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 2500);
     } catch (error) {
       console.error("Convert error:", error);
       const message = error?.message || String(error);
-      alert(
-        spreadPaid
-          ? `Conversion backend échouée après paiement du spread.\n\nDétail: ${message}`
-          : "Conversion error: " + message
-      );
+      alert("Conversion error: " + message);
     } finally {
       setConvertProcessing(false);
     }
@@ -568,7 +493,6 @@ export function useSwapConversion({
     backendWalletAddress,
     convertAmount,
     convertBaseCurrency,
-    convertCurrencyAllocation,
     convertQuoteCurrency,
     currencyLinesSummary,
     demoLines,
@@ -576,12 +500,16 @@ export function useSwapConversion({
     effectiveIsConnected,
     getFxSource,
     getRlusdPerUnit,
+    hasOnChainRlusd,
     isPreviewMode,
-    paySpreadRlusd,
+    refreshBalance,
+    refreshCurrencyLines,
     setConvertAmount,
     setConvertPreview,
     setConvertProcessing,
     setDemoLines,
+    signTransaction,
+    walletAddress,
   ]);
 
   return { handleDemoConvert };

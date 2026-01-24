@@ -88,22 +88,22 @@ export function WalletInfoContent({
 
 
             </li>
-            <li>{t("ui_xcannes_ne_pr_l_ve_pas_de_fe_b3ee902ca3", "XCANNES ne prélève pas de “fee” séparé. Le modèle est un")}
+            <li>{t("ui_xcannes_ne_pr_l_ve_pas_de_fe_b3ee902ca3", "XCANNES ne prélève pas de frais séparé. Le modèle est un")}
               {" "}
-              <span className="font-semibold">{t("ui_spread_8f9f9fc2e9", "spread")}</span>{t("ui_appliqu_uniquement_quand_il__d0c9824222", "appliqué uniquement quand il y a une conversion FX (ex:")}
+              <span className="font-semibold">{t("ui_spread_8f9f9fc2e9", "taux FX fixe")}</span>{t("ui_appliqu_uniquement_quand_il__d0c9824222", "appliqué uniquement quand il y a une conversion (ex:")}
               {" "}
               <span className="font-mono">{t("ui_eur_gbp_1865864628", "EUR↔GBP")}</span>,{" "}
               <span className="font-mono">{t("ui_rlusd_eur_23dc8f699b", "RLUSD↔EUR")}</span>).
             </li>
-            <li>{t("ui_spread_fx_tiers_88afacafd8", "Spread FX: tiers")}
+            <li>{t("ui_spread_fx_tiers_88afacafd8", "Taux FX par catégorie:")}
               <span className="font-mono">{t("ui_a_b_c_04f974d21b", "A/B/C")}</span>{t("ui_ex_1f3a886dcf", "(ex:")}
               <span className="font-mono">{t("ui_a_0_60_462cd3b75c", "A=0.60%")}</span>,{" "}
               <span className="font-mono">{t("ui_b_1_00_d712ad6d37", "B=1.00%")}</span>,{" "}
-              <span className="font-mono">{t("ui_c_1_80_0cb90046ff", "C=1.80%")}</span>{t("ui_total_bid_ask_autour_du_mid__fb93bb89c0", "“total”, bid/ask autour du mid), prélevé en")}
+              <span className="font-mono">{t("ui_c_1_80_0cb90046ff", "C=1.80%")}</span>{t("ui_total_bid_ask_autour_du_mid__fb93bb89c0", "appliqué sur le montant en")}
               <span className="font-mono">{t("ui_rlusd_5933874327", "RLUSD")}</span>{t("ui_sent_onchain_to_company_wallet_d9e8e01d57", "et envoyé on-chain vers un wallet entreprise XCANNES.")}
 
             </li>
-            <li>{t("ui_convert_interne_1_signature__c7b5a8e4dd", "Convert interne: 1 signature Xumm (paiement du spread) ; paiement entre 2 wallets: 2 signatures (spread puis paiement).")}
+            <li>{t("ui_convert_interne_1_signature__c7b5a8e4dd", "Conversion interne: 1 signature Xumm. Paiement entre 2 wallets: 2 signatures si un taux FX s’applique (sinon 1).")}
 
 
             </li>

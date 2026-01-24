@@ -1,6 +1,6 @@
 "use client";
 
-	import { useEffect } from "react";
+	import { useEffect, useRef } from "react";
 	import xcannesApi from "@/lib/xcannesApi";
 	import { extractPercentChange } from "@/utils/marketStats";
 
@@ -17,13 +17,21 @@ export function useLiveTickerData({
   setPriceChange,
   setPercent24h,
 }) {
+  // Garder la dernière Map sans recréer l'intervalle à chaque tick.
+  const tickersRef = useRef(tickers);
+  const inFlightRef = useRef(false);
+
+  useEffect(() => {
+    tickersRef.current = tickers;
+  }, [tickers]);
+
   useEffect(() => {
     if (!tickerKey) return undefined;
 
     let tickerInterval;
 
     const updateFromTicker = async () => {
-      const ticker = tickerKey ? tickers?.get?.(tickerKey) : null;
+      const ticker = tickerKey ? tickersRef.current?.get?.(tickerKey) : null;
 
       const applyFromSource = (src) => {
         if (!src) return null;
@@ -116,11 +124,15 @@ export function useLiveTickerData({
       if (applyFromSource(ticker)) {
         return;
       }
+      if (inFlightRef.current) return;
+      inFlightRef.current = true;
       try {
         const res = await xcannesApi.getTicker(tickerKey || pair);
         applyFromSource(res);
       } catch {
         // silencieux
+      } finally {
+        inFlightRef.current = false;
       }
     };
 
@@ -132,7 +144,6 @@ export function useLiveTickerData({
   }, [
     tickerKey,
     pair,
-    tickers,
     isXRPL,
     isFxMode,
     updateCurrentCandle,

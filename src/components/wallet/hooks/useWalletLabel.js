@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { apiUrl } from "@/lib/runtimeConfig";
 import { buildRlusdPaymentTxjson, XCANNES_ACTIVATION_WALLET_ADDRESS } from "@/utils/walletSpread";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 
 export function useWalletLabel({
   walletAddress,
   isConnected,
-  storageKey,
   defaultLabel = "",
   signTransaction,
   activationDestination = XCANNES_ACTIVATION_WALLET_ADDRESS,
@@ -16,8 +16,11 @@ export function useWalletLabel({
   const [walletLabel, setWalletLabel] = useState(defaultLabel);
   const [walletLabelDraft, setWalletLabelDraft] = useState(defaultLabel);
   const [isEditingWalletLabel, setIsEditingWalletLabel] = useState(false);
+  const [isWalletLabelRequired, setIsWalletLabelRequired] = useState(false);
+  const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
   const [walletHeaderToast, setWalletHeaderToast] = useState("");
   const toastTimeoutRef = useRef(null);
+  const loadTokenRef = useRef(0);
 
   const clearToastTimer = useCallback(() => {
     if (!toastTimeoutRef.current) return;
@@ -42,26 +45,52 @@ export function useWalletLabel({
     return () => clearToastTimer();
   }, [clearToastTimer]);
 
+  const loadWalletLabel = useCallback(async () => {
+    if (!isConnected || !walletAddress) return;
+    const token = ++loadTokenRef.current;
+    setIsWalletLabelLoading(true);
+    try {
+      const res = await fetch(
+        apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+      );
+      const data = await res.json().catch(() => ({}));
+      if (token !== loadTokenRef.current) return;
+      if (!res.ok) {
+        throw new Error(data?.error || "Unable to fetch wallet label");
+      }
+      const label = String(data?.label || "").trim();
+      setWalletLabel(label || defaultLabel);
+      setWalletLabelDraft(label || defaultLabel);
+      const required = !label;
+      setIsWalletLabelRequired(required);
+      if (required) {
+        setIsEditingWalletLabel(true);
+      }
+    } catch (err) {
+      console.error("[useWalletLabel] Error fetching wallet label:", err);
+      if (token === loadTokenRef.current) {
+        setIsWalletLabelRequired(false);
+      }
+      flashWalletHeaderToast("Impossible de charger le nom du wallet.", 2200);
+    } finally {
+      if (token === loadTokenRef.current) {
+        setIsWalletLabelLoading(false);
+      }
+    }
+  }, [defaultLabel, flashWalletHeaderToast, isConnected, walletAddress]);
+
   useEffect(() => {
     if (!isConnected || !walletAddress) {
       setWalletLabel(defaultLabel);
       setWalletLabelDraft(defaultLabel);
       setIsEditingWalletLabel(false);
+      setIsWalletLabelRequired(false);
+      setIsWalletLabelLoading(false);
+      loadTokenRef.current += 1;
       return;
     }
-
-    if (typeof window === "undefined") return;
-
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      const labels = raw ? JSON.parse(raw) : {};
-      const label = labels[walletAddress] || defaultLabel;
-      setWalletLabel(label);
-      setWalletLabelDraft(label);
-    } catch (err) {
-      console.error("[useWalletLabel] Error loading wallet label:", err);
-    }
-  }, [defaultLabel, isConnected, storageKey, walletAddress]);
+    loadWalletLabel();
+  }, [defaultLabel, isConnected, loadWalletLabel, walletAddress]);
 
   const openWalletLabelEditor = useCallback(() => {
     if (!walletAddress) return;
@@ -72,6 +101,11 @@ export function useWalletLabel({
   const saveWalletLabel = useCallback(async () => {
     if (!walletAddress) return;
     const trimmed = String(walletLabelDraft || "").trim();
+    const words = trimmed.split(/\s+/).filter(Boolean);
+    if (words.length < 1 || words.length > 2) {
+      flashWalletHeaderToast("Nom du wallet: 1 ou 2 mots max.", 2200);
+      return;
+    }
     if (trimmed === walletLabel) {
       setIsEditingWalletLabel(false);
       return;
@@ -121,49 +155,44 @@ export function useWalletLabel({
 
     setWalletLabel(trimmed);
     setIsEditingWalletLabel(false);
-
-    if (typeof window !== "undefined") {
-      try {
-        const raw = window.localStorage.getItem(storageKey);
-        const labels = raw ? JSON.parse(raw) : {};
-        if (trimmed) {
-          labels[walletAddress] = trimmed;
-        } else {
-          delete labels[walletAddress];
-        }
-        window.localStorage.setItem(storageKey, JSON.stringify(labels));
-      } catch (err) {
-        console.error("[useWalletLabel] Error saving wallet label:", err);
-      }
-    }
+    setIsWalletLabelRequired(false);
+    loadWalletLabel();
 
     flashWalletHeaderToast("Nom enregistré", 1600);
   }, [
     activationDestination,
     flashWalletHeaderToast,
     isConnected,
+    loadWalletLabel,
     renameFeeRlusd,
     signTransaction,
-    storageKey,
     walletAddress,
     walletLabel,
     walletLabelDraft,
   ]);
 
   const cancelWalletLabel = useCallback(() => {
+    if (isWalletLabelRequired) {
+      flashWalletHeaderToast("Nom du wallet requis.", 2000);
+      setIsEditingWalletLabel(true);
+      return;
+    }
     setWalletLabelDraft(walletLabel);
     setIsEditingWalletLabel(false);
-  }, [walletLabel]);
+  }, [flashWalletHeaderToast, isWalletLabelRequired, walletLabel]);
 
   return {
     walletLabel,
     walletLabelDraft,
     setWalletLabelDraft,
     isEditingWalletLabel,
+    isWalletLabelRequired,
+    isWalletLabelLoading,
     walletHeaderToast,
     flashWalletHeaderToast,
     openWalletLabelEditor,
     saveWalletLabel,
     cancelWalletLabel,
+    loadWalletLabel,
   };
 }
