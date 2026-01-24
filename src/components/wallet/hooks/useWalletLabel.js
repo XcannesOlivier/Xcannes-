@@ -1,12 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { buildRlusdPaymentTxjson, XCANNES_ACTIVATION_WALLET_ADDRESS } from "@/utils/walletSpread";
+import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 
 export function useWalletLabel({
   walletAddress,
   isConnected,
   storageKey,
   defaultLabel = "",
+  signTransaction,
+  activationDestination = XCANNES_ACTIVATION_WALLET_ADDRESS,
+  renameFeeRlusd = 1,
 } = {}) {
   const [walletLabel, setWalletLabel] = useState(defaultLabel);
   const [walletLabelDraft, setWalletLabelDraft] = useState(defaultLabel);
@@ -64,9 +69,56 @@ export function useWalletLabel({
     setIsEditingWalletLabel(true);
   }, [walletAddress, walletLabel]);
 
-  const saveWalletLabel = useCallback(() => {
+  const saveWalletLabel = useCallback(async () => {
     if (!walletAddress) return;
     const trimmed = String(walletLabelDraft || "").trim();
+    if (trimmed === walletLabel) {
+      setIsEditingWalletLabel(false);
+      return;
+    }
+
+    if (!isConnected || !signTransaction) {
+      flashWalletHeaderToast("Connect wallet to rename.", 2000);
+      return;
+    }
+
+    const destination = String(activationDestination || "").trim();
+    if (!destination) {
+      flashWalletHeaderToast("Activation wallet not configured.", 2000);
+      return;
+    }
+
+    const fee = Number(renameFeeRlusd);
+    if (!Number.isFinite(fee) || fee <= 0) {
+      flashWalletHeaderToast("Invalid rename fee.", 2000);
+      return;
+    }
+
+    const txjson = buildRlusdPaymentTxjson({
+      account: walletAddress,
+      destination,
+      amountRlusd: fee,
+    });
+    if (!txjson) {
+      flashWalletHeaderToast("Unable to build rename payment.", 2000);
+      return;
+    }
+
+    const memoPayload = {
+      xcannes: "wallet_label",
+      schema: "xcannes-wallet-label-v1",
+      v: 1,
+      label: trimmed,
+    };
+    const memos = buildXrplJsonMemo(memoPayload);
+    if (memos) txjson.Memos = memos;
+
+    const result = await signTransaction(txjson, { action: "wallet:label" });
+    if (!result?.signed) {
+      flashWalletHeaderToast("Rename payment cancelled.", 2000);
+      return;
+    }
+
     setWalletLabel(trimmed);
     setIsEditingWalletLabel(false);
 
@@ -86,7 +138,17 @@ export function useWalletLabel({
     }
 
     flashWalletHeaderToast("Nom enregistré", 1600);
-  }, [flashWalletHeaderToast, storageKey, walletAddress, walletLabelDraft]);
+  }, [
+    activationDestination,
+    flashWalletHeaderToast,
+    isConnected,
+    renameFeeRlusd,
+    signTransaction,
+    storageKey,
+    walletAddress,
+    walletLabel,
+    walletLabelDraft,
+  ]);
 
   const cancelWalletLabel = useCallback(() => {
     setWalletLabelDraft(walletLabel);
@@ -105,4 +167,3 @@ export function useWalletLabel({
     cancelWalletLabel,
   };
 }
-

@@ -134,7 +134,7 @@ export default function WalletDashboardTokenRow({
           <p className="mt-1 text-[11px] text-amber-200/80">
             {currencyCode === "RLUSD" ?
           "Autorise RLUSD sur votre wallet." :
-          "Elle permet de détenir du XCS et payer les frais XCANNES."}
+          "Elle permet de détenir du XCS."}
           </p>
         </div>
       }

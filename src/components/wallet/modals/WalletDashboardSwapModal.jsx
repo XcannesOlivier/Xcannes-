@@ -27,7 +27,6 @@ export default function WalletDashboardSwapModal({
   walletAddress,
   onConnectWallet,
   hasOnChainRlusd,
-  hasOnChainXcs,
   onInstallTrustline,
   onActivateCurrencyLine,
   refreshCurrencyLines,
@@ -56,7 +55,7 @@ export default function WalletDashboardSwapModal({
   selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
-  activationFeeXcs,
+  activationFeeRlusd,
   simulateDexInDemo = false
 }) {
   const { t } = useTranslation("common");
@@ -92,16 +91,15 @@ export default function WalletDashboardSwapModal({
     isPreviewMode ||
     (effectiveIsConnected &&
       isWalletActivated === true &&
-      hasOnChainRlusd &&
-      hasOnChainXcs);
+      hasOnChainRlusd);
   const activationFeeLabel = useMemo(() => {
-    const value = Number(activationFeeXcs);
-    const safe = Number.isFinite(value) && value > 0 ? value : 0.2;
+    const value = Number(activationFeeRlusd);
+    const safe = Number.isFinite(value) && value > 0 ? value : 1;
     return safe.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-  }, [activationFeeXcs]);
+  }, [activationFeeRlusd]);
   const previewRequestId = useRef(0);
   const [previewState, setPreviewState] = useState({ status: "idle", error: null });
   const [previewAmount, setPreviewAmount] = useState(null);
@@ -528,15 +526,14 @@ export default function WalletDashboardSwapModal({
               </div>
             ) : null}
 
-          {!isPreviewMode && (!hasOnChainRlusd || !hasOnChainXcs) &&
+          {!isPreviewMode && !hasOnChainRlusd &&
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
               <div className="text-[12px] font-semibold text-amber-200">{t("ui_trustlines_required_d39ef28613", "Trustlines requises")}
 
           </div>
               <p className="mt-1 text-[11px] text-amber-200/80">{t("ui_to_fully_use_wallet_5439f003e6", "Pour utiliser pleinement le wallet, installez les trustlines XRPL pour")}
 
-            <span className="font-mono">{t("ui_rlusd_03b00d11bf", "RLUSD")}</span>{t("ui_and_620aeaa4b1", "et")}{" "}
-                <span className="font-mono">{t("ui_xcs_f295b34180", "XCS")}</span>.
+            <span className="font-mono">{t("ui_rlusd_03b00d11bf", "RLUSD")}</span>.
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {!hasOnChainRlusd &&
@@ -547,18 +544,6 @@ export default function WalletDashboardSwapModal({
                 onInstallTrustline?.("RLUSD");
               }}
               className={`px-2.5 py-1.5 text-[11px] ${blueActionBtnBase}`}>{t("ui_install_trustline_rlusd_35e926ab5c", "Installer trustline RLUSD")}
-
-
-            </button>
-            }
-                {!hasOnChainXcs &&
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onInstallTrustline?.("XCS");
-              }}
-              className={`px-2.5 py-1.5 text-[11px] ${blueActionBtnBase}`}>{t("ui_install_trustline_xcs_5a6044d70e", "Installer trustline XCS")}
 
 
             </button>
@@ -757,7 +742,7 @@ export default function WalletDashboardSwapModal({
               t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.") :
               isWalletActivated === false ?
               t("ui_wallet_activation_required_f4", "Wallet must be activated to create currency lines.") :
-              t("ui_trustlines_required_currency_lines_f4", "RLUSD and XCS trustlines are required to create currency lines.")}
+              t("ui_trustlines_required_currency_lines_f4", "RLUSD trustline is required to create currency lines.")}
                 </p>
             }
 
@@ -790,7 +775,7 @@ export default function WalletDashboardSwapModal({
                 <p className="mt-2 text-[10px] text-white/45">
                   {t("ui_activation_fee_xcs_company_wallet_f4", {
                     defaultValue:
-                      "Activation fee: {{amount}} XCS.",
+                      "Activation fee: {{amount}} RLUSD.",
                     amount: activationFeeLabel,
                   })}
                 </p>
