@@ -508,7 +508,7 @@ export default function CurrencyStatement({
   };
 
   // Fonction pour obtenir le drapeau de la devise
-  const getCurrencyFlag = (curr) => {
+  const getCurrencyFlag = useCallback((curr) => {
     const flags = {
       // Devises fiat - Monde entier
       "USD": "🇺🇸", // Dollar américain
@@ -708,10 +708,10 @@ export default function CurrencyStatement({
       "XCS": "🌟" // Xcannes Coin
     };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
-  };
+  }, []);
 
   // Fonction pour enrichir la description avec des drapeaux
-  const enrichDescription = (description) => {
+  const enrichDescription = useCallback((description) => {
     if (!description) return description;
 
     // Remplacer les codes de devises par leurs drapeaux + code
@@ -725,7 +725,7 @@ export default function CurrencyStatement({
     });
 
     return enriched;
-  };
+  }, [getCurrencyFlag]);
   const simplifyMobileDescription = useCallback(
     (description, category) => {
       if (!description) return description;

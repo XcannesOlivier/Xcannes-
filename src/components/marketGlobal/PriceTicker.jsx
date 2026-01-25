@@ -261,11 +261,12 @@ export default function PriceTicker({
   }, [limitedPairs, connected, fetchPrices]);
 
   useEffect(() => {
+    const subscriptions = subscriptionsRef.current;
     return () => {
-      subscriptionsRef.current.forEach((pairKey) => {
+      subscriptions.forEach((pairKey) => {
         unsubscribe("ticker", pairKey);
       });
-      subscriptionsRef.current.clear();
+      subscriptions.clear();
     };
   }, [unsubscribe]);
 

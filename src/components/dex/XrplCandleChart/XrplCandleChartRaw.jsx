@@ -587,7 +587,7 @@ export default function XrplCandleChartRaw({
       // Créer la série selon le type de graphique
       if (chartType === "candle") {
         candleSeriesRef.current = chart.addCandlestickSeries({
-          // Même palette que l'orderbook : vert xcannes-green, rouge xcannes-red
+          // Même palette : vert xcannes-green, rouge xcannes-red
           upColor: "#10b981c0",
           downColor: "#f16262ff",
           borderUpColor: "#10b981c0",
@@ -1185,23 +1185,17 @@ export default function XrplCandleChartRaw({
 
   const mobileWatermark = null;
 
-  const noDataContent =
-  <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
+  const noDataContent = (
+    <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20">
       <div className="text-center max-w-md px-6">
         <div className="text-6xl mb-4">⚠️</div>
-        <p className="text-lg font-semibold text-white mb-2">{t("ui_service_de_donn_es_indisponi_42cacb1f89", "Service de données indisponible")}</p>
-        <p className="text-sm text-white/60 mb-4">{noDataMessage}</p>
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4 mb-4">
-          <p className="text-xs text-white/60 leading-relaxed">{t("ui_l_api_data_xrplf_org_ne_r_po_2427381aa5", "L’API data.xrplf.org ne répond plus correctement. Le Order Book en temps réel fonctionne toujours via wss://xrplcluster.com")}
-
-
+        <p className="text-lg font-semibold text-white mb-2">
+          {t("ui_service_de_donn_es_indisponi_42cacb1f89", "Service de données indisponible")}
         </p>
-        </div>
-        <div className="text-xs text-white/40">{t("ui_meanwhile_check_orderbook_be84ec6208", "En attendant, consultez l’Order Book ci-dessous pour les prix en temps réel")}
-
+        <p className="text-sm text-white/60 mb-4">{noDataMessage}</p>
       </div>
-      </div>
-    </div>;
+    </div>
+  );
 
 
   return (

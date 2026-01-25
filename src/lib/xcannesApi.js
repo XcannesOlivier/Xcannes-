@@ -25,7 +25,6 @@ const API_ENDPOINTS = {
   MARKETS: '/api/v1/markets',
   MARKETS_ALL: '/api/v1/markets/all',
   TICKER: '/api/v1/ticker',
-  ORDERBOOK: '/api/v1/orderbook',
   TRADES: '/api/v1/trades',
   KLINES: '/api/v1/klines',
   DEPTH: '/api/v1/depth',
@@ -198,19 +197,6 @@ class XcannesAPI {
   }
 
   /**
-   * Récupérer l'orderbook (carnet d'ordres)
-   * @param {string} pair - Format: XCS_XRP
-   * @param {number} limit - Nombre de niveaux (default: 20)
-   * @returns {Promise<Object>}
-   */
-  async getOrderbook(pair, limit = 20) {
-    const result = await this.request(
-      `${API_ENDPOINTS.ORDERBOOK}?pair=${pair}&limit=${limit}`
-    );
-    return result.success ? result.data : null;
-  }
-
-  /**
    * Récupérer les trades récents
    * @param {string} pair - Format: XCS_XRP
    * @param {number} limit - Nombre de trades (default: 50)
@@ -232,7 +218,7 @@ class XcannesAPI {
    * @returns {Promise<Object>}
    */
   async getKlines(pair, interval = "1h", limit = 100) {
-    // Utiliser uniquement l'endpoint temps réel (données orderbook XRPL réelles)
+    // Utiliser uniquement l'endpoint temps réel (données XRPL réelles)
     const result = await this.request(
       `${API_ENDPOINTS.KLINES}?pair=${pair}&interval=${interval}&limit=${limit}`
     );

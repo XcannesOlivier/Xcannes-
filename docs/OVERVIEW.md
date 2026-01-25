@@ -6,7 +6,7 @@
 ## Scope
 
 Frontend Next.js pour :
-- page DEX (chart, orderbook, trades, market panels),
+- page DEX (chart, trades, market panels),
 - wallet multi-devise (off-chain allocations RLUSD),
 - pages "pay" / "wallet" / "dex" / "whitepaper" / "contact" / "disclaimer",
 - pages demo wallets (UI fictive).
