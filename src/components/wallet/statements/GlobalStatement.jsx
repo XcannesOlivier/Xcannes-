@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { getWalletSessionHeaders } from "@/lib/walletSession";
 import {
   buildCsvString,
   downloadTextFile,
@@ -77,7 +78,8 @@ export default function GlobalStatement({
     const loadLabel = async () => {
       try {
         const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
+          { headers: getWalletSessionHeaders() }
         );
         const data = await res.json();
         if (!res.ok) {

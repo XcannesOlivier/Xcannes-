@@ -5,6 +5,7 @@
 	import { useXumm } from "@/context/XummContext";
 import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { getWalletSessionHeaders } from "@/lib/walletSession";
 	import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import {
@@ -1172,7 +1173,9 @@ export default function WalletDashboard({
         const params = new URLSearchParams();
         params.set("address", backendWalletAddress);
         params.set("limit", "5");
-        const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
+        const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`), {
+          headers: getWalletSessionHeaders(),
+        });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return;
 

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { getWalletSessionHeaders } from "@/lib/walletSession";
 
 export function useWalletLines(address, { signTransaction } = {}) {
   const [lines, setLines] = useState([]);
@@ -39,7 +40,8 @@ export function useWalletLines(address, { signTransaction } = {}) {
       setError(null);
 
       const res = await fetch(
-        apiUrl(`/wallet/lines?address=${encodeURIComponent(address)}`)
+        apiUrl(`/wallet/lines?address=${encodeURIComponent(address)}`),
+        { headers: getWalletSessionHeaders() }
       );
       const data = await res.json();
 
