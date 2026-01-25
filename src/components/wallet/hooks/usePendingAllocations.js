@@ -3,8 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
+import { useXumm } from "@/context/XummContext";
 
 export function usePendingAllocations(address, { signTransaction } = {}) {
+  const xumm = useXumm();
+  const walletSessionToken = xumm?.walletSessionToken || null;
   const [pending, setPending] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,7 +31,7 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
   }, [signTransaction]);
 
   const fetchPending = useCallback(async () => {
-    if (!address) {
+    if (!address || !walletSessionToken) {
       setPending([]);
       setLoading(false);
       setError(null);
@@ -40,7 +43,7 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
       setError(null);
       const res = await fetch(
         apiUrl(`/wallet/pending-allocations?address=${encodeURIComponent(address)}`),
-        { headers: getWalletSessionHeaders() }
+        { headers: getWalletSessionHeaders(walletSessionToken) }
       );
       const data = await res.json();
       if (!res.ok) {
@@ -54,7 +57,7 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
     } finally {
       setLoading(false);
     }
-  }, [address]);
+  }, [address, walletSessionToken]);
 
   const activatePending = useCallback(
     async (currencyCode, { xummUuid } = {}) => {
@@ -67,7 +70,10 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
 
       const res = await fetch(apiUrl("/wallet/pending-allocations/activate"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getWalletSessionHeaders(walletSessionToken),
+        },
         body: JSON.stringify({ address, currencyCode, xummUuid: signatureUuid }),
       });
       const data = await res.json();
@@ -76,7 +82,7 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
       }
       return data;
     },
-    [address, requestWalletSignature]
+    [address, requestWalletSignature, walletSessionToken]
   );
 
   useEffect(() => {

@@ -1,21 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo, useReducer, useCallback } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { createChart } from "lightweight-charts";
 import xcannesApi from "@/lib/xcannesApi";
 import { MARKET_STRUCTURE, getPairCategory } from "@/utils/marketStructure"; // ✅ Structure des marchés
-import {
-  calculateBollingerBands,
-  calculateEMA,
-  calculateSMA,
-  calculateRSI,
-  calculateMACD,
-  calculateVWAP } from
-"./indicators";
 import ChartHeader from "./components/ChartHeader";
 import useMarketData from "./hooks/useMarketData";
-import IndicatorsToolbar from "./components/IndicatorsToolbar";
 import ChartFooter from "./components/ChartFooter";
 import ChartCanvas from "./components/ChartCanvas";
 import { useTranslation } from "next-i18next";
@@ -44,38 +35,8 @@ export default function XrplCandleChartRaw({
   const chartRef = useRef();
   const chartInstanceRef = useRef(null);
   const candleSeriesRef = useRef(null);
-  const volumeSeriesRef = useRef(null);
   const timeScaleRef = useRef(null);
   const initialVisibleRangeRef = useRef(null);
-  const rsiChartRef = useRef(null); // legacy (plus utilisé pour un chart séparé)
-  const rsiSeriesRef = useRef({
-    main: null,
-    overbought: null,
-    oversold: null
-  });
-  const macdChartRef = useRef(null); // legacy (plus utilisé pour un chart séparé)
-  const macdSeriesRef = useRef({
-    macd: null,
-    signal: null,
-    histogram: null,
-    zeroLine: null
-  });
-  const vwapSeriesRef = useRef(null);
-  const smaSeriesRef = useRef({
-    sma20: null,
-    sma50: null,
-    sma200: null
-  });
-  const emaSeriesRef = useRef({
-    ema20: null,
-    ema50: null,
-    ema200: null
-  });
-  const bollingerSeriesRef = useRef({
-    upper: null,
-    middle: null,
-    lower: null
-  });
   const containerRef = useRef(null);
   const oldestTimeRef = useRef(null);
   const newestTimeRef = useRef(null);
@@ -86,47 +47,7 @@ export default function XrplCandleChartRaw({
 
   // États pour les fonctionnalités modernes
   const [chartType, setChartType] = useState("candle"); // "candle" ou "line"
-  const [indicatorsState, dispatchIndicators] = useReducer(
-    (state, action) => {
-      switch (action.type) {
-        case "SET":
-          return { ...state, [action.key]: action.value };
-        case "SET_SMA":
-          return { ...state, showSMA: { ...state.showSMA, ...action.value } };
-        case "SET_EMA":
-          return { ...state, showEMA: { ...state.showEMA, ...action.value } };
-        default:
-          return state;
-      }
-    },
-    {
-      showVolume: false,
-      showBollinger: false,
-      showRSI: false,
-      showMACD: false,
-      showVWAP: false,
-      showSMA: { sma20: false, sma50: false, sma200: false },
-      showEMA: { ema20: false, ema50: false, ema200: false },
-      hideAllIndicators: false,
-      showTooltips: true
-    }
-  );
-  const { showVolume, showBollinger, showRSI, showMACD, showVWAP, showSMA, showEMA, hideAllIndicators, showTooltips } =
-  indicatorsState;
-
-  const setIndicator = useCallback((key) => (value) => dispatchIndicators({ type: "SET", key, value }), []);
-  const setShowVolume = useCallback((v) => dispatchIndicators({ type: "SET", key: "showVolume", value: v }), []);
-  const setShowBollinger = useCallback((v) => dispatchIndicators({ type: "SET", key: "showBollinger", value: v }), []);
-  const setShowRSI = useCallback((v) => dispatchIndicators({ type: "SET", key: "showRSI", value: v }), []);
-  const setShowMACD = useCallback((v) => dispatchIndicators({ type: "SET", key: "showMACD", value: v }), []);
-  const setShowVWAP = useCallback((v) => dispatchIndicators({ type: "SET", key: "showVWAP", value: v }), []);
-  const setShowTooltips = useCallback((v) => dispatchIndicators({ type: "SET", key: "showTooltips", value: v }), []);
-  const setHideAllIndicators = useCallback(
-    (v) => dispatchIndicators({ type: "SET", key: "hideAllIndicators", value: v }),
-    []
-  );
-  const setShowSMA = useCallback((obj) => dispatchIndicators({ type: "SET_SMA", value: obj }), []);
-  const setShowEMA = useCallback((obj) => dispatchIndicators({ type: "SET_EMA", value: obj }), []);
+  const showTooltips = true;
 
   // États pour les paramètres du graphique
   const [showSettings, setShowSettings] = useState(false);
@@ -214,20 +135,6 @@ export default function XrplCandleChartRaw({
       };
     });
   }, []);
-
-  // Réinitialiser les moyennes mobiles (SMA/EMA)
-  // quand on change de paire, pour éviter qu'une ligne
-  // reste affichée "par défaut" sur un nouveau marché.
-  useEffect(() => {
-    dispatchIndicators({
-      type: "SET_SMA",
-      value: { sma20: false, sma50: false, sma200: false }
-    });
-    dispatchIndicators({
-      type: "SET_EMA",
-      value: { ema20: false, ema50: false, ema200: false }
-    });
-  }, [pair]);
 
   // Ancien système de lazy-load de l'historique retiré pour simplifier:
   // le chart affiche simplement les bougies fournies par useMarketData
@@ -434,18 +341,6 @@ export default function XrplCandleChartRaw({
         lastCrosshairParamRef.current = null;
       }
       unsubscribeTimeHandlers();
-      if (rsiChartRef.current) {
-        try {
-          rsiChartRef.current.remove();
-        } catch (_) {}
-        rsiChartRef.current = null;
-      }
-      if (macdChartRef.current) {
-        try {
-          macdChartRef.current.remove();
-        } catch (_) {}
-        macdChartRef.current = null;
-      }
       if (chartInstanceRef.current) {
         try {
           if (crosshairHandler) {
@@ -463,13 +358,6 @@ export default function XrplCandleChartRaw({
         chartInstanceRef.current = null;
       }
       candleSeriesRef.current = null;
-      volumeSeriesRef.current = null;
-      vwapSeriesRef.current = null;
-      smaSeriesRef.current = { sma20: null, sma50: null, sma200: null };
-      emaSeriesRef.current = { ema20: null, ema50: null, ema200: null };
-      bollingerSeriesRef.current = { upper: null, middle: null, lower: null };
-      macdSeriesRef.current = { macd: null, signal: null, histogram: null, zeroLine: null };
-      rsiSeriesRef.current = { main: null, overbought: null, oversold: null };
       currentCandleRef.current = null;
     };
 
@@ -569,7 +457,7 @@ export default function XrplCandleChartRaw({
           borderColor,
           scaleMargins: {
             top: 0.1, // Marge haute raisonnable
-            bottom: showVolume ? 0.25 : 0.1 // Espace pour volume si activé
+            bottom: 0.1
           },
           autoScale: true, // ✅ Activé
           mode: 0, // Mode normal (pas logarithmique)
@@ -700,254 +588,6 @@ export default function XrplCandleChartRaw({
 
         chart.subscribeCrosshairMove(crosshairHandler);
         chart.subscribeClick(clickHandler);
-      }
-
-      // Ajouter le volume si activé (XRPL uniquement, pas FX/Pyth)
-      if (showVolume && !isFxMode && !isExternal) {
-        volumeSeriesRef.current = chart.addHistogramSeries({
-          color: "#10b981c0",
-          priceFormat: { type: "volume" },
-          priceScaleId: "",
-          scaleMargins: { top: 0.8, bottom: 0 }
-        });
-
-        const volumeData = data.map((d) => ({
-          time: d.time,
-          value: d.volume || 0,
-          color: d.close >= d.open ? "#10b98136" : "#f1626238"
-        }));
-        volumeSeriesRef.current.setData(volumeData);
-      }
-
-      // Ajouter Bollinger Bands si activé
-      if (showBollinger) {
-        const bollinger = calculateBollingerBands(data, 20, 2);
-
-        // Bande supérieure (rouge semi-transparent)
-        bollingerSeriesRef.current.upper = chart.addLineSeries({
-          color: "rgba(239, 83, 80, 0.8)",
-          lineWidth: 1,
-          priceLineVisible: false,
-          lastValueVisible: false
-        });
-        bollingerSeriesRef.current.upper.setData(bollinger.upper);
-
-        // Bande moyenne (blanc semi-transparent)
-        bollingerSeriesRef.current.middle = chart.addLineSeries({
-          color: "rgba(255, 255, 255, 0.5)",
-          lineWidth: 1,
-          lineStyle: 2, // Dashed
-          priceLineVisible: false,
-          lastValueVisible: false
-        });
-        bollingerSeriesRef.current.middle.setData(bollinger.middle);
-
-        // Bande inférieure (vert semi-transparent)
-        bollingerSeriesRef.current.lower = chart.addLineSeries({
-          color: "#10b981ff",
-          lineWidth: 1,
-          priceLineVisible: false,
-          lastValueVisible: false
-        });
-        bollingerSeriesRef.current.lower.setData(bollinger.lower);
-      }
-
-      // Ajouter le VWAP si activé (XRPL uniquement)
-      if (showVWAP && data.length > 0 && !isFxMode && !isExternal) {
-        const vwapData = calculateVWAP(data);
-        vwapSeriesRef.current = chart.addLineSeries({
-          color: "#fbbf24", // Jaune/Or
-          lineWidth: 2,
-          lineStyle: 0, // Solid
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "VWAP"
-        });
-        vwapSeriesRef.current.setData(vwapData);
-      }
-
-      // Ajouter les SMA si activés
-      if (showSMA.sma20 && data.length >= 20) {
-        const sma20Data = calculateSMA(data, 20);
-        smaSeriesRef.current.sma20 = chart.addLineSeries({
-          color: "#3b82f6", // Bleu
-          lineWidth: 2,
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "SMA 20"
-        });
-        smaSeriesRef.current.sma20.setData(sma20Data);
-      }
-
-      if (showSMA.sma50 && data.length >= 50) {
-        const sma50Data = calculateSMA(data, 50);
-        smaSeriesRef.current.sma50 = chart.addLineSeries({
-          color: "#f59e0b", // Orange
-          lineWidth: 2,
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "SMA 50"
-        });
-        smaSeriesRef.current.sma50.setData(sma50Data);
-      }
-
-      if (showSMA.sma200 && data.length >= 200) {
-        const sma200Data = calculateSMA(data, 200);
-        smaSeriesRef.current.sma200 = chart.addLineSeries({
-          color: "#ef4444", // Rouge
-          lineWidth: 2,
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "SMA 200"
-        });
-        smaSeriesRef.current.sma200.setData(sma200Data);
-      }
-
-      // Ajouter les EMA si activés
-      if (showEMA.ema20 && data.length >= 20) {
-        const ema20Data = calculateEMA(data, 20);
-        emaSeriesRef.current.ema20 = chart.addLineSeries({
-          color: "#06b6d4", // Cyan
-          lineWidth: 2,
-          lineStyle: 0, // Solid
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "EMA 20"
-        });
-        emaSeriesRef.current.ema20.setData(ema20Data);
-      }
-
-      if (showEMA.ema50 && data.length >= 50) {
-        const ema50Data = calculateEMA(data, 50);
-        emaSeriesRef.current.ema50 = chart.addLineSeries({
-          color: "#a855f7", // Violet
-          lineWidth: 2,
-          lineStyle: 0, // Solid
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "EMA 50"
-        });
-        emaSeriesRef.current.ema50.setData(ema50Data);
-      }
-
-      if (showEMA.ema200 && data.length >= 200) {
-        const ema200Data = calculateEMA(data, 200);
-        emaSeriesRef.current.ema200 = chart.addLineSeries({
-          color: "#ec4899", // Rose
-          lineWidth: 2,
-          lineStyle: 0, // Solid
-          priceLineVisible: false,
-          lastValueVisible: true,
-          title: "EMA 200"
-        });
-        emaSeriesRef.current.ema200.setData(ema200Data);
-      }
-
-      // Ajouter le RSI en overlay dans le même chart (plus de panneau séparé)
-      if (showRSI && data.length > 15) {
-        const rsiData = calculateRSI(data, 14);
-
-        // Série principale RSI
-        if (!rsiSeriesRef.current.main) {
-          rsiSeriesRef.current.main = chart.addLineSeries({
-            color: "#9333ea",
-            lineWidth: 2,
-            priceLineVisible: false,
-            lastValueVisible: false,
-            priceScaleId: "rsi"
-          });
-
-          // Price scale dédiée au RSI, en bas du chart
-          chart.priceScale("rsi").applyOptions({
-            position: "right",
-            scaleMargins: {
-              top: 0.75,
-              bottom: 0.02
-            }
-          });
-        }
-        rsiSeriesRef.current.main.setData(rsiData);
-
-        // Lignes 30 / 70
-        const boundsData = data.map((d) => ({ time: d.time, value: 70 }));
-        const lowerData = data.map((d) => ({ time: d.time, value: 30 }));
-
-        if (!rsiSeriesRef.current.overbought) {
-          rsiSeriesRef.current.overbought = chart.addLineSeries({
-            color: "rgba(220, 38, 38, 0.5)",
-            lineWidth: 1,
-            lineStyle: 2,
-            priceLineVisible: false,
-            lastValueVisible: false,
-            priceScaleId: "rsi"
-          });
-        }
-        if (!rsiSeriesRef.current.oversold) {
-          rsiSeriesRef.current.oversold = chart.addLineSeries({
-            color: "rgba(34, 197, 94, 0.5)",
-            lineWidth: 1,
-            lineStyle: 2,
-            priceLineVisible: false,
-            lastValueVisible: false,
-            priceScaleId: "rsi"
-          });
-        }
-
-        rsiSeriesRef.current.overbought.setData(boundsData);
-        rsiSeriesRef.current.oversold.setData(lowerData);
-      }
-
-      // Ajouter le MACD en overlay dans le même chart (plus de panneau séparé)
-      if (showMACD && data.length > 35) {
-        const macdData = calculateMACD(data, 12, 26, 9);
-
-        // Price scale dédiée au MACD, entre le prix et le RSI
-        if (!macdSeriesRef.current.macd) {
-          chart.priceScale("macd").applyOptions({
-            position: "right",
-            scaleMargins: {
-              top: 0.55,
-              bottom: 0.25
-            }
-          });
-
-          macdSeriesRef.current.macd = chart.addLineSeries({
-            color: "#2196f3",
-            lineWidth: 2,
-            priceLineVisible: false,
-            lastValueVisible: false,
-            priceScaleId: "macd"
-          });
-
-          macdSeriesRef.current.signal = chart.addLineSeries({
-            color: "#ff9800",
-            lineWidth: 1,
-            priceLineVisible: false,
-            lastValueVisible: false,
-            priceScaleId: "macd"
-          });
-
-          macdSeriesRef.current.histogram = chart.addHistogramSeries({
-            priceFormat: { type: "price", precision: 5, minMove: 0.00001 },
-            priceScaleId: "macd"
-          });
-
-          macdSeriesRef.current.zeroLine = chart.addLineSeries({
-            color: "rgba(255, 255, 255, 0.3)",
-            lineWidth: 1,
-            lineStyle: 2,
-            priceLineVisible: false,
-            lastValueVisible: false,
-            priceScaleId: "macd"
-          });
-        }
-
-        macdSeriesRef.current.macd.setData(macdData.macd);
-        macdSeriesRef.current.signal.setData(macdData.signal);
-        macdSeriesRef.current.histogram.setData(macdData.histogram);
-        macdSeriesRef.current.zeroLine.setData(
-          macdData.macd.map((d) => ({ time: d.time, value: 0 }))
-        );
       }
 
       // Calculer les statistiques
@@ -1105,19 +745,7 @@ export default function XrplCandleChartRaw({
     // sont volontairement omis car ils sont soit des refs (stables), soit utilisés via closures.
     // Ajouter ces dépendances causerait des re-renders inutiles du chart.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-  pair,
-  interval,
-  showVolume,
-  chartType,
-  showBollinger,
-  showRSI,
-  showMACD,
-  showVWAP,
-  showSMA,
-  showEMA,
-  chartSettings]
-  );
+  }, [pair, interval, chartType, chartSettings]);
 
   // Mettre à jour les séries lorsque les données changent sans recréer le chart
   useEffect(() => {
@@ -1270,31 +898,7 @@ export default function XrplCandleChartRaw({
 
       }
 
-      {/* Container avec barre latérale gauche (masquée sur mobile) */}
       <div className="flex flex-1 min-h-0">
-        <div className="hidden md:block">
-          <IndicatorsToolbar
-            showTooltips={showTooltips}
-            setShowTooltips={setShowTooltips}
-            hideAllIndicators={hideAllIndicators}
-            setHideAllIndicators={setHideAllIndicators}
-            showVolume={showVolume}
-            setShowVolume={setShowVolume}
-            showRSI={showRSI}
-            setShowRSI={setShowRSI}
-            showMACD={showMACD}
-            setShowMACD={setShowMACD}
-            showBollinger={showBollinger}
-            setShowBollinger={setShowBollinger}
-            showVWAP={showVWAP}
-            setShowVWAP={setShowVWAP}
-            showSMA={showSMA}
-            setShowSMA={setShowSMA}
-            showEMA={showEMA}
-            setShowEMA={setShowEMA}
-            isFxMode={isFxMode} />
-
-        </div>
         <ChartCanvas
           chartRef={chartRef}
           statusBar={statusBar}
@@ -1305,7 +909,6 @@ export default function XrplCandleChartRaw({
           interval={interval}
           chartClassName="w-full relative z-0 dex-chart-container"
           watermark={mobileWatermark} />
-
       </div>
 
       {/* Timeframes mobile sous le chart */}

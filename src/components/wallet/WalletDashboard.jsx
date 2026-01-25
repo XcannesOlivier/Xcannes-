@@ -108,6 +108,7 @@ export default function WalletDashboard({
     isConnecting,
     balance,
     isWalletActivated,
+    walletSessionToken,
     refreshBalance,
     connect,
     disconnect,
@@ -1156,7 +1157,7 @@ export default function WalletDashboard({
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isPreviewMode) return;
-    if (!backendWalletAddress) return;
+    if (!backendWalletAddress || !walletSessionToken) return;
 
     const storageKey = `xcannes_wallet_last_incoming:${backendWalletAddress}`;
     try {
@@ -1174,7 +1175,7 @@ export default function WalletDashboard({
         params.set("address", backendWalletAddress);
         params.set("limit", "5");
         const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`), {
-          headers: getWalletSessionHeaders(),
+          headers: getWalletSessionHeaders(walletSessionToken),
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return;
@@ -1244,7 +1245,7 @@ export default function WalletDashboard({
       cancelled = true;
       window.clearInterval(interval);
     };
-  }, [backendWalletAddress, flashWalletHeaderToast, isPreviewMode]);
+  }, [backendWalletAddress, flashWalletHeaderToast, isPreviewMode, walletSessionToken]);
 
   const displayTokensWithCurrencyLines = useMemo(() => {
     return (augmentedTokens || []).map((token) => {

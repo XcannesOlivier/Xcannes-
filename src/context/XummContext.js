@@ -148,6 +148,7 @@ function clearSessionToken() {
 
 export const XummProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");
+  const [walletSessionToken, setWalletSessionTokenState] = useState(() => getSessionToken());
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [balance, setBalance] = useState(null);
@@ -273,9 +274,11 @@ export const XummProvider = ({ children }) => {
       const data = await res.json().catch(() => ({}));
       if (res.ok && active && data.sessionToken) {
         setSessionToken(data.sessionToken);
+        setWalletSessionTokenState(data.sessionToken);
       }
       if (res.ok && !active) {
         clearSessionToken();
+        setWalletSessionTokenState(null);
       }
     } catch (error) {
       console.warn("Wallet session update failed:", error);
@@ -650,6 +653,7 @@ export const XummProvider = ({ children }) => {
     }
     clearPendingConnectUuid();
     clearSessionToken();
+    setWalletSessionTokenState(null);
     updateWallet(null);
   }, [updateWallet, updateWalletSession, wallet]);
 
@@ -680,6 +684,7 @@ export const XummProvider = ({ children }) => {
   return (
     <XummContext.Provider value={{ 
       wallet, 
+      walletSessionToken,
       isConnected, 
       isConnecting,
       balance,

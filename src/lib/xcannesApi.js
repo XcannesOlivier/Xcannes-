@@ -28,7 +28,6 @@ const API_ENDPOINTS = {
   TRADES: '/api/v1/trades',
   KLINES: '/api/v1/klines',
   DEPTH: '/api/v1/depth',
-  INDICATORS: '/api/v1/indicators',
   FX_EOD: '/api/v1/fx/eod',
   FX_CURRENCIES: '/api/v1/fx/currencies',
 };
@@ -232,20 +231,6 @@ class XcannesAPI {
    */
   async getDepth(pair) {
     const result = await this.request(`${API_ENDPOINTS.DEPTH}?pair=${pair}`);
-    return result.success ? result.data : null;
-  }
-
-  /**
-   * Récupérer les indicateurs techniques
-   * @param {string} pair - Format: XCS_XRP
-   * @param {string} interval - Timeframe
-   * @param {string} indicators - Liste séparée par virgules: sma20,ema12,rsi
-   * @returns {Promise<Object>}
-   */
-  async getIndicators(pair, interval = '1h', indicators = "sma20,ema12,rsi") {
-    const result = await this.request(
-      `${API_ENDPOINTS.INDICATORS}?pair=${pair}&interval=${interval}&indicators=${indicators}`
-    );
     return result.success ? result.data : null;
   }
 
