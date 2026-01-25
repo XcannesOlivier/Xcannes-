@@ -263,7 +263,7 @@ class XcannesWebSocket {
 
   /**
    * Écouter un type d'événement
-   * @param {string} eventType - 'ticker', 'orderbook', 'trades', 'connected', 'heartbeat'
+   * @param {string} eventType - 'ticker', 'trades', 'connected', 'heartbeat'
    * @param {Function} callback
    */
   on(eventType, callback) {
@@ -323,7 +323,7 @@ class XcannesWebSocket {
 
   /**
    * S'abonner à un canal pour une paire
-   * @param {string} channel - 'ticker' ou 'orderbook'
+   * @param {string} channel - 'ticker' ou 'trades'
    * @param {string} pair - Format: XCS_XRP
    */
   subscribe(channel, pair) {
@@ -374,7 +374,7 @@ class XcannesWebSocket {
 
   /**
    * Se désabonner d'un canal pour une paire
-   * @param {string} channel - 'ticker' ou 'orderbook'
+   * @param {string} channel - 'ticker' ou 'trades'
    * @param {string} pair - Format: XCS_XRP
    */
   unsubscribe(channel, pair) {

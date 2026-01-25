@@ -658,7 +658,7 @@ export default function WalletDashboardSwapModal({
 
               {previewState.status === "loading" ? (
                 <div className="text-[11px] text-white/50">
-                  {t("ui_loading_orderbook_08e2c6ff6b", "Refreshing orderbook...")}
+                  {t("ui_loading_market_data_1d5d6ed3c4", "Refreshing market data...")}
                 </div>
               ) : null}
 

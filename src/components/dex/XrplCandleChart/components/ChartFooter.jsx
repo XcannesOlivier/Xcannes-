@@ -309,7 +309,7 @@ export default function ChartFooter({ pair, fxMode, fxBase, fxQuote, stats24h: p
   const quoteIcon = getSmartIcon(pairInfo.quote, currencies.quote);
   const baseName = getSmartName(pairInfo.base, currencies.base);
   const quoteName = getSmartName(pairInfo.quote, currencies.quote);
-  // Volume uniquement pour les paires XRPL "pures" (orderbook XRPL),
+  // Volume uniquement pour les paires XRPL "pures" (flux XRPL),
   // pas pour les paires Pyth ou EOD/FX.
   const showVolume = isXrplPair && !actualFxMode && !isPythPair;
 

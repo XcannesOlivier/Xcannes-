@@ -3,7 +3,7 @@
  * Connexion wallet ou signature transaction
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { apiUrl } from "@/lib/runtimeConfig";
 import { useTranslation } from "next-i18next";
@@ -116,7 +116,7 @@ export default function XummQRModal({
   };
   const isMobile = isMobileDevice();
 
-  const resolveXummLinks = () => {
+  const resolveXummLinks = useCallback(() => {
     const raw = deepLink || (uuid ? `https://xumm.app/sign/${uuid}` : "");
     if (!raw) return { appLink: "", webLink: "" };
     const isScheme = /^xumm:\/\//i.test(raw) || /^xaman:\/\//i.test(raw);
@@ -127,9 +127,9 @@ export default function XummQRModal({
     const scheme = /xaman/i.test(raw) ? "xaman://" : "xumm://";
     const appLink = raw.replace(/^https?:\/\//i, scheme);
     return { appLink, webLink: raw };
-  };
+  }, [deepLink, uuid]);
 
-  const openXummApp = ({ allowFallback = true } = {}) => {
+  const openXummApp = useCallback(({ allowFallback = true } = {}) => {
     const { appLink, webLink } = resolveXummLinks();
     if (!appLink) return;
     let didHide = false;
@@ -146,7 +146,7 @@ export default function XummQRModal({
         window.location.href = webLink;
       }, 1500);
     }
-  };
+  }, [resolveXummLinks]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -165,7 +165,7 @@ export default function XummQRModal({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [isOpen, isMobile, uuid, deepLink, type]);
+  }, [isOpen, isMobile, uuid, deepLink, type, openXummApp]);
 
   if (!isOpen) return null;
 
