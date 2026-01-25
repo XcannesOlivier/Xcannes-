@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { getWalletSessionHeaders } from "@/lib/walletSession";
 
 export function usePendingAllocations(address, { signTransaction } = {}) {
   const [pending, setPending] = useState([]);
@@ -38,7 +39,8 @@ export function usePendingAllocations(address, { signTransaction } = {}) {
       setLoading(true);
       setError(null);
       const res = await fetch(
-        apiUrl(`/wallet/pending-allocations?address=${encodeURIComponent(address)}`)
+        apiUrl(`/wallet/pending-allocations?address=${encodeURIComponent(address)}`),
+        { headers: getWalletSessionHeaders() }
       );
       const data = await res.json();
       if (!res.ok) {

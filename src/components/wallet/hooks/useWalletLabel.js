@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { getWalletSessionHeaders } from "@/lib/walletSession";
 import { buildRlusdPaymentTxjson, XCANNES_ACTIVATION_WALLET_ADDRESS } from "@/utils/walletSpread";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 
@@ -51,7 +52,8 @@ export function useWalletLabel({
     setIsWalletLabelLoading(true);
     try {
       const res = await fetch(
-        apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+        apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
+        { headers: getWalletSessionHeaders() }
       );
       const data = await res.json().catch(() => ({}));
       if (token !== loadTokenRef.current) return;

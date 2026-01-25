@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { getWalletSessionHeaders } from "@/lib/walletSession";
 import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";
 import {
   buildCsvString,
@@ -127,7 +128,8 @@ export default function CurrencyStatement({
     const loadLabel = async () => {
       try {
         const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
+          { headers: getWalletSessionHeaders() }
         );
         const data = await res.json();
         if (!res.ok) {
@@ -176,7 +178,9 @@ export default function CurrencyStatement({
       }
       if (cursor) url.searchParams.set("cursor", String(cursor));
 
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), {
+        headers: getWalletSessionHeaders(),
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(
