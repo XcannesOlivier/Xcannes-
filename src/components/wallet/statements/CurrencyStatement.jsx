@@ -6,6 +6,7 @@ import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
+import { useXumm } from "@/context/XummContext";
 import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";
 import {
   buildCsvString,
@@ -61,6 +62,8 @@ export default function CurrencyStatement({
   onClose
 }) {
   const { t, i18n } = useTranslation("common");
+  const xumm = useXumm();
+  const walletSessionToken = xumm?.walletSessionToken || null;
   const locale = i18n?.language || "en";
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
@@ -120,7 +123,7 @@ export default function CurrencyStatement({
 
   useEffect(() => {
     let cancelled = false;
-    if (!walletAddress) {
+    if (!walletAddress || !walletSessionToken) {
       setWalletLabel("");
       return () => {};
     }
@@ -129,7 +132,7 @@ export default function CurrencyStatement({
       try {
         const res = await fetch(
           apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-          { headers: getWalletSessionHeaders() }
+          { headers: getWalletSessionHeaders(walletSessionToken) }
         );
         const data = await res.json();
         if (!res.ok) {
@@ -147,7 +150,7 @@ export default function CurrencyStatement({
     return () => {
       cancelled = true;
     };
-  }, [walletAddress]);
+  }, [walletAddress, walletSessionToken]);
 
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),
@@ -160,9 +163,10 @@ export default function CurrencyStatement({
       typeof backendWalletAddress === "string" &&
       backendWalletAddress.startsWith("r") &&
       backendWalletAddress.length >= 25 &&
-      ["XRP", "RLUSD", "XCS"].includes(normalizedCurrency));
+      ["XRP", "RLUSD", "XCS"].includes(normalizedCurrency) &&
+      Boolean(walletSessionToken));
 
-  }, [backendWalletAddress, normalizedCurrency]);
+  }, [backendWalletAddress, normalizedCurrency, walletSessionToken]);
 
   const fetchXrplPayments = useCallback(
     async ({ cursor, direction } = {}) => {
@@ -179,7 +183,7 @@ export default function CurrencyStatement({
       if (cursor) url.searchParams.set("cursor", String(cursor));
 
       const res = await fetch(url.toString(), {
-        headers: getWalletSessionHeaders(),
+        headers: getWalletSessionHeaders(walletSessionToken),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -189,7 +193,7 @@ export default function CurrencyStatement({
       }
       return data;
     },
-    [backendWalletAddress, normalizedCurrency]
+    [backendWalletAddress, normalizedCurrency, walletSessionToken]
   );
 
   const loadXrplFirstPage = useCallback(async () => {

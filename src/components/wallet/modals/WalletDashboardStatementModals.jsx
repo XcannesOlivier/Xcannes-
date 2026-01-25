@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
+import { useXumm } from "@/context/XummContext";
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
 
@@ -30,6 +31,8 @@ export default function WalletDashboardStatementModals({
   setSelectedStatementToken,
 }) {
   const { t } = useTranslation("common");
+  const xumm = useXumm();
+  const walletSessionToken = xumm?.walletSessionToken || null;
   const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
     const code = String(t?.currency || "").toUpperCase();
     return code === "RLUSD" && !t?.isMissingTrustline;
@@ -49,9 +52,10 @@ export default function WalletDashboardStatementModals({
       typeof window !== "undefined" &&
       typeof backendWalletAddress === "string" &&
       backendWalletAddress.startsWith("r") &&
-      backendWalletAddress.length >= 25
+      backendWalletAddress.length >= 25 &&
+      Boolean(walletSessionToken)
     );
-  }, [backendWalletAddress]);
+  }, [backendWalletAddress, walletSessionToken]);
 
   const [globalMovements, setGlobalMovements] = useState([]);
   const [globalCursorNext, setGlobalCursorNext] = useState(null);
@@ -75,7 +79,7 @@ export default function WalletDashboardStatementModals({
       url.searchParams.set(key, String(value));
     });
     const res = await fetch(url.toString(), {
-      headers: getWalletSessionHeaders(),
+      headers: getWalletSessionHeaders(walletSessionToken),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -88,7 +92,7 @@ export default function WalletDashboardStatementModals({
       );
     }
     return data;
-  }, [t]);
+  }, [t, walletSessionToken]);
 
   const loadGlobalFirstPage = useCallback(async () => {
     if (!canFetchStatements) return;

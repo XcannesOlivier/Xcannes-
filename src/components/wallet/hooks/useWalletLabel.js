@@ -5,6 +5,7 @@ import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
 import { buildRlusdPaymentTxjson, XCANNES_ACTIVATION_WALLET_ADDRESS } from "@/utils/walletSpread";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { useXumm } from "@/context/XummContext";
 
 export function useWalletLabel({
   walletAddress,
@@ -14,6 +15,8 @@ export function useWalletLabel({
   activationDestination = XCANNES_ACTIVATION_WALLET_ADDRESS,
   renameFeeRlusd = 1,
 } = {}) {
+  const xumm = useXumm();
+  const walletSessionToken = xumm?.walletSessionToken || null;
   const [walletLabel, setWalletLabel] = useState(defaultLabel);
   const [walletLabelDraft, setWalletLabelDraft] = useState(defaultLabel);
   const [isEditingWalletLabel, setIsEditingWalletLabel] = useState(false);
@@ -47,13 +50,13 @@ export function useWalletLabel({
   }, [clearToastTimer]);
 
   const loadWalletLabel = useCallback(async () => {
-    if (!isConnected || !walletAddress) return;
+    if (!isConnected || !walletAddress || !walletSessionToken) return;
     const token = ++loadTokenRef.current;
     setIsWalletLabelLoading(true);
     try {
       const res = await fetch(
         apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-        { headers: getWalletSessionHeaders() }
+        { headers: getWalletSessionHeaders(walletSessionToken) }
       );
       const data = await res.json().catch(() => ({}));
       if (token !== loadTokenRef.current) return;
@@ -79,10 +82,10 @@ export function useWalletLabel({
         setIsWalletLabelLoading(false);
       }
     }
-  }, [defaultLabel, flashWalletHeaderToast, isConnected, walletAddress]);
+  }, [defaultLabel, flashWalletHeaderToast, isConnected, walletAddress, walletSessionToken]);
 
   useEffect(() => {
-    if (!isConnected || !walletAddress) {
+    if (!isConnected || !walletAddress || !walletSessionToken) {
       setWalletLabel(defaultLabel);
       setWalletLabelDraft(defaultLabel);
       setIsEditingWalletLabel(false);
@@ -92,7 +95,7 @@ export function useWalletLabel({
       return;
     }
     loadWalletLabel();
-  }, [defaultLabel, isConnected, loadWalletLabel, walletAddress]);
+  }, [defaultLabel, isConnected, loadWalletLabel, walletAddress, walletSessionToken]);
 
   const openWalletLabelEditor = useCallback(() => {
     if (!walletAddress) return;

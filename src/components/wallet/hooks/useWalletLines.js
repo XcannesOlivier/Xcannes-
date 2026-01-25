@@ -1,8 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
+import { useXumm } from "@/context/XummContext";
 
 export function useWalletLines(address, { signTransaction } = {}) {
+  const xumm = useXumm();
+  const walletSessionToken = xumm?.walletSessionToken || null;
   const [lines, setLines] = useState([]);
   const [totalLockedXcs, setTotalLockedXcs] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -27,7 +30,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
   }, [signTransaction]);
 
   const fetchLines = useCallback(async () => {
-    if (!address) {
+    if (!address || !walletSessionToken) {
       setLines([]);
       setTotalLockedXcs(0);
       setLoading(false);
@@ -41,7 +44,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
 
       const res = await fetch(
         apiUrl(`/wallet/lines?address=${encodeURIComponent(address)}`),
-        { headers: getWalletSessionHeaders() }
+        { headers: getWalletSessionHeaders(walletSessionToken) }
       );
       const data = await res.json();
 
@@ -57,7 +60,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
     } finally {
       setLoading(false);
     }
-  }, [address]);
+  }, [address, walletSessionToken]);
 
   const addLine = useCallback(
     async (currencyCode, lockedXcs) => {
@@ -74,6 +77,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...getWalletSessionHeaders(walletSessionToken),
           },
           body: JSON.stringify({
             address,
@@ -97,7 +101,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
         setLoading(false);
       }
     },
-    [address, fetchLines, requestWalletSignature]
+    [address, fetchLines, requestWalletSignature, walletSessionToken]
   );
 
   const removeLine = useCallback(
@@ -115,6 +119,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            ...getWalletSessionHeaders(walletSessionToken),
           },
           body: JSON.stringify({
             address,
@@ -137,7 +142,7 @@ export function useWalletLines(address, { signTransaction } = {}) {
         setLoading(false);
       }
     },
-    [address, fetchLines, requestWalletSignature]
+    [address, fetchLines, requestWalletSignature, walletSessionToken]
   );
 
   useEffect(() => {

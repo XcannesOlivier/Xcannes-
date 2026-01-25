@@ -9,13 +9,11 @@ const componentsRoot = path.join(chartRoot, ".."); // Xcannes-/components
 const requiredFiles = [
   "XrplCandleChartRaw.jsx",
   "index.jsx",
-  "indicators.js",
   "README.md",
   path.join("hooks", "useMarketData.js"),
   path.join("components", "ChartCanvas.jsx"),
   path.join("components", "ChartHeader.jsx"),
   path.join("components", "ChartFooter.jsx"),
-  path.join("components", "IndicatorsToolbar.jsx"),
   path.join("components", "FxPairSelector.jsx"),
 ];
 
@@ -24,7 +22,6 @@ const expectedExports = [
   'export { default as XrplCandleChartRaw } from "./XrplCandleChartRaw";',
   'export { default as ChartHeader } from "./components/ChartHeader";',
   'export { default as ChartFooter } from "./components/ChartFooter";',
-  'export { default as IndicatorsToolbar } from "./components/IndicatorsToolbar";',
   'export { default as FxPairSelector } from "./components/FxPairSelector";',
   'export { default as ChartCanvas } from "./components/ChartCanvas";',
   'export { default as useMarketData } from "./hooks/useMarketData";',

@@ -9,8 +9,8 @@ export function getWalletSessionToken() {
   }
 }
 
-export function getWalletSessionHeaders() {
-  const token = getWalletSessionToken();
+export function getWalletSessionHeaders(tokenOverride) {
+  const token = tokenOverride || getWalletSessionToken();
   if (!token) return {};
   return { "x-wallet-session": token };
 }
