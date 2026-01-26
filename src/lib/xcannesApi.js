@@ -27,7 +27,6 @@ const API_ENDPOINTS = {
   TICKER: '/api/v1/ticker',
   TRADES: '/api/v1/trades',
   KLINES: '/api/v1/klines',
-  DEPTH: '/api/v1/depth',
   FX_EOD: '/api/v1/fx/eod',
   FX_CURRENCIES: '/api/v1/fx/currencies',
 };
@@ -220,30 +219,6 @@ class XcannesAPI {
     // Utiliser uniquement l'endpoint temps réel (données XRPL réelles)
     const result = await this.request(
       `${API_ENDPOINTS.KLINES}?pair=${pair}&interval=${interval}&limit=${limit}`
-    );
-    return result.success ? result.data?.candles || [] : [];
-  }
-
-  /**
-   * Récupérer la profondeur de marché
-   * @param {string} pair - Format: XCS_XRP
-   * @returns {Promise<Object>}
-   */
-  async getDepth(pair) {
-    const result = await this.request(`${API_ENDPOINTS.DEPTH}?pair=${pair}`);
-    return result.success ? result.data : null;
-  }
-
-  /**
-   * Récupérer les données EOD (End of Day) pour forex/Fawaz
-   * @param {string} symbol - Format: EUR_USD
-   * @param {number} limit - Nombre de bougies (default: 30)
-   * @returns {Promise<Array>}
-   */
-  async getEODData(symbol, limit = 30) {
-    const result = await this.request(
-      `${API_ENDPOINTS.FX_EOD}?symbol=${symbol}&limit=${limit}`,
-      { cacheTTL: 60000 } // Cache de 1 minute pour EOD
     );
     return result.success ? result.data?.candles || [] : [];
   }
