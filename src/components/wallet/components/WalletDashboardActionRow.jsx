@@ -4,11 +4,6 @@ import { useTranslation } from "next-i18next";
 export default function WalletDashboardActionRow({
   layout,
   onAction,
-  showKycPanel = false,
-  effectiveIsConnected,
-  walletAddress,
-  kycStatus,
-  onVerifyClick
 }) {
   const { t } = useTranslation("common");
   return (
@@ -107,14 +102,6 @@ export default function WalletDashboardActionRow({
         </button>
       </div>
 
-      {showKycPanel && effectiveIsConnected && walletAddress ?
-      <div className="mt-2">
-          {/*
-           Intentionnellement non affiché par défaut dans WalletDashboard.
-           Si besoin, brancher KYCStatusPanel ici.
-          */}
-        </div> :
-      null}
     </div>);
 
 }

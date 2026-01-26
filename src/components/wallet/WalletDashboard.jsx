@@ -1913,7 +1913,6 @@ export default function WalletDashboard({
         <WalletDashboardActionRow
           layout={layout}
           onAction={handleAction}
-          showKycPanel={false}
         />
 
         {!isPreviewMode && pendingActivationItems.length > 0 ? (
