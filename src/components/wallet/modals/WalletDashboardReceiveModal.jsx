@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { Buffer } from "buffer";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
@@ -32,10 +31,6 @@ export default function WalletDashboardReceiveModal({
   augmentedTokens,
   requestMemo,
   setRequestMemo,
-  requestMethod,
-  setRequestMethod,
-  requestToAddress,
-  setRequestToAddress,
   rlusdPerUnitRates,
   rlusdPerUnitSources,
   onRequestGenerated
@@ -73,7 +68,7 @@ export default function WalletDashboardReceiveModal({
   useEffect(() => {
     setGeneratedRequest(null);
     setGenerateError(null);
-  }, [effectiveWallet, requestAmount, requestCurrency, requestMemo, requestToAddress]);
+  }, [effectiveWallet, requestAmount, requestCurrency, requestMemo]);
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -163,24 +158,6 @@ export default function WalletDashboardReceiveModal({
     if (!generatedRequest) return "";
     try {
       return JSON.stringify(generatedRequest);
-    } catch {
-      return "";
-    }
-  }, [generatedRequest]);
-
-  const requestLink = useMemo(() => {
-    if (!generatedRequest) return "";
-    if (typeof window === "undefined") return "";
-    try {
-      const json = JSON.stringify(generatedRequest);
-      const base64url = Buffer.from(json, "utf8").
-      toString("base64").
-      replace(/\+/g, "-").
-      replace(/\//g, "_").
-      replace(/=+$/g, "");
-      const url = new URL("/pay", window.location.origin);
-      url.searchParams.set("req", base64url);
-      return url.toString();
     } catch {
       return "";
     }
@@ -372,49 +349,6 @@ export default function WalletDashboardReceiveModal({
 
               </div>
 
-              {/* Request Method Selection */}
-              <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-2">{t("ui_send_request_via_19ac1c6506", "Send request via:")}
-
-            </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                type="button"
-                onClick={() => setRequestMethod("qr")}
-                className={`px-3 py-2 text-xs ${
-                requestMethod === "qr" ? greenActionBtnMuted : greenTabInactive
-                }`}>{t("ui_qr_code_7614ee32a0", "📱 QR Code")}
-
-
-              </button>
-                  <button
-                type="button"
-                onClick={() => setRequestMethod("link")}
-                className={`px-3 py-2 text-xs ${
-                requestMethod === "link" ? greenActionBtnMuted : greenTabInactive
-                }`}>{t("ui_link_c2c8a504d7", "🔗 Link")}
-
-
-              </button>
-                </div>
-              </div>
-
-              {/* Conditional: Address for notification */}
-              {requestMethod === "notification" &&
-          <div>
-                  <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_recipient_wallet_address_1724bca6de", "Recipient Wallet Address")}
-
-            </label>
-                  <input
-              type="text"
-              value={requestToAddress}
-              onChange={(e) => setRequestToAddress(e.target.value)}
-              placeholder={t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_ae36b8d4d2", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
-              className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80" />
-
-                </div>
-          }
-
               {/* Generate Button */}
               <SwipeConfirmButton
               label={t("ui_generate_request_58584f23a2", "Generate Request")}
@@ -440,63 +374,33 @@ export default function WalletDashboardReceiveModal({
 
               {!!generatedRequest && !!requestValue &&
           <div className="space-y-3">
-                  {requestMethod === "qr" ?
-            <div className="flex flex-col items-center gap-3">
-                      <div className="bg-black/60 border border-white/10 rounded-xl p-3">
-                        <QRCodeCanvas
-                  value={requestMethod === "qr" && requestLink ? requestLink : requestValue}
-                  size={180}
-                  bgColor="#000000"
-                  fgColor="#ffffff" />
-
-                      </div>
-                      {requestLink ?
-              <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
-                          {requestLink}
-                        </div> :
-
-              <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
-                          {requestValue}
-                        </div>
-              }
-                      <button
-                type="button"
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  try {
-                    await navigator.clipboard.writeText(requestLink || requestValue);
-                  } catch {
-
-                    // ignore
-                  }}}
-                className={`px-4 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_copy_request_32a3f4409b", "Copy request")}
-
-
-              </button>
-                    </div> :
-
-            <div className="space-y-2">
-                      <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
-                        {requestMethod === "link" && requestLink ? requestLink : requestValue}
-                      </div>
-                      <button
-                type="button"
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  try {
-                    await navigator.clipboard.writeText(
-                      requestMethod === "link" && requestLink ? requestLink : requestValue
-                    );
-                  } catch {
-
-                    // ignore
-                  }}}
-                className={`w-full px-4 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_copy_request_32a3f4409b", "Copy request")}
-
-
-              </button>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="bg-black/60 border border-white/10 rounded-xl p-3">
+                      <QRCodeCanvas
+                        value={requestValue}
+                        size={180}
+                        bgColor="#000000"
+                        fgColor="#ffffff"
+                      />
                     </div>
-            }
+                    <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
+                      {requestValue}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await navigator.clipboard.writeText(requestValue);
+                        } catch {
+                          // ignore
+                        }
+                      }}
+                      className={`px-4 py-2 text-xs ${greenActionBtnBase}`}
+                    >
+                      {t("ui_copy_request_32a3f4409b", "Copy request")}
+                    </button>
+                  </div>
                   <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
                     {isFxRequest
                       ? t("ui_request_settlement_note_6a1c9d2f3b", {
@@ -516,26 +420,10 @@ export default function WalletDashboardReceiveModal({
               {/* Info */}
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                 <p className="text-xs text-blue-400">
-                  {requestMethod === "qr" &&
-                    t(
-                      "ui_request_info_qr_4b1c8d2a6f",
-                      "Generate a QR code that can be scanned to pay you."
-                    )}
-                  {requestMethod === "link" &&
-                    t(
-                      "ui_request_info_link_9a2b6c1d4f",
-                      "Create a shareable link for this payment request."
-                    )}
-                  {requestMethod === "xrpl" &&
-                    t(
-                      "ui_request_info_xrpl_2c7b1a9d5e",
-                      "Use XRPL native payment request (Payment Channel)."
-                    )}
-                  {requestMethod === "notification" &&
-                    t(
-                      "ui_request_info_notification_7d1a4c9b2e",
-                      "Send a notification to the specified wallet address."
-                    )}
+                  {t(
+                    "ui_request_info_qr_4b1c8d2a6f",
+                    "Generate a QR code that can be scanned to pay you."
+                  )}
                 </p>
               </div>
             </div>

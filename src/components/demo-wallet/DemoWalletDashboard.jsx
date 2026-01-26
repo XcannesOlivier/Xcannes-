@@ -386,15 +386,10 @@ export default function DemoWalletDashboard({
     setRequestAmount,
     requestCurrency,
     setRequestCurrency,
-    requestMethod,
-    setRequestMethod,
-    requestToAddress,
-    setRequestToAddress,
     requestMemo,
     setRequestMemo
   } = usePaymentRequestForm({
-    defaultCurrency: "RLUSD",
-    defaultMethod: "qr"
+    defaultCurrency: "RLUSD"
   });
 
   const {
@@ -1681,10 +1676,6 @@ export default function DemoWalletDashboard({
         augmentedTokens={augmentedTokens}
         requestMemo={requestMemo}
         setRequestMemo={setRequestMemo}
-        requestMethod={requestMethod}
-        setRequestMethod={setRequestMethod}
-        requestToAddress={requestToAddress}
-        setRequestToAddress={setRequestToAddress}
         rlusdPerUnitRates={rlusdPerUnitRates}
         rlusdPerUnitSources={rlusdPerUnitSources}
         onRequestGenerated={handleDemoRequestGenerated} />

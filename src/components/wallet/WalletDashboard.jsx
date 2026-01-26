@@ -210,10 +210,6 @@ export default function WalletDashboard({
     setRequestAmount,
     requestCurrency,
     setRequestCurrency,
-    requestMethod,
-    setRequestMethod,
-    requestToAddress,
-    setRequestToAddress,
     requestMemo,
     setRequestMemo,
   } = usePaymentRequestForm();
@@ -2092,10 +2088,6 @@ export default function WalletDashboard({
             augmentedTokens={augmentedTokens}
             requestMemo={requestMemo}
             setRequestMemo={setRequestMemo}
-            requestMethod={requestMethod}
-            setRequestMethod={setRequestMethod}
-            requestToAddress={requestToAddress}
-            setRequestToAddress={setRequestToAddress}
             rlusdPerUnitRates={rlusdPerUnitRates}
             rlusdPerUnitSources={rlusdPerUnitSources}
           />
