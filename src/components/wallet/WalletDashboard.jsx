@@ -453,8 +453,7 @@ export default function WalletDashboard({
     loading: pendingAllocationsLoading,
     error: pendingAllocationsError,
     refresh: refreshPendingAllocations,
-    activatePending: activatePendingAllocations,
-  } = usePendingAllocations(backendWalletAddress, { signTransaction });
+  } = usePendingAllocations(backendWalletAddress);
 
   const {
     handleUpsertCurrencyLine: handleUpsertCurrencyLineReal,
@@ -511,7 +510,7 @@ export default function WalletDashboard({
     ? () => {}
     : refreshCurrencyLines;
 
-  const payActivationFee = useCallback(async ({ action, memoPayload } = {}) => {
+  const payActivationFee = useCallback(async ({ action, memoPayload, memoPayloads } = {}) => {
     if (!wallet || !signTransaction) {
       alert("Please connect your Xumm wallet first.");
       return null;
@@ -537,9 +536,16 @@ export default function WalletDashboard({
       return null;
     }
 
+    const payloadList = [];
+    if (Array.isArray(memoPayloads)) {
+      payloadList.push(...memoPayloads);
+    }
     if (memoPayload) {
-      const memos = buildXrplJsonMemo(memoPayload);
-      if (memos) txjson.Memos = memos;
+      payloadList.push(memoPayload);
+    }
+    if (payloadList.length > 0) {
+      const memos = payloadList.flatMap((payload) => buildXrplJsonMemo(payload) || []);
+      if (memos.length > 0) txjson.Memos = memos;
     }
 
     const result = await signTransaction(txjson, { action });
@@ -668,15 +674,21 @@ export default function WalletDashboard({
         return;
       }
 
-      const hasLine = (currencyLines || []).some(
-        (line) => String(line?.currencyCode || "").toUpperCase() === code
-      );
+      const existingLine =
+        (currencyLines || []).find(
+          (line) => String(line?.currencyCode || "").toUpperCase() === code
+        ) || null;
+      const lineIsActive = existingLine ? existingLine.active !== false : false;
+      const needsActivation = !lineIsActive;
       if (!hasOnChainRlusd) {
         alert("RLUSD trustline is not installed yet. Please install it first.");
         return;
       }
 
       const totalRlusd = Number(entry?.totalAmountRlusd ?? 0);
+      if (!Number.isFinite(totalRlusd) || totalRlusd <= 0) {
+        return;
+      }
       const totalDisplay = Number(entry?.totalDisplayAmount ?? NaN);
       const displayCurrency =
         String(entry?.displayCurrencyCode || code).toUpperCase();
@@ -685,7 +697,7 @@ export default function WalletDashboard({
         ? `${formatPendingAmount(totalDisplay)} ${displayCurrency}`
         : `${formatPendingAmount(totalRlusd)} RLUSD`;
 
-      const confirmMessage = hasLine
+      const confirmMessage = !needsActivation
         ? t("ui_pending_payment_apply_prompt_f4", {
             defaultValue:
               "Paiement en attente pour {{currency}}.\nMontant: {{amount}}\n\nCréditer la ligne maintenant ?",
@@ -704,24 +716,32 @@ export default function WalletDashboard({
 
       setPendingActivationCurrency(code);
       try {
-        let activationUuid = null;
-        if (!hasLine) {
-          activationUuid = await payActivationFee({
-            action: "wallet:pending-allocations:activate",
-            memoPayload: {
-              xcannes: "currency_line",
-              schema: "xcannes-currency-line-v1",
-              v: 1,
-              action: "activate",
-              currencyCode: code,
-            },
+        const memoPayloads = [];
+        if (needsActivation) {
+          memoPayloads.push({
+            xcannes: "currency_line",
+            schema: "xcannes-currency-line-v1",
+            v: 1,
+            action: "activate",
+            currencyCode: code,
           });
-          if (!activationUuid) return;
         }
-
-        await activatePendingAllocations?.(code, {
-          xummUuid: activationUuid,
+        memoPayloads.push({
+          xcannes: "allocation_adjust",
+          schema: "xcannes-allocation-v1",
+          v: 1,
+          action: "allocate",
+          currencyCode: code,
+          amountRlusd: totalRlusd,
+          reason: "pending_payreq",
         });
+
+        const activationUuid = await payActivationFee({
+          action: "wallet:pending-allocations:activate",
+          memoPayloads,
+        });
+        if (!activationUuid) return;
+
         await refreshPendingAllocations?.();
         await refreshCurrencyLines?.();
         if (refreshBalance) {
@@ -741,7 +761,6 @@ export default function WalletDashboard({
       }
     },
     [
-      activatePendingAllocations,
       backendWalletAddress,
       currencyLines,
       formatPendingAmount,
@@ -1170,6 +1189,7 @@ export default function WalletDashboard({
         const params = new URLSearchParams();
         params.set("address", backendWalletAddress);
         params.set("limit", "5");
+        params.set("source", "onchain");
         const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`), {
           headers: getWalletSessionHeaders(walletSessionToken),
         });
