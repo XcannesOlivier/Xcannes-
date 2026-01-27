@@ -78,6 +78,7 @@ export default function WalletDashboardStatementModals({
       if (value == null || value === "") return;
       url.searchParams.set(key, String(value));
     });
+    url.searchParams.set("source", "onchain");
     const res = await fetch(url.toString(), {
       headers: getWalletSessionHeaders(walletSessionToken),
     });
