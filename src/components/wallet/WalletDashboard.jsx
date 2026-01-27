@@ -14,7 +14,6 @@ import {
   XCANNES_ACTIVATION_WALLET_ADDRESS,
   XCANNES_SPREAD_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
-	import { useWalletLines } from "./hooks/useWalletLines";
 	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
   import { usePendingAllocations } from "./hooks/usePendingAllocations";
 	import { useConvertForm } from "./hooks/useConvertForm";
@@ -30,7 +29,6 @@ import { useSwapConversion } from "./hooks/useSwapConversion";
 import { useSwapDemoLines } from "./hooks/useSwapDemoLines";
 import { useWalletTokens } from "./hooks/useWalletTokens";
 import { useRlusdPerUnitRates } from "./hooks/useRlusdPerUnitRates";
-import { useTrustlinesForm } from "./hooks/useTrustlinesForm";
 import { useUsdTotalLabel } from "./hooks/useUsdTotalLabel";
 import { useWalletMeta } from "./hooks/useWalletMeta";
 import { useXrplConnectionIndicator } from "./hooks/useXrplConnectionIndicator";
@@ -47,8 +45,6 @@ import WalletDashboardReceiveModal from "./modals/WalletDashboardReceiveModal";
 import WalletDashboardSendModal from "./modals/WalletDashboardSendModal";
 import WalletDashboardStatementModals from "./modals/WalletDashboardStatementModals";
 import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
-import WalletDashboardTrustlineCurrencyModal from "./modals/WalletDashboardTrustlineCurrencyModal";
-import WalletDashboardTrustlinesModal from "./modals/WalletDashboardTrustlinesModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
@@ -73,18 +69,6 @@ const WALLET_LABEL_FEE_RLUSD = (() => {
     process.env.NEXT_PUBLIC_WALLET_LABEL_FEE_RLUSD || ""
   );
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_WALLET_LABEL_FEE_RLUSD;
-})();
-
-const DEFAULT_MIN_LOCKED_XCS = 0.2;
-const MIN_LOCKED_XCS = (() => {
-  const raw = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_LINE_MIN_LOCKED_XCS || ""
-  );
-  if (Number.isFinite(raw) && raw > 0) return raw;
-  const fallback = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_XCS || ""
-  );
-  return Number.isFinite(fallback) && fallback > 0 ? fallback : DEFAULT_MIN_LOCKED_XCS;
 })();
 
 export default function WalletDashboard({
@@ -126,7 +110,7 @@ export default function WalletDashboard({
     : wallet;
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | 'trustlines' | null
+  const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | null
   const [pendingActivationCurrency, setPendingActivationCurrency] = useState(null);
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
@@ -215,16 +199,6 @@ export default function WalletDashboard({
   } = usePaymentRequestForm();
   
   const [selectedWallet, setSelectedWallet] = useState("");
-  const {
-    trustlineCode,
-    setTrustlineCode,
-    trustlineLocked,
-    setTrustlineLocked,
-    editingTrustlineCurrency,
-    setEditingTrustlineCurrency,
-    editingTrustlineLocked,
-    setEditingTrustlineLocked,
-  } = useTrustlinesForm();
   const {
     convertBaseCurrency,
     setConvertBaseCurrency,
@@ -427,16 +401,8 @@ export default function WalletDashboard({
     return tokens;
   }, [baseTokens, xrpAmount, isPreviewMode, demoLines]);
 
-  // Trustlines (panneau avancé)
+  // Adresse backend (session API)
   const backendWalletAddress = isPreviewMode ? null : effectiveWallet || null;
-  const {
-    lines: walletLines,
-    totalLockedXcs,
-    loading: walletLinesLoading,
-    error: walletLinesError,
-    addLine,
-    removeLine,
-  } = useWalletLines(backendWalletAddress, { signTransaction });
 
   const {
     lines: currencyLines,
@@ -950,51 +916,6 @@ export default function WalletDashboard({
     setTimeout(() => setIsRefreshing(false), 800);
   };
 
-  const openTrustlineEditor = (currency) => {
-    const code = String(currency || "").toUpperCase();
-    if (!code) return;
-    const existingLine =
-      (walletLines || []).find(
-        (line) => String(line.currencyCode || "").toUpperCase() === code
-      ) || null;
-    setEditingTrustlineCurrency(code);
-    setEditingTrustlineLocked(
-      existingLine && Number.isFinite(Number(existingLine.lockedXcs))
-        ? String(existingLine.lockedXcs)
-        : ""
-    );
-    setActiveAction("trustlineCurrency");
-  };
-
-  const handleSaveTrustlineCurrency = async () => {
-    const code = String(editingTrustlineCurrency || "").toUpperCase();
-    if (!code) return;
-    const locked = Number(editingTrustlineLocked || "0");
-    if (!Number.isFinite(locked) || locked < MIN_LOCKED_XCS) {
-      alert(`Enter a locked XCS amount >= ${MIN_LOCKED_XCS}.`);
-      return;
-    }
-    await addLine(code, locked);
-    setActiveAction(null);
-    setEditingTrustlineCurrency(null);
-    setEditingTrustlineLocked("");
-  };
-
-  const handleRemoveTrustlineCurrency = async () => {
-    const code = String(editingTrustlineCurrency || "").toUpperCase();
-    if (!code) return;
-    await removeLine(code);
-    setActiveAction(null);
-    setEditingTrustlineCurrency(null);
-    setEditingTrustlineLocked("");
-  };
-
-  const handleCloseTrustlineEditor = () => {
-    setActiveAction(null);
-    setEditingTrustlineCurrency(null);
-    setEditingTrustlineLocked("");
-  };
-
   const handleInstallRequiredTrustline = useCallback(
     async (currencyCode) => {
       const code = String(currencyCode || "").toUpperCase();
@@ -1065,7 +986,7 @@ export default function WalletDashboard({
     augmentedTokens,
     allocatedRlusdByCurrency,
     swapCurrencyOptions,
-  } = useWalletTokens({ displayTokens, walletLines, currencyLines });
+  } = useWalletTokens({ displayTokens, currencyLines });
 
   const selectLabelByAssetKey = useMemo(() => {
     const labels = {};
@@ -1149,10 +1070,6 @@ export default function WalletDashboard({
 
   const currencyLineCodes = useMemo(() => {
     const codes = new Set();
-    (walletLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      if (code) codes.add(code);
-    });
     (currencyLines || []).forEach((line) => {
       const code = String(line?.currencyCode || "").toUpperCase();
       if (code) codes.add(code);
@@ -1160,7 +1077,7 @@ export default function WalletDashboard({
     // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
     ["XRP", "XCS", "RLUSD"].forEach((c) => codes.delete(c));
     return Array.from(codes);
-  }, [currencyLines, walletLines]);
+  }, [currencyLines]);
 
   const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
     useRlusdPerUnitRates(currencyLineCodes);
@@ -1839,22 +1756,6 @@ export default function WalletDashboard({
     connect();
   };
 
-  const handleAddTrustline = async () => {
-    const code = (trustlineCode || "").trim().toUpperCase();
-    if (!code) {
-      alert("Enter a currency code (ex: XCS)");
-      return;
-    }
-    const locked = Number(trustlineLocked || "0");
-    if (!Number.isFinite(locked) || locked < MIN_LOCKED_XCS) {
-      alert(`Enter a locked XCS amount >= ${MIN_LOCKED_XCS}.`);
-      return;
-    }
-    await addLine(code, locked);
-    setTrustlineCode("");
-    setTrustlineLocked("");
-  };
-
   useEffect(() => {
     setSelectedWallet(wallet || "");
   }, [wallet]);
@@ -1895,14 +1796,6 @@ export default function WalletDashboard({
 
   useOverflowLock(!!activeAction);
 
-  const currentEditingLine =
-    editingTrustlineCurrency &&
-    (walletLines || []).find(
-      (line) =>
-        String(line.currencyCode || "").toUpperCase() ===
-        String(editingTrustlineCurrency || "").toUpperCase()
-    );
-
   return (
     <>
       <div className={`flex flex-col bg-elevated h-full min-h-0 ${layout.containerClass}`}>
@@ -1929,7 +1822,7 @@ export default function WalletDashboard({
           onCancelWalletLabel={handleCancelWalletLabel}
         />
 
-        {/* Action row: Send / Receive / Exchange / Buy / Trustlines */}
+        {/* Action row: Send / Receive / Exchange / Buy */}
         <WalletDashboardActionRow
           layout={layout}
           onAction={handleAction}
@@ -2170,35 +2063,6 @@ export default function WalletDashboard({
 	        walletAddress={effectiveWallet || ""}
 	      />
 
-	      <WalletDashboardTrustlineCurrencyModal
-	        open={activeAction === "trustlineCurrency" && !!editingTrustlineCurrency}
-	        onClose={handleCloseTrustlineEditor}
-          isPreviewMode={isPreviewMode}
-	        editingTrustlineCurrency={editingTrustlineCurrency}
-	        currentEditingLine={currentEditingLine}
-	        editingTrustlineLocked={editingTrustlineLocked}
-	        setEditingTrustlineLocked={setEditingTrustlineLocked}
-	        handleSaveTrustlineCurrency={handleSaveTrustlineCurrency}
-	        handleRemoveTrustlineCurrency={handleRemoveTrustlineCurrency}
-          minLockedXcs={MIN_LOCKED_XCS}
-	      />
-
-	      <WalletDashboardTrustlinesModal
-	        open={activeAction === "trustlines"}
-	        onClose={() => setActiveAction(null)}
-          isPreviewMode={isPreviewMode}
-	        trustlineCode={trustlineCode}
-	        setTrustlineCode={setTrustlineCode}
-	        trustlineLocked={trustlineLocked}
-	        setTrustlineLocked={setTrustlineLocked}
-        handleAddTrustline={handleAddTrustline}
-        walletLinesLoading={walletLinesLoading}
-        walletLinesError={walletLinesError}
-        walletLines={walletLines}
-        totalLockedXcs={totalLockedXcs}
-        openTrustlineEditor={openTrustlineEditor}
-        minLockedXcs={MIN_LOCKED_XCS}
-      />
         </>,
         document.body
       )}
