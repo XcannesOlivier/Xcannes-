@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
+export function useWalletTokens({ displayTokens, currencyLines }) {
   const allocatedRlusdByCurrency = useMemo(() => {
     const map = new Map();
     (currencyLines || []).forEach((line) => {
@@ -22,18 +22,6 @@ export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
       if (!byCurrency.has(code)) {
         byCurrency.set(code, { ...token, currency: code });
       }
-    });
-
-    (walletLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      if (!code || byCurrency.has(code)) return;
-      byCurrency.set(code, {
-        key: `TL:${code}`,
-        currency: code,
-        issuer: "Trustline",
-        value: 0,
-        isTrustlineOnly: true,
-      });
     });
 
     (currencyLines || []).forEach((line) => {
@@ -58,7 +46,7 @@ export function useWalletTokens({ displayTokens, walletLines, currencyLines }) {
     });
 
     return withAllocations;
-  }, [allocatedRlusdByCurrency, currencyLines, displayTokens, walletLines]);
+  }, [allocatedRlusdByCurrency, currencyLines, displayTokens]);
 
   const walletCurrencyOptions = useMemo(() => {
     const seen = new Set();
