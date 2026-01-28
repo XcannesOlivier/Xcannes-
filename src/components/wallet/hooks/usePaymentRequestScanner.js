@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { Buffer } from "buffer";
+import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
 
 export function usePaymentRequestScanner({
   augmentedTokens,
@@ -110,6 +111,12 @@ export function usePaymentRequestScanner({
           const fxRate = request.fxRate ?? null;
           const fxSource = request.fxSource ?? null;
           const memo = request.memo ?? null;
+          const beneficiaryLabel =
+            request.beneficiaryLabel ??
+            request.beneficiaryName ??
+            request.beneficiary ??
+            request.walletLabel ??
+            null;
 
           if (isXcannesPayReq && targetCurrency) {
             const matchingToken = (augmentedTokens || []).find(
@@ -138,7 +145,7 @@ export function usePaymentRequestScanner({
 
             setSendDestination?.(request.to);
             setSendPaymentRequest?.({
-              schema: "xcannes-payreq-v1",
+              schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
               to: request.to,
               targetCurrencyCode: targetCurrency || null,
               displayAmount:
@@ -149,6 +156,8 @@ export function usePaymentRequestScanner({
               fxRate: fxRate != null ? Number(fxRate) : null,
               fxSource: fxSource != null ? String(fxSource) : null,
               memo: memo != null ? String(memo) : null,
+              beneficiaryLabel:
+                beneficiaryLabel != null ? String(beneficiaryLabel) : null,
             });
             setSendTab?.("manual");
             setPaymentRequestScannerOpen(false);
@@ -195,6 +204,12 @@ export function usePaymentRequestScanner({
         const fxRate = request.fxRate ?? null;
         const fxSource = request.fxSource ?? null;
         const memo = request.memo ?? null;
+        const beneficiaryLabel =
+          request.beneficiaryLabel ??
+          request.beneficiaryName ??
+          request.beneficiary ??
+          request.walletLabel ??
+          null;
 
         if (isXcannesPayReq && targetCurrency) {
           const matchingToken = (augmentedTokens || []).find(
@@ -221,7 +236,7 @@ export function usePaymentRequestScanner({
 
           setSendDestination?.(request.to);
           setSendPaymentRequest?.({
-            schema: "xcannes-payreq-v1",
+            schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
             to: request.to,
             targetCurrencyCode: targetCurrency || null,
             displayAmount:
@@ -231,6 +246,8 @@ export function usePaymentRequestScanner({
             fxRate: fxRate != null ? Number(fxRate) : null,
             fxSource: fxSource != null ? String(fxSource) : null,
             memo: memo != null ? String(memo) : null,
+            beneficiaryLabel:
+              beneficiaryLabel != null ? String(beneficiaryLabel) : null,
           });
           setSendTab?.("manual");
           setPaymentRequestScannerOpen(false);

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
 import { buildRlusdPaymentTxjson, XCANNES_ACTIVATION_WALLET_ADDRESS } from "@/utils/walletSpread";
-import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { buildXrplJsonMemo, buildWalletLabelMemo } from "@/utils/xrplMemo";
 import { useXumm } from "@/context/XummContext";
 
 export function useWalletLabel({
@@ -107,8 +107,16 @@ export function useWalletLabel({
     if (!walletAddress) return;
     const trimmed = String(walletLabelDraft || "").trim();
     const words = trimmed.split(/\s+/).filter(Boolean);
-    if (words.length < 1 || words.length > 2) {
-      flashWalletHeaderToast("Nom du wallet: 1 ou 2 mots max.", 2200);
+    const wordPattern = /^\p{L}+$/u;
+    const isValid =
+      words.length >= 1 &&
+      words.length <= 2 &&
+      words.every((word) => word.length <= 6 && wordPattern.test(word));
+    if (!isValid) {
+      flashWalletHeaderToast(
+        "Nom du wallet: 1 ou 2 mots, 6 lettres max par mot, lettres uniquement.",
+        2600
+      );
       return;
     }
     if (trimmed === walletLabel) {
@@ -143,14 +151,17 @@ export function useWalletLabel({
       return;
     }
 
-    const memoPayload = {
-      xcannes: "wallet_label",
-      schema: "xcannes-wallet-label-v1",
-      v: 1,
-      label: trimmed,
-    };
+    const memoPayload = buildWalletLabelMemo({ label: trimmed });
+    if (!memoPayload) {
+      flashWalletHeaderToast("Invalid wallet label memo.", 2000);
+      return;
+    }
     const memos = buildXrplJsonMemo(memoPayload);
-    if (memos) txjson.Memos = memos;
+    if (!memos) {
+      flashWalletHeaderToast("Invalid wallet label memo.", 2000);
+      return;
+    }
+    txjson.Memos = memos;
 
     const result = await signTransaction(txjson, { action: "wallet:label" });
     if (!result?.signed) {

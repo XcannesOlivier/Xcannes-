@@ -24,6 +24,7 @@ export default function WalletDashboardSendModal({
   setSendAssetKey,
   sendAmount,
   setSendAmount,
+  sendPaymentRequest,
   selectLabelByAssetKey,
   selectLabelRightByAssetKey,
   selectIconByAssetKey,
@@ -54,6 +55,17 @@ export default function WalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination]
   );
+  const showCalculatedAmountLabel = useMemo(() => {
+    if (!sendPaymentRequest || !selectedSendToken) return false;
+    const target = String(sendPaymentRequest?.targetCurrencyCode || "")
+      .trim()
+      .toUpperCase();
+    const selectedCurrency = String(selectedSendToken?.currency || "")
+      .trim()
+      .toUpperCase();
+    if (!target || !selectedCurrency) return false;
+    return target !== selectedCurrency;
+  }, [sendPaymentRequest, selectedSendToken]);
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
       (addr) => addr.address === normalizedDestination
@@ -242,14 +254,27 @@ export default function WalletDashboardSendModal({
                   </p>
             }
               </div>
+              {sendPaymentRequest?.beneficiaryLabel ?
+                <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+                  <span className="text-white/70">{t("ui_beneficiary_label", "Bénéficiaire")}:</span>{" "}
+                  <span className="font-semibold">{String(sendPaymentRequest.beneficiaryLabel)}</span>
+                </div> :
+                null}
               <div>
-                <label
-                  className="block text-[11px] md:text-xs text-white/60 mb-1"
-                  title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
-                >
-                  {t("ui_amount_52cea2dd3d", "Amount")}
+                <div className="flex items-center justify-between">
+                  <label
+                    className="block text-[11px] md:text-xs text-white/60 mb-1"
+                    title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
+                  >
+                    {t("ui_amount_52cea2dd3d", "Amount")}
 
-            </label>
+                  </label>
+                  {showCalculatedAmountLabel ?
+                    <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
+                      {t("ui_calculated_amount_label", "Montant calculé")}
+                    </span> :
+                    null}
+                </div>
               <TokenAmountInput
               value={sendAmount}
               onChange={setSendAmount}

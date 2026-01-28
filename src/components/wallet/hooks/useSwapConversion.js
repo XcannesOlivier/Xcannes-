@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { buildXrplJsonMemo, buildConversionMemo } from "@/utils/xrplMemo";
 import {
   buildRlusdPaymentTxjson,
   computeSpreadQuote,
@@ -422,10 +422,7 @@ export function useSwapConversion({
         return;
       }
 
-      const memoPayload = {
-        xcannes: "conversion",
-        schema: "xcannes-convert-v1",
-        v: 1,
+      const memoPayload = buildConversionMemo({
         base,
         quote,
         amountBase,
@@ -436,7 +433,10 @@ export function useSwapConversion({
         fxSource: fxSource || null,
         spreadRlusd: spreadFee > 0 ? spreadFee : null,
         spreadTier: spread?.tier || null,
-      };
+      });
+      if (!memoPayload) {
+        throw new Error("Invalid conversion memo payload");
+      }
 
       const txjson = buildRlusdPaymentTxjson({
         account: walletAddress,

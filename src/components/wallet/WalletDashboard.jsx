@@ -45,7 +45,7 @@ import WalletDashboardSendModal from "./modals/WalletDashboardSendModal";
 import WalletDashboardStatementModals from "./modals/WalletDashboardStatementModals";
 import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
-import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { buildCurrencyLineMemo, buildPayreqMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
   getCurrencyFlag,
@@ -501,7 +501,19 @@ export default function WalletDashboard({
       payloadList.push(memoPayload);
     }
     if (payloadList.length > 0) {
-      const memos = payloadList.flatMap((payload) => buildXrplJsonMemo(payload) || []);
+      const memos = [];
+      for (const payload of payloadList) {
+        if (!payload) {
+          alert("Invalid memo payload.");
+          return null;
+        }
+        const built = buildXrplJsonMemo(payload);
+        if (!built) {
+          alert("Invalid memo payload.");
+          return null;
+        }
+        memos.push(...built);
+      }
       if (memos.length > 0) txjson.Memos = memos;
     }
 
@@ -558,13 +570,14 @@ export default function WalletDashboard({
         return false;
       }
 
-      const memoPayload = {
-        xcannes: "currency_line",
-        schema: "xcannes-currency-line-v1",
-        v: 1,
+      const memoPayload = buildCurrencyLineMemo({
         action: "activate",
         currencyCode,
-      };
+      });
+      if (!memoPayload) {
+        alert("Invalid currency line memo.");
+        return false;
+      }
       const xummUuid = await payActivationFee({
         action: "wallet:currency-lines:upsert",
         memoPayload,
@@ -737,15 +750,17 @@ export default function WalletDashboard({
       const ok = confirm(`Supprimer la ligne ${currencyCode} ?`);
       if (!ok) return false;
 
+      const deleteMemo = buildCurrencyLineMemo({
+        action: "delete",
+        currencyCode,
+      });
+      if (!deleteMemo) {
+        alert("Invalid currency line memo.");
+        return false;
+      }
       const xummUuid = await payActivationFee({
         action: "wallet:currency-lines:delete",
-        memoPayload: {
-          xcannes: "currency_line",
-          schema: "xcannes-currency-line-v1",
-          v: 1,
-          action: "delete",
-          currencyCode,
-        },
+        memoPayload: deleteMemo,
       });
       if (!xummUuid) return false;
 
@@ -1144,6 +1159,68 @@ export default function WalletDashboard({
     sendAmount,
   ]);
 
+  useEffect(() => {
+    if (!sendPaymentRequest || !selectedSendToken) return;
+    const requestedRlusd = Number(sendPaymentRequest?.amountRlusd);
+    if (!Number.isFinite(requestedRlusd) || requestedRlusd <= 0) return;
+
+    const targetCurrency = String(sendPaymentRequest?.targetCurrencyCode || "")
+      .trim()
+      .toUpperCase();
+    const selectedCurrency = String(selectedSendToken?.currency || "").toUpperCase();
+    if (!selectedCurrency) return;
+
+    const demoLine = isPreviewMode ? demoLines?.[selectedCurrency] : null;
+    const demoUnits = Number(demoLine?.units || 0);
+    const demoRlusd = Number(demoLine?.rlusd || 0);
+    const demoPerUnit =
+      Number.isFinite(demoUnits) && demoUnits > 0 && Number.isFinite(demoRlusd) && demoRlusd > 0
+        ? demoRlusd / demoUnits
+        : null;
+
+    const rawRate = Number(rlusdPerUnitRates?.[selectedCurrency]);
+    const fallbackRate =
+      isPreviewMode && Number.isFinite(demoPerUnit) && demoPerUnit > 0
+        ? demoPerUnit
+        : Number.isFinite(rawRate) && rawRate > 0
+          ? rawRate
+          : Number.NaN;
+
+    let nextAmount = null;
+
+    if (selectedCurrency === "RLUSD") {
+      nextAmount = requestedRlusd;
+    } else if (targetCurrency && selectedCurrency === targetCurrency) {
+      const displayAmount = Number(sendPaymentRequest?.displayAmount);
+      if (Number.isFinite(displayAmount) && displayAmount > 0) {
+        nextAmount = displayAmount;
+      } else {
+        const requestedFxRate = Number(sendPaymentRequest?.fxRate);
+        const rate =
+          Number.isFinite(requestedFxRate) && requestedFxRate > 0 ? requestedFxRate : fallbackRate;
+        if (Number.isFinite(rate) && rate > 0) {
+          nextAmount = requestedRlusd / rate;
+        }
+      }
+    } else {
+      if (Number.isFinite(fallbackRate) && fallbackRate > 0) {
+        nextAmount = requestedRlusd / fallbackRate;
+      }
+    }
+
+    if (!Number.isFinite(nextAmount) || nextAmount <= 0) return;
+
+    const formatted = nextAmount.toFixed(6).replace(/\.?0+$/, "");
+    setSendAmount(formatted);
+  }, [
+    demoLines,
+    isPreviewMode,
+    rlusdPerUnitRates,
+    sendPaymentRequest,
+    selectedSendToken,
+    setSendAmount,
+  ]);
+
   const {
     qrScannerOpen,
     setQrScannerOpen,
@@ -1246,13 +1323,6 @@ export default function WalletDashboard({
         )
           .trim()
           .toUpperCase();
-        if (requestTargetCurrency && requestTargetCurrency !== currency) {
-          alert(
-            `Cette demande est libellée en ${requestTargetCurrency}.\n` +
-              `Veuillez sélectionner ${requestTargetCurrency} comme devise d’envoi.`
-          );
-          return { ok: false };
-        }
 
         const requestedFxRate =
           sendPaymentRequest?.fxRate != null
@@ -1260,9 +1330,11 @@ export default function WalletDashboard({
             : Number.NaN;
 
         const rawRate = Number(rlusdPerUnitRates?.[currency]);
-        const effectiveRate = Number.isFinite(requestedFxRate) && requestedFxRate > 0
-          ? requestedFxRate
-          : rawRate;
+        const effectiveRate =
+          requestTargetCurrency && requestTargetCurrency === currency &&
+          Number.isFinite(requestedFxRate) && requestedFxRate > 0
+            ? requestedFxRate
+            : rawRate;
 
         const rlusdPerUnit = isPreviewMode
           ? demoPerUnit || 1
@@ -1274,12 +1346,31 @@ export default function WalletDashboard({
           return { ok: false };
         }
 
-        const paymentRlusd = amountNum * rlusdPerUnit;
-        if (
+        const requestedRlusd =
           sendPaymentRequest?.amountRlusd != null &&
           Number.isFinite(Number(sendPaymentRequest.amountRlusd))
-        ) {
-          const requestedRlusd = Number(sendPaymentRequest.amountRlusd);
+            ? Number(sendPaymentRequest.amountRlusd)
+            : null;
+
+        let paymentRlusd = amountNum * rlusdPerUnit;
+        let effectiveAmountNum = amountNum;
+        let isAlternateCurrency = false;
+
+        if (requestTargetCurrency && requestTargetCurrency !== currency) {
+          if (!Number.isFinite(requestedRlusd) || requestedRlusd <= 0) {
+            alert("Montant RLUSD demandé manquant pour cette demande.");
+            return { ok: false };
+          }
+          isAlternateCurrency = true;
+          paymentRlusd = requestedRlusd;
+          effectiveAmountNum = paymentRlusd / rlusdPerUnit;
+          if (!Number.isFinite(effectiveAmountNum) || effectiveAmountNum <= 0) {
+            alert("Impossible de calculer le montant dans la devise sélectionnée.");
+            return { ok: false };
+          }
+        }
+
+        if (Number.isFinite(requestedRlusd)) {
           const diff = Math.abs(paymentRlusd - requestedRlusd);
           if (diff > Math.max(0.01, requestedRlusd * 0.005)) {
             alert(
@@ -1318,9 +1409,24 @@ export default function WalletDashboard({
           return { ok: false };
         }
 
+        const requestedDisplayAmount =
+          sendPaymentRequest?.displayAmount ??
+          (Number.isFinite(requestedRlusd) &&
+          Number.isFinite(Number(sendPaymentRequest?.fxRate)) &&
+          Number(sendPaymentRequest?.fxRate) > 0
+            ? requestedRlusd / Number(sendPaymentRequest.fxRate)
+            : null);
+        const requestedDisplayCurrency =
+          sendPaymentRequest?.displayCurrency || requestTargetCurrency || null;
+
         const ok = confirm(
           `Paiement en RLUSD (affiché en ${currency}).\n\n` +
-            `Montant: ${amountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
+            (isAlternateCurrency && requestedDisplayCurrency
+              ? `Demande: ${requestedDisplayAmount != null
+                  ? Number(requestedDisplayAmount).toLocaleString("en-US", { maximumFractionDigits: 6 })
+                  : "-"} ${requestedDisplayCurrency}\n`
+              : "") +
+            `Montant: ${effectiveAmountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
             `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n` +
             (spreadFeeRlusd > 0
               ? `Spread XCANNES (tier ${spread?.tier || "A"}): ≈ ${spreadFeeRlusd.toLocaleString("en-US", {
@@ -1340,7 +1446,7 @@ export default function WalletDashboard({
           // Demo: simulate 2 signatures + update demoLines balance.
           const currentLine = demoLines?.[currency] || null;
           const availableUnits = Number(currentLine?.units || 0);
-          if (availableUnits + 1e-9 < amountNum) {
+          if (availableUnits + 1e-9 < effectiveAmountNum) {
             alert(
               `Solde démo insuffisant en ${currency}. Disponible: ${availableUnits.toLocaleString("en-US", {
                 maximumFractionDigits: 6,
@@ -1364,7 +1470,7 @@ export default function WalletDashboard({
           setDemoLines((prev) => {
             const next = { ...prev };
             const line = next[currency] || { currency, rlusd: 0, units: 0, rate: 0 };
-            const newUnits = Math.max(0, Number(line.units || 0) - amountNum);
+            const newUnits = Math.max(0, Number(line.units || 0) - effectiveAmountNum);
             const newRlusd = Math.max(0, Number(line.rlusd || 0) - totalDebitRlusd);
             next[currency] = {
               ...line,
@@ -1399,10 +1505,7 @@ export default function WalletDashboard({
           if (!spreadTx) {
             throw new Error("Invalid RLUSD spread payment");
           }
-          const spreadMemoPayload = {
-            xcannes: "payreq",
-            schema: "xcannes-payreq-v1",
-            v: 1,
+          const spreadMemoPayload = buildPayreqMemo({
             origin: "spread",
             targetCurrencyCode: currency,
             displayAmount: spreadFeeRlusd,
@@ -1411,9 +1514,15 @@ export default function WalletDashboard({
             fxRate: rlusdPerUnit,
             fxSource,
             note: "spread",
-          };
+          });
+          if (!spreadMemoPayload) {
+            throw new Error("Invalid spread memo payload");
+          }
           const spreadMemos = buildXrplJsonMemo(spreadMemoPayload);
-          if (spreadMemos) spreadTx.Memos = spreadMemos;
+          if (!spreadMemos) {
+            throw new Error("Invalid spread memo");
+          }
+          spreadTx.Memos = spreadMemos;
 
           const spreadResult = await signTransaction(spreadTx, {
             action: "wallet:convert",
@@ -1434,21 +1543,34 @@ export default function WalletDashboard({
           throw new Error("Invalid RLUSD payment");
         }
 
-        const memoPayload = {
-          xcannes: "payreq",
-          schema: "xcannes-payreq-v1",
-          v: 1,
+        const targetCurrencyForMemo = sendPaymentRequest?.targetCurrencyCode
+          ? requestTargetCurrency || currency
+          : currency;
+        const displayAmountForMemo = sendPaymentRequest
+          ? sendPaymentRequest?.displayAmount ?? effectiveAmountNum
+          : effectiveAmountNum;
+        const displayCurrencyForMemo = sendPaymentRequest
+          ? sendPaymentRequest?.displayCurrency ?? targetCurrencyForMemo ?? currency
+          : currency;
+
+        const memoPayload = buildPayreqMemo({
           origin: sendPaymentRequest ? "payreq" : "manual",
-          targetCurrencyCode: currency,
-          displayAmount: amountNum,
-          displayCurrencyCode: currency,
+          targetCurrencyCode: targetCurrencyForMemo,
+          displayAmount: displayAmountForMemo,
+          displayCurrencyCode: displayCurrencyForMemo,
           amountRlusd: paymentRlusd,
           fxRate: rlusdPerUnit,
           fxSource,
           note: sendPaymentRequest?.memo || null,
-        };
+        });
+        if (!memoPayload) {
+          throw new Error("Invalid payment memo payload");
+        }
         const memos = buildXrplJsonMemo(memoPayload);
-        if (memos) payTx.Memos = memos;
+        if (!memos) {
+          throw new Error("Invalid payment memo");
+        }
+        payTx.Memos = memos;
 
         const payResult = await signTransaction(payTx, {
           action: "wallet:convert",
@@ -1534,10 +1656,7 @@ export default function WalletDashboard({
         const target = String(sendPaymentRequest.targetCurrencyCode || "")
           .trim()
           .toUpperCase();
-        const memoPayload = {
-          xcannes: "payreq",
-          schema: "xcannes-payreq-v1",
-          v: 1,
+        const memoPayload = buildPayreqMemo({
           origin: "payreq",
           targetCurrencyCode: target || null,
           displayAmount: sendPaymentRequest?.displayAmount ?? null,
@@ -1546,9 +1665,15 @@ export default function WalletDashboard({
           fxRate: sendPaymentRequest?.fxRate ?? null,
           fxSource: sendPaymentRequest?.fxSource ?? null,
           note: sendPaymentRequest?.memo || null,
-        };
+        });
+        if (!memoPayload) {
+          throw new Error("Invalid payreq memo payload");
+        }
         const memos = buildXrplJsonMemo(memoPayload);
-        if (memos) txjson.Memos = memos;
+        if (!memos) {
+          throw new Error("Invalid payreq memo");
+        }
+        txjson.Memos = memos;
       }
 
       const result = await signTransaction(txjson);
@@ -1719,6 +1844,7 @@ export default function WalletDashboard({
             setSendAssetKey={setSendAssetKey}
             sendAmount={sendAmount}
             setSendAmount={setSendAmount}
+            sendPaymentRequest={sendPaymentRequest}
             selectLabelByAssetKey={selectLabelByAssetKey}
             selectLabelRightByAssetKey={selectLabelRightByAssetKey}
             selectIconByAssetKey={selectIconByAssetKey}
@@ -1755,6 +1881,7 @@ export default function WalletDashboard({
             setRequestMemo={setRequestMemo}
             rlusdPerUnitRates={rlusdPerUnitRates}
             rlusdPerUnitSources={rlusdPerUnitSources}
+            walletLabel={walletLabel}
           />
 
             <WalletDashboardSwapModal

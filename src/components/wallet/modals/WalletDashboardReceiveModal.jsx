@@ -7,6 +7,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
+import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
 
 export default function WalletDashboardReceiveModal({
   open,
@@ -33,6 +34,7 @@ export default function WalletDashboardReceiveModal({
   setRequestMemo,
   rlusdPerUnitRates,
   rlusdPerUnitSources,
+  walletLabel,
   onRequestGenerated
 }) {
   const { t } = useTranslation("common");
@@ -136,8 +138,9 @@ export default function WalletDashboardReceiveModal({
           : null;
     const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
+    const beneficiaryLabel = String(walletLabel || "").trim() || null;
     const req = {
-      schema: "xcannes-payreq-v1",
+      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
       to: effectiveWallet,
       targetCurrency: targetCurrencyUpper,
       displayAmount: amount,
@@ -147,6 +150,7 @@ export default function WalletDashboardReceiveModal({
       fxSource,
       issuer,
       memo: requestMemo || "",
+      beneficiaryLabel,
       createdAt: new Date().toISOString()
     };
 
