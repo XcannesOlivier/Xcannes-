@@ -35,6 +35,9 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   i18n,
+  experimental: {
+    externalDir: true,
+  },
 
   // ✅ Optimisation des images
   images: {
