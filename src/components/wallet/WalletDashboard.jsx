@@ -45,7 +45,7 @@ import WalletDashboardSendModal from "./modals/WalletDashboardSendModal";
 import WalletDashboardStatementModals from "./modals/WalletDashboardStatementModals";
 import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
-import { buildCurrencyLineMemo, buildPayreqMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
   getCurrencyFlag,
@@ -69,6 +69,37 @@ const WALLET_LABEL_FEE_RLUSD = (() => {
   );
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_WALLET_LABEL_FEE_RLUSD;
 })();
+
+const MOONPAY_SELL_WALLETS = new Set(
+  String(process.env.NEXT_PUBLIC_MOONPAY_WALLETS || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+);
+
+const isMoonpaySellDestination = (address) => {
+  const dest = String(address || "").trim();
+  return dest && MOONPAY_SELL_WALLETS.has(dest);
+};
+
+const buildMoonpaySellMemos = (destination, { currency, amount, amountRlusd } = {}) => {
+  if (!isMoonpaySellDestination(destination)) return null;
+  const payload = buildMoonpayMemo({
+    side: "sell",
+    provider: "moonpay",
+    currencyCode: currency || null,
+    amount: Number.isFinite(Number(amount)) ? Number(amount) : null,
+    amountRlusd: Number.isFinite(Number(amountRlusd)) ? Number(amountRlusd) : null,
+  });
+  if (!payload) return null;
+  return buildXrplJsonMemo(payload);
+};
+
+const appendMemos = (txjson, extraMemos) => {
+  if (!txjson || !Array.isArray(extraMemos) || extraMemos.length === 0) return;
+  const existing = Array.isArray(txjson.Memos) ? txjson.Memos : [];
+  txjson.Memos = [...existing, ...extraMemos];
+};
 
 export default function WalletDashboard({
   preview = false,
@@ -1571,6 +1602,14 @@ export default function WalletDashboard({
           throw new Error("Invalid payment memo");
         }
         payTx.Memos = memos;
+        appendMemos(
+          payTx,
+          buildMoonpaySellMemos(dest, {
+            currency,
+            amount: effectiveAmountNum,
+            amountRlusd: paymentRlusd,
+          })
+        );
 
         const payResult = await signTransaction(payTx, {
           action: "wallet:convert",
@@ -1675,6 +1714,15 @@ export default function WalletDashboard({
         }
         txjson.Memos = memos;
       }
+
+      appendMemos(
+        txjson,
+        buildMoonpaySellMemos(dest, {
+          currency,
+          amount: amountNum,
+          amountRlusd: currency === "RLUSD" ? amountNum : null,
+        })
+      );
 
       const result = await signTransaction(txjson);
       if (result && result.signed) {

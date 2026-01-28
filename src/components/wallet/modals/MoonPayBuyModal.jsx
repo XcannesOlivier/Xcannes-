@@ -8,6 +8,21 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
+const MOONPAY_TAG_XRP = Number.parseInt(
+  process.env.NEXT_PUBLIC_MOONPAY_TAG_XRP || "589",
+  10
+);
+const MOONPAY_TAG_RLUSD = Number.parseInt(
+  process.env.NEXT_PUBLIC_MOONPAY_TAG_RLUSD || "590",
+  10
+);
+
+const resolveMoonpayTag = (currencyCode) => {
+  const code = String(currencyCode || "").trim().toUpperCase();
+  if (code === "XRP") return Number.isFinite(MOONPAY_TAG_XRP) ? MOONPAY_TAG_XRP : null;
+  if (code === "RLUSD") return Number.isFinite(MOONPAY_TAG_RLUSD) ? MOONPAY_TAG_RLUSD : null;
+  return null;
+};
 
 const isTrustedMoonPayOrigin = (origin) => {
   try {
@@ -237,6 +252,7 @@ const MoonPayBuyModal = ({
 
       setStep('loading');
 
+      const walletAddressTag = resolveMoonpayTag(currency);
       const response = await fetch('/api/moonpay/generate-buy-url', {
         method: 'POST',
         headers: {
@@ -248,7 +264,8 @@ const MoonPayBuyModal = ({
           baseCurrencyCode: fiatCurrency,
           baseCurrencyAmount: amountType === 'fiat' ? parseFloat(amount) : undefined,
           quoteCurrencyAmount: amountType === 'crypto' ? parseFloat(amount) : undefined,
-          xummUuid
+          xummUuid,
+          options: walletAddressTag != null ? { walletAddressTag } : undefined
         })
       });
 
