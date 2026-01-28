@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Buffer } from "buffer";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
@@ -29,7 +30,77 @@ const USD_STABLECOINS = [
 "USDP",
 "GUSD"];
 const HIGHLIGHT_DURATION_MS = 5000;
-const XRPL_HISTORY_DAYS = 365;
+const XRPL_HISTORY_MONTHS = 13;
+const MOONPAY_TAG_XRP = Number.parseInt(
+  process.env.NEXT_PUBLIC_MOONPAY_TAG_XRP || "589",
+  10
+);
+const MOONPAY_TAG_RLUSD = Number.parseInt(
+  process.env.NEXT_PUBLIC_MOONPAY_TAG_RLUSD || "590",
+  10
+);
+
+const computeSinceMonthsAgoIso = (months) => {
+  const date = new Date();
+  date.setMonth(date.getMonth() - months);
+  return date.toISOString();
+};
+
+const resolveMoonpayBuyTag = (currencyCode) => {
+  const code = String(currencyCode || "").trim().toUpperCase();
+  if (code === "XRP") return Number.isFinite(MOONPAY_TAG_XRP) ? MOONPAY_TAG_XRP : null;
+  if (code === "RLUSD") return Number.isFinite(MOONPAY_TAG_RLUSD) ? MOONPAY_TAG_RLUSD : null;
+  return null;
+};
+
+const decodeHexToUtf8 = (hex) => {
+  const raw = String(hex || "").trim();
+  if (!raw) return "";
+  if (!/^[0-9A-Fa-f]+$/.test(raw) || raw.length % 2 !== 0) return "";
+  try {
+    return Buffer.from(raw, "hex").toString("utf8");
+  } catch {
+    return "";
+  }
+};
+
+const extractMoonpayMemoDetails = (memos) => {
+  const list = Array.isArray(memos) ? memos : [];
+  for (const entry of list) {
+    const memo = entry?.Memo || entry?.memo || null;
+    if (!memo?.MemoData) continue;
+    const text = decodeHexToUtf8(memo.MemoData).trim();
+    if (!text.startsWith("{") || !text.endsWith("}")) continue;
+    try {
+      const payload = JSON.parse(text);
+      if (!payload || typeof payload !== "object") continue;
+      const xcannesType = String(payload?.xcannes || "").trim().toLowerCase();
+      const schema = String(payload?.schema || "").trim().toLowerCase();
+      if (xcannesType !== "moonpay" && !schema.includes("moonpay")) continue;
+      const side = String(payload?.side || "").trim().toLowerCase();
+      const currencyCode = String(payload?.currencyCode || payload?.currency || "")
+        .trim()
+        .toUpperCase();
+      const amount =
+        payload?.amount != null && Number.isFinite(Number(payload.amount))
+          ? Number(payload.amount)
+          : null;
+      const amountRlusd =
+        payload?.amountRlusd != null && Number.isFinite(Number(payload.amountRlusd))
+          ? Number(payload.amountRlusd)
+          : null;
+      return {
+        side,
+        currencyCode: currencyCode || null,
+        amount,
+        amountRlusd,
+      };
+    } catch {
+      continue;
+    }
+  }
+  return null;
+};
 
 
 /**
@@ -174,7 +245,7 @@ export default function CurrencyStatement({
       url.searchParams.set("address", backendWalletAddress);
       url.searchParams.set("currencyCode", normalizedCurrency);
       url.searchParams.set("limit", "100");
-      url.searchParams.set("days", String(XRPL_HISTORY_DAYS));
+      url.searchParams.set("since", computeSinceMonthsAgoIso(XRPL_HISTORY_MONTHS));
 
       const dir = String(direction || "").trim().toLowerCase();
       if (dir === "send" || dir === "receive") {
@@ -411,6 +482,48 @@ export default function CurrencyStatement({
     return true;
   });
 
+  const transactionsWithDisplayBalance = useMemo(() => {
+    const list = (filteredTransactions || []).map((tx) => ({ ...tx }));
+    const currentDisplayBalance = Number.isFinite(Number(balance))
+      ? Number(balance)
+      : null;
+    let displayBalance = currentDisplayBalance;
+    let stopDisplayBalance = false;
+
+    for (const tx of list) {
+      if (stopDisplayBalance) continue;
+      const kind = String(tx?.kind || "").trim().toUpperCase();
+      const displayAmount = Number(tx?.displayAmount ?? tx?.amount ?? NaN);
+      const displayCurrency = String(
+        tx?.displayCurrencyCode || normalizedCurrency || ""
+      )
+        .trim()
+        .toUpperCase();
+      const isMoonpay = kind === "MOONPAY_BUY" || kind === "MOONPAY_SELL";
+      const hasDisplay =
+        isMoonpay &&
+        Number.isFinite(displayBalance) &&
+        Number.isFinite(displayAmount) &&
+        displayAmount > 0 &&
+        displayCurrency &&
+        displayCurrency === normalizedCurrency;
+      if (!hasDisplay) continue;
+
+      if (kind === "MOONPAY_BUY") {
+        tx.displayRunningBalance = displayBalance;
+        const delta = Math.abs(displayAmount);
+        displayBalance -= delta;
+        continue;
+      }
+
+      if (kind === "MOONPAY_SELL") {
+        stopDisplayBalance = true;
+      }
+    }
+
+    return list;
+  }, [filteredTransactions, balance, normalizedCurrency]);
+
   useEffect(() => {
     if (!highlightedTransactionId || ledgerTab !== "statement") return;
     const node = highlightRowRef.current;
@@ -464,13 +577,15 @@ export default function CurrencyStatement({
 
   const statementHashInput = useMemo(() => {
     const safeBalance = Number.isFinite(Number(balance)) ? Number(balance) : 0;
-    const txPayload = (filteredTransactions || []).map((tx) => ({
+    const txPayload = (transactionsWithDisplayBalance || []).map((tx) => ({
       date: tx?.date || "",
       type: tx?.type || "",
       category: tx?.category || "",
       description: tx?.description || "",
       amount: Number.isFinite(Number(tx?.amount)) ? Number(tx.amount) : 0,
-      runningBalance: Number.isFinite(Number(tx?.runningBalance))
+      runningBalance: Number.isFinite(Number(tx?.displayRunningBalance))
+        ? Number(tx.displayRunningBalance)
+        : Number.isFinite(Number(tx?.runningBalance))
         ? Number(tx.runningBalance)
         : 0,
       counterparty: tx?.counterparty || "",
@@ -489,7 +604,7 @@ export default function CurrencyStatement({
   balance,
   currentPeriod,
   fallbackPeriod,
-  filteredTransactions,
+  transactionsWithDisplayBalance,
   normalizedCurrency,
   walletAddress]);
 
@@ -800,7 +915,7 @@ export default function CurrencyStatement({
     const typeLabel = t("ui_type_label_8b1a4d2c7e", "Type");
     const amountLabel = `${t("ui_amount_0bb3c64b1d", "Amount")} (${normalizedCurrency})`;
     const balanceLabel = `${t("ui_balance_label_7f2a1b9c5e", "Balance")} (${normalizedCurrency})`;
-    const rowsHtml = (filteredTransactions || []).map((tx) => {
+    const rowsHtml = (transactionsWithDisplayBalance || []).map((tx) => {
       const isDebit = tx?.type === "debit";
       const txType = isDebit ?
       t("ui_debit_0f7c2a1b9e", "Debit") :
@@ -814,7 +929,11 @@ export default function CurrencyStatement({
           <td>${escapeHtml(fullDescription)}</td>
           <td>${escapeHtml(txType)}</td>
           <td class="right">${escapeHtml(`${isDebit ? "-" : "+"}${formatAmount(tx?.amount)}`)}</td>
-          <td class="right">${escapeHtml(formatAmount(tx?.runningBalance))}</td>
+          <td class="right">${escapeHtml(
+            formatAmount(
+              tx?.displayRunningBalance != null ? tx.displayRunningBalance : tx?.runningBalance
+            )
+          )}</td>
         </tr>
       `;
     }).join("");
@@ -858,7 +977,7 @@ export default function CurrencyStatement({
   currentPeriod,
   docHash,
   fallbackPeriod,
-  filteredTransactions,
+  transactionsWithDisplayBalance,
   formatDate,
   formatAmount,
   ledgerLastIndex,
@@ -923,13 +1042,17 @@ export default function CurrencyStatement({
       "ledger_status",
       "ledger_index",
       "doc_hash"];
-      const rows = (filteredTransactions || []).map((tx) => ([
+      const rows = (transactionsWithDisplayBalance || []).map((tx) => ([
         tx?.date || "",
         tx?.type || "",
         tx?.category || "",
         tx?.description || "",
         Number.isFinite(Number(tx?.amount)) ? Number(tx.amount) : "",
-        Number.isFinite(Number(tx?.runningBalance)) ? Number(tx.runningBalance) : "",
+        Number.isFinite(Number(tx?.displayRunningBalance))
+          ? Number(tx.displayRunningBalance)
+          : Number.isFinite(Number(tx?.runningBalance))
+          ? Number(tx.runningBalance)
+          : "",
         Number.isFinite(Number(balance)) ? Number(balance) : "",
         tx?.counterparty || "",
         normalizedCurrency || "",
@@ -949,7 +1072,7 @@ export default function CurrencyStatement({
   }, [
   balance,
   docHash,
-  filteredTransactions,
+  transactionsWithDisplayBalance,
   ledgerLastIndex,
   ledgerStatus,
   normalizedCurrency]);
@@ -1376,6 +1499,38 @@ export default function CurrencyStatement({
                   const payReq = extractXcannesPayReqFromMemos(p?.memos);
                   const credited =
                   payReq?.targetCurrencyCode || payReq?.targetCurrency || null;
+                  const moonpayMemo = extractMoonpayMemoDetails(p?.memos);
+                  const moonpayTag = resolveMoonpayBuyTag(normalizedCurrency);
+                  const destinationTag = Number.isFinite(Number(p?.destinationTag))
+                    ? Number(p.destinationTag)
+                    : null;
+                  const isMoonpayBuy =
+                    !isSend &&
+                    Number.isFinite(moonpayTag) &&
+                    Number.isFinite(destinationTag) &&
+                    destinationTag === moonpayTag;
+                  const moonpayBuyAmountLabel = isMoonpayBuy
+                    ? (() => {
+                        if (Number.isFinite(amount) && amount > 0) {
+                          return `+${amount.toLocaleString(locale, { maximumFractionDigits: 8 })} ${normalizedCurrency}`;
+                        }
+                        return null;
+                      })()
+                    : null;
+                  const isMoonpaySell = isSend && moonpayMemo?.side === "sell";
+                  const moonpaySellAmountLabel = isMoonpaySell
+                    ? (() => {
+                        const memoAmount = Number(moonpayMemo?.amount ?? null);
+                        const memoCurrency = String(moonpayMemo?.currencyCode || "").trim().toUpperCase();
+                        if (Number.isFinite(memoAmount) && memoAmount > 0 && memoCurrency) {
+                          return `-${memoAmount.toLocaleString(locale, { maximumFractionDigits: 8 })} ${memoCurrency}`;
+                        }
+                        if (Number.isFinite(amount) && amount > 0) {
+                          return `-${amount.toLocaleString(locale, { maximumFractionDigits: 8 })} ${normalizedCurrency}`;
+                        }
+                        return null;
+                      })()
+                    : null;
                   const desc = isSend ?
                   t("demo_stmt_desc_send", "Send") :
                   t("demo_stmt_desc_receive", "Receive");
@@ -1414,6 +1569,16 @@ export default function CurrencyStatement({
                                     {String(credited).toUpperCase()}
                                   </div> :
                           null}
+                                {isMoonpayBuy ?
+                          <div className="text-[10px] text-emerald-300/80">
+                                    MoonPay buy{moonpayBuyAmountLabel ? ` · ${moonpayBuyAmountLabel}` : ""}
+                                  </div> :
+                          null}
+                                {isMoonpaySell ?
+                          <div className="text-[10px] text-amber-300/80">
+                                    MoonPay sell{moonpaySellAmountLabel ? ` · ${moonpaySellAmountLabel}` : ""}
+                                  </div> :
+                          null}
                               </div>
                             </td>
                             <td className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${isSend ? "text-red-400" : "text-green-400"}`}>
@@ -1447,14 +1612,14 @@ export default function CurrencyStatement({
 
                   </td>
                     </tr> :
-                filteredTransactions.length === 0 ?
+                transactionsWithDisplayBalance.length === 0 ?
                 <tr>
                       <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_no_transactions_found_af217af8de", "No transactions found")}
 
                   </td>
                     </tr> :
 
-                filteredTransactions.map((tx, idx) => {
+                transactionsWithDisplayBalance.map((tx, idx) => {
                   const icon = getTransactionIcon(tx.category);
                   const transactionId = tx?.id || null;
                   const isHighlighted =
@@ -1496,7 +1661,11 @@ export default function CurrencyStatement({
                             {tx.type === "debit" ? "−" : "+"}{formatAmount(tx.amount)}
                           </td>
                           <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                            {formatAmount(tx.runningBalance)}
+                            {formatAmount(
+                              tx?.displayRunningBalance != null
+                                ? tx.displayRunningBalance
+                                : tx.runningBalance
+                            )}
                           </td>
                         </tr>);
 
