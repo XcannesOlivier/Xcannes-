@@ -15,7 +15,6 @@ import {
   XCANNES_SPREAD_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
-  import { usePendingAllocations } from "./hooks/usePendingAllocations";
 	import { useConvertForm } from "./hooks/useConvertForm";
 	import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
 import { useCurrencyLinesActions } from "./hooks/useCurrencyLinesActions";
@@ -111,7 +110,6 @@ export default function WalletDashboard({
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | null
-  const [pendingActivationCurrency, setPendingActivationCurrency] = useState(null);
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
   const { receiveTab, setReceiveTab } = useReceiveForm();
@@ -415,13 +413,6 @@ export default function WalletDashboard({
   } = useWalletCurrencyLines(backendWalletAddress, { signTransaction });
 
   const {
-    pending: pendingAllocations,
-    loading: pendingAllocationsLoading,
-    error: pendingAllocationsError,
-    refresh: refreshPendingAllocations,
-  } = usePendingAllocations(backendWalletAddress);
-
-  const {
     handleUpsertCurrencyLine: handleUpsertCurrencyLineReal,
   } =
     useCurrencyLinesActions({
@@ -598,149 +589,6 @@ export default function WalletDashboard({
     ]
   );
 
-  const pendingActivationItems = useMemo(() => {
-    if (isPreviewMode) return [];
-    return (pendingAllocations || []).filter(
-      (entry) => Number(entry?.totalAmountRlusd || 0) > 0
-    );
-  }, [isPreviewMode, pendingAllocations]);
-
-  const formatPendingAmount = useCallback((value, digits = 6) => {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return "0";
-    return num.toLocaleString("en-US", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: digits,
-    });
-  }, []);
-
-  const handleActivatePendingAllocation = useCallback(
-    async (currencyCode) => {
-      if (isPreviewMode) return;
-      if (!backendWalletAddress) {
-        alert("Please connect your Xumm wallet first.");
-        return;
-      }
-
-      const code = String(currencyCode || "").trim().toUpperCase();
-      if (!code) return;
-
-      const entry =
-        (pendingAllocations || []).find(
-          (item) => String(item?.currencyCode || "").toUpperCase() === code
-        ) || null;
-      if (!entry) return;
-
-      if (isWalletActivated === false) {
-        alert(
-          t("ui_wallet_activation_required_f4", {
-            defaultValue: "Wallet must be activated to create currency lines.",
-          })
-        );
-        return;
-      }
-
-      const existingLine =
-        (currencyLines || []).find(
-          (line) => String(line?.currencyCode || "").toUpperCase() === code
-        ) || null;
-      const lineIsActive = existingLine ? existingLine.active !== false : false;
-      const needsActivation = !lineIsActive;
-      if (!hasOnChainRlusd) {
-        alert("RLUSD trustline is not installed yet. Please install it first.");
-        return;
-      }
-
-      const totalRlusd = Number(entry?.totalAmountRlusd ?? 0);
-      if (!Number.isFinite(totalRlusd) || totalRlusd <= 0) {
-        return;
-      }
-      const totalDisplay = Number(entry?.totalDisplayAmount ?? NaN);
-      const displayCurrency =
-        String(entry?.displayCurrencyCode || code).toUpperCase();
-
-      const amountLabel = Number.isFinite(totalDisplay)
-        ? `${formatPendingAmount(totalDisplay)} ${displayCurrency}`
-        : `${formatPendingAmount(totalRlusd)} RLUSD`;
-
-      const confirmMessage = !needsActivation
-        ? t("ui_pending_payment_apply_prompt_f4", {
-            defaultValue:
-              "Paiement en attente pour {{currency}}.\nMontant: {{amount}}\n\nCréditer la ligne maintenant ?",
-            currency: code,
-            amount: amountLabel,
-          })
-        : t("ui_pending_payment_activate_prompt_f4", {
-            defaultValue:
-              "Vous avez reçu un paiement en {{currency}}, mais cette devise n'est pas encore activée.\nMontant: {{amount}}\n\nActiver la devise pour créditer le paiement ?",
-            currency: code,
-            amount: amountLabel,
-          });
-
-      const ok = confirm(confirmMessage);
-      if (!ok) return;
-
-      setPendingActivationCurrency(code);
-      try {
-        const memoPayloads = [];
-        if (needsActivation) {
-          memoPayloads.push({
-            xcannes: "currency_line",
-            schema: "xcannes-currency-line-v1",
-            v: 1,
-            action: "activate",
-            currencyCode: code,
-          });
-        }
-        memoPayloads.push({
-          xcannes: "allocation_adjust",
-          schema: "xcannes-allocation-v1",
-          v: 1,
-          action: "allocate",
-          currencyCode: code,
-          amountRlusd: totalRlusd,
-          reason: "pending_payreq",
-        });
-
-        const activationUuid = await payActivationFee({
-          action: "wallet:pending-allocations:activate",
-          memoPayloads,
-        });
-        if (!activationUuid) return;
-
-        await refreshPendingAllocations?.();
-        await refreshCurrencyLines?.();
-        if (refreshBalance) {
-          setTimeout(() => refreshBalance(), 1500);
-        }
-      } catch (err) {
-        console.error("[pending-allocations] activate failed:", err);
-        alert(
-          t("ui_pending_payment_activate_failed_f4", {
-            defaultValue:
-              "Impossible de créditer la devise pour le moment. {{message}}",
-            message: err?.message || String(err),
-          })
-        );
-      } finally {
-        setPendingActivationCurrency(null);
-      }
-    },
-    [
-      backendWalletAddress,
-      currencyLines,
-      formatPendingAmount,
-      hasOnChainRlusd,
-      isWalletActivated,
-      isPreviewMode,
-      payActivationFee,
-      pendingAllocations,
-      refreshBalance,
-      refreshCurrencyLines,
-      refreshPendingAllocations,
-      t,
-    ]
-  );
 
   // Ouvrir le convert (swap modal) depuis d'autres briques UI.
   // Event detail:
@@ -1827,101 +1675,6 @@ export default function WalletDashboard({
           layout={layout}
           onAction={handleAction}
         />
-
-        {!isPreviewMode && pendingActivationItems.length > 0 ? (
-          <div className="px-3 py-2 border-b border-white/5 space-y-2">
-            <div className="text-[11px] text-amber-200/90 font-semibold">
-              {t(
-                "ui_pending_currency_activation_title_f4",
-                "Paiements reçus sur une devise non activée"
-              )}
-            </div>
-            {pendingAllocationsLoading ? (
-              <div className="text-[11px] text-white/50">
-                {t(
-                  "ui_pending_currency_activation_loading_f4",
-                  "Chargement des paiements en attente..."
-                )}
-              </div>
-            ) : null}
-            {pendingAllocationsError ? (
-              <div className="text-[11px] text-red-300">
-                {pendingAllocationsError}
-              </div>
-            ) : null}
-            {!pendingAllocationsLoading && !pendingAllocationsError ? (
-              <div className="space-y-2">
-                {pendingActivationItems.map((entry) => {
-                  const code = String(entry?.currencyCode || "").toUpperCase();
-                  if (!code) return null;
-                  const hasLine = (currencyLines || []).some(
-                    (line) =>
-                      String(line?.currencyCode || "").toUpperCase() === code
-                  );
-                  const totalRlusd = Number(entry?.totalAmountRlusd ?? 0);
-                  const totalDisplay = Number(entry?.totalDisplayAmount ?? NaN);
-                  const displayCurrency = String(
-                    entry?.displayCurrencyCode || code
-                  ).toUpperCase();
-                  const amountLabel = Number.isFinite(totalDisplay)
-                    ? `${formatPendingAmount(totalDisplay)} ${displayCurrency}`
-                    : `${formatPendingAmount(totalRlusd)} RLUSD`;
-                  const countLabel =
-                    Number(entry?.count || 0) > 1
-                      ? t("ui_pending_payment_count_f4", {
-                          defaultValue: "{{count}} paiements",
-                          count: entry.count,
-                        })
-                      : t("ui_pending_payment_count_single_f4", "1 paiement");
-
-                  return (
-                    <div
-                      key={code}
-                      className="flex items-start justify-between gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2"
-                    >
-                      <div className="min-w-0">
-                        <div className="text-[11px] text-amber-100 font-semibold">
-                          {hasLine
-                            ? t("ui_pending_payment_line_active_f4", {
-                                defaultValue:
-                                  "Paiement en attente sur {{currency}}.",
-                                currency: code,
-                              })
-                            : t("ui_pending_payment_line_missing_f4", {
-                                defaultValue:
-                                  "Devise {{currency}} non activée.",
-                                currency: code,
-                              })}
-                        </div>
-                        <div className="text-[10px] text-amber-100/70">
-                          {amountLabel} · {countLabel}
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleActivatePendingAllocation(code);
-                        }}
-                        disabled={
-                          pendingActivationCurrency === code ||
-                          !effectiveIsConnected
-                        }
-                        className="px-2.5 py-1.5 rounded-md bg-amber-300/80 hover:bg-amber-300 text-black text-[11px] font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {pendingActivationCurrency === code
-                          ? t("ui_processing_37a63f1b12", "Processing...")
-                          : hasLine
-                            ? t("ui_apply_pending_payment_f4", "Créditer")
-                            : t("ui_activate_currency_f4", "Activer")}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
 
         {/* Token list */}
         <div className="flex-1 flex flex-col min-h-0">
