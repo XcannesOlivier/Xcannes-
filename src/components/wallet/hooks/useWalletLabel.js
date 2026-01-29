@@ -10,6 +10,9 @@ import { useXumm } from "@/context/XummContext";
 export function useWalletLabel({
   walletAddress,
   isConnected,
+  isPreviewMode = false,
+  isWalletActivated = null,
+  hasOnChainRlusd = null,
   defaultLabel = "",
   signTransaction,
   activationDestination = XCANNES_ACTIVATION_WALLET_ADDRESS,
@@ -124,8 +127,33 @@ export function useWalletLabel({
       return;
     }
 
+    if (isPreviewMode) {
+      setWalletLabel(trimmed);
+      setWalletLabelDraft(trimmed);
+      setIsEditingWalletLabel(false);
+      setIsWalletLabelRequired(false);
+      flashWalletHeaderToast("Nom enregistré", 1600);
+      return;
+    }
+
     if (!isConnected || !signTransaction) {
       flashWalletHeaderToast("Connect wallet to rename.", 2000);
+      return;
+    }
+
+    if (isWalletActivated === false) {
+      flashWalletHeaderToast(
+        "Wallet must be activated to rename.",
+        2200
+      );
+      return;
+    }
+
+    if (hasOnChainRlusd === false) {
+      flashWalletHeaderToast(
+        "RLUSD trustline is not installed yet.",
+        2200
+      );
       return;
     }
 
@@ -178,7 +206,10 @@ export function useWalletLabel({
   }, [
     activationDestination,
     flashWalletHeaderToast,
+    hasOnChainRlusd,
     isConnected,
+    isPreviewMode,
+    isWalletActivated,
     loadWalletLabel,
     renameFeeRlusd,
     signTransaction,
