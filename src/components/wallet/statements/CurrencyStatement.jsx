@@ -7,6 +7,8 @@ import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
+import wsClient from "@/lib/xcannesWebSocket";
+import { getCachedStatement, setCachedStatement } from "@/lib/walletStatementCache";
 import { useXumm } from "@/context/XummContext";
 import { extractXcannesPayReqFromMemos } from "@/utils/xrplMemo";
 import {
@@ -298,6 +300,10 @@ export default function CurrencyStatement({
       }
       if (cursor) url.searchParams.set("cursor", String(cursor));
 
+      const cacheKey = url.toString();
+      const cached = getCachedStatement(cacheKey);
+      if (cached) return cached;
+
       const res = await fetch(url.toString(), {
         headers: getWalletSessionHeaders(walletSessionToken),
       });
@@ -307,24 +313,22 @@ export default function CurrencyStatement({
           data?.error || `XRPL payments request failed (${res.status})`
         );
       }
+      setCachedStatement(cacheKey, data);
       return data;
     },
     [backendWalletAddress, normalizedCurrency, walletSessionToken]
   );
 
-  const loadXrplFirstPage = useCallback(async () => {
+  const refreshXrplFirstPage = useCallback(async ({ silent } = {}) => {
     if (!canFetchXrplPayments) return;
-    setXrplLoading(true);
+    if (!silent) setXrplLoading(true);
     setXrplError(null);
-    setXrplPayments([]);
-    setXrplHasMore(false);
-    setXrplCursorNext(null);
 
     try {
       const dir =
-      xrplDirection === "send" || xrplDirection === "receive" ?
-      xrplDirection :
-      null;
+        xrplDirection === "send" || xrplDirection === "receive"
+          ? xrplDirection
+          : null;
       const data = await fetchXrplPayments({ direction: dir });
       setXrplPayments(Array.isArray(data?.payments) ? data.payments : []);
       setXrplHasMore(Boolean(data?.hasMore));
@@ -338,13 +342,26 @@ export default function CurrencyStatement({
             "Failed to load XRPL payments."
           )
       );
-      setXrplPayments([]);
-      setXrplHasMore(false);
-      setXrplCursorNext(null);
+      if (!silent) {
+        setXrplPayments([]);
+        setXrplHasMore(false);
+        setXrplCursorNext(null);
+      }
     } finally {
-      setXrplLoading(false);
+      if (!silent) setXrplLoading(false);
     }
-  }, [canFetchXrplPayments, fetchXrplPayments, xrplDirection, t]);
+  }, [canFetchXrplPayments, fetchXrplPayments, t, xrplDirection]);
+
+  const loadXrplFirstPage = useCallback(async () => {
+    if (!canFetchXrplPayments) return;
+    setXrplLoading(true);
+    setXrplError(null);
+    setXrplPayments([]);
+    setXrplHasMore(false);
+    setXrplCursorNext(null);
+
+    await refreshXrplFirstPage({ silent: false });
+  }, [canFetchXrplPayments, refreshXrplFirstPage]);
 
   const loadXrplMore = useCallback(async () => {
     if (!canFetchXrplPayments || !xrplHasMore || !xrplCursorNext) return;
@@ -391,6 +408,56 @@ export default function CurrencyStatement({
     if (ledgerTab !== "xrpl") return;
     loadXrplFirstPage();
   }, [ledgerTab, loadXrplFirstPage]);
+
+  const walletWsRefreshRef = useRef(0);
+
+  useEffect(() => {
+    if (ledgerTab !== "xrpl") return;
+    if (!canFetchXrplPayments) return;
+    if (!backendWalletAddress || !walletSessionToken) return;
+
+    let cancelled = false;
+    const address = backendWalletAddress;
+    const channelKey = `wallet:${address}`;
+
+    wsClient
+      .connect()
+      .then(() => {
+        if (cancelled) return;
+        wsClient.subscribe("wallet", address);
+      })
+      .catch(() => {
+        // best-effort
+      });
+
+    const handleWalletUpdate = (message) => {
+      if (cancelled) return;
+      const channel = message?.channel;
+      const data = message?.data || {};
+      if (channel && channel !== channelKey) return;
+      if (data?.address && data.address !== address) return;
+
+      const now = Date.now();
+      if (now - walletWsRefreshRef.current < 5000) return;
+      walletWsRefreshRef.current = now;
+
+      refreshXrplFirstPage({ silent: true });
+    };
+
+    wsClient.on("wallet", handleWalletUpdate);
+
+    return () => {
+      cancelled = true;
+      wsClient.off("wallet", handleWalletUpdate);
+      wsClient.unsubscribe("wallet", address);
+    };
+  }, [
+    backendWalletAddress,
+    canFetchXrplPayments,
+    ledgerTab,
+    refreshXrplFirstPage,
+    walletSessionToken,
+  ]);
 
   useEffect(() => {
     // avoid mixing data between currencies

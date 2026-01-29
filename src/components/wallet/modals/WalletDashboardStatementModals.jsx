@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 import { getWalletSessionHeaders } from "@/lib/walletSession";
+import { getCachedStatement, setCachedStatement } from "@/lib/walletStatementCache";
 import { useXumm } from "@/context/XummContext";
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
@@ -80,6 +81,9 @@ export default function WalletDashboardStatementModals({
       url.searchParams.set(key, String(value));
     });
     url.searchParams.set("source", "onchain");
+    const cacheKey = url.toString();
+    const cached = getCachedStatement(cacheKey);
+    if (cached) return cached;
     const res = await fetch(url.toString(), {
       headers: getWalletSessionHeaders(walletSessionToken),
     });
@@ -93,6 +97,7 @@ export default function WalletDashboardStatementModals({
           })
       );
     }
+    setCachedStatement(cacheKey, data);
     return data;
   }, [t, walletSessionToken]);
 
