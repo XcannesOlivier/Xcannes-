@@ -157,7 +157,10 @@ export default function WalletDashboard({
       }
     : balance;
 
-  const baseTokens = effectiveBalance?.tokens || [];
+  const baseTokens = useMemo(
+    () => effectiveBalance?.tokens || [],
+    [effectiveBalance?.tokens]
+  );
   const hasOnChainRlusd = (baseTokens || []).some(
     (t) => String(t?.currency || "").toUpperCase() === "RLUSD"
   );

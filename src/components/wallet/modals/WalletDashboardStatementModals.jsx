@@ -257,6 +257,7 @@ export default function WalletDashboardStatementModals({
       currencyCursorNext,
       currencyHasMore,
       currencyLoadingMore,
+      currencyStatementMonths,
       fetchStatement,
       t,
     ]
