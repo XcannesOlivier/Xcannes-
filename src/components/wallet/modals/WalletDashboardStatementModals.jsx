@@ -65,6 +65,7 @@ export default function WalletDashboardStatementModals({
   const [globalError, setGlobalError] = useState(null);
 
   const [currencyTransactions, setCurrencyTransactions] = useState([]);
+  const [currencyStatementMonths, setCurrencyStatementMonths] = useState([]);
   const [currencyCursorNext, setCurrencyCursorNext] = useState(null);
   const [currencyBalanceAfterNext, setCurrencyBalanceAfterNext] = useState(null);
   const [currencyHasMore, setCurrencyHasMore] = useState(false);
@@ -167,6 +168,7 @@ export default function WalletDashboardStatementModals({
       setCurrencyLoading(true);
       setCurrencyError(null);
       setCurrencyTransactions([]);
+      setCurrencyStatementMonths([]);
       setCurrencyHasMore(false);
       setCurrencyCursorNext(null);
       setCurrencyBalanceAfterNext(null);
@@ -179,6 +181,9 @@ export default function WalletDashboardStatementModals({
         });
         setCurrencyTransactions(
           Array.isArray(data?.transactions) ? data.transactions : []
+        );
+        setCurrencyStatementMonths(
+          Array.isArray(data?.statementMonths) ? data.statementMonths : []
         );
         setCurrencyHasMore(Boolean(data?.hasMore));
         setCurrencyCursorNext(data?.cursorNext || null);
@@ -193,6 +198,7 @@ export default function WalletDashboardStatementModals({
             )
         );
         setCurrencyTransactions([]);
+        setCurrencyStatementMonths([]);
         setCurrencyHasMore(false);
         setCurrencyCursorNext(null);
         setCurrencyBalanceAfterNext(null);
@@ -221,6 +227,13 @@ export default function WalletDashboardStatementModals({
         });
         const more = Array.isArray(data?.transactions) ? data.transactions : [];
         setCurrencyTransactions((prev) => [...(prev || []), ...more]);
+        if (
+          Array.isArray(data?.statementMonths) &&
+          data.statementMonths.length > 0 &&
+          (!currencyStatementMonths || currencyStatementMonths.length === 0)
+        ) {
+          setCurrencyStatementMonths(data.statementMonths);
+        }
         setCurrencyHasMore(Boolean(data?.hasMore));
         setCurrencyCursorNext(data?.cursorNext || null);
         setCurrencyBalanceAfterNext(data?.balanceAfterRlusdNext ?? null);
@@ -314,6 +327,9 @@ export default function WalletDashboardStatementModals({
             canFetchStatements
               ? currencyTransactions
               : previewTransactions || []
+          }
+          statementMonths={
+            canFetchStatements ? currencyStatementMonths : null
           }
           hasMore={canFetchStatements ? currencyHasMore : false}
           loadingMore={canFetchStatements ? currencyLoadingMore : false}
