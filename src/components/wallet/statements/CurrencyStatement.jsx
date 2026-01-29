@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Buffer } from "buffer";
 import { createPortal } from "react-dom";
 import Image from "next/image";
@@ -44,6 +44,50 @@ const computeSinceMonthsAgoIso = (months) => {
   const date = new Date();
   date.setMonth(date.getMonth() - months);
   return date.toISOString();
+};
+
+const buildMonthKeyUtc = (date) => {
+  if (!(date instanceof Date)) return null;
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  if (!Number.isFinite(year) || !Number.isFinite(month)) return null;
+  return `${year}-${String(month).padStart(2, "0")}`;
+};
+
+const buildDefaultMonthKeys = (months) => {
+  const now = new Date();
+  const list = [];
+  for (let i = 0; i < months; i += 1) {
+    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    const key = buildMonthKeyUtc(date);
+    if (key) list.push(key);
+  }
+  return list;
+};
+
+const getMonthKeyFromTransaction = (tx) => {
+  const createdAt = tx?.createdAt ? new Date(tx.createdAt) : null;
+  if (createdAt && Number.isFinite(createdAt.getTime())) {
+    return buildMonthKeyUtc(createdAt);
+  }
+  const dateRaw = String(tx?.date || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateRaw)) {
+    const [year, month] = dateRaw.split("-").map((value) => Number.parseInt(value, 10));
+    if (Number.isFinite(year) && Number.isFinite(month)) {
+      return `${year}-${String(month).padStart(2, "0")}`;
+    }
+  }
+  return null;
+};
+
+const formatMonthLabel = (monthKey, locale, { monthOnly = false } = {}) => {
+  if (!monthKey) return "";
+  const [year, month] = String(monthKey).split("-").map((value) => Number.parseInt(value, 10));
+  if (!Number.isFinite(year) || !Number.isFinite(month)) return monthKey;
+  const date = new Date(year, month - 1, 1);
+  return date.toLocaleDateString(locale || "en", monthOnly
+    ? { month: "long" }
+    : { month: "long", year: "numeric" });
 };
 
 const resolveMoonpayBuyTag = (currencyCode) => {
@@ -129,6 +173,7 @@ export default function CurrencyStatement({
   hasRlusdTrustline = false,
   hasXcsTrustline = false,
   xcannesCurrencyLinesCount = 0,
+  statementMonths = [],
   highlightTransactionId = null,
   onClose
 }) {
@@ -408,33 +453,6 @@ export default function CurrencyStatement({
     };
   }, [normalizedCurrency, xcannesCurrencyLinesCount]);
 
-  // Générer les 12 derniers mois
-  const generateMonths = () => {
-    const months = [];
-    const currentDate = new Date();
-
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-      months.push({
-        value: i,
-        label: date.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
-        displayLabel: date.toLocaleDateString(locale, { month: 'long' }) // Juste le mois pour l'affichage
-      });
-    }
-
-    months.push({
-      value: 'archives',
-      label: archivesLongLabel,
-      displayLabel: archivesLabel
-    });
-    return months;
-  };
-
-  const availableMonths = generateMonths();
-  const currentPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.label || fallbackPeriod;
-  const currentDisplayPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.displayLabel || String(fallbackPeriod).split(' ')[0]; // Affiche juste le mois
-
-
   // Calculer les statistiques
   const credits = transactions.filter((t) => t.type === "credit");
   const debits = transactions.filter((t) => t.type === "debit");
@@ -523,6 +541,110 @@ export default function CurrencyStatement({
 
     return list;
   }, [filteredTransactions, balance, normalizedCurrency]);
+
+  const statementMonthKeys = useMemo(() => {
+    const provided = Array.isArray(statementMonths)
+      ? statementMonths.filter((key) => typeof key === "string" && key.length >= 7)
+      : [];
+    if (provided.length > 0) return provided;
+
+    const derived = new Set();
+    for (const tx of transactionsWithDisplayBalance || []) {
+      const key = getMonthKeyFromTransaction(tx);
+      if (key) derived.add(key);
+    }
+    if (derived.size > 0) {
+      return Array.from(derived).sort((a, b) => b.localeCompare(a));
+    }
+
+    return buildDefaultMonthKeys(XRPL_HISTORY_MONTHS);
+  }, [statementMonths, transactionsWithDisplayBalance]);
+
+  const availableMonths = useMemo(() => {
+    const keys = statementMonthKeys || [];
+    const visibleKeys = keys.slice(0, 12);
+    const months = visibleKeys.map((key, idx) => ({
+      value: idx,
+      key,
+      label: formatMonthLabel(key, locale),
+      displayLabel: formatMonthLabel(key, locale, { monthOnly: true })
+    }));
+    if (keys.length > 12) {
+      months.push({
+        value: 'archives',
+        key: 'archives',
+        label: archivesLongLabel,
+        displayLabel: archivesLabel
+      });
+    }
+    return months;
+  }, [statementMonthKeys, locale, archivesLongLabel, archivesLabel]);
+
+  useEffect(() => {
+    const hasArchives = availableMonths.some((option) => option.value === "archives");
+    if (selectedMonth === "archives" && !hasArchives) {
+      setSelectedMonth(0);
+      return;
+    }
+    if (typeof selectedMonth === "number") {
+      const maxIndex = availableMonths.filter((option) => typeof option.value === "number").length - 1;
+      if (maxIndex >= 0 && selectedMonth > maxIndex) {
+        setSelectedMonth(0);
+      }
+    }
+  }, [availableMonths, selectedMonth]);
+
+  const selectedMonthKey = useMemo(() => {
+    if (selectedMonth === "archives") return null;
+    const option = availableMonths.find(
+      (item) => typeof item?.value === "number" && Number(item.value) === Number(selectedMonth)
+    );
+    return option?.key || null;
+  }, [availableMonths, selectedMonth]);
+
+  const currentPeriod = selectedMonth === 'archives'
+    ? archivesLabel
+    : availableMonths.find((option) => option.value === selectedMonth)?.label || fallbackPeriod;
+  const currentDisplayPeriod = selectedMonth === 'archives'
+    ? archivesLabel
+    : availableMonths.find((option) => option.value === selectedMonth)?.displayLabel || String(fallbackPeriod).split(' ')[0];
+
+  const transactionsByMonth = useMemo(() => {
+    const map = new Map(statementMonthKeys.map((key) => [key, []]));
+    for (const tx of transactionsWithDisplayBalance || []) {
+      const key = getMonthKeyFromTransaction(tx);
+      if (!key) continue;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(tx);
+    }
+    return statementMonthKeys.map((key) => ({
+      key,
+      label: formatMonthLabel(key, locale),
+      transactions: map.get(key) || []
+    }));
+  }, [statementMonthKeys, transactionsWithDisplayBalance, locale]);
+
+  const visibleGroups = useMemo(() => {
+    const map = new Map(transactionsByMonth.map((group) => [group.key, group]));
+    if (selectedMonth === "archives") {
+      const archiveKeys = statementMonthKeys.slice(12);
+      return archiveKeys.map((key) => map.get(key) || {
+        key,
+        label: formatMonthLabel(key, locale),
+        transactions: []
+      });
+    }
+    if (!selectedMonthKey) return [];
+    return [
+      map.get(selectedMonthKey) || {
+        key: selectedMonthKey,
+        label: formatMonthLabel(selectedMonthKey, locale),
+        transactions: []
+      }
+    ];
+  }, [transactionsByMonth, selectedMonth, selectedMonthKey, statementMonthKeys, locale]);
+
+  const showMonthHeaders = selectedMonth === "archives";
 
   const adjustmentInfo = useMemo(() => {
     let required = false;
@@ -1661,64 +1783,88 @@ export default function CurrencyStatement({
 
                   </td>
                     </tr> :
-                transactionsWithDisplayBalance.length === 0 ?
+                (!visibleGroups || visibleGroups.length === 0) ?
                 <tr>
                       <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_no_transactions_found_af217af8de", "No transactions found")}
 
                   </td>
                     </tr> :
 
-                transactionsWithDisplayBalance.map((tx, idx) => {
-                  const icon = getTransactionIcon(tx.category);
-                  const transactionId = tx?.id || null;
-                  const isHighlighted =
-                    highlightedTransactionId && transactionId === highlightedTransactionId;
-                  const rowClassName = isHighlighted
-                    ? "border-b border-white/5 bg-xcannes-green/10 transition-colors"
-                    : "border-b border-white/5 hover:bg-white/5 transition-colors";
-                  return (
-                    <tr
-                      key={idx}
-                      ref={isHighlighted ? highlightRowRef : null}
-                      className={rowClassName}
-                    >
-                          <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
-                            {formatDate(tx.date)}
-                          </td>
-                          <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
-                            <div className="flex items-center gap-2">
-                              {icon ?
-                          <span className="transaction-icon text-lg flex-shrink-0">
-                                  {icon}
-                                </span> :
-                          null}
-                              <div className="min-w-0">
-                                <p className="text-sm text-white/90 truncate">
-                                  {isMobileDate ?
-                                    simplifyMobileDescription(tx.description, tx.category) :
-                                    enrichDescription(tx.description)}
-                                </p>
-                                {tx.counterparty &&
-                            <p className="text-xs text-white/40 font-mono truncate hidden md:block">
-                                    {tx.counterparty.slice(0, 10)}...{tx.counterparty.slice(-6)}
+                (visibleGroups || []).map((group, groupIdx) => (
+                  <Fragment key={group.key || groupIdx}>
+                    {showMonthHeaders ? (
+                      <tr className="bg-white/5">
+                        <td colSpan="4" className="px-2 md:px-4 py-2 text-xs font-semibold text-white/70 uppercase tracking-wide">
+                          {group.label || group.key}
+                        </td>
+                      </tr>
+                    ) : null}
+                    {group.transactions.length === 0 ? (
+                      <tr className="border-b border-white/5">
+                        <td colSpan="4" className="text-center py-6 text-white/40 text-sm">
+                          {t("ui_no_transactions_found_af217af8de", "No transactions found")}
+                        </td>
+                      </tr>
+                    ) : (
+                      group.transactions.map((tx, idx) => {
+                        const icon = getTransactionIcon(tx.category);
+                        const transactionId = tx?.id || null;
+                        const isHighlighted =
+                          highlightedTransactionId && transactionId === highlightedTransactionId;
+                        const rowClassName = isHighlighted
+                          ? "border-b border-white/5 bg-xcannes-green/10 transition-colors"
+                          : "border-b border-white/5 hover:bg-white/5 transition-colors";
+                        return (
+                          <tr
+                            key={`${group.key || groupIdx}-${idx}`}
+                            ref={isHighlighted ? highlightRowRef : null}
+                            className={rowClassName}
+                          >
+                            <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
+                              {formatDate(tx.date)}
+                            </td>
+                            <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
+                              <div className="flex items-center gap-2">
+                                {icon ? (
+                                  <span className="transaction-icon text-lg flex-shrink-0">
+                                    {icon}
+                                  </span>
+                                ) : null}
+                                <div className="min-w-0">
+                                  <p className="text-sm text-white/90 truncate">
+                                    {isMobileDate
+                                      ? simplifyMobileDescription(tx.description, tx.category)
+                                      : enrichDescription(tx.description)}
                                   </p>
-                            }
+                                  {tx.counterparty && (
+                                    <p className="text-xs text-white/40 font-mono truncate hidden md:block">
+                                      {tx.counterparty.slice(0, 10)}...{tx.counterparty.slice(-6)}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${tx.type === "debit" ? "text-red-400" : "text-green-400"}`}>
-                            {tx.type === "debit" ? "−" : "+"}{formatAmount(tx.amount)}
-                          </td>
-                          <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                            {formatAmount(
-                              tx?.displayRunningBalance != null
-                                ? tx.displayRunningBalance
-                                : tx.runningBalance
-                            )}
-                          </td>
-                        </tr>);
-
-                })
+                            </td>
+                            <td
+                              className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${
+                                tx.type === "debit" ? "text-red-400" : "text-green-400"
+                              }`}
+                            >
+                              {tx.type === "debit" ? "−" : "+"}
+                              {formatAmount(tx.amount)}
+                            </td>
+                            <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
+                              {formatAmount(
+                                tx?.displayRunningBalance != null
+                                  ? tx.displayRunningBalance
+                                  : tx.runningBalance
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </Fragment>
+                ))
                 }
                 </tbody>
               </table>
