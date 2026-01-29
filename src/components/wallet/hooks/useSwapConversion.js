@@ -422,6 +422,18 @@ export function useSwapConversion({
         return;
       }
 
+      const lineStates = [];
+      const baseAllocated = allocatedRlusdByCurrency?.get(base);
+      const quoteAllocated = allocatedRlusdByCurrency?.get(quote);
+      if (base !== "RLUSD" && Number.isFinite(baseAllocated)) {
+        const after = Math.max(0, Number(baseAllocated) - grossRlusd);
+        lineStates.push({ currencyCode: base, allocatedRlusdAfter: after });
+      }
+      if (quote !== "RLUSD" && Number.isFinite(quoteAllocated)) {
+        const after = Math.max(0, Number(quoteAllocated) + netRlusd);
+        lineStates.push({ currencyCode: quote, allocatedRlusdAfter: after });
+      }
+
       const memoPayload = buildConversionMemo({
         base,
         quote,
@@ -433,6 +445,7 @@ export function useSwapConversion({
         fxSource: fxSource || null,
         spreadRlusd: spreadFee > 0 ? spreadFee : null,
         spreadTier: spread?.tier || null,
+        lineStates: lineStates.length > 0 ? lineStates : null,
       });
       if (!memoPayload) {
         throw new Error("Invalid conversion memo payload");

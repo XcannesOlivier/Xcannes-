@@ -44,6 +44,7 @@ import WalletDashboardReceiveModal from "./modals/WalletDashboardReceiveModal";
 import WalletDashboardSendModal from "./modals/WalletDashboardSendModal";
 import WalletDashboardStatementModals from "./modals/WalletDashboardStatementModals";
 import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
+import WalletDashboardAdjustModal from "./modals/WalletDashboardAdjustModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
 import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
@@ -68,6 +69,14 @@ const WALLET_LABEL_FEE_RLUSD = (() => {
     process.env.NEXT_PUBLIC_WALLET_LABEL_FEE_RLUSD || ""
   );
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_WALLET_LABEL_FEE_RLUSD;
+})();
+
+const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
+const ADJUSTMENT_FEE_RLUSD = (() => {
+  const raw = Number.parseFloat(
+    process.env.NEXT_PUBLIC_WALLET_ADJUSTMENT_FEE_RLUSD || ""
+  );
+  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ADJUSTMENT_FEE_RLUSD;
 })();
 
 const MOONPAY_SELL_WALLETS = new Set(
@@ -139,10 +148,29 @@ export default function WalletDashboard({
     ? "rPREVIEWWALLETxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     : wallet;
 
+  const effectiveBalance = isPreviewMode
+    ? {
+        xrp: "0",
+        // En mode preview, on laisse la liste de devises vide
+        // pour que les lignes soient créées via les trustlines.
+        tokens: [],
+      }
+    : balance;
+
+  const baseTokens = effectiveBalance?.tokens || [];
+  const hasOnChainRlusd = (baseTokens || []).some(
+    (t) => String(t?.currency || "").toUpperCase() === "RLUSD"
+  );
+  const hasOnChainXcs = (baseTokens || []).some(
+    (t) => String(t?.currency || "").toUpperCase() === "XCS"
+  );
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | null
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
+  const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+  const adjustmentAutoOpenedRef = useRef(false);
   const { receiveTab, setReceiveTab } = useReceiveForm();
   const {
     sendTab,
@@ -178,6 +206,9 @@ export default function WalletDashboard({
   } = useWalletLabel({
     walletAddress: effectiveWallet,
     isConnected: effectiveIsConnected,
+    isPreviewMode,
+    isWalletActivated,
+    hasOnChainRlusd,
     defaultLabel: t("nav_wallet", "Wallet"),
     signTransaction,
     activationDestination: XCANNES_ACTIVATION_WALLET_ADDRESS,
@@ -257,31 +288,7 @@ export default function WalletDashboard({
     demoRlusdTotal: DEMO_RLUSD_TOTAL,
   });
 
-  const effectiveBalance = isPreviewMode
-    ? {
-        xrp: "0",
-        // En mode preview, on laisse la liste de devises vide
-        // pour que les lignes soient créées via les trustlines.
-        tokens: [],
-      }
-    : balance;
-
-  const baseTokens = useMemo(
-    () => effectiveBalance?.tokens || [],
-    [effectiveBalance?.tokens]
-  );
-  
   const xrpAmount = parseFloat(effectiveBalance?.xrp || 0) || 0;
-  const hasOnChainRlusd = useMemo(() => {
-    return (baseTokens || []).some(
-      (t) => String(t?.currency || "").toUpperCase() === "RLUSD"
-    );
-  }, [baseTokens]);
-  const hasOnChainXcs = useMemo(() => {
-    return (baseTokens || []).some(
-      (t) => String(t?.currency || "").toUpperCase() === "XCS"
-    );
-  }, [baseTokens]);
 
   const isStablecoin = useCallback((currency) => {
     return USD_STABLECOINS.includes(String(currency || "").toUpperCase());
@@ -498,6 +505,12 @@ export default function WalletDashboard({
     ? () => {}
     : refreshCurrencyLines;
 
+  const adjustmentDeficitRlusd = Number(
+    effectiveCurrencyLinesSummary?.excessAllocatedRlusd ?? 0
+  );
+  const hasAdjustmentDeficit =
+    Number.isFinite(adjustmentDeficitRlusd) && adjustmentDeficitRlusd > 1e-9;
+
   const payActivationFee = useCallback(async ({ action, memoPayload, memoPayloads } = {}) => {
     if (!wallet || !signTransaction) {
       alert("Please connect your Xumm wallet first.");
@@ -604,6 +617,7 @@ export default function WalletDashboard({
       const memoPayload = buildCurrencyLineMemo({
         action: "activate",
         currencyCode,
+        allocatedRlusdAfter: 0,
       });
       if (!memoPayload) {
         alert("Invalid currency line memo.");
@@ -670,6 +684,35 @@ export default function WalletDashboard({
     setConvertQuoteCurrency,
     setSwapDefaultView,
     setSwapLockedView,
+  ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      setShowAdjustmentModal(true);
+    };
+    window.addEventListener("xcannes:wallet:open-adjustment", handler);
+    return () =>
+      window.removeEventListener("xcannes:wallet:open-adjustment", handler);
+  }, []);
+
+  useEffect(() => {
+    if (isPreviewMode) return;
+    if (!backendWalletAddress) return;
+    if (!hasAdjustmentDeficit) {
+      adjustmentAutoOpenedRef.current = false;
+      return;
+    }
+    if (adjustmentAutoOpenedRef.current) return;
+    if (activeAction || showAdjustmentModal) return;
+    setShowAdjustmentModal(true);
+    adjustmentAutoOpenedRef.current = true;
+  }, [
+    activeAction,
+    backendWalletAddress,
+    hasAdjustmentDeficit,
+    isPreviewMode,
+    showAdjustmentModal,
   ]);
 
   const handleUpsertCurrencyLine = useCallback(async () => {
@@ -784,6 +827,7 @@ export default function WalletDashboard({
       const deleteMemo = buildCurrencyLineMemo({
         action: "delete",
         currencyCode,
+        allocatedRlusdAfter: 0,
       });
       if (!deleteMemo) {
         alert("Invalid currency line memo.");
@@ -1528,6 +1572,10 @@ export default function WalletDashboard({
           rlusdPerUnitSources?.[currency] ||
           null;
         if (spreadFeeRlusd > 0) {
+          const spreadAllocatedBefore = allocatedRlusdByCurrency?.get(currency);
+          const spreadAllocatedAfter = Number.isFinite(spreadAllocatedBefore)
+            ? Math.max(0, Number(spreadAllocatedBefore) - spreadFeeRlusd)
+            : null;
           const spreadTx = buildRlusdPaymentTxjson({
             account: wallet,
             destination: XCANNES_SPREAD_WALLET_ADDRESS,
@@ -1542,6 +1590,7 @@ export default function WalletDashboard({
             displayAmount: spreadFeeRlusd,
             displayCurrencyCode: "RLUSD",
             amountRlusd: spreadFeeRlusd,
+            allocatedRlusdAfter: spreadAllocatedAfter,
             fxRate: rlusdPerUnit,
             fxSource,
             note: "spread",
@@ -1583,6 +1632,12 @@ export default function WalletDashboard({
         const displayCurrencyForMemo = sendPaymentRequest
           ? sendPaymentRequest?.displayCurrency ?? targetCurrencyForMemo ?? currency
           : currency;
+        const targetAllocatedBefore = allocatedRlusdByCurrency?.get(targetCurrencyForMemo);
+        const paymentDebitRlusd =
+          targetCurrencyForMemo === currency ? totalToSpendRlusd : paymentRlusd;
+        const paymentAllocatedAfter = Number.isFinite(targetAllocatedBefore)
+          ? Math.max(0, Number(targetAllocatedBefore) - paymentDebitRlusd)
+          : null;
 
         const memoPayload = buildPayreqMemo({
           origin: sendPaymentRequest ? "payreq" : "manual",
@@ -1590,6 +1645,7 @@ export default function WalletDashboard({
           displayAmount: displayAmountForMemo,
           displayCurrencyCode: displayCurrencyForMemo,
           amountRlusd: paymentRlusd,
+          allocatedRlusdAfter: paymentAllocatedAfter,
           fxRate: rlusdPerUnit,
           fxSource,
           note: sendPaymentRequest?.memo || null,
@@ -1695,12 +1751,17 @@ export default function WalletDashboard({
         const target = String(sendPaymentRequest.targetCurrencyCode || "")
           .trim()
           .toUpperCase();
+        const targetAllocatedBefore = allocatedRlusdByCurrency?.get(target);
+        const paymentAllocatedAfter = Number.isFinite(targetAllocatedBefore)
+          ? Math.max(0, Number(targetAllocatedBefore) - amountNum)
+          : null;
         const memoPayload = buildPayreqMemo({
           origin: "payreq",
           targetCurrencyCode: target || null,
           displayAmount: sendPaymentRequest?.displayAmount ?? null,
           displayCurrencyCode: (sendPaymentRequest?.displayCurrency ?? target) || null,
           amountRlusd: amountNum,
+          allocatedRlusdAfter: paymentAllocatedAfter,
           fxRate: sendPaymentRequest?.fxRate ?? null,
           fxSource: sendPaymentRequest?.fxSource ?? null,
           note: sendPaymentRequest?.memo || null,
@@ -1815,7 +1876,7 @@ export default function WalletDashboard({
     isConnected: effectiveIsConnected,
   });
 
-  useOverflowLock(!!activeAction);
+  useOverflowLock(!!activeAction || showAdjustmentModal);
 
   return (
     <>
@@ -1973,6 +2034,21 @@ export default function WalletDashboard({
             convertProcessing={convertProcessing}
             rlusdPerUnitRates={rlusdPerUnitRates}
             activationFeeRlusd={ACTIVATION_FEE_RLUSD}
+          />
+
+          <WalletDashboardAdjustModal
+            open={showAdjustmentModal}
+            onClose={() => setShowAdjustmentModal(false)}
+            isPreviewMode={isPreviewMode}
+            renderWalletMeta={renderWalletMeta}
+            walletAddress={effectiveWallet}
+            signTransaction={signTransaction}
+            deficitRlusd={adjustmentDeficitRlusd}
+            currencyLines={effectiveCurrencyLines}
+            rlusdPerUnitRates={rlusdPerUnitRates}
+            refreshBalance={refreshBalance}
+            refreshCurrencyLines={effectiveRefreshCurrencyLines}
+            adjustmentFeeRlusd={ADJUSTMENT_FEE_RLUSD}
           />
 
 	      <WalletDashboardCashModal
