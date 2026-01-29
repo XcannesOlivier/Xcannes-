@@ -5,6 +5,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
+import wsClient from "@/lib/xcannesWebSocket";
+import { listCachedStatementKeys, setCachedStatement } from "@/lib/walletStatementCache";
 import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 
 const XummContext = createContext();
@@ -257,6 +259,82 @@ export const XummProvider = ({ children }) => {
     []
   );
 
+  const warmFullReplay = useCallback(async (address, sessionToken) => {
+    if (!address || !sessionToken) return;
+    try {
+      const params = new URLSearchParams();
+      params.set("address", address);
+      params.set("limit", "100");
+      params.set("forceFullReplay", "true");
+      params.set("includeRaw", "true");
+      params.set("source", "onchain");
+      const url = apiUrl(`/wallet/statement?${params.toString()}`);
+      const res = await fetch(url, {
+        headers: { "x-wallet-session": sessionToken },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setCachedStatement(url, data);
+        const rawlessParams = new URLSearchParams(params);
+        rawlessParams.delete("includeRaw");
+        const rawlessUrl = apiUrl(`/wallet/statement?${rawlessParams.toString()}`);
+        setCachedStatement(rawlessUrl, data);
+      }
+    } catch (error) {
+      if (process.env.NEXT_PUBLIC_DEBUG_LOGS === "true") {
+        console.warn("[wallet] full replay warmup failed:", error?.message || error);
+      }
+    }
+  }, []);
+
+  const refreshCachedStatementsForAddress = useCallback(async (address, sessionToken) => {
+    if (!address || !sessionToken) return;
+    const cacheKeys = listCachedStatementKeys();
+    const targetKeys = cacheKeys.filter((key) => {
+      if (!key.includes("/wallet/statement")) return false;
+      if (!key.includes(`address=${encodeURIComponent(address)}`)) return false;
+      if (key.includes("cursor=")) return false;
+      return true;
+    });
+
+    const urls = targetKeys.length > 0
+      ? targetKeys
+      : (() => {
+          const params = new URLSearchParams();
+          params.set("address", address);
+          params.set("limit", "100");
+          params.set("source", "onchain");
+          return [apiUrl(`/wallet/statement?${params.toString()}`)];
+        })();
+
+    for (const url of urls) {
+      const fetchUrl = (() => {
+        try {
+          const parsed = new URL(url);
+          if (!parsed.searchParams.has("includeRaw")) {
+            parsed.searchParams.set("includeRaw", "true");
+          }
+          return parsed.toString();
+        } catch {
+          return url;
+        }
+      })();
+      try {
+        const res = await fetch(fetchUrl, {
+          headers: { "x-wallet-session": sessionToken },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          setCachedStatement(url, data);
+        }
+      } catch (error) {
+        if (process.env.NEXT_PUBLIC_DEBUG_LOGS === "true") {
+          console.warn("[wallet] cache refresh failed:", error?.message || error);
+        }
+      }
+    }
+  }, []);
+
   const updateWalletSession = useCallback(async (address, active, { xummUuid } = {}) => {
     if (!address) return;
     const endpoint = active ? "/wallet/session/connect" : "/wallet/session/disconnect";
@@ -275,6 +353,7 @@ export const XummProvider = ({ children }) => {
       if (res.ok && active && data.sessionToken) {
         setSessionToken(data.sessionToken);
         setWalletSessionTokenState(data.sessionToken);
+        warmFullReplay(address, data.sessionToken);
       }
       if (res.ok && !active) {
         clearSessionToken();
@@ -283,7 +362,7 @@ export const XummProvider = ({ children }) => {
     } catch (error) {
       console.warn("Wallet session update failed:", error);
     }
-  }, []);
+  }, [warmFullReplay]);
 
   const updateWallet = useCallback(
     (account) => {
@@ -304,6 +383,47 @@ export const XummProvider = ({ children }) => {
     },
     [fetchBalance, updateWalletSession]
   );
+
+  const walletWsRefreshRef = useRef(0);
+
+  useEffect(() => {
+    if (!wallet || !walletSessionToken) return;
+    let cancelled = false;
+    const address = wallet;
+    const channelKey = `wallet:${address}`;
+
+    wsClient
+      .connect()
+      .then(() => {
+        if (cancelled) return;
+        wsClient.subscribe("wallet", address);
+      })
+      .catch(() => {
+        // best-effort only
+      });
+
+    const handleWalletUpdate = (message) => {
+      if (cancelled) return;
+      const channel = message?.channel;
+      const data = message?.data || {};
+      if (channel && channel !== channelKey) return;
+      if (data?.address && data.address !== address) return;
+
+      const now = Date.now();
+      if (now - walletWsRefreshRef.current < 5000) return;
+      walletWsRefreshRef.current = now;
+
+      refreshCachedStatementsForAddress(address, walletSessionToken);
+    };
+
+    wsClient.on("wallet", handleWalletUpdate);
+
+    return () => {
+      cancelled = true;
+      wsClient.off("wallet", handleWalletUpdate);
+      wsClient.unsubscribe("wallet", address);
+    };
+  }, [refreshCachedStatementsForAddress, wallet, walletSessionToken]);
 
   const checkPendingConnect = useCallback(async () => {
     if (isConnected) {
