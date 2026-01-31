@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -52,7 +52,8 @@ const MoonPayBuyModal = ({
   noticeVariant = "preview",
   noticeContextLabel = "",
   demoMode = false,
-  onDemoSubmit
+  onDemoSubmit,
+  prefill = null
 }) => {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -67,7 +68,7 @@ const MoonPayBuyModal = ({
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
   const [amount, setAmount] = useState('');
-  const amountType = 'fiat';
+  const [amountType, setAmountType] = useState('fiat');
   const [fiatCurrency, setFiatCurrency] = useState('USD');
   const [fiatCurrencies, setFiatCurrencies] = useState([]);
   const [fiatLoading, setFiatLoading] = useState(false);
@@ -87,6 +88,40 @@ const MoonPayBuyModal = ({
   { code: 'XRP', name: 'XRP (Ripple)', icon: CRYPTO_ICONS.XRP }];
 
   const PRODUCT_MIN_USD = 5;
+
+  const prefillSignature = useMemo(() => {
+    if (!prefill) return "";
+    return JSON.stringify({
+      currency: prefill.currency || "",
+      amount: prefill.amount ?? "",
+      amountType: prefill.amountType || "",
+      fiatCurrency: prefill.fiatCurrency || "",
+    });
+  }, [prefill]);
+  const lastPrefillRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      lastPrefillRef.current = null;
+      return;
+    }
+    if (!prefill || !prefillSignature) return;
+    if (lastPrefillRef.current === prefillSignature) return;
+    lastPrefillRef.current = prefillSignature;
+    if (prefill.currency) {
+      setCurrency(String(prefill.currency).toUpperCase());
+    }
+    if (prefill.amount != null) {
+      setAmount(String(prefill.amount));
+    }
+    if (prefill.amountType) {
+      const nextType = prefill.amountType === "crypto" ? "crypto" : "fiat";
+      setAmountType(nextType);
+    }
+    if (prefill.fiatCurrency) {
+      setFiatCurrency(String(prefill.fiatCurrency).toUpperCase());
+    }
+  }, [isOpen, prefill, prefillSignature]);
 
 
   const hasRlusdTrustline = useMemo(() => {
