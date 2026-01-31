@@ -6,9 +6,19 @@ import { useTranslation } from "next-i18next";
 export function WalletInfoContent({
   withCloseGutter = false,
   isPreviewMode = false,
+  isWalletActivated = null,
+  hasRlusdTrustline = null,
   noticeVariant = "preview"
 }) {
   const { t } = useTranslation("common");
+  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
+  const showNotActivatedNotice =
+    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
+  const showRlusdNotActivatedNotice =
+    !isPreviewMode &&
+    noticeVariant !== "demo" &&
+    isWalletActivated === true &&
+    hasRlusdTrustline === false;
   const activationFeeValue = Number.parseFloat(
     process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_RLUSD || ""
   );
@@ -32,9 +42,25 @@ export function WalletInfoContent({
               {t("demo_notice_title", "Mode démo")}
             </span>
           ) : null}
-          {isPreviewMode && noticeVariant !== "demo" ? (
+          {showNotConnectedNotice ? (
             <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
               {t("wallet_not_connected_title", "Wallet not connected")}
+            </span>
+          ) : null}
+          {showNotActivatedNotice ? (
+            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+              {t(
+                "wallet_not_activated_title",
+                "Wallet not activated: a minimum reserve of 1 XRP is required."
+              )}
+            </span>
+          ) : null}
+          {showRlusdNotActivatedNotice ? (
+            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+              {t(
+                "wallet_rlusd_not_activated_title",
+                "RLUSD not activated. Authorize RLUSD on your wallet."
+              )}
             </span>
           ) : null}
         </div>
@@ -139,6 +165,8 @@ export default function WalletInfoModal({
   isOpen,
   onClose,
   isPreviewMode = false,
+  isWalletActivated = null,
+  hasRlusdTrustline = null,
   noticeVariant = "preview",
   noticeContextLabel = ""
 }) {
@@ -170,6 +198,8 @@ export default function WalletInfoModal({
           <WalletInfoContent
             withCloseGutter
             isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
             noticeVariant={noticeVariant} />
         </div>
       </div>

@@ -9,6 +9,8 @@ export default function WalletDashboardCashModal({
   open,
   onClose,
   isPreviewMode = false,
+  isWalletActivated = null,
+  hasRlusdTrustline = null,
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
@@ -27,6 +29,14 @@ export default function WalletDashboardCashModal({
   walletAddress
 }) {
   const { t } = useTranslation("common");
+  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
+  const showNotActivatedNotice =
+    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
+  const showRlusdNotActivatedNotice =
+    !isPreviewMode &&
+    noticeVariant !== "demo" &&
+    isWalletActivated === true &&
+    hasRlusdTrustline === false;
   if (!open) return null;
 
   const content =
@@ -59,9 +69,25 @@ export default function WalletDashboardCashModal({
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
-                {isPreviewMode && noticeVariant !== "demo" ? (
+                {showNotConnectedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+                {showNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t(
+                      "wallet_not_activated_title",
+                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                    )}
+                  </span>
+                ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "RLUSD not activated. Authorize RLUSD on your wallet."
+                    )}
                   </span>
                 ) : null}
               </div>

@@ -14,6 +14,7 @@ export default function WalletDashboardStatementModals({
   backendWalletAddress,
   effectiveWallet,
   isPreviewMode = false,
+  isWalletActivated = null,
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
@@ -290,6 +291,8 @@ export default function WalletDashboardStatementModals({
           tokens={augmentedTokens}
           walletAddress={effectiveWallet}
           isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
           noticeVariant={noticeVariant}
           noticeContextLabel={noticeContextLabel}
           walletId={walletId}
@@ -320,13 +323,14 @@ export default function WalletDashboardStatementModals({
           walletAddress={effectiveWallet}
           backendWalletAddress={backendWalletAddress}
           isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
           noticeVariant={noticeVariant}
           noticeContextLabel={noticeContextLabel}
           walletId={walletId}
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}
-          hasRlusdTrustline={hasRlusdTrustline}
           hasXcsTrustline={hasXcsTrustline}
           xcannesCurrencyLinesCount={xcannesCurrencyLinesCount}
           transactions={

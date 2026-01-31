@@ -45,7 +45,20 @@ const MoonPaySellModal = ({
   selectLabelMobileByCurrency
 }) => {
   const { t } = useTranslation("common");
-  const { signTransaction } = useXumm();
+  const { signTransaction, isWalletActivated, balance } = useXumm();
+  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
+  const showNotActivatedNotice =
+    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
+  const hasRlusdTrustline = useMemo(() => {
+    return (balance?.tokens || []).some(
+      (token) => String(token?.currency || "").toUpperCase() === "RLUSD"
+    );
+  }, [balance]);
+  const showRlusdNotActivatedNotice =
+    !isPreviewMode &&
+    noticeVariant !== "demo" &&
+    isWalletActivated === true &&
+    hasRlusdTrustline === false;
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -719,9 +732,25 @@ const MoonPaySellModal = ({
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
-                {isPreviewMode && noticeVariant !== "demo" ? (
+                {showNotConnectedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                     {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+                {showNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+                    {t(
+                      "wallet_not_activated_title",
+                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                    )}
+                  </span>
+                ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "RLUSD not activated. Authorize RLUSD on your wallet."
+                    )}
                   </span>
                 ) : null}
               </div>

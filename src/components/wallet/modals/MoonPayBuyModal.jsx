@@ -55,11 +55,14 @@ const MoonPayBuyModal = ({
   onDemoSubmit
 }) => {
   const { t } = useTranslation("common");
+  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const { isWalletActivated, balance, signTransaction } = useXumm();
+  const showNotActivatedNotice =
+    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
@@ -90,14 +93,16 @@ const MoonPayBuyModal = ({
     const tokens = balance?.tokens || [];
     return tokens.some((t) => String(t?.currency || "").toUpperCase() === "RLUSD");
   }, [balance?.tokens]);
+  const showRlusdNotActivatedNotice =
+    !isPreviewMode &&
+    noticeVariant !== "demo" &&
+    isWalletActivated === true &&
+    hasRlusdTrustline === false;
 
   const hasXcsTrustline = useMemo(() => {
     const tokens = balance?.tokens || [];
     return tokens.some((t) => String(t?.currency || "").toUpperCase() === "XCS");
   }, [balance?.tokens]);
-
-  const needsActivation = isWalletActivated === false;
-  const needsTrustlines = isWalletActivated === true && (!hasRlusdTrustline || !hasXcsTrustline);
 
   const selectedFiat = useMemo(() => {
     return (fiatCurrencies || []).find((fiat) => fiat.code === fiatCurrency);
@@ -383,22 +388,6 @@ const MoonPayBuyModal = ({
             {step === 'form' &&
     <div className="space-y-4">
 
-                {(needsActivation || needsTrustlines) &&
-	      <div className="bg-amber-500/10 border border-amber-500/25 rounded-lg p-3">
-	                    <p className="text-xs text-amber-200">
-	                      {needsActivation ?
-	          t(
-	            "moonpay_buy_activation_notice",
-	            "Wallet not activated: your first purchase also includes XRP to activate your wallet (1 XRP) and enable RLUSD/XCS trustlines (+0.1 XRP)."
-	          ) :
-	          t(
-	            "moonpay_buy_trustlines_notice",
-	            "Missing trustlines: your first purchase may include +0.1 XRP to install RLUSD/XCS if needed."
-	          )}
-	                    </p>
-	                  </div>
-	      }
-
                 {/* Currency selector */}
 	                <div>
 	                  <label className="block text-sm font-medium text-white/80 mb-2">
@@ -668,9 +657,25 @@ const MoonPayBuyModal = ({
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
-                {isPreviewMode && noticeVariant !== "demo" ? (
+                {showNotConnectedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                     {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+                {showNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+                    {t(
+                      "wallet_not_activated_title",
+                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                    )}
+                  </span>
+                ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "RLUSD not activated. Authorize RLUSD on your wallet."
+                    )}
                   </span>
                 ) : null}
               </div>

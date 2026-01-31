@@ -24,6 +24,7 @@ export default function WalletDashboardSwapModal({
   walletId = "",
   effectiveIsConnected,
   isWalletActivated,
+  hasRlusdTrustline = null,
   walletAddress,
   onConnectWallet,
   hasOnChainRlusd,
@@ -59,6 +60,14 @@ export default function WalletDashboardSwapModal({
   simulateDexInDemo = false
 }) {
   const { t } = useTranslation("common");
+  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
+  const showNotActivatedNotice =
+    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
+  const showRlusdNotActivatedNotice =
+    !isPreviewMode &&
+    noticeVariant !== "demo" &&
+    isWalletActivated === true &&
+    hasRlusdTrustline === false;
   const blueActionBtnBase =
     "rounded-lg border border-[#06B6D4]/40 bg-[#06B6D4]/80 text-black font-semibold transition-all duration-200 hover:bg-[#06B6D4] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const blueActionBtnMuted =
@@ -488,9 +497,25 @@ export default function WalletDashboardSwapModal({
                   {t("demo_notice_title", "Mode démo")}
                 </span>
               ) : null}
-              {isPreviewMode && noticeVariant !== "demo" ? (
+              {showNotConnectedNotice ? (
                 <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                   {t("wallet_not_connected_title", "Wallet not connected")}
+                </span>
+              ) : null}
+              {showNotActivatedNotice ? (
+                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                  {t(
+                    "wallet_not_activated_title",
+                    "Wallet not activated: a minimum reserve of 1 XRP is required."
+                  )}
+                </span>
+              ) : null}
+              {showRlusdNotActivatedNotice ? (
+                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                  {t(
+                    "wallet_rlusd_not_activated_title",
+                    "RLUSD not activated. Authorize RLUSD on your wallet."
+                  )}
                 </span>
               ) : null}
             </div>
@@ -525,32 +550,6 @@ export default function WalletDashboardSwapModal({
                 </button>
               </div>
             ) : null}
-
-          {!isPreviewMode && !hasOnChainRlusd &&
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-              <div className="text-[12px] font-semibold text-amber-200">{t("ui_trustlines_required_d39ef28613", "Trustlines requises")}
-
-          </div>
-              <p className="mt-1 text-[11px] text-amber-200/80">{t("ui_to_fully_use_wallet_5439f003e6", "Pour utiliser pleinement le wallet, installez les trustlines XRPL pour")}
-
-            <span className="font-mono">{t("ui_rlusd_03b00d11bf", "RLUSD")}</span>.
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {!hasOnChainRlusd &&
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onInstallTrustline?.("RLUSD");
-              }}
-              className={`px-2.5 py-1.5 text-[11px] ${blueActionBtnBase}`}>{t("ui_install_trustline_rlusd_35e926ab5c", "Installer trustline RLUSD")}
-
-
-            </button>
-            }
-              </div>
-            </div>
-        }
 
           {view === "convert" ?
         <div className="space-y-3">
