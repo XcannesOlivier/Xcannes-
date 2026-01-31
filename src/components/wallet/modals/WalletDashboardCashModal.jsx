@@ -17,6 +17,7 @@ export default function WalletDashboardCashModal({
   demoMode = false,
   onDemoBuy,
   onDemoSell,
+  buyPrefill,
   cashModalTab,
   setCashModalTab,
   renderWalletMeta,
@@ -167,7 +168,8 @@ export default function WalletDashboardCashModal({
             demoMode={demoMode}
             onDemoSubmit={onDemoBuy}
             noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel} /> :
+            noticeContextLabel={noticeContextLabel}
+            prefill={buyPrefill} /> :
 
 
           <MoonPaySellModal

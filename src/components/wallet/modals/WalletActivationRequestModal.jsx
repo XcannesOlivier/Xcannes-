@@ -1,16 +1,16 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useMemo, useState } from "react";
-import { QRCodeCanvas } from "qrcode.react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
+import { apiUrl } from "@/lib/runtimeConfig";
 
 export default function WalletActivationRequestModal({
   open,
   onClose,
   walletAddress,
   walletLabel,
+  activationAmountXrp = 1,
   isPreviewMode = false,
   isWalletActivated = null,
   hasRlusdTrustline = null,
@@ -21,43 +21,92 @@ export default function WalletActivationRequestModal({
   const showRlusdNotActivatedNotice =
     !isPreviewMode && isWalletActivated === true && hasRlusdTrustline === false;
   const [copied, setCopied] = useState(false);
+  const [xummPayload, setXummPayload] = useState(null);
+  const [xummError, setXummError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const activationAmountLabel =
+    Number(activationAmountXrp) === 1.4 ? "1.40" : String(activationAmountXrp || "1");
 
-  const requestPayload = useMemo(() => {
-    if (!walletAddress) return null;
-    return {
-      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
-      to: walletAddress,
-      targetCurrency: "XRP",
-      displayAmount: 1,
-      displayCurrency: "XRP",
-      amountRlusd: null,
-      fxRate: null,
-      fxSource: null,
-      issuer: null,
-      memo: "",
-      beneficiaryLabel: String(walletLabel || "").trim() || null,
-      createdAt: new Date().toISOString(),
-    };
-  }, [walletAddress, walletLabel]);
-
-  const requestValue = useMemo(() => {
-    if (!requestPayload) return "";
-    try {
-      return JSON.stringify(requestPayload);
-    } catch {
-      return "";
+  useEffect(() => {
+    if (!open || !walletAddress) {
+      setXummPayload(null);
+      setXummError(null);
+      setIsLoading(false);
+      return;
     }
-  }, [requestPayload]);
+
+    let isActive = true;
+    setIsLoading(true);
+    setXummError(null);
+
+    const createPayload = async () => {
+      try {
+        const amountDrops = Math.round(Number(activationAmountXrp) * 1_000_000);
+        const txjson = {
+          TransactionType: "Payment",
+          Destination: walletAddress,
+          Amount: String(Number.isFinite(amountDrops) && amountDrops > 0 ? amountDrops : 1_000_000),
+        };
+        const res = await fetch(apiUrl("/xumm/sign"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            txjson,
+            action: "wallet:activation-request",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to create XUMM request");
+        }
+        if (!isActive) return;
+        setXummPayload({
+          uuid: data.uuid,
+          qrUrl: data.qrUrl,
+          deepLink: data.deepLink,
+        });
+      } catch (error) {
+        if (!isActive) return;
+        setXummPayload(null);
+        setXummError(error?.message || "Failed to create XUMM request");
+      } finally {
+        if (isActive) setIsLoading(false);
+      }
+    };
+
+    createPayload();
+    return () => {
+      isActive = false;
+    };
+  }, [activationAmountXrp, open, walletAddress]);
+
+  const shareLink = useMemo(() => {
+    if (!xummPayload) return "";
+    const raw =
+      xummPayload.deepLink || (xummPayload.uuid ? `https://xumm.app/sign/${xummPayload.uuid}` : "");
+    if (!raw) return "";
+    if (/^xumm:\/\//i.test(raw) || /^xaman:\/\//i.test(raw)) {
+      return raw.replace(/^xumm:\/\//i, "https://").replace(/^xaman:\/\//i, "https://");
+    }
+    return raw;
+  }, [xummPayload]);
+
+  const transactionCode = useMemo(() => {
+    if (!shareLink) return "";
+    return shareLink;
+  }, [shareLink]);
 
   const shareText = useMemo(() => {
-    if (!requestValue) return "";
-    return `${t("ui_activation_share_text_7f0f1c9a2d", "Demande de paiement XCANNES:")}\n${requestValue}`;
-  }, [requestValue, t]);
+    if (!shareLink) return "";
+    return `${t("ui_activation_share_text_7f0f1c9a2d", "Demande {{amount}} XRP XCANNES:", {
+      amount: activationAmountLabel,
+    })}\n${shareLink}`;
+  }, [activationAmountLabel, shareLink, t]);
 
   const handleCopy = async () => {
-    if (!requestValue || typeof navigator === "undefined") return;
+    if (!transactionCode || typeof navigator === "undefined") return;
     try {
-      await navigator.clipboard.writeText(requestValue);
+      await navigator.clipboard.writeText(transactionCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -66,12 +115,13 @@ export default function WalletActivationRequestModal({
   };
 
   const handleShare = async () => {
-    if (!requestValue || typeof navigator === "undefined") return;
+    if (!shareLink || typeof navigator === "undefined") return;
     if (navigator.share) {
       try {
         await navigator.share({
           title: t("ui_activation_share_title_8b2d9f1a5c", "Demande de paiement"),
           text: shareText,
+          url: shareLink,
         });
         return;
       } catch {
@@ -104,7 +154,9 @@ export default function WalletActivationRequestModal({
 
           <div className="pr-8">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {t("ui_activation_request_title_6b7c3e2a1f", "Demande 1 XRP")}
+              {t("ui_activation_request_title_6b7c3e2a1f", "Demande {{amount}} XRP", {
+                amount: activationAmountLabel,
+              })}
             </h3>
             {showNotConnectedNotice ? (
               <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none mt-1">
@@ -128,23 +180,41 @@ export default function WalletActivationRequestModal({
               </span>
             ) : null}
             <p className="mt-1 text-sm text-white/60">
-              {t("ui_activation_request_subtitle_9a2d7f5c1e", "QR code et code de demande deja prets.")}
+              {t("ui_activation_request_subtitle_9a2d7f5c1e", "QR XUMM pour {{amount}} XRP.", {
+                amount: activationAmountLabel,
+              })}
             </p>
           </div>
 
-          {requestValue ? (
+          {xummPayload?.qrUrl ? (
             <div className="flex flex-col items-center gap-3">
               <div className="bg-black/60 border border-white/10 rounded-xl p-3">
-                <QRCodeCanvas
-                  value={requestValue}
-                  size={180}
-                  bgColor="#000000"
-                  fgColor="#ffffff"
+                <img
+                  src={xummPayload.qrUrl}
+                  alt={t("ui_xumm_qr_code_282d93fd60", "Code QR XUMM")}
+                  className="h-[180px] w-[180px]"
                 />
               </div>
-              <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
-                {requestValue}
-              </div>
+              {transactionCode ? (
+                <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
+                  <span className="text-white/40">{t("ui_transaction_code_2a6c9b1d5e", "Code de transaction")}:</span>{" "}
+                  <a
+                    href={transactionCode}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/90 underline underline-offset-2 hover:text-white">
+                    {transactionCode}
+                  </a>
+                </div>
+              ) : null}
+            </div>
+          ) : isLoading ? (
+            <div className="text-xs text-white/70 bg-black/30 border border-white/10 rounded-md px-3 py-2">
+              {t("ui_activation_request_loading_2b9d7f1c5a", "Preparation du QR XUMM...")}
+            </div>
+          ) : xummError ? (
+            <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
+              {t("ui_activation_request_qr_error_9f1a2b3c4d", "Erreur lors de la creation du QR XUMM.")}
             </div>
           ) : (
             <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
@@ -156,32 +226,19 @@ export default function WalletActivationRequestModal({
             <button
               type="button"
               onClick={handleShare}
-              className="w-full rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95">
+              disabled={!shareLink}
+              className="w-full rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed">
               {t("ui_share_request_4b9a2d7f1c", "Partager")}
             </button>
             <button
               type="button"
               onClick={handleCopy}
-              className="w-full rounded-lg border border-white/20 bg-transparent text-white/70 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/90">
+              disabled={!transactionCode}
+              className="w-full rounded-lg border border-white/20 bg-transparent text-white/70 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/90 disabled:opacity-60 disabled:cursor-not-allowed">
               {copied
                 ? t("ui_copied_9a2d7f5c1e", "Copie")
                 : t("ui_copy_request_32a3f4409b", "Copier le code")}
             </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <a
-              href={`mailto:?subject=${encodeURIComponent(
-                t("ui_activation_mail_subject_2a9f1c7d5e", "Demande de paiement XCANNES")
-              )}&body=${encodeURIComponent(shareText)}`}
-              className="text-center text-xs text-white/70 rounded-lg border border-white/15 bg-black/30 px-3 py-2 hover:text-white/90 hover:border-white/30">
-              {t("ui_share_mail_4d7a1f2c9e", "Email")}
-            </a>
-            <a
-              href={`sms:?body=${encodeURIComponent(shareText)}`}
-              className="text-center text-xs text-white/70 rounded-lg border border-white/15 bg-black/30 px-3 py-2 hover:text-white/90 hover:border-white/30">
-              {t("ui_share_sms_7b2d9f1a5c", "SMS")}
-            </a>
           </div>
         </div>
       </div>

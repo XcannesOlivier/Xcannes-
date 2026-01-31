@@ -81,6 +81,9 @@ const ADJUSTMENT_FEE_RLUSD = (() => {
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ADJUSTMENT_FEE_RLUSD;
 })();
 
+const DEFAULT_ACTIVATION_XRP_AMOUNT = 1;
+const ACTIVATION_BUNDLE_XRP_AMOUNT = 1.4;
+
 const MOONPAY_SELL_WALLETS = new Set(
   String(process.env.NEXT_PUBLIC_MOONPAY_WALLETS || "")
     .split(",")
@@ -226,6 +229,8 @@ export default function WalletDashboard({
     walletLabel,
   });
 
+  const [cashBuyPrefill, setCashBuyPrefill] = useState(null);
+
   const handleAction = useCallback(
     (nextAction) => {
       if (effectiveIsConnected && isWalletLabelRequired) {
@@ -236,6 +241,9 @@ export default function WalletDashboard({
       if (nextAction === "swap") {
         setSwapDefaultView("convert");
         setSwapLockedView(null);
+      }
+      if (nextAction === "cash") {
+        setCashBuyPrefill(null);
       }
       setActiveAction(nextAction);
     },
@@ -254,6 +262,11 @@ export default function WalletDashboard({
   }, []);
   
   const [cashModalTab, setCashModalTab] = useState("buy"); // 'buy' | 'sell' - Onglet actif dans la modal Cash
+  const [activationBundleEnabled, setActivationBundleEnabled] = useState(false);
+  const activationXrpAmount = activationBundleEnabled ?
+    ACTIVATION_BUNDLE_XRP_AMOUNT :
+    DEFAULT_ACTIVATION_XRP_AMOUNT;
+  const activationXrpAmountLabel = activationBundleEnabled ? "1.40" : "1";
   
   // États pour Payment Request
   const {
@@ -266,6 +279,7 @@ export default function WalletDashboard({
   } = usePaymentRequestForm();
 
   const handleOpenActivationModal = useCallback(() => {
+    setActivationBundleEnabled(false);
     setShowActivationModal(true);
   }, []);
 
@@ -276,9 +290,14 @@ export default function WalletDashboard({
 
   const handleActivationBuyViaMoonpay = useCallback(() => {
     setShowActivationModal(false);
+    setCashBuyPrefill({
+      currency: "XRP",
+      amount: activationXrpAmountLabel,
+      amountType: "crypto",
+    });
     setCashModalTab("buy");
     setActiveAction("cash");
-  }, [setCashModalTab]);
+  }, [activationXrpAmountLabel, setCashModalTab]);
   
   const [selectedWallet, setSelectedWallet] = useState("");
   const {
@@ -1875,7 +1894,7 @@ export default function WalletDashboard({
       return;
     }
 
-    const amountDrops = String(Math.round(1 * 1_000_000));
+    const amountDrops = String(Math.round(Number(activationXrpAmount) * 1_000_000));
     const txjson = {
       TransactionType: "Payment",
       Destination: effectiveWallet,
@@ -1886,7 +1905,7 @@ export default function WalletDashboard({
     if (result?.signed && refreshBalance) {
       setTimeout(() => refreshBalance(), 3000);
     }
-  }, [effectiveWallet, refreshBalance, signTransaction]);
+  }, [activationXrpAmount, effectiveWallet, refreshBalance, signTransaction]);
 
   const handleSwitchWallet = () => {
     if (isConnecting) return;
@@ -2000,6 +2019,9 @@ export default function WalletDashboard({
           onSendFromWallet={handleActivationSendFromWallet}
           onRequestFromThirdParty={handleActivationRequestFromThirdParty}
           onBuyViaMoonpay={handleActivationBuyViaMoonpay}
+          activationBundleEnabled={activationBundleEnabled}
+          onToggleActivationBundle={setActivationBundleEnabled}
+          activationAmountXrp={activationXrpAmount}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}
           hasRlusdTrustline={hasRlusdTrustline}
@@ -2009,6 +2031,7 @@ export default function WalletDashboard({
           onClose={() => setShowActivationRequestModal(false)}
           walletAddress={effectiveWallet}
           walletLabel={walletLabel}
+          activationAmountXrp={activationXrpAmount}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}
           hasRlusdTrustline={hasRlusdTrustline}
@@ -2138,7 +2161,10 @@ export default function WalletDashboard({
 
 	      <WalletDashboardCashModal
 	        open={activeAction === "cash"}
-	        onClose={() => setActiveAction(null)}
+	        onClose={() => {
+	          setActiveAction(null);
+	          setCashBuyPrefill(null);
+	        }}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}
           hasRlusdTrustline={hasRlusdTrustline}
@@ -2152,6 +2178,7 @@ export default function WalletDashboard({
 	        selectIconByCurrency={selectIconByAssetKey}
 	        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
 	        walletAddress={effectiveWallet || ""}
+          buyPrefill={cashBuyPrefill}
 	      />
 
         </>,

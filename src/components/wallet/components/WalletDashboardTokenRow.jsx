@@ -105,12 +105,22 @@ export default function WalletDashboardTokenRow({
             <div className="flex-1 min-w-0 px-2">
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-blue-200/90 text-center leading-snug">
                 <span>
-                  {t(
-                    "ui_for_activate_your_wallet_su_75416099a8",
-                    "Pour activer votre wallet sur le reseau XRPL, une reserve minimale de"
-                  )}{" "}
-                  <span className="font-mono">{t("ui_1_xrp_5436c63b66", "1 XRP")}</span>{" "}
-                  {t("ui_est_requise_38539df503", "est requise.")}{" "}
+                  <span className="hidden md:inline">
+                    {t(
+                      "ui_for_activate_your_wallet_su_75416099a8",
+                      "Pour activer votre wallet sur le reseau XRPL, une reserve minimale de"
+                    )}{" "}
+                    <span className="font-mono">{t("ui_1_xrp_5436c63b66", "1 XRP")}</span>{" "}
+                    {t("ui_est_requise_38539df503", "est requise.")}{" "}
+                  </span>
+                  <span className="md:hidden">
+                    {t(
+                      "ui_min_xrp_reserve_short_6c2a5f9b1d",
+                      "Sur le reseau XRPL, une reserve minimale de"
+                    )}{" "}
+                    <span className="font-mono">{t("ui_1_xrp_5436c63b66", "1 XRP")}</span>{" "}
+                    {t("ui_est_requis_5b9c2d7f1a", "est requis.")}{" "}
+                  </span>
                 </span>
                 <span
                   role="button"
@@ -172,10 +182,10 @@ export default function WalletDashboardTokenRow({
             </div>
           ) : showXcsTrustlineNotice ? (
             <div className="flex-1 min-w-0 px-2">
-              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-amber-200/90 text-center leading-snug">
+              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-white/90 md:text-amber-200/90 text-center leading-snug">
                 <span>
-                  {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
                   <span className="hidden md:inline">
+                    {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
                     {t(
                       "ui_xcs_benefits_notice_2c1e5f9b",
                       "Elle permet de détenir du XCS et de profiter d'avantages."
@@ -203,7 +213,7 @@ export default function WalletDashboardTokenRow({
                       onInstallTrustline?.(currencyCode);
                     }
                   }}
-                  className="text-amber-100 underline underline-offset-2 hover:text-amber-50 whitespace-nowrap">
+                  className="text-white underline underline-offset-2 hover:text-white/90 md:text-amber-100 md:hover:text-amber-50 whitespace-nowrap">
                   {t("ui_activate_7f2974ed87", "Activer")}
                 </span>
               </div>
