@@ -12,7 +12,7 @@ import {
   buildPayreqMemo,
   buildAllocationAdjustMemo,
   buildMoonpayMemo,
-} from "../../../utils/xcannesMemoSchemas";
+} from "./xcannesMemoSchemas";
 
 const MEMO_METRICS_LOG_INTERVAL_MS = Number(
   process.env.NEXT_PUBLIC_MEMO_METRICS_LOG_INTERVAL_MS || 60000
