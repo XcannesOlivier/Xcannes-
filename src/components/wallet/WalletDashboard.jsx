@@ -46,6 +46,8 @@ import WalletDashboardStatementModals from "./modals/WalletDashboardStatementMod
 import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
 import WalletDashboardAdjustModal from "./modals/WalletDashboardAdjustModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
+import WalletActivationModal from "./modals/WalletActivationModal";
+import WalletActivationRequestModal from "./modals/WalletActivationRequestModal";
 import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
@@ -173,6 +175,8 @@ export default function WalletDashboard({
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+  const [showActivationModal, setShowActivationModal] = useState(false);
+  const [showActivationRequestModal, setShowActivationRequestModal] = useState(false);
   const adjustmentAutoOpenedRef = useRef(false);
   const { receiveTab, setReceiveTab } = useReceiveForm();
   const {
@@ -260,6 +264,21 @@ export default function WalletDashboard({
     requestMemo,
     setRequestMemo,
   } = usePaymentRequestForm();
+
+  const handleOpenActivationModal = useCallback(() => {
+    setShowActivationModal(true);
+  }, []);
+
+  const handleActivationRequestFromThirdParty = useCallback(() => {
+    setShowActivationModal(false);
+    setShowActivationRequestModal(true);
+  }, []);
+
+  const handleActivationBuyViaMoonpay = useCallback(() => {
+    setShowActivationModal(false);
+    setCashModalTab("buy");
+    setActiveAction("cash");
+  }, [setCashModalTab]);
   
   const [selectedWallet, setSelectedWallet] = useState("");
   const {
@@ -914,13 +933,19 @@ export default function WalletDashboard({
         tokenRowClass={layout.tokenRowClass}
         onInstallTrustline={handleInstallRequiredTrustline}
         isWalletActivated={isWalletActivated}
+        onActivateWallet={handleOpenActivationModal}
         onClick={() => {
           setSelectedStatementToken(token);
           setShowCurrencyStatement(true);
         }}
       />
     ),
-    [handleInstallRequiredTrustline, isWalletActivated, layout.tokenRowClass]
+    [
+      handleInstallRequiredTrustline,
+      handleOpenActivationModal,
+      isWalletActivated,
+      layout.tokenRowClass,
+    ]
   );
 
   const {
@@ -928,6 +953,13 @@ export default function WalletDashboard({
     allocatedRlusdByCurrency,
     swapCurrencyOptions,
   } = useWalletTokens({ displayTokens, currencyLines });
+
+  const hasRlusdTrustline = useMemo(() => {
+    return (augmentedTokens || []).some((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      return code === "RLUSD" && !token?.isMissingTrustline;
+    });
+  }, [augmentedTokens]);
 
   const selectLabelByAssetKey = useMemo(() => {
     const labels = {};
@@ -1813,7 +1845,7 @@ export default function WalletDashboard({
     }
   };
 
-  const handleCopyAddress = async () => {
+  const handleCopyAddress = useCallback(async () => {
     if (!effectiveWallet || typeof navigator === "undefined") return;
     try {
       if (navigator.clipboard?.writeText) {
@@ -1834,7 +1866,27 @@ export default function WalletDashboard({
       console.error("Copy error:", e);
       flashWalletHeaderToast("Copie impossible", 2000);
     }
-  };
+  }, [effectiveWallet, flashWalletHeaderToast]);
+
+  const handleActivationSendFromWallet = useCallback(async () => {
+    setShowActivationModal(false);
+    if (!effectiveWallet || !signTransaction) {
+      alert("Please connect your Xumm wallet first.");
+      return;
+    }
+
+    const amountDrops = String(Math.round(1 * 1_000_000));
+    const txjson = {
+      TransactionType: "Payment",
+      Destination: effectiveWallet,
+      Amount: amountDrops,
+    };
+
+    const result = await signTransaction(txjson, { action: "wallet:activate_xrp" });
+    if (result?.signed && refreshBalance) {
+      setTimeout(() => refreshBalance(), 3000);
+    }
+  }, [effectiveWallet, refreshBalance, signTransaction]);
 
   const handleSwitchWallet = () => {
     if (isConnecting) return;
@@ -1879,7 +1931,9 @@ export default function WalletDashboard({
     isConnected: effectiveIsConnected,
   });
 
-  useOverflowLock(!!activeAction || showAdjustmentModal);
+  useOverflowLock(
+    !!activeAction || showAdjustmentModal || showActivationModal || showActivationRequestModal
+  );
 
   return (
     <>
@@ -1937,6 +1991,27 @@ export default function WalletDashboard({
           isOpen={walletInfoOpen}
           onClose={() => setWalletInfoOpen(false)}
           isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
+        />
+        <WalletActivationModal
+          open={showActivationModal}
+          onClose={() => setShowActivationModal(false)}
+          onSendFromWallet={handleActivationSendFromWallet}
+          onRequestFromThirdParty={handleActivationRequestFromThirdParty}
+          onBuyViaMoonpay={handleActivationBuyViaMoonpay}
+          isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
+        />
+        <WalletActivationRequestModal
+          open={showActivationRequestModal}
+          onClose={() => setShowActivationRequestModal(false)}
+          walletAddress={effectiveWallet}
+          walletLabel={walletLabel}
+          isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
         />
       </div>
 
@@ -1947,6 +2022,8 @@ export default function WalletDashboard({
             open={activeAction === "send"}
             onClose={() => setActiveAction(null)}
             isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
             sendTab={sendTab}
             setSendTab={setSendTab}
             renderWalletMeta={renderWalletMeta}
@@ -1975,6 +2052,8 @@ export default function WalletDashboard({
             open={activeAction === "receive"}
             onClose={() => setActiveAction(null)}
             isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
             receiveTab={receiveTab}
             setReceiveTab={setReceiveTab}
             renderWalletMeta={renderWalletMeta}
@@ -2005,6 +2084,7 @@ export default function WalletDashboard({
               lockedView={swapLockedView}
               effectiveIsConnected={effectiveIsConnected}
             isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
             walletAddress={effectiveWallet}
             onConnectWallet={connect}
             hasOnChainRlusd={hasOnChainRlusd}
@@ -2043,6 +2123,8 @@ export default function WalletDashboard({
             open={showAdjustmentModal}
             onClose={() => setShowAdjustmentModal(false)}
             isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
             renderWalletMeta={renderWalletMeta}
             walletAddress={effectiveWallet}
             signTransaction={signTransaction}
@@ -2058,6 +2140,8 @@ export default function WalletDashboard({
 	        open={activeAction === "cash"}
 	        onClose={() => setActiveAction(null)}
           isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
 	        cashModalTab={cashModalTab}
 	        setCashModalTab={setCashModalTab}
 	        renderWalletMeta={renderWalletMeta}
@@ -2105,6 +2189,7 @@ export default function WalletDashboard({
 	        backendWalletAddress={backendWalletAddress}
 	        effectiveWallet={effectiveWallet}
           isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
 	        isFullPageView={isFullPageView}
 	        statementVariant={statementVariant}
 	        currencyLines={effectiveCurrencyLines}
