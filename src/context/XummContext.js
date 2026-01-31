@@ -414,6 +414,7 @@ export const XummProvider = ({ children }) => {
       walletWsRefreshRef.current = now;
 
       refreshCachedStatementsForAddress(address, walletSessionToken);
+      fetchBalance(address);
     };
 
     wsClient.on("wallet", handleWalletUpdate);
@@ -423,7 +424,7 @@ export const XummProvider = ({ children }) => {
       wsClient.off("wallet", handleWalletUpdate);
       wsClient.unsubscribe("wallet", address);
     };
-  }, [refreshCachedStatementsForAddress, wallet, walletSessionToken]);
+  }, [fetchBalance, refreshCachedStatementsForAddress, wallet, walletSessionToken]);
 
   const checkPendingConnect = useCallback(async () => {
     if (isConnected) {
