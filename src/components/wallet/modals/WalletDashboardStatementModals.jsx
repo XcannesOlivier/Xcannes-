@@ -279,6 +279,33 @@ export default function WalletDashboardStatementModals({
     loadCurrencyFirstPage(selectedStatementToken.currency);
   }, [loadCurrencyFirstPage, selectedStatementToken, showCurrencyStatement]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!canFetchStatements || !backendWalletAddress) return;
+
+    const handleWalletRefresh = (event) => {
+      const address = event?.detail?.address;
+      if (!address || address !== backendWalletAddress) return;
+      if (showGlobalStatement) {
+        loadGlobalFirstPage();
+      }
+      if (showCurrencyStatement && selectedStatementToken) {
+        loadCurrencyFirstPage(selectedStatementToken.currency);
+      }
+    };
+
+    window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+    return () => window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+  }, [
+    backendWalletAddress,
+    canFetchStatements,
+    loadCurrencyFirstPage,
+    loadGlobalFirstPage,
+    selectedStatementToken,
+    showCurrencyStatement,
+    showGlobalStatement,
+  ]);
+
   const previewMovements = canFetchStatements ? null : (previewGlobalMovements || []);
   const previewTransactions = canFetchStatements
     ? null
