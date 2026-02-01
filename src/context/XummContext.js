@@ -415,6 +415,11 @@ export const XummProvider = ({ children }) => {
 
       refreshCachedStatementsForAddress(address, walletSessionToken);
       fetchBalance(address);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("xcannes:wallet:refresh", { detail: { address } })
+        );
+      }
     };
 
     wsClient.on("wallet", handleWalletUpdate);

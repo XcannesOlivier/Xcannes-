@@ -546,6 +546,21 @@ export default function WalletDashboard({
     ? () => {}
     : refreshCurrencyLines;
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isPreviewMode) return;
+    if (!backendWalletAddress || !effectiveRefreshCurrencyLines) return;
+
+    const handleWalletRefresh = (event) => {
+      const address = event?.detail?.address;
+      if (!address || address !== backendWalletAddress) return;
+      effectiveRefreshCurrencyLines();
+    };
+
+    window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+    return () => window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+  }, [backendWalletAddress, effectiveRefreshCurrencyLines, isPreviewMode]);
+
   const adjustmentDeficitRlusd = Number(
     effectiveCurrencyLinesSummary?.excessAllocatedRlusd ?? 0
   );
