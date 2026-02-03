@@ -56,6 +56,14 @@ function normalizeMemoTypeMarker(value) {
   return null;
 }
 
+function isValidWalletLabel(label) {
+  if (!label) return false;
+  const parts = String(label).trim().split(/\s+/).filter(Boolean);
+  if (parts.length < 1 || parts.length > 2) return false;
+  const wordPattern = /^[A-Za-z]+$/;
+  return parts.every((part) => part.length <= 7 && wordPattern.test(part));
+}
+
 function parseOptionalNumber(value, { min = null, minExclusive = false } = {}) {
   if (value == null || value === '') return { ok: true, value: null, provided: false };
   const parsed = Number.parseFloat(value);
@@ -99,7 +107,7 @@ function inferXcannesMemoType(payload) {
 
 function normalizeWalletLabelPayload(payload, errors) {
   const label = normalizeString(payload?.label);
-  if (!label) errors.push('wallet_label.label');
+  if (!label || !isValidWalletLabel(label)) errors.push('wallet_label.label');
   return { label };
 }
 

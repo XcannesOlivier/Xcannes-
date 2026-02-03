@@ -122,7 +122,7 @@ export default function WalletDashboardReceiveModal({
       amountRlusd = amount;
       fxRate = 1;
       fxSource = "PYTH";
-    } else if (isFxRequest) {
+    } else {
       const rate = Number(rlusdPerUnitRates?.[targetCurrencyUpper]);
       if (!Number.isFinite(rate) || rate <= 0) {
         setGenerateError(
