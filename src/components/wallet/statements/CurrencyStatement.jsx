@@ -237,94 +237,10 @@ export default function CurrencyStatement({
     };
   }, [normalizedCurrency, xcannesCurrencyLinesCount]);
 
-  // Calculer les statistiques
-  const credits = transactions.filter((t) => t.type === "credit");
-  const debits = transactions.filter((t) => t.type === "debit");
-
-  const totalCredits = credits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  const totalDebits = debits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-
-  const openingBalance = balance - totalCredits + totalDebits;
-  const closingBalance = balance;
-  const netChange = closingBalance - openingBalance;
-  const percentChange = openingBalance !== 0 ? netChange / openingBalance * 100 : 0;
-
-  // Statistiques supplémentaires
-  const avgTransaction = transactions.length > 0 ? (totalCredits + totalDebits) / transactions.length : 0;
-  const largestTransaction = transactions.reduce((max, t) => {
-    const amount = parseFloat(t.amount || 0);
-    return amount > max ? amount : max;
-  }, 0);
-
-  // Catégorisation par type
-  const transactionsByCategory = transactions.reduce((acc, tx) => {
-    const cat = tx.category || 'other';
-    if (!acc[cat]) acc[cat] = { count: 0, amount: 0 };
-    acc[cat].count++;
-    acc[cat].amount += parseFloat(tx.amount || 0);
-    return acc;
-  }, {});
-
-  // Données pour graphiques (fictives basées sur les transactions)
-  const monthlyData = [
-  { day: '01', balance: openingBalance * 0.95 },
-  { day: '05', balance: openingBalance * 0.92 },
-  { day: '10', balance: openingBalance * 0.98 },
-  { day: '15', balance: openingBalance * 1.05 },
-  { day: '20', balance: openingBalance * 1.02 },
-  { day: '25', balance: openingBalance * 1.08 },
-  { day: '28', balance: closingBalance }];
-
-
-  // Filtrer les transactions
-  const filteredTransactions = transactions.filter((t) => {
-    if (filter === "credit") return t.type === "credit";
-    if (filter === "debit") return t.type === "debit";
-    if (filter === "conversion") return t.category === "exchange";
-    return true;
-  });
-
-  const transactionsWithDisplayBalance = useMemo(() => {
-    const list = (filteredTransactions || []).map((tx) => ({ ...tx }));
-    const currentDisplayBalance = Number.isFinite(Number(balance))
-      ? Number(balance)
-      : null;
-    let displayBalance = currentDisplayBalance;
-    let stopDisplayBalance = false;
-
-    for (const tx of list) {
-      if (stopDisplayBalance) continue;
-      const kind = String(tx?.kind || "").trim().toUpperCase();
-      const displayAmount = Number(tx?.displayAmount ?? tx?.amount ?? NaN);
-      const displayCurrency = String(
-        tx?.displayCurrencyCode || normalizedCurrency || ""
-      )
-        .trim()
-        .toUpperCase();
-      const isMoonpay = kind === "MOONPAY_BUY" || kind === "MOONPAY_SELL";
-      const hasDisplay =
-        isMoonpay &&
-        Number.isFinite(displayBalance) &&
-        Number.isFinite(displayAmount) &&
-        displayAmount > 0 &&
-        displayCurrency &&
-        displayCurrency === normalizedCurrency;
-      if (!hasDisplay) continue;
-
-      if (kind === "MOONPAY_BUY") {
-        tx.displayRunningBalance = displayBalance;
-        const delta = Math.abs(displayAmount);
-        displayBalance -= delta;
-        continue;
-      }
-
-      if (kind === "MOONPAY_SELL") {
-        stopDisplayBalance = true;
-      }
-    }
-
-    return list;
-  }, [filteredTransactions, balance, normalizedCurrency]);
+  const baseTransactions = useMemo(
+    () => (Array.isArray(transactions) ? transactions : []),
+    [transactions]
+  );
 
   const statementMonthKeys = useMemo(() => {
     const provided = Array.isArray(statementMonths)
@@ -333,7 +249,7 @@ export default function CurrencyStatement({
     if (provided.length > 0) return provided;
 
     const derived = new Set();
-    for (const tx of transactionsWithDisplayBalance || []) {
+    for (const tx of baseTransactions || []) {
       const key = getMonthKeyFromTransaction(tx);
       if (key) derived.add(key);
     }
@@ -342,7 +258,7 @@ export default function CurrencyStatement({
     }
 
     return buildDefaultMonthKeys(STATEMENT_HISTORY_MONTHS);
-  }, [statementMonths, transactionsWithDisplayBalance]);
+  }, [statementMonths, baseTransactions]);
 
   const availableMonths = useMemo(() => {
     const keys = statementMonthKeys || [];
@@ -393,6 +309,115 @@ export default function CurrencyStatement({
     ? archivesLabel
     : availableMonths.find((option) => option.value === selectedMonth)?.displayLabel || String(fallbackPeriod).split(' ')[0];
 
+  const selectedMonthKeys = useMemo(() => {
+    if (selectedMonth === "archives") {
+      return statementMonthKeys.slice(12);
+    }
+    return selectedMonthKey ? [selectedMonthKey] : [];
+  }, [selectedMonth, selectedMonthKey, statementMonthKeys]);
+
+  const periodTransactions = useMemo(() => {
+    if (!selectedMonthKeys.length) return [];
+    const keySet = new Set(selectedMonthKeys);
+    return baseTransactions.filter((tx) => {
+      const key = getMonthKeyFromTransaction(tx);
+      return key && keySet.has(key);
+    });
+  }, [baseTransactions, selectedMonthKeys]);
+
+  // Calculer les statistiques (sur la période sélectionnée)
+  const credits = periodTransactions.filter((t) => t.type === "credit");
+  const debits = periodTransactions.filter((t) => t.type === "debit");
+  const conversions = periodTransactions.filter((t) => t.category === "exchange");
+
+  const totalCredits = credits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  const totalDebits = debits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+
+  const openingBalance = balance - totalCredits + totalDebits;
+  const closingBalance = balance;
+  const netChange = closingBalance - openingBalance;
+  const percentChange = openingBalance !== 0 ? netChange / openingBalance * 100 : 0;
+
+  // Statistiques supplémentaires
+  const avgTransaction = periodTransactions.length > 0
+    ? (totalCredits + totalDebits) / periodTransactions.length
+    : 0;
+  const largestTransaction = periodTransactions.reduce((max, t) => {
+    const amount = parseFloat(t.amount || 0);
+    return amount > max ? amount : max;
+  }, 0);
+
+  // Catégorisation par type
+  const transactionsByCategory = periodTransactions.reduce((acc, tx) => {
+    const cat = tx.category || 'other';
+    if (!acc[cat]) acc[cat] = { count: 0, amount: 0 };
+    acc[cat].count++;
+    acc[cat].amount += parseFloat(tx.amount || 0);
+    return acc;
+  }, {});
+
+  // Données pour graphiques (fictives basées sur les transactions)
+  const monthlyData = [
+  { day: '01', balance: openingBalance * 0.95 },
+  { day: '05', balance: openingBalance * 0.92 },
+  { day: '10', balance: openingBalance * 0.98 },
+  { day: '15', balance: openingBalance * 1.05 },
+  { day: '20', balance: openingBalance * 1.02 },
+  { day: '25', balance: openingBalance * 1.08 },
+  { day: '28', balance: closingBalance }];
+
+
+  // Filtrer les transactions
+  const filteredTransactions = useMemo(() => {
+    return periodTransactions.filter((t) => {
+      if (filter === "credit") return t.type === "credit";
+      if (filter === "debit") return t.type === "debit";
+      if (filter === "conversion") return t.category === "exchange";
+      return true;
+    });
+  }, [periodTransactions, filter]);
+
+  const transactionsWithDisplayBalance = useMemo(() => {
+    const list = (filteredTransactions || []).map((tx) => ({ ...tx }));
+    const currentDisplayBalance = Number.isFinite(Number(balance))
+      ? Number(balance)
+      : null;
+    let displayBalance = currentDisplayBalance;
+    let stopDisplayBalance = false;
+
+    for (const tx of list) {
+      if (stopDisplayBalance) continue;
+      const kind = String(tx?.kind || "").trim().toUpperCase();
+      const displayAmount = Number(tx?.displayAmount ?? tx?.amount ?? NaN);
+      const displayCurrency = String(
+        tx?.displayCurrencyCode || normalizedCurrency || ""
+      )
+        .trim()
+        .toUpperCase();
+      const isMoonpay = kind === "MOONPAY_BUY" || kind === "MOONPAY_SELL";
+      const hasDisplay =
+        isMoonpay &&
+        Number.isFinite(displayBalance) &&
+        Number.isFinite(displayAmount) &&
+        displayAmount > 0 &&
+        displayCurrency &&
+        displayCurrency === normalizedCurrency;
+      if (!hasDisplay) continue;
+
+      if (kind === "MOONPAY_BUY") {
+        tx.displayRunningBalance = displayBalance;
+        const delta = Math.abs(displayAmount);
+        displayBalance -= delta;
+        continue;
+      }
+
+      if (kind === "MOONPAY_SELL") {
+        stopDisplayBalance = true;
+      }
+    }
+
+    return list;
+  }, [filteredTransactions, balance, normalizedCurrency]);
   const transactionsByMonth = useMemo(() => {
     const map = new Map(statementMonthKeys.map((key) => [key, []]));
     for (const tx of transactionsWithDisplayBalance || []) {
@@ -1313,7 +1338,7 @@ export default function CurrencyStatement({
               "bg-white/5 text-white/60 hover:bg-white/10"}`
               }>{t("ui_all_0c90d41d71", "All (")}
 
-              {transactions.length})
+              {periodTransactions.length})
                 </button>
                 <button
               onClick={() => setFilter("credit")}
@@ -1343,7 +1368,7 @@ export default function CurrencyStatement({
               "bg-white/5 text-white/60 hover:bg-white/10"}`
               }>{t("ui_conversions_b604b5ef8b", "Conversions (")}
 
-              {transactions.filter((t) => t.category === "exchange").length})
+              {conversions.length})
                 </button>
               </div>
           </div>
