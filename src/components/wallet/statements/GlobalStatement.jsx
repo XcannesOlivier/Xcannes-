@@ -68,22 +68,6 @@ export default function GlobalStatement({
     "Archives (12+ months)"
   );
   const fallbackPeriod = period || defaultPeriod;
-  const filteredRecentMovements = useMemo(() => {
-    const hiddenKinds = new Set([
-      "CURRENCY_LINE_ACTIVATE",
-      "CURRENCY_LINE_DELETE",
-      "ALLOCATE_SET",
-      "DEALLOCATE_SET",
-      "WALLET_LABEL",
-    ]);
-    return (movements || []).filter((m) => {
-      const kind = String(m?.kind || "").trim().toUpperCase();
-      if (!kind) return true;
-      if (kind.startsWith("CURRENCY_LINE_")) return false;
-      if (kind.startsWith("ALLOCATE_")) return false;
-      return !hiddenKinds.has(kind);
-    });
-  }, [movements]);
 
   useEffect(() => {
     let cancelled = false;
@@ -800,83 +784,6 @@ export default function GlobalStatement({
             </div>
           </div>
         </div>
-
-        {!isPreviewMode && (
-      movementsError ||
-      movementsLoading ||
-      Array.isArray(filteredRecentMovements) && filteredRecentMovements.length > 0 ||
-      movementsHasMore) ?
-      <div className="border-t border-white/10 bg-black/20 px-3 sm:px-6 py-4">
-            <div className="flex items-center justify-between gap-3 mb-2">
-              <h3 className="text-sm font-semibold text-white/80">{t("ui_recent_activity_de80b9813c", "Recent activity")}
-
-          </h3>
-              {movementsLoading &&
-          <span className="text-[10px] text-white/40">{t("ui_loading_1386baebe9", "Loading…")}</span>
-          }
-            </div>
-            {movementsError &&
-        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
-                {movementsError}
-              </div>
-        }
-            {!movementsError &&
-        Array.isArray(filteredRecentMovements) &&
-        filteredRecentMovements.length > 0 ?
-        <div className="space-y-1.5">
-                {filteredRecentMovements.slice(0, 15).map((m) => {
-            const from = String(m?.fromCurrencyCode || "").toUpperCase();
-            const to = String(m?.toCurrencyCode || "").toUpperCase();
-            const amount = Number(m?.amountRlusd || 0);
-            const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
-            const when =
-            createdAt && Number.isFinite(createdAt.getTime()) ?
-            createdAt.toLocaleString(locale) :
-            "";
-            return (
-              <div
-                key={m.movementId || `${when}:${from}:${to}:${amount}`}
-                className="flex items-center justify-between gap-3 rounded-md bg-black/30 border border-white/10 px-3 py-2">
-
-                      <div className="min-w-0">
-                        <div className="text-[11px] text-white/70 truncate">
-                          {from && to ?
-                            `${from} → ${to}` :
-                            t("ui_movement_7a2c1b9d5e", "Movement")}
-                        </div>
-                        <div className="text-[10px] text-white/30 truncate">
-                          {when}
-                        </div>
-                      </div>
-                      <div className="text-[11px] font-mono text-white/80">
-                        {Number.isFinite(amount) ?
-                  `${amount.toLocaleString(locale, {
-                    maximumFractionDigits: 6
-                  })} RLUSD` :
-                  "—"}
-                      </div>
-                    </div>);
-
-          })}
-              </div> :
-        null}
-
-            {movementsHasMore &&
-        <div className="mt-3">
-                <button
-            type="button"
-            onClick={() => onLoadMoreMovements && onLoadMoreMovements()}
-            disabled={movementsLoadingMore}
-            className="w-full px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white/70 border border-white/15 text-xs font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
-
-                  {movementsLoadingMore ?
-                    t("ui_loading_1386baebe9", "Loading…") :
-                    t("ui_load_more_3f7a1c9d5b", "Load more")}
-                </button>
-              </div>
-        }
-          </div> :
-      null}
 
         {/* Footer Actions */}
         <div className="border-t border-white/10 px-3 sm:px-6 py-3 sm:py-4 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
