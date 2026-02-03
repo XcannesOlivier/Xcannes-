@@ -20,6 +20,7 @@ export default function WalletDashboardHeader({
   isRefreshing,
   isEditingWalletLabel,
   isWalletLabelRequired,
+  isWalletLabelLocked,
   walletLabelDraft,
   onWalletLabelDraftChange,
   onSaveWalletLabel,
@@ -114,27 +115,29 @@ export default function WalletDashboardHeader({
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <button
+                  {!isWalletLabelLocked &&
+                  <button
                     type="button"
                     onClick={onOpenWalletLabelEditor}
                     title={t("ui_rename_86c8307e14", "Renommer")}
                     className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
                     aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
 
-                      <svg
+                    <svg
                       className="w-4 h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24">
 
-                        <path
+                      <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
                         d="M16.862 3.487a2.1 2.1 0 012.97 2.97L8.9 17.39a4 4 0 01-1.69 1l-3.42 1.14 1.14-3.42a4 4 0 011-1.69L16.862 3.487z" />
 
-                      </svg>
-                    </button>
+                    </svg>
+                  </button>
+                  }
 
                     <button
                     type="button"

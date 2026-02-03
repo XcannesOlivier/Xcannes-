@@ -207,6 +207,7 @@ export default function WalletDashboard({
     setWalletLabelDraft,
     isEditingWalletLabel,
     isWalletLabelRequired,
+    isWalletLabelLocked,
     walletHeaderToast,
     flashWalletHeaderToast,
     openWalletLabelEditor: handleOpenWalletLabelEditor,
@@ -2032,6 +2033,7 @@ export default function WalletDashboard({
           isRefreshing={isRefreshing}
           isEditingWalletLabel={isEditingWalletLabel}
           isWalletLabelRequired={isWalletLabelRequired}
+          isWalletLabelLocked={isWalletLabelLocked}
           walletLabelDraft={walletLabelDraft}
           onWalletLabelDraftChange={setWalletLabelDraft}
           onSaveWalletLabel={handleSaveWalletLabel}

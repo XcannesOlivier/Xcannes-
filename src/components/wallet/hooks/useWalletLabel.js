@@ -20,6 +20,7 @@ export function useWalletLabel({
   const [walletLabelDraft, setWalletLabelDraft] = useState(defaultLabel);
   const [isEditingWalletLabel, setIsEditingWalletLabel] = useState(false);
   const [isWalletLabelRequired, setIsWalletLabelRequired] = useState(false);
+  const [isWalletLabelLocked, setIsWalletLabelLocked] = useState(false);
   const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
   const [walletHeaderToast, setWalletHeaderToast] = useState("");
   const toastTimeoutRef = useRef(null);
@@ -67,6 +68,7 @@ export function useWalletLabel({
       setWalletLabelDraft(label || defaultLabel);
       const required = !label;
       setIsWalletLabelRequired(required);
+      setIsWalletLabelLocked(Boolean(label));
       if (required) {
         setIsEditingWalletLabel(true);
       }
@@ -89,6 +91,7 @@ export function useWalletLabel({
       setWalletLabelDraft(defaultLabel);
       setIsEditingWalletLabel(false);
       setIsWalletLabelRequired(false);
+      setIsWalletLabelLocked(false);
       setIsWalletLabelLoading(false);
       loadTokenRef.current += 1;
       return;
@@ -98,12 +101,21 @@ export function useWalletLabel({
 
   const openWalletLabelEditor = useCallback(() => {
     if (!walletAddress) return;
+    if (isWalletLabelLocked) {
+      flashWalletHeaderToast("Nom du wallet deja valide.", 2000);
+      return;
+    }
     setWalletLabelDraft(walletLabel || "");
     setIsEditingWalletLabel(true);
-  }, [walletAddress, walletLabel]);
+  }, [flashWalletHeaderToast, isWalletLabelLocked, walletAddress, walletLabel]);
 
   const saveWalletLabel = useCallback(async () => {
     if (!walletAddress) return;
+    if (isWalletLabelLocked) {
+      flashWalletHeaderToast("Nom du wallet deja valide.", 2000);
+      setIsEditingWalletLabel(false);
+      return;
+    }
     const trimmed = String(walletLabelDraft || "").trim();
     const words = trimmed.split(/\s+/).filter(Boolean);
     const wordPattern = /^[A-Za-z]+$/;
@@ -196,6 +208,7 @@ export function useWalletLabel({
     setWalletLabel(trimmed);
     setIsEditingWalletLabel(false);
     setIsWalletLabelRequired(false);
+    setIsWalletLabelLocked(true);
     loadWalletLabel();
 
     flashWalletHeaderToast("Nom enregistré", 1600);
@@ -206,6 +219,7 @@ export function useWalletLabel({
     isConnected,
     isPreviewMode,
     isWalletActivated,
+    isWalletLabelLocked,
     loadWalletLabel,
     renameFeeRlusd,
     signTransaction,
@@ -230,6 +244,7 @@ export function useWalletLabel({
     setWalletLabelDraft,
     isEditingWalletLabel,
     isWalletLabelRequired,
+    isWalletLabelLocked,
     isWalletLabelLoading,
     walletHeaderToast,
     flashWalletHeaderToast,
