@@ -5,8 +5,6 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { getWalletSessionHeaders } from "@/lib/walletSession";
-import { useXumm } from "@/context/XummContext";
 import {
   buildCsvString,
   downloadTextFile,
@@ -54,8 +52,6 @@ export default function GlobalStatement({
   onViewCurrency
 }) {
   const { t, i18n } = useTranslation("common");
-  const xumm = useXumm();
-  const walletSessionToken = xumm?.walletSessionToken || null;
   const locale = i18n?.language || "en";
   const [sortBy, setSortBy] = useState("balance"); // balance, change, name
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
@@ -75,7 +71,7 @@ export default function GlobalStatement({
 
   useEffect(() => {
     let cancelled = false;
-    if (!walletAddress || !walletSessionToken) {
+    if (!walletAddress) {
       setWalletLabel("");
       return () => {};
     }
@@ -83,8 +79,7 @@ export default function GlobalStatement({
     const loadLabel = async () => {
       try {
         const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-          { headers: getWalletSessionHeaders(walletSessionToken) }
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
         );
         const data = await res.json();
         if (!res.ok) {
@@ -102,7 +97,7 @@ export default function GlobalStatement({
     return () => {
       cancelled = true;
     };
-  }, [walletAddress, walletSessionToken]);
+  }, [walletAddress]);
 
   // Générer les 12 derniers mois
   const generateMonths = () => {

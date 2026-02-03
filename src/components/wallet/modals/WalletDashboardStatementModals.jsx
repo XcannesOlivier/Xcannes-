@@ -3,9 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { getWalletSessionHeaders } from "@/lib/walletSession";
 import { getCachedStatement, setCachedStatement } from "@/lib/walletStatementCache";
-import { useXumm } from "@/context/XummContext";
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
 
@@ -33,8 +31,6 @@ export default function WalletDashboardStatementModals({
   setSelectedStatementToken,
 }) {
   const { t } = useTranslation("common");
-  const xumm = useXumm();
-  const walletSessionToken = xumm?.walletSessionToken || null;
   const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
     const code = String(t?.currency || "").toUpperCase();
     return code === "RLUSD" && !t?.isMissingTrustline;
@@ -54,10 +50,9 @@ export default function WalletDashboardStatementModals({
       typeof window !== "undefined" &&
       typeof backendWalletAddress === "string" &&
       backendWalletAddress.startsWith("r") &&
-      backendWalletAddress.length >= 25 &&
-      Boolean(walletSessionToken)
+      backendWalletAddress.length >= 25
     );
-  }, [backendWalletAddress, walletSessionToken]);
+  }, [backendWalletAddress]);
 
   const [globalMovements, setGlobalMovements] = useState([]);
   const [globalCursorNext, setGlobalCursorNext] = useState(null);
@@ -85,9 +80,7 @@ export default function WalletDashboardStatementModals({
     const cacheKey = url.toString();
     const cached = getCachedStatement(cacheKey);
     if (cached) return cached;
-    const res = await fetch(url.toString(), {
-      headers: getWalletSessionHeaders(walletSessionToken),
-    });
+    const res = await fetch(url.toString());
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       throw new Error(
@@ -100,7 +93,7 @@ export default function WalletDashboardStatementModals({
     }
     setCachedStatement(cacheKey, data);
     return data;
-  }, [t, walletSessionToken]);
+  }, [t]);
 
   const loadGlobalFirstPage = useCallback(async () => {
     if (!canFetchStatements) return;

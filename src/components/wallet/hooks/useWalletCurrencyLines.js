@@ -1,11 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { getWalletSessionHeaders } from "@/lib/walletSession";
-import { useXumm } from "@/context/XummContext";
 
 export function useWalletCurrencyLines(address, { signTransaction } = {}) {
-  const xumm = useXumm();
-  const walletSessionToken = xumm?.walletSessionToken || null;
   const [lines, setLines] = useState([]);
   const [summary, setSummary] = useState({
     rlusdOnChain: null,
@@ -36,7 +32,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
   }, [signTransaction]);
 
   const fetchCurrencyLines = useCallback(async () => {
-    if (!address || !walletSessionToken) {
+    if (!address) {
       setLines([]);
       setSummary({
         rlusdOnChain: null,
@@ -55,8 +51,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
       setError(null);
 
       const res = await fetch(
-        apiUrl(`/wallet/currency-lines?address=${encodeURIComponent(address)}`),
-        { headers: getWalletSessionHeaders(walletSessionToken) }
+        apiUrl(`/wallet/currency-lines?address=${encodeURIComponent(address)}`)
       );
       const data = await res.json();
 
@@ -78,7 +73,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
     } finally {
       setLoading(false);
     }
-  }, [address, walletSessionToken]);
+  }, [address]);
 
   const upsertCurrencyLine = useCallback(
     async ({ currencyCode, allocatedRlusd, fxRate, fxSource, xummUuid } = {}) => {
@@ -97,7 +92,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...getWalletSessionHeaders(walletSessionToken),
+            // no session headers
           },
           body: JSON.stringify({
             address,
@@ -131,7 +126,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
         setLoading(false);
       }
     },
-    [address, requestWalletSignature, walletSessionToken]
+    [address, requestWalletSignature]
   );
 
   const removeCurrencyLine = useCallback(
@@ -151,7 +146,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            ...getWalletSessionHeaders(walletSessionToken),
+            // no session headers
           },
           body: JSON.stringify({
             address,
@@ -182,7 +177,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
         setLoading(false);
       }
     },
-    [address, requestWalletSignature, walletSessionToken]
+    [address, requestWalletSignature]
   );
 
   const convertAllocation = useCallback(
@@ -210,7 +205,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...getWalletSessionHeaders(walletSessionToken),
+            // no session headers
           },
           body: JSON.stringify({
             address,
@@ -247,7 +242,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
         setLoading(false);
       }
     },
-    [address, requestWalletSignature, walletSessionToken]
+    [address, requestWalletSignature]
   );
 
   useEffect(() => {
