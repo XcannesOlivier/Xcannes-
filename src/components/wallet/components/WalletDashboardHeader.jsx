@@ -15,8 +15,9 @@ export default function WalletDashboardHeader({
   walletHeaderToast,
   onOpenWalletLabelEditor,
   onCopyAddress,
-  onSwitchWallet,
+  onRefreshWallet,
   isConnecting,
+  isRefreshing,
   isEditingWalletLabel,
   isWalletLabelRequired,
   walletLabelDraft,
@@ -83,170 +84,171 @@ export default function WalletDashboardHeader({
         {/* Affichage du wallet connecté à la place du menu déroulant */}
         {effectiveIsConnected && effectiveWallet &&
         <div className="w-full mt-2 px-2 flex justify-center">
-            <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                    className={`h-2 w-2 rounded-full ring-4 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
-                    xrplConnectionIndicator.pulse ? "animate-pulse" : ""}`
-                    }
-                    title={xrplConnectionIndicator.label}
-                    aria-label={xrplConnectionIndicator.label} />
+            <div className="relative w-full max-w-[560px] pr-12">
+              <div className="w-full min-w-0 rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                      className={`h-2 w-2 rounded-full ring-4 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
+                      xrplConnectionIndicator.pulse ? "animate-pulse" : ""}`
+                      }
+                      title={xrplConnectionIndicator.label}
+                      aria-label={xrplConnectionIndicator.label} />
 
-                    <span className="text-[12px] md:text-[13px] font-semibold text-white/85 truncate">
-                      {walletLabel || "Wallet"}
-                    </span>
-                  </div>
-
-                  <div className="mt-1 flex items-center gap-2 min-w-0">
-                    <span className="font-mono text-[11px] text-white/55 truncate">
-                      {effectiveWallet.slice(0, 10)}…{effectiveWallet.slice(-8)}
-                    </span>
-                    {walletHeaderToast &&
-                  <span className="text-[10px] text-xcannes-green/90">
-                        {walletHeaderToast}
+                      <span className="text-[12px] md:text-[13px] font-semibold text-white/85 truncate">
+                        {walletLabel || "Wallet"}
                       </span>
-                  }
+                    </div>
+
+                    <div className="mt-1 flex items-center gap-2 min-w-0">
+                      <span className="font-mono text-[11px] text-white/55 truncate">
+                        {effectiveWallet.slice(0, 10)}…{effectiveWallet.slice(-8)}
+                      </span>
+                      {walletHeaderToast &&
+                    <span className="text-[10px] text-xcannes-green/90">
+                          {walletHeaderToast}
+                        </span>
+                    }
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                  type="button"
-                  onClick={onOpenWalletLabelEditor}
-                  title={t("ui_rename_86c8307e14", "Renommer")}
-                  className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
-                  aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
-
-                    <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                      <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16.862 3.487a2.1 2.1 0 012.97 2.97L8.9 17.39a4 4 0 01-1.69 1l-3.42 1.14 1.14-3.42a4 4 0 011-1.69L16.862 3.487z" />
-
-                    </svg>
-                  </button>
-
-                  <button
-                  type="button"
-                  onClick={onCopyAddress}
-                  title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
-                  className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
-                  aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
-
-                    <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                      <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-
-                    </svg>
-                  </button>
-
-                  <button
-                  type="button"
-                  onClick={onSwitchWallet}
-                  disabled={isConnecting}
-                  title={t("ui_change_wallet_0a2d485467", "Changer de wallet")}
-                  className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-                  aria-label={t("ui_change_wallet_3a2195cf75", "Changer de wallet")}>
-
-                    <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24">
-
-                      <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 1l4 4-4 4M21 5H9a4 4 0 00-4 4v1M7 23l-4-4 4-4M3 19h12a4 4 0 004-4v-1" />
-
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              {isEditingWalletLabel &&
-            <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 rounded-lg bg-white/5 border border-white/10 px-2 py-2">
-                  <input
-                type="text"
-                value={walletLabelDraft}
-                onChange={(e) => onWalletLabelDraftChange?.(e.target.value)}
-                placeholder={t("ui_wallet_name_b4c2f054b9", "Nom du wallet")}
-                className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    onSaveWalletLabel?.();
-                  }
-                  if (e.key === "Escape") {
-                    onCancelWalletLabel?.();
-                  }
-                }}
-                autoFocus />
-
-
-                  <button
-                type="button"
-                onClick={onSaveWalletLabel}
-                className="p-2 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
-                aria-label={t("ui_save_404be3f4a5", "Enregistrer")}
-                title={t("ui_save_2d42b7df0f", "Enregistrer")}>
-
-                    <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-
-                      <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7" />
-
-                    </svg>
-                  </button>
-
-                  {!isWalletLabelRequired &&
-                  <button
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
                     type="button"
-                    onClick={onCancelWalletLabel}
-                    className="p-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
-                    aria-label={t("ui_cancel_d2d2058892", "Annuler")}
-                    title={t("ui_cancel_fbca985028", "Annuler")}>
+                    onClick={onOpenWalletLabelEditor}
+                    title={t("ui_rename_86c8307e14", "Renommer")}
+                    className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
+                    aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
 
-                    <svg
+                      <svg
                       className="w-4 h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24">
 
-                      <path
+                        <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12" />
+                        d="M16.862 3.487a2.1 2.1 0 012.97 2.97L8.9 17.39a4 4 0 01-1.69 1l-3.42 1.14 1.14-3.42a4 4 0 011-1.69L16.862 3.487z" />
 
-                    </svg>
-                  </button>
-                  }
+                      </svg>
+                    </button>
+
+                    <button
+                    type="button"
+                    onClick={onCopyAddress}
+                    title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+                    className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
+                    aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
+
+                      <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+
+                        <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-            }
+
+                {isEditingWalletLabel &&
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 rounded-lg bg-white/5 border border-white/10 px-2 py-2">
+                    <input
+                  type="text"
+                  value={walletLabelDraft}
+                  onChange={(e) => onWalletLabelDraftChange?.(e.target.value)}
+                  placeholder={t("ui_wallet_name_b4c2f054b9", "Nom du wallet")}
+                  className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      onSaveWalletLabel?.();
+                    }
+                    if (e.key === "Escape") {
+                      onCancelWalletLabel?.();
+                    }
+                  }}
+                  autoFocus />
+
+
+                    <button
+                  type="button"
+                  onClick={onSaveWalletLabel}
+                  className="p-2 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
+                  aria-label={t("ui_save_404be3f4a5", "Enregistrer")}
+                  title={t("ui_save_2d42b7df0f", "Enregistrer")}>
+
+                      <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+
+                        <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7" />
+
+                      </svg>
+                    </button>
+
+                    {!isWalletLabelRequired &&
+                    <button
+                      type="button"
+                      onClick={onCancelWalletLabel}
+                      className="p-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
+                      aria-label={t("ui_cancel_d2d2058892", "Annuler")}
+                      title={t("ui_cancel_fbca985028", "Annuler")}>
+
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12" />
+
+                      </svg>
+                    </button>
+                    }
+                  </div>
+              }
+              </div>
+
+              <button
+              type="button"
+              onClick={onRefreshWallet}
+              disabled={isConnecting || isRefreshing}
+              title={t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+              isRefreshing ?
+              "text-xcannes-green hover:text-xcannes-green/90" :
+              "text-white/60 hover:text-white"}`
+              }
+              aria-label={t("ui_refresh_wallet_label_7b2d1a9c4e", "Recharger le wallet")}>
+
+                <svg
+                className={`w-7 h-7 ${isRefreshing ? "animate-spin" : ""}`}
+                fill="currentColor"
+                viewBox="0 0 24 24">
+
+                  <path
+                  d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />
+                </svg>
+              </button>
             </div>
           </div>
         }
