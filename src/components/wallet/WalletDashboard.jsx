@@ -172,6 +172,7 @@ export default function WalletDashboard({
   );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshTimerRef = useRef(null);
   const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | null
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
@@ -1916,10 +1917,57 @@ export default function WalletDashboard({
     }
   }, [activationXrpAmount, effectiveWallet, refreshBalance, signTransaction]);
 
-  const handleSwitchWallet = () => {
-    if (isConnecting) return;
-    connect();
-  };
+  const handleRefreshWallet = useCallback(async () => {
+    if (isConnecting || isRefreshing) return;
+    if (isPreviewMode) return;
+    const startedAt = Date.now();
+    setIsRefreshing(true);
+    try {
+      const tasks = [];
+      if (typeof refreshBalance === "function") {
+        tasks.push(Promise.resolve(refreshBalance()));
+      }
+      if (typeof window !== "undefined" && backendWalletAddress) {
+        window.dispatchEvent(
+          new CustomEvent("xcannes:wallet:refresh", {
+            detail: { address: backendWalletAddress },
+          })
+        );
+      }
+      if (tasks.length > 0) await Promise.allSettled(tasks);
+    } finally {
+      const minDurationMs = 700;
+      const elapsed = Date.now() - startedAt;
+      const remaining = minDurationMs - elapsed;
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
+      if (remaining > 0) {
+        refreshTimerRef.current = setTimeout(() => {
+          setIsRefreshing(false);
+          refreshTimerRef.current = null;
+        }, remaining);
+      } else {
+        setIsRefreshing(false);
+      }
+    }
+  }, [
+    backendWalletAddress,
+    isConnecting,
+    isPreviewMode,
+    isRefreshing,
+    refreshBalance,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (refreshTimerRef.current) {
+        clearTimeout(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setSelectedWallet(wallet || "");
@@ -1979,8 +2027,9 @@ export default function WalletDashboard({
           walletHeaderToast={walletHeaderToast}
           onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
           onCopyAddress={handleCopyAddress}
-          onSwitchWallet={handleSwitchWallet}
+          onRefreshWallet={handleRefreshWallet}
           isConnecting={isConnecting}
+          isRefreshing={isRefreshing}
           isEditingWalletLabel={isEditingWalletLabel}
           isWalletLabelRequired={isWalletLabelRequired}
           walletLabelDraft={walletLabelDraft}
