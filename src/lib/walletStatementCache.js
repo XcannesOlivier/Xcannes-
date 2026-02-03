@@ -1,5 +1,5 @@
 const STATEMENT_CACHE_KEY = "xcannes_wallet_statement_cache_v1";
-const DEFAULT_TTL_MS = 0;
+const DEFAULT_TTL_MS = 60 * 1000;
 const MAX_ENTRIES = 25;
 
 function readCache() {

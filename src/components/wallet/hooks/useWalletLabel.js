@@ -106,14 +106,14 @@ export function useWalletLabel({
     if (!walletAddress) return;
     const trimmed = String(walletLabelDraft || "").trim();
     const words = trimmed.split(/\s+/).filter(Boolean);
-    const wordPattern = /^\p{L}+$/u;
+    const wordPattern = /^[A-Za-z]+$/;
     const isValid =
       words.length >= 1 &&
       words.length <= 2 &&
-      words.every((word) => word.length <= 6 && wordPattern.test(word));
+      words.every((word) => word.length <= 7 && wordPattern.test(word));
     if (!isValid) {
       flashWalletHeaderToast(
-        "Nom du wallet: 1 ou 2 mots, 6 lettres max par mot, lettres uniquement.",
+        "Nom du wallet: 1 ou 2 mots, 7 lettres max par mot, lettres A-Z uniquement (sans accents).",
         2600
       );
       return;

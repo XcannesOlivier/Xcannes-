@@ -68,6 +68,22 @@ export default function GlobalStatement({
     "Archives (12+ months)"
   );
   const fallbackPeriod = period || defaultPeriod;
+  const filteredRecentMovements = useMemo(() => {
+    const hiddenKinds = new Set([
+      "CURRENCY_LINE_ACTIVATE",
+      "CURRENCY_LINE_DELETE",
+      "ALLOCATE_SET",
+      "DEALLOCATE_SET",
+      "WALLET_LABEL",
+    ]);
+    return (movements || []).filter((m) => {
+      const kind = String(m?.kind || "").trim().toUpperCase();
+      if (!kind) return true;
+      if (kind.startsWith("CURRENCY_LINE_")) return false;
+      if (kind.startsWith("ALLOCATE_")) return false;
+      return !hiddenKinds.has(kind);
+    });
+  }, [movements]);
 
   useEffect(() => {
     let cancelled = false;
@@ -788,7 +804,7 @@ export default function GlobalStatement({
         {!isPreviewMode && (
       movementsError ||
       movementsLoading ||
-      Array.isArray(movements) && movements.length > 0 ||
+      Array.isArray(filteredRecentMovements) && filteredRecentMovements.length > 0 ||
       movementsHasMore) ?
       <div className="border-t border-white/10 bg-black/20 px-3 sm:px-6 py-4">
             <div className="flex items-center justify-between gap-3 mb-2">
@@ -805,10 +821,10 @@ export default function GlobalStatement({
               </div>
         }
             {!movementsError &&
-        Array.isArray(movements) &&
-        movements.length > 0 ?
+        Array.isArray(filteredRecentMovements) &&
+        filteredRecentMovements.length > 0 ?
         <div className="space-y-1.5">
-                {movements.slice(0, 15).map((m) => {
+                {filteredRecentMovements.slice(0, 15).map((m) => {
             const from = String(m?.fromCurrencyCode || "").toUpperCase();
             const to = String(m?.toCurrencyCode || "").toUpperCase();
             const amount = Number(m?.amountRlusd || 0);
