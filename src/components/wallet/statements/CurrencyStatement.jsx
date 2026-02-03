@@ -5,8 +5,6 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { getWalletSessionHeaders } from "@/lib/walletSession";
-import { useXumm } from "@/context/XummContext";
 import {
   buildCsvString,
   downloadTextFile,
@@ -107,8 +105,6 @@ export default function CurrencyStatement({
   onClose
 }) {
   const { t, i18n } = useTranslation("common");
-  const xumm = useXumm();
-  const walletSessionToken = xumm?.walletSessionToken || null;
   const locale = i18n?.language || "en";
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
@@ -159,7 +155,7 @@ export default function CurrencyStatement({
 
   useEffect(() => {
     let cancelled = false;
-    if (!walletAddress || !walletSessionToken) {
+    if (!walletAddress) {
       setWalletLabel("");
       return () => {};
     }
@@ -167,8 +163,7 @@ export default function CurrencyStatement({
     const loadLabel = async () => {
       try {
         const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-          { headers: getWalletSessionHeaders(walletSessionToken) }
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
         );
         const data = await res.json();
         if (!res.ok) {
@@ -186,7 +181,7 @@ export default function CurrencyStatement({
     return () => {
       cancelled = true;
     };
-  }, [walletAddress, walletSessionToken]);
+  }, [walletAddress]);
 
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),

@@ -5,7 +5,6 @@
 	import { useXumm } from "@/context/XummContext";
 import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { getWalletSessionHeaders } from "@/lib/walletSession";
 	import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import {
@@ -136,7 +135,6 @@ export default function WalletDashboard({
     isConnecting,
     balance,
     isWalletActivated,
-    walletSessionToken,
     refreshBalance,
     connect,
     disconnect,
@@ -235,8 +233,6 @@ export default function WalletDashboard({
     (nextAction) => {
       if (effectiveIsConnected && isWalletLabelRequired) {
         flashWalletHeaderToast("Nom du wallet requis.", 2000);
-        handleOpenWalletLabelEditor();
-        return;
       }
       if (nextAction === "swap") {
         setSwapDefaultView("convert");
@@ -250,7 +246,6 @@ export default function WalletDashboard({
     [
       effectiveIsConnected,
       flashWalletHeaderToast,
-      handleOpenWalletLabelEditor,
       isWalletLabelRequired,
     ]
   );
@@ -542,9 +537,10 @@ export default function WalletDashboard({
     : currencyLinesSummary;
   const effectiveCurrencyLinesLoading = isPreviewMode ? false : currencyLinesLoading;
   const effectiveCurrencyLinesError = isPreviewMode ? null : currencyLinesError;
-  const effectiveRefreshCurrencyLines = isPreviewMode
-    ? () => {}
-    : refreshCurrencyLines;
+  const effectiveRefreshCurrencyLines = useMemo(() => {
+    if (isPreviewMode) return () => {};
+    return refreshCurrencyLines;
+  }, [isPreviewMode, refreshCurrencyLines]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1096,7 +1092,7 @@ export default function WalletDashboard({
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isPreviewMode) return;
-    if (!backendWalletAddress || !walletSessionToken) return;
+    if (!backendWalletAddress) return;
 
     const storageKey = `xcannes_wallet_last_incoming:${backendWalletAddress}`;
     try {
@@ -1114,9 +1110,7 @@ export default function WalletDashboard({
         params.set("address", backendWalletAddress);
         params.set("limit", "5");
         params.set("source", "onchain");
-        const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`), {
-          headers: getWalletSessionHeaders(walletSessionToken),
-        });
+        const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return;
 
@@ -1185,7 +1179,7 @@ export default function WalletDashboard({
       cancelled = true;
       window.clearInterval(interval);
     };
-  }, [backendWalletAddress, flashWalletHeaderToast, isPreviewMode, walletSessionToken]);
+  }, [backendWalletAddress, flashWalletHeaderToast, isPreviewMode]);
 
   const displayTokensWithCurrencyLines = useMemo(() => {
     return (augmentedTokens || []).map((token) => {

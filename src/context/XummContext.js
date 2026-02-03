@@ -12,7 +12,6 @@ import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 const XummContext = createContext();
 const XUMM_PENDING_CONNECT_KEY = "xcannes_xumm_pending_connect";
 const XUMM_TICKET_QUERY_KEY = "xummTicket";
-const WALLET_SESSION_TOKEN_KEY = "xcannes_wallet_session_token";
 
 function generateXummTicket() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -119,38 +118,9 @@ function clearPendingConnectUuid() {
   }
 }
 
-function getSessionToken() {
-  if (typeof window === "undefined") return null;
-  try {
-    return sessionStorage.getItem(WALLET_SESSION_TOKEN_KEY);
-  } catch (err) {
-    return null;
-  }
-}
-
-function setSessionToken(token) {
-  if (typeof window === "undefined") return;
-  try {
-    if (token) {
-      sessionStorage.setItem(WALLET_SESSION_TOKEN_KEY, token);
-    }
-  } catch (err) {
-    // Ignore storage errors (private mode, etc.)
-  }
-}
-
-function clearSessionToken() {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.removeItem(WALLET_SESSION_TOKEN_KEY);
-  } catch (err) {
-    // Ignore storage errors (private mode, etc.)
-  }
-}
 
 export const XummProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");
-  const [walletSessionToken, setWalletSessionTokenState] = useState(() => getSessionToken());
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [balance, setBalance] = useState(null);
@@ -259,8 +229,8 @@ export const XummProvider = ({ children }) => {
     []
   );
 
-  const warmFullReplay = useCallback(async (address, sessionToken) => {
-    if (!address || !sessionToken) return;
+  const warmFullReplay = useCallback(async (address) => {
+    if (!address) return;
     try {
       const params = new URLSearchParams();
       params.set("address", address);
@@ -269,9 +239,7 @@ export const XummProvider = ({ children }) => {
       params.set("includeRaw", "true");
       params.set("source", "onchain");
       const url = apiUrl(`/wallet/statement?${params.toString()}`);
-      const res = await fetch(url, {
-        headers: { "x-wallet-session": sessionToken },
-      });
+      const res = await fetch(url);
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setCachedStatement(url, data);
@@ -287,8 +255,8 @@ export const XummProvider = ({ children }) => {
     }
   }, []);
 
-  const refreshCachedStatementsForAddress = useCallback(async (address, sessionToken) => {
-    if (!address || !sessionToken) return;
+  const refreshCachedStatementsForAddress = useCallback(async (address) => {
+    if (!address) return;
     const cacheKeys = listCachedStatementKeys();
     const targetKeys = cacheKeys.filter((key) => {
       if (!key.includes("/wallet/statement")) return false;
@@ -320,9 +288,7 @@ export const XummProvider = ({ children }) => {
         }
       })();
       try {
-        const res = await fetch(fetchUrl, {
-          headers: { "x-wallet-session": sessionToken },
-        });
+        const res = await fetch(fetchUrl);
         const data = await res.json().catch(() => ({}));
         if (res.ok) {
           setCachedStatement(url, data);
@@ -335,35 +301,6 @@ export const XummProvider = ({ children }) => {
     }
   }, []);
 
-  const updateWalletSession = useCallback(async (address, active, { xummUuid } = {}) => {
-    if (!address) return;
-    const endpoint = active ? "/wallet/session/connect" : "/wallet/session/disconnect";
-    const payload = active
-      ? { address, xummUuid: xummUuid || getPendingConnectUuid() }
-      : { address, sessionToken: getSessionToken() };
-    if (active && !payload.xummUuid) return;
-    if (!active && !payload.sessionToken) return;
-    try {
-      const res = await fetch(apiUrl(endpoint), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && active && data.sessionToken) {
-        setSessionToken(data.sessionToken);
-        setWalletSessionTokenState(data.sessionToken);
-        warmFullReplay(address, data.sessionToken);
-      }
-      if (res.ok && !active) {
-        clearSessionToken();
-        setWalletSessionTokenState(null);
-      }
-    } catch (error) {
-      console.warn("Wallet session update failed:", error);
-    }
-  }, [warmFullReplay]);
-
   const updateWallet = useCallback(
     (account) => {
       if (account) {
@@ -372,7 +309,7 @@ export const XummProvider = ({ children }) => {
         setIsWalletActivated(null);
         sessionStorage.setItem("xumm_wallet", account);
         fetchBalance(account);
-        updateWalletSession(account, true);
+        warmFullReplay(account);
       } else {
         setWallet("");
         setIsConnected(false);
@@ -381,13 +318,13 @@ export const XummProvider = ({ children }) => {
         sessionStorage.removeItem("xumm_wallet");
       }
     },
-    [fetchBalance, updateWalletSession]
+    [fetchBalance, warmFullReplay]
   );
 
   const walletWsRefreshRef = useRef(0);
 
   useEffect(() => {
-    if (!wallet || !walletSessionToken) return;
+    if (!wallet) return;
     let cancelled = false;
     const address = wallet;
     const channelKey = `wallet:${address}`;
@@ -413,7 +350,7 @@ export const XummProvider = ({ children }) => {
       if (now - walletWsRefreshRef.current < 5000) return;
       walletWsRefreshRef.current = now;
 
-      refreshCachedStatementsForAddress(address, walletSessionToken);
+      refreshCachedStatementsForAddress(address);
       fetchBalance(address);
       if (typeof window !== "undefined") {
         window.dispatchEvent(
@@ -429,7 +366,7 @@ export const XummProvider = ({ children }) => {
       wsClient.off("wallet", handleWalletUpdate);
       wsClient.unsubscribe("wallet", address);
     };
-  }, [fetchBalance, refreshCachedStatementsForAddress, wallet, walletSessionToken]);
+  }, [fetchBalance, refreshCachedStatementsForAddress, wallet]);
 
   const checkPendingConnect = useCallback(async () => {
     if (isConnected) {
@@ -774,14 +711,9 @@ export const XummProvider = ({ children }) => {
   ]);
 
   const disconnect = useCallback(async () => {
-    if (wallet) {
-      await updateWalletSession(wallet, false);
-    }
     clearPendingConnectUuid();
-    clearSessionToken();
-    setWalletSessionTokenState(null);
     updateWallet(null);
-  }, [updateWallet, updateWalletSession, wallet]);
+  }, [updateWallet]);
 
   useEffect(() => {
     // Récupère le wallet sauvegardé si existe
@@ -810,7 +742,6 @@ export const XummProvider = ({ children }) => {
   return (
     <XummContext.Provider value={{ 
       wallet, 
-      walletSessionToken,
       isConnected, 
       isConnecting,
       balance,

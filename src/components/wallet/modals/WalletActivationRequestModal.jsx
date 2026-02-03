@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 
@@ -189,9 +190,11 @@ export default function WalletActivationRequestModal({
           {xummPayload?.qrUrl ? (
             <div className="flex flex-col items-center gap-3">
               <div className="bg-black/60 border border-white/10 rounded-xl p-3">
-                <img
+                <Image
                   src={xummPayload.qrUrl}
                   alt={t("ui_xumm_qr_code_282d93fd60", "Code QR XUMM")}
+                  width={180}
+                  height={180}
                   className="h-[180px] w-[180px]"
                 />
               </div>
