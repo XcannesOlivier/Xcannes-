@@ -1514,7 +1514,7 @@ export default function DemoWalletDashboard({
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 min-h-0 p-3 flex flex-col">
           <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="text-[11px] text-white/45">
+            <div className="text-xs text-white/45">
               {t("demo_lines_title", "Lignes (monnaies locales)")}
             </div>
             <button
@@ -1525,7 +1525,7 @@ export default function DemoWalletDashboard({
                 setActiveAction("swap");
               }}
               title={t("demo_tt_manage_lines", "Gérer les lignes de comptes.")}
-              className="text-[11px] text-xcannes-green/80 hover:text-xcannes-green transition-colors">
+              className="text-xs text-xcannes-green/80 hover:text-xcannes-green transition-colors">
 
               {t("demo_manage_lines", "Gérer les lignes de comptes")} →
             </button>

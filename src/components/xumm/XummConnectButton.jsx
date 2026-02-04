@@ -141,9 +141,9 @@ export default function XummConnectButton({
 
   const connectClass =
   variant === "statement" ?
-  "px-4 py-1.5 text-xs bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green font-medium rounded-lg transition-all duration-200 border border-xcannes-green/30 hover:scale-105" :
+  "px-4 py-1.5 text-sm md:text-xs bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green font-medium rounded-lg transition-all duration-200 border border-xcannes-green/30 hover:scale-105" :
   variant === "statement-blue" ?
-  "px-4 py-1.5 text-xs bg-[#0f7fe1]/20 hover:bg-[#0f7fe1]/30 text-[#0f7fe1] font-medium rounded-lg transition-all duration-200 border border-[#0f7fe1]/40 hover:scale-105" :
+  "px-4 py-1.5 text-sm md:text-xs bg-[#0f7fe1]/20 hover:bg-[#0f7fe1]/30 text-[#0f7fe1] font-medium rounded-lg transition-all duration-200 border border-[#0f7fe1]/40 hover:scale-105" :
   `${small ? "px-4 py-1.5 text-xs" : "px-5 py-2 text-sm"} bg-[#3052ff] hover:bg-[#2642d9] text-white font-medium rounded-lg transition-all duration-200`;
 
   const setupModal =
