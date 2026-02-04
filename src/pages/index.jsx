@@ -225,7 +225,7 @@ export default function Home() {
                       {item.link ? null : null}
                     </div>
                     {item.subtitle ? (
-                      <div className="mt-0.5 text-[13px] text-white/65">
+                      <div className="mt-0.5 text-[13px] text-white/65 italic">
                         {item.subtitle}
                       </div>
                     ) : null}
@@ -239,7 +239,7 @@ export default function Home() {
                     {item.desc ? (
                       <div
                         className={[
-                          "text-[14.5px] text-white/55 leading-relaxed",
+                          "text-[14.5px] text-white/55 leading-relaxed italic",
                           item.stat ? "mt-1 text-center" : "",
                           item.descClassName
                         ].filter(Boolean).join(" ")}

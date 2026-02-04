@@ -566,7 +566,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               </div>
               <p
                 className={[
-                  "mt-2",
+                  "mt-2 italic",
                   descLayoutClassName,
                   action.isPlain
                     ? action.plainDescClassName || "text-white/60 text-sm"
