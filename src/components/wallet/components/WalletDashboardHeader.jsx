@@ -30,14 +30,14 @@ export default function WalletDashboardHeader({
   return (
     <div className={`panel-header ${layout.headerClass} flex flex-col shrink-0`}>
       {/* Titres discrets en haut */}
-      <div className="flex items-center justify-between mb-2 md:mb-3">
+      <div className="flex items-center justify-between mb-4 md:mb-3">
         {layout.showBrandTitle ?
         <div className="flex items-center gap-3 min-w-0">
-            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_3cdc66a392", "XCANNES")}
+            <span className="text-sm md:text-base font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_3cdc66a392", "XCANNES")}
 
           </span>
-            <span className="text-[10px] font-light text-white/30">|</span>
-            <span className="text-[10px] font-light text-white/40 truncate max-w-[160px] sm:max-w-none">{t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
+            <span className="hidden md:inline text-[11px] font-light text-white/30">|</span>
+            <span className="hidden md:inline text-[11px] font-light text-white/40 truncate max-w-[160px] sm:max-w-none">{t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
 
           </span>
           </div> :
@@ -77,7 +77,7 @@ export default function WalletDashboardHeader({
           href="https://ripple.com/solutions/stablecoin/transparency/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-white/40 hover:text-xcannes-green/80 transition-colors">{t("ui_stablecoin_usd_r_gul_d_details_80d8d1ba32", "Stablecoin USD régulé (détails)")}
+          className="text-xs md:text-[10px] text-white/40 hover:text-xcannes-green/80 transition-colors">{t("ui_stablecoin_usd_r_gul_d_details_80d8d1ba32", "Stablecoin USD régulé (détails)")}
 
 
         </a>

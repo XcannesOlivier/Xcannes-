@@ -17,12 +17,12 @@ export default function WalletDashboardTokenList({
     >
       {(headerTitle || headerActionLabel) && (
         <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="text-[11px] text-white/45">{headerTitle}</div>
+          <div className="text-xs text-white/45">{headerTitle}</div>
           {headerActionLabel ? (
             <button
               type="button"
               onClick={onHeaderAction}
-              className="text-[11px] text-xcannes-green/80 hover:text-xcannes-green transition-colors"
+              className="text-xs text-xcannes-green/80 hover:text-xcannes-green transition-colors"
             >
               {headerActionLabel} →
             </button>

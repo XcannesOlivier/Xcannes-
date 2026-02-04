@@ -90,7 +90,7 @@ export const WALLET_LAYOUTS = {
     isFullPage: false,
     tokenListClass: "max-h-72 md:max-h-[420px]",
     statementVariant: "default",
-    showBrandTitle: false,
+    showBrandTitle: true,
     showOpenFullWallet: false,
     containerClass: "",
     headerClass: "",
