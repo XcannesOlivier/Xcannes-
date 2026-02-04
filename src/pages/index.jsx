@@ -93,10 +93,12 @@ export default function Home() {
               </h1>
 
                 <p className="mt-6 text-lg sm:text-xl text-white/80 font-light leading-relaxed">
-                  {t(
-                    "home_v2_hero_subtitle",
-                  "Payez, recevez et convertissez dans 160+ devises → rapide, sécurisé, économique."
-                  )}
+                  <span dangerouslySetInnerHTML={{
+                    __html: t(
+                      "home_v2_hero_subtitle",
+                      "Payez, recevez et convertissez dans 160+ devises ⟶ rapide, sécurisé, économique."
+                    ).replace('⟶', '<span class="inline-block text-xcannes-green animate-pulse">⟶</span>')
+                  }} />
                 </p>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center">
@@ -110,7 +112,6 @@ export default function Home() {
                   className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}
                 >
                   {t("home_v2_final_cta_markets", "Voir les marchés")}
-                  <span className="inline-block ml-2 text-xs">→</span>
                 </Link>
               </div>
 
@@ -220,7 +221,7 @@ export default function Home() {
                     </div>
                     <div className="min-w-0 text-left flex-1 h-full flex flex-col">
                     <div className="flex w-full items-baseline justify-between gap-3">
-                      <div className="text-[15px] font-semibold text-white/90">{item.title}</div>
+                      <div className="text-[17px] font-semibold text-white/90">{item.title}</div>
                       {item.link ? null : null}
                     </div>
                     {item.subtitle ? (
@@ -238,7 +239,7 @@ export default function Home() {
                     {item.desc ? (
                       <div
                         className={[
-                          "text-[13px] text-white/55 leading-relaxed",
+                          "text-[14.5px] text-white/55 leading-relaxed",
                           item.stat ? "mt-1 text-center" : "",
                           item.descClassName
                         ].filter(Boolean).join(" ")}
@@ -256,7 +257,6 @@ export default function Home() {
                         className="inline-flex items-center gap-1 text-[11px] text-xcannes-green hover:text-xcannes-green/80 transition-colors shrink-0 mt-auto self-end pt-3"
                       >
                         {item.link.label}
-                        <span aria-hidden="true">→</span>
                       </button>
                     ) : null}
                   </div>

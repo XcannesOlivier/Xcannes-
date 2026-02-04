@@ -493,8 +493,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     ? "text-[12px] text-white/65 leading-snug line-clamp-2"
     : "text-sm text-white/70 leading-relaxed";
   const ctaClassName = isCompact
-    ? "mt-1 flex items-center gap-1.5 text-[10px] text-white/50 transition-colors group-hover:text-white/80"
-    : "mt-3 flex items-center gap-2 text-xs text-white/50 transition-colors group-hover:text-white/80 lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
+    ? "mt-1 flex items-center gap-1.5 text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
+    : "mt-3 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
 
   return (
     <div className={rootClassName}>
@@ -523,7 +523,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             action.isPlain
               ? "bg-transparent border-none rounded-none shadow-none"
             : "bg-black/20 backdrop-blur-sm border border-xcannes-green/25 rounded-xl",
-            "group",
+            "group/card",
             cardPaddingClassName,
             cardLayoutClassName,
             action.borderHoverClassName,
@@ -542,7 +542,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 {!action.isPlain && (
                   <div
                     className={[
-                      "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover:scale-110",
+                      "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover/card:scale-110",
                       isCompact ? "w-9 h-9" : "w-10 h-10",
                       !isCompact ? "lg:mt-0.5" : "",
                       action.iconClassName,
@@ -577,10 +577,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               </p>
               {!action.isPlain && (
                 <div className={ctaClassName}>
-                  <span>
+                  <span className="relative z-10">
                     {t("home_v2_essentials_modal_cta", "En savoir plus")}
                   </span>
-                  <span className="text-sm">&rarr;</span>
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-xcannes-green/20 to-transparent -translate-x-full opacity-0 group-hover/card:translate-x-full group-hover/card:opacity-100 transition-all duration-700 ease-in-out" />
                 </div>
               )}
               {action.showArrow && (
