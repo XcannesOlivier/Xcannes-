@@ -613,54 +613,167 @@ export default function Home() {
                 if (e.target === e.currentTarget) setValueModalOpen(false);
               }}
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white">
-                      {t("home_v2_hero_value_modal_title", "Gardez la valeur")}
-                    </h4>
-                    <p className="mt-1 text-sm text-white/65">
-                      {t(
-                        "home_v2_hero_value_modal_subtitle",
-                        "Montants locaux affichés, référence USD stable."
-                      )}
-                    </p>
+              <div className="w-full max-w-[560px] rounded-2xl border border-white/10 bg-[#040c13]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+                {/* Header avec icône */}
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-start gap-3">
+                    {/* Icône ancre/bouclier */}
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-xcannes-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
+                        {t("home_v2_hero_value_modal_title", "Protégé contre la volatilité")}
+                      </h4>
+                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                        {t(
+                          "home_v2_hero_value_modal_subtitle",
+                          "Même si la devise locale bouge, votre référence USD (RLUSD) reste la même."
+                        )}
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setValueModalOpen(false)}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
+                    className="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
                     aria-label={t("home_v2_hero_value_modal_close", "Fermer")}
                   >
                     ✕
                   </button>
                 </div>
-                <div className="mt-4 space-y-2 text-sm text-white/70">
+
+                {/* Points principaux */}
+                <div className="mt-5 space-y-3">
                   {[
                     t(
                       "home_v2_hero_value_modal_point_1",
-                      "Votre valeur de référence est en USD (RLUSD)."
+                      "Le montant que vous validez est en devise locale."
                     ),
                     t(
                       "home_v2_hero_value_modal_point_2",
-                      "Les montants locaux sont indicatifs, basés sur des taux marché."
+                      "Les montants locaux suivent le taux du marché."
                     ),
                     t(
                       "home_v2_hero_value_modal_point_3",
-                      "Conversion possible à tout moment, taux affiché avant confirmation."
+                      "La référence USD (RLUSD) reste stable et lisible."
                     ),
                   ].map((line) => (
-                    <div key={line} className="flex items-start gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                      <span>{line}</span>
+                    <div key={line} className="flex items-start gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 text-xs text-white/45">
+
+                {/* Bloc Exemple visuel */}
+                <div className="mt-6">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="text-[12px] font-semibold text-xcannes-green uppercase tracking-[0.2em]">
+                      {t("home_v2_hero_value_modal_example_title", "Exemple")}
+                    </div>
+                    <div className="text-[11px] text-white/50">
+                      {t("home_v2_hero_value_modal_example_rate", "Taux initial 1,18 → 1,10")}
+                    </div>
+                  </div>
+
+                  <p className="text-[13.5px] text-white/65 leading-relaxed mb-4">
+                    {t(
+                      "home_v2_hero_value_modal_example_intro",
+                      "Si vous convertissez 1 EUR au taux 1,18, votre référence devient 1,18 RLUSD."
+                    )}
+                  </p>
+
+                  {/* Mini-schéma visuel */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 text-[12px] text-white/60 mb-3">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-md border border-white/10 bg-white/[0.03] text-xcannes-green/90">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 7l6 6 4-4 6 6" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M20 19H4" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                      <span className="font-medium">{t("home_v2_hero_value_modal_example_if_eur_falls", "Si l'euro baisse")}</span>
+                    </div>
+
+                    <div className="grid gap-3">
+                      <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                        <div className="text-[10px] text-white/45 uppercase tracking-[0.18em] mb-1">
+                          {t("home_v2_hero_value_modal_example_today", "Aujourd'hui")}
+                        </div>
+                        <div className="text-[14px] text-white">1 EUR = 1,18$</div>
+                        <div className="text-[12px] text-white/55">
+                          {t("home_v2_hero_value_modal_example_ref", "Réf")} : 1,18$
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-center gap-2 text-[11px] text-white/45">
+                        <span>{t("home_v2_hero_value_modal_example_rate_moves", "Le taux change")}</span>
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 5v14" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M7 14l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+
+                      <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                        <div className="text-[10px] text-white/45 uppercase tracking-[0.18em] mb-1">
+                          {t("home_v2_hero_value_modal_example_later", "Plus tard")}
+                        </div>
+                        <div className="text-[14px] text-white">1 EUR = 1,10$</div>
+                        <div className="mt-2 space-y-1">
+                          <div className="flex items-center justify-between text-[12px]">
+                            <span className="text-white">EUR ≈ 1,07</span>
+                            <span className="text-[10px] text-white/45 uppercase tracking-wide">
+                              {t("home_v2_hero_value_modal_example_change", "change")}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-[12px]">
+                            <span className="text-xcannes-green">USD = 1,18$</span>
+                            <span className="text-[10px] text-white/45 uppercase tracking-wide">
+                              {t("home_v2_hero_value_modal_example_stable", "stable")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center gap-2 text-[12px] text-white/60">
+                      <div className="flex items-center justify-center w-6 h-6 rounded-md border border-white/10 bg-white/[0.03] text-xcannes-green/90">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 3l8 4v6c0 5-4 7.5-8 8-4-0.5-8-3-8-8V7l8-4z" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                      <span>{t("home_v2_hero_value_modal_example_usd_anchor", "Référence USD inchangée")}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 text-[13.5px] text-white/65 leading-relaxed border-t border-white/10 pt-3">
+                    {t(
+                      "home_v2_hero_value_modal_example_conclusion",
+                      "Si le taux passe à 1,10, l'affichage devient ≈ 1,07 EUR, mais la référence reste 1,18 RLUSD. Vous décidez quand reconvertir."
+                    )}
+                  </div>
+                </div>
+
+                {/* Note finale */}
+                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
                     "home_v2_hero_value_modal_note",
-                    "L'affichage local varie avec le taux de change; la référence reste RLUSD."
+                    "L'affichage local varie avec le marché ; la référence reste USD (RLUSD)."
                   )}
+                </div>
+
+                {/* Bouton CTA discret */}
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setValueModalOpen(false)}
+                    className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
+                  >
+                    {t("home_v2_hero_value_modal_cta", "Compris")}
+                  </button>
                 </div>
               </div>
             </div>,
