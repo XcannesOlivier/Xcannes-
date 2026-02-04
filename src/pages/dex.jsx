@@ -217,6 +217,15 @@ export default function Dex() {
           }
         </div>
 
+        {/* Slogan section */}
+        <section className="relative py-14 sm:py-16 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-montserrat font-[300] text-white/90 tracking-[0.02em]">
+              {t("home_v2_demo_slogan", "Votre argent. Partout. Intact.")}
+            </h3>
+          </div>
+        </section>
+
         {/* Footer global pro */}
         <FooterPro />
       </main>

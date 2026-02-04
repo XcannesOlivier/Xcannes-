@@ -17,7 +17,7 @@ export default function WalletProductSection() {
               "Une interface de compte, en multi‑devises."
             )}
           </h2>
-          <p className="text-base sm:text-lg text-white/80 font-[400] max-w-3xl mx-auto">
+          <p className="text-lg sm:text-lg text-white/80 font-[400] max-w-3xl mx-auto">
             {t(
               "home_v2_demo_subtitle",
               "Les essentiels, au quotidien."
