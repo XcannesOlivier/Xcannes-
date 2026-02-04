@@ -1425,7 +1425,7 @@ export default function DemoWalletDashboard({
                 <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </div>
-            <span className="wallet-action-label">{t("demo_tab_send", "Envoyer")}</span>
+            <span className="wallet-action-label !text-sm !font-normal">{t("demo_tab_send", "Envoyer")}</span>
           </button>
 
           <button
@@ -1451,7 +1451,7 @@ export default function DemoWalletDashboard({
                 <polyline points="19 12 12 19 5 12"></polyline>
               </svg>
             </div>
-            <span className="wallet-action-label">{t("demo_receive", "Recevoir")}</span>
+            <span className="wallet-action-label !text-sm !font-normal">{t("demo_receive", "Recevoir")}</span>
           </button>
 
           <button
@@ -1480,7 +1480,7 @@ export default function DemoWalletDashboard({
                 <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
               </svg>
             </div>
-            <span className="wallet-action-label">{t("demo_tab_convert", "Convertir")}</span>
+            <span className="wallet-action-label !text-sm !font-normal">{t("demo_tab_convert", "Convertir")}</span>
           </button>
 
           <button
@@ -1506,7 +1506,7 @@ export default function DemoWalletDashboard({
                 <line x1="1" y1="10" x2="23" y2="10"></line>
               </svg>
             </div>
-            <span className="wallet-action-label">{t("ui_buy_sell_fce5963198", "Buy/Sell")}</span>
+            <span className="wallet-action-label !text-lg !font-bold">+/−</span>
           </button>
         </div>
       </div>
@@ -1525,7 +1525,7 @@ export default function DemoWalletDashboard({
                 setActiveAction("swap");
               }}
               title={t("demo_tt_manage_lines", "Gérer les lignes de comptes.")}
-              className="text-xs text-xcannes-green/80 hover:text-xcannes-green transition-colors">
+              className="text-sm md:text-xs text-xcannes-green/80 hover:text-xcannes-green transition-colors">
 
               {t("demo_manage_lines", "Gérer les lignes de comptes")} →
             </button>

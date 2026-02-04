@@ -17,7 +17,7 @@ export default function WalletProductSection() {
               "Une interface de compte, en multi‑devises."
             )}
           </h2>
-          <p className="text-lg sm:text-lg text-white/80 font-[400] max-w-3xl mx-auto">
+          <p className="text-lg sm:text-lg text-white/80 font-[400] max-w-3xl mx-auto italic">
             {t(
               "home_v2_demo_subtitle",
               "Les essentiels, au quotidien."
@@ -34,7 +34,7 @@ export default function WalletProductSection() {
           </div>
 
           <div
-            className="bg-black/20 backdrop-blur-sm border border-xcannes-green/25 rounded-xl shadow-2xl overflow-hidden"
+            className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-xl shadow-2xl overflow-hidden"
           >
             <div className="px-5 py-4 border-b border-white/10">
               <div className="flex items-center justify-between gap-3">
