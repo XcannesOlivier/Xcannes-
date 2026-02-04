@@ -95,7 +95,7 @@ export default function Home() {
                 <p className="mt-6 text-lg sm:text-xl text-white/80 font-light leading-relaxed">
                   {t(
                     "home_v2_hero_subtitle",
-                  "Payez, recevez et convertissez dans 160+ devises — rapide, sécurisé, économique."
+                  "Payez, recevez et convertissez dans 160+ devises → rapide, sécurisé, économique."
                   )}
                 </p>
 
