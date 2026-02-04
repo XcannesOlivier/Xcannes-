@@ -439,7 +439,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "order-last lg:order-1 lg:-mb-2",
       plainTitleClassName:
         "text-white/90 font-montserrat font-semibold text-xl sm:text-base lg:text-base tracking-normal",
-      plainDescClassName: "text-white/60 text-lg sm:text-[15px] lg:text-sm",
+      plainDescClassName: "text-white/60 text-lg sm:text-[15px] lg:text-sm italic",
       showArrow: true,
       isPlain: true,
       icon: (
@@ -506,7 +506,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           <h3 className="mt-1 text-[28px] font-montserrat font-semibold text-white/90 leading-tight">
             {t("home_v2_demo_preview_title", "Démo interactive")}
           </h3>
-          <p className="mt-1 text-[11px] text-white/60 leading-snug line-clamp-2">
+          <p className="mt-1 text-[11px] text-white/60 leading-snug line-clamp-2 italic">
             {t(
               "home_v2_demo_card_desc",
               "Démo interactive, sans transaction réelle."
@@ -578,7 +578,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               {!action.isPlain && (
                 <div className={ctaClassName}>
                   <span className="relative z-10">
-                    {t("home_v2_essentials_modal_cta", "En savoir plus")}
+                    <span className="md:hidden">{t("home_v2_essentials_modal_cta", "En savoir plus")}</span>
+                    <span className="hidden md:inline text-xcannes-green text-xl font-light">+</span>
                   </span>
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-xcannes-green/20 to-transparent -translate-x-full opacity-0 group-hover/card:translate-x-full group-hover/card:opacity-100 transition-all duration-700 ease-in-out" />
                 </div>

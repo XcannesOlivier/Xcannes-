@@ -30,7 +30,7 @@ export default function WalletDashboardActionRow({
               <polyline points="7 7 17 7 17 17"></polyline>
             </svg>
           </div>
-          <span className="wallet-action-label !text-base !font-medium md:!font-normal">{t("ui_send_bee4f9e2f5", "Send")}</span>
+          <span className="wallet-action-label !text-sm !font-normal">{t("ui_send_bee4f9e2f5", "Send")}</span>
         </button>
 
         <button
@@ -52,7 +52,7 @@ export default function WalletDashboardActionRow({
               <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
           </div>
-          <span className="wallet-action-label !text-base !font-medium md:!font-normal">{t("ui_receive_127eab0703", "Receive")}</span>
+          <span className="wallet-action-label !text-sm !font-normal">{t("ui_receive_127eab0703", "Receive")}</span>
         </button>
 
         <button
@@ -76,7 +76,7 @@ export default function WalletDashboardActionRow({
               <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
             </svg>
           </div>
-          <span className="wallet-action-label !text-base !font-medium md:!font-normal">{t("ui_convert_e0fbc97f15", "Convert")}</span>
+          <span className="wallet-action-label !text-sm !font-normal">{t("ui_convert_e0fbc97f15", "Convert")}</span>
         </button>
 
         <button
@@ -98,7 +98,7 @@ export default function WalletDashboardActionRow({
               <line x1="1" y1="10" x2="23" y2="10"></line>
             </svg>
           </div>
-          <span className="wallet-action-label !text-base !font-bold">{t("ui_buy_sell_ec2ec12982", "Buy/Sell")}</span>
+          <span className="wallet-action-label !text-lg !font-bold">+/−</span>
         </button>
       </div>
 
