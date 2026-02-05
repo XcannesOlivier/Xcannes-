@@ -452,35 +452,155 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       key: "convert_lines_mobile",
       title: t("home_v2_essentials_convert_lines_title", "Conversion & Lignes de comptes"),
       desc: t(
-        "home_v2_essentials_lines_desc",
-        "Activez et gérez vos devises locales en quelques étapes."
+        "home_v2_essentials_convert_lines_desc",
+        "Conversion et lignes de comptes fonctionnent ensemble pour gérer vos devises locales."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_3_modal_point_1",
-          "Taux affiché avant confirmation."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_convert_lines_modal_intro",
+          "Choisissez de convertir une devise ou de gérer vos lignes de comptes."
         ),
-        t(
-          "home_v2_essentials_3_modal_point_2",
-          "Conversion instantanée entre devises."
-        ),
-        t(
-          "home_v2_essentials_3_modal_point_3",
-          "Montants affichés clairement, sans surprise."
-        ),
-        t(
-          "home_v2_essentials_lines_modal_point_1",
-          "Activez une devise pour l'utiliser dans le wallet."
-        ),
-        t(
-          "home_v2_essentials_lines_modal_point_2",
-          "Allouez et ajustez vos montants en RLUSD."
-        ),
-        t(
-          "home_v2_essentials_lines_modal_point_3",
-          "Gérez les lignes actives et leur disponibilité."
-        ),
-      ],
+        flows: [
+          {
+            key: "convert",
+            tabLabel: t("home_v2_essentials_3_modal_flow_1_tab", "Conversion"),
+            title: t(
+              "home_v2_essentials_3_modal_flow_1_title",
+              "Parcours · Conversion"
+            ),
+            intro: t(
+              "home_v2_essentials_3_modal_flow_1_intro",
+              "Convertissez entre devises en voyant le taux avant validation."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_3_modal_flow_1_step_1_title",
+                  "Choisir les devises"
+                ),
+                desc: t(
+                  "home_v2_essentials_3_modal_flow_1_step_1_desc",
+                  "Sélectionnez la devise de départ et la devise d’arrivée."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_3_modal_flow_1_step_1_detail_1",
+                    "Devise de départ"
+                  ),
+                  t(
+                    "home_v2_essentials_3_modal_flow_1_step_1_detail_2",
+                    "Devise d’arrivée"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_3_modal_flow_1_step_2_title",
+                  "Saisir le montant"
+                ),
+                desc: t(
+                  "home_v2_essentials_3_modal_flow_1_step_2_desc",
+                  "Indiquez le montant à convertir."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_3_modal_flow_1_step_3_title",
+                  "Vérifier l’aperçu"
+                ),
+                desc: t(
+                  "home_v2_essentials_3_modal_flow_1_step_3_desc",
+                  "Le taux, le montant reçu et les frais éventuels s’affichent avant confirmation."
+                ),
+              },
+            ],
+            note: t(
+              "home_v2_essentials_3_modal_flow_1_note",
+              "Selon la paire, la conversion utilise le marché XRPL (XRP/XCS) ou une réallocation interne en RLUSD."
+            ),
+          },
+          {
+            key: "lines",
+            tabLabel: t(
+              "home_v2_essentials_lines_modal_flow_1_tab",
+              "Lignes de comptes"
+            ),
+            title: t(
+              "home_v2_essentials_lines_modal_flow_1_title",
+              "Parcours · Lignes de comptes"
+            ),
+            intro: t(
+              "home_v2_essentials_lines_modal_flow_1_intro",
+              "Une ligne de compte est une devise locale activée dans votre wallet, prête à être utilisée pour les paiements, conversions et réceptions."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_1_title",
+                  "Activer une devise"
+                ),
+                desc: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_1_desc",
+                  "Choisissez une devise locale et activez la ligne correspondante."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_1_detail_1",
+                    "Activation on-chain"
+                  ),
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_1_detail_2",
+                    "Devise disponible immédiatement"
+                  ),
+                ],
+                note: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_1_note",
+                  "Des frais uniques de 1 USD (≈ 1 RLUSD) s’appliquent lors de l’activation."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_2_title",
+                  "Utiliser la ligne"
+                ),
+                desc: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_2_desc",
+                  "Une fois activée, la ligne est prête à l’emploi :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_2_detail_1",
+                    "Payer ou recevoir dans cette devise"
+                  ),
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_2_detail_2",
+                    "Effectuer des conversions"
+                  ),
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_2_detail_3",
+                    "Le solde s’affiche automatiquement selon le taux en vigueur"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_3_title",
+                  "Gérer ou fermer"
+                ),
+                desc: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_3_desc",
+                  "Vous pouvez gérer votre ligne à tout moment. La désactivation est possible uniquement si le solde est à zéro."
+                ),
+                note: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_3_note",
+                  "La désactivation entraîne également des frais uniques de 1 USD (≈ 1 RLUSD)."
+                ),
+              },
+            ],
+          },
+        ],
+        note: "",
+      },
       orderClassName: "order-3 lg:hidden",
       iconClassName:
         "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] group-hover:bg-[rgba(6,182,212,0.14)]",
@@ -525,20 +645,73 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         "home_v2_essentials_3_desc",
         "Taux clairement affiché avant validation."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_3_modal_point_1",
-          "Taux affiché avant confirmation."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_3_modal_intro",
+          "Convertissez entre devises en voyant le taux avant validation."
         ),
-        t(
-          "home_v2_essentials_3_modal_point_2",
-          "Conversion instantanée entre devises."
-        ),
-        t(
-          "home_v2_essentials_3_modal_point_3",
-          "Montants affichés clairement, sans surprise."
-        ),
-      ],
+        flows: [
+          {
+            key: "convert",
+            tabLabel: t("home_v2_essentials_3_modal_flow_1_tab", "Conversion"),
+            title: t(
+              "home_v2_essentials_3_modal_flow_1_title",
+              "Parcours · Conversion"
+            ),
+            intro: t(
+              "home_v2_essentials_3_modal_flow_1_intro",
+              "Choisissez la devise de départ et la devise d’arrivée, puis validez."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_3_modal_flow_1_step_1_title",
+                  "Choisir les devises"
+                ),
+                desc: t(
+                  "home_v2_essentials_3_modal_flow_1_step_1_desc",
+                  "Sélectionnez la devise de départ et la devise d’arrivée."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_3_modal_flow_1_step_1_detail_1",
+                    "Devise de départ"
+                  ),
+                  t(
+                    "home_v2_essentials_3_modal_flow_1_step_1_detail_2",
+                    "Devise d’arrivée"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_3_modal_flow_1_step_2_title",
+                  "Saisir le montant"
+                ),
+                desc: t(
+                  "home_v2_essentials_3_modal_flow_1_step_2_desc",
+                  "Indiquez le montant à convertir."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_3_modal_flow_1_step_3_title",
+                  "Vérifier l’aperçu"
+                ),
+                desc: t(
+                  "home_v2_essentials_3_modal_flow_1_step_3_desc",
+                  "Le taux, le montant reçu et les frais éventuels s’affichent avant confirmation."
+                ),
+              },
+            ],
+            note: t(
+              "home_v2_essentials_3_modal_flow_1_note",
+              "Selon la paire, la conversion utilise le marché XRPL (XRP/XCS) ou une réallocation interne en RLUSD."
+            ),
+          },
+        ],
+        note: "",
+      },
       orderClassName: "hidden lg:block lg:order-5",
       iconClassName:
         "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] group-hover:bg-[rgba(6,182,212,0.14)]",
@@ -683,20 +856,94 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         "home_v2_essentials_lines_desc",
         "Activez et gérez vos devises locales en quelques étapes."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_lines_modal_point_1",
-          "Activez une devise pour l'utiliser dans le wallet."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_lines_modal_intro",
+          ""
         ),
-        t(
-          "home_v2_essentials_lines_modal_point_2",
-          "Allouez et ajustez vos montants en RLUSD."
-        ),
-        t(
-          "home_v2_essentials_lines_modal_point_3",
-          "Gérez les lignes actives et leur disponibilité."
-        ),
-      ],
+        flows: [
+          {
+            key: "lines",
+            tabLabel: t(
+              "home_v2_essentials_lines_modal_flow_1_tab",
+              "Lignes de comptes"
+            ),
+            title: t(
+              "home_v2_essentials_lines_modal_flow_1_title",
+              "Parcours · Lignes de comptes"
+            ),
+            intro: t(
+              "home_v2_essentials_lines_modal_flow_1_intro",
+              "Une ligne de compte est une devise locale activée dans votre wallet, prête à être utilisée pour les paiements, conversions et réceptions."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_1_title",
+                  "Activer une devise"
+                ),
+                desc: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_1_desc",
+                  "Choisissez une devise locale et activez la ligne correspondante."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_1_detail_1",
+                    "Activation on-chain"
+                  ),
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_1_detail_2",
+                    "Devise disponible immédiatement"
+                  ),
+                ],
+                note: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_1_note",
+                  "Des frais uniques de 1 USD (≈ 1 RLUSD) s’appliquent lors de l’activation."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_2_title",
+                  "Utiliser la ligne"
+                ),
+                desc: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_2_desc",
+                  "Une fois activée, la ligne est prête à l’emploi :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_2_detail_1",
+                    "Payer ou recevoir dans cette devise"
+                  ),
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_2_detail_2",
+                    "Effectuer des conversions"
+                  ),
+                  t(
+                    "home_v2_essentials_lines_modal_flow_1_step_2_detail_3",
+                    "Le solde s’affiche automatiquement selon le taux en vigueur"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_3_title",
+                  "Gérer ou fermer"
+                ),
+                desc: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_3_desc",
+                  "Vous pouvez gérer votre ligne à tout moment. La désactivation est possible uniquement si le solde est à zéro."
+                ),
+                note: t(
+                  "home_v2_essentials_lines_modal_flow_1_step_3_note",
+                  "La désactivation entraîne également des frais uniques de 1 USD (≈ 1 RLUSD)."
+                ),
+              },
+            ],
+          },
+        ],
+        note: "",
+      },
       orderClassName: "hidden lg:block lg:order-7",
       iconClassName:
         "text-[#F59E0B] bg-[rgba(245,158,11,0.08)] group-hover:bg-[rgba(245,158,11,0.14)]",
@@ -764,6 +1011,59 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     activeAction?.modalSections?.length ||
     activeAction?.modalPoints?.length
   );
+  const isConversionModal =
+    activeAction?.key === "convert" ||
+    activeAction?.key === "lines" ||
+    activeAction?.key === "convert_lines_mobile";
+  const useLargeMobileType =
+    activeAction?.key === "pay" ||
+    activeAction?.key === "receive_request" ||
+    isConversionModal;
+  const modalAccent =
+    activeAction?.key === "pay"
+      ? "sky"
+      : activeAction?.key === "receive_request"
+      ? "green"
+      : isConversionModal
+      ? "cyan"
+      : "green";
+  const modalAccentStyles = {
+    green: {
+      step: "border-xcannes-green/40 text-xcannes-green/80",
+      dot: "bg-xcannes-green/60",
+      tabActive:
+        "rounded-lg border border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90 font-semibold transition-all duration-200 hover:bg-xcannes-green/20 hover:text-xcannes-green hover:scale-105 active:scale-95",
+      tabInactive:
+        "rounded-lg border border-xcannes-green/30 bg-transparent text-xcannes-green/70 font-semibold transition-all duration-200 hover:border-xcannes-green/50 hover:text-xcannes-green/90",
+    },
+    sky: {
+      step: "border-[#38BDF8]/50 text-[#5FC9F8]",
+      dot: "bg-[#38BDF8]/70",
+      tabActive:
+        "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95",
+      tabInactive:
+        "rounded-lg border border-[#38BDF8]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#38BDF8]/60 hover:text-white/80",
+    },
+    cyan: {
+      step: "border-[#06B6D4]/50 text-[#06B6D4]/90",
+      dot: "bg-[#06B6D4]/70",
+      tabActive:
+        "rounded-lg border border-[#06B6D4]/40 bg-[#06B6D4]/10 text-[#06B6D4]/90 font-semibold transition-all duration-200 hover:bg-[#06B6D4]/20 hover:text-[#06B6D4] hover:scale-105 active:scale-95",
+      tabInactive:
+        "rounded-lg border border-[#06B6D4]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#06B6D4]/60 hover:text-white/80",
+    },
+  };
+  const modalAccentTokens = modalAccentStyles[modalAccent];
+  const modalBackgroundClass =
+    activeAction?.key === "pay" ||
+    activeAction?.key === "receive_request" ||
+    activeAction?.key === "convert" ||
+    activeAction?.key === "buy" ||
+    activeAction?.key === "lines" ||
+    activeAction?.key === "statements" ||
+    activeAction?.key === "config"
+      ? "bg-black/20"
+      : "bg-[#040c13]/95";
   useEffect(() => {
     if (!activeAction?.modalLayout?.flows?.length) {
       setActiveFlowKey(null);
@@ -793,8 +1093,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     ? "text-[12px] text-white/65 leading-snug line-clamp-2"
     : "text-[17px] sm:text-sm text-white/70 leading-relaxed";
   const ctaClassName = isCompact
-    ? "mt-1 flex items-center gap-1.5 text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
-    : "absolute bottom-3 right-4 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden md:static md:mt-3 md:ml-0 md:self-auto lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
+    ? "mt-1 flex items-center justify-end gap-1.5 w-full text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
+    : "absolute bottom-3 right-4 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors overflow-hidden md:static md:mt-3 md:ml-0 md:self-auto lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
 
   const explanationKeys = visibleActions
     .filter((action) => !action.isPlain)
@@ -811,10 +1111,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     const isExplanationCard = !action.isPlain;
     const isLastExplanation =
       explanationKeys[explanationKeys.length - 1] === action.key;
+    const forceDesktopSeparator = !isCompact && action.key === "lines";
     const showSeparator =
-      isExplanationCard &&
-      !isLastExplanation &&
-      !(action.key === "config" && !isCompact);
+      (isExplanationCard &&
+        !isLastExplanation &&
+        !(action.key === "config" && !isCompact)) ||
+      forceDesktopSeparator;
     const wrapperClassName =
       wrapperClassNameOverride || action.orderClassName || "";
     const cardClasses = [
@@ -878,8 +1180,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         {!action.isPlain && (
           <div className={ctaClassName}>
             <span className="relative z-10">
-              <span className="md:hidden text-xcannes-green text-xl font-light">+</span>
-              <span className="hidden md:inline text-xcannes-green text-xl font-light">+</span>
+              <span className="md:hidden text-xcannes-green text-2xl font-light transition-transform duration-200 group-hover/card:scale-125">+</span>
+              <span className="hidden md:inline text-xcannes-green text-xl font-light transition-transform duration-200 group-hover/card:scale-125">+</span>
             </span>
             <span className="absolute inset-0 opacity-0 transition-all duration-200 ease-out group-hover/card:opacity-100 group-hover/card:scale-110" />
           </div>
@@ -1014,7 +1316,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         hasModalContent &&
         createPortal(
           <div
-            className="fixed inset-0 z-[10070] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+            className="fixed inset-0 z-[10070] flex items-center justify-center bg-xcannes-background px-4"
             onClick={(event) => {
               if (event.target === event.currentTarget) {
                 setActiveActionKey(null);
@@ -1025,7 +1327,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId || undefined}
-              className="w-full max-w-[620px] rounded-2xl border border-white/10 bg-[#040c13]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none"
+              className={`w-full max-w-[620px] rounded-xl ${modalBackgroundClass} p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none`}
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 mb-5">
@@ -1056,8 +1358,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   <div className="flex flex-col gap-4 min-h-0">
                     <p
                       className={[
-                        activeAction.key === "pay" ||
-                        activeAction.key === "receive_request"
+                        useLargeMobileType
                           ? "text-[19px] sm:text-[13.5px]"
                           : "text-[13.5px]",
                         "text-white/65 leading-[1.6]",
@@ -1065,20 +1366,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                     >
                       {activeAction.modalLayout.intro}
                     </p>
-                    {activeAction.modalLayout.flows?.length ? (
+                    {activeAction.modalLayout.flows?.length > 1 ? (
                       <div className="flex gap-2">
                         {activeAction.modalLayout.flows.map((flow) => {
                           const isActive = flow.key === activeFlowKey;
-                          const useGreenTabs =
-                            activeAction.key === "receive_request";
-                          const activeTabClass = useGreenTabs
-                            ? "rounded-lg border border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90 font-semibold transition-all duration-200 hover:bg-xcannes-green/20 hover:text-xcannes-green hover:scale-105 active:scale-95"
-                            : "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95";
-                          const inactiveTabClass = useGreenTabs
-                            ? "rounded-lg border border-xcannes-green/30 bg-transparent text-xcannes-green/70 font-semibold transition-all duration-200 hover:border-xcannes-green/50 hover:text-xcannes-green/90"
-                            : activeAction.key === "pay"
-                            ? "rounded-lg border border-[#38BDF8]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#38BDF8]/60 hover:text-white/80"
-                            : "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
+                          const activeTabClass = modalAccentTokens.tabActive;
+                          const inactiveTabClass = modalAccentTokens.tabInactive;
                           return (
                             <button
                               key={flow.key}
@@ -1113,8 +1406,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                             >
                               <div
                                 className={[
-                                  activeAction.key === "pay" ||
-                                  activeAction.key === "receive_request"
+                                  useLargeMobileType
                                     ? "text-[17px] sm:text-[13.5px]"
                                     : "text-[13.5px]",
                                   "font-semibold text-white/90",
@@ -1125,8 +1417,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                               {flow.intro ? (
                                 <p
                                   className={[
-                                    activeAction.key === "pay" ||
-                                    activeAction.key === "receive_request"
+                                    useLargeMobileType
                                       ? "text-[17px] sm:text-[12.5px]"
                                       : "text-[12.5px]",
                                     "mt-2 text-white/65 leading-relaxed",
@@ -1153,9 +1444,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                                     <li key={stepKey} className="flex items-start gap-3">
                                       <span
                                         className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${
-                                          activeAction.key === "pay"
-                                            ? "border-[#38BDF8]/50 text-[#5FC9F8]"
-                                            : "border-xcannes-green/40 text-xcannes-green/80"
+                                          modalAccentTokens.step
                                         }`}
                                       >
                                         {index + 1}
@@ -1164,8 +1453,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                                         {stepTitle ? (
                                           <div
                                             className={[
-                                              activeAction.key === "pay" ||
-                                              activeAction.key === "receive_request"
+                                              useLargeMobileType
                                                 ? "text-[16.5px] sm:text-[13px]"
                                                 : "text-[13px]",
                                               "font-semibold text-white/85",
@@ -1177,8 +1465,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                                         {stepDesc ? (
                                           <p
                                             className={[
-                                              activeAction.key === "pay" ||
-                                              activeAction.key === "receive_request"
+                                              useLargeMobileType
                                                 ? "text-[16px] sm:text-[12.5px]"
                                                 : "text-[12.5px]",
                                               "mt-1 text-white/70 leading-relaxed",
@@ -1190,8 +1477,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                                         {stepDetails.length ? (
                                           <ul
                                             className={[
-                                              activeAction.key === "pay" ||
-                                              activeAction.key === "receive_request"
+                                              useLargeMobileType
                                                 ? "text-[15.5px] sm:text-[12px]"
                                                 : "text-[12px]",
                                               "mt-2 space-y-1.5 text-white/60",
@@ -1201,9 +1487,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                                               <li key={detail} className="flex items-start gap-2">
                                                 <span
                                                   className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${
-                                                    activeAction.key === "pay"
-                                                      ? "bg-[#38BDF8]/70"
-                                                      : "bg-xcannes-green/60"
+                                                    modalAccentTokens.dot
                                                   }`}
                                                   aria-hidden="true"
                                                 />
@@ -1215,8 +1499,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                                         {stepNote ? (
                                           <p
                                             className={[
-                                              activeAction.key === "pay" ||
-                                              activeAction.key === "receive_request"
+                                              useLargeMobileType
                                                 ? "text-[15px] sm:text-[11.5px]"
                                                 : "text-[11.5px]",
                                               "mt-2 text-white/50 italic leading-relaxed",
@@ -1254,7 +1537,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                           {section.items.map((item) => (
                             <li key={item} className="flex items-start gap-2">
                               <span
-                                className="mt-2 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0"
+                                className={`mt-2 h-1.5 w-1.5 rounded-full flex-shrink-0 ${modalAccentTokens.dot}`}
                                 aria-hidden="true"
                               />
                               <span>{item}</span>
@@ -1268,7 +1551,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   <ul className="mt-4 space-y-3 text-[14.5px] text-white/80 leading-relaxed">
                     {activeAction.modalPoints.map((point) => (
                       <li key={point} className="flex items-start gap-3">
-                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                        <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${modalAccentTokens.dot}`} />
                         <span>{point}</span>
                       </li>
                     ))}

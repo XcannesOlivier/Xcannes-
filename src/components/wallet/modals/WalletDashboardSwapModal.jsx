@@ -73,7 +73,7 @@ export default function WalletDashboardSwapModal({
   const blueActionBtnMuted =
     "rounded-lg border border-[#06B6D4]/30 bg-[#06B6D4]/10 text-[#06B6D4]/70 font-semibold transition-all duration-200 hover:bg-[#06B6D4]/20 hover:text-[#06B6D4] hover:scale-105 active:scale-95";
   const blueTabInactive =
-    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
+    "rounded-lg border border-[#06B6D4]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#06B6D4]/60 hover:text-white/80";
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   useEffect(() => {

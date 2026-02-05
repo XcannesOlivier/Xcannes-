@@ -89,6 +89,12 @@ export default function SupportAssistantWidget({ mode = "support" }) {
   const sendLabel = isTrading
     ? t("ui_send_504b64a87b", "Envoyer")
     : t("home_support_send", "Envoyer");
+  const messageTitleClass = isTrading
+    ? "text-sm font-medium text-white/90 mb-2"
+    : "text-[13.5px] font-medium text-white/90 mb-2";
+  const messageBodyClass = isTrading
+    ? "text-xs text-white/60 leading-relaxed"
+    : "text-[12.5px] text-white/60 leading-relaxed";
 
   return createPortal(
     <div className={wrapperClassName}>
@@ -125,10 +131,10 @@ export default function SupportAssistantWidget({ mode = "support" }) {
             </button>
           </div>
           <div className="ai-message-area">
-            <p className="text-sm font-medium text-white/90 mb-2">
+            <p className={messageTitleClass}>
               {messageTitle}
             </p>
-            <p className="text-xs text-white/60 leading-relaxed">
+            <p className={messageBodyClass}>
               {messageBody}
             </p>
           </div>
@@ -183,7 +189,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           </button>
           <div
             className={[
-              "absolute right-12 md:right-14 whitespace-nowrap rounded-full border border-black/10 bg-white px-4 py-2 text-[12px] text-black/90 shadow-xl transition-all duration-200",
+              "absolute right-12 md:right-14 whitespace-nowrap rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] text-black/90 shadow-xl transition-all duration-200",
               showPrompt
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-1 pointer-events-none",
@@ -368,7 +374,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           background: var(--assistant-input-bg);
           border: 1px solid var(--assistant-input-border);
           border-radius: 8px;
-          font-size: 13px;
+          font-size: 14px;
           color: rgba(255, 255, 255, 0.9);
           transition: all 120ms;
         }
