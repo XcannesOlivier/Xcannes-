@@ -794,7 +794,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     : "text-[17px] sm:text-sm text-white/70 leading-relaxed";
   const ctaClassName = isCompact
     ? "mt-1 flex items-center gap-1.5 text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
-    : "mt-3 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
+    : "absolute bottom-3 right-4 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden md:static md:mt-3 md:ml-0 md:self-auto lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
 
   const explanationKeys = visibleActions
     .filter((action) => !action.isPlain)
@@ -825,6 +825,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         : "bg-black/20 backdrop-blur-sm rounded-xl",
       "group/card",
       cardPaddingClassName,
+      action.isPlain ? "" : "relative pb-10 md:pb-5",
       cardLayoutClassName,
       showCardBorders ? action.borderHoverClassName : "",
       action.isPlain
@@ -877,12 +878,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         {!action.isPlain && (
           <div className={ctaClassName}>
             <span className="relative z-10">
-              <span className="md:hidden">
-                {t("home_v2_essentials_modal_cta", "En savoir plus")}
-              </span>
+              <span className="md:hidden text-xcannes-green text-xl font-light">+</span>
               <span className="hidden md:inline text-xcannes-green text-xl font-light">+</span>
             </span>
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-xcannes-green/20 to-transparent -translate-x-full opacity-0 group-hover/card:translate-x-full group-hover/card:opacity-100 transition-all duration-700 ease-in-out" />
+            <span className="absolute inset-0 opacity-0 transition-all duration-200 ease-out group-hover/card:opacity-100 group-hover/card:scale-110" />
           </div>
         )}
         {action.showArrow && (
@@ -959,7 +958,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         {showSeparator && (
           <div className="mt-2 flex justify-center">
             <svg
-              className="w-[86%] h-[6px]"
+              className="w-[86%] h-[5px]"
               viewBox="0 0 100 6"
               preserveAspectRatio="none"
               aria-hidden="true"
@@ -1046,118 +1045,200 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 </button>
               </div>
 
-              <div className="max-h-[70vh] overflow-y-auto pr-1">
+              <div
+                className={
+                  activeAction.modalLayout
+                    ? "max-h-[70vh] flex flex-col min-h-0"
+                    : "max-h-[70vh] overflow-y-auto pr-1"
+                }
+              >
                 {activeAction.modalLayout ? (
-                  <div className="space-y-4">
-                  <p className="text-[13.5px] text-white/65 leading-[1.6]">
-                    {activeAction.modalLayout.intro}
-                  </p>
-                  {activeAction.modalLayout.flows?.length ? (
-                    <div className="flex gap-2">
-                      {activeAction.modalLayout.flows.map((flow) => {
-                        const isActive = flow.key === activeFlowKey;
-                        const useGreenTabs =
-                          activeAction.key === "receive_request";
-                        const activeTabClass = useGreenTabs
-                          ? "rounded-lg border border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90 font-semibold transition-all duration-200 hover:bg-xcannes-green/20 hover:text-xcannes-green hover:scale-105 active:scale-95"
-                          : "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95";
-                        const inactiveTabClass = useGreenTabs
-                          ? "rounded-lg border border-xcannes-green/30 bg-transparent text-xcannes-green/70 font-semibold transition-all duration-200 hover:border-xcannes-green/50 hover:text-xcannes-green/90"
-                          : "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
-                        return (
-                          <button
-                            key={flow.key}
-                            type="button"
-                            onClick={() => setActiveFlowKey(flow.key)}
-                            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-                              isActive ? activeTabClass : inactiveTabClass
-                            }`}
-                          >
-                            {flow.tabLabel || flow.title}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                  <div className="grid grid-cols-1 gap-3">
-                    {activeAction.modalLayout.flows
-                      .filter((flow) =>
-                        activeFlowKey ? flow.key === activeFlowKey : true
-                      )
-                      .map((flow) => (
-                        <div
-                          key={flow.title}
-                          className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
-                        >
-                          <div className="text-[13.5px] font-semibold text-white/90">
-                            {flow.title}
-                          </div>
-                          {flow.intro ? (
-                            <p className="mt-2 text-[12.5px] text-white/65 leading-relaxed">
-                              {flow.intro}
-                            </p>
-                          ) : null}
-                          <ul className="mt-3 space-y-2.5">
-                            {flow.steps.map((step, index) => {
-                              const stepKey =
-                                typeof step === "string"
-                                  ? step
-                                  : step.title || `${flow.title}-step-${index}`;
-                              const stepTitle =
-                                typeof step === "string" ? step : step.title;
-                              const stepDesc =
-                                typeof step === "string" ? "" : step.desc;
-                              const stepDetails =
-                                typeof step === "string" ? [] : step.details || [];
-                              const stepNote =
-                                typeof step === "string" ? "" : step.note;
-                              return (
-                                <li key={stepKey} className="flex items-start gap-3">
-                                  <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-xcannes-green/40 text-[11px] text-xcannes-green/80">
-                                    {index + 1}
-                                  </span>
-                                  <div className="flex-1">
-                                    {stepTitle ? (
-                                      <div className="text-[13px] font-semibold text-white/85">
-                                        {stepTitle}
+                  <div className="flex flex-col gap-4 min-h-0">
+                    <p
+                      className={[
+                        activeAction.key === "pay" ||
+                        activeAction.key === "receive_request"
+                          ? "text-[19px] sm:text-[13.5px]"
+                          : "text-[13.5px]",
+                        "text-white/65 leading-[1.6]",
+                      ].join(" ")}
+                    >
+                      {activeAction.modalLayout.intro}
+                    </p>
+                    {activeAction.modalLayout.flows?.length ? (
+                      <div className="flex gap-2">
+                        {activeAction.modalLayout.flows.map((flow) => {
+                          const isActive = flow.key === activeFlowKey;
+                          const useGreenTabs =
+                            activeAction.key === "receive_request";
+                          const activeTabClass = useGreenTabs
+                            ? "rounded-lg border border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90 font-semibold transition-all duration-200 hover:bg-xcannes-green/20 hover:text-xcannes-green hover:scale-105 active:scale-95"
+                            : "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95";
+                          const inactiveTabClass = useGreenTabs
+                            ? "rounded-lg border border-xcannes-green/30 bg-transparent text-xcannes-green/70 font-semibold transition-all duration-200 hover:border-xcannes-green/50 hover:text-xcannes-green/90"
+                            : activeAction.key === "pay"
+                            ? "rounded-lg border border-[#38BDF8]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#38BDF8]/60 hover:text-white/80"
+                            : "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
+                          return (
+                            <button
+                              key={flow.key}
+                              type="button"
+                              onClick={() => setActiveFlowKey(flow.key)}
+                              className={`flex-1 px-3 py-2 ${
+                                activeAction.key === "pay"
+                                  ? "text-[15px] sm:text-sm"
+                                  : activeAction.key === "receive_request"
+                                  ? "text-[14px] sm:text-sm"
+                                  : "text-xs md:text-sm"
+                              } ${
+                                isActive ? activeTabClass : inactiveTabClass
+                              }`}
+                            >
+                              {flow.tabLabel || flow.title}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                    <div className="flex-1 overflow-y-auto pr-1 min-h-0">
+                      <div className="grid grid-cols-1 gap-3">
+                        {activeAction.modalLayout.flows
+                          .filter((flow) =>
+                            activeFlowKey ? flow.key === activeFlowKey : true
+                          )
+                          .map((flow) => (
+                            <div
+                              key={flow.title}
+                              className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                            >
+                              <div
+                                className={[
+                                  activeAction.key === "pay" ||
+                                  activeAction.key === "receive_request"
+                                    ? "text-[17px] sm:text-[13.5px]"
+                                    : "text-[13.5px]",
+                                  "font-semibold text-white/90",
+                                ].join(" ")}
+                              >
+                                {flow.title}
+                              </div>
+                              {flow.intro ? (
+                                <p
+                                  className={[
+                                    activeAction.key === "pay" ||
+                                    activeAction.key === "receive_request"
+                                      ? "text-[17px] sm:text-[12.5px]"
+                                      : "text-[12.5px]",
+                                    "mt-2 text-white/65 leading-relaxed",
+                                  ].join(" ")}
+                                >
+                                  {flow.intro}
+                                </p>
+                              ) : null}
+                              <ul className="mt-3 space-y-2.5">
+                                {flow.steps.map((step, index) => {
+                                  const stepKey =
+                                    typeof step === "string"
+                                      ? step
+                                      : step.title || `${flow.title}-step-${index}`;
+                                  const stepTitle =
+                                    typeof step === "string" ? step : step.title;
+                                  const stepDesc =
+                                    typeof step === "string" ? "" : step.desc;
+                                  const stepDetails =
+                                    typeof step === "string" ? [] : step.details || [];
+                                  const stepNote =
+                                    typeof step === "string" ? "" : step.note;
+                                  return (
+                                    <li key={stepKey} className="flex items-start gap-3">
+                                      <span
+                                        className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${
+                                          activeAction.key === "pay"
+                                            ? "border-[#38BDF8]/50 text-[#5FC9F8]"
+                                            : "border-xcannes-green/40 text-xcannes-green/80"
+                                        }`}
+                                      >
+                                        {index + 1}
+                                      </span>
+                                      <div className="flex-1">
+                                        {stepTitle ? (
+                                          <div
+                                            className={[
+                                              activeAction.key === "pay" ||
+                                              activeAction.key === "receive_request"
+                                                ? "text-[16.5px] sm:text-[13px]"
+                                                : "text-[13px]",
+                                              "font-semibold text-white/85",
+                                            ].join(" ")}
+                                          >
+                                            {stepTitle}
+                                          </div>
+                                        ) : null}
+                                        {stepDesc ? (
+                                          <p
+                                            className={[
+                                              activeAction.key === "pay" ||
+                                              activeAction.key === "receive_request"
+                                                ? "text-[16px] sm:text-[12.5px]"
+                                                : "text-[12.5px]",
+                                              "mt-1 text-white/70 leading-relaxed",
+                                            ].join(" ")}
+                                          >
+                                            {stepDesc}
+                                          </p>
+                                        ) : null}
+                                        {stepDetails.length ? (
+                                          <ul
+                                            className={[
+                                              activeAction.key === "pay" ||
+                                              activeAction.key === "receive_request"
+                                                ? "text-[15.5px] sm:text-[12px]"
+                                                : "text-[12px]",
+                                              "mt-2 space-y-1.5 text-white/60",
+                                            ].join(" ")}
+                                          >
+                                            {stepDetails.map((detail) => (
+                                              <li key={detail} className="flex items-start gap-2">
+                                                <span
+                                                  className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${
+                                                    activeAction.key === "pay"
+                                                      ? "bg-[#38BDF8]/70"
+                                                      : "bg-xcannes-green/60"
+                                                  }`}
+                                                  aria-hidden="true"
+                                                />
+                                                <span>{detail}</span>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        ) : null}
+                                        {stepNote ? (
+                                          <p
+                                            className={[
+                                              activeAction.key === "pay" ||
+                                              activeAction.key === "receive_request"
+                                                ? "text-[15px] sm:text-[11.5px]"
+                                                : "text-[11.5px]",
+                                              "mt-2 text-white/50 italic leading-relaxed",
+                                            ].join(" ")}
+                                          >
+                                            {stepNote}
+                                          </p>
+                                        ) : null}
                                       </div>
-                                    ) : null}
-                                    {stepDesc ? (
-                                      <p className="mt-1 text-[12.5px] text-white/70 leading-relaxed">
-                                        {stepDesc}
-                                      </p>
-                                    ) : null}
-                                    {stepDetails.length ? (
-                                      <ul className="mt-2 space-y-1.5 text-[12px] text-white/60">
-                                        {stepDetails.map((detail) => (
-                                          <li key={detail} className="flex items-start gap-2">
-                                            <span
-                                              className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/60 flex-shrink-0"
-                                              aria-hidden="true"
-                                            />
-                                            <span>{detail}</span>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    ) : null}
-                                    {stepNote ? (
-                                      <p className="mt-2 text-[11.5px] text-white/50 italic leading-relaxed">
-                                        {stepNote}
-                                      </p>
-                                    ) : null}
-                                  </div>
-                                </li>
-                              );
-                            })}
-                          </ul>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          ))}
+                      </div>
+                      {activeAction.modalLayout.note?.trim() ? (
+                        <div className="text-[12.5px] text-white/50 italic leading-relaxed">
+                          {activeAction.modalLayout.note}
                         </div>
-                      ))}
-                  </div>
-                  {activeAction.modalLayout.note?.trim() ? (
-                    <div className="text-[12.5px] text-white/50 italic leading-relaxed">
-                      {activeAction.modalLayout.note}
+                      ) : null}
                     </div>
-                  ) : null}
                   </div>
                 ) : activeAction.modalSections?.length ? (
                   <div className="mt-4 space-y-3 text-sm text-white/70">
