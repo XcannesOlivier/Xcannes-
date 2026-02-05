@@ -6,6 +6,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const { t } = useTranslation("common");
   const [modalRoot, setModalRoot] = useState(null);
   const [activeActionKey, setActiveActionKey] = useState(null);
+  const [activeFlowKey, setActiveFlowKey] = useState(null);
   const isCompact = variant === "compare";
 
   useEffect(() => {
@@ -77,22 +78,167 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       title: t("home_v2_essentials_2_title", "Payer / Envoyer"),
       desc: t(
         "home_v2_essentials_2_desc",
-        "Demandez (QR), recevez et envoyez en quelques secondes."
+        "Payer une demande (QR/code) ou envoyer à une adresse."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_2_modal_point_1",
-          "Payer ou envoyer en quelques secondes."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_2_modal_intro",
+          "Deux parcours clairs pour envoyer des fonds depuis le wallet."
         ),
-        t(
-          "home_v2_essentials_2_modal_point_2",
-          "Validation explicite avant chaque transaction."
-        ),
-        t(
-          "home_v2_essentials_2_modal_point_3",
-          "QR et demandes intégrés pour aller plus vite."
-        ),
-      ],
+        flows: [
+          {
+            key: "pay_request",
+            tabLabel: t(
+              "home_v2_essentials_2_modal_flow_1_tab",
+              "Payer une demande"
+            ),
+            title: t(
+              "home_v2_essentials_2_modal_flow_1_title",
+              "Parcours 1 · Payer une demande"
+            ),
+            intro: t(
+              "home_v2_essentials_2_modal_flow_1_intro",
+              "Réglez facilement une demande de paiement déjà préparée par le destinataire."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_1_step_1_title",
+                  "Recevoir la demande"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_1_step_1_desc",
+                  "Le destinataire vous envoie une demande contenant le montant, la devise, son wallet."
+                ),
+                note: t(
+                  "home_v2_essentials_2_modal_flow_1_step_1_note",
+                  "Elle peut être reçue par message, e-mail, SMS, ou présentée en face à face via un QR code."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_1_step_2_title",
+                  "Charger la demande"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_1_step_2_desc",
+                  "Depuis votre wallet, importez la demande en :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_2_modal_flow_1_step_2_detail_1",
+                    "Scannant le QR code"
+                  ),
+                  t(
+                    "home_v2_essentials_2_modal_flow_1_step_2_detail_2",
+                    "Chargeant une image du QR"
+                  ),
+                  t(
+                    "home_v2_essentials_2_modal_flow_1_step_2_detail_3",
+                    "Ou collant le code reçu"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_1_step_3_title",
+                  "Vérifier et confirmer"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_1_step_3_desc",
+                  "Les informations s’affichent automatiquement. Vérifiez-les, puis confirmez la transaction."
+                ),
+                note: t(
+                  "home_v2_essentials_2_modal_flow_1_step_3_note",
+                  "Chaque paiement nécessite une validation explicite pour garantir sécurité et contrôle."
+                ),
+              },
+            ],
+          },
+          {
+            key: "simple_send",
+            tabLabel: t(
+              "home_v2_essentials_2_modal_flow_2_tab",
+              "Envoi simple"
+            ),
+            title: t(
+              "home_v2_essentials_2_modal_flow_2_title",
+              "Parcours 2 · Envoi simple"
+            ),
+            intro: t(
+              "home_v2_essentials_2_modal_flow_2_intro",
+              "Envoyez des fonds sans demande préalable, en renseignant vous-même le destinataire."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_2_step_1_title",
+                  "Choisir le destinataire"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_2_step_1_desc",
+                  "Définissez le wallet du destinataire en :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_2_modal_flow_2_step_1_detail_1",
+                    "Scannant un QR code s’il est en face de vous"
+                  ),
+                  t(
+                    "home_v2_essentials_2_modal_flow_2_step_1_detail_2",
+                    "Collant une adresse reçue par message, e-mail ou SMS"
+                  ),
+                  t(
+                    "home_v2_essentials_2_modal_flow_2_step_1_detail_3",
+                    "Ou sélectionnant une adresse enregistrée dans votre liste de wallets"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_2_step_2_title",
+                  "Indiquer le paiement"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_2_step_2_desc",
+                  "Renseignez :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_2_modal_flow_2_step_2_detail_1",
+                    "La devise"
+                  ),
+                  t(
+                    "home_v2_essentials_2_modal_flow_2_step_2_detail_2",
+                    "Le montant"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_2_step_3_title",
+                  "Vérifier et confirmer"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_2_step_3_desc",
+                  "Vérifiez les informations affichées, puis confirmez l’envoi."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_2_modal_flow_2_step_4_title",
+                  "Confirmer la transaction"
+                ),
+                desc: t(
+                  "home_v2_essentials_2_modal_flow_2_step_4_desc",
+                  "Chaque transaction nécessite une validation explicite afin de garantir sécurité et contrôle."
+                ),
+              },
+            ],
+          },
+        ],
+        note: "",
+      },
       orderClassName: "order-1 lg:order-2",
       iconClassName:
         "text-[#5FC9F8] bg-[rgba(56,189,248,0.14)] group-hover:bg-[rgba(56,189,248,0.2)]",
@@ -472,6 +618,18 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const modalTitleId = activeAction
     ? `essentials-modal-title-${activeAction.key}`
     : null;
+  const hasModalContent = Boolean(
+    activeAction?.modalLayout ||
+    activeAction?.modalSections?.length ||
+    activeAction?.modalPoints?.length
+  );
+  useEffect(() => {
+    if (!activeAction?.modalLayout?.flows?.length) {
+      setActiveFlowKey(null);
+      return;
+    }
+    setActiveFlowKey(activeAction.modalLayout.flows[0].key);
+  }, [activeActionKey]);
 
   const rootClassName = isCompact
     ? "h-full w-full flex flex-col min-h-0 gap-4"
@@ -659,7 +817,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
 
       {modalRoot &&
         activeAction &&
-        activeAction.modalPoints?.length &&
+        hasModalContent &&
         createPortal(
           <div
             className="fixed inset-0 z-[10070] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
@@ -673,13 +831,13 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId || undefined}
-              className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#050c12]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none"
+              className="w-full max-w-[620px] rounded-2xl border border-white/10 bg-[#040c13]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start justify-between gap-4 mb-5">
                 <h4
                   id={modalTitleId || undefined}
-                  className="text-lg font-semibold text-white"
+                  className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight"
                 >
                   {activeAction.title}
                 </h4>
@@ -693,17 +851,148 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 </button>
               </div>
 
-              <ul className="mt-4 space-y-2 text-sm text-white/70">
-                {activeAction.modalPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-2">
-                    <span
-                      className="mt-2 h-1.5 w-1.5 rounded-full bg-white/60 flex-shrink-0"
-                      aria-hidden="true"
-                    />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="max-h-[70vh] overflow-y-auto pr-1">
+                {activeAction.modalLayout ? (
+                  <div className="space-y-4">
+                  <p className="text-[13.5px] text-white/65 leading-[1.6]">
+                    {activeAction.modalLayout.intro}
+                  </p>
+                  {activeAction.modalLayout.flows?.length ? (
+                    <div className="flex gap-2">
+                      {activeAction.modalLayout.flows.map((flow) => {
+                        const isActive = flow.key === activeFlowKey;
+                        return (
+                          <button
+                            key={flow.key}
+                            type="button"
+                            onClick={() => setActiveFlowKey(flow.key)}
+                            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+                              isActive
+                                ? "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95"
+                                : "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80"
+                            }`}
+                          >
+                            {flow.tabLabel || flow.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                  <div className="grid grid-cols-1 gap-3">
+                    {activeAction.modalLayout.flows
+                      .filter((flow) =>
+                        activeFlowKey ? flow.key === activeFlowKey : true
+                      )
+                      .map((flow) => (
+                        <div
+                          key={flow.title}
+                          className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+                        >
+                          <div className="text-[13.5px] font-semibold text-white/90">
+                            {flow.title}
+                          </div>
+                          {flow.intro ? (
+                            <p className="mt-2 text-[12.5px] text-white/65 leading-relaxed">
+                              {flow.intro}
+                            </p>
+                          ) : null}
+                          <ul className="mt-3 space-y-2.5">
+                            {flow.steps.map((step, index) => {
+                              const stepKey =
+                                typeof step === "string"
+                                  ? step
+                                  : step.title || `${flow.title}-step-${index}`;
+                              const stepTitle =
+                                typeof step === "string" ? step : step.title;
+                              const stepDesc =
+                                typeof step === "string" ? "" : step.desc;
+                              const stepDetails =
+                                typeof step === "string" ? [] : step.details || [];
+                              const stepNote =
+                                typeof step === "string" ? "" : step.note;
+                              return (
+                                <li key={stepKey} className="flex items-start gap-3">
+                                  <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-xcannes-green/40 text-[11px] text-xcannes-green/80">
+                                    {index + 1}
+                                  </span>
+                                  <div className="flex-1">
+                                    {stepTitle ? (
+                                      <div className="text-[13px] font-semibold text-white/85">
+                                        {stepTitle}
+                                      </div>
+                                    ) : null}
+                                    {stepDesc ? (
+                                      <p className="mt-1 text-[12.5px] text-white/70 leading-relaxed">
+                                        {stepDesc}
+                                      </p>
+                                    ) : null}
+                                    {stepDetails.length ? (
+                                      <ul className="mt-2 space-y-1.5 text-[12px] text-white/60">
+                                        {stepDetails.map((detail) => (
+                                          <li key={detail} className="flex items-start gap-2">
+                                            <span
+                                              className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/60 flex-shrink-0"
+                                              aria-hidden="true"
+                                            />
+                                            <span>{detail}</span>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : null}
+                                    {stepNote ? (
+                                      <p className="mt-2 text-[11.5px] text-white/50 italic leading-relaxed">
+                                        {stepNote}
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ))}
+                  </div>
+                  {activeAction.modalLayout.note?.trim() ? (
+                    <div className="text-[12.5px] text-white/50 italic leading-relaxed">
+                      {activeAction.modalLayout.note}
+                    </div>
+                  ) : null}
+                  </div>
+                ) : activeAction.modalSections?.length ? (
+                  <div className="mt-4 space-y-3 text-sm text-white/70">
+                    {activeAction.modalSections.map((section) => (
+                      <div
+                        key={section.title}
+                        className="rounded-xl border border-white/10 bg-white/[0.03] p-3"
+                      >
+                        <div className="text-sm font-semibold text-white/90">
+                          {section.title}
+                        </div>
+                        <ul className="mt-2 space-y-2">
+                          {section.items.map((item) => (
+                            <li key={item} className="flex items-start gap-2">
+                              <span
+                                className="mt-2 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0"
+                                aria-hidden="true"
+                              />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <ul className="mt-4 space-y-3 text-[14.5px] text-white/80 leading-relaxed">
+                    {activeAction.modalPoints.map((point) => (
+                      <li key={point} className="flex items-start gap-3">
+                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           </div>,
           modalRoot
