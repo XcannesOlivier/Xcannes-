@@ -777,11 +777,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     : "";
   const gridClassName = isCompact
     ? "grid grid-cols-1 grid-rows-7 gap-2 flex-1 min-h-0"
-    : "grid sm:grid-cols-2 lg:grid-cols-1 gap-4";
+    : "grid sm:grid-cols-2 lg:grid-cols-1 gap-3";
   const cardPaddingClassName = isCompact ? "p-3" : "p-5";
   const baseLayoutClassName = isCompact
     ? "space-y-2"
     : "lg:flex lg:items-start lg:gap-6";
+  const showCardBorders = variant !== "home";
   const titleRowClassName = isCompact
     ? "flex items-center gap-2.5"
     : "flex items-center gap-3 lg:items-start lg:min-w-[190px]";
@@ -790,10 +791,189 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     : "text-white/80 font-montserrat font-semibold tracking-widest text-xs uppercase";
   const descClassName = isCompact
     ? "text-[12px] text-white/65 leading-snug line-clamp-2"
-    : "text-sm text-white/70 leading-relaxed";
+    : "text-[17px] sm:text-sm text-white/70 leading-relaxed";
   const ctaClassName = isCompact
     ? "mt-1 flex items-center gap-1.5 text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
     : "mt-3 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
+
+  const explanationKeys = visibleActions
+    .filter((action) => !action.isPlain)
+    .map((action) => action.key);
+  const demoAction = actions.find((action) => action.key === "demo_intro");
+  const listActions = isCompact
+    ? visibleActions
+    : visibleActions.filter((action) => action.key !== "demo_intro");
+
+  const renderActionCard = (action, options = {}) => {
+    const { wrapperClassNameOverride = "", keySuffix = "" } = options;
+    const cardLayoutClassName = baseLayoutClassName;
+    const descLayoutClassName = !isCompact ? "lg:mt-0 lg:flex-1" : "";
+    const isExplanationCard = !action.isPlain;
+    const isLastExplanation =
+      explanationKeys[explanationKeys.length - 1] === action.key;
+    const showSeparator =
+      isExplanationCard &&
+      !isLastExplanation &&
+      !(action.key === "config" && !isCompact);
+    const wrapperClassName =
+      wrapperClassNameOverride || action.orderClassName || "";
+    const cardClasses = [
+      action.isPlain
+        ? "bg-transparent border-none rounded-none shadow-none"
+        : showCardBorders
+        ? "bg-black/20 backdrop-blur-sm border border-xcannes-green/25 rounded-xl"
+        : "bg-black/20 backdrop-blur-sm rounded-xl",
+      "group/card",
+      cardPaddingClassName,
+      cardLayoutClassName,
+      showCardBorders ? action.borderHoverClassName : "",
+      action.isPlain
+        ? ""
+        : "w-full text-left cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:bg-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const effectiveTitle = action.title;
+    const effectiveDesc = action.desc;
+    const cardContent = (
+      <>
+        <div className={titleRowClassName}>
+          {!action.isPlain && (
+            <div
+              className={[
+                "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover/card:scale-110",
+                isCompact ? "w-9 h-9" : "w-10 h-10",
+                !isCompact ? "lg:mt-0.5" : "",
+                action.iconClassName,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {action.icon}
+            </div>
+          )}
+          <div
+            className={
+              action.isPlain
+                ? action.plainTitleClassName ||
+                  "text-white/90 font-montserrat font-semibold text-sm sm:text-base tracking-normal"
+                : titleClassName
+            }
+          >
+            {effectiveTitle}
+          </div>
+        </div>
+        <p
+          className={[
+            "mt-2 italic",
+            descLayoutClassName,
+            action.isPlain
+              ? action.plainDescClassName || "text-white/60 text-sm"
+              : descClassName,
+          ].join(" ")}
+        >
+          {effectiveDesc}
+        </p>
+        {!action.isPlain && (
+          <div className={ctaClassName}>
+            <span className="relative z-10">
+              <span className="md:hidden">
+                {t("home_v2_essentials_modal_cta", "En savoir plus")}
+              </span>
+              <span className="hidden md:inline text-xcannes-green text-xl font-light">+</span>
+            </span>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-xcannes-green/20 to-transparent -translate-x-full opacity-0 group-hover/card:translate-x-full group-hover/card:opacity-100 transition-all duration-700 ease-in-out" />
+          </div>
+        )}
+        {action.showArrow && (
+          <div className="mt-3 flex justify-end lg:mt-0 lg:ml-auto lg:self-center">
+            <span
+              className="inline-flex lg:hidden text-xcannes-green/70 animate-pulse-slow"
+              aria-hidden="true"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 5v14"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M7 14l5 5 5-5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span
+              className="hidden lg:inline-flex text-xcannes-green/70 animate-pulse-slow"
+              aria-hidden="true"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 12h14"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M14 7l5 5-5 5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+          </div>
+        )}
+      </>
+    );
+
+    if (action.isPlain) {
+      return (
+        <div
+          key={`${action.key}${keySuffix ? `-${keySuffix}` : ""}`}
+          className={wrapperClassName}
+        >
+          <div className={cardClasses}>{cardContent}</div>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        key={`${action.key}${keySuffix ? `-${keySuffix}` : ""}`}
+        className={wrapperClassName}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveActionKey(action.key)}
+          className={cardClasses}
+          aria-haspopup="dialog"
+          aria-expanded={activeActionKey === action.key}
+        >
+          {cardContent}
+        </button>
+        {showSeparator && (
+          <div className="mt-2 flex justify-center">
+            <svg
+              className="w-[86%] h-[6px]"
+              viewBox="0 0 100 6"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M0 3 C 24 2.7 38 1.1 50 1.1 C 62 1.1 76 2.7 100 3 C 76 3.3 62 4.9 50 4.9 C 38 4.9 24 3.3 0 3 Z"
+                fill="rgba(34,197,94,0.35)"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={rootClassName}>
@@ -815,145 +995,19 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       )}
 
       <div className={gridClassName}>
-        {visibleActions.map((action) => {
-          const cardLayoutClassName = baseLayoutClassName;
-          const descLayoutClassName = !isCompact ? "lg:mt-0 lg:flex-1" : "";
-          const cardClasses = [
-            action.isPlain
-              ? "bg-transparent border-none rounded-none shadow-none"
-            : "bg-black/20 backdrop-blur-sm border border-xcannes-green/25 rounded-xl",
-            "group/card",
-            cardPaddingClassName,
-            cardLayoutClassName,
-            action.borderHoverClassName,
-            action.orderClassName,
-            action.isPlain
-              ? ""
-              : "w-full text-left cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:bg-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
-          ]
-            .filter(Boolean)
-            .join(" ");
-          const effectiveTitle = action.title;
-          const effectiveDesc = action.desc;
-          const cardContent = (
-            <>
-              <div className={titleRowClassName}>
-                {!action.isPlain && (
-                  <div
-                    className={[
-                      "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover/card:scale-110",
-                      isCompact ? "w-9 h-9" : "w-10 h-10",
-                      !isCompact ? "lg:mt-0.5" : "",
-                      action.iconClassName,
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    {action.icon}
-                  </div>
-                )}
-                <div
-                  className={
-                    action.isPlain
-                      ? action.plainTitleClassName ||
-                        "text-white/90 font-montserrat font-semibold text-sm sm:text-base tracking-normal"
-                      : titleClassName
-                  }
-                >
-                  {effectiveTitle}
-                </div>
-              </div>
-              <p
-                className={[
-                  "mt-2 italic",
-                  descLayoutClassName,
-                  action.isPlain
-                    ? action.plainDescClassName || "text-white/60 text-sm"
-                    : descClassName,
-                ].join(" ")}
-              >
-                {effectiveDesc}
-              </p>
-              {!action.isPlain && (
-                <div className={ctaClassName}>
-                  <span className="relative z-10">
-                    <span className="md:hidden">{t("home_v2_essentials_modal_cta", "En savoir plus")}</span>
-                    <span className="hidden md:inline text-xcannes-green text-xl font-light">+</span>
-                  </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-xcannes-green/20 to-transparent -translate-x-full opacity-0 group-hover/card:translate-x-full group-hover/card:opacity-100 transition-all duration-700 ease-in-out" />
-                </div>
-              )}
-              {action.showArrow && (
-                <div className="mt-3 flex justify-end lg:mt-0 lg:ml-auto lg:self-center">
-                  <span
-                    className="inline-flex lg:hidden text-xcannes-green/70 animate-pulse-slow"
-                    aria-hidden="true"
-                  >
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 5v14"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M7 14l5 5 5-5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  <span
-                    className="hidden lg:inline-flex text-xcannes-green/70 animate-pulse-slow"
-                    aria-hidden="true"
-                  >
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M5 12h14"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M14 7l5 5-5 5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              )}
-            </>
-          );
-
-          if (action.isPlain) {
-            return (
-              <div
-                key={action.key}
-                className={cardClasses}
-              >
-                {cardContent}
-              </div>
-            );
-          }
-
-          return (
-            <button
-              key={action.key}
-              type="button"
-              onClick={() => setActiveActionKey(action.key)}
-              className={cardClasses}
-              aria-haspopup="dialog"
-              aria-expanded={activeActionKey === action.key}
-            >
-              {cardContent}
-            </button>
-          );
-        })}
+        {!isCompact &&
+          demoAction &&
+          renderActionCard(demoAction, {
+            wrapperClassNameOverride: "hidden lg:block lg:order-1 lg:-mb-2",
+            keySuffix: "desktop",
+          })}
+        {listActions.map((action) => renderActionCard(action))}
+        {!isCompact &&
+          demoAction &&
+          renderActionCard(demoAction, {
+            wrapperClassNameOverride: "lg:hidden order-last",
+            keySuffix: "mobile",
+          })}
       </div>
 
       {modalRoot &&
