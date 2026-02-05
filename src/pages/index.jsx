@@ -276,18 +276,25 @@ export default function Home() {
                 if (e.target === e.currentTarget) setSpeedModalOpen(false);
               }}
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white">
-                      {t("home_v2_hero_speed_modal_title", "Pourquoi c'est rapide")}
-                    </h4>
-                    <p className="mt-1 text-sm text-white/65">
-                      {t(
-                        "home_v2_hero_speed_modal_subtitle",
-                        "XCANNES s'appuie sur le réseau XRP Ledger (XRP) pour finaliser les transactions en quelques secondes."
-                      )}
-                    </p>
+              <div className="w-full max-w-[560px] rounded-2xl border border-white/10 bg-[#040c13]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
+                        {t("home_v2_hero_speed_modal_title", "Pourquoi c'est rapide")}
+                      </h4>
+                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                        {t(
+                          "home_v2_hero_speed_modal_subtitle",
+                          "XCANNES s'appuie sur le réseau XRP Ledger pour valider les transactions en quelques secondes."
+                        )}
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -298,32 +305,48 @@ export default function Home() {
                     ✕
                   </button>
                 </div>
-                <div className="mt-4 space-y-2 text-sm text-white/70">
+
+                <div className="mt-5 space-y-3">
                   {[
                     t(
                       "home_v2_hero_speed_modal_point_1",
-                      "Vous validez dans Xaman."
+                      "Transactions XRPL natives : validation on-chain en quelques secondes."
                     ),
                     t(
                       "home_v2_hero_speed_modal_point_2",
-                      "Confirmations rapides, sans délais bancaires."
+                      "Signature immédiate dans Xaman, sans délais bancaires."
                     ),
                     t(
                       "home_v2_hero_speed_modal_point_3",
+                      "Transactions préremplies : vous validez, c'est terminé."
+                    ),
+                    t(
+                      "home_v2_hero_speed_modal_point_4",
                       "Engagement XCANNES : < 3 s en conditions normales."
                     ),
                   ].map((line) => (
-                    <div key={line} className="flex items-start gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                      <span>{line}</span>
+                    <div key={line} className="flex items-start gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 text-xs text-white/45">
+
+                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
                     "home_v2_hero_speed_modal_note",
                     "En cas de congestion rare du réseau, le délai peut être légèrement supérieur."
                   )}
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSpeedModalOpen(false)}
+                    className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
+                  >
+                    {t("home_v2_hero_speed_modal_cta", "Compris")}
+                  </button>
                 </div>
               </div>
             </div>,
@@ -338,21 +361,25 @@ export default function Home() {
                 if (e.target === e.currentTarget) setSecurityModalOpen(false);
               }}
             >
-              <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl max-h-[85vh] overflow-hidden flex flex-col animate-essentials-slide-in motion-reduce:animate-none">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white">
-                      {t(
-                        "home_v2_hero_security_modal_title",
-                        "Sécurité & validation des transactions"
-                      )}
-                    </h4>
-                    <p className="mt-1 text-sm text-white/65">
-                      {t(
-                        "home_v2_hero_security_modal_subtitle",
-                        "Le wallet XCANNES s'appuie sur Xaman, une solution de validation utilisée par des centaines de milliers d'utilisateurs dans le monde."
-                      )}
-                    </p>
+              <div className="w-full max-w-[560px] rounded-2xl border border-white/10 bg-[#040c13]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 3l8 4v6c0 5-4 7.5-8 8-4-0.5-8-3-8-8V7l8-4z" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
+                        {t("home_v2_hero_security_modal_title", "Sécurisé")}
+                      </h4>
+                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                        {t(
+                          "home_v2_hero_security_modal_subtitle",
+                          "Chaque transaction est validée sous votre contrôle exclusif."
+                        )}
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -363,176 +390,52 @@ export default function Home() {
                     ✕
                   </button>
                 </div>
-                <div className="mt-4 flex-1 overflow-y-auto pr-2">
-                  <div className="space-y-4 text-xs text-white/60">
-                    <div className="flex items-start gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                      <span>
-                        {t(
-                          "home_v2_hero_security_modal_biometrics",
-                          "Validation biométrique sur votre appareil (empreinte/Face ID)."
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                      <span>
-                        {t(
-                          "home_v2_hero_security_modal_xrpl_native",
-                          "Transactions XRPL natives : validation on-chain, sans intermédiaire."
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-5 space-y-5 text-sm text-white/70">
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-white/50">
-                        {t(
-                          "home_v2_hero_security_modal_section_control_title",
-                          "Un contrôle qui reste entre vos mains"
-                        )}
-                      </div>
-                      <div className="mt-2 space-y-2">
-                        {[
-                          t(
-                            "home_v2_hero_security_modal_point_1",
-                            "Vos fonds restent sous votre contrôle."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_point_2",
-                            "Chaque transaction doit être validée par vous."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_point_3",
-                            "Aucune action ne peut être exécutée sans votre accord."
-                          ),
-                        ].map((line) => (
-                          <div key={line} className="flex items-start gap-2">
-                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                            <span>{line}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-2 text-xs text-white/55">
-                        {t(
-                          "home_v2_hero_security_modal_note",
-                          "Ni XCANNES, ni Xaman ne peuvent accéder à vos fonds ou agir à votre place."
-                        )}
-                      </div>
-                    </div>
 
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-white/50">
-                        {t(
-                          "home_v2_hero_security_modal_section_trust_title",
-                          "Un système reconnu et largement utilisé"
-                        )}
-                      </div>
-                      <p className="mt-2">
-                        {t(
-                          "home_v2_hero_security_modal_section_trust_body",
-                          "Xaman est un wallet non-custodial reconnu dans l'écosystème des actifs numériques, utilisé par des services, entreprises et utilisateurs dans le monde."
-                        )}
-                      </p>
-                      <p className="mt-2">
-                        {t(
-                          "home_v2_hero_security_modal_section_trust_body_2",
-                          "Son principe est simple : l'utilisateur conserve le contrôle, la plateforme n'intervient pas dans la validation."
-                        )}
-                      </p>
+                <div className="mt-5 space-y-3">
+                  {[
+                    t(
+                      "home_v2_hero_security_modal_point_1",
+                      "Non‑custodial : XCANNES ne détient pas vos fonds."
+                    ),
+                    t(
+                      "home_v2_hero_security_modal_point_2",
+                      "Chaque action est validée par vous, jamais automatiquement."
+                    ),
+                    t(
+                      "home_v2_hero_security_modal_point_3",
+                      "Transactions enregistrées sur le réseau, traçables et vérifiables."
+                    ),
+                    t(
+                      "home_v2_hero_security_modal_point_5",
+                      "XCANNES renforce la sécurité des transactions en s’appuyant sur Xaman, le wallet natif de l’écosystème XRPL."
+                    ),
+                    t(
+                      "home_v2_hero_security_modal_point_4",
+                      "Les transactions ne peuvent être validées qu’après authentification sur l’appareil de l’utilisateur, par code PIN ou biométrie."
+                    ),
+                  ].map((line) => (
+                    <div key={line} className="flex items-start gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
+                  ))}
+                </div>
 
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-white/50">
-                        {t(
-                          "home_v2_hero_security_modal_section_reg_title",
-                          "Compatibilité avec les cadres réglementaires"
-                        )}
-                      </div>
-                      <p className="mt-2">
-                        {t(
-                          "home_v2_hero_security_modal_section_reg_body",
-                          "Architecture sans conservation de fonds, sans gestion des clés par la plateforme, avec validation explicite par l'utilisateur."
-                        )}
-                      </p>
-                      <p className="mt-2">
-                        {t(
-                          "home_v2_hero_security_modal_section_reg_body_2",
-                          "Compatible avec les grandes orientations (ex. MiCA en Europe, États-Unis). Xaman est un logiciel de validation, pas un intermédiaire financier."
-                        )}
-                      </p>
-                    </div>
+                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
+                  {t(
+                    "home_v2_hero_security_modal_note",
+                    "Vous gardez le contrôle, XCANNES n’agit jamais à votre place."
+                  )}
+                </div>
 
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-white/50">
-                        {t(
-                          "home_v2_hero_security_modal_section_role_title",
-                          "Le rôle de XCANNES"
-                        )}
-                      </div>
-                      <div className="mt-2 space-y-2">
-                        {[
-                          t(
-                            "home_v2_hero_security_modal_section_role_point_1",
-                            "Initier des paiements et conversions."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_section_role_point_2",
-                            "Afficher vos soldes et opérations."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_section_role_point_3",
-                            "Vous guider dans vos actions."
-                          ),
-                        ].map((line) => (
-                          <div key={line} className="flex items-start gap-2">
-                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                            <span>{line}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-2 text-xs text-white/55">
-                        {t(
-                          "home_v2_hero_security_modal_section_role_note",
-                          "La validation finale et la sécurité reposent sur Xaman et votre confirmation."
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-white/50">
-                        {t(
-                          "home_v2_hero_security_modal_section_summary_title",
-                          "En résumé"
-                        )}
-                      </div>
-                      <div className="mt-2 space-y-2">
-                        {[
-                          t(
-                            "home_v2_hero_security_modal_section_summary_point_1",
-                            "Vous gardez le contrôle de vos fonds."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_section_summary_point_2",
-                            "Chaque transaction est validée manuellement."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_section_summary_point_3",
-                            "Xaman est une solution reconnue et largement utilisée."
-                          ),
-                          t(
-                            "home_v2_hero_security_modal_section_summary_point_4",
-                            "XCANNES ne détient ni vos fonds, ni vos clés."
-                          ),
-                        ].map((line) => (
-                          <div key={line} className="flex items-start gap-2">
-                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                            <span>{line}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSecurityModalOpen(false)}
+                    className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
+                  >
+                    {t("home_v2_hero_security_modal_cta", "Compris")}
+                  </button>
                 </div>
               </div>
             </div>,
@@ -547,18 +450,25 @@ export default function Home() {
                 if (e.target === e.currentTarget) setFeesModalOpen(false);
               }}
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#040c13]/95 p-5 shadow-2xl animate-essentials-slide-in motion-reduce:animate-none">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h4 className="text-lg font-semibold text-white">
-                      {t("home_v2_hero_fees_modal_title", "Frais & transparence")}
-                    </h4>
-                    <p className="mt-1 text-sm text-white/65">
-                      {t(
-                        "home_v2_hero_fees_modal_subtitle",
-                        "Les coûts sont affichés avant confirmation."
-                      )}
-                    </p>
+              <div className="w-full max-w-[560px] rounded-2xl border border-white/10 bg-[#040c13]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+                <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M4 6h16M7 12h10M10 18h4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
+                        {t("home_v2_hero_fees_modal_title", "Économique")}
+                      </h4>
+                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                        {t(
+                          "home_v2_hero_fees_modal_subtitle",
+                          "Des coûts maîtrisés, affichés avant confirmation."
+                        )}
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -569,36 +479,44 @@ export default function Home() {
                     ✕
                   </button>
                 </div>
-                <div className="mt-4 space-y-2 text-sm text-white/70">
+
+                <div className="mt-5 space-y-3">
                   {[
                     t(
-                      "home_v2_hero_fees_modal_point_1",
-                      "Frais réseau XRPL sur chaque transaction on-chain."
-                    ),
-                    t(
                       "home_v2_hero_fees_modal_point_2",
-                      "XCANNES ne prélève pas de frais séparés : le coût est un spread FX."
+                      "XCANNES ne prélève pas de frais séparés : le coût principal est le spread."
                     ),
                     t(
                       "home_v2_hero_fees_modal_point_3",
-                      "Spread par tiers selon la devise (A/B/C)."
+                      "Le spread est optimisé selon la devise."
                     ),
                     t(
-                      "home_v2_hero_fees_modal_point_4",
-                      "Taux de conversion : Pyth quand disponible, sinon FX EOD (1x/jour)."
+                      "home_v2_hero_fees_modal_point_5",
+                      "Activation ou désactivation d’une ligne de compte : 1 USD (≈ 1 RLUSD), sans durée limite. Cette transaction enregistre l’action sur le réseau XRPL."
                     ),
                   ].map((line) => (
-                    <div key={line} className="flex items-start gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-xcannes-green/70" />
-                      <span>{line}</span>
+                    <div key={line} className="flex items-start gap-3">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 text-xs text-white/45">
+
+                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
                     "home_v2_hero_fees_modal_note",
                     "Activation d'une nouvelle devise : paiement unique en RLUSD."
                   )}
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setFeesModalOpen(false)}
+                    className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
+                  >
+                    {t("home_v2_hero_fees_modal_cta", "Compris")}
+                  </button>
                 </div>
               </div>
             </div>,
@@ -674,17 +592,21 @@ export default function Home() {
                     <div className="text-[12px] font-semibold text-xcannes-green uppercase tracking-[0.2em]">
                       {t("home_v2_hero_value_modal_example_title", "Exemple")}
                     </div>
-                    <div className="text-[11px] text-white/50">
-                      {t("home_v2_hero_value_modal_example_rate", "Taux initial 1,18 → 1,10")}
-                    </div>
+                    {t("home_v2_hero_value_modal_example_rate", "").trim() ? (
+                      <div className="text-[11px] text-white/50">
+                        {t("home_v2_hero_value_modal_example_rate", "Taux initial 1,18 → 1,10")}
+                      </div>
+                    ) : null}
                   </div>
 
-                  <p className="text-[13.5px] text-white/65 leading-relaxed mb-4">
-                    {t(
-                      "home_v2_hero_value_modal_example_intro",
-                      "Si vous convertissez 1 EUR au taux 1,18, votre référence devient 1,18 RLUSD."
-                    )}
-                  </p>
+                  {t("home_v2_hero_value_modal_example_intro", "").trim() ? (
+                    <p className="text-[13.5px] text-white/65 leading-relaxed mb-4">
+                      {t(
+                        "home_v2_hero_value_modal_example_intro",
+                        "Si vous convertissez 1 EUR au taux 1,18, votre référence devient 1,18 RLUSD."
+                      )}
+                    </p>
+                  ) : null}
 
                   {/* Mini-schéma visuel */}
                   <div className="mb-4">
@@ -709,13 +631,15 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-center gap-2 text-[11px] text-white/45">
-                        <span>{t("home_v2_hero_value_modal_example_rate_moves", "Le taux change")}</span>
-                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M12 5v14" strokeLinecap="round" strokeLinejoin="round" />
-                          <path d="M7 14l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </div>
+                      {t("home_v2_hero_value_modal_example_rate_moves", "").trim() ? (
+                        <div className="flex items-center justify-center gap-2 text-[11px] text-white/45">
+                          <span>{t("home_v2_hero_value_modal_example_rate_moves", "Le taux change")}</span>
+                          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 5v14" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M7 14l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                      ) : null}
 
                       <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                         <div className="text-[10px] text-white/45 uppercase tracking-[0.18em] mb-1">
@@ -749,12 +673,14 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="mt-4 text-[13.5px] text-white/65 leading-relaxed border-t border-white/10 pt-3">
-                    {t(
-                      "home_v2_hero_value_modal_example_conclusion",
-                      "Si le taux passe à 1,10, l'affichage devient ≈ 1,07 EUR, mais la référence reste 1,18 RLUSD. Vous décidez quand reconvertir."
-                    )}
-                  </div>
+                  {t("home_v2_hero_value_modal_example_conclusion", "").trim() ? (
+                    <div className="mt-4 text-[13.5px] text-white/65 leading-relaxed border-t border-white/10 pt-3">
+                      {t(
+                        "home_v2_hero_value_modal_example_conclusion",
+                        "Si le taux passe à 1,10, l'affichage devient ≈ 1,07 EUR, mais la référence reste 1,18 RLUSD. Vous décidez quand reconvertir."
+                      )}
+                    </div>
+                  ) : null}
                 </div>
 
                 {/* Note finale */}
