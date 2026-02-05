@@ -268,20 +268,161 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         "home_v2_essentials_5_desc",
         "Recevoir des fonds ou créer une demande."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_5_modal_point_1",
-          "Créer une demande de paiement en un clic."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_5_modal_intro",
+          "Deux parcours complémentaires pour recevoir des fonds ou demander un paiement."
         ),
-        t(
-          "home_v2_essentials_5_modal_point_2",
-          "Partage rapide via QR ou lien."
-        ),
-        t(
-          "home_v2_essentials_5_modal_point_3",
-          "Suivi simple des paiements reçus."
-        ),
-      ],
+        flows: [
+          {
+            key: "receive",
+            tabLabel: t(
+              "home_v2_essentials_5_modal_flow_1_tab",
+              "Recevoir"
+            ),
+            title: t(
+              "home_v2_essentials_5_modal_flow_1_title",
+              "Parcours 1 · Recevoir"
+            ),
+            intro: t(
+              "home_v2_essentials_5_modal_flow_1_intro",
+              "Partagez votre adresse pour que l'on vous envoie des fonds directement."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_5_modal_flow_1_step_1_title",
+                  "Afficher votre adresse"
+                ),
+                desc: t(
+                  "home_v2_essentials_5_modal_flow_1_step_1_desc",
+                  "Votre wallet génère automatiquement une adresse de réception et un QR code prêt à être partagé."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_5_modal_flow_1_step_1_detail_1",
+                    "Copier l’adresse"
+                  ),
+                  t(
+                    "home_v2_essentials_5_modal_flow_1_step_1_detail_2",
+                    "Afficher le QR code"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_5_modal_flow_1_step_2_title",
+                  "Partager avec le payeur"
+                ),
+                desc: t(
+                  "home_v2_essentials_5_modal_flow_1_step_2_desc",
+                  "Transmettez votre adresse ou votre QR :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_5_modal_flow_1_step_2_detail_1",
+                    "Par message, e-mail ou SMS"
+                  ),
+                  t(
+                    "home_v2_essentials_5_modal_flow_1_step_2_detail_2",
+                    "En face à face, en laissant le payeur scanner le QR"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_5_modal_flow_1_step_3_title",
+                  "Recevoir et suivre"
+                ),
+                desc: t(
+                  "home_v2_essentials_5_modal_flow_1_step_3_desc",
+                  "Le paiement apparaît dans votre wallet dès réception."
+                ),
+                note: t(
+                  "home_v2_essentials_5_modal_flow_1_step_3_note",
+                  "Chaque transaction est visible et traçable dans vos relevés."
+                ),
+              },
+            ],
+          },
+          {
+            key: "request",
+            tabLabel: t(
+              "home_v2_essentials_5_modal_flow_2_tab",
+              "Demander"
+            ),
+            title: t(
+              "home_v2_essentials_5_modal_flow_2_title",
+              "Parcours 2 · Demande de paiement"
+            ),
+            intro: t(
+              "home_v2_essentials_5_modal_flow_2_intro",
+              "Créez une demande avec montant et devise, puis partagez-la."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_5_modal_flow_2_step_1_title",
+                  "Créer la demande"
+                ),
+                desc: t(
+                  "home_v2_essentials_5_modal_flow_2_step_1_desc",
+                  "Saisissez le montant, la devise et un libellé optionnel."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_5_modal_flow_2_step_1_detail_1",
+                    "Montant exact"
+                  ),
+                  t(
+                    "home_v2_essentials_5_modal_flow_2_step_1_detail_2",
+                    "Devise demandée"
+                  ),
+                  t(
+                    "home_v2_essentials_5_modal_flow_2_step_1_detail_3",
+                    "Mémo ou libellé (optionnel)"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_5_modal_flow_2_step_2_title",
+                  "Générer le code"
+                ),
+                desc: t(
+                  "home_v2_essentials_5_modal_flow_2_step_2_desc",
+                  "XCANNES crée un QR et un code de demande."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_5_modal_flow_2_step_2_detail_1",
+                    "QR à scanner"
+                  ),
+                  t(
+                    "home_v2_essentials_5_modal_flow_2_step_2_detail_2",
+                    "Code à copier/coller"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_5_modal_flow_2_step_3_title",
+                  "Partager et suivre"
+                ),
+                desc: t(
+                  "home_v2_essentials_5_modal_flow_2_step_3_desc",
+                  "Envoyez la demande au payeur et suivez le règlement dans votre wallet."
+                ),
+                note: t(
+                  "home_v2_essentials_5_modal_flow_2_step_3_note",
+                  "Le payeur valide explicitement la transaction avant l’envoi."
+                ),
+              },
+            ],
+          },
+        ],
+        note: "",
+      },
       orderClassName: "order-2 lg:order-4",
       iconClassName:
         "text-[#22C55E] bg-[rgba(34,197,94,0.08)] group-hover:bg-[rgba(34,197,94,0.14)]",
@@ -861,15 +1002,21 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                     <div className="flex gap-2">
                       {activeAction.modalLayout.flows.map((flow) => {
                         const isActive = flow.key === activeFlowKey;
+                        const useGreenTabs =
+                          activeAction.key === "receive_request";
+                        const activeTabClass = useGreenTabs
+                          ? "rounded-lg border border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90 font-semibold transition-all duration-200 hover:bg-xcannes-green/20 hover:text-xcannes-green hover:scale-105 active:scale-95"
+                          : "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95";
+                        const inactiveTabClass = useGreenTabs
+                          ? "rounded-lg border border-xcannes-green/30 bg-transparent text-xcannes-green/70 font-semibold transition-all duration-200 hover:border-xcannes-green/50 hover:text-xcannes-green/90"
+                          : "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
                         return (
                           <button
                             key={flow.key}
                             type="button"
                             onClick={() => setActiveFlowKey(flow.key)}
                             className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-                              isActive
-                                ? "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95"
-                                : "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80"
+                              isActive ? activeTabClass : inactiveTabClass
                             }`}
                           >
                             {flow.tabLabel || flow.title}
