@@ -172,7 +172,7 @@ export default function Home() {
                     "home_v2_hero_pillar_4_desc",
                     "Un pouvoir d’achat stable, dans n’importe quel pays. Protégez ce que vous mettez de côté."
                   ),
-                  descClassName: "text-[13px]",
+                  descClassName: "text-[16px] sm:text-[13px]",
                   className:
                     "order-first sm:order-none lg:order-first lg:col-span-3",
                   iconWrapperClassName: "w-10 h-10 lg:w-11 lg:h-11",
@@ -221,11 +221,11 @@ export default function Home() {
                     </div>
                     <div className="min-w-0 text-left flex-1 h-full flex flex-col">
                     <div className="flex w-full items-baseline justify-between gap-3">
-                      <div className="text-[17px] font-semibold text-white/90">{item.title}</div>
+                      <div className="text-[18px] sm:text-[17px] font-semibold text-white/90">{item.title}</div>
                       {item.link ? null : null}
                     </div>
                     {item.subtitle ? (
-                      <div className="mt-0.5 text-[13px] text-white/65 italic">
+                      <div className="mt-0.5 text-[16px] sm:text-[13px] text-white/65 italic">
                         {item.subtitle}
                       </div>
                     ) : null}
@@ -239,7 +239,7 @@ export default function Home() {
                     {item.desc ? (
                       <div
                         className={[
-                          "text-[14.5px] text-white/55 leading-relaxed italic",
+                        "text-[17.5px] sm:text-[14.5px] text-white/55 leading-relaxed italic",
                           item.stat ? "mt-1 text-center" : "",
                           item.descClassName
                         ].filter(Boolean).join(" ")}
