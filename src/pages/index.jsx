@@ -92,7 +92,7 @@ export default function Home() {
                 </span>
               </h1>
 
-                <p className="mt-6 text-lg sm:text-xl text-white/80 font-light leading-relaxed italic">
+                <p className="mt-6 text-lg sm:text-xl text-white/90 font-light leading-relaxed italic">
                   <span dangerouslySetInnerHTML={{
                     __html: t(
                       "home_v2_hero_subtitle",
@@ -225,7 +225,7 @@ export default function Home() {
                       {item.link ? null : null}
                     </div>
                     {item.subtitle ? (
-                      <div className="mt-0.5 text-[16px] sm:text-[13px] text-white/65 italic">
+                      <div className="mt-0.5 text-[17.5px] sm:text-[14.5px] text-white/75 italic">
                         {item.subtitle}
                       </div>
                     ) : null}
@@ -239,7 +239,7 @@ export default function Home() {
                     {item.desc ? (
                       <div
                         className={[
-                        "text-[17.5px] sm:text-[14.5px] text-white/55 leading-relaxed italic",
+                          "text-[17.5px] sm:text-[14.5px] text-white/75 leading-relaxed italic",
                           item.stat ? "mt-1 text-center" : "",
                           item.descClassName
                         ].filter(Boolean).join(" ")}
@@ -288,7 +288,7 @@ export default function Home() {
                       <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
                         {t("home_v2_hero_speed_modal_title", "Pourquoi c'est rapide")}
                       </h4>
-                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                      <p className="mt-1.5 text-[19.5px] sm:text-[13.5px] text-white/65 leading-[1.5]">
                         {t(
                           "home_v2_hero_speed_modal_subtitle",
                           "XCANNES s'appuie sur le réseau XRP Ledger pour valider les transactions en quelques secondes."
@@ -327,12 +327,12 @@ export default function Home() {
                   ].map((line) => (
                     <div key={line} className="flex items-start gap-3">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                      <span className="text-[20.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
+                <div className="mt-5 text-[18.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
                     "home_v2_hero_speed_modal_note",
                     "En cas de congestion rare du réseau, le délai peut être légèrement supérieur."
@@ -373,7 +373,7 @@ export default function Home() {
                       <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
                         {t("home_v2_hero_security_modal_title", "Sécurisé")}
                       </h4>
-                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                      <p className="mt-1.5 text-[15.5px] sm:text-[13.5px] text-white/65 leading-[1.5]">
                         {t(
                           "home_v2_hero_security_modal_subtitle",
                           "Chaque transaction est validée sous votre contrôle exclusif."
@@ -416,12 +416,12 @@ export default function Home() {
                   ].map((line) => (
                     <div key={line} className="flex items-start gap-3">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                      <span className="text-[16.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
+                <div className="mt-5 text-[14.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
                     "home_v2_hero_security_modal_note",
                     "Vous gardez le contrôle, XCANNES n’agit jamais à votre place."
@@ -462,7 +462,7 @@ export default function Home() {
                       <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
                         {t("home_v2_hero_fees_modal_title", "Économique")}
                       </h4>
-                      <p className="mt-1.5 text-[13.5px] text-white/65 leading-[1.5]">
+                      <p className="mt-1.5 text-[19.5px] sm:text-[13.5px] text-white/65 leading-[1.5]">
                         {t(
                           "home_v2_hero_fees_modal_subtitle",
                           "Des coûts maîtrisés, affichés avant confirmation."
@@ -497,12 +497,12 @@ export default function Home() {
                   ].map((line) => (
                     <div key={line} className="flex items-start gap-3">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                      <span className="text-[20.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-5 text-[12.5px] text-white/50 italic leading-relaxed">
+                <div className="mt-5 text-[18.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
                     "home_v2_hero_fees_modal_note",
                     "Activation d'une nouvelle devise : paiement unique en RLUSD."
