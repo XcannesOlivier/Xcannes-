@@ -34,7 +34,7 @@ export default function WalletProductSection() {
           </div>
 
           <div
-            className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-xl shadow-2xl overflow-hidden"
+            className="bg-black/20 backdrop-blur-sm rounded-xl shadow-[0_0_26px_rgba(255,255,255,0.2)] md:shadow-[0_0_26px_rgba(255,255,255,0.16)] overflow-hidden"
           >
             <div className="px-5 py-4 border-b border-white/10">
               <div className="flex items-center justify-between gap-3">
