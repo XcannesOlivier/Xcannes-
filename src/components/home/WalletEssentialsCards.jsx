@@ -1011,6 +1011,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     activeAction?.modalSections?.length ||
     activeAction?.modalPoints?.length
   );
+  const modalIntroText = activeAction?.modalLayout?.intro || "";
   const isConversionModal =
     activeAction?.key === "convert" ||
     activeAction?.key === "lines" ||
@@ -1054,6 +1055,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
   };
   const modalAccentTokens = modalAccentStyles[modalAccent];
+  const modalShadowClass =
+    modalAccent === "cyan" || modalAccent === "sky"
+      ? "shadow-[0_0_26px_rgba(6,182,212,0.2)] md:shadow-[0_0_22px_rgba(6,182,212,0.14)]"
+      : "shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)]";
   const modalBackgroundClass =
     activeAction?.key === "pay" ||
     activeAction?.key === "receive_request" ||
@@ -1327,7 +1332,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId || undefined}
-              className={`w-full max-w-[620px] rounded-xl ${modalBackgroundClass} p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none`}
+              className={`w-full max-w-[620px] rounded-xl ${modalBackgroundClass} p-6 sm:p-7 backdrop-blur-sm ${modalShadowClass} animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none`}
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 mb-5">
@@ -1364,7 +1369,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                         "text-white/65 leading-[1.6]",
                       ].join(" ")}
                     >
-                      {activeAction.modalLayout.intro}
+                      {modalIntroText}
                     </p>
                     {activeAction.modalLayout.flows?.length > 1 ? (
                       <div className="flex gap-2">

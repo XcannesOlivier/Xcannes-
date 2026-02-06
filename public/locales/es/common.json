@@ -346,7 +346,7 @@
   "home_v2_essentials_4_desc": "Acceso fiat según disponibilidad por país.",
   "home_v2_essentials_5_title": "Recibir & Solicitar",
   "home_v2_essentials_5_desc": "Recibir fondos o crear una solicitud.",
-  "home_v2_essentials_5_modal_intro": "Dos rutas complementarias para recibir fondos o solicitar un pago.",
+  "home_v2_essentials_5_modal_intro": "Dos rutas para recibir fondos o solicitar un pago.",
   "home_v2_essentials_5_modal_flow_1_title": "Flujo 1 · Recibir",
   "home_v2_essentials_5_modal_flow_1_tab": "Recibir",
   "home_v2_essentials_5_modal_flow_1_intro": "Comparte tu dirección de recepción para recibir fondos fácilmente.",
@@ -1183,5 +1183,7 @@
   "home_v2_hero_security_modal_biometrics": "Validación biométrica en tu dispositivo (huella/Face ID).",
   "home_v2_hero_security_modal_xrpl_native": "Transacciones XRPL nativas: validación on-chain, sin intermediarios.",
   "home_v2_essentials_convert_lines_title": "Conversión y líneas de cuenta",
+  "home_v2_essentials_convert_lines_desc": "Activa tus divisas locales y convierte con la tasa mostrada antes de validar.",
+  "home_v2_essentials_convert_lines_modal_intro": "Dos recorridos: convertir una divisa o gestionar tus líneas de cuenta.",
   "home_v2_demo_slogan": "Tu dinero? Estable. En todas partes. Siempre."
 }
