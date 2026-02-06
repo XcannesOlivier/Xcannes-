@@ -1344,7 +1344,7 @@ export default function DemoWalletDashboard({
 
             </span>
             <span className="text-[10px] font-light text-white/30">|</span>
-            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/70 uppercase truncate">
+            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/70 uppercase truncate italic">
               {t("demo_wallet_label", "Wallet")} {activeWalletId}
             </span>
           </div>
@@ -1392,9 +1392,9 @@ export default function DemoWalletDashboard({
 
             {t("demo_view_statement", "Voir le relevé")}
           </button>
-          <div className="mt-2 text-[11px] text-white/50">
+          <div className="mt-2 text-xs text-white/50">
             {t("demo_to_wallet", "Contrepartie")}:{" "}
-            <span className="text-white/75">{otherWallet?.label}</span>
+            <span className="text-white/75 italic">{otherWallet?.label}</span>
           </div>
         </div>
       </div>

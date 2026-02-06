@@ -37,20 +37,154 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         "home_v2_essentials_1_desc",
         "Suivez les mouvements, par devise ou globalement."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_1_modal_point_1",
-          "Relevés par devise ou globaux, en un clic."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_1_modal_intro",
+          "Deux vues complémentaires pour suivre vos opérations : globale et par devise."
         ),
-        t(
-          "home_v2_essentials_1_modal_point_2",
-          "Partage et export en un clic."
+        flows: [
+          {
+            key: "global",
+            tabLabel: t(
+              "home_v2_essentials_1_modal_flow_1_tab",
+              "Vue globale"
+            ),
+            title: t(
+              "home_v2_essentials_1_modal_flow_1_title",
+              "Parcours 1 · Relevé global"
+            ),
+            intro: t(
+              "home_v2_essentials_1_modal_flow_1_intro",
+              "Une vue d’ensemble des soldes et de toutes vos devises."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_1_title",
+                  "Ouvrir le relevé"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_1_desc",
+                  "Depuis votre wallet, cliquez sur Relevés pour accéder à la vue globale."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_2_title",
+                  "Voir les balances"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_2_desc",
+                  "Le solde total et chaque devise apparaissent au même endroit."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_1",
+                    "Solde total"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_2",
+                    "Balances par devise"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_3",
+                    "Accès rapide aux lignes"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_3_title",
+                  "Exporter ou partager"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_3_desc",
+                  "Téléchargez un PDF/CSV ou partagez le hash du relevé."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_3_detail_1",
+                    "Export PDF / CSV"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_3_detail_2",
+                    "Hash du document"
+                  ),
+                ],
+              },
+            ],
+          },
+          {
+            key: "currency",
+            tabLabel: t(
+              "home_v2_essentials_1_modal_flow_2_tab",
+              "Par devise"
+            ),
+            title: t(
+              "home_v2_essentials_1_modal_flow_2_title",
+              "Parcours 2 · Relevé par devise"
+            ),
+            intro: t(
+              "home_v2_essentials_1_modal_flow_2_intro",
+              "Suivez les débits, crédits et conversions d’une devise."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_1_title",
+                  "Choisir la devise"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_1_desc",
+                  "Sélectionnez la ligne de compte depuis vos balances."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_2_title",
+                  "Filtrer les opérations"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_2_desc",
+                  "Affinez l’affichage par type d’opération."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_1",
+                    "Tous"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_2",
+                    "Crédits"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_3",
+                    "Débits"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_4",
+                    "Conversions"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_3_title",
+                  "Lire la chronologie"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_3_desc",
+                  "Le solde et les opérations s’affichent par mois, avec un solde après chaque mouvement."
+                ),
+              },
+            ],
+          },
+        ],
+        note: t(
+          "home_v2_essentials_1_modal_note",
+          "Les relevés sont reconstruits depuis l’historique XRPL et reflètent la période et le filtre actifs."
         ),
-        t(
-          "home_v2_essentials_1_modal_point_3",
-          "Historique clair pour le suivi comptable."
-        ),
-      ],
+      },
       orderClassName: "order-6 lg:order-8",
       iconClassName:
         "text-[#22C55E] bg-[rgba(34,197,94,0.08)] group-hover:bg-[rgba(34,197,94,0.14)]",
@@ -1019,7 +1153,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const useLargeMobileType =
     activeAction?.key === "pay" ||
     activeAction?.key === "receive_request" ||
-    isConversionModal;
+    isConversionModal ||
+    activeAction?.key === "statements";
   const modalAccent =
     activeAction?.key === "pay"
       ? "sky"
