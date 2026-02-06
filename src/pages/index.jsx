@@ -278,7 +278,7 @@ export default function Home() {
             >
               <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4 mb-5">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" strokeLinecap="round" strokeLinejoin="round" />
@@ -299,7 +299,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setSpeedModalOpen(false)}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                     aria-label={t("home_v2_hero_speed_modal_close", "Fermer")}
                   >
                     ✕
@@ -363,7 +363,7 @@ export default function Home() {
             >
               <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4 mb-5">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 3l8 4v6c0 5-4 7.5-8 8-4-0.5-8-3-8-8V7l8-4z" strokeLinecap="round" strokeLinejoin="round" />
@@ -384,7 +384,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setSecurityModalOpen(false)}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                     aria-label={t("home_v2_hero_security_modal_close", "Fermer")}
                   >
                     ✕
@@ -452,7 +452,7 @@ export default function Home() {
             >
               <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4 mb-5">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M4 6h16M7 12h10M10 18h4" strokeLinecap="round" strokeLinejoin="round" />
@@ -473,7 +473,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setFeesModalOpen(false)}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                     aria-label={t("home_v2_hero_fees_modal_close", "Fermer")}
                   >
                     ✕
