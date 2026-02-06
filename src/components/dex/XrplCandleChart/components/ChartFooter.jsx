@@ -16,7 +16,7 @@ const logError = (...args) => {
 const CRYPTO_ICON_PATHS = {
   XRP: "/symbols/xrp.png",
   RLUSD: "/symbols/rlusd.png",
-  XCS: "/symbols/xcs.png"
+  XCS: "/symbols/xcs.svg"
 };
 
 // Fonction pour obtenir le drapeau d'une devise

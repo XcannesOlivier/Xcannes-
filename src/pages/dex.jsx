@@ -205,7 +205,7 @@ export default function Dex() {
 
 
                   <div className="mt-3 xl:mt-0">
-                    <div className="xl:sticky xl:top-32 xl:h-[calc(100vh-8rem)] panel-surface overflow-hidden">
+                    <div className="min-h-[70vh] xl:min-h-0 xl:sticky xl:top-32 xl:h-[calc(100vh-8rem)] panel-surface overflow-hidden">
                       <div className="h-full overflow-y-auto">
                         <DexSidebar pair={selectedPair} />
                       </div>
