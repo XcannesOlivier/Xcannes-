@@ -57,16 +57,16 @@ export default function WalletDashboardCurrencyLinesPanel({
         <Image
           src={icon.src}
           alt={icon.alt || upper}
-          width={18}
-          height={18}
-          className="w-4 h-4 object-contain"
+          width={28}
+          height={28}
+          className="w-7 h-7 object-contain"
         />
       );
     }
     if (typeof icon === "string" || typeof icon === "number") {
-      return <span className="text-sm leading-none">{icon}</span>;
+      return <span className="text-lg leading-none">{icon}</span>;
     }
-    return <span className="text-sm leading-none">{resolveFallbackIcon(upper)}</span>;
+    return <span className="text-lg leading-none">{resolveFallbackIcon(upper)}</span>;
   };
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-3 space-y-2">
@@ -92,7 +92,7 @@ export default function WalletDashboardCurrencyLinesPanel({
                 <div key={line.code} className="space-y-2">
                   <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-6 h-6 flex items-center justify-center rounded-full bg-white/5 border border-white/10">
+                      <div className="w-8 h-8 flex items-center justify-center rounded-full">
                         {renderLineIcon(line.code)}
                       </div>
                       <div className="min-w-0">

@@ -1531,7 +1531,14 @@ export default function DemoWalletDashboard({
             </button>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
-            {tokens.map((row) =>
+            {tokens.map((row) => {
+              const upperCode = String(row.code || "").toUpperCase();
+              const isNativeAsset = upperCode === "XRP" || upperCode === "XCS" || upperCode === "RLUSD";
+              const iconSizeClass = isNativeAsset
+                ? "w-7 h-7 text-[13px]"
+                : "w-9 h-9 text-[16px] sm:w-9 sm:h-9 sm:text-[16px]";
+              const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
+              return (
             <div key={row.code} className="w-full">
                 <button
                 type="button"
@@ -1558,7 +1565,7 @@ export default function DemoWalletDashboard({
                     ].join(" ")}
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden rounded-md">
+                      <div className={`${iconSizeClass} ${iconRadiusClass} flex items-center justify-center font-semibold text-primary overflow-hidden`}>
                         {renderDemoTokenIcon(row.code)}
                       </div>
                       <div className="flex flex-col min-w-0">
@@ -1581,7 +1588,8 @@ export default function DemoWalletDashboard({
                   </div>
                 </button>
               </div>
-            )}
+              );
+            })}
 
             {tokens.length === 0 ?
             <div className="text-sm text-white/50">

@@ -69,7 +69,7 @@ export default function TradingLayoutV1A({
         {/* Colonne droite : Wallet RLUSD/XCS + dashboard */}
         <section className="order-2">
           <div className="mt-3 lg:mt-0">
-            <div className="lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] bg-elevated backdrop-blur-sm overflow-hidden">
+            <div className="min-h-[70vh] lg:min-h-0 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] bg-elevated backdrop-blur-sm overflow-hidden">
               <WalletDashboard preview={!isConnected} variant={walletVariant} />
             </div>
           </div>

@@ -44,6 +44,14 @@ export default function WalletDashboardTokenRow({
   const currencyCode = String(token?.currency || "").toUpperCase();
   const rawValue = Number(token?.value || 0);
   const isMissingTrustline = !!token?.isMissingTrustline;
+  const isLineCurrency = Boolean(token?.isTrustlineOnly);
+  const isNativeAsset = currencyCode === "XRP" || currencyCode === "XCS" || currencyCode === "RLUSD";
+  const iconSizeClass = isLineCurrency
+    ? "w-11 h-11 text-[20px] sm:w-10 sm:h-10 sm:text-[18px]"
+    : "w-7 h-7 text-[13px]";
+  const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
+  const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
+  const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
   const demoRlusd =
   token?.demoRlusdValue != null && Number.isFinite(Number(token.demoRlusdValue)) ?
   Number(token.demoRlusdValue) :
@@ -82,8 +90,8 @@ export default function WalletDashboardTokenRow({
         <div
           className={`flex items-center gap-3 rounded-md bg-base hover:bg-slate-800/40 border border-slate-800/60 px-3 py-2 transition-colors cursor-pointer ${tokenRowClass}`}>
 
-          <div className="flex items-center gap-2 min-w-0">
-            <div className="w-7 h-7 flex items-center justify-center text-[13px] font-semibold text-primary overflow-hidden">
+          <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
+            <div className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}>
               {renderTokenIcon(token)}
             </div>
             <div className="flex flex-col min-w-0">
@@ -92,7 +100,7 @@ export default function WalletDashboardTokenRow({
                 {token?.currency === "XRP" ?
                 "XRP · Native" :
                 token?.isTrustlineOnly ?
-                `${getCurrencyDescription(token?.currency)} · RLUSD allocation` :
+                `${getCurrencyDescription(token?.currency)}` :
                 isStablecoin(token?.currency) ?
                 "XRPL Stablecoin" :
                 token?.currency === "XCS" ?
