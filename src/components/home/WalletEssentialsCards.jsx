@@ -1322,13 +1322,14 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       ? "bg-black/20"
       : "bg-[#040c13]/95";
   const activeFlows = activeAction?.modalLayout?.flows;
+  const firstFlowKey = activeFlows?.[0]?.key || null;
   useEffect(() => {
-    if (!activeFlows?.length) {
+    if (!firstFlowKey) {
       setActiveFlowKey(null);
       return;
     }
-    setActiveFlowKey(activeFlows[0].key);
-  }, [activeActionKey, activeFlows]);
+    setActiveFlowKey(firstFlowKey);
+  }, [activeActionKey, firstFlowKey]);
 
   const rootClassName = isCompact
     ? "h-full w-full flex flex-col min-h-0 gap-4"

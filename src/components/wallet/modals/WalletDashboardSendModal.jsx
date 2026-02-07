@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -39,6 +39,7 @@ export default function WalletDashboardSendModal({
   handleSendSubmit,
   sendProcessing,
   enableSaveAddress = false,
+  showFauxPayreqDecor,
   inline = false
 }) {
   const { t } = useTranslation("common");
@@ -59,6 +60,28 @@ export default function WalletDashboardSendModal({
   const [requestText, setRequestText] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
   const payreqFileInputId = "payreq-qr-file";
+  const manualQrFileInputId = "manual-qr-file";
+  const manualQrReaderIdRef = useRef(
+    `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`
+  );
+  const manualQrScannerRef = useRef(null);
+  const manualQrDecor =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 24 24' shape-rendering='crispEdges'%3E%3Crect width='24' height='24' fill='none'/%3E%3Crect x='0' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='17' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='18' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='19' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='0' y='17' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='18' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='19' width='3' height='3' fill='%23fff'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='4' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='13' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='20' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
+  const manualQrDecorSize = "200px";
+  const manualQrDecorOpacity = 0.08;
+  const payreqQrDecorSize = "180px";
+  const payreqQrDecorOpacity = 0.06;
+  const payreqQrDecor = manualQrDecor;
+  const fauxPayreqExample =
+    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"RLUSD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+  const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && isDesktop);
+  const useUnifiedPayreqPanel = isDesktop && noticeVariant !== "demo";
+  const showManualQrUpload = isDesktop && noticeVariant !== "demo";
+  const fauxPayreqTextClass = showFauxPayreq && !inline
+    ? "text-[9px] text-white/10"
+    : "text-[10px] text-white/15";
+  const fauxQrSize = inline ? "240px" : "200px";
+  const fauxQrOpacity = inline ? 0.08 : 0.06;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -103,6 +126,34 @@ export default function WalletDashboardSendModal({
   const handleLoadRequest = () => {
     handlePaymentRequestScan?.(requestText);
   };
+  const handleManualQrFile = async (file) => {
+    if (!file) return;
+    try {
+      const { Html5Qrcode } = await import("html5-qrcode");
+      const readerId = manualQrReaderIdRef.current;
+      const instance =
+        manualQrScannerRef.current || new Html5Qrcode(readerId);
+      manualQrScannerRef.current = instance;
+
+      const decodedText = await instance.scanFile(file, true);
+      try {
+        await instance.clear();
+      } catch (err) {
+        // ignore cleanup errors
+      }
+      if (decodedText) {
+        handlePaymentRequestScan?.(decodedText);
+      }
+    } catch (err) {
+      console.error("QR scanFile error:", err);
+      alert(
+        t(
+          "ui_qr_decode_failed_3b5d7f9a2c",
+          "Unable to decode this image. Try a clearer screenshot."
+        )
+      );
+    }
+  };
 
   useEffect(() => {
     if (!open) {
@@ -138,7 +189,7 @@ export default function WalletDashboardSendModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+    "relative w-full border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -225,9 +276,12 @@ export default function WalletDashboardSendModal({
           </div>
 
 
-          {/* Tab Content: Manual Send */}
-          {sendTab === "manual" &&
-        <div className="space-y-3">
+          <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
+            {/* Tab Content: Manual Send */}
+            {sendTab === "manual" &&
+        <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+              <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
+                <div className={inline ? "space-y-3" : ""}>
               <div>
                 <label
                   className="block text-[11px] md:text-xs text-white/60 mb-1"
@@ -362,7 +416,59 @@ export default function WalletDashboardSendModal({
                   </p>
                 </div>
           }
-              <div>
+              </div>
+              <div className={inline ? "space-y-2" : ""}>
+                {showManualQrUpload ?
+            <div>
+                    <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-4 space-y-3 overflow-hidden md:p-8 md:space-y-4 md:min-h-[220px]">
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
+                        style={{
+                          backgroundImage: `url("${manualQrDecor}")`,
+                          backgroundSize: `${manualQrDecorSize} ${manualQrDecorSize}`,
+                          opacity: manualQrDecorOpacity,
+                        }}
+                      />
+                      <div className="relative z-10 flex flex-col gap-3 pt-10 md:pt-12">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const input = document.getElementById(manualQrFileInputId);
+                            input?.click();
+                          }}
+                          className="absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-black/70 text-white/90 transition-colors hover:bg-black/80 hover:text-white md:top-4 md:right-4"
+                        >
+                          <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                            +
+                          </span>
+                          {t(
+                            "ui_upload_recipient_qr_code_1e7c2d9a5b",
+                            "Charger le QR code de l'adresse du destinataire"
+                          )}
+                        </button>
+                      </div>
+                      <input
+                      id={manualQrFileInputId}
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        e.target.value = "";
+                        handleManualQrFile(file);
+                      }} />
+                      <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
+                    </div>
+                  </div> :
+            null}
+                {showManualQrUpload ?
+            <div className="hidden md:flex items-center justify-center">
+                    <span className="text-2xl font-semibold text-white/70">ou</span>
+                  </div> :
+            null}
+                <div>
                 <label
                   className="block text-[11px] md:text-xs text-white/60 mb-1"
                   title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
@@ -445,82 +551,97 @@ export default function WalletDashboardSendModal({
               null}
                 </div>
               </div>
-              <SwipeConfirmButton
-              label={
-                sendProcessing
-                  ? t("ui_sending_3b8c1a7d5e", "Sending...")
-                  : t("ui_send_504b64a87b", "Send")
-              }
-              onConfirm={handleManualSend}
+              </div>
+              </div>
+              <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
+                <SwipeConfirmButton
+                label={
+                  sendProcessing
+                    ? t("ui_sending_3b8c1a7d5e", "Sending...")
+                    : t("ui_send_504b64a87b", "Send")
+                }
+                onConfirm={handleManualSend}
+                disabled={sendProcessing || !canManualSend}
+                variant="blue"
+                className="mt-2 md:hidden" />
+                <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleManualSend();
+              }}
               disabled={sendProcessing || !canManualSend}
-              variant="blue"
-              className="mt-2 md:hidden" />
-              <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleManualSend();
-            }}
-            disabled={sendProcessing || !canManualSend}
-            className={`hidden md:block w-full mt-2 text-sm py-2.5 ${blueActionBtnBase}`}>
+              className={`hidden md:block w-full mt-2 text-sm py-2.5 ${blueActionBtnBase}`}>
 
-                {sendProcessing
-                  ? t("ui_sending_3b8c1a7d5e", "Sending...")
-                  : t("ui_send_504b64a87b", "Send")}
-              </button>
+                  {sendProcessing
+                    ? t("ui_sending_3b8c1a7d5e", "Sending...")
+                    : t("ui_send_504b64a87b", "Send")}
+                </button>
+              </div>
             </div>
         }
 
           {/* Tab Content: Scan Request */}
           {sendTab === "scan-request" &&
-        <div className="space-y-6">
-              <QRScanner
-              isOpen={sendTab === "scan-request"}
-              onScan={handlePaymentRequestScan}
-              embedded={true}
-              showClose={false}
-              fileInputId={payreqFileInputId}
-              enableCamera={!isDesktop}
-              className="bg-black/30 border-white/10" />
+        <div className={`space-y-6 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+              {useUnifiedPayreqPanel ?
+          <>
+                <div className={`rounded-lg border border-white/10 bg-black/30 p-4 space-y-3 md:rounded-xl ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+                  <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
+                      <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
+                        {t("demo_payreq_token", "Request token")}
+                      </div>
+                      <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const input = document.getElementById(payreqFileInputId);
+                        input?.click();
+                      }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-black/70 text-white/90 transition-colors hover:bg-black/80 hover:text-white">
 
-              {!isDesktop &&
-              <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
-                <span className="h-px flex-1 bg-white/10" />
-                <span className="text-base md:text-lg font-semibold text-white/60">
-                  {t("ui_or_8a4c1f83bd", "ou")}
-                </span>
-                <span className="h-px flex-1 bg-white/10" />
-              </div>
-              }
-
-              <div className="rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3">
-                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
-                  <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
-                    {t("demo_payreq_token", "Request token")}
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                          +
+                        </span>
+                        {t(
+                          "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                          "Charger une image qrcode"
+                        )}
+                      </button>
+                    </div>
+                    <div className="relative h-[140px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[160px]">
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 pointer-events-none bg-no-repeat"
+                        style={{
+                          backgroundImage: `url("${payreqQrDecor}")`,
+                          backgroundSize: `${payreqQrDecorSize} ${payreqQrDecorSize}`,
+                          backgroundPosition: "center 24px",
+                          opacity: payreqQrDecorOpacity
+                        }}
+                      />
+                    </div>
+                    <div className={`relative ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+                      {showFauxPayreq ? (
+                        <div
+                          aria-hidden="true"
+                          className={`absolute inset-0 p-3 leading-snug font-mono whitespace-pre-wrap break-words pointer-events-none ${fauxPayreqTextClass}`}
+                        >
+                          {fauxPayreqExample}
+                        </div>
+                      ) : null}
+                      <textarea
+                      value={requestText}
+                      onChange={(e) => setRequestText(e.target.value)}
+                      className={`relative w-full min-h-[120px] text-xs text-white/80 placeholder:text-white/20 focus:outline-none font-mono md:min-h-[140px] ${useUnifiedPayreqPanel ? "bg-transparent border-transparent rounded-none px-0 py-2 focus:ring-0" : "rounded-md bg-black/40 border border-white/10 px-3 py-2 focus:ring-2 focus:ring-xcannes-green/30 md:border-white/15 md:bg-black/50"} ${inline ? "flex-1 min-h-[160px]" : ""}`}
+                      placeholder={t(
+                        "ui_payreq_placeholder_3a9c1b7d2e",
+                        "xcannes-payreq:... / JSON"
+                      )} />
+                    </div>
                   </div>
-                  <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const input = document.getElementById(payreqFileInputId);
-                    input?.click();
-                  }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/5 text-white/80 transition-colors hover:bg-white/10 hover:text-white">
-
-                    <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                      +
-                    </span>
-                    {t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Upload a QR image")}
-                  </button>
                 </div>
-                <textarea
-                value={requestText}
-                onChange={(e) => setRequestText(e.target.value)}
-                className="w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50"
-                placeholder={t(
-                  "ui_payreq_placeholder_3a9c1b7d2e",
-                  "xcannes-payreq:... / JSON"
-                )} />
                 <SwipeConfirmButton
                 label={t("demo_scan_parse", "Load request")}
                 onConfirm={handleLoadRequest}
@@ -538,10 +659,97 @@ export default function WalletDashboardSendModal({
 
                   {t("demo_scan_parse", "Load request")}
                 </button>
-              </div>
+              </> :
+          <>
+                <QRScanner
+              isOpen={sendTab === "scan-request"}
+              onScan={handlePaymentRequestScan}
+              embedded={true}
+              showClose={false}
+              fileInputId={payreqFileInputId}
+              enableCamera={!isDesktop}
+              showFauxQrBackground={showFauxPayreq}
+              fauxQrBackgroundSize={fauxQrSize}
+              fauxQrBackgroundOpacity={fauxQrOpacity}
+              className={inline ? "flex-1 min-h-[260px] bg-black/30 border-white/10" : "bg-black/30 border-white/10"} />
+
+                <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
+                  {!isDesktop &&
+                  <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
+                    <span className="h-px flex-1 bg-white/10" />
+                    <span className="text-base md:text-lg font-semibold text-white/60">
+                      {t("ui_or_8a4c1f83bd", "ou")}
+                    </span>
+                    <span className="h-px flex-1 bg-white/10" />
+                  </div>
+                  }
+
+                  <div className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
+                      <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
+                        {t("demo_payreq_token", "Request token")}
+                      </div>
+                      <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const input = document.getElementById(payreqFileInputId);
+                        input?.click();
+                      }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-black/70 text-white/90 transition-colors hover:bg-black/80 hover:text-white">
+
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                          +
+                        </span>
+                        {t(
+                          "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                          "Charger une image qrcode"
+                        )}
+                      </button>
+                    </div>
+                    <div className="relative">
+                      {showFauxPayreq ? (
+                        <div
+                          aria-hidden="true"
+                          className={`absolute inset-0 p-3 leading-snug font-mono whitespace-pre-wrap break-words pointer-events-none ${fauxPayreqTextClass}`}
+                        >
+                          {fauxPayreqExample}
+                        </div>
+                      ) : null}
+                      <textarea
+                      value={requestText}
+                      onChange={(e) => setRequestText(e.target.value)}
+                      className={`relative w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${inline ? "flex-1 min-h-[160px]" : ""}`}
+                      placeholder={t(
+                        "ui_payreq_placeholder_3a9c1b7d2e",
+                        "xcannes-payreq:... / JSON"
+                      )} />
+                    </div>
+                    <SwipeConfirmButton
+                    label={t("demo_scan_parse", "Load request")}
+                    onConfirm={handleLoadRequest}
+                    disabled={!canLoadRequest}
+                    variant="blue"
+                    className="md:hidden" />
+                    <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLoadRequest();
+                    }}
+                    disabled={!canLoadRequest}
+                    className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${blueActionBtnBase}`}>
+
+                      {t("demo_scan_parse", "Load request")}
+                    </button>
+                  </div>
+                </div>
+              </>
+          }
 
             </div>
         }
+          </div>
         </div>
       </div>
     </>;

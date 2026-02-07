@@ -11,7 +11,9 @@ export default function WalletDashboardCurrencyLinesPanel({
   currencyLines,
   selectIconByCurrency,
   onRefresh,
-  onDelete
+  onDelete,
+  inline = false,
+  className = ""
 }) {
   const { t } = useTranslation("common");
   const neutralActionBtnMuted =
@@ -68,8 +70,16 @@ export default function WalletDashboardCurrencyLinesPanel({
     }
     return <span className="text-lg leading-none">{resolveFallbackIcon(upper)}</span>;
   };
+  const rootClassName = [
+    "rounded-xl border border-white/10 bg-black/20 p-3 space-y-2",
+    inline ? "flex flex-col min-h-0" : "",
+    className
+  ].filter(Boolean).join(" ");
+  const listClassName = inline
+    ? "flex-1 min-h-0 overflow-y-auto pr-1 space-y-2"
+    : "max-h-48 overflow-y-auto pr-1 space-y-2";
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-3 space-y-2">
+    <div className={rootClassName}>
       <div className="flex items-center justify-between gap-2">
         <div className="text-[11px] font-semibold text-white/80">{t("ui_currency_lines_active_f4", "Active currency lines")}
 
@@ -80,11 +90,11 @@ export default function WalletDashboardCurrencyLinesPanel({
       <div className="text-[11px] text-red-400">{currencyLinesError}</div>
       }
 
-      <div className="space-y-2">
+      <div className={inline ? "flex flex-col min-h-0 gap-2" : "space-y-2"}>
         {normalizedLines.length === 0 ?
         <div className="text-[11px] text-white/40">{t("ui_no_currency_lines_yet_9630af229d", "No currency lines yet.")}</div> :
 
-        <div className="max-h-48 overflow-y-auto pr-1 space-y-2">
+        <div className={listClassName}>
             {normalizedLines.map((line) => {
               const isConfirming = confirmingCode === line.code;
               const canDelete = Number(line.allocated || 0) <= 0;
