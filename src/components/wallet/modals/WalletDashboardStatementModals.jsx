@@ -29,6 +29,11 @@ export default function WalletDashboardStatementModals({
   setShowCurrencyStatement,
   selectedStatementToken,
   setSelectedStatementToken,
+  inlineGlobalStatement = false,
+  inlineGlobalStatementClassName = "",
+  inlineStatementVariant,
+  inlineCurrencyStatement = false,
+  inlineCurrencyStatementClassName = "",
 }) {
   const { t } = useTranslation("common");
   const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
@@ -262,15 +267,18 @@ export default function WalletDashboardStatementModals({
     ]
   );
 
-  useEffect(() => {
-    if (!showGlobalStatement) return;
-    loadGlobalFirstPage();
-  }, [loadGlobalFirstPage, showGlobalStatement]);
+  const shouldLoadGlobal = showGlobalStatement || inlineGlobalStatement;
+  const shouldLoadCurrency = showCurrencyStatement || inlineCurrencyStatement;
 
   useEffect(() => {
-    if (!showCurrencyStatement || !selectedStatementToken) return;
+    if (!shouldLoadGlobal) return;
+    loadGlobalFirstPage();
+  }, [loadGlobalFirstPage, shouldLoadGlobal]);
+
+  useEffect(() => {
+    if (!shouldLoadCurrency || !selectedStatementToken) return;
     loadCurrencyFirstPage(selectedStatementToken.currency);
-  }, [loadCurrencyFirstPage, selectedStatementToken, showCurrencyStatement]);
+  }, [loadCurrencyFirstPage, selectedStatementToken, shouldLoadCurrency]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -279,10 +287,10 @@ export default function WalletDashboardStatementModals({
     const handleWalletRefresh = (event) => {
       const address = event?.detail?.address;
       if (!address || address !== backendWalletAddress) return;
-      if (showGlobalStatement) {
+      if (shouldLoadGlobal) {
         loadGlobalFirstPage();
       }
-      if (showCurrencyStatement && selectedStatementToken) {
+      if (shouldLoadCurrency && selectedStatementToken) {
         loadCurrencyFirstPage(selectedStatementToken.currency);
       }
     };
@@ -295,8 +303,8 @@ export default function WalletDashboardStatementModals({
     loadCurrencyFirstPage,
     loadGlobalFirstPage,
     selectedStatementToken,
-    showCurrencyStatement,
-    showGlobalStatement,
+    shouldLoadCurrency,
+    shouldLoadGlobal,
   ]);
 
   const previewMovements = canFetchStatements ? null : (previewGlobalMovements || []);
@@ -306,7 +314,81 @@ export default function WalletDashboardStatementModals({
 
   return (
     <>
-      {showGlobalStatement ? (
+      {inlineGlobalStatement ? (
+        <div className={inlineGlobalStatementClassName}>
+          <GlobalStatement
+            tokens={augmentedTokens}
+            walletAddress={effectiveWallet}
+            isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
+            noticeVariant={noticeVariant}
+            noticeContextLabel={noticeContextLabel}
+            walletId={walletId}
+            period="December 2025"
+            isFullPage={isFullPageView}
+            variant={inlineStatementVariant || "inline-desktop"}
+            inline
+            usdRates={usdRates}
+            movements={canFetchStatements ? globalMovements : previewMovements}
+            movementsLoading={canFetchStatements ? globalLoading : false}
+            movementsError={canFetchStatements ? globalError : null}
+            movementsHasMore={canFetchStatements ? globalHasMore : false}
+            movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
+            onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
+            onClose={() => {}}
+            onViewCurrency={(token) => {
+              setSelectedStatementToken(token);
+              setShowCurrencyStatement(true);
+            }}
+          />
+        </div>
+      ) : null}
+
+      {inlineCurrencyStatement && selectedStatementToken ? (
+        <div className={inlineCurrencyStatementClassName}>
+          <CurrencyStatement
+            currency={selectedStatementToken.currency}
+            balance={parseFloat(selectedStatementToken.value || 0)}
+            issuer={selectedStatementToken.issuer}
+            walletAddress={effectiveWallet}
+            backendWalletAddress={backendWalletAddress}
+            isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
+            noticeVariant={noticeVariant}
+            noticeContextLabel={noticeContextLabel}
+            walletId={walletId}
+            isFullPage={isFullPageView}
+            variant={inlineStatementVariant || "inline-desktop"}
+            inline
+            usdRates={usdRates}
+            hasXcsTrustline={hasXcsTrustline}
+            xcannesCurrencyLinesCount={xcannesCurrencyLinesCount}
+            transactions={
+              canFetchStatements
+                ? currencyTransactions
+                : previewTransactions || []
+            }
+            statementMonths={
+              canFetchStatements ? currencyStatementMonths : null
+            }
+            hasMore={canFetchStatements ? currencyHasMore : false}
+            loadingMore={canFetchStatements ? currencyLoadingMore : false}
+            onLoadMore={
+              canFetchStatements
+                ? () => loadCurrencyMore(selectedStatementToken.currency)
+                : null
+            }
+            loading={canFetchStatements ? currencyLoading : false}
+            error={canFetchStatements ? currencyError : null}
+            highlightTransactionId={highlightTransactionId}
+            onClose={() => setShowCurrencyStatement(false)}
+          />
+        </div>
+      ) : null}
+
+      {showGlobalStatement && !inlineGlobalStatement ? (
         <GlobalStatement
           tokens={augmentedTokens}
           walletAddress={effectiveWallet}
@@ -335,7 +417,7 @@ export default function WalletDashboardStatementModals({
         />
       ) : null}
 
-      {showCurrencyStatement && selectedStatementToken ? (
+      {showCurrencyStatement && selectedStatementToken && !inlineCurrencyStatement ? (
         <CurrencyStatement
           currency={selectedStatementToken.currency}
           balance={parseFloat(selectedStatementToken.value || 0)}

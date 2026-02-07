@@ -37,7 +37,8 @@ export default function WalletDashboardReceiveModal({
   rlusdPerUnitRates,
   rlusdPerUnitSources,
   walletLabel,
-  onRequestGenerated
+  onRequestGenerated,
+  inline = false
 }) {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -179,23 +180,33 @@ export default function WalletDashboardReceiveModal({
 
   if (!open) return null;
 
+  const wrapperClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
+  const panelClass = [
+    "relative w-full border border-white/10 p-4 md:p-5 space-y-3 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+    inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+    noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
+    noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+  ].join(" ");
+
   const content =
   <>
       {/* Backdrop */}
-      <div
-      className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-      onClick={onClose} />
+      {!inline ? (
+        <div
+        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
+        onClick={onClose} />
+      ) : null}
 
       {/* Modale */}
-      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
+      <div className={wrapperClass}>
         <div
-        className={[
-          "relative w-full max-w-md md:max-w-lg border border-white/10 rounded-2xl p-4 md:p-5 space-y-3 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
-          noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
-          noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
-        ].join(" ")}
+        className={panelClass}
         style={{ WebkitOverflowScrolling: "touch" }}
-        onClick={(e) => e.stopPropagation()}>
+        onClick={(e) => {
+          if (!inline) e.stopPropagation();
+        }}>
 
           <button
           type="button"
@@ -463,6 +474,7 @@ export default function WalletDashboardReceiveModal({
     </>;
 
 
+  if (inline) return content;
   if (typeof document === "undefined") return null;
   return createPortal(content, document.body);
 }

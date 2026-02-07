@@ -96,6 +96,7 @@ export default function CurrencyStatement({
   period = "",
   isFullPage = false,
   variant = "default",
+  inline = false,
   usdRates = {},
   hasRlusdTrustline = false,
   hasXcsTrustline = false,
@@ -1046,10 +1047,19 @@ export default function CurrencyStatement({
       wrapperClass: "items-center justify-center px-4",
       panelClass:
       "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[92vh]"
+    },
+    "inline-desktop": {
+      backdropClass: "",
+      wrapperClass: "items-stretch justify-stretch p-0",
+      panelClass:
+      "w-full h-full rounded-xl border border-white/10"
     }
   };
 
   const resolvedLayout = STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+  const wrapperBaseClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[10200] flex";
 
   const modalBgClass = noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -1063,11 +1073,12 @@ export default function CurrencyStatement({
 
   const content =
   <div
-    className={`fixed inset-0 z-[10200] flex ${resolvedLayout.wrapperClass} ${resolvedLayout.backdropClass}`}
+    className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${inline ? "" : resolvedLayout.backdropClass}`}
     onClick={(e) => {
+      if (inline) return;
       // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
       if (e.target === e.currentTarget) {
-        onClose();
+        onClose?.();
       }
     }}>
 
@@ -1551,6 +1562,10 @@ export default function CurrencyStatement({
       </div>
     </div>;
 
+
+  if (inline) {
+    return content;
+  }
 
   if (typeof document === "undefined") {
     return null;

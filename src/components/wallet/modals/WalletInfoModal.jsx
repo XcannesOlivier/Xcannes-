@@ -168,23 +168,33 @@ export default function WalletInfoModal({
   isWalletActivated = null,
   hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = ""
+  noticeContextLabel = "",
+  inline = false
 }) {
   const { t } = useTranslation("common");
   if (!isOpen) return null;
-  if (typeof document === "undefined") return null;
+  const wrapperClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
+  const panelClass = inline
+    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-4 md:p-6 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
+    : "relative w-full max-w-2xl bg-elevated border border-subtle rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl";
 
-  return createPortal(
+  const content = (
     <>
-      <div
-        className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
-        onClick={() => onClose && onClose()} />
-
-      <div className="fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none">
+      {!inline ? (
         <div
-          className="relative w-full max-w-2xl bg-elevated border border-subtle rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
+          className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
+          onClick={() => onClose && onClose()} />
+      ) : null}
+
+      <div className={wrapperClass}>
+        <div
+          className={panelClass}
           style={{ WebkitOverflowScrolling: "touch" }}
-          onClick={(e) => e.stopPropagation()}>
+          onClick={(e) => {
+            if (!inline) e.stopPropagation();
+          }}>
 
           <button
             type="button"
@@ -203,7 +213,10 @@ export default function WalletInfoModal({
             noticeVariant={noticeVariant} />
         </div>
       </div>
-    </>,
-    document.body
+    </>
   );
+
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

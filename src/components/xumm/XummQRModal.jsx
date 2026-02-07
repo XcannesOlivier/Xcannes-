@@ -18,7 +18,8 @@ export default function XummQRModal({
   onSuccess,
   status: statusProp,
   enablePolling = true,
-  zIndexClassName = "z-50"
+  zIndexClassName = "z-50",
+  inline = false
 }) {
   const { t } = useTranslation("common");
   const [localStatus, setLocalStatus] = useState('loading'); // loading, waiting, signed, error
@@ -169,9 +170,16 @@ export default function XummQRModal({
 
   if (!isOpen) return null;
 
+  const wrapperClass = inline
+    ? "absolute inset-0 z-10 flex"
+    : `fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm`;
+  const panelClass = inline
+    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-6 shadow-2xl overflow-y-auto"
+    : "relative bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl";
+
   return (
-    <div className={`fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm`}>
-      <div className="relative bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl">
+    <div className={wrapperClass}>
+      <div className={panelClass}>
         {/* Close Button */}
         <button
           onClick={onClose}
