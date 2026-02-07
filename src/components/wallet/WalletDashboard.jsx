@@ -120,6 +120,7 @@ export default function WalletDashboard({
   isFullPage = false,
   variant,
   showDesktopStatement = false,
+  showPayreqDecor = false,
 }) {
   const { t } = useTranslation("common");
   // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
@@ -131,6 +132,7 @@ export default function WalletDashboard({
   const isFullPageView = layout.isFullPage;
   const statementVariant = layout.statementVariant;
   const showDesktopStatementPanel = Boolean(showDesktopStatement);
+  const payreqDecorProps = showPayreqDecor ? { showFauxPayreqDecor: true } : {};
 
   const {
     wallet,
@@ -2300,6 +2302,7 @@ export default function WalletDashboard({
                 handleSendSubmit={handleSendSubmit}
                 sendProcessing={sendProcessing}
                 enableSaveAddress={true}
+                {...payreqDecorProps}
               />
             ) : null}
 
@@ -2547,6 +2550,7 @@ export default function WalletDashboard({
             handleSendSubmit={handleSendSubmit}
             sendProcessing={sendProcessing}
             enableSaveAddress={true}
+            {...payreqDecorProps}
           />
 
           <WalletDashboardReceiveModal

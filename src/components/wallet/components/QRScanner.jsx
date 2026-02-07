@@ -14,7 +14,10 @@ export default function QRScanner({
   showClose = true,
   className = "",
   fileInputId,
-  enableCamera = true
+  enableCamera = true,
+  showFauxQrBackground = false,
+  fauxQrBackgroundSize = "240px",
+  fauxQrBackgroundOpacity = 0.08
 }) {
   const { t } = useTranslation("common");
   const html5QrCodeRef = useRef(null);
@@ -226,15 +229,32 @@ export default function QRScanner({
 
   const resolvedFileInputId = fileInputId || `${readerIdRef.current}-file`;
 
+  const fauxQrBackground =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 22 22' shape-rendering='crispEdges'%3E%3Crect width='22' height='22' fill='none'/%3E%3Crect x='0' y='0' width='6' height='6' fill='%23fff'/%3E%3Crect x='16' y='0' width='6' height='6' fill='%23fff'/%3E%3Crect x='0' y='16' width='6' height='6' fill='%23fff'/%3E%3Crect x='8' y='2' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='2' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='7' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='17' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
+  const showEmbeddedFauxQr = embedded && showFauxQrBackground;
+
   const scannerCard =
   <div
     className={[
     embedded ?
     "relative rounded-xl border border-white/10 bg-black/20 p-4" :
     "relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-6 shadow-2xl",
+    showEmbeddedFauxQr ? "overflow-hidden" : "",
     className].
     filter(Boolean).
     join(" ")} >
+      {showEmbeddedFauxQr ? (
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url("${fauxQrBackground}")`,
+            backgroundSize: `${fauxQrBackgroundSize} ${fauxQrBackgroundSize}`,
+            opacity: fauxQrBackgroundOpacity
+          }}
+        />
+      ) : null}
+      <div className={showEmbeddedFauxQr ? "relative z-10" : ""}>
       {/* Close Button */}
       {showClose && onClose ?
     <button
@@ -305,6 +325,7 @@ export default function QRScanner({
           </p>
         </div>
     }
+      </div>
     </div>;
 
   if (embedded) {

@@ -177,6 +177,7 @@ export default function WalletDashboardReceiveModal({
       return "";
     }
   }, [generatedRequest]);
+  const qrSize = inline ? 240 : 180;
 
   if (!open) return null;
 
@@ -184,7 +185,7 @@ export default function WalletDashboardReceiveModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full border border-white/10 p-4 md:p-5 space-y-3 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto",
+    "relative w-full border border-white/10 p-4 md:p-5 space-y-3 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -291,13 +292,14 @@ export default function WalletDashboardReceiveModal({
                 )}
           </p>
 
-          {/* Tab Content: Receive */}
-          {receiveTab === "receive" && effectiveWallet &&
-        <div className="flex flex-col items-center gap-3">
+          <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
+            {/* Tab Content: Receive */}
+            {receiveTab === "receive" && effectiveWallet &&
+        <div className={`flex flex-col items-center gap-3 ${inline ? "flex-1 min-h-0 justify-center" : ""}`}>
               <div className="bg-black/60 border border-white/10 rounded-xl p-3">
                 <QRCodeCanvas
               value={effectiveWallet}
-              size={180}
+              size={qrSize}
               bgColor="#000000"
               fgColor="#ffffff" />
 
@@ -320,7 +322,9 @@ export default function WalletDashboardReceiveModal({
 
           {/* Tab Content: Request Payment */}
           {receiveTab === "request" && effectiveWallet &&
-        <div className="space-y-4">
+        <div className={`space-y-4 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+              <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-4"}>
+              <div className="space-y-4">
               {/* Amount & Currency */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -413,13 +417,15 @@ export default function WalletDashboardReceiveModal({
                 </div>
           }
 
+              </div>
+
               {!!generatedRequest && !!requestValue &&
           <div className="space-y-3">
                   <div className="flex flex-col items-center gap-3">
                     <div className="bg-black/60 border border-white/10 rounded-xl p-3">
                       <QRCodeCanvas
                         value={requestValue}
-                        size={180}
+                        size={qrSize}
                         bgColor="#000000"
                         fgColor="#ffffff"
                       />
@@ -457,7 +463,6 @@ export default function WalletDashboardReceiveModal({
                   </div>
                 </div>
           }
-
               {/* Info */}
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                 <p className="text-xs text-blue-400">
@@ -467,8 +472,10 @@ export default function WalletDashboardReceiveModal({
                   )}
                 </p>
               </div>
+              </div>
             </div>
         }
+          </div>
         </div>
       </div>
     </>;

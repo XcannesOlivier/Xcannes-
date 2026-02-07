@@ -461,7 +461,7 @@ export default function WalletDashboardSwapModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
+    "relative w-full border border-white/10 overflow-hidden flex flex-col min-h-0 pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -563,7 +563,9 @@ export default function WalletDashboardSwapModal({
             ) : null}
 
           {view === "convert" ?
-        <div className="space-y-3">
+        <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+              <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
+              <div className={inline ? "space-y-3" : ""}>
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
 
@@ -638,110 +640,116 @@ export default function WalletDashboardSwapModal({
               tokenClassName="text-white"
               containerClassName="focus-within:!border-[#06B6D4]/80" />
               </div>
-
-              <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
-                <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
-                  {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
-                </div>
-                <div className="text-sm text-primary">
-                  {formatAmount(previewAmount, 6)} {convertQuoteCurrency || "-"}
-                </div>
-                {previewMeta?.route === "dex" ? (
-                  <div className="text-[10px] text-white/45">
-                    {"IOC"}
-                    {" · "}
-                    {t("ui_slippage_1pct_0fdafce1d0", "Slippage")} 1%
-                  </div>
-                ) : null}
-                {previewMeta?.route === "allocation" &&
-                previewMeta?.isFx &&
-                previewMeta?.spreadFeeRlusd > 0 ? (
-                    <div className="text-[10px] text-white/45">
-                      {t("ui_spread_fee_6c2a8d5e1b", "Spread")}:{" "}
-                      {previewMeta.spreadPercent.toFixed(2)}% (≈{" "}
-                      {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
-                      {"RLUSD"}
-                      {")"}
-                    </div>
-                ) : null}
               </div>
 
-              {previewState.status === "loading" ? (
-                <div className="text-[11px] text-white/50">
-                  {t("ui_loading_market_data_1d5d6ed3c4", "Refreshing market data...")}
+              <div className={inline ? "space-y-2" : "space-y-2"}>
+                <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
+                  <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
+                    {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
+                  </div>
+                  <div className="text-sm text-primary">
+                    {formatAmount(previewAmount, 6)} {convertQuoteCurrency || "-"}
+                  </div>
+                  {previewMeta?.route === "dex" ? (
+                    <div className="text-[10px] text-white/45">
+                      {"IOC"}
+                      {" · "}
+                      {t("ui_slippage_1pct_0fdafce1d0", "Slippage")} 1%
+                    </div>
+                  ) : null}
+                  {previewMeta?.route === "allocation" &&
+                  previewMeta?.isFx &&
+                  previewMeta?.spreadFeeRlusd > 0 ? (
+                      <div className="text-[10px] text-white/45">
+                        {t("ui_spread_fee_6c2a8d5e1b", "Spread")}:{" "}
+                        {previewMeta.spreadPercent.toFixed(2)}% (≈{" "}
+                        {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
+                        {"RLUSD"}
+                        {")"}
+                      </div>
+                  ) : null}
                 </div>
-              ) : null}
 
-              {previewState.status === "error" ? (
-                <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                  {previewState.error}
-                </div>
-              ) : null}
+                {previewState.status === "loading" ? (
+                  <div className="text-[11px] text-white/50">
+                    {t("ui_loading_market_data_1d5d6ed3c4", "Refreshing market data...")}
+                  </div>
+                ) : null}
 
-              {dexError ? (
-                <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                  {dexError}
-                </div>
-              ) : null}
+                {previewState.status === "error" ? (
+                  <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                    {previewState.error}
+                  </div>
+                ) : null}
 
-              {isDexRoute && isPreviewMode ? (
-                <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
-                  {t(
-                    "ui_wallet_required_trade_18f7e1d2a9",
-                    "Connect your wallet to trade."
-                  )}
-                </div>
-              ) : null}
+                {dexError ? (
+                  <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                    {dexError}
+                  </div>
+                ) : null}
 
-              {convertPreview ? (
-                <p className="text-[11px] text-white/60">
-                  {convertPreview}
-                </p>
-              ) : null}
+                {isDexRoute && isPreviewMode ? (
+                  <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                    {t(
+                      "ui_wallet_required_trade_18f7e1d2a9",
+                      "Connect your wallet to trade."
+                    )}
+                  </div>
+                ) : null}
 
-              {!effectiveIsConnected && !isPreviewMode ? (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onConnectWallet?.();
-                  }}
-                  className={`w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
-                >
-                  {t("wallet_connect_cta", "Connect wallet")}
-                </button>
-              ) : (
-                <>
-                  <SwipeConfirmButton
-                    label={convertButtonLabel}
-                    onConfirm={handleConvertAction}
-                    disabled={convertButtonDisabled}
-                    variant="cyan"
-                    className="mt-1 md:hidden"
-                  />
+                {convertPreview ? (
+                  <p className="text-[11px] text-white/60">
+                    {convertPreview}
+                  </p>
+                ) : null}
+              </div>
+              </div>
+
+              <div className={inline ? "mt-auto space-y-2 pt-2 border-t border-white/10" : ""}>
+                {!effectiveIsConnected && !isPreviewMode ? (
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleConvertAction();
+                      onConnectWallet?.();
                     }}
-                    className={`hidden md:block w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
-                    disabled={convertButtonDisabled}
+                    className={`w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
                   >
-                    {convertButtonLabel}
+                    {t("wallet_connect_cta", "Connect wallet")}
                   </button>
-                </>
-              )}
+                ) : (
+                  <>
+                    <SwipeConfirmButton
+                      label={convertButtonLabel}
+                      onConfirm={handleConvertAction}
+                      disabled={convertButtonDisabled}
+                      variant="cyan"
+                      className="mt-1 md:hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConvertAction();
+                      }}
+                      className={`hidden md:block w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
+                      disabled={convertButtonDisabled}
+                    >
+                      {convertButtonLabel}
+                    </button>
+                  </>
+                )}
 
-              {!isPreviewMode &&
-          <div className="text-[10px] text-white/45">{t("ui_tip_use_the_b06aa04f1f", "Tip: use the")}
-            <span className="font-mono">{t("ui_currency_lines_267fc2eff3", "Currency lines")}</span>{" "}{t("ui_tab_to_add_activate_new_line_1965097add", "tab to add/activate new lines.")}
+                {!isPreviewMode &&
+            <div className="text-[10px] text-white/45">{t("ui_tip_use_the_b06aa04f1f", "Tip: use the")}
+              <span className="font-mono">{t("ui_currency_lines_267fc2eff3", "Currency lines")}</span>{" "}{t("ui_tab_to_add_activate_new_line_1965097add", "tab to add/activate new lines.")}
 
-          </div>
-          }
+            </div>
+            }
+              </div>
             </div> :
 
-        <div className="space-y-3">
+        <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               <div className="rounded-xl border border-white/10 bg-black/20 p-3">
                 <div className="text-[11px] font-semibold text-white/80">{t("ui_available_currencies_267b159a9a", "Available currencies")}
 
@@ -798,7 +806,9 @@ export default function WalletDashboardSwapModal({
             currencyLines={currencyLines}
             selectIconByCurrency={selectIconByCurrency}
             onRefresh={refreshCurrencyLines}
-            onDelete={handleDeleteLine} />
+            onDelete={handleDeleteLine}
+            inline={inline}
+            className={inline ? "flex-1 min-h-0" : ""} />
 
 
             </div>

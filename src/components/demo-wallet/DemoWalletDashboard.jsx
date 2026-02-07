@@ -1652,7 +1652,8 @@ export default function DemoWalletDashboard({
         handlePaymentRequestScan={handlePaymentRequestScan}
         handleSendSubmit={handleSendSubmit}
         sendProcessing={sendProcessing}
-        enableSaveAddress={false} />
+        enableSaveAddress={false}
+        showFauxPayreqDecor={true} />
 
 
       <WalletDashboardReceiveModal
