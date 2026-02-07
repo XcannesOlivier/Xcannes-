@@ -14,14 +14,14 @@ export default function WalletActivationModal({
   activationAmountXrp = 1,
   isPreviewMode = false,
   isWalletActivated = null,
-  hasRlusdTrustline = null
+  hasRlusdTrustline = null,
+  inline = false
 }) {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode;
   const showRlusdNotActivatedNotice =
     !isPreviewMode && isWalletActivated === true && hasRlusdTrustline === false;
   if (!open) return null;
-  if (typeof document === "undefined") return null;
 
   const actionCardBase =
     "group w-full text-left rounded-xl border border-white/10 bg-black/30 hover:bg-black/40 px-4 py-3 transition-all duration-200 hover:border-white/20 hover:-translate-y-0.5";
@@ -38,19 +38,30 @@ export default function WalletActivationModal({
     "border-emerald-400/40 bg-emerald-500/10" :
     "border-white/10 bg-black/30";
 
-  return createPortal(
-    <>
-      <div
-        className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
-        onClick={() => {
-          onToggleActivationBundle?.(false);
-          onClose?.();
-        }} />
+  const wrapperClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
+  const panelClass = inline
+    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl overflow-y-auto"
+    : "relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl";
 
-      <div className="fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none">
+  const content = (
+    <>
+      {!inline ? (
         <div
-          className="relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl"
-          onClick={(e) => e.stopPropagation()}>
+          className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
+          onClick={() => {
+            onToggleActivationBundle?.(false);
+            onClose?.();
+          }} />
+      ) : null}
+
+      <div className={wrapperClass}>
+        <div
+          className={panelClass}
+          onClick={(e) => {
+            if (!inline) e.stopPropagation();
+          }}>
           <button
             type="button"
             onClick={() => {
@@ -213,7 +224,10 @@ export default function WalletActivationModal({
           </div>
         </div>
       </div>
-    </>,
-    document.body
+    </>
   );
+
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

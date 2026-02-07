@@ -28,6 +28,7 @@ export default function WalletDashboardAdjustModal({
   refreshBalance,
   refreshCurrencyLines,
   adjustmentFeeRlusd = DEFAULT_ADJUSTMENT_FEE_RLUSD,
+  inline = false,
 }) {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -232,23 +233,33 @@ export default function WalletDashboardAdjustModal({
     ? requiredTotalRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })
     : "-";
 
+  const wrapperClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
+  const panelClass = [
+    "relative w-full border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
+    inline ? "h-full max-h-none rounded-xl" : "max-w-2xl max-h-[92vh] rounded-2xl",
+    noticeVariant === "demo" && walletId === "A"
+      ? "bg-[#0b1017]"
+      : "bg-elevated",
+    noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+  ].join(" ");
+
   const content = (
     <>
-      <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
+      {!inline ? (
         <div
-          className={[
-            "relative w-full max-w-2xl border border-white/10 rounded-2xl max-h-[92vh] overflow-hidden flex flex-col pointer-events-auto",
-            noticeVariant === "demo" && walletId === "A"
-              ? "bg-[#0b1017]"
-              : "bg-elevated",
-            noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
-          ].join(" ")}
-          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
+          onClick={onClose}
+        />
+      ) : null}
+
+      <div className={wrapperClass}>
+        <div
+          className={panelClass}
+          onClick={(e) => {
+            if (!inline) e.stopPropagation();
+          }}
         >
           <button
             type="button"
@@ -481,5 +492,7 @@ export default function WalletDashboardAdjustModal({
     </>
   );
 
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
   return createPortal(content, document.body);
 }

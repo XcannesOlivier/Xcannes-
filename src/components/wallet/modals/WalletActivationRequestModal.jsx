@@ -15,6 +15,7 @@ export default function WalletActivationRequestModal({
   isPreviewMode = false,
   isWalletActivated = null,
   hasRlusdTrustline = null,
+  inline = false,
 }) {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode;
@@ -133,18 +134,28 @@ export default function WalletActivationRequestModal({
   };
 
   if (!open) return null;
-  if (typeof document === "undefined") return null;
 
-  return createPortal(
+  const wrapperClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
+  const panelClass = inline
+    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl overflow-y-auto"
+    : "relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl";
+
+  const content = (
     <>
-      <div
-        className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
-        onClick={() => onClose?.()} />
-
-      <div className="fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none">
+      {!inline ? (
         <div
-          className="relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl"
-          onClick={(e) => e.stopPropagation()}>
+          className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
+          onClick={() => onClose?.()} />
+      ) : null}
+
+      <div className={wrapperClass}>
+        <div
+          className={panelClass}
+          onClick={(e) => {
+            if (!inline) e.stopPropagation();
+          }}>
           <button
             type="button"
             onClick={() => onClose?.()}
@@ -245,7 +256,10 @@ export default function WalletActivationRequestModal({
           </div>
         </div>
       </div>
-    </>,
-    document.body
+    </>
   );
+
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

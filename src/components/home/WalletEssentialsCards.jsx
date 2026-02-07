@@ -1321,13 +1321,14 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     activeAction?.key === "config"
       ? "bg-black/20"
       : "bg-[#040c13]/95";
+  const activeFlows = activeAction?.modalLayout?.flows;
   useEffect(() => {
-    if (!activeAction?.modalLayout?.flows?.length) {
+    if (!activeFlows?.length) {
       setActiveFlowKey(null);
       return;
     }
-    setActiveFlowKey(activeAction.modalLayout.flows[0].key);
-  }, [activeActionKey]);
+    setActiveFlowKey(activeFlows[0].key);
+  }, [activeActionKey, activeFlows]);
 
   const rootClassName = isCompact
     ? "h-full w-full flex flex-col min-h-0 gap-4"

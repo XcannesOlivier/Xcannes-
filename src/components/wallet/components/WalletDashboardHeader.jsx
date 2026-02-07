@@ -24,7 +24,8 @@ export default function WalletDashboardHeader({
   walletLabelDraft,
   onWalletLabelDraftChange,
   onSaveWalletLabel,
-  onCancelWalletLabel
+  onCancelWalletLabel,
+  hideStatementCtaOnDesktop = false,
 }) {
   const { t } = useTranslation("common");
   return (
@@ -68,7 +69,7 @@ export default function WalletDashboardHeader({
         <button
           type="button"
           onClick={onOpenGlobalStatement}
-          className="mt-2 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105">{t("ui_see_statement_9771dff7ec", "Voir le relevé")}
+          className={`mt-2 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105 ${hideStatementCtaOnDesktop ? "lg:hidden" : ""}`}>{t("ui_see_statement_9771dff7ec", "Voir le relevé")}
 
 
         </button>

@@ -57,7 +57,8 @@ export default function WalletDashboardSwapModal({
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   activationFeeRlusd,
-  simulateDexInDemo = false
+  simulateDexInDemo = false,
+  inline = false
 }) {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -456,22 +457,32 @@ export default function WalletDashboardSwapModal({
 
   if (!open) return null;
 
+  const wrapperClass = inline
+    ? "relative w-full h-full flex"
+    : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
+  const panelClass = [
+    "relative w-full border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
+    inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+    noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
+    noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+  ].join(" ");
+
   const content =
   <>
       {/* Backdrop */}
-      <div
-      className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-      onClick={onClose} />
+      {!inline ? (
+        <div
+        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
+        onClick={onClose} />
+      ) : null}
 
       {/* Modale */}
-      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
+      <div className={wrapperClass}>
         <div
-        className={[
-          "relative w-full max-w-md md:max-w-lg border border-white/10 rounded-2xl max-h-[92vh] overflow-hidden flex flex-col pointer-events-auto",
-          noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
-          noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
-        ].join(" ")}
-        onClick={(e) => e.stopPropagation()}>
+        className={panelClass}
+        onClick={(e) => {
+          if (!inline) e.stopPropagation();
+        }}>
 
           <button
           type="button"
@@ -812,9 +823,12 @@ export default function WalletDashboardSwapModal({
         type="sign"
         onSuccess={handleDexConfirm}
         zIndexClassName="z-[11000]"
+        inline={inline}
       />
     </>;
 
 
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
   return createPortal(content, document.body);
 }
