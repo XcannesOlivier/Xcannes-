@@ -104,14 +104,24 @@ export default function Home() {
               <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center">
                 <Link href="/wallet">
                   <button className={bankButtonClassName({ tone: "blue", variant: "soft", size: "lg" })}>
-                    {t("home_v2_hero_cta_primary", "Ouvrir le wallet")}
+                    <span className="sm:hidden">
+                      {t("home_v2_hero_cta_primary_mobile", "Gérer mon argent")}
+                    </span>
+                    <span className="hidden sm:inline">
+                      {t("home_v2_hero_cta_primary", "Ouvrir le wallet")}
+                    </span>
                   </button>
                 </Link>
                 <Link
                   href="/dex"
                   className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}
                 >
-                  {t("home_v2_final_cta_markets", "Voir les marchés")}
+                  <span className="sm:hidden">
+                    {t("home_v2_final_cta_markets_mobile", "Voir les taux de change")}
+                  </span>
+                  <span className="hidden sm:inline">
+                    {t("home_v2_final_cta_markets", "Voir les marchés")}
+                  </span>
                 </Link>
               </div>
 

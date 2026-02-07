@@ -942,20 +942,136 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         "home_v2_essentials_4_desc",
         "Accès fiat selon la disponibilité du pays."
       ),
-      modalPoints: [
-        t(
-          "home_v2_essentials_4_modal_point_1",
-          "Accès fiat selon la disponibilité du pays."
+      modalLayout: {
+        intro: t(
+          "home_v2_essentials_4_modal_intro",
+          "Deux parcours simples pour acheter ou vendre des cryptos via un prestataire de paiement intégré."
         ),
-        t(
-          "home_v2_essentials_4_modal_point_2",
-          "Acheter ou vendre en quelques étapes."
+        flows: [
+          {
+            key: "buy",
+            tabLabel: t(
+              "home_v2_essentials_4_modal_flow_1_tab",
+              "Acheter"
+            ),
+            title: t(
+              "home_v2_essentials_4_modal_flow_1_title",
+              "Parcours 1 · Acheter"
+            ),
+            intro: t(
+              "home_v2_essentials_4_modal_flow_1_intro",
+              "Achetez des cryptos avec carte ou virement selon disponibilité."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_4_modal_flow_1_step_1_title",
+                  "Choisir la crypto et la devise"
+                ),
+                desc: t(
+                  "home_v2_essentials_4_modal_flow_1_step_1_desc",
+                  "Sélectionnez :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_4_modal_flow_1_step_1_detail_1",
+                    "la crypto"
+                  ),
+                  t(
+                    "home_v2_essentials_4_modal_flow_1_step_1_detail_2",
+                    "la devise de paiement"
+                  ),
+                  t(
+                    "home_v2_essentials_4_modal_flow_1_step_1_detail_3",
+                    "le montant"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_4_modal_flow_1_step_2_title",
+                  "Finaliser le paiement"
+                ),
+                desc: t(
+                  "home_v2_essentials_4_modal_flow_1_step_2_desc",
+                  "Vous êtes redirigé vers l’interface sécurisée du prestataire de paiement pour finaliser l’achat."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_4_modal_flow_1_step_3_title",
+                  "Réception dans le wallet"
+                ),
+                desc: t(
+                  "home_v2_essentials_4_modal_flow_1_step_3_desc",
+                  "Après validation, la crypto est envoyée directement sur votre wallet."
+                ),
+              },
+            ],
+          },
+          {
+            key: "sell",
+            tabLabel: t(
+              "home_v2_essentials_4_modal_flow_2_tab",
+              "Vendre"
+            ),
+            title: t(
+              "home_v2_essentials_4_modal_flow_2_title",
+              "Parcours 2 · Vendre"
+            ),
+            intro: t(
+              "home_v2_essentials_4_modal_flow_2_intro",
+              "Vendez vos cryptos et recevez des fonds via un partenaire de paiement, selon les devises et options disponibles."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_4_modal_flow_2_step_1_title",
+                  "Choisir la crypto et le montant"
+                ),
+                desc: t(
+                  "home_v2_essentials_4_modal_flow_2_step_1_desc",
+                  "Sélectionnez :"
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_4_modal_flow_2_step_1_detail_1",
+                    "la crypto (ou une ligne locale)"
+                  ),
+                  t(
+                    "home_v2_essentials_4_modal_flow_2_step_1_detail_2",
+                    "le montant à vendre"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_4_modal_flow_2_step_2_title",
+                  "Finaliser la vente"
+                ),
+                desc: t(
+                  "home_v2_essentials_4_modal_flow_2_step_2_desc",
+                  "Vous êtes redirigé vers l’interface sécurisée du prestataire de paiement pour renseigner les informations nécessaires et confirmer l’opération."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_4_modal_flow_2_step_3_title",
+                  "Recevoir les fonds"
+                ),
+                desc: t(
+                  "home_v2_essentials_4_modal_flow_2_step_3_desc",
+                  "Après validation, les fonds sont transférés vers votre compte bancaire, selon les devises et modes de paiement proposés par le prestataire."
+                ),
+              },
+            ],
+          },
+        ],
+        note: t(
+          "home_v2_essentials_4_modal_note",
+          "Le service est opéré par un prestataire tiers. La disponibilité, les devises prises en charge, les frais et les montants minimums dépendent du pays et du mode de paiement, et sont toujours affichés avant validation."
         ),
-        t(
-          "home_v2_essentials_4_modal_point_3",
-          "Frais et limites indiqués avant validation."
-        ),
-      ],
+      },
       orderClassName: "order-5 lg:order-6",
       iconClassName:
         "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] group-hover:bg-[rgba(139,92,246,0.14)]",
@@ -1153,6 +1269,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const useLargeMobileType =
     activeAction?.key === "pay" ||
     activeAction?.key === "receive_request" ||
+    activeAction?.key === "buy" ||
     isConversionModal ||
     activeAction?.key === "statements";
   const modalAccent =

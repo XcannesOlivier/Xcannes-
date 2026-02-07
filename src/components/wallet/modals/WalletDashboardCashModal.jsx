@@ -38,6 +38,16 @@ export default function WalletDashboardCashModal({
     noticeVariant !== "demo" &&
     isWalletActivated === true &&
     hasRlusdTrustline === false;
+  const cashNote =
+    noticeVariant === "demo"
+      ? t(
+          "ui_fiat_gateway_note_demo_6f1d8c2a9b",
+          "Demo mode: buy/sell are simulated, no MoonPay redirect."
+        )
+      : t(
+          "ui_fiat_gateway_note_live_4b8c2d1e9f",
+          "Buy/sell via MoonPay (partner). Availability depends on country and payment method. Rates and fees are shown before confirmation."
+        );
   if (!open) return null;
 
   const content =
@@ -100,7 +110,10 @@ export default function WalletDashboardCashModal({
                 ✕
               </button>
             </div>
-            <div className="px-4 pb-3">{renderWalletMeta?.()}</div>
+            <div className="px-4 pb-3 space-y-2">
+              {renderWalletMeta?.()}
+              <p className="text-xs text-white/60">{cashNote}</p>
+            </div>
 
             {/* Onglets Buy/Sell */}
             <div className="flex gap-2 px-4 pt-3">
