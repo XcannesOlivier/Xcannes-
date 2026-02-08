@@ -21,6 +21,8 @@ export default function Home() {
   const [feesModalOpen, setFeesModalOpen] = useState(false);
   const [valueModalRoot, setValueModalRoot] = useState(null);
   const [valueModalOpen, setValueModalOpen] = useState(false);
+  const isHeroModalOpen =
+    speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");
@@ -31,6 +33,23 @@ export default function Home() {
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const { body, documentElement } = document;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    if (isHeroModalOpen) {
+      const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+      body.style.overflow = "hidden";
+      if (scrollbarWidth > 0) {
+        body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+    }
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+    };
+  }, [isHeroModalOpen]);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");
@@ -281,12 +300,12 @@ export default function Home() {
           speedModalOpen &&
           createPortal(
             <div
-              className="fixed inset-0 z-[10050] flex items-center justify-center bg-xcannes-background px-4"
+              className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
                 if (e.target === e.currentTarget) setSpeedModalOpen(false);
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
@@ -366,12 +385,12 @@ export default function Home() {
           securityModalOpen &&
           createPortal(
             <div
-              className="fixed inset-0 z-[10050] flex items-center justify-center bg-xcannes-background px-4"
+              className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
                 if (e.target === e.currentTarget) setSecurityModalOpen(false);
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
@@ -455,12 +474,12 @@ export default function Home() {
           feesModalOpen &&
           createPortal(
             <div
-              className="fixed inset-0 z-[10050] flex items-center justify-center bg-xcannes-background px-4"
+              className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
                 if (e.target === e.currentTarget) setFeesModalOpen(false);
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
@@ -536,12 +555,12 @@ export default function Home() {
           valueModalOpen &&
           createPortal(
             <div
-              className="fixed inset-0 z-[10050] flex items-center justify-center bg-xcannes-background px-4"
+              className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
                 if (e.target === e.currentTarget) setValueModalOpen(false);
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl bg-black/20 p-6 sm:p-7 backdrop-blur-sm shadow-[0_0_26px_rgba(34,197,94,0.18)] md:shadow-[0_0_22px_rgba(34,197,94,0.12)] animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
                 {/* Header avec icône */}
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3">

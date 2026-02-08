@@ -17,7 +17,6 @@ import {
 	import { useConvertForm } from "./hooks/useConvertForm";
 	import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
 import { useCurrencyLinesActions } from "./hooks/useCurrencyLinesActions";
-import { useOverflowLock } from "./hooks/useOverflowLock";
 	import { useSavedAddresses } from "./hooks/useSavedAddresses";
 	import { usePaymentRequestScanner } from "./hooks/usePaymentRequestScanner";
 	import { usePaymentRequestForm } from "./hooks/usePaymentRequestForm";
@@ -2055,10 +2054,6 @@ export default function WalletDashboard({
     isConnected: effectiveIsConnected,
   });
 
-  useOverflowLock(
-    !!activeAction || showAdjustmentModal || showActivationModal || showActivationRequestModal
-  );
-
   useEffect(() => {
     if (!isDesktopPanel) {
       desktopDefaultActionSetRef.current = false;
@@ -2129,6 +2124,19 @@ export default function WalletDashboard({
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && showActivationRequestModal;
   const showInlineInfo =
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && walletInfoOpen;
+  const shouldLockBodyScroll =
+    !isDesktopPanel &&
+    Boolean(
+      activeAction ||
+      showAdjustmentModal ||
+      showActivationModal ||
+      showActivationRequestModal ||
+      walletInfoOpen ||
+      qrScannerOpen ||
+      showSaveAddressPrompt ||
+      showGlobalStatement ||
+      showCurrencyStatement
+    );
   const hasInlineModal =
     showInlineXumm ||
     showInlineQrScanner ||
@@ -2147,6 +2155,40 @@ export default function WalletDashboard({
     selectedStatementToken;
   const showInlineGlobalStatement =
     isDesktopPanel && !hasInlineModal && !showInlineCurrencyStatement;
+
+  const bodyScrollLockRef = useRef({
+    locked: false,
+    overflow: "",
+    paddingRight: "",
+    htmlOverflow: "",
+  });
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const { body, documentElement: html } = document;
+    if (shouldLockBodyScroll) {
+      if (!bodyScrollLockRef.current.locked) {
+        bodyScrollLockRef.current = {
+          locked: true,
+          overflow: body.style.overflow,
+          paddingRight: body.style.paddingRight,
+          htmlOverflow: html.style.overflow,
+        };
+        const scrollbarWidth = window.innerWidth - html.clientWidth;
+        html.style.overflow = "hidden";
+        body.style.overflow = "hidden";
+        if (scrollbarWidth > 0) {
+          body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+      }
+      return;
+    }
+    if (bodyScrollLockRef.current.locked) {
+      html.style.overflow = bodyScrollLockRef.current.htmlOverflow;
+      body.style.overflow = bodyScrollLockRef.current.overflow;
+      body.style.paddingRight = bodyScrollLockRef.current.paddingRight;
+      bodyScrollLockRef.current.locked = false;
+    }
+  }, [shouldLockBodyScroll]);
 
   return (
     <>

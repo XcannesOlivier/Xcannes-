@@ -557,7 +557,7 @@ export default function GlobalStatement({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
 
-  const modalBgClass = noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated";
+  const modalBgClass = noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;

@@ -150,7 +150,7 @@ export default function Header({ fixed = true }) {
   const headerBgClass = (() => {
     // DEX: gradient sombre pour conserver l'ambiance graphique
     if (isDex) {
-      const gradientBase = "bg-gradient-to-b from-black via-black/95 to-[#040c13]";
+      const gradientBase = "bg-gradient-to-b from-black via-black/95 to-[#0a0f0d]";
       return scrolled ?
       `${gradientBase} backdrop-blur-md border-white/10` :
       `${gradientBase} backdrop-blur-sm border-white/5`;
