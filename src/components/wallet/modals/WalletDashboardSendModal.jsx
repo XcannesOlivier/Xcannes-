@@ -67,19 +67,25 @@ export default function WalletDashboardSendModal({
   const manualQrScannerRef = useRef(null);
   const manualQrDecor =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 24 24' shape-rendering='crispEdges'%3E%3Crect width='24' height='24' fill='none'/%3E%3Crect x='0' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='17' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='18' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='19' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='0' y='17' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='18' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='19' width='3' height='3' fill='%23fff'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='4' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='13' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='20' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
-  const manualQrDecorSize = "200px";
-  const manualQrDecorOpacity = 0.08;
-  const payreqQrDecorSize = "180px";
-  const payreqQrDecorOpacity = 0.06;
+  const isDemoMode = noticeVariant === "demo";
+  const useDemoQrDecor = isDemoMode && isDesktop;
+  const manualQrDecorSize = useDemoQrDecor ? "240px" : "200px";
+  const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
+  const payreqQrDecorSize = useDemoQrDecor ? "220px" : "180px";
+  const payreqQrDecorOpacity = useDemoQrDecor ? 1 : 0.06;
+  const payreqQrDecorPosition = useDemoQrDecor ? "center 12px" : "center 24px";
   const payreqQrDecor = manualQrDecor;
   const fauxPayreqExample =
     '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"RLUSD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && isDesktop);
-  const useUnifiedPayreqPanel = isDesktop && noticeVariant !== "demo";
-  const showManualQrUpload = isDesktop && noticeVariant !== "demo";
-  const fauxPayreqTextClass = showFauxPayreq && !inline
-    ? "text-[9px] text-white/10"
-    : "text-[10px] text-white/15";
+  const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
+  const useUnifiedPayreqPanel = useDexStyleLayout;
+  const showManualQrUpload = useDexStyleLayout;
+  const fauxPayreqTextClass = isDemoMode && isDesktop
+    ? "text-[11px] text-white/70"
+    : showFauxPayreq && !inline
+      ? "text-[9px] text-white/10"
+      : "text-[10px] text-white/15";
   const fauxQrSize = inline ? "240px" : "200px";
   const fauxQrOpacity = inline ? 0.08 : 0.06;
 
@@ -614,7 +620,7 @@ export default function WalletDashboardSendModal({
                         style={{
                           backgroundImage: `url("${payreqQrDecor}")`,
                           backgroundSize: `${payreqQrDecorSize} ${payreqQrDecorSize}`,
-                          backgroundPosition: "center 24px",
+                          backgroundPosition: payreqQrDecorPosition,
                           opacity: payreqQrDecorOpacity
                         }}
                       />
