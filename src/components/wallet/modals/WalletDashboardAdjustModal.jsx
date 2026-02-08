@@ -239,7 +239,7 @@ export default function WalletDashboardAdjustModal({
   const panelClass = [
     "relative w-full border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-2xl max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" && walletId === "A"
+    noticeVariant === "demo" && walletId === "B"
       ? "bg-[#0b1017]"
       : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",

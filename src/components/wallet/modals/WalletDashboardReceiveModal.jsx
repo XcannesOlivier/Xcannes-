@@ -208,7 +208,7 @@ export default function WalletDashboardReceiveModal({
   const panelClass = [
     "relative w-full border border-white/10 p-4 md:p-5 space-y-3 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" && walletId === "A" ? "bg-[#0b1017]" : "bg-elevated",
+    noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
   ].join(" ");
 

@@ -25,6 +25,12 @@ export default function XummQRModal({
   const [localStatus, setLocalStatus] = useState('loading'); // loading, waiting, signed, error
   const [localCountdown, setLocalCountdown] = useState(300); // 5 minutes
   const lastAutoOpenedRef = useRef(null);
+  const bodyScrollLockRef = useRef({
+    locked: false,
+    overflow: "",
+    paddingRight: "",
+    htmlOverflow: "",
+  });
   const isControlled = statusProp != null;
   const displayStatus = isControlled ? statusProp : localStatus;
 
@@ -61,6 +67,34 @@ export default function XummQRModal({
 
     return clearAll;
   }, [displayStatus, isControlled, isOpen, uuid]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const { body, documentElement: html } = document;
+    if (isOpen && !inline) {
+      if (!bodyScrollLockRef.current.locked) {
+        bodyScrollLockRef.current = {
+          locked: true,
+          overflow: body.style.overflow,
+          paddingRight: body.style.paddingRight,
+          htmlOverflow: html.style.overflow,
+        };
+        const scrollbarWidth = window.innerWidth - html.clientWidth;
+        html.style.overflow = "hidden";
+        body.style.overflow = "hidden";
+        if (scrollbarWidth > 0) {
+          body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+      }
+      return;
+    }
+    if (bodyScrollLockRef.current.locked) {
+      html.style.overflow = bodyScrollLockRef.current.htmlOverflow;
+      body.style.overflow = bodyScrollLockRef.current.overflow;
+      body.style.paddingRight = bodyScrollLockRef.current.paddingRight;
+      bodyScrollLockRef.current.locked = false;
+    }
+  }, [isOpen, inline]);
 
   useEffect(() => {
     if (!isOpen || !uuid || isControlled || !enablePolling) {

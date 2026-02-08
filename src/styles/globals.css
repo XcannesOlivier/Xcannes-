@@ -9,7 +9,7 @@
 :root {
   /* Core background surfaces */
   --bg-base: #05090f;
-  --bg-elevated: #040c13;
+  --bg-elevated: #0a0f0d;
   --bg-subtle: #101827;
 
   /* Borders */
@@ -162,7 +162,7 @@
 }
 
 .demo-wallet-theme-dex {
-  --bg-base: #040c13;
+  --bg-base: #0a0f0d;
   --bg-elevated: #071420;
   --bg-subtle: #0b1b2a;
 }

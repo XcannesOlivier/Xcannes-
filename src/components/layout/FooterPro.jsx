@@ -142,7 +142,7 @@ export default function FooterPro() {
     [router?.events, router?.locales]
   );
 
-  const gradientFromClass = isDex ? "from-[#040c13]" : "from-xcannes-background";
+  const gradientFromClass = isDex ? "from-[#0a0f0d]" : "from-xcannes-background";
 
   return (
     <footer className={`w-screen max-w-none text-white pt-16 pb-8 px-6 border-t border-white/10 bg-gradient-to-b ${gradientFromClass} to-black`}>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import {
@@ -304,6 +304,14 @@ export default function DemoWalletDashboard({
   const demoAccents = DEMO_WALLET_ACCENTS;
   const activeAccent = demoAccents[activeWalletId] || demoAccents.A;
   const panelRingClass = isHomeTheme ? "ring-white/10" : activeAccent.ring;
+  const demoBottomBorderClass =
+    isHomeTheme && activeWalletId === "A" ? "border-b border-white/10" : "";
+  const bodyScrollLockRef = useRef({
+    locked: false,
+    overflow: "",
+    paddingRight: "",
+    htmlOverflow: "",
+  });
 
   const walletContextLabel = `${t("demo_wallet_label", "Wallet")} ${activeWalletId}`;
   const effectiveWallet = getWalletAddress(state, activeWalletId);
@@ -683,6 +691,9 @@ export default function DemoWalletDashboard({
     setSendTab,
     setSendPaymentRequest
   });
+  const shouldLockBodyScroll = Boolean(
+    activeAction || showGlobalStatement || showCurrencyStatement || qrScannerOpen
+  );
 
   const handlePendingDemoRequest = useCallback((detail) => {
     if (!detail?.request) return false;
@@ -714,6 +725,34 @@ export default function DemoWalletDashboard({
     window.addEventListener("xcannes:demo-wallet:request", handler);
     return () => window.removeEventListener("xcannes:demo-wallet:request", handler);
   }, [handlePendingDemoRequest]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const { body, documentElement: html } = document;
+    if (shouldLockBodyScroll) {
+      if (!bodyScrollLockRef.current.locked) {
+        bodyScrollLockRef.current = {
+          locked: true,
+          overflow: body.style.overflow,
+          paddingRight: body.style.paddingRight,
+          htmlOverflow: html.style.overflow,
+        };
+        const scrollbarWidth = window.innerWidth - html.clientWidth;
+        html.style.overflow = "hidden";
+        body.style.overflow = "hidden";
+        if (scrollbarWidth > 0) {
+          body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+      }
+      return;
+    }
+    if (bodyScrollLockRef.current.locked) {
+      html.style.overflow = bodyScrollLockRef.current.htmlOverflow;
+      body.style.overflow = bodyScrollLockRef.current.overflow;
+      body.style.paddingRight = bodyScrollLockRef.current.paddingRight;
+      bodyScrollLockRef.current.locked = false;
+    }
+  }, [shouldLockBodyScroll]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1334,7 +1373,8 @@ export default function DemoWalletDashboard({
       "h-full flex flex-col min-h-0 ring-1 rounded-xl bg-elevated",
       isHomeTheme ? "demo-wallet-theme-home" : "",
       isDexTheme ? "demo-wallet-theme-dex" : "",
-      panelRingClass].
+      panelRingClass,
+      demoBottomBorderClass].
       join(" ")}>
 
       <div className="panel-header">
@@ -1561,7 +1601,7 @@ export default function DemoWalletDashboard({
                   <div
                     className={[
                       "flex items-center justify-between rounded-md border border-white/10 px-3 py-2 hover:border-white/20 transition-colors",
-                      isHomeTheme ? "bg-black/20" : "bg-base",
+                      "bg-black/40",
                     ].join(" ")}
                   >
                     <div className="flex items-center gap-2 min-w-0">
