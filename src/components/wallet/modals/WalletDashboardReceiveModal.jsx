@@ -18,6 +18,7 @@ export default function WalletDashboardReceiveModal({
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
+  dashboardVariant = "default",
   receiveTab,
   setReceiveTab,
   renderWalletMeta,
@@ -57,6 +58,9 @@ export default function WalletDashboardReceiveModal({
     "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const showPersistentRequestPreview =
+    inline && isDesktop && noticeVariant !== "demo" && dashboardVariant === "full";
 
   const requestCurrencyCode = useMemo(
     () => String(requestCurrency || "").trim().toUpperCase(),
@@ -77,6 +81,19 @@ export default function WalletDashboardReceiveModal({
       setGenerateError(null);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(min-width: 768px)");
+    const handleChange = () => setIsDesktop(media.matches);
+    handleChange();
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
+    }
+    media.addListener(handleChange);
+    return () => media.removeListener(handleChange);
+  }, []);
 
   useEffect(() => {
     setGeneratedRequest(null);
@@ -177,6 +194,10 @@ export default function WalletDashboardReceiveModal({
       return "";
     }
   }, [generatedRequest]);
+  const shouldShowRequestPreview =
+    showPersistentRequestPreview || (Boolean(generatedRequest) && Boolean(requestValue));
+  const showRequestPlaceholder =
+    showPersistentRequestPreview && (!generatedRequest || !requestValue);
   const qrSize = inline ? 240 : 180;
 
   if (!open) return null;
@@ -419,48 +440,69 @@ export default function WalletDashboardReceiveModal({
 
               </div>
 
-              {!!generatedRequest && !!requestValue &&
+              {shouldShowRequestPreview &&
           <div className="space-y-3">
                   <div className="flex flex-col items-center gap-3">
                     <div className="bg-black/60 border border-white/10 rounded-xl p-3">
-                      <QRCodeCanvas
-                        value={requestValue}
-                        size={qrSize}
-                        bgColor="#000000"
-                        fgColor="#ffffff"
-                      />
+                      {showRequestPlaceholder ? (
+                        <div
+                          className="flex items-center justify-center text-center text-xs text-white/50"
+                          style={{ width: qrSize, height: qrSize }}
+                        >
+                          {t(
+                            "ui_request_qr_placeholder_2c4f7a1d9b",
+                            "Votre QR code sera créé ici"
+                          )}
+                        </div>
+                      ) : (
+                        <QRCodeCanvas
+                          value={requestValue}
+                          size={qrSize}
+                          bgColor="#000000"
+                          fgColor="#ffffff"
+                        />
+                      )}
                     </div>
-                    <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
-                      {requestValue}
+                    <div className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all ${showRequestPlaceholder ? "text-center" : ""}`}>
+                      {showRequestPlaceholder
+                        ? t(
+                            "ui_request_code_placeholder_8c1e7b4d2a",
+                            "Votre code de demande de paiement apparaîtra ici"
+                          )
+                        : requestValue}
                     </div>
-                    <button
-                      type="button"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await navigator.clipboard.writeText(requestValue);
-                        } catch {
-                          // ignore
-                        }
-                      }}
-                      className={`px-4 py-2 text-xs ${greenActionBtnBase}`}
-                    >
-                      {t("ui_copy_request_32a3f4409b", "Copy request")}
-                    </button>
+                    {!showRequestPlaceholder ? (
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            await navigator.clipboard.writeText(requestValue);
+                          } catch {
+                            // ignore
+                          }
+                        }}
+                        className={`px-4 py-2 text-xs ${greenActionBtnBase}`}
+                      >
+                        {t("ui_copy_request_32a3f4409b", "Copy request")}
+                      </button>
+                    ) : null}
                   </div>
-                  <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
-                    {isFxRequest
-                      ? t("ui_request_settlement_note_6a1c9d2f3b", {
-                          defaultValue:
-                            "Payment will settle on-chain in RLUSD, and be credited to the {{currency}} line for the receiver.",
-                          currency: requestCurrencyCode,
-                        })
-                      : t("ui_request_prepared_for_5d2a8b1c3f", {
-                          defaultValue:
-                            "Payment request prepared for {{currency}}.",
-                          currency: requestCurrencyCode || "RLUSD",
-                        })}
-                  </div>
+                  {!showRequestPlaceholder ? (
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
+                      {isFxRequest
+                        ? t("ui_request_settlement_note_6a1c9d2f3b", {
+                            defaultValue:
+                              "Payment will settle on-chain in RLUSD, and be credited to the {{currency}} line for the receiver.",
+                            currency: requestCurrencyCode,
+                          })
+                        : t("ui_request_prepared_for_5d2a8b1c3f", {
+                            defaultValue:
+                              "Payment request prepared for {{currency}}.",
+                            currency: requestCurrencyCode || "RLUSD",
+                          })}
+                    </div>
+                  ) : null}
                 </div>
           }
               {/* Info */}

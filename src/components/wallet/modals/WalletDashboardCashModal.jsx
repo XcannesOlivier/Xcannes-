@@ -123,7 +123,6 @@ export default function WalletDashboardCashModal({
             </div>
             <div className="px-4 pb-3 space-y-2">
               {renderWalletMeta?.()}
-              <p className="text-xs text-white/60">{cashNote}</p>
             </div>
 
             {/* Onglets Buy/Sell */}

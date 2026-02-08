@@ -2314,6 +2314,7 @@ export default function WalletDashboard({
                 isPreviewMode={isPreviewMode}
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
+                dashboardVariant={variant}
                 receiveTab={receiveTab}
                 setReceiveTab={setReceiveTab}
                 renderWalletMeta={renderWalletMeta}
@@ -2345,6 +2346,7 @@ export default function WalletDashboard({
                 isPreviewMode={isPreviewMode}
                 defaultView={swapDefaultView}
                 lockedView={swapLockedView}
+                dashboardVariant={variant}
                 effectiveIsConnected={effectiveIsConnected}
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
@@ -2559,6 +2561,7 @@ export default function WalletDashboard({
             isPreviewMode={isPreviewMode}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
+            dashboardVariant={variant}
             receiveTab={receiveTab}
             setReceiveTab={setReceiveTab}
             renderWalletMeta={renderWalletMeta}
@@ -2587,6 +2590,7 @@ export default function WalletDashboard({
               isPreviewMode={isPreviewMode}
               defaultView={swapDefaultView}
               lockedView={swapLockedView}
+              dashboardVariant={variant}
               effectiveIsConnected={effectiveIsConnected}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}

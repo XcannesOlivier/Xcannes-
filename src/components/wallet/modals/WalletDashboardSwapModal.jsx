@@ -22,6 +22,7 @@ export default function WalletDashboardSwapModal({
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
+  dashboardVariant = "default",
   effectiveIsConnected,
   isWalletActivated,
   hasRlusdTrustline = null,
@@ -77,11 +78,25 @@ export default function WalletDashboardSwapModal({
     "rounded-lg border border-[#06B6D4]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#06B6D4]/60 hover:text-white/80";
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
+  const [isDesktop, setIsDesktop] = useState(false);
   useEffect(() => {
     if (!open) return;
     const nextView = lockedView || defaultView || "convert";
     setView(nextView);
   }, [defaultView, lockedView, open]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(min-width: 768px)");
+    const handleChange = () => setIsDesktop(media.matches);
+    handleChange();
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
+    }
+    media.addListener(handleChange);
+    return () => media.removeListener(handleChange);
+  }, []);
 
   const existingCurrencyLinesSet = useMemo(() => {
     const set = new Set();
@@ -102,6 +117,19 @@ export default function WalletDashboardSwapModal({
     (effectiveIsConnected &&
       isWalletActivated === true &&
       hasOnChainRlusd);
+  const showDesktopWalletConvertNote =
+    inline &&
+    isDesktop &&
+    noticeVariant !== "demo" &&
+    dashboardVariant === "full" &&
+    view === "convert";
+  const useDesktopWalletConvertLayout = showDesktopWalletConvertNote;
+  const lockLinesScrollToList =
+    inline &&
+    isDesktop &&
+    noticeVariant !== "demo" &&
+    dashboardVariant === "full" &&
+    view === "lines";
   const activationFeeLabel = useMemo(() => {
     const value = Number(activationFeeRlusd);
     const safe = Number.isFinite(value) && value > 0 ? value : 1;
@@ -495,7 +523,9 @@ export default function WalletDashboardSwapModal({
             ✕
           </button>
           <div
-          className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-3 md:space-y-4"
+          className={`flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-3 md:space-y-4 ${
+            lockLinesScrollToList ? "overflow-hidden" : "overflow-y-auto"
+          }`}
           style={{ WebkitOverflowScrolling: "touch" }}>
             <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
               <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
@@ -564,8 +594,12 @@ export default function WalletDashboardSwapModal({
 
           {view === "convert" ?
         <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-              <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
-              <div className={inline ? "space-y-3" : ""}>
+              <div className={useDesktopWalletConvertLayout
+                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-4"
+                : inline
+                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]"
+                : "space-y-3"}>
+              <div className={useDesktopWalletConvertLayout ? "space-y-4" : inline ? "space-y-3" : ""}>
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
 
@@ -739,6 +773,13 @@ export default function WalletDashboardSwapModal({
                     </button>
                   </>
                 )}
+
+                {showDesktopWalletConvertNote ? (
+                  <div className="text-[11px] text-white/55 leading-relaxed">
+                    La conversion est disponible pour les devises actives.
+                    Activez simplement la devise de votre choix pour effectuer une conversion.
+                  </div>
+                ) : null}
 
                 {!isPreviewMode &&
             <div className="text-[10px] text-white/45">{t("ui_tip_use_the_b06aa04f1f", "Tip: use the")}
