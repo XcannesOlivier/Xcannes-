@@ -419,7 +419,26 @@ export default function WalletDashboardSendModal({
               </div>
               <div className={inline ? "space-y-2" : ""}>
                 {showManualQrUpload ?
-            <div>
+            <div className="space-y-3">
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const input = document.getElementById(manualQrFileInputId);
+                          input?.click();
+                        }}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+                      >
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                          +
+                        </span>
+                        {t(
+                          "ui_upload_recipient_qr_code_1e7c2d9a5b",
+                          "Charger le QR code de l'adresse du destinataire"
+                        )}
+                      </button>
+                    </div>
                     <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-4 space-y-3 overflow-hidden md:p-8 md:space-y-4 md:min-h-[220px]">
                       <div
                         aria-hidden="true"
@@ -430,29 +449,10 @@ export default function WalletDashboardSendModal({
                           opacity: manualQrDecorOpacity,
                         }}
                       />
-                      <div className="relative z-10 flex flex-col gap-3 pt-10 md:pt-12">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const input = document.getElementById(manualQrFileInputId);
-                            input?.click();
-                          }}
-                          className="absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-black/70 text-white/90 transition-colors hover:bg-black/80 hover:text-white md:top-4 md:right-4"
-                        >
-                          <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                            +
-                          </span>
-                          {t(
-                            "ui_upload_recipient_qr_code_1e7c2d9a5b",
-                            "Charger le QR code de l'adresse du destinataire"
-                          )}
-                        </button>
-                      </div>
-                      <input
-                      id={manualQrFileInputId}
-                      type="file"
-                      accept="image/*"
+                    <input
+                    id={manualQrFileInputId}
+                    type="file"
+                    accept="image/*"
                       className="sr-only"
                       onChange={(e) => {
                         const file = e.target.files?.[0] || null;
@@ -588,10 +588,7 @@ export default function WalletDashboardSendModal({
           <>
                 <div className={`rounded-lg border border-white/10 bg-black/30 p-4 space-y-3 md:rounded-xl ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
                   <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
-                      <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
-                        {t("demo_payreq_token", "Request token")}
-                      </div>
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-end md:gap-3">
                       <button
                       type="button"
                       onClick={(e) => {
@@ -599,7 +596,7 @@ export default function WalletDashboardSendModal({
                         const input = document.getElementById(payreqFileInputId);
                         input?.click();
                       }}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-black/70 text-white/90 transition-colors hover:bg-black/80 hover:text-white">
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white">
 
                         <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
                           +
@@ -610,7 +607,7 @@ export default function WalletDashboardSendModal({
                         )}
                       </button>
                     </div>
-                    <div className="relative h-[140px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[160px]">
+                    <div className="relative h-[180px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[220px]">
                       <div
                         aria-hidden="true"
                         className="absolute inset-0 pointer-events-none bg-no-repeat"
@@ -621,6 +618,11 @@ export default function WalletDashboardSendModal({
                           opacity: payreqQrDecorOpacity
                         }}
                       />
+                    </div>
+                    <div className="hidden md:flex items-center justify-center">
+                      <span className="text-lg font-semibold text-white/70">
+                        Ou Indiquez votre code de paiement
+                      </span>
                     </div>
                     <div className={`relative ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
                       {showFauxPayreq ? (
@@ -635,10 +637,12 @@ export default function WalletDashboardSendModal({
                       value={requestText}
                       onChange={(e) => setRequestText(e.target.value)}
                       className={`relative w-full min-h-[120px] text-xs text-white/80 placeholder:text-white/20 focus:outline-none font-mono md:min-h-[140px] ${useUnifiedPayreqPanel ? "bg-transparent border-transparent rounded-none px-0 py-2 focus:ring-0" : "rounded-md bg-black/40 border border-white/10 px-3 py-2 focus:ring-2 focus:ring-xcannes-green/30 md:border-white/15 md:bg-black/50"} ${inline ? "flex-1 min-h-[160px]" : ""}`}
-                      placeholder={t(
-                        "ui_payreq_placeholder_3a9c1b7d2e",
-                        "xcannes-payreq:... / JSON"
-                      )} />
+                      placeholder={useUnifiedPayreqPanel ?
+                        "" :
+                        t(
+                          "ui_payreq_placeholder_3a9c1b7d2e",
+                          "xcannes-payreq:... / JSON"
+                        )} />
                     </div>
                   </div>
                 </div>
@@ -696,7 +700,7 @@ export default function WalletDashboardSendModal({
                         const input = document.getElementById(payreqFileInputId);
                         input?.click();
                       }}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-black/70 text-white/90 transition-colors hover:bg-black/80 hover:text-white">
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white">
 
                         <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
                           +
