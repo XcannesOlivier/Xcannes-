@@ -30,6 +30,10 @@ export default function XummQRModal({
     overflow: "",
     paddingRight: "",
     htmlOverflow: "",
+    position: "",
+    top: "",
+    width: "",
+    scrollY: 0,
   });
   const isControlled = statusProp != null;
   const displayStatus = isControlled ? statusProp : localStatus;
@@ -73,15 +77,23 @@ export default function XummQRModal({
     const { body, documentElement: html } = document;
     if (isOpen && !inline) {
       if (!bodyScrollLockRef.current.locked) {
+        const scrollY = window.scrollY || window.pageYOffset || 0;
         bodyScrollLockRef.current = {
           locked: true,
           overflow: body.style.overflow,
           paddingRight: body.style.paddingRight,
           htmlOverflow: html.style.overflow,
+          position: body.style.position,
+          top: body.style.top,
+          width: body.style.width,
+          scrollY,
         };
         const scrollbarWidth = window.innerWidth - html.clientWidth;
         html.style.overflow = "hidden";
         body.style.overflow = "hidden";
+        body.style.position = "fixed";
+        body.style.top = `-${scrollY}px`;
+        body.style.width = "100%";
         if (scrollbarWidth > 0) {
           body.style.paddingRight = `${scrollbarWidth}px`;
         }
@@ -92,6 +104,10 @@ export default function XummQRModal({
       html.style.overflow = bodyScrollLockRef.current.htmlOverflow;
       body.style.overflow = bodyScrollLockRef.current.overflow;
       body.style.paddingRight = bodyScrollLockRef.current.paddingRight;
+      body.style.position = bodyScrollLockRef.current.position;
+      body.style.top = bodyScrollLockRef.current.top;
+      body.style.width = bodyScrollLockRef.current.width;
+      window.scrollTo(0, bodyScrollLockRef.current.scrollY || 0);
       bodyScrollLockRef.current.locked = false;
     }
   }, [isOpen, inline]);
