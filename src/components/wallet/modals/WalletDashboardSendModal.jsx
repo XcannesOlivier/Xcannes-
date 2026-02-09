@@ -7,6 +7,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function WalletDashboardSendModal({
   open,
@@ -81,6 +82,11 @@ export default function WalletDashboardSendModal({
   const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
   const useUnifiedPayreqPanel = useDexStyleLayout;
   const showManualQrUpload = useDexStyleLayout;
+  const showDemoMobileQrImage = isDemoMode && !isDesktop;
+  const showDemoDesktopQrImage = isDemoMode && isDesktop;
+  const showRealDesktopQrImage = !isDemoMode && isDesktop;
+  const showManualStaticQr = isDesktop;
+  const showStaticQrImage = showDemoMobileQrImage || showDemoDesktopQrImage || showRealDesktopQrImage;
   const fauxPayreqTextClass = isDemoMode && isDesktop
     ? "text-[11px] text-white/70"
     : showFauxPayreq && !inline
@@ -88,6 +94,8 @@ export default function WalletDashboardSendModal({
       : "text-[10px] text-white/15";
   const fauxQrSize = inline ? "240px" : "200px";
   const fauxQrOpacity = inline ? 0.08 : 0.06;
+  const demoQrSize = inline ? 240 : 180;
+  const payreqPreviewSize = inline ? 200 : 180;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -450,11 +458,25 @@ export default function WalletDashboardSendModal({
                         aria-hidden="true"
                         className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
                         style={{
-                          backgroundImage: `url("${manualQrDecor}")`,
+                          backgroundImage: showManualStaticQr ? "none" : `url("${manualQrDecor}")`,
                           backgroundSize: `${manualQrDecorSize} ${manualQrDecorSize}`,
                           opacity: manualQrDecorOpacity,
                         }}
                       />
+                      {showManualStaticQr ? (
+                        <div className="relative z-10 flex items-center justify-center">
+                          <div className="rounded-lg border border-white/10 bg-black/60 p-3">
+                            <div className={showRealDesktopQrImage ? "brightness-75 opacity-90" : ""}>
+                              <QRCodeCanvas
+                                value={fauxPayreqExample}
+                                size={demoQrSize}
+                                bgColor="#000000"
+                                fgColor="#ffffff"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
                     <input
                     id={manualQrFileInputId}
                     type="file"
@@ -618,12 +640,26 @@ export default function WalletDashboardSendModal({
                         aria-hidden="true"
                         className="absolute inset-0 pointer-events-none bg-no-repeat"
                         style={{
-                          backgroundImage: `url("${payreqQrDecor}")`,
+                          backgroundImage: showRealDesktopQrImage ? "none" : `url("${payreqQrDecor}")`,
                           backgroundSize: `${payreqQrDecorSize} ${payreqQrDecorSize}`,
                           backgroundPosition: payreqQrDecorPosition,
                           opacity: payreqQrDecorOpacity
                         }}
                       />
+                      {showRealDesktopQrImage ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="rounded-lg border border-white/10 bg-black/60 p-3">
+                            <div className="brightness-75 opacity-90">
+                              <QRCodeCanvas
+                                value={fauxPayreqExample}
+                                size={payreqPreviewSize}
+                                bgColor="#000000"
+                                fgColor="#ffffff"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                     <div className="hidden md:flex items-center justify-center">
                       <span className="text-lg font-semibold text-white/70">
@@ -677,7 +713,34 @@ export default function WalletDashboardSendModal({
               embedded={true}
               showClose={false}
               fileInputId={payreqFileInputId}
-              enableCamera={!isDesktop}
+              enableCamera={!isDesktop && !showStaticQrImage}
+              showStaticImage={showStaticQrImage}
+              showFileInputWhenStatic={showDemoDesktopQrImage || showRealDesktopQrImage}
+              staticContent={showStaticQrImage ? (
+                showRealDesktopQrImage ? (
+                  <div className="brightness-75 opacity-90">
+                    <QRCodeCanvas
+                      value={fauxPayreqExample}
+                      size={demoQrSize}
+                      bgColor="#000000"
+                      fgColor="#ffffff"
+                    />
+                  </div>
+                ) : (
+                  <QRCodeCanvas
+                    value={fauxPayreqExample}
+                    size={demoQrSize}
+                    bgColor="#000000"
+                    fgColor="#ffffff"
+                  />
+                )
+              ) : null}
+              staticContentClassName="bg-black/60"
+              staticFooter={showDemoMobileQrImage ? (
+                <div className="w-full rounded-xl border border-[#1f4d3d] bg-[#0f1f1a] px-4 py-3 text-center text-sm font-semibold text-white/80">
+                  Point your camera at a QR code
+                </div>
+              ) : null}
               showFauxQrBackground={showFauxPayreq}
               fauxQrBackgroundSize={fauxQrSize}
               fauxQrBackgroundOpacity={fauxQrOpacity}
