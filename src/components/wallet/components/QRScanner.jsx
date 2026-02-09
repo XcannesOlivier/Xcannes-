@@ -15,6 +15,14 @@ export default function QRScanner({
   className = "",
   fileInputId,
   enableCamera = true,
+  showStaticImage = false,
+  staticImageSrc = "",
+  staticImageAlt = "",
+  staticContent = null,
+  staticContentClassName = "",
+  staticFooter = null,
+  staticFooterClassName = "",
+  showFileInputWhenStatic = false,
   showFauxQrBackground = false,
   fauxQrBackgroundSize = "240px",
   fauxQrBackgroundOpacity = 0.08
@@ -50,6 +58,8 @@ export default function QRScanner({
     setIsStarting(false);
   };
 
+  const cameraEnabled = enableCamera && !showStaticImage;
+
   useEffect(() => {
     if (!isOpen) {
       // Cleanup when closing
@@ -61,7 +71,7 @@ export default function QRScanner({
       return;
     }
 
-    if (!enableCamera) {
+    if (!cameraEnabled) {
       stopScanner().catch(console.error);
       setError(null);
       setIsScanning(false);
@@ -195,7 +205,7 @@ export default function QRScanner({
       stopScanner().catch(console.error);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enableCamera, isOpen]);
+  }, [cameraEnabled, isOpen]);
 
   if (!isOpen) return null;
 
@@ -231,7 +241,8 @@ export default function QRScanner({
 
   const fauxQrBackground =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 22 22' shape-rendering='crispEdges'%3E%3Crect width='22' height='22' fill='none'/%3E%3Crect x='0' y='0' width='6' height='6' fill='%23fff'/%3E%3Crect x='16' y='0' width='6' height='6' fill='%23fff'/%3E%3Crect x='0' y='16' width='6' height='6' fill='%23fff'/%3E%3Crect x='8' y='2' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='2' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='7' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='17' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
-  const showEmbeddedFauxQr = embedded && showFauxQrBackground;
+  const showEmbeddedFauxQr = embedded && showFauxQrBackground && !showStaticImage;
+  const showStaticQr = showStaticImage && (staticImageSrc || staticContent);
 
   const scannerCard =
   <div
@@ -272,16 +283,45 @@ export default function QRScanner({
         {t("ui_scan_qr_code_481606b590", "Scan QR Code")}
       </h3>
 
-      {/* Scanner */}
-      <div className="mb-4">
-        <div
-        id={readerIdRef.current}
-        className="rounded-lg overflow-hidden" />
-
-      </div>
+      {/* Scanner / Static Demo */}
+      {showStaticQr ? (
+        <div className="mb-4 space-y-3">
+          <div className="rounded-lg overflow-hidden border border-white/10 bg-black/40">
+            {staticContent ? (
+              <div
+                className={[
+                "flex items-center justify-center p-3",
+                staticContentClassName].
+                filter(Boolean).
+                join(" ")}
+              >
+                {staticContent}
+              </div>
+            ) : (
+              <img
+                src={staticImageSrc}
+                alt={staticImageAlt || t("ui_scan_qr_code_481606b590", "Scan QR Code")}
+                className="block w-full h-auto"
+              />
+            )}
+          </div>
+          {staticFooter ? (
+            <div className={staticFooterClassName}>
+              {staticFooter}
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className="mb-4">
+          <div
+            id={readerIdRef.current}
+            className="rounded-lg overflow-hidden"
+          />
+        </div>
+      )}
 
       {/* Fallback: upload image */}
-      {!embedded ?
+      {!showStaticQr && !embedded ?
     <div className="mb-4">
           <label className="sr-only">
             {t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Or upload a QR image (works even on HTTP):")}
@@ -293,12 +333,14 @@ export default function QRScanner({
           className="w-full text-xs text-white/70 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:text-white/80 hover:file:bg-white/20"
           onChange={(e) => handleFile(e.target.files?.[0] || null)} />
         </div> :
-    <input
+      (!showStaticQr || showFileInputWhenStatic) ?
+      <input
       id={resolvedFileInputId}
       type="file"
       accept="image/*"
       className="sr-only"
-      onChange={(e) => handleFile(e.target.files?.[0] || null)} />}
+      onChange={(e) => handleFile(e.target.files?.[0] || null)} /> :
+      null}
 
       {/* Error */}
       {error &&
@@ -318,7 +360,7 @@ export default function QRScanner({
     }
 
       {/* Instructions */}
-      {(isScanning || isStarting) && !error &&
+      {(isScanning || isStarting) && !error && !showStaticQr &&
     <div className="bg-xcannes-green/10 border border-xcannes-green/30 rounded-lg p-3">
           <p className="text-sm text-white/70 text-center">
             {isStarting ? "Starting camera..." : "Point your camera at a QR code"}
