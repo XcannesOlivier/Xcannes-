@@ -120,6 +120,7 @@ export default function WalletDashboard({
   variant,
   showDesktopStatement = false,
   showPayreqDecor = false,
+  qrSizingVariant = "default",
 }) {
   const { t } = useTranslation("common");
   // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
@@ -2338,6 +2339,7 @@ export default function WalletDashboard({
                 isPreviewMode={isPreviewMode}
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
+                qrSizingVariant={qrSizingVariant}
                 sendTab={sendTab}
                 setSendTab={setSendTab}
                 renderWalletMeta={renderWalletMeta}
@@ -2588,6 +2590,7 @@ export default function WalletDashboard({
             isPreviewMode={isPreviewMode}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
+            qrSizingVariant={qrSizingVariant}
             sendTab={sendTab}
             setSendTab={setSendTab}
             renderWalletMeta={renderWalletMeta}

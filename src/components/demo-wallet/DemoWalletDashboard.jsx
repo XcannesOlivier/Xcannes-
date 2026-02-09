@@ -23,6 +23,7 @@ import WalletDashboardSwapModal from "@/components/wallet/modals/WalletDashboard
 import WalletDashboardCashModal from "@/components/wallet/modals/WalletDashboardCashModal";
 import WalletDashboardStatementModals from "@/components/wallet/modals/WalletDashboardStatementModals";
 import QRScanner from "@/components/wallet/components/QRScanner";
+import { QRCodeCanvas } from "qrcode.react";
 import { useSendForm } from "@/components/wallet/hooks/useSendForm";
 import { useReceiveForm } from "@/components/wallet/hooks/useReceiveForm";
 import { usePaymentRequestForm } from "@/components/wallet/hooks/usePaymentRequestForm";
@@ -48,6 +49,9 @@ const DEMO_WALLET_ACCENTS = {
     focusRing: "focus:ring-xcannes-blue-light/40"
   }
 };
+
+const DEMO_FAUX_PAYREQ_EXAMPLE =
+  '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"RLUSD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
 
 function clone(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
@@ -297,6 +301,7 @@ export default function DemoWalletDashboard({
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [previewCurrencyTransactions, setPreviewCurrencyTransactions] = useState([]);
   const [statementHighlightByWallet, setStatementHighlightByWallet] = useState({});
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const activeWallet = state.wallets[activeWalletId];
   const otherWalletId = activeWalletId === "A" ? "B" : "A";
@@ -647,6 +652,19 @@ export default function DemoWalletDashboard({
     if (!sendAssetKey) setSendAssetKey(selectedSendToken.key);
   }, [selectedSendToken, sendAssetKey, setSendAssetKey]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(min-width: 768px)");
+    const handleChange = () => setIsDesktop(media.matches);
+    handleChange();
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
+    }
+    media.addListener(handleChange);
+    return () => media.removeListener(handleChange);
+  }, []);
+
   const sendFxInfo = useMemo(() => {
     if (!selectedSendToken) return null;
     const amountFx = Number.parseFloat(sendAmount || "0");
@@ -698,6 +716,8 @@ export default function DemoWalletDashboard({
   const shouldLockBodyScroll = Boolean(
     activeAction || showGlobalStatement || showCurrencyStatement || qrScannerOpen
   );
+  const showDemoMobileScannerQr = !isDesktop;
+  const demoScannerQrSize = 220;
 
   const handlePendingDemoRequest = useCallback((detail) => {
     if (!detail?.request) return false;
@@ -1879,7 +1899,18 @@ export default function DemoWalletDashboard({
       <QRScanner
         isOpen={qrScannerOpen}
         onScan={handleAddressScan}
-        onClose={() => setQrScannerOpen(false)} />
+        onClose={() => setQrScannerOpen(false)}
+        enableCamera={!showDemoMobileScannerQr}
+        showStaticImage={showDemoMobileScannerQr}
+        staticContent={showDemoMobileScannerQr ? (
+          <QRCodeCanvas
+            value={DEMO_FAUX_PAYREQ_EXAMPLE}
+            size={demoScannerQrSize}
+            bgColor="#000000"
+            fgColor="#ffffff"
+          />
+        ) : null}
+        staticContentClassName="bg-black/60" />
 
 
     </div>);
