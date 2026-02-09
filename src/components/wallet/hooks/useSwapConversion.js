@@ -37,20 +37,27 @@ export function useSwapConversion({
 }) {
   useEffect(() => {
     if (!swapCurrencyOptions?.length) return;
+    const baseCandidate = swapCurrencyOptions.includes("RLUSD")
+      ? "RLUSD"
+      : swapCurrencyOptions.includes("XRP")
+        ? "XRP"
+        : swapCurrencyOptions[0];
+    const effectiveBase = convertBaseCurrency || baseCandidate;
     if (!convertBaseCurrency) {
-      const preferredBase = swapCurrencyOptions.includes("RLUSD")
-        ? "RLUSD"
-        : swapCurrencyOptions.includes("XRP")
-          ? "XRP"
-          : swapCurrencyOptions[0];
-      setConvertBaseCurrency(preferredBase);
+      setConvertBaseCurrency(baseCandidate);
     }
     if (!convertQuoteCurrency) {
-      const preferredQuotes = ["RLUSD", "USD", "USDT", "USDC"];
+      const preferredQuotes = ["XCS", "RLUSD", "USD", "USDT", "USDC"];
+      const firstPreferred =
+        preferredQuotes.find(
+          (c) => swapCurrencyOptions.includes(c) && c !== effectiveBase
+        ) ||
+        preferredQuotes.find((c) => swapCurrencyOptions.includes(c));
       const fromWallet =
-        preferredQuotes.find((c) => swapCurrencyOptions.includes(c)) ||
+        firstPreferred ||
         (swapCurrencyOptions.length > 1
-          ? swapCurrencyOptions[1]
+          ? swapCurrencyOptions.find((c) => c !== effectiveBase) ||
+            swapCurrencyOptions[0]
           : swapCurrencyOptions[0]);
       setConvertQuoteCurrency(fromWallet);
     }
