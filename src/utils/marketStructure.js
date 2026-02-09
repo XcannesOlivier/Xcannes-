@@ -30,9 +30,6 @@ export const MARKET_STRUCTURE = {
         "USD/JPY", "USD/CNH", "USD/HKD", "USD/SGD", "USD/KRW", "USD/TWD", "USD/INR", "USD/IDR", "USD/PHP",
         "AUD/USD", "AUD/JPY", "AUD/CAD", "AUD/CHF", "AUD/NZD",
         "NZD/USD", "NZD/CAD", "NZD/CHF", "NZD/JPY"
-      ],
-      "Other": [
-        "USD/ZAR", "USD/TRY"
       ]
     }
   },

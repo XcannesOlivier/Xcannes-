@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import FxPairSelector from "./FxPairSelector";
 
 // En-tête compact original du chart (prix + sélecteurs)
-import { useTranslation } from "next-i18next";export default function ChartHeader({
+import { useTranslation } from "next-i18next";
+
+export default function ChartHeader({
   pair,
   interval,
   onPairChange,
@@ -12,14 +14,10 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
   availableIntervals,
   uniquePairs,
   filteredMarketStructure,
-  pairMode,
-  setPairMode,
   isFxMode,
-  setIsFxMode,
   fxBase,
   fxQuote,
   fxInfo,
-  fxLoading,
   setFxBase,
   setFxQuote,
   currentPrice,
@@ -27,10 +25,6 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
   showTooltips,
   dropdownOpen,
   setDropdownOpen,
-  expandedMarkets,
-  expandedCurrencies,
-  toggleMarket,
-  toggleCurrency,
   handlePairSelect,
   dropdownRef,
   chartType,
@@ -42,6 +36,35 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
   setChartSettings
 }) {
   const { t } = useTranslation("common");
+  const popularLivePairs = useMemo(() => {
+    const pyth = filteredMarketStructure?.pyth?.currencies;
+    const pythPairs = pyth ? Object.values(pyth).flat() : [];
+    const preferredOrder = [
+      "EUR/USD",
+      "USD/CNH",
+      "GBP/USD",
+      "USD/JPY",
+      "USD/CHF",
+      "USD/AUD",
+      "USD/CAD",
+      "USD/INR",
+      "EUR/GBP"
+    ];
+    const uniquePyth = Array.from(new Set(pythPairs));
+    const preferred = preferredOrder.filter((p) => uniquePyth.includes(p));
+    const rest = uniquePyth.
+    filter((p) => !preferred.includes(p)).
+    sort((a, b) => a.localeCompare(b));
+    return [...preferred, ...rest];
+  }, [filteredMarketStructure]);
+  const xrplPairs = useMemo(() => {
+    const xrpl = filteredMarketStructure?.xrpl?.currencies;
+    if (!xrpl) return [];
+    return Object.values(xrpl).flat();
+  }, [filteredMarketStructure]);
+  const pairStatusLabel = isFxMode ?
+  t("ui_daily_rate_4f4a2c7a6d", "Taux quotidien") :
+  t("ui_live_a633f195c7", "En direct");
   // Accessibilité : fermer les menus sur Escape
   useEffect(() => {
     const onKeyDown = (e) => {
@@ -126,7 +149,7 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
             ref={dropdownRef}
             className="flex flex-col max-sm:items-center max-sm:text-center relative">
 
-            {uniquePairs.length > 0 && onPairChange ?
+            {onPairChange ?
             <button
               type="button"
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -137,6 +160,14 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
 
                 <span className="font-orbitron font-semibold text-xl md:text-sm tracking-[0.14em] uppercase">
                   {isFxMode ? `${fxBase}/${fxQuote}` : pair}
+                </span>
+                <span
+                  className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${
+                  isFxMode ?
+                  "bg-white/5 text-white/60" :
+                  "bg-xcannes-green/15 text-xcannes-green"}`
+                  }>
+                  {pairStatusLabel}
                 </span>
                 <svg
                 className={`w-3 h-3 transition-transform ${
@@ -174,7 +205,7 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
                 }
                 title={
                 isFxMode ?
-                "Daily change (EOD Fawaz)" :
+                "Variation quotidienne" :
                 "Évolution sur 24h"
                 }>
 
@@ -193,191 +224,83 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
               </div>
             }
             {/* Dropdown principal sous le nom de paire */}
-            {uniquePairs.length > 0 && dropdownOpen &&
-            <div
-              id="pair-dropdown"
-              role="listbox"
-              className={`absolute md:fixed z-40 mt-8 md:mt-0 left-1/2 md:left-4 -translate-x-1/2 md:translate-x-0 md:top-28 ${
-              isFxMode ?
-              "w-[460px] max-w-[95vw]" :
-              "w-[300px] max-w-[90vw]"} max-h-[530px] overflow-y-auto bg-base border border-subtle rounded-lg shadow-2xl p-2 space-y-2`
-              }>
+            {dropdownOpen &&
+            <>
+              <div
+                className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm"
+                onClick={() => setDropdownOpen(false)}
+                aria-hidden="true" />
+              <div
+                id="pair-dropdown"
+                role="listbox"
+                className={`absolute md:fixed z-40 mt-8 md:mt-0 left-1/2 md:left-4 -translate-x-1/2 md:translate-x-0 md:top-28 ${
+                isFxMode ?
+                "w-[92vw] max-w-[92vw] md:w-[640px] md:max-w-[95vw]" :
+                "w-[92vw] max-w-[92vw] md:w-[520px] md:max-w-[95vw]"} max-h-[580px] md:max-h-[680px] overflow-y-auto bg-elevated border border-white/10 rounded-lg shadow-2xl p-2 space-y-2`
+                }>
 
-                {/* Toggle Live / EOD dans le menu */}
-                <div className="px-2 pb-2 border-b border-subtle flex items-center justify-between text-[11px] text-muted">
-                  <span className="uppercase tracking-[0.16em]">{t("ui_mode_6f09dd56a0", "Mode")}</span>
-                  <div className="inline-flex items-center rounded-full bg-subtle border border-subtle p-0.5">
+                {(popularLivePairs.length > 0 || xrplPairs.length > 0) &&
+                <div className="px-2 pb-2 border-b border-white/10">
+                    <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.14em] text-muted">
+                      <span>{t("ui_popular_pairs_0f4bb8a2b3", "Paires populaires")}</span>
+                      <span>{t("ui_xrpl_assets_68a2c5aef7", "Actif XRPL")}</span>
+                    </div>
+                    <div className="mt-2 grid gap-1 grid-cols-[1fr_84px] md:grid-cols-[1fr_96px] items-start">
+                      <div className="flex flex-wrap gap-1.5 max-h-[60px] overflow-y-scroll pr-1 scrollbar-visible scrollbar-indicator-40">
+                        {popularLivePairs.map((p) =>
                     <button
-                    type="button"
-                    onClick={() => {
-                      setPairMode("live");
-                      setIsFxMode(false);
-                    }}
-                    aria-pressed={!isFxMode}
-                    className={`px-3 py-0.5 rounded-full text-[11px] font-semibold transition-all ${
-                    !isFxMode ?
-                    "bg-accent-rlusd/20 text-primary" :
-                    "text-muted hover:text-primary"}`
-                    }>{t("ui_live_a633f195c7", "Live")}
+                      key={p}
+                      type="button"
+                      onClick={() => handlePairSelect(p)}
+                      className="px-2 py-1 rounded-full border border-white/10 text-xs text-secondary transition-all md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80">
 
-
-                  </button>
+                          {p}
+                        </button>
+                    )}
+                      </div>
+                      <div className="ml-auto flex flex-col gap-1 items-stretch -ml-2 justify-self-end">
+                        {xrplPairs.map((p) =>
                       <button
-                    type="button"
-                    onClick={() => {
-                      setPairMode("eod");
-                      // Basculer en mode FX EOD sur une paire par défaut
-                      // (EUR/USD) si aucune paire FX n'a encore été choisie.
-                      const nextBase = fxBase || "EUR";
-                      const nextQuote = fxQuote || "USD";
-                      setFxBase(nextBase);
-                      setFxQuote(nextQuote);
-                      setIsFxMode(true);
-                    }}
-                    aria-pressed={isFxMode}
-                    className={`px-3 py-0.5 rounded-full text-[11px] font-semibold transition-all ${
-                    isFxMode ?
-                    "bg-subtle text-primary" :
-                    "text-muted hover:text-primary"}`
-                    }>{t("ui_add_90615be412", "ADD")}
+                        key={p}
+                        type="button"
+                        onClick={() => handlePairSelect(p)}
+                        className={`w-full px-2 py-1 rounded-md border-2 text-xs transition-all ${
+                        p === "XRP/RLUSD" || p === "XCS/RLUSD" ?
+                        "border-xcannes-blue-weight text-secondary hover:border-xcannes-blue hover:text-xcannes-blue" :
+                        "border-white/10 text-secondary md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80"}`
+                        }>
 
-
-                  </button>
+                            {p}
+                          </button>
+                      )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Contenu du sélecteur selon le mode */}
-                {!isFxMode &&
-              <>
-                    {/* Liste des marchés / paires Live (XRPL + Pyth temps réel) */}
-                    {Object.entries(filteredMarketStructure).map(
-                  ([marketKey, market]) => {
-                    const isExpanded = expandedMarkets[marketKey];
-                    return (
-                      <div
-                        key={marketKey}
-                        className="border border-subtle rounded-md overflow-hidden">
+                }
 
-                            <button
-                          onClick={() => toggleMarket(marketKey)}
-                          className="w-full flex items-center justify-between px-3 py-2 text-xs text-primary bg-subtle hover:bg-elevated transition-all">
-
-                              <span>{market.label}</span>
-                              <svg
-                            className={`w-3 h-3 transition-transform ${
-                            isExpanded ? "rotate-180" : ""}`
-                            }
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24">
-
-                                <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7" />
-
-                              </svg>
-                            </button>
-
-                            {isExpanded &&
-                        <div className="bg-base px-2 pb-2">
-                                {Object.entries(market.currencies).map(
-                            ([currency, pairs]) => {
-                              const currencyKey = `${marketKey}-${currency}`;
-                              const isCurrencyExpanded =
-                              expandedCurrencies[currencyKey];
-
-                              return (
-                                <div key={currency} className="mb-1">
-                                        <button
-                                    onClick={() =>
-                                    toggleCurrency(marketKey, currency)
-                                    }
-                                    className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-secondary hover:bg-subtle rounded transition-all">
-
-                                          <span className="font-medium">
-                                            {currency}
-                                          </span>
-                                          <svg
-                                      className={`w-2.5 h-2.5 transition-transform ${
-                                      isCurrencyExpanded ?
-                                      "rotate-180" :
-                                      ""}`
-                                      }
-                                      fill="none"
-                                      stroke="currentColor"
-                                      viewBox="0 0 24 24">
-
-                                            <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M19 9l-7 7-7-7" />
-
-                                          </svg>
-                                        </button>
-
-                                        {isCurrencyExpanded &&
-                                  <div className="ml-2 mt-1 space-y-0.5">
-                                            {pairs.map((p) =>
-                                    <button
-                                      key={p}
-                                      onClick={() =>
-                                      handlePairSelect(p)
-                                      }
-                                      className={`w-full text-left px-3 py-1.5 text-xs rounded hover:bg-subtle transition-all ${
-                                      pair === p ?
-                                      "bg-accent-rlusd/10 text-accent-rlusd" :
-                                      "text-muted"}`
-                                      }>
-
-                                                {p}
-                                              </button>
-                                    )}
-                                          </div>
-                                  }
-                                      </div>);
-
-                            }
-                          )}
-                              </div>
-                        }
-                          </div>);
-
-                  }
-                )}
-                  </>
-              }
-
-                {isFxMode &&
-              <div className="px-2 pt-2">
-                    <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-muted">{t("ui_currencies_add_d324e3ae6f", "Devises (ADD)")}
-
-                </div>
-                    <FxPairSelector
-                  base={fxBase}
-                  quote={fxQuote}
-                  alwaysOpen
-                  onChange={({ base: nextBase, quote: nextQuote }, field) => {
-                    const baseClean = String(nextBase || "").toUpperCase();
-                    const quoteClean = String(nextQuote || "").toUpperCase();
-                    if (!baseClean || !quoteClean) return;
-                    setFxBase(baseClean);
-                    setFxQuote(quoteClean);
-                    setIsFxMode(true);
-                    if (onPairChange) {
-                      onPairChange(`${baseClean}/${quoteClean}`);
-                    }
-                    // Fermer le sélecteur seulement après sélection de la QUOTE
-                    if (field === "quote") {
-                      setDropdownOpen(false);
-                    }
-                  }} />
-
+                <div className="px-2 pt-3">
+                  <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-muted">
+                    {t("ui_create_pair_4a77c2e68c", "Créer une paire (fiat)")}
                   </div>
-              }
+                  <FxPairSelector
+                    base={fxBase}
+                    quote={fxQuote}
+                    alwaysOpen
+                    compact
+                    onChange={({ base: nextBase, quote: nextQuote }, field) => {
+                      const baseClean = String(nextBase || "").toUpperCase();
+                      const quoteClean = String(nextQuote || "").toUpperCase();
+                      if (!baseClean || !quoteClean) return;
+                      setFxBase(baseClean);
+                      setFxQuote(quoteClean);
+                      if (field === "quote") {
+                        handlePairSelect(`${baseClean}/${quoteClean}`);
+                      }
+                    }} />
+                </div>
+
               </div>
+            </>
             }
           </div>
         </div>
@@ -391,7 +314,7 @@ import { useTranslation } from "next-i18next";export default function ChartHeade
             value={interval}
             onChange={(e) => !isFxMode && onIntervalChange(e.target.value)}
             disabled={isFxMode}
-            className="hidden sm:inline-block bg-subtle border border-subtle px-3 py-1.5 rounded text-xs text-primary font-medium disabled:opacity-40 hover:border-accent-rlusd/60 transition-all">
+            className="hidden sm:inline-block bg-elevated border border-white/10 px-3 py-1.5 rounded text-xs text-primary font-medium disabled:opacity-40 hover:border-xcannes-green/60 transition-all">
 
                 {availableIntervals.map((int) =>
             <option key={int} value={int}>

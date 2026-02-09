@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { createChart } from "lightweight-charts";
 import xcannesApi from "@/lib/xcannesApi";
-import { MARKET_STRUCTURE, getPairCategory } from "@/utils/marketStructure"; // ✅ Structure des marchés
+import { MARKET_STRUCTURE } from "@/utils/marketStructure";
 import ChartHeader from "./components/ChartHeader";
 import useMarketData from "./hooks/useMarketData";
 import ChartFooter from "./components/ChartFooter";
@@ -69,9 +69,8 @@ export default function XrplCandleChartRaw({
   const [fxBase, setFxBase] = useState("EUR");
   const [fxQuote, setFxQuote] = useState("USD");
   const [fxInfo, setFxInfo] = useState({ price: null, changePercent: null });
-  const [fxLoading, setFxLoading] = useState(false);
+  const [, setFxLoading] = useState(false);
   const [isFxMode, setIsFxMode] = useState(false);
-  const [pairMode, setPairMode] = useState("live"); // 'live' | 'eod'
 
   // Données marché centralisées (historiques + live + stats)
   const {
@@ -141,8 +140,6 @@ export default function XrplCandleChartRaw({
   // sans tenter de charger plus d'historique au scroll.
   // États pour le dropdown en cascade
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [expandedMarkets, setExpandedMarkets] = useState({});
-  const [expandedCurrencies, setExpandedCurrencies] = useState({});
   const dropdownRef = useRef(null);
 
   // Fermer le dropdown si on clique à l'extérieur
@@ -150,8 +147,6 @@ export default function XrplCandleChartRaw({
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
-        setExpandedMarkets({});
-        setExpandedCurrencies({});
       }
     };
 
@@ -159,55 +154,21 @@ export default function XrplCandleChartRaw({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Lorsque le menu est ouvert, ouvrir par défaut la bonne section:
-  // - Live => marché XRPL
-  // - EOD (isFxMode) => marché Devises (Pyth)
-  useEffect(() => {
-    if (!dropdownOpen) return;
-
-    setExpandedMarkets((prev) => {
-      const next = { ...prev };
-      Object.keys(MARKET_STRUCTURE).forEach((marketKey) => {
-        if (isFxMode) {
-          // En mode EOD, on met en avant les Devises
-          next[marketKey] = marketKey === "pyth";
-        } else {
-          // En mode Live, on met en avant XRPL
-          next[marketKey] = marketKey === "xrpl";
-        }
-      });
-      return next;
-    });
-  }, [dropdownOpen, isFxMode]);
-
-  const toggleMarket = (marketKey) => {
-    setExpandedMarkets((prev) => ({
-      ...prev,
-      [marketKey]: !prev[marketKey]
-    }));
-  };
-
-  const toggleCurrency = (marketKey, currency) => {
-    const key = `${marketKey}-${currency}`;
-    setExpandedCurrencies((prev) => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
+  const uniquePairs = useMemo(
+    () => Array.from(new Set(availablePairs)),
+    [availablePairs]
+  );
 
   const handlePairSelect = (selectedPair) => {
-    const category = getPairCategory(selectedPair);
-    const isFxPair = category !== "xrpl";
+    const isLivePair = uniquePairs.includes(selectedPair);
 
-    if (pairMode === "eod" && isFxPair) {
+    if (!isLivePair) {
       const [base, quote] = selectedPair.split("/");
       if (base && quote) {
         setFxBase(base);
         setFxQuote(quote);
-        setIsFxMode(true);
-      } else {
-        setIsFxMode(true);
       }
+      setIsFxMode(true);
     } else {
       setIsFxMode(false);
     }
@@ -216,14 +177,7 @@ export default function XrplCandleChartRaw({
       onPairChange(selectedPair);
     }
     setDropdownOpen(false);
-    setExpandedMarkets({});
-    setExpandedCurrencies({});
   };
-
-  const uniquePairs = useMemo(
-    () => Array.from(new Set(availablePairs)),
-    [availablePairs]
-  );
 
   // Filtrer les paires disponibles par marché et devise
   const filteredMarketStructure = useMemo(() => {
@@ -860,14 +814,10 @@ export default function XrplCandleChartRaw({
         availableIntervals={availableIntervals}
         uniquePairs={uniquePairs}
         filteredMarketStructure={filteredMarketStructure}
-        pairMode={pairMode}
-        setPairMode={setPairMode}
         isFxMode={isFxMode}
-        setIsFxMode={setIsFxMode}
         fxBase={fxBase}
         fxQuote={fxQuote}
         fxInfo={fxInfo}
-        fxLoading={fxLoading}
         setFxBase={setFxBase}
         setFxQuote={setFxQuote}
         currentPrice={currentPrice}
@@ -875,10 +825,6 @@ export default function XrplCandleChartRaw({
         showTooltips={showTooltips}
         dropdownOpen={dropdownOpen}
         setDropdownOpen={setDropdownOpen}
-        expandedMarkets={expandedMarkets}
-        expandedCurrencies={expandedCurrencies}
-        toggleMarket={toggleMarket}
-        toggleCurrency={toggleCurrency}
         handlePairSelect={handlePairSelect}
         dropdownRef={dropdownRef}
         chartType={chartType}
@@ -912,7 +858,7 @@ export default function XrplCandleChartRaw({
       </div>
 
       {/* Timeframes mobile sous le chart */}
-      {pairMode === "live" &&
+      {!isFxMode &&
       availableIntervals.length > 0 &&
       typeof onIntervalChange === "function" &&
       <div className="sm:hidden px-3 py-2 bg-elevated">

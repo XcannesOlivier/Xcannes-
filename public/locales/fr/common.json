@@ -683,7 +683,7 @@
   "ui_activation_wallet_1dcd314549": "Activation du wallet",
   "ui_activation_wallet_7d13181510": "Activation du wallet :",
   "ui_activation_wallet_xcannes_92757c7cdd": "Activation du wallet XCANNES",
-  "ui_add_90615be412": "AJOUTER",
+  "ui_add_90615be412": "Taux quotidien",
   "ui_add_set_currency_line_777a38797b": "Ajouter / définir une ligne de compte",
   "ui_address_2ef763fa89": "Adresse",
   "ui_add_or_remove_your_lines_f40801cee4": "Ajoutez ou supprimez vos lignes de suivi internes XCS.",
@@ -787,7 +787,7 @@
   "ui_crosshair_5734deb624": "Réticule",
   "ui_crypto_fiat_7ec0396100": "Crypto → Fiat",
   "ui_currencies_5e5bf1a8a1": "Devises",
-  "ui_currencies_add_d324e3ae6f": "Devises (AJOUTER)",
+  "ui_currencies_add_d324e3ae6f": "Devises (Taux quotidien)",
   "ui_currency_1ed55673be": "Devise",
   "ui_currency_lines_267fc2eff3": "Lignes de comptes",
   "ui_currency_lines_allocations_r_d87a98865f": "Lignes de comptes (allocations RLUSD)",
@@ -1352,5 +1352,10 @@
   "home_v2_essentials_lines_modal_flow_1_step_2_detail_3": "Le solde s’affiche automatiquement selon le taux en vigueur",
   "home_v2_essentials_lines_modal_flow_1_step_3_title": "Gérer ou fermer",
   "home_v2_essentials_lines_modal_flow_1_step_3_desc": "Vous pouvez gérer votre ligne à tout moment. La désactivation est possible uniquement si le solde est à zéro.",
-  "home_v2_essentials_lines_modal_flow_1_step_3_note": "La désactivation entraîne également des frais uniques de 1 USD (≈ 1 RLUSD)."
+  "home_v2_essentials_lines_modal_flow_1_step_3_note": "La désactivation entraîne également des frais uniques de 1 USD (≈ 1 RLUSD).",
+  "ui_daily_rate_4f4a2c7a6d": "Taux quotidien",
+  "ui_create_pair_4a77c2e68c": "Créer une paire (fiat)",
+  "ui_xrpl_assets_68a2c5aef7": "Actifs XRPL",
+  "ui_all_live_pairs_d2c9ce2a67": "Toutes les paires live",
+  "ui_common_currencies_8c51c2aedd": "Devises courantes"
 }
