@@ -18,6 +18,7 @@ export default function WalletDashboardSendModal({
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
+  qrSizingVariant = "default",
   sendTab,
   setSendTab,
   renderWalletMeta,
@@ -78,24 +79,33 @@ export default function WalletDashboardSendModal({
   const payreqQrDecor = manualQrDecor;
   const fauxPayreqExample =
     '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"RLUSD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
-  const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && isDesktop);
+  const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && (isDesktop || isDemoMode));
   const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
   const useUnifiedPayreqPanel = useDexStyleLayout;
   const showManualQrUpload = useDexStyleLayout;
   const showDemoMobileQrImage = isDemoMode && !isDesktop;
   const showDemoDesktopQrImage = isDemoMode && isDesktop;
+  const showDemoDesktopPayreqQr = isDemoMode && isDesktop;
   const showRealDesktopQrImage = !isDemoMode && isDesktop;
   const showManualStaticQr = isDesktop;
   const showStaticQrImage = showDemoMobileQrImage || showDemoDesktopQrImage || showRealDesktopQrImage;
+  const useDexSizing = inline || qrSizingVariant === "dex";
   const fauxPayreqTextClass = isDemoMode && isDesktop
     ? "text-[11px] text-white/70"
-    : showFauxPayreq && !inline
-      ? "text-[9px] text-white/10"
-      : "text-[10px] text-white/15";
+    : isDemoMode
+      ? "text-[10px] text-white/70"
+      : showFauxPayreq && !inline
+        ? "text-[9px] text-white/10"
+        : "text-[10px] text-white/15";
+  const fauxPayreqOverlay = showFauxPayreq ? (
+    <div className={`h-full w-full overflow-y-auto pr-2 leading-snug font-mono whitespace-pre-wrap break-words ${fauxPayreqTextClass}`}>
+      {fauxPayreqExample}
+    </div>
+  ) : null;
   const fauxQrSize = inline ? "240px" : "200px";
   const fauxQrOpacity = inline ? 0.08 : 0.06;
-  const demoQrSize = inline ? 240 : 180;
-  const payreqPreviewSize = inline ? 200 : 180;
+  const demoQrSize = useDexSizing ? 240 : 180;
+  const payreqPreviewSize = useDexSizing ? 200 : 180;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -466,7 +476,10 @@ export default function WalletDashboardSendModal({
                       {showManualStaticQr ? (
                         <div className="relative z-10 flex items-center justify-center">
                           <div className="rounded-lg border border-white/10 bg-black/60 p-3">
-                            <div className={showRealDesktopQrImage ? "brightness-75 opacity-90" : ""}>
+                            <div
+                              className={showRealDesktopQrImage ? "opacity-90" : ""}
+                              style={showRealDesktopQrImage ? { filter: "brightness(0.2)" } : undefined}
+                            >
                               <QRCodeCanvas
                                 value={fauxPayreqExample}
                                 size={demoQrSize}
@@ -494,6 +507,9 @@ export default function WalletDashboardSendModal({
                 {showManualQrUpload ?
             <div className="hidden md:flex items-center justify-center">
                     <span className="text-2xl font-semibold text-white/70">ou</span>
+                    <span className="ml-2 text-xs font-semibold text-white/50">
+                      Copier/coller l&apos;adresse
+                    </span>
                   </div> :
             null}
                 <div>
@@ -640,16 +656,28 @@ export default function WalletDashboardSendModal({
                         aria-hidden="true"
                         className="absolute inset-0 pointer-events-none bg-no-repeat"
                         style={{
-                          backgroundImage: showRealDesktopQrImage ? "none" : `url("${payreqQrDecor}")`,
+                          backgroundImage: showRealDesktopQrImage || showDemoDesktopPayreqQr ? "none" : `url("${payreqQrDecor}")`,
                           backgroundSize: `${payreqQrDecorSize} ${payreqQrDecorSize}`,
                           backgroundPosition: payreqQrDecorPosition,
                           opacity: payreqQrDecorOpacity
                         }}
                       />
+                      {showDemoDesktopPayreqQr ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="rounded-lg border border-white/10 bg-black/60 p-3">
+                            <QRCodeCanvas
+                              value={fauxPayreqExample}
+                              size={payreqPreviewSize}
+                              bgColor="#000000"
+                              fgColor="#ffffff"
+                            />
+                          </div>
+                        </div>
+                      ) : null}
                       {showRealDesktopQrImage ? (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="rounded-lg border border-white/10 bg-black/60 p-3">
-                            <div className="brightness-75 opacity-90">
+                            <div className="opacity-90" style={{ filter: "brightness(0.2)" }}>
                               <QRCodeCanvas
                                 value={fauxPayreqExample}
                                 size={payreqPreviewSize}
@@ -663,22 +691,25 @@ export default function WalletDashboardSendModal({
                     </div>
                     <div className="hidden md:flex items-center justify-center">
                       <span className="text-lg font-semibold text-white/70">
-                        Ou Indiquez votre code de paiement
+                        Ou
+                      </span>
+                      <span className="ml-2 text-xs font-semibold text-white/50">
+                        Indiquez votre code de paiement
                       </span>
                     </div>
                     <div className={`relative ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
                       {showFauxPayreq ? (
                         <div
                           aria-hidden="true"
-                          className={`absolute inset-0 p-3 leading-snug font-mono whitespace-pre-wrap break-words pointer-events-none ${fauxPayreqTextClass}`}
+                          className="absolute inset-0 p-3 pointer-events-none"
                         >
-                          {fauxPayreqExample}
+                          {fauxPayreqOverlay}
                         </div>
                       ) : null}
                       <textarea
                       value={requestText}
                       onChange={(e) => setRequestText(e.target.value)}
-                      className={`relative w-full min-h-[120px] text-xs text-white/80 placeholder:text-white/20 focus:outline-none font-mono md:min-h-[140px] ${useUnifiedPayreqPanel ? "bg-transparent border-transparent rounded-none px-0 py-2 focus:ring-0" : "rounded-md bg-black/40 border border-white/10 px-3 py-2 focus:ring-2 focus:ring-xcannes-green/30 md:border-white/15 md:bg-black/50"} ${inline ? "flex-1 min-h-[160px]" : ""}`}
+                      className={`relative w-full min-h-[120px] overflow-y-auto text-xs text-white/80 placeholder:text-white/20 focus:outline-none font-mono md:min-h-[140px] ${useUnifiedPayreqPanel ? "bg-transparent border-transparent rounded-none px-0 py-2 focus:ring-0" : "rounded-md bg-black/40 border border-white/10 px-3 py-2 focus:ring-2 focus:ring-xcannes-green/30 md:border-white/15 md:bg-black/50"} ${inline ? "flex-1 min-h-[160px]" : ""}`}
                       placeholder={useUnifiedPayreqPanel ?
                         "" :
                         t(
@@ -718,7 +749,7 @@ export default function WalletDashboardSendModal({
               showFileInputWhenStatic={showDemoDesktopQrImage || showRealDesktopQrImage}
               staticContent={showStaticQrImage ? (
                 showRealDesktopQrImage ? (
-                  <div className="brightness-75 opacity-90">
+                  <div className="opacity-90" style={{ filter: "brightness(0.2)" }}>
                     <QRCodeCanvas
                       value={fauxPayreqExample}
                       size={demoQrSize}
@@ -784,15 +815,15 @@ export default function WalletDashboardSendModal({
                       {showFauxPayreq ? (
                         <div
                           aria-hidden="true"
-                          className={`absolute inset-0 p-3 leading-snug font-mono whitespace-pre-wrap break-words pointer-events-none ${fauxPayreqTextClass}`}
+                          className="absolute inset-0 p-3 pointer-events-none"
                         >
-                          {fauxPayreqExample}
+                          {fauxPayreqOverlay}
                         </div>
                       ) : null}
                       <textarea
                       value={requestText}
                       onChange={(e) => setRequestText(e.target.value)}
-                      className={`relative w-full min-h-[110px] rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${inline ? "flex-1 min-h-[160px]" : ""}`}
+                      className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${inline ? "flex-1 min-h-[160px]" : ""}`}
                       placeholder={t(
                         "ui_payreq_placeholder_3a9c1b7d2e",
                         "xcannes-payreq:... / JSON"

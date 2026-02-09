@@ -22,6 +22,8 @@ export default function QRScanner({
   staticContentClassName = "",
   staticFooter = null,
   staticFooterClassName = "",
+  staticOverlay = null,
+  staticOverlayClassName = "",
   showFileInputWhenStatic = false,
   showFauxQrBackground = false,
   fauxQrBackgroundSize = "240px",
@@ -286,7 +288,7 @@ export default function QRScanner({
       {/* Scanner / Static Demo */}
       {showStaticQr ? (
         <div className="mb-4 space-y-3">
-          <div className="rounded-lg overflow-hidden border border-white/10 bg-black/40">
+          <div className="relative rounded-lg overflow-hidden border border-white/10 bg-black/40">
             {staticContent ? (
               <div
                 className={[
@@ -304,6 +306,17 @@ export default function QRScanner({
                 className="block w-full h-auto"
               />
             )}
+            {staticOverlay ? (
+              <div
+                className={[
+                "absolute inset-0",
+                staticOverlayClassName].
+                filter(Boolean).
+                join(" ")}
+              >
+                {staticOverlay}
+              </div>
+            ) : null}
           </div>
           {staticFooter ? (
             <div className={staticFooterClassName}>
