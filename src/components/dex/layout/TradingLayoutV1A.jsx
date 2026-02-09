@@ -41,7 +41,7 @@ export default function TradingLayoutV1A({
 
   // Variante 1A desktop ≥1024px : 2 colonnes
   return (
-    <div className="w-full px-3 sm:px-4 lg:px-0">
+    <div className="w-full px-3 sm:px-4 lg:px-6 xl:px-8 2xl:px-10">
       <div
         className="
           grid gap-4

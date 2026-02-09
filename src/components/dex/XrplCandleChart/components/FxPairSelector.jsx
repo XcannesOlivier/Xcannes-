@@ -120,7 +120,8 @@ export default function FxPairSelector({
   quote,
   value,
   onChange,
-  alwaysOpen = false
+  alwaysOpen = false,
+  compact = false
 }) {
   const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
@@ -329,11 +330,11 @@ export default function FxPairSelector({
           type="button"
           onClick={() => openFor("base")}
           className={
-          "bg-subtle border px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" + (
+          "bg-elevated border border-white/10 px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" + (
           alwaysOpen ? " flex-1" : "") + (
           isDropdownOpen && activeField === "base" ?
-          " border-emerald-400 text-emerald-300" :
-          " border-subtle text-primary hover:border-accent-rlusd/60")
+          " border-xcannes-green text-xcannes-green" :
+          " border-white/10 text-primary hover:border-xcannes-green/60")
           }>
 
           <div className="flex items-center gap-1">
@@ -370,11 +371,11 @@ export default function FxPairSelector({
           type="button"
           onClick={() => openFor("quote")}
           className={
-          "bg-subtle border px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" + (
+          "bg-elevated border border-white/10 px-3 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1 min-w-[80px]" + (
           alwaysOpen ? " flex-1" : "") + (
           isDropdownOpen && activeField === "quote" ?
-          " border-sky-400 text-sky-300" :
-          " border-subtle text-primary hover:border-accent-rlusd/60")
+          " border-xcannes-green text-xcannes-green" :
+          " border-white/10 text-primary hover:border-xcannes-green/60")
           }>
 
           <div className="flex items-center gap-1">
@@ -424,18 +425,18 @@ export default function FxPairSelector({
         ref={popupRef}
         className={
         alwaysOpen ?
-        "mt-2 w-full bg-base border border-subtle rounded-lg shadow-2xl" :
-        "absolute z-50 top-full mt-2 right-0 w-96 max-w-[90vw] md:max-w-[95vw] bg-base border border-subtle rounded-lg shadow-2xl"
+        "mt-2 w-full bg-elevated border border-white/10 rounded-lg shadow-2xl" :
+        "absolute z-50 top-full mt-2 right-0 w-96 max-w-[90vw] md:max-w-[95vw] bg-elevated border border-white/10 rounded-lg shadow-2xl"
         }>
 
-          <div className="px-3 py-2 border-b border-subtle flex items-center justify-between gap-2">
+          <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between gap-2">
             <div className="flex flex-col gap-0.5">
               <span
               className={
               "text-[10px] font-semibold uppercase tracking-[0.16em]" + (
               activeField === "base" ?
-              " text-emerald-300" :
-              " text-sky-300")
+              " text-xcannes-green" :
+              " text-xcannes-green/80")
               }>
 
                 {activeField === "base" ? "BASE (FROM)" : "QUOTE (TO)"}
@@ -460,12 +461,12 @@ export default function FxPairSelector({
               </button>
           }
           </div>
-          <div className="px-3 py-2 border-b border-subtle">
+          <div className="px-3 py-2 border-b border-white/10">
             <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("ui_search_code_or_name_1ed4e95837", "Search code or name...")}
-            className="w-full bg-subtle border border-subtle rounded px-2 py-1.5 text-sm md:text-xs text-primary placeholder:text-muted focus:outline-none focus:border-accent-rlusd" />
+            className="w-full bg-elevated border border-white/10 rounded px-2 py-1.5 text-sm md:text-xs text-primary placeholder:text-muted focus:outline-none focus:border-xcannes-green" />
 
           </div>
 
@@ -475,171 +476,207 @@ export default function FxPairSelector({
 
         </div> :
 
-        <div className={alwaysOpen ? "max-h-96 overflow-y-auto" : "max-h-80 overflow-y-auto"}>
-              {/* Favorites (collapsible, max 5) */}
-              {favorites.length > 0 &&
-          <div className="px-3 py-2 border-b border-subtle">
-                  <button
-              type="button"
-              onClick={() => setFavoritesExpanded((v) => !v)}
-              className="flex items-center justify-between w-full mb-1">
-
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs md:text-[10px] text-muted uppercase">{t("ui_favorites_1cc397670e", "Favorites")}
-
-                </span>
-                      <span className="text-[9px] text-muted">
-                        ({favorites.length}/5)
-                      </span>
+        <div className={alwaysOpen ? "max-h-[220px] md:max-h-[320px] overflow-y-scroll scrollbar-visible flush-scrollbar scrollbar-indicator-50" : "max-h-[220px] md:max-h-[320px] overflow-y-scroll scrollbar-visible flush-scrollbar scrollbar-indicator-50"}>
+              {compact ?
+          <div className="px-3 py-2 space-y-3">
+                  <div>
+                    <div className="text-xs md:text-[10px] text-muted uppercase mb-1">
+                      {t("ui_all_currencies_6155623249", "All currencies")}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <button
+                    {filtered.length === 0 ?
+                <div className="text-sm md:text-[11px] text-muted py-2">
+                        {"No result for \""}{search}{"\""}
+                      </div> :
+
+                <div className="mt-2 space-y-1">
+                        {filtered.map((c) =>
+                <button
+                  key={c.code}
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearFavorites();
-                  }}
-                  className="text-xs md:text-[10px] text-muted hover:text-primary transition-colors"
-                  title={t("ui_clear_favorites_c448f101b4", "Clear favorites")}>{t("ui_clear_0c0415464e", "Clear")}
+                  onClick={() => handleSelect(c.code)}
+                  className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-sm md:text-[11px] text-secondary">
 
-
-                </button>
-                      <svg
-                  className={`w-3 h-3 text-muted transition-transform ${
-                  favoritesExpanded ? "rotate-180" : ""}`
-                  }
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-
-                        <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7" />
-
-                      </svg>
-                    </div>
-                  </button>
-                  {favoritesExpanded &&
-            <div className="flex flex-wrap gap-1">
-                      {favorites.map((code) =>
-              <button
-                key={code}
-                type="button"
-                onClick={() => handleSelect(code)}
-                className="px-2 py-1 rounded-full border border-subtle text-sm md:text-[11px] text-secondary hover:border-accent-rlusd hover:text-accent-rlusd transition-all">
-
-                          {code}
-                        </button>
-              )}
-                    </div>
-            }
-                </div>
-          }
-
-              {/* All currencies filtered */}
-              <div className="px-3 py-2">
-                <div className="text-xs md:text-[10px] text-muted uppercase mb-1">{t("ui_all_currencies_6155623249", "All currencies")}
-
-            </div>
-                
-                {/* Detailed regions list */}
-                {!search &&
-            <div className="mb-3 border-b border-white/10 pb-2">
-                    {DETAILED_REGIONS.map((region) => {
-                const currencyCodes = DETAILED_REGION_CURRENCIES[region] || [];
-                const availableCurrencies = currencyCodes.
-                map((code) => byCode.get(code)).
-                filter((c) => c != null);
-                const isExpanded = expandedDetailedRegions[region];
-
-                return (
-                  <div key={region} className="mb-1">
-                          <button
-                      type="button"
-                      onClick={() =>
-                      setExpandedDetailedRegions((prev) => ({
-                        // Fermer toutes les autres régions et toggle celle-ci
-                        [region]: !prev[region]
-                      }))
-                      }
-                      className="w-full flex items-center justify-between px-2 py-1.5 text-sm md:text-[11px] text-secondary hover:bg-subtle rounded">
-
-                            <span>{region}</span>
-                            <div className="flex items-center gap-1">
-                              <span className="text-muted text-[10px] md:text-[9px]">
-                                {availableCurrencies.length}
-                              </span>
-                              <svg
-                          className={`w-3 h-3 transition-transform ${
-                          isExpanded ? 'rotate-180' : ''}`
-                          }
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24">
-
-                                <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7" />
-
-                              </svg>
-                            </div>
+                            <span className="font-semibold mr-2">
+                              {c.code}
+                            </span>
+                            <span className="flex-1 text-left text-white/50 truncate">
+                              {c.name}
+                            </span>
                           </button>
-                          {isExpanded && availableCurrencies.length > 0 &&
-                    <div className="mt-1 ml-2 pl-2 border-l border-subtle">
-                              {availableCurrencies.map((c) =>
-                      <button
-                        key={c.code}
-                        type="button"
-                        onClick={() => handleSelect(c.code)}
-                        className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-subtle text-sm md:text-[11px] text-secondary">
+                )}
+                      </div>
 
-                                  <span className="font-semibold mr-2">
-                                    {c.code}
-                                  </span>
-                                  <span className="flex-1 text-left text-white/50 truncate">
-                                    {c.name}
-                                  </span>
-                                </button>
-                      )}
-                            </div>
+              }
+                  </div>
+                </div> :
+
+          <>
+                {/* Favorites (collapsible, max 5) */}
+                {favorites.length > 0 &&
+            <div className="px-3 py-2 border-b border-white/10">
+                    <button
+                type="button"
+                onClick={() => setFavoritesExpanded((v) => !v)}
+                className="flex items-center justify-between w-full mb-1">
+
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs md:text-[10px] text-muted uppercase">{t("ui_favorites_1cc397670e", "Favorites")}
+
+                  </span>
+                        <span className="text-[9px] text-muted">
+                          ({favorites.length}/5)
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearFavorites();
+                    }}
+                    className="text-xs md:text-[10px] text-muted hover:text-primary transition-colors"
+                    title={t("ui_clear_favorites_c448f101b4", "Clear favorites")}>{t("ui_clear_0c0415464e", "Clear")}
+
+
+                  </button>
+                        <svg
+                    className={`w-3 h-3 text-muted transition-transform ${
+                    favoritesExpanded ? "rotate-180" : ""}`
                     }
-                        </div>);
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
 
-              })}
+                          <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7" />
+
+                        </svg>
+                      </div>
+                    </button>
+                    {favoritesExpanded &&
+              <div className="flex flex-wrap gap-1">
+                        {favorites.map((code) =>
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => handleSelect(code)}
+                  className="px-2 py-1 rounded-full border border-white/10 text-sm md:text-[11px] text-secondary hover:border-xcannes-green hover:text-xcannes-green transition-all">
+
+                            {code}
+                          </button>
+                )}
+                      </div>
+              }
                   </div>
             }
-                
-                {/* Si recherche active, afficher les résultats filtrés */}
-                {search && (
-            filtered.length === 0 ?
-            <div className="text-sm md:text-[11px] text-muted py-2">
-                      {"No result for \""}{search}{"\""}
-                    </div> :
 
-            <div className="mt-2">
-                      {filtered.map((c) =>
-              <button
-                key={c.code}
-                type="button"
-                onClick={() => handleSelect(c.code)}
-                className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-subtle text-sm md:text-[11px] text-secondary">
+                {/* All currencies filtered */}
+                <div className="px-3 py-2">
+                  <div className="text-xs md:text-[10px] text-muted uppercase mb-1">{t("ui_all_currencies_6155623249", "All currencies")}
 
-                          <span className="font-semibold mr-2">
-                            {c.code}
-                          </span>
-                          <span className="flex-1 text-left text-white/50 truncate">
-                            {c.name}
-                          </span>
-                        </button>
-              )}
-                    </div>)
-
-            }
               </div>
+                  
+                  {/* Detailed regions list */}
+                  {!search &&
+                      <div className="mb-3 border-b border-white/10 pb-2">
+                      {DETAILED_REGIONS.map((region) => {
+                  const currencyCodes = DETAILED_REGION_CURRENCIES[region] || [];
+                  const availableCurrencies = currencyCodes.
+                  map((code) => byCode.get(code)).
+                  filter((c) => c != null);
+                  const isExpanded = expandedDetailedRegions[region];
+
+                  return (
+                    <div key={region} className="mb-1">
+                            <button
+                        type="button"
+                        onClick={() =>
+                        setExpandedDetailedRegions((prev) => ({
+                          // Fermer toutes les autres régions et toggle celle-ci
+                          [region]: !prev[region]
+                        }))
+                        }
+                        className="w-full flex items-center justify-between px-2 py-1.5 text-sm md:text-[11px] text-secondary hover:bg-white/5 rounded">
+
+                              <span>{region}</span>
+                              <div className="flex items-center gap-1">
+                                <span className="text-muted text-[10px] md:text-[9px]">
+                                  {availableCurrencies.length}
+                                </span>
+                                <svg
+                            className={`w-3 h-3 transition-transform ${
+                            isExpanded ? 'rotate-180' : ''}`
+                            }
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24">
+
+                                  <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7" />
+
+                                </svg>
+                              </div>
+                            </button>
+                            {isExpanded && availableCurrencies.length > 0 &&
+                      <div className="mt-1 ml-2 pl-2 border-l border-white/10">
+                        {availableCurrencies.map((c) =>
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => handleSelect(c.code)}
+                          className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-sm md:text-[11px] text-secondary">
+
+                                    <span className="font-semibold mr-2">
+                                      {c.code}
+                                    </span>
+                                    <span className="flex-1 text-left text-white/50 truncate">
+                                      {c.name}
+                                    </span>
+                                  </button>
+                        )}
+                              </div>
+                      }
+                          </div>);
+
+                })}
+                    </div>
+              }
+                  
+                  {/* Si recherche active, afficher les résultats filtrés */}
+                  {search && (
+              filtered.length === 0 ?
+              <div className="text-sm md:text-[11px] text-muted py-2">
+                        {"No result for \""}{search}{"\""}
+                      </div> :
+
+              <div className="mt-2">
+                        {filtered.map((c) =>
+                <button
+                  key={c.code}
+                  type="button"
+                  onClick={() => handleSelect(c.code)}
+                  className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-sm md:text-[11px] text-secondary">
+
+                            <span className="font-semibold mr-2">
+                              {c.code}
+                            </span>
+                            <span className="flex-1 text-left text-white/50 truncate">
+                              {c.name}
+                            </span>
+                          </button>
+                )}
+                      </div>)
+
+              }
+                </div>
+              </>
+          }
             </div>
         }
         </div>

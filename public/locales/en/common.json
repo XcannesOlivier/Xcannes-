@@ -683,7 +683,7 @@
   "ui_activation_wallet_1dcd314549": "Activation wallet",
   "ui_activation_wallet_7d13181510": "Activation wallet:",
   "ui_activation_wallet_xcannes_92757c7cdd": "Activation wallet XCANNES",
-  "ui_add_90615be412": "ADD",
+  "ui_add_90615be412": "Daily rate",
   "ui_add_set_currency_line_777a38797b": "Add / set currency line",
   "ui_address_2ef763fa89": "Address",
   "ui_add_or_remove_your_lines_f40801cee4": "Add or delete your internal tracking lines XCS.",
@@ -787,7 +787,7 @@
   "ui_crosshair_5734deb624": "Crosshair",
   "ui_crypto_fiat_7ec0396100": "Crypto → Fiat",
   "ui_currencies_5e5bf1a8a1": "Currencies",
-  "ui_currencies_add_d324e3ae6f": "Currencies (ADD)",
+  "ui_currencies_add_d324e3ae6f": "Currencies (Daily rate)",
   "ui_currency_1ed55673be": "Currency",
   "ui_currency_lines_267fc2eff3": "Currency lines",
   "ui_currency_lines_allocations_r_d87a98865f": "Currency lines (allocations RLUSD)",
@@ -1334,5 +1334,10 @@
   "home_v2_essentials_lines_modal_flow_1_step_2_detail_3": "Balance updates automatically with the current rate",
   "home_v2_essentials_lines_modal_flow_1_step_3_title": "Manage or close",
   "home_v2_essentials_lines_modal_flow_1_step_3_desc": "You can manage your line at any time. Deactivation is only possible when the balance is zero.",
-  "home_v2_essentials_lines_modal_flow_1_step_3_note": "Deactivation also incurs a one-time fee of 1 USD (≈ 1 RLUSD)."
+  "home_v2_essentials_lines_modal_flow_1_step_3_note": "Deactivation also incurs a one-time fee of 1 USD (≈ 1 RLUSD).",
+  "ui_daily_rate_4f4a2c7a6d": "Daily rate",
+  "ui_create_pair_4a77c2e68c": "Create a pair (fiat)",
+  "ui_xrpl_assets_68a2c5aef7": "XRPL assets",
+  "ui_all_live_pairs_d2c9ce2a67": "All live pairs",
+  "ui_common_currencies_8c51c2aedd": "Common currencies"
 }
