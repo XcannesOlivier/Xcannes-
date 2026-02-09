@@ -34,6 +34,8 @@ import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
 import { computeSpreadQuote } from "@/utils/walletSpread";
 import xcannesApi from "@/lib/xcannesApi";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import { USD_STABLECOINS } from "@/components/wallet/walletDashboardConfig";
 
 const DEMO_WALLET_ACCENTS = {
   A: {
@@ -92,6 +94,14 @@ function renderDemoTokenIcon(code) {
     );
   }
   return getCurrencyFlag(upper);
+}
+
+function getDemoCurrencyLabel(code) {
+  const upper = String(code || "").toUpperCase();
+  if (upper === "XRP") return "XRP · Native";
+  if (upper === "XCS") return "XCannes Token";
+  if (USD_STABLECOINS.includes(upper)) return "XRPL Stablecoin";
+  return getCurrencyDescription(upper) || upper;
 }
 
 function formatMoney(locale, amount, currency) {
@@ -1647,7 +1657,7 @@ export default function DemoWalletDashboard({
                       <div className="flex flex-col min-w-0">
                         <span className="text-xs text-primary truncate">{row.code}</span>
                         <span className="text-[11px] text-muted truncate">
-                          {t("demo_currency_line_label", "Monnaie locale")}
+                          {getDemoCurrencyLabel(row.code)}
                         </span>
                       </div>
                     </div>

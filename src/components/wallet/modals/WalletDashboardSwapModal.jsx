@@ -161,6 +161,7 @@ export default function WalletDashboardSwapModal({
   );
 
   const isXrplCore = (code) => code === "XRP" || code === "XCS";
+  const sameCurrencySelected = Boolean(baseCode && quoteCode && baseCode === quoteCode);
 
   const conversionRoute = useMemo(() => {
     if (!baseCode || !quoteCode || baseCode === quoteCode) {
@@ -426,11 +427,13 @@ export default function WalletDashboardSwapModal({
     ? dexSubmitting ||
       dexConfirming ||
       previewState.status !== "done" ||
-      !effectiveIsConnected
+      !effectiveIsConnected ||
+      sameCurrencySelected
     : convertProcessing ||
       !convertBaseCurrency ||
       !convertQuoteCurrency ||
       !convertAmount ||
+      sameCurrencySelected ||
       effectiveRouteType !== "allocation";
   const convertButtonLabel = isDexRoute
     ? dexSubmitting
@@ -448,6 +451,9 @@ export default function WalletDashboardSwapModal({
     }
     handleDemoConvert();
   };
+  const activeCurrencyUpper = String(activateCurrencyCode || "").toUpperCase();
+  const isLineAlreadyActive =
+    Boolean(activeCurrencyUpper) && existingCurrencyLinesSet.has(activeCurrencyUpper);
   const activateLineDisabled =
     !canMutateLines ||
     currencyLinesLoading ||
@@ -608,7 +614,6 @@ export default function WalletDashboardSwapModal({
               value={convertBaseCurrency}
               onChange={setConvertBaseCurrency}
               options={(swapCurrencyOptions || [])
-                .filter((code) => code !== convertQuoteCurrency)
                 .map((code) => {
                   const labelLeft = selectLabelByCurrency?.[code] || code;
                   const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -639,7 +644,6 @@ export default function WalletDashboardSwapModal({
               value={convertQuoteCurrency}
               onChange={setConvertQuoteCurrency}
               options={(swapCurrencyOptions || [])
-                .filter((code) => code !== convertBaseCurrency)
                 .map((code) => {
                   const labelLeft = selectLabelByCurrency?.[code] || code;
                   const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -677,6 +681,11 @@ export default function WalletDashboardSwapModal({
               </div>
 
               <div className={inline ? "space-y-2" : "space-y-2"}>
+                {sameCurrencySelected ? (
+                  <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+                    {t("ui_convert_same_asset_warning_6f13d5c9c2", "Veuillez choisir 2 actifs différents.")}
+                  </div>
+                ) : null}
                 <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
                   <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
@@ -812,6 +821,15 @@ export default function WalletDashboardSwapModal({
                 placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
                 quickOptions={suggestedCurrencies}
                 showQuickAdd={false} />
+
+                  {isLineAlreadyActive ? (
+                    <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+                      {t(
+                        "ui_currency_line_already_active_5df2d3b1a8",
+                        "Ligne de compte déjà active"
+                      )}
+                    </div>
+                  ) : null}
 
                   <SwipeConfirmButton
                 label={t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}

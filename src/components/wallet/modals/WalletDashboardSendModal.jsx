@@ -478,7 +478,7 @@ export default function WalletDashboardSendModal({
                           <div className="rounded-lg border border-white/10 bg-black/60 p-3">
                             <div
                               className={showRealDesktopQrImage ? "opacity-90" : ""}
-                              style={showRealDesktopQrImage ? { filter: "brightness(0.2)" } : undefined}
+                              style={showRealDesktopQrImage ? { filter: "brightness(0.15)" } : undefined}
                             >
                               <QRCodeCanvas
                                 value={fauxPayreqExample}
@@ -677,7 +677,7 @@ export default function WalletDashboardSendModal({
                       {showRealDesktopQrImage ? (
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="rounded-lg border border-white/10 bg-black/60 p-3">
-                            <div className="opacity-90" style={{ filter: "brightness(0.2)" }}>
+                            <div className="opacity-90" style={{ filter: "brightness(0.15)" }}>
                               <QRCodeCanvas
                                 value={fauxPayreqExample}
                                 size={payreqPreviewSize}
@@ -749,7 +749,7 @@ export default function WalletDashboardSendModal({
               showFileInputWhenStatic={showDemoDesktopQrImage || showRealDesktopQrImage}
               staticContent={showStaticQrImage ? (
                 showRealDesktopQrImage ? (
-                  <div className="opacity-90" style={{ filter: "brightness(0.2)" }}>
+                  <div className="opacity-90" style={{ filter: "brightness(0.15)" }}>
                     <QRCodeCanvas
                       value={fauxPayreqExample}
                       size={demoQrSize}

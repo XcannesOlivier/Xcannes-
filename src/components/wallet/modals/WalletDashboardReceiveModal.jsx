@@ -61,6 +61,12 @@ export default function WalletDashboardReceiveModal({
   const [isDesktop, setIsDesktop] = useState(false);
   const showPersistentRequestPreview =
     inline && isDesktop && noticeVariant !== "demo" && dashboardVariant === "full";
+  const showWalletPageRequestDecor =
+    !inline &&
+    isDesktop &&
+    noticeVariant !== "demo" &&
+    dashboardVariant === "full" &&
+    (!generatedRequest || !requestValue);
 
   const requestCurrencyCode = useMemo(
     () => String(requestCurrency || "").trim().toUpperCase(),
@@ -194,10 +200,13 @@ export default function WalletDashboardReceiveModal({
       return "";
     }
   }, [generatedRequest]);
+  const requestDecorValue = useMemo(() => {
+    if (effectiveWallet) return `xcannes-request:${effectiveWallet}`;
+    return "xcannes-request";
+  }, [effectiveWallet]);
   const shouldShowRequestPreview =
     showPersistentRequestPreview || (Boolean(generatedRequest) && Boolean(requestValue));
-  const showRequestPlaceholder =
-    showPersistentRequestPreview && (!generatedRequest || !requestValue);
+  const showRequestPlaceholder = !generatedRequest || !requestValue;
   const qrSize = inline ? 240 : 180;
 
   if (!open) return null;
@@ -443,25 +452,39 @@ export default function WalletDashboardReceiveModal({
               {shouldShowRequestPreview &&
           <div className="space-y-3">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="bg-black/60 border border-white/10 rounded-xl p-3">
-                      {showRequestPlaceholder ? (
-                        <div
-                          className="flex items-center justify-center text-center text-xs text-white/50"
-                          style={{ width: qrSize, height: qrSize }}
-                        >
-                          {t(
-                            "ui_request_qr_placeholder_2c4f7a1d9b",
-                            "Votre QR code sera créé ici"
-                          )}
+                    <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 overflow-hidden">
+                      {showWalletPageRequestDecor ? (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="opacity-30" style={{ filter: "brightness(0.2)" }}>
+                            <QRCodeCanvas
+                              value={requestDecorValue}
+                              size={qrSize}
+                              bgColor="#000000"
+                              fgColor="#ffffff"
+                            />
+                          </div>
                         </div>
-                      ) : (
-                        <QRCodeCanvas
-                          value={requestValue}
-                          size={qrSize}
-                          bgColor="#000000"
-                          fgColor="#ffffff"
-                        />
-                      )}
+                      ) : null}
+                      <div className="relative z-10">
+                        {showRequestPlaceholder ? (
+                          <div
+                            className="flex items-center justify-center text-center text-xs text-white/50"
+                            style={{ width: qrSize, height: qrSize }}
+                          >
+                            {t(
+                              "ui_request_qr_placeholder_2c4f7a1d9b",
+                              "Votre QR code sera créé ici"
+                            )}
+                          </div>
+                        ) : (
+                          <QRCodeCanvas
+                            value={requestValue}
+                            size={qrSize}
+                            bgColor="#000000"
+                            fgColor="#ffffff"
+                          />
+                        )}
+                      </div>
                     </div>
                     <div className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all ${showRequestPlaceholder ? "text-center" : ""}`}>
                       {showRequestPlaceholder
