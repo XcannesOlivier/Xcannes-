@@ -55,7 +55,7 @@ export default function WalletDashboardCashModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
+    "relative w-full wallet-modal-panel border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-2xl max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -92,7 +92,7 @@ export default function WalletDashboardCashModal({
                   </span>
                 ) : null}
                 {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}

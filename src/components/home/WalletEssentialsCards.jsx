@@ -1402,7 +1402,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         ? "bg-transparent border-none rounded-none shadow-none"
         : showCardBorders
         ? "bg-black/20 backdrop-blur-sm border border-xcannes-green/25 rounded-xl"
-        : "bg-black/20 backdrop-blur-sm rounded-xl",
+        : "bg-black/20 backdrop-blur-sm rounded-xl border border-transparent hover:border-xcannes-green/25",
       "group/card",
       cardPaddingClassName,
       action.isPlain ? "" : "relative pb-10 md:pb-5",
@@ -1584,7 +1584,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         {!isCompact &&
           demoAction &&
           renderActionCard(demoAction, {
-            wrapperClassNameOverride: "lg:hidden order-last",
+            wrapperClassNameOverride: "lg:hidden order-last mt-18",
             keySuffix: "mobile",
           })}
       </div>

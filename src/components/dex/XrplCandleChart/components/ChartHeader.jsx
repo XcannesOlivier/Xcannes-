@@ -246,7 +246,7 @@ export default function ChartHeader({
                       <span>{t("ui_xrpl_assets_68a2c5aef7", "Actif XRPL")}</span>
                     </div>
                     <div className="mt-2 grid gap-1 grid-cols-[1fr_84px] md:grid-cols-[1fr_96px] items-start">
-                      <div className="flex flex-wrap gap-1.5 max-h-[60px] overflow-y-scroll pr-1 scrollbar-visible scrollbar-indicator-40">
+                      <div className="flex flex-wrap gap-1.5 max-h-[60px] overflow-y-scroll pr-1">
                         {popularLivePairs.map((p) =>
                     <button
                       key={p}
@@ -266,7 +266,7 @@ export default function ChartHeader({
                         onClick={() => handlePairSelect(p)}
                         className={`w-full px-2 py-1 rounded-md border-2 text-xs transition-all ${
                         p === "XRP/RLUSD" || p === "XCS/RLUSD" ?
-                        "border-xcannes-blue-weight text-secondary hover:border-xcannes-blue hover:text-xcannes-blue" :
+                        "border-xcannes-blue-weight text-white/90 hover:border-xcannes-blue hover:text-white/90" :
                         "border-white/10 text-secondary md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80"}`
                         }>
 

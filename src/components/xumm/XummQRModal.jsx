@@ -224,8 +224,8 @@ export default function XummQRModal({
     ? "absolute inset-0 z-10 flex"
     : `fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm`;
   const panelClass = inline
-    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-6 shadow-2xl overflow-y-auto"
-    : "relative bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl";
+    ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-6 shadow-2xl overflow-y-auto"
+    : "relative wallet-modal-panel bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl";
 
   return (
     <div className={wrapperClass}>

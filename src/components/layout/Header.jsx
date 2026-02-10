@@ -214,22 +214,20 @@ export default function Header({ fixed = true }) {
       headerBgClass} text-white`}>
 
       {/* Logo simple texte style banque suisse */}
-      <Link href="/" onClick={withHardNavFallback("/")}>
-        <div className="flex items-center gap-2 group whitespace-nowrap min-w-0">
-          <span className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white group-hover:text-xcannes-green transition-colors duration-300">{t("ui_xcannes_43b38baa2c", "XCANNES")}
-
-          </span>
-          <span className="text-[10px] sm:text-[11px] text-white/40 font-light">
-            |
-          </span>
-          <span className="text-[12px] sm:text-[13px] text-white/60 font-light tracking-wide truncate">
-            {t("header_tagline", "Compte multi-devises")}
-          </span>
-        </div>
-      </Link>
+      <div className="flex items-center gap-2 whitespace-nowrap min-w-0">
+        <span className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white">
+          {t("ui_xcannes_43b38baa2c", "XCANNES")}
+        </span>
+        <span className="text-[10px] sm:text-[11px] text-white/40 font-light">
+          |
+        </span>
+        <span className="text-[18px] sm:text-[19px] md:text-[16px] text-white/60 font-light italic tracking-wide truncate">
+          {t("header_tagline", "Compte multi-devises")}
+        </span>
+      </div>
 
       {/* Navigation épurée */}
-      <nav className="hidden md:flex items-center gap-16 font-[300] text-sm">
+      <nav className="hidden md:flex items-center gap-30 font-[300] text-lg">
         {!isHome &&
         <Link
           href="/"
@@ -310,16 +308,25 @@ export default function Header({ fixed = true }) {
 
       {/* Menu mobile minimaliste */}
       <button
-        className="md:hidden text-white text-2xl focus:outline-none hover:text-xcannes-green transition-colors"
+        className="md:hidden text-white focus:outline-none hover:text-xcannes-green transition-colors"
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label={t("ui_toggle_menu_9e88e70e51", "Toggle menu")}
         aria-expanded={menuOpen}>
-
-        {menuOpen ? "×" : "☰"}
+        <span className={`header-burger ${menuOpen ? "is-open" : ""}`} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
       </button>
 
-      {menuOpen &&
-      <div className="absolute top-16 left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 py-8 md:hidden border-b border-white/10">
+      <div
+        className={`absolute top-16 left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out ${
+          menuOpen
+            ? "opacity-100 translate-y-0 pointer-events-auto max-h-[420px] py-8"
+            : "opacity-0 -translate-y-2 pointer-events-none max-h-0 py-0"
+        }`}
+        aria-hidden={!menuOpen}
+      >
           {!isHome &&
         <Link
           href="/"
@@ -355,7 +362,6 @@ export default function Header({ fixed = true }) {
 
           <LanguageSwitcher onSelect={() => setMenuOpen(false)} />
         </div>
-      }
     </header>);
 
 }

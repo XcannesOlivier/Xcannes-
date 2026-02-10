@@ -42,8 +42,8 @@ export default function WalletActivationModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = inline
-    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl overflow-y-auto"
-    : "relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl";
+    ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl overflow-y-auto"
+    : "relative w-full wallet-modal-panel max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl";
 
   const content = (
     <>
@@ -92,7 +92,7 @@ export default function WalletActivationModal({
               </p>
               <div className="flex flex-wrap items-center gap-2">
                 {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
+                  <span className="inline-flex items-center text-xcannes-yellow text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}

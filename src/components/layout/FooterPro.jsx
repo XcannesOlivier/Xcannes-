@@ -173,29 +173,29 @@ export default function FooterPro() {
               <li>
                 <Link
                   href="/dex"
-                  className="text-white/70 hover:text-xcannes-green transition-colors"
+                  className="header-nav-link footer-nav-link text-white/70"
                   onClick={withHardNavFallback("/dex")}>
 
-                  {t("footer_nav_trading")}
+                  <span className="header-nav-label">{t("footer_nav_trading")}</span>
                 </Link>
               </li>
               <li>
                 <Link
                   href="/whitepaper"
-                  className="text-white/70 hover:text-xcannes-green transition-colors"
+                  className="header-nav-link footer-nav-link text-white/70"
                   onClick={withHardNavFallback("/whitepaper")}>
 
-                  {t("footer_nav_whitepaper")}
+                  <span className="header-nav-label">{t("footer_nav_whitepaper")}</span>
                 </Link>
               </li>
               <li>
                 <Link
                   href="/disclaimer"
-                  className="text-white/70 hover:text-xcannes-green transition-colors flex items-center justify-center gap-2"
+                  className="header-nav-link footer-nav-link text-white/70"
                   onClick={withHardNavFallback("/disclaimer")}>
 
                   <span>🏛️</span>
-                  <span>{t("footer_nav_legal", "Legal Info")}</span>
+                  <span className="header-nav-label">{t("footer_nav_legal", "Legal Info")}</span>
                 </Link>
               </li>
             </ul>

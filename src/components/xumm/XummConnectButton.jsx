@@ -206,7 +206,7 @@ export default function XummConnectButton({
         }
       }}>
 
-            <div className="w-full max-w-md rounded-2xl border border-white/10 bg-gray-900 p-5 text-white shadow-2xl">
+            <div className="w-full wallet-modal-panel max-w-md rounded-2xl border border-white/10 bg-gray-900 p-5 text-white shadow-2xl">
               <h3 className="text-lg font-semibold">
                 {t(
             "xumm_setup_title",
