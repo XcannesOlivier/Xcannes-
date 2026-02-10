@@ -224,6 +224,11 @@
   transform: none;
 }
 
+body.wallet-page .wallet-edge-arrow {
+  font-size: 48px;
+  line-height: 1;
+}
+
 @media (max-width: 767px) {
   .header-nav-link .header-nav-arrow {
     font-size: 1.4em;
