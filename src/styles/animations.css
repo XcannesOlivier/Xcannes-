@@ -26,6 +26,141 @@
   animation: pulse-slow 3s ease-in-out infinite;
 }
 
+/* ====== MODAL SLIDE (HOME VALUE CARD) ====== */
+
+@keyframes modalSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+.modal-slide-down {
+  animation: modalSlideDown 300ms ease-out;
+}
+
+.modal-slide-up {
+  animation: modalSlideUp 300ms ease-in;
+}
+
+@keyframes modalSlideUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalSlideDownOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+.modal-slide-up-in {
+  animation: modalSlideUpIn 300ms ease-out;
+}
+
+.modal-slide-down-out {
+  animation: modalSlideDownOut 300ms ease-in;
+}
+
+@keyframes modalSlideRightIn {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes modalSlideLeftOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+.modal-slide-right-in {
+  animation: modalSlideRightIn 300ms ease-out;
+}
+
+.modal-slide-left-out {
+  animation: modalSlideLeftOut 300ms ease-in;
+}
+
+@keyframes modalSlideLeftIn {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes modalSlideRightOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+.modal-slide-left-in {
+  animation: modalSlideLeftIn 300ms ease-out;
+}
+
+.modal-slide-right-out {
+  animation: modalSlideRightOut 300ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-slide-down,
+  .modal-slide-up,
+  .modal-slide-up-in,
+  .modal-slide-down-out,
+  .modal-slide-right-in,
+  .modal-slide-left-out,
+  .modal-slide-left-in,
+  .modal-slide-right-out {
+    animation: none;
+  }
+}
+
 /* ====== PAGE TRANSITION (SOFT ENTER) ====== */
 
 @keyframes pageEnterFromLeft {
