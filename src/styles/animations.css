@@ -51,11 +51,11 @@
 }
 
 .modal-slide-down {
-  animation: modalSlideDown 300ms ease-out;
+  animation: modalSlideDown 400ms ease-out;
 }
 
 .modal-slide-up {
-  animation: modalSlideUp 300ms ease-in;
+  animation: modalSlideUp 400ms ease-in;
 }
 
 @keyframes modalSlideUpIn {
@@ -81,11 +81,11 @@
 }
 
 .modal-slide-up-in {
-  animation: modalSlideUpIn 300ms ease-out;
+  animation: modalSlideUpIn 400ms ease-out;
 }
 
 .modal-slide-down-out {
-  animation: modalSlideDownOut 300ms ease-in;
+  animation: modalSlideDownOut 400ms ease-in;
 }
 
 @keyframes modalSlideRightIn {
@@ -111,11 +111,11 @@
 }
 
 .modal-slide-right-in {
-  animation: modalSlideRightIn 300ms ease-out;
+  animation: modalSlideRightIn 400ms ease-out;
 }
 
 .modal-slide-left-out {
-  animation: modalSlideLeftOut 300ms ease-in;
+  animation: modalSlideLeftOut 400ms ease-in;
 }
 
 @keyframes modalSlideLeftIn {
@@ -141,11 +141,11 @@
 }
 
 .modal-slide-left-in {
-  animation: modalSlideLeftIn 300ms ease-out;
+  animation: modalSlideLeftIn 400ms ease-out;
 }
 
 .modal-slide-right-out {
-  animation: modalSlideRightOut 300ms ease-in;
+  animation: modalSlideRightOut 400ms ease-in;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -186,43 +186,51 @@
 }
 
 .page-transition {
+  --page-exit-x: 0px;
+}
+
+.page-transition > :not(header) {
   transition: opacity 50ms ease-out, transform 50ms ease-out;
   will-change: opacity, transform;
 }
 
-.page-transition--from-left {
+.page-transition--from-left > :not(header) {
   animation: pageEnterFromLeft 400ms ease-out;
 }
 
-.page-transition--from-right {
+.page-transition--from-right > :not(header) {
   animation: pageEnterFromRight 400ms ease-out;
 }
 
 .page-transition--exit {
   animation: none;
-  opacity: 0;
 }
 
 .page-transition--exit.page-transition--from-left {
-  transform: translateX(24px);
+  --page-exit-x: 24px;
 }
 
 .page-transition--exit.page-transition--from-right {
-  transform: translateX(-24px);
+  --page-exit-x: -24px;
+}
+
+.page-transition--exit > :not(header) {
+  animation: none;
+  opacity: 0;
+  transform: translateX(var(--page-exit-x));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-transition {
-    animation: none;
+  .page-transition > :not(header) {
     transition: none;
   }
 
-  .page-transition--from-left,
-  .page-transition--from-right {
+  .page-transition--from-left > :not(header),
+  .page-transition--from-right > :not(header) {
     animation: none;
   }
 
-  .page-transition--exit {
+  .page-transition--exit > :not(header) {
     opacity: 1;
     transform: none;
   }
