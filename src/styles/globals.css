@@ -223,7 +223,7 @@
 .header-nav-link {
   display: inline-flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
   transition: color 200ms ease;
 }
 
