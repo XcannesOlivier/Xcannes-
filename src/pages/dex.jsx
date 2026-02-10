@@ -118,12 +118,12 @@ export default function Dex() {
 
 
       {/* Header desktop uniquement */}
-      <div className="hidden md:block">
+      <div className="hidden md:block page-fixed-layer">
         <Header />
       </div>
 
       {/* PriceTicker desktop uniquement */}
-      <div className="hidden md:block">
+      <div className="hidden md:block page-fixed-layer">
         <PriceTicker
           pairs={tickerPairs}
           fixed={true}
