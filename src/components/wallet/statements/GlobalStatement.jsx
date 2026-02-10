@@ -622,7 +622,7 @@ export default function GlobalStatement({
             {!inline ? (
               <button
               onClick={onClose}
-              className="text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0">
+              className="wallet-modal-close text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0">
 
                 ✕
               </button>
