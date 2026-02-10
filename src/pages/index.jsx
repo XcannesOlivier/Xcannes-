@@ -31,6 +31,11 @@ export default function Home() {
   const valueModalCloseTimerRef = useRef(null);
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
+
+  const getModalCloseDelay = () => {
+    if (typeof window === "undefined") return 400;
+    return window.matchMedia("(max-width: 767px)").matches ? 500 : 400;
+  };
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");
@@ -166,7 +171,7 @@ export default function Home() {
       setValueModalOpen(false);
       setValueModalClosing(false);
       valueModalCloseTimerRef.current = null;
-    }, 400);
+    }, getModalCloseDelay());
   };
 
   const openSecurityModal = () => {
@@ -184,7 +189,7 @@ export default function Home() {
       setSecurityModalOpen(false);
       setSecurityModalClosing(false);
       securityModalCloseTimerRef.current = null;
-    }, 400);
+    }, getModalCloseDelay());
   };
 
   const openSpeedModal = () => {
@@ -202,7 +207,7 @@ export default function Home() {
       setSpeedModalOpen(false);
       setSpeedModalClosing(false);
       speedModalCloseTimerRef.current = null;
-    }, 400);
+    }, getModalCloseDelay());
   };
 
   const openFeesModal = () => {
@@ -220,7 +225,7 @@ export default function Home() {
       setFeesModalOpen(false);
       setFeesModalClosing(false);
       feesModalCloseTimerRef.current = null;
-    }, 400);
+    }, getModalCloseDelay());
   };
 
   return (

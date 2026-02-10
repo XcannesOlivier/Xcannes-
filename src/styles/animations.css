@@ -106,7 +106,7 @@
   }
   to {
     opacity: 0;
-    transform: translateX(24px);
+    transform: translateX(-24px);
   }
 }
 
@@ -136,7 +136,7 @@
   }
   to {
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(24px);
   }
 }
 
@@ -146,6 +146,40 @@
 
 .modal-slide-right-out {
   animation: modalSlideRightOut 400ms ease-in;
+}
+
+@media (max-width: 767px) {
+  .modal-slide-down {
+    animation: modalSlideDown 500ms ease-out;
+  }
+
+  .modal-slide-up {
+    animation: modalSlideUp 500ms ease-in;
+  }
+
+  .modal-slide-up-in {
+    animation: modalSlideUpIn 500ms ease-out;
+  }
+
+  .modal-slide-down-out {
+    animation: modalSlideDownOut 500ms ease-in;
+  }
+
+  .modal-slide-right-in {
+    animation: modalSlideRightIn 500ms ease-out;
+  }
+
+  .modal-slide-left-out {
+    animation: modalSlideLeftOut 500ms ease-in;
+  }
+
+  .modal-slide-left-in {
+    animation: modalSlideLeftIn 500ms ease-out;
+  }
+
+  .modal-slide-right-out {
+    animation: modalSlideRightOut 500ms ease-in;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -189,16 +223,16 @@
   --page-exit-x: 0px;
 }
 
-.page-transition > :not(header) {
+.page-transition > :not(header):not(.page-fixed-layer) {
   transition: opacity 50ms ease-out, transform 50ms ease-out;
   will-change: opacity, transform;
 }
 
-.page-transition--from-left > :not(header) {
+.page-transition--from-left > :not(header):not(.page-fixed-layer) {
   animation: pageEnterFromLeft 400ms ease-out;
 }
 
-.page-transition--from-right > :not(header) {
+.page-transition--from-right > :not(header):not(.page-fixed-layer) {
   animation: pageEnterFromRight 400ms ease-out;
 }
 
@@ -214,23 +248,23 @@
   --page-exit-x: -24px;
 }
 
-.page-transition--exit > :not(header) {
+.page-transition--exit > :not(header):not(.page-fixed-layer) {
   animation: none;
   opacity: 0;
   transform: translateX(var(--page-exit-x));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-transition > :not(header) {
+  .page-transition > :not(header):not(.page-fixed-layer) {
     transition: none;
   }
 
-  .page-transition--from-left > :not(header),
-  .page-transition--from-right > :not(header) {
+  .page-transition--from-left > :not(header):not(.page-fixed-layer),
+  .page-transition--from-right > :not(header):not(.page-fixed-layer) {
     animation: none;
   }
 
-  .page-transition--exit > :not(header) {
+  .page-transition--exit > :not(header):not(.page-fixed-layer) {
     opacity: 1;
     transform: none;
   }

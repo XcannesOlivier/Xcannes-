@@ -122,7 +122,7 @@ export default function Header({ fixed = true }) {
   );
 
   const withMobileNavDelay = useCallback(
-    (href, { delay = 500 } = {}) =>
+    (href, { delay = 350 } = {}) =>
     (e) => {
       if (typeof window === "undefined") return;
       if (!e || e.defaultPrevented) return;
@@ -184,6 +184,41 @@ export default function Header({ fixed = true }) {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [settingsOpen]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (!menuOpen || !isMobile) return;
+
+    const { body, documentElement: html } = document;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    const prevPosition = body.style.position;
+    const prevTop = body.style.top;
+    const prevWidth = body.style.width;
+    const prevHtmlOverflow = html.style.overflow;
+    const scrollbarWidth = window.innerWidth - html.clientWidth;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+      window.scrollTo(0, Math.abs(parseInt(prevTop || "0", 10)) || 0);
+    };
+  }, [menuOpen]);
 
   const headerBgClass = (() => {
     // DEX: gradient sombre pour conserver l'ambiance graphique
@@ -320,7 +355,15 @@ export default function Header({ fixed = true }) {
       </button>
 
       <div
-        className={`absolute top-16 left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out ${
+        className={`fixed top-16 left-0 right-0 bottom-0 md:hidden bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setMenuOpen(false)}
+        aria-hidden={!menuOpen}
+      />
+
+      <div
+        className={`absolute top-16 left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out z-50 ${
           menuOpen
             ? "opacity-100 translate-y-0 pointer-events-auto max-h-[420px] py-8"
             : "opacity-0 -translate-y-2 pointer-events-none max-h-0 py-0"
