@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
@@ -15,12 +15,20 @@ export default function Home() {
 
   const [speedModalRoot, setSpeedModalRoot] = useState(null);
   const [speedModalOpen, setSpeedModalOpen] = useState(false);
+  const [speedModalClosing, setSpeedModalClosing] = useState(false);
+  const speedModalCloseTimerRef = useRef(null);
   const [securityModalRoot, setSecurityModalRoot] = useState(null);
   const [securityModalOpen, setSecurityModalOpen] = useState(false);
+  const [securityModalClosing, setSecurityModalClosing] = useState(false);
+  const securityModalCloseTimerRef = useRef(null);
   const [feesModalRoot, setFeesModalRoot] = useState(null);
   const [feesModalOpen, setFeesModalOpen] = useState(false);
+  const [feesModalClosing, setFeesModalClosing] = useState(false);
+  const feesModalCloseTimerRef = useRef(null);
   const [valueModalRoot, setValueModalRoot] = useState(null);
   const [valueModalOpen, setValueModalOpen] = useState(false);
+  const [valueModalClosing, setValueModalClosing] = useState(false);
+  const valueModalCloseTimerRef = useRef(null);
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   useEffect(() => {
@@ -30,9 +38,21 @@ export default function Home() {
     document.body.appendChild(el);
     setSpeedModalRoot(el);
     return () => {
+      if (speedModalCloseTimerRef.current) {
+        window.clearTimeout(speedModalCloseTimerRef.current);
+        speedModalCloseTimerRef.current = null;
+      }
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
+  useEffect(() => {
+    if (!speedModalOpen) return;
+    setSpeedModalClosing(false);
+    if (speedModalCloseTimerRef.current) {
+      window.clearTimeout(speedModalCloseTimerRef.current);
+      speedModalCloseTimerRef.current = null;
+    }
+  }, [speedModalOpen]);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const { body, documentElement: html } = document;
@@ -71,9 +91,21 @@ export default function Home() {
     document.body.appendChild(el);
     setSecurityModalRoot(el);
     return () => {
+      if (securityModalCloseTimerRef.current) {
+        window.clearTimeout(securityModalCloseTimerRef.current);
+        securityModalCloseTimerRef.current = null;
+      }
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
+  useEffect(() => {
+    if (!securityModalOpen) return;
+    setSecurityModalClosing(false);
+    if (securityModalCloseTimerRef.current) {
+      window.clearTimeout(securityModalCloseTimerRef.current);
+      securityModalCloseTimerRef.current = null;
+    }
+  }, [securityModalOpen]);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");
@@ -81,9 +113,21 @@ export default function Home() {
     document.body.appendChild(el);
     setFeesModalRoot(el);
     return () => {
+      if (feesModalCloseTimerRef.current) {
+        window.clearTimeout(feesModalCloseTimerRef.current);
+        feesModalCloseTimerRef.current = null;
+      }
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
+  useEffect(() => {
+    if (!feesModalOpen) return;
+    setFeesModalClosing(false);
+    if (feesModalCloseTimerRef.current) {
+      window.clearTimeout(feesModalCloseTimerRef.current);
+      feesModalCloseTimerRef.current = null;
+    }
+  }, [feesModalOpen]);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");
@@ -91,9 +135,93 @@ export default function Home() {
     document.body.appendChild(el);
     setValueModalRoot(el);
     return () => {
+      if (valueModalCloseTimerRef.current) {
+        window.clearTimeout(valueModalCloseTimerRef.current);
+        valueModalCloseTimerRef.current = null;
+      }
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
+  useEffect(() => {
+    if (!valueModalOpen) return;
+    setValueModalClosing(false);
+    if (valueModalCloseTimerRef.current) {
+      window.clearTimeout(valueModalCloseTimerRef.current);
+      valueModalCloseTimerRef.current = null;
+    }
+  }, [valueModalOpen]);
+
+  const openValueModal = () => {
+    setValueModalClosing(false);
+    setValueModalOpen(true);
+  };
+
+  const closeValueModal = () => {
+    if (valueModalClosing) return;
+    setValueModalClosing(true);
+    if (valueModalCloseTimerRef.current) {
+      window.clearTimeout(valueModalCloseTimerRef.current);
+    }
+    valueModalCloseTimerRef.current = window.setTimeout(() => {
+      setValueModalOpen(false);
+      setValueModalClosing(false);
+      valueModalCloseTimerRef.current = null;
+    }, 300);
+  };
+
+  const openSecurityModal = () => {
+    setSecurityModalClosing(false);
+    setSecurityModalOpen(true);
+  };
+
+  const closeSecurityModal = () => {
+    if (securityModalClosing) return;
+    setSecurityModalClosing(true);
+    if (securityModalCloseTimerRef.current) {
+      window.clearTimeout(securityModalCloseTimerRef.current);
+    }
+    securityModalCloseTimerRef.current = window.setTimeout(() => {
+      setSecurityModalOpen(false);
+      setSecurityModalClosing(false);
+      securityModalCloseTimerRef.current = null;
+    }, 300);
+  };
+
+  const openSpeedModal = () => {
+    setSpeedModalClosing(false);
+    setSpeedModalOpen(true);
+  };
+
+  const closeSpeedModal = () => {
+    if (speedModalClosing) return;
+    setSpeedModalClosing(true);
+    if (speedModalCloseTimerRef.current) {
+      window.clearTimeout(speedModalCloseTimerRef.current);
+    }
+    speedModalCloseTimerRef.current = window.setTimeout(() => {
+      setSpeedModalOpen(false);
+      setSpeedModalClosing(false);
+      speedModalCloseTimerRef.current = null;
+    }, 300);
+  };
+
+  const openFeesModal = () => {
+    setFeesModalClosing(false);
+    setFeesModalOpen(true);
+  };
+
+  const closeFeesModal = () => {
+    if (feesModalClosing) return;
+    setFeesModalClosing(true);
+    if (feesModalCloseTimerRef.current) {
+      window.clearTimeout(feesModalCloseTimerRef.current);
+    }
+    feesModalCloseTimerRef.current = window.setTimeout(() => {
+      setFeesModalOpen(false);
+      setFeesModalClosing(false);
+      feesModalCloseTimerRef.current = null;
+    }, 300);
+  };
 
   return (
     <>
@@ -115,7 +243,9 @@ export default function Home() {
           <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-24">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-5">
-                {t("home_v2_hero_badge", "XCANNES")}
+                <span className="inline-block italic -skew-x-12">
+                  {t("home_v2_hero_badge", "XCANNES")}
+                </span>
               </p>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
@@ -167,7 +297,7 @@ export default function Home() {
                   subtitle: t("home_v2_hero_pillar_1_caption", "Paiement & conversion"),
                   link: {
                     label: t("home_v2_hero_pillar_1_link", "Détails"),
-                    onClick: () => setSpeedModalOpen(true),
+                    onClick: () => openSpeedModal(),
                   },
                   icon:
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
@@ -184,7 +314,7 @@ export default function Home() {
                   ),
                   link: {
                     label: t("home_v2_hero_pillar_2_link", "Détails"),
-                    onClick: () => setSecurityModalOpen(true),
+                    onClick: () => openSecurityModal(),
                   },
                   icon:
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
@@ -200,7 +330,7 @@ export default function Home() {
                   ),
                   link: {
                     label: t("home_v2_hero_pillar_3_link", "Détails"),
-                    onClick: () => setFeesModalOpen(true),
+                    onClick: () => openFeesModal(),
                   },
                   icon:
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
@@ -221,7 +351,7 @@ export default function Home() {
                   iconWrapperClassName: "w-10 h-10 lg:w-11 lg:h-11",
                   link: {
                     label: t("home_v2_hero_pillar_4_link", "Détails"),
-                    onClick: () => setValueModalOpen(true),
+                    onClick: () => openValueModal(),
                   },
                   icon:
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
@@ -311,15 +441,19 @@ export default function Home() {
           </div>
         </main>
         {speedModalRoot &&
-          speedModalOpen &&
+          (speedModalOpen || speedModalClosing) &&
           createPortal(
             <div
               className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
-                if (e.target === e.currentTarget) setSpeedModalOpen(false);
+                if (e.target === e.currentTarget) closeSpeedModal();
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div
+                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 ${
+                  speedModalClosing ? "modal-slide-left-out" : "modal-slide-right-in"
+                } motion-reduce:animate-none`}
+              >
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
@@ -341,7 +475,7 @@ export default function Home() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setSpeedModalOpen(false)}
+                    onClick={() => closeSpeedModal()}
                     className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                     aria-label={t("home_v2_hero_speed_modal_close", "Fermer")}
                   >
@@ -385,7 +519,7 @@ export default function Home() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setSpeedModalOpen(false)}
+                    onClick={() => closeSpeedModal()}
                     className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
                   >
                     {t("home_v2_hero_speed_modal_cta", "Compris")}
@@ -396,15 +530,19 @@ export default function Home() {
             speedModalRoot
           )}
         {securityModalRoot &&
-          securityModalOpen &&
+          (securityModalOpen || securityModalClosing) &&
           createPortal(
             <div
               className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
-                if (e.target === e.currentTarget) setSecurityModalOpen(false);
+                if (e.target === e.currentTarget) closeSecurityModal();
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div
+                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 ${
+                  securityModalClosing ? "modal-slide-down-out" : "modal-slide-up-in"
+                } motion-reduce:animate-none`}
+              >
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
@@ -426,7 +564,7 @@ export default function Home() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setSecurityModalOpen(false)}
+                    onClick={() => closeSecurityModal()}
                     className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                     aria-label={t("home_v2_hero_security_modal_close", "Fermer")}
                   >
@@ -474,7 +612,7 @@ export default function Home() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setSecurityModalOpen(false)}
+                    onClick={() => closeSecurityModal()}
                     className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
                   >
                     {t("home_v2_hero_security_modal_cta", "Compris")}
@@ -485,15 +623,19 @@ export default function Home() {
             securityModalRoot
           )}
         {feesModalRoot &&
-          feesModalOpen &&
+          (feesModalOpen || feesModalClosing) &&
           createPortal(
             <div
               className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
-                if (e.target === e.currentTarget) setFeesModalOpen(false);
+                if (e.target === e.currentTarget) closeFeesModal();
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div
+                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 ${
+                  feesModalClosing ? "modal-slide-right-out" : "modal-slide-left-in"
+                } motion-reduce:animate-none`}
+              >
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xcannes-green/90">
@@ -515,7 +657,7 @@ export default function Home() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setFeesModalOpen(false)}
+                    onClick={() => closeFeesModal()}
                     className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors shrink-0"
                     aria-label={t("home_v2_hero_fees_modal_close", "Fermer")}
                   >
@@ -555,7 +697,7 @@ export default function Home() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setFeesModalOpen(false)}
+                    onClick={() => closeFeesModal()}
                     className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
                   >
                     {t("home_v2_hero_fees_modal_cta", "Compris")}
@@ -566,15 +708,19 @@ export default function Home() {
             feesModalRoot
           )}
         {valueModalRoot &&
-          valueModalOpen &&
+          (valueModalOpen || valueModalClosing) &&
           createPortal(
             <div
               className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
               onClick={(e) => {
-                if (e.target === e.currentTarget) setValueModalOpen(false);
+                if (e.target === e.currentTarget) closeValueModal();
               }}
             >
-              <div className="w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none">
+              <div
+                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 ${
+                  valueModalClosing ? "modal-slide-up" : "modal-slide-down"
+                } motion-reduce:animate-none`}
+              >
                 {/* Header avec icône */}
                 <div className="flex items-start justify-between gap-4 mb-5">
                   <div className="flex items-start gap-3">
@@ -598,7 +744,7 @@ export default function Home() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setValueModalOpen(false)}
+                    onClick={() => closeValueModal()}
                     className="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
                     aria-label={t("home_v2_hero_value_modal_close", "Fermer")}
                   >
