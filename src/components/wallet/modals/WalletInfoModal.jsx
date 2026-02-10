@@ -43,7 +43,7 @@ export function WalletInfoContent({
             </span>
           ) : null}
           {showNotConnectedNotice ? (
-            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+            <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
               {t("wallet_not_connected_title", "Wallet not connected")}
             </span>
           ) : null}
@@ -177,8 +177,8 @@ export default function WalletInfoModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = inline
-    ? "relative w-full h-full bg-elevated border border-subtle rounded-xl p-4 md:p-6 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
-    : "relative w-full max-w-2xl bg-elevated border border-subtle rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl";
+    ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-6 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
+    : "relative w-full wallet-modal-panel max-w-2xl bg-elevated border border-subtle rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl";
 
   const content = (
     <>

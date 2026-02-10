@@ -1,5 +1,6 @@
 "use client";
 
+	import { useEffect } from "react";
 	import { useTranslation } from "next-i18next";
 	import { getPageTranslations } from "@/i18n/getPageTranslations";
 	import WalletDashboard from "@/components/wallet/WalletDashboard";
@@ -9,6 +10,14 @@
 export default function Wallet() {
   const { t } = useTranslation("common");
   const { isConnected } = useXumm();
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.classList.add("wallet-page");
+    return () => {
+      document.body.classList.remove("wallet-page");
+    };
+  }, []);
 
   return (
     <>

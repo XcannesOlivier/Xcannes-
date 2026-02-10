@@ -1082,7 +1082,7 @@ export default function CurrencyStatement({
     }}>
 
       <div
-      className={`relative w-full ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}>
+      className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}>
 
         
 	        {/* Header avec Account Info intégré */}
@@ -1111,7 +1111,7 @@ export default function CurrencyStatement({
                     </span>
                   ) : null}
                   {showNotConnectedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                       {t("wallet_not_connected_title", "Wallet not connected")}
                     </span>
                   ) : null}

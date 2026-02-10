@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      spacing: {
+        18: "4.5rem",
+        30: "7.5rem",
+      },
       colors: {
         "xcannes-background": "#0a0f0d",
         "xcannes-green": "#16a34a",

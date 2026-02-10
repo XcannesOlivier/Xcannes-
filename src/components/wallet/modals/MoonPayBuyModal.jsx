@@ -677,7 +677,7 @@ const MoonPayBuyModal = ({
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-          className="relative w-full max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
+          className="relative w-full wallet-modal-panel max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
           onClick={(e) => e.stopPropagation()}>
 
           {/* Header */}
@@ -693,7 +693,7 @@ const MoonPayBuyModal = ({
                   </span>
                 ) : null}
                 {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
