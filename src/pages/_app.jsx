@@ -87,7 +87,7 @@ function App({ Component, pageProps }) {
       if (fromPath === "/" && (toPath === "/dex" || toPath === "/wallet")) {
         setTransitionDirection("from-left");
       } else if (toPath === "/" && (fromPath === "/dex" || fromPath === "/wallet")) {
-        setTransitionDirection("from-right");
+        setTransitionDirection("from-left");
       } else {
         setTransitionDirection("from-right");
       }
