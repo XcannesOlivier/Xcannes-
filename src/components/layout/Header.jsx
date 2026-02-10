@@ -121,6 +121,44 @@ export default function Header({ fixed = true }) {
     [router?.events, router?.locales]
   );
 
+  const withMobileNavDelay = useCallback(
+    (href, { delay = 320 } = {}) =>
+    (e) => {
+      if (typeof window === "undefined") return;
+      if (!e || e.defaultPrevented) return;
+      if (e.button != null && e.button !== 0) return; // only left click
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // keep new-tab behavior
+
+      e.preventDefault();
+
+      const linkEl = e.currentTarget;
+      if (linkEl?.classList) linkEl.classList.add("is-animating");
+
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+      const effectiveDelay = reduceMotion ? 0 : delay;
+
+      window.setTimeout(() => {
+        if (linkEl?.classList) linkEl.classList.remove("is-animating");
+        setMenuOpen(false);
+
+        const safeTarget = linkEl || { getAttribute: () => String(href || "") };
+        const handler = withHardNavFallback(href);
+        handler({
+          defaultPrevented: false,
+          button: 0,
+          metaKey: false,
+          ctrlKey: false,
+          shiftKey: false,
+          altKey: false,
+          currentTarget: safeTarget,
+        });
+
+        router.push(href);
+      }, effectiveDelay);
+    },
+    [router, withHardNavFallback]
+  );
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -191,35 +229,38 @@ export default function Header({ fixed = true }) {
       </Link>
 
       {/* Navigation épurée */}
-      <nav className="hidden md:flex items-center gap-8 font-[300] text-sm">
+      <nav className="hidden md:flex items-center gap-12 font-[300] text-sm">
         {!isHome &&
         <Link
           href="/"
-          className="hover:text-xcannes-green transition-colors duration-200"
+          className="header-nav-link"
           onClick={withHardNavFallback("/")}>
 
-            {t("nav_home")}
+            <span className="header-nav-label">{t("nav_home")}</span>
+            <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
           </Link>
         }
 
         {!isDex &&
         <Link
           href="/dex"
-          className="hover:text-xcannes-green transition-colors duration-200"
+          className="header-nav-link"
           onClick={withHardNavFallback("/dex")}>
 
-            {t("nav_trading", "Markets")}
+            <span className="header-nav-label">{t("nav_trading", "Markets")}</span>
+            <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
           </Link>
         }
 
         <Link
           href="/wallet"
-          className={`hover:text-xcannes-green transition-colors duration-200 ${
-          router.pathname === "/wallet" ? "text-xcannes-green" : ""}`
+          className={`header-nav-link ${
+          router.pathname === "/wallet" ? "is-active" : ""}`
           }
           onClick={withHardNavFallback("/wallet")}>
 
-          {t("nav_wallet", "Wallet")}
+          <span className="header-nav-label">{t("nav_wallet", "Wallet")}</span>
+          <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
         </Link>
 
         <div ref={settingsRef} className="relative">
@@ -282,40 +323,34 @@ export default function Header({ fixed = true }) {
           {!isHome &&
         <Link
           href="/"
-          onClick={(e) => {
-            setMenuOpen(false);
-            withHardNavFallback("/")(e);
-          }}
-          className="hover:text-xcannes-green transition-colors">
+          onClick={withMobileNavDelay("/")}
+          className="header-nav-link w-full justify-between px-8">
 
-              {t("nav_home")}
+              <span className="header-nav-label">{t("nav_home")}</span>
+              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
             </Link>
         }
 
           {!isDex &&
         <Link
           href="/dex"
-          onClick={(e) => {
-            setMenuOpen(false);
-            withHardNavFallback("/dex")(e);
-          }}
-          className="hover:text-xcannes-green transition-colors">
+          onClick={withMobileNavDelay("/dex")}
+          className="header-nav-link w-full justify-between px-8">
 
-              {t("nav_trading", "Markets")}
+              <span className="header-nav-label">{t("nav_trading", "Markets")}</span>
+              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
             </Link>
         }
 
           <Link
           href="/wallet"
-          onClick={(e) => {
-            setMenuOpen(false);
-            withHardNavFallback("/wallet")(e);
-          }}
-          className={`hover:text-xcannes-green transition-colors ${
-          router.pathname === "/wallet" ? "text-xcannes-green" : ""}`
+          onClick={withMobileNavDelay("/wallet")}
+          className={`header-nav-link w-full justify-between px-8 ${
+          router.pathname === "/wallet" ? "is-active" : ""}`
           }>
 
-            {t("nav_wallet", "Wallet")}
+            <span className="header-nav-label">{t("nav_wallet", "Wallet")}</span>
+            <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
           </Link>
 
           <LanguageSwitcher onSelect={() => setMenuOpen(false)} />

@@ -9,7 +9,7 @@ module.exports = {
     extend: {
       colors: {
         "xcannes-background": "#0a0f0d",
-        "xcannes-green": "#10b981",
+        "xcannes-green": "#16a34a",
         "xcannes-blue-light": "#3b82f6",
         "xcannes-blue": "#1e40af",
         "xcannes-blue-weight": "#1e3a5f",
