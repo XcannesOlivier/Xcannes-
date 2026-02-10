@@ -12,7 +12,7 @@ const logError = (...args) => {
 
 const REGION_DEFS = {
   Europe: ["EUR", "GBP", "CHF", "SEK", "NOK", "DKK", "PLN", "CZK", "HUF"],
-  Americas: ["USD", "CAD", "BRL", "MXN", "ARS", "CLP", "COP", "PEN", "BZD", "GTQ", "HNL", "CRC"],
+  Americas: ["USD", "CAD", "BRL", "MXN", "ARS", "CLP", "COP", "SOL", "BZD", "GTQ", "HNL", "CRC"],
   "Asia-Pacific": ["JPY", "CNY", "CNH", "HKD", "KRW", "INR", "SGD", "THB", "PHP", "IDR", "MYR", "AUD", "NZD", "FJD"],
   "Middle East & Africa": ["AED", "SAR", "QAR", "KWD", "EGP", "MAD", "ZAR", "KES", "NGN", "GHS"]
 };
@@ -52,9 +52,7 @@ const DETAILED_REGION_CURRENCIES = {
   "BEF", // Franc belge
   "FRF", // Franc français
   "IEP", // Livre irlandaise
-  "LUF", // Franc luxembourgeois
   "CYP", // Livre chypriote
-  "HRK", // Kuna croate
   "ITL", // Lire italienne
   "MTL", // Lire maltaise
   "PTF", // Escudo portugais (PTE)
@@ -66,8 +64,8 @@ const DETAILED_REGION_CURRENCIES = {
   ],
   "Americas - Northern": ["CAD", "USD"],
   "Americas - Central": ["BZD", "CRC", "GTQ", "HNL", "NIO", "PAB", "SVC"],
-  "Americas - Caribbean": ["BBD", "BMD", "BSD", "CUC", "CUP", "DOP", "HTG", "JMD", "KYD", "TTD", "XCD"],
-  "Americas - Southern": ["ARS", "BRL", "CLP", "COP", "FKP", "GYD", "PEN", "SRD", "UYU"],
+  "Americas - Caribbean": ["BBD", "BMD", "BSD", "CUP", "DOP", "HTG", "JMD", "KYD", "TTD", "XCD"],
+  "Americas - Southern": ["ARS", "BRL", "CLP", "COP", "FKP", "GYD", "SOL", "SRD", "UYU"],
   "Asia - Western": ["AED", "BHD", "ILS", "IQD", "JOD", "KWD", "OMR", "QAR", "SAR", "SYP", "YER"],
   "Asia - Central": ["AMD", "AZN", "GEL", "KGS", "KZT", "TJS", "TMT", "UZS"],
   "Asia - Southern": ["AFN", "BTN", "INR", "LKR", "MVR", "NPR", "PKR"],
@@ -77,7 +75,7 @@ const DETAILED_REGION_CURRENCIES = {
   "Oceania - Melanesia": ["FJD"],
   "Oceania - Polynesia": ["SBD", "TOP", "XPF"],
   "Africa - Northern": ["DZD", "EGP", "LYD", "MAD", "SDG", "TND"],
-  "Africa - Western": ["CVE", "GHS", "GMD", "GNF", "LRD", "NGN", "SHP", "SLE", "SLL"],
+  "Africa - Western": ["CVE", "GHS", "GMD", "GNF", "LRD", "NGN", "SHP", "SLE"],
   "Africa - Central": ["CDF", "STN", "XAF"],
   "Africa - Eastern": ["BIF", "DJF", "ETB", "KES", "KMF", "MUR", "RWF", "SOS", "SSP", "TZS", "UGX"],
   "Africa - Southern": ["AOA", "BWP", "MGA", "MWK", "MZN", "NAD", "SCR", "SZL", "ZAR", "ZWL"]
@@ -134,7 +132,18 @@ export default function FxPairSelector({
   const [favorites, setFavorites] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('fx-favorites');
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      try {
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return [];
+        const normalized = parsed.map((code) => {
+          if (String(code).toUpperCase() === 'PEN') return 'SOL';
+          return String(code).toUpperCase();
+        });
+        return Array.from(new Set(normalized));
+      } catch {
+        return [];
+      }
     }
     return [];
   });

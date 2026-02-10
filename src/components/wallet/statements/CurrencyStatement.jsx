@@ -641,6 +641,7 @@ export default function CurrencyStatement({
       "HNL": "🇭🇳", // Lempira hondurien
       "NIO": "🇳🇮", // Cordoba nicaraguayen
       "PAB": "🇵🇦", // Balboa panaméen
+      "SOL": "🇵🇪", // Sol péruvien (affichage)
       "DOP": "🇩🇴", // Peso dominicain
       "HTG": "🇭🇹", // Gourde haïtienne
       "JMD": "🇯🇲", // Dollar jamaïcain
@@ -680,7 +681,6 @@ export default function CurrencyStatement({
       "HUF": "🇭🇺", // Forint hongrois
       "RON": "🇷🇴", // Leu roumain
       "BGN": "🇧🇬", // Lev bulgare
-      "HRK": "🇭🇷", // Kuna croate
       "RSD": "🇷🇸", // Dinar serbe
       "UAH": "🇺🇦", // Hryvnia ukrainienne
       "BYN": "🇧🇾", // Rouble biélorusse
@@ -719,7 +719,6 @@ export default function CurrencyStatement({
       "USDT": "₮", // Tether
       "USDC": "🔵", // USD Coin
       "BNB": "🔶", // Binance Coin
-      "SOL": "◎", // Solana
       "ADA": "₳", // Cardano
       "DOGE": "Ð", // Dogecoin
       "MATIC": "🟣", // Polygon

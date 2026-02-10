@@ -68,7 +68,8 @@ export const getCurrencyDescription = (code) => {
     "ARS": "Argentine Peso",
     "CLP": "Chilean Peso",
     "COP": "Colombian Peso",
-    "PEN": "Peruvian Sol",
+    "PEN": "Sol",
+    "SOL": "Sol",
     "VES": "Venezuelan Bolivar",
     "UYU": "Uruguayan Peso",
     "PYG": "Paraguayan Guarani",
@@ -87,7 +88,6 @@ export const getCurrencyDescription = (code) => {
     "BZD": "Belizean Dollar",
     "SVC": "Salvadoran Colon",
     "CUP": "Cuban Peso",
-    "CUC": "Cuban Convertible Peso",
     
     // Afrique
     "EGP": "Egyptian Pound",
@@ -114,7 +114,6 @@ export const getCurrencyDescription = (code) => {
     // Europe de l'Est & autres
     "ALL": "Albanian Lek",
     "BGN": "Bulgarian Lev",
-    "HRK": "Croatian Kuna",
     "RSD": "Serbian Dinar",
     "BAM": "Bosnia-Herzegovina Convertible Mark",
     "MKD": "Macedonian Denar",
@@ -157,7 +156,6 @@ export const getCurrencyDescription = (code) => {
     "BTC": "Bitcoin",
     "ETH": "Ethereum",
     "BNB": "Binance Coin",
-    "SOL": "Solana",
     "ADA": "Cardano",
     "DOGE": "Dogecoin",
     "MATIC": "Polygon",
