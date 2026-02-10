@@ -524,7 +524,7 @@ export default function WalletDashboardSwapModal({
             e.stopPropagation();
             onClose();
           }}
-          className="absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
+          className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
 
             ✕
           </button>

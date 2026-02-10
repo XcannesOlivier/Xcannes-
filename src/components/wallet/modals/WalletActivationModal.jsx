@@ -68,7 +68,7 @@ export default function WalletActivationModal({
               onToggleActivationBundle?.(false);
               onClose?.();
             }}
-            className="absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl"
+            className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl"
             aria-label={t("ui_close_08378568ba", "Close")}>
             ✕
           </button>

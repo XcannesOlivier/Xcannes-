@@ -762,7 +762,7 @@ const MoonPaySellModal = ({
             <button
               type="button"
               onClick={onClose}
-              className="text-white/60 hover:text-white transition-colors text-xl">
+              className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl">
 
                 ✕
               </button>

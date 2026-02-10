@@ -1139,7 +1139,7 @@ export default function CurrencyStatement({
             </div>
             <button
             onClick={onClose}
-            className="text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2">
+            className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2">
 
               ×
             </button>

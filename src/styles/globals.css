@@ -206,6 +206,24 @@
   transition: transform 220ms ease, opacity 220ms ease;
 }
 
+/* Compact header links (used for wallet edge links) */
+.header-nav-link.header-nav-link-compact {
+  gap: 0.35rem;
+}
+
+.header-nav-link.header-nav-link-compact .header-nav-arrow {
+  transition: none;
+  transform: none;
+  width: 1.1em;
+  text-align: center;
+}
+
+.header-nav-link.header-nav-link-compact:hover .header-nav-arrow,
+.header-nav-link.header-nav-link-compact:focus-visible .header-nav-arrow,
+.header-nav-link.header-nav-link-compact.is-animating .header-nav-arrow {
+  transform: none;
+}
+
 @media (max-width: 767px) {
   .header-nav-link .header-nav-arrow {
     font-size: 1.4em;
@@ -303,6 +321,12 @@
   body.wallet-page .wallet-modal-panel {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  body.wallet-page .wallet-modal-close {
+    display: none !important;
   }
 }
 

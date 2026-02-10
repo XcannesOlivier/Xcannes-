@@ -31,16 +31,14 @@ export default function Wallet() {
       />
 
       <div className="hidden md:flex fixed top-5 left-6 z-40">
-        <Link href="/" className="header-nav-link text-white/70">
-          <span aria-hidden="true" className="header-nav-arrow">‹</span>
-          <span className="header-nav-label">{t("nav_home", "Page d'accueil")}</span>
+        <Link href="/" className="header-nav-link header-nav-link-compact text-white/70">
+          <span aria-hidden="true" className="header-nav-arrow text-2xl">‹</span>
         </Link>
       </div>
 
       <div className="hidden md:flex fixed top-5 right-6 z-40">
-        <Link href="/dex" className="header-nav-link text-white/70">
-          <span className="header-nav-label">{t("nav_trading", "Taux de change")}</span>
-          <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
+        <Link href="/dex" className="header-nav-link header-nav-link-compact text-white/70">
+          <span aria-hidden="true" className="header-nav-arrow text-2xl">›</span>
         </Link>
       </div>
 
