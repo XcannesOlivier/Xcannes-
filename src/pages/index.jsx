@@ -166,7 +166,7 @@ export default function Home() {
       setValueModalOpen(false);
       setValueModalClosing(false);
       valueModalCloseTimerRef.current = null;
-    }, 300);
+    }, 400);
   };
 
   const openSecurityModal = () => {
@@ -184,7 +184,7 @@ export default function Home() {
       setSecurityModalOpen(false);
       setSecurityModalClosing(false);
       securityModalCloseTimerRef.current = null;
-    }, 300);
+    }, 400);
   };
 
   const openSpeedModal = () => {
@@ -202,7 +202,7 @@ export default function Home() {
       setSpeedModalOpen(false);
       setSpeedModalClosing(false);
       speedModalCloseTimerRef.current = null;
-    }, 300);
+    }, 400);
   };
 
   const openFeesModal = () => {
@@ -220,7 +220,7 @@ export default function Home() {
       setFeesModalOpen(false);
       setFeesModalClosing(false);
       feesModalCloseTimerRef.current = null;
-    }, 300);
+    }, 400);
   };
 
   return (
@@ -242,8 +242,8 @@ export default function Home() {
 
           <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-24">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-5">
-                <span className="inline-block italic -skew-x-12">
+              <p className="text-[11px] tracking-[0.25em] text-white/60 mb-5">
+                <span className="inline-block italic -skew-x-12 lowercase text-[13px]">
                   {t("home_v2_hero_badge", "XCANNES")}
                 </span>
               </p>
