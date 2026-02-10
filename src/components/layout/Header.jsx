@@ -122,7 +122,7 @@ export default function Header({ fixed = true }) {
   );
 
   const withMobileNavDelay = useCallback(
-    (href, { delay = 320 } = {}) =>
+    (href, { delay = 500 } = {}) =>
     (e) => {
       if (typeof window === "undefined") return;
       if (!e || e.defaultPrevented) return;
@@ -229,7 +229,7 @@ export default function Header({ fixed = true }) {
       </Link>
 
       {/* Navigation épurée */}
-      <nav className="hidden md:flex items-center gap-12 font-[300] text-sm">
+      <nav className="hidden md:flex items-center gap-16 font-[300] text-sm">
         {!isHome &&
         <Link
           href="/"
