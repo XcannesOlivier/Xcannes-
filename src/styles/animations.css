@@ -25,3 +25,70 @@
 .animate-pulse-slow {
   animation: pulse-slow 3s ease-in-out infinite;
 }
+
+/* ====== PAGE TRANSITION (SOFT ENTER) ====== */
+
+@keyframes pageEnterFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pageEnterFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.page-transition {
+  transition: opacity 50ms ease-out, transform 50ms ease-out;
+  will-change: opacity, transform;
+}
+
+.page-transition--from-left {
+  animation: pageEnterFromLeft 400ms ease-out;
+}
+
+.page-transition--from-right {
+  animation: pageEnterFromRight 400ms ease-out;
+}
+
+.page-transition--exit {
+  animation: none;
+  opacity: 0;
+}
+
+.page-transition--exit.page-transition--from-left {
+  transform: translateX(24px);
+}
+
+.page-transition--exit.page-transition--from-right {
+  transform: translateX(-24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+    transition: none;
+  }
+
+  .page-transition--from-left,
+  .page-transition--from-right {
+    animation: none;
+  }
+
+  .page-transition--exit {
+    opacity: 1;
+    transform: none;
+  }
+}

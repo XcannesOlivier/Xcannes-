@@ -52,11 +52,69 @@ function XummModalLayer({ children }) {
 }
 
 function App({ Component, pageProps }) {
+  const router = useRouter();
+  const [isRouteChanging, setIsRouteChanging] = useState(false);
+  const [transitionDirection, setTransitionDirection] = useState("from-right");
+
+  useEffect(() => {
+    if (!router?.events) return;
+    const normalizePath = (value) => {
+      if (!value) return "";
+      try {
+        const url = new URL(String(value), window.location.origin);
+        return url.pathname;
+      } catch {
+        return String(value).split("?")[0].split("#")[0];
+      }
+    };
+    const stripLocalePrefix = (path) => {
+      const normalized = normalizePath(path);
+      const locales = router?.locales || [];
+      for (const locale of locales) {
+        const prefix = `/${locale}`;
+        if (normalized === prefix) return "/";
+        if (normalized.startsWith(`${prefix}/`)) {
+          return normalized.slice(prefix.length) || "/";
+        }
+      }
+      return normalized || "/";
+    };
+
+    const handleStart = (url) => {
+      setIsRouteChanging(true);
+      const fromPath = stripLocalePrefix(router.asPath || "/");
+      const toPath = stripLocalePrefix(url || "/");
+      if (fromPath === "/" && (toPath === "/dex" || toPath === "/wallet")) {
+        setTransitionDirection("from-left");
+      } else if (toPath === "/" && (fromPath === "/dex" || fromPath === "/wallet")) {
+        setTransitionDirection("from-right");
+      } else {
+        setTransitionDirection("from-right");
+      }
+    };
+    const handleEnd = () => setIsRouteChanging(false);
+    router.events.on("routeChangeStart", handleStart);
+    router.events.on("routeChangeComplete", handleEnd);
+    router.events.on("routeChangeError", handleEnd);
+    return () => {
+      router.events.off("routeChangeStart", handleStart);
+      router.events.off("routeChangeComplete", handleEnd);
+      router.events.off("routeChangeError", handleEnd);
+    };
+  }, [router?.events]);
+
   return (
     <XummProvider>
       <XcannesWSProvider>
         <XummModalLayer>
-          <Component {...pageProps} />
+          <div
+            key={router.asPath}
+            className={`page-transition page-transition--${transitionDirection}${
+              isRouteChanging ? " page-transition--exit" : ""
+            }`}
+          >
+            <Component {...pageProps} />
+          </div>
         </XummModalLayer>
       </XcannesWSProvider>
     </XummProvider>
