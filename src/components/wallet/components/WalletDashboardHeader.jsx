@@ -1,6 +1,7 @@
 "use client";
 
 import XummConnectButton from "@/components/xumm/XummConnectButton";
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardHeader({
@@ -26,6 +27,7 @@ export default function WalletDashboardHeader({
   onSaveWalletLabel,
   onCancelWalletLabel,
   hideStatementCtaOnDesktop = false,
+  showMobileHomeLink = false,
 }) {
   const { t } = useTranslation("common");
   return (
@@ -34,6 +36,15 @@ export default function WalletDashboardHeader({
       <div className="flex items-center justify-between mb-4 md:mb-3">
         {layout.showBrandTitle ?
         <div className="flex items-center gap-3 min-w-0">
+            {showMobileHomeLink && (
+            <Link
+              href="/"
+              className="md:hidden text-white/70 hover:text-xcannes-green transition-colors text-2xl leading-none"
+              aria-label={t("nav_home", "Page d'accueil")}
+            >
+              ‹
+            </Link>
+            )}
             <span className="text-sm md:text-base font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_3cdc66a392", "XCANNES")}
 
           </span>

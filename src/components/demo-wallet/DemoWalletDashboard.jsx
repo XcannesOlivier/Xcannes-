@@ -28,6 +28,7 @@ import { useSendForm } from "@/components/wallet/hooks/useSendForm";
 import { useReceiveForm } from "@/components/wallet/hooks/useReceiveForm";
 import { usePaymentRequestForm } from "@/components/wallet/hooks/usePaymentRequestForm";
 import { usePaymentRequestScanner } from "@/components/wallet/hooks/usePaymentRequestScanner";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 import { useConvertForm } from "@/components/wallet/hooks/useConvertForm";
 import { useCurrencyLinesForm } from "@/components/wallet/hooks/useCurrencyLinesForm";
 import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
@@ -321,17 +322,6 @@ export default function DemoWalletDashboard({
   const panelRingClass = isHomeTheme ? "ring-white/10" : activeAccent.ring;
   const demoBottomBorderClass =
     isHomeTheme && activeWalletId === "A" ? "border-b border-white/10" : "";
-  const bodyScrollLockRef = useRef({
-    locked: false,
-    overflow: "",
-    paddingRight: "",
-    htmlOverflow: "",
-    position: "",
-    top: "",
-    width: "",
-    scrollY: 0,
-  });
-
   const walletContextLabel = `${t("demo_wallet_label", "Wallet")} ${activeWalletId}`;
   const effectiveWallet = getWalletAddress(state, activeWalletId);
   const { renderWalletMeta } = useWalletMeta({
@@ -761,43 +751,8 @@ export default function DemoWalletDashboard({
   }, [handlePendingDemoRequest]);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const { body, documentElement: html } = document;
-    if (shouldLockBodyScroll) {
-      if (!bodyScrollLockRef.current.locked) {
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        bodyScrollLockRef.current = {
-          locked: true,
-          overflow: body.style.overflow,
-          paddingRight: body.style.paddingRight,
-          htmlOverflow: html.style.overflow,
-          position: body.style.position,
-          top: body.style.top,
-          width: body.style.width,
-          scrollY,
-        };
-        const scrollbarWidth = window.innerWidth - html.clientWidth;
-        html.style.overflow = "hidden";
-        body.style.overflow = "hidden";
-        body.style.position = "fixed";
-        body.style.top = `-${scrollY}px`;
-        body.style.width = "100%";
-        if (scrollbarWidth > 0) {
-          body.style.paddingRight = `${scrollbarWidth}px`;
-        }
-      }
-      return;
-    }
-    if (bodyScrollLockRef.current.locked) {
-      html.style.overflow = bodyScrollLockRef.current.htmlOverflow;
-      body.style.overflow = bodyScrollLockRef.current.overflow;
-      body.style.paddingRight = bodyScrollLockRef.current.paddingRight;
-      body.style.position = bodyScrollLockRef.current.position;
-      body.style.top = bodyScrollLockRef.current.top;
-      body.style.width = bodyScrollLockRef.current.width;
-      window.scrollTo(0, bodyScrollLockRef.current.scrollY || 0);
-      bodyScrollLockRef.current.locked = false;
-    }
+    if (!shouldLockBodyScroll) return;
+    return lockBodyScroll();
   }, [shouldLockBodyScroll]);
 
   useEffect(() => {

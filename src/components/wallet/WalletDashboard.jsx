@@ -28,6 +28,7 @@ import { useWalletTokens } from "./hooks/useWalletTokens";
 import { useRlusdPerUnitRates } from "./hooks/useRlusdPerUnitRates";
 import { useUsdTotalLabel } from "./hooks/useUsdTotalLabel";
 import { useWalletMeta } from "./hooks/useWalletMeta";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 import { useXrplConnectionIndicator } from "./hooks/useXrplConnectionIndicator";
 import { useWalletLabel } from "./hooks/useWalletLabel";
 import WalletDashboardFooter from "./components/WalletDashboardFooter";
@@ -121,6 +122,7 @@ export default function WalletDashboard({
   showDesktopStatement = false,
   showPayreqDecor = false,
   qrSizingVariant = "default",
+  showMobileHomeLink = false,
 }) {
   const { t } = useTranslation("common");
   // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
@@ -2157,54 +2159,9 @@ export default function WalletDashboard({
   const showInlineGlobalStatement =
     isDesktopPanel && !hasInlineModal && !showInlineCurrencyStatement;
 
-  const bodyScrollLockRef = useRef({
-    locked: false,
-    overflow: "",
-    paddingRight: "",
-    htmlOverflow: "",
-    position: "",
-    top: "",
-    width: "",
-    scrollY: 0,
-  });
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const { body, documentElement: html } = document;
-    if (shouldLockBodyScroll) {
-      if (!bodyScrollLockRef.current.locked) {
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        bodyScrollLockRef.current = {
-          locked: true,
-          overflow: body.style.overflow,
-          paddingRight: body.style.paddingRight,
-          htmlOverflow: html.style.overflow,
-          position: body.style.position,
-          top: body.style.top,
-          width: body.style.width,
-          scrollY,
-        };
-        const scrollbarWidth = window.innerWidth - html.clientWidth;
-        html.style.overflow = "hidden";
-        body.style.overflow = "hidden";
-        body.style.position = "fixed";
-        body.style.top = `-${scrollY}px`;
-        body.style.width = "100%";
-        if (scrollbarWidth > 0) {
-          body.style.paddingRight = `${scrollbarWidth}px`;
-        }
-      }
-      return;
-    }
-    if (bodyScrollLockRef.current.locked) {
-      html.style.overflow = bodyScrollLockRef.current.htmlOverflow;
-      body.style.overflow = bodyScrollLockRef.current.overflow;
-      body.style.paddingRight = bodyScrollLockRef.current.paddingRight;
-      body.style.position = bodyScrollLockRef.current.position;
-      body.style.top = bodyScrollLockRef.current.top;
-      body.style.width = bodyScrollLockRef.current.width;
-      window.scrollTo(0, bodyScrollLockRef.current.scrollY || 0);
-      bodyScrollLockRef.current.locked = false;
-    }
+    if (!shouldLockBodyScroll) return;
+    return lockBodyScroll();
   }, [shouldLockBodyScroll]);
 
   return (
@@ -2240,6 +2197,7 @@ export default function WalletDashboard({
           onWalletLabelDraftChange={setWalletLabelDraft}
           onSaveWalletLabel={handleSaveWalletLabel}
           onCancelWalletLabel={handleCancelWalletLabel}
+          showMobileHomeLink={showMobileHomeLink}
         />
 
           {/* Action row: Send / Receive / Exchange / Buy */}

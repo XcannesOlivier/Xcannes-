@@ -56,6 +56,7 @@ export default function Wallet() {
               variant="full"
               showDesktopStatement
               qrSizingVariant="dex"
+              showMobileHomeLink
             />
           </div>
         </div>
