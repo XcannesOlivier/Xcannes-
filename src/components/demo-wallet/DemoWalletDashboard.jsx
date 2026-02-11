@@ -303,6 +303,7 @@ export default function DemoWalletDashboard({
   const state = isExternalState ? demoState : localState;
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
+  const [walletSwitchAnimating, setWalletSwitchAnimating] = useState(false);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
@@ -1368,10 +1369,50 @@ export default function DemoWalletDashboard({
     return walletMap?.[currencyKey]?.eventId || null;
   }, [activeWalletId, selectedStatementToken, statementHighlightByWallet]);
 
+  const walletSwitchTimeoutRef = useRef(null);
+  const walletSwitchRafRef = useRef(null);
+  const prevWalletIdRef = useRef(activeWalletId);
+
+  useEffect(() => {
+    if (prevWalletIdRef.current === activeWalletId) return;
+    prevWalletIdRef.current = activeWalletId;
+
+    setWalletSwitchAnimating(false);
+
+    if (walletSwitchTimeoutRef.current) {
+      window.clearTimeout(walletSwitchTimeoutRef.current);
+      walletSwitchTimeoutRef.current = null;
+    }
+    if (walletSwitchRafRef.current) {
+      window.cancelAnimationFrame(walletSwitchRafRef.current);
+      walletSwitchRafRef.current = null;
+    }
+
+    walletSwitchRafRef.current = window.requestAnimationFrame(() => {
+      setWalletSwitchAnimating(true);
+      walletSwitchTimeoutRef.current = window.setTimeout(() => {
+        setWalletSwitchAnimating(false);
+        walletSwitchTimeoutRef.current = null;
+      }, 360);
+    });
+
+    return () => {
+      if (walletSwitchTimeoutRef.current) {
+        window.clearTimeout(walletSwitchTimeoutRef.current);
+        walletSwitchTimeoutRef.current = null;
+      }
+      if (walletSwitchRafRef.current) {
+        window.cancelAnimationFrame(walletSwitchRafRef.current);
+        walletSwitchRafRef.current = null;
+      }
+    };
+  }, [activeWalletId]);
+
   return (
     <div
       className={[
       "h-full flex flex-col min-h-0 ring-1 rounded-xl bg-elevated border border-white/10",
+      walletSwitchAnimating ? "demo-wallet-switch-in" : "",
       isHomeTheme ? "demo-wallet-theme-home" : "",
       isDexTheme ? "demo-wallet-theme-dex" : "",
       panelRingClass,

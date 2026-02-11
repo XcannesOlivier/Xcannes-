@@ -8,6 +8,7 @@ import {
   buildRlusdPaymentTxjson,
   XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
 
@@ -224,7 +225,12 @@ export default function WalletDashboardAdjustModal({
     }
   };
 
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const remainingLabel = Number.isFinite(totals.remaining)
     ? totals.remaining.toLocaleString("en-US", { maximumFractionDigits: 6 })
@@ -243,13 +249,17 @@ export default function WalletDashboardAdjustModal({
       ? "bg-[#0b1017]"
       : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
 
   const content = (
     <>
       {!inline ? (
         <div
-          className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
           onClick={onClose}
         />
       ) : null}

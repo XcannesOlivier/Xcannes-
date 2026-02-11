@@ -8,6 +8,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletDashboardReceiveModal({
   open,
@@ -209,7 +210,12 @@ export default function WalletDashboardReceiveModal({
   const showRequestPlaceholder = !generatedRequest || !requestValue;
   const qrSize = inline ? 240 : 180;
 
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -219,6 +225,8 @@ export default function WalletDashboardReceiveModal({
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
 
   const content =
@@ -226,8 +234,11 @@ export default function WalletDashboardReceiveModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={onClose} />
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
+          onClick={onClose}
+        />
       ) : null}
 
       {/* Modale */}
@@ -310,21 +321,22 @@ export default function WalletDashboardReceiveModal({
           </button>
           </div>
 
-          <p className="text-xs md:text-sm text-white/50 mb-3">
-            {receiveTab === "receive"
-              ? t(
-                  "ui_receive_assets_desc_1b7f2c9d4e",
-                  "Share this XRPL address to receive funds."
-                )
-              : t(
-                  "ui_request_payment_desc_9c2b1a7d4f",
-                  "Create a payment request to send to another wallet."
-                )}
-          </p>
-
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            {/* Tab Content: Receive */}
-            {receiveTab === "receive" && effectiveWallet &&
+            <div key={receiveTab} className="wallet-tab-unfold-in">
+              <p className="text-xs md:text-sm text-white/50 mb-3">
+                {receiveTab === "receive"
+                  ? t(
+                      "ui_receive_assets_desc_1b7f2c9d4e",
+                      "Share this XRPL address to receive funds."
+                    )
+                  : t(
+                      "ui_request_payment_desc_9c2b1a7d4f",
+                      "Create a payment request to send to another wallet."
+                    )}
+              </p>
+
+              {/* Tab Content: Receive */}
+              {receiveTab === "receive" && effectiveWallet &&
         <div className={`flex flex-col items-center gap-3 ${inline ? "flex-1 min-h-0 justify-center" : ""}`}>
               <div className="bg-black/60 border border-white/10 rounded-xl p-3">
                 <QRCodeCanvas
@@ -350,8 +362,8 @@ export default function WalletDashboardReceiveModal({
             </div>
         }
 
-          {/* Tab Content: Request Payment */}
-          {receiveTab === "request" && effectiveWallet &&
+              {/* Tab Content: Request Payment */}
+              {receiveTab === "request" && effectiveWallet &&
         <div className={`space-y-4 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-4"}>
               <div className="space-y-4">
@@ -539,7 +551,8 @@ export default function WalletDashboardReceiveModal({
               </div>
               </div>
             </div>
-        }
+          }
+            </div>
           </div>
         </div>
       </div>

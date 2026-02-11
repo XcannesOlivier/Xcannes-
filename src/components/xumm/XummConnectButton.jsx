@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useXumm } from "@/context/XummContext";
 import { useTranslation } from "next-i18next";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 const XUMM_ACCOUNT_STORAGE_KEY = "xcannes_xumm_account_status";
 
@@ -51,6 +52,8 @@ export default function XummConnectButton({
   const { wallet, isConnected, isConnecting, connect, disconnect } = useXumm();
   const { t } = useTranslation("common");
   const [showSetupModal, setShowSetupModal] = useState(false);
+  const { shouldRender: shouldRenderSetupModal, isClosing: setupModalClosing } =
+    useModalTransition(showSetupModal);
   useEffect(() => {
     if (isConnected) {
       markXummAccountKnown();
@@ -58,9 +61,9 @@ export default function XummConnectButton({
     }
   }, [isConnected]);
   useEffect(() => {
-    if (!showSetupModal) return;
+    if (!shouldRenderSetupModal) return;
     return lockBodyScroll();
-  }, [showSetupModal]);
+  }, [shouldRenderSetupModal]);
 
   const handleConnectClick = () => {
     if (isConnected) return;
@@ -151,17 +154,23 @@ export default function XummConnectButton({
   `${small ? "px-4 py-1.5 text-xs" : "px-5 py-2 text-sm"} bg-[#3052ff] hover:bg-[#2642d9] text-white font-medium rounded-lg transition-all duration-200`;
 
   const setupModal =
-  showSetupModal && typeof document !== "undefined" ?
+  shouldRenderSetupModal && typeof document !== "undefined" ?
   createPortal(
     <div
-      className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+      className={`fixed inset-0 z-[10050] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 ${
+        setupModalClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+      }`}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           setShowSetupModal(false);
         }
       }}>
 
-            <div className="w-full wallet-modal-panel max-w-md rounded-2xl border border-white/10 bg-gray-900 p-5 text-white shadow-2xl">
+            <div
+              className={`w-full wallet-modal-panel max-w-md rounded-2xl border border-white/10 bg-gray-900 p-5 text-white shadow-2xl ${
+                setupModalClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
+              }`}
+            >
               <h3 className="text-lg font-semibold">
                 {t(
             "xumm_setup_title",

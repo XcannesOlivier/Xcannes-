@@ -96,6 +96,7 @@ export default function CurrencyStatement({
   period = "",
   isFullPage = false,
   variant = "default",
+  isClosing = false,
   inline = false,
   usdRates = {},
   hasRlusdTrustline = false,
@@ -1072,7 +1073,13 @@ export default function CurrencyStatement({
 
   const content =
   <div
-    className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${inline ? "" : resolvedLayout.backdropClass}`}
+    className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
+      inline
+        ? ""
+        : `${resolvedLayout.backdropClass} ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`
+    }`}
     onClick={(e) => {
       if (inline) return;
       // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
@@ -1082,7 +1089,9 @@ export default function CurrencyStatement({
     }}>
 
       <div
-      className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${resolvedLayout.panelClass}`}>
+      className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
+        resolvedLayout.panelClass
+      } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}>
 
         
 	        {/* Header avec Account Info intégré */}

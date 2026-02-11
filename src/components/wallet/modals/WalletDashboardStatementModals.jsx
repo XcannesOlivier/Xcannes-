@@ -6,6 +6,7 @@ import { apiUrl } from "@/lib/runtimeConfig";
 import { getCachedStatement, setCachedStatement } from "@/lib/walletStatementCache";
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletDashboardStatementModals({
   augmentedTokens,
@@ -74,6 +75,7 @@ export default function WalletDashboardStatementModals({
   const [currencyLoadingMore, setCurrencyLoadingMore] = useState(false);
   const [currencyLoading, setCurrencyLoading] = useState(false);
   const [currencyError, setCurrencyError] = useState(null);
+  const [closingCurrencyToken, setClosingCurrencyToken] = useState(null);
 
   const fetchStatement = useCallback(async (params) => {
     const url = new URL(apiUrl("/wallet/statement"));
@@ -311,6 +313,26 @@ export default function WalletDashboardStatementModals({
   const previewTransactions = canFetchStatements
     ? null
     : (previewCurrencyTransactions || []);
+  const effectiveCurrencyToken = selectedStatementToken || closingCurrencyToken;
+  const currencyModalOpen = Boolean(showCurrencyStatement && selectedStatementToken);
+  const globalModalTransition = useModalTransition(showGlobalStatement, {
+    enabled: !inlineGlobalStatement,
+  });
+  const currencyModalTransition = useModalTransition(currencyModalOpen, {
+    enabled: !inlineCurrencyStatement,
+  });
+
+  useEffect(() => {
+    if (selectedStatementToken) {
+      setClosingCurrencyToken(selectedStatementToken);
+    }
+  }, [selectedStatementToken]);
+
+  useEffect(() => {
+    if (!currencyModalTransition.shouldRender) {
+      setClosingCurrencyToken(null);
+    }
+  }, [currencyModalTransition.shouldRender]);
 
   return (
     <>
@@ -388,7 +410,7 @@ export default function WalletDashboardStatementModals({
         </div>
       ) : null}
 
-      {showGlobalStatement && !inlineGlobalStatement ? (
+      {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
         <GlobalStatement
           tokens={augmentedTokens}
           walletAddress={effectiveWallet}
@@ -408,6 +430,7 @@ export default function WalletDashboardStatementModals({
           movementsHasMore={canFetchStatements ? globalHasMore : false}
           movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
           onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
+          isClosing={globalModalTransition.isClosing}
           onClose={() => setShowGlobalStatement(false)}
           onViewCurrency={(token) => {
             setSelectedStatementToken(token);
@@ -417,11 +440,11 @@ export default function WalletDashboardStatementModals({
         />
       ) : null}
 
-      {showCurrencyStatement && selectedStatementToken && !inlineCurrencyStatement ? (
+      {currencyModalTransition.shouldRender && effectiveCurrencyToken && !inlineCurrencyStatement ? (
         <CurrencyStatement
-          currency={selectedStatementToken.currency}
-          balance={parseFloat(selectedStatementToken.value || 0)}
-          issuer={selectedStatementToken.issuer}
+          currency={effectiveCurrencyToken.currency}
+          balance={parseFloat(effectiveCurrencyToken.value || 0)}
+          issuer={effectiveCurrencyToken.issuer}
           walletAddress={effectiveWallet}
           backendWalletAddress={backendWalletAddress}
           isPreviewMode={isPreviewMode}
@@ -447,13 +470,14 @@ export default function WalletDashboardStatementModals({
           loadingMore={canFetchStatements ? currencyLoadingMore : false}
           onLoadMore={
             canFetchStatements
-              ? () => loadCurrencyMore(selectedStatementToken.currency)
+              ? () => loadCurrencyMore(effectiveCurrencyToken.currency)
               : null
           }
           loading={canFetchStatements ? currencyLoading : false}
           error={canFetchStatements ? currencyError : null}
           period="December 2025"
           highlightTransactionId={highlightTransactionId}
+          isClosing={currencyModalTransition.isClosing}
           onClose={() => {
             setShowCurrencyStatement(false);
             setSelectedStatementToken(null);

@@ -197,6 +197,14 @@
   transition: transform 220ms ease;
 }
 
+.header-nav-link.is-reverse {
+  flex-direction: row-reverse;
+}
+
+.header-nav-link.is-reverse .header-nav-label::after {
+  transform-origin: right;
+}
+
 .header-nav-link .header-nav-arrow {
   line-height: 1;
   font-size: 1.25em;
@@ -257,10 +265,21 @@ body.wallet-page .wallet-edge-arrow {
   transform: translateX(6px);
 }
 
+.header-nav-link.is-reverse:hover .header-nav-arrow,
+.header-nav-link.is-reverse:focus-visible .header-nav-arrow,
+.header-nav-link.is-reverse.is-animating .header-nav-arrow {
+  transform: translateX(-6px);
+}
+
 @media (min-width: 768px) {
   .header-nav-link:hover .header-nav-arrow,
   .header-nav-link:focus-visible .header-nav-arrow {
     transform: translateX(12px);
+  }
+
+  .header-nav-link.is-reverse:hover .header-nav-arrow,
+  .header-nav-link.is-reverse:focus-visible .header-nav-arrow {
+    transform: translateX(-12px);
   }
 }
 

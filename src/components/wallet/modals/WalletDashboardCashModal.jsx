@@ -4,6 +4,7 @@ import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletDashboardCashModal({
   open,
@@ -49,7 +50,12 @@ export default function WalletDashboardCashModal({
           "ui_fiat_gateway_note_live_4b8c2d1e9f",
           "Buy/sell via MoonPay (partner). Availability depends on country and payment method. Rates and fees are shown before confirmation."
         );
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -59,6 +65,8 @@ export default function WalletDashboardCashModal({
     inline ? "h-full max-h-none rounded-xl" : "max-w-2xl max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
 
   const content =
@@ -66,8 +74,11 @@ export default function WalletDashboardCashModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={onClose} />
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
+          onClick={onClose}
+        />
       ) : null}
 
 
@@ -194,39 +205,40 @@ export default function WalletDashboardCashModal({
           <div
           className="p-4 md:p-5 overflow-y-auto overscroll-contain flex-1 min-h-0"
           style={{ WebkitOverflowScrolling: "touch" }}>
+            <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
+              {cashModalTab === "buy" ?
+            <MoonPayBuyModal
+              isOpen={true}
+              onClose={onClose}
+              walletAddress={walletAddress || ""}
+              embedded={true}
+              isPreviewMode={isPreviewMode}
+              demoMode={demoMode}
+              onDemoSubmit={onDemoBuy}
+              noticeVariant={noticeVariant}
+              noticeContextLabel={noticeContextLabel}
+              prefill={buyPrefill} /> :
 
-            {cashModalTab === "buy" ?
-          <MoonPayBuyModal
-            isOpen={true}
-            onClose={onClose}
-            walletAddress={walletAddress || ""}
-            embedded={true}
-            isPreviewMode={isPreviewMode}
-            demoMode={demoMode}
-            onDemoSubmit={onDemoBuy}
-            noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel}
-            prefill={buyPrefill} /> :
 
+            <MoonPaySellModal
+              isOpen={true}
+              onClose={onClose}
+              walletAddress={walletAddress || ""}
+              embedded={true}
+              isPreviewMode={isPreviewMode}
+              demoMode={demoMode}
+              onDemoSubmit={onDemoSell}
+              availableTokens={availableTokens}
+              rlusdPerUnitRates={rlusdPerUnitRates}
+              selectLabelByCurrency={selectLabelByCurrency}
+              selectLabelRightByCurrency={selectLabelRightByCurrency}
+              selectIconByCurrency={selectIconByCurrency}
+              selectLabelMobileByCurrency={selectLabelMobileByCurrency}
+              noticeVariant={noticeVariant}
+              noticeContextLabel={noticeContextLabel} />
 
-          <MoonPaySellModal
-            isOpen={true}
-            onClose={onClose}
-            walletAddress={walletAddress || ""}
-            embedded={true}
-            isPreviewMode={isPreviewMode}
-            demoMode={demoMode}
-            onDemoSubmit={onDemoSell}
-            availableTokens={availableTokens}
-            rlusdPerUnitRates={rlusdPerUnitRates}
-            selectLabelByCurrency={selectLabelByCurrency}
-            selectLabelRightByCurrency={selectLabelRightByCurrency}
-            selectIconByCurrency={selectIconByCurrency}
-            selectLabelMobileByCurrency={selectLabelMobileByCurrency}
-            noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel} />
-
-          }
+            }
+            </div>
           </div>
         </div>
       </div>

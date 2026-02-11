@@ -4,6 +4,7 @@ import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { useXumm } from "@/context/XummContext";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -442,7 +443,16 @@ const MoonPaySellModal = ({
     }));
   const fiatSelectValue = fiatCurrencies.length === 0 ? "" : quoteCurrency;
 
-  if (!isOpen) return null;
+  const shouldAnimate = !embedded;
+  const { shouldRender, isClosing } = useModalTransition(isOpen, {
+    enabled: shouldAnimate,
+  });
+
+  if (embedded) {
+    if (!isOpen) return null;
+  } else if (!shouldRender) {
+    return null;
+  }
 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () =>
@@ -710,15 +720,21 @@ const MoonPaySellModal = ({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={step === 'iframe' ? null : onClose} />
+        className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+          isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+        }`}
+        onClick={step === 'iframe' ? null : onClose}
+      />
 
       
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-          className="relative w-full wallet-modal-panel max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
-          onClick={(e) => e.stopPropagation()}>
+          className={`relative w-full wallet-modal-panel max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
+            isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
 
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">

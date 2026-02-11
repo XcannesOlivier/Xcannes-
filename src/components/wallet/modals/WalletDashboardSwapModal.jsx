@@ -11,6 +11,7 @@ import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 import XummQRModal from "@/components/xumm/XummQRModal";
 import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletDashboardSwapModal({
   open,
@@ -489,7 +490,12 @@ export default function WalletDashboardSwapModal({
     }
   };
 
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -499,6 +505,8 @@ export default function WalletDashboardSwapModal({
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
 
   const content =
@@ -506,8 +514,11 @@ export default function WalletDashboardSwapModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={onClose} />
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
+          onClick={onClose}
+        />
       ) : null}
 
       {/* Modale */}
@@ -598,7 +609,8 @@ export default function WalletDashboardSwapModal({
               </div>
             ) : null}
 
-          {view === "convert" ?
+          <div key={view} className="wallet-tab-unfold-in">
+            {view === "convert" ?
         <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               <div className={useDesktopWalletConvertLayout
                 ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-4"
@@ -872,6 +884,7 @@ export default function WalletDashboardSwapModal({
 
             </div>
         }
+          </div>
           </div>
           {view === "lines" ? (
             <div className="border-t border-white/10 px-4 md:px-5 py-2 text-[10px] text-white/45">

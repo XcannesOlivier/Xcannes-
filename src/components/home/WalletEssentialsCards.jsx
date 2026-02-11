@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
@@ -27,41 +27,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!activeActionKey || typeof window === "undefined") return;
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        closeModal();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeActionKey]);
-
-  useEffect(() => {
-    if (!activeActionKey) return;
-    setModalClosing(false);
-    if (closeTimerRef.current) {
-      window.clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-  }, [activeActionKey]);
-
-  const getModalCloseDelay = () => {
+  const getModalCloseDelay = useCallback(() => {
     if (typeof window === "undefined") return 400;
     return window.matchMedia("(max-width: 767px)").matches ? 500 : 400;
-  };
+  }, []);
 
-  const openModal = (key) => {
-    setModalClosing(false);
-    if (closeTimerRef.current) {
-      window.clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-    setActiveActionKey(key);
-  };
-
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     if (modalClosing) return;
     setModalClosing(true);
     if (closeTimerRef.current) {
@@ -72,6 +43,35 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       setModalClosing(false);
       closeTimerRef.current = null;
     }, getModalCloseDelay());
+  }, [getModalCloseDelay, modalClosing]);
+
+  useEffect(() => {
+    if (!activeActionKey || typeof window === "undefined") return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeActionKey, closeModal]);
+
+  useEffect(() => {
+    if (!activeActionKey) return;
+    setModalClosing(false);
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, [activeActionKey]);
+
+  const openModal = (key) => {
+    setModalClosing(false);
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setActiveActionKey(key);
   };
 
   const actions = [
@@ -2160,7 +2160,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                     <div className="flex-1 overflow-y-auto pr-1 min-h-0">
                       <div
                         key={activeFlowKey || "all"}
-                        className="grid grid-cols-1 gap-3 essentials-flow-in"
+                        className="grid grid-cols-1 gap-3 wallet-tab-unfold-in"
                       >
                         {activeAction.modalLayout.flows
                           .filter((flow) =>
