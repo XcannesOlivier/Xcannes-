@@ -708,7 +708,7 @@ export default function GlobalStatement({
           <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-black/40 backdrop-blur-sm z-10">
+                <thead className="sticky top-0 bg-black z-10">
                   <tr className="border-b border-white/10">
                     <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_asset_e3ae76ddf7", "Asset")}</th>
                     <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_type_c5068d5570", "Type")}</th>

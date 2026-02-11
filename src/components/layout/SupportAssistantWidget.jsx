@@ -238,22 +238,22 @@ export default function SupportAssistantWidget({ mode = "support" }) {
 
         .ai-assistant-panel {
           --assistant-panel-bg: #080c0a;
-          --assistant-panel-border: rgba(255, 255, 255, 0.1);
+          --assistant-panel-border: rgba(255, 255, 255, 0.25);
           --assistant-panel-shadow:
             0 8px 32px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.04) inset;
           --assistant-panel-blur: 0px;
           --assistant-badge-bg: rgba(6, 182, 212, 0.15);
-          --assistant-badge-border: rgba(6, 182, 212, 0.3);
+          --assistant-badge-border: rgba(255, 255, 255, 0.25);
           --assistant-badge-color: #06b6d4;
           --assistant-message-bg: #0a0f0d;
-          --assistant-message-border: rgba(148, 163, 184, 0.18);
+          --assistant-message-border: rgba(255, 255, 255, 0.25);
           --assistant-input-bg: #0a0f0d;
-          --assistant-input-border: rgba(148, 163, 184, 0.2);
-          --assistant-input-border-focus: rgba(255, 255, 255, 0.28);
+          --assistant-input-border: rgba(255, 255, 255, 0.25);
+          --assistant-input-border-focus: rgba(255, 255, 255, 0.4);
           --assistant-input-ring: rgba(16, 185, 129, 0.12);
           --assistant-send-bg: rgba(255, 255, 255, 0.06);
-          --assistant-send-border: rgba(255, 255, 255, 0.12);
+          --assistant-send-border: rgba(255, 255, 255, 0.25);
           --assistant-send-color: rgba(255, 255, 255, 0.75);
           --assistant-send-hover-bg: rgba(255, 255, 255, 0.1);
           --assistant-send-hover-border: rgba(255, 255, 255, 0.2);
@@ -262,7 +262,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           background: var(--assistant-panel-bg);
           backdrop-filter: blur(var(--assistant-panel-blur));
           -webkit-backdrop-filter: blur(var(--assistant-panel-blur));
-          border: 1px solid var(--assistant-panel-border);
+          border: 0.1px solid var(--assistant-panel-border);
           border-radius: 16px;
           padding: 16px;
           box-shadow: var(--assistant-panel-shadow);
@@ -271,27 +271,27 @@ export default function SupportAssistantWidget({ mode = "support" }) {
         }
 
         .ai-assistant-panel[data-variant="trading"] {
-          --assistant-panel-bg: rgba(4, 12, 19, 0.9);
-          --assistant-panel-border: rgba(255, 255, 255, 0.1);
+          --assistant-panel-bg: #080c0a;
+          --assistant-panel-border: rgba(255, 255, 255, 0.25);
           --assistant-panel-shadow:
-            0 12px 32px rgba(0, 0, 0, 0.35),
+            0 8px 32px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-          --assistant-panel-blur: 12px;
-          --assistant-badge-bg: rgba(16, 185, 129, 0.2);
-          --assistant-badge-border: rgba(16, 185, 129, 0.4);
-          --assistant-badge-color: #10b981;
-          --assistant-message-bg: rgba(0, 0, 0, 0.2);
-          --assistant-message-border: rgba(255, 255, 255, 0.1);
-          --assistant-input-bg: rgba(0, 0, 0, 0.25);
-          --assistant-input-border: rgba(255, 255, 255, 0.12);
-          --assistant-input-border-focus: rgba(16, 185, 129, 0.45);
+          --assistant-panel-blur: 0px;
+          --assistant-badge-bg: rgba(6, 182, 212, 0.15);
+          --assistant-badge-border: rgba(255, 255, 255, 0.25);
+          --assistant-badge-color: #06b6d4;
+          --assistant-message-bg: #0a0f0d;
+          --assistant-message-border: rgba(255, 255, 255, 0.25);
+          --assistant-input-bg: #0a0f0d;
+          --assistant-input-border: rgba(255, 255, 255, 0.25);
+          --assistant-input-border-focus: rgba(255, 255, 255, 0.4);
           --assistant-input-ring: rgba(16, 185, 129, 0.12);
-          --assistant-send-bg: rgba(255, 255, 255, 0.05);
-          --assistant-send-border: rgba(255, 255, 255, 0.1);
+          --assistant-send-bg: rgba(255, 255, 255, 0.06);
+          --assistant-send-border: rgba(255, 255, 255, 0.25);
           --assistant-send-color: rgba(255, 255, 255, 0.75);
-          --assistant-send-hover-bg: rgba(255, 255, 255, 0.12);
-          --assistant-send-hover-border: rgba(255, 255, 255, 0.22);
-          --assistant-send-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+          --assistant-send-hover-bg: rgba(255, 255, 255, 0.1);
+          --assistant-send-hover-border: rgba(255, 255, 255, 0.2);
+          --assistant-send-hover-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
         }
 
         @keyframes aiPanelFadeIn {
@@ -311,7 +311,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           justify-content: center;
           padding: 2px 6px;
           background: var(--assistant-badge-bg);
-          border: 1px solid var(--assistant-badge-border);
+          border: 0.1px solid var(--assistant-badge-border);
           border-radius: 4px;
           font-size: 10px;
           font-weight: 700;
@@ -346,7 +346,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           overflow-y: auto;
           padding: 12px;
           background: var(--assistant-message-bg);
-          border: 1px solid var(--assistant-message-border);
+          border: 0.1px solid var(--assistant-message-border);
           border-radius: 8px;
         }
 
@@ -372,7 +372,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           flex: 1;
           padding: 8px 12px;
           background: var(--assistant-input-bg);
-          border: 1px solid var(--assistant-input-border);
+          border: 0.1px solid var(--assistant-input-border);
           border-radius: 8px;
           font-size: 14px;
           color: rgba(255, 255, 255, 0.9);
@@ -396,7 +396,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           width: 36px;
           height: 36px;
           background: var(--assistant-send-bg);
-          border: 1px solid var(--assistant-send-border);
+          border: 0.1px solid var(--assistant-send-border);
           border-radius: 8px;
           color: var(--assistant-send-color);
           cursor: pointer;

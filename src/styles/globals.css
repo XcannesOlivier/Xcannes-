@@ -354,6 +354,12 @@ body.wallet-page .wallet-edge-arrow {
   }
 }
 
+@media (min-width: 768px) {
+  body.wallet-page .wallet-modal-close.wallet-modal-close--force {
+    display: inline-flex !important;
+  }
+}
+
 .demo-wallet-theme-home {
   --bg-base: rgba(255, 255, 255, 0.04);
   --bg-elevated: rgba(255, 255, 255, 0.05);

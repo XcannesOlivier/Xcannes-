@@ -60,14 +60,8 @@ export default function WalletDashboardReceiveModal({
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const [isDesktop, setIsDesktop] = useState(false);
-  const showPersistentRequestPreview =
-    inline && isDesktop && noticeVariant !== "demo" && dashboardVariant === "full";
-  const showWalletPageRequestDecor =
-    !inline &&
-    isDesktop &&
-    noticeVariant !== "demo" &&
-    dashboardVariant === "full" &&
-    (!generatedRequest || !requestValue);
+  const showPersistentRequestPreview = false;
+  const showWalletPageRequestDecor = false;
 
   const requestCurrencyCode = useMemo(
     () => String(requestCurrency || "").trim().toUpperCase(),

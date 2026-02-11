@@ -72,9 +72,9 @@ export default function WalletDashboardSendModal({
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 24 24' shape-rendering='crispEdges'%3E%3Crect width='24' height='24' fill='none'/%3E%3Crect x='0' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='17' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='18' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='19' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='0' y='17' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='18' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='19' width='3' height='3' fill='%23fff'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='4' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='13' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='20' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
   const isDemoMode = noticeVariant === "demo";
   const useDemoQrDecor = isDemoMode && isDesktop;
-  const manualQrDecorSize = useDemoQrDecor ? "240px" : "200px";
+  const manualQrDecorSize = useDemoQrDecor ? "170px" : inline && isDesktop ? "120px" : "130px";
   const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
-  const payreqQrDecorSize = useDemoQrDecor ? "220px" : "180px";
+  const payreqQrDecorSize = useDemoQrDecor ? "170px" : inline && isDesktop ? "120px" : "130px";
   const payreqQrDecorOpacity = useDemoQrDecor ? 1 : 0.06;
   const payreqQrDecorPosition = useDemoQrDecor ? "center 12px" : "center 24px";
   const payreqQrDecor = manualQrDecor;
@@ -103,10 +103,10 @@ export default function WalletDashboardSendModal({
       {fauxPayreqExample}
     </div>
   ) : null;
-  const fauxQrSize = inline ? "240px" : "200px";
+  const fauxQrSize = inline ? (isDesktop ? "120px" : "200px") : "160px";
   const fauxQrOpacity = inline ? 0.08 : 0.06;
-  const demoQrSize = useDexSizing ? 240 : 180;
-  const payreqPreviewSize = useDexSizing ? 200 : 180;
+  const demoQrSize = useDexSizing ? 200 : 160;
+  const payreqPreviewSize = useDexSizing ? 170 : 150;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -475,7 +475,7 @@ export default function WalletDashboardSendModal({
                         )}
                       </button>
                     </div>
-                    <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-4 space-y-3 overflow-hidden md:p-8 md:space-y-4 md:min-h-[220px]">
+                    <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-3 space-y-3 overflow-hidden md:p-6 md:space-y-4 md:min-h-[180px]">
                       <div
                         aria-hidden="true"
                         className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
@@ -487,7 +487,7 @@ export default function WalletDashboardSendModal({
                       />
                       {showManualStaticQr ? (
                         <div className="relative z-10 flex items-center justify-center">
-                          <div className="rounded-lg border border-white/10 bg-black/60 p-3">
+                          <div className="rounded-lg border border-white/10 bg-black/60 p-2">
                             <div
                               className={showRealDesktopQrImage ? "opacity-90" : ""}
                               style={showRealDesktopQrImage ? { filter: "brightness(0.15)" } : undefined}
@@ -514,14 +514,6 @@ export default function WalletDashboardSendModal({
                       }} />
                       <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
                     </div>
-                  </div> :
-            null}
-                {showManualQrUpload ?
-            <div className="hidden md:flex items-center justify-center">
-                    <span className="text-2xl font-semibold text-white/70">ou</span>
-                    <span className="ml-2 text-xs font-semibold text-white/50">
-                      Copier/coller l&apos;adresse
-                    </span>
                   </div> :
             null}
                 <div>
@@ -663,7 +655,7 @@ export default function WalletDashboardSendModal({
                         )}
                       </button>
                     </div>
-                    <div className="relative h-[180px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[220px]">
+                    <div className="relative h-[160px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[200px]">
                       <div
                         aria-hidden="true"
                         className="absolute inset-0 pointer-events-none bg-no-repeat"
@@ -702,7 +694,7 @@ export default function WalletDashboardSendModal({
                       ) : null}
                     </div>
                     <div className="hidden md:flex items-center justify-center">
-                      <span className="text-lg font-semibold text-white/70">
+                      <span className="text-xs md:text-sm font-semibold text-white/50">
                         Ou
                       </span>
                       <span className="ml-2 text-xs font-semibold text-white/50">
@@ -787,7 +779,7 @@ export default function WalletDashboardSendModal({
               showFauxQrBackground={showFauxPayreq}
               fauxQrBackgroundSize={fauxQrSize}
               fauxQrBackgroundOpacity={fauxQrOpacity}
-              className={inline ? "flex-1 min-h-[260px] bg-black/30 border-white/10" : "bg-black/30 border-white/10"} />
+              className={inline ? "flex-1 min-h-[210px] bg-black/30 border-white/10" : "bg-black/30 border-white/10"} />
 
                 <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
                   {!isDesktop &&
