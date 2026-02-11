@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { apiUrl } from "@/lib/runtimeConfig";
 import { useTranslation } from "next-i18next";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function XummQRModal({
   isOpen,
@@ -63,10 +64,15 @@ export default function XummQRModal({
     return clearAll;
   }, [displayStatus, isControlled, isOpen, uuid]);
 
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(isOpen, {
+    enabled: shouldAnimate,
+  });
+
   useEffect(() => {
-    if (!isOpen || inline) return;
+    if (!shouldRender || inline) return;
     return lockBodyScroll();
-  }, [isOpen, inline]);
+  }, [shouldRender, inline]);
 
   useEffect(() => {
     if (!isOpen || !uuid || isControlled || !enablePolling) {
@@ -174,14 +180,22 @@ export default function XummQRModal({
     return () => clearTimeout(timer);
   }, [isOpen, isMobile, uuid, deepLink, type, openXummApp]);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "absolute inset-0 z-10 flex"
-    : `fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm`;
-  const panelClass = inline
-    ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-6 shadow-2xl overflow-y-auto"
-    : "relative wallet-modal-panel bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl";
+    : `fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/80 md:backdrop-blur-sm ${
+        isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+      }`;
+  const panelClass = [
+    inline
+      ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-6 shadow-2xl overflow-y-auto"
+      : "relative wallet-modal-panel bg-elevated border border-subtle rounded-2xl p-6 max-w-md w-full shadow-2xl",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={wrapperClass}>

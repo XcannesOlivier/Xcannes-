@@ -101,7 +101,7 @@ function App({ Component, pageProps }) {
       router.events.off("routeChangeComplete", handleEnd);
       router.events.off("routeChangeError", handleEnd);
     };
-  }, [router?.events]);
+  }, [router?.events, router.asPath, router?.locales]);
 
   return (
     <XummProvider>

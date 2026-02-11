@@ -8,6 +8,7 @@ import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletDashboardSendModal({
   open,
@@ -207,7 +208,12 @@ export default function WalletDashboardSendModal({
     }
   }, [canSaveDestination]);
 
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -217,6 +223,8 @@ export default function WalletDashboardSendModal({
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
 
   const content =
@@ -224,8 +232,11 @@ export default function WalletDashboardSendModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={onClose} />
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
+          onClick={onClose}
+        />
       ) : null}
 
       {/* Modale */}
@@ -301,8 +312,9 @@ export default function WalletDashboardSendModal({
 
 
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            {/* Tab Content: Manual Send */}
-            {sendTab === "manual" &&
+            <div key={sendTab} className="wallet-tab-unfold-in">
+              {/* Tab Content: Manual Send */}
+              {sendTab === "manual" &&
         <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
                 <div className={inline ? "space-y-3" : ""}>
@@ -625,8 +637,8 @@ export default function WalletDashboardSendModal({
             </div>
         }
 
-          {/* Tab Content: Scan Request */}
-          {sendTab === "scan-request" &&
+              {/* Tab Content: Scan Request */}
+              {sendTab === "scan-request" &&
         <div className={`space-y-6 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               {useUnifiedPayreqPanel ?
           <>
@@ -852,7 +864,8 @@ export default function WalletDashboardSendModal({
           }
 
             </div>
-        }
+          }
+            </div>
           </div>
         </div>
       </div>

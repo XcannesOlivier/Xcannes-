@@ -237,6 +237,113 @@
   }
 }
 
+@keyframes walletInlineZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wallet-inline-zoom-in {
+  animation: walletInlineZoomIn 220ms ease-out;
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+@keyframes walletTabZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wallet-tab-zoom-in {
+  animation: walletTabZoomIn 220ms ease-out;
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+@keyframes walletTabUnfoldIn {
+  from {
+    opacity: 0;
+    clip-path: inset(50% 0 50% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.wallet-tab-unfold-in {
+  animation: walletTabUnfoldIn 320ms ease-out;
+  will-change: opacity, clip-path;
+}
+
+@keyframes demoWalletSwitchIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.demo-wallet-switch-in {
+  animation: demoWalletSwitchIn 360ms ease-out;
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+@keyframes walletModalLiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes walletModalLiftOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes walletBackdropIn {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes walletBackdropOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .essentials-modal-lift-in {
   animation: essentialsModalLiftIn 400ms ease-out;
   animation-fill-mode: both;
@@ -261,6 +368,30 @@
   will-change: opacity;
 }
 
+.wallet-modal-lift-in {
+  animation: walletModalLiftIn 400ms ease-out;
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+}
+
+.wallet-modal-lift-out {
+  animation: walletModalLiftOut 400ms ease-in;
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+}
+
+.wallet-modal-backdrop-in {
+  animation: walletBackdropIn 400ms ease-out;
+  animation-fill-mode: both;
+  will-change: opacity;
+}
+
+.wallet-modal-backdrop-out {
+  animation: walletBackdropOut 400ms ease-in;
+  animation-fill-mode: both;
+  will-change: opacity;
+}
+
 @media (max-width: 767px) {
   .essentials-modal-lift-in {
     animation: essentialsModalLiftIn 500ms ease-out;
@@ -277,13 +408,37 @@
   .essentials-modal-backdrop-out {
     animation: essentialsBackdropOut 500ms ease-in;
   }
+
+  .wallet-modal-lift-in {
+    animation: walletModalLiftIn 500ms ease-out;
+  }
+
+  .wallet-modal-lift-out {
+    animation: walletModalLiftOut 500ms ease-in;
+  }
+
+  .wallet-modal-backdrop-in {
+    animation: walletBackdropIn 500ms ease-out;
+  }
+
+  .wallet-modal-backdrop-out {
+    animation: walletBackdropOut 500ms ease-in;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .wallet-inline-zoom-in,
+  .wallet-tab-zoom-in,
+  .wallet-tab-unfold-in,
+  .demo-wallet-switch-in,
   .essentials-modal-lift-in,
   .essentials-modal-lift-out,
   .essentials-modal-backdrop-in,
-  .essentials-modal-backdrop-out {
+  .essentials-modal-backdrop-out,
+  .wallet-modal-lift-in,
+  .wallet-modal-lift-out,
+  .wallet-modal-backdrop-in,
+  .wallet-modal-backdrop-out {
     animation: none;
   }
 }
@@ -306,8 +461,28 @@
   will-change: opacity, transform;
 }
 
+@keyframes essentialsTabZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.essentials-tab-zoom-in {
+  animation: essentialsTabZoomIn 220ms ease-out;
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .essentials-flow-in {
+    animation: none;
+  }
+  .essentials-tab-zoom-in {
     animation: none;
   }
 }

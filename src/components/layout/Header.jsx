@@ -239,11 +239,11 @@ export default function Header({ fixed = true }) {
         {!isHome &&
         <Link
           href="/"
-          className="header-nav-link"
+          className={`header-nav-link ${isDex ? "is-reverse" : ""}`}
           onClick={withHardNavFallback("/")}>
 
             <span className="header-nav-label">{t("nav_home")}</span>
-            <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
+            <span aria-hidden="true" className="header-nav-arrow">{isDex ? "<" : ">"}</span>
           </Link>
         }
 
@@ -347,10 +347,10 @@ export default function Header({ fixed = true }) {
         <Link
           href="/"
           onClick={withMobileNavDelay("/")}
-          className="header-nav-link w-full justify-between px-8">
+          className={`header-nav-link w-full justify-between px-8 ${isDex ? "is-reverse" : ""}`}>
 
               <span className="header-nav-label">{t("nav_home")}</span>
-              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
+              <span aria-hidden="true" className="header-nav-arrow">{isDex ? "<" : ">"}</span>
             </Link>
         }
 

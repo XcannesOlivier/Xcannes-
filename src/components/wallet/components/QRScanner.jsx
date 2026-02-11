@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import Image from "next/image";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -209,7 +211,16 @@ export default function QRScanner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraEnabled, isOpen]);
 
-  if (!isOpen) return null;
+  const shouldAnimate = !embedded;
+  const { shouldRender, isClosing } = useModalTransition(isOpen, {
+    enabled: shouldAnimate,
+  });
+
+  if (embedded) {
+    if (!isOpen) return null;
+  } else if (!shouldRender) {
+    return null;
+  }
 
   const handleFile = async (file) => {
     if (!file) return;
@@ -253,6 +264,8 @@ export default function QRScanner({
     "relative rounded-xl border border-white/10 bg-black/20 p-4" :
     "relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-6 shadow-2xl",
     showEmbeddedFauxQr ? "overflow-hidden" : "",
+    embedded ? "wallet-inline-zoom-in" : "",
+    !embedded ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
     className].
     filter(Boolean).
     join(" ")} >
@@ -300,9 +313,13 @@ export default function QRScanner({
                 {staticContent}
               </div>
             ) : (
-              <img
+              <Image
                 src={staticImageSrc}
                 alt={staticImageAlt || t("ui_scan_qr_code_481606b590", "Scan QR Code")}
+                width={640}
+                height={640}
+                sizes="100vw"
+                unoptimized
                 className="block w-full h-auto"
               />
             )}
@@ -388,7 +405,11 @@ export default function QRScanner({
   }
 
   const content =
-  <div className="fixed inset-0 z-[10100] flex items-center justify-center p-4 bg-black/95">
+  <div
+    className={`fixed inset-0 z-[10100] flex items-center justify-center p-4 bg-black/95 ${
+      isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+    }`}
+  >
       {scannerCard}
     </div>;
 

@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletActivationModal({
   open,
@@ -21,7 +22,12 @@ export default function WalletActivationModal({
   const showNotConnectedNotice = isPreviewMode;
   const showRlusdNotActivatedNotice =
     !isPreviewMode && isWalletActivated === true && hasRlusdTrustline === false;
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const actionCardBase =
     "group w-full text-left rounded-xl border border-white/10 bg-black/30 hover:bg-black/40 px-4 py-3 transition-all duration-200 hover:border-white/20 hover:-translate-y-0.5";
@@ -41,19 +47,28 @@ export default function WalletActivationModal({
   const wrapperClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
-  const panelClass = inline
-    ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl overflow-y-auto"
-    : "relative w-full wallet-modal-panel max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl";
+  const panelClass = [
+    inline
+      ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl overflow-y-auto"
+      : "relative w-full wallet-modal-panel max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const content = (
     <>
       {!inline ? (
         <div
-          className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
+          className={`fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
           onClick={() => {
             onToggleActivationBundle?.(false);
             onClose?.();
-          }} />
+          }}
+        />
       ) : null}
 
       <div className={wrapperClass}>

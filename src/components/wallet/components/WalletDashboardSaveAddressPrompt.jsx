@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletDashboardSaveAddressPrompt({
   open,
@@ -12,19 +13,27 @@ export default function WalletDashboardSaveAddressPrompt({
   onSave
 }) {
   const { t } = useTranslation("common");
-  if (!open) return null;
+  const { shouldRender, isClosing } = useModalTransition(open);
+
+  if (!shouldRender) return null;
   if (typeof document === "undefined") return null;
 
   return createPortal(
     <>
       <div
-        className="fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm"
-        onClick={onClose} />
+        className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+          isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+        }`}
+        onClick={onClose}
+      />
 
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
         <div
-          className="relative w-full max-w-md bg-gray-900 border-0 md:border md:border-white/10 rounded-2xl overflow-hidden pointer-events-auto"
-          onClick={(e) => e.stopPropagation()}>
+          className={`relative w-full max-w-md bg-gray-900 border-0 md:border md:border-white/10 rounded-2xl overflow-hidden pointer-events-auto ${
+            isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
+          }`}
+          onClick={(e) => e.stopPropagation()}
+        >
 
           <div className="p-6">
             <h3 className="text-xl font-bold text-white mb-2">{t("ui_save_this_address_7ef65aa11c", "Save this address?")}

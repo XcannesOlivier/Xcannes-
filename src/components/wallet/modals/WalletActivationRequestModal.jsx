@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
+import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function WalletActivationRequestModal({
   open,
@@ -133,21 +134,35 @@ export default function WalletActivationRequestModal({
     handleCopy();
   };
 
-  if (!open) return null;
+  const shouldAnimate = !inline;
+  const { shouldRender, isClosing } = useModalTransition(open, {
+    enabled: shouldAnimate,
+  });
+
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
-  const panelClass = inline
-    ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl overflow-y-auto"
-    : "relative w-full wallet-modal-panel max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl";
+  const panelClass = [
+    inline
+      ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl overflow-y-auto"
+      : "relative w-full wallet-modal-panel max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-3 pointer-events-auto shadow-2xl",
+    inline ? "wallet-inline-zoom-in" : "",
+    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const content = (
     <>
       {!inline ? (
         <div
-          className="fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm"
-          onClick={() => onClose?.()} />
+          className={`fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm ${
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
+          }`}
+          onClick={() => onClose?.()}
+        />
       ) : null}
 
       <div className={wrapperClass}>
