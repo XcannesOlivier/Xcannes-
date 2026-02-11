@@ -84,7 +84,9 @@ export default function WalletDashboardCashModal({
             <div className="flex items-center justify-between p-4 pb-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                  {t("ui_fiat_gateway_2b14cbec79", "Fiat Gateway")}
+                  {cashModalTab === "sell"
+                    ? t("ui_crypto_gateway_title_6b2a4f7e91", "Crypto→Fiat")
+                    : t("ui_fiat_gateway_2b14cbec79", "Fiat→Crypto")}
                 </h3>
                 {noticeVariant === "demo" ? (
                   <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
@@ -121,7 +123,11 @@ export default function WalletDashboardCashModal({
                 ✕
               </button>
             </div>
-            <div className="px-4 pb-3 space-y-2">
+            <div className="px-4 pb-3 space-y-1.5">
+              <p className="text-[11px] text-white/50 leading-relaxed">
+                <span className="font-semibold text-white/70">{t("ui_fiat_label_9f2c1d7b4e", "Fiat")}</span>{" "}
+                {t("ui_fiat_label_detail_7a4e2c9d1f", "Argent bancaire (euros, dollars…)")}
+              </p>
               {renderWalletMeta?.()}
             </div>
 
@@ -130,7 +136,7 @@ export default function WalletDashboardCashModal({
               <button
               type="button"
               onClick={() => setCashModalTab("buy")}
-              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 border ${
+              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
               cashModalTab === "buy" ?
               "bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02]" :
               "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
@@ -147,13 +153,17 @@ export default function WalletDashboardCashModal({
                   </svg>
                   <span>{t("ui_buy_crypto_f72f8661b9", "Buy Crypto")}</span>
                 </div>
-                <div className="text-[10px] mt-1 opacity-70">{t("ui_fiat_crypto_21ae637b23", "Fiat → Crypto")}</div>
+                {t("ui_fiat_crypto_21ae637b23", "") ? (
+                  <div className="text-[10px] mt-1 opacity-70">
+                    {t("ui_fiat_crypto_21ae637b23", "")}
+                  </div>
+                ) : null}
               </button>
 
               <button
               type="button"
               onClick={() => setCashModalTab("sell")}
-              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-sm transition-all duration-200 border ${
+              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
               cashModalTab === "sell" ?
               "bg-violet-500/20 text-violet-500 border-violet-500/40 hover:bg-violet-500/30 hover:scale-[1.02]" :
               "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
@@ -171,7 +181,11 @@ export default function WalletDashboardCashModal({
                   </svg>
                   <span>{t("ui_sell_crypto_c12d62c0d6", "Sell Crypto")}</span>
                 </div>
-                <div className="text-[10px] mt-1 opacity-70">{t("ui_crypto_fiat_7ec0396100", "Crypto → Fiat")}</div>
+                {t("ui_crypto_fiat_7ec0396100", "") ? (
+                  <div className="text-[10px] mt-1 opacity-70">
+                    {t("ui_crypto_fiat_7ec0396100", "")}
+                  </div>
+                ) : null}
               </button>
             </div>
           </div>

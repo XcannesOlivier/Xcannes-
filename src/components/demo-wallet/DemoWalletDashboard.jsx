@@ -1385,11 +1385,11 @@ export default function DemoWalletDashboard({
 
             </span>
             <span className="text-[10px] font-light text-white/30">|</span>
-            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/70 uppercase truncate italic">
+            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/70 truncate italic">
               {t("demo_wallet_label", "Wallet")} {activeWalletId}
             </span>
           </div>
-          <span className="text-[10px] font-semibold text-xcannes-green uppercase tracking-[0.18em]">
+          <span className="text-[10px] font-semibold text-xcannes-green tracking-[0.18em]">
             {t("demo_notice_title", "Demo mode")}
           </span>
         </div>

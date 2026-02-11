@@ -77,7 +77,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const actions = [
     {
       key: "statements",
-      title: t("home_v2_essentials_1_title", "Relevés d'opération"),
+      title: t("home_v2_essentials_1_title", "Suivre"),
       desc: t(
         "home_v2_essentials_1_desc",
         "Suivez les mouvements, par devise ou globalement."
@@ -230,7 +230,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           "Les relevés sont reconstruits depuis l’historique XRPL et reflètent la période et le filtre actifs."
         ),
       },
-      orderClassName: "order-6 lg:order-8",
+      orderClassName: "hidden",
       iconClassName:
         "text-[#22C55E] bg-[rgba(34,197,94,0.08)] group-hover:bg-[rgba(34,197,94,0.14)]",
       borderHoverClassName: "group-hover:border-xcannes-green/60",
@@ -257,7 +257,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       title: t("home_v2_essentials_2_title", "Payer / Envoyer"),
       desc: t(
         "home_v2_essentials_2_desc",
-        "Payer une demande (QR/code) ou envoyer à une adresse."
+        "Payer (QR/code) ou envoyer à une adresse."
       ),
       modalLayout: {
         intro: t(
@@ -269,11 +269,11 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             key: "pay_request",
             tabLabel: t(
               "home_v2_essentials_2_modal_flow_1_tab",
-              "Payer une demande"
+              "Payer"
             ),
             title: t(
               "home_v2_essentials_2_modal_flow_1_title",
-              "Parcours 1 · Payer une demande"
+              "Parcours 1 · Payer"
             ),
             intro: t(
               "home_v2_essentials_2_modal_flow_1_intro",
@@ -338,11 +338,11 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             key: "simple_send",
             tabLabel: t(
               "home_v2_essentials_2_modal_flow_2_tab",
-              "Envoi simple"
+              "Envoyer"
             ),
             title: t(
               "home_v2_essentials_2_modal_flow_2_title",
-              "Parcours 2 · Envoi simple"
+              "Parcours 2 · Envoyer"
             ),
             intro: t(
               "home_v2_essentials_2_modal_flow_2_intro",
@@ -629,15 +629,15 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "convert_lines_mobile",
-      title: t("home_v2_essentials_convert_lines_title", "Conversion & Lignes de comptes"),
+      title: t("home_v2_essentials_convert_lines_title", "Convertir & Suivre"),
       desc: t(
         "home_v2_essentials_convert_lines_desc",
-        "Conversion et lignes de comptes fonctionnent ensemble pour gérer vos devises locales."
+        "Convertissez, suivez et gérez vos opérations."
       ),
       modalLayout: {
         intro: t(
           "home_v2_essentials_convert_lines_modal_intro",
-          "Choisissez de convertir une devise ou de gérer vos lignes de comptes."
+          "Convertir une devise, suivre vos opérations ou gérer vos lignes."
         ),
         flows: [
           {
@@ -777,10 +777,178 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               },
             ],
           },
+          {
+            key: "global",
+            tabLabel: t(
+              "home_v2_essentials_1_modal_flow_1_tab",
+              "Vue globale"
+            ),
+            title: t(
+              "home_v2_essentials_1_modal_flow_1_title",
+              "Parcours 1 · Relevé global"
+            ),
+            intro: t(
+              "home_v2_essentials_1_modal_flow_1_intro",
+              "Une vue d’ensemble des soldes et de toutes vos devises."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_1_title",
+                  "Ouvrir le relevé"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_1_desc",
+                  "Depuis votre wallet, cliquez sur Relevés pour accéder à la vue globale."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_2_title",
+                  "Voir les balances"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_2_desc",
+                  "Le solde total et chaque devise apparaissent au même endroit."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_1",
+                    "Solde total"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_2",
+                    "Balances par devise"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_3",
+                    "Accès rapide aux lignes"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_3_title",
+                  "Exporter ou partager"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_3_desc",
+                  "Téléchargez un PDF/CSV ou partagez le hash du relevé."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_3_detail_1",
+                    "Export PDF / CSV"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_3_detail_2",
+                    "Hash du document"
+                  ),
+                ],
+              },
+            ],
+          },
+          {
+            key: "currency",
+            tabLabel: t(
+              "home_v2_essentials_1_modal_flow_2_tab",
+              "Par devise"
+            ),
+            title: t(
+              "home_v2_essentials_1_modal_flow_2_title",
+              "Parcours 2 · Relevé par devise"
+            ),
+            intro: t(
+              "home_v2_essentials_1_modal_flow_2_intro",
+              "Suivez les débits, crédits et conversions d’une devise."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_1_title",
+                  "Choisir la devise"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_1_desc",
+                  "Sélectionnez la ligne de compte depuis vos balances."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_2_title",
+                  "Filtrer les opérations"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_2_desc",
+                  "Affinez l’affichage par type d’opération."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_1",
+                    "Tous"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_2",
+                    "Crédits"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_3",
+                    "Débits"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_4",
+                    "Conversions"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_3_title",
+                  "Lire la chronologie"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_3_desc",
+                  "Le solde et les opérations s’affichent par mois, avec un solde après chaque mouvement."
+                ),
+              },
+            ],
+          },
+          {
+            key: "config",
+            tabLabel: t("home_v2_essentials_6_title", "Configurer"),
+            title: t(
+              "home_v2_essentials_6_modal_title",
+              "Parcours · Configurer"
+            ),
+            intro: t(
+              "home_v2_essentials_6_desc",
+              "Mise en place simple, fonctionnement clair."
+            ),
+            steps: [
+              {
+                desc: t(
+                  "home_v2_essentials_6_modal_point_1",
+                  "Paramètres simples, guidés pas à pas."
+                ),
+              },
+              {
+                desc: t(
+                  "home_v2_essentials_6_modal_point_2",
+                  "Fonctionnement transparent, règles claires."
+                ),
+              },
+              {
+                desc: t(
+                  "home_v2_essentials_6_modal_point_3",
+                  "Notifications et sécurité configurables."
+                ),
+              },
+            ],
+          },
         ],
         note: "",
       },
-      orderClassName: "order-3 lg:hidden",
+      orderClassName: "hidden",
       iconClassName:
         "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] group-hover:bg-[rgba(6,182,212,0.14)]",
       borderHoverClassName: "group-hover:border-xcannes-green/60",
@@ -819,15 +987,15 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "convert",
-      title: t("home_v2_essentials_3_title", "Conversion"),
+      title: t("home_v2_essentials_3_title", "Convertir & Suivre"),
       desc: t(
         "home_v2_essentials_3_desc",
-        "Taux clairement affiché avant validation."
+        "Convertissez une devise et suivez vos opérations."
       ),
       modalLayout: {
         intro: t(
           "home_v2_essentials_3_modal_intro",
-          "Convertissez entre devises en voyant le taux avant validation."
+          "Deux vues : convertir une devise ou suivre vos opérations."
         ),
         flows: [
           {
@@ -888,10 +1056,149 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               "Selon la paire, la conversion utilise le marché XRPL (XRP/XCS) ou une réallocation interne en RLUSD."
             ),
           },
+          {
+            key: "global",
+            tabLabel: t(
+              "home_v2_essentials_1_modal_flow_1_tab",
+              "Vue globale"
+            ),
+            title: t(
+              "home_v2_essentials_1_modal_flow_1_title",
+              "Parcours 1 · Relevé global"
+            ),
+            intro: t(
+              "home_v2_essentials_1_modal_flow_1_intro",
+              "Une vue d’ensemble des soldes et de toutes vos devises."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_1_title",
+                  "Ouvrir le relevé"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_1_desc",
+                  "Depuis votre wallet, cliquez sur Relevés pour accéder à la vue globale."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_2_title",
+                  "Voir les balances"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_2_desc",
+                  "Le solde total et chaque devise apparaissent au même endroit."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_1",
+                    "Solde total"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_2",
+                    "Balances par devise"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_2_detail_3",
+                    "Accès rapide aux lignes"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_1_step_3_title",
+                  "Exporter ou partager"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_1_step_3_desc",
+                  "Téléchargez un PDF/CSV ou partagez le hash du relevé."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_3_detail_1",
+                    "Export PDF / CSV"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_1_step_3_detail_2",
+                    "Hash du document"
+                  ),
+                ],
+              },
+            ],
+          },
+          {
+            key: "currency",
+            tabLabel: t(
+              "home_v2_essentials_1_modal_flow_2_tab",
+              "Par devise"
+            ),
+            title: t(
+              "home_v2_essentials_1_modal_flow_2_title",
+              "Parcours 2 · Relevé par devise"
+            ),
+            intro: t(
+              "home_v2_essentials_1_modal_flow_2_intro",
+              "Suivez les débits, crédits et conversions d’une devise."
+            ),
+            steps: [
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_1_title",
+                  "Choisir la devise"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_1_desc",
+                  "Sélectionnez la ligne de compte depuis vos balances."
+                ),
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_2_title",
+                  "Filtrer les opérations"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_2_desc",
+                  "Affinez l’affichage par type d’opération."
+                ),
+                details: [
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_1",
+                    "Tous"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_2",
+                    "Crédits"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_3",
+                    "Débits"
+                  ),
+                  t(
+                    "home_v2_essentials_1_modal_flow_2_step_2_detail_4",
+                    "Conversions"
+                  ),
+                ],
+              },
+              {
+                title: t(
+                  "home_v2_essentials_1_modal_flow_2_step_3_title",
+                  "Lire la chronologie"
+                ),
+                desc: t(
+                  "home_v2_essentials_1_modal_flow_2_step_3_desc",
+                  "Le solde et les opérations s’affichent par mois, avec un solde après chaque mouvement."
+                ),
+              },
+            ],
+          },
         ],
-        note: "",
+        note: t(
+          "home_v2_essentials_1_modal_note",
+          "Les relevés sont reconstruits depuis l’historique XRPL et reflètent la période et le filtre actifs."
+        ),
       },
-      orderClassName: "hidden lg:block lg:order-5",
+      orderClassName: "order-3 lg:order-5",
       iconClassName:
         "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] group-hover:bg-[rgba(6,182,212,0.14)]",
       borderHoverClassName: "group-hover:border-xcannes-green/60",
@@ -930,7 +1237,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "config",
-      title: t("home_v2_essentials_6_title", "Configuration"),
+      title: t("home_v2_essentials_6_title", "Configurer"),
       desc: t(
         "home_v2_essentials_6_desc",
         "Mise en place simple, fonctionnement clair."
@@ -949,7 +1256,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           "Notifications et sécurité configurables."
         ),
       ],
-      orderClassName: "order-7 lg:order-9",
+      orderClassName: "hidden",
       iconClassName:
         "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] group-hover:bg-[rgba(139,92,246,0.14)]",
       borderHoverClassName: "group-hover:border-xcannes-green/60",
@@ -1117,7 +1424,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           "Le service est opéré par un prestataire tiers. La disponibilité, les devises prises en charge, les frais et les montants minimums dépendent du pays et du mode de paiement, et sont toujours affichés avant validation."
         ),
       },
-      orderClassName: "order-5 lg:order-6",
+      orderClassName: "order-4 lg:order-6",
       iconClassName:
         "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] group-hover:bg-[rgba(139,92,246,0.14)]",
       borderHoverClassName: "group-hover:border-xcannes-green/60",
@@ -1146,10 +1453,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "lines",
-      title: t("home_v2_essentials_lines_title", "Lignes de comptes"),
+      title: t("home_v2_essentials_lines_title", "Gérer & Configurer"),
       desc: t(
         "home_v2_essentials_lines_desc",
-        "Activez et gérez vos devises locales en quelques étapes."
+        "Gérez vos devises locales et vos paramètres."
       ),
       modalLayout: {
         intro: t(
@@ -1236,10 +1543,42 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               },
             ],
           },
+          {
+            key: "config",
+            tabLabel: t("home_v2_essentials_6_title", "Configurer"),
+            title: t(
+              "home_v2_essentials_6_modal_title",
+              "Parcours · Configurer"
+            ),
+            intro: t(
+              "home_v2_essentials_6_desc",
+              "Mise en place simple, fonctionnement clair."
+            ),
+            steps: [
+              {
+                desc: t(
+                  "home_v2_essentials_6_modal_point_1",
+                  "Paramètres simples, guidés pas à pas."
+                ),
+              },
+              {
+                desc: t(
+                  "home_v2_essentials_6_modal_point_2",
+                  "Fonctionnement transparent, règles claires."
+                ),
+              },
+              {
+                desc: t(
+                  "home_v2_essentials_6_modal_point_3",
+                  "Notifications et sécurité configurables."
+                ),
+              },
+            ],
+          },
         ],
         note: "",
       },
-      orderClassName: "hidden lg:block lg:order-7",
+      orderClassName: "order-5 lg:order-7",
       iconClassName:
         "text-[#F59E0B] bg-[rgba(245,158,11,0.08)] group-hover:bg-[rgba(245,158,11,0.14)]",
       borderHoverClassName: "group-hover:border-xcannes-green/60",
@@ -1311,6 +1650,17 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     activeAction?.key === "convert" ||
     activeAction?.key === "lines" ||
     activeAction?.key === "convert_lines_mobile";
+  const isConvertFollowModal = activeAction?.key === "convert";
+  const lastFollowFlowRef = useRef("global");
+  const isFollowFlow =
+    isConvertFollowModal &&
+    (activeFlowKey === "global" || activeFlowKey === "currency");
+  useEffect(() => {
+    if (!isConvertFollowModal) return;
+    if (activeFlowKey === "global" || activeFlowKey === "currency") {
+      lastFollowFlowRef.current = activeFlowKey;
+    }
+  }, [isConvertFollowModal, activeFlowKey]);
   const useLargeMobileType =
     activeAction?.key === "pay" ||
     activeAction?.key === "receive_request" ||
@@ -1377,20 +1727,20 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const cardPaddingClassName = isCompact ? "p-3" : "p-5";
   const baseLayoutClassName = isCompact
     ? "space-y-2"
-    : "lg:flex lg:items-start lg:gap-6";
+    : "space-y-3";
   const showCardBorders = variant !== "home";
   const titleRowClassName = isCompact
     ? "flex items-center gap-2.5"
-    : "flex items-center gap-3 lg:items-start lg:min-w-[190px]";
+    : "flex items-center gap-3";
   const titleClassName = isCompact
-    ? "text-white/80 font-montserrat font-semibold tracking-[0.18em] text-[10px] uppercase leading-snug"
-    : "text-white/80 font-montserrat font-semibold tracking-widest text-xs uppercase";
+    ? "text-white/80 font-montserrat font-semibold tracking-[0.18em] text-[10px] leading-snug"
+    : "text-white/80 font-montserrat font-semibold tracking-widest text-[15px]";
   const descClassName = isCompact
     ? "text-[12px] text-white/65 leading-snug line-clamp-2"
     : "text-[17px] sm:text-sm text-white/70 leading-relaxed";
   const ctaClassName = isCompact
-    ? "mt-1 flex items-center justify-end gap-1.5 w-full text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
-    : "absolute bottom-3 right-4 flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors overflow-hidden md:static md:mt-3 md:ml-0 md:self-auto lg:mt-0 lg:ml-auto lg:self-start lg:pt-0.5";
+    ? "flex items-center justify-end gap-1.5 text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
+    : "flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden";
 
   const explanationKeys = visibleActions
     .filter((action) => !action.isPlain)
@@ -1403,7 +1753,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const renderActionCard = (action, options = {}) => {
     const { wrapperClassNameOverride = "", keySuffix = "" } = options;
     const cardLayoutClassName = baseLayoutClassName;
-    const descLayoutClassName = !isCompact ? "lg:mt-0 lg:flex-1" : "";
+    const descLayoutClassName = "";
     const isExplanationCard = !action.isPlain;
     const isLastExplanation =
       explanationKeys[explanationKeys.length - 1] === action.key;
@@ -1436,56 +1786,116 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     const effectiveDesc = action.desc;
     const cardContent = (
       <>
-        <div className={titleRowClassName}>
-          {!action.isPlain && (
+        <div
+          className={
+            action.isPlain ? "" : "flex items-center justify-between gap-3"
+          }
+        >
+          <div className={titleRowClassName}>
+            {!action.isPlain && (
+              <div
+                className={[
+                  "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover/card:scale-110",
+                  isCompact ? "w-9 h-9" : "w-10 h-10",
+                  !isCompact ? "lg:mt-0.5" : "",
+                  action.iconClassName,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {action.icon}
+              </div>
+            )}
             <div
-              className={[
-                "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover/card:scale-110",
-                isCompact ? "w-9 h-9" : "w-10 h-10",
-                !isCompact ? "lg:mt-0.5" : "",
-                action.iconClassName,
-              ]
-                .filter(Boolean)
-                .join(" ")}
+              className={
+                action.isPlain
+                  ? action.plainTitleClassName ||
+                    "text-white/90 font-montserrat font-semibold text-sm sm:text-base tracking-normal"
+                  : titleClassName
+              }
             >
-              {action.icon}
+              {effectiveTitle}
+            </div>
+          </div>
+          {!action.isPlain && (
+            <div className={ctaClassName}>
+              <span className="relative z-10">
+                <span className="md:hidden text-xcannes-green text-2xl font-light transition-transform duration-200 group-hover/card:scale-125">
+                  +
+                </span>
+                <span className="hidden md:inline text-xcannes-green text-xl font-light transition-transform duration-200 group-hover/card:scale-125">
+                  +
+                </span>
+              </span>
+              <span className="absolute inset-0 opacity-0 transition-all duration-200 ease-out group-hover/card:opacity-100 group-hover/card:scale-110" />
             </div>
           )}
-          <div
-            className={
-              action.isPlain
-                ? action.plainTitleClassName ||
-                  "text-white/90 font-montserrat font-semibold text-sm sm:text-base tracking-normal"
-                : titleClassName
-            }
-          >
-            {effectiveTitle}
-          </div>
         </div>
-        <p
-          className={[
-            "mt-2 italic",
-            descLayoutClassName,
-            action.isPlain
-              ? action.plainDescClassName || "text-white/60 text-sm"
-              : descClassName,
-          ].join(" ")}
-        >
-          {effectiveDesc}
-        </p>
-        {!action.isPlain && (
-          <div className={ctaClassName}>
-            <span className="relative z-10">
-              <span className="md:hidden text-xcannes-green text-2xl font-light transition-transform duration-200 group-hover/card:scale-125">+</span>
-              <span className="hidden md:inline text-xcannes-green text-xl font-light transition-transform duration-200 group-hover/card:scale-125">+</span>
-            </span>
-            <span className="absolute inset-0 opacity-0 transition-all duration-200 ease-out group-hover/card:opacity-100 group-hover/card:scale-110" />
-          </div>
+        {action.showArrow ? (
+          <>
+            <div className="mt-2 lg:hidden">
+              <p
+                className={[
+                  "italic",
+                  descLayoutClassName,
+                  action.isPlain
+                    ? action.plainDescClassName || "text-white/60 text-sm"
+                    : descClassName,
+                ].join(" ")}
+              >
+                {effectiveDesc}
+              </p>
+            </div>
+            <div className="mt-2 hidden lg:flex items-start justify-between gap-3">
+              <p
+                className={[
+                  "italic",
+                  descLayoutClassName,
+                  action.isPlain
+                    ? action.plainDescClassName || "text-white/60 text-sm"
+                    : descClassName,
+                ].join(" ")}
+              >
+                {effectiveDesc}
+              </p>
+              <span
+                className="inline-flex text-xcannes-green/70 animate-pulse-slow"
+                aria-hidden="true"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M5 12h14"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M14 7l5 5-5 5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+            </div>
+          </>
+        ) : (
+          <p
+            className={[
+              "mt-2 italic",
+              descLayoutClassName,
+              action.isPlain
+                ? action.plainDescClassName || "text-white/60 text-sm"
+                : descClassName,
+            ].join(" ")}
+          >
+            {effectiveDesc}
+          </p>
         )}
         {action.showArrow && (
-          <div className="mt-3 flex justify-end lg:mt-0 lg:ml-auto lg:self-center">
+          <div className="mt-3 flex justify-end lg:hidden">
             <span
-              className="inline-flex lg:hidden text-xcannes-green/70 animate-pulse-slow"
+              className="inline-flex text-xcannes-green/70 animate-pulse-slow"
               aria-hidden="true"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -1501,25 +1911,6 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            <span
-              className="hidden lg:inline-flex text-xcannes-green/70 animate-pulse-slow"
-              aria-hidden="true"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 12h14"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M14 7l5 5-5 5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
                 />
               </svg>
             </span>
@@ -1667,31 +2058,104 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                       {modalIntroText}
                     </p>
                     {activeAction.modalLayout.flows?.length > 1 ? (
-                      <div className="flex gap-2">
-                        {activeAction.modalLayout.flows.map((flow) => {
-                          const isActive = flow.key === activeFlowKey;
-                          const activeTabClass = modalAccentTokens.tabActive;
-                          const inactiveTabClass = modalAccentTokens.tabInactive;
-                          return (
+                      isConvertFollowModal ? (
+                        <div className="flex flex-col gap-2">
+                          <div className="flex gap-2">
                             <button
-                              key={flow.key}
                               type="button"
-                              onClick={() => setActiveFlowKey(flow.key)}
-                              className={`flex-1 px-3 py-2 ${
-                                activeAction.key === "pay"
-                                  ? "text-[15px] sm:text-sm"
-                                  : activeAction.key === "receive_request"
-                                  ? "text-[14px] sm:text-sm"
-                                  : "text-xs md:text-sm"
-                              } ${
-                                isActive ? activeTabClass : inactiveTabClass
+                              onClick={() => setActiveFlowKey("convert")}
+                              className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+                                activeFlowKey === "convert"
+                                  ? modalAccentTokens.tabActive
+                                  : modalAccentTokens.tabInactive
                               }`}
                             >
-                              {flow.tabLabel || flow.title}
+                              {t(
+                                "home_v2_essentials_3_modal_flow_1_tab",
+                                "Convertir"
+                              )}
                             </button>
-                          );
-                        })}
-                      </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setActiveFlowKey(
+                                  lastFollowFlowRef.current || "global"
+                                )
+                              }
+                              className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+                                isFollowFlow
+                                  ? modalAccentTokens.tabActive
+                                  : modalAccentTokens.tabInactive
+                              }`}
+                            >
+                              {t("home_v2_essentials_follow_tab", "Suivre")}
+                            </button>
+                          </div>
+                          <div
+                            className={`flex items-center justify-center gap-4 text-xs md:text-sm overflow-hidden transition-all duration-200 ${
+                              isFollowFlow
+                                ? "opacity-100 max-h-10 border-t border-white/10 pt-2"
+                                : "opacity-0 max-h-0 border-t border-transparent pt-0 pointer-events-none"
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setActiveFlowKey("global")}
+                              className={`transition-colors ${
+                                activeFlowKey === "global"
+                                  ? "text-[#5FC9F8] font-semibold"
+                                  : "text-white/60 hover:text-[#5FC9F8]"
+                              }`}
+                            >
+                              {t(
+                                "home_v2_essentials_1_modal_flow_1_tab",
+                                "Vue globale"
+                              )}
+                            </button>
+                            <span className="text-white/20">•</span>
+                            <button
+                              type="button"
+                              onClick={() => setActiveFlowKey("currency")}
+                              className={`transition-colors ${
+                                activeFlowKey === "currency"
+                                  ? "text-[#5FC9F8] font-semibold"
+                                  : "text-white/60 hover:text-[#5FC9F8]"
+                              }`}
+                            >
+                              {t(
+                                "home_v2_essentials_1_modal_flow_2_tab",
+                                "Par devise"
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          {activeAction.modalLayout.flows.map((flow) => {
+                            const isActive = flow.key === activeFlowKey;
+                            const activeTabClass = modalAccentTokens.tabActive;
+                            const inactiveTabClass = modalAccentTokens.tabInactive;
+                            return (
+                              <button
+                                key={flow.key}
+                                type="button"
+                                onClick={() => setActiveFlowKey(flow.key)}
+                                className={`flex-1 px-3 py-2 ${
+                                  activeAction.key === "pay"
+                                    ? "text-[15px] sm:text-sm"
+                                    : activeAction.key === "receive_request"
+                                    ? "text-[14px] sm:text-sm"
+                                    : "text-xs md:text-sm"
+                                } ${
+                                  isActive ? activeTabClass : inactiveTabClass
+                                }`}
+                              >
+                                {flow.tabLabel || flow.title}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )
                     ) : null}
                     <div className="flex-1 overflow-y-auto pr-1 min-h-0">
                       <div

@@ -577,7 +577,7 @@ export default function WalletDashboardSwapModal({
                     e.stopPropagation();
                     setView("convert");
                   }}
-                  className={`px-3 py-2 text-xs ${
+                  className={`px-3 py-2 text-xs md:text-sm ${
                     view === "convert" ? blueActionBtnMuted : blueTabInactive
                   }`}
                 >
@@ -589,7 +589,7 @@ export default function WalletDashboardSwapModal({
                     e.stopPropagation();
                     setView("lines");
                   }}
-                  className={`px-3 py-2 text-xs ${
+                  className={`px-3 py-2 text-xs md:text-sm ${
                     view === "lines" ? blueActionBtnMuted : blueTabInactive
                   }`}
                 >
