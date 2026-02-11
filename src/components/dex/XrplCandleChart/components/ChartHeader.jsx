@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from "react";
 import FxPairSelector from "./FxPairSelector";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 // En-tête compact original du chart (prix + sélecteurs)
 import { useTranslation } from "next-i18next";
@@ -140,6 +141,14 @@ export default function ChartHeader({
     return () => menu.removeEventListener("keydown", onKeyDown);
   }, [showSettings, dropdownRef]);
 
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    if (typeof window === "undefined") return;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (!isMobile) return;
+    return lockBodyScroll();
+  }, [dropdownOpen]);
+
   return (
     <div className="border-b-0 md:border-b border-subtle border-l-0 border-r-0 px-3 py-2 max-sm:px-2 max-sm:pt-px max-sm:pb-1.5 bg-elevated">
       <div className="flex items-center justify-between gap-3 max-sm:gap-1.5 max-sm:flex-col max-sm:items-stretch">
@@ -224,19 +233,26 @@ export default function ChartHeader({
               </div>
             }
             {/* Dropdown principal sous le nom de paire */}
-            {dropdownOpen &&
             <>
               <div
-                className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm"
+                className={`fixed inset-0 z-30 bg-black/40 backdrop-blur-sm transition-opacity duration-700 ${
+                  dropdownOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                }`}
                 onClick={() => setDropdownOpen(false)}
-                aria-hidden="true" />
+                aria-hidden={!dropdownOpen}
+              />
               <div
                 id="pair-dropdown"
                 role="listbox"
+                aria-hidden={!dropdownOpen}
                 className={`absolute md:fixed z-40 mt-8 md:mt-0 left-1/2 md:left-4 -translate-x-1/2 md:translate-x-0 md:top-28 ${
                 isFxMode ?
                 "w-[92vw] max-w-[92vw] md:w-[640px] md:max-w-[95vw]" :
-                "w-[92vw] max-w-[92vw] md:w-[520px] md:max-w-[95vw]"} max-h-[580px] md:max-h-[680px] overflow-y-auto bg-elevated border border-white/10 rounded-lg shadow-2xl p-2 space-y-2`
+                "w-[92vw] max-w-[92vw] md:w-[520px] md:max-w-[95vw]"} max-h-[580px] md:max-h-[680px] overflow-y-auto bg-elevated border border-white/10 rounded-lg shadow-2xl p-2 space-y-2 transition-all duration-700 ease-out ${
+                  dropdownOpen
+                    ? "opacity-100 translate-y-0 pointer-events-auto"
+                    : "opacity-0 -translate-y-2 pointer-events-none"
+                }`
                 }>
 
                 {(popularLivePairs.length > 0 || xrplPairs.length > 0) &&
@@ -301,7 +317,6 @@ export default function ChartHeader({
 
               </div>
             </>
-            }
           </div>
         </div>
 

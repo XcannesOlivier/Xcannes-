@@ -9,6 +9,7 @@ import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import WalletProductSection from "@/components/home/WalletProductSection";
 import { bankButtonClassName } from "@/components/ui/bankButtonClassName";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 export default function Home() {
   const { t } = useTranslation("common");
@@ -59,36 +60,14 @@ export default function Home() {
     }
   }, [speedModalOpen]);
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const { body, documentElement: html } = document;
-    const prevOverflow = body.style.overflow;
-    const prevPaddingRight = body.style.paddingRight;
-    const prevPosition = body.style.position;
-    const prevTop = body.style.top;
-    const prevWidth = body.style.width;
-    const prevHtmlOverflow = html.style.overflow;
-    if (isHeroModalOpen) {
-      const scrollbarWidth = window.innerWidth - html.clientWidth;
-      const scrollY = window.scrollY || window.pageYOffset || 0;
-      html.style.overflow = "hidden";
-      body.style.overflow = "hidden";
-      body.style.position = "fixed";
-      body.style.top = `-${scrollY}px`;
-      body.style.width = "100%";
-      if (scrollbarWidth > 0) {
-        body.style.paddingRight = `${scrollbarWidth}px`;
-      }
-    }
-    return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevOverflow;
-      body.style.paddingRight = prevPaddingRight;
-      body.style.position = prevPosition;
-      body.style.top = prevTop;
-      body.style.width = prevWidth;
-      window.scrollTo(0, Math.abs(parseInt(prevTop || "0", 10)) || 0);
-    };
-  }, [isHeroModalOpen]);
+    if (!isHeroModalOpen) return;
+    if (typeof window === "undefined") return lockBodyScroll();
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const allowScrollOnMobile =
+      isMobile && (securityModalOpen || speedModalOpen);
+    if (allowScrollOnMobile) return;
+    return lockBodyScroll();
+  }, [isHeroModalOpen, securityModalOpen, speedModalOpen]);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");

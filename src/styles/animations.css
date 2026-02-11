@@ -195,6 +195,123 @@
   }
 }
 
+/* ====== WALLET DEMO MODALS (ESSENTIALS) ====== */
+
+@keyframes essentialsModalLiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes essentialsModalLiftOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes essentialsBackdropIn {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes essentialsBackdropOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.essentials-modal-lift-in {
+  animation: essentialsModalLiftIn 400ms ease-out;
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+}
+
+.essentials-modal-lift-out {
+  animation: essentialsModalLiftOut 400ms ease-in;
+  animation-fill-mode: both;
+  will-change: opacity, transform;
+}
+
+.essentials-modal-backdrop-in {
+  animation: essentialsBackdropIn 400ms ease-out;
+  animation-fill-mode: both;
+  will-change: opacity;
+}
+
+.essentials-modal-backdrop-out {
+  animation: essentialsBackdropOut 400ms ease-in;
+  animation-fill-mode: both;
+  will-change: opacity;
+}
+
+@media (max-width: 767px) {
+  .essentials-modal-lift-in {
+    animation: essentialsModalLiftIn 500ms ease-out;
+  }
+
+  .essentials-modal-lift-out {
+    animation: essentialsModalLiftOut 500ms ease-in;
+  }
+
+  .essentials-modal-backdrop-in {
+    animation: essentialsBackdropIn 500ms ease-out;
+  }
+
+  .essentials-modal-backdrop-out {
+    animation: essentialsBackdropOut 500ms ease-in;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .essentials-modal-lift-in,
+  .essentials-modal-lift-out,
+  .essentials-modal-backdrop-in,
+  .essentials-modal-backdrop-out {
+    animation: none;
+  }
+}
+
+/* ====== WALLET DEMO TAB SWITCH ====== */
+
+@keyframes essentialsFlowIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.essentials-flow-in {
+  animation: essentialsFlowIn 400ms ease-out;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .essentials-flow-in {
+    animation: none;
+  }
+}
+
 /* ====== PAGE TRANSITION (SOFT ENTER) ====== */
 
 @keyframes pageEnterFromLeft {

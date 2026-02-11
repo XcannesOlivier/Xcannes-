@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 export default function WalletEssentialsCards({ variant = "home" }) {
   const { t } = useTranslation("common");
   const [modalRoot, setModalRoot] = useState(null);
   const [activeActionKey, setActiveActionKey] = useState(null);
   const [activeFlowKey, setActiveFlowKey] = useState(null);
+  const [modalClosing, setModalClosing] = useState(false);
+  const closeTimerRef = useRef(null);
   const isCompact = variant === "compare";
 
   useEffect(() => {
@@ -16,6 +19,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     document.body.appendChild(el);
     setModalRoot(el);
     return () => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
       if (document.body.contains(el)) document.body.removeChild(el);
     };
   }, []);
@@ -23,11 +30,49 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   useEffect(() => {
     if (!activeActionKey || typeof window === "undefined") return;
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") setActiveActionKey(null);
+      if (event.key === "Escape") {
+        closeModal();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeActionKey]);
+
+  useEffect(() => {
+    if (!activeActionKey) return;
+    setModalClosing(false);
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, [activeActionKey]);
+
+  const getModalCloseDelay = () => {
+    if (typeof window === "undefined") return 400;
+    return window.matchMedia("(max-width: 767px)").matches ? 500 : 400;
+  };
+
+  const openModal = (key) => {
+    setModalClosing(false);
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setActiveActionKey(key);
+  };
+
+  const closeModal = () => {
+    if (modalClosing) return;
+    setModalClosing(true);
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+    closeTimerRef.current = window.setTimeout(() => {
+      setActiveActionKey(null);
+      setModalClosing(false);
+      closeTimerRef.current = null;
+    }, getModalCloseDelay());
+  };
 
   const actions = [
     {
@@ -1319,35 +1364,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     setActiveFlowKey(firstFlowKey);
   }, [activeActionKey, firstFlowKey]);
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const { body, documentElement: html } = document;
-    const prevOverflow = body.style.overflow;
-    const prevPaddingRight = body.style.paddingRight;
-    const prevPosition = body.style.position;
-    const prevTop = body.style.top;
-    const prevWidth = body.style.width;
-    const prevHtmlOverflow = html.style.overflow;
-    if (activeActionKey) {
-      const scrollbarWidth = window.innerWidth - html.clientWidth;
-      const scrollY = window.scrollY || window.pageYOffset || 0;
-      html.style.overflow = "hidden";
-      body.style.overflow = "hidden";
-      body.style.position = "fixed";
-      body.style.top = `-${scrollY}px`;
-      body.style.width = "100%";
-      if (scrollbarWidth > 0) {
-        body.style.paddingRight = `${scrollbarWidth}px`;
-      }
-    }
-    return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevOverflow;
-      body.style.paddingRight = prevPaddingRight;
-      body.style.position = prevPosition;
-      body.style.top = prevTop;
-      body.style.width = prevWidth;
-      window.scrollTo(0, Math.abs(parseInt(prevTop || "0", 10)) || 0);
-    };
+    if (!activeActionKey) return;
+    return lockBodyScroll();
   }, [activeActionKey]);
 
   const rootClassName = isCompact
@@ -1528,7 +1546,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       >
         <button
           type="button"
-          onClick={() => setActiveActionKey(action.key)}
+          onClick={() => openModal(action.key)}
           className={cardClasses}
           aria-haspopup="dialog"
           aria-expanded={activeActionKey === action.key}
@@ -1594,10 +1612,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         hasModalContent &&
         createPortal(
           <div
-            className="fixed inset-0 z-[10070] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+            className={`fixed inset-0 z-[10070] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 ${
+              modalClosing ? "essentials-modal-backdrop-out" : "essentials-modal-backdrop-in"
+            }`}
             onClick={(event) => {
               if (event.target === event.currentTarget) {
-                setActiveActionKey(null);
+                closeModal();
               }
             }}
           >
@@ -1605,7 +1625,9 @@ export default function WalletEssentialsCards({ variant = "home" }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby={modalTitleId || undefined}
-              className={`w-full max-w-[620px] rounded-xl border border-white/10 ${modalBackgroundClass} p-6 sm:p-7 ${modalShadowClass} animate-[fadeScale_180ms_ease-out] motion-reduce:animate-none`}
+              className={`w-full max-w-[620px] rounded-xl border border-white/10 ${modalBackgroundClass} p-6 sm:p-7 ${modalShadowClass} ${
+                modalClosing ? "essentials-modal-lift-out" : "essentials-modal-lift-in"
+              } motion-reduce:animate-none`}
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 mb-5">
@@ -1617,7 +1639,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 </h4>
                 <button
                   type="button"
-                  onClick={() => setActiveActionKey(null)}
+                  onClick={() => closeModal()}
                   className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-colors"
                   aria-label={t("ui_close_ed73c869c7", "Close")}
                 >
@@ -1672,7 +1694,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                       </div>
                     ) : null}
                     <div className="flex-1 overflow-y-auto pr-1 min-h-0">
-                      <div className="grid grid-cols-1 gap-3">
+                      <div
+                        key={activeFlowKey || "all"}
+                        className="grid grid-cols-1 gap-3 essentials-flow-in"
+                      >
                         {activeAction.modalLayout.flows
                           .filter((flow) =>
                             activeFlowKey ? flow.key === activeFlowKey : true

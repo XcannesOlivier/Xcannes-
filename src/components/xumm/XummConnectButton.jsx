@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useXumm } from "@/context/XummContext";
 import { useTranslation } from "next-i18next";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 const XUMM_ACCOUNT_STORAGE_KEY = "xcannes_xumm_account_status";
 
@@ -50,17 +51,6 @@ export default function XummConnectButton({
   const { wallet, isConnected, isConnecting, connect, disconnect } = useXumm();
   const { t } = useTranslation("common");
   const [showSetupModal, setShowSetupModal] = useState(false);
-  const setupModalLockRef = useRef({
-    locked: false,
-    overflow: "",
-    paddingRight: "",
-    htmlOverflow: "",
-    position: "",
-    top: "",
-    width: "",
-    scrollY: 0,
-  });
-
   useEffect(() => {
     if (isConnected) {
       markXummAccountKnown();
@@ -68,43 +58,8 @@ export default function XummConnectButton({
     }
   }, [isConnected]);
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const { body, documentElement: html } = document;
-    if (showSetupModal) {
-      if (!setupModalLockRef.current.locked) {
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        setupModalLockRef.current = {
-          locked: true,
-          overflow: body.style.overflow,
-          paddingRight: body.style.paddingRight,
-          htmlOverflow: html.style.overflow,
-          position: body.style.position,
-          top: body.style.top,
-          width: body.style.width,
-          scrollY,
-        };
-        const scrollbarWidth = window.innerWidth - html.clientWidth;
-        html.style.overflow = "hidden";
-        body.style.overflow = "hidden";
-        body.style.position = "fixed";
-        body.style.top = `-${scrollY}px`;
-        body.style.width = "100%";
-        if (scrollbarWidth > 0) {
-          body.style.paddingRight = `${scrollbarWidth}px`;
-        }
-      }
-      return;
-    }
-    if (setupModalLockRef.current.locked) {
-      html.style.overflow = setupModalLockRef.current.htmlOverflow;
-      body.style.overflow = setupModalLockRef.current.overflow;
-      body.style.paddingRight = setupModalLockRef.current.paddingRight;
-      body.style.position = setupModalLockRef.current.position;
-      body.style.top = setupModalLockRef.current.top;
-      body.style.width = setupModalLockRef.current.width;
-      window.scrollTo(0, setupModalLockRef.current.scrollY || 0);
-      setupModalLockRef.current.locked = false;
-    }
+    if (!showSetupModal) return;
+    return lockBodyScroll();
   }, [showSetupModal]);
 
   const handleConnectClick = () => {

@@ -3,6 +3,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
+import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 export default function Header({ fixed = true }) {
   const router = useRouter();
@@ -186,38 +187,10 @@ export default function Header({ fixed = true }) {
   }, [settingsOpen]);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
+    if (typeof window === "undefined") return;
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
     if (!menuOpen || !isMobile) return;
-
-    const { body, documentElement: html } = document;
-    const prevOverflow = body.style.overflow;
-    const prevPaddingRight = body.style.paddingRight;
-    const prevPosition = body.style.position;
-    const prevTop = body.style.top;
-    const prevWidth = body.style.width;
-    const prevHtmlOverflow = html.style.overflow;
-    const scrollbarWidth = window.innerWidth - html.clientWidth;
-    const scrollY = window.scrollY || window.pageYOffset || 0;
-
-    html.style.overflow = "hidden";
-    body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.width = "100%";
-    if (scrollbarWidth > 0) {
-      body.style.paddingRight = `${scrollbarWidth}px`;
-    }
-
-    return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevOverflow;
-      body.style.paddingRight = prevPaddingRight;
-      body.style.position = prevPosition;
-      body.style.top = prevTop;
-      body.style.width = prevWidth;
-      window.scrollTo(0, Math.abs(parseInt(prevTop || "0", 10)) || 0);
-    };
+    return lockBodyScroll();
   }, [menuOpen]);
 
   const headerBgClass = (() => {
