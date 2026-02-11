@@ -434,7 +434,7 @@ export default function Home() {
               }}
             >
               <div
-                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 ${
+                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 flex flex-col ${
                   speedModalClosing ? "modal-slide-left-out" : "modal-slide-right-in"
                 } motion-reduce:animate-none`}
               >
@@ -467,37 +467,39 @@ export default function Home() {
                   </button>
                 </div>
 
-                <div className="mt-5 space-y-3">
-                  {[
-                    t(
-                      "home_v2_hero_speed_modal_point_1",
-                      "Transactions XRPL natives : validation on-chain en quelques secondes."
-                    ),
-                    t(
-                      "home_v2_hero_speed_modal_point_2",
-                      "Signature immédiate dans Xaman, sans délais bancaires."
-                    ),
-                    t(
-                      "home_v2_hero_speed_modal_point_3",
-                      "Transactions préremplies : vous validez, c'est terminé."
-                    ),
-                    t(
-                      "home_v2_hero_speed_modal_point_4",
-                      "Engagement XCANNES : < 3 s en conditions normales."
-                    ),
-                  ].map((line) => (
-                    <div key={line} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                      <span className="text-[20.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
-                    </div>
-                  ))}
-                </div>
+                <div className="mt-5 flex-1 min-h-0 overflow-y-auto pr-2 md:overflow-visible md:pr-0">
+                  <div className="space-y-3">
+                    {[
+                      t(
+                        "home_v2_hero_speed_modal_point_1",
+                        "Transactions XRPL natives : validation on-chain en quelques secondes."
+                      ),
+                      t(
+                        "home_v2_hero_speed_modal_point_2",
+                        "Signature immédiate dans Xaman, sans délais bancaires."
+                      ),
+                      t(
+                        "home_v2_hero_speed_modal_point_3",
+                        "Transactions préremplies : vous validez, c'est terminé."
+                      ),
+                      t(
+                        "home_v2_hero_speed_modal_point_4",
+                        "Engagement XCANNES : < 3 s en conditions normales."
+                      ),
+                    ].map((line) => (
+                      <div key={line} className="flex items-start gap-3">
+                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                        <span className="text-[20.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                      </div>
+                    ))}
+                  </div>
 
-                <div className="mt-5 text-[18.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
-                  {t(
-                    "home_v2_hero_speed_modal_note",
-                    "En cas de congestion rare du réseau, le délai peut être légèrement supérieur."
-                  )}
+                  <div className="mt-5 text-[18.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
+                    {t(
+                      "home_v2_hero_speed_modal_note",
+                      "En cas de congestion rare du réseau, le délai peut être légèrement supérieur."
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-6 flex justify-end">
@@ -523,7 +525,7 @@ export default function Home() {
               }}
             >
               <div
-                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 ${
+                className={`w-full max-w-[560px] rounded-xl border border-white/10 bg-elevated p-6 sm:p-7 flex flex-col ${
                   securityModalClosing ? "modal-slide-down-out" : "modal-slide-up-in"
                 } motion-reduce:animate-none`}
               >
@@ -556,41 +558,43 @@ export default function Home() {
                   </button>
                 </div>
 
-                <div className="mt-5 space-y-3">
-                  {[
-                    t(
-                      "home_v2_hero_security_modal_point_1",
-                      "Non‑custodial : XCANNES ne détient pas vos fonds."
-                    ),
-                    t(
-                      "home_v2_hero_security_modal_point_2",
-                      "Chaque action est validée par vous, jamais automatiquement."
-                    ),
-                    t(
-                      "home_v2_hero_security_modal_point_3",
-                      "Transactions enregistrées sur le réseau, traçables et vérifiables."
-                    ),
-                    t(
-                      "home_v2_hero_security_modal_point_5",
-                      "XCANNES renforce la sécurité des transactions en s’appuyant sur Xaman, le wallet natif de l’écosystème XRPL."
-                    ),
-                    t(
-                      "home_v2_hero_security_modal_point_4",
-                      "Les transactions ne peuvent être validées qu’après authentification sur l’appareil de l’utilisateur, par code PIN ou biométrie."
-                    ),
-                  ].map((line) => (
-                    <div key={line} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                      <span className="text-[16.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
-                    </div>
-                  ))}
-                </div>
+                <div className="mt-5 flex-1 min-h-0 overflow-y-auto pr-2 md:overflow-visible md:pr-0">
+                  <div className="space-y-3">
+                    {[
+                      t(
+                        "home_v2_hero_security_modal_point_1",
+                        "Non‑custodial : XCANNES ne détient pas vos fonds."
+                      ),
+                      t(
+                        "home_v2_hero_security_modal_point_2",
+                        "Chaque action est validée par vous, jamais automatiquement."
+                      ),
+                      t(
+                        "home_v2_hero_security_modal_point_3",
+                        "Transactions enregistrées sur le réseau, traçables et vérifiables."
+                      ),
+                      t(
+                        "home_v2_hero_security_modal_point_5",
+                        "XCANNES renforce la sécurité des transactions en s’appuyant sur Xaman, le wallet natif de l’écosystème XRPL."
+                      ),
+                      t(
+                        "home_v2_hero_security_modal_point_4",
+                        "Les transactions ne peuvent être validées qu’après authentification sur l’appareil de l’utilisateur, par code PIN ou biométrie."
+                      ),
+                    ].map((line) => (
+                      <div key={line} className="flex items-start gap-3">
+                        <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
+                        <span className="text-[16.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                      </div>
+                    ))}
+                  </div>
 
-                <div className="mt-5 text-[14.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
-                  {t(
-                    "home_v2_hero_security_modal_note",
-                    "Vous gardez le contrôle, XCANNES n’agit jamais à votre place."
-                  )}
+                  <div className="mt-5 text-[14.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
+                    {t(
+                      "home_v2_hero_security_modal_note",
+                      "Vous gardez le contrôle, XCANNES n’agit jamais à votre place."
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-6 flex justify-end">

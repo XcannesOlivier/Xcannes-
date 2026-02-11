@@ -39,7 +39,7 @@ export default function WalletDashboardHeader({
             {showMobileHomeLink && (
             <Link
               href="/"
-              className="md:hidden text-white/70 hover:text-xcannes-green transition-colors text-2xl leading-none"
+              className="md:hidden text-white/70 hover:text-xcannes-green transition-colors text-3xl leading-none"
               aria-label={t("nav_home", "Page d'accueil")}
             >
               ‹
