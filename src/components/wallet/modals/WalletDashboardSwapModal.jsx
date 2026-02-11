@@ -609,7 +609,10 @@ export default function WalletDashboardSwapModal({
               </div>
             ) : null}
 
-          <div key={view} className="wallet-tab-unfold-in">
+          <div
+            key={view}
+            className={inline ? "wallet-tab-unfold-in flex-1 min-h-0 flex flex-col" : "wallet-tab-unfold-in"}
+          >
             {view === "convert" ?
         <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               <div className={useDesktopWalletConvertLayout
@@ -740,15 +743,6 @@ export default function WalletDashboardSwapModal({
                 {dexError ? (
                   <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
                     {dexError}
-                  </div>
-                ) : null}
-
-                {isDexRoute && isPreviewMode ? (
-                  <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
-                    {t(
-                      "ui_wallet_required_trade_18f7e1d2a9",
-                      "Connect your wallet to trade."
-                    )}
                   </div>
                 ) : null}
 

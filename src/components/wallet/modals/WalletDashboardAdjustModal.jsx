@@ -240,11 +240,11 @@ export default function WalletDashboardAdjustModal({
     : "-";
 
   const wrapperClass = inline
-    ? "relative w-full h-full flex"
+    ? "relative w-full flex-1 min-h-0 flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
-    inline ? "h-full max-h-none rounded-xl" : "max-w-2xl max-h-[92vh] rounded-2xl",
+    inline ? "h-full max-h-none rounded-xl min-h-0" : "max-w-2xl max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" && walletId === "B"
       ? "bg-[#0b1017]"
       : "bg-elevated",
@@ -252,6 +252,10 @@ export default function WalletDashboardAdjustModal({
     inline ? "wallet-inline-zoom-in" : "",
     !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
+
+  const listContainerClass = inline
+    ? "space-y-3 max-h-[50vh] overflow-y-auto pr-1"
+    : "space-y-3";
 
   const content = (
     <>
@@ -283,7 +287,7 @@ export default function WalletDashboardAdjustModal({
           </button>
 
           <div
-            className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 space-y-4"
+            className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 md:p-6 space-y-4"
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
@@ -368,7 +372,7 @@ export default function WalletDashboardAdjustModal({
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className={listContainerClass}>
               {lineRows.length === 0 ? (
                 <div className="text-sm text-white/50">
                   {t(

@@ -1393,7 +1393,7 @@ export default function DemoWalletDashboard({
       walletSwitchTimeoutRef.current = window.setTimeout(() => {
         setWalletSwitchAnimating(false);
         walletSwitchTimeoutRef.current = null;
-      }, 360);
+      }, 500);
     });
 
     return () => {
@@ -1411,7 +1411,7 @@ export default function DemoWalletDashboard({
   return (
     <div
       className={[
-      "h-full flex flex-col min-h-0 ring-1 rounded-xl bg-elevated border border-white/10",
+      "h-full flex flex-col min-h-0 ring-1 rounded-b-xl rounded-t-none bg-elevated border border-white/10",
       walletSwitchAnimating ? "demo-wallet-switch-in" : "",
       isHomeTheme ? "demo-wallet-theme-home" : "",
       isDexTheme ? "demo-wallet-theme-dex" : "",
