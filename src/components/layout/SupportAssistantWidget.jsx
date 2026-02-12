@@ -90,11 +90,11 @@ export default function SupportAssistantWidget({ mode = "support" }) {
     ? t("ui_send_504b64a87b", "Envoyer")
     : t("home_support_send", "Envoyer");
   const messageTitleClass = isTrading
-    ? "text-sm font-medium text-white/90 mb-2"
-    : "text-[13.5px] font-medium text-white/90 mb-2";
+    ? "text-sm font-semibold text-white/90 mb-2"
+    : "text-[13.5px] font-semibold text-white/90 mb-2";
   const messageBodyClass = isTrading
-    ? "text-xs text-white/60 leading-relaxed"
-    : "text-[12.5px] text-white/60 leading-relaxed";
+    ? "text-xs font-medium text-white/60 leading-relaxed"
+    : "text-[12.5px] font-medium text-white/60 leading-relaxed";
 
   return createPortal(
     <div className={wrapperClassName}>
@@ -345,7 +345,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           max-height: 280px;
           overflow-y: auto;
           padding: 12px;
-          background: #f1ece3;
+          background: #dfd4c6;
           border: 0.1px solid rgba(0, 0, 0, 0.18);
           border-radius: 8px;
         }
@@ -379,10 +379,11 @@ export default function SupportAssistantWidget({ mode = "support" }) {
         .ai-input {
           flex: 1;
           padding: 8px 12px;
-          background: #f2ede4;
+          background: #ded6ca;
           border: 0.1px solid rgba(0, 0, 0, 0.2);
           border-radius: 8px;
           font-size: 14px;
+          font-weight: 500;
           color: #0a0f0d;
           transition: all 120ms;
         }
