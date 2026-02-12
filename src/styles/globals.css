@@ -31,8 +31,8 @@
   /* Status / trading */
   --success: #16a34a;
   --error: #f97373;
-  --price-up: #4ade80;
-  --price-down: #fb7185;
+  --price-up: #16a34a;
+  --price-down: #dc2626;
 
   /* Focus */
   --focus-ring: #fbbf24;
@@ -235,6 +235,12 @@
 body.wallet-page .wallet-edge-arrow {
   font-size: 48px;
   line-height: 1;
+}
+
+body.wallet-page .header-nav-link.header-nav-link-compact:hover,
+body.wallet-page .header-nav-link.header-nav-link-compact:focus-visible,
+body.wallet-page .header-nav-link.header-nav-link-compact.is-animating {
+  color: #15803d;
 }
 
 @media (max-width: 767px) {

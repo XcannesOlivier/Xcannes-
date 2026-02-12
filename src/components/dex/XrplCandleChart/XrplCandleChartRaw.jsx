@@ -371,16 +371,16 @@ export default function XrplCandleChartRaw({
         crosshair: {
           mode: chartSettings.showCrosshair ? 1 : 0,
           vertLine: {
-            color: "#10b981ff",
+            color: "#16a34a",
             width: 1,
             style: 3,
-            labelBackgroundColor: "#10b981ff"
+            labelBackgroundColor: "#16a34a"
           },
           horzLine: {
-            color: "#10b981ff",
+            color: "#16a34a",
             width: 1,
             style: 3,
-            labelBackgroundColor: "#10b981ff"
+            labelBackgroundColor: "#16a34a"
           }
         },
         timeScale: {
@@ -432,12 +432,12 @@ export default function XrplCandleChartRaw({
       if (chartType === "candle") {
         candleSeriesRef.current = chart.addCandlestickSeries({
           // Même palette : vert xcannes-green, rouge xcannes-red
-          upColor: "#10b981c0",
-          downColor: "#f16262ff",
-          borderUpColor: "#10b981c0",
-          borderDownColor: "#f16262ff",
-          wickUpColor: "#10b981c0",
-          wickDownColor: "#f16262ff",
+          upColor: "rgba(22, 163, 74, 0.75)",
+          downColor: "rgba(220, 38, 38, 0.75)",
+          borderUpColor: "rgba(22, 163, 74, 0.75)",
+          borderDownColor: "rgba(220, 38, 38, 0.75)",
+          wickUpColor: "rgba(22, 163, 74, 0.75)",
+          wickDownColor: "rgba(220, 38, 38, 0.75)",
           priceLineVisible: priceLineVisibleMain,
           lastValueVisible: lastValueVisibleMain,
           priceFormat: {
@@ -457,10 +457,10 @@ export default function XrplCandleChartRaw({
         }));
 
         candleSeriesRef.current = chart.addAreaSeries({
-          lineColor: "#10b981c0",
+          lineColor: "rgba(22, 163, 74, 0.75)",
           topColor: isMobileScreen ?
-          "rgba(16, 185, 129, 0.18)" :
-          "rgba(16, 185, 129, 0.10)",
+          "rgba(22, 163, 74, 0.18)" :
+          "rgba(22, 163, 74, 0.10)",
           bottomColor: "rgba(16, 185, 129, 0.0)",
           lineWidth: 2,
           priceLineVisible: priceLineVisibleMain,
