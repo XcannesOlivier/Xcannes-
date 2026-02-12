@@ -145,9 +145,11 @@ export default function XrplCandleChartRaw({
   // Fermer le dropdown si on clique à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
+      const dropdownNode = dropdownRef.current;
+      const menuNode = document.getElementById("pair-dropdown");
+      if (dropdownNode && dropdownNode.contains(event.target)) return;
+      if (menuNode && menuNode.contains(event.target)) return;
+      setDropdownOpen(false);
     };
 
     document.addEventListener('mousedown', handleClickOutside);

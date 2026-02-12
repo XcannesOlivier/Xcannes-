@@ -485,7 +485,7 @@ export default function FxPairSelector({
 
         </div> :
 
-        <div className={alwaysOpen ? "max-h-[220px] md:max-h-[320px] overflow-y-scroll" : "max-h-[220px] md:max-h-[320px] overflow-y-scroll"}>
+        <div className={alwaysOpen ? "max-h-[236px] md:max-h-[330px] overflow-y-scroll" : "max-h-[236px] md:max-h-[330px] overflow-y-scroll"}>
               {compact ?
           <div className="px-3 py-2 space-y-3">
                   <div>

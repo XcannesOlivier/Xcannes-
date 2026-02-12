@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import FxPairSelector from "./FxPairSelector";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
@@ -58,6 +59,8 @@ export default function ChartHeader({
     sort((a, b) => a.localeCompare(b));
     return [...preferred, ...rest];
   }, [filteredMarketStructure]);
+  const [isMobile, setIsMobile] = useState(false);
+  const [dropdownTop, setDropdownTop] = useState(null);
   const xrplPairs = useMemo(() => {
     const xrpl = filteredMarketStructure?.xrpl?.currencies;
     if (!xrpl) return [];
@@ -80,8 +83,11 @@ export default function ChartHeader({
 
   // Accessibilité : focus trap dans le dropdown paires
   useEffect(() => {
-    if (!dropdownOpen || !dropdownRef?.current) return;
-    const container = dropdownRef.current;
+    if (!dropdownOpen) return;
+    const container =
+      document.getElementById("pair-dropdown") ||
+      dropdownRef?.current;
+    if (!container) return;
     const focusables = container.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
@@ -149,6 +155,140 @@ export default function ChartHeader({
     return lockBodyScroll();
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobile(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!dropdownOpen || !isMobile) return;
+    if (!dropdownRef?.current) return;
+    const update = () => {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setDropdownTop(Math.round(rect.bottom + 1));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [dropdownOpen, isMobile, dropdownRef]);
+
+  const dropdownOverlay = (
+    <div
+      className={`fixed inset-0 z-30 bg-black/40 backdrop-blur-[2px] transition-opacity duration-700 ${
+        dropdownOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
+      onClick={() => setDropdownOpen(false)}
+      aria-hidden={!dropdownOpen}
+    />
+  );
+
+  const dropdownMenu = (
+    <div
+      id="pair-dropdown"
+      role="listbox"
+      aria-hidden={!dropdownOpen}
+      style={isMobile && dropdownTop != null ? { top: dropdownTop } : undefined}
+      className={`${
+        isMobile ? "fixed mt-0" : "absolute md:fixed mt-8 md:mt-0"
+      } z-40 left-1/2 md:left-4 -translate-x-1/2 md:translate-x-0 md:top-10 ${
+        isFxMode
+          ? "w-[92vw] max-w-[92vw] md:w-[640px] md:max-w-[95vw]"
+          : "w-[92vw] max-w-[92vw] md:w-[520px] md:max-w-[95vw]"
+      } max-h-[600px] md:max-h-[700px] overflow-y-auto bg-elevated border border-white/10 rounded-lg shadow-2xl p-2 space-y-2 transition-all duration-700 ease-out ${
+        dropdownOpen
+          ? "opacity-100 translate-y-0 pointer-events-auto"
+          : "opacity-0 -translate-y-2 pointer-events-none"
+      }`}
+    >
+      <div className="flex items-center justify-center px-1 pb-1">
+        <button
+          type="button"
+          onClick={() => setDropdownOpen(false)}
+          aria-label={t("ui_close_dropdown_1f2d3a4b5c", "Fermer")}
+          className="p-1 rounded-full text-white/60 hover:text-xcannes-green transition-colors focus:outline-none focus:ring-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6 md:w-[18px] md:h-[18px]"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 15l-6-6-6 6" />
+          </svg>
+        </button>
+      </div>
+
+      {(popularLivePairs.length > 0 || xrplPairs.length > 0) &&
+        <div className="px-2 pb-2 border-b border-white/10">
+          <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.14em] text-muted">
+            <span>{t("ui_popular_pairs_0f4bb8a2b3", "Paires populaires")}</span>
+            <span>{t("ui_xrpl_assets_68a2c5aef7", "Actif XRPL")}</span>
+          </div>
+          <div className="mt-2 grid gap-1 grid-cols-[1fr_84px] md:grid-cols-[1fr_96px] items-start">
+            <div className="flex flex-wrap gap-1.5 max-h-[60px] overflow-y-scroll pr-1">
+              {popularLivePairs.map((p) =>
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => handlePairSelect(p)}
+                  className="px-2 py-1 rounded-full border border-white/10 text-xs text-secondary transition-all md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80">
+
+                  {p}
+                </button>
+              )}
+            </div>
+            <div className="ml-auto flex flex-col gap-1 items-stretch -ml-2 justify-self-end">
+              {xrplPairs.map((p) =>
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => handlePairSelect(p)}
+                  className={`w-full px-2 py-1 rounded-md border-2 text-xs transition-all ${
+                    p === "XRP/RLUSD" || p === "XCS/RLUSD"
+                      ? "border-xcannes-blue-weight text-white/90 hover:border-xcannes-blue hover:text-white/90"
+                      : "border-white/10 text-secondary md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80"}`
+                  }>
+
+                  {p}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      }
+
+      <div className="px-2 pt-3">
+        <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-muted">
+          {t("ui_create_pair_4a77c2e68c", "Créer une paire (fiat)")}
+        </div>
+        <FxPairSelector
+          base={fxBase}
+          quote={fxQuote}
+          alwaysOpen
+          compact
+          onChange={({ base: nextBase, quote: nextQuote }, field) => {
+            const baseClean = String(nextBase || "").toUpperCase();
+            const quoteClean = String(nextQuote || "").toUpperCase();
+            if (!baseClean || !quoteClean) return;
+            setFxBase(baseClean);
+            setFxQuote(quoteClean);
+            if (field === "quote") {
+              handlePairSelect(`${baseClean}/${quoteClean}`);
+            }
+          }} />
+      </div>
+
+    </div>
+  );
+
   return (
     <div className="border-b-0 md:border-b border-subtle border-l-0 border-r-0 px-3 py-2 max-sm:px-2 max-sm:pt-px max-sm:pb-1.5 bg-elevated">
       <div className="flex items-center justify-between gap-3 max-sm:gap-1.5 max-sm:flex-col max-sm:items-stretch">
@@ -179,7 +319,7 @@ export default function ChartHeader({
                   {pairStatusLabel}
                 </span>
                 <svg
-                className={`w-3 h-3 transition-transform ${
+                className={`w-4 h-4 md:w-3 md:h-3 transition-transform ${
                 dropdownOpen ? "rotate-180" : ""}`
                 }
                 fill="none"
@@ -234,88 +374,12 @@ export default function ChartHeader({
             }
             {/* Dropdown principal sous le nom de paire */}
             <>
-              <div
-                className={`fixed inset-0 z-30 bg-black/40 backdrop-blur-sm transition-opacity duration-700 ${
-                  dropdownOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-                }`}
-                onClick={() => setDropdownOpen(false)}
-                aria-hidden={!dropdownOpen}
-              />
-              <div
-                id="pair-dropdown"
-                role="listbox"
-                aria-hidden={!dropdownOpen}
-                className={`absolute md:fixed z-40 mt-8 md:mt-0 left-1/2 md:left-4 -translate-x-1/2 md:translate-x-0 md:top-28 ${
-                isFxMode ?
-                "w-[92vw] max-w-[92vw] md:w-[640px] md:max-w-[95vw]" :
-                "w-[92vw] max-w-[92vw] md:w-[520px] md:max-w-[95vw]"} max-h-[580px] md:max-h-[680px] overflow-y-auto bg-elevated border border-white/10 rounded-lg shadow-2xl p-2 space-y-2 transition-all duration-700 ease-out ${
-                  dropdownOpen
-                    ? "opacity-100 translate-y-0 pointer-events-auto"
-                    : "opacity-0 -translate-y-2 pointer-events-none"
-                }`
-                }>
-
-                {(popularLivePairs.length > 0 || xrplPairs.length > 0) &&
-                <div className="px-2 pb-2 border-b border-white/10">
-                    <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.14em] text-muted">
-                      <span>{t("ui_popular_pairs_0f4bb8a2b3", "Paires populaires")}</span>
-                      <span>{t("ui_xrpl_assets_68a2c5aef7", "Actif XRPL")}</span>
-                    </div>
-                    <div className="mt-2 grid gap-1 grid-cols-[1fr_84px] md:grid-cols-[1fr_96px] items-start">
-                      <div className="flex flex-wrap gap-1.5 max-h-[60px] overflow-y-scroll pr-1">
-                        {popularLivePairs.map((p) =>
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => handlePairSelect(p)}
-                      className="px-2 py-1 rounded-full border border-white/10 text-xs text-secondary transition-all md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80">
-
-                          {p}
-                        </button>
-                    )}
-                      </div>
-                      <div className="ml-auto flex flex-col gap-1 items-stretch -ml-2 justify-self-end">
-                        {xrplPairs.map((p) =>
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => handlePairSelect(p)}
-                        className={`w-full px-2 py-1 rounded-md border-2 text-xs transition-all ${
-                        p === "XRP/RLUSD" || p === "XCS/RLUSD" ?
-                        "border-xcannes-blue-weight text-white/90 hover:border-xcannes-blue hover:text-white/90" :
-                        "border-white/10 text-secondary md:hover:border-xcannes-green/60 md:hover:text-xcannes-green/80"}`
-                        }>
-
-                            {p}
-                          </button>
-                      )}
-                      </div>
-                    </div>
-                  </div>
-                }
-
-                <div className="px-2 pt-3">
-                  <div className="mb-2 text-[11px] uppercase tracking-[0.14em] text-muted">
-                    {t("ui_create_pair_4a77c2e68c", "Créer une paire (fiat)")}
-                  </div>
-                  <FxPairSelector
-                    base={fxBase}
-                    quote={fxQuote}
-                    alwaysOpen
-                    compact
-                    onChange={({ base: nextBase, quote: nextQuote }, field) => {
-                      const baseClean = String(nextBase || "").toUpperCase();
-                      const quoteClean = String(nextQuote || "").toUpperCase();
-                      if (!baseClean || !quoteClean) return;
-                      setFxBase(baseClean);
-                      setFxQuote(quoteClean);
-                      if (field === "quote") {
-                        handlePairSelect(`${baseClean}/${quoteClean}`);
-                      }
-                    }} />
-                </div>
-
-              </div>
+              {dropdownOpen && typeof document !== "undefined" && isMobile ?
+                createPortal(dropdownOverlay, document.body) :
+                dropdownOverlay}
+              {typeof document !== "undefined" && isMobile ?
+                createPortal(dropdownMenu, document.body) :
+                dropdownMenu}
             </>
           </div>
         </div>

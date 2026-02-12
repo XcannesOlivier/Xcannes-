@@ -1,18 +1,18 @@
 "use client";
 
 import { useRouter } from "next/router";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "next-i18next";
 
 // Langues principales toujours visibles
-const mainLanguages = [
+export const mainLanguages = [
   { code: "en", label: "English", flag: "🇬🇧", country: "United Kingdom" },
   { code: "fr", label: "Français", flag: "🇫🇷", country: "France" },
   { code: "es", label: "Español", flag: "🇪🇸", country: "Spain" },
   { code: "de", label: "Deutsch", flag: "🇩🇪", country: "Germany" },
 ];
 
-const languagesByRegion = {
+export const languagesByRegion = {
   europe: {
     label: "Europe",
     icon: "🇪🇺",
@@ -87,7 +87,7 @@ const languagesByRegion = {
   },
 };
 
-const getAllLanguages = () => {
+export const getAllLanguages = () => {
   const allLangs = [...mainLanguages];
   Object.values(languagesByRegion).forEach((region) => {
     allLangs.push(...region.languages);
@@ -95,10 +95,27 @@ const getAllLanguages = () => {
   return allLangs;
 };
 
-export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
+export default function LanguageSwitcher({
+  variant = "dropdown",
+  onSelect,
+  hideTrigger = false,
+  open,
+  onOpenChange,
+  insideRefs = [],
+  menuClassName = ""
+}) {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenInternal, setIsOpenInternal] = useState(false);
+  const isControlled = typeof open === "boolean";
+  const isOpen = isControlled ? open : isOpenInternal;
+  const setOpen = useCallback(
+    (value) => {
+      onOpenChange?.(value);
+      if (!isControlled) setIsOpenInternal(value);
+    },
+    [isControlled, onOpenChange]
+  );
   const [openRegion, setOpenRegion] = useState(null);
   const dropdownRef = useRef(null);
   const isInline = variant === "inline";
@@ -119,14 +136,18 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
   useEffect(() => {
     if (isInline) return;
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setOpenRegion(null);
+      const target = event.target;
+      if (dropdownRef.current && dropdownRef.current.contains(target)) return;
+      if (insideRefs?.length) {
+        const isInside = insideRefs.some((ref) => ref?.current && ref.current.contains(target));
+        if (isInside) return;
       }
+      setOpen(false);
+      setOpenRegion(null);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isInline]);
+  }, [insideRefs, isInline, setOpen]);
 
   const changeLanguage = (locale) => {
     if (typeof window !== "undefined") {
@@ -139,7 +160,7 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
     onSelect?.();
     const { pathname, asPath, query } = router;
     router.push({ pathname, query }, asPath, { locale });
-    setIsOpen(false);
+    setOpen(false);
     setOpenRegion(null);
   };
 
@@ -152,9 +173,9 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
       ref={dropdownRef}
       className={`${isInline ? "w-full text-[11px]" : "relative text-[11px]"}`}
     >
-      {!isInline && (
+      {!isInline && !hideTrigger && (
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setOpen(!isOpen)}
           className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-lg transition-all duration-300"
           aria-label={t("langswitcher_aria_label", "Change language")}
         >
@@ -182,7 +203,7 @@ export default function LanguageSwitcher({ variant = "dropdown", onSelect }) {
 
       {(isInline || isOpen) && (
         <div
-          className={`${
+          className={`${menuClassName} ${
             isInline
               ? "w-full bg-transparent border-0 shadow-none rounded-none"
               : "absolute right-0 top-full mt-2 w-30 bg-black/95 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl z-50 animate-fadeIn"
