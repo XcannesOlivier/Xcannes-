@@ -1461,7 +1461,7 @@ export default function DemoWalletDashboard({
 
         <div className="mt-4 flex flex-col items-center gap-2">
           <p
-            className="text-2xl md:text-3xl font-orbitron font-semibold text-white"
+            className="text-2xl md:text-3xl font-sans font-semibold text-white tabular-nums"
             title={t("demo_tt_balance", "Total converti en USD (démo).")}
           >
             {formatMoney(locale, displayAmount, displayCurrency)}

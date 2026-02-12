@@ -1546,9 +1546,15 @@ export default function CurrencyStatement({
             disabled={exportFormat === "pdf"}
             className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
 
-              {exportFormat === "pdf" ?
-                t("ui_loading_1386baebe9", "Loading…") :
-                t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+              {exportFormat === "pdf" ? (
+                <span className="text-[13px] sm:text-inherit">
+                  {t("ui_loading_1386baebe9", "Loading…")}
+                </span>
+              ) : (
+                <span className="text-[13px] sm:text-inherit">
+                  {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+                </span>
+              )}
             </button>
             <button
             onClick={handleExportCsv}
