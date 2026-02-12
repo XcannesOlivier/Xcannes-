@@ -100,7 +100,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
     <div className={wrapperClassName}>
       {assistantOpen && (
         <div
-          className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-lg"
+          className="ai-assistant-panel mb-3 w-[96vw] h-[45vh] max-w-none md:max-w-lg md:h-auto flex flex-col"
           data-variant={panelVariant}
         >
           <div className="flex items-center justify-between mb-3">
@@ -345,9 +345,17 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           max-height: 280px;
           overflow-y: auto;
           padding: 12px;
-          background: var(--assistant-message-bg);
-          border: 0.1px solid var(--assistant-message-border);
+          background: #f1ece3;
+          border: 0.1px solid rgba(0, 0, 0, 0.18);
           border-radius: 8px;
+        }
+
+        .ai-message-area p {
+          color: #0a0f0d;
+        }
+
+        .ai-message-area p + p {
+          color: rgba(10, 15, 13, 0.75);
         }
 
         .ai-message-area::-webkit-scrollbar {
@@ -371,21 +379,21 @@ export default function SupportAssistantWidget({ mode = "support" }) {
         .ai-input {
           flex: 1;
           padding: 8px 12px;
-          background: var(--assistant-input-bg);
-          border: 0.1px solid var(--assistant-input-border);
+          background: #f2ede4;
+          border: 0.1px solid rgba(0, 0, 0, 0.2);
           border-radius: 8px;
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.9);
+          color: #0a0f0d;
           transition: all 120ms;
         }
 
         .ai-input::placeholder {
-          color: rgba(255, 255, 255, 0.35);
+          color: rgba(15, 23, 42, 0.45);
         }
 
         .ai-input:focus {
           outline: none;
-          border-color: var(--assistant-input-border-focus);
+          border-color: rgba(0, 0, 0, 0.6);
           box-shadow: 0 0 0 3px var(--assistant-input-ring);
         }
 
@@ -414,9 +422,18 @@ export default function SupportAssistantWidget({ mode = "support" }) {
         }
 
         @media (max-width: 768px) {
+          .ai-input {
+            font-size: 16px;
+          }
+
           .ai-message-area {
-            min-height: 100px;
-            max-height: 200px;
+            min-height: 0;
+            max-height: none;
+            flex: 1;
+          }
+
+          .ai-message-area p {
+            font-size: 15px;
           }
         }
 

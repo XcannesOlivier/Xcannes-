@@ -475,7 +475,7 @@ export default function FxPairSelector({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("ui_search_code_or_name_1ed4e95837", "Search code or name...")}
-            className="w-full bg-elevated border border-white/10 rounded px-2 py-1.5 text-sm md:text-xs text-primary placeholder:text-muted focus:outline-none focus:border-xcannes-green" />
+            className="w-full bg-elevated border border-white/10 rounded px-2 py-1.5 text-base md:text-xs text-primary placeholder:text-muted focus:outline-none focus:border-xcannes-green" />
 
           </div>
 
