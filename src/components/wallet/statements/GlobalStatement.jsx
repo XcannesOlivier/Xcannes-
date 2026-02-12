@@ -815,9 +815,15 @@ export default function GlobalStatement({
             disabled={exportFormat === "pdf"}
             className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15 disabled:opacity-50">
 
-              {exportFormat === "pdf" ?
-              t("ui_loading_1386baebe9", "Loading…") :
-              t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+              {exportFormat === "pdf" ? (
+                <span className="text-[9px] sm:text-inherit">
+                  {t("ui_loading_1386baebe9", "Loading…")}
+                </span>
+              ) : (
+                <span className="text-[9px] sm:text-inherit">
+                  {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+                </span>
+              )}
 
 
           </button>

@@ -3,11 +3,30 @@ import "@/styles/animations.css";
 import "@/styles/wallet-actions.css";
 import { appWithTranslation } from "next-i18next";
 import nextI18NextConfig from "../../next-i18next.config";
+import { Manrope, Orbitron, Montserrat } from "next/font/google";
 import { XummProvider, useXumm } from "@/context/XummContext";
 import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket centralisé
 import XummQRModal from "@/components/xumm/XummQRModal";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: "--font-orbitron",
+  display: "swap",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
 
 function XummModalLayer({ children }) {
   const { qrModalData, closeQrModal } = useXumm();
@@ -55,6 +74,7 @@ function App({ Component, pageProps }) {
   const router = useRouter();
   const [isRouteChanging, setIsRouteChanging] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState("from-right");
+  const fontVars = `${manrope.variable} ${orbitron.variable} ${montserrat.variable}`;
 
   useEffect(() => {
     if (!router?.events) return;
@@ -106,16 +126,18 @@ function App({ Component, pageProps }) {
   return (
     <XummProvider>
       <XcannesWSProvider>
-        <XummModalLayer>
-          <div
-            key={router.asPath}
-            className={`page-transition page-transition--${transitionDirection}${
-              isRouteChanging ? " page-transition--exit" : ""
-            }`}
-          >
-            <Component {...pageProps} />
-          </div>
-        </XummModalLayer>
+        <div className={`${fontVars} font-sans`}>
+          <XummModalLayer>
+            <div
+              key={router.asPath}
+              className={`page-transition page-transition--${transitionDirection}${
+                isRouteChanging ? " page-transition--exit" : ""
+              }`}
+            >
+              <Component {...pageProps} />
+            </div>
+          </XummModalLayer>
+        </div>
       </XcannesWSProvider>
     </XummProvider>
   );

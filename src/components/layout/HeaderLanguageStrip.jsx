@@ -31,14 +31,17 @@ export default function HeaderLanguageStrip({ className = "" }) {
     [supportedLocales]
   );
 
-  const currentLanguage =
-    allLanguages.find((lang) => lang.code === router.locale) ||
-    allLanguages[0] || {
-      code: router?.locale || router?.defaultLocale || "en",
-      label: "Language",
-      flag: "🌐",
-      country: "",
-    };
+  const currentLanguage = useMemo(() => {
+    return (
+      allLanguages.find((lang) => lang.code === router.locale) ||
+      allLanguages[0] || {
+        code: router?.locale || router?.defaultLocale || "en",
+        label: "Language",
+        flag: "🌐",
+        country: "",
+      }
+    );
+  }, [allLanguages, router?.defaultLocale, router?.locale]);
 
   const quickLanguages = useMemo(() => {
     const base = mainLanguages.filter((lang) =>

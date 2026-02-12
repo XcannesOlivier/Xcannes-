@@ -201,7 +201,7 @@ export default function Header({ fixed = true }) {
         <span className="text-[10px] sm:text-[11px] text-white/40 font-light">
           |
         </span>
-        <span className="text-[18px] sm:text-[19px] md:text-[16px] text-white/60 font-light italic tracking-wide truncate">
+        <span className="text-[15px] sm:text-[17px] md:text-[16px] text-white/60 font-light italic tracking-wide truncate">
           {t("header_tagline", "Compte multi-devises")}
         </span>
       </div>

@@ -2,7 +2,7 @@
 
 const BASE_PRINT_STYLES = `
   * { box-sizing: border-box; }
-  body { font-family: Arial, Helvetica, sans-serif; color: #111; padding: 24px; }
+  body { font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #111; padding: 24px; }
   h1 { font-size: 20px; margin: 0 0 8px; }
   h2 { font-size: 14px; margin: 16px 0 8px; }
   table { width: 100%; border-collapse: collapse; font-size: 12px; }

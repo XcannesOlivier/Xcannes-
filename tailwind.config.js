@@ -45,9 +45,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-manrope)", "sans-serif"],
-        orbitron: ["var(--font-orbitron)", "sans-serif"],
-        montserrat: ["var(--font-montserrat)", "sans-serif"],
+        sans: ["var(--font-manrope)", "system-ui", "sans-serif"],
+        orbitron: ["var(--font-orbitron)", "system-ui", "sans-serif"],
+        montserrat: ["var(--font-montserrat)", "system-ui", "sans-serif"],
       },
     },
   },

@@ -72,7 +72,7 @@ export default function WalletDashboardHeader({
 
       {/* Solde et info wallet */}
       <div className="flex flex-col items-center gap-2">
-        <p className="text-2xl md:text-3xl font-orbitron font-semibold text-white">
+        <p className="text-2xl md:text-3xl font-sans font-semibold text-white tabular-nums">
           {totalLabel}
         </p>
 
