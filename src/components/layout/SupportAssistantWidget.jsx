@@ -100,7 +100,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
     <div className={wrapperClassName}>
       {assistantOpen && (
         <div
-          className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-md"
+          className="ai-assistant-panel mb-3 w-[96vw] max-w-none md:max-w-lg"
           data-variant={panelVariant}
         >
           <div className="flex items-center justify-between mb-3">
@@ -341,8 +341,8 @@ export default function SupportAssistantWidget({ mode = "support" }) {
         }
 
         .ai-message-area {
-          min-height: 120px;
-          max-height: 240px;
+          min-height: 140px;
+          max-height: 280px;
           overflow-y: auto;
           padding: 12px;
           background: var(--assistant-message-bg);
