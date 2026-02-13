@@ -4,6 +4,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { apiUrl } from "@/lib/runtimeConfig";
 import {
   buildCsvString,
@@ -787,7 +788,7 @@ export default function CurrencyStatement({
     let enriched = description;
 
     // Chercher les patterns courants: "XXX → YYY" ou "XXX/YYY"
-    const currencyPattern = /\b([A-Z]{3})\b/g;
+    const currencyPattern = /\b([A-Z]{3,6})\b/g;
     enriched = enriched.replace(currencyPattern, (match) => {
       const flag = getCurrencyFlag(match);
       return `${flag} ${match}`;
@@ -817,11 +818,11 @@ export default function CurrencyStatement({
         if (lower.includes("envoyer") && lower.includes("wallet")) return "envoyé";
         return enrichDescription(safeDescription);
       }
-      const arrowMatch = safeDescription.match(/([A-Z]{3})\s*(?:→|->)\s*([A-Z]{3})/);
+      const arrowMatch = safeDescription.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
       if (arrowMatch) {
         return enrichDescription(`${arrowMatch[1]} → ${arrowMatch[2]}`);
       }
-      const slashMatch = safeDescription.match(/([A-Z]{3})\s*\/\s*([A-Z]{3})/);
+      const slashMatch = safeDescription.match(/([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/);
       if (slashMatch) {
         return enrichDescription(`${slashMatch[1]} → ${slashMatch[2]}`);
       }
@@ -832,6 +833,60 @@ export default function CurrencyStatement({
       return enrichDescription(trimmed);
     },
     [enrichDescription]
+  );
+
+  const parseConversionPair = useCallback((description) => {
+    if (!description) return null;
+    const text = String(description).trim();
+    let match = text.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
+    if (!match) {
+      match = text.match(/([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/);
+    }
+    if (!match) return null;
+    return { from: match[1], to: match[2] };
+  }, []);
+
+  const renderCurrencyBadge = useCallback(
+    (code) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper) return null;
+      if (CRYPTO_ICONS?.[upper]) {
+        return (
+          <span className="inline-flex items-center gap-1">
+            <Image
+              src={CRYPTO_ICONS[upper]}
+              alt={upper}
+              width={16}
+              height={16}
+              className="w-4 h-4 rounded-sm"
+            />
+            <span className="text-white/80 text-xs md:text-sm">{upper}</span>
+          </span>
+        );
+      }
+      return (
+        <span className="inline-flex items-center gap-1">
+          <span className="text-base md:text-lg">{getCurrencyFlag(upper)}</span>
+          <span className="text-white/80 text-xs md:text-sm">{upper}</span>
+        </span>
+      );
+    },
+    [getCurrencyFlag]
+  );
+
+  const renderConversionDescription = useCallback(
+    (description) => {
+      const pair = parseConversionPair(description);
+      if (!pair) return null;
+      return (
+        <span className="inline-flex items-center gap-2">
+          {renderCurrencyBadge(pair.from)}
+          <span className="text-white/50 text-xs md:text-sm">→</span>
+          {renderCurrencyBadge(pair.to)}
+        </span>
+      );
+    },
+    [parseConversionPair, renderCurrencyBadge]
   );
 
   const formatDate = useCallback((dateStr) => {
@@ -1098,17 +1153,19 @@ export default function CurrencyStatement({
 	        <div className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}>
 	          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-              {['XRP', 'RLUSD', 'XCS'].includes(currency) ?
-            <Image
-              src={`/symbols/${currency.toLowerCase()}.png`}
-              alt={currency}
-              width={32}
-              height={32}
-              className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md" /> :
-
-
-            <span className="text-2xl md:text-3xl flex-shrink-0">{getCurrencyFlag(currency)}</span>
-            }
+              {CRYPTO_ICONS?.[normalizedCurrency] ? (
+                <Image
+                  src={CRYPTO_ICONS[normalizedCurrency]}
+                  alt={normalizedCurrency}
+                  width={32}
+                  height={32}
+                  className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                />
+              ) : (
+                <span className="text-2xl md:text-3xl flex-shrink-0">
+                  {getCurrencyFlag(currency)}
+                </span>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 min-w-0">
                   <h2 className="text-lg md:text-xl font-bold text-white truncate">
@@ -1401,7 +1458,7 @@ export default function CurrencyStatement({
           }
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-black/40 backdrop-blur-sm z-10">
+                <thead className="sticky top-0 bg-black/85 backdrop-blur-md z-10">
                 <tr className="border-b border-white/10">
                       <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_date_bb69dc2fa3", "Date")}</th>
                       <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_description_d37d7cf577", "Description")}</th>
@@ -1465,9 +1522,14 @@ export default function CurrencyStatement({
                                 ) : null}
                                 <div className="min-w-0">
                                   <p className="text-sm text-white/90 truncate">
-                                    {isMobileDate
-                                      ? simplifyMobileDescription(tx.description, tx.category)
-                                      : enrichDescription(tx.description)}
+                                    {tx.category === "exchange"
+                                      ? renderConversionDescription(tx.description) ||
+                                        (isMobileDate
+                                          ? simplifyMobileDescription(tx.description, tx.category)
+                                          : enrichDescription(tx.description))
+                                      : isMobileDate
+                                        ? simplifyMobileDescription(tx.description, tx.category)
+                                        : enrichDescription(tx.description)}
                                   </p>
                                   {tx.counterparty && (
                                     <p className="text-xs text-white/40 font-mono truncate hidden md:block">
