@@ -1253,6 +1253,7 @@ export default function DemoWalletDashboard({
     const txs = [];
 
     events.forEach((evt) => {
+      const createdAt = new Date(evt.ts).toISOString();
       let amount = 0;
       let delta = 0;
       let type = "credit";
@@ -1323,24 +1324,51 @@ export default function DemoWalletDashboard({
         delta = -amount;
         description = t("demo_statement_sell_moonpay", "Vente via MoonPay (démo)");
       } else if (
-      evt.kind === "spread_fee" &&
-      String(evt.currency).toUpperCase() === currency &&
-      evt.wallet === activeWalletId)
+        evt.kind === "spread_fee" &&
+        String(evt.currency).toUpperCase() === currency &&
+        evt.wallet === activeWalletId)
       {
         category = "fee";
         type = "debit";
         amount = Number(evt.amount || 0);
         delta = -amount;
         description = t("demo_statement_fee_spread", "Frais XCANNES (spread)");
+      } else if (
+        evt.kind === "trustline_add" &&
+        String(evt.currency).toUpperCase() === currency &&
+        evt.wallet === activeWalletId
+      ) {
+        category = "operation";
+        type = "credit";
+        amount = 0;
+        delta = 0;
+        description = t("demo_statement_trustline_add", {
+          defaultValue: "Activation de ligne {{currency}}",
+          currency
+        });
+      } else if (
+        evt.kind === "trustline_remove" &&
+        String(evt.currency).toUpperCase() === currency &&
+        evt.wallet === activeWalletId
+      ) {
+        category = "operation";
+        type = "debit";
+        amount = 0;
+        delta = 0;
+        description = t("demo_statement_trustline_remove", {
+          defaultValue: "Désactivation de ligne {{currency}}",
+          currency
+        });
       } else {
         return;
       }
 
-      if (!Number.isFinite(amount) || amount <= 0) return;
+      if (!Number.isFinite(amount) || (amount <= 0 && category !== "operation")) return;
 
       txs.push({
         id: evt.id,
-        date: new Date(evt.ts).toISOString(),
+        date: createdAt,
+        createdAt,
         category,
         type,
         description,
