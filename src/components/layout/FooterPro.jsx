@@ -13,20 +13,25 @@ export default function FooterPro() {
   const [xrplConnected, setXrplConnected] = useState(true); // Backend gère la connexion
   const [xrplLoading, setXrplLoading] = useState(false);
 
-  const socials = [
-  {
-    name: "Twitter",
-    url: "https://twitter.com/xcannes",
-    svg:
+  const xIcon = (
     <svg
       className="w-4 h-4"
       fill="currentColor"
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
 
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-        </svg>
-
+  const socials = [
+  {
+    name: t("footer_nav_legal", "Informations légales"),
+    url: "/disclaimer",
+    svg: (
+      <span className="text-xs text-white/70">
+        🏛️ {t("footer_nav_legal", "Informations légales")}
+      </span>
+    )
   }];
 
 
@@ -166,7 +171,7 @@ export default function FooterPro() {
 
           {/* Colonne 2 - Liens essentiels */}
           <div className="text-center">
-            <h4 className="font-semibold text-white mb-4 text-base md:text-sm uppercase tracking-wider">
+            <h4 className="font-semibold text-white mb-4 text-base md:text-sm tracking-wider">
               {t("footer_nav_title")}
             </h4>
             <ul className="text-base md:text-sm space-y-2">
@@ -189,21 +194,21 @@ export default function FooterPro() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/disclaimer"
-                  className="header-nav-link footer-nav-link text-white/70"
-                  onClick={withHardNavFallback("/disclaimer")}>
-
-                  <span>🏛️</span>
-                  <span className="header-nav-label">{t("footer_nav_legal", "Legal Info")}</span>
-                </Link>
+                <a
+                  href="https://twitter.com/xcannes"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="header-nav-link footer-nav-link text-white/70 inline-flex items-center transition-transform duration-200 hover:scale-110"
+                >
+                  <span className="text-white/70">{xIcon}</span>
+                </a>
               </li>
             </ul>
           </div>
 
           {/* Colonne 3 - Contact & Réseaux */}
           <div className="text-center md:text-right">
-            <h4 className="font-semibold text-white mb-4 text-base md:text-sm uppercase tracking-wider">
+            <h4 className="font-semibold text-white mb-4 text-base md:text-sm tracking-wider">
               {t("footer_contact_title")}
             </h4>
             <p className="text-base md:text-sm mb-4">
@@ -222,8 +227,8 @@ export default function FooterPro() {
               <a
                 key={s.name}
                 href={s.url}
-                target="_blank"
-                rel="noreferrer"
+                target={s.target}
+                rel={s.rel}
                 className="opacity-60 hover:opacity-100 transition-opacity text-white"
                 aria-label={s.name}>
 
@@ -231,31 +236,6 @@ export default function FooterPro() {
                 </a>
               )}
 
-              {/* Wall Street Journal */}
-              <a
-                href="https://www.wsj.com/finance/currencies"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="opacity-60 hover:opacity-100 transition-opacity ml-2"
-                aria-label={t("ui_wall_street_journal_3d3879b3d4", "Wall Street Journal")}>
-
-                <span className="text-xs text-white/60 uppercase tracking-wider">{t("ui_wsj_bd2a3597f5", "WSJ")}
-
-                </span>
-              </a>
-
-              {/* Festival de Cannes */}
-              <a
-                href="https://www.festival-cannes.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="opacity-60 hover:opacity-100 transition-opacity ml-2"
-                aria-label={t("ui_festival_de_cannes_6bfe021fac", "Festival de Cannes")}>
-
-                <span className="text-xs text-white/60 uppercase tracking-wider">{t("ui_cannes_a168ee5056", "CANNES")}
-
-                </span>
-              </a>
             </div>
           </div>
         </div>
