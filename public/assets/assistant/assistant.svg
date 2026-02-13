@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Assistant">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#faf8f5"/>
+      <stop offset="70%" stop-color="#f5f2ed"/>
+      <stop offset="100%" stop-color="#ebe7e0"/>
+    </radialGradient>
+    <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#faf8f5"/>
+      <stop offset="70%" stop-color="#f5f2ed"/>
+      <stop offset="100%" stop-color="#ebe7e0"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    .blink { animation: blink 7.5s infinite; transform-origin: center; transform-box: fill-box; }
+    .pupil-left { animation: look-around-left 12s infinite; }
+    .pupil-right { animation: look-around-right 12s infinite; }
+    
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      94%, 96% { transform: scaleY(0.18); }
+    }
+    
+    @keyframes look-around-left {
+      0%, 10%, 100% { transform: translate(0, 0); }
+      15%, 20% { transform: translate(-2px, 0); }
+      25%, 35% { transform: translate(0, 0); }
+      40%, 45% { transform: translate(0, -1.5px); }
+      50%, 60% { transform: translate(0, 0); }
+      65%, 70% { transform: translate(2px, 0); }
+      75%, 85% { transform: translate(0, 0); }
+      90%, 95% { transform: translate(0, 1.5px); }
+    }
+    
+    @keyframes look-around-right {
+      0%, 10%, 100% { transform: translate(0, 0); }
+      15%, 20% { transform: translate(-2px, 0); }
+      25%, 35% { transform: translate(0, 0); }
+      40%, 45% { transform: translate(0, -1.5px); }
+      50%, 60% { transform: translate(0, 0); }
+      65%, 70% { transform: translate(2px, 0); }
+      75%, 85% { transform: translate(0, 0); }
+      90%, 95% { transform: translate(0, 1.5px); }
+    }
+  </style>
+
+  <g>
+    <circle cx="60" cy="60" r="44" fill="url(#bg)" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+
+    <!-- Antenne -->
+    <line x1="60" y1="16" x2="60" y2="5" stroke="#faf8f5" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="60" cy="3" r="3" fill="#faf8f5" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+    <!-- Oreilles -->
+    <path d="M 18 53 A 7 7 0 0 0 18 67 Z" fill="url(#bg)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+    <path d="M 102 53 A 7 7 0 0 1 102 67 Z" fill="url(#bg)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+
+    <!-- Triangle rempli en bas à droite -->
+    <path d="M 102.5 103.5 L 62.5 103.5 L 102.5 53.5 Z" fill="url(#triangleGradient)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+    <g class="blink">
+      <path d="M 39 54 Q 46 52 53 54 A 7 7 0 0 1 39 54 Z" fill="#000000"/>
+      <path d="M 67 54 Q 74 52 81 54 A 7 7 0 0 1 67 54 Z" fill="#000000"/>
+    </g>
+    
+    <circle class="pupil-left" cx="46" cy="56" r="1.5" fill="#ffffff"/>
+    <circle class="pupil-right" cx="74" cy="56" r="1.5" fill="#ffffff"/>
+
+    <path d="M44 78 Q60 90 76 78" stroke="#000000" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M34 48 L40 52" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M86 48 L80 52" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>
