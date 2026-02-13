@@ -10,17 +10,9 @@ export default function SupportAssistantWidget({ mode = "support" }) {
   const [showPrompt, setShowPrompt] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [assistantSize, setAssistantSize] = useState(40);
+  const assistantIconUrl = "/assets/assistant/assistant.svg";
   const assistantHaloSize = useMemo(
     () => assistantSize + 20,
-    [assistantSize]
-  );
-  const assistantSpriteUrl = "/assets/assistant/eliott-sprite.png";
-  const assistantFrames = 84;
-  const assistantDurationMs = 5000;
-  const assistantPauseMs = 5000;
-  const assistantTotalMs = assistantDurationMs + assistantPauseMs;
-  const assistantFrameWidth = useMemo(
-    () => Math.round(assistantSize * 47 / 48),
     [assistantSize]
   );
 
@@ -59,95 +51,6 @@ export default function SupportAssistantWidget({ mode = "support" }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isTrading]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-    if (!assistantContainer) return undefined;
-    const canvas = assistantContainer.querySelector(".assistant-bot-canvas");
-    if (!canvas) return undefined;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return undefined;
-
-    const frames = Number(canvas.dataset.frames || assistantFrames);
-    const duration = Number(canvas.dataset.duration || assistantDurationMs);
-    const pause = Number(canvas.dataset.pause || assistantPauseMs);
-    const total = duration + pause;
-    let sourceFrameWidth = 0;
-    let sourceFrameHeight = 0;
-    let spriteOffsetX = 0;
-    const targetWidth = canvas.width;
-    const targetHeight = canvas.height;
-    let rafId = null;
-    let startTime = performance.now();
-    let lastFrame = -1;
-
-    const sprite = new Image();
-    sprite.decoding = "async";
-    sprite.src = canvas.dataset.sprite || assistantSpriteUrl;
-
-    const render = (time) => {
-      if (!canvas.isConnected) return;
-      const elapsed = (time - startTime) % total;
-      const frameIndex =
-        elapsed <= duration
-          ? Math.min(frames - 1, Math.floor((elapsed / duration) * frames))
-          : frames - 1;
-
-      if (frameIndex !== lastFrame && sprite.complete && sourceFrameWidth > 0) {
-        ctx.clearRect(0, 0, targetWidth, targetHeight);
-        const sx = spriteOffsetX + frameIndex * sourceFrameWidth;
-        const sy = 0;
-        const sWidth = sourceFrameWidth;
-        const sHeight = sourceFrameHeight;
-        const scale = Math.min(
-          targetWidth / sWidth,
-          targetHeight / sHeight
-        );
-        const drawWidth = Math.round(sWidth * scale);
-        const drawHeight = Math.round(sHeight * scale);
-        const dx = Math.round((targetWidth - drawWidth) / 2);
-        const dy = Math.round((targetHeight - drawHeight) / 2);
-        ctx.drawImage(
-          sprite,
-          sx,
-          sy,
-          sWidth,
-          sHeight,
-          dx,
-          dy,
-          drawWidth,
-          drawHeight
-        );
-        lastFrame = frameIndex;
-      }
-
-      rafId = requestAnimationFrame(render);
-    };
-
-    const handleLoad = () => {
-      sourceFrameHeight = sprite.naturalHeight || 0;
-      const usableWidth = Math.floor(sprite.naturalWidth / frames) * frames;
-      sourceFrameWidth = Math.floor(usableWidth / frames) || sourceFrameHeight;
-      spriteOffsetX = Math.floor((sprite.naturalWidth - usableWidth) / 2);
-      startTime = performance.now();
-      rafId = requestAnimationFrame(render);
-    };
-
-    sprite.addEventListener("load", handleLoad, { once: true });
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [
-    assistantContainer,
-    assistantDurationMs,
-    assistantPauseMs,
-    assistantFrames,
-    assistantSpriteUrl,
-    assistantFrameWidth,
-    assistantSize,
-  ]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -292,20 +195,14 @@ export default function SupportAssistantWidget({ mode = "support" }) {
             aria-label={openLabel}
             title={openTitle}
           >
-            <span
-              className="assistant-bot-halo"
-              style={{ width: assistantHaloSize, height: assistantHaloSize }}
-              aria-hidden="true"
-            />
-            <canvas
-              className="assistant-bot-canvas"
-              width={assistantFrameWidth}
+            <img
+              className="assistant-bot-icon"
+              width={assistantSize}
               height={assistantSize}
-              data-sprite={assistantSpriteUrl}
-              data-frames={assistantFrames}
-              data-duration={assistantDurationMs}
-              data-pause={assistantPauseMs}
+              src={assistantIconUrl}
+              alt=""
               aria-hidden="true"
+              decoding="async"
             />
           </button>
           <div
@@ -333,18 +230,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           background: transparent;
         }
 
-        .assistant-bot-halo {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          border-radius: 9999px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          pointer-events: none;
-        }
-
-        .assistant-bot-canvas {
+        .assistant-bot-icon {
           display: block;
           position: relative;
           z-index: 1;
