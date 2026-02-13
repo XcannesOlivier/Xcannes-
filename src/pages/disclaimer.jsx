@@ -2,8 +2,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
-import Header from "@/components/layout/Header";
-import FooterPro from "@/components/layout/FooterPro";
 
 export default function Disclaimer() {
   const { t } = useTranslation("common");
@@ -163,8 +161,6 @@ export default function Disclaimer() {
 
         <meta name="robots" content="index, follow" />
       </Head>
-
-      <Header />
 
       <div className="min-h-screen bg-xcannes-background py-16 px-6">
         <div className="max-w-5xl mx-auto">
@@ -505,7 +501,6 @@ export default function Disclaimer() {
         </div>
       </div>
 
-      <FooterPro />
     </>);
 
 }
