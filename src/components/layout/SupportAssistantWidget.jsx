@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 
@@ -9,6 +9,20 @@ export default function SupportAssistantWidget({ mode = "support" }) {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [assistantSize, setAssistantSize] = useState(40);
+  const assistantHaloSize = useMemo(
+    () => assistantSize + 20,
+    [assistantSize]
+  );
+  const assistantSpriteUrl = "/assets/assistant/eliott-sprite.png";
+  const assistantFrames = 84;
+  const assistantDurationMs = 5000;
+  const assistantPauseMs = 5000;
+  const assistantTotalMs = assistantDurationMs + assistantPauseMs;
+  const assistantFrameWidth = useMemo(
+    () => Math.round(assistantSize * 47 / 48),
+    [assistantSize]
+  );
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -45,6 +59,108 @@ export default function SupportAssistantWidget({ mode = "support" }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isTrading]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    if (!assistantContainer) return undefined;
+    const canvas = assistantContainer.querySelector(".assistant-bot-canvas");
+    if (!canvas) return undefined;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return undefined;
+
+    const frames = Number(canvas.dataset.frames || assistantFrames);
+    const duration = Number(canvas.dataset.duration || assistantDurationMs);
+    const pause = Number(canvas.dataset.pause || assistantPauseMs);
+    const total = duration + pause;
+    let sourceFrameWidth = 0;
+    let sourceFrameHeight = 0;
+    let spriteOffsetX = 0;
+    const targetWidth = canvas.width;
+    const targetHeight = canvas.height;
+    let rafId = null;
+    let startTime = performance.now();
+    let lastFrame = -1;
+
+    const sprite = new Image();
+    sprite.decoding = "async";
+    sprite.src = canvas.dataset.sprite || assistantSpriteUrl;
+
+    const render = (time) => {
+      if (!canvas.isConnected) return;
+      const elapsed = (time - startTime) % total;
+      const frameIndex =
+        elapsed <= duration
+          ? Math.min(frames - 1, Math.floor((elapsed / duration) * frames))
+          : frames - 1;
+
+      if (frameIndex !== lastFrame && sprite.complete && sourceFrameWidth > 0) {
+        ctx.clearRect(0, 0, targetWidth, targetHeight);
+        const sx = spriteOffsetX + frameIndex * sourceFrameWidth;
+        const sy = 0;
+        const sWidth = sourceFrameWidth;
+        const sHeight = sourceFrameHeight;
+        const scale = Math.min(
+          targetWidth / sWidth,
+          targetHeight / sHeight
+        );
+        const drawWidth = Math.round(sWidth * scale);
+        const drawHeight = Math.round(sHeight * scale);
+        const dx = Math.round((targetWidth - drawWidth) / 2);
+        const dy = Math.round((targetHeight - drawHeight) / 2);
+        ctx.drawImage(
+          sprite,
+          sx,
+          sy,
+          sWidth,
+          sHeight,
+          dx,
+          dy,
+          drawWidth,
+          drawHeight
+        );
+        lastFrame = frameIndex;
+      }
+
+      rafId = requestAnimationFrame(render);
+    };
+
+    const handleLoad = () => {
+      sourceFrameHeight = sprite.naturalHeight || 0;
+      const usableWidth = Math.floor(sprite.naturalWidth / frames) * frames;
+      sourceFrameWidth = Math.floor(usableWidth / frames) || sourceFrameHeight;
+      spriteOffsetX = Math.floor((sprite.naturalWidth - usableWidth) / 2);
+      startTime = performance.now();
+      rafId = requestAnimationFrame(render);
+    };
+
+    sprite.addEventListener("load", handleLoad, { once: true });
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [
+    assistantContainer,
+    assistantDurationMs,
+    assistantPauseMs,
+    assistantFrames,
+    assistantSpriteUrl,
+    assistantFrameWidth,
+    assistantSize,
+  ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(min-width: 768px)");
+    const syncSize = () => setAssistantSize(media.matches ? 48 : 40);
+    syncSize();
+    if (media.addEventListener) {
+      media.addEventListener("change", syncSize);
+      return () => media.removeEventListener("change", syncSize);
+    }
+    media.addListener(syncSize);
+    return () => media.removeListener(syncSize);
+  }, []);
 
   if (!assistantContainer) return null;
 
@@ -172,19 +288,24 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           <button
             type="button"
             onClick={() => setAssistantOpen(true)}
-            className="w-10 h-10 md:w-12 md:h-12 transition-all bg-transparent text-white hover:bg-white/10 border-2 border-white/30 rounded-full flex items-center justify-center relative overflow-hidden"
+            className="assistant-bot-button transition-all text-white rounded-full flex items-center justify-center relative overflow-hidden"
             aria-label={openLabel}
             title={openTitle}
           >
             <span
-              className="tracking-wider relative z-10 inline-block text-lg md:text-xl"
-              style={{ animation: "irregularPulse 3s ease-in-out infinite" }}
-            >
-              •••
-            </span>
-            <span
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-              style={{ animation: "shimmer 2s ease-in-out infinite" }}
+              className="assistant-bot-halo"
+              style={{ width: assistantHaloSize, height: assistantHaloSize }}
+              aria-hidden="true"
+            />
+            <canvas
+              className="assistant-bot-canvas"
+              width={assistantFrameWidth}
+              height={assistantSize}
+              data-sprite={assistantSpriteUrl}
+              data-frames={assistantFrames}
+              data-duration={assistantDurationMs}
+              data-pause={assistantPauseMs}
+              aria-hidden="true"
             />
           </button>
           <div
@@ -196,44 +317,37 @@ export default function SupportAssistantWidget({ mode = "support" }) {
             ].join(" ")}
             aria-hidden={!showPrompt}
           >
-            {t("home_support_prompt", "Comment puis-je vous aider ?")}
+            {t("home_support_prompt", "Une question ?")}
           </div>
         </div>
       )}
       <style jsx global>{`
-        @keyframes shimmer {
-          0% {
-            transform: translateX(-100%) rotate(0deg);
-          }
-          100% {
-            transform: translateX(100%) rotate(360deg);
-          }
+        .assistant-bot-button {
+          background: transparent;
+          border: none;
+          padding: 6px;
+          border-radius: 9999px;
         }
-        @keyframes irregularPulse {
-          0% {
-            transform: scale(1);
-          }
-          15% {
-            transform: scale(1.15);
-          }
-          25% {
-            transform: scale(1);
-          }
-          40% {
-            transform: scale(1.08);
-          }
-          50% {
-            transform: scale(1);
-          }
-          75% {
-            transform: scale(1.12);
-          }
-          85% {
-            transform: scale(1);
-          }
-          100% {
-            transform: scale(1);
-          }
+
+        .assistant-bot-button:hover {
+          background: transparent;
+        }
+
+        .assistant-bot-halo {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          border-radius: 9999px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          pointer-events: none;
+        }
+
+        .assistant-bot-canvas {
+          display: block;
+          position: relative;
+          z-index: 1;
         }
 
         .ai-assistant-panel {
