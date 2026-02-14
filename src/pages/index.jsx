@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
 import Link from "next/link";
@@ -291,11 +292,14 @@ export default function Home() {
                     className="inline-flex"
                     aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
                   >
-                    <img
+                    <Image
                       src={appStoreBadgeSrc}
                       alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
                       className="h-12 w-auto"
+                      width={250}
+                      height={83}
                       loading="lazy"
+                      unoptimized
                     />
                   </a>
 
@@ -306,11 +310,14 @@ export default function Home() {
                     className="inline-flex"
                     aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
                   >
-                    <img
+                    <Image
                       src={googlePlayBadgeSrc}
                       alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
                       className="h-[60px] w-auto"
+                      width={646}
+                      height={250}
                       loading="lazy"
+                      unoptimized
                     />
                   </a>
                 </div>
@@ -944,11 +951,14 @@ export default function Home() {
               className="inline-flex"
               aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
             >
-              <img
+              <Image
                 src={appStoreBadgeSrc}
                 alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
                 className="h-12 w-auto"
+                width={250}
+                height={83}
                 loading="lazy"
+                unoptimized
               />
             </a>
 
@@ -959,11 +969,14 @@ export default function Home() {
               className="inline-flex"
               aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
             >
-              <img
+              <Image
                 src={googlePlayBadgeSrc}
                 alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
                 className="h-[60px] w-auto"
+                width={646}
+                height={250}
                 loading="lazy"
+                unoptimized
               />
             </a>
           </div>

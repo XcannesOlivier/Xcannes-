@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { useTranslation } from "next-i18next";
 
 export default function SupportAssistantWidget({ mode = "support" }) {
@@ -195,14 +196,14 @@ export default function SupportAssistantWidget({ mode = "support" }) {
             aria-label={openLabel}
             title={openTitle}
           >
-            <img
+            <Image
               className="assistant-bot-icon"
               width={assistantSize}
               height={assistantSize}
               src={assistantIconUrl}
               alt=""
               aria-hidden="true"
-              decoding="async"
+              priority={false}
             />
           </button>
           <div

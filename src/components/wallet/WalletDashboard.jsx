@@ -1413,9 +1413,22 @@ export default function WalletDashboard({
         isWalletActivated={isWalletActivated}
         onActivateWallet={handleOpenActivationModal}
         onClick={() => handleOpenCurrencyStatement(token)}
+        onOpenXcsProgram={() => {
+          const xcsToken = augmentedTokens.find(t => String(t?.currency || "").toUpperCase() === "XCS");
+          if (xcsToken) {
+            handleOpenCurrencyStatement(xcsToken);
+            // Ouvrir automatiquement le bloc Programme XCS
+            setTimeout(() => {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("xcannes:xcs:open-program"));
+              }
+            }, 100);
+          }
+        }}
       />
     ),
     [
+      augmentedTokens,
       handleInstallRequiredTrustline,
       handleOpenActivationModal,
       handleOpenCurrencyStatement,
