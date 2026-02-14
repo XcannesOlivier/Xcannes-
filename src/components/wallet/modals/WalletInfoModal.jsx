@@ -12,7 +12,6 @@ export function WalletInfoContent({
   noticeVariant = "preview"
 }) {
   const { t } = useTranslation("common");
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
   const showRlusdNotActivatedNotice =
@@ -41,11 +40,6 @@ export function WalletInfoContent({
           {noticeVariant === "demo" ? (
             <span className="inline-flex items-center text-xcannes-green text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
               {t("demo_notice_title", "Mode démo")}
-            </span>
-          ) : null}
-          {showNotConnectedNotice ? (
-            <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
-              {t("wallet_not_connected_title", "Wallet not connected")}
             </span>
           ) : null}
           {showNotActivatedNotice ? (
