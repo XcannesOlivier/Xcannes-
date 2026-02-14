@@ -21,7 +21,6 @@ export default function WalletDashboardStatementModals({
   previewCurrencyTransactions,
   isFullPageView,
   statementVariant,
-  currencyLines,
   usdRates,
   highlightTransactionId,
   showGlobalStatement,
@@ -47,9 +46,13 @@ export default function WalletDashboardStatementModals({
     return code === "XCS" && !t?.isMissingTrustline;
   });
 
-  const xcannesCurrencyLinesCount = Array.isArray(currencyLines)
-    ? currencyLines.length
-    : 0;
+  const xcsBalance = useMemo(() => {
+    const token = (augmentedTokens || []).find(
+      (entry) => String(entry?.currency || "").toUpperCase() === "XCS"
+    );
+    const value = Number.parseFloat(token?.value ?? token?.balance ?? 0);
+    return Number.isFinite(value) ? value : 0;
+  }, [augmentedTokens]);
 
   const canFetchStatements = useMemo(() => {
     return (
@@ -386,7 +389,7 @@ export default function WalletDashboardStatementModals({
             inline
             usdRates={usdRates}
             hasXcsTrustline={hasXcsTrustline}
-            xcannesCurrencyLinesCount={xcannesCurrencyLinesCount}
+            xcsBalance={xcsBalance}
             transactions={
               canFetchStatements
                 ? currencyTransactions
@@ -457,7 +460,7 @@ export default function WalletDashboardStatementModals({
           variant={statementVariant}
           usdRates={usdRates}
           hasXcsTrustline={hasXcsTrustline}
-          xcannesCurrencyLinesCount={xcannesCurrencyLinesCount}
+          xcsBalance={xcsBalance}
           transactions={
             canFetchStatements
               ? currencyTransactions

@@ -2499,7 +2499,6 @@ export default function WalletDashboard({
                 isWalletActivated={isWalletActivated}
                 isFullPageView={isFullPageView}
                 statementVariant={statementVariant}
-                currencyLines={effectiveCurrencyLines}
                 usdRates={usdRates}
                 showGlobalStatement={showGlobalStatement}
                 setShowGlobalStatement={setShowGlobalStatement}
@@ -2522,7 +2521,6 @@ export default function WalletDashboard({
                 isWalletActivated={isWalletActivated}
                 isFullPageView={isFullPageView}
                 statementVariant={statementVariant}
-                currencyLines={effectiveCurrencyLines}
                 usdRates={usdRates}
                 showGlobalStatement={showGlobalStatement}
                 setShowGlobalStatement={setShowGlobalStatement}
@@ -2727,7 +2725,6 @@ export default function WalletDashboard({
           isWalletActivated={isWalletActivated}
           isFullPageView={isFullPageView}
           statementVariant={statementVariant}
-          currencyLines={effectiveCurrencyLines}
           usdRates={usdRates}
           showGlobalStatement={showGlobalStatement}
           setShowGlobalStatement={setShowGlobalStatement}
