@@ -1919,7 +1919,6 @@ export default function DemoWalletDashboard({
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={false}
         statementVariant={"default"}
-        currencyLines={currencyLines}
         usdRates={effectiveUsdPerUnitRates}
         highlightTransactionId={highlightTransactionId}
         showGlobalStatement={showGlobalStatement}

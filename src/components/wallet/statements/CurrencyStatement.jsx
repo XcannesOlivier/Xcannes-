@@ -102,7 +102,7 @@ export default function CurrencyStatement({
   usdRates = {},
   hasRlusdTrustline = false,
   hasXcsTrustline = false,
-  xcannesCurrencyLinesCount = 0,
+  xcsBalance = null,
   statementMonths = [],
   highlightTransactionId = null,
   onClose
@@ -114,6 +114,7 @@ export default function CurrencyStatement({
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
   const [reserveOpen, setReserveOpen] = useState(false);
+  const [xcsBenefitOpen, setXcsBenefitOpen] = useState(false);
   const [docHash, setDocHash] = useState("");
   const [walletLabel, setWalletLabel] = useState("");
   const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
@@ -204,6 +205,10 @@ export default function CurrencyStatement({
 
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
   const reservePlaceholder = "—";
+  const XCS_BASE_FEE_PERCENT = 1;
+  const XCS_FREE_FEE_THRESHOLD = 100;
+  const showAppliedRate = Boolean(normalizedCurrency) && normalizedCurrency !== "XRP";
+  const showXcsProgram = normalizedCurrency === "XCS";
 
   const xrpReserveDetails = useMemo(() => {
     const code = normalizedCurrency;
@@ -223,23 +228,24 @@ export default function CurrencyStatement({
     };
   }, [hasRlusdTrustline, hasXcsTrustline, normalizedCurrency, showReserveDetails]);
 
-  const xcsReserveDetails = useMemo(() => {
-    const code = normalizedCurrency;
-    if (code !== "XCS" || !showReserveDetails) return null;
+  const xcsAppliedFeePercent = useMemo(() => {
+    if (!showAppliedRate) return null;
+    const parsed = Number.parseFloat(xcsBalance);
+    const fallback = normalizedCurrency === "XCS" ? Number.parseFloat(balance) : 0;
+    const held = Number.isFinite(parsed) ? parsed : fallback;
+    const safeHeld = Number.isFinite(held) ? Math.max(0, held) : 0;
+    const capped = Math.min(safeHeld, XCS_FREE_FEE_THRESHOLD);
+    const reduction = (capped / XCS_FREE_FEE_THRESHOLD) * XCS_BASE_FEE_PERCENT;
+    const applied = Math.max(0, XCS_BASE_FEE_PERCENT - reduction);
+    return applied;
+  }, [balance, normalizedCurrency, showAppliedRate, xcsBalance]);
 
-    const linesCount = Number(xcannesCurrencyLinesCount || 0);
-    const lockXcsPerLine = 0.2;
-    const xcannesLinesLockedXcs =
-      Number.isFinite(linesCount) && linesCount > 0 ? linesCount * lockXcsPerLine : 0;
-    const totalLockedXcs = xcannesLinesLockedXcs;
-
-    return {
-      totalLockedXcs,
-      xcannesCurrencyLinesCount: Number.isFinite(linesCount) ? linesCount : 0,
-      lockXcsPerLine,
-      xcannesLinesLockedXcs
-    };
-  }, [normalizedCurrency, showReserveDetails, xcannesCurrencyLinesCount]);
+  const xcsAppliedRateLabel = useMemo(() => {
+    if (!Number.isFinite(xcsAppliedFeePercent)) return reservePlaceholder;
+    const rounded = Math.round(xcsAppliedFeePercent * 100) / 100;
+    const label = rounded.toFixed(2).replace(/\.?0+$/, "");
+    return `${label}%`;
+  }, [reservePlaceholder, xcsAppliedFeePercent]);
 
   const baseTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
@@ -1314,7 +1320,7 @@ export default function CurrencyStatement({
             <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs text-white/50">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
+                      <p className="text-xs text-white/50">{t("ui_xcs_applied_rate_label_8e2f1c9a4b", "Taux de conversion appliqué")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
                         {xrpReserveDetails
                           ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
@@ -1365,29 +1371,41 @@ export default function CurrencyStatement({
                 </div>
             }
 
-              {(normalizedCurrency === "XCS") &&
+              {showAppliedRate &&
             <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs text-white/50">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
+                      <p className="text-xs text-white/50">{t("ui_xcs_applied_rate_label_8e2f1c9a4b", "Taux de conversion appliqué")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
-                        {xcsReserveDetails
-                          ? `${xcsReserveDetails.totalLockedXcs.toFixed(2)}${t("ui_xcs_3a4119a8c0", "XCS")}`
-                          : reservePlaceholder}
-                  </p>
+                        {xcsAppliedRateLabel}
+                      </p>
                     </div>
+                    {showXcsProgram ? (
+                      <button
+                        type="button"
+                        onClick={() => setXcsBenefitOpen((v) => !v)}
+                        className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                        aria-expanded={xcsBenefitOpen}
+                        aria-label={t("ui_xcs_benefit_title_2d3c7a1f8e", "Avantage XCS")}
+                      >
+                        {t("ui_xcs_program_cta_4fd1b09c3a", "Programme XCS")}
+                      </button>
+                    ) : null}
                   </div>
-                  <div className="mt-2 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-[11px] text-white/70 space-y-1">
-                    <p className="font-semibold text-white/80">
-                      {t("ui_xcs_benefit_title_2d3c7a1f8e", "Avantage XCS (à venir)")}
-                    </p>
-                    <p>
-                      {t(
-                        "ui_xcs_benefit_body_71b8f6c2a4",
-                        "Détenir 1 XCS au moment d'une conversion donne droit à 1 % de réduction sur les frais (frais de base : 1 %). Exemple : 6 XCS → frais de conversion à 0,94 %. La réduction dépend du nombre de XCS détenus au moment de la conversion ; vous pouvez revendre après et racheter plus tard."
-                      )}
-                    </p>
-                  </div>
+
+                  {showXcsProgram && xcsBenefitOpen && (
+                    <div className="mt-2 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-[11px] text-white/70 space-y-1">
+                      <p className="font-semibold text-white/80">
+                        {t("ui_xcs_benefit_title_2d3c7a1f8e", "Avantage XCS")}
+                      </p>
+                      <p className="whitespace-pre-line">
+                        {t(
+                          "ui_xcs_benefit_body_71b8f6c2a4",
+                          "Les conversions sont soumises à un taux standard de 1 %.\n\nLa détention de XCS permet d’accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l’opération.\n\nLe niveau d’optimisation évolue en fonction du volume de XCS détenu.\n\nIllustration :\n\n6 XCS → frais ajustés à 0,94 %\n\n100 XCS → 0 % de frais\n\nLes XCS ne sont ni débités ni immobilisés lors de la conversion.\nIls demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement."
+                        )}
+                      </p>
+                    </div>
+                  )}
                 </div>
             }
             </div>

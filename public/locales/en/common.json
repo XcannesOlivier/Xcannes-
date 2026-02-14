@@ -1356,6 +1356,8 @@
   "statement_conversion_label": "Conversion",
   "statement_xrpl_mobile_in": "Received",
   "statement_xrpl_mobile_out": "Sent",
-  "ui_xcs_benefit_title_2d3c7a1f8e": "XCS benefit (coming soon)",
-  "ui_xcs_benefit_body_71b8f6c2a4": "No XCS cap: holding 1 XCS at the time of a conversion gives a 1% discount on conversion fees (base fee: 1%). Example: 6 XCS → conversion fee 0.94%. 100 XCS → 0% fee. The discount depends on the number of XCS held at the time of the conversion; you can sell after and buy again later."
+  "ui_xcs_benefit_title_2d3c7a1f8e": "XCS benefit",
+  "ui_xcs_applied_rate_label_8e2f1c9a4b": "Applied conversion rate",
+  "ui_xcs_program_cta_4fd1b09c3a": "XCS Program",
+  "ui_xcs_benefit_body_71b8f6c2a4": "Conversions are subject to a standard 1% fee.\n\nHolding XCS unlocks optimized conversion conditions, applied automatically at the time of the operation.\n\nThe optimization level scales with the amount of XCS held.\n\nIllustration:\n\n6 XCS → fees adjusted to 0.94%\n\n100 XCS → 0% fees\n\nXCS is neither debited nor locked during conversion.\nIt remains fully available and can be kept, sold, or increased freely."
 }

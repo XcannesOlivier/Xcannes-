@@ -1374,6 +1374,8 @@
   "statement_conversion_label": "Conversion",
   "statement_xrpl_mobile_in": "Reçu",
   "statement_xrpl_mobile_out": "Envoyé",
-  "ui_xcs_benefit_title_2d3c7a1f8e": "Avantage XCS (à venir)",
-  "ui_xcs_benefit_body_71b8f6c2a4": "Sans limite de XCS : détenir 1 XCS au moment d'une conversion donne 1 % de réduction sur les frais (frais de base : 1 %). Exemple : 6 XCS → frais de conversion à 0,94 %. 100 XCS → 0 % de frais. La réduction dépend du nombre de XCS détenus au moment de la conversion ; vous pouvez revendre après et racheter plus tard."
+  "ui_xcs_benefit_title_2d3c7a1f8e": "Avantage XCS",
+  "ui_xcs_applied_rate_label_8e2f1c9a4b": "Taux de conversion appliqué",
+  "ui_xcs_program_cta_4fd1b09c3a": "Programme XCS",
+  "ui_xcs_benefit_body_71b8f6c2a4": "Les conversions sont soumises à un taux standard de 1 %.\n\nLa détention de XCS permet d’accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l’opération.\n\nLe niveau d’optimisation évolue en fonction du volume de XCS détenu.\n\nIllustration :\n\n6 XCS → frais ajustés à 0,94 %\n\n100 XCS → 0 % de frais\n\nLes XCS ne sont ni débités ni immobilisés lors de la conversion.\nIls demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement."
 }
