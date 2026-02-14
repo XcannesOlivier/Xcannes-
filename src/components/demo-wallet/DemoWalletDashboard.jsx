@@ -1066,7 +1066,7 @@ export default function DemoWalletDashboard({
       return;
     }
     const usdGross = amt * baseUsd;
-    const feeUsd = usdGross * 60 / 10_000;
+    const feeUsd = usdGross * 100 / 10_000;
     const usdNet = Math.max(0, usdGross - feeUsd);
     const toAmount = usdNet / quoteUsd;
     const amountLabel = toAmount.toLocaleString(locale, { maximumFractionDigits: 6 });
@@ -1268,7 +1268,7 @@ export default function DemoWalletDashboard({
           type = "debit";
           counterparty = getWalletAddress(state, evt.to);
           description = t("demo_statement_send_to_wallet", {
-            defaultValue: "Envoyer vers le wallet {{walletId}}",
+            defaultValue: "Envoyé à {{walletId}}",
             walletId: evt.to
           });
         } else if (evt.to === activeWalletId) {
@@ -1332,7 +1332,7 @@ export default function DemoWalletDashboard({
         type = "debit";
         amount = Number(evt.amount || 0);
         delta = -amount;
-        description = t("demo_statement_fee_spread", "Frais XCANNES (spread)");
+        description = t("demo_statement_fee_spread", "Frais de conversion (1 %)");
       } else if (
         evt.kind === "trustline_add" &&
         String(evt.currency).toUpperCase() === currency &&

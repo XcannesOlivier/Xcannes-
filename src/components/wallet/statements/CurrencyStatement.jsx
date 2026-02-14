@@ -202,15 +202,18 @@ export default function CurrencyStatement({
     return value;
   }, [balance, normalizedCurrency, usdRates]);
 
+  const showReserveDetails = isPreviewMode || isWalletActivated === true;
+  const reservePlaceholder = "—";
+
   const xrpReserveDetails = useMemo(() => {
     const code = normalizedCurrency;
-    if (code !== "XRP") return null;
+    if (code !== "XRP" || !showReserveDetails) return null;
 
     const activationXrp = 1;
-    const trustlinesExtraXrpTotal = 0.1;
-    const trustlineRlusdXrp = trustlinesExtraXrpTotal / 2;
-    const trustlineXcsXrp = trustlinesExtraXrpTotal / 2;
-    const totalReserveXrp = activationXrp + trustlinesExtraXrpTotal;
+    const trustlineReserveXrp = 0.2;
+    const trustlineRlusdXrp = hasRlusdTrustline ? trustlineReserveXrp : 0;
+    const trustlineXcsXrp = hasXcsTrustline ? trustlineReserveXrp : 0;
+    const totalReserveXrp = activationXrp + trustlineRlusdXrp + trustlineXcsXrp;
 
     return {
       totalReserveXrp,
@@ -218,27 +221,25 @@ export default function CurrencyStatement({
       trustlineRlusdXrp,
       trustlineXcsXrp
     };
-  }, [normalizedCurrency]);
+  }, [hasRlusdTrustline, hasXcsTrustline, normalizedCurrency, showReserveDetails]);
 
   const xcsReserveDetails = useMemo(() => {
     const code = normalizedCurrency;
-    if (code !== "XCS") return null;
+    if (code !== "XCS" || !showReserveDetails) return null;
 
-    const walletActivationXcs = 1;
     const linesCount = Number(xcannesCurrencyLinesCount || 0);
     const lockXcsPerLine = 0.2;
     const xcannesLinesLockedXcs =
-    Number.isFinite(linesCount) && linesCount > 0 ? linesCount * lockXcsPerLine : 0;
-    const totalLockedXcs = walletActivationXcs + xcannesLinesLockedXcs;
+      Number.isFinite(linesCount) && linesCount > 0 ? linesCount * lockXcsPerLine : 0;
+    const totalLockedXcs = xcannesLinesLockedXcs;
 
     return {
       totalLockedXcs,
-      walletActivationXcs,
       xcannesCurrencyLinesCount: Number.isFinite(linesCount) ? linesCount : 0,
       lockXcsPerLine,
       xcannesLinesLockedXcs
     };
-  }, [normalizedCurrency, xcannesCurrencyLinesCount]);
+  }, [normalizedCurrency, showReserveDetails, xcannesCurrencyLinesCount]);
 
   const baseTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
@@ -571,6 +572,7 @@ export default function CurrencyStatement({
 
   // Icône par type de transaction
   const getTransactionIcon = (category) => {
+    if (isPreviewMode && (category === "buy" || category === "sell")) return null;
     const icons = {
       buy: "+",
       sell: "−"
@@ -803,19 +805,20 @@ export default function CurrencyStatement({
       const lower = safeDescription.toLowerCase();
       if (category !== "exchange") {
         if (lower.includes("moonpay")) {
-          if (lower.includes("achat")) return "achat";
-          if (lower.includes("vente")) return "vente";
+          if (lower.includes("achat")) return "Achat";
+          if (lower.includes("vente")) return "Vente";
         }
-        if (lower.startsWith("achat")) return "achat";
-        if (lower.startsWith("vente")) return "vente";
+        if (lower.startsWith("achat")) return "Achat";
+        if (lower.startsWith("vente")) return "Vente";
         if (lower.startsWith("recevoir") || lower.startsWith("reçu") || lower.startsWith("recu")) {
-          return "reçu";
+          return "Reçu";
         }
         if (lower.startsWith("envoyer") || lower.startsWith("envoyé") || lower.startsWith("envoye")) {
-          return "envoyé";
+          return "Envoyé";
         }
-        if (lower.includes("recevoir") && lower.includes("wallet")) return "reçu";
-        if (lower.includes("envoyer") && lower.includes("wallet")) return "envoyé";
+        if (lower.startsWith("payer")) return "Envoyé";
+        if (lower.includes("recevoir") && lower.includes("wallet")) return "Reçu";
+        if (lower.includes("envoyer") && lower.includes("wallet")) return "Envoyé";
         return enrichDescription(safeDescription);
       }
       const arrowMatch = safeDescription.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
@@ -846,6 +849,50 @@ export default function CurrencyStatement({
     return { from: match[1], to: match[2] };
   }, []);
 
+  const getLocalizedDescription = useCallback(
+    (tx) => {
+      const kind = String(tx?.kind || "").trim().toUpperCase();
+      const rawCounterparty = tx?.counterparty ? String(tx.counterparty).trim() : "";
+      const counterparty =
+        rawCounterparty && rawCounterparty.toUpperCase() !== "XCANNES"
+          ? rawCounterparty
+          : "";
+      const category = String(tx?.category || "").trim().toLowerCase();
+
+      if (kind === "PAYMENT_OUT") {
+        return counterparty
+          ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", { counterparty })
+          : t("statement_payment_out_generic", "Paiement envoyé");
+      }
+      if (kind === "PAYMENT_IN") {
+        return counterparty
+          ? t("statement_payment_in_from", "Reçu de {{counterparty}}", { counterparty })
+          : t("statement_payment_in_generic", "Paiement reçu");
+      }
+      if (kind === "XRPL_PAYMENT_OUT") {
+        return t("statement_xrpl_payment_out", "Paiement envoyé");
+      }
+      if (kind === "XRPL_PAYMENT_IN") {
+        return t("statement_xrpl_payment_in", "Paiement reçu");
+      }
+      if (kind === "MOONPAY_BUY") {
+        return t("statement_buy_bank", "Purchase by bank payment");
+      }
+      if (kind === "MOONPAY_SELL") {
+        return t("statement_sell_bank", "Sale to bank account");
+      }
+      if (category === "exchange") {
+        const pair = parseConversionPair(tx?.description || "");
+        if (pair) {
+          return `${t("statement_conversion_label", "Conversion")} ${pair.from} → ${pair.to}`;
+        }
+      }
+
+      return tx?.description || "";
+    },
+    [parseConversionPair, t]
+  );
+
   const renderCurrencyBadge = useCallback(
     (code) => {
       const upper = String(code || "").toUpperCase();
@@ -875,18 +922,27 @@ export default function CurrencyStatement({
   );
 
   const renderConversionDescription = useCallback(
-    (description) => {
+    (description, { withLabel = false } = {}) => {
       const pair = parseConversionPair(description);
       if (!pair) return null;
-      return (
+      const badges = (
         <span className="inline-flex items-center gap-2">
           {renderCurrencyBadge(pair.from)}
           <span className="text-white/50 text-xs md:text-sm">→</span>
           {renderCurrencyBadge(pair.to)}
         </span>
       );
+      if (!withLabel) return badges;
+      return (
+        <span className="inline-flex items-center gap-2">
+          <span className="text-white/70 text-xs md:text-sm">
+            {t("statement_conversion_label", "Conversion")}
+          </span>
+          {badges}
+        </span>
+      );
     },
-    [parseConversionPair, renderCurrencyBadge]
+    [parseConversionPair, renderCurrencyBadge, t]
   );
 
   const formatDate = useCallback((dateStr) => {
@@ -921,8 +977,13 @@ export default function CurrencyStatement({
       const txType = isDebit ?
       t("ui_debit_0f7c2a1b9e", "Debit") :
       t("ui_credit_93bc2a1d7e", "Credit");
-      const txDescription = tx?.description || "";
-      const counterparty = tx?.counterparty ? `(${tx.counterparty})` : "";
+      const txDescription = getLocalizedDescription(tx);
+      const counterparty =
+        tx?.counterparty &&
+        String(tx.counterparty).toUpperCase() !== "XCANNES" &&
+        !txDescription.includes(tx.counterparty)
+          ? `(${tx.counterparty})`
+          : "";
       const fullDescription = [txDescription, counterparty].filter(Boolean).join(" ");
       return `
         <tr>
@@ -1047,7 +1108,7 @@ export default function CurrencyStatement({
         tx?.date || "",
         tx?.type || "",
         tx?.category || "",
-        tx?.description || "",
+        getLocalizedDescription(tx),
         Number.isFinite(Number(tx?.amount)) ? Number(tx.amount) : "",
         Number.isFinite(Number(tx?.displayRunningBalance))
           ? Number(tx.displayRunningBalance)
@@ -1249,20 +1310,24 @@ export default function CurrencyStatement({
                 ≈ {formatAmount(estimatedUsd)}{t("ui_usd_506842b2ba", "USD")}
             </p>
 
-              {xrpReserveDetails &&
+              {(normalizedCurrency === "XRP") &&
             <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <p className="text-xs text-white/50">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
-                        {xrpReserveDetails.totalReserveXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}
+                        {xrpReserveDetails
+                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
+                          : reservePlaceholder}
                   </p>
                     </div>
                     <button
                   type="button"
                   onClick={() => setReserveOpen((v) => !v)}
-                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                  disabled={!xrpReserveDetails}
+                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
                   aria-expanded={reserveOpen}
+                  aria-disabled={!xrpReserveDetails}
                   aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
 
 
@@ -1300,55 +1365,29 @@ export default function CurrencyStatement({
                 </div>
             }
 
-              {xcsReserveDetails &&
+              {(normalizedCurrency === "XCS") &&
             <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <p className="text-xs text-white/50">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
-                        {xcsReserveDetails.totalLockedXcs.toFixed(2)}{t("ui_xcs_3a4119a8c0", "XCS")}
+                        {xcsReserveDetails
+                          ? `${xcsReserveDetails.totalLockedXcs.toFixed(2)}${t("ui_xcs_3a4119a8c0", "XCS")}`
+                          : reservePlaceholder}
                   </p>
                     </div>
-                    <button
-                  type="button"
-                  onClick={() => setReserveOpen((v) => !v)}
-                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
-                  aria-expanded={reserveOpen}
-                  aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
-
-
-                </button>
                   </div>
-
-                  {reserveOpen &&
-              <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
-                      <div className="text-[11px] text-white/70">
-                        <div className="flex items-center justify-between gap-2">
-                          <span>{t("ui_activation_wallet_xcannes_92757c7cdd", "Activation wallet XCANNES")}</span>
-                          <span className="font-mono">
-                            {xcsReserveDetails.walletActivationXcs.toFixed(2)}{t("ui_xcs_3a4119a8c0", "XCS")}
-                    </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-2 border-t border-white/10 text-[11px] text-white/70">
-                        <div className="flex items-center justify-between gap-2">
-                          <span>{t("ui_xcannes_currency_lines_1f3927f668", "Lignes de comptes XCANNES (")}
-                      {xcsReserveDetails.xcannesCurrencyLinesCount} × {xcsReserveDetails.lockXcsPerLine.toFixed(2)}{t("ui_xcs_f516c57c4d", "XCS)")}
-                    </span>
-                          <span className="font-mono">
-                            {xcsReserveDetails.xcannesLinesLockedXcs.toFixed(2)}{t("ui_xcs_3a4119a8c0", "XCS")}
-                    </span>
-                        </div>
-                        <p className="mt-1 text-[10px] text-white/45">{t("ui_locking_xcs_via_escrow__2d99312708", "Verrouillage XCS via escrow. Fermeture: 0.10 XCS remboursé, 0.10 XCS vers XCANNES.")}
-
-                  </p>
-                        <p className="mt-1 text-[10px] text-white/45">{t("ui_inclut_les_lignes_actives_m__0e52afcff8", "Inclut les lignes actives même si allocation = 0 RLUSD.")}
-
-                  </p>
-                      </div>
-                    </div>
-              }
+                  <div className="mt-2 rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-[11px] text-white/70 space-y-1">
+                    <p className="font-semibold text-white/80">
+                      {t("ui_xcs_benefit_title_2d3c7a1f8e", "Avantage XCS (à venir)")}
+                    </p>
+                    <p>
+                      {t(
+                        "ui_xcs_benefit_body_71b8f6c2a4",
+                        "Détenir 1 XCS au moment d'une conversion donne droit à 1 % de réduction sur les frais (frais de base : 1 %). Exemple : 6 XCS → frais de conversion à 0,94 %. La réduction dépend du nombre de XCS détenus au moment de la conversion ; vous pouvez revendre après et racheter plus tard."
+                      )}
+                    </p>
+                  </div>
                 </div>
             }
             </div>
@@ -1522,14 +1561,23 @@ export default function CurrencyStatement({
                                 ) : null}
                                 <div className="min-w-0">
                                   <p className="text-sm text-white/90 truncate">
-                                    {tx.category === "exchange"
-                                      ? renderConversionDescription(tx.description) ||
-                                        (isMobileDate
-                                          ? simplifyMobileDescription(tx.description, tx.category)
-                                          : enrichDescription(tx.description))
-                                      : isMobileDate
-                                        ? simplifyMobileDescription(tx.description, tx.category)
-                                        : enrichDescription(tx.description)}
+                                    {(() => {
+                                      const localizedDescription = getLocalizedDescription(tx);
+                                      return tx.category === "exchange"
+                                        ? renderConversionDescription(localizedDescription, {
+                                            withLabel: !isMobileDate,
+                                          }) ||
+                                          (isMobileDate
+                                            ? simplifyMobileDescription(localizedDescription, tx.category)
+                                            : enrichDescription(localizedDescription))
+                                        : isMobileDate
+                                          ? (tx.kind === "XRPL_PAYMENT_IN"
+                                              ? t("statement_xrpl_mobile_in", "Reçu")
+                                              : tx.kind === "XRPL_PAYMENT_OUT"
+                                                ? t("statement_xrpl_mobile_out", "Envoyé")
+                                                : simplifyMobileDescription(localizedDescription, tx.category))
+                                          : enrichDescription(localizedDescription);
+                                    })()}
                                   </p>
                                   {tx.counterparty && (
                                     <p className="text-xs text-white/40 font-mono truncate hidden md:block">

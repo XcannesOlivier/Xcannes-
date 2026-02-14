@@ -74,7 +74,7 @@ const DEFAULT_DEMO_WALLETS = {
   },
 };
 
-const DEMO_EVENT_SPREAD_BPS = 60;
+const DEMO_EVENT_SPREAD_BPS = 100;
 const DEMO_EVENTS_MONTHS = 12;
 
 function safeNumber(value) {
@@ -838,7 +838,7 @@ export function applyDemoConvert({
   fromCurrencyCode,
   toCurrencyCode,
   amountUnits,
-  spreadBps = 60,
+  spreadBps = 100,
   ratesUsdPerUnit,
 }) {
   const amount = safeNumber(amountUnits);

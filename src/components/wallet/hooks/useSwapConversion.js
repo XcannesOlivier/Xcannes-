@@ -313,7 +313,7 @@ export function useSwapConversion({
 
         const spreadLabel =
           spread?.isFx && spreadFee > 0
-            ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
+            ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
                 "en-US",
                 { maximumFractionDigits: 6 }
               )} RLUSD)`
@@ -421,7 +421,7 @@ export function useSwapConversion({
       }
 
       if (!Number.isFinite(netRlusd) || netRlusd <= 0) {
-        alert("Montant trop faible après spread.");
+        alert("Montant trop faible après frais.");
         return;
       }
       if (!Number.isFinite(spreadFee) || spreadFee <= 0) {
@@ -483,7 +483,7 @@ export function useSwapConversion({
 
       const spreadLabel =
         spread?.isFx && spreadFee > 0
-          ? `, spread ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
+          ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
               "en-US",
               { maximumFractionDigits: 6 }
             )} RLUSD)`

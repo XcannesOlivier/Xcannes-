@@ -1589,7 +1589,7 @@ export default function WalletDashboard({
               : availableAllocatedRlusd;
           const maxFx = maxPaymentRlusd > 0 ? maxPaymentRlusd / rlusdPerUnit : 0;
           alert(
-            `Allocation insuffisante en ${currency} pour couvrir paiement + spread.\n\n` +
+            `Allocation insuffisante en ${currency} pour couvrir paiement + frais de conversion.\n\n` +
               `Disponible: ≈ ${availableAllocatedRlusd.toLocaleString("en-US", {
                 maximumFractionDigits: 6,
               })} RLUSD\n` +
@@ -1618,7 +1618,7 @@ export default function WalletDashboard({
             `Montant: ${effectiveAmountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
             `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n` +
             (spreadFeeRlusd > 0
-              ? `Spread XCANNES (tier ${spread?.tier || "A"}): ≈ ${spreadFeeRlusd.toLocaleString("en-US", {
+              ? `Frais de conversion (1 %) : ≈ ${spreadFeeRlusd.toLocaleString("en-US", {
                   maximumFractionDigits: 6,
                 })} RLUSD\n`
               : "") +
@@ -1626,7 +1626,7 @@ export default function WalletDashboard({
               maximumFractionDigits: 6,
             })} RLUSD\n\n` +
             (spreadFeeRlusd > 0
-              ? `2 signatures Xumm seront demandées (spread → XCANNES, puis paiement → destinataire).`
+              ? `2 signatures Xumm seront demandées (frais de conversion → XCANNES, puis paiement → destinataire).`
               : `1 signature Xumm sera demandée (paiement → destinataire).`)
         );
         if (!ok) return { ok: false };
@@ -1648,7 +1648,7 @@ export default function WalletDashboard({
           const totalDebitRlusd = totalToSpendRlusd;
           if (availableRlusd + 1e-9 < totalDebitRlusd) {
             alert(
-              `Allocation démo insuffisante (≈ RLUSD) pour couvrir paiement + spread. Disponible: ${availableRlusd.toLocaleString(
+              `Allocation démo insuffisante (≈ RLUSD) pour couvrir paiement + frais de conversion. Disponible: ${availableRlusd.toLocaleString(
                 "en-US",
                 { maximumFractionDigits: 6 }
               )} RLUSD.`
@@ -1671,7 +1671,7 @@ export default function WalletDashboard({
           });
 
           alert(
-            `✅ (Demo) Signature 1/2 simulée: spread → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
+            `✅ (Demo) Signature 1/2 simulée: frais de conversion → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
               `✅ (Demo) Signature 2/2 simulée: paiement → destinataire (${dest})`
           );
           handleAddressSave(dest);
@@ -1680,7 +1680,7 @@ export default function WalletDashboard({
           return { ok: true };
         }
 
-        // 1) Paiement spread → wallet entreprise XCANNES
+        // 1) Paiement des frais de conversion → wallet entreprise XCANNES
         const fxSource =
           (sendPaymentRequest?.fxSource ? String(sendPaymentRequest.fxSource) : null) ||
           rlusdPerUnitSources?.[currency] ||
@@ -1696,7 +1696,7 @@ export default function WalletDashboard({
             amountRlusd: spreadFeeRlusd,
           });
           if (!spreadTx) {
-            throw new Error("Invalid RLUSD spread payment");
+            throw new Error("Invalid RLUSD conversion fee payment");
           }
           const spreadMemoPayload = buildPayreqMemo({
             origin: "spread",
@@ -1710,11 +1710,11 @@ export default function WalletDashboard({
             note: "spread",
           });
           if (!spreadMemoPayload) {
-            throw new Error("Invalid spread memo payload");
+            throw new Error("Invalid conversion fee memo payload");
           }
           const spreadMemos = buildXrplJsonMemo(spreadMemoPayload);
           if (!spreadMemos) {
-            throw new Error("Invalid spread memo");
+            throw new Error("Invalid conversion fee memo");
           }
           spreadTx.Memos = spreadMemos;
 
@@ -1722,7 +1722,7 @@ export default function WalletDashboard({
             action: "wallet:convert",
           });
           if (!spreadResult?.signed) {
-            alert("Spread payment cancelled or expired.");
+            alert("Conversion fee payment cancelled or expired.");
             return { ok: false };
           }
         }
@@ -1798,7 +1798,7 @@ export default function WalletDashboard({
         } else {
           alert(
             spreadFeeRlusd > 0
-              ? "Payment cancelled or expired. (Spread was already paid.)"
+              ? "Payment cancelled or expired. (Conversion fee was already paid.)"
               : "Transaction cancelled or expired."
           );
           return { ok: false };

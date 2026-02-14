@@ -1,7 +1,8 @@
 "use client";
 
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
-import { spreadFractionForTier, currencyTier } from "@/utils/marketSpread";
+
+const FIXED_FX_FEE_FRACTION = 0.01;
 
 export const XCANNES_SPREAD_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||
@@ -34,20 +35,15 @@ export function computeSpreadQuote({ base, quote, amountRlusd }) {
     };
   }
 
-  const destinationTier = currencyTier(q);
-  const spreadFraction = spreadFractionForTier(destinationTier);
-  // Use full tier fraction as the fixed FX fee (no bid/ask split).
-  const feeFraction = Number(spreadFraction);
-  const spreadFeeRlusd = amount * feeFraction;
-
-  const tier = destinationTier;
+  const spreadFraction = FIXED_FX_FEE_FRACTION;
+  const spreadFeeRlusd = amount * spreadFraction;
 
   return {
     isFx: true,
     spreadFraction,
-    halfSpreadFraction: feeFraction,
+    halfSpreadFraction: spreadFraction,
     spreadFeeRlusd: Number.isFinite(spreadFeeRlusd) ? spreadFeeRlusd : 0,
-    tier,
+    tier: null,
   };
 }
 
