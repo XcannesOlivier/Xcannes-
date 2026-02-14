@@ -260,33 +260,6 @@ export default function WalletDashboard({
 
   const [cashBuyPrefill, setCashBuyPrefill] = useState(null);
 
-  const handleAction = useCallback(
-    (nextAction) => {
-      if (effectiveIsConnected && isWalletLabelRequired) {
-        flashWalletHeaderToast("Nom du wallet requis.", 2000);
-      }
-      if (nextAction === "swap") {
-        setSwapDefaultView("convert");
-        setSwapLockedView(null);
-      }
-      if (nextAction === "cash") {
-        setCashBuyPrefill(null);
-      }
-      setActiveAction(nextAction);
-    },
-    [
-      effectiveIsConnected,
-      flashWalletHeaderToast,
-      isWalletLabelRequired,
-    ]
-  );
-
-  const handleOpenCurrencyLines = useCallback(() => {
-    setSwapDefaultView("lines");
-    setSwapLockedView("lines");
-    setActiveAction("swap");
-  }, []);
-  
   const [cashModalTab, setCashModalTab] = useState("buy"); // 'buy' | 'sell' - Onglet actif dans la modal Cash
   const [activationBundleEnabled, setActivationBundleEnabled] = useState(false);
   const activationXrpAmount = activationBundleEnabled ?
@@ -303,27 +276,6 @@ export default function WalletDashboard({
     requestMemo,
     setRequestMemo,
   } = usePaymentRequestForm();
-
-  const handleOpenActivationModal = useCallback(() => {
-    setActivationBundleEnabled(false);
-    setShowActivationModal(true);
-  }, []);
-
-  const handleActivationRequestFromThirdParty = useCallback(() => {
-    setShowActivationModal(false);
-    setShowActivationRequestModal(true);
-  }, []);
-
-  const handleActivationBuyViaMoonpay = useCallback(() => {
-    setShowActivationModal(false);
-    setCashBuyPrefill({
-      currency: "XRP",
-      amount: activationXrpAmountLabel,
-      amountType: "crypto",
-    });
-    setCashModalTab("buy");
-    setActiveAction("cash");
-  }, [activationXrpAmountLabel, setCashModalTab]);
   
   const [selectedWallet, setSelectedWallet] = useState("");
   const {
@@ -731,72 +683,6 @@ export default function WalletDashboard({
   );
 
 
-  // Ouvrir le convert (swap modal) depuis d'autres briques UI.
-  // Event detail:
-  // - action: "buy" | "sell"
-  // - base, quote: codes devises (ex: EUR/USD)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const handler = async (event) => {
-      const detail = event?.detail || {};
-      const action = String(detail.action || "").toLowerCase();
-      const base = String(detail.base || "").trim().toUpperCase();
-      const quote = String(detail.quote || "").trim().toUpperCase();
-      if (!base || !quote) return;
-
-      const desiredBase = action === "buy" ? quote : base;
-      const desiredQuote = action === "buy" ? base : quote;
-
-      setConvertBaseCurrency(desiredBase);
-      setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
-      setConvertAmount("");
-      setSwapDefaultView("convert");
-      setSwapLockedView(null);
-      setActiveAction("swap");
-
-    };
-
-    window.addEventListener("xcannes:wallet:open-convert", handler);
-    return () => window.removeEventListener("xcannes:wallet:open-convert", handler);
-  }, [
-    handleActivateCurrencyLine,
-    setActiveAction,
-    setConvertAmount,
-    setConvertBaseCurrency,
-    setConvertQuoteCurrency,
-    setSwapDefaultView,
-    setSwapLockedView,
-  ]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handler = () => {
-      setShowAdjustmentModal(true);
-    };
-    window.addEventListener("xcannes:wallet:open-adjustment", handler);
-    return () =>
-      window.removeEventListener("xcannes:wallet:open-adjustment", handler);
-  }, []);
-
-  useEffect(() => {
-    if (isPreviewMode) return;
-    if (!backendWalletAddress) return;
-    if (!hasAdjustmentDeficit) {
-      adjustmentAutoOpenedRef.current = false;
-      return;
-    }
-    if (adjustmentAutoOpenedRef.current) return;
-    if (activeAction || showAdjustmentModal) return;
-    setShowAdjustmentModal(true);
-    adjustmentAutoOpenedRef.current = true;
-  }, [
-    activeAction,
-    backendWalletAddress,
-    hasAdjustmentDeficit,
-    isPreviewMode,
-    showAdjustmentModal,
-  ]);
 
   const handleUpsertCurrencyLine = useCallback(async () => {
     if (isPreviewMode) {
@@ -1381,27 +1267,182 @@ export default function WalletDashboard({
     setSendPaymentRequest,
   });
 
+  const closeInlineQr = useCallback(() => {
+    if (!isDesktopPanel) return;
+    setQrScannerOpen(false);
+    closeQrModal?.();
+  }, [closeQrModal, isDesktopPanel, setQrScannerOpen]);
+
+  const handleAction = useCallback(
+    (nextAction) => {
+      closeInlineQr();
+      setWalletInfoOpen(false);
+      if (effectiveIsConnected && isWalletLabelRequired) {
+        flashWalletHeaderToast("Nom du wallet requis.", 2000);
+      }
+      if (nextAction === "swap") {
+        setSwapDefaultView("convert");
+        setSwapLockedView(null);
+      }
+      if (nextAction === "cash") {
+        setCashBuyPrefill(null);
+      }
+      setActiveAction(nextAction);
+    },
+    [
+      closeInlineQr,
+      effectiveIsConnected,
+      flashWalletHeaderToast,
+      isWalletLabelRequired,
+      setSwapDefaultView,
+      setSwapLockedView,
+      setCashBuyPrefill,
+    ]
+  );
+
+  const handleOpenCurrencyLines = useCallback(() => {
+    closeInlineQr();
+    setWalletInfoOpen(false);
+    setSwapDefaultView("lines");
+    setSwapLockedView("lines");
+    setActiveAction("swap");
+  }, [closeInlineQr, setSwapDefaultView, setSwapLockedView]);
+
+  const handleOpenActivationModal = useCallback(() => {
+    closeInlineQr();
+    setWalletInfoOpen(false);
+    setActivationBundleEnabled(false);
+    setShowActivationModal(true);
+  }, [closeInlineQr]);
+
+  const handleActivationRequestFromThirdParty = useCallback(() => {
+    closeInlineQr();
+    setWalletInfoOpen(false);
+    setShowActivationModal(false);
+    setShowActivationRequestModal(true);
+  }, [closeInlineQr]);
+
+  const handleActivationBuyViaMoonpay = useCallback(() => {
+    closeInlineQr();
+    setWalletInfoOpen(false);
+    setShowActivationModal(false);
+    setCashBuyPrefill({
+      currency: "XRP",
+      amount: activationXrpAmountLabel,
+      amountType: "crypto",
+    });
+    setCashModalTab("buy");
+    setActiveAction("cash");
+  }, [activationXrpAmountLabel, closeInlineQr, setCashModalTab]);
+
   const handleOpenCurrencyStatement = useCallback(
     (token) => {
+      closeInlineQr();
+      setWalletInfoOpen(false);
       if (isDesktopPanel) {
         setActiveAction(null);
         setShowAdjustmentModal(false);
         setShowActivationModal(false);
         setShowActivationRequestModal(false);
-        setWalletInfoOpen(false);
         setShowGlobalStatement(false);
-        setQrScannerOpen(false);
-        closeQrModal?.();
       }
       setSelectedStatementToken(token);
       setShowCurrencyStatement(true);
     },
     [
-      closeQrModal,
+      closeInlineQr,
       isDesktopPanel,
-      setQrScannerOpen,
     ]
   );
+
+  const handleOpenInfo = useCallback(() => {
+    closeInlineQr();
+    if (isDesktopPanel) {
+      setActiveAction(null);
+      setShowAdjustmentModal(false);
+      setShowActivationModal(false);
+      setShowActivationRequestModal(false);
+      setShowCurrencyStatement(false);
+      setSelectedStatementToken(null);
+      setShowGlobalStatement(false);
+    }
+    setWalletInfoOpen(true);
+  }, [closeInlineQr, isDesktopPanel]);
+
+  // Ouvrir le convert (swap modal) depuis d'autres briques UI.
+  // Event detail:
+  // - action: "buy" | "sell"
+  // - base, quote: codes devises (ex: EUR/USD)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handler = async (event) => {
+      closeInlineQr();
+      setWalletInfoOpen(false);
+      const detail = event?.detail || {};
+      const action = String(detail.action || "").toLowerCase();
+      const base = String(detail.base || "").trim().toUpperCase();
+      const quote = String(detail.quote || "").trim().toUpperCase();
+      if (!base || !quote) return;
+
+      const desiredBase = action === "buy" ? quote : base;
+      const desiredQuote = action === "buy" ? base : quote;
+
+      setConvertBaseCurrency(desiredBase);
+      setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
+      setConvertAmount("");
+      setSwapDefaultView("convert");
+      setSwapLockedView(null);
+      setActiveAction("swap");
+
+    };
+
+    window.addEventListener("xcannes:wallet:open-convert", handler);
+    return () => window.removeEventListener("xcannes:wallet:open-convert", handler);
+  }, [
+    closeInlineQr,
+    handleActivateCurrencyLine,
+    setActiveAction,
+    setConvertAmount,
+    setConvertBaseCurrency,
+    setConvertQuoteCurrency,
+    setSwapDefaultView,
+    setSwapLockedView,
+  ]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      closeInlineQr();
+      setWalletInfoOpen(false);
+      setShowAdjustmentModal(true);
+    };
+    window.addEventListener("xcannes:wallet:open-adjustment", handler);
+    return () =>
+      window.removeEventListener("xcannes:wallet:open-adjustment", handler);
+  }, [closeInlineQr]);
+
+  useEffect(() => {
+    if (isPreviewMode) return;
+    if (!backendWalletAddress) return;
+    if (!hasAdjustmentDeficit) {
+      adjustmentAutoOpenedRef.current = false;
+      return;
+    }
+    if (adjustmentAutoOpenedRef.current) return;
+    if (activeAction || showAdjustmentModal) return;
+    closeInlineQr();
+    setWalletInfoOpen(false);
+    setShowAdjustmentModal(true);
+    adjustmentAutoOpenedRef.current = true;
+  }, [
+    activeAction,
+    backendWalletAddress,
+    closeInlineQr,
+    hasAdjustmentDeficit,
+    isPreviewMode,
+    showAdjustmentModal,
+  ]);
 
   const renderTokenRow = useCallback(
     (token) => (
@@ -2088,24 +2129,22 @@ export default function WalletDashboard({
   ]);
 
   const handleOpenGlobalStatement = useCallback(() => {
+    closeInlineQr();
+    setWalletInfoOpen(false);
     if (isDesktopPanel) {
       setActiveAction(null);
       setShowAdjustmentModal(false);
       setShowActivationModal(false);
       setShowActivationRequestModal(false);
-      setWalletInfoOpen(false);
       setShowCurrencyStatement(false);
       setSelectedStatementToken(null);
-      setQrScannerOpen(false);
-      closeQrModal?.();
       setShowGlobalStatement(false);
       return;
     }
     setShowGlobalStatement(true);
   }, [
-    closeQrModal,
+    closeInlineQr,
     isDesktopPanel,
-    setQrScannerOpen,
   ]);
 
   const isXummInlineOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
@@ -2224,7 +2263,7 @@ export default function WalletDashboard({
             layout={layout}
             xrplConnectionIndicator={xrplConnectionIndicator}
             isFullPageView={isFullPageView}
-            onOpenInfo={() => setWalletInfoOpen(true)}
+            onOpenInfo={handleOpenInfo}
           />
           {!isDesktopPanel ? (
             <>
