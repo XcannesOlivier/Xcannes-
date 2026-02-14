@@ -29,6 +29,11 @@ const USD_STABLECOINS = [
 const HIGHLIGHT_DURATION_MS = 5000;
 const STATEMENT_HISTORY_MONTHS = 13;
 
+const isSvgIcon = (src) => {
+  if (!src) return false;
+  return String(src).toLowerCase().endsWith(".svg");
+};
+
 const buildMonthKeyUtc = (date) => {
   if (!(date instanceof Date)) return null;
   const year = date.getUTCFullYear();
@@ -109,6 +114,10 @@ export default function CurrencyStatement({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+  const normalizedCurrency = useMemo(
+    () => String(currency || "").toUpperCase(),
+    [currency]
+  );
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
@@ -199,11 +208,6 @@ export default function CurrencyStatement({
       cancelled = true;
     };
   }, [walletAddress]);
-
-  const normalizedCurrency = useMemo(
-    () => String(currency || "").toUpperCase(),
-    [currency]
-  );
 
   const estimatedUsd = useMemo(() => {
     const value = Number.parseFloat(balance || 0) || 0;
@@ -924,15 +928,27 @@ export default function CurrencyStatement({
       const upper = String(code || "").toUpperCase();
       if (!upper) return null;
       if (CRYPTO_ICONS?.[upper]) {
+        const iconSrc = CRYPTO_ICONS[upper];
         return (
           <span className="inline-flex items-center gap-1">
-            <Image
-              src={CRYPTO_ICONS[upper]}
-              alt={upper}
-              width={16}
-              height={16}
-              className="w-4 h-4 rounded-sm"
-            />
+            {isSvgIcon(iconSrc) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={iconSrc}
+                alt={upper}
+                width={16}
+                height={16}
+                className="w-4 h-4 rounded-sm"
+              />
+            ) : (
+              <Image
+                src={iconSrc}
+                alt={upper}
+                width={16}
+                height={16}
+                className="w-4 h-4 rounded-sm"
+              />
+            )}
             <span className="text-white/80 text-xs md:text-sm">{upper}</span>
           </span>
         );
@@ -1243,13 +1259,24 @@ export default function CurrencyStatement({
 	          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               {CRYPTO_ICONS?.[normalizedCurrency] ? (
-                <Image
-                  src={CRYPTO_ICONS[normalizedCurrency]}
-                  alt={normalizedCurrency}
-                  width={32}
-                  height={32}
-                  className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
-                />
+                isSvgIcon(CRYPTO_ICONS[normalizedCurrency]) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={CRYPTO_ICONS[normalizedCurrency]}
+                    alt={normalizedCurrency}
+                    width={32}
+                    height={32}
+                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                  />
+                ) : (
+                  <Image
+                    src={CRYPTO_ICONS[normalizedCurrency]}
+                    alt={normalizedCurrency}
+                    width={32}
+                    height={32}
+                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                  />
+                )
               ) : (
                 <span className="text-2xl md:text-3xl flex-shrink-0">
                   {getCurrencyFlag(currency)}
@@ -1425,10 +1452,11 @@ export default function CurrencyStatement({
                       {/* Header avec badge */}
                       <div className="px-4 py-3 border-b border-white/10 bg-white/5">
                         <div className="flex items-center gap-2">
-                          <Image 
-                            src="/symbols/xcs.svg" 
-                            alt="XCS" 
-                            width={20} 
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src="/symbols/xcs.svg"
+                            alt="XCS"
+                            width={20}
                             height={20}
                             className="shrink-0"
                           />
