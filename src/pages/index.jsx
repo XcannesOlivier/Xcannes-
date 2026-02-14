@@ -928,6 +928,48 @@ export default function Home() {
           )}
       </div>
 
+      <section className="md:hidden px-6 pb-6 -mt-2">
+        <div className="flex flex-col items-center justify-center gap-4 text-center">
+          <p className="text-sm text-white/70">
+            {t(
+              "home_v2_hero_store_cta_hint",
+              "Téléchargez l'application XCANNES sur votre mobile."
+            )}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex"
+              aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+            >
+              <img
+                src={appStoreBadgeSrc}
+                alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                className="h-12 w-auto"
+                loading="lazy"
+              />
+            </a>
+
+            <a
+              href="#"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex"
+              aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+            >
+              <img
+                src={googlePlayBadgeSrc}
+                alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                className="h-[60px] w-auto"
+                loading="lazy"
+              />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CONTENT SECTIONS */}
       <div className="bg-xcannes-background">
         <WalletProductSection />
