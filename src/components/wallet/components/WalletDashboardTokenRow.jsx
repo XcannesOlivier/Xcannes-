@@ -108,18 +108,6 @@ export default function WalletDashboardTokenRow({
                 "XCannes Token" :
                 "XRPL Token"}
               </span>
-              {currencyCode === "XCS" && !isMissingTrustline && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onOpenXcsProgram?.();
-                  }}
-                  className="mt-0.5 text-[10px] text-xcannes-green hover:text-xcannes-green/80 underline underline-offset-2 text-left transition-colors"
-                >
-                  {t("ui_xcs_program_link", "Programme XCS")}
-                </button>
-              )}
             </div>
           </div>
           {showWalletActivationNotice ? (
