@@ -719,11 +719,9 @@ export default function WalletDashboardSwapModal({
                   previewMeta?.isFx &&
                   previewMeta?.spreadFeeRlusd > 0 ? (
                       <div className="text-[10px] text-white/45">
-                        {t("ui_spread_fee_6c2a8d5e1b", "Spread")}:{" "}
-                        {previewMeta.spreadPercent.toFixed(2)}% (≈{" "}
-                        {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
+                        {t("ui_spread_fee_6c2a8d5e1b", "Conversion fee (1%)")}:{" "}
+                        ≈ {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
                         {"RLUSD"}
-                        {")"}
                       </div>
                   ) : null}
                 </div>

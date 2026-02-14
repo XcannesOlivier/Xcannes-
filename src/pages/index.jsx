@@ -701,11 +701,11 @@ export default function Home() {
                   {[
                     t(
                       "home_v2_hero_fees_modal_point_2",
-                      "XCANNES ne prélève pas de frais séparés : le coût principal est le spread."
+                      "Frais de conversion : 1 % quelle que soit la devise."
                     ),
                     t(
                       "home_v2_hero_fees_modal_point_3",
-                      "Le spread est optimisé selon la devise."
+                      "Aucun frais XCANNES sur l’envoi et la réception."
                     ),
                     t(
                       "home_v2_hero_fees_modal_point_5",

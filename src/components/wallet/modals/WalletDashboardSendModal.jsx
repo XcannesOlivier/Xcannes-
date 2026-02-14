@@ -419,31 +419,29 @@ export default function WalletDashboardSendModal({
 
             </p>
                   {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 &&
-            <p className="mt-1 text-[11px] text-white/60">{t("ui_spread_xcannes_tier_7ad17576d3", "Spread XCANNES (tier")}
-              {" "}
-                      <span className="font-mono">{sendFxInfo.spreadTier || "A"}</span>,{" "}
-                  {sendFxInfo.fxSource ?
-              <>{t("ui_source_507c065942", "source")}
-                {" "}
-                          <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
-                        </> :
-
-              t("ui_source_unknown_4c1a7d9b2e", "unknown source")
-              }
-                      ):{" "}
-                      <span className="font-mono">
-                        {Number(sendFxInfo.spreadFeeRlusd || 0).toLocaleString("en-US", {
+            <p className="mt-1 text-[11px] text-white/60">
+              {t("ui_spread_xcannes_tier_7ad17576d3", "Conversion fee (1%)")}
+              {sendFxInfo.fxSource ? (
+                <>
+                  {" "}· {t("ui_source_507c065942", "source")}{" "}
+                  <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
+                </>
+              ) : (
+                <>{" "}· {t("ui_source_unknown_4c1a7d9b2e", "unknown source")}</>
+              )}
+              :{" "}
+              <span className="font-mono">
+                {Number(sendFxInfo.spreadFeeRlusd || 0).toLocaleString("en-US", {
                   maximumFractionDigits: 6
                 })}{" "}{t("ui_rlusd_ff5048a674", "RLUSD")}
-
               </span>
-                    </p>
+            </p>
             }
                   <p className="mt-2 text-[10px] text-white/45">
                     {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
               t(
                 "ui_xumm_signatures_two_8d1c7a2b9e",
-                "2 Xumm signatures: spread → XCANNES, then payment → recipient."
+                "2 Xumm signatures: conversion fee (1%) → XCANNES, then payment → recipient."
               ) :
               t(
                 "ui_xumm_signatures_one_5b2c1a7d9f",
