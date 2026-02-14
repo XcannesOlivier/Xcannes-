@@ -6,10 +6,6 @@ import WalletEssentialsCards from "@/components/home/WalletEssentialsCards";
 export default function WalletProductSection() {
   const { t } = useTranslation("common");
   const [demoWalletId, setDemoWalletId] = useState("A");
-  const appStoreBadgeSrc =
-    "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/fr-fr?size=250x83";
-  const googlePlayBadgeSrc =
-    "https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png";
 
   return (
     <section id="demo" className="relative py-24 px-4 sm:px-6 overflow-hidden">
@@ -81,45 +77,6 @@ export default function WalletProductSection() {
             </div>
           </div>
 
-          <div className="mt-6 md:hidden flex flex-col items-center justify-center gap-4">
-            <p className="text-sm text-white/70 text-center">
-              {t(
-                "home_v2_hero_store_cta_hint",
-                "Téléchargez l'application XCANNES sur votre mobile."
-              )}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <a
-                href="#"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex"
-                aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
-              >
-                <img
-                  src={appStoreBadgeSrc}
-                  alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
-                  className="h-12 w-auto"
-                  loading="lazy"
-                />
-              </a>
-
-              <a
-                href="#"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex"
-                aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
-              >
-                <img
-                  src={googlePlayBadgeSrc}
-                  alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
-                  className="h-[60px] w-auto"
-                  loading="lazy"
-                />
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     </section>
