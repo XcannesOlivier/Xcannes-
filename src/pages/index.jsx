@@ -13,6 +13,10 @@ import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 export default function Home() {
   const { t } = useTranslation("common");
+  const appStoreBadgeSrc =
+    "https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/fr-fr?size=250x83";
+  const googlePlayBadgeSrc =
+    "https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png";
 
   const [speedModalRoot, setSpeedModalRoot] = useState(null);
   const [speedModalOpen, setSpeedModalOpen] = useState(false);
@@ -248,7 +252,7 @@ export default function Home() {
                   }} />
                 </p>
 
-              <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center md:hidden">
                 <Link href="/wallet">
                   <button className={bankButtonClassName({ tone: "blue", variant: "soft", size: "lg" })}>
                     <span className="sm:hidden">
@@ -270,6 +274,46 @@ export default function Home() {
                     {t("home_v2_final_cta_markets", "Voir les marchés")}
                   </span>
                 </Link>
+              </div>
+
+              <div className="mt-10 hidden md:flex flex-col items-center justify-center gap-4">
+                <p className="text-sm text-white/70">
+                  {t(
+                    "home_v2_hero_store_cta_hint",
+                    "Téléchargez l'application XCANNES sur votre mobile."
+                  )}
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  <a
+                    href="#"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex"
+                    aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                  >
+                    <img
+                      src={appStoreBadgeSrc}
+                      alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                      className="h-12 w-auto"
+                      loading="lazy"
+                    />
+                  </a>
+
+                  <a
+                    href="#"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex"
+                    aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                  >
+                    <img
+                      src={googlePlayBadgeSrc}
+                      alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                      className="h-[60px] w-auto"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
               </div>
 
               {/* 4 essentials (keep light, avoid jargon) */}
