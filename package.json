@@ -7,7 +7,6 @@
     "build": "node -r ./scripts/exdev-rename-fallback.cjs ./node_modules/next/dist/bin/next build",
     "start": "next start -p 2500",
     "lint": "next lint",
-    "check:chart": "node src/components/dex/XrplCandleChart/checkChart.cjs",
     "i18n:sync": "node scripts/sync-locales.cjs",
     "i18n:audit": "node scripts/i18n-audit.cjs",
     "i18n:sample": "node scripts/i18n-sample.cjs",

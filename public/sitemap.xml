@@ -9,14 +9,6 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- DEX -->
-  <url>
-    <loc>https://xcannes.com/dex</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-
   <!-- Whitepaper -->
   <url>
     <loc>https://xcannes.com/whitepaper</loc>

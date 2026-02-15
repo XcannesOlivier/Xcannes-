@@ -562,28 +562,6 @@ body {
   }
 }
 
-/* ====== DEX Chart: responsive hauteur mobile / desktop ====== */
-.dex-chart-container {
-  /* Smartphone : hauteur libre avec un minimum confortable */
-  height: auto;
-  min-height: 400px;
-}
-
-@media (min-width: 768px) {
-  .dex-chart-container {
-    /* Sur desktop, le conteneur prend toute la hauteur disponible
-       dans la colonne centrale (cf. flex + h-full dans le composant) */
-    height: 100%;
-    min-height: 0;
-  }
-}
-
-@media (min-width: 1280px) {
-  .dex-chart-container {
-    height: 100%;
-  }
-}
-
 /* ========= RTL SUPPORT (Right-To-Left) ========= */
 
 /* Support automatique pour les langues RTL (arabe, ourdou) */

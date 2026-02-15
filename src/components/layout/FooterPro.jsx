@@ -7,7 +7,6 @@ import { useXumm } from "@/context/XummContext";
 export default function FooterPro() {
   const { t } = useTranslation("common");
   const router = useRouter();
-  const isDex = router.pathname === "/dex";
   const { wallet, isConnected } = useXumm();
 
   const [xrplConnected, setXrplConnected] = useState(true); // Backend gère la connexion
@@ -147,7 +146,7 @@ export default function FooterPro() {
     [router?.events, router?.locales]
   );
 
-  const gradientFromClass = isDex ? "from-[#0a0f0d]" : "from-xcannes-background";
+  const gradientFromClass = "from-xcannes-background";
 
   return (
     <footer className={`w-screen max-w-none text-white pt-16 pb-8 px-6 border-t border-white/10 bg-gradient-to-b ${gradientFromClass} to-black`}>
@@ -177,11 +176,11 @@ export default function FooterPro() {
             <ul className="text-base md:text-sm space-y-2">
               <li>
                 <Link
-                  href="/dex"
+                  href="/wallet"
                   className="header-nav-link footer-nav-link text-white/70"
-                  onClick={withHardNavFallback("/dex")}>
+                  onClick={withHardNavFallback("/wallet")}>
 
-                  <span className="header-nav-label">{t("footer_nav_trading")}</span>
+                  <span className="header-nav-label">{t("nav_wallet", "Wallet")}</span>
                 </Link>
               </li>
               <li>
