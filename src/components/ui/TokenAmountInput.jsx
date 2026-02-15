@@ -4,7 +4,7 @@ export default function TokenAmountInput({
   onChange,
   max,
   placeholder = "0.00",
-  token = "XCS",
+  token = "RLUSD",
   tokenClassName = "",
   containerClassName = ""
 }) {

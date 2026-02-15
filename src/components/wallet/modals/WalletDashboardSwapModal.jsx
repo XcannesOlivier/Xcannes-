@@ -55,7 +55,6 @@ export default function WalletDashboardSwapModal({
   selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
-  activationFeeRlusd,
   inline = false
 }) {
   const { t } = useTranslation("common");
@@ -127,14 +126,6 @@ export default function WalletDashboardSwapModal({
     noticeVariant !== "demo" &&
     dashboardVariant === "full" &&
     view === "lines";
-  const activationFeeLabel = useMemo(() => {
-    const value = Number(activationFeeRlusd);
-    const safe = Number.isFinite(value) && value > 0 ? value : 1;
-    return safe.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  }, [activationFeeRlusd]);
   const [previewState, setPreviewState] = useState({ status: "idle", error: null });
   const [previewAmount, setPreviewAmount] = useState(null);
   const [previewMeta, setPreviewMeta] = useState(null);
@@ -152,7 +143,7 @@ export default function WalletDashboardSwapModal({
     [convertAmount]
   );
 
-  const isXrplCore = (code) => code === "XRP" || code === "XCS";
+  const isXrplCore = (code) => code === "XRP" || code === "RLUSD";
   const sameCurrencySelected = Boolean(baseCode && quoteCode && baseCode === quoteCode);
 
   const conversionRoute = useMemo(() => {
@@ -165,7 +156,7 @@ export default function WalletDashboardSwapModal({
         type: "unsupported",
         error: t(
           "ui_xrpl_conversion_temporarily_unavailable_1f8b72d3aa",
-          "XRP/XCS conversion is temporarily unavailable."
+          "XRP/RLUSD conversion is temporarily unavailable."
         ),
       };
     }
@@ -667,11 +658,10 @@ export default function WalletDashboardSwapModal({
               </button>
                 </div>
                 <p className="mt-2 text-[10px] text-white/45">
-                  {t("ui_activation_fee_xcs_company_wallet_f4", {
-                    defaultValue:
-                      "Activation fee: {{amount}} RLUSD.",
-                    amount: activationFeeLabel,
-                  })}
+                  {t(
+                    "ui_currency_line_action_free_f4",
+                    "Activation and deletion are free (XRPL network fee only)."
+                  )}
                 </p>
               </div>
 

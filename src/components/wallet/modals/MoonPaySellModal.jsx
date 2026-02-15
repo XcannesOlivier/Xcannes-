@@ -87,7 +87,7 @@ const MoonPaySellModal = ({
     (availableTokens || []).forEach((token) => {
       const currencyRaw = token?.currency;
       const currency = String(currencyRaw || "").toUpperCase();
-      if (!currency || currency === "XCS" || seen.has(currency)) return;
+      if (!currency || currency === "RLUSD" || seen.has(currency)) return;
       seen.add(currency);
       const labelLeft =
         selectLabelByCurrency?.[currencyRaw] ||

@@ -8,7 +8,7 @@ export const MARKET_STRUCTURE = {
     label: "🔷 XRPL",
     currencies: {
       XRP: ["XRP/RLUSD"],
-      XCS: ["XCS/RLUSD"]
+      RLUSD: ["RLUSD/XRP"]
     }
   },
   

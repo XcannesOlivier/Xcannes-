@@ -17,7 +17,7 @@ export default function SuccessPage() {
         title={t("success_seo_title", "Transaction confirmed - XCANNES")}
         description={t(
           "success_seo_description",
-          "Your transaction has been validated successfully. Your XCS tokens will be transferred to your XRPL wallet."
+          "Your transaction has been validated successfully. Your RLUSD tokens will be transferred to your XRPL wallet."
         )}
         canonical="https://xcannes.com/success" />
 
@@ -173,7 +173,7 @@ export default function SuccessPage() {
                     </div>
                   </div>
                   <a
-                    href="https://xumm.app/detect/xapp:trustset?issuer=rYourIssuerAddress&currency=XCS"
+                    href="https://xumm.app/detect/xapp:trustset?issuer=rYourIssuerAddress&currency=RLUSD"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-xcannes-green text-black font-semibold rounded-lg hover:bg-xcannes-green/90 transition-all duration-300 shadow-lg shadow-xcannes-green/20">

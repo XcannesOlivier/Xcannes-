@@ -7,7 +7,7 @@ import { useXumm } from "@/context/XummContext";
 export default function FooterPro() {
   const { t } = useTranslation("common");
   const router = useRouter();
-  const { wallet, isConnected } = useXumm();
+  const { wallet, isConnected, isConnecting, connect, disconnect } = useXumm();
 
   const [xrplConnected, setXrplConnected] = useState(true); // Backend gère la connexion
   const [xrplLoading, setXrplLoading] = useState(false);
@@ -147,6 +147,26 @@ export default function FooterPro() {
   );
 
   const gradientFromClass = "from-xcannes-background";
+  const walletActionLabel = isConnected
+    ? t("nav_sign_out", "Se déconnecter")
+    : t("nav_sign_in", "Se connecter");
+  const walletActionToneClass = isConnected
+    ? "text-white/80 hover:text-red-300 border border-white/20 hover:border-red-500/40 bg-transparent hover:bg-red-500/15"
+    : "text-white/80 hover:text-white bg-transparent";
+
+  const handleWalletAction = useCallback(async () => {
+    if (isConnecting) return;
+
+    if (isConnected) {
+      await disconnect();
+      if (router.pathname === "/wallet") {
+        router.replace("/");
+      }
+      return;
+    }
+
+    connect();
+  }, [connect, disconnect, isConnected, isConnecting, router]);
 
   return (
     <footer className={`w-screen max-w-none text-white pt-16 pb-8 px-6 border-t border-white/10 bg-gradient-to-b ${gradientFromClass} to-black`}>
@@ -175,22 +195,14 @@ export default function FooterPro() {
             </h4>
             <ul className="text-base md:text-sm space-y-2">
               <li>
-                <Link
-                  href="/wallet"
-                  className="header-nav-link footer-nav-link text-white/70"
-                  onClick={withHardNavFallback("/wallet")}>
+                <button
+                  type="button"
+                  className={`header-nav-link footer-nav-link rounded-md px-3 py-1.5 ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
+                  onClick={handleWalletAction}
+                  disabled={isConnecting}>
 
-                  <span className="header-nav-label">{t("nav_wallet", "Wallet")}</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/whitepaper"
-                  className="header-nav-link footer-nav-link text-white/70"
-                  onClick={withHardNavFallback("/whitepaper")}>
-
-                  <span className="header-nav-label">{t("footer_nav_whitepaper")}</span>
-                </Link>
+                  <span className="header-nav-label">{walletActionLabel}</span>
+                </button>
               </li>
               <li>
                 <a

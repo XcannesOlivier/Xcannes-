@@ -100,7 +100,7 @@ function renderDemoTokenIcon(code) {
 function getDemoCurrencyLabel(code) {
   const upper = String(code || "").toUpperCase();
   if (upper === "XRP") return "XRP · Native";
-  if (upper === "XCS") return "XCannes Token";
+  if (upper === "RLUSD") return "XCannes Token";
   if (USD_STABLECOINS.includes(upper)) return "XRPL Stablecoin";
   return getCurrencyDescription(upper) || upper;
 }
@@ -136,7 +136,7 @@ const DEMO_LATENCY_MS_MAX = 1100;
 const DEMO_RATES_REFRESH_MS = 15_000;
 const DEMO_RATES_STALE_AFTER_MS = 30_000;
 const DEMO_PENDING_REQUEST_TTL_MS = 10 * 60 * 1000;
-const DEMO_TOKEN_PRIORITY = { XRP: 0, XCS: 1, RLUSD: 2 };
+const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, RLUSD: 2 };
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -190,7 +190,7 @@ function getDemoLatencyMs() {
   return Math.max(0, Math.floor(min + Math.random() * (max - min)));
 }
 
-const DEMO_NATIVE_CURRENCIES = new Set(["XRP", "RLUSD", "XCS"]);
+const DEMO_NATIVE_CURRENCIES = new Set(["XRP", "RLUSD", "RLUSD"]);
 
 function isDemoNativeCurrency(code) {
   return DEMO_NATIVE_CURRENCIES.has(String(code || "").toUpperCase());
@@ -440,7 +440,7 @@ export default function DemoWalletDashboard({
   }, []);
 
   const requiredRateCodes = useMemo(() => {
-    const codes = new Set(["USD", "RLUSD", "XRP", "XCS"]);
+    const codes = new Set(["USD", "RLUSD", "XRP", "RLUSD"]);
     const wallets = state?.wallets || {};
     Object.values(wallets).forEach((wallet) => {
       Object.keys(wallet?.allocations || {}).forEach((code) => {
@@ -1036,7 +1036,7 @@ export default function DemoWalletDashboard({
     );
     codes.add("RLUSD");
     codes.add("XRP");
-    codes.add("XCS");
+    codes.add("RLUSD");
     return Array.from(codes).filter(Boolean).sort((a, b) => {
       const aPriority =
         Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, a)
@@ -1647,7 +1647,7 @@ export default function DemoWalletDashboard({
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
             {tokens.map((row) => {
               const upperCode = String(row.code || "").toUpperCase();
-              const isNativeAsset = upperCode === "XRP" || upperCode === "XCS" || upperCode === "RLUSD";
+              const isNativeAsset = upperCode === "XRP" || upperCode === "RLUSD" || upperCode === "RLUSD";
               const iconSizeClass = isNativeAsset
                 ? "w-7 h-7 text-[13px]"
                 : "w-9 h-9 text-[16px] sm:w-9 sm:h-9 sm:text-[16px]";
@@ -1816,7 +1816,6 @@ export default function DemoWalletDashboard({
         walletId={activeWalletId}
         effectiveIsConnected={false}
         hasOnChainRlusd={true}
-        hasOnChainXcs={true}
         onInstallTrustline={() => {}}
         onActivateCurrencyLine={handleActivateCurrencyLine}
         refreshCurrencyLines={() => {}}

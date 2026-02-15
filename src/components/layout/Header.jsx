@@ -4,11 +4,13 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
+import { useXumm } from "@/context/XummContext";
 
 export default function Header({ fixed = true }) {
   const router = useRouter();
   const { t } = useTranslation("common");
   const isHome = router.pathname === "/";
+  const { isConnected, isConnecting, connect, disconnect } = useXumm();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -157,6 +159,28 @@ export default function Header({ fixed = true }) {
     [router, withHardNavFallback]
   );
 
+  const walletActionLabel = isConnected
+    ? t("nav_sign_out", "Se déconnecter")
+    : t("nav_sign_in", "Se connecter");
+  const showHomeWalletLink = isHome && isConnected;
+  const walletActionToneClass = isConnected
+    ? "text-white/80 hover:text-red-300 border border-white/20 hover:border-red-500/40 bg-transparent hover:bg-red-500/15"
+    : "text-white/80 hover:text-white bg-transparent";
+
+  const handleWalletAction = useCallback(async () => {
+    if (isConnecting) return;
+
+    if (isConnected) {
+      await disconnect();
+      if (router.pathname === "/wallet") {
+        router.replace("/");
+      }
+      return;
+    }
+
+    connect();
+  }, [connect, disconnect, isConnected, isConnecting, router]);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -219,16 +243,28 @@ export default function Header({ fixed = true }) {
             </Link>
           }
 
+          {showHomeWalletLink &&
           <Link
             href="/wallet"
-            className={`header-nav-link ${
-            router.pathname === "/wallet" ? "is-active" : ""}`
-            }
+            className="header-nav-link header-nav-link-white-hover"
             onClick={withHardNavFallback("/wallet")}>
 
-            <span className="header-nav-label">{t("nav_wallet", "Wallet")}</span>
+              <span className="header-nav-label">
+                {t("nav_multi_currency_account", "Compte Multi-Devises")}
+              </span>
+              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
+            </Link>
+          }
+
+          <button
+            type="button"
+            className={`header-nav-link rounded-md px-3 py-1.5 ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
+            onClick={handleWalletAction}
+            disabled={isConnecting}>
+
+            <span className="header-nav-label">{walletActionLabel}</span>
             <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
-          </Link>
+          </button>
 
         </nav>
 
@@ -275,16 +311,31 @@ export default function Header({ fixed = true }) {
             </Link>
         }
 
+          {showHomeWalletLink &&
           <Link
-          href="/wallet"
-          onClick={withMobileNavDelay("/wallet")}
-          className={`header-nav-link w-full justify-between px-8 ${
-          router.pathname === "/wallet" ? "is-active" : ""}`
-          }>
+            href="/wallet"
+            onClick={withMobileNavDelay("/wallet")}
+            className="header-nav-link header-nav-link-white-hover w-full justify-between px-8">
 
-            <span className="header-nav-label">{t("nav_wallet", "Wallet")}</span>
+              <span className="header-nav-label">
+                {t("nav_multi_currency_account", "Compte Multi-Devises")}
+              </span>
+              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
+            </Link>
+          }
+
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              handleWalletAction();
+            }}
+            className={`header-nav-link w-full justify-between px-8 rounded-md ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
+            disabled={isConnecting}>
+
+            <span className="header-nav-label">{walletActionLabel}</span>
             <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
-          </Link>
+          </button>
 
           <div className="pt-2 w-full flex justify-start px-8">
             <HeaderLanguageStrip />

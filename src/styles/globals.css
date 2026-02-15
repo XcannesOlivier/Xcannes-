@@ -24,9 +24,9 @@
   --accent-primary: #16a34a; /* proche xcannes-green, légèrement adouci */
   --accent-secondary: #38bdf8;
 
-  /* Accents spécifiques RLUSD / XCS (peu saturés) */
+  /* Accents spécifiques RLUSD / RLUSD (peu saturés) */
   --accent-rlusd: #4ade80; /* vert stable RLUSD */
-  --accent-xcs: #fbbf24; /* or doux XCS */
+  --accent-rlusd: #fbbf24; /* or doux RLUSD */
 
   /* Status / trading */
   --success: #16a34a;
@@ -93,16 +93,16 @@
   color: var(--accent-rlusd);
 }
 
-.accent-xcs {
-  color: var(--accent-xcs);
+.accent-rlusd {
+  color: var(--accent-rlusd);
 }
 
 .bg-accent-rlusd {
   background-color: var(--accent-rlusd);
 }
 
-.bg-accent-xcs {
-  background-color: var(--accent-xcs);
+.bg-accent-rlusd {
+  background-color: var(--accent-rlusd);
 }
 
 .border-accent-rlusd {
@@ -295,6 +295,13 @@ body.wallet-page .header-nav-link.header-nav-link-compact.is-animating {
 .header-nav-link.is-active,
 .header-nav-link.is-animating {
   color: var(--accent-primary);
+}
+
+.header-nav-link.header-nav-link-white-hover:hover,
+.header-nav-link.header-nav-link-white-hover:focus-visible,
+.header-nav-link.header-nav-link-white-hover.is-active,
+.header-nav-link.header-nav-link-white-hover.is-animating {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .header-nav-link:hover .header-nav-label::after,

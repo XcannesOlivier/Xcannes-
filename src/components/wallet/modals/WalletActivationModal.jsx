@@ -140,7 +140,7 @@ export default function WalletActivationModal({
                 <div className="text-[11px] text-white/60">
                   {t(
                     "ui_activation_bundle_desc_4b7a1c9e2d",
-                    "Activer le wallet et avoir de quoi activer RLUSD et XCS."
+                    "Activer le wallet et avoir de quoi activer RLUSD et RLUSD."
                   )}
                 </div>
               </div>

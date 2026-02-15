@@ -324,7 +324,7 @@ class XcannesWebSocket {
   /**
    * S'abonner à un canal pour une paire
    * @param {string} channel - 'ticker' ou 'trades'
-   * @param {string} pair - Format: XCS_XRP
+   * @param {string} pair - Format: RLUSD_XRP
    */
   subscribe(channel, pair) {
     const subscriptionKey = `${channel}:${pair}`;
@@ -375,7 +375,7 @@ class XcannesWebSocket {
   /**
    * Se désabonner d'un canal pour une paire
    * @param {string} channel - 'ticker' ou 'trades'
-   * @param {string} pair - Format: XCS_XRP
+   * @param {string} pair - Format: RLUSD_XRP
    */
   unsubscribe(channel, pair) {
     const subscriptionKey = `${channel}:${pair}`;

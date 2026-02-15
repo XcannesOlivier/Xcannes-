@@ -454,7 +454,7 @@ export default function GlobalStatement({
       DKK: "🇩🇰", PLN: "🇵🇱", THB: "🇹🇭", IDR: "🇮🇩",
       MYR: "🇲🇾", PHP: "🇵🇭", CZK: "🇨🇿", ILS: "🇮🇱",
       CLP: "🇨🇱", AED: "🇦🇪", SAR: "🇸🇦",
-      XRP: "✕", RLUSD: "💵", XCS: "🪙",
+      XRP: "✕", RLUSD: "💵", RLUSD: "🪙",
       BTC: "₿", ETH: "Ξ", USDT: "₮", USDC: "💵",
       BNB: "🔶", ADA: "₳", DOGE: "Ð",
       XLM: "🚀", LINK: "⬡", DOT: "⚫", UNI: "🦄",
@@ -500,7 +500,7 @@ export default function GlobalStatement({
         color: "blue"
       };
     }
-    if (token.currency === "XCS") {
+    if (token.currency === "RLUSD") {
       return {
         label: t("ui_label_platform_7c1a9d3b5e", "Platform"),
         color: "green"
@@ -726,7 +726,7 @@ export default function GlobalStatement({
                     <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <td className="px-3 md:px-4 py-2.5 md:py-3">
                           <div className="flex items-center gap-2">
-                            {['XRP', 'RLUSD', 'XCS'].includes(token.currency) ?
+                            {['XRP', 'RLUSD', 'RLUSD'].includes(token.currency) ?
                           <Image
                             src={`/symbols/${token.currency.toLowerCase()}.png`}
                             alt={token.currency}

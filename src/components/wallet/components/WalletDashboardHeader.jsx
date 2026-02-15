@@ -74,7 +74,7 @@ export default function WalletDashboardHeader({
         <button
           type="button"
           onClick={() => onDisconnect?.()}
-          className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/60 hover:text-red-400 rounded-md transition-colors">{t("ui_disconnect_2c9c62cc27", "Déconnecter")}
+          className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/60 hover:text-red-400 rounded-md transition-colors">{t("nav_sign_out", "Se déconnecter")}
 
 
         </button> :

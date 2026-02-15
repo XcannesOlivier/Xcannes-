@@ -186,7 +186,7 @@ class XcannesAPI {
 
   /**
    * Récupérer le ticker d'une paire
-   * @param {string} pair - Format: XCS_XRP
+   * @param {string} pair - Format: RLUSD_XRP
    * @returns {Promise<Object>}
    */
   async getTicker(pair) {
@@ -196,7 +196,7 @@ class XcannesAPI {
 
   /**
    * Récupérer les trades récents
-   * @param {string} pair - Format: XCS_XRP
+   * @param {string} pair - Format: RLUSD_XRP
    * @param {number} limit - Nombre de trades (default: 50)
    * @returns {Promise<Object>}
    */
@@ -210,7 +210,7 @@ class XcannesAPI {
 
   /**
    * Récupérer les candles OHLCV
-   * @param {string} pair - Format: XCS_XRP
+   * @param {string} pair - Format: RLUSD_XRP
    * @param {string} interval - 1m, 5m, 15m, 1h, 4h, 1d
    * @param {number} limit - Nombre de candles (default: 100)
    * @returns {Promise<Object>}

@@ -12,6 +12,7 @@ import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 const XummContext = createContext();
 const XUMM_PENDING_CONNECT_KEY = "xcannes_xumm_pending_connect";
 const XUMM_TICKET_QUERY_KEY = "xummTicket";
+const XUMM_POST_CONNECT_REDIRECT_KEY = "xcannes_xumm_post_connect_redirect";
 
 function generateXummTicket() {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -118,11 +119,43 @@ function clearPendingConnectUuid() {
   }
 }
 
+function setPostConnectRedirectPath(pathname = "/wallet") {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(
+      XUMM_POST_CONNECT_REDIRECT_KEY,
+      String(pathname || "/wallet")
+    );
+  } catch (err) {
+    // Ignore storage errors (private mode, etc.)
+  }
+}
+
+function consumePostConnectRedirectPath() {
+  if (typeof window === "undefined") return null;
+  try {
+    const value = sessionStorage.getItem(XUMM_POST_CONNECT_REDIRECT_KEY);
+    sessionStorage.removeItem(XUMM_POST_CONNECT_REDIRECT_KEY);
+    return value || null;
+  } catch (err) {
+    return null;
+  }
+}
+
+function redirectAfterConnect() {
+  if (typeof window === "undefined") return;
+  const targetPath = consumePostConnectRedirectPath() || "/wallet";
+  const currentPath = String(window.location.pathname || "");
+  if (currentPath === targetPath || currentPath.endsWith("/wallet")) return;
+  window.location.assign(targetPath);
+}
+
 
 export const XummProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isSessionReady, setIsSessionReady] = useState(false);
   const [balance, setBalance] = useState(null);
   const [isWalletActivated, setIsWalletActivated] = useState(null); // null | boolean
   const [qrModalData, setQrModalData] = useState(null);
@@ -384,6 +417,7 @@ export const XummProvider = ({ children }) => {
       if (data.signed && data.wallet) {
         clearPolling();
         updateWallet(data.wallet);
+        redirectAfterConnect();
         clearPendingConnectUuid();
         setIsConnecting(false);
         updateQrStatus("signed");
@@ -424,6 +458,7 @@ export const XummProvider = ({ children }) => {
   const connect = async () => {
     setIsConnecting(true);
     try {
+      setPostConnectRedirectPath("/wallet");
       const ticket = generateXummTicket();
       const returnUrl = appendTicketToUrl(window.location.href, ticket);
       // Appeler l'API pour créer un payload XUMM
@@ -502,6 +537,7 @@ export const XummProvider = ({ children }) => {
         if (data.signed && data.wallet) {
           clearPolling();
           updateWallet(data.wallet);
+          redirectAfterConnect();
           clearPendingConnectUuid();
           setIsConnecting(false);
           updateQrStatus("signed");
@@ -673,6 +709,7 @@ export const XummProvider = ({ children }) => {
 
         if (statusRes.ok && statusData.signed && statusData.wallet) {
           updateWallet(statusData.wallet);
+          redirectAfterConnect();
           clearPendingConnectUuid();
           setIsConnecting(false);
           updateQrStatus("signed");
@@ -717,10 +754,14 @@ export const XummProvider = ({ children }) => {
 
   useEffect(() => {
     // Récupère le wallet sauvegardé si existe
-    const savedWallet = sessionStorage.getItem("xumm_wallet");
+    const savedWallet =
+      typeof sessionStorage !== "undefined"
+        ? sessionStorage.getItem("xumm_wallet")
+        : null;
     if (savedWallet) {
       updateWallet(savedWallet);
     }
+    setIsSessionReady(true);
   }, [updateWallet]);
 
   useEffect(() => {
@@ -744,6 +785,7 @@ export const XummProvider = ({ children }) => {
       wallet, 
       isConnected, 
       isConnecting,
+      isSessionReady,
       balance,
       isWalletActivated,
       qrModalData,

@@ -57,14 +57,6 @@ import {
   USD_STABLECOINS,
 } from "./walletDashboardConfig";
 
-const DEFAULT_ACTIVATION_FEE_RLUSD = 1;
-const ACTIVATION_FEE_RLUSD = (() => {
-  const raw = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_RLUSD || ""
-  );
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ACTIVATION_FEE_RLUSD;
-})();
-
 const DEFAULT_WALLET_LABEL_FEE_RLUSD = 1;
 const WALLET_LABEL_FEE_RLUSD = (() => {
   const raw = Number.parseFloat(
@@ -177,9 +169,6 @@ export default function WalletDashboard({
   );
   const hasOnChainRlusd = (baseTokens || []).some(
     (t) => String(t?.currency || "").toUpperCase() === "RLUSD"
-  );
-  const hasOnChainXcs = (baseTokens || []).some(
-    (t) => String(t?.currency || "").toUpperCase() === "XCS"
   );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -355,16 +344,16 @@ export default function WalletDashboard({
         seen.add(upper);
       });
 
-      // S'assurer qu'il y a toujours une ligne XCS dédiée
-      if (!seen.has("XCS")) {
+      // S'assurer qu'il y a toujours une ligne RLUSD dédiée
+      if (!seen.has("RLUSD")) {
         tokens.push({
-          key: "DEMO:XCS",
-          currency: "XCS",
+          key: "DEMO:RLUSD",
+          currency: "RLUSD",
           issuer: "Trustline",
           value: 0,
           demoRlusdValue: 0,
         });
-        seen.add("XCS");
+        seen.add("RLUSD");
       }
 
       // S'assurer qu'il y a toujours une ligne RLUSD visible (même si demoLines a été modifié)
@@ -380,7 +369,7 @@ export default function WalletDashboard({
 
       const weight = (currency) => {
         if (currency === "XRP") return 0;
-        if (currency === "XCS") return 1;
+        if (currency === "RLUSD") return 1;
         if (currency === "RLUSD") return 2;
         return 3;
       };
@@ -413,28 +402,12 @@ export default function WalletDashboard({
 
     const weight = (currency) => {
       if (currency === "XRP") return 0;
-      if (currency === "XCS") return 1;
-      if (currency === "RLUSD") return 2;
-      return 3;
+      if (currency === "RLUSD") return 1;
+      return 2;
     };
 
-    // S'assurer qu'il y a toujours une ligne XCS juste après XRP,
+    // S'assurer qu'il y a toujours une ligne RLUSD juste après XRP,
     // même si aucune position ou trustline n'existe encore.
-    const hasXcs = tokens.some(
-      (t) => String(t.currency || "").toUpperCase() === "XCS"
-    );
-    if (!hasXcs) {
-      tokens.push({
-        key: "XCS:auto",
-        currency: "XCS",
-        issuer: "Trustline",
-        value: 0,
-        isMissingTrustline: true,
-      });
-    }
-
-    // S'assurer qu'il y a toujours une ligne RLUSD visible,
-    // même si la trustline n'est pas encore installée.
     const hasRlusd = tokens.some(
       (t) => String(t.currency || "").toUpperCase() === "RLUSD"
     );
@@ -548,29 +521,9 @@ export default function WalletDashboard({
   const hasAdjustmentDeficit =
     Number.isFinite(adjustmentDeficitRlusd) && adjustmentDeficitRlusd > 1e-9;
 
-  const payActivationFee = useCallback(async ({ action, memoPayload, memoPayloads } = {}) => {
+  const submitCurrencyLineAction = useCallback(async ({ action, memoPayload, memoPayloads } = {}) => {
     if (!wallet || !signTransaction) {
       alert("Please connect your Xumm wallet first.");
-      return null;
-    }
-    if (!hasOnChainRlusd) {
-      alert("RLUSD trustline is not installed yet. Please install it first.");
-      return null;
-    }
-
-    const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();
-    if (!destination) {
-      alert("Activation wallet not configured.");
-      return null;
-    }
-
-    const txjson = buildRlusdPaymentTxjson({
-      account: wallet,
-      destination,
-      amountRlusd: ACTIVATION_FEE_RLUSD,
-    });
-    if (!txjson) {
-      alert("Unable to build activation fee payment.");
       return null;
     }
 
@@ -595,27 +548,38 @@ export default function WalletDashboard({
         }
         memos.push(...built);
       }
-      if (memos.length > 0) txjson.Memos = memos;
-    }
+      if (memos.length === 0) {
+        alert("Invalid memo payload.");
+        return null;
+      }
+      const txjson = {
+        TransactionType: "Payment",
+        Account: wallet,
+        Destination: wallet,
+        Amount: "1", // 1 drop XRP (memo-only trace, no RLUSD fee)
+        Memos: memos,
+      };
+      const result = await signTransaction(txjson, { action });
+      if (!result?.signed || !result?.uuid) {
+        alert("Action cancelled or expired.");
+        return null;
+      }
 
-    const result = await signTransaction(txjson, { action });
-    if (!result?.signed || !result?.uuid) {
-      alert("Activation payment cancelled or expired.");
-      return null;
-    }
+      if (refreshBalance) {
+        setTimeout(() => refreshBalance(), 2500);
+      }
 
-    if (refreshBalance) {
-      setTimeout(() => refreshBalance(), 2500);
+      return result.uuid;
     }
-
-    return result.uuid;
-  }, [hasOnChainRlusd, refreshBalance, signTransaction, wallet]);
+    alert("Invalid memo payload.");
+    return null;
+  }, [refreshBalance, signTransaction, wallet]);
 
   const handleActivateCurrencyLine = useCallback(
     async (code) => {
       const currencyCode = String(code || "").trim().toUpperCase();
       if (!currencyCode || currencyCode.length < 2) return false;
-      if (currencyCode === "RLUSD" || currencyCode === "XRP" || currencyCode === "XCS") return false;
+      if (currencyCode === "RLUSD" || currencyCode === "XRP") return false;
 
       if (isPreviewMode) {
         setDemoLines((prev) => {
@@ -660,7 +624,7 @@ export default function WalletDashboard({
         alert("Invalid currency line memo.");
         return false;
       }
-      const xummUuid = await payActivationFee({
+      const xummUuid = await submitCurrencyLineAction({
         action: "wallet:currency-lines:upsert",
         memoPayload,
       });
@@ -677,7 +641,7 @@ export default function WalletDashboard({
       hasOnChainRlusd,
       isPreviewMode,
       isWalletActivated,
-      payActivationFee,
+      submitCurrencyLineAction,
       refreshCurrencyLines,
       setDemoLines,
       t,
@@ -804,7 +768,7 @@ export default function WalletDashboard({
         alert("Invalid currency line memo.");
         return false;
       }
-      const xummUuid = await payActivationFee({
+      const xummUuid = await submitCurrencyLineAction({
         action: "wallet:currency-lines:delete",
         memoPayload: deleteMemo,
       });
@@ -815,7 +779,7 @@ export default function WalletDashboard({
       }
       return true;
     },
-    [currencyLines, isPreviewMode, payActivationFee, refreshCurrencyLines, setDemoLines]
+    [currencyLines, isPreviewMode, refreshCurrencyLines, setDemoLines, submitCurrencyLineAction]
   );
 
   const handleRefresh = async () => {
@@ -955,7 +919,7 @@ export default function WalletDashboard({
     const weight = (code) => {
       if (code === "RLUSD") return 0;
       if (code === "XRP") return 1;
-      if (code === "XCS") return 2;
+      if (code === "RLUSD") return 2;
       return 3;
     };
 
@@ -974,7 +938,7 @@ export default function WalletDashboard({
       if (code) codes.add(code);
     });
     // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
-    ["XRP", "XCS", "RLUSD"].forEach((c) => codes.delete(c));
+    ["XRP", "RLUSD", "RLUSD"].forEach((c) => codes.delete(c));
     return Array.from(codes);
   }, [currencyLines]);
 
@@ -1086,7 +1050,7 @@ export default function WalletDashboard({
       // - valeur principale en devise (units), basée sur l'allocation RLUSD et un taux indicatif
       // - valeur secondaire "≈ RLUSD" = allocation RLUSD
       if (!token?.isTrustlineOnly) return token;
-      if (currency === "XRP" || currency === "XCS" || currency === "RLUSD") return token;
+      if (currency === "XRP" || currency === "RLUSD" || currency === "RLUSD") return token;
 
       const allocated =
         allocatedRlusdByCurrency?.get?.(currency) ??
@@ -1141,7 +1105,7 @@ export default function WalletDashboard({
   const sendFxInfo = useMemo(() => {
     const code = String(selectedSendToken?.currency || "").toUpperCase();
     if (!code) return null;
-    if (code === "XRP" || code === "RLUSD" || code === "XCS") return null;
+    if (code === "XRP" || code === "RLUSD" || code === "RLUSD") return null;
     if (!selectedSendToken?.isTrustlineOnly) return null;
 
     const amountFx = Number.parseFloat(sendAmount || "0");
@@ -1501,11 +1465,11 @@ export default function WalletDashboard({
       return { ok: false };
     }
     if (
-      selectedSendToken?.currency === "XCS" &&
-      !hasOnChainXcs &&
+      selectedSendToken?.currency === "RLUSD" &&
+      !hasOnChainRlusd &&
       !isPreviewMode
     ) {
-      alert("XCS trustline is not installed yet. Please install it first.");
+      alert("RLUSD trustline is not installed yet. Please install it first.");
       return { ok: false };
     }
 
@@ -1526,7 +1490,7 @@ export default function WalletDashboard({
       selectedSendToken?.isTrustlineOnly &&
       currency !== "XRP" &&
       currency !== "RLUSD" &&
-      currency !== "XCS";
+      currency !== "RLUSD";
 
     setSendProcessing(true);
     setActiveAction(null);
@@ -2451,7 +2415,6 @@ export default function WalletDashboard({
                 handleDemoConvert={handleDemoConvert}
                 convertProcessing={convertProcessing}
                 rlusdPerUnitRates={rlusdPerUnitRates}
-                activationFeeRlusd={ACTIVATION_FEE_RLUSD}
               />
             ) : null}
 
@@ -2694,7 +2657,6 @@ export default function WalletDashboard({
             handleDemoConvert={handleDemoConvert}
             convertProcessing={convertProcessing}
             rlusdPerUnitRates={rlusdPerUnitRates}
-            activationFeeRlusd={ACTIVATION_FEE_RLUSD}
           />
 
           <WalletDashboardAdjustModal

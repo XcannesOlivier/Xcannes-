@@ -19,17 +19,6 @@ export function WalletInfoContent({
     noticeVariant !== "demo" &&
     isWalletActivated === true &&
     hasRlusdTrustline === false;
-  const activationFeeValue = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_ACTIVATION_FEE_RLUSD || ""
-  );
-  const activationFeeLabel = (
-    Number.isFinite(activationFeeValue) && activationFeeValue > 0
-      ? activationFeeValue
-      : 1
-  ).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
   return (
     <>
       <div className={withCloseGutter ? "pr-8" : ""}>
@@ -69,7 +58,7 @@ export function WalletInfoContent({
         <section className="rounded-xl border border-white/10 bg-black/30 p-4">
           <h4 className="text-sm font-semibold text-white/80">{t("ui_core_features_fe8d86dd76", "Core features")}</h4>
           <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
-            <li>{t("ui_hold_assets_on_chain_xrp_rlu_6e9344f999", "Hold assets on-chain (XRP / RLUSD / XCS).")}</li>
+            <li>{t("ui_hold_assets_on_chain_xrp_rlu_6e9344f999", "Hold assets on-chain (XRP / RLUSD / RLUSD).")}</li>
             <li>{t("ui_create_currency_lines_eur_gb_3cb882c93c", "Create currency lines (EUR/GBP/…) to allocate RLUSD internally.")}
 
             </li>
@@ -88,17 +77,19 @@ export function WalletInfoContent({
 
         <section className="rounded-xl border border-white/10 bg-black/30 p-4">
           <h4 className="text-sm font-semibold text-white/80">
-            {t("ui_activation_fee_xcs_title_f4", "Activation fee (RLUSD)")}
+            {t("ui_currency_line_activation_title_f4", "Currency line activation")}
           </h4>
           <p className="mt-2 text-[13px] text-white/70">
-            {t("ui_activation_fee_xcs_body_f4", {
-              defaultValue:
-                "Creating a new currency line requires a one-time payment of {{amount}} RLUSD to the XCANNES wallet.",
-              amount: activationFeeLabel,
-            })}
+            {t(
+              "ui_currency_line_activation_body_f4",
+              "Creating or deleting a currency line is now free."
+            )}
           </p>
           <p className="mt-2 text-[12px] text-white/45">
-            {t("ui_activation_fee_xcs_note_f4", "No escrow/lock: the fee is paid on-chain at activation.")}
+            {t(
+              "ui_currency_line_activation_note_f4",
+              "Only standard XRPL network fees apply to the transaction."
+            )}
           </p>
         </section>
 

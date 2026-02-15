@@ -19,7 +19,7 @@ const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_LINE_ACTIONS = new Set(['activate', 'delete']);
 const VALID_ALLOC_ACTIONS = new Set(['allocate', 'deallocate']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
-const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD', 'XCS']);
+const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD', 'RLUSD']);
 
 function isPlainObject(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));

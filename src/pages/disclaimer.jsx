@@ -33,13 +33,13 @@ export default function Disclaimer() {
   {
     number: "02",
     icon: "🪙",
-    title: "Nature et Usage du Token XCS",
+    title: "Nature et Usage du Token RLUSD",
     content: [
-    "XCS est un <strong>actif numérique</strong> basé sur le XRPL (XRP Ledger) conçu pour représenter et soutenir l'écosystème de XCANNES.",
+    "RLUSD est un <strong>actif numérique</strong> basé sur le XRPL (XRP Ledger) conçu pour représenter et soutenir l'écosystème de XCANNES.",
     "Il ne constitue <strong>pas un produit financier</strong>, ni une valeur mobilière, ni une offre d'investissement.",
     "Aucune garantie de rentabilité, de valorisation future ou de liquidité n'est offerte.",
-    "<strong class='text-xcannes-green'>⚠️ AVERTISSEMENT IMPORTANT :</strong> XCANNES n'est pas responsable des fluctuations de prix du XCS sur les marchés. La valeur peut augmenter ou diminuer de manière significative.",
-    "XCS peut être utilisé pour des services dans l'écosystème XCANNES, mais son utilité peut évoluer."]
+    "<strong class='text-xcannes-green'>⚠️ AVERTISSEMENT IMPORTANT :</strong> XCANNES n'est pas responsable des fluctuations de prix du RLUSD sur les marchés. La valeur peut augmenter ou diminuer de manière significative.",
+    "RLUSD peut être utilisé pour des services dans l'écosystème XCANNES, mais son utilité peut évoluer."]
 
   },
   {
@@ -49,7 +49,7 @@ export default function Disclaimer() {
     content: [
     "Vous devez avoir <strong>au moins 18 ans</strong> (ou l'âge de la majorité dans votre juridiction).",
     "Respecter les lois et régulations de votre pays concernant les cryptomonnaies et actifs numériques.",
-    "Ne pas utiliser XCS ou nos services à des fins illégales (blanchiment d'argent, financement du terrorisme, etc.).",
+    "Ne pas utiliser RLUSD ou nos services à des fins illégales (blanchiment d'argent, financement du terrorisme, etc.).",
     "XCANNES se réserve le droit de refuser l'accès à ses services dans certaines juridictions.",
     "Les utilisateurs de pays où les cryptomonnaies sont interdites utilisent les services à leurs propres risques."]
 
@@ -74,8 +74,8 @@ export default function Disclaimer() {
     icon: "🔄",
     title: "Transactions et Échanges",
     content: [
-    "XCS peut être échangé sur des plateformes DEX (XCANNES DEX, XRP Toolkit) ou CEX partenaires (Bitrue, etc.).",
-    "Nous ne garantissons pas la disponibilité ou la liquidité de XCS sur toutes les plateformes.",
+    "RLUSD peut être échangé sur des plateformes DEX (XCANNES DEX, XRP Toolkit) ou CEX partenaires (Bitrue, etc.).",
+    "Nous ne garantissons pas la disponibilité ou la liquidité de RLUSD sur toutes les plateformes.",
     "<strong>Toutes les transactions blockchain sont définitives et irréversibles.</strong>",
     "XCANNES ne prend pas en charge les frais de transaction (gas fees, network fees) imposés par les exchanges, wallets ou la blockchain.",
     "Vérifiez toujours l'adresse du destinataire avant d'envoyer des tokens - les erreurs ne peuvent pas être annulées.",
@@ -102,12 +102,12 @@ export default function Disclaimer() {
     title: "Réglementation et Conformité",
     content: [
     "XCANNES opère dans un cadre décentralisé et s'efforce de respecter les lois applicables.",
-    "<strong class='text-xcannes-green'>⚠️ RESPONSABILITÉ DE L'UTILISATEUR :</strong> Chaque utilisateur doit vérifier la légalité de l'utilisation de XCS et des cryptomonnaies dans son pays de résidence.",
+    "<strong class='text-xcannes-green'>⚠️ RESPONSABILITÉ DE L'UTILISATEUR :</strong> Chaque utilisateur doit vérifier la légalité de l'utilisation de RLUSD et des cryptomonnaies dans son pays de résidence.",
     "XCANNES <strong>ne fournit aucun conseil</strong> financier, juridique, fiscal ou d'investissement.",
     "Consultez un professionnel qualifié avant de prendre des décisions financières.",
     "XCANNES se réserve le droit de coopérer avec les autorités réglementaires si nécessaire.",
     "Les utilisateurs sont responsables de déclarer leurs gains/pertes en cryptomonnaies selon les lois fiscales de leur juridiction.",
-    "XCS n'est pas enregistré comme valeur mobilière dans aucune juridiction à ce jour."]
+    "RLUSD n'est pas enregistré comme valeur mobilière dans aucune juridiction à ce jour."]
 
   },
   {
@@ -116,11 +116,11 @@ export default function Disclaimer() {
     title: "Risques et Limitations de Responsabilité",
     content: [
     "<strong class='text-xcannes-green'>AVERTISSEMENT SUR LES RISQUES :</strong>",
-    "• <strong>Volatilité :</strong> Le prix du XCS peut fluctuer de manière extrême et imprévisible.",
+    "• <strong>Volatilité :</strong> Le prix du RLUSD peut fluctuer de manière extrême et imprévisible.",
     "• <strong>Perte totale :</strong> Vous pouvez perdre la totalité de votre investissement.",
     "• <strong>Absence de garantie :</strong> XCANNES ne garantit pas le fonctionnement continu de ses services.",
     "• <strong>Bugs et failles :</strong> Des erreurs techniques peuvent survenir malgré nos efforts.",
-    "• <strong>Évolution réglementaire :</strong> Les lois sur les cryptomonnaies peuvent changer et affecter XCS.",
+    "• <strong>Évolution réglementaire :</strong> Les lois sur les cryptomonnaies peuvent changer et affecter RLUSD.",
     "• <strong>Cyberattaques :</strong> Malgré nos mesures de sécurité, aucun système n'est infaillible.",
     "XCANNES décline toute responsabilité pour les pertes financières, manques à gagner ou dommages indirects.",
     "Les services sont fournis « en l'état » sans garantie d'aucune sorte."]
@@ -154,10 +154,10 @@ export default function Disclaimer() {
   return (
     <>
       <Head>
-        <title>{t("ui_legal_information_disclaimer_1ceae5d05b", "Legal Information & Disclaimer - XCANNES LLC (XCS)")}</title>
+        <title>{t("ui_legal_information_disclaimer_1ceae5d05b", "Legal Information & Disclaimer - XCANNES LLC (RLUSD)")}</title>
         <meta
           name="description"
-          content="Complete legal information about XCANNES LLC (Delaware), including company registration, EIN, terms of use, risk disclaimers and regulatory compliance for XCS token." />
+          content="Complete legal information about XCANNES LLC (Delaware), including company registration, EIN, terms of use, risk disclaimers and regulatory compliance for RLUSD token." />
 
         <meta name="robots" content="index, follow" />
       </Head>
@@ -493,7 +493,7 @@ export default function Disclaimer() {
           {/* Footer legal */}
           <div className="mt-12 pt-8 border-t border-white/10 text-center text-white/40 text-xs">
             <p>{t("ui_2025_xcannes_llc_all_droits_175b1d1aaf", "© 2025 XCANNES LLC. Tous droits réservés.")}</p>
-            <p className="mt-2">{t("ui_xcs_token_xrpl_native_issuer_274ab72595", "XCS Token • XRPL Native • Issuer: rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx")}
+            <p className="mt-2">{t("ui_rlusd_token_xrpl_native_issuer_274ab72595", "RLUSD Token • XRPL Native • Issuer: rBxQY3dc4mJtcDA5UgmLvtKsdc7vmCGgxx")}
 
 
             </p>

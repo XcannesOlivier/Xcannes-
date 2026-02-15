@@ -1,6 +1,6 @@
 export const TOKEN_ICONS = {
   XRP: "✕",
-  XCS: "Ⓧ",
+  RLUSD: "Ⓧ",
   BTC: "₿",
   ETH: "Ξ",
   USDT: "₮",

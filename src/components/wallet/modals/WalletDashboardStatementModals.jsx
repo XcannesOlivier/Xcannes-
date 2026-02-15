@@ -41,14 +41,9 @@ export default function WalletDashboardStatementModals({
     return code === "RLUSD" && !t?.isMissingTrustline;
   });
 
-  const hasXcsTrustline = (augmentedTokens || []).some((t) => {
-    const code = String(t?.currency || "").toUpperCase();
-    return code === "XCS" && !t?.isMissingTrustline;
-  });
-
-  const xcsBalance = useMemo(() => {
+  const rlusdBalance = useMemo(() => {
     const token = (augmentedTokens || []).find(
-      (entry) => String(entry?.currency || "").toUpperCase() === "XCS"
+      (entry) => String(entry?.currency || "").toUpperCase() === "RLUSD"
     );
     const value = Number.parseFloat(token?.value ?? token?.balance ?? 0);
     return Number.isFinite(value) ? value : 0;
@@ -388,8 +383,7 @@ export default function WalletDashboardStatementModals({
             variant={inlineStatementVariant || "inline-desktop"}
             inline
             usdRates={usdRates}
-            hasXcsTrustline={hasXcsTrustline}
-            xcsBalance={xcsBalance}
+            rlusdBalance={rlusdBalance}
             transactions={
               canFetchStatements
                 ? currencyTransactions
@@ -459,8 +453,7 @@ export default function WalletDashboardStatementModals({
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}
-          hasXcsTrustline={hasXcsTrustline}
-          xcsBalance={xcsBalance}
+          rlusdBalance={rlusdBalance}
           transactions={
             canFetchStatements
               ? currencyTransactions

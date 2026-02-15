@@ -51,7 +51,7 @@ export function useUsdTotalLabel({
 
       if (
         (cryptoIcons && cryptoIcons[upper]) ||
-        ["XRP", "XCS", "BTC", "ETH"].includes(upper)
+        ["XRP", "RLUSD", "BTC", "ETH"].includes(upper)
       ) {
         try {
           const ticker = await getTicker?.(`${upper}_RLUSD`);
