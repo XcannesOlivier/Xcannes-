@@ -1814,7 +1814,6 @@ export default function DemoWalletDashboard({
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
         walletId={activeWalletId}
-        simulateDexInDemo={true}
         effectiveIsConnected={false}
         hasOnChainRlusd={true}
         hasOnChainXcs={true}
