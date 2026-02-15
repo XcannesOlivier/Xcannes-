@@ -21,7 +21,8 @@ export default function XummQRModal({
   status: statusProp,
   enablePolling = true,
   zIndexClassName = "z-50",
-  inline = false
+  inline = false,
+  lockBodyScrollEnabled = true
 }) {
   const { t } = useTranslation("common");
   const [localStatus, setLocalStatus] = useState('loading'); // loading, waiting, signed, error
@@ -70,9 +71,9 @@ export default function XummQRModal({
   });
 
   useEffect(() => {
-    if (!shouldRender || inline) return;
+    if (!shouldRender || inline || !lockBodyScrollEnabled) return;
     return lockBodyScroll();
-  }, [shouldRender, inline]);
+  }, [shouldRender, inline, lockBodyScrollEnabled]);
 
   useEffect(() => {
     if (!isOpen || !uuid || isControlled || !enablePolling) {
