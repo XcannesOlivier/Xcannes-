@@ -73,6 +73,7 @@ export default function WalletProductSection() {
                 defaultWalletId={demoWalletId}
                 theme={demoWalletId === "B" ? "dex" : "home"}
                 showWalletSwitcher={false}
+                allowBackgroundScrollOnMobile
               />
             </div>
           </div>

@@ -77,7 +77,7 @@ export default function WalletDashboardCurrencyLinesPanel({
   ].filter(Boolean).join(" ");
   const listClassName = inline
     ? "flex-1 min-h-0 overflow-y-auto pr-1 space-y-2"
-    : "max-h-48 overflow-y-auto pr-1 space-y-2";
+    : "max-h-44 overflow-y-auto pr-1 space-y-2";
   return (
     <div className={rootClassName}>
       <div className="flex items-center justify-between gap-2">

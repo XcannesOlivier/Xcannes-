@@ -38,6 +38,7 @@ export default function TradingLayoutV1A({
     return "desktop1A";
   }, [viewportWidth]);
   const walletVariant = layoutMode === "mobile" ? "default" : "full";
+  const allowPageScrollOnMobile = layoutMode === "mobile";
 
   // Variante 1A desktop ≥1024px : 2 colonnes
   return (
@@ -70,7 +71,12 @@ export default function TradingLayoutV1A({
         <section className="order-2">
           <div className="mt-3 lg:mt-0">
             <div className="min-h-[70vh] lg:min-h-0 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] bg-elevated overflow-hidden">
-              <WalletDashboard preview={!isConnected} variant={walletVariant} showPayreqDecor />
+              <WalletDashboard
+                preview={!isConnected}
+                variant={walletVariant}
+                showPayreqDecor
+                allowPageScrollOnMobile={allowPageScrollOnMobile}
+              />
             </div>
           </div>
         </section>

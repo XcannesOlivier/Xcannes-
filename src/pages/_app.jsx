@@ -35,6 +35,7 @@ function XummModalLayer({ children }) {
 
   const isOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
   const isWalletRoute = router.pathname === "/wallet";
+  const allowBackgroundScroll = !isDesktop && (qrModalData?.type || "connect") === "connect";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -64,6 +65,7 @@ function XummModalLayer({ children }) {
           type={qrModalData?.type || "connect"}
           status={qrModalData?.status}
           enablePolling={false}
+          lockBodyScrollEnabled={!allowBackgroundScroll}
         />
       ) : null}
     </>

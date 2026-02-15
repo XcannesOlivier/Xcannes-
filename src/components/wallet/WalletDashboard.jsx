@@ -123,6 +123,8 @@ export default function WalletDashboard({
   showPayreqDecor = false,
   qrSizingVariant = "default",
   showMobileHomeLink = false,
+  allowBackgroundScrollOnMobile = false,
+  allowPageScrollOnMobile = false,
 }) {
   const { t } = useTranslation("common");
   // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
@@ -2166,18 +2168,28 @@ export default function WalletDashboard({
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && showActivationRequestModal;
   const showInlineInfo =
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && walletInfoOpen;
+  const allowBackgroundScrollForStatements =
+    !isDesktopPanel && (showGlobalStatement || showCurrencyStatement);
+  const allowBackgroundScrollForActions =
+    !isDesktopPanel &&
+    ((activeAction === "cash") ||
+      (activeAction === "swap" && swapLockedView === "lines") ||
+      (activeAction === "send" && sendTab === "payreq"));
+  const lockForActiveAction = Boolean(activeAction && !allowBackgroundScrollForActions);
+  const lockForStatements =
+    Boolean((showGlobalStatement || showCurrencyStatement) && !allowBackgroundScrollForStatements);
   const shouldLockBodyScroll =
     !isDesktopPanel &&
+    !allowBackgroundScrollOnMobile &&
     Boolean(
-      activeAction ||
+      lockForActiveAction ||
       showAdjustmentModal ||
       showActivationModal ||
       showActivationRequestModal ||
       walletInfoOpen ||
       qrScannerOpen ||
       showSaveAddressPrompt ||
-      showGlobalStatement ||
-      showCurrencyStatement
+      lockForStatements
     );
   const hasInlineModal =
     showInlineXumm ||
@@ -2256,6 +2268,7 @@ export default function WalletDashboard({
             onHeaderAction={handleOpenCurrencyLines}
             className="touch-pan-y"
             style={{ WebkitOverflowScrolling: "touch" }}
+            disableInternalScroll={allowPageScrollOnMobile && !isDesktopPanel}
           />
           </div>
 

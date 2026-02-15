@@ -9,7 +9,11 @@ export default function WalletDashboardTokenList({
   headerTitle = "",
   headerActionLabel = "",
   onHeaderAction,
+  disableInternalScroll = false,
 }) {
+  const listClassName = disableInternalScroll
+    ? "flex-1 min-h-0 px-3 pb-3"
+    : "flex-1 min-h-0 px-3 pb-3 overflow-y-auto overscroll-contain";
   return (
     <div
       className={`flex-1 min-h-0 flex flex-col ${layout.tokenListClass} ${className}`}
@@ -29,7 +33,7 @@ export default function WalletDashboardTokenList({
           ) : null}
         </div>
       )}
-      <div className="flex-1 min-h-0 px-3 pb-3 overflow-y-auto overscroll-contain">
+      <div className={listClassName}>
         <div className="space-y-1.5 md:hidden">{tokens.map(renderTokenRow)}</div>
         <div className="hidden md:flex md:flex-col md:space-y-1.5">
           {tokens.map(renderTokenRow)}

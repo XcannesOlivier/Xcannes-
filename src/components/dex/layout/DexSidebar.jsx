@@ -22,11 +22,17 @@ export default function DexSidebar() {
   }, []);
 
   const walletVariant = isDesktop ? "full" : "default";
+  const allowPageScrollOnMobile = !isDesktop;
 
   return (
     <aside className="h-full flex flex-col min-h-0 overflow-hidden">
       <div className="flex-1 min-h-0 overflow-hidden bg-elevated">
-        <WalletDashboard preview={!isConnected} variant={walletVariant} showPayreqDecor />
+        <WalletDashboard
+          preview={!isConnected}
+          variant={walletVariant}
+          showPayreqDecor
+          allowPageScrollOnMobile={allowPageScrollOnMobile}
+        />
       </div>
     </aside>
   );

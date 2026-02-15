@@ -35,6 +35,7 @@ export default function Home() {
   const [valueModalOpen, setValueModalOpen] = useState(false);
   const [valueModalClosing, setValueModalClosing] = useState(false);
   const valueModalCloseTimerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
 
@@ -42,6 +43,18 @@ export default function Home() {
     if (typeof window === "undefined") return 400;
     return window.matchMedia("(max-width: 767px)").matches ? 500 : 400;
   };
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const handleChange = () => setIsMobile(mediaQuery.matches);
+    handleChange();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const el = document.createElement("div");
@@ -497,10 +510,10 @@ export default function Home() {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-[23px] sm:text-[24px] font-semibold text-white leading-tight">
+                      <h4 className="text-[21px] sm:text-[24px] font-semibold text-white leading-tight">
                         {t("home_v2_hero_speed_modal_title", "Pourquoi c'est rapide")}
                       </h4>
-                      <p className="mt-1.5 text-[19.5px] sm:text-[13.5px] text-white/65 leading-[1.5]">
+                      <p className="mt-1.5 text-[17.5px] sm:text-[13.5px] text-white/65 leading-[1.5]">
                         {t(
                           "home_v2_hero_speed_modal_subtitle",
                           "XCANNES s'appuie sur le réseau XRP Ledger pour valider les transactions en quelques secondes."
@@ -540,12 +553,12 @@ export default function Home() {
                     ].map((line) => (
                       <div key={line} className="flex items-start gap-3">
                         <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                        <span className="text-[20.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                        <span className="text-[18.5px] sm:text-[14.5px] text-white/80 leading-relaxed">{line}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div className="mt-5 text-[18.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
+                  <div className="mt-5 text-[16.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
                     {t(
                       "home_v2_hero_speed_modal_note",
                       "En cas de congestion rare du réseau, le délai peut être légèrement supérieur."
@@ -793,23 +806,44 @@ export default function Home() {
 
                 {/* Points principaux */}
                 <div className="mt-5 space-y-3">
-                  {[
-                    t(
-                      "home_v2_hero_value_modal_point_1",
-                      "Le montant que vous validez est en devise locale."
-                    ),
-                    t(
-                      "home_v2_hero_value_modal_point_2",
-                      "Les montants locaux suivent le taux du marché."
-                    ),
-                    t(
-                      "home_v2_hero_value_modal_point_3",
-                      "La référence USD (RLUSD) reste stable et lisible."
-                    ),
-                  ].map((line) => (
-                    <div key={line} className="flex items-start gap-3">
+                  {(
+                    isMobile
+                      ? [
+                          {
+                            key: "point_1",
+                            text: t(
+                              "home_v2_hero_value_modal_point_1",
+                              "Le montant que vous validez est en devise locale."
+                            ),
+                          },
+                        ]
+                      : [
+                          {
+                            key: "point_1",
+                            text: t(
+                              "home_v2_hero_value_modal_point_1",
+                              "Le montant que vous validez est en devise locale."
+                            ),
+                          },
+                          {
+                            key: "point_2",
+                            text: t(
+                              "home_v2_hero_value_modal_point_2",
+                              "Les montants locaux suivent le taux du marché."
+                            ),
+                          },
+                          {
+                            key: "point_3",
+                            text: t(
+                              "home_v2_hero_value_modal_point_3",
+                              "La référence USD (RLUSD) reste stable et lisible."
+                            ),
+                          },
+                        ]
+                  ).map((line) => (
+                    <div key={line.key} className="flex items-start gap-3">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-xcannes-green/70 flex-shrink-0" />
-                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line}</span>
+                      <span className="text-[14.5px] text-white/80 leading-relaxed">{line.text}</span>
                     </div>
                   ))}
                 </div>

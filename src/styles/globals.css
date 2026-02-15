@@ -151,6 +151,46 @@
   padding: var(--panel-padding-y) var(--panel-padding-x);
 }
 
+/* Fullscreen helpers (mobile safe) */
+.xcannes-fullscreen {
+  height: 100svh;
+  max-height: 100svh;
+}
+
+@supports (height: 100dvh) {
+  .xcannes-fullscreen {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+.xcannes-fullscreen-safe {
+  height: 100svh;
+  max-height: 100svh;
+}
+
+@supports (height: 100dvh) {
+  .xcannes-fullscreen-safe {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+@media (max-width: 767px) {
+  .xcannes-fullscreen-safe {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.xcannes-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.xcannes-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
 /* Header nav hover: progressive underline + arrow drift */
 .header-nav-link {
   display: inline-flex;

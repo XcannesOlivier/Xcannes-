@@ -268,7 +268,8 @@ export default function DemoWalletDashboard({
   theme = "default",
   showWalletSwitcher = true,
   demoState,
-  setDemoState
+  setDemoState,
+  allowBackgroundScrollOnMobile = false
 }) {
   const { t } = useTranslation("common");
   const router = useRouter();
@@ -714,8 +715,11 @@ export default function DemoWalletDashboard({
     setSendTab,
     setSendPaymentRequest
   });
+  const allowBackgroundScroll =
+    allowBackgroundScrollOnMobile && !isDesktop;
   const shouldLockBodyScroll = Boolean(
-    activeAction || showGlobalStatement || showCurrencyStatement || qrScannerOpen
+    !allowBackgroundScroll &&
+      (activeAction || showGlobalStatement || showCurrencyStatement || qrScannerOpen)
   );
   const showDemoMobileScannerQr = !isDesktop;
   const demoScannerQrSize = 220;
