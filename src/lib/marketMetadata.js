@@ -7,9 +7,7 @@ import {
 
 const RLUSD_HEX = encodeXrplCurrencyCode("RLUSD");
 const RLUSD_ISSUER = (XRPL_KNOWN_ISSUERS.RLUSD || "").trim();
-const XCS_ISSUER = (XRPL_KNOWN_ISSUERS.XCS || "").trim();
 const FALLBACK_ISSUERS = {
-  XCS: XCS_ISSUER,
   RLUSD: RLUSD_ISSUER,
 };
 

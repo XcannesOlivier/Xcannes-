@@ -728,8 +728,8 @@ export default function Home() {
                       "Aucun frais XCANNES sur l’envoi et la réception."
                     ),
                     t(
-                      "home_v2_hero_fees_modal_point_5",
-                      "Activation ou désactivation d’une ligne de compte : 1 USD (≈ 1 RLUSD), sans durée limite. Cette transaction enregistre l’action sur le réseau XRPL."
+                      "home_v2_hero_fees_modal_point_currency_lines_free_f5",
+                      "Activation ou désactivation d’une ligne de compte : gratuit (hors frais réseau XRPL)."
                     ),
                   ].map((line) => (
                     <div key={line} className="flex items-start gap-3">
@@ -741,8 +741,8 @@ export default function Home() {
 
                 <div className="mt-5 text-[18.5px] sm:text-[12.5px] text-white/50 italic leading-relaxed">
                   {t(
-                    "home_v2_hero_fees_modal_note",
-                    "Activation d'une nouvelle devise : paiement unique en RLUSD."
+                    "home_v2_hero_fees_modal_note_currency_lines_free_f5",
+                    "Aucun frais XCANNES n’est prélevé pour activer une devise."
                   )}
                 </div>
 

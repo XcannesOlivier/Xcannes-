@@ -39,14 +39,14 @@ export default function WalletDashboardTokenRow({
   onInstallTrustline,
   isWalletActivated,
   onActivateWallet,
-  onOpenXcsProgram
+  onOpenRlusdProgram
 }) {
   const { t } = useTranslation("common");
   const currencyCode = String(token?.currency || "").toUpperCase();
   const rawValue = Number(token?.value || 0);
   const isMissingTrustline = !!token?.isMissingTrustline;
   const isLineCurrency = Boolean(token?.isTrustlineOnly);
-  const isNativeAsset = currencyCode === "XRP" || currencyCode === "XCS" || currencyCode === "RLUSD";
+  const isNativeAsset = currencyCode === "XRP" || currencyCode === "RLUSD";
   const iconSizeClass = isLineCurrency
     ? "w-11 h-11 text-[20px] sm:w-10 sm:h-10 sm:text-[18px]"
     : "w-7 h-7 text-[13px]";
@@ -67,8 +67,6 @@ export default function WalletDashboardTokenRow({
   currencyCode === "XRP" && isWalletActivated === false;
   const showRlusdTrustlineNotice =
   currencyCode === "RLUSD" && isMissingTrustline;
-  const showXcsTrustlineNotice =
-  currencyCode === "XCS" && isMissingTrustline;
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;
@@ -104,8 +102,8 @@ export default function WalletDashboardTokenRow({
                 `${getCurrencyDescription(token?.currency)}` :
                 isStablecoin(token?.currency) ?
                 "XRPL Stablecoin" :
-                token?.currency === "XCS" ?
-                "XCannes Token" :
+                token?.currency === "RLUSD" ?
+                "RLUSD Token" :
                 "XRPL Token"}
               </span>
             </div>
@@ -189,20 +187,20 @@ export default function WalletDashboardTokenRow({
                 </span>
               </div>
             </div>
-          ) : showXcsTrustlineNotice ? (
+          ) : showRlusdTrustlineNotice ? (
             <div className="flex-1 min-w-0 px-2">
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-white/90 md:text-amber-200/90 text-center leading-snug">
                 <span>
                   <span className="hidden md:inline">
                     {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
                     {t(
-                      "ui_xcs_benefits_notice_2c1e5f9b",
-                      "Elle permet de détenir du XCS et de profiter d'avantages."
+                      "ui_rlusd_benefits_notice_2c1e5f9b",
+                      "Elle permet de détenir du RLUSD et de profiter d'avantages."
                     )}
                   </span>
                   <span className="md:hidden">
                     {t(
-                      "ui_xcs_benefits_notice_short_2c1e5f9c",
+                      "ui_rlusd_benefits_notice_short_2c1e5f9c",
                       "Profiter d'avantages."
                     )}
                   </span>{" "}

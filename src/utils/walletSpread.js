@@ -16,7 +16,7 @@ export function isFxConversion(base, quote) {
   const b = String(base || "").toUpperCase();
   const q = String(quote || "").toUpperCase();
   if (!b || !q || b === q) return false;
-  if (b === "XRP" || b === "XCS" || q === "XRP" || q === "XCS") return false;
+  if (b === "XRP" || b === "RLUSD" || q === "XRP" || q === "RLUSD") return false;
   // FX conversions: RLUSD<->fiat or fiat<->fiat.
   return b !== "RLUSD" || q !== "RLUSD";
 }
@@ -60,26 +60,6 @@ export function buildRlusdPaymentTxjson({ account, destination, amountRlusd }) {
 
   const currency = encodeXrplCurrencyCode("RLUSD");
   const issuer = XRPL_KNOWN_ISSUERS.RLUSD;
-  if (!currency || !issuer) return null;
-
-  return {
-    TransactionType: "Payment",
-    Account: account,
-    Destination: destination,
-    Amount: {
-      currency,
-      issuer,
-      value,
-    },
-  };
-}
-
-export function buildXcsPaymentTxjson({ account, destination, amountXcs }) {
-  const value = normalizeXrplIouValue(amountXcs);
-  if (!value) return null;
-
-  const currency = encodeXrplCurrencyCode("XCS");
-  const issuer = XRPL_KNOWN_ISSUERS.XCS;
   if (!currency || !issuer) return null;
 
   return {

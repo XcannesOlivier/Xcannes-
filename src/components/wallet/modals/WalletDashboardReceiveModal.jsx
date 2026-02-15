@@ -104,7 +104,7 @@ export default function WalletDashboardReceiveModal({
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
     if (!requestCurrencyCode) return false;
-    return requestCurrencyCode !== "XRP" && requestCurrencyCode !== "RLUSD" && requestCurrencyCode !== "XCS";
+    return requestCurrencyCode !== "XRP" && requestCurrencyCode !== "RLUSD" && requestCurrencyCode !== "RLUSD";
   }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
 
   const handleGenerateRequest = () => {
@@ -162,8 +162,8 @@ export default function WalletDashboardReceiveModal({
     const knownIssuer =
       targetCurrencyUpper === "RLUSD"
         ? XRPL_KNOWN_ISSUERS.RLUSD
-        : targetCurrencyUpper === "XCS"
-          ? XRPL_KNOWN_ISSUERS.XCS
+        : targetCurrencyUpper === "RLUSD"
+          ? XRPL_KNOWN_ISSUERS.RLUSD
           : null;
     const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 

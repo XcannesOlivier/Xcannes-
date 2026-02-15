@@ -11,7 +11,7 @@ module.exports = {
           "1": "XCANNES",
           "5": "RLUSD",
           "7": "XRPL",
-          "10": "XCS",
+          "10": "RLUSD",
           "11": "XRP",
           "12": "WSJ",
           "13": "DEX",
@@ -37,7 +37,7 @@ module.exports = {
         // Seen in FR locales: `_GLOSSARY_11__ Ledger` should become `XRP Ledger`.
         return replaced
           .replace(/_+GLOSSARY_11_+(?=\s*Ledger\b)/g, "XRP")
-          .replace(/_+GLOSSARY_11_+(?=\s*\/\s*(?:RLUSD|XCS)\b)/g, "XRP");
+          .replace(/_+GLOSSARY_11_+(?=\s*\/\s*(?:RLUSD|RLUSD)\b)/g, "XRP");
       },
     },
   ],

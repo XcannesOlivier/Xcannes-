@@ -172,7 +172,7 @@ export default function HeaderLanguageStrip({ className = "" }) {
                 key={lang.code}
                 type="button"
                 onClick={() => changeLanguage(lang.code)}
-                className="text-lg font-medium text-white/70 hover:text-xcannes-green hover:underline underline-offset-4 transition-colors"
+                className="text-lg font-medium text-white/70 hover:text-white hover:underline underline-offset-4 transition-colors"
               >
                 {formatLocaleInitials(lang.code)}
               </button>
@@ -184,7 +184,7 @@ export default function HeaderLanguageStrip({ className = "" }) {
                 setMenuOpen((open) => !open);
               }}
               aria-label={t("langswitcher_open_menu", "Afficher toutes les langues")}
-              className="text-lg font-medium text-white/70 hover:text-xcannes-green hover:underline underline-offset-4 transition-colors"
+              className="text-lg font-medium text-white/70 hover:text-white hover:underline underline-offset-4 transition-colors"
             >
               +
             </button>
@@ -249,7 +249,7 @@ export default function HeaderLanguageStrip({ className = "" }) {
             type="button"
             onClick={() => changeLanguage(lang.code)}
             style={{ transitionDelay: expanded ? `${index * 100}ms` : "0ms" }}
-            className={`h-7 px-2 text-lg font-medium transition-[opacity,transform,color] duration-200 ease-out hover:text-xcannes-green hover:underline underline-offset-4 ${
+            className={`h-7 px-2 text-lg font-medium transition-[opacity,transform,color] duration-200 ease-out hover:text-white hover:underline underline-offset-4 ${
               expanded ? "opacity-100 translate-x-0" : "opacity-0 translate-x-1"
             }`}
           >
@@ -264,7 +264,7 @@ export default function HeaderLanguageStrip({ className = "" }) {
           }}
           aria-label={t("langswitcher_open_menu", "Afficher toutes les langues")}
           style={{ transitionDelay: expanded ? `${quickOthersDesktop.length * 100}ms` : "0ms" }}
-          className={`h-7 w-7 text-lg font-medium transition-[opacity,transform,color] duration-200 ease-out hover:text-xcannes-green hover:underline underline-offset-4 flex items-center justify-center ${
+          className={`h-7 w-7 text-lg font-medium transition-[opacity,transform,color] duration-200 ease-out hover:text-white hover:underline underline-offset-4 flex items-center justify-center ${
             expanded ? "opacity-100 translate-x-0 text-white/80" : "opacity-0 translate-x-1 text-white/80"
           }`}
         >
@@ -277,7 +277,7 @@ export default function HeaderLanguageStrip({ className = "" }) {
         onClick={() => setExpanded((value) => !value)}
         aria-expanded={expanded}
         aria-label={t("langswitcher_current", "Langue actuelle")}
-        className={`h-7 px-2.5 text-lg font-medium transition-colors hover:text-xcannes-green hover:underline underline-offset-4 ${
+        className={`h-7 px-2.5 text-lg font-medium transition-colors hover:text-white hover:underline underline-offset-4 ${
           expanded ? "text-white/70" : "text-white"
         }`}
       >

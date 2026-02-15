@@ -75,7 +75,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     const weight = (code) => {
       if (code === "RLUSD") return 0;
       if (code === "XRP") return 1;
-      if (code === "XCS") return 2;
+      if (code === "RLUSD") return 2;
       return 3;
     };
 

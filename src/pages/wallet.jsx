@@ -2,15 +2,17 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-	import { useTranslation } from "next-i18next";
-	import { getPageTranslations } from "@/i18n/getPageTranslations";
-	import WalletDashboard from "@/components/wallet/WalletDashboard";
-	import SEOHead from "@/components/layout/SEOHead";
-	import { useXumm } from "@/context/XummContext";
+import { useRouter } from "next/router";
+		import { useTranslation } from "next-i18next";
+		import { getPageTranslations } from "@/i18n/getPageTranslations";
+		import WalletDashboard from "@/components/wallet/WalletDashboard";
+		import SEOHead from "@/components/layout/SEOHead";
+		import { useXumm } from "@/context/XummContext";
 
 export default function Wallet() {
+  const router = useRouter();
   const { t } = useTranslation("common");
-  const { isConnected } = useXumm();
+  const { isConnected, isConnecting, isSessionReady } = useXumm();
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -19,6 +21,16 @@ export default function Wallet() {
       document.body.classList.remove("wallet-page");
     };
   }, []);
+
+  useEffect(() => {
+    if (!isSessionReady) return;
+    if (isConnected || isConnecting) return;
+    router.replace("/");
+  }, [isConnected, isConnecting, isSessionReady, router]);
+
+  if (!isSessionReady || !isConnected) {
+    return null;
+  }
 
   return (
     <>
@@ -43,7 +55,7 @@ export default function Wallet() {
         <div className="w-full md:max-w-5xl lg:max-w-[1600px] min-h-[100svh] h-auto md:h-full md:min-h-0 mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6">
           <div className="bg-elevated min-h-[100svh] h-auto overflow-visible md:h-full md:min-h-0 md:overflow-hidden border-0 rounded-none md:border md:border-white/15 md:rounded-xl lg:shadow-[0_0_28px_rgba(22,163,74,0.12)]">
             <WalletDashboard
-              preview={!isConnected}
+              preview={false}
               variant="full"
               showDesktopStatement
               qrSizingVariant="dex"

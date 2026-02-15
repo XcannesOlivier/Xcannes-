@@ -106,8 +106,7 @@ export default function CurrencyStatement({
   inline = false,
   usdRates = {},
   hasRlusdTrustline = false,
-  hasXcsTrustline = false,
-  xcsBalance = null,
+  rlusdBalance = null,
   statementMonths = [],
   highlightTransactionId = null,
   onClose
@@ -123,7 +122,7 @@ export default function CurrencyStatement({
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
   const [reserveOpen, setReserveOpen] = useState(false);
-  const [xcsBenefitOpen, setXcsBenefitOpen] = useState(false);
+  const [rlusdBenefitOpen, setRlusdBenefitOpen] = useState(false);
   const [docHash, setDocHash] = useState("");
   const [walletLabel, setWalletLabel] = useState("");
   const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
@@ -150,17 +149,17 @@ export default function CurrencyStatement({
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Écouter l'événement pour ouvrir automatiquement le Programme XCS
+  // Écouter l'événement pour ouvrir automatiquement le Programme RLUSD
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (normalizedCurrency !== "XCS") return;
+    if (normalizedCurrency !== "RLUSD") return;
     
-    const handleOpenXcsProgram = () => {
-      setXcsBenefitOpen(true);
+    const handleOpenRlusdProgram = () => {
+      setRlusdBenefitOpen(true);
     };
     
-    window.addEventListener("xcannes:xcs:open-program", handleOpenXcsProgram);
-    return () => window.removeEventListener("xcannes:xcs:open-program", handleOpenXcsProgram);
+    window.addEventListener("xcannes:rlusd:open-program", handleOpenRlusdProgram);
+    return () => window.removeEventListener("xcannes:rlusd:open-program", handleOpenRlusdProgram);
   }, [normalizedCurrency]);
 
   useEffect(() => {
@@ -222,10 +221,10 @@ export default function CurrencyStatement({
 
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
   const reservePlaceholder = "—";
-  const XCS_BASE_FEE_PERCENT = 1;
-  const XCS_FREE_FEE_THRESHOLD = 100;
+  const RLUSD_BASE_FEE_PERCENT = 1;
+  const RLUSD_FREE_FEE_THRESHOLD = 100;
   const showAppliedRate = Boolean(normalizedCurrency) && normalizedCurrency !== "XRP";
-  const showXcsProgram = normalizedCurrency === "XCS";
+  const showRlusdProgram = normalizedCurrency === "RLUSD";
 
   const xrpReserveDetails = useMemo(() => {
     const code = normalizedCurrency;
@@ -234,41 +233,39 @@ export default function CurrencyStatement({
     const activationXrp = 1;
     const trustlineReserveXrp = 0.2;
     const trustlineRlusdXrp = hasRlusdTrustline ? trustlineReserveXrp : 0;
-    const trustlineXcsXrp = hasXcsTrustline ? trustlineReserveXrp : 0;
-    const totalReserveXrp = activationXrp + trustlineRlusdXrp + trustlineXcsXrp;
+    const totalReserveXrp = activationXrp + trustlineRlusdXrp;
 
     return {
       totalReserveXrp,
       activationXrp,
       trustlineRlusdXrp,
-      trustlineXcsXrp
     };
-  }, [hasRlusdTrustline, hasXcsTrustline, normalizedCurrency, showReserveDetails]);
+  }, [hasRlusdTrustline, normalizedCurrency, showReserveDetails]);
 
-  const xcsAppliedFeePercent = useMemo(() => {
+  const rlusdAppliedFeePercent = useMemo(() => {
     if (!showAppliedRate) return null;
-    const parsed = Number.parseFloat(xcsBalance);
-    const fallback = normalizedCurrency === "XCS" ? Number.parseFloat(balance) : 0;
+    const parsed = Number.parseFloat(rlusdBalance);
+    const fallback = normalizedCurrency === "RLUSD" ? Number.parseFloat(balance) : 0;
     const held = Number.isFinite(parsed) ? parsed : fallback;
     const safeHeld = Number.isFinite(held) ? Math.max(0, held) : 0;
-    const capped = Math.min(safeHeld, XCS_FREE_FEE_THRESHOLD);
-    const reduction = (capped / XCS_FREE_FEE_THRESHOLD) * XCS_BASE_FEE_PERCENT;
-    const applied = Math.max(0, XCS_BASE_FEE_PERCENT - reduction);
+    const capped = Math.min(safeHeld, RLUSD_FREE_FEE_THRESHOLD);
+    const reduction = (capped / RLUSD_FREE_FEE_THRESHOLD) * RLUSD_BASE_FEE_PERCENT;
+    const applied = Math.max(0, RLUSD_BASE_FEE_PERCENT - reduction);
     return applied;
-  }, [balance, normalizedCurrency, showAppliedRate, xcsBalance]);
+  }, [balance, normalizedCurrency, showAppliedRate, rlusdBalance]);
 
-  const xcsAppliedRateLabel = useMemo(() => {
-    if (!Number.isFinite(xcsAppliedFeePercent)) return reservePlaceholder;
-    const rounded = Math.round(xcsAppliedFeePercent * 100) / 100;
+  const rlusdAppliedRateLabel = useMemo(() => {
+    if (!Number.isFinite(rlusdAppliedFeePercent)) return reservePlaceholder;
+    const rounded = Math.round(rlusdAppliedFeePercent * 100) / 100;
     const label = rounded.toFixed(2).replace(/\.?0+$/, "");
     return `${label}%`;
-  }, [reservePlaceholder, xcsAppliedFeePercent]);
+  }, [reservePlaceholder, rlusdAppliedFeePercent]);
 
   const appliedRateLabelLines = useMemo(() => {
-    const raw = t("ui_xcs_applied_rate_label_8e2f1c9a4b", "Taux de conversion\nappliqué");
+    const raw = t("ui_rlusd_applied_rate_label_8e2f1c9a4b", "Taux de conversion\nappliqué");
     return String(raw || "").split("\n");
   }, [t]);
-  const appliedRateLine1 = appliedRateLabelLines[0] || t("ui_xcs_applied_rate_label_8e2f1c9a4b", "Taux de conversion");
+  const appliedRateLine1 = appliedRateLabelLines[0] || t("ui_rlusd_applied_rate_label_8e2f1c9a4b", "Taux de conversion");
   const appliedRateLine2 = appliedRateLabelLines[1] || "";
 
   const baseTransactions = useMemo(
@@ -527,7 +524,7 @@ export default function CurrencyStatement({
 
   const ledgerStatus = useMemo(() => {
     if (isPreviewMode) return "preview";
-    if (!["XRP", "RLUSD", "XCS"].includes(normalizedCurrency)) return "offchain";
+    if (!["XRP", "RLUSD", "RLUSD"].includes(normalizedCurrency)) return "offchain";
     if (ledgerEvidenceCount > 0) return "verified";
     return "available";
   }, [isPreviewMode, ledgerEvidenceCount, normalizedCurrency]);
@@ -772,7 +769,7 @@ export default function CurrencyStatement({
       "OP": "🔴", // Optimism
       "SAND": "🏖️", // The Sandbox
       "MANA": "🎮", // Decentraland
-      "XCS": "🌟", // Xcannes Coin
+      "RLUSD": "🌟", // Xcannes Coin
       "SHIB": "🐕", // Shiba Inu
       "TRX": "🔺", // Tron
       "LTC": "Ł", // Litecoin
@@ -807,7 +804,7 @@ export default function CurrencyStatement({
       "ZEC": "🛡️", // Zcash
       "DASH": "💸", // Dash
       "DCR": "🔷", // Decred
-      "XCS": "🌟" // Xcannes Coin
+      "RLUSD": "🌟" // Xcannes Coin
     };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
   }, []);
@@ -1369,7 +1366,7 @@ export default function CurrencyStatement({
             <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs text-white/50 whitespace-pre-line">{t("ui_xcs_applied_rate_label_8e2f1c9a4b", "Taux de conversion\nappliqué")}</p>
+                      <p className="text-xs text-white/50 whitespace-pre-line">{t("ui_rlusd_applied_rate_label_8e2f1c9a4b", "Taux de conversion\nappliqué")}</p>
                       <p className="text-[11px] text-white/70 font-mono">
                         {xrpReserveDetails
                           ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
@@ -1407,12 +1404,12 @@ export default function CurrencyStatement({
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
                           <span>
-                            {t("ui_trustline_xcs_91682deeea", "Trustline XCS")}{" "}
-                            {hasXcsTrustline ?
+                            {t("ui_trustline_rlusd_91682deeea", "Trustline RLUSD")}{" "}
+                            {hasRlusdTrustline ?
                               t("ui_status_active_short_4c8b1a7d2e", "(active)") :
                               t("ui_status_to_activate_short_7a1c4d9b2e", "(to activate)")}
                           </span>
-                          <span className="font-mono">{xrpReserveDetails.trustlineXcsXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
+                          <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                       </div>
                     </div>
@@ -1429,39 +1426,39 @@ export default function CurrencyStatement({
                         <span className="flex items-baseline gap-2">
                           <span>{appliedRateLine2}</span>
                           <span className="text-sm md:text-base text-white/90 font-mono font-semibold leading-tight">
-                            {xcsAppliedRateLabel}
+                            {rlusdAppliedRateLabel}
                           </span>
                         </span>
                       </p>
                     </div>
-                    {showXcsProgram ? (
+                    {showRlusdProgram ? (
                       <button
                         type="button"
-                        onClick={() => setXcsBenefitOpen((v) => !v)}
+                        onClick={() => setRlusdBenefitOpen((v) => !v)}
                         className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
-                        aria-expanded={xcsBenefitOpen}
-                        aria-label={t("ui_xcs_benefit_title_2d3c7a1f8e", "Avantage XCS")}
+                        aria-expanded={rlusdBenefitOpen}
+                        aria-label={t("ui_rlusd_benefit_title_2d3c7a1f8e", "Avantage RLUSD")}
                       >
-                        {t("ui_xcs_program_cta_4fd1b09c3a", "Programme XCS")}
+                        {t("ui_rlusd_program_cta_4fd1b09c3a", "Programme RLUSD")}
                       </button>
                     ) : null}
                   </div>
 
-                  {showXcsProgram && xcsBenefitOpen && (
+                  {showRlusdProgram && rlusdBenefitOpen && (
                     <div className="mt-3 rounded-xl border border-white/20 bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm overflow-hidden">
                       {/* Header avec badge */}
                       <div className="px-4 py-3 border-b border-white/10 bg-white/5">
                         <div className="flex items-center gap-2">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src="/symbols/xcs.svg"
-                            alt="XCS"
+                            src="/symbols/rlusd.png"
+                            alt="RLUSD"
                             width={20}
                             height={20}
                             className="shrink-0"
                           />
                           <h3 className="font-semibold text-white text-sm">
-                            {t("ui_xcs_benefit_title_2d3c7a1f8e", "Avantage XCS")}
+                            {t("ui_rlusd_benefit_title_2d3c7a1f8e", "Avantage RLUSD")}
                           </h3>
                           <span className="ml-auto px-2 py-0.5 rounded-full bg-xcannes-green/20 text-xcannes-green text-[10px] font-medium border border-xcannes-green/30">
                             Premium
@@ -1475,14 +1472,14 @@ export default function CurrencyStatement({
                         <div className="space-y-1.5">
                           <p className="text-white/90 leading-relaxed">
                             {t(
-                              "ui_xcs_benefit_intro",
+                              "ui_rlusd_benefit_intro",
                               "Les conversions sont soumises à un taux standard de 1 %."
                             )}
                           </p>
                           <p className="text-white/75 leading-relaxed">
                             {t(
-                              "ui_xcs_benefit_desc",
-                              "La détention de XCS permet d'accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l'opération."
+                              "ui_rlusd_benefit_desc",
+                              "La détention de RLUSD permet d'accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l'opération."
                             )}
                           </p>
                         </div>
@@ -1493,14 +1490,14 @@ export default function CurrencyStatement({
                         {/* Exemples avec design amélioré */}
                         <div className="space-y-2">
                           <p className="text-white/60 text-[10px] uppercase tracking-wider font-medium">
-                            {t("ui_xcs_examples", "Exemples d'optimisation")}
+                            {t("ui_rlusd_examples", "Exemples d'optimisation")}
                           </p>
                           
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
                               <div className="flex items-center gap-2">
                                 <span className="text-white/50 text-xs">→</span>
-                                <span className="text-white/90 font-medium">6 XCS</span>
+                                <span className="text-white/90 font-medium">6 RLUSD</span>
                               </div>
                               <span className="text-emerald-400 text-xs font-semibold">0,94 %</span>
                             </div>
@@ -1508,7 +1505,7 @@ export default function CurrencyStatement({
                             <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-xcannes-green/10 border border-xcannes-green/30">
                               <div className="flex items-center gap-2">
                                 <span className="text-xcannes-green text-xs">→</span>
-                                <span className="text-white font-medium">100 XCS</span>
+                                <span className="text-white font-medium">100 RLUSD</span>
                               </div>
                               <span className="text-xcannes-green text-xs font-bold">0 % de frais</span>
                             </div>
@@ -1524,8 +1521,8 @@ export default function CurrencyStatement({
                             <span className="text-white/50 text-xs mt-0.5">ℹ️</span>
                             <p className="text-white/70 text-[11px] leading-relaxed">
                               {t(
-                                "ui_xcs_benefit_note",
-                                "Les XCS ne sont ni débités ni immobilisés lors de la conversion. Ils demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement."
+                                "ui_rlusd_benefit_note",
+                                "Les RLUSD ne sont ni débités ni immobilisés lors de la conversion. Ils demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement."
                               )}
                             </p>
                           </div>

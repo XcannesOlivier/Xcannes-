@@ -173,7 +173,7 @@ export const getCurrencyDescription = (code) => {
     "APT": "Aptos",
     "ARB": "Arbitrum",
     "OP": "Optimism",
-    "XCS": "Xcannes Coin",
+    "RLUSD": "Xcannes Coin",
     "SHIB": "Shiba Inu",
     "TRX": "Tron",
     "LTC": "Litecoin",

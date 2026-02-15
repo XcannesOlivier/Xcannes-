@@ -1,7 +1,7 @@
 const DEFAULT_RATES_USD_PER_UNIT = {
   RLUSD: 1,
   XRP: 0.55,
-  XCS: 0.1,
+  RLUSD: 0.1,
   EUR: 1.08,
   CAD: 0.74,
   CHF: 1.1,
@@ -24,7 +24,7 @@ const DEFAULT_DEMO_WALLETS = {
     address: "rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx",
     allocations: {
       XRP: 12.345678,
-      XCS: 250,
+      RLUSD: 250,
       RLUSD: 1000,
       EUR: 420,
       CAD: 380,
@@ -47,7 +47,7 @@ const DEFAULT_DEMO_WALLETS = {
     address: "rDEMO_WALLET_B_xxxxxxxxxxxxxxxxxxxxxxxx",
     allocations: {
       XRP: 5,
-      XCS: 50,
+      RLUSD: 50,
       RLUSD: 500,
       EUR: 120,
       CAD: 140,
@@ -454,8 +454,8 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
   // Extra fictive events to enrich per-currency statements with varied operations.
   pushConversion({ walletId: "A", fromCurrency: "RLUSD", toCurrency: "XRP", factor: 0.04, min: 20 });
   pushConversion({ walletId: "B", fromCurrency: "XRP", toCurrency: "RLUSD", factor: 0.35, min: 1.5 });
-  pushConversion({ walletId: "A", fromCurrency: "XCS", toCurrency: "RLUSD", factor: 0.12, min: 5 });
-  pushConversion({ walletId: "B", fromCurrency: "RLUSD", toCurrency: "XCS", factor: 0.05, min: 12 });
+  pushConversion({ walletId: "A", fromCurrency: "RLUSD", toCurrency: "RLUSD", factor: 0.12, min: 5 });
+  pushConversion({ walletId: "B", fromCurrency: "RLUSD", toCurrency: "RLUSD", factor: 0.05, min: 12 });
   pushConversion({ walletId: "A", fromCurrency: "RLUSD", toCurrency: "EUR", factor: 0.03, min: 15 });
   pushConversion({ walletId: "B", fromCurrency: "GBP", toCurrency: "RLUSD", factor: 0.02, min: 1.5 });
   pushConversion({ walletId: "A", fromCurrency: "MXN", toCurrency: "RLUSD", factor: 0.005, min: 15 });
@@ -471,7 +471,7 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
 
   pushSpreadFee({ walletId: "A", currency: "EUR", factor: 0.0012, min: 0.05, maxAbsolute: 1 });
   pushSpreadFee({ walletId: "B", currency: "INR", factor: 0.0009, min: 1, maxAbsolute: 120 });
-  pushSpreadFee({ walletId: "A", currency: "XCS", factor: 0.01, min: 0.5, maxAbsolute: 4 });
+  pushSpreadFee({ walletId: "A", currency: "RLUSD", factor: 0.01, min: 0.5, maxAbsolute: 4 });
 
   const pushTrustlineEvent = ({ walletId, currency, action }) => {
     events.push({

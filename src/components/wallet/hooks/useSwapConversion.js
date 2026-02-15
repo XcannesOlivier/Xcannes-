@@ -47,7 +47,7 @@ export function useSwapConversion({
       setConvertBaseCurrency(baseCandidate);
     }
     if (!convertQuoteCurrency) {
-      const preferredQuotes = ["XCS", "RLUSD", "USD", "USDT", "USDC"];
+      const preferredQuotes = ["RLUSD", "RLUSD", "USD", "USDT", "USDC"];
       const firstPreferred =
         preferredQuotes.find(
           (c) => swapCurrencyOptions.includes(c) && c !== effectiveBase
@@ -100,7 +100,7 @@ export function useSwapConversion({
         }
       }
 
-      if (code === "XCS" || code === "XRP") {
+      if (code === "RLUSD" || code === "XRP") {
         try {
           const pairSymbol = `${code}_RLUSD`;
           const ticker = await getTicker?.(pairSymbol);
@@ -176,7 +176,7 @@ export function useSwapConversion({
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return null;
       if (code === "RLUSD" || code === "USD") return "PYTH";
-      if (code === "XRP" || code === "XCS") return "XRPL";
+      if (code === "XRP" || code === "RLUSD") return "XRPL";
 
       try {
         const markets = await getAllMarkets?.();

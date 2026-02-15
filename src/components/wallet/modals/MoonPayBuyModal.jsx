@@ -135,11 +135,6 @@ const MoonPayBuyModal = ({
     isWalletActivated === true &&
     hasRlusdTrustline === false;
 
-  const hasXcsTrustline = useMemo(() => {
-    const tokens = balance?.tokens || [];
-    return tokens.some((t) => String(t?.currency || "").toUpperCase() === "XCS");
-  }, [balance?.tokens]);
-
   const selectedFiat = useMemo(() => {
     return (fiatCurrencies || []).find((fiat) => fiat.code === fiatCurrency);
   }, [fiatCurrencies, fiatCurrency]);

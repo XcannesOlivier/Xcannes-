@@ -695,7 +695,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             ],
             note: t(
               "home_v2_essentials_3_modal_flow_1_note",
-              "Selon la paire, la conversion utilise le marché XRPL (XRP/XCS) ou une réallocation interne en RLUSD."
+              "Selon la paire, la conversion utilise le marché XRPL (XRP/RLUSD) ou une réallocation interne en RLUSD."
             ),
           },
           {
@@ -733,8 +733,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   ),
                 ],
                 note: t(
-                  "home_v2_essentials_lines_modal_flow_1_step_1_note",
-                  "Des frais uniques de 1 USD (≈ 1 RLUSD) s’appliquent lors de l’activation."
+                  "home_v2_essentials_lines_modal_flow_1_step_1_note_free_f5",
+                  "L’activation est gratuite (hors frais réseau XRPL)."
                 ),
               },
               {
@@ -771,8 +771,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   "Vous pouvez gérer votre ligne à tout moment. La désactivation est possible uniquement si le solde est à zéro."
                 ),
                 note: t(
-                  "home_v2_essentials_lines_modal_flow_1_step_3_note",
-                  "La désactivation entraîne également des frais uniques de 1 USD (≈ 1 RLUSD)."
+                  "home_v2_essentials_lines_modal_flow_1_step_3_note_free_f5",
+                  "La désactivation est également gratuite (hors frais réseau XRPL)."
                 ),
               },
             ],
@@ -1053,7 +1053,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             ],
             note: t(
               "home_v2_essentials_3_modal_flow_1_note",
-              "Selon la paire, la conversion utilise le marché XRPL (XRP/XCS) ou une réallocation interne en RLUSD."
+              "Selon la paire, la conversion utilise le marché XRPL (XRP/RLUSD) ou une réallocation interne en RLUSD."
             ),
           },
           {
@@ -1499,8 +1499,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   ),
                 ],
                 note: t(
-                  "home_v2_essentials_lines_modal_flow_1_step_1_note",
-                  "Des frais uniques de 1 USD (≈ 1 RLUSD) s’appliquent lors de l’activation."
+                  "home_v2_essentials_lines_modal_flow_1_step_1_note_free_f5",
+                  "L’activation est gratuite (hors frais réseau XRPL)."
                 ),
               },
               {
@@ -1537,8 +1537,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                   "Vous pouvez gérer votre ligne à tout moment. La désactivation est possible uniquement si le solde est à zéro."
                 ),
                 note: t(
-                  "home_v2_essentials_lines_modal_flow_1_step_3_note",
-                  "La désactivation entraîne également des frais uniques de 1 USD (≈ 1 RLUSD)."
+                  "home_v2_essentials_lines_modal_flow_1_step_3_note_free_f5",
+                  "La désactivation est également gratuite (hors frais réseau XRPL)."
                 ),
               },
             ],

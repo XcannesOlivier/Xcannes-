@@ -3,7 +3,6 @@ Allow: /
 
 # Pages principales
 Allow: /
-Allow: /whitepaper
 Allow: /contact
 Allow: /disclaimer
 Allow: /success

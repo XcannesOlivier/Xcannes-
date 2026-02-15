@@ -67,5 +67,4 @@ export const CURRENCY_FLAGS = {
 export const CRYPTO_ICONS = {
   XRP: "/symbols/xrp.png",
   RLUSD: "/symbols/rlusd.png",
-  XCS: "/symbols/xcs.svg",
 };
