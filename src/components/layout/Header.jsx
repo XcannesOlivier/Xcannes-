@@ -8,7 +8,6 @@ import { lockBodyScroll } from "@/utils/bodyScrollLock";
 export default function Header({ fixed = true }) {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const isDex = router.pathname === "/dex";
   const isHome = router.pathname === "/";
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -174,8 +173,8 @@ export default function Header({ fixed = true }) {
   }, [menuOpen]);
 
   const headerBgClass = (() => {
-    // DEX + Home: fond noir uniforme (même rendu)
-    if (isDex || isHome) {
+    // Home: fond noir uniforme
+    if (isHome) {
       return scrolled ?
       "bg-black backdrop-blur-md border-white/10" :
       "bg-black backdrop-blur-sm border-white/5";
@@ -212,21 +211,10 @@ export default function Header({ fixed = true }) {
           {!isHome &&
           <Link
             href="/"
-            className={`header-nav-link ${isDex ? "is-reverse" : ""}`}
+            className="header-nav-link"
             onClick={withHardNavFallback("/")}>
 
               <span className="header-nav-label">{t("nav_home")}</span>
-              <span aria-hidden="true" className="header-nav-arrow">{isDex ? "<" : ">"}</span>
-            </Link>
-          }
-
-          {!isDex &&
-          <Link
-            href="/dex"
-            className="header-nav-link"
-            onClick={withHardNavFallback("/dex")}>
-
-              <span className="header-nav-label">{t("nav_trading", "Markets")}</span>
               <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
             </Link>
           }
@@ -280,20 +268,9 @@ export default function Header({ fixed = true }) {
         <Link
           href="/"
           onClick={withMobileNavDelay("/")}
-          className={`header-nav-link w-full justify-between px-8 ${isDex ? "is-reverse" : ""}`}>
-
-              <span className="header-nav-label">{t("nav_home")}</span>
-              <span aria-hidden="true" className="header-nav-arrow">{isDex ? "<" : ">"}</span>
-            </Link>
-        }
-
-          {!isDex &&
-        <Link
-          href="/dex"
-          onClick={withMobileNavDelay("/dex")}
           className="header-nav-link w-full justify-between px-8">
 
-              <span className="header-nav-label">{t("nav_trading", "Markets")}</span>
+              <span className="header-nav-label">{t("nav_home")}</span>
               <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
             </Link>
         }

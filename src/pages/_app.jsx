@@ -106,9 +106,9 @@ function App({ Component, pageProps }) {
       setIsRouteChanging(true);
       const fromPath = stripLocalePrefix(router.asPath || "/");
       const toPath = stripLocalePrefix(url || "/");
-      if (fromPath === "/" && (toPath === "/dex" || toPath === "/wallet")) {
+      if (fromPath === "/" && toPath === "/wallet") {
         setTransitionDirection("from-left");
-      } else if (toPath === "/" && (fromPath === "/dex" || fromPath === "/wallet")) {
+      } else if (toPath === "/" && fromPath === "/wallet") {
         setTransitionDirection("from-left");
       } else {
         setTransitionDirection("from-right");

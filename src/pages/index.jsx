@@ -278,14 +278,14 @@ export default function Home() {
                   </button>
                 </Link>
                 <Link
-                  href="/dex"
+                  href="/wallet"
                   className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}
                 >
                   <span className="sm:hidden">
-                    {t("home_v2_final_cta_markets_mobile", "Voir les taux de change")}
+                    {t("home_v2_hero_cta_primary_mobile", "Gérer mon argent")}
                   </span>
                   <span className="hidden sm:inline">
-                    {t("home_v2_final_cta_markets", "Voir les marchés")}
+                    {t("home_v2_hero_cta_primary", "Ouvrir le wallet")}
                   </span>
                 </Link>
               </div>

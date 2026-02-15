@@ -36,10 +36,10 @@ export default function Whitepaper() {
             {t("nav_home", "Home")}
           </Link>
           <Link
-            href="/dex"
+            href="/wallet"
             className="px-6 py-2 rounded-full border border-white font-bolt bg-black text-white hover:bg-white hover:text-black transition transform hover:scale-105 shadow"
           >
-            {t("whitepaper_button_dex", "DEX")}
+            {t("nav_wallet", "Wallet")}
           </Link>
         </div>
 
@@ -457,10 +457,10 @@ export default function Whitepaper() {
             {t("nav_home", "Home")}
           </Link>
           <Link
-            href="/dex"
+            href="/wallet"
             className="px-6 py-2 rounded-full font-[500] bg-black text-white border border-white hover:bg-white hover:text-black transition transform hover:scale-105 shadow"
           >
-            {t("whitepaper_button_dex", "DEX")}
+            {t("nav_wallet", "Wallet")}
           </Link>
         </div>
 
