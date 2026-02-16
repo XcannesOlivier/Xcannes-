@@ -206,17 +206,17 @@ export default function SupportAssistantWidget({ mode = "support" }) {
               priority={false}
             />
           </button>
-          <div
-            className={[
-              "absolute right-12 md:right-14 whitespace-nowrap rounded-full border border-black/10 bg-white px-5 py-2.5 text-[13px] text-black/90 shadow-xl transition-all duration-200",
-              showPrompt
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-1 pointer-events-none",
-            ].join(" ")}
-            aria-hidden={!showPrompt}
-          >
-            {t("home_support_prompt", "Une question ?")}
-          </div>
+	          <div
+	            className={[
+	              "absolute right-12 md:right-14 whitespace-nowrap rounded-full border border-black/10 bg-white/90 md:bg-white px-4 md:px-5 py-2 md:py-2.5 text-[12px] md:text-[13px] text-black/85 md:text-black/90 shadow-lg md:shadow-xl transition-all duration-200",
+	              showPrompt
+	                ? "opacity-90 md:opacity-100 translate-y-0"
+	                : "opacity-0 translate-y-1 pointer-events-none",
+	            ].join(" ")}
+	            aria-hidden={!showPrompt}
+	          >
+	            {t("home_support_prompt", "Une question ?")}
+	          </div>
         </div>
       )}
       <style jsx global>{`

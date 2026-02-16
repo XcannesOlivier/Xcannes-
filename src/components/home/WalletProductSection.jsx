@@ -10,7 +10,7 @@ export default function WalletProductSection() {
   return (
     <section id="demo" className="relative py-24 px-4 sm:px-6 overflow-hidden">
       <div className="relative max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-montserrat font-semibold mb-3 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
             {t(
               "home_v2_demo_title",
@@ -25,18 +25,17 @@ export default function WalletProductSection() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
-          <div className="flex flex-col gap-8">
+        <div className="mt-12 grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-0 items-start">
+          <div className="flex flex-col gap-8 lg:pr-10 lg:border-r lg:border-white/10">
             <div className="order-1 lg:order-2">
               <WalletEssentialsCards variant="home" />
             </div>
 
           </div>
 
-          <div
-            className="bg-black/20 backdrop-blur-sm shadow-[0_0_18px_rgba(22,163,74,0.12)] md:shadow-[0_0_18px_rgba(22,163,74,0.09)] overflow-hidden"
-          >
-            <div className="px-5 py-4 border-x border-t border-white/10 rounded-t-xl rounded-b-none">
+          <div className="bg-black/15 overflow-hidden rounded-xl">
+            <div className="lg:pl-10">
+            <div className="px-5 py-4 border-b border-white/5">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-base text-white/70 min-w-0">
                   {t("home_v2_demo_preview_title", "Démo interactive (fictive)")}
@@ -75,6 +74,7 @@ export default function WalletProductSection() {
                 showWalletSwitcher={false}
                 allowBackgroundScrollOnMobile
               />
+            </div>
             </div>
           </div>
 

@@ -232,21 +232,21 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       },
       orderClassName: "hidden",
       iconClassName:
-        "text-[#22C55E] bg-[rgba(34,197,94,0.08)] group-hover:bg-[rgba(34,197,94,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+        "text-white/70 bg-white/[0.04] group-hover:bg-white/[0.07]",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
             d="M7 3h10a2 2 0 0 1 2 2v16l-3-2-2 2-2-2-2 2-3-2V5a2 2 0 0 1 2-2Z"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M9 7h6M9 11h6M9 15h4"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
           />
         </svg>
@@ -254,7 +254,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "pay",
-      title: t("home_v2_essentials_2_title", "Payer / Envoyer"),
+      title: t("home_v2_essentials_2_title", "Envoyer"),
       desc: t(
         "home_v2_essentials_2_desc",
         "Payer (QR/code) ou envoyer à une adresse."
@@ -421,19 +421,19 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "order-1 lg:order-2",
       iconClassName:
         "text-[#5FC9F8] bg-[rgba(56,189,248,0.14)] group-hover:bg-[rgba(56,189,248,0.2)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
             d="M7 17l10-10"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
           />
           <path
             d="M10 7h7v7"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -442,7 +442,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "receive_request",
-      title: t("home_v2_essentials_5_title", "Recevoir / Demander"),
+      title: t("home_v2_essentials_5_title", "Recevoir"),
       desc: t(
         "home_v2_essentials_5_desc",
         "Recevoir des fonds ou créer une demande."
@@ -604,23 +604,23 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       },
       orderClassName: "order-2 lg:order-4",
       iconClassName:
-        "text-[#22C55E] bg-[rgba(34,197,94,0.08)] group-hover:bg-[rgba(34,197,94,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+        "text-white/70 bg-white/[0.04] group-hover:bg-white/[0.07]",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <line
             x1="12"
             y1="5"
             x2="12"
             y2="19"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
           />
           <polyline
             points="19 12 12 19 5 12"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -629,7 +629,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "convert_lines_mobile",
-      title: t("home_v2_essentials_convert_lines_title", "Convertir & Suivre"),
+      title: t("home_v2_essentials_convert_lines_title", "Convertir"),
       desc: t(
         "home_v2_essentials_convert_lines_desc",
         "Convertissez, suivez et gérez vos opérations."
@@ -915,7 +915,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           },
           {
             key: "config",
-            tabLabel: t("home_v2_essentials_6_title", "Configurer"),
+            tabLabel: t("home_v2_essentials_6_title", "Paramètres"),
             title: t(
               "home_v2_essentials_6_modal_title",
               "Parcours · Configurer"
@@ -951,34 +951,34 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "hidden",
       iconClassName:
         "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] group-hover:bg-[rgba(6,182,212,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <polyline
             points="17 1 21 5 17 9"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M3 11V9a4 4 0 0 1 4-4h14"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <polyline
             points="7 23 3 19 7 15"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M21 13v2a4 4 0 0 1-4 4H3"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -987,7 +987,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "convert",
-      title: t("home_v2_essentials_3_title", "Convertir & Suivre"),
+      title: t("home_v2_essentials_3_title", "Convertir"),
       desc: t(
         "home_v2_essentials_3_desc",
         "Convertissez une devise et suivez vos opérations."
@@ -1201,34 +1201,34 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "order-3 lg:order-5",
       iconClassName:
         "text-[#06B6D4] bg-[rgba(6,182,212,0.08)] group-hover:bg-[rgba(6,182,212,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <polyline
             points="17 1 21 5 17 9"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M3 11V9a4 4 0 0 1 4-4h14"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <polyline
             points="7 23 3 19 7 15"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
             d="M21 13v2a4 4 0 0 1-4 4H3"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -1237,7 +1237,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     },
     {
       key: "config",
-      title: t("home_v2_essentials_6_title", "Configurer"),
+      title: t("home_v2_essentials_6_title", "Paramètres"),
       desc: t(
         "home_v2_essentials_6_desc",
         "Mise en place simple, fonctionnement clair."
@@ -1259,30 +1259,30 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "hidden",
       iconClassName:
         "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] group-hover:bg-[rgba(139,92,246,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
             d="M4 7h10M18 7h2"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
           />
           <path
             d="M14 7a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
           />
           <path
             d="M4 17h6M14 17h6"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
           />
           <path
             d="M14 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
           />
         </svg>
       ),
@@ -1427,9 +1427,9 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "order-4 lg:order-6",
       iconClassName:
         "text-[#8B5CF6] bg-[rgba(139,92,246,0.08)] group-hover:bg-[rgba(139,92,246,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <rect
             x="1"
             y="4"
@@ -1438,7 +1438,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             rx="2"
             ry="2"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
           />
           <line
             x1="1"
@@ -1446,14 +1446,14 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             x2="23"
             y2="10"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
           />
         </svg>
       ),
     },
     {
       key: "lines",
-      title: t("home_v2_essentials_lines_title", "Gérer & Configurer"),
+      title: t("home_v2_essentials_lines_title", "Paramètres & gestion"),
       desc: t(
         "home_v2_essentials_lines_desc",
         "Gérez vos devises locales et vos paramètres."
@@ -1545,7 +1545,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           },
           {
             key: "config",
-            tabLabel: t("home_v2_essentials_6_title", "Configurer"),
+            tabLabel: t("home_v2_essentials_6_title", "Paramètres"),
             title: t(
               "home_v2_essentials_6_modal_title",
               "Parcours · Configurer"
@@ -1581,16 +1581,22 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       orderClassName: "order-5 lg:order-7",
       iconClassName:
         "text-[#F59E0B] bg-[rgba(245,158,11,0.08)] group-hover:bg-[rgba(245,158,11,0.14)]",
-      borderHoverClassName: "group-hover:border-xcannes-green/60",
+      borderHoverClassName: "group-hover:border-white/15",
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <path
             d="M5 6h14M5 12h14M5 18h10"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinecap="round"
           />
-          <circle cx="19" cy="18" r="2" stroke="currentColor" strokeWidth="2" />
+          <circle
+            cx="19"
+            cy="18"
+            r="2"
+            stroke="currentColor"
+            strokeWidth="1.25"
+          />
         </svg>
       ),
     },
@@ -1611,18 +1617,18 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       showArrow: true,
       isPlain: true,
       icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
           <circle
             cx="12"
             cy="12"
             r="9"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
           />
           <path
             d="M10 8l6 4-6 4V8Z"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="1.25"
             strokeLinejoin="round"
           />
         </svg>
@@ -1677,12 +1683,12 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       : "green";
   const modalAccentStyles = {
     green: {
-      step: "border-xcannes-green/40 text-xcannes-green/80",
-      dot: "bg-xcannes-green/60",
+      step: "border-white/15 text-white/75",
+      dot: "bg-white/35",
       tabActive:
-        "rounded-lg border border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90 font-semibold transition-all duration-200 hover:bg-xcannes-green/20 hover:text-xcannes-green hover:scale-105 active:scale-95",
+        "rounded-lg border border-white/15 bg-white/[0.05] text-white/85 font-semibold transition-all duration-200 hover:bg-white/[0.07] hover:text-white hover:scale-105 active:scale-95",
       tabInactive:
-        "rounded-lg border border-xcannes-green/30 bg-transparent text-xcannes-green/70 font-semibold transition-all duration-200 hover:border-xcannes-green/50 hover:text-xcannes-green/90",
+        "rounded-lg border border-white/10 bg-transparent text-white/55 font-semibold transition-all duration-200 hover:border-white/20 hover:text-white/75",
     },
     sky: {
       step: "border-[#38BDF8]/50 text-[#5FC9F8]",
@@ -1723,62 +1729,71 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     : "";
   const gridClassName = isCompact
     ? "grid grid-cols-1 grid-rows-7 gap-2 flex-1 min-h-0"
-    : "grid sm:grid-cols-2 lg:grid-cols-1 gap-3";
+    : "grid sm:grid-cols-2 lg:grid-cols-1 gap-2.5 md:gap-3";
   const cardPaddingClassName = isCompact ? "p-3" : "p-5";
   const baseLayoutClassName = isCompact
     ? "space-y-2"
-    : "space-y-3";
-  const showCardBorders = variant !== "home";
+    : "";
   const titleRowClassName = isCompact
     ? "flex items-center gap-2.5"
-    : "flex items-center gap-3";
+    : "flex items-center gap-2.5";
   const titleClassName = isCompact
     ? "text-white/80 font-montserrat font-semibold tracking-[0.18em] text-[10px] leading-snug"
     : "text-white/80 font-montserrat font-semibold tracking-widest text-[15px]";
   const descClassName = isCompact
     ? "text-[12px] text-white/65 leading-snug line-clamp-2"
-    : "text-[17px] sm:text-sm text-white/70 leading-relaxed";
+    : "text-[14px] sm:text-[13px] text-white/55 leading-relaxed line-clamp-2";
   const ctaClassName = isCompact
-    ? "flex items-center justify-end gap-1.5 text-[10px] text-xcannes-green/70 transition-colors relative overflow-hidden"
-    : "flex items-center gap-2 text-xs text-xcannes-green/70 transition-colors relative overflow-hidden";
+    ? "flex items-center justify-end gap-1.5 text-[10px] text-white/45 transition-colors"
+    : "flex items-center gap-2 text-xs text-white/45 transition-colors";
 
-  const explanationKeys = visibleActions
-    .filter((action) => !action.isPlain)
-    .map((action) => action.key);
   const demoAction = actions.find((action) => action.key === "demo_intro");
   const listActions = isCompact
     ? visibleActions
     : visibleActions.filter((action) => action.key !== "demo_intro");
+  const showInstitutionalNav = variant === "home" && !isCompact;
+  const getActionsByKeys = (keys) => {
+    const byKey = new Map(listActions.map((action) => [action.key, action]));
+    return keys.map((key) => byKey.get(key)).filter(Boolean);
+  };
+  const operationActions = showInstitutionalNav
+    ? getActionsByKeys(["pay", "receive_request", "convert", "buy"])
+    : [];
+  const configurationActions = showInstitutionalNav
+    ? getActionsByKeys(["lines"])
+    : [];
 
   const renderActionCard = (action, options = {}) => {
     const { wrapperClassNameOverride = "", keySuffix = "" } = options;
     const cardLayoutClassName = baseLayoutClassName;
     const descLayoutClassName = "";
-    const isExplanationCard = !action.isPlain;
-    const isLastExplanation =
-      explanationKeys[explanationKeys.length - 1] === action.key;
-    const forceDesktopSeparator = !isCompact && action.key === "lines";
-    const showSeparator =
-      (isExplanationCard &&
-        !isLastExplanation &&
-        !(action.key === "config" && !isCompact)) ||
-      forceDesktopSeparator;
     const wrapperClassName =
       wrapperClassNameOverride || action.orderClassName || "";
+    const isActive = activeActionKey === action.key;
     const cardClasses = [
       action.isPlain
         ? "bg-transparent border-none rounded-none shadow-none"
-        : showCardBorders
-        ? "bg-black/20 backdrop-blur-sm border border-xcannes-green/25 rounded-xl"
-        : "bg-black/20 backdrop-blur-sm rounded-xl border border-transparent hover:border-xcannes-green/25",
-      "group/card",
-      cardPaddingClassName,
-      action.isPlain ? "" : "relative pb-10 md:pb-5",
-      cardLayoutClassName,
-      showCardBorders ? action.borderHoverClassName : "",
+        : [
+            "group/card relative w-full text-left cursor-pointer",
+            "bg-transparent hover:bg-white/[0.03] focus-visible:bg-white/[0.03]",
+            "rounded-[12px]",
+            "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.0)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.10)]",
+            "px-5 py-2.5 pl-6 md:py-3",
+            "h-[76px] md:h-[84px]",
+            "flex flex-col justify-center",
+            "transition-[background-color,box-shadow] duration-200 ease-in-out",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15",
+            isActive
+              ? "bg-white/[0.05] before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 md:before:top-2.5 md:before:bottom-2.5 before:w-[2px] before:rounded-full before:bg-white/20"
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
+      action.isPlain ? cardPaddingClassName : "",
+      action.isPlain ? "" : cardLayoutClassName,
       action.isPlain
         ? ""
-        : "w-full text-left cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:bg-black/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30",
+        : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -1793,18 +1808,9 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         >
           <div className={titleRowClassName}>
             {!action.isPlain && (
-              <div
-                className={[
-                  "rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/80 transition-transform duration-200 group-hover/card:scale-110",
-                  isCompact ? "w-9 h-9" : "w-10 h-10",
-                  !isCompact ? "lg:mt-0.5" : "",
-                  action.iconClassName,
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
+              <span className="inline-flex items-center text-white/60 shrink-0 leading-none">
                 {action.icon}
-              </div>
+              </span>
             )}
             <div
               className={
@@ -1819,15 +1825,17 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           </div>
           {!action.isPlain && (
             <div className={ctaClassName}>
-              <span className="relative z-10">
-                <span className="md:hidden text-xcannes-green text-2xl font-light transition-transform duration-200 group-hover/card:scale-125">
-                  +
-                </span>
-                <span className="hidden md:inline text-xcannes-green text-xl font-light transition-transform duration-200 group-hover/card:scale-125">
-                  +
-                </span>
+              <span className="inline-flex items-center text-white/35 group-hover/card:text-white/45 transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M9 6l6 6-6 6"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </span>
-              <span className="absolute inset-0 opacity-0 transition-all duration-200 ease-out group-hover/card:opacity-100 group-hover/card:scale-110" />
             </div>
           )}
         </div>
@@ -1859,20 +1867,20 @@ export default function WalletEssentialsCards({ variant = "home" }) {
                 {effectiveDesc}
               </p>
               <span
-                className="inline-flex text-xcannes-green/70 animate-pulse-slow"
+                className="inline-flex text-white/35"
                 aria-hidden="true"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M5 12h14"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="1.5"
                     strokeLinecap="round"
                   />
                   <path
                     d="M14 7l5 5-5 5"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="1.5"
                     strokeLinecap="round"
                   />
                 </svg>
@@ -1882,7 +1890,7 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         ) : (
           <p
             className={[
-              "mt-2 italic",
+              "mt-1 italic",
               descLayoutClassName,
               action.isPlain
                 ? action.plainDescClassName || "text-white/60 text-sm"
@@ -1895,20 +1903,20 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         {action.showArrow && (
           <div className="mt-3 flex justify-end lg:hidden">
             <span
-              className="inline-flex text-xcannes-green/70 animate-pulse-slow"
+              className="inline-flex text-white/35"
               aria-hidden="true"
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                 <path
                   d="M12 5v14"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                 />
                 <path
                   d="M7 14l5 5 5-5"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -1944,21 +1952,6 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         >
           {cardContent}
         </button>
-        {showSeparator && (
-          <div className="mt-2 flex justify-center">
-            <svg
-              className="w-[86%] h-[5px]"
-              viewBox="0 0 100 6"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M0 3 C 24 2.7 38 1.1 50 1.1 C 62 1.1 76 2.7 100 3 C 76 3.3 62 4.9 50 4.9 C 38 4.9 24 3.3 0 3 Z"
-                fill="rgba(34,197,94,0.35)"
-              />
-            </svg>
-          </div>
-        )}
       </div>
     );
   };
@@ -1986,14 +1979,31 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         {!isCompact &&
           demoAction &&
           renderActionCard(demoAction, {
-            wrapperClassNameOverride: "hidden lg:block lg:order-1 lg:-mb-2",
+            wrapperClassNameOverride: "hidden lg:block lg:-mb-2",
             keySuffix: "desktop",
           })}
-        {listActions.map((action) => renderActionCard(action))}
+        {showInstitutionalNav ? (
+          <>
+            <p className="col-span-full px-5 pl-6 text-[10px] uppercase tracking-[0.22em] text-white/60">
+              {t("home_v2_demo_nav_operations_label", "OPÉRATIONS")}
+            </p>
+            {operationActions.map((action) =>
+              renderActionCard(action, { wrapperClassNameOverride: "order-none" })
+            )}
+            <p className="col-span-full mt-2 px-5 pl-6 text-[10px] uppercase tracking-[0.22em] text-white/60">
+              {t("home_v2_demo_nav_configuration_label", "CONFIGURATION")}
+            </p>
+            {configurationActions.map((action) =>
+              renderActionCard(action, { wrapperClassNameOverride: "order-none" })
+            )}
+          </>
+        ) : (
+          listActions.map((action) => renderActionCard(action))
+        )}
         {!isCompact &&
           demoAction &&
           renderActionCard(demoAction, {
-            wrapperClassNameOverride: "lg:hidden order-last mt-18",
+            wrapperClassNameOverride: "lg:hidden mt-18",
             keySuffix: "mobile",
           })}
       </div>
