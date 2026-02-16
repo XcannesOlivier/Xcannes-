@@ -239,10 +239,10 @@ export default function Home() {
 
         {/* HERO (more “private bank” tone) */}
         <main className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,197,94,0.10),transparent_55%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.05),transparent_45%)]" />
+          <div className="absolute inset-0 bg-[#0b0f10] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-xcannes-background md:h-36" />
 
-          <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 md:py-24">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-28">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-[11px] tracking-[0.25em] text-white/60 mb-5">
                 <span className="inline-block italic -skew-x-[16deg] uppercase text-[14px]">
@@ -250,151 +250,154 @@ export default function Home() {
                 </span>
               </p>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
-                {t("home_v2_hero_title", "Payez local.")}{" "}
-                <span className="text-xcannes-green">
-                  {t("home_v2_hero_title_emphasis", "Gardez la valeur.")}
-                </span>
-              </h1>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
+                  {t("home_v2_hero_title", "Payez local.")}
+                  <span className="block mt-1 text-[21px] sm:text-[26px] md:text-[32px] font-medium text-white/85">
+                    {t("home_v2_hero_title_emphasis", "Gardez la valeur.")}
+                  </span>
+                </h1>
 
-                <p className="mt-6 text-lg sm:text-xl text-white/90 font-light leading-relaxed italic">
+                <p className="mt-6 text-base sm:text-lg text-white/90 font-light leading-relaxed italic">
                   <span dangerouslySetInnerHTML={{
                     __html: t(
                       "home_v2_hero_subtitle",
-                      "Payez, recevez et convertissez dans 160+ devises ⮕ rapide, sécurisé, économique."
+                      "Payez, recevez et convertissez en toute simplicité.<br/>Rapide. Sécurisé. Transparent."
                     ).replace('⮕', '<span class="inline-block text-xcannes-green animate-pulse">⮕</span>')
                   }} />
                 </p>
 
-              <div className="mt-10 flex justify-center items-center md:hidden">
-                <Link
-                  href="/wallet"
-                  className={bankButtonClassName({
-                    tone: "neutral",
-                    variant: "solid",
-                    size: "lg",
-                    className:
-                      "bg-neutral-900 hover:bg-neutral-800 text-white/80 border-white/10 focus:ring-white/10",
-                  })}
-                >
-                  {t("nav_sign_in", "Se connecter")}
-                </Link>
-              </div>
-
-              <div className="mt-10 hidden md:flex flex-col items-center justify-center gap-4">
-                <p className="text-sm text-white/70">
-                  {t(
-                    "home_v2_hero_store_cta_hint",
-                    "Téléchargez l'application XCANNES sur votre mobile."
-                  )}
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-4">
-                  <a
-                    href="#"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex"
-                    aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                <div className="mt-10 flex justify-center items-center md:hidden">
+                  <Link
+                    href="/wallet"
+                    className={bankButtonClassName({
+                      tone: "neutral",
+                      variant: "solid",
+                      size: "lg",
+                      className:
+                        "w-full max-w-[360px] bg-gradient-to-b from-neutral-500 to-neutral-950 hover:from-neutral-400 hover:to-neutral-900 text-white border-white/55 hover:border-white/70 focus:ring-white/30 shadow-[0_18px_44px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.35)] hover:shadow-[0_22px_58px_rgba(0,0,0,0.72),inset_0_1px_0_rgba(255,255,255,0.14)] font-semibold tracking-wide",
+                    })}
                   >
-                    <Image
-                      src={appStoreBadgeSrc}
-                      alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
-                      className="h-12 w-auto"
-                      width={250}
-                      height={83}
-                      loading="lazy"
-                      unoptimized
-                    />
-                  </a>
-
-                  <a
-                    href="#"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex"
-                    aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
-                  >
-                    <Image
-                      src={googlePlayBadgeSrc}
-                      alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
-                      className="h-[60px] w-auto"
-                      width={646}
-                      height={250}
-                      loading="lazy"
-                      unoptimized
-                    />
-                  </a>
+                    {t("nav_sign_in", "Se connecter")}
+                  </Link>
                 </div>
-              </div>
 
-              {/* 4 essentials (keep light, avoid jargon) */}
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {[
-                {
-                  title: t("home_v2_hero_pillar_1_title", "Rapide"),
+                <div className="mt-10 hidden md:flex flex-col items-center justify-center gap-4">
+                  <p className="text-sm text-white/70">
+                    {t(
+                      "home_v2_hero_store_cta_hint",
+                      "Téléchargez l'application XCANNES sur votre mobile."
+                    )}
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    <a
+                      href="#"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex"
+                      aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                    >
+                      <Image
+                        src={appStoreBadgeSrc}
+                        alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                        className="h-12 w-auto"
+                        width={250}
+                        height={83}
+                        loading="lazy"
+                        unoptimized
+                      />
+                    </a>
+
+                    <a
+                      href="#"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex"
+                      aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                    >
+                      <Image
+                        src={googlePlayBadgeSrc}
+                        alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                        className="h-[60px] w-auto"
+                        width={646}
+                        height={250}
+                        loading="lazy"
+                        unoptimized
+                      />
+                    </a>
+                  </div>
+                </div>
+
+                {/* 4 essentials (keep light, avoid jargon) */}
+                <div className="mt-14 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {[
+                  {
+                  title: t("home_v2_hero_pillar_1_title", "Exécution instantanée"),
                   stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
-                  subtitle: t("home_v2_hero_pillar_1_caption", "Paiement & conversion"),
+                  subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
+                  showLinkButton: false,
                   link: {
                     label: t("home_v2_hero_pillar_1_link", "Détails"),
                     onClick: () => openSpeedModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
-                        <path d="M10 13l2 2 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M12 22A10 10 0 1 0 2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                        <path d="M10 13l2 2 7-7" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M12 22A10 10 0 1 0 2 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
                 },
                 {
-                  title: t("home_v2_hero_pillar_2_title", "Sécurisé"),
+                  title: t("home_v2_hero_pillar_2_title", "Contrôle des transactions"),
                   desc: t(
                     "home_v2_hero_pillar_2_desc",
-                    "Chaque transaction est validée sous votre contrôle exclusif."
+                    "Validation sécurisée sous votre autorité."
                   ),
+                  showLinkButton: false,
                   link: {
                     label: t("home_v2_hero_pillar_2_link", "Détails"),
                     onClick: () => openSecurityModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
-                        <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                        <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
                 },
                 {
-                  title: t("home_v2_hero_pillar_3_title", "Économique"),
+                  title: t("home_v2_hero_pillar_3_title", "Transparence des frais"),
                   desc: t(
                     "home_v2_hero_pillar_3_desc",
-                    "Frais optimisés, conversion affichée avant confirmation."
+                    "Frais affichés avant chaque confirmation."
                   ),
+                  showLinkButton: false,
                   link: {
                     label: t("home_v2_hero_pillar_3_link", "Détails"),
                     onClick: () => openFeesModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
-                        <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                        <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
                 },
                 {
-                  title: t("home_v2_hero_pillar_4_title", "Gardez la valeur"),
+                  title: t("home_v2_hero_pillar_4_title", "Stabilité réglementée"),
                   desc: t(
                     "home_v2_hero_pillar_4_desc",
-                    "Un pouvoir d’achat stable, dans n’importe quel pays. Protégez ce que vous mettez de côté."
+                    "Indexation USD conforme aux standards financiers.\nConversion multi-devises instantanée."
                   ),
                   descClassName: "text-[16px] sm:text-[13px]",
                   className:
-                    "order-first sm:order-none lg:order-first lg:col-span-3",
-                  iconWrapperClassName: "w-10 h-10 lg:w-11 lg:h-11",
+                    "order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 bg-black/30 hover:bg-black/25 py-5 md:py-4 shadow-none hover:shadow-none",
+                  iconWrapperClassName: "w-8 h-8 lg:w-11 lg:h-11",
                   link: {
                     label: t("home_v2_hero_pillar_4_link", "Détails"),
                     onClick: () => openValueModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/80">
-                        <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                        <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
                 }].map((item) => {
@@ -415,17 +418,17 @@ export default function Home() {
                             }
                           : undefined
                         }
-                        className={[
-                          "flex items-start gap-3 bg-black/20 border border-white/15 rounded-xl px-4 py-4 transition-transform duration-200 ease-out hover:scale-[1.01] hover:border-white/25",
-                          isClickable
-                            ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xcannes-green/70"
-                            : "",
-                          item.className
-                        ].filter(Boolean).join(" ")}>
+                      className={[
+                        "flex items-start gap-2.5 bg-black/20 hover:bg-black/15 rounded-[12px] px-4 py-7 md:py-4 shadow-[0_10px_28px_rgba(0,0,0,0.22)] hover:shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition-[background-color,box-shadow] duration-200",
+                        isClickable
+                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
+                          : "",
+                        item.className
+                      ].filter(Boolean).join(" ")}>
 
                     <div
                       className={[
-                        "mt-0.5 flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10",
+                        "mt-0.5 flex items-center justify-center w-8 h-8 shrink-0",
                         item.iconWrapperClassName
                       ].filter(Boolean).join(" ")}
                     >
@@ -451,7 +454,7 @@ export default function Home() {
                     {item.desc ? (
                       <div
                         className={[
-                          "text-[17.5px] sm:text-[14.5px] text-white/75 leading-relaxed italic",
+                          "text-[17.5px] sm:text-[14.5px] text-white/75 leading-relaxed italic whitespace-pre-line",
                           item.stat ? "mt-1 text-center" : "",
                           item.descClassName
                         ].filter(Boolean).join(" ")}
@@ -459,14 +462,14 @@ export default function Home() {
                         {item.desc}
                       </div>
                     ) : null}
-                    {item.link ? (
+                    {item.link && item.showLinkButton !== false ? (
                       <button
                         type="button"
                         onClick={(event) => {
                           event.stopPropagation();
                           item.link.onClick();
                         }}
-                        className="inline-flex items-center gap-1 text-[11px] text-xcannes-green hover:text-xcannes-green/80 transition-colors shrink-0 mt-auto self-end pt-3"
+                        className="inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-xcannes-green/80 transition-colors shrink-0 mt-auto self-end pt-3"
                       >
                         {item.link.label}
                       </button>
