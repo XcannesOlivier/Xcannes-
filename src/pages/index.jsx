@@ -266,27 +266,18 @@ export default function Home() {
                   }} />
                 </p>
 
-              <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center items-center md:hidden">
-                <Link href="/wallet">
-                  <button className={bankButtonClassName({ tone: "blue", variant: "soft", size: "lg" })}>
-                    <span className="sm:hidden">
-                      {t("home_v2_hero_cta_primary_mobile", "Gérer mon argent")}
-                    </span>
-                    <span className="hidden sm:inline">
-                      {t("home_v2_hero_cta_primary", "Ouvrir le wallet")}
-                    </span>
-                  </button>
-                </Link>
+              <div className="mt-10 flex justify-center items-center md:hidden">
                 <Link
                   href="/wallet"
-                  className={bankButtonClassName({ tone: "green", variant: "soft", size: "lg" })}
+                  className={bankButtonClassName({
+                    tone: "neutral",
+                    variant: "solid",
+                    size: "lg",
+                    className:
+                      "bg-neutral-900 hover:bg-neutral-800 text-white/80 border-white/10 focus:ring-white/10",
+                  })}
                 >
-                  <span className="sm:hidden">
-                    {t("home_v2_hero_cta_primary_mobile", "Gérer mon argent")}
-                  </span>
-                  <span className="hidden sm:inline">
-                    {t("home_v2_hero_cta_primary", "Ouvrir le wallet")}
-                  </span>
+                  {t("nav_sign_in", "Se connecter")}
                 </Link>
               </div>
 
@@ -423,14 +414,14 @@ export default function Home() {
                               }
                             }
                           : undefined
-                      }
-                      className={[
-                        "flex items-start gap-3 bg-black/20 border border-xcannes-green/25 rounded-xl px-4 py-4 transition-transform duration-200 ease-out hover:scale-[1.01] hover:border-xcannes-green/60",
-                        isClickable
-                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xcannes-green/70"
-                          : "",
-                        item.className
-                      ].filter(Boolean).join(" ")}>
+                        }
+                        className={[
+                          "flex items-start gap-3 bg-black/20 border border-white/15 rounded-xl px-4 py-4 transition-transform duration-200 ease-out hover:scale-[1.01] hover:border-white/25",
+                          isClickable
+                            ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-xcannes-green/70"
+                            : "",
+                          item.className
+                        ].filter(Boolean).join(" ")}>
 
                     <div
                       className={[
