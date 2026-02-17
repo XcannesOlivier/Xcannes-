@@ -52,11 +52,11 @@ export default function WalletDashboardSendModal({
     noticeVariant !== "demo" &&
     isWalletActivated === true &&
     hasRlusdTrustline === false;
-  const blueActionBtnBase =
-    "rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/80 text-black font-semibold transition-all duration-200 hover:bg-[#38BDF8] hover:scale-105 active:scale-95 disabled:border-[#38BDF8]/30 disabled:bg-[#38BDF8]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#38BDF8]/25";
-  const blueActionBtnMuted =
-    "rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#5FC9F8]/80 font-semibold transition-all duration-200 hover:bg-[#38BDF8]/20 hover:text-[#5FC9F8] hover:scale-105 active:scale-95";
-  const blueTabInactive =
+  const greenActionBtnBase =
+    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
+  const greenActionBtnMuted =
+    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-[#22C55E]/80 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-[#22C55E] hover:scale-105 active:scale-95";
+  const greenTabInactive =
     "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
@@ -219,7 +219,7 @@ export default function WalletDashboardSendModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-send-modal border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -291,20 +291,20 @@ export default function WalletDashboardSendModal({
             <button
             type="button"
             onClick={() => setSendTab("scan-request")}
-            title={t("ui_send_tab_payreq_tip", "Payer via un code de demande.")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-            sendTab === "scan-request" ? blueActionBtnMuted : blueTabInactive
-            }`}>{t("ui_scan_request_44801f50d1", "Scan Request")}
+	            title={t("ui_send_tab_payreq_tip", "Payer via un code de demande.")}
+	            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+	            sendTab === "scan-request" ? greenActionBtnMuted : greenTabInactive
+	            }`}>{t("ui_scan_request_44801f50d1", "Scan Request")}
 
 
           </button>
             <button
             type="button"
             onClick={() => setSendTab("manual")}
-            title={t("ui_send_tab_manual_tip", "Envoyer manuellement à une adresse.")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-            sendTab === "manual" ? blueActionBtnMuted : blueTabInactive
-            }`}>{t("ui_manual_send_d5de1bf948", "Manual Send")}
+	            title={t("ui_send_tab_manual_tip", "Envoyer manuellement à une adresse.")}
+	            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
+	            sendTab === "manual" ? greenActionBtnMuted : greenTabInactive
+	            }`}>{t("ui_manual_send_d5de1bf948", "Manual Send")}
 
 
           </button>
@@ -355,9 +355,9 @@ export default function WalletDashboardSendModal({
               })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px] appearance-none cursor-pointer"
+	              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px] appearance-none cursor-pointer"
+	              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
                 {selectedSendToken &&
             <p className="mt-1 text-[11px] text-white/40">{t("ui_balance_340cdcff7a", "Balance:")}
@@ -399,7 +399,7 @@ export default function WalletDashboardSendModal({
               placeholder="0.0000"
               token={selectedSendToken?.currency || "XRP"}
               tokenClassName="text-white"
-              containerClassName="focus-within:!border-[#38BDF8]/80" />
+	              containerClassName="focus-within:!border-xcannes-green/80" />
 
               </div>
 
@@ -534,7 +534,7 @@ export default function WalletDashboardSendModal({
                     placeholder={(savedAddresses || []).length > 0 ?
                     t("ui_select_saved_address_60c28f89c1", "Select saved address...") :
                     t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
-                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px]" />
+	                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]" />
                       <datalist id="saved-addresses">
                         {(savedAddresses || []).map((addr, idx) =>
                   <option
@@ -607,17 +607,17 @@ export default function WalletDashboardSendModal({
                     : t("ui_send_504b64a87b", "Send")
                 }
                 onConfirm={handleManualSend}
-                disabled={sendProcessing || !canManualSend}
-                variant="blue"
-                className="mt-2 md:hidden" />
+	                disabled={sendProcessing || !canManualSend}
+	                variant="green"
+	                className="mt-2 md:hidden" />
                 <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 handleManualSend();
               }}
-              disabled={sendProcessing || !canManualSend}
-              className={`hidden md:block w-full mt-2 text-sm py-2.5 ${blueActionBtnBase}`}>
+	              disabled={sendProcessing || !canManualSend}
+	              className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}>
 
                   {sendProcessing
                     ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -724,17 +724,17 @@ export default function WalletDashboardSendModal({
                 <SwipeConfirmButton
                 label={t("demo_scan_parse", "Load request")}
                 onConfirm={handleLoadRequest}
-                disabled={!canLoadRequest}
-                variant="blue"
-                className="md:hidden" />
+	                disabled={!canLoadRequest}
+	                variant="green"
+	                className="md:hidden" />
                 <button
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleLoadRequest();
-                }}
-                disabled={!canLoadRequest}
-                className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${blueActionBtnBase}`}>
+	                }}
+	                disabled={!canLoadRequest}
+	                className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${greenActionBtnBase}`}>
 
                   {t("demo_scan_parse", "Load request")}
                 </button>
@@ -831,12 +831,12 @@ export default function WalletDashboardSendModal({
                         "xcannes-payreq:... / JSON"
                       )} />
                     </div>
-                    <SwipeConfirmButton
-                    label={t("demo_scan_parse", "Load request")}
-                    onConfirm={handleLoadRequest}
-                    disabled={!canLoadRequest}
-                    variant="blue"
-                    className="md:hidden" />
+	                    <SwipeConfirmButton
+	                    label={t("demo_scan_parse", "Load request")}
+	                    onConfirm={handleLoadRequest}
+	                    disabled={!canLoadRequest}
+	                    variant="green"
+	                    className="md:hidden" />
                     <button
                     type="button"
                     onClick={(e) => {
@@ -844,7 +844,7 @@ export default function WalletDashboardSendModal({
                       handleLoadRequest();
                     }}
                     disabled={!canLoadRequest}
-                    className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${blueActionBtnBase}`}>
+                    className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${greenActionBtnBase}`}>
 
                       {t("demo_scan_parse", "Load request")}
                     </button>

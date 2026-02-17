@@ -237,7 +237,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           z-index: 1;
         }
 
-        .ai-assistant-panel {
+	        .ai-assistant-panel {
           --assistant-panel-bg: #080c0a;
           --assistant-panel-border: rgba(255, 255, 255, 0.25);
           --assistant-panel-shadow:
@@ -264,9 +264,9 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           backdrop-filter: blur(var(--assistant-panel-blur));
           -webkit-backdrop-filter: blur(var(--assistant-panel-blur));
           border: 0.1px solid var(--assistant-panel-border);
-          border-radius: 16px;
-          padding: 16px;
-          box-shadow: var(--assistant-panel-shadow);
+	          border-radius: 0.375rem;
+	          padding: 16px;
+	          box-shadow: var(--assistant-panel-shadow);
 
           animation: aiPanelFadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -306,21 +306,21 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           }
         }
 
-        .ai-badge {
+	        .ai-badge {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           padding: 2px 6px;
           background: var(--assistant-badge-bg);
           border: 0.1px solid var(--assistant-badge-border);
-          border-radius: 4px;
-          font-size: 10px;
-          font-weight: 700;
-          color: var(--assistant-badge-color);
+	          border-radius: 0.375rem;
+	          font-size: 10px;
+	          font-weight: 700;
+	          color: var(--assistant-badge-color);
           letter-spacing: 0.5px;
         }
 
-        .ai-close-btn {
+	        .ai-close-btn {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -329,8 +329,8 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           color: rgba(255, 255, 255, 0.4);
           transition: all 120ms;
           cursor: pointer;
-          border-radius: 4px;
-        }
+	          border-radius: 0.375rem;
+	        }
 
         .ai-close-btn:hover {
           color: rgba(255, 255, 255, 0.9);
@@ -341,15 +341,15 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           transform: scale(0.95);
         }
 
-        .ai-message-area {
+	        .ai-message-area {
           min-height: 140px;
           max-height: 280px;
           overflow-y: auto;
           padding: 12px;
           background: #dfd4c6;
           border: 0.1px solid rgba(0, 0, 0, 0.18);
-          border-radius: 8px;
-        }
+	          border-radius: 0.375rem;
+	        }
 
         .ai-message-area p {
           color: #0a0f0d;
@@ -363,29 +363,29 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           width: 4px;
         }
 
-        .ai-message-area::-webkit-scrollbar-track {
+	        .ai-message-area::-webkit-scrollbar-track {
           background: rgba(255, 255, 255, 0.04);
-          border-radius: 2px;
-        }
+	          border-radius: 0.375rem;
+	        }
 
-        .ai-message-area::-webkit-scrollbar-thumb {
+	        .ai-message-area::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.14);
-          border-radius: 2px;
-        }
+	          border-radius: 0.375rem;
+	        }
 
         .ai-message-area::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.22);
         }
 
-        .ai-input {
+	        .ai-input {
           flex: 1;
           padding: 8px 12px;
           background: #ded6ca;
           border: 0.1px solid rgba(0, 0, 0, 0.2);
-          border-radius: 8px;
-          font-size: 14px;
-          font-weight: 500;
-          color: #0a0f0d;
+	          border-radius: 0.375rem;
+	          font-size: 14px;
+	          font-weight: 500;
+	          color: #0a0f0d;
           transition: all 120ms;
         }
 
@@ -399,7 +399,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           box-shadow: 0 0 0 3px var(--assistant-input-ring);
         }
 
-        .ai-send-btn {
+	        .ai-send-btn {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -407,11 +407,11 @@ export default function SupportAssistantWidget({ mode = "support" }) {
           height: 36px;
           background: var(--assistant-send-bg);
           border: 0.1px solid var(--assistant-send-border);
-          border-radius: 8px;
-          color: var(--assistant-send-color);
-          cursor: pointer;
-          transition: all 120ms;
-        }
+	          border-radius: 0.375rem;
+	          color: var(--assistant-send-color);
+	          cursor: pointer;
+	          transition: all 120ms;
+	        }
 
         .ai-send-btn:hover {
           background: var(--assistant-send-hover-bg);

@@ -63,7 +63,7 @@ export default function WalletDashboardCashModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-cash-modal border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-2xl max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -175,12 +175,12 @@ export default function WalletDashboardCashModal({
 
               <button
               type="button"
-              onClick={() => setCashModalTab("sell")}
-              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
-              cashModalTab === "sell" ?
-              "bg-violet-500/20 text-violet-500 border-violet-500/40 hover:bg-violet-500/30 hover:scale-[1.02]" :
-              "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
-              }>
+	              onClick={() => setCashModalTab("sell")}
+	              className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
+	              cashModalTab === "sell" ?
+	              "bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02]" :
+	              "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"}`
+	              }>
 
                 <div className="flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">

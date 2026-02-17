@@ -18,7 +18,7 @@ export default function WalletDashboardActionRow({
 
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -40,7 +40,7 @@ export default function WalletDashboardActionRow({
 
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4 transition-transform duration-150 group-hover:translate-y-0.5"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -62,7 +62,7 @@ export default function WalletDashboardActionRow({
 
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4 transition-transform duration-150 group-hover:rotate-90"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -86,7 +86,7 @@ export default function WalletDashboardActionRow({
 
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4 transition-transform duration-150 group-hover:scale-110"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

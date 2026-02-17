@@ -47,7 +47,7 @@ export default function StatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="statement-select w-full bg-black/40 border border-white/20 rounded-md px-3 py-1.5 text-sm text-white cursor-pointer hover:border-white/40 transition-colors flex items-center justify-between gap-2"
+        className="statement-select w-full bg-black/40 border border-transparent rounded-md px-3 py-1.5 text-sm text-white cursor-pointer transition-colors flex items-center justify-between gap-2"
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
@@ -71,7 +71,7 @@ export default function StatementMonthSelect({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-md border border-white/10 shadow-2xl ${menuClassName}`}
+          className={`absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-md border border-transparent shadow-2xl ${menuClassName}`}
           onClick={(e) => e.stopPropagation()}
         >
           {options.map((option) => {

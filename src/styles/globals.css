@@ -48,7 +48,7 @@
 
   /* Radius / borders */
   --radius-small: 0.375rem;
-  --radius-medium: 0.75rem;
+  --radius-medium: 0.375rem;
   --border-thin: 1px solid var(--border-subtle);
 }
 
@@ -344,6 +344,34 @@ body.wallet-page {
   }
 }
 
+.header-nav-link.header-nav-link-no-arrow-anim .header-nav-arrow {
+  transition: none !important;
+  transform: none !important;
+}
+
+@media (min-width: 768px) {
+  .header-nav-link.header-nav-link-no-arrow-anim:hover .header-nav-arrow,
+  .header-nav-link.header-nav-link-no-arrow-anim:focus-visible .header-nav-arrow {
+    transform: none !important;
+  }
+}
+
+.wallet-send-modal :where(*) {
+  border-width: 0 !important;
+}
+
+.wallet-receive-modal :where(*) {
+  border-width: 0 !important;
+}
+
+.wallet-convert-modal :where(*) {
+  border-width: 0 !important;
+}
+
+.wallet-cash-modal :where(*) {
+  border-width: 0 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .header-nav-link,
   .header-nav-link .header-nav-label::after,
@@ -464,13 +492,13 @@ body.wallet-page {
     line-height: 1.4;
     font-weight: 500;
     color: #f9fafb;
-    background: linear-gradient(160deg, rgba(12, 18, 24, 0.98), rgba(6, 10, 14, 0.98));
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 10px;
-    box-shadow:
-      0 12px 28px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
-    z-index: 120;
+	    background: linear-gradient(160deg, rgba(12, 18, 24, 0.98), rgba(6, 10, 14, 0.98));
+	    border: 1px solid rgba(255, 255, 255, 0.16);
+	    border-radius: var(--radius-small);
+	    box-shadow:
+	      0 12px 28px rgba(0, 0, 0, 0.45),
+	      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+	    z-index: 120;
     pointer-events: none;
     transition: opacity 0.15s ease, transform 0.15s ease;
   }

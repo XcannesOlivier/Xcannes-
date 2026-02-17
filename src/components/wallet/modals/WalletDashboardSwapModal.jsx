@@ -66,12 +66,12 @@ export default function WalletDashboardSwapModal({
     noticeVariant !== "demo" &&
     isWalletActivated === true &&
     hasRlusdTrustline === false;
-  const blueActionBtnBase =
-    "rounded-lg border border-[#06B6D4]/40 bg-[#06B6D4]/80 text-black font-semibold transition-all duration-200 hover:bg-[#06B6D4] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
-  const blueActionBtnMuted =
-    "rounded-lg border border-[#06B6D4]/30 bg-[#06B6D4]/10 text-[#06B6D4]/70 font-semibold transition-all duration-200 hover:bg-[#06B6D4]/20 hover:text-[#06B6D4] hover:scale-105 active:scale-95";
-  const blueTabInactive =
-    "rounded-lg border border-[#06B6D4]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#06B6D4]/60 hover:text-white/80";
+  const greenActionBtnBase =
+    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
+  const greenActionBtnMuted =
+    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-[#22C55E]/80 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-[#22C55E] hover:scale-105 active:scale-95";
+  const greenTabInactive =
+    "rounded-lg border border-[#22C55E]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#22C55E]/60 hover:text-white/80";
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
@@ -318,7 +318,7 @@ export default function WalletDashboardSwapModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel border border-white/10 overflow-hidden flex flex-col min-h-0 pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-convert-modal border border-white/10 overflow-hidden flex flex-col min-h-0 pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
@@ -406,7 +406,7 @@ export default function WalletDashboardSwapModal({
                     setView("convert");
                   }}
                   className={`px-3 py-2 text-xs md:text-sm ${
-                    view === "convert" ? blueActionBtnMuted : blueTabInactive
+                    view === "convert" ? greenActionBtnMuted : greenTabInactive
                   }`}
                 >
                   {t("ui_convert_8408e969ec", "Convert")}
@@ -418,7 +418,7 @@ export default function WalletDashboardSwapModal({
                     setView("lines");
                   }}
                   className={`px-3 py-2 text-xs md:text-sm ${
-                    view === "lines" ? blueActionBtnMuted : blueTabInactive
+                    view === "lines" ? greenActionBtnMuted : greenTabInactive
                   }`}
                 >
                   {t("ui_currency_lines_267fc2eff3", "Currency lines")}
@@ -462,9 +462,9 @@ export default function WalletDashboardSwapModal({
                 })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
             />
               </div>
 
@@ -492,9 +492,9 @@ export default function WalletDashboardSwapModal({
                 })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#06B6D4]/80 appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
             />
               </div>
 
@@ -508,7 +508,7 @@ export default function WalletDashboardSwapModal({
               placeholder="0.0000"
               token={convertBaseCurrency || "XRP"}
               tokenClassName="text-white"
-              containerClassName="focus-within:!border-[#06B6D4]/80" />
+              containerClassName="focus-within:!border-xcannes-green/80" />
               </div>
               </div>
 
@@ -522,7 +522,7 @@ export default function WalletDashboardSwapModal({
                   <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
                   </div>
-                  <div className="text-sm text-primary">
+                  <div className="text-sm text-xcannes-green">
                     {formatAmount(previewAmount, 6)} {convertQuoteCurrency || "-"}
                   </div>
                   {previewMeta?.route === "allocation" &&
@@ -564,7 +564,7 @@ export default function WalletDashboardSwapModal({
                       e.stopPropagation();
                       onConnectWallet?.();
                     }}
-                    className={`w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
+                    className={`w-full mt-1 text-sm py-2.5 ${greenActionBtnBase}`}
                   >
                     {t("wallet_connect_cta", "Connect wallet")}
                   </button>
@@ -574,7 +574,7 @@ export default function WalletDashboardSwapModal({
                       label={convertButtonLabel}
                       onConfirm={handleConvertAction}
                       disabled={convertButtonDisabled}
-                      variant="cyan"
+                      variant="green"
                       className="mt-1 md:hidden"
                     />
                     <button
@@ -583,7 +583,7 @@ export default function WalletDashboardSwapModal({
                         e.stopPropagation();
                         handleConvertAction();
                       }}
-                      className={`hidden md:block w-full mt-1 text-sm py-2.5 ${blueActionBtnBase}`}
+                      className={`hidden md:block w-full mt-1 text-sm py-2.5 ${greenActionBtnBase}`}
                       disabled={convertButtonDisabled}
                     >
                       {convertButtonLabel}
@@ -643,7 +643,7 @@ export default function WalletDashboardSwapModal({
                 label={t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
                 onConfirm={handleActivateLine}
                 disabled={activateLineDisabled}
-                variant="cyan"
+                variant="green"
                 className="md:hidden" />
                   <button
                 type="button"
@@ -652,7 +652,7 @@ export default function WalletDashboardSwapModal({
                   e.stopPropagation();
                   handleActivateLine();
                 }}
-                className={`hidden md:block w-full px-3 py-2 text-xs ${blueActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+                className={`hidden md:block w-full px-3 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
 
 
               </button>

@@ -387,13 +387,13 @@ export default function Home() {
                     "home_v2_hero_pillar_4_desc",
                     "Indexation USD conforme aux standards financiers.\nConversion multi-devises instantanée."
                   ),
-                  descClassName: "text-[16px] sm:text-[13px]",
-                  className:
-                    "order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 bg-black/30 hover:bg-black/25 py-5 md:py-4 shadow-none hover:shadow-none",
-                  iconWrapperClassName: "w-8 h-8 lg:w-11 lg:h-11",
-                  link: {
-                    label: t("home_v2_hero_pillar_4_link", "Détails"),
-                    onClick: () => openValueModal(),
+	                  descClassName: "text-[16px] sm:text-[13px]",
+	                  className:
+	                    "order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 bg-black/30 hover:bg-black/20 py-5 md:py-4 shadow-none hover:shadow-none",
+	                  iconWrapperClassName: "w-8 h-8 lg:w-11 lg:h-11",
+	                  link: {
+	                    label: t("home_v2_hero_pillar_4_link", "Détails"),
+	                    onClick: () => openValueModal(),
                   },
                   icon:
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
@@ -418,12 +418,12 @@ export default function Home() {
                             }
                           : undefined
                         }
-	                      className={[
-	                        "flex items-start gap-2.5 bg-black/20 hover:bg-black/15 rounded-[12px] px-4 py-7 md:py-4 transition-[background-color] duration-200",
-	                        isClickable
-	                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
-	                          : "",
-	                        item.className
+		                      className={[
+		                        "flex items-start gap-2.5 bg-black/20 hover:bg-black/10 rounded-md px-4 py-7 md:py-4 transition-[background-color] duration-200",
+		                        isClickable
+		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
+		                          : "",
+		                        item.className
 	                      ].filter(Boolean).join(" ")}>
 
                     <div
