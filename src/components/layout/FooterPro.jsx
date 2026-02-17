@@ -26,12 +26,12 @@ export default function FooterPro() {
   {
     name: t("footer_nav_legal", "Informations légales"),
     url: "/disclaimer",
-    svg: (
-      <span className="text-xs text-white/70">
-        🏛️ {t("footer_nav_legal", "Informations légales")}
-      </span>
-    )
-  }];
+	    svg: (
+	      <span className="text-sm text-white/70">
+	        🏛️ {t("footer_nav_legal", "Informations légales")}
+	      </span>
+	    )
+	  }];
 
 
   // Connexion XRPL gérée par le backend - pas besoin de vérifier côté client
@@ -151,8 +151,8 @@ export default function FooterPro() {
     ? t("nav_sign_out", "Se déconnecter")
     : t("nav_sign_in", "Se connecter");
   const walletActionToneClass = isConnected
-    ? "text-white/80 hover:text-red-300 border border-white/20 hover:border-red-500/40 bg-transparent hover:bg-red-500/15"
-    : "text-white/80 hover:text-white bg-transparent";
+    ? "text-white hover:text-white border border-white/25 hover:border-white/40 bg-transparent hover:bg-white/10 transition-transform duration-200 hover:scale-105 active:scale-95 header-nav-link-no-arrow-anim"
+    : "text-white/80 hover:text-white bg-transparent header-nav-link-no-arrow-anim";
 
   const handleWalletAction = useCallback(async () => {
     if (isConnecting) return;
@@ -223,13 +223,13 @@ export default function FooterPro() {
               {t("footer_contact_title")}
             </h4>
             <p className="text-base md:text-sm mb-4">
-              <Link
-                href="/contact"
-                className="text-white/70 hover:text-xcannes-green transition-colors"
-                onClick={withHardNavFallback("/contact")}>
+	              <Link
+	                href="/contact"
+	                className="text-white/70 hover:text-white/90 transition-colors"
+	                onClick={withHardNavFallback("/contact")}>
 
-                {t("footer_contact_email")}
-              </Link>
+	                {t("footer_contact_email")}
+	              </Link>
             </p>
 
             {/* Réseaux sociaux minimalistes */}
@@ -285,14 +285,14 @@ export default function FooterPro() {
             </div>
 
             <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-              <a
-                href="https://icis.corp.delaware.gov/ecorp/entitysearch/namesearch.aspx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-xcannes-green transition-colors">{t("ui_reg_no_10157026_e69505fd0c", "Reg. No. 10157026")}
+	              <a
+	                href="https://icis.corp.delaware.gov/ecorp/entitysearch/namesearch.aspx"
+	                target="_blank"
+	                rel="noopener noreferrer"
+	                className="hover:text-white/90 transition-colors">{t("ui_reg_no_10157026_e69505fd0c", "Reg. No. 10157026")}
 
 
-              </a>
+	              </a>
             </div>
           </div>
         </div>

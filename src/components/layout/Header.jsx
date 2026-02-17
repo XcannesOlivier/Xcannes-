@@ -164,8 +164,8 @@ export default function Header({ fixed = true }) {
     : t("nav_sign_in", "Se connecter");
   const showHomeWalletLink = isHome && isConnected;
   const walletActionToneClass = isConnected
-    ? "text-white/80 hover:text-red-300 border border-white/20 hover:border-red-500/40 bg-transparent hover:bg-red-500/15"
-    : "text-white/80 hover:text-white bg-transparent";
+    ? "text-white hover:text-white border border-white/25 hover:border-white/40 bg-transparent hover:bg-white/10 transition-transform duration-200 hover:scale-105 active:scale-95 header-nav-link-no-arrow-anim"
+    : "text-white/80 hover:text-white bg-transparent header-nav-link-no-arrow-anim";
 
   const handleWalletAction = useCallback(async () => {
     if (isConnecting) return;
@@ -200,14 +200,14 @@ export default function Header({ fixed = true }) {
     // Home: fond noir uniforme
     if (isHome) {
       return scrolled ?
-      "bg-black backdrop-blur-md border-white/10" :
-      "bg-black backdrop-blur-sm border-white/5";
+      "bg-[#07090A] backdrop-blur-md border-white/10" :
+      "bg-[#07090A] backdrop-blur-sm border-white/5";
     }
 
     // Autres pages : header sombre classique
     return scrolled ?
-    "bg-black/95 backdrop-blur-md border-white/10" :
-    "bg-black/80 backdrop-blur-sm border-white/5";
+    "bg-[#07090A] backdrop-blur-md border-white/10" :
+    "bg-[#07090A] backdrop-blur-sm border-white/5";
   })();
 
   return (
@@ -243,39 +243,37 @@ export default function Header({ fixed = true }) {
             </Link>
           }
 
-          {showHomeWalletLink &&
-          <Link
-            href="/wallet"
-            className="header-nav-link header-nav-link-white-hover"
-            onClick={withHardNavFallback("/wallet")}>
+	          {showHomeWalletLink &&
+	          <Link
+	            href="/wallet"
+	            className="header-nav-link header-nav-link-white-hover"
+	            onClick={withHardNavFallback("/wallet")}>
 
-              <span className="header-nav-label">
-                {t("nav_multi_currency_account", "Compte Multi-Devises")}
-              </span>
-              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
-            </Link>
-          }
+	              <span className="header-nav-label">
+	                {t("nav_multi_currency_account", "Mes comptes")}
+	              </span>
+	            </Link>
+	          }
 
-          <button
-            type="button"
-            className={`header-nav-link rounded-md px-3 py-1.5 ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
-            onClick={handleWalletAction}
-            disabled={isConnecting}>
+	          <button
+	            type="button"
+	            className={`header-nav-link rounded-md px-3 py-1.5 ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
+	            onClick={handleWalletAction}
+	            disabled={isConnecting}>
 
-            <span className="header-nav-label">{walletActionLabel}</span>
-            <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
-          </button>
+	            <span className="header-nav-label">{walletActionLabel}</span>
+	          </button>
 
         </nav>
 
         <HeaderLanguageStrip className="hidden md:flex ml-4" />
 
-        {/* Menu mobile minimaliste */}
-        <button
-          className="md:hidden text-white focus:outline-none hover:text-xcannes-green transition-colors"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label={t("ui_toggle_menu_9e88e70e51", "Toggle menu")}
-          aria-expanded={menuOpen}>
+	        {/* Menu mobile minimaliste */}
+	        <button
+	          className="md:hidden text-white focus:outline-none hover:text-white/90 transition-colors"
+	          onClick={() => setMenuOpen(!menuOpen)}
+	          aria-label={t("ui_toggle_menu_9e88e70e51", "Toggle menu")}
+	          aria-expanded={menuOpen}>
           <span className={`header-burger ${menuOpen ? "is-open" : ""}`} aria-hidden="true">
             <span />
             <span />
@@ -311,31 +309,29 @@ export default function Header({ fixed = true }) {
             </Link>
         }
 
-          {showHomeWalletLink &&
-          <Link
-            href="/wallet"
-            onClick={withMobileNavDelay("/wallet")}
-            className="header-nav-link header-nav-link-white-hover w-full justify-between px-8">
+	          {showHomeWalletLink &&
+	          <Link
+	            href="/wallet"
+	            onClick={withMobileNavDelay("/wallet")}
+	            className="header-nav-link header-nav-link-white-hover w-full justify-between px-8">
 
-              <span className="header-nav-label">
-                {t("nav_multi_currency_account", "Compte Multi-Devises")}
-              </span>
-              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
-            </Link>
-          }
+	              <span className="header-nav-label">
+	                {t("nav_multi_currency_account", "Mes comptes")}
+	              </span>
+	            </Link>
+	          }
 
-          <button
-            type="button"
-            onClick={() => {
-              setMenuOpen(false);
-              handleWalletAction();
-            }}
-            className={`header-nav-link w-full justify-between px-8 rounded-md ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
-            disabled={isConnecting}>
+	          <button
+	            type="button"
+	            onClick={() => {
+	              setMenuOpen(false);
+	              handleWalletAction();
+	            }}
+	            className={`header-nav-link w-full justify-between px-8 rounded-md ${walletActionToneClass} disabled:opacity-60 disabled:cursor-not-allowed`}
+	            disabled={isConnecting}>
 
-            <span className="header-nav-label">{walletActionLabel}</span>
-            <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
-          </button>
+	            <span className="header-nav-label">{walletActionLabel}</span>
+	          </button>
 
           <div className="pt-2 w-full flex justify-start px-8">
             <HeaderLanguageStrip />

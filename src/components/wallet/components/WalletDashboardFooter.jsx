@@ -162,13 +162,13 @@ export default function WalletDashboardFooter({
             </Link>
           )}
 
-	          {showInfoButton && (
-	            <button
-	              type="button"
-	              onClick={onOpenInfo}
-              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
-              title={t("wallet_footer_info_title", "Wallet info & fees")}
-            >
+		          {showInfoButton && (
+		            <button
+		              type="button"
+		              onClick={onOpenInfo}
+		              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 font-medium transition-all duration-300"
+		              title={t("wallet_footer_info_title", "Wallet info & fees")}
+		            >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
                 i
               </span>

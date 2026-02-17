@@ -21,7 +21,7 @@
   padding: 0.75rem 0.5rem;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid transparent;
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
@@ -82,7 +82,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   border: 1px solid transparent;
   transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -91,11 +91,11 @@
 
 /* Improvement 3: Enhanced icon hover feedback */
 .wallet-action-btn:hover .wallet-action-icon {
-  transform: scale(1.05); /* Slight grow on hover */
+  transform: none;
 }
 
 .wallet-action-btn:active .wallet-action-icon {
-  transform: scale(0.95); /* Compress on click */
+  transform: none;
 }
 
 /* Label - clean, readable, responsive */

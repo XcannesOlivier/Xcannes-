@@ -1611,12 +1611,12 @@ export default function DemoWalletDashboard({
 		            )}
 		          </a>
 
-			          <div className="w-full mt-1.5 flex justify-center">
-			            <div className="relative w-full max-w-[560px] pr-10">
-			              <div className="w-full min-w-0 rounded-md border border-white/10 bg-black/20 px-2.5 py-1.5 shadow-none">
-				                <div className="flex items-start justify-between gap-3">
-				                  <div className="min-w-0">
-			                    <div className="flex items-center gap-2 min-w-0">
+				          <div className="w-full mt-1.5 flex justify-center">
+				            <div className="flex items-center gap-2 w-full max-w-[460px]">
+				              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
+					                <div className="flex items-start justify-between gap-3">
+					                  <div className="min-w-0">
+				                    <div className="flex items-center gap-2 min-w-0">
 			                      <span className="text-[11px] md:text-[12px] font-semibold text-white/85 truncate">
 			                        {walletContextLabel || t("nav_wallet", "Wallet")}
 			                      </span>
@@ -1648,13 +1648,13 @@ export default function DemoWalletDashboard({
 			                    {!isWalletLabelLocked ? (
 			                      <button
 		                        type="button"
-		                        onClick={handleOpenWalletLabelEditor}
-		                        disabled={isEditingWalletLabel}
-		                        title={t("ui_rename_86c8307e14", "Renommer")}
-			                        className="p-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
-			                        aria-label={t(
-			                          "ui_rename_wallet_8fecb8eee2",
-			                          "Renommer le wallet"
+			                        onClick={handleOpenWalletLabelEditor}
+			                        disabled={isEditingWalletLabel}
+			                        title={t("ui_rename_86c8307e14", "Renommer")}
+				                        className="p-1 rounded-md bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+				                        aria-label={t(
+				                          "ui_rename_wallet_8fecb8eee2",
+				                          "Renommer le wallet"
 		                        )}
 		                      >
 		                        <svg
@@ -1673,15 +1673,15 @@ export default function DemoWalletDashboard({
 		                      </button>
 		                    ) : null}
 
-			                    <button
-			                      type="button"
-			                      onClick={handleCopyWalletAddress}
-			                      title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
-			                      className="p-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-95"
-			                      aria-label={t(
-			                        "ui_copy_xrpl_address_4f63ed10fc",
-			                        "Copier l'adresse XRPL"
-		                      )}
+				                    <button
+				                      type="button"
+				                      onClick={handleCopyWalletAddress}
+				                      title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+				                      className="p-1 rounded-md bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
+				                      aria-label={t(
+				                        "ui_copy_xrpl_address_4f63ed10fc",
+				                        "Copier l'adresse XRPL"
+			                      )}
 		                    >
 		                      <svg
 		                        className="w-4 h-4"
@@ -1766,18 +1766,18 @@ export default function DemoWalletDashboard({
 			                ) : null}
 		              </div>
 
-		              <button
-		                type="button"
-		                onClick={handleRefreshWallet}
-		                disabled={isRefreshing}
-			                title={t("demo_tt_reset", "Réinitialiser la démo.")}
-			                aria-label={t("demo_reset", "Réinitialiser")}
-			                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
-			                  isRefreshing
-			                    ? "text-xcannes-green hover:text-xcannes-green/90"
-			                    : "text-white/60 hover:text-white"
-			                }`}
-			              >
+			              <button
+			                type="button"
+			                onClick={handleRefreshWallet}
+				                disabled={isRefreshing}
+				                title={t("demo_tt_reset", "Réinitialiser la démo.")}
+				                aria-label={t("demo_reset", "Réinitialiser")}
+				                className={`shrink-0 z-10 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+				                  isRefreshing
+				                    ? "text-xcannes-green hover:text-xcannes-green/90"
+				                    : "text-white/60 hover:text-white"
+				                }`}
+				              >
 			                <svg
 			                  className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`}
 			                  fill="currentColor"
@@ -1803,14 +1803,14 @@ export default function DemoWalletDashboard({
             title={t("demo_tt_send", "Envoyer un paiement dans la devise choisie.")}
             className="wallet-action-btn wallet-action-send group">
 
-            <div className="wallet-action-icon">
-              <svg
-                className="w-4 h-4 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
+	            <div className="wallet-action-icon">
+	              <svg
+	                className="w-4 h-4"
+	                viewBox="0 0 24 24"
+	                fill="none"
+	                stroke="currentColor"
+	                strokeWidth="2"
+	                strokeLinecap="round"
                 strokeLinejoin="round">
 
                 <line x1="7" y1="17" x2="17" y2="7"></line>
@@ -1856,14 +1856,14 @@ export default function DemoWalletDashboard({
             title={t("demo_tt_convert", "Convertir entre devises internes (démo).")}
             className="wallet-action-btn wallet-action-swap group">
 
-            <div className="wallet-action-icon">
-              <svg
-                className="w-4 h-4 transition-transform duration-150 group-hover:rotate-90"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
+	            <div className="wallet-action-icon">
+	              <svg
+	                className="w-4 h-4"
+	                viewBox="0 0 24 24"
+	                fill="none"
+	                stroke="currentColor"
+	                strokeWidth="2"
+	                strokeLinecap="round"
                 strokeLinejoin="round">
 
                 <polyline points="17 1 21 5 17 9"></polyline>
@@ -2001,12 +2001,12 @@ export default function DemoWalletDashboard({
 	            {t("ui_xrpl_not_connected_0d0d4a67a1", "XRPL non connecté")}
 	          </div>
 	          <div className="flex items-center gap-2 flex-shrink-0">
-	            <button
-	              type="button"
-	              onClick={() => setWalletInfoOpen(true)}
-	              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
-	              title={t("wallet_footer_info_title", "Wallet info & fees")}
-	            >
+		            <button
+			              type="button"
+			              onClick={() => setWalletInfoOpen(true)}
+			              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 font-medium transition-all duration-300"
+			              title={t("wallet_footer_info_title", "Wallet info & fees")}
+			            >
 	              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
 	                i
 	              </span>

@@ -1771,22 +1771,21 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       wrapperClassNameOverride || action.orderClassName || "";
     const isActive = activeActionKey === action.key;
     const cardClasses = [
-      action.isPlain
-        ? "bg-transparent border-none rounded-none shadow-none"
-        : [
-            "group/card relative w-full text-left cursor-pointer",
-            "bg-transparent hover:bg-white/[0.03] focus-visible:bg-white/[0.03]",
-            "rounded-[12px]",
-            "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.0)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.10)]",
-            "px-5 py-2.5 pl-6 md:py-3",
-            "h-[76px] md:h-[84px]",
-            "flex flex-col justify-center",
-            "transition-[background-color,box-shadow] duration-200 ease-in-out",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15",
-            isActive
-              ? "bg-white/[0.05] before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 md:before:top-2.5 md:before:bottom-2.5 before:w-[2px] before:rounded-full before:bg-white/20"
-              : "",
-          ]
+	      action.isPlain
+	        ? "bg-transparent border-none rounded-none shadow-none"
+	        : [
+	            "group/card relative w-full text-left cursor-pointer",
+	            "bg-transparent hover:bg-white/[0.03] focus-visible:bg-white/[0.03]",
+	            "rounded-md",
+	            "px-5 py-2.5 pl-6 md:py-3",
+	            "h-[76px] md:h-[84px]",
+	            "flex flex-col justify-center",
+	            "transition-[background-color] duration-200 ease-in-out",
+	            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/15",
+	            isActive
+	              ? "bg-white/[0.05] before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 md:before:top-2.5 md:before:bottom-2.5 before:w-[2px] before:rounded-full before:bg-white/20"
+	              : "",
+	          ]
             .filter(Boolean)
             .join(" "),
       action.isPlain ? cardPaddingClassName : "",

@@ -687,44 +687,44 @@ export default function GlobalStatement({
         <div className="flex-1 overflow-hidden px-4 md:px-5 py-4 flex flex-col gap-4 min-h-0">
 
           {/* Controls */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex gap-2 flex-wrap">
-              <button
-              onClick={() => setSortBy("balance")}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-              sortBy === "balance" ?
-              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" :
-              "bg-white/5 text-white/60 hover:bg-white/10"}`
-              }>{t("ui_sort_by_balance_17aed9021c", "Sort by Balance")}
+	          <div className="flex items-center justify-between gap-2">
+	            <div className="flex gap-2 flex-wrap">
+	              <button
+	              onClick={() => setSortBy("balance")}
+	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+	              sortBy === "balance" ?
+	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
+	              "bg-white/5 text-white/60 hover:bg-white/10"}`
+	              }>{t("ui_sort_by_balance_17aed9021c", "Sort by Balance")}
 
 
             </button>
-              <button
-              onClick={() => setSortBy("name")}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-              sortBy === "name" ?
-              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" :
-              "bg-white/5 text-white/60 hover:bg-white/10"}`
-              }>{t("ui_sort_by_name_2590e44f12", "Sort by Name")}
+	              <button
+	              onClick={() => setSortBy("name")}
+	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+	              sortBy === "name" ?
+	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
+	              "bg-white/5 text-white/60 hover:bg-white/10"}`
+	              }>{t("ui_sort_by_name_2590e44f12", "Sort by Name")}
 
 
             </button>
             </div>
           </div>
 
-          {/* Assets Table */}
-          <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
-            <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-black z-10">
-                  <tr className="border-b border-white/10">
-                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_asset_e3ae76ddf7", "Asset")}</th>
-                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_type_c5068d5570", "Type")}</th>
-                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_balance_0ad2d5b8eb", "Balance")}</th>
-                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_usd_value_6925fe3f7e", "≈ USD Value")}</th>
-                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_action_96db311a48", "Action")}</th>
-                  </tr>
-                </thead>
+	          {/* Assets Table */}
+	          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
+	            <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
+	              <table className="w-full text-sm">
+	                <thead className="sticky top-0 bg-black z-10">
+	                  <tr>
+	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_asset_e3ae76ddf7", "Asset")}</th>
+	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_type_c5068d5570", "Type")}</th>
+	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_balance_0ad2d5b8eb", "Balance")}</th>
+	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_usd_value_6925fe3f7e", "≈ USD Value")}</th>
+	                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_action_96db311a48", "Action")}</th>
+	                  </tr>
+	                </thead>
                 <tbody>
                   {sortedTokens.map((token, idx) => {
                   const badge = getCategoryBadge(token);
@@ -776,13 +776,13 @@ export default function GlobalStatement({
                         "--"}
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
-                          <button
-                          onClick={() => onViewCurrency && onViewCurrency(token)}
-                          className="px-2 sm:px-3 py-1 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded text-[9px] sm:text-xs font-medium transition-colors border border-xcannes-green/30 whitespace-nowrap">
+	                          <button
+	                          onClick={() => onViewCurrency && onViewCurrency(token)}
+	                          className="px-2 sm:px-3 py-1 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded text-[9px] sm:text-xs font-medium transition-colors border border-transparent whitespace-nowrap">
 
-                            <span className="hidden sm:inline">
-                              {t("view_statement", "View Statement")}
-                            </span>
+	                            <span className="hidden sm:inline">
+	                              {t("view_statement", "View Statement")}
+	                            </span>
                             <span className="sm:hidden">{t("view", "View")}</span>
                           </button>
                         </td>
@@ -795,36 +795,31 @@ export default function GlobalStatement({
           </div>
 
           {/* Watermark */}
-          <div className="hidden sm:block text-center py-3 sm:py-4">
-            <div className="space-y-1">
-              <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{t("ui_generated_on_3827d9035f", "Generated on")}
-              {new Date().toLocaleString(locale)}
-              </p>
-              <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{ledgerStatusLabel}</p>
-              {ledgerLastIndex != null ?
-            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
-                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-                  {ledgerLastIndex}
-                </p> :
-            null}
-              <p className="text-[9px] sm:text-xs text-white/10 font-mono px-2 break-all">
-                {t("ui_document_hash_label_9b5c1a2d7e", "Document hash:")}{" "}
-                {docHash || "-"}
-              </p>
-            </div>
-          </div>
+	          <div className="hidden sm:block text-center py-3 sm:py-4">
+	            <div className="space-y-1">
+	              <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{t("ui_generated_on_3827d9035f", "Generated on")}
+	              {new Date().toLocaleString(locale)}
+	              </p>
+	              {ledgerLastIndex != null ?
+	            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
+	                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
+	                  {ledgerLastIndex}
+	                </p> :
+	            null}
+	            </div>
+	          </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="border-t border-white/10 px-3 sm:px-6 py-3 sm:py-4 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
-          <div className="flex gap-2 flex-wrap">
-            <button
-            onClick={handleExportPdf}
-            disabled={exportFormat === "pdf"}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15 disabled:opacity-50">
+	        <div className="px-3 sm:px-6 py-3 sm:py-4 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
+	          <div className="flex gap-2 flex-wrap">
+	            <button
+	            onClick={handleExportPdf}
+	            disabled={exportFormat === "pdf"}
+	            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-transparent disabled:opacity-50">
 
-              {exportFormat === "pdf" ? (
-                <span className="text-[9px] sm:text-inherit">
+	              {exportFormat === "pdf" ? (
+	                <span className="text-[9px] sm:text-inherit">
                   {t("ui_loading_1386baebe9", "Loading…")}
                 </span>
               ) : (
@@ -835,20 +830,20 @@ export default function GlobalStatement({
 
 
           </button>
-            <button
-            onClick={handleExportCsv}
-            disabled={exportFormat === "csv"}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15 disabled:opacity-50">
+	            <button
+	            onClick={handleExportCsv}
+	            disabled={exportFormat === "csv"}
+	            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-transparent disabled:opacity-50">
 
-              {exportFormat === "csv" ?
-              t("ui_loading_1386baebe9", "Loading…") :
+	              {exportFormat === "csv" ?
+	              t("ui_loading_1386baebe9", "Loading…") :
               t("ui_export_csv_2f8a1b9d5e", "Export CSV")}
 
 
           </button>
-            <button
-            onClick={handlePrint}
-            className="hidden md:inline-flex md:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-white/15">{t("ui_print_eb5de3a228", "🖨️ Print")}
+	            <button
+	            onClick={handlePrint}
+	            className="hidden md:inline-flex md:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-transparent">{t("ui_print_eb5de3a228", "🖨️ Print")}
 
 
           </button>

@@ -71,14 +71,14 @@ export default function WalletDashboardHeader({
         <div />
         }
         {/* Bouton Connect ou Déconnecter */}
-        {effectiveIsConnected && effectiveWallet ?
-        <button
-          type="button"
-          onClick={() => onDisconnect?.()}
-          className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/60 hover:text-red-400 rounded-md transition-colors">{t("nav_sign_out", "Se déconnecter")}
+	        {effectiveIsConnected && effectiveWallet ?
+	        <button
+	          type="button"
+	          onClick={() => onDisconnect?.()}
+	          className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/90 rounded-md transition-colors">{t("nav_sign_out", "Se déconnecter")}
 
 
-        </button> :
+	        </button> :
 
         <XummConnectButton small variant="statement-blue" />
         }
@@ -108,14 +108,14 @@ export default function WalletDashboardHeader({
 
 	        </a>
 
-        {/* Affichage du wallet connecté à la place du menu déroulant */}
-        {effectiveIsConnected && effectiveWallet &&
-	          <div className="w-full mt-1.5 px-2 flex justify-center">
-	            <div className="relative w-full max-w-[560px] pr-10">
-	              <div className="w-full min-w-0 rounded-md border border-white/10 bg-black/20 px-2.5 py-1.5 shadow-none">
-	                <div className="flex items-start justify-between gap-3">
-	                  <div className="min-w-0">
-	                    <div className="flex items-center gap-2 min-w-0">
+	        {/* Affichage du wallet connecté à la place du menu déroulant */}
+	        {effectiveIsConnected && effectiveWallet &&
+		          <div className="w-full mt-1.5 px-2 flex justify-center">
+		            <div className="flex items-center gap-2 w-full max-w-[460px]">
+		              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
+		                <div className="flex items-start justify-between gap-3">
+		                  <div className="min-w-0">
+		                    <div className="flex items-center gap-2 min-w-0">
                       <span
                       className={`h-2 w-2 rounded-full ring-4 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
                       xrplConnectionIndicator.pulse ? "animate-pulse" : ""}`
@@ -150,11 +150,11 @@ export default function WalletDashboardHeader({
 	                  <div className="flex items-center gap-2 shrink-0">
 	                  {!isWalletLabelLocked &&
 	                  <button
-                    type="button"
-                    onClick={onOpenWalletLabelEditor}
-                    title={t("ui_rename_86c8307e14", "Renommer")}
-	                    className="p-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-md transition-all active:scale-95"
-	                    aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
+	                    type="button"
+	                    onClick={onOpenWalletLabelEditor}
+	                    title={t("ui_rename_86c8307e14", "Renommer")}
+		                    className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
+		                    aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
 
                     <svg
                       className="w-4 h-4"
@@ -172,12 +172,12 @@ export default function WalletDashboardHeader({
                   </button>
                   }
 
-	                    <button
-	                    type="button"
-	                    onClick={onCopyAddress}
-	                    title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
-	                    className="p-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-md transition-all active:scale-95"
-	                    aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
+		                    <button
+		                    type="button"
+		                    onClick={onCopyAddress}
+		                    title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+		                    className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
+		                    aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
 
                       <svg
                       className="w-4 h-4"
@@ -259,22 +259,22 @@ export default function WalletDashboardHeader({
 
                       </svg>
                     </button>
-                    }
-                  </div>
-              }
-              </div>
+		                    }
+		                  </div>
+		              }
+		              </div>
 
-              <button
-              type="button"
-              onClick={onRefreshWallet}
-              disabled={isConnecting || isRefreshing}
-              title={t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
-	              className={`absolute right-0 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
-	              isRefreshing ?
-	              "text-xcannes-green hover:text-xcannes-green/90" :
-	              "text-white/60 hover:text-white"}`
-	              }
-	              aria-label={t("ui_refresh_wallet_label_7b2d1a9c4e", "Recharger le wallet")}>
+		              <button
+		              type="button"
+		              onClick={onRefreshWallet}
+		              disabled={isConnecting || isRefreshing}
+		              title={t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
+			              className={`shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+			              isRefreshing ?
+			              "text-xcannes-green hover:text-xcannes-green/90" :
+			              "text-white/60 hover:text-white"}`
+			              }
+			              aria-label={t("ui_refresh_wallet_label_7b2d1a9c4e", "Recharger le wallet")}>
 
 	                <svg
 	                className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`}
