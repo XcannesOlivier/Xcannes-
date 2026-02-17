@@ -53,20 +53,28 @@ export default function WalletDashboardTokenRow({
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
-  const demoRlusd =
-  token?.demoRlusdValue != null && Number.isFinite(Number(token.demoRlusdValue)) ?
-  Number(token.demoRlusdValue) :
-  rawValue;
-
   const displayValue =
   currencyCode === "XRP" && Number.isFinite(rawValue) ?
   Math.min(rawValue, 5) :
   rawValue;
 
-  const showWalletActivationNotice =
-  currencyCode === "XRP" && isWalletActivated === false;
-  const showRlusdTrustlineNotice =
-  currencyCode === "RLUSD" && isMissingTrustline;
+  const currencyLabel =
+    currencyCode === "XRP"
+      ? "XRP · Native"
+      : currencyCode === "RLUSD"
+      ? "RLUSD Token"
+      : getCurrencyDescription(currencyCode) ||
+        (isStablecoin(currencyCode)
+          ? "XRPL Stablecoin"
+          : isLineCurrency
+          ? `${getCurrencyDescription(currencyCode)}`
+          : "XRPL Token");
+
+		  const showWalletActivationNotice =
+		  currencyCode === "XRP" && isWalletActivated === false;
+		  const showRlusdTrustlineNotice =
+		  currencyCode === "RLUSD" && isMissingTrustline;
+	  const rowSurfaceClass = "bg-black/20 hover:bg-black/15";
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;
@@ -87,27 +95,19 @@ export default function WalletDashboardTokenRow({
         className="w-full text-left">
 
         <div
-          className={`flex items-center gap-3 rounded-md bg-black/40 border border-white/10 px-3 py-2 transition-colors cursor-pointer hover:border-white/20 ${tokenRowClass}`}>
+          className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}>
 
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
-            <div className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}>
-              {renderTokenIcon(token)}
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-xs text-primary truncate">{token?.currency}</span>
-              <span className="text-[11px] text-muted truncate">
-                {token?.currency === "XRP" ?
-                "XRP · Native" :
-                token?.isTrustlineOnly ?
-                `${getCurrencyDescription(token?.currency)}` :
-                isStablecoin(token?.currency) ?
-                "XRPL Stablecoin" :
-                token?.currency === "RLUSD" ?
-                "RLUSD Token" :
-                "XRPL Token"}
-              </span>
-            </div>
-          </div>
+	            <div className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}>
+	              {renderTokenIcon(token)}
+	            </div>
+	            <div className="min-w-0">
+	              <div className="flex items-baseline gap-2 min-w-0">
+		                <span className="text-[13px] text-primary truncate">{token?.currency}</span>
+		                <span className="text-[12px] text-muted truncate">{currencyLabel}</span>
+		              </div>
+		            </div>
+		          </div>
           {showWalletActivationNotice ? (
             <div className="flex-1 min-w-0 px-2">
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-blue-200/90 text-center leading-snug">
@@ -228,26 +228,17 @@ export default function WalletDashboardTokenRow({
           ) : (
             <div className="flex-1" />
           )}
-          <div className="text-right text-[12px] text-primary shrink-0">
-            <div className="font-mono">
-              {Number.isFinite(displayValue) ?
-              displayValue.toLocaleString("en-US", {
-                maximumFractionDigits: 4
-              }) :
-              "0"}
-            </div>
-            <div className="mt-0.5 text-[10px] text-muted font-normal">
-              ≈{" "}
-              {Number.isFinite(demoRlusd) ?
-              demoRlusd.toLocaleString("en-US", {
-                maximumFractionDigits: 2
-              }) :
-              "0"}{" "}{t("ui_rlusd_f36819f8e2", "RLUSD")}
-
-            </div>
-          </div>
-        </div>
-      </div>
+		          <div className="text-right text-[13px] text-primary shrink-0">
+		            <div className="font-mono">
+		              {Number.isFinite(displayValue) ?
+		              displayValue.toLocaleString("en-US", {
+	                maximumFractionDigits: 4
+	              }) :
+	              "0"}
+	            </div>
+	          </div>
+	        </div>
+	      </div>
 
     </div>);
 

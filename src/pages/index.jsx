@@ -235,12 +235,12 @@ export default function Home() {
 
       <Header />
 
-      <div className="pt-16 bg-xcannes-background">
+      <div className="pt-16 bg-[#0b0f10]">
 
         {/* HERO (more “private bank” tone) */}
         <main className="relative overflow-hidden">
           <div className="absolute inset-0 bg-[#0b0f10] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-xcannes-background md:h-36" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0b0f10] md:h-36" />
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-28">
             <div className="mx-auto max-w-3xl text-center">
@@ -418,13 +418,13 @@ export default function Home() {
                             }
                           : undefined
                         }
-                      className={[
-                        "flex items-start gap-2.5 bg-black/20 hover:bg-black/15 rounded-[12px] px-4 py-7 md:py-4 shadow-[0_10px_28px_rgba(0,0,0,0.22)] hover:shadow-[0_14px_36px_rgba(0,0,0,0.28)] transition-[background-color,box-shadow] duration-200",
-                        isClickable
-                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
-                          : "",
-                        item.className
-                      ].filter(Boolean).join(" ")}>
+	                      className={[
+	                        "flex items-start gap-2.5 bg-black/20 hover:bg-black/15 rounded-[12px] px-4 py-7 md:py-4 transition-[background-color] duration-200",
+	                        isClickable
+	                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
+	                          : "",
+	                        item.className
+	                      ].filter(Boolean).join(" ")}>
 
                     <div
                       className={[
@@ -963,7 +963,7 @@ export default function Home() {
           )}
       </div>
 
-      <section className="md:hidden px-6 pb-6 -mt-2">
+      <section className="md:hidden px-6 pb-6 -mt-2 bg-[#0b0f10]">
         <div className="flex flex-col items-center justify-center gap-4 text-center">
           <p className="text-sm text-white/70">
             {t(
@@ -1012,7 +1012,7 @@ export default function Home() {
       </section>
 
       {/* CONTENT SECTIONS */}
-      <div className="bg-xcannes-background">
+      <div className="bg-[#0b0f10]">
         <WalletProductSection />
         <section className="relative py-14 sm:py-16 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">

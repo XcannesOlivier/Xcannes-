@@ -162,10 +162,10 @@ export default function WalletDashboardFooter({
             </Link>
           )}
 
-          {showInfoButton && (
-            <button
-              type="button"
-              onClick={onOpenInfo}
+	          {showInfoButton && (
+	            <button
+	              type="button"
+	              onClick={onOpenInfo}
               className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
               title={t("wallet_footer_info_title", "Wallet info & fees")}
             >
@@ -176,18 +176,11 @@ export default function WalletDashboardFooter({
                 {t("wallet_footer_info_fees", "Info & Fees")}
               </span>
               <span className="sm:hidden">{t("wallet_footer_info", "Info")}</span>
-            </button>
-          )}
+	            </button>
+	          )}
 
-          <div
-            className={`${
-              isFullPageView ? "block" : "hidden sm:block"
-            } text-[10px] text-[#0f7fe1]/80`}
-          >
-            {t("wallet_footer_secured_xumm", "Secured via XUMM")}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+	        </div>
+	      </div>
+	    </div>
+	  );
+	}

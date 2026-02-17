@@ -32,6 +32,8 @@ const MoonPaySellModal = ({
   isOpen,
   onClose,
   walletAddress,
+  walletLabel = "",
+  hideWalletAddress = false,
   embedded = false,
   isPreviewMode = false,
   noticeVariant = "preview",
@@ -468,9 +470,9 @@ const MoonPaySellModal = ({
 	                      "Select cryptocurrency to sell"
 	                    )}
 	                  </label>
-                  <ModalSelect
-          value={currency}
-          onChange={setCurrency}
+	                  <ModalSelect
+	          value={currency}
+	          onChange={setCurrency}
           options={supportedCurrencies.map((curr) => ({
             value: curr.code,
             label: curr.label || curr.name || curr.code,
@@ -484,13 +486,13 @@ const MoonPaySellModal = ({
               curr.code,
             icon: curr.icon || null,
           }))}
-          useNativeSelect={false}
-          showMobileOptionRight={true}
-          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
-          menuClassName="bg-elevated"
-          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
-        />
-                </div>
+	          useNativeSelect={false}
+	          showMobileOptionRight={true}
+	          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
+	          menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
+	          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
+	        />
+	                </div>
 
                 {/* Amount input */}
 	                <div>
@@ -541,18 +543,18 @@ const MoonPaySellModal = ({
 	                  <label className="block text-sm font-medium text-white/80 mb-2">
 	                    {t("moonpay_receive_in", "Receive in")}
 	                  </label>
-                  <ModalSelect
-          value={fiatSelectValue}
-          onChange={setQuoteCurrency}
+	                  <ModalSelect
+	          value={fiatSelectValue}
+	          onChange={setQuoteCurrency}
           options={fiatOptions}
-          placeholder={fiatPlaceholder}
-          disabled={fiatLoading || fiatCurrencies.length === 0}
-          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
-          menuClassName="bg-elevated"
-          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
-        />
-                  {showFiatError && (
-                    <p className="text-xs text-red-400 mt-1">{fiatError}</p>
+	          placeholder={fiatPlaceholder}
+	          disabled={fiatLoading || fiatCurrencies.length === 0}
+	          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
+	          menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
+	          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
+	        />
+	                  {showFiatError && (
+	                    <p className="text-xs text-red-400 mt-1">{fiatError}</p>
                   )}
                   {!fiatLoading && !fiatError && fiatUnavailable && (
                     <p className="text-xs text-white/50 mt-1">
@@ -564,15 +566,21 @@ const MoonPaySellModal = ({
                   )}
                 </div>
 
-                {/* Wallet address display */}
-	                <div className="bg-black/40 border border-white/10 rounded-lg p-3">
-	                  <p className="text-xs text-white/60 mb-1">
-	                    {t("moonpay_from_wallet", "From wallet")}
-	                  </p>
-	                  <p className="text-sm text-white/90 font-mono break-all">
-	                    {walletAddress}
-	                  </p>
-	                </div>
+	                {/* Wallet address display */}
+		                <div className="bg-black/40 border border-white/10 rounded-lg p-3">
+		                  <p className="text-xs text-white/60 mb-1">
+		                    {t("moonpay_from_wallet", "From wallet")}
+		                  </p>
+		                  {hideWalletAddress && String(walletLabel || "").trim() ? (
+		                    <p className="text-sm text-white/90 font-semibold truncate">
+		                      {walletLabel}
+		                    </p>
+		                  ) : (
+		                    <p className="text-sm text-white/90 font-mono break-all">
+		                      {walletAddress}
+		                    </p>
+		                  )}
+		                </div>
 
                 {/* Error message */}
                 {error &&
@@ -727,14 +735,18 @@ const MoonPaySellModal = ({
       />
 
       
-      {/* Modal */}
-      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
-        <div
-          className={`relative w-full wallet-modal-panel max-w-2xl bg-elevated border border-subtle rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
-            isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
+	      {/* Modal */}
+	      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
+	        <div
+	          className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
+	            noticeVariant === "demo"
+	              ? "bg-[#0b0f10] border-white/10"
+	              : "bg-elevated border-subtle"
+	          } ${
+	            isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
+	          }`}
+	          onClick={(e) => e.stopPropagation()}
+	        >
 
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
@@ -744,7 +756,7 @@ const MoonPaySellModal = ({
 
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-xcannes-green text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}

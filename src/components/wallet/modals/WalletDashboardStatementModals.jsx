@@ -12,6 +12,7 @@ export default function WalletDashboardStatementModals({
   augmentedTokens,
   backendWalletAddress,
   effectiveWallet,
+  walletDisplayLabel = "",
   isPreviewMode = false,
   isWalletActivated = null,
   noticeVariant = "preview",
@@ -339,6 +340,7 @@ export default function WalletDashboardStatementModals({
           <GlobalStatement
             tokens={augmentedTokens}
             walletAddress={effectiveWallet}
+            walletLabelOverride={walletDisplayLabel}
             isPreviewMode={isPreviewMode}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
@@ -365,17 +367,18 @@ export default function WalletDashboardStatementModals({
         </div>
       ) : null}
 
-      {inlineCurrencyStatement && selectedStatementToken ? (
-        <div className={inlineCurrencyStatementClassName}>
-          <CurrencyStatement
-            currency={selectedStatementToken.currency}
-            balance={parseFloat(selectedStatementToken.value || 0)}
-            issuer={selectedStatementToken.issuer}
-            walletAddress={effectiveWallet}
-            backendWalletAddress={backendWalletAddress}
-            isPreviewMode={isPreviewMode}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
+	      {inlineCurrencyStatement && selectedStatementToken ? (
+	        <div className={inlineCurrencyStatementClassName}>
+	          <CurrencyStatement
+	            currency={selectedStatementToken.currency}
+	            balance={parseFloat(selectedStatementToken.value || 0)}
+	            issuer={selectedStatementToken.issuer}
+	            walletAddress={effectiveWallet}
+	            walletLabelOverride={walletDisplayLabel}
+	            backendWalletAddress={backendWalletAddress}
+	            isPreviewMode={isPreviewMode}
+	            isWalletActivated={isWalletActivated}
+	            hasRlusdTrustline={hasRlusdTrustline}
             noticeVariant={noticeVariant}
             noticeContextLabel={noticeContextLabel}
             walletId={walletId}
@@ -411,6 +414,7 @@ export default function WalletDashboardStatementModals({
         <GlobalStatement
           tokens={augmentedTokens}
           walletAddress={effectiveWallet}
+          walletLabelOverride={walletDisplayLabel}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}
           hasRlusdTrustline={hasRlusdTrustline}
@@ -443,6 +447,7 @@ export default function WalletDashboardStatementModals({
           balance={parseFloat(effectiveCurrencyToken.value || 0)}
           issuer={effectiveCurrencyToken.issuer}
           walletAddress={effectiveWallet}
+          walletLabelOverride={walletDisplayLabel}
           backendWalletAddress={backendWalletAddress}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}

@@ -27,7 +27,7 @@ export function WalletInfoContent({
 
           </h3>
           {noticeVariant === "demo" ? (
-            <span className="inline-flex items-center text-xcannes-green text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
+            <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
               {t("demo_notice_title", "Mode démo")}
             </span>
           ) : null}
@@ -165,10 +165,15 @@ export default function WalletInfoModal({
   const wrapperClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
+  const panelVariantClass =
+    noticeVariant === "demo"
+      ? "bg-[#0b0f10] border-white/10"
+      : "bg-elevated border-subtle";
   const panelClass = [
     inline
-      ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-6 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
-      : "relative w-full wallet-modal-panel max-w-2xl bg-elevated border border-subtle rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl",
+      ? "relative w-full wallet-modal-panel h-full border rounded-xl p-4 md:p-6 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
+      : "relative w-full wallet-modal-panel max-w-2xl border rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl",
+    panelVariantClass,
     inline ? "wallet-inline-zoom-in" : "",
     !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ]

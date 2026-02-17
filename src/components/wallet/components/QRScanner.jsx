@@ -257,18 +257,18 @@ export default function QRScanner({
   const showEmbeddedFauxQr = embedded && showFauxQrBackground && !showStaticImage;
   const showStaticQr = showStaticImage && (staticImageSrc || staticContent);
 
-  const scannerCard =
-  <div
-    className={[
-    embedded ?
-    "relative rounded-xl border border-white/10 bg-black/20 p-4" :
-    "relative w-full max-w-md bg-elevated border border-subtle rounded-2xl p-6 shadow-2xl",
-    showEmbeddedFauxQr ? "overflow-hidden" : "",
-    embedded ? "wallet-inline-zoom-in" : "",
-    !embedded ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
-    className].
-    filter(Boolean).
-    join(" ")} >
+	  const scannerCard =
+	  <div
+	    className={[
+	    embedded ?
+	    "relative rounded-xl border border-white/10 bg-black/20 p-4" :
+	    "relative w-full max-w-md bg-[#0b0f10] border border-white/10 rounded-2xl p-6 shadow-2xl",
+	    showEmbeddedFauxQr ? "overflow-hidden" : "",
+	    embedded ? "wallet-inline-zoom-in" : "",
+	    !embedded ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+	    className].
+	    filter(Boolean).
+	    join(" ")} >
       {showEmbeddedFauxQr ? (
         <div
           aria-hidden="true"
