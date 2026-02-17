@@ -5,22 +5,26 @@ import { useCallback } from "react";
 export function useWalletMeta({
   walletAddress,
   walletLabel,
+  hideAddress = false,
   addressBadge,
   addressBadgeClassName = "",
   addressTitle = ""
 } = {}) {
   const renderWalletMeta = useCallback(
     (className = "") => {
-      if (!walletAddress) return null;
+      const resolvedLabel = String(walletLabel || "").trim();
+      const resolvedAddress = String(walletAddress || "").trim();
+      if (!resolvedAddress && !resolvedLabel) return null;
       return (
         <div className={`text-[10px] text-white/50 ${className}`}>
           <div className="font-semibold text-white/70">
-            {walletLabel || "Wallet"}
+            {resolvedLabel || "Wallet"}
           </div>
-          <div className="font-mono flex flex-wrap items-center gap-2">
-            <span className="break-all" title={addressTitle || undefined}>
-              {walletAddress}
-            </span>
+          {!hideAddress && resolvedAddress ? (
+            <div className="font-mono flex flex-wrap items-center gap-2">
+              <span className="break-all" title={addressTitle || undefined}>
+                {resolvedAddress}
+              </span>
             {addressBadge ? (
               <span
                 className={[
@@ -33,11 +37,32 @@ export function useWalletMeta({
                 {addressBadge}
               </span>
             ) : null}
-          </div>
+            </div>
+          ) : addressBadge ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={[
+                  "text-[10px] font-semibold",
+                  addressBadgeClassName,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {addressBadge}
+              </span>
+            </div>
+          ) : null}
         </div>
       );
     },
-    [walletAddress, walletLabel, addressBadge, addressBadgeClassName, addressTitle]
+    [
+      addressBadge,
+      addressBadgeClassName,
+      addressTitle,
+      hideAddress,
+      walletAddress,
+      walletLabel,
+    ]
   );
 
   return { renderWalletMeta };

@@ -244,9 +244,14 @@ export default function WalletDashboard({
     activationDestination: XCANNES_ACTIVATION_WALLET_ADDRESS,
     renameFeeRlusd: WALLET_LABEL_FEE_RLUSD,
   });
+  const defaultWalletLabel = t("nav_wallet", "Wallet");
+  const walletHasCustomLabel = Boolean(
+    String(walletLabel || "").trim() && String(walletLabel || "").trim() !== defaultWalletLabel
+  );
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
     walletLabel,
+    hideAddress: walletHasCustomLabel,
   });
 
   const [cashBuyPrefill, setCashBuyPrefill] = useState(null);
@@ -2181,39 +2186,40 @@ export default function WalletDashboard({
 
   return (
     <>
-      <div
-        className={`bg-elevated h-full min-h-0 ${layout.containerClass} ${
-          showDesktopStatementPanel
-            ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-6"
-            : "flex flex-col"
-        }`}
-      >
+	      <div
+	        className={`bg-[#0b0f10] h-full min-h-0 ${layout.containerClass} ${
+	          showDesktopStatementPanel
+	            ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-6"
+	            : "flex flex-col"
+	        }`}
+	      >
         <div className="flex flex-col min-h-0">
           {/* Header */}
-        <WalletDashboardHeader
-          layout={layout}
-          effectiveIsConnected={effectiveIsConnected}
-          effectiveWallet={effectiveWallet}
-          onDisconnect={disconnect}
-          totalLabel={previewTotalLabel || totalLabel}
-            onOpenGlobalStatement={handleOpenGlobalStatement}
-          xrplConnectionIndicator={xrplConnectionIndicator}
-          walletLabel={walletLabel}
-          walletHeaderToast={walletHeaderToast}
-          onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
-          onCopyAddress={handleCopyAddress}
-          onRefreshWallet={handleRefreshWallet}
-          isConnecting={isConnecting}
-          isRefreshing={isRefreshing}
-          isEditingWalletLabel={isEditingWalletLabel}
-          isWalletLabelRequired={isWalletLabelRequired}
-          isWalletLabelLocked={isWalletLabelLocked}
-          walletLabelDraft={walletLabelDraft}
-          onWalletLabelDraftChange={setWalletLabelDraft}
-          onSaveWalletLabel={handleSaveWalletLabel}
-          onCancelWalletLabel={handleCancelWalletLabel}
-          showMobileHomeLink={showMobileHomeLink}
-        />
+	        <WalletDashboardHeader
+	          layout={layout}
+	          effectiveIsConnected={effectiveIsConnected}
+	          effectiveWallet={effectiveWallet}
+	          onDisconnect={disconnect}
+	          totalLabel={previewTotalLabel || totalLabel}
+	            onOpenGlobalStatement={handleOpenGlobalStatement}
+	          xrplConnectionIndicator={xrplConnectionIndicator}
+	          walletLabel={walletLabel}
+	          walletHeaderToast={walletHeaderToast}
+	          onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
+	          onCopyAddress={handleCopyAddress}
+	          onRefreshWallet={handleRefreshWallet}
+	          isConnecting={isConnecting}
+	          isRefreshing={isRefreshing}
+	          isEditingWalletLabel={isEditingWalletLabel}
+	          isWalletLabelRequired={isWalletLabelRequired}
+	          isWalletLabelLocked={isWalletLabelLocked}
+	          walletLabelDraft={walletLabelDraft}
+	          onWalletLabelDraftChange={setWalletLabelDraft}
+	          onSaveWalletLabel={handleSaveWalletLabel}
+	          onCancelWalletLabel={handleCancelWalletLabel}
+	          showMobileHomeLink={showMobileHomeLink}
+	          hideWalletAddress={walletHasCustomLabel}
+	        />
 
           {/* Action row: Send / Receive / Exchange / Buy */}
           <WalletDashboardActionRow
@@ -2418,25 +2424,27 @@ export default function WalletDashboard({
               />
             ) : null}
 
-            {showInlineCash ? (
-              <WalletDashboardCashModal
-                open
-                inline
-                onClose={() => {
-                  setActiveAction(null);
-                  setCashBuyPrefill(null);
-                }}
-                isPreviewMode={isPreviewMode}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-                cashModalTab={cashModalTab}
-                setCashModalTab={setCashModalTab}
-                renderWalletMeta={renderWalletMeta}
-                availableTokens={augmentedTokens}
-                rlusdPerUnitRates={rlusdPerUnitRates}
-                selectLabelByCurrency={selectLabelByAssetKey}
-                selectLabelRightByCurrency={selectLabelRightByAssetKey}
-                selectIconByCurrency={selectIconByAssetKey}
+	            {showInlineCash ? (
+	              <WalletDashboardCashModal
+	                open
+	                inline
+	                onClose={() => {
+	                  setActiveAction(null);
+	                  setCashBuyPrefill(null);
+	                }}
+	                isPreviewMode={isPreviewMode}
+	                isWalletActivated={isWalletActivated}
+	                hasRlusdTrustline={hasRlusdTrustline}
+	                cashModalTab={cashModalTab}
+	                setCashModalTab={setCashModalTab}
+	                renderWalletMeta={renderWalletMeta}
+	                walletLabel={walletLabel}
+	                hideWalletAddress={walletHasCustomLabel}
+	                availableTokens={augmentedTokens}
+	                rlusdPerUnitRates={rlusdPerUnitRates}
+	                selectLabelByCurrency={selectLabelByAssetKey}
+	                selectLabelRightByCurrency={selectLabelRightByAssetKey}
+	                selectIconByCurrency={selectIconByAssetKey}
                 selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
                 walletAddress={effectiveWallet || ""}
                 buyPrefill={cashBuyPrefill}
@@ -2505,15 +2513,16 @@ export default function WalletDashboard({
               />
             ) : null}
 
-            {showInlineCurrencyStatement ? (
-              <WalletDashboardStatementModals
-                augmentedTokens={augmentedTokens}
-                backendWalletAddress={backendWalletAddress}
-                effectiveWallet={effectiveWallet}
-                isPreviewMode={isPreviewMode}
-                isWalletActivated={isWalletActivated}
-                isFullPageView={isFullPageView}
-                statementVariant={statementVariant}
+	            {showInlineCurrencyStatement ? (
+	              <WalletDashboardStatementModals
+	                augmentedTokens={augmentedTokens}
+	                backendWalletAddress={backendWalletAddress}
+	                effectiveWallet={effectiveWallet}
+	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
+	                isPreviewMode={isPreviewMode}
+	                isWalletActivated={isWalletActivated}
+	                isFullPageView={isFullPageView}
+	                statementVariant={statementVariant}
                 usdRates={usdRates}
                 showGlobalStatement={showGlobalStatement}
                 setShowGlobalStatement={setShowGlobalStatement}
@@ -2527,15 +2536,16 @@ export default function WalletDashboard({
               />
             ) : null}
 
-            {showInlineGlobalStatement ? (
-              <WalletDashboardStatementModals
-                augmentedTokens={augmentedTokens}
-                backendWalletAddress={backendWalletAddress}
-                effectiveWallet={effectiveWallet}
-                isPreviewMode={isPreviewMode}
-                isWalletActivated={isWalletActivated}
-                isFullPageView={isFullPageView}
-                statementVariant={statementVariant}
+	            {showInlineGlobalStatement ? (
+	              <WalletDashboardStatementModals
+	                augmentedTokens={augmentedTokens}
+	                backendWalletAddress={backendWalletAddress}
+	                effectiveWallet={effectiveWallet}
+	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
+	                isPreviewMode={isPreviewMode}
+	                isWalletActivated={isWalletActivated}
+	                isFullPageView={isFullPageView}
+	                statementVariant={statementVariant}
                 usdRates={usdRates}
                 showGlobalStatement={showGlobalStatement}
                 setShowGlobalStatement={setShowGlobalStatement}
@@ -2676,23 +2686,25 @@ export default function WalletDashboard({
             adjustmentFeeRlusd={ADJUSTMENT_FEE_RLUSD}
           />
 
-	      <WalletDashboardCashModal
-	        open={activeAction === "cash"}
-	        onClose={() => {
-	          setActiveAction(null);
-	          setCashBuyPrefill(null);
-	        }}
-          isPreviewMode={isPreviewMode}
-          isWalletActivated={isWalletActivated}
-          hasRlusdTrustline={hasRlusdTrustline}
-	        cashModalTab={cashModalTab}
-	        setCashModalTab={setCashModalTab}
-	        renderWalletMeta={renderWalletMeta}
-	        availableTokens={augmentedTokens}
-	        rlusdPerUnitRates={rlusdPerUnitRates}
-	        selectLabelByCurrency={selectLabelByAssetKey}
-	        selectLabelRightByCurrency={selectLabelRightByAssetKey}
-	        selectIconByCurrency={selectIconByAssetKey}
+		      <WalletDashboardCashModal
+		        open={activeAction === "cash"}
+		        onClose={() => {
+		          setActiveAction(null);
+		          setCashBuyPrefill(null);
+		        }}
+	          isPreviewMode={isPreviewMode}
+	          isWalletActivated={isWalletActivated}
+	          hasRlusdTrustline={hasRlusdTrustline}
+		        cashModalTab={cashModalTab}
+		        setCashModalTab={setCashModalTab}
+		        renderWalletMeta={renderWalletMeta}
+		        walletLabel={walletLabel}
+		        hideWalletAddress={walletHasCustomLabel}
+		        availableTokens={augmentedTokens}
+		        rlusdPerUnitRates={rlusdPerUnitRates}
+		        selectLabelByCurrency={selectLabelByAssetKey}
+		        selectLabelRightByCurrency={selectLabelRightByAssetKey}
+		        selectIconByCurrency={selectIconByAssetKey}
 	        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
 	        walletAddress={effectiveWallet || ""}
           buyPrefill={cashBuyPrefill}
@@ -2730,16 +2742,17 @@ export default function WalletDashboard({
         }}
       />
 
-      {!isDesktopPanel ? (
-        <WalletDashboardStatementModals
-          augmentedTokens={augmentedTokens}
-          backendWalletAddress={backendWalletAddress}
-          effectiveWallet={effectiveWallet}
-          isPreviewMode={isPreviewMode}
-          isWalletActivated={isWalletActivated}
-          isFullPageView={isFullPageView}
-          statementVariant={statementVariant}
-          usdRates={usdRates}
+	      {!isDesktopPanel ? (
+	        <WalletDashboardStatementModals
+	          augmentedTokens={augmentedTokens}
+	          backendWalletAddress={backendWalletAddress}
+	          effectiveWallet={effectiveWallet}
+	          walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
+	          isPreviewMode={isPreviewMode}
+	          isWalletActivated={isWalletActivated}
+	          isFullPageView={isFullPageView}
+	          statementVariant={statementVariant}
+	          usdRates={usdRates}
           showGlobalStatement={showGlobalStatement}
           setShowGlobalStatement={setShowGlobalStatement}
           showCurrencyStatement={showCurrencyStatement}

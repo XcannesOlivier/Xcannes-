@@ -245,9 +245,7 @@ export default function WalletDashboardAdjustModal({
   const panelClass = [
     "relative w-full wallet-modal-panel border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl min-h-0" : "max-w-2xl max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" && walletId === "B"
-      ? "bg-[#0b1017]"
-      : "bg-elevated",
+    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
@@ -298,7 +296,7 @@ export default function WalletDashboardAdjustModal({
                 )}
               </h3>
               {noticeVariant === "demo" ? (
-                <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                   {t("demo_notice_title", "Mode demo")}
                 </span>
               ) : null}

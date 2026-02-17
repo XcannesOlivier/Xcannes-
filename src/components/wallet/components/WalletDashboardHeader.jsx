@@ -28,6 +28,7 @@ export default function WalletDashboardHeader({
   onCancelWalletLabel,
   hideStatementCtaOnDesktop = false,
   showMobileHomeLink = false,
+  hideWalletAddress = false,
 }) {
   const { t } = useTranslation("common");
   return (
@@ -90,31 +91,31 @@ export default function WalletDashboardHeader({
         </p>
 
         {/* Bouton Global Statement - Toujours visible, même en démo */}
-        <button
-          type="button"
-          onClick={onOpenGlobalStatement}
-          className={`mt-2 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105 ${hideStatementCtaOnDesktop ? "lg:hidden" : ""}`}>{t("ui_see_statement_9771dff7ec", "Voir le relevé")}
+	        <button
+	          type="button"
+	          onClick={onOpenGlobalStatement}
+	          className={`mt-2 px-4 py-1.5 bg-xcannes-green/50 hover:bg-xcannes-green/60 text-white rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 ${hideStatementCtaOnDesktop ? "lg:hidden" : ""}`}>{t("ui_see_statement_9771dff7ec", "Voir le relevé")}
 
 
-        </button>
+	        </button>
 
-        <a
-          href="https://ripple.com/solutions/stablecoin/transparency/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs md:text-[10px] text-white/40 hover:text-xcannes-green/80 transition-colors">{t("ui_stablecoin_usd_r_gul_d_details_80d8d1ba32", "Stablecoin USD régulé (détails)")}
+	        <a
+	          href="https://ripple.com/solutions/stablecoin/transparency/"
+	          target="_blank"
+	          rel="noopener noreferrer"
+	          className="text-xs md:text-[10px] text-white/40 hover:text-white/70 transition-colors">{t("ui_stablecoin_usd_r_gul_d_details_80d8d1ba32", "Stablecoin USD régulé (détails)")}
 
 
-        </a>
+	        </a>
 
         {/* Affichage du wallet connecté à la place du menu déroulant */}
         {effectiveIsConnected && effectiveWallet &&
-        <div className="w-full mt-2 px-2 flex justify-center">
-            <div className="relative w-full max-w-[560px] pr-12">
-              <div className="w-full min-w-0 rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 min-w-0">
+	          <div className="w-full mt-1.5 px-2 flex justify-center">
+	            <div className="relative w-full max-w-[560px] pr-10">
+	              <div className="w-full min-w-0 rounded-md border border-white/10 bg-black/20 px-2.5 py-1.5 shadow-none">
+	                <div className="flex items-start justify-between gap-3">
+	                  <div className="min-w-0">
+	                    <div className="flex items-center gap-2 min-w-0">
                       <span
                       className={`h-2 w-2 rounded-full ring-4 ${xrplConnectionIndicator.dotClass} ${xrplConnectionIndicator.ringClass} ${
                       xrplConnectionIndicator.pulse ? "animate-pulse" : ""}`
@@ -122,31 +123,38 @@ export default function WalletDashboardHeader({
                       title={xrplConnectionIndicator.label}
                       aria-label={xrplConnectionIndicator.label} />
 
-                      <span className="text-[12px] md:text-[13px] font-semibold text-white/85 truncate">
-                        {walletLabel || "Wallet"}
-                      </span>
-                    </div>
+		                      <span className="text-[11px] md:text-[12px] font-semibold text-white/85 truncate">
+		                        {walletLabel || "Wallet"}
+		                      </span>
+	                      {hideWalletAddress && walletHeaderToast ? (
+	                        <span className="text-[10px] text-xcannes-green/90 truncate">
+	                          {walletHeaderToast}
+	                        </span>
+	                      ) : null}
+	                    </div>
 
-                    <div className="mt-1 flex items-center gap-2 min-w-0">
-                      <span className="font-mono text-[11px] text-white/55 truncate">
-                        {effectiveWallet.slice(0, 10)}…{effectiveWallet.slice(-8)}
-                      </span>
-                      {walletHeaderToast &&
-                    <span className="text-[10px] text-xcannes-green/90">
-                          {walletHeaderToast}
-                        </span>
-                    }
-                    </div>
-                  </div>
+		                    {!hideWalletAddress ? (
+		                      <div className="mt-0.5 flex items-center gap-2 min-w-0">
+		                        <span className="font-mono text-[10px] text-white/55 truncate">
+		                          {effectiveWallet.slice(0, 10)}…{effectiveWallet.slice(-8)}
+		                        </span>
+	                        {walletHeaderToast ? (
+	                          <span className="text-[10px] text-xcannes-green/90">
+	                            {walletHeaderToast}
+	                          </span>
+	                        ) : null}
+	                      </div>
+	                    ) : null}
+	                  </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                  {!isWalletLabelLocked &&
-                  <button
+	                  <div className="flex items-center gap-2 shrink-0">
+	                  {!isWalletLabelLocked &&
+	                  <button
                     type="button"
                     onClick={onOpenWalletLabelEditor}
                     title={t("ui_rename_86c8307e14", "Renommer")}
-                    className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
-                    aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
+	                    className="p-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-md transition-all active:scale-95"
+	                    aria-label={t("ui_rename_wallet_8fecb8eee2", "Renommer le wallet")}>
 
                     <svg
                       className="w-4 h-4"
@@ -164,12 +172,12 @@ export default function WalletDashboardHeader({
                   </button>
                   }
 
-                    <button
-                    type="button"
-                    onClick={onCopyAddress}
-                    title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
-                    className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-lg transition-all active:scale-95"
-                    aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
+	                    <button
+	                    type="button"
+	                    onClick={onCopyAddress}
+	                    title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+	                    className="p-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-md transition-all active:scale-95"
+	                    aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}>
 
                       <svg
                       className="w-4 h-4"
@@ -186,13 +194,13 @@ export default function WalletDashboardHeader({
                       </svg>
                     </button>
                   </div>
-                </div>
+	                </div>
 
-                {isEditingWalletLabel &&
-              <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 rounded-lg bg-white/5 border border-white/10 px-2 py-2">
-                    <input
-                  type="text"
-                  value={walletLabelDraft}
+	                {isEditingWalletLabel &&
+	              <div className="mt-1.5 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-1.5 rounded-md bg-white/5 border border-white/10 px-2 py-1">
+	                    <input
+	                  type="text"
+	                  value={walletLabelDraft}
                   onChange={(e) => onWalletLabelDraftChange?.(e.target.value)}
                   placeholder={t("ui_wallet_name_b4c2f054b9", "Nom du wallet")}
                   className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
@@ -207,12 +215,12 @@ export default function WalletDashboardHeader({
                   autoFocus />
 
 
-                    <button
-                  type="button"
-                  onClick={onSaveWalletLabel}
-                  className="p-2 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
-                  aria-label={t("ui_save_404be3f4a5", "Enregistrer")}
-                  title={t("ui_save_2d42b7df0f", "Enregistrer")}>
+	                    <button
+	                  type="button"
+	                  onClick={onSaveWalletLabel}
+	                  className="p-1 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
+	                  aria-label={t("ui_save_404be3f4a5", "Enregistrer")}
+	                  title={t("ui_save_2d42b7df0f", "Enregistrer")}>
 
                       <svg
                     className="w-4 h-4"
@@ -233,7 +241,7 @@ export default function WalletDashboardHeader({
                     <button
                       type="button"
                       onClick={onCancelWalletLabel}
-                      className="p-2 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
+                      className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
                       aria-label={t("ui_cancel_d2d2058892", "Annuler")}
                       title={t("ui_cancel_fbca985028", "Annuler")}>
 
@@ -261,17 +269,17 @@ export default function WalletDashboardHeader({
               onClick={onRefreshWallet}
               disabled={isConnecting || isRefreshing}
               title={t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
-              className={`absolute right-0 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-xl transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
-              isRefreshing ?
-              "text-xcannes-green hover:text-xcannes-green/90" :
-              "text-white/60 hover:text-white"}`
-              }
-              aria-label={t("ui_refresh_wallet_label_7b2d1a9c4e", "Recharger le wallet")}>
+	              className={`absolute right-0 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+	              isRefreshing ?
+	              "text-xcannes-green hover:text-xcannes-green/90" :
+	              "text-white/60 hover:text-white"}`
+	              }
+	              aria-label={t("ui_refresh_wallet_label_7b2d1a9c4e", "Recharger le wallet")}>
 
-                <svg
-                className={`w-7 h-7 ${isRefreshing ? "animate-spin" : ""}`}
-                fill="currentColor"
-                viewBox="0 0 24 24">
+	                <svg
+	                className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`}
+	                fill="currentColor"
+	                viewBox="0 0 24 24">
 
                   <path
                   d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />

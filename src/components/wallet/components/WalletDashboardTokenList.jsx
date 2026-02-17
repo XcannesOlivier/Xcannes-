@@ -26,7 +26,7 @@ export default function WalletDashboardTokenList({
             <button
               type="button"
               onClick={onHeaderAction}
-              className="text-sm md:text-xs text-xcannes-green/80 hover:text-xcannes-green transition-colors"
+              className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
             >
               {headerActionLabel} →
             </button>

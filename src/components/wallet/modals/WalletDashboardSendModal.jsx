@@ -221,7 +221,7 @@ export default function WalletDashboardSendModal({
   const panelClass = [
     "relative w-full wallet-modal-panel border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
@@ -265,7 +265,7 @@ export default function WalletDashboardSendModal({
                 : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
             </h3>
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
@@ -356,7 +356,7 @@ export default function WalletDashboardSendModal({
               useNativeSelect={false}
               showMobileOptionRight={true}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px] appearance-none cursor-pointer"
-              menuClassName="bg-elevated"
+              menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#38BDF8]/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
                 {selectedSendToken &&

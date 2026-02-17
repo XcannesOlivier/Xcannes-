@@ -88,6 +88,7 @@ export default function CurrencyStatement({
   balance,
   issuer,
   walletAddress,
+  walletLabelOverride = "",
   isPreviewMode = false,
   isWalletActivated = null,
   noticeVariant = "preview",
@@ -125,6 +126,7 @@ export default function CurrencyStatement({
   const [rlusdBenefitOpen, setRlusdBenefitOpen] = useState(false);
   const [docHash, setDocHash] = useState("");
   const [walletLabel, setWalletLabel] = useState("");
+  const resolvedLabelOverride = String(walletLabelOverride || "").trim();
   const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
@@ -180,6 +182,10 @@ export default function CurrencyStatement({
 
   useEffect(() => {
     let cancelled = false;
+    if (resolvedLabelOverride) {
+      setWalletLabel(resolvedLabelOverride);
+      return () => {};
+    }
     if (!walletAddress) {
       setWalletLabel("");
       return () => {};
@@ -206,7 +212,7 @@ export default function CurrencyStatement({
     return () => {
       cancelled = true;
     };
-  }, [walletAddress]);
+  }, [resolvedLabelOverride, walletAddress]);
 
   const estimatedUsd = useMemo(() => {
     const value = Number.parseFloat(balance || 0) || 0;
@@ -221,9 +227,6 @@ export default function CurrencyStatement({
 
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
   const reservePlaceholder = "—";
-  const RLUSD_BASE_FEE_PERCENT = 1;
-  const RLUSD_FREE_FEE_THRESHOLD = 100;
-  const showAppliedRate = Boolean(normalizedCurrency) && normalizedCurrency !== "XRP";
   const showRlusdProgram = normalizedCurrency === "RLUSD";
 
   const xrpReserveDetails = useMemo(() => {
@@ -241,32 +244,6 @@ export default function CurrencyStatement({
       trustlineRlusdXrp,
     };
   }, [hasRlusdTrustline, normalizedCurrency, showReserveDetails]);
-
-  const rlusdAppliedFeePercent = useMemo(() => {
-    if (!showAppliedRate) return null;
-    const parsed = Number.parseFloat(rlusdBalance);
-    const fallback = normalizedCurrency === "RLUSD" ? Number.parseFloat(balance) : 0;
-    const held = Number.isFinite(parsed) ? parsed : fallback;
-    const safeHeld = Number.isFinite(held) ? Math.max(0, held) : 0;
-    const capped = Math.min(safeHeld, RLUSD_FREE_FEE_THRESHOLD);
-    const reduction = (capped / RLUSD_FREE_FEE_THRESHOLD) * RLUSD_BASE_FEE_PERCENT;
-    const applied = Math.max(0, RLUSD_BASE_FEE_PERCENT - reduction);
-    return applied;
-  }, [balance, normalizedCurrency, showAppliedRate, rlusdBalance]);
-
-  const rlusdAppliedRateLabel = useMemo(() => {
-    if (!Number.isFinite(rlusdAppliedFeePercent)) return reservePlaceholder;
-    const rounded = Math.round(rlusdAppliedFeePercent * 100) / 100;
-    const label = rounded.toFixed(2).replace(/\.?0+$/, "");
-    return `${label}%`;
-  }, [reservePlaceholder, rlusdAppliedFeePercent]);
-
-  const appliedRateLabelLines = useMemo(() => {
-    const raw = t("ui_rlusd_applied_rate_label_8e2f1c9a4b", "Taux de conversion\nappliqué");
-    return String(raw || "").split("\n");
-  }, [t]);
-  const appliedRateLine1 = appliedRateLabelLines[0] || t("ui_rlusd_applied_rate_label_8e2f1c9a4b", "Taux de conversion");
-  const appliedRateLine2 = appliedRateLabelLines[1] || "";
 
   const baseTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
@@ -1218,7 +1195,7 @@ export default function CurrencyStatement({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
 
-  const modalBgClass = noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated";
+  const modalBgClass = noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -1285,7 +1262,7 @@ export default function CurrencyStatement({
                     {currency} {t("ui_statement_a87c93acb8", "Statement")}
                   </h2>
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
@@ -1328,17 +1305,19 @@ export default function CurrencyStatement({
 	          {/* Account Info dans le header */}
 	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 	            <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_3eef963295", "Account Holder")}</p>
-              <p className="text-sm text-white font-semibold truncate">
-                {walletLabel || t("nav_wallet", "Wallet")}
-              </p>
-              <p className="text-[11px] text-white/50 font-mono break-all">
-                {walletAddress}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_6dedec11d9", "Statement Period")}</p>
-              {/* Month Selector - Version simplifiée */}
+	              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_3eef963295", "Account Holder")}</p>
+	              <p className="text-sm text-white font-semibold truncate">
+	                {walletLabel || t("nav_wallet", "Wallet")}
+	              </p>
+	              {!walletLabel ? (
+	                <p className="text-[11px] text-white/50 font-mono break-all">
+	                  {walletAddress}
+	                </p>
+	              ) : null}
+	            </div>
+	            <div>
+	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_6dedec11d9", "Statement Period")}</p>
+	              {/* Month Selector - Version simplifiée */}
               <StatementMonthSelect
                 value={selectedMonth}
                 onChange={(nextValue) => {
@@ -1362,15 +1341,15 @@ export default function CurrencyStatement({
                 ≈ {formatAmount(estimatedUsd)}{t("ui_usd_506842b2ba", "USD")}
             </p>
 
-              {(normalizedCurrency === "XRP") &&
-            <div className="mt-2 relative">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs text-white/50 whitespace-pre-line">{t("ui_rlusd_applied_rate_label_8e2f1c9a4b", "Taux de conversion\nappliqué")}</p>
-                      <p className="text-[11px] text-white/70 font-mono">
-                        {xrpReserveDetails
-                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
-                          : reservePlaceholder}
+	              {(normalizedCurrency === "XRP") &&
+	            <div className="mt-2 relative">
+	                  <div className="flex items-center justify-between gap-2">
+	                    <div>
+	                      <p className="text-xs text-white/50 whitespace-pre-line">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
+	                      <p className="text-[11px] text-white/70 font-mono">
+	                        {xrpReserveDetails
+	                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
+	                          : reservePlaceholder}
                   </p>
                     </div>
                     <button
@@ -1417,34 +1396,21 @@ export default function CurrencyStatement({
                 </div>
             }
 
-              {showAppliedRate &&
-            <div className="mt-2 relative">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs text-white/70">
-                        <span className="block">{appliedRateLine1}</span>
-                        <span className="flex items-baseline gap-2">
-                          <span>{appliedRateLine2}</span>
-                          <span className="text-sm md:text-base text-white/90 font-mono font-semibold leading-tight">
-                            {rlusdAppliedRateLabel}
-                          </span>
-                        </span>
-                      </p>
-                    </div>
-                    {showRlusdProgram ? (
-                      <button
-                        type="button"
-                        onClick={() => setRlusdBenefitOpen((v) => !v)}
-                        className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
-                        aria-expanded={rlusdBenefitOpen}
-                        aria-label={t("ui_rlusd_benefit_title_2d3c7a1f8e", "Avantage RLUSD")}
-                      >
-                        {t("ui_rlusd_program_cta_4fd1b09c3a", "Programme RLUSD")}
-                      </button>
-                    ) : null}
+              {showRlusdProgram && (
+                <div className="mt-2 relative">
+                  <div className="flex items-center justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setRlusdBenefitOpen((v) => !v)}
+                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
+                      aria-expanded={rlusdBenefitOpen}
+                      aria-label={t("ui_rlusd_benefit_title_2d3c7a1f8e", "Avantage RLUSD")}
+                    >
+                      {t("ui_rlusd_program_cta_4fd1b09c3a", "Programme RLUSD")}
+                    </button>
                   </div>
 
-                  {showRlusdProgram && rlusdBenefitOpen && (
+                  {rlusdBenefitOpen && (
                     <div className="mt-3 rounded-xl border border-white/20 bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm overflow-hidden">
                       {/* Header avec badge */}
                       <div className="px-4 py-3 border-b border-white/10 bg-white/5">
@@ -1531,7 +1497,7 @@ export default function CurrencyStatement({
                     </div>
                   )}
                 </div>
-            }
+              )}
             </div>
           </div>
         </div>

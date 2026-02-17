@@ -20,7 +20,7 @@
   gap: 0.5rem;
   padding: 0.75rem 0.5rem;
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid transparent;
   border-radius: 0.5rem;
   transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -57,7 +57,6 @@
 
 /* Improvement 3: Enhanced hover state - faster, more visible */
 .wallet-action-btn:hover {
-  border-color: rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.05);
   transform: translateY(-1px); /* Subtle lift on hover */
 }
@@ -65,7 +64,6 @@
 /* Improvement 3: Active state - clear press feedback */
 .wallet-action-btn:active {
   transform: translateY(0) scale(0.97); /* Press down effect */
-  border-color: rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.03);
   transition-duration: 60ms; /* Faster response on click */
 }
@@ -74,7 +72,6 @@
 .wallet-action-btn:focus-visible {
   outline: 2px solid rgba(0, 255, 163, 0.5);
   outline-offset: 3px;
-  border-color: rgba(0, 255, 163, 0.3);
   z-index: 10; /* Ensure focus ring is visible */
 }
 
@@ -85,8 +82,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
   transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   pointer-events: none; /* Icon shouldn't block clicks */
@@ -94,8 +91,6 @@
 
 /* Improvement 3: Enhanced icon hover feedback */
 .wallet-action-btn:hover .wallet-action-icon {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.08);
   transform: scale(1.05); /* Slight grow on hover */
 }
 
@@ -123,47 +118,44 @@
 
 /* Send - Blue-green (neutral transfer) */
 .wallet-action-send .wallet-action-icon {
-  background: rgba(56, 189, 248, 0.08);
-  color: #38BDF8;
+  background: transparent;
+  color: #16A34A;
 }
 
 .wallet-action-send:hover .wallet-action-icon {
-  background: rgba(56, 189, 248, 0.14);
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.18);
+  background: transparent;
 }
 
 .wallet-action-send:active .wallet-action-icon {
-  background: rgba(56, 189, 248, 0.2);
+  background: transparent;
 }
 
 /* Receive - Green (incoming, positive) */
 .wallet-action-receive .wallet-action-icon {
-  background: rgba(34, 197, 94, 0.08);
-  color: #22C55E;
+  background: transparent;
+  color: #16A34A;
 }
 
 .wallet-action-receive:hover .wallet-action-icon {
-  background: rgba(34, 197, 94, 0.14);
-  box-shadow: 0 0 16px rgba(34, 197, 94, 0.18);
+  background: transparent;
 }
 
 .wallet-action-receive:active .wallet-action-icon {
-  background: rgba(34, 197, 94, 0.2);
+  background: transparent;
 }
 
 /* Convert - Cyan (exchange, swap) */
 .wallet-action-swap .wallet-action-icon {
-  background: rgba(6, 182, 212, 0.08);
-  color: #06B6D4;
+  background: transparent;
+  color: #16A34A;
 }
 
 .wallet-action-swap:hover .wallet-action-icon {
-  background: rgba(6, 182, 212, 0.14);
-  box-shadow: 0 0 16px rgba(6, 182, 212, 0.18);
+  background: transparent;
 }
 
 .wallet-action-swap:active .wallet-action-icon {
-  background: rgba(6, 182, 212, 0.2);
+  background: transparent;
 }
 
 /* ============================================
@@ -173,54 +165,47 @@
 
 .wallet-action-send {
   /* Subtle but permanent emphasis */
-  background: rgba(56, 189, 248, 0.05);
-  border-color: rgba(56, 189, 248, 0.25);
+  background: rgba(22, 163, 74, 0.06);
 }
 
 .wallet-action-send .wallet-action-icon {
-  background: rgba(56, 189, 248, 0.14); /* More visible background */
-  color: #5FC9F8; /* Slightly brighter blue */
-  border-color: rgba(56, 189, 248, 0.28);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); /* Permanent subtle glow */
+  background: transparent;
+  color: #16A34A;
 }
 
 .wallet-action-send:hover {
-  background: rgba(56, 189, 248, 0.08);
-  border-color: rgba(56, 189, 248, 0.38);
+  background: rgba(22, 163, 74, 0.1);
 }
 
 .wallet-action-send:hover .wallet-action-icon {
-  background: rgba(56, 189, 248, 0.2);
-  box-shadow: 0 0 18px rgba(56, 189, 248, 0.28); /* Stronger glow on hover */
-  border-color: rgba(56, 189, 248, 0.45);
+  background: transparent;
 }
 
 .wallet-action-send:active .wallet-action-icon {
-  background: rgba(56, 189, 248, 0.28);
+  background: transparent;
 }
 
 .wallet-action-send .wallet-action-label {
-  color: rgba(95, 201, 248, 0.9); /* More visible label */
+  color: rgba(22, 163, 74, 0.9); /* More visible label */
   font-weight: 600; /* Slightly bolder */
 }
 
 .wallet-action-send:hover .wallet-action-label {
-  color: rgba(95, 201, 248, 1);
+  color: rgba(22, 163, 74, 1);
 }
 
 /* Buy/Sell - Violet (fiat operations) - SECONDARY */
 .wallet-action-buysell .wallet-action-icon {
-  background: rgba(139, 92, 246, 0.08);
-  color: #8B5CF6;
+  background: transparent;
+  color: #16A34A;
 }
 
 .wallet-action-buysell:hover .wallet-action-icon {
-  background: rgba(139, 92, 246, 0.14);
-  box-shadow: 0 0 16px rgba(139, 92, 246, 0.18);
+  background: transparent;
 }
 
 .wallet-action-buysell:active .wallet-action-icon {
-  background: rgba(139, 92, 246, 0.2);
+  background: transparent;
 }
 
 /* ============================================
@@ -255,24 +240,24 @@
 .wallet-action-btn:focus-visible {
   outline: 2px solid rgba(0, 255, 163, 0.6);
   outline-offset: 3px;
-  border-color: rgba(0, 255, 163, 0.35);
   z-index: 10;
 }
 
 /* Primary action (Send) has stronger focus */
 .wallet-action-send:focus-visible {
   outline-color: rgba(95, 201, 248, 0.7);
-  border-color: rgba(95, 201, 248, 0.5);
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .wallet-action-btn {
     border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.55);
   }
 
   .wallet-action-icon {
     border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.55);
   }
   
   .wallet-action-label {
@@ -300,7 +285,6 @@
   /* Still provide visual feedback, just without motion */
   .wallet-action-btn:hover {
     transform: none;
-    border-color: rgba(255, 255, 255, 0.2);
   }
   
   .wallet-action-btn:active {

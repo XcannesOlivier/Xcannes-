@@ -19,24 +19,26 @@ import {
 } from "./DemoWalletModel";
 import WalletDashboardSendModal from "@/components/wallet/modals/WalletDashboardSendModal";
 import WalletDashboardReceiveModal from "@/components/wallet/modals/WalletDashboardReceiveModal";
-import WalletDashboardSwapModal from "@/components/wallet/modals/WalletDashboardSwapModal";
-import WalletDashboardCashModal from "@/components/wallet/modals/WalletDashboardCashModal";
-import WalletDashboardStatementModals from "@/components/wallet/modals/WalletDashboardStatementModals";
-import QRScanner from "@/components/wallet/components/QRScanner";
-import { QRCodeCanvas } from "qrcode.react";
-import { useSendForm } from "@/components/wallet/hooks/useSendForm";
-import { useReceiveForm } from "@/components/wallet/hooks/useReceiveForm";
+	import WalletDashboardSwapModal from "@/components/wallet/modals/WalletDashboardSwapModal";
+	import WalletDashboardCashModal from "@/components/wallet/modals/WalletDashboardCashModal";
+	import WalletDashboardStatementModals from "@/components/wallet/modals/WalletDashboardStatementModals";
+	import WalletInfoModal from "@/components/wallet/modals/WalletInfoModal";
+	import QRScanner from "@/components/wallet/components/QRScanner";
+	import { QRCodeCanvas } from "qrcode.react";
+	import { useSendForm } from "@/components/wallet/hooks/useSendForm";
+	import { useReceiveForm } from "@/components/wallet/hooks/useReceiveForm";
 import { usePaymentRequestForm } from "@/components/wallet/hooks/usePaymentRequestForm";
 import { usePaymentRequestScanner } from "@/components/wallet/hooks/usePaymentRequestScanner";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
-import { useConvertForm } from "@/components/wallet/hooks/useConvertForm";
-import { useCurrencyLinesForm } from "@/components/wallet/hooks/useCurrencyLinesForm";
-import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
-import { computeSpreadQuote } from "@/utils/walletSpread";
-import xcannesApi from "@/lib/xcannesApi";
-import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-import { USD_STABLECOINS } from "@/components/wallet/walletDashboardConfig";
+	import { useConvertForm } from "@/components/wallet/hooks/useConvertForm";
+	import { useCurrencyLinesForm } from "@/components/wallet/hooks/useCurrencyLinesForm";
+	import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
+	import { useSavedAddresses } from "@/components/wallet/hooks/useSavedAddresses";
+	import { computeSpreadQuote } from "@/utils/walletSpread";
+	import xcannesApi from "@/lib/xcannesApi";
+	import { CRYPTO_ICONS } from "@/utils/marketConstants";
+	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+	import { USD_STABLECOINS } from "@/components/wallet/walletDashboardConfig";
 
 const DEMO_WALLET_ACCENTS = {
   A: {
@@ -44,12 +46,6 @@ const DEMO_WALLET_ACCENTS = {
     chipInactive: "text-white/60 hover:text-white",
     ring: "ring-xcannes-green/15",
     focusRing: "focus:ring-xcannes-green/40"
-  },
-  B: {
-    chip: "bg-xcannes-blue-light/10 border-xcannes-blue-light/25 text-xcannes-blue-light",
-    chipInactive: "text-white/60 hover:text-white",
-    ring: "ring-xcannes-blue-light/15",
-    focusRing: "focus:ring-xcannes-blue-light/40"
   }
 };
 
@@ -129,55 +125,24 @@ function formatUnits(locale, amount) {
   }
 }
 
-const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
-const DEMO_PENDING_REQUEST_KEY = "xcannes_demo_wallet_pending_request_v1";
-const DEMO_LATENCY_MS_MIN = 450;
-const DEMO_LATENCY_MS_MAX = 1100;
-const DEMO_RATES_REFRESH_MS = 15_000;
-const DEMO_RATES_STALE_AFTER_MS = 30_000;
-const DEMO_PENDING_REQUEST_TTL_MS = 10 * 60 * 1000;
+function formatDemoAddressShort(address) {
+  const value = String(address || "").trim();
+  if (!value) return "";
+  if (value.length <= 18) return value;
+  return `${value.slice(0, 8)}…${value.slice(-8)}`;
+}
+
+	const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
+	const DEMO_SAVED_ADDRESSES_STORAGE_KEY = "xcannes_demo_saved_addresses_v1";
+	const DEMO_DEFAULT_DESTINATION_ADDRESS = "rDEMO_MERCHANT_xxxxxxxxxxxxxxxxxxxxxx";
+	const DEMO_LATENCY_MS_MIN = 450;
+	const DEMO_LATENCY_MS_MAX = 1100;
+	const DEMO_RATES_REFRESH_MS = 15_000;
+	const DEMO_RATES_STALE_AFTER_MS = 30_000;
 const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, RLUSD: 2 };
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function readPendingDemoRequest() {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(DEMO_PENDING_REQUEST_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return null;
-    if (!parsed.request || !parsed.toWalletId) return null;
-    const ts = Number(parsed.ts || 0);
-    if (ts && Date.now() - ts > DEMO_PENDING_REQUEST_TTL_MS) {
-      window.localStorage.removeItem(DEMO_PENDING_REQUEST_KEY);
-      return null;
-    }
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function writePendingDemoRequest(detail) {
-  if (typeof window === "undefined") return;
-  try {
-    const payload = { ...detail, ts: Date.now() };
-    window.localStorage.setItem(DEMO_PENDING_REQUEST_KEY, JSON.stringify(payload));
-  } catch {
-    // ignore
-  }
-}
-
-function clearPendingDemoRequest() {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.removeItem(DEMO_PENDING_REQUEST_KEY);
-  } catch {
-    // ignore
-  }
 }
 
 function newDemoEventId(prefix = "demo") {
@@ -258,14 +223,13 @@ function isValidDemoState(value) {
   if (!value || typeof value !== "object") return false;
   const wallets = value.wallets;
   if (!wallets || typeof wallets !== "object") return false;
-  if (!wallets.A || !wallets.B) return false;
-  if (!wallets.A.allocations || !wallets.B.allocations) return false;
+  if (!wallets.A || !wallets.A.allocations) return false;
   return true;
 }
 
 export default function DemoWalletDashboard({
   defaultWalletId = "A",
-  theme = "default",
+  theme: _theme = "default",
   showWalletSwitcher = true,
   demoState,
   setDemoState,
@@ -275,9 +239,7 @@ export default function DemoWalletDashboard({
   const router = useRouter();
   const locale = router?.locale || "en";
 
-  const isHomeTheme = theme === "home";
-  const isDexTheme = theme === "dex";
-  const resolvedDefaultWalletId = defaultWalletId === "B" ? "B" : "A";
+  const resolvedDefaultWalletId = "A";
   const fallbackUsdPerUnit = useMemo(() => getDemoRatesUsdPerUnit(), []);
   const fallbackRates = useMemo(
     () => ({
@@ -298,6 +260,8 @@ export default function DemoWalletDashboard({
   }));
   const [ratesLastOkTs, setRatesLastOkTs] = useState(() => Date.now());
   const [ratesNowTs, setRatesNowTs] = useState(() => Date.now());
+  const ratesCancelledRef = useRef(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [localState, setLocalState] = useState(() => buildDefaultDemoState());
   const [isHydrated, setIsHydrated] = useState(false);
   const isExternalState = demoState && typeof setDemoState === "function";
@@ -305,30 +269,121 @@ export default function DemoWalletDashboard({
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [walletSwitchAnimating, setWalletSwitchAnimating] = useState(false);
-  const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
-  const [swapDefaultView, setSwapDefaultView] = useState("convert");
-  const [swapLockedView, setSwapLockedView] = useState(null);
-  const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
-  const [showGlobalStatement, setShowGlobalStatement] = useState(false);
-  const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
-  const [selectedStatementToken, setSelectedStatementToken] = useState(null);
-  const [previewCurrencyTransactions, setPreviewCurrencyTransactions] = useState([]);
-  const [statementHighlightByWallet, setStatementHighlightByWallet] = useState({});
-  const [isDesktop, setIsDesktop] = useState(false);
+	  const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
+	  const [swapDefaultView, setSwapDefaultView] = useState("convert");
+	  const [swapLockedView, setSwapLockedView] = useState(null);
+	  const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
+	  const [showGlobalStatement, setShowGlobalStatement] = useState(false);
+	  const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
+	  const [walletInfoOpen, setWalletInfoOpen] = useState(false);
+	  const [selectedStatementToken, setSelectedStatementToken] = useState(null);
+	  const [previewCurrencyTransactions, setPreviewCurrencyTransactions] = useState([]);
+	  const [statementHighlightByWallet, setStatementHighlightByWallet] = useState({});
+	  const [isDesktop, setIsDesktop] = useState(false);
 
   const activeWallet = state.wallets[activeWalletId];
-  const otherWalletId = activeWalletId === "A" ? "B" : "A";
-  const otherWallet = state.wallets[otherWalletId];
   const demoAccents = DEMO_WALLET_ACCENTS;
   const activeAccent = demoAccents[activeWalletId] || demoAccents.A;
-  const panelRingClass = isHomeTheme ? "ring-white/10" : activeAccent.ring;
-  const demoBottomBorderClass =
-    isHomeTheme && activeWalletId === "A" ? "border-b border-white/10" : "";
-  const walletContextLabel = `${t("demo_wallet_label", "Wallet")} ${activeWalletId}`;
+  const panelRingClass = "ring-white/10";
+  const demoBottomBorderClass = "";
+  const isWalletLabelLocked = Boolean(activeWallet?.labelLocked);
+  const walletContextLabel =
+    String(activeWallet?.label || "").trim() ||
+    `${t("demo_wallet_label", "Wallet")} ${activeWalletId}`;
   const effectiveWallet = getWalletAddress(state, activeWalletId);
+  const [isEditingWalletLabel, setIsEditingWalletLabel] = useState(false);
+  const [walletLabelDraft, setWalletLabelDraft] = useState(walletContextLabel);
+  const [walletHeaderToast, setWalletHeaderToast] = useState("");
+  const toastTimerRef = useRef(null);
+  const refreshTimerRef = useRef(null);
+
+  useEffect(() => {
+    setWalletLabelDraft(walletContextLabel);
+  }, [walletContextLabel]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = null;
+      }
+      if (refreshTimerRef.current) {
+        window.clearTimeout(refreshTimerRef.current);
+        refreshTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  const flashWalletHeaderToast = useCallback((message) => {
+    const text = String(message || "").trim();
+    if (!text) return;
+    setWalletHeaderToast(text);
+    if (toastTimerRef.current) {
+      window.clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
+    }
+    toastTimerRef.current = window.setTimeout(() => {
+      setWalletHeaderToast("");
+      toastTimerRef.current = null;
+    }, 1300);
+  }, []);
+
+  useEffect(() => {
+    if (isWalletLabelLocked && isEditingWalletLabel) setIsEditingWalletLabel(false);
+  }, [isEditingWalletLabel, isWalletLabelLocked]);
+
+  const handleOpenWalletLabelEditor = useCallback(() => {
+    if (isWalletLabelLocked) return;
+    setWalletLabelDraft(walletContextLabel);
+    setIsEditingWalletLabel(true);
+  }, [isWalletLabelLocked, walletContextLabel]);
+
+  const handleCancelWalletLabel = useCallback(() => {
+    setIsEditingWalletLabel(false);
+    setWalletLabelDraft(walletContextLabel);
+  }, [walletContextLabel]);
+
+  const handleSaveWalletLabel = useCallback(() => {
+    if (isWalletLabelLocked) return;
+    const nextLabel = String(walletLabelDraft || "").trim();
+    if (!nextLabel) {
+      handleCancelWalletLabel();
+      return;
+    }
+    if (nextLabel === "Compte démo") {
+      handleCancelWalletLabel();
+      return;
+    }
+    const nextState = clone(state);
+    const wallet = nextState?.wallets?.[activeWalletId];
+    if (wallet) {
+      wallet.label = nextLabel.slice(0, 40);
+      wallet.labelLocked = true;
+    }
+    setState(nextState);
+    setIsEditingWalletLabel(false);
+  }, [
+    activeWalletId,
+    handleCancelWalletLabel,
+    isWalletLabelLocked,
+    setState,
+    state,
+    walletLabelDraft,
+  ]);
+
+  const handleCopyWalletAddress = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(effectiveWallet);
+      flashWalletHeaderToast(t("demo_copied", "Copié"));
+    } catch {
+      // noop
+    }
+  }, [effectiveWallet, flashWalletHeaderToast, t]);
+
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
     walletLabel: walletContextLabel,
+    hideAddress: isWalletLabelLocked,
     addressTitle: t("demo_tt_wallet_address", "Adresse XRPL du wallet.")
   });
   const demoNoticeContextLabel = "";
@@ -345,16 +400,21 @@ export default function DemoWalletDashboard({
     });
   }, []);
 
-  const demoSavedAddresses = useMemo(() => {
-    const address = getWalletAddress(state, otherWalletId);
-    if (!address) return [];
-    return [
-      {
-        label: otherWallet?.label || `${t("demo_wallet_label", "Wallet")} ${otherWalletId}`,
-        address
-      }
-    ];
-  }, [otherWallet?.label, otherWalletId, state, t]);
+	  const { savedAddresses: demoSavedAddresses, saveAddress: saveDemoAddress } =
+	    useSavedAddresses(DEMO_SAVED_ADDRESSES_STORAGE_KEY);
+
+	  useEffect(() => {
+	    if (typeof window === "undefined") return;
+	    const hasStored = Boolean(
+	      window.localStorage.getItem(DEMO_SAVED_ADDRESSES_STORAGE_KEY)
+	    );
+	    if (hasStored) return;
+	    if ((demoSavedAddresses || []).length > 0) return;
+	    saveDemoAddress(
+	      DEMO_DEFAULT_DESTINATION_ADDRESS,
+	      t("demo_counterparty_label", "Merchant")
+	    );
+	  }, [demoSavedAddresses, saveDemoAddress, t]);
 
   useEffect(() => {
     if (isExternalState) return;
@@ -439,6 +499,13 @@ export default function DemoWalletDashboard({
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    ratesCancelledRef.current = false;
+    return () => {
+      ratesCancelledRef.current = true;
+    };
+  }, []);
+
   const requiredRateCodes = useMemo(() => {
     const codes = new Set(["USD", "RLUSD", "XRP", "RLUSD"]);
     const wallets = state?.wallets || {};
@@ -453,54 +520,93 @@ export default function DemoWalletDashboard({
     return Array.from(codes).filter(Boolean).sort((a, b) => a.localeCompare(b));
   }, [convertBaseCurrency, convertQuoteCurrency, requestCurrency, state?.wallets]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const refreshRates = useCallback(async () => {
+    try {
+      const markets = await xcannesApi.getAllMarkets();
+      const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
+      const pythPairsMap = new Map();
+      pythPairs.forEach((pair) => {
+        const base = String(pair?.base || "").toUpperCase();
+        const quote = String(pair?.quote || "").toUpperCase();
+        if (!base || !quote) return;
+        pythPairsMap.set(`${base}_${quote}`, pair);
+      });
 
-    const loadRates = async () => {
-      try {
-        const markets = await xcannesApi.getAllMarkets();
-        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
-        const pythPairsMap = new Map();
-        pythPairs.forEach((pair) => {
-          const base = String(pair?.base || "").toUpperCase();
-          const quote = String(pair?.quote || "").toUpperCase();
-          if (!base || !quote) return;
-          pythPairsMap.set(`${base}_${quote}`, pair);
-        });
+      const nextRates = { USD: 1, RLUSD: 1 };
+      const nextSources = { USD: "PYTH", RLUSD: "PYTH" };
 
-        const nextRates = { USD: 1, RLUSD: 1 };
-        const nextSources = { USD: "PYTH", RLUSD: "PYTH" };
+      await Promise.all(
+        (requiredRateCodes || []).map(async (code) => {
+          const resolved = await resolveUsdPerUnit(code, pythPairsMap);
+          const num = Number(resolved?.rate);
+          if (!Number.isFinite(num) || num <= 0) return;
+          const upper = String(code || "").toUpperCase();
+          if (!upper) return;
+          nextRates[upper] = num;
+          nextSources[upper] = resolved?.source || null;
+        })
+      );
 
-        await Promise.all(
-          (requiredRateCodes || []).map(async (code) => {
-            const resolved = await resolveUsdPerUnit(code, pythPairsMap);
-            const num = Number(resolved?.rate);
-            if (!Number.isFinite(num) || num <= 0) return;
-            const upper = String(code || "").toUpperCase();
-            if (!upper) return;
-            nextRates[upper] = num;
-            nextSources[upper] = resolved?.source || null;
-          })
-        );
-
-        if (cancelled) return;
-        setUsdPerUnitRates((prev) => ({ ...prev, ...nextRates }));
-        setUsdPerUnitSources((prev) => ({ ...prev, ...nextSources }));
-        setRatesLastOkTs(Date.now());
-      } catch (err) {
-        if (!cancelled) {
-          console.warn("[demo-wallet] rates refresh failed:", err?.message || err);
-        }
+      if (ratesCancelledRef.current) return;
+      setUsdPerUnitRates((prev) => ({ ...prev, ...nextRates }));
+      setUsdPerUnitSources((prev) => ({ ...prev, ...nextSources }));
+      setRatesLastOkTs(Date.now());
+    } catch (err) {
+      if (!ratesCancelledRef.current) {
+        console.warn("[demo-wallet] rates refresh failed:", err?.message || err);
       }
-    };
+    }
+  }, [requiredRateCodes]);
 
-    loadRates();
-    const id = setInterval(loadRates, DEMO_RATES_REFRESH_MS);
+  useEffect(() => {
+    refreshRates();
+    const id = setInterval(refreshRates, DEMO_RATES_REFRESH_MS);
     return () => {
-      cancelled = true;
       clearInterval(id);
     };
-  }, [requiredRateCodes]);
+  }, [refreshRates]);
+
+  const handleReset = useCallback(() => {
+    setState(buildDefaultDemoState());
+    setActiveWalletId(resolvedDefaultWalletId);
+    setActiveAction(null);
+    setCashModalTab("buy");
+    setShowGlobalStatement(false);
+    setShowCurrencyStatement(false);
+    setSelectedStatementToken(null);
+    setStatementHighlightByWallet({});
+    setSendPaymentRequest(null);
+    setIsEditingWalletLabel(false);
+    setWalletHeaderToast("");
+  }, [
+    resolvedDefaultWalletId,
+    setActiveAction,
+    setActiveWalletId,
+    setCashModalTab,
+    setSelectedStatementToken,
+    setSendPaymentRequest,
+    setShowCurrencyStatement,
+    setShowGlobalStatement,
+    setState,
+    setStatementHighlightByWallet,
+    setIsEditingWalletLabel,
+    setWalletHeaderToast,
+  ]);
+
+  const handleRefreshWallet = useCallback(() => {
+    // Bound to demo reset (same intent as the "Réinitialiser" button).
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    handleReset();
+    if (refreshTimerRef.current) {
+      window.clearTimeout(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+    refreshTimerRef.current = window.setTimeout(() => {
+      setIsRefreshing(false);
+      refreshTimerRef.current = null;
+    }, 500);
+  }, [handleReset, isRefreshing]);
 
   const ratesAreStale = ratesNowTs - ratesLastOkTs > DEMO_RATES_STALE_AFTER_MS;
   const effectiveUsdPerUnitRates = useMemo(
@@ -705,7 +811,6 @@ export default function DemoWalletDashboard({
   const {
     qrScannerOpen,
     setQrScannerOpen,
-    handleAddressScan,
     handlePaymentRequestScan
   } = usePaymentRequestScanner({
     augmentedTokens,
@@ -717,69 +822,33 @@ export default function DemoWalletDashboard({
   });
   const allowBackgroundScroll =
     allowBackgroundScrollOnMobile && !isDesktop;
-  const shouldLockBodyScroll = Boolean(
-    !allowBackgroundScroll &&
-      (activeAction || showGlobalStatement || showCurrencyStatement || qrScannerOpen)
-  );
+	  const shouldLockBodyScroll = Boolean(
+	    !allowBackgroundScroll &&
+	      (activeAction ||
+	        showGlobalStatement ||
+	        showCurrencyStatement ||
+	        walletInfoOpen ||
+	        qrScannerOpen)
+	  );
   const showDemoMobileScannerQr = !isDesktop;
   const demoScannerQrSize = 220;
 
-  const handlePendingDemoRequest = useCallback((detail) => {
-    if (!detail?.request) return false;
-    if (detail.toWalletId !== activeWalletId) return false;
-    setSendTab("manual");
-    setActiveAction("send");
-    handlePaymentRequestScan?.(JSON.stringify(detail.request));
-    clearPendingDemoRequest();
-    return true;
-  }, [activeWalletId, handlePaymentRequestScan, setActiveAction, setSendTab]);
+  const handleDemoQrScan = useCallback((data) => {
+    // Support both plain XRPL addresses and XCANNES payreq payloads.
+    handlePaymentRequestScan?.(data);
+    setQrScannerOpen(false);
+  }, [handlePaymentRequestScan, setQrScannerOpen]);
 
-  const handleDemoRequestGenerated = useCallback((request) => {
-    if (!request || typeof window === "undefined") return;
-    const detail = {
-      request,
-      fromWalletId: activeWalletId,
-      toWalletId: otherWalletId
-    };
-    window.dispatchEvent(new CustomEvent("xcannes:demo-wallet:request", { detail }));
-    writePendingDemoRequest(detail);
-  }, [activeWalletId, otherWalletId]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handler = (event) => {
-      const detail = event?.detail || {};
-      handlePendingDemoRequest(detail);
-    };
-    window.addEventListener("xcannes:demo-wallet:request", handler);
-    return () => window.removeEventListener("xcannes:demo-wallet:request", handler);
-  }, [handlePendingDemoRequest]);
+  const handleDemoRequestGenerated = useCallback((_request) => {
+    // With a single demo wallet, we don't simulate cross-wallet payment requests anymore.
+  }, []);
 
   useEffect(() => {
     if (!shouldLockBodyScroll) return;
     return lockBodyScroll();
   }, [shouldLockBodyScroll]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const pending = readPendingDemoRequest();
-    if (!pending) return;
-    handlePendingDemoRequest(pending);
-  }, [activeWalletId, handlePendingDemoRequest]);
-
-  const handleReset = () => {
-    setState(buildDefaultDemoState());
-    setActiveWalletId(resolvedDefaultWalletId);
-    setActiveAction(null);
-    setCashModalTab("buy");
-    setShowGlobalStatement(false);
-    setShowCurrencyStatement(false);
-    setSelectedStatementToken(null);
-    setStatementHighlightByWallet({});
-    setSendPaymentRequest(null);
-  };
-
-  const submitSend = ({ amount, currency, memo, toWalletId, isFxSend, paymentRequest }) => {
+  const submitSend = ({ amount, currency, memo, toAddress, isFxSend, paymentRequest }) => {
     const minUnits = getMinUnitsForCurrency(currency);
     if (!Number.isFinite(Number(amount)) || Number(amount) < minUnits) {
       return {
@@ -855,7 +924,8 @@ export default function DemoWalletDashboard({
     const result = applyDemoSend({
       state: nextState,
       fromWalletId: activeWalletId,
-      toWalletId: toWalletId || otherWalletId,
+      toWalletId: null,
+      toAddress,
       currencyCode: currency,
       amountUnits: amount,
       memo,
@@ -873,9 +943,6 @@ export default function DemoWalletDashboard({
     const sendEvent = result?.event || null;
     if (sendEvent?.id) {
       recordStatementHighlight(activeWalletId, currency, sendEvent.id);
-      if (toWalletId) {
-        recordStatementHighlight(toWalletId, currency, sendEvent.id);
-      }
     }
 
     if (isFxSend && spreadFeeUnits > 0) {
@@ -942,28 +1009,21 @@ export default function DemoWalletDashboard({
     return { ok: true, event: result?.event || nextState?.events?.[0] || null };
   };
 
-  const handleSendSubmit = async () => {
-    if (!selectedSendToken) return { ok: false };
-    const amountNum = Number.parseFloat(sendAmount || "0");
-    if (!Number.isFinite(amountNum) || amountNum <= 0) return { ok: false };
+	  const handleSendSubmit = async ({ saveDestination = "", saveLabel = "" } = {}) => {
+	    if (!selectedSendToken) return { ok: false };
+	    const amountNum = Number.parseFloat(sendAmount || "0");
+	    if (!Number.isFinite(amountNum) || amountNum <= 0) return { ok: false };
 
-    const dest = String(sendDestination || "").trim();
+	    const dest = String(sendDestination || "").trim();
+    if (!dest) {
+      alert(t("demo_error_destination_required", "Veuillez saisir une adresse de destination (démo)."));
+      return { ok: false };
+    }
     if (sendPaymentRequest?.to && dest !== String(sendPaymentRequest.to).trim()) {
       alert(
         t(
           "demo_error_request_destination_mismatch",
           "La destination de la demande de paiement ne correspond pas (démo)."
-        )
-      );
-      return { ok: false };
-    }
-    const toWalletId =
-      dest === getWalletAddress(state, otherWalletId) ? otherWalletId : null;
-    if (!toWalletId) {
-      alert(
-        t(
-          "demo_error_destination_wallet_required",
-          "Démo : la destination doit être une adresse Wallet A/B."
         )
       );
       return { ok: false };
@@ -986,26 +1046,38 @@ export default function DemoWalletDashboard({
 
     const isFxSend = selectedSendToken?.isTrustlineOnly && !isDemoNativeCurrency(currency);
 
-    setSendProcessing(true);
-    try {
-      await sleep(getDemoLatencyMs());
-      const res = submitSend({
-        amount: amountNum,
+	    setSendProcessing(true);
+	    try {
+	      await sleep(getDemoLatencyMs());
+	      const res = submitSend({
+	        amount: amountNum,
         currency,
         memo: sendPaymentRequest?.memo || "",
-        toWalletId,
+        toAddress: dest,
         isFxSend,
         paymentRequest: sendPaymentRequest
       });
-      if (res?.error) {
-        alert(res.error);
-        return { ok: false };
-      }
-      setActiveAction(null);
-      setSendPaymentRequest(null);
-      return { ok: true };
-    } finally {
-      setSendProcessing(false);
+	      if (res?.error) {
+	        alert(res.error);
+	        return { ok: false };
+	      }
+	      const normalizedSaveDestination = String(saveDestination || "").trim();
+	      if (normalizedSaveDestination && normalizedSaveDestination === dest) {
+	        const isAlreadySaved = (demoSavedAddresses || []).some(
+	          (entry) => entry.address === normalizedSaveDestination
+	        );
+	        if (!isAlreadySaved) {
+	          saveDemoAddress(
+	            normalizedSaveDestination,
+	            String(saveLabel || "").trim()
+	          );
+	        }
+	      }
+	      setActiveAction(null);
+	      setSendPaymentRequest(null);
+	      return { ok: true };
+	    } finally {
+	      setSendProcessing(false);
     }
   };
 
@@ -1270,19 +1342,43 @@ export default function DemoWalletDashboard({
         if (evt.from === activeWalletId) {
           delta = -amount;
           type = "debit";
-          counterparty = getWalletAddress(state, evt.to);
-          description = t("demo_statement_send_to_wallet", {
-            defaultValue: "Envoyé à {{walletId}}",
-            walletId: evt.to
-          });
+          const destAddress = String(
+            evt.toAddress || (evt.to ? getWalletAddress(state, evt.to) : "")
+          ).trim();
+          const destLabel =
+            String(evt.toLabel || "").trim() ||
+            formatDemoAddressShort(destAddress) ||
+            (evt.to ? String(evt.to) : "");
+          counterparty = destAddress || destLabel;
+          description = evt.to
+            ? t("demo_statement_send_to_wallet", {
+                defaultValue: "Envoyé à {{walletId}}",
+                walletId: evt.to,
+              })
+            : t("demo_statement_send_to", {
+                defaultValue: "Envoyé à {{to}}",
+                to: destLabel || t("demo_counterparty_unknown", "Destination"),
+              });
         } else if (evt.to === activeWalletId) {
           delta = amount;
           type = "credit";
-          counterparty = getWalletAddress(state, evt.from);
-          description = t("demo_statement_receive_from_wallet", {
-            defaultValue: "Recevoir depuis le wallet {{walletId}}",
-            walletId: evt.from
-          });
+          const srcAddress = String(
+            evt.fromAddress || (evt.from ? getWalletAddress(state, evt.from) : "")
+          ).trim();
+          const srcLabel =
+            String(evt.fromLabel || "").trim() ||
+            formatDemoAddressShort(srcAddress) ||
+            (evt.from ? String(evt.from) : "");
+          counterparty = srcAddress || srcLabel;
+          description = evt.from
+            ? t("demo_statement_receive_from_wallet", {
+                defaultValue: "Recevoir depuis le wallet {{walletId}}",
+                walletId: evt.from,
+              })
+            : t("demo_statement_receive_from", {
+                defaultValue: "Reçu de {{from}}",
+                from: srcLabel || t("demo_counterparty_unknown", "Source"),
+              });
         } else {
           return;
         }
@@ -1441,55 +1537,51 @@ export default function DemoWalletDashboard({
   }, [activeWalletId]);
 
   return (
-    <div
-      className={[
-      "h-full flex flex-col min-h-0 ring-1 rounded-b-xl rounded-t-none bg-elevated border border-white/10",
-      walletSwitchAnimating ? "demo-wallet-switch-in" : "",
-      isHomeTheme ? "demo-wallet-theme-home" : "",
-      isDexTheme ? "demo-wallet-theme-dex" : "",
-      panelRingClass,
-      demoBottomBorderClass].
-      join(" ")}>
+	    <div
+	      className={[
+		      "h-full flex flex-col min-h-0 ring-1 rounded-md overflow-hidden bg-[#0b0f10] border border-white/10",
+	      "demo-wallet-tooltip-scope",
+	      walletSwitchAnimating ? "demo-wallet-switch-in" : "",
+	      panelRingClass,
+	      demoBottomBorderClass].
+	      join(" ")}>
 
-      <div className="panel-header">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_30015bef4b", "XCANNES")}
+		      <div className="panel-header">
+		        <div className="flex items-center justify-between gap-3">
+		          <div className="flex items-center gap-1 min-w-0">
+		            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_30015bef4b", "XCANNES")}
 
-            </span>
-            <span className="text-[10px] font-light text-white/30">|</span>
-            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/70 truncate italic">
-              {t("demo_wallet_label", "Wallet")} {activeWalletId}
-            </span>
-          </div>
-          <span className="text-[10px] font-semibold text-xcannes-green tracking-[0.18em]">
-            {t("demo_notice_title", "Demo mode")}
-          </span>
-        </div>
+		            </span>
+		            <span className="text-[10px] font-light text-white/30">|</span>
+		          </div>
+			          <span className="text-xs md:text-sm font-semibold text-white/70 tracking-[0.18em]">
+			            {t("demo_notice_title", "Demo mode")}
+			          </span>
+			        </div>
 
-        {showWalletSwitcher &&
-        <div className="mt-3 flex items-center justify-between gap-3">
-            <div className="inline-flex rounded-lg bg-black/20 border border-white/10 p-1">
-              {["A", "B"].map((id) =>
-            <button
-              key={id}
-              type="button"
-              onClick={() => setActiveWalletId(id)}
-              className={[
-              "px-3 py-1.5 text-xs rounded-md transition-colors border",
-              activeWalletId === id ?
-              id === "A" ?
-              "bg-white/5 border-white/15 text-white hover:bg-white/10" :
+	        {showWalletSwitcher &&
+	        <div className="mt-3 flex items-center justify-between gap-3">
+	            <div className="inline-flex rounded-lg bg-black/20 border border-white/10 p-1">
+	              {["A"].map((id) =>
+	            <button
+	              key={id}
+	              type="button"
+	              onClick={() => setActiveWalletId(id)}
+	              className={[
+	              "px-3 py-1.5 text-xs rounded-md transition-colors border",
+	              activeWalletId === id ?
+	              id === "A" ?
+	              "bg-white/5 border-white/15 text-white hover:bg-white/10" :
               "bg-xcannes-blue-light/10 border-xcannes-blue-light/30 text-xcannes-blue-light" :
               "border-transparent text-white/60 hover:text-white"].
               join(" ")}>
 
-                  {t("demo_wallet_label", "Wallet")} {id}
-                </button>
-            )}
-            </div>
-          </div>
-        }
+	                  {t("demo_wallet_label", "Wallet")} {id}
+	                </button>
+	            )}
+	            </div>
+	          </div>
+	        }
 
         <div className="mt-4 flex flex-col items-center gap-2">
           <p
@@ -1498,30 +1590,216 @@ export default function DemoWalletDashboard({
           >
             {formatMoney(locale, displayAmount, displayCurrency)}
           </p>
-          <button
-            type="button"
-            onClick={() => setShowGlobalStatement(true)}
-            title={t("demo_tt_statement", "Voir le relevé global.")}
-            className="mt-1 px-4 py-1.5 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded-lg text-xs font-medium transition-all duration-200 border border-xcannes-green/30 hover:scale-105">
+		          <button
+		            type="button"
+		            onClick={() => setShowGlobalStatement(true)}
+		            title={t("demo_tt_statement", "Voir le relevé global.")}
+		            className="mt-1 px-4 py-1.5 bg-xcannes-green/50 hover:bg-xcannes-green/60 text-white rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105">
 
-            {t("demo_view_statement", "Voir le relevé")}
-          </button>
-          <div className="mt-2 text-xs text-white/50">
-            {t("demo_to_wallet", "Contrepartie")}:{" "}
-            <span className="text-white/75 italic">{otherWallet?.label}</span>
-          </div>
-        </div>
-      </div>
+		            {t("demo_view_statement", "Voir le relevé")}
+		          </button>
+
+		          <a
+		            href="https://ripple.com/solutions/stablecoin/transparency/"
+		            target="_blank"
+		            rel="noopener noreferrer"
+		            className="text-xs md:text-[10px] text-white/40 hover:text-white/70 transition-colors"
+		          >
+		            {t(
+		              "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
+		              "Stablecoin USD régulé (détails)"
+		            )}
+		          </a>
+
+			          <div className="w-full mt-1.5 flex justify-center">
+			            <div className="relative w-full max-w-[560px] pr-10">
+			              <div className="w-full min-w-0 rounded-md border border-white/10 bg-black/20 px-2.5 py-1.5 shadow-none">
+				                <div className="flex items-start justify-between gap-3">
+				                  <div className="min-w-0">
+			                    <div className="flex items-center gap-2 min-w-0">
+			                      <span className="text-[11px] md:text-[12px] font-semibold text-white/85 truncate">
+			                        {walletContextLabel || t("nav_wallet", "Wallet")}
+			                      </span>
+		                      {isWalletLabelLocked && walletHeaderToast ? (
+		                        <span className="text-[10px] text-xcannes-green/90 truncate">
+		                          {walletHeaderToast}
+		                        </span>
+		                      ) : null}
+		                    </div>
+
+			                    {!isWalletLabelLocked ? (
+			                      <div className="mt-0.5 flex items-center gap-2 min-w-0">
+			                        <span
+			                          className="font-mono text-[10px] text-white/55 truncate"
+			                          title={t("demo_tt_wallet_address", "Adresse XRPL du wallet.")}
+			                        >
+			                          {formatDemoAddressShort(effectiveWallet)}
+			                        </span>
+		                        {walletHeaderToast ? (
+		                          <span className="text-[10px] text-xcannes-green/90">
+		                            {walletHeaderToast}
+		                          </span>
+		                        ) : null}
+		                      </div>
+		                    ) : null}
+		                  </div>
+
+			                  <div className="flex items-center gap-2 shrink-0">
+			                    {!isWalletLabelLocked ? (
+			                      <button
+		                        type="button"
+		                        onClick={handleOpenWalletLabelEditor}
+		                        disabled={isEditingWalletLabel}
+		                        title={t("ui_rename_86c8307e14", "Renommer")}
+			                        className="p-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+			                        aria-label={t(
+			                          "ui_rename_wallet_8fecb8eee2",
+			                          "Renommer le wallet"
+		                        )}
+		                      >
+		                        <svg
+		                          className="w-4 h-4"
+		                          fill="none"
+		                          stroke="currentColor"
+		                          viewBox="0 0 24 24"
+		                        >
+		                          <path
+		                            strokeLinecap="round"
+		                            strokeLinejoin="round"
+		                            strokeWidth={2}
+		                            d="M16.862 3.487a2.1 2.1 0 012.97 2.97L8.9 17.39a4 4 0 01-1.69 1l-3.42 1.14 1.14-3.42a4 4 0 011-1.69L16.862 3.487z"
+		                          />
+		                        </svg>
+		                      </button>
+		                    ) : null}
+
+			                    <button
+			                      type="button"
+			                      onClick={handleCopyWalletAddress}
+			                      title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+			                      className="p-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white transition-all active:scale-95"
+			                      aria-label={t(
+			                        "ui_copy_xrpl_address_4f63ed10fc",
+			                        "Copier l'adresse XRPL"
+		                      )}
+		                    >
+		                      <svg
+		                        className="w-4 h-4"
+		                        fill="none"
+		                        stroke="currentColor"
+		                        viewBox="0 0 24 24"
+		                      >
+		                        <path
+		                          strokeLinecap="round"
+		                          strokeLinejoin="round"
+		                          strokeWidth={2}
+		                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+		                        />
+		                      </svg>
+		                    </button>
+			                  </div>
+			                </div>
+
+			                {isEditingWalletLabel && !isWalletLabelLocked ? (
+			                  <div className="mt-1.5 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-1.5 rounded-md bg-white/5 border border-white/10 px-2 py-1">
+			                    <input
+			                      type="text"
+			                      value={walletLabelDraft}
+	                      onChange={(e) => setWalletLabelDraft(e.target.value)}
+	                      placeholder={t("ui_wallet_name_b4c2f054b9", "Nom du wallet")}
+	                      className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
+	                      onKeyDown={(e) => {
+	                        if (e.key === "Enter") {
+	                          handleSaveWalletLabel();
+	                        }
+	                        if (e.key === "Escape") {
+	                          handleCancelWalletLabel();
+	                        }
+	                      }}
+	                      autoFocus
+	                    />
+
+			                    <button
+			                      type="button"
+			                      onClick={handleSaveWalletLabel}
+			                      className="p-1 rounded-md bg-xcannes-green/15 hover:bg-xcannes-green/25 border border-xcannes-green/25 text-xcannes-green transition-colors active:scale-95"
+			                      aria-label={t("ui_save_404be3f4a5", "Enregistrer")}
+			                      title={t("ui_save_2d42b7df0f", "Enregistrer")}
+			                    >
+	                      <svg
+	                        className="w-4 h-4"
+	                        fill="none"
+	                        stroke="currentColor"
+	                        viewBox="0 0 24 24"
+	                      >
+	                        <path
+	                          strokeLinecap="round"
+	                          strokeLinejoin="round"
+	                          strokeWidth={2}
+	                          d="M5 13l4 4L19 7"
+	                        />
+	                      </svg>
+	                    </button>
+
+		                    <button
+		                      type="button"
+		                      onClick={handleCancelWalletLabel}
+		                      className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 transition-colors active:scale-95"
+		                      aria-label={t("ui_cancel_d2d2058892", "Annuler")}
+		                      title={t("ui_cancel_fbca985028", "Annuler")}
+		                    >
+	                      <svg
+	                        className="w-4 h-4"
+	                        fill="none"
+	                        stroke="currentColor"
+	                        viewBox="0 0 24 24"
+	                      >
+	                        <path
+	                          strokeLinecap="round"
+	                          strokeLinejoin="round"
+	                          strokeWidth={2}
+	                          d="M6 18L18 6M6 6l12 12"
+	                        />
+	                      </svg>
+	                    </button>
+	                  </div>
+			                ) : null}
+		              </div>
+
+		              <button
+		                type="button"
+		                onClick={handleRefreshWallet}
+		                disabled={isRefreshing}
+			                title={t("demo_tt_reset", "Réinitialiser la démo.")}
+			                aria-label={t("demo_reset", "Réinitialiser")}
+			                className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 h-9 w-9 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+			                  isRefreshing
+			                    ? "text-xcannes-green hover:text-xcannes-green/90"
+			                    : "text-white/60 hover:text-white"
+			                }`}
+			              >
+			                <svg
+			                  className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`}
+			                  fill="currentColor"
+			                  viewBox="0 0 24 24"
+			                >
+		                  <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />
+		                </svg>
+		              </button>
+		            </div>
+		          </div>
+		        </div>
+		      </div>
 
       <div className="px-3 py-2 md:py-3 border-b border-white/5">
         <div className="grid grid-cols-4 gap-2 sm:gap-3">
           <button
             type="button"
-            onClick={() => {
-              setSendTab("manual");
-              setSendDestination(getWalletAddress(state, otherWalletId));
-              setActiveAction("send");
-            }}
+	            onClick={() => {
+	              setSendTab("manual");
+	              setSendDestination(DEMO_DEFAULT_DESTINATION_ADDRESS);
+	              setActiveAction("send");
+	            }}
             title={t("demo_tt_send", "Envoyer un paiement dans la devise choisie.")}
             className="wallet-action-btn wallet-action-send group">
 
@@ -1637,12 +1915,12 @@ export default function DemoWalletDashboard({
                 setSwapDefaultView("lines");
                 setSwapLockedView("lines");
                 setActiveAction("swap");
-              }}
-              title={t("demo_tt_manage_lines", "Gérer les lignes de comptes.")}
-              className="text-sm md:text-xs text-xcannes-green/80 hover:text-xcannes-green transition-colors">
+	              }}
+	              title={t("demo_tt_manage_lines", "Gérer les lignes de comptes.")}
+	              className="text-sm md:text-xs text-white/70 hover:text-white transition-colors">
 
-              {t("demo_manage_lines", "Gérer les lignes de comptes")} →
-            </button>
+	              {t("demo_manage_lines", "Gérer les lignes de comptes")} →
+	            </button>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
             {tokens.map((row) => {
@@ -1672,36 +1950,33 @@ export default function DemoWalletDashboard({
                 className="w-full text-left"
                 title={t("demo_open_statement", "Ouvrir le relevé")}>
 
-                  <div
-                    className={[
-                      "flex items-center justify-between rounded-md border border-white/10 px-3 py-2 hover:border-white/20 transition-colors",
-                      "bg-black/40",
-                    ].join(" ")}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className={`${iconSizeClass} ${iconRadiusClass} flex items-center justify-center font-semibold text-primary overflow-hidden`}>
-                        {renderDemoTokenIcon(row.code)}
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-xs text-primary truncate">{row.code}</span>
-                        <span className="text-[11px] text-muted truncate">
-                          {getDemoCurrencyLabel(row.code)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-right text-[12px] text-primary">
-                      <div className="font-mono">
-                        {formatUnits(locale, row.units)}
-                      </div>
-                      <div className="mt-0.5 text-[10px] text-muted font-normal">
-                        {row.usdValue == null ?
-                      "—" :
-                      `≈ ${formatMoney(locale, row.usdValue, "USD")}`}
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              </div>
+		                  <div
+		                    className={[
+		                      "flex items-center justify-between rounded-md px-3 py-2 transition-colors",
+		                      "bg-black/20 hover:bg-black/15",
+		                    ].join(" ")}
+		                  >
+	                    <div className="flex items-center gap-2 min-w-0">
+	                      <div className={`${iconSizeClass} ${iconRadiusClass} flex items-center justify-center font-semibold text-primary overflow-hidden`}>
+	                        {renderDemoTokenIcon(row.code)}
+	                      </div>
+	                      <div className="min-w-0">
+	                        <div className="flex items-baseline gap-2 min-w-0">
+		                          <span className="text-[13px] text-primary truncate">{row.code}</span>
+		                          <span className="text-[12px] text-muted truncate">
+		                            {getDemoCurrencyLabel(row.code)}
+		                          </span>
+	                        </div>
+	                      </div>
+	                    </div>
+			                    <div className="text-right text-[13px] text-primary">
+			                      <div className="font-mono">
+			                        {formatUnits(locale, row.units)}
+			                      </div>
+		                    </div>
+	                  </div>
+	                </button>
+	              </div>
               );
             })}
 
@@ -1715,59 +1990,74 @@ export default function DemoWalletDashboard({
 
       </div>
 
-      <div
-        className={[
-          "shrink-0 border-t border-white/10 px-3 py-2",
-          isHomeTheme ? "bg-elevated" : "bg-elevated/80 backdrop-blur",
-        ].join(" ")}
-      >
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={handleReset}
-            title={t("demo_tt_reset", "Réinitialiser la démo.")}
-            className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-colors">
+		      <div
+		        className={[
+		          "shrink-0 border-t border-white/10 px-3 py-2",
+			          "bg-[#0b0f10]",
+			        ].join(" ")}
+			      >
+	        <div className="flex items-center justify-between gap-3">
+	          <div className="text-[11px] text-white/60 font-medium">
+	            {t("ui_xrpl_not_connected_0d0d4a67a1", "XRPL non connecté")}
+	          </div>
+	          <div className="flex items-center gap-2 flex-shrink-0">
+	            <button
+	              type="button"
+	              onClick={() => setWalletInfoOpen(true)}
+	              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 font-medium transition-all duration-300"
+	              title={t("wallet_footer_info_title", "Wallet info & fees")}
+	            >
+	              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
+	                i
+	              </span>
+	              <span>{t("wallet_footer_info_fees", "Info & Fees")}</span>
+	            </button>
+	          </div>
+	        </div>
+	      </div>
 
-            {t("demo_reset", "Réinitialiser")}
-          </button>
-          <div className="text-xs text-white/45">
-            {t("demo_footer_note", "Données fictives")}
-          </div>
-        </div>
-      </div>
+	      <WalletInfoModal
+	        isOpen={walletInfoOpen}
+	        onClose={() => setWalletInfoOpen(false)}
+	        isPreviewMode={true}
+	        isWalletActivated={true}
+	        hasRlusdTrustline={true}
+	        noticeVariant="demo"
+	        noticeContextLabel={demoNoticeContextLabel}
+	      />
 
-      <WalletDashboardSendModal
-        open={activeAction === "send"}
-        onClose={() => {
-          setActiveAction(null);
-          setSendPaymentRequest(null);
-        }}
-        isPreviewMode={true}
-        noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
-        sendTab={sendTab}
-        setSendTab={setSendTab}
-        renderWalletMeta={renderWalletMeta}
-        augmentedTokens={augmentedTokens}
-        selectedSendToken={selectedSendToken}
-        sendFxInfo={sendFxInfo}
-        setSendAssetKey={setSendAssetKey}
-        sendAmount={sendAmount}
-        setSendAmount={setSendAmount}
-        selectLabelByAssetKey={selectLabelByAssetKey}
-        selectLabelRightByAssetKey={selectLabelRightByAssetKey}
-        selectIconByAssetKey={selectIconByAssetKey}
-        selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
-        savedAddresses={demoSavedAddresses}
-        sendDestination={sendDestination}
-        setSendDestination={setSendDestination}
-        setQrScannerOpen={setQrScannerOpen}
-        handlePaymentRequestScan={handlePaymentRequestScan}
-        handleSendSubmit={handleSendSubmit}
-        sendProcessing={sendProcessing}
-        enableSaveAddress={false}
-        showFauxPayreqDecor={true} />
+	      <WalletDashboardSendModal
+	        open={activeAction === "send"}
+	        onClose={() => {
+	          setActiveAction(null);
+	          setSendPaymentRequest(null);
+	        }}
+	        isPreviewMode={true}
+	        noticeVariant="demo"
+	        noticeContextLabel={demoNoticeContextLabel}
+	        walletId={activeWalletId}
+	        sendTab={sendTab}
+	        setSendTab={setSendTab}
+	        renderWalletMeta={renderWalletMeta}
+	        augmentedTokens={augmentedTokens}
+	        selectedSendToken={selectedSendToken}
+	        sendFxInfo={sendFxInfo}
+	        setSendAssetKey={setSendAssetKey}
+	        sendAmount={sendAmount}
+	        setSendAmount={setSendAmount}
+	        selectLabelByAssetKey={selectLabelByAssetKey}
+	        selectLabelRightByAssetKey={selectLabelRightByAssetKey}
+	        selectIconByAssetKey={selectIconByAssetKey}
+	        selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
+	        savedAddresses={demoSavedAddresses}
+	        sendDestination={sendDestination}
+	        setSendDestination={setSendDestination}
+	        setQrScannerOpen={setQrScannerOpen}
+	        handlePaymentRequestScan={handlePaymentRequestScan}
+	        handleSendSubmit={handleSendSubmit}
+	        sendProcessing={sendProcessing}
+	        enableSaveAddress={true}
+	        showFauxPayreqDecor={true} />
 
 
       <WalletDashboardReceiveModal
@@ -1846,17 +2136,19 @@ export default function DemoWalletDashboard({
         rlusdPerUnitRates={rlusdPerUnitRates} />
 
 
-      <WalletDashboardCashModal
-        open={activeAction === "cash"}
-        onClose={() => setActiveAction(null)}
-        isPreviewMode={true}
-        noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
-        demoMode={true}
-        onDemoBuy={async ({ amount }) => {
-          await sleep(getDemoLatencyMs());
-          const nextState = clone(state);
+	      <WalletDashboardCashModal
+	        open={activeAction === "cash"}
+	        onClose={() => setActiveAction(null)}
+	        isPreviewMode={true}
+	        noticeVariant="demo"
+	        noticeContextLabel={demoNoticeContextLabel}
+	        walletId={activeWalletId}
+	        walletLabel={walletContextLabel}
+	        hideWalletAddress={isWalletLabelLocked}
+	        demoMode={true}
+	        onDemoBuy={async ({ amount }) => {
+	          await sleep(getDemoLatencyMs());
+	          const nextState = clone(state);
           const res = applyDemoBuySell({
             state: nextState,
             walletId: activeWalletId,
@@ -1909,14 +2201,15 @@ export default function DemoWalletDashboard({
         walletAddress={effectiveWallet || ""} />
 
 
-      <WalletDashboardStatementModals
-        augmentedTokens={augmentedTokens}
-        backendWalletAddress={""}
-        effectiveWallet={effectiveWallet}
-        isPreviewMode={true}
-        noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
+	      <WalletDashboardStatementModals
+	        augmentedTokens={augmentedTokens}
+	        backendWalletAddress={""}
+	        effectiveWallet={effectiveWallet}
+	        walletDisplayLabel={isWalletLabelLocked ? walletContextLabel : ""}
+	        isPreviewMode={true}
+	        noticeVariant="demo"
+	        noticeContextLabel={demoNoticeContextLabel}
+	        walletId={activeWalletId}
         previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={false}
@@ -1933,7 +2226,7 @@ export default function DemoWalletDashboard({
 
       <QRScanner
         isOpen={qrScannerOpen}
-        onScan={handleAddressScan}
+        onScan={handleDemoQrScan}
         onClose={() => setQrScannerOpen(false)}
         enableCamera={!showDemoMobileScannerQr}
         showStaticImage={showDemoMobileScannerQr}

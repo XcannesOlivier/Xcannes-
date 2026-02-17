@@ -32,6 +32,7 @@ const USD_STABLECOINS = [
 export default function GlobalStatement({
   tokens = [],
   walletAddress,
+  walletLabelOverride = "",
   isPreviewMode = false,
   isWalletActivated = null,
   hasRlusdTrustline = null,
@@ -60,6 +61,7 @@ export default function GlobalStatement({
   const [exportFormat, setExportFormat] = useState(null);
   const [docHash, setDocHash] = useState("");
   const [walletLabel, setWalletLabel] = useState("");
+  const resolvedLabelOverride = String(walletLabelOverride || "").trim();
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025"
@@ -73,6 +75,10 @@ export default function GlobalStatement({
 
   useEffect(() => {
     let cancelled = false;
+    if (resolvedLabelOverride) {
+      setWalletLabel(resolvedLabelOverride);
+      return () => {};
+    }
     if (!walletAddress) {
       setWalletLabel("");
       return () => {};
@@ -99,7 +105,7 @@ export default function GlobalStatement({
     return () => {
       cancelled = true;
     };
-  }, [walletAddress]);
+  }, [resolvedLabelOverride, walletAddress]);
 
   // Générer les 12 derniers mois
   const generateMonths = () => {
@@ -558,7 +564,7 @@ export default function GlobalStatement({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
 
-  const modalBgClass = noticeVariant === "demo" && walletId === "B" ? "bg-[#0b1017]" : "bg-elevated";
+  const modalBgClass = noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -601,7 +607,7 @@ export default function GlobalStatement({
                   {t("ui_global_statement_13e29aa8aa", "Global Statement")}
                 </h2>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-xcannes-green text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
@@ -640,19 +646,21 @@ export default function GlobalStatement({
 
           
           {/* Account Info dans le header */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_1bfc3cd21c", "Account Holder")}</p>
-              <p className="text-sm text-white font-semibold truncate">
-                {walletLabel || t("nav_wallet", "Wallet")}
-              </p>
-              <p className="text-[11px] text-white/50 font-mono break-all">
-                {walletAddress}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_4674b18f25", "Statement Period")}</p>
-              {/* Month Selector - simplifié */}
+	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+	            <div>
+	              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_1bfc3cd21c", "Account Holder")}</p>
+	              <p className="text-sm text-white font-semibold truncate">
+	                {walletLabel || t("nav_wallet", "Wallet")}
+	              </p>
+	              {!walletLabel ? (
+	                <p className="text-[11px] text-white/50 font-mono break-all">
+	                  {walletAddress}
+	                </p>
+	              ) : null}
+	            </div>
+	            <div>
+	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_4674b18f25", "Statement Period")}</p>
+	              {/* Month Selector - simplifié */}
               <StatementMonthSelect
                 value={selectedMonth}
                 onChange={(nextValue) => {
