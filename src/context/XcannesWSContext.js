@@ -8,40 +8,9 @@ export const XcannesWSProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [tickers, setTickers] = useState(new Map()); // Map<pair, ticker>
   const [tickersVersion, setTickersVersion] = useState(0); // ✅ Compteur pour forcer re-render
-  const [trades, setTrades] = useState(new Map()); // Map<pair, trades[]>
   const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> unifié
   const [externalPricesVersion, setExternalPricesVersion] = useState(0); // ✅ Compteur pour forcer re-render
   const [wsErrors, setWsErrors] = useState([]); // Derniers messages d'erreur WS (optionnel)
-
-  const normalizeTrade = (trade) => {
-    if (!trade || !trade.symbol) return null;
-    const price = Number(trade.price);
-    const amount = Number(trade.amount);
-    if (!Number.isFinite(price) || !Number.isFinite(amount)) return null;
-    const total = Number.isFinite(trade.total) ? Number(trade.total) : price * amount;
-    const timestamp = trade.timestamp
-      ? new Date(
-          trade.timestamp instanceof Date
-            ? trade.timestamp
-            : Number.isFinite(trade.timestamp)
-            ? (trade.timestamp > 1e12 ? trade.timestamp : trade.timestamp * 1000)
-            : trade.timestamp
-        )
-      : new Date();
-
-    return {
-      symbol: trade.symbol,
-      price,
-      amount,
-      total,
-      side: trade.side || "buy",
-      txHash: trade.txHash || null,
-      account: trade.account || null,
-      tradeType: trade.tradeType || "live",
-      timestamp,
-      source: trade.source || "ws",
-    };
-  };
 
   useEffect(() => {
     // Utiliser le singleton wsClient
@@ -115,43 +84,6 @@ export const XcannesWSProvider = ({ children }) => {
 
     wsClient.on("eod-summary", handleEodSummary);
 
-    const handleTradesSnapshot = (message) => {
-      if (!message?.data?.symbol || !Array.isArray(message.data.trades)) return;
-      const symbol = message.data.symbol;
-      const normalizedList = message.data.trades
-        .map(normalizeTrade)
-        .filter(Boolean)
-        .slice(0, 100);
-
-      setTrades((prev) => {
-        const next = new Map(prev);
-        next.set(symbol, normalizedList);
-        return next;
-      });
-    };
-
-    const handleTradeUpdate = (message) => {
-      if (!message?.data?.symbol) return;
-      const normalized = normalizeTrade(message.data);
-      if (!normalized) return;
-
-      setTrades((prev) => {
-        const next = new Map(prev);
-        const list = next.get(normalized.symbol)
-          ? [...next.get(normalized.symbol)]
-          : [];
-        list.unshift(normalized);
-        if (list.length > 100) {
-          list.length = 100;
-        }
-        next.set(normalized.symbol, list);
-        return next;
-      });
-    };
-
-    wsClient.on("trades", handleTradesSnapshot);
-    wsClient.on("trade", handleTradeUpdate);
-
     // Gérer les messages d'erreur du serveur WS de manière non bloquante
     const handleWsError = (message) => {
       const msg =
@@ -179,8 +111,6 @@ export const XcannesWSProvider = ({ children }) => {
       wsClient.off("ticker", handleTicker);
       wsClient.off("pyth", handlePyth);
       wsClient.off("eod-summary", handleEodSummary);
-      wsClient.off("trades", handleTradesSnapshot);
-      wsClient.off("trade", handleTradeUpdate);
       wsClient.off("error", handleWsError);
     };
   }, []);
@@ -199,14 +129,13 @@ export const XcannesWSProvider = ({ children }) => {
     connected,
     tickers,
     tickersVersion, // ✅ Exposer le compteur
-    trades,
     externalPrices,
     externalPricesVersion, // ✅ Exposer le compteur
     wsErrors,
     subscribe,
     unsubscribe,
     ws: wsClient,
-  }), [connected, tickers, tickersVersion, trades, externalPrices, externalPricesVersion, wsErrors, subscribe, unsubscribe]);
+  }), [connected, tickers, tickersVersion, externalPrices, externalPricesVersion, wsErrors, subscribe, unsubscribe]);
 
   return (
     <XcannesWSContext.Provider value={value}>

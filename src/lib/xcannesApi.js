@@ -25,8 +25,6 @@ const API_ENDPOINTS = {
   MARKETS: '/api/v1/markets',
   MARKETS_ALL: '/api/v1/markets/all',
   TICKER: '/api/v1/ticker',
-  TRADES: '/api/v1/trades',
-  KLINES: '/api/v1/klines',
   FX_EOD: '/api/v1/fx/eod',
   FX_CURRENCIES: '/api/v1/fx/currencies',
 };
@@ -192,35 +190,6 @@ class XcannesAPI {
   async getTicker(pair) {
     const result = await this.request(`${API_ENDPOINTS.TICKER}?pair=${pair}`);
     return result.success ? result.data : null;
-  }
-
-  /**
-   * Récupérer les trades récents
-   * @param {string} pair - Format: RLUSD_XRP
-   * @param {number} limit - Nombre de trades (default: 50)
-   * @returns {Promise<Object>}
-   */
-  async getTrades(pair, limit = 50) {
-    const result = await this.request(
-      `${API_ENDPOINTS.TRADES}?pair=${pair}&limit=${limit}`,
-      { useCache: false } // Toujours récupérer les derniers trades
-    );
-    return result.success ? result.data : { trades: [] };
-  }
-
-  /**
-   * Récupérer les candles OHLCV
-   * @param {string} pair - Format: RLUSD_XRP
-   * @param {string} interval - 1m, 5m, 15m, 1h, 4h, 1d
-   * @param {number} limit - Nombre de candles (default: 100)
-   * @returns {Promise<Object>}
-   */
-  async getKlines(pair, interval = "1h", limit = 100) {
-    // Utiliser uniquement l'endpoint temps réel (données XRPL réelles)
-    const result = await this.request(
-      `${API_ENDPOINTS.KLINES}?pair=${pair}&interval=${interval}&limit=${limit}`
-    );
-    return result.success ? result.data?.candles || [] : [];
   }
 
   /**
