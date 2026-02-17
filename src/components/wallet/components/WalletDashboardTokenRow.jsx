@@ -47,9 +47,13 @@ export default function WalletDashboardTokenRow({
   const isMissingTrustline = !!token?.isMissingTrustline;
   const isLineCurrency = Boolean(token?.isTrustlineOnly);
   const isNativeAsset = currencyCode === "XRP" || currencyCode === "RLUSD";
-  const iconSizeClass = isLineCurrency
-    ? "w-11 h-11 text-[20px] sm:w-10 sm:h-10 sm:text-[18px]"
-    : "w-7 h-7 text-[13px]";
+  const hasCryptoIcon = Boolean(currencyCode && CRYPTO_ICONS?.[currencyCode]);
+  const isFlagIcon = isLineCurrency && !hasCryptoIcon;
+  const iconSizeClass = isFlagIcon
+    ? "w-11 h-11 text-[20px] sm:w-12 sm:h-12 sm:text-[22px]"
+    : isLineCurrency
+      ? "w-9 h-9 text-[16px]"
+      : "w-7 h-7 text-[13px]";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
@@ -101,13 +105,13 @@ export default function WalletDashboardTokenRow({
 	            <div className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}>
 	              {renderTokenIcon(token)}
 	            </div>
-	            <div className="min-w-0">
-	              <div className="flex items-baseline gap-2 min-w-0">
-		                <span className="text-[13px] text-primary truncate">{token?.currency}</span>
-		                <span className="text-[12px] text-muted truncate">{currencyLabel}</span>
-		              </div>
-		            </div>
-		          </div>
+		            <div className="min-w-0">
+		              <div className="flex items-baseline gap-2 min-w-0">
+			                <span className="text-[14px] md:text-[15px] text-primary truncate">{token?.currency}</span>
+			                <span className="text-[13px] md:text-[14px] text-muted truncate">{currencyLabel}</span>
+			              </div>
+			            </div>
+			          </div>
           {showWalletActivationNotice ? (
             <div className="flex-1 min-w-0 px-2">
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-blue-200/90 text-center leading-snug">
@@ -228,11 +232,11 @@ export default function WalletDashboardTokenRow({
           ) : (
             <div className="flex-1" />
           )}
-		          <div className="text-right text-[13px] text-primary shrink-0">
-		            <div className="font-mono">
-		              {Number.isFinite(displayValue) ?
-		              displayValue.toLocaleString("en-US", {
-	                maximumFractionDigits: 4
+			          <div className="text-right text-[14px] md:text-[15px] text-primary shrink-0">
+			            <div className="font-mono">
+			              {Number.isFinite(displayValue) ?
+			              displayValue.toLocaleString("en-US", {
+		                maximumFractionDigits: 4
 	              }) :
 	              "0"}
 	            </div>

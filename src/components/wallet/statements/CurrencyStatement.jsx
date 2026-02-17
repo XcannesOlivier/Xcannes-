@@ -123,7 +123,6 @@ export default function CurrencyStatement({
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
   const [reserveOpen, setReserveOpen] = useState(false);
-  const [rlusdBenefitOpen, setRlusdBenefitOpen] = useState(false);
   const [docHash, setDocHash] = useState("");
   const [walletLabel, setWalletLabel] = useState("");
   const resolvedLabelOverride = String(walletLabelOverride || "").trim();
@@ -150,19 +149,6 @@ export default function CurrencyStatement({
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-
-  // Écouter l'événement pour ouvrir automatiquement le Programme RLUSD
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (normalizedCurrency !== "RLUSD") return;
-    
-    const handleOpenRlusdProgram = () => {
-      setRlusdBenefitOpen(true);
-    };
-    
-    window.addEventListener("xcannes:rlusd:open-program", handleOpenRlusdProgram);
-    return () => window.removeEventListener("xcannes:rlusd:open-program", handleOpenRlusdProgram);
-  }, [normalizedCurrency]);
 
   useEffect(() => {
     if (!highlightTransactionId) return undefined;
@@ -227,7 +213,6 @@ export default function CurrencyStatement({
 
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
   const reservePlaceholder = "—";
-  const showRlusdProgram = normalizedCurrency === "RLUSD";
 
   const xrpReserveDetails = useMemo(() => {
     const code = normalizedCurrency;
@@ -1162,13 +1147,13 @@ export default function CurrencyStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-4xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-5xl"
+      "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl"
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-3 md:px-4",
       panelClass:
-      "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]"
+      "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[90vh]"
     },
     "dex-mobile": {
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
@@ -1180,13 +1165,13 @@ export default function CurrencyStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-4",
       panelClass:
-      "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[92vh]"
+      "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[92vh]"
     },
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
       panelClass:
-      "w-full h-full rounded-xl border border-white/10"
+      "w-full h-full rounded-xl"
     }
   };
 
@@ -1229,7 +1214,7 @@ export default function CurrencyStatement({
 
         
 	        {/* Header avec Account Info intégré */}
-	        <div className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}>
+		        <div className={`flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}>
 	          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
               {CRYPTO_ICONS?.[normalizedCurrency] ? (
@@ -1354,22 +1339,22 @@ export default function CurrencyStatement({
                     </div>
                     <button
                   type="button"
-                  onClick={() => setReserveOpen((v) => !v)}
-                  disabled={!xrpReserveDetails}
-                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
-                  aria-expanded={reserveOpen}
-                  aria-disabled={!xrpReserveDetails}
-                  aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
+	                  onClick={() => setReserveOpen((v) => !v)}
+	                  disabled={!xrpReserveDetails}
+	                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
+	                  aria-expanded={reserveOpen}
+	                  aria-disabled={!xrpReserveDetails}
+	                  aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
 
 
                 </button>
-                  </div>
+	                  </div>
 
-                  {reserveOpen &&
-              <div className="mt-2 rounded-lg border border-white/10 bg-black/60 p-3 space-y-2">
-                      <div className="text-[11px] text-white/70">
-                        <div className="flex items-center justify-between gap-2">
-                          <span>{t("ui_activation_wallet_1dcd314549", "Activation wallet")}</span>
+	                  {reserveOpen &&
+	              <div className="mt-2 rounded-lg bg-black/60 p-3 space-y-2">
+	                      <div className="text-[11px] text-white/70">
+	                        <div className="flex items-center justify-between gap-2">
+	                          <span>{t("ui_activation_wallet_1dcd314549", "Activation wallet")}</span>
                           <span className="font-mono">{xrpReserveDetails.activationXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
@@ -1396,108 +1381,6 @@ export default function CurrencyStatement({
                 </div>
             }
 
-              {showRlusdProgram && (
-                <div className="mt-2 relative">
-                  <div className="flex items-center justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setRlusdBenefitOpen((v) => !v)}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 border border-white/10 transition-colors"
-                      aria-expanded={rlusdBenefitOpen}
-                      aria-label={t("ui_rlusd_benefit_title_2d3c7a1f8e", "Avantage RLUSD")}
-                    >
-                      {t("ui_rlusd_program_cta_4fd1b09c3a", "Programme RLUSD")}
-                    </button>
-                  </div>
-
-                  {rlusdBenefitOpen && (
-                    <div className="mt-3 rounded-xl border border-white/20 bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm overflow-hidden">
-                      {/* Header avec badge */}
-                      <div className="px-4 py-3 border-b border-white/10 bg-white/5">
-                        <div className="flex items-center gap-2">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src="/symbols/rlusd.png"
-                            alt="RLUSD"
-                            width={20}
-                            height={20}
-                            className="shrink-0"
-                          />
-                          <h3 className="font-semibold text-white text-sm">
-                            {t("ui_rlusd_benefit_title_2d3c7a1f8e", "Avantage RLUSD")}
-                          </h3>
-                          <span className="ml-auto px-2 py-0.5 rounded-full bg-xcannes-green/20 text-xcannes-green text-[10px] font-medium border border-xcannes-green/30">
-                            Premium
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Contenu structuré */}
-                      <div className="px-4 py-3 space-y-3 text-[11.5px]">
-                        {/* Contexte général */}
-                        <div className="space-y-1.5">
-                          <p className="text-white/90 leading-relaxed">
-                            {t(
-                              "ui_rlusd_benefit_intro",
-                              "Les conversions sont soumises à un taux standard de 1 %."
-                            )}
-                          </p>
-                          <p className="text-white/75 leading-relaxed">
-                            {t(
-                              "ui_rlusd_benefit_desc",
-                              "La détention de RLUSD permet d'accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l'opération."
-                            )}
-                          </p>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="border-t border-white/10"></div>
-
-                        {/* Exemples avec design amélioré */}
-                        <div className="space-y-2">
-                          <p className="text-white/60 text-[10px] uppercase tracking-wider font-medium">
-                            {t("ui_rlusd_examples", "Exemples d'optimisation")}
-                          </p>
-                          
-                          <div className="space-y-1.5">
-                            <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 border border-white/10">
-                              <div className="flex items-center gap-2">
-                                <span className="text-white/50 text-xs">→</span>
-                                <span className="text-white/90 font-medium">6 RLUSD</span>
-                              </div>
-                              <span className="text-emerald-400 text-xs font-semibold">0,94 %</span>
-                            </div>
-                            
-                            <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-xcannes-green/10 border border-xcannes-green/30">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xcannes-green text-xs">→</span>
-                                <span className="text-white font-medium">100 RLUSD</span>
-                              </div>
-                              <span className="text-xcannes-green text-xs font-bold">0 % de frais</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Divider */}
-                        <div className="border-t border-white/10"></div>
-
-                        {/* Note importante */}
-                        <div className="rounded-lg bg-white/5 border border-white/10 px-3 py-2.5">
-                          <div className="flex gap-2">
-                            <span className="text-white/50 text-xs mt-0.5">ℹ️</span>
-                            <p className="text-white/70 text-[11px] leading-relaxed">
-                              {t(
-                                "ui_rlusd_benefit_note",
-                                "Les RLUSD ne sont ni débités ni immobilisés lors de la conversion. Ils demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement."
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1507,7 +1390,7 @@ export default function CurrencyStatement({
           
           {/* Archive Notice */}
           {selectedMonth === 'archives' &&
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 md:p-4">
+	        <div className="bg-blue-500/10 rounded-lg p-3 md:p-4">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <span className="text-xl">📁</span>
                 <span><strong>{t("ui_archives_743254edfe", "Archives:")}</strong>{t("ui_displaying_transactions_olde_e408b4a17d", "Displaying transactions older than 12 months.")}</span>
@@ -1516,7 +1399,7 @@ export default function CurrencyStatement({
         }
 
           {adjustmentInfo.required &&
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 md:p-4">
+	        <div className="bg-amber-500/10 rounded-lg p-3 md:p-4">
               <p className="text-sm text-amber-200 flex items-center gap-2">
                 <span className="text-xl">⚠️</span>
                 <span>
@@ -1538,9 +1421,9 @@ export default function CurrencyStatement({
                     window.dispatchEvent(
                       new CustomEvent("xcannes:wallet:open-adjustment")
                     );
-                  }}
-                  className="px-3 py-1.5 text-xs rounded-lg border border-amber-300/40 bg-amber-300/20 text-amber-100 hover:bg-amber-300/30 transition-colors"
-                >
+	                  }}
+	                  className="px-3 py-1.5 text-xs rounded-lg bg-amber-300/20 text-amber-100 hover:bg-amber-300/30 transition-colors"
+	                >
                   {t(
                     "ui_adjustment_open_modal_3c2b1a9d5e",
                     "Ajuster maintenant"
@@ -1551,45 +1434,45 @@ export default function CurrencyStatement({
         }
 
           {/* Filters */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex gap-1.5 flex-wrap">
-                <button
-              onClick={() => setFilter("all")}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-              filter === "all" ?
-              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green border border-xcannes-green/30" :
-              "bg-white/5 text-white/60 hover:bg-white/10"}`
-              }>{t("ui_all_0c90d41d71", "All (")}
+	          <div className="flex items-center justify-between gap-2 flex-wrap">
+	            <div className="flex gap-1.5 flex-wrap">
+	                <button
+	              onClick={() => setFilter("all")}
+	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+	              filter === "all" ?
+	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
+	              "bg-white/5 text-white/60 hover:bg-white/10"}`
+	              }>{t("ui_all_0c90d41d71", "All (")}
 
               {periodTransactions.length})
                 </button>
-                <button
-              onClick={() => setFilter("credit")}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-              filter === "credit" ?
-              "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30" :
-              "bg-white/5 text-white/60 hover:bg-white/10"}`
-              }>{t("ui_credits_b8166276a0", "Credits (")}
+	                <button
+	              onClick={() => setFilter("credit")}
+	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+	              filter === "credit" ?
+	              "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300" :
+	              "bg-white/5 text-white/60 hover:bg-white/10"}`
+	              }>{t("ui_credits_b8166276a0", "Credits (")}
 
               {credits.length})
                 </button>
-                <button
-              onClick={() => setFilter("debit")}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-              filter === "debit" ?
-              "bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30" :
-              "bg-white/5 text-white/60 hover:bg-white/10"}`
-              }>{t("ui_debits_38c870b18f", "Debits (")}
+	                <button
+	              onClick={() => setFilter("debit")}
+	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+	              filter === "debit" ?
+	              "bg-red-500/20 hover:bg-red-500/30 text-red-300" :
+	              "bg-white/5 text-white/60 hover:bg-white/10"}`
+	              }>{t("ui_debits_38c870b18f", "Debits (")}
 
               {debits.length})
                 </button>
-                <button
-              onClick={() => setFilter("conversion")}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-              filter === "conversion" ?
-              "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30" :
-              "bg-white/5 text-white/60 hover:bg-white/10"}`
-              }>{t("ui_conversions_b604b5ef8b", "Conversions (")}
+	                <button
+	              onClick={() => setFilter("conversion")}
+	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+	              filter === "conversion" ?
+	              "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300" :
+	              "bg-white/5 text-white/60 hover:bg-white/10"}`
+	              }>{t("ui_conversions_b604b5ef8b", "Conversions (")}
 
               {conversions.length})
                 </button>
@@ -1597,22 +1480,22 @@ export default function CurrencyStatement({
           </div>
 
           {/* Transactions Table */}
-          <div className="bg-black/40 rounded-lg border border-white/10 overflow-hidden flex flex-col min-h-0">
-            {error &&
-          <div className="border-b border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-                {error}
-              </div>
-          }
+	          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
+	            {error &&
+	          <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+	                {error}
+	              </div>
+	          }
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-black/85 backdrop-blur-md z-10">
-                <tr className="border-b border-white/10">
-                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_date_bb69dc2fa3", "Date")}</th>
-                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_description_d37d7cf577", "Description")}</th>
-                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_amount_1843418f56", "Amount")}</th>
-                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_balance_445d830d72", "Balance")}</th>
-                    </tr>
-                </thead>
+	              <table className="w-full text-sm">
+	                <thead className="sticky top-0 bg-black/85 backdrop-blur-md z-10">
+	                <tr>
+	                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_date_bb69dc2fa3", "Date")}</th>
+	                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_description_d37d7cf577", "Description")}</th>
+	                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_amount_1843418f56", "Amount")}</th>
+	                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_balance_445d830d72", "Balance")}</th>
+	                    </tr>
+	                </thead>
                 <tbody>
                   {loading ?
                 <tr>
@@ -1637,11 +1520,11 @@ export default function CurrencyStatement({
                       </tr>
                     ) : null}
                     {group.transactions.length === 0 ? (
-                      <tr className="border-b border-white/5">
-                        <td colSpan="4" className="text-center py-6 text-white/40 text-sm">
-                          {t("ui_no_transactions_found_af217af8de", "No transactions found")}
-                        </td>
-                      </tr>
+	                      <tr>
+	                        <td colSpan="4" className="text-center py-6 text-white/40 text-sm">
+	                          {t("ui_no_transactions_found_af217af8de", "No transactions found")}
+	                        </td>
+	                      </tr>
                     ) : (
                       group.transactions.map((tx, idx) => {
                         const icon = getTransactionIcon(tx.category);
@@ -1725,9 +1608,9 @@ export default function CurrencyStatement({
           {hasMore &&
         <button
           type="button"
-          onClick={() => onLoadMore && onLoadMore()}
-          disabled={loadingMore}
-          className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
+	          onClick={() => onLoadMore && onLoadMore()}
+	          disabled={loadingMore}
+	          className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
 
               {loadingMore ?
                 t("ui_loading_1386baebe9", "Loading…") :
@@ -1735,34 +1618,26 @@ export default function CurrencyStatement({
             </button>
         }
 
-          {/* Watermark */}
-          <div className="hidden sm:block text-center py-3 md:py-4 border-t border-white/10">
-            <div className="space-y-1">
-              <p className="text-xs text-white/20 font-mono hidden md:block">{t("ui_generated_on_ae324c9048", "Generated on")}
-              {new Date().toLocaleString(locale)}
-              </p>
-              <p className="text-xs text-white/20 font-mono">{ledgerStatusLabel}</p>
-              {ledgerLastIndex != null ?
-            <p className="text-xs text-white/20 font-mono">
-                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-                  {ledgerLastIndex}
-                </p> :
-            null}
-              <p className="text-[10px] text-white/10 font-mono break-all">
-                {t("ui_document_hash_label_9b5c1a2d7e", "Document hash:")}{" "}
-                {docHash || "-"}
-              </p>
-            </div>
-          </div>
-        </div>
+		          {/* Watermark */}
+			          <div className="hidden sm:block text-center py-3 md:py-4">
+		            <div className="space-y-1">
+		              {ledgerLastIndex != null ?
+		            <p className="text-xs text-white/20 font-mono">
+		                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
+		                  {ledgerLastIndex}
+	                </p> :
+	            null}
+	            </div>
+	          </div>
+	        </div>
 
-        {/* Footer Actions */}
-        <div className="border-t border-white/10 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-black/30">
-          <div className="flex gap-2 flex-wrap">
-            <button
-            onClick={handleExportPdf}
-            disabled={exportFormat === "pdf"}
-            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
+	        {/* Footer Actions */}
+	        <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-black/30">
+	          <div className="flex gap-2 flex-wrap">
+	            <button
+	            onClick={handleExportPdf}
+	            disabled={exportFormat === "pdf"}
+	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
 
               {exportFormat === "pdf" ? (
                 <span className="text-[13px] sm:text-inherit">
@@ -1774,18 +1649,18 @@ export default function CurrencyStatement({
                 </span>
               )}
             </button>
-            <button
-            onClick={handleExportCsv}
-            disabled={exportFormat === "csv"}
-            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">
+	            <button
+	            onClick={handleExportCsv}
+	            disabled={exportFormat === "csv"}
+	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
 
               {exportFormat === "csv" ?
                 t("ui_loading_1386baebe9", "Loading…") :
                 t("ui_export_csv_2f8a1b9d5e", "Export CSV")}
             </button>
-            <button
-            onClick={handlePrint}
-            className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70 border border-white/15">{t("ui_print_1313eff37c", "🖨️ Print")}
+	            <button
+	            onClick={handlePrint}
+	            className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70">{t("ui_print_1313eff37c", "🖨️ Print")}
 
 
           </button>

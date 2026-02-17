@@ -14,15 +14,26 @@ export default function WalletDashboardTokenList({
   const listClassName = disableInternalScroll
     ? "flex-1 min-h-0 px-3 pb-3"
     : "flex-1 min-h-0 px-3 pb-3 overflow-y-auto overscroll-contain";
+  const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
   return (
     <div
       className={`flex-1 min-h-0 flex flex-col ${layout.tokenListClass} ${className}`}
       style={style}
     >
       {(headerTitle || headerActionLabel) && (
-        <div className="flex items-center justify-between gap-2 mb-2 px-3 pt-3">
-          <div className="text-xs text-white/45">{headerTitle}</div>
-          {headerActionLabel ? (
+        <div
+          className={`flex items-center gap-2 mb-2 px-3 pt-3 ${
+            showHeaderAction ? "justify-between" : "justify-end"
+          }`}
+        >
+          {typeof headerTitle === "string" ? (
+            <div className={`text-xs text-white/45 ${showHeaderAction ? "" : "ml-auto"}`}>
+              {headerTitle}
+            </div>
+          ) : headerTitle ? (
+            <div className={showHeaderAction ? "" : "ml-auto"}>{headerTitle}</div>
+          ) : null}
+          {showHeaderAction ? (
             <button
               type="button"
               onClick={onHeaderAction}

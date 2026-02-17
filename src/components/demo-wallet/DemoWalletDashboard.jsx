@@ -1583,25 +1583,19 @@ export default function DemoWalletDashboard({
 	          </div>
 	        }
 
-        <div className="mt-4 flex flex-col items-center gap-2">
-          <p
-            className="text-2xl md:text-3xl font-sans font-semibold text-white tabular-nums"
-            title={t("demo_tt_balance", "Total converti en USD (démo).")}
-          >
-            {formatMoney(locale, displayAmount, displayCurrency)}
-          </p>
-		          <button
-		            type="button"
-		            onClick={() => setShowGlobalStatement(true)}
-		            title={t("demo_tt_statement", "Voir le relevé global.")}
-		            className="mt-1 px-4 py-1.5 bg-xcannes-green/50 hover:bg-xcannes-green/60 text-white rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105">
-
-		            {t("demo_view_statement", "Voir le relevé")}
-		          </button>
-
-		          <a
-		            href="https://ripple.com/solutions/stablecoin/transparency/"
-		            target="_blank"
+	        <div className="mt-4 flex flex-col items-center gap-2">
+	          <div className="text-[11px] md:text-xs text-white/55 tracking-[0.18em] uppercase">
+	            {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
+	          </div>
+	          <p
+	            className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight"
+	            title={t("demo_tt_balance", "Total converti en USD (démo).")}
+	          >
+	            {formatMoney(locale, displayAmount, displayCurrency)}
+	          </p>
+			          <a
+			            href="https://ripple.com/solutions/stablecoin/transparency/"
+			            target="_blank"
 		            rel="noopener noreferrer"
 		            className="text-xs md:text-[10px] text-white/40 hover:text-white/70 transition-colors"
 		          >
@@ -1617,9 +1611,9 @@ export default function DemoWalletDashboard({
 					                <div className="flex items-start justify-between gap-3">
 					                  <div className="min-w-0">
 				                    <div className="flex items-center gap-2 min-w-0">
-			                      <span className="text-[11px] md:text-[12px] font-semibold text-white/85 truncate">
-			                        {walletContextLabel || t("nav_wallet", "Wallet")}
-			                      </span>
+				                      <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
+				                        {walletContextLabel || t("nav_wallet", "Wallet")}
+				                      </span>
 		                      {isWalletLabelLocked && walletHeaderToast ? (
 		                        <span className="text-[10px] text-xcannes-green/90 truncate">
 		                          {walletHeaderToast}
@@ -1905,33 +1899,33 @@ export default function DemoWalletDashboard({
 
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 min-h-0 p-3 flex flex-col">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div className="text-xs text-white/45">
-              {t("demo_lines_title", "Lignes (monnaies locales)")}
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setSwapDefaultView("lines");
-                setSwapLockedView("lines");
-                setActiveAction("swap");
-	              }}
-	              title={t("demo_tt_manage_lines", "Gérer les lignes de comptes.")}
-	              className="text-sm md:text-xs text-white/70 hover:text-white transition-colors">
-
-	              {t("demo_manage_lines", "Gérer les lignes de comptes")} →
+	          <div className="flex items-center justify-end gap-2 mb-2">
+	            <button
+	              type="button"
+	              onClick={() => setShowGlobalStatement(true)}
+	              className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
+	              title={t("demo_tt_statement", "Voir le relevé global.")}
+	            >
+	              {t(
+	                "ui_consult_global_statement_3b89f4a7a2",
+	                "Consulter votre Relevé global"
+	              )}
 	            </button>
-          </div>
+	          </div>
           <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
-            {tokens.map((row) => {
-              const upperCode = String(row.code || "").toUpperCase();
-              const isNativeAsset = upperCode === "XRP" || upperCode === "RLUSD" || upperCode === "RLUSD";
-              const iconSizeClass = isNativeAsset
-                ? "w-7 h-7 text-[13px]"
-                : "w-9 h-9 text-[16px] sm:w-9 sm:h-9 sm:text-[16px]";
-              const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
-              return (
-            <div key={row.code} className="w-full">
+	            {tokens.map((row) => {
+	              const upperCode = String(row.code || "").toUpperCase();
+	              const isNativeAsset = upperCode === "XRP" || upperCode === "RLUSD" || upperCode === "RLUSD";
+	              const hasCryptoIcon = Boolean(CRYPTO_ICONS?.[upperCode]);
+	              const isFlagIcon = !isNativeAsset && !hasCryptoIcon;
+	              const iconSizeClass = isNativeAsset
+	                ? "w-7 h-7 text-[13px]"
+	                : isFlagIcon
+	                  ? "w-10 h-10 text-[18px] sm:w-11 sm:h-11 sm:text-[20px]"
+	                  : "w-9 h-9 text-[16px] sm:w-9 sm:h-9 sm:text-[16px]";
+	              const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
+	              return (
+	            <div key={row.code} className="w-full">
                 <button
                 type="button"
                 onClick={() => {
@@ -1960,20 +1954,20 @@ export default function DemoWalletDashboard({
 	                      <div className={`${iconSizeClass} ${iconRadiusClass} flex items-center justify-center font-semibold text-primary overflow-hidden`}>
 	                        {renderDemoTokenIcon(row.code)}
 	                      </div>
-	                      <div className="min-w-0">
-	                        <div className="flex items-baseline gap-2 min-w-0">
-		                          <span className="text-[13px] text-primary truncate">{row.code}</span>
-		                          <span className="text-[12px] text-muted truncate">
-		                            {getDemoCurrencyLabel(row.code)}
-		                          </span>
-	                        </div>
-	                      </div>
-	                    </div>
-			                    <div className="text-right text-[13px] text-primary">
-			                      <div className="font-mono">
-			                        {formatUnits(locale, row.units)}
-			                      </div>
+		                      <div className="min-w-0">
+		                        <div className="flex items-baseline gap-2 min-w-0">
+			                          <span className="text-[14px] md:text-[15px] text-primary truncate">{row.code}</span>
+			                          <span className="text-[13px] md:text-[14px] text-muted truncate">
+			                            {getDemoCurrencyLabel(row.code)}
+			                          </span>
+		                        </div>
+		                      </div>
 		                    </div>
+				                    <div className="text-right text-[14px] md:text-[15px] text-primary">
+				                      <div className="font-mono">
+				                        {formatUnits(locale, row.units)}
+				                      </div>
+			                    </div>
 	                  </div>
 	                </button>
 	              </div>

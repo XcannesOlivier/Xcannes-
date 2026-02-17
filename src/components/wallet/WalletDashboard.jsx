@@ -2195,17 +2195,16 @@ export default function WalletDashboard({
 	      >
         <div className="flex flex-col min-h-0">
           {/* Header */}
-	        <WalletDashboardHeader
-	          layout={layout}
-	          effectiveIsConnected={effectiveIsConnected}
-	          effectiveWallet={effectiveWallet}
-	          onDisconnect={disconnect}
-	          totalLabel={previewTotalLabel || totalLabel}
-	            onOpenGlobalStatement={handleOpenGlobalStatement}
-	          xrplConnectionIndicator={xrplConnectionIndicator}
-	          walletLabel={walletLabel}
-	          walletHeaderToast={walletHeaderToast}
-	          onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
+		        <WalletDashboardHeader
+		          layout={layout}
+		          effectiveIsConnected={effectiveIsConnected}
+		          effectiveWallet={effectiveWallet}
+		          onDisconnect={disconnect}
+		          totalLabel={previewTotalLabel || totalLabel}
+		          xrplConnectionIndicator={xrplConnectionIndicator}
+		          walletLabel={walletLabel}
+		          walletHeaderToast={walletHeaderToast}
+		          onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
 	          onCopyAddress={handleCopyAddress}
 	          onRefreshWallet={handleRefreshWallet}
 	          isConnecting={isConnecting}
@@ -2228,19 +2227,28 @@ export default function WalletDashboard({
           />
 
           {/* Token list */}
-          <div className="flex-1 flex flex-col min-h-0">
-          <WalletDashboardTokenList
-            layout={layout}
-            tokens={isPreviewMode ? displayTokens : displayTokensWithCurrencyLines}
-            renderTokenRow={renderTokenRow}
-            headerTitle={t("demo_lines_title", "Balances by currency")}
-            headerActionLabel={t("home_feature_currencylines_cta", "Manage lines")}
-            onHeaderAction={handleOpenCurrencyLines}
-            className="touch-pan-y"
-            style={{ WebkitOverflowScrolling: "touch" }}
-            disableInternalScroll={allowPageScrollOnMobile && !isDesktopPanel}
-          />
-          </div>
+	          <div className="flex-1 flex flex-col min-h-0">
+		          <WalletDashboardTokenList
+		            layout={layout}
+		            tokens={isPreviewMode ? displayTokens : displayTokensWithCurrencyLines}
+		            renderTokenRow={renderTokenRow}
+		            headerTitle={
+		              <button
+		                type="button"
+		                onClick={handleOpenGlobalStatement}
+		                className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
+		              >
+		                {t(
+		                  "ui_consult_global_statement_3b89f4a7a2",
+		                  "Consulter votre Relevé global"
+		                )}
+		              </button>
+		            }
+		            className="touch-pan-y"
+		            style={{ WebkitOverflowScrolling: "touch" }}
+		            disableInternalScroll={allowPageScrollOnMobile && !isDesktopPanel}
+		          />
+	          </div>
 
           <WalletDashboardFooter
             layout={layout}

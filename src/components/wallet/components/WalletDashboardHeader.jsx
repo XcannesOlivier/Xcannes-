@@ -86,18 +86,23 @@ export default function WalletDashboardHeader({
 
       {/* Solde et info wallet */}
       <div className="flex flex-col items-center gap-2">
-        <p className="text-2xl md:text-3xl font-sans font-semibold text-white tabular-nums">
+        <div className="text-[11px] md:text-xs text-white/55 tracking-[0.18em] uppercase">
+          {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
+        </div>
+        <p className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight">
           {totalLabel}
         </p>
 
-        {/* Bouton Global Statement - Toujours visible, même en démo */}
-	        <button
-	          type="button"
-	          onClick={onOpenGlobalStatement}
-	          className={`mt-2 px-4 py-1.5 bg-xcannes-green/50 hover:bg-xcannes-green/60 text-white rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 ${hideStatementCtaOnDesktop ? "lg:hidden" : ""}`}>{t("ui_see_statement_9771dff7ec", "Voir le relevé")}
-
-
-	        </button>
+	        {/* Bouton Global Statement */}
+	        {onOpenGlobalStatement ? (
+	          <button
+	            type="button"
+	            onClick={onOpenGlobalStatement}
+	            className={`mt-2 px-4 py-1.5 bg-xcannes-green/50 hover:bg-xcannes-green/60 text-white rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 ${hideStatementCtaOnDesktop ? "lg:hidden" : ""}`}
+	          >
+	            {t("ui_see_statement_9771dff7ec", "Voir le relevé")}
+	          </button>
+	        ) : null}
 
 	        <a
 	          href="https://ripple.com/solutions/stablecoin/transparency/"
@@ -123,9 +128,9 @@ export default function WalletDashboardHeader({
                       title={xrplConnectionIndicator.label}
                       aria-label={xrplConnectionIndicator.label} />
 
-		                      <span className="text-[11px] md:text-[12px] font-semibold text-white/85 truncate">
-		                        {walletLabel || "Wallet"}
-		                      </span>
+			                      <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
+			                        {walletLabel || "Wallet"}
+			                      </span>
 	                      {hideWalletAddress && walletHeaderToast ? (
 	                        <span className="text-[10px] text-xcannes-green/90 truncate">
 	                          {walletHeaderToast}
