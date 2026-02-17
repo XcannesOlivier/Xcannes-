@@ -1,4 +1,4 @@
-/* ✅ Fonts optimisées via next/font (plus besoin de Google Fonts externe) */
+/* Fonts: pas de fetch Google Fonts au build (fallback system-ui). */
 
 @tailwind base;
 @tailwind components;
@@ -19,6 +19,9 @@
   --text-primary: #f9fafb;
   --text-secondary: #e5e7eb;
   --text-muted: #9ca3af;
+  --font-manrope: system-ui;
+  --font-orbitron: system-ui;
+  --font-montserrat: system-ui;
 
   /* Accents (global) */
   --accent-primary: #16a34a; /* proche xcannes-green, légèrement adouci */
