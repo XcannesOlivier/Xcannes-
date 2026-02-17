@@ -54,7 +54,7 @@ export default function WalletDashboardReceiveModal({
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
-    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-[#22C55E]/80 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-[#22C55E] hover:scale-105 active:scale-95";
+    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
   const greenTabInactive =
     "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [generatedRequest, setGeneratedRequest] = useState(null);
@@ -347,12 +347,12 @@ export default function WalletDashboardReceiveModal({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              handleCopyAddress();
-            }}
-            className={`px-4 py-2 text-xs ${greenActionBtnMuted}`}>{t("ui_copy_address_779691d570", "Copy address")}
+	              handleCopyAddress();
+	            }}
+	            className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors">{t("ui_copy_address_779691d570", "Copy address")}
 
-
-          </button>
+	
+	          </button>
             </div>
         }
 
@@ -534,15 +534,6 @@ export default function WalletDashboardReceiveModal({
                   ) : null}
                 </div>
           }
-              {/* Info */}
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-                <p className="text-xs text-blue-400">
-                  {t(
-                    "ui_request_info_qr_4b1c8d2a6f",
-                    "Generate a QR code that can be scanned to pay you."
-                  )}
-                </p>
-              </div>
               </div>
             </div>
           }

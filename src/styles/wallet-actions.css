@@ -186,12 +186,12 @@
 }
 
 .wallet-action-send .wallet-action-label {
-  color: rgba(22, 163, 74, 0.9); /* More visible label */
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600; /* Slightly bolder */
 }
 
 .wallet-action-send:hover .wallet-action-label {
-  color: rgba(22, 163, 74, 1);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 /* Buy/Sell - Violet (fiat operations) - SECONDARY */

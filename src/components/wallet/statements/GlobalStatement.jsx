@@ -259,7 +259,6 @@ export default function GlobalStatement({
   }, [statementHashInput]);
 
   const buildPrintHtml = useCallback(() => {
-    const generatedAt = new Date().toLocaleString(locale);
     const docHashLabel = docHash || "-";
     const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
@@ -322,7 +321,6 @@ export default function GlobalStatement({
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
         <div><strong>${escapeHtml(t("ui_total_balance_label_2c7a1d9b5e", "Total balance (USD)"))}:</strong> ${escapeHtml(totalBalanceDisplay)}</div>
-        <div><strong>${escapeHtml(t("ui_generated_on_3827d9035f", "Generated on"))}:</strong> ${escapeHtml(generatedAt)}</div>
         <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
         <div><strong>${escapeHtml(t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index"))}:</strong> ${escapeHtml(ledgerIndexLabel)}</div>
         <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
@@ -794,16 +792,13 @@ export default function GlobalStatement({
             </div>
           </div>
 
-          {/* Watermark */}
-	          <div className="hidden sm:block text-center py-3 sm:py-4">
-	            <div className="space-y-1">
-	              <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">{t("ui_generated_on_3827d9035f", "Generated on")}
-	              {new Date().toLocaleString(locale)}
-	              </p>
-	              {ledgerLastIndex != null ?
-	            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
-	                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-	                  {ledgerLastIndex}
+	          {/* Watermark */}
+		          <div className="hidden sm:block text-center py-3 sm:py-4">
+		            <div className="space-y-1">
+		              {ledgerLastIndex != null ?
+		            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
+		                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
+		                  {ledgerLastIndex}
 	                </p> :
 	            null}
 	            </div>

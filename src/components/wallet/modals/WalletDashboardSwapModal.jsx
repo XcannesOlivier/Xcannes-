@@ -69,7 +69,7 @@ export default function WalletDashboardSwapModal({
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
-    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-[#22C55E]/80 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-[#22C55E] hover:scale-105 active:scale-95";
+    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
   const greenTabInactive =
     "rounded-lg border border-[#22C55E]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#22C55E]/60 hover:text-white/80";
   const [view, setView] = useState("convert"); // 'convert' | 'lines'
@@ -430,14 +430,14 @@ export default function WalletDashboardSwapModal({
             key={view}
             className={inline ? "wallet-tab-unfold-in flex-1 min-h-0 flex flex-col" : "wallet-tab-unfold-in"}
           >
-            {view === "convert" ?
-        <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-              <div className={useDesktopWalletConvertLayout
-                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-4"
-                : inline
-                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]"
-                : "space-y-3"}>
-              <div className={useDesktopWalletConvertLayout ? "space-y-4" : inline ? "space-y-3" : ""}>
+	            {view === "convert" ?
+		        <div className={`space-y-5 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+		              <div className={useDesktopWalletConvertLayout
+		                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
+		                : inline
+		                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(18px,2.8vh,36px)]"
+		                : "space-y-5"}>
+		              <div className={useDesktopWalletConvertLayout ? "space-y-7" : inline ? "space-y-6" : ""}>
               <div>
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
 
@@ -522,7 +522,7 @@ export default function WalletDashboardSwapModal({
                   <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
                   </div>
-                  <div className="text-sm text-xcannes-green">
+                  <div className="text-sm text-white/90">
                     {formatAmount(previewAmount, 6)} {convertQuoteCurrency || "-"}
                   </div>
                   {previewMeta?.route === "allocation" &&
@@ -598,12 +598,7 @@ export default function WalletDashboardSwapModal({
                   </div>
                 ) : null}
 
-                {!isPreviewMode &&
-            <div className="text-[10px] text-white/45">{t("ui_tip_use_the_b06aa04f1f", "Tip: use the")}
-              <span className="font-mono">{t("ui_currency_lines_267fc2eff3", "Currency lines")}</span>{" "}{t("ui_tab_to_add_activate_new_line_1965097add", "tab to add/activate new lines.")}
-
-            </div>
-            }
+                
               </div>
             </div> :
 
@@ -657,12 +652,6 @@ export default function WalletDashboardSwapModal({
 
               </button>
                 </div>
-                <p className="mt-2 text-[10px] text-white/45">
-                  {t(
-                    "ui_currency_line_action_free_f4",
-                    "Activation and deletion are free (XRPL network fee only)."
-                  )}
-                </p>
               </div>
 
               <WalletDashboardCurrencyLinesPanel
