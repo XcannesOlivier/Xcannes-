@@ -17,28 +17,28 @@ import {
   migrateDemoState,
   walletUsdTotal
 } from "./DemoWalletModel";
-import WalletDashboardSendModal from "@/components/wallet/modals/WalletDashboardSendModal";
-import WalletDashboardReceiveModal from "@/components/wallet/modals/WalletDashboardReceiveModal";
-	import WalletDashboardSwapModal from "@/components/wallet/modals/WalletDashboardSwapModal";
-	import WalletDashboardCashModal from "@/components/wallet/modals/WalletDashboardCashModal";
-	import WalletDashboardStatementModals from "@/components/wallet/modals/WalletDashboardStatementModals";
-	import WalletInfoModal from "@/components/wallet/modals/WalletInfoModal";
-	import QRScanner from "@/components/wallet/components/QRScanner";
-	import { QRCodeCanvas } from "qrcode.react";
-	import { useSendForm } from "@/components/wallet/hooks/useSendForm";
-	import { useReceiveForm } from "@/components/wallet/hooks/useReceiveForm";
-import { usePaymentRequestForm } from "@/components/wallet/hooks/usePaymentRequestForm";
-import { usePaymentRequestScanner } from "@/components/wallet/hooks/usePaymentRequestScanner";
+import DemoWalletDashboardSendModal from "./modals/DemoWalletDashboardSendModal";
+import DemoWalletDashboardReceiveModal from "./modals/DemoWalletDashboardReceiveModal";
+import DemoWalletDashboardSwapModal from "./modals/DemoWalletDashboardSwapModal";
+import DemoWalletDashboardCashModal from "./modals/DemoWalletDashboardCashModal";
+import DemoWalletDashboardStatementModals from "./modals/DemoWalletDashboardStatementModals";
+import DemoWalletInfoModal from "./modals/DemoWalletInfoModal";
+import DemoQRScanner from "./components/DemoQRScanner";
+import { QRCodeCanvas } from "qrcode.react";
+import { useDemoSendForm } from "./hooks/useDemoSendForm";
+import { useDemoReceiveForm } from "./hooks/useDemoReceiveForm";
+import { useDemoPaymentRequestForm } from "./hooks/useDemoPaymentRequestForm";
+import { useDemoPaymentRequestScanner } from "./hooks/useDemoPaymentRequestScanner";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
-	import { useConvertForm } from "@/components/wallet/hooks/useConvertForm";
-	import { useCurrencyLinesForm } from "@/components/wallet/hooks/useCurrencyLinesForm";
-	import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
-	import { useSavedAddresses } from "@/components/wallet/hooks/useSavedAddresses";
-	import { computeSpreadQuote } from "@/utils/walletSpread";
-		import xcannesApi from "@/lib/xcannesApi";
-		import { CRYPTO_ICONS } from "@/utils/marketConstants";
-		import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-		import { getDisplayCurrencyCode, USD_STABLECOINS } from "@/components/wallet/walletDashboardConfig";
+import { useDemoConvertForm } from "./hooks/useDemoConvertForm";
+import { useDemoCurrencyLinesForm } from "./hooks/useDemoCurrencyLinesForm";
+import { useDemoWalletMeta } from "./hooks/useDemoWalletMeta";
+import { useDemoSavedAddresses } from "./hooks/useDemoSavedAddresses";
+	import { computeSpreadQuote } from "./utils/demoWalletSpread";
+import xcannesApi from "@/lib/xcannesApi";
+	import { CRYPTO_ICONS } from "./utils/demoMarketConstants";
+	import { getCurrencyDescription } from "./utils/demoCurrencyDescriptions";
+import { getDisplayCurrencyCode, USD_STABLECOINS } from "./demoWalletDashboardConfig";
 
 const DEMO_WALLET_ACCENTS = {
   A: {
@@ -381,7 +381,7 @@ export default function DemoWalletDashboard({
     }
   }, [effectiveWallet, flashWalletHeaderToast, t]);
 
-  const { renderWalletMeta } = useWalletMeta({
+  const { renderWalletMeta } = useDemoWalletMeta({
     walletAddress: effectiveWallet,
     walletLabel: walletContextLabel,
     hideAddress: isWalletLabelLocked,
@@ -401,8 +401,8 @@ export default function DemoWalletDashboard({
     });
   }, []);
 
-	  const { savedAddresses: demoSavedAddresses, saveAddress: saveDemoAddress } =
-	    useSavedAddresses(DEMO_SAVED_ADDRESSES_STORAGE_KEY);
+  const { savedAddresses: demoSavedAddresses, saveAddress: saveDemoAddress } =
+    useDemoSavedAddresses(DEMO_SAVED_ADDRESSES_STORAGE_KEY);
 
 	  useEffect(() => {
 	    if (typeof window === "undefined") return;
@@ -457,9 +457,9 @@ export default function DemoWalletDashboard({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest
-  } = useSendForm({ defaultSendTab: "scan-request" });
+  } = useDemoSendForm({ defaultSendTab: "scan-request" });
 
-  const { receiveTab, setReceiveTab } = useReceiveForm();
+  const { receiveTab, setReceiveTab } = useDemoReceiveForm();
 
   const {
     requestAmount,
@@ -468,7 +468,7 @@ export default function DemoWalletDashboard({
     setRequestCurrency,
     requestMemo,
     setRequestMemo
-  } = usePaymentRequestForm({
+  } = useDemoPaymentRequestForm({
     defaultCurrency: "RLUSD"
   });
 
@@ -483,7 +483,7 @@ export default function DemoWalletDashboard({
     setConvertPreview,
     convertProcessing,
     setConvertProcessing
-  } = useConvertForm({
+  } = useDemoConvertForm({
     defaultBaseCurrency: "EUR",
     defaultQuoteCurrency: "RLUSD"
   });
@@ -493,7 +493,7 @@ export default function DemoWalletDashboard({
     setCurrencyLineCode,
     currencyLineAllocatedRlusd,
     setCurrencyLineAllocatedRlusd
-  } = useCurrencyLinesForm();
+  } = useDemoCurrencyLinesForm();
 
   useEffect(() => {
     const id = setInterval(() => setRatesNowTs(Date.now()), 5000);
@@ -851,7 +851,7 @@ export default function DemoWalletDashboard({
     qrScannerOpen,
     setQrScannerOpen,
     handlePaymentRequestScan
-  } = usePaymentRequestScanner({
+  } = useDemoPaymentRequestScanner({
     augmentedTokens,
     setSendDestination,
     setSendAmount,
@@ -2051,7 +2051,7 @@ export default function DemoWalletDashboard({
 	        </div>
 	      </div>
 
-	      <WalletInfoModal
+	      <DemoWalletInfoModal
 	        isOpen={walletInfoOpen}
 	        onClose={() => setWalletInfoOpen(false)}
 	        isPreviewMode={true}
@@ -2061,7 +2061,7 @@ export default function DemoWalletDashboard({
 	        noticeContextLabel={demoNoticeContextLabel}
 	      />
 
-		      <WalletDashboardSendModal
+		      <DemoWalletDashboardSendModal
 	        open={activeAction === "send"}
 	        onClose={() => {
 	          setActiveAction(null);
@@ -2095,7 +2095,7 @@ export default function DemoWalletDashboard({
 	        showFauxPayreqDecor={true} />
 
 
-	      <WalletDashboardReceiveModal
+	      <DemoWalletDashboardReceiveModal
         open={activeAction === "receive"}
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
@@ -2129,7 +2129,7 @@ export default function DemoWalletDashboard({
 	        onRequestGenerated={handleDemoRequestGenerated} />
 
 
-      <WalletDashboardSwapModal
+      <DemoWalletDashboardSwapModal
         open={activeAction === "swap"}
         onClose={() => setActiveAction(null)}
         defaultView={swapDefaultView}
@@ -2171,7 +2171,7 @@ export default function DemoWalletDashboard({
         rlusdPerUnitRates={rlusdPerUnitRates} />
 
 
-	      <WalletDashboardCashModal
+	      <DemoWalletDashboardCashModal
 	        open={activeAction === "cash"}
 	        onClose={() => setActiveAction(null)}
 	        isPreviewMode={true}
@@ -2236,7 +2236,7 @@ export default function DemoWalletDashboard({
         walletAddress={effectiveWallet || ""} />
 
 
-	      <WalletDashboardStatementModals
+	      <DemoWalletDashboardStatementModals
 	        augmentedTokens={selectableTokens}
 	        backendWalletAddress={""}
 	        effectiveWallet={effectiveWallet}
@@ -2259,7 +2259,7 @@ export default function DemoWalletDashboard({
         setSelectedStatementToken={setSelectedStatementToken} />
 
 
-      <QRScanner
+      <DemoQRScanner
         isOpen={qrScannerOpen}
         onScan={handleDemoQrScan}
         onClose={() => setQrScannerOpen(false)}
