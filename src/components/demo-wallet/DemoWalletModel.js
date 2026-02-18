@@ -444,6 +444,7 @@ export function migrateDemoState(state) {
 export function walletUsdTotal(wallet, ratesUsdPerUnit) {
   const allocations = wallet?.allocations || {};
   return Object.entries(allocations).reduce((sum, [code, units]) => {
+    if (String(code || "").toUpperCase() === "XRP") return sum;
     const usdPerUnit = ratesUsdPerUnit?.[String(code).toUpperCase()] ?? null;
     if (!usdPerUnit) return sum;
     const safeUnits = safeNumber(units);

@@ -73,7 +73,7 @@ export function useSwapConversion({
     async (currencyCode) => {
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return Number.NaN;
-      if (code === "RLUSD") return 1;
+      if (code === "RLUSD" || code === "USD") return 1;
 
       let pythPairsMap = null;
       try {

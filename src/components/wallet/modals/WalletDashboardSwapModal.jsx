@@ -104,9 +104,15 @@ export default function WalletDashboardSwapModal({
   }, [currencyLines]);
 
   const suggestedCurrencies = useMemo(
-    () => ["EUR", "USD", "GBP", "CHF", "CAD", "AED", "SAR", "XOF", "XAF", "JPY"],
+    () => ["EUR", "GBP", "CHF", "CAD", "AED", "SAR", "XOF", "XAF", "JPY"],
     []
   );
+
+  const swapCurrencyOptionsSanitized = useMemo(() => {
+    return (swapCurrencyOptions || []).filter(
+      (code) => String(code || "").trim().toUpperCase() !== "USD"
+    );
+  }, [swapCurrencyOptions]);
 
   const canMutateLines =
     isPreviewMode ||
@@ -143,7 +149,9 @@ export default function WalletDashboardSwapModal({
     [convertAmount]
   );
 
-  const isXrplCore = (code) => code === "XRP" || code === "RLUSD";
+  // Seules les conversions impliquant XRP sont hors-scope ici (pas de swap DEX).
+  // RLUSD est traité comme devise de base (peg 1:1 avec USD) pour les conversions "allocation".
+  const isXrplCore = (code) => code === "XRP";
   const sameCurrencySelected = Boolean(baseCode && quoteCode && baseCode === quoteCode);
 
   const conversionRoute = useMemo(() => {
@@ -194,10 +202,11 @@ export default function WalletDashboardSwapModal({
     }
 
     if (conversionRoute.type === "allocation") {
-      const rlusdPerBase = baseCode === "RLUSD"
+      const isPeggedToUsd = (code) => code === "RLUSD" || code === "USD";
+      const rlusdPerBase = isPeggedToUsd(baseCode)
         ? 1
         : Number(rlusdPerUnitRates?.[baseCode]);
-      const rlusdPerQuote = quoteCode === "RLUSD"
+      const rlusdPerQuote = isPeggedToUsd(quoteCode)
         ? 1
         : Number(rlusdPerUnitRates?.[quoteCode]);
 
@@ -389,7 +398,7 @@ export default function WalletDashboardSwapModal({
                 <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                   {t(
                     "wallet_rlusd_not_activated_title",
-                    "RLUSD not activated. Authorize RLUSD on your wallet."
+                    "USD not activated. Authorize USD on your wallet."
                   )}
                 </span>
               ) : null}
@@ -442,14 +451,14 @@ export default function WalletDashboardSwapModal({
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
 
             </label>
-                <ModalSelect
-              value={convertBaseCurrency}
-              onChange={setConvertBaseCurrency}
-              options={(swapCurrencyOptions || [])
-                .map((code) => {
-                  const labelLeft = selectLabelByCurrency?.[code] || code;
-                  const labelRight = selectLabelRightByCurrency?.[code] || null;
-                  return {
+	                <ModalSelect
+	              value={convertBaseCurrency}
+	              onChange={setConvertBaseCurrency}
+	              options={(swapCurrencyOptionsSanitized || [])
+	                .map((code) => {
+	                  const labelLeft = selectLabelByCurrency?.[code] || code;
+	                  const labelRight = selectLabelRightByCurrency?.[code] || null;
+	                  return {
                     value: code,
                     icon: selectIconByCurrency?.[code] || null,
                     label: labelLeft,
@@ -472,14 +481,14 @@ export default function WalletDashboardSwapModal({
                 <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_quote_e3761255be", "Quote")}
 
             </label>
-                <ModalSelect
-              value={convertQuoteCurrency}
-              onChange={setConvertQuoteCurrency}
-              options={(swapCurrencyOptions || [])
-                .map((code) => {
-                  const labelLeft = selectLabelByCurrency?.[code] || code;
-                  const labelRight = selectLabelRightByCurrency?.[code] || null;
-                  return {
+	                <ModalSelect
+	              value={convertQuoteCurrency}
+	              onChange={setConvertQuoteCurrency}
+	              options={(swapCurrencyOptionsSanitized || [])
+	                .map((code) => {
+	                  const labelLeft = selectLabelByCurrency?.[code] || code;
+	                  const labelRight = selectLabelRightByCurrency?.[code] || null;
+	                  return {
                     value: code,
                     icon: selectIconByCurrency?.[code] || null,
                     label: labelLeft,
@@ -506,7 +515,11 @@ export default function WalletDashboardSwapModal({
               value={convertAmount}
               onChange={setConvertAmount}
               placeholder="0.0000"
-              token={convertBaseCurrency || "XRP"}
+              token={
+                selectLabelByCurrency?.[convertBaseCurrency] ||
+                convertBaseCurrency ||
+                "RLUSD"
+              }
               tokenClassName="text-white"
               containerClassName="focus-within:!border-xcannes-green/80" />
               </div>
@@ -523,7 +536,8 @@ export default function WalletDashboardSwapModal({
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
                   </div>
                   <div className="text-sm text-white/90">
-                    {formatAmount(previewAmount, 6)} {convertQuoteCurrency || "-"}
+                    {formatAmount(previewAmount, 6)}{" "}
+                    {selectLabelByCurrency?.[convertQuoteCurrency] || convertQuoteCurrency || "-"}
                   </div>
                   {previewMeta?.route === "allocation" &&
                   previewMeta?.isFx &&
@@ -531,7 +545,7 @@ export default function WalletDashboardSwapModal({
                       <div className="text-[10px] text-white/45">
                         {t("ui_spread_fee_6c2a8d5e1b", "Conversion fee (1%)")}:{" "}
                         ≈ {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
-                        {"RLUSD"}
+                        {"USD"}
                       </div>
                   ) : null}
                 </div>
@@ -613,17 +627,18 @@ export default function WalletDashboardSwapModal({
               t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.") :
               isWalletActivated === false ?
               t("ui_wallet_activation_required_f4", "Wallet must be activated to create currency lines.") :
-              t("ui_trustlines_required_currency_lines_f4", "RLUSD trustline is required to create currency lines.")}
+	              t("ui_trustlines_required_currency_lines_f4", "USD trustline is required to create currency lines.")}
                 </p>
             }
 
                 <div className="mt-2 grid grid-cols-1 gap-2">
-                  <WalletCurrencySelector
-                value={activateCurrencyCode}
-                onChange={setActivateCurrencyCode}
-                placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
-                quickOptions={suggestedCurrencies}
-                showQuickAdd={false} />
+	                  <WalletCurrencySelector
+	                value={activateCurrencyCode}
+	                onChange={setActivateCurrencyCode}
+	                placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
+	                quickOptions={suggestedCurrencies}
+	                excludeCodes={["USD"]}
+	                showQuickAdd={false} />
 
                   {isLineAlreadyActive ? (
                     <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">

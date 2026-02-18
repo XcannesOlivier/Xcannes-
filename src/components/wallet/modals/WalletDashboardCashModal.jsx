@@ -119,14 +119,14 @@ export default function WalletDashboardCashModal({
                     )}
                   </span>
                 ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet."
-                    )}
-                  </span>
-                ) : null}
+	                {showRlusdNotActivatedNotice ? (
+	                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+	                    {t(
+	                      "wallet_rlusd_not_activated_title",
+	                      "USD not activated. Authorize USD on your wallet."
+	                    )}
+	                  </span>
+	                ) : null}
               </div>
               <button
               type="button"

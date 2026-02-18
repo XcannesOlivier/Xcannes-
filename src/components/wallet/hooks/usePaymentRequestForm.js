@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export function usePaymentRequestForm({
   defaultAmount = "",
-  defaultCurrency = "XRP",
+  defaultCurrency = "RLUSD",
   defaultMemo = "",
 } = {}) {
   const [requestAmount, setRequestAmount] = useState(defaultAmount);

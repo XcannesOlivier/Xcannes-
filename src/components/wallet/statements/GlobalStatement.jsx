@@ -13,6 +13,7 @@ import {
   sha256Hex
 } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
+import { getDisplayCurrencyCode } from "../walletDashboardConfig";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -144,10 +145,10 @@ export default function GlobalStatement({
     if (!Number.isFinite(value)) return null;
     if (value === 0) return 0;
     const code = String(token.currency || "").toUpperCase();
+    if (code === "XRP") return null;
     const rate = usdRates?.[code];
     if (Number.isFinite(rate)) return value * rate;
     if (isUsdStablecoin(code)) return value;
-    if (code === "XRP") return value * 0.5;
     return null;
   }, [isUsdStablecoin, usdRates]);
 
@@ -267,9 +268,10 @@ export default function GlobalStatement({
     "-";
     const balancesRows = (sortedTokens || []).map((token) => {
       const usdValue = getUsdValue(token);
+      const displayCode = getDisplayCurrencyCode(token?.currency);
       return `
         <tr>
-          <td>${escapeHtml(String(token?.currency || "").toUpperCase())}</td>
+          <td>${escapeHtml(displayCode || "-")}</td>
           <td class="right">${escapeHtml(formatAmount(token?.value))}</td>
           <td class="right">${Number.isFinite(usdValue) ? escapeHtml(`$${formatAmount(usdValue)}`) : "-"}</td>
         </tr>
@@ -741,10 +743,10 @@ export default function GlobalStatement({
                             className="flex-shrink-0 w-6 h-6 rounded-md" /> :
 
 
-                          <span className="text-lg sm:text-2xl flex-shrink-0">{getCurrencyFlag(token.currency)}</span>
+                          <span className="text-lg sm:text-2xl flex-shrink-0">{getCurrencyFlag(getDisplayCurrencyCode(token.currency))}</span>
                           }
                             <div className="min-w-0">
-                              <p className="text-white font-medium text-xs sm:text-sm truncate">{token.currency}</p>
+                              <p className="text-white font-medium text-xs sm:text-sm truncate">{getDisplayCurrencyCode(token.currency)}</p>
                               <p className="text-[9px] sm:text-xs text-white/40 truncate">
                                 {token.currency === "XRP" ?
                                   t("ui_label_native_2d7a1c9b4e", "Native") :
@@ -766,7 +768,7 @@ export default function GlobalStatement({
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white font-medium text-[10px] sm:text-sm">
                           <div className="truncate">{formatAmount(token.value)}</div>
-                          <div className="text-[9px] sm:text-xs text-white/50">{token.currency}</div>
+                          <div className="text-[9px] sm:text-xs text-white/50">{getDisplayCurrencyCode(token.currency)}</div>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
                           {Number.isFinite(usdValue) ?

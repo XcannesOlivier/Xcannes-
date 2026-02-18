@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { getCurrencyFlag, getTokenIcon, TOKEN_ICONS } from "../walletDashboardConfig";
+import { getCurrencyFlag, getDisplayCurrencyCode, getTokenIcon, TOKEN_ICONS } from "../walletDashboardConfig";
 
 export default function WalletDashboardCurrencyLinesPanel({
   currencyLinesLoading,
@@ -29,9 +29,10 @@ export default function WalletDashboardCurrencyLinesPanel({
   const normalizedLines = useMemo(() => {
     return (currencyLines || []).map((line) => {
       const code = String(line?.currencyCode || "").toUpperCase();
+      if (code === "USD") return null;
       const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
       return { code, allocated };
-    });
+    }).filter(Boolean);
   }, [currencyLines]);
   useEffect(() => {
     if (!confirmingCode) return;
@@ -46,7 +47,9 @@ export default function WalletDashboardCurrencyLinesPanel({
   }, [confirmingCode]);
   const resolveFallbackIcon = (code) => {
     const upper = String(code || "").toUpperCase();
-    if (upper === "RLUSD" || TOKEN_ICONS?.[upper]) {
+    const display = getDisplayCurrencyCode(upper);
+    if (display !== upper) return getCurrencyFlag(display);
+    if (TOKEN_ICONS?.[upper]) {
       return getTokenIcon(upper);
     }
     return getCurrencyFlag(upper);
@@ -95,20 +98,21 @@ export default function WalletDashboardCurrencyLinesPanel({
         <div className="text-[11px] text-white/40">{t("ui_no_currency_lines_yet_9630af229d", "No currency lines yet.")}</div> :
 
         <div className={listClassName}>
-            {normalizedLines.map((line) => {
-              const isConfirming = confirmingCode === line.code;
-              const canDelete = Number(line.allocated || 0) <= 0;
-              return (
-                <div key={line.code} className="space-y-2">
-                  <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-2">
+	            {normalizedLines.map((line) => {
+	              const displayCode = getDisplayCurrencyCode(line.code);
+	              const isConfirming = confirmingCode === line.code;
+	              const canDelete = Number(line.allocated || 0) <= 0;
+	              return (
+	                <div key={line.code} className="space-y-2">
+	                  <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-8 h-8 flex items-center justify-center rounded-full">
                         {renderLineIcon(line.code)}
                       </div>
-                      <div className="min-w-0">
-                        <div className="font-mono text-[11px] text-white/80">
-                          {line.code}
-                        </div>
+	                      <div className="min-w-0">
+	                        <div className="font-mono text-[11px] text-white/80">
+	                          {displayCode}
+	                        </div>
                         <div className="text-[10px] text-white/40">
                           {t("ui_currency_line_active_label_f4", "Active")}
                         </div>
