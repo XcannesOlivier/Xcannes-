@@ -56,12 +56,14 @@ const DemoMoonPayBuyModal = ({
   demoMode = false,
   onDemoSubmit,
   prefill = null
-}) => {
-  const { t } = useTranslation("common");
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const [iframeUrl, setIframeUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+	}) => {
+	  const { t } = useTranslation("common");
+	  const stripLeadingNoticePrefix = (value) =>
+	    String(value || "").replace(/^\s*[^:：]{1,60}\s*[:：]\s*/, "");
+	  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
+	  const [iframeUrl, setIframeUrl] = useState(null);
+	  const [loading, setLoading] = useState(false);
+	  const [error, setError] = useState(null);
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const showNotActivatedNotice = false;
 
@@ -468,21 +470,23 @@ const DemoMoonPayBuyModal = ({
 
                 {/* Info box */}
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                  <p className="text-xs text-blue-400">
-                    {demoMode ?
-          `ℹ️ ${t(
-            "moonpay_info_buy_demo_1b7d2c9a5e",
-            "Demo mode: no MoonPay redirect. The buy is simulated."
-          )}` :
-          `ℹ️ ${t(
-            "moonpay_info_buy_live_3c8a1d6b2f",
-            "You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer."
-          )}`}{" "}
-                    {t(
-                      "moonpay_minimum_note",
-                      "Minimums depend on MoonPay (currency, country, payment method)."
-                    )}
-                  </p>
+		                  <p className="text-xs text-blue-400">
+		                    {demoMode
+		                      ? `ℹ️ ${stripLeadingNoticePrefix(
+		                          t(
+		                            "moonpay_info_buy_demo_1b7d2c9a5e",
+		                            "No MoonPay redirect. The buy is simulated."
+		                          )
+		                        )}`
+		                      : `ℹ️ ${t(
+		                          "moonpay_info_buy_live_3c8a1d6b2f",
+		                          "You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer."
+		                        )}`}{" "}
+		                    {t(
+		                      "moonpay_minimum_note",
+	                      "Minimums depend on MoonPay (currency, country, payment method)."
+	                    )}
+	                  </p>
                 </div>
 
                 {/* Continue button */}
@@ -630,20 +634,15 @@ const DemoMoonPayBuyModal = ({
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_buy_crypto_with_fiat_f09c7b4228", "Buy Crypto with Fiat")}
+	              <div className="flex items-center gap-2 flex-wrap">
+	                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_buy_crypto_with_fiat_f09c7b4228", "Buy Crypto with Fiat")}
 
-                </h3>
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
+	                </h3>
+	                {showNotConnectedNotice ? (
+	                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
+	                    {t("wallet_not_connected_title", "Wallet not connected")}
+	                  </span>
+	                ) : null}
                 {showNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                     {t(

@@ -47,6 +47,8 @@ const DemoMoonPaySellModal = ({
   selectLabelMobileByCurrency
 }) => {
   const { t } = useTranslation("common");
+  const stripLeadingNoticePrefix = (value) =>
+    String(value || "").replace(/^\s*[^:：]{1,60}\s*[:：]\s*/, "");
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice = false;
   const showRlusdNotActivatedNotice = false;
@@ -515,21 +517,23 @@ const DemoMoonPaySellModal = ({
 
                 {/* Info box */}
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                  <p className="text-xs text-blue-400">
-                    {demoMode ?
-          `💰 ${t(
-            "moonpay_info_sell_demo_6d1a9c2b7e",
-            "Demo mode: the sell is simulated (no bank transfer)."
-          )}` :
-          `💰 ${t(
-            "moonpay_info_sell_live_8b2c1a7d5f",
-            "Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries."
-          )}`}{" "}
-                    {t(
-                      "moonpay_minimum_note",
-                      "Minimums depend on MoonPay (currency, country, payment method)."
-                    )}
-                  </p>
+		                  <p className="text-xs text-blue-400">
+		                    {demoMode
+		                      ? `💰 ${stripLeadingNoticePrefix(
+		                          t(
+		                            "moonpay_info_sell_demo_6d1a9c2b7e",
+		                            "The sell is simulated (no bank transfer)."
+		                          )
+		                        )}`
+		                      : `💰 ${t(
+		                          "moonpay_info_sell_live_8b2c1a7d5f",
+		                          "Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries."
+		                        )}`}{" "}
+	                    {t(
+	                      "moonpay_minimum_note",
+	                      "Minimums depend on MoonPay (currency, country, payment method)."
+	                    )}
+	                  </p>
                 </div>
 
                 {/* Continue button */}
@@ -674,20 +678,15 @@ const DemoMoonPaySellModal = ({
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
             <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_sell_crypto_for_fiat_1167ce7e08", "Sell Crypto for Fiat")}
+	              <div className="flex items-center gap-2 flex-wrap">
+	                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_sell_crypto_for_fiat_1167ce7e08", "Sell Crypto for Fiat")}
 
-                </h3>
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
+	                </h3>
+	                {showNotConnectedNotice ? (
+	                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
+	                    {t("wallet_not_connected_title", "Wallet not connected")}
+	                  </span>
+	                ) : null}
                 {showNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                     {t(

@@ -370,22 +370,17 @@ export default function DemoWalletDashboardSwapModal({
             lockLinesScrollToList ? "overflow-hidden" : "overflow-y-auto"
           }`}
           style={{ WebkitOverflowScrolling: "touch" }}>
-            <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                {view === "lines"
-                  ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
-                  : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
-              </h3>
-              {noticeVariant === "demo" ? (
-                <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                  {t("demo_notice_title", "Mode démo")}
-                </span>
-              ) : null}
-              {showNotConnectedNotice ? (
-                <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                  {t("wallet_not_connected_title", "Wallet not connected")}
-                </span>
-              ) : null}
+	            <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
+	              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+	                {view === "lines"
+	                  ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
+	                  : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
+	              </h3>
+	              {showNotConnectedNotice ? (
+	                <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+	                  {t("wallet_not_connected_title", "Wallet not connected")}
+	                </span>
+	              ) : null}
               {showNotActivatedNotice ? (
                 <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                   {t(

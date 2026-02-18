@@ -22,19 +22,14 @@ export function WalletInfoContent({
   return (
     <>
       <div className={withCloseGutter ? "pr-8" : ""}>
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_xcannes_wallet_how_it_works_0397d0e570", "XCANNES Wallet — How it works")}
+	        <div className="flex items-center gap-2">
+	          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_xcannes_wallet_how_it_works_0397d0e570", "XCANNES Wallet — How it works")}
 
-          </h3>
-          {noticeVariant === "demo" ? (
-            <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
-              {t("demo_notice_title", "Mode démo")}
-            </span>
-          ) : null}
-          {showNotActivatedNotice ? (
-            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-              {t(
-                "wallet_not_activated_title",
+	          </h3>
+	          {showNotActivatedNotice ? (
+	            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+	              {t(
+	                "wallet_not_activated_title",
                 "Wallet not activated: a minimum reserve of 1 XRP is required."
               )}
             </span>
@@ -100,23 +95,23 @@ export function WalletInfoContent({
 
 
             </li>
-            <li>{t("ui_xcannes_ne_pr_l_ve_pas_de_fe_b3ee902ca3", "XCANNES ne prélève pas de frais séparé. Le modèle est un")}
+            <li>{t("demo_fee_model_intro_f4", "Aucun frais séparé n’est prélevé. Le modèle est un")}
               {" "}
               <span className="font-semibold">{t("ui_spread_8f9f9fc2e9", "taux FX fixe")}</span>{t("ui_appliqu_uniquement_quand_il__d0c9824222", "appliqué uniquement quand il y a une conversion (ex:")}
               {" "}
               <span className="font-mono">{t("ui_eur_gbp_1865864628", "EUR↔GBP")}</span>,{" "}
-	              <span className="font-mono">{t("ui_rlusd_eur_23dc8f699b", "USD↔EUR")}</span>).
+		              <span className="font-mono">{t("ui_rlusd_eur_23dc8f699b", "USD↔EUR")}</span>).
             </li>
             <li>
-	              {t(
-	                "ui_fx_fee_fixed_1pct",
-	                "Conversion fee: 1% regardless of currency, applied on the USD amount and sent on-chain to an XCANNES company wallet."
-	              )}
+		              {t(
+		                "demo_fx_fee_fixed_1pct_f4",
+		                "Frais de conversion : 1 % quelle que soit la devise, appliqué sur le montant en USD."
+		              )}
             </li>
-            <li>{t("ui_convert_interne_1_signature__c7b5a8e4dd", "Conversion interne: 1 signature Xumm. Paiement entre 2 wallets: 2 signatures si un taux FX s’applique (sinon 1).")}
+	            <li>{t("demo_signatures_none_f4", "Aucune signature n’est requise (données fictives).")}
 
 
-            </li>
+	            </li>
           </ul>
           <p className="mt-2 text-[12px] text-white/45">{t("ui_source_de_rate_paires_live_v_6b7123ea24", "Source de taux: paires “live” via Pyth quand disponible, sinon FX EOD (coté 1×/jour).")}
 
