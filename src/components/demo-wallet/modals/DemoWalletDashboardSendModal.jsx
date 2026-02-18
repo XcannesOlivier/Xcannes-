@@ -79,7 +79,7 @@ export default function DemoWalletDashboardSendModal({
   const payreqQrDecorPosition = useDemoQrDecor ? "center 12px" : "center 24px";
   const payreqQrDecor = manualQrDecor;
   const fauxPayreqExample =
-    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+    '{"schema":"xcannes-payreq-v1","to":"rGt_Comptedepresentation_xxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && (isDesktop || isDemoMode));
   const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
   const useUnifiedPayreqPanel = useDexStyleLayout;
@@ -258,22 +258,17 @@ export default function DemoWalletDashboardSendModal({
 
             ✕
           </button>
-          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {sendTab === "manual"
-                ? t("ui_send_assets_title_2c9b1a7d5e", "Send assets")
-                : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
-            </h3>
-            {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                {t("demo_notice_title", "Mode démo")}
-              </span>
-            ) : null}
-            {showNotConnectedNotice ? (
-              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t("wallet_not_connected_title", "Wallet not connected")}
-              </span>
-            ) : null}
+	          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
+	            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+	              {sendTab === "manual"
+	                ? t("ui_send_assets_title_2c9b1a7d5e", "Send assets")
+	                : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
+	            </h3>
+	            {showNotConnectedNotice ? (
+	              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+	                {t("wallet_not_connected_title", "Wallet not connected")}
+	              </span>
+	            ) : null}
 	            {showRlusdNotActivatedNotice ? (
 	              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
 	                {t(
@@ -441,17 +436,17 @@ export default function DemoWalletDashboardSendModal({
 	              </span>
 	            </p>
             }
-                  <p className="mt-2 text-[10px] text-white/45">
-                    {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
-              t(
-                "ui_xumm_signatures_two_8d1c7a2b9e",
-                "2 Xumm signatures: conversion fee (1%) → XCANNES, then payment → recipient."
-              ) :
-              t(
-                "ui_xumm_signatures_one_5b2c1a7d9f",
-                "1 Xumm signature: payment → recipient."
-              )}
-                  </p>
+	                  <p className="mt-2 text-[10px] text-white/45">
+	                    {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
+	              t(
+	                "demo_send_flow_with_fee_f4",
+	                "Demo: service fee (1%) applied, then payment → recipient."
+	              ) :
+	              t(
+	                "demo_send_flow_simple_f4",
+	                "Demo: payment → recipient."
+	              )}
+	                  </p>
                 </div>
           }
               </div>

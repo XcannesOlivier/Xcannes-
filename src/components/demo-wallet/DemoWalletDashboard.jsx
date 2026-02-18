@@ -50,7 +50,7 @@ const DEMO_WALLET_ACCENTS = {
 };
 
 const DEMO_FAUX_PAYREQ_EXAMPLE =
-  '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+  '{"schema":"xcannes-payreq-v1","to":"rGt_Comptedepresentation_xxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
 
 function clone(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
@@ -135,7 +135,7 @@ function formatDemoAddressShort(address) {
 
 	const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 	const DEMO_SAVED_ADDRESSES_STORAGE_KEY = "xcannes_demo_saved_addresses_v1";
-	const DEMO_DEFAULT_DESTINATION_ADDRESS = "rDEMO_MERCHANT_xxxxxxxxxxxxxxxxxxxxxx";
+	const DEMO_DEFAULT_DESTINATION_ADDRESS = "rDe_Receverpresentation_xxxxxxxxxxxxxxxxxxxxxx";
 	const DEMO_LATENCY_MS_MIN = 450;
 	const DEMO_LATENCY_MS_MAX = 1100;
 	const DEMO_RATES_REFRESH_MS = 15_000;
@@ -226,6 +226,37 @@ function isValidDemoState(value) {
   if (!wallets || typeof wallets !== "object") return false;
   if (!wallets.A || !wallets.A.allocations) return false;
   return true;
+}
+
+function needsDemoStateMigration(value) {
+  if (!isValidDemoState(value)) return false;
+  const walletA = value?.wallets?.A || {};
+  const label = String(walletA?.label || "").trim();
+  const address = String(walletA?.address || "").trim();
+  if (
+    !label ||
+    label === "Wallet A" ||
+    label === "Compte démo" ||
+    label === "Compte demo"
+  ) {
+    return true;
+  }
+  if (
+    !address ||
+    address === "rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx" ||
+    address === "rGt_Comptedepresentation_xxxxxxxxxxx" ||
+    address === "rGt_Comptedepresentation_xxxxxxxxxxxxx" ||
+    address === "rGt_Comptedepresentation_RVkj2JhnHC"
+  ) {
+    return true;
+  }
+  if (
+    address.startsWith("rGt_Comptedepresentation_") &&
+    address !== "rGt_Comptedepresentation_xxxxxxxxxxxxxxx"
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export default function DemoWalletDashboard({
@@ -351,7 +382,7 @@ export default function DemoWalletDashboard({
       handleCancelWalletLabel();
       return;
     }
-    if (nextLabel === "Compte démo") {
+    if (nextLabel === "Mr et Mme Dupont") {
       handleCancelWalletLabel();
       return;
     }
@@ -432,6 +463,13 @@ export default function DemoWalletDashboard({
       setIsHydrated(true);
     }
   }, [isExternalState, setState]);
+
+  useEffect(() => {
+    if (isExternalState) return;
+    if (!isHydrated) return;
+    if (!needsDemoStateMigration(state)) return;
+    setState((prev) => migrateDemoState(prev));
+  }, [isExternalState, isHydrated, setState, state]);
 
   useEffect(() => {
     if (isExternalState) return;
@@ -685,7 +723,7 @@ export default function DemoWalletDashboard({
         key: currency,
         currency,
         value,
-        issuer: isTrustlineOnly ? "XCANNES" : undefined,
+        issuer: undefined,
         isTrustlineOnly,
         isMissingTrustline: false,
         demoRlusdValue
@@ -986,30 +1024,12 @@ export default function DemoWalletDashboard({
 
     if (isFxSend && spreadFeeUnits > 0) {
       const fromWallet = nextState.wallets?.[activeWalletId];
-      const feeWallet = nextState.wallets?.FEE;
       if (fromWallet) {
         ensureAllocation(fromWallet, currency);
         fromWallet.allocations[currency] = Number(
           (Number(fromWallet.allocations[currency] || 0) - Number(spreadFeeUnits)).toFixed(6)
         );
       }
-      if (feeWallet) {
-        ensureAllocation(feeWallet, currency);
-        feeWallet.allocations[currency] = Number(
-          (Number(feeWallet.allocations[currency] || 0) + Number(spreadFeeUnits)).toFixed(6)
-        );
-      }
-      if (!nextState.events) nextState.events = [];
-      nextState.events.unshift({
-        id: newDemoEventId("demo_spread"),
-        ts: Date.now(),
-        kind: "spread_fee",
-        wallet: activeWalletId,
-        currency,
-        amount: Number(spreadFeeUnits),
-        usdValue: Number(spreadFeeRlusd) || 0,
-        fxRate
-      });
     }
 
     setState(nextState);
@@ -1585,18 +1605,14 @@ export default function DemoWalletDashboard({
 	      demoBottomBorderClass].
 	      join(" ")}>
 
-		      <div className="panel-header">
-		        <div className="flex items-center justify-between gap-3">
-		          <div className="flex items-center gap-1 min-w-0">
-		            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_30015bef4b", "XCANNES")}
+			      <div className="panel-header">
+			        <div className="flex items-center justify-between gap-3">
+			          <div className="flex items-center gap-1 min-w-0">
+			            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_30015bef4b", "XCANNES")}
 
-		            </span>
-		            <span className="text-[10px] font-light text-white/30">|</span>
-		          </div>
-			          <span className="text-xs md:text-sm font-semibold text-white/70 tracking-[0.18em]">
-			            {t("demo_notice_title", "Demo mode")}
-			          </span>
-			        </div>
+			            </span>
+			          </div>
+				        </div>
 
 	        {showWalletSwitcher &&
 	        <div className="mt-3 flex items-center justify-between gap-3">
@@ -2236,16 +2252,16 @@ export default function DemoWalletDashboard({
         walletAddress={effectiveWallet || ""} />
 
 
-	      <DemoWalletDashboardStatementModals
-	        augmentedTokens={selectableTokens}
-	        backendWalletAddress={""}
-	        effectiveWallet={effectiveWallet}
-	        walletDisplayLabel={isWalletLabelLocked ? walletContextLabel : ""}
-	        isPreviewMode={true}
-	        noticeVariant="demo"
-	        noticeContextLabel={demoNoticeContextLabel}
-	        walletId={activeWalletId}
-        previewGlobalMovements={previewGlobalMovements}
+		      <DemoWalletDashboardStatementModals
+		        augmentedTokens={selectableTokens}
+		        backendWalletAddress={""}
+		        effectiveWallet={effectiveWallet}
+		        walletDisplayLabel={walletContextLabel}
+		        isPreviewMode={true}
+		        noticeVariant="demo"
+		        noticeContextLabel={demoNoticeContextLabel}
+		        walletId={activeWalletId}
+	        previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={false}
         statementVariant={"default"}

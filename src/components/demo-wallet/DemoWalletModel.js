@@ -1,7 +1,6 @@
 const DEFAULT_RATES_USD_PER_UNIT = {
   RLUSD: 1,
   XRP: 0.55,
-  RLUSD: 0.1,
   EUR: 1.08,
   CAD: 0.74,
   CHF: 1.1,
@@ -20,12 +19,11 @@ const DEFAULT_RATES_USD_PER_UNIT = {
 const DEFAULT_DEMO_WALLETS = {
   A: {
     id: "A",
-    label: "Compte démo",
+    label: "Mr et Mme Dupont",
     labelLocked: false,
-    address: "rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx",
+    address: "rGt_Comptedepresentation_xxxxxxxxxxxxxxx",
     allocations: {
       XRP: 12.345678,
-      RLUSD: 250,
       RLUSD: 1000,
       EUR: 420,
       CAD: 380,
@@ -42,21 +40,12 @@ const DEFAULT_DEMO_WALLETS = {
       XAF: 180000,
     },
   },
-  FEE: {
-    id: "FEE",
-    label: "XCANNES Fees",
-    labelLocked: false,
-    address: "rDEMO_WALLET_FEES_xxxxxxxxxxxxxxxxxxxxx",
-    allocations: {
-      RLUSD: 0,
-    },
-  },
 };
 
 const DEMO_EVENT_SPREAD_BPS = 100;
 const DEMO_EVENTS_MONTHS = 12;
 const DEMO_COUNTERPARTIES = [
-  { label: "Merchant", address: "rDEMO_MERCHANT_xxxxxxxxxxxxxxxxxxxxxx" },
+  { label: "Merchant", address: "rDe_Receverpresentation_xxxxxxxxxxxxxxxxxxxxxx" },
   { label: "Payroll", address: "rDEMO_PAYROLL_xxxxxxxxxxxxxxxxxxxxxxx" },
   { label: "Friend", address: "rDEMO_FRIEND_xxxxxxxxxxxxxxxxxxxxxxxx" },
 ];
@@ -233,7 +222,7 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
   const allocations = walletA?.allocations || {};
   const currencyCodes = Object.keys(allocations)
     .map((code) => String(code).toUpperCase())
-    .filter((code) => code && code !== "FEE");
+    .filter((code) => code);
 
   const uniqueCurrencies = Array.from(new Set(currencyCodes));
   const counterpartyForIndex = (i) => DEMO_COUNTERPARTIES[i % DEMO_COUNTERPARTIES.length];
@@ -245,21 +234,6 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
       kind: action === "remove" ? "trustline_remove" : "trustline_add",
       wallet: walletId,
       currency: String(currency || "").toUpperCase(),
-    });
-  };
-
-  const pushSpreadFee = ({ walletId, currency, amount }) => {
-    const upper = String(currency || "").toUpperCase();
-    const usdPerUnit = ratesUsdPerUnit?.[upper] ?? 0;
-    events.push({
-      id: newId(),
-      ts: nextTs(),
-      kind: "spread_fee",
-      wallet: walletId,
-      currency: upper,
-      amount: formatUnits(amount),
-      usdValue: formatUnits(formatUnits(amount) * usdPerUnit),
-      fxRate: usdPerUnit || null,
     });
   };
 
@@ -377,10 +351,6 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
     );
   });
 
-  // A couple spread fee entries (display-only).
-  pushSpreadFee({ walletId: "A", currency: "EUR", amount: 0.12 });
-  pushSpreadFee({ walletId: "A", currency: "RLUSD", amount: 1.25 });
-
   return events.sort((a, b) => b.ts - a.ts);
 }
 
@@ -415,18 +385,27 @@ export function migrateDemoState(state) {
       target.allocations[code] = value;
     });
 
-    // Wallet label rules (demo): default is "Compte démo", user can rename once then lock.
+    // Wallet label rules (demo): default is "Mr et Mme Dupont", user can rename once then lock.
     if (walletId === "A") {
-      const defaultLabel = "Compte démo";
-      const legacyDefaultLabel = "Wallet A";
+      const defaultLabel = "Mr et Mme Dupont";
+      const legacyDefaultLabels = new Set(["Wallet A", "Compte démo", "Compte demo"]);
       const normalizedLabel = String(target?.label || "").trim();
-      if (!normalizedLabel || normalizedLabel === legacyDefaultLabel) {
+      if (!normalizedLabel || legacyDefaultLabels.has(normalizedLabel)) {
         target.label = defaultLabel;
         target.labelLocked = false;
       } else if (typeof target.labelLocked !== "boolean") {
         target.labelLocked = normalizedLabel !== defaultLabel;
       } else if (target.labelLocked && normalizedLabel === defaultLabel) {
         target.labelLocked = false;
+      }
+
+      const normalizedAddress = String(target?.address || "").trim();
+      if (
+        !normalizedAddress ||
+        normalizedAddress === "rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx" ||
+        normalizedAddress.startsWith("rGt_Comptedepresentation_")
+      ) {
+        target.address = base.wallets?.A?.address || target.address;
       }
     } else if (typeof target.labelLocked !== "boolean") {
       target.labelLocked = false;

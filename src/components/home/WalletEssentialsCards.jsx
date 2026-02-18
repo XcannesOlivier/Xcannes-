@@ -1600,20 +1600,20 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         </svg>
       ),
     },
-    {
-      key: "demo_intro",
-      title: t(
-        "home_v2_demo_card_title",
-        "Découvrez la démo du wallet XCANNES"
-      ),
-      desc: t(
-        "home_v2_demo_card_desc",
-        "Démo interactive, sans transaction réelle."
-      ),
-      orderClassName: "order-last lg:order-1 lg:-mb-2",
-      plainTitleClassName:
-        "text-white/90 font-montserrat font-semibold text-xl sm:text-base lg:text-base tracking-normal",
-      plainDescClassName: "text-white/60 text-lg sm:text-[15px] lg:text-sm italic",
+	    {
+	      key: "demo_intro",
+	      title: t(
+	        "home_v2_demo_card_title",
+	        "Découvrez l'environnement de présentation XCANNES"
+	      ),
+	      desc: t(
+	        "home_v2_demo_card_desc",
+	        "Accès d’évaluation — aucune transaction réelle."
+	      ),
+	      orderClassName: "order-last lg:order-1 lg:-mb-2",
+	      plainTitleClassName:
+	        "text-white/90 font-montserrat font-semibold text-xl sm:text-base lg:text-base tracking-normal",
+	      plainDescClassName: "text-white/60 text-lg sm:text-[15px] lg:text-sm italic",
       showArrow: true,
       isPlain: true,
       icon: (
@@ -1965,14 +1965,14 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           <h3 className="mt-1 text-[28px] font-montserrat font-semibold text-white/90 leading-tight">
             {t("home_v2_demo_preview_title", "Démo interactive")}
           </h3>
-          <p className="mt-1 text-[11px] text-white/60 leading-snug line-clamp-2 italic">
-            {t(
-              "home_v2_demo_card_desc",
-              "Démo interactive, sans transaction réelle."
-            )}
-          </p>
-        </div>
-      )}
+	          <p className="mt-1 text-[11px] text-white/60 leading-snug line-clamp-2 italic">
+	            {t(
+	              "home_v2_demo_card_desc",
+	              "Accès d’évaluation — aucune transaction réelle."
+	            )}
+	          </p>
+	        </div>
+	      )}
 
       <div className={gridClassName}>
         {!isCompact &&

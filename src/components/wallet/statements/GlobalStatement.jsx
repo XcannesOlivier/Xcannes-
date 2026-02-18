@@ -451,6 +451,7 @@ export default function GlobalStatement({
   }, [docHash, ledgerStatus, movements, totalBalance]);
 
   const getCurrencyFlag = (currency) => {
+    const code = String(currency || "").trim().toUpperCase();
     const flags = {
       EUR: "🇪🇺", USD: "🇺🇸", GBP: "🇬🇧", JPY: "🇯🇵",
       CHF: "🇨🇭", CAD: "🇨🇦", AUD: "🇦🇺", NZD: "🇳🇿",
@@ -460,7 +461,9 @@ export default function GlobalStatement({
       DKK: "🇩🇰", PLN: "🇵🇱", THB: "🇹🇭", IDR: "🇮🇩",
       MYR: "🇲🇾", PHP: "🇵🇭", CZK: "🇨🇿", ILS: "🇮🇱",
       CLP: "🇨🇱", AED: "🇦🇪", SAR: "🇸🇦",
-      XRP: "✕", RLUSD: "💵", RLUSD: "🪙",
+      XRP: "✕",
+      // Global statement: show RLUSD as USD for clarity.
+      RLUSD: "🇺🇸",
       BTC: "₿", ETH: "Ξ", USDT: "₮", USDC: "💵",
       BNB: "🔶", ADA: "₳", DOGE: "Ð",
       XLM: "🚀", LINK: "⬡", DOT: "⚫", UNI: "🦄",
@@ -496,7 +499,7 @@ export default function GlobalStatement({
       VUV: "🇻🇺", VES: "🇻🇪", VND: "🇻🇳", YER: "🇾🇪",
       ZMW: "🇿🇲", ZWL: "🇿🇼"
     };
-    return flags[currency] || "💱";
+    return flags[code] || "💱";
   };
 
   const getCategoryBadge = (token) => {

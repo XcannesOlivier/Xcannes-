@@ -46,7 +46,7 @@ export default function DemoWalletDashboardCashModal({
     noticeVariant === "demo"
       ? t(
           "ui_fiat_gateway_note_demo_6f1d8c2a9b",
-          "Demo mode: buy/sell are simulated, no MoonPay redirect."
+          "Buy/sell are simulated, no MoonPay redirect."
         )
       : t(
           "ui_fiat_gateway_note_live_4b8c2d1e9f",
@@ -95,22 +95,17 @@ export default function DemoWalletDashboardCashModal({
           {/* Header avec onglets Buy/Sell */}
           <div className="border-b border-white/10">
             <div className="flex items-center justify-between p-4 pb-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                  {cashModalTab === "sell"
-                    ? t("ui_crypto_gateway_title_6b2a4f7e91", "Crypto→Fiat")
-                    : t("ui_fiat_gateway_2b14cbec79", "Fiat→Crypto")}
-                </h3>
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
+	              <div className="flex flex-wrap items-center gap-2">
+	                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+	                  {cashModalTab === "sell"
+	                    ? t("ui_crypto_gateway_title_6b2a4f7e91", "Crypto→Fiat")
+	                    : t("ui_fiat_gateway_2b14cbec79", "Fiat→Crypto")}
+	                </h3>
+	                {showNotConnectedNotice ? (
+	                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+	                    {t("wallet_not_connected_title", "Wallet not connected")}
+	                  </span>
+	                ) : null}
                 {showNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t(

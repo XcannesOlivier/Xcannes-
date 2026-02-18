@@ -141,15 +141,15 @@ export const getCurrencyDescription = (code) => {
     "VUV": "Vanuatu Vatu",
     "XPF": "CFP Franc",
     
-    // Stablecoins
-    "RLUSD": "Ripple USD Stablecoin",
-    "USDT": "Tether USD Stablecoin",
-    "USDC": "USD Coin Stablecoin",
-    "BUSD": "Binance USD Stablecoin",
-    "DAI": "DAI Stablecoin",
-    "TUSD": "TrueUSD Stablecoin",
-    "USDP": "Pax Dollar Stablecoin",
-    "GUSD": "Gemini Dollar Stablecoin",
+	    // Stablecoins
+	    "RLUSD": "US Dollar",
+	    "USDT": "Tether USD Stablecoin",
+	    "USDC": "USD Coin Stablecoin",
+	    "BUSD": "Binance USD Stablecoin",
+	    "DAI": "DAI Stablecoin",
+	    "TUSD": "TrueUSD Stablecoin",
+	    "USDP": "Pax Dollar Stablecoin",
+	    "GUSD": "Gemini Dollar Stablecoin",
     
     // Cryptomonnaies
     "XRP": "XRP Ledger Native Token",
@@ -173,8 +173,7 @@ export const getCurrencyDescription = (code) => {
     "APT": "Aptos",
     "ARB": "Arbitrum",
     "OP": "Optimism",
-    "RLUSD": "Xcannes Coin",
-    "SHIB": "Shiba Inu",
+	    "SHIB": "Shiba Inu",
     "TRX": "Tron",
     "LTC": "Litecoin",
     "BCH": "Bitcoin Cash",

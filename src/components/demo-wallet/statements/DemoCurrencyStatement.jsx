@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "../utils/demoCurrencyDescriptions";
 import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
-import { apiUrl } from "@/lib/runtimeConfig";
 import {
   buildCsvString,
   downloadTextFile,
@@ -123,14 +122,18 @@ export default function DemoCurrencyStatement({
     () => getDisplayCurrencyCode(normalizedCurrency),
     [normalizedCurrency]
   );
+  const currencyDescription = useMemo(
+    () => String(getCurrencyDescription(normalizedCurrency) || "").trim(),
+    [normalizedCurrency]
+  );
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
   const [reserveOpen, setReserveOpen] = useState(false);
   const [docHash, setDocHash] = useState("");
-  const [walletLabel, setWalletLabel] = useState("");
   const resolvedLabelOverride = String(walletLabelOverride || "").trim();
+  const [walletLabel, setWalletLabel] = useState(resolvedLabelOverride);
   const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
@@ -172,38 +175,8 @@ export default function DemoCurrencyStatement({
   }, [highlightTransactionId]);
 
   useEffect(() => {
-    let cancelled = false;
-    if (resolvedLabelOverride) {
-      setWalletLabel(resolvedLabelOverride);
-      return () => {};
-    }
-    if (!walletAddress) {
-      setWalletLabel("");
-      return () => {};
-    }
-
-    const loadLabel = async () => {
-      try {
-        const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Failed to load wallet label");
-        }
-        if (cancelled) return;
-        setWalletLabel(String(data?.label || "").trim());
-      } catch (err) {
-        console.error("Error loading wallet label:", err);
-        if (!cancelled) setWalletLabel("");
-      }
-    };
-
-    loadLabel();
-    return () => {
-      cancelled = true;
-    };
-  }, [resolvedLabelOverride, walletAddress]);
+    setWalletLabel(resolvedLabelOverride);
+  }, [resolvedLabelOverride]);
 
   const estimatedUsd = useMemo(() => {
     const value = Number.parseFloat(balance || 0) || 0;
@@ -698,12 +671,12 @@ export default function DemoCurrencyStatement({
       "TOP": "🇹🇴", // Pa'anga tongien
       "VUV": "🇻🇺", // Vatu vanuatais
 
-      // Stablecoins et tokens fiat
-      "RLUSD": "🔵", // Ripple USD (Stablecoin)
-      "BUSD": "🟡", // Binance USD
-      "DAI": "🟠", // DAI Stablecoin
-      "TUSD": "🔷", // TrueUSD
-      "USDP": "⚪", // Pax Dollar
+	      // Stablecoins et tokens fiat
+	      "RLUSD": "🇺🇸", // USD
+	      "BUSD": "🟡", // Binance USD
+	      "DAI": "🟠", // DAI Stablecoin
+	      "TUSD": "🔷", // TrueUSD
+	      "USDP": "⚪", // Pax Dollar
       "GUSD": "💚", // Gemini Dollar
       "USDD": "⚫", // USDD Stablecoin
       "FRAX": "🔲", // Frax
@@ -735,9 +708,8 @@ export default function DemoCurrencyStatement({
       "ARB": "🔷", // Arbitrum
       "OP": "🔴", // Optimism
       "SAND": "🏖️", // The Sandbox
-      "MANA": "🎮", // Decentraland
-      "RLUSD": "🌟", // Xcannes Coin
-      "SHIB": "🐕", // Shiba Inu
+	      "MANA": "🎮", // Decentraland
+	      "SHIB": "🐕", // Shiba Inu
       "TRX": "🔺", // Tron
       "LTC": "Ł", // Litecoin
       "BCH": "₿", // Bitcoin Cash
@@ -769,10 +741,9 @@ export default function DemoCurrencyStatement({
       "ICX": "🔷", // ICON
       "ONT": "⭕", // Ontology
       "ZEC": "🛡️", // Zcash
-      "DASH": "💸", // Dash
-      "DCR": "🔷", // Decred
-      "RLUSD": "🌟" // Xcannes Coin
-    };
+	      "DASH": "💸", // Dash
+	      "DCR": "🔷", // Decred
+	    };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
   }, []);
 
@@ -843,15 +814,12 @@ export default function DemoCurrencyStatement({
     return { from: match[1], to: match[2] };
   }, []);
 
-  const getLocalizedDescription = useCallback(
-    (tx) => {
-      const kind = String(tx?.kind || "").trim().toUpperCase();
-      const rawCounterparty = tx?.counterparty ? String(tx.counterparty).trim() : "";
-      const counterparty =
-        rawCounterparty && rawCounterparty.toUpperCase() !== "XCANNES"
-          ? rawCounterparty
-          : "";
-      const category = String(tx?.category || "").trim().toLowerCase();
+	  const getLocalizedDescription = useCallback(
+	    (tx) => {
+	      const kind = String(tx?.kind || "").trim().toUpperCase();
+	      const rawCounterparty = tx?.counterparty ? String(tx.counterparty).trim() : "";
+	      const counterparty = rawCounterparty;
+	      const category = String(tx?.category || "").trim().toLowerCase();
 
       if (kind === "PAYMENT_OUT") {
         return counterparty
@@ -968,6 +936,13 @@ export default function DemoCurrencyStatement({
     });
   }, [locale]);
 
+  const formatUsdAmount = useCallback((amount) => {
+    return parseFloat(amount || 0).toLocaleString(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }, [locale]);
+
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
     const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
@@ -984,13 +959,12 @@ export default function DemoCurrencyStatement({
       const txType = isDebit ?
       t("ui_debit_0f7c2a1b9e", "Debit") :
       t("ui_credit_93bc2a1d7e", "Credit");
-      const txDescription = getLocalizedDescription(tx);
-      const counterparty =
-        tx?.counterparty &&
-        String(tx.counterparty).toUpperCase() !== "XCANNES" &&
-        !txDescription.includes(tx.counterparty)
-          ? `(${tx.counterparty})`
-          : "";
+	      const txDescription = getLocalizedDescription(tx);
+	      const counterparty =
+	        tx?.counterparty &&
+	        !txDescription.includes(tx.counterparty)
+	          ? `(${tx.counterparty})`
+	          : "";
       const fullDescription = [txDescription, counterparty].filter(Boolean).join(" ");
       return `
         <tr>
@@ -1249,19 +1223,19 @@ export default function DemoCurrencyStatement({
 	              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 min-w-0">
-	                  <h2 className="text-lg md:text-xl font-bold text-white truncate">
-	                    {displayCurrency} {t("ui_statement_a87c93acb8", "Statement")}
-	                  </h2>
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
-                  {showNotConnectedNotice ? (
-                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                      {t("wallet_not_connected_title", "Wallet not connected")}
-                    </span>
-                  ) : null}
+		                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+		                    <span className="truncate">{displayCurrency}</span>
+		                    {currencyDescription ? (
+		                      <span className="truncate text-sm md:text-base font-semibold text-white/60">
+		                        {currencyDescription}
+		                      </span>
+		                    ) : null}
+			                  </h2>
+	                  {showNotConnectedNotice ? (
+	                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
+	                      {t("wallet_not_connected_title", "Wallet not connected")}
+	                    </span>
+	                  ) : null}
                   {showNotActivatedNotice ? (
                     <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                       {t(
@@ -1279,10 +1253,8 @@ export default function DemoCurrencyStatement({
                     </span>
                   ) : null}
                 </div>
-                <p className="text-xs md:text-sm text-white/60 truncate">
-                  {getCurrencyDescription(currency)}
-                </p>
-              </div>
+	                {/* Description merged into title */}
+	              </div>
             </div>
             <button
             onClick={onClose}
@@ -1297,14 +1269,14 @@ export default function DemoCurrencyStatement({
 	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 	            <div>
 	              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_3eef963295", "Account Holder")}</p>
-	              <p className="text-sm text-white font-semibold truncate">
-	                {walletLabel || t("nav_wallet", "Wallet")}
-	              </p>
-	              {!walletLabel ? (
-	                <p className="text-[11px] text-white/50 font-mono break-all">
-	                  {walletAddress}
-	                </p>
-	              ) : null}
+		              <p className="text-sm text-white font-semibold truncate">
+		                {walletLabel || t("nav_wallet", "Wallet")}
+		              </p>
+		              {walletAddress ? (
+		                <p className="text-[11px] text-white/50 font-mono break-all">
+		                  {walletAddress}
+		                </p>
+		              ) : null}
 	            </div>
 	            <div>
 	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_6dedec11d9", "Statement Period")}</p>
@@ -1323,17 +1295,28 @@ export default function DemoCurrencyStatement({
                 menuClassName={modalBgClass}
               />
             </div>
-            <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_balance_445d830d72", "Balance")}</p>
-	              <p className="text-sm text-white font-semibold">
-	                {formatAmount(balance)} {displayCurrency}
-	              </p>
-              <p className="text-[11px] text-white/50">
-                ≈ {formatAmount(estimatedUsd)}{t("ui_usd_506842b2ba", "USD")}
-            </p>
+	            <div>
+	              <div className="flex items-start justify-between gap-3">
+	                <div className="pl-1">
+	                  <p className="text-xs text-white/50 mb-1">
+	                    {t("ui_balance_445d830d72", "Balance")}
+	                  </p>
+		                  <p className="text-sm text-white font-semibold">
+		                    {formatAmount(balance)} {displayCurrency}
+		                  </p>
+	                </div>
+	                <div className="text-right">
+	                  <p className="text-xs text-white/50 mb-1">
+	                    {t("demo_indexed_stability_label_f4", "Stabilité Indexée")}
+	                  </p>
+	                  <p className="text-[11px] text-white/50">
+	                    ≈ {formatUsdAmount(estimatedUsd)} {t("ui_usd_506842b2ba", "USD")}
+	                  </p>
+	                </div>
+	              </div>
 
-	              {(normalizedCurrency === "XRP") &&
-	            <div className="mt-2 relative">
+		              {(normalizedCurrency === "XRP") &&
+		            <div className="mt-2 relative">
 	                  <div className="flex items-center justify-between gap-2">
 	                    <div>
 	                      <p className="text-xs text-white/50 whitespace-pre-line">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>

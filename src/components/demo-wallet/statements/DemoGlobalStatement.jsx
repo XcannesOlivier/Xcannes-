@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
-import { apiUrl } from "@/lib/runtimeConfig";
 import {
   buildCsvString,
   downloadTextFile,
@@ -61,8 +60,8 @@ export default function DemoGlobalStatement({
   const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
   const [exportFormat, setExportFormat] = useState(null);
   const [docHash, setDocHash] = useState("");
-  const [walletLabel, setWalletLabel] = useState("");
   const resolvedLabelOverride = String(walletLabelOverride || "").trim();
+  const [walletLabel, setWalletLabel] = useState(resolvedLabelOverride);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025"
@@ -75,38 +74,8 @@ export default function DemoGlobalStatement({
   const fallbackPeriod = period || defaultPeriod;
 
   useEffect(() => {
-    let cancelled = false;
-    if (resolvedLabelOverride) {
-      setWalletLabel(resolvedLabelOverride);
-      return () => {};
-    }
-    if (!walletAddress) {
-      setWalletLabel("");
-      return () => {};
-    }
-
-    const loadLabel = async () => {
-      try {
-        const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Failed to load wallet label");
-        }
-        if (cancelled) return;
-        setWalletLabel(String(data?.label || "").trim());
-      } catch (err) {
-        console.error("Error loading wallet label:", err);
-        if (!cancelled) setWalletLabel("");
-      }
-    };
-
-    loadLabel();
-    return () => {
-      cancelled = true;
-    };
-  }, [resolvedLabelOverride, walletAddress]);
+    setWalletLabel(resolvedLabelOverride);
+  }, [resolvedLabelOverride]);
 
   // Générer les 12 derniers mois
   const generateMonths = () => {
@@ -451,6 +420,7 @@ export default function DemoGlobalStatement({
   }, [docHash, ledgerStatus, movements, totalBalance]);
 
   const getCurrencyFlag = (currency) => {
+    const code = String(currency || "").trim().toUpperCase();
     const flags = {
       EUR: "🇪🇺", USD: "🇺🇸", GBP: "🇬🇧", JPY: "🇯🇵",
       CHF: "🇨🇭", CAD: "🇨🇦", AUD: "🇦🇺", NZD: "🇳🇿",
@@ -460,7 +430,9 @@ export default function DemoGlobalStatement({
       DKK: "🇩🇰", PLN: "🇵🇱", THB: "🇹🇭", IDR: "🇮🇩",
       MYR: "🇲🇾", PHP: "🇵🇭", CZK: "🇨🇿", ILS: "🇮🇱",
       CLP: "🇨🇱", AED: "🇦🇪", SAR: "🇸🇦",
-      XRP: "✕", RLUSD: "💵", RLUSD: "🪙",
+      XRP: "✕",
+      // Demo wallet: treat RLUSD as USD for statement visuals.
+      RLUSD: "🇺🇸",
       BTC: "₿", ETH: "Ξ", USDT: "₮", USDC: "💵",
       BNB: "🔶", ADA: "₳", DOGE: "Ð",
       XLM: "🚀", LINK: "⬡", DOT: "⚫", UNI: "🦄",
@@ -496,26 +468,20 @@ export default function DemoGlobalStatement({
       VUV: "🇻🇺", VES: "🇻🇪", VND: "🇻🇳", YER: "🇾🇪",
       ZMW: "🇿🇲", ZWL: "🇿🇼"
     };
-    return flags[currency] || "💱";
+    return flags[code] || "💱";
   };
 
   const getCategoryBadge = (token) => {
-    if (token.currency === "XRP") {
-      return {
-        label: t("ui_label_native_2d7a1c9b4e", "Native"),
-        color: "blue"
-      };
-    }
-    if (token.currency === "RLUSD") {
-      return {
-        label: t("ui_label_platform_7c1a9d3b5e", "Platform"),
-        color: "green"
-      };
-    }
-    if (isUsdStablecoin(token.currency))
-    return {
-      label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
-      color: "purple"
+	    if (token.currency === "XRP") {
+	      return {
+	        label: t("ui_label_native_2d7a1c9b4e", "Native"),
+	        color: "blue"
+	      };
+	    }
+	    if (isUsdStablecoin(token.currency))
+	    return {
+	      label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
+	      color: "purple"
     };
     if (token.isTrustlineOnly) {
       return {
@@ -599,23 +565,24 @@ export default function DemoGlobalStatement({
         
         {/* Header avec Account Info intégré */}
         <div className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4`}>
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="text-3xl flex-shrink-0">🌍</span>
-              <div className="flex items-center gap-2 min-w-0">
-                <h2 className="text-xl font-bold text-white truncate">
-                  {t("ui_global_statement_13e29aa8aa", "Global Statement")}
-                </h2>
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
+	          <div className="flex items-start justify-between gap-3 mb-4">
+	            <div className="flex items-center gap-3 min-w-0">
+		              <Image
+		                src="/assets/statement.svg"
+		                alt={t("ui_statement_a87c93acb8", "Statement")}
+		                width={40}
+		                height={40}
+		                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10"
+		              />
+		              <div className="flex items-center gap-2 min-w-0">
+		                <h2 className="text-xl font-bold text-white truncate">
+		                  {t("ui_global_statement_13e29aa8aa", "Global Statement")}
+		                </h2>
+	                {showNotConnectedNotice ? (
+	                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
+	                    {t("wallet_not_connected_title", "Wallet not connected")}
+	                  </span>
+	                ) : null}
                 {showNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t(
@@ -649,14 +616,14 @@ export default function DemoGlobalStatement({
 	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 	            <div>
 	              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_1bfc3cd21c", "Account Holder")}</p>
-	              <p className="text-sm text-white font-semibold truncate">
-	                {walletLabel || t("nav_wallet", "Wallet")}
-	              </p>
-	              {!walletLabel ? (
-	                <p className="text-[11px] text-white/50 font-mono break-all">
-	                  {walletAddress}
-	                </p>
-	              ) : null}
+		              <p className="text-sm text-white font-semibold truncate">
+		                {walletLabel || t("nav_wallet", "Wallet")}
+		              </p>
+		              {walletAddress ? (
+		                <p className="text-[11px] text-white/50 font-mono break-all">
+		                  {walletAddress}
+		                </p>
+		              ) : null}
 	            </div>
 	            <div>
 	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_4674b18f25", "Statement Period")}</p>
@@ -675,13 +642,21 @@ export default function DemoGlobalStatement({
                 menuClassName={modalBgClass}
               />
             </div>
-            <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_total_assets_918e935125", "Total Assets")}</p>
-              <p className="text-sm text-white">≈ {formatAmount(totalBalance)}{t("ui_usd_fb11d8df09", "USD")}</p>
-              <p className="text-[11px] text-white/50">{tokens.length}{t("ui_currencies_5e5bf1a8a1", "Currencies")}</p>
-            </div>
-          </div>
-        </div>
+	            <div>
+	              <p className="text-xs text-white/50 mb-1">
+	                {t("demo_total_balance_label_f4", "Solde total")}
+	              </p>
+	              <div className="flex items-baseline justify-between gap-2">
+	                <p className="text-sm text-white">
+	                  ≈ {formatAmount(totalBalance)} {t("ui_usd_fb11d8df09", "USD")}
+	                </p>
+	                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-xs font-semibold whitespace-nowrap">
+	                  {tokens.length} {t("ui_currencies_5e5bf1a8a1", "Devises")}
+	                </span>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
 
         {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 overflow-hidden px-4 md:px-5 py-4 flex flex-col gap-4 min-h-0">
