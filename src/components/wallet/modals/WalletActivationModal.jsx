@@ -111,14 +111,14 @@ export default function WalletActivationModal({
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet."
-                    )}
-                  </span>
-                ) : null}
+	                {showRlusdNotActivatedNotice ? (
+	                  <span className="inline-flex items-center text-amber-300 text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
+	                    {t(
+	                      "wallet_rlusd_not_activated_title",
+	                      "USD not activated. Authorize USD on your wallet."
+	                    )}
+	                  </span>
+	                ) : null}
               </div>
             </div>
           </div>
@@ -138,11 +138,11 @@ export default function WalletActivationModal({
                   })}
                 </div>
                 <div className="text-[11px] text-white/60">
-                  {t(
-                    "ui_activation_bundle_desc_4b7a1c9e2d",
-                    "Activer le wallet et avoir de quoi activer RLUSD et RLUSD."
-                  )}
-                </div>
+	                  {t(
+	                    "ui_activation_bundle_desc_4b7a1c9e2d",
+	                    "Activer le wallet et avoir de quoi activer USD."
+	                  )}
+	                </div>
               </div>
             </label>
           </div>

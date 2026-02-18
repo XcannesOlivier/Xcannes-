@@ -39,16 +39,16 @@ export function WalletInfoContent({
               )}
             </span>
           ) : null}
-          {showRlusdNotActivatedNotice ? (
-            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-              {t(
-                "wallet_rlusd_not_activated_title",
-                "RLUSD not activated. Authorize RLUSD on your wallet."
-              )}
-            </span>
-          ) : null}
+	          {showRlusdNotActivatedNotice ? (
+	            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
+	              {t(
+	                "wallet_rlusd_not_activated_title",
+	                "USD not activated. Authorize USD on your wallet."
+	              )}
+	            </span>
+	          ) : null}
         </div>
-        <p className="mt-1 text-sm text-white/60">{t("ui_wallet_no_custodial_on_xrp_4e8c91bea3", "Wallet non-custodial sur XRPL + un “ledger UX” pour répartir RLUSD en lignes de comptes.")}
+	        <p className="mt-1 text-sm text-white/60">{t("ui_wallet_no_custodial_on_xrp_4e8c91bea3", "Wallet non-custodial sur XRPL + un “ledger UX” pour répartir USD en lignes de comptes.")}
 
 
         </p>
@@ -58,8 +58,8 @@ export function WalletInfoContent({
         <section className="rounded-xl border border-white/10 bg-black/30 p-4">
           <h4 className="text-sm font-semibold text-white/80">{t("ui_core_features_fe8d86dd76", "Core features")}</h4>
           <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
-            <li>{t("ui_hold_assets_on_chain_xrp_rlu_6e9344f999", "Hold assets on-chain (XRP / RLUSD / RLUSD).")}</li>
-            <li>{t("ui_create_currency_lines_eur_gb_3cb882c93c", "Create currency lines (EUR/GBP/…) to allocate RLUSD internally.")}
+	            <li>{t("ui_hold_assets_on_chain_xrp_rlu_6e9344f999", "Hold assets on-chain (XRP / USD).")}</li>
+	            <li>{t("ui_create_currency_lines_eur_gb_3cb882c93c", "Create currency lines (EUR/GBP/…) to allocate USD internally.")}
 
             </li>
             <li>{t("ui_convert_between_lines_alloca_8439f5b49f", "Convert between lines (allocation-only MVP, no on-chain FX).")}</li>
@@ -70,7 +70,7 @@ export function WalletInfoContent({
             <span className="font-mono">{t("ui_xrpl_assets_c7b3e7185a", "XRPL assets")}</span>{t("ui_on_chain_and_0836c903ca", "(on-chain) and")}{" "}
             <span className="font-mono">{t("ui_local_currency_lines_2b186f452e", "local currency lines")}</span>{t("ui_off_chain_allocations_for_lo_07b1acc670", "(off-chain allocations). For local currency lines, the small")}
             {" "}
-            <span className="font-mono">{t("ui_rlusd_6a0d57ec4d", "≈ … RLUSD")}</span>{t("ui_value_represents_the_underly_94a3198fdf", "value represents the underlying allocation.")}
+	            <span className="font-mono">{t("ui_rlusd_6a0d57ec4d", "≈ … USD")}</span>{t("ui_value_represents_the_underly_94a3198fdf", "value represents the underlying allocation.")}
 
           </p>
         </section>
@@ -105,13 +105,13 @@ export function WalletInfoContent({
               <span className="font-semibold">{t("ui_spread_8f9f9fc2e9", "taux FX fixe")}</span>{t("ui_appliqu_uniquement_quand_il__d0c9824222", "appliqué uniquement quand il y a une conversion (ex:")}
               {" "}
               <span className="font-mono">{t("ui_eur_gbp_1865864628", "EUR↔GBP")}</span>,{" "}
-              <span className="font-mono">{t("ui_rlusd_eur_23dc8f699b", "RLUSD↔EUR")}</span>).
+	              <span className="font-mono">{t("ui_rlusd_eur_23dc8f699b", "USD↔EUR")}</span>).
             </li>
             <li>
-              {t(
-                "ui_fx_fee_fixed_1pct",
-                "Conversion fee: 1% regardless of currency, applied on the RLUSD amount and sent on-chain to an XCANNES company wallet."
-              )}
+	              {t(
+	                "ui_fx_fee_fixed_1pct",
+	                "Conversion fee: 1% regardless of currency, applied on the USD amount and sent on-chain to an XCANNES company wallet."
+	              )}
             </li>
             <li>{t("ui_convert_interne_1_signature__c7b5a8e4dd", "Conversion interne: 1 signature Xumm. Paiement entre 2 wallets: 2 signatures si un taux FX s’applique (sinon 1).")}
 
@@ -128,15 +128,15 @@ export function WalletInfoContent({
           <h4 className="text-sm font-semibold text-white/80">{t("ui_important_af28edf1c1", "Important")}</h4>
           <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
             <li>{t("ui_xrpl_est_la_source_de_v_rit__bf1084eac7", "XRPL est la source de vérité pour les soldes on-chain.")}</li>
-            <li>{t("ui_currency_lines_represent_rlusd_155e16f839", "Les lignes de comptes représentent une répartition interne de RLUSD.")}
+	            <li>{t("ui_currency_lines_represent_rlusd_155e16f839", "Les lignes de comptes représentent une répartition interne de USD.")}
 
 
             </li>
-            <li>{t("ui_l_allocation_totale_ne_doit__dcf11e3d6c", "L’allocation totale ne doit jamais dépasser RLUSD on-chain.")}</li>
+	            <li>{t("ui_l_allocation_totale_ne_doit__dcf11e3d6c", "L’allocation totale ne doit jamais dépasser USD on-chain.")}</li>
             <li>{t("ui_amounts_in_currency_indicative_73d7ff4e8d", "Les montants en devise (EUR, USD, …) sont des valeurs indicatives basées sur des taux marché; la valeur de référence reste")}
 
               {" "}
-              <span className="font-mono">{t("ui_rlusd_5933874327", "RLUSD")}</span>.
+	              <span className="font-mono">{t("ui_rlusd_5933874327", "USD")}</span>.
             </li>
           </ul>
         </section>

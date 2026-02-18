@@ -35,10 +35,10 @@ import { lockBodyScroll } from "@/utils/bodyScrollLock";
 	import { useWalletMeta } from "@/components/wallet/hooks/useWalletMeta";
 	import { useSavedAddresses } from "@/components/wallet/hooks/useSavedAddresses";
 	import { computeSpreadQuote } from "@/utils/walletSpread";
-	import xcannesApi from "@/lib/xcannesApi";
-	import { CRYPTO_ICONS } from "@/utils/marketConstants";
-	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-	import { USD_STABLECOINS } from "@/components/wallet/walletDashboardConfig";
+		import xcannesApi from "@/lib/xcannesApi";
+		import { CRYPTO_ICONS } from "@/utils/marketConstants";
+		import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+		import { getDisplayCurrencyCode, USD_STABLECOINS } from "@/components/wallet/walletDashboardConfig";
 
 const DEMO_WALLET_ACCENTS = {
   A: {
@@ -50,7 +50,7 @@ const DEMO_WALLET_ACCENTS = {
 };
 
 const DEMO_FAUX_PAYREQ_EXAMPLE =
-  '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"RLUSD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+  '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
 
 function clone(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
@@ -78,28 +78,29 @@ function getCurrencyFlag(code) {
 
 function renderDemoTokenIcon(code) {
   const upper = String(code || "").toUpperCase();
-  const iconSrc = CRYPTO_ICONS?.[upper];
+  const display = getDisplayCurrencyCode(upper);
+  const iconSrc = CRYPTO_ICONS?.[display];
   if (iconSrc) {
     return (
       <Image
         src={iconSrc}
-        alt={upper}
+        alt={display}
         width={20}
         height={20}
         className="w-5 h-5 object-contain"
       />
     );
   }
-  return getCurrencyFlag(upper);
+  return getCurrencyFlag(display);
 }
 
-function getDemoCurrencyLabel(code) {
-  const upper = String(code || "").toUpperCase();
-  if (upper === "XRP") return "XRP · Native";
-  if (upper === "RLUSD") return "XCannes Token";
-  if (USD_STABLECOINS.includes(upper)) return "XRPL Stablecoin";
-  return getCurrencyDescription(upper) || upper;
-}
+		function getDemoCurrencyLabel(code) {
+		  const upper = String(code || "").toUpperCase();
+		  if (upper === "XRP") return "XRP · Native";
+		  if (upper === "RLUSD") return "US Dollar";
+		  if (USD_STABLECOINS.includes(upper)) return "XRPL Stablecoin";
+		  return getCurrencyDescription(upper) || upper;
+		}
 
 function formatMoney(locale, amount, currency) {
   const safeLocale = locale || "en";
@@ -139,7 +140,7 @@ function formatDemoAddressShort(address) {
 	const DEMO_LATENCY_MS_MAX = 1100;
 	const DEMO_RATES_REFRESH_MS = 15_000;
 	const DEMO_RATES_STALE_AFTER_MS = 30_000;
-const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, RLUSD: 2 };
+const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -155,7 +156,7 @@ function getDemoLatencyMs() {
   return Math.max(0, Math.floor(min + Math.random() * (max - min)));
 }
 
-const DEMO_NATIVE_CURRENCIES = new Set(["XRP", "RLUSD", "RLUSD"]);
+const DEMO_NATIVE_CURRENCIES = new Set(["XRP", "RLUSD"]);
 
 function isDemoNativeCurrency(code) {
   return DEMO_NATIVE_CURRENCIES.has(String(code || "").toUpperCase());
@@ -507,16 +508,27 @@ export default function DemoWalletDashboard({
   }, []);
 
   const requiredRateCodes = useMemo(() => {
-    const codes = new Set(["USD", "RLUSD", "XRP", "RLUSD"]);
+    const codes = new Set(["USD", "RLUSD", "RLUSD"]);
     const wallets = state?.wallets || {};
     Object.values(wallets).forEach((wallet) => {
       Object.keys(wallet?.allocations || {}).forEach((code) => {
-        codes.add(String(code || "").toUpperCase());
+        const upper = String(code || "").toUpperCase();
+        if (!upper || upper === "XRP") return;
+        codes.add(upper);
       });
     });
-    if (convertBaseCurrency) codes.add(String(convertBaseCurrency).toUpperCase());
-    if (convertQuoteCurrency) codes.add(String(convertQuoteCurrency).toUpperCase());
-    if (requestCurrency) codes.add(String(requestCurrency).toUpperCase());
+    if (convertBaseCurrency) {
+      const upper = String(convertBaseCurrency).toUpperCase();
+      if (upper && upper !== "XRP") codes.add(upper);
+    }
+    if (convertQuoteCurrency) {
+      const upper = String(convertQuoteCurrency).toUpperCase();
+      if (upper && upper !== "XRP") codes.add(upper);
+    }
+    if (requestCurrency) {
+      const upper = String(requestCurrency).toUpperCase();
+      if (upper && upper !== "XRP") codes.add(upper);
+    }
     return Array.from(codes).filter(Boolean).sort((a, b) => a.localeCompare(b));
   }, [convertBaseCurrency, convertQuoteCurrency, requestCurrency, state?.wallets]);
 
@@ -698,13 +710,36 @@ export default function DemoWalletDashboard({
     );
   }, [activeWallet?.allocations, rlusdPerUnitRates]);
 
+  const selectableTokens = useMemo(() => {
+    return (augmentedTokens || []).filter((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      return code !== "XRP" && code !== "USD";
+    });
+  }, [augmentedTokens]);
+
+  useEffect(() => {
+    const upper = String(requestCurrency || "").toUpperCase();
+    if (upper === "XRP" || upper === "USD") setRequestCurrency("RLUSD");
+  }, [requestCurrency, setRequestCurrency]);
+
+  useEffect(() => {
+    const upper = String(convertBaseCurrency || "").toUpperCase();
+    if (upper === "XRP" || upper === "USD") setConvertBaseCurrency("RLUSD");
+  }, [convertBaseCurrency, setConvertBaseCurrency]);
+
+  useEffect(() => {
+    const upper = String(convertQuoteCurrency || "").toUpperCase();
+    if (upper === "XRP" || upper === "USD") setConvertQuoteCurrency("RLUSD");
+  }, [convertQuoteCurrency, setConvertQuoteCurrency]);
+
   const selectLabelByAssetKey = useMemo(() => {
     const labels = {};
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
-      if (token.key) labels[token.key] = code;
-      labels[code] = code;
+      const display = getDisplayCurrencyCode(code);
+      if (token.key) labels[token.key] = display;
+      labels[code] = display;
     });
     return labels;
   }, [augmentedTokens]);
@@ -729,7 +764,8 @@ export default function DemoWalletDashboard({
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
       const amountLabel = formatUnits(locale, token.value || 0);
-      const label = `${code} (${amountLabel})`;
+      const display = getDisplayCurrencyCode(code);
+      const label = `${display} (${amountLabel})`;
       if (token.key) labels[token.key] = label;
       labels[code] = label;
     });
@@ -741,9 +777,10 @@ export default function DemoWalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
-      const icon = CRYPTO_ICONS?.[code]
-        ? { src: CRYPTO_ICONS[code], alt: code }
-        : getCurrencyFlag(code);
+      const display = getDisplayCurrencyCode(code);
+      const icon = CRYPTO_ICONS?.[display]
+        ? { src: CRYPTO_ICONS[display], alt: display }
+        : getCurrencyFlag(display);
       if (token.key) icons[token.key] = icon;
       icons[code] = icon;
     });
@@ -751,9 +788,11 @@ export default function DemoWalletDashboard({
   }, [augmentedTokens]);
 
   const selectedSendToken = useMemo(() => {
-    if (!augmentedTokens.length) return null;
-    return augmentedTokens.find((token) => token.key === sendAssetKey) || augmentedTokens[0];
-  }, [augmentedTokens, sendAssetKey]);
+    if (!selectableTokens.length) return null;
+    return (
+      selectableTokens.find((token) => token.key === sendAssetKey) || selectableTokens[0]
+    );
+  }, [selectableTokens, sendAssetKey]);
 
   useEffect(() => {
     if (!selectedSendToken) return;
@@ -888,14 +927,14 @@ export default function DemoWalletDashboard({
           const computedLabel = paymentRlusd.toLocaleString(locale, {
             maximumFractionDigits: 6
           });
-          return {
-            error: t("demo_error_payment_request_mismatch", {
-              defaultValue:
-                "Demande de paiement incohérente (démo).\n\nDemandé : ≈ {{requested}} RLUSD\nCalculé : ≈ {{computed}} RLUSD\n\nResscanez la demande ou réessayez.",
-              requested: requestedLabel,
-              computed: computedLabel
-            })
-          };
+	          return {
+	            error: t("demo_error_payment_request_mismatch", {
+	              defaultValue:
+	                "Demande de paiement incohérente (démo).\n\nDemandé : ≈ {{requested}} USD\nCalculé : ≈ {{computed}} USD\n\nResscanez la demande ou réessayez.",
+	              requested: requestedLabel,
+	              computed: computedLabel
+	            })
+	          };
         }
       }
 
@@ -1104,10 +1143,10 @@ export default function DemoWalletDashboard({
 
   const swapCurrencyOptions = useMemo(() => {
     const codes = new Set(
-      (augmentedTokens || []).map((tok) => String(tok.currency || "").toUpperCase())
+      (augmentedTokens || [])
+        .map((tok) => String(tok.currency || "").toUpperCase())
+        .filter((code) => code && code !== "XRP")
     );
-    codes.add("RLUSD");
-    codes.add("XRP");
     codes.add("RLUSD");
     return Array.from(codes).filter(Boolean).sort((a, b) => {
       const aPriority =
@@ -1912,14 +1951,16 @@ export default function DemoWalletDashboard({
 	              )}
 	            </button>
 	          </div>
-          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
-	            {tokens.map((row) => {
-	              const upperCode = String(row.code || "").toUpperCase();
-	              const isNativeAsset = upperCode === "XRP" || upperCode === "RLUSD" || upperCode === "RLUSD";
-	              const hasCryptoIcon = Boolean(CRYPTO_ICONS?.[upperCode]);
-	              const isFlagIcon = !isNativeAsset && !hasCryptoIcon;
+	          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
+			            {tokens.map((row) => {
+			              const upperCode = String(row.code || "").toUpperCase();
+			              if (upperCode === "XRP" || upperCode === "USD") return null;
+			              const displayCode = getDisplayCurrencyCode(upperCode);
+			              const isNativeAsset = upperCode === "XRP";
+			              const hasCryptoIcon = Boolean(CRYPTO_ICONS?.[displayCode]);
+			              const isFlagIcon = !isNativeAsset && !hasCryptoIcon;
 	              const iconSizeClass = isNativeAsset
-	                ? "w-7 h-7 text-[13px]"
+		                ? "w-7 h-7 text-[13px]"
 	                : isFlagIcon
 	                  ? "w-10 h-10 text-[18px] sm:w-11 sm:h-11 sm:text-[20px]"
 	                  : "w-9 h-9 text-[16px] sm:w-9 sm:h-9 sm:text-[16px]";
@@ -1956,10 +1997,10 @@ export default function DemoWalletDashboard({
 	                      </div>
 		                      <div className="min-w-0">
 		                        <div className="flex items-baseline gap-2 min-w-0">
-			                          <span className="text-[14px] md:text-[15px] text-primary truncate">{row.code}</span>
-			                          <span className="text-[13px] md:text-[14px] text-muted truncate">
-			                            {getDemoCurrencyLabel(row.code)}
-			                          </span>
+				                          <span className="text-[14px] md:text-[15px] text-primary truncate">{displayCode}</span>
+				                          <span className="text-[13px] md:text-[14px] text-muted truncate">
+				                            {getDemoCurrencyLabel(row.code)}
+				                          </span>
 		                        </div>
 		                      </div>
 		                    </div>
@@ -2020,7 +2061,7 @@ export default function DemoWalletDashboard({
 	        noticeContextLabel={demoNoticeContextLabel}
 	      />
 
-	      <WalletDashboardSendModal
+		      <WalletDashboardSendModal
 	        open={activeAction === "send"}
 	        onClose={() => {
 	          setActiveAction(null);
@@ -2033,7 +2074,7 @@ export default function DemoWalletDashboard({
 	        sendTab={sendTab}
 	        setSendTab={setSendTab}
 	        renderWalletMeta={renderWalletMeta}
-	        augmentedTokens={augmentedTokens}
+		        augmentedTokens={selectableTokens}
 	        selectedSendToken={selectedSendToken}
 	        sendFxInfo={sendFxInfo}
 	        setSendAssetKey={setSendAssetKey}
@@ -2054,7 +2095,7 @@ export default function DemoWalletDashboard({
 	        showFauxPayreqDecor={true} />
 
 
-      <WalletDashboardReceiveModal
+	      <WalletDashboardReceiveModal
         open={activeAction === "receive"}
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
@@ -2080,12 +2121,12 @@ export default function DemoWalletDashboard({
         selectLabelRightByCurrency={selectLabelRightByAssetKey}
         selectIconByCurrency={selectIconByAssetKey}
         selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-        augmentedTokens={augmentedTokens}
-        requestMemo={requestMemo}
-        setRequestMemo={setRequestMemo}
-        rlusdPerUnitRates={rlusdPerUnitRates}
-        rlusdPerUnitSources={rlusdPerUnitSources}
-        onRequestGenerated={handleDemoRequestGenerated} />
+	        augmentedTokens={selectableTokens}
+	        requestMemo={requestMemo}
+	        setRequestMemo={setRequestMemo}
+	        rlusdPerUnitRates={rlusdPerUnitRates}
+	        rlusdPerUnitSources={rlusdPerUnitSources}
+	        onRequestGenerated={handleDemoRequestGenerated} />
 
 
       <WalletDashboardSwapModal
@@ -2186,7 +2227,7 @@ export default function DemoWalletDashboard({
         cashModalTab={cashModalTab}
         setCashModalTab={setCashModalTab}
         renderWalletMeta={renderWalletMeta}
-        availableTokens={augmentedTokens}
+	        availableTokens={selectableTokens}
         rlusdPerUnitRates={rlusdPerUnitRates}
         selectLabelByCurrency={selectLabelByAssetKey}
         selectLabelRightByCurrency={selectLabelRightByAssetKey}
@@ -2196,7 +2237,7 @@ export default function DemoWalletDashboard({
 
 
 	      <WalletDashboardStatementModals
-	        augmentedTokens={augmentedTokens}
+	        augmentedTokens={selectableTokens}
 	        backendWalletAddress={""}
 	        effectiveWallet={effectiveWallet}
 	        walletDisplayLabel={isWalletLabelLocked ? walletContextLabel : ""}

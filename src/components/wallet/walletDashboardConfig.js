@@ -1,6 +1,5 @@
 export const TOKEN_ICONS = {
   XRP: "✕",
-  RLUSD: "Ⓧ",
   BTC: "₿",
   ETH: "Ξ",
   USDT: "₮",
@@ -26,6 +25,11 @@ export const USD_STABLECOINS = [
   "GUSD",
 ];
 
+export function getDisplayCurrencyCode(code) {
+  const upper = String(code || "").toUpperCase();
+  return upper === "RLUSD" ? "USD" : upper;
+}
+
 export function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
   const codePoints = [...countryCode.toUpperCase()].map(
@@ -46,6 +50,7 @@ export function getCurrencyFlag(code) {
 
 export function getTokenIcon(currency) {
   const code = String(currency || "").toUpperCase();
+  if (code === "RLUSD" || code === "USD") return getCurrencyFlag("USD");
   if (TOKEN_ICONS[code]) return TOKEN_ICONS[code];
   const first = code.match(/[A-Z]/);
   return first ? first[0] : "?";

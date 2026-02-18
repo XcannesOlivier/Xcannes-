@@ -198,14 +198,14 @@ export default function WalletActivationRequestModal({
                 )}
               </span>
             ) : null}
-            {showRlusdNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none mt-1">
-                {t(
-                  "wallet_rlusd_not_activated_title",
-                  "RLUSD not activated. Authorize RLUSD on your wallet."
-                )}
-              </span>
-            ) : null}
+	            {showRlusdNotActivatedNotice ? (
+	              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none mt-1">
+	                {t(
+	                  "wallet_rlusd_not_activated_title",
+	                  "USD not activated. Authorize USD on your wallet."
+	                )}
+	              </span>
+	            ) : null}
             <p className="mt-1 text-sm text-white/60">
               {t("ui_activation_request_subtitle_9a2d7f5c1e", "QR XUMM pour {{amount}} XRP.", {
                 amount: activationAmountLabel,

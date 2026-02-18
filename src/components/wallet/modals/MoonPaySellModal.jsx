@@ -126,15 +126,9 @@ const MoonPaySellModal = ({
     return [
       {
         code: 'RLUSD',
-        label: 'RLUSD Stablecoin',
-        labelLeft: 'RLUSD Stablecoin',
-        labelMobile: 'RLUSD Stablecoin'
-      },
-      {
-        code: 'XRP',
-        label: 'XRP (Ripple)',
-        labelLeft: 'XRP (Ripple)',
-        labelMobile: 'XRP (Ripple)'
+        label: 'USD Stablecoin',
+        labelLeft: 'USD Stablecoin',
+        labelMobile: 'USD Stablecoin'
       }
     ];
   }, [
@@ -171,7 +165,11 @@ const MoonPaySellModal = ({
   const amountValue = Number.parseFloat(amount || "");
   const currencyUpper = String(currency || "").toUpperCase();
   const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
-  const rlusdRate = isCurrencyLine ? Number(rlusdPerUnitRates?.[currencyUpper]) : Number.NaN;
+  const rlusdRate = isCurrencyLine
+    ? currencyUpper === "RLUSD" || currencyUpper === "USD"
+      ? 1
+      : Number(rlusdPerUnitRates?.[currencyUpper])
+    : Number.NaN;
   const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
   const conversionMissing =
     isCurrencyLine && hasValidAmount && (!Number.isFinite(rlusdRate) || rlusdRate <= 0);
@@ -775,10 +773,10 @@ const MoonPaySellModal = ({
                 ) : null}
                 {showRlusdNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet."
-                    )}
+                      {t(
+                        "wallet_rlusd_not_activated_title",
+                        "USD not activated. Authorize USD on your wallet."
+                      )}
                   </span>
                 ) : null}
               </div>

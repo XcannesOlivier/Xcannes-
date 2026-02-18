@@ -85,10 +85,9 @@ const MoonPayBuyModal = ({
     return 'Failed to load fiat currencies';
   };
 
-  // Cryptos supportées par MoonPay (RLUSD en priorité)
+  // Cryptos supportées par MoonPay (USD via RLUSD)
   const supportedCurrencies = [
-  { code: 'RLUSD', name: 'RLUSD Stablecoin', icon: CRYPTO_ICONS.RLUSD },
-  { code: 'XRP', name: 'XRP (Ripple)', icon: CRYPTO_ICONS.XRP }];
+  { code: 'RLUSD', name: 'USD Stablecoin', icon: CRYPTO_ICONS.RLUSD }];
 
   const PRODUCT_MIN_USD = 5;
 
@@ -730,10 +729,10 @@ const MoonPayBuyModal = ({
                 ) : null}
                 {showRlusdNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet."
-                    )}
+                      {t(
+                        "wallet_rlusd_not_activated_title",
+                        "USD not activated. Authorize USD on your wallet."
+                      )}
                   </span>
                 ) : null}
               </div>

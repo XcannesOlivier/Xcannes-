@@ -19,6 +19,8 @@ export function useUsdTotalLabel({
   const rateCodesKey = useMemo(() => {
     const codes = (augmentedTokens || [])
       .filter((token) => {
+        const code = String(token.currency || "").toUpperCase();
+        if (code === "XRP") return false;
         const value = Number(token.value || 0);
         return Number.isFinite(value) && value > 0;
       })
@@ -153,6 +155,7 @@ export function useUsdTotalLabel({
   const totalUsd = useMemo(() => {
     const total = (augmentedTokens || []).reduce((sum, token) => {
       const code = String(token.currency || "").toUpperCase();
+      if (code === "XRP") return sum;
       const rate = usdRates[code];
       const value = Number(token.value || 0);
       if (!Number.isFinite(rate) || !Number.isFinite(value)) return sum;
@@ -179,10 +182,7 @@ export function useUsdTotalLabel({
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })} USD`
-      : `${Number(xrpAmount || 0).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} USD`;
+      : `0.00 USD`;
 
   const totalLabel = totalUsdLabel || fallbackTotalLabel;
 
@@ -194,4 +194,3 @@ export function useUsdTotalLabel({
     totalLabel,
   };
 }
-

@@ -52,6 +52,7 @@ import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildXrplJson
 import { useTranslation } from "next-i18next";
 import {
   getCurrencyFlag,
+  getDisplayCurrencyCode,
   getTokenIcon,
   resolveWalletLayout,
   USD_STABLECOINS,
@@ -286,6 +287,24 @@ export default function WalletDashboard({
     convertProcessing,
     setConvertProcessing,
   } = useConvertForm();
+
+  useEffect(() => {
+    const upper = String(requestCurrency || "").trim().toUpperCase();
+    if (upper === "XRP" || upper === "USD") {
+      setRequestCurrency("RLUSD");
+    }
+  }, [requestCurrency, setRequestCurrency]);
+
+  useEffect(() => {
+    const baseUpper = String(convertBaseCurrency || "").trim().toUpperCase();
+    const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
+    if (baseUpper === "XRP" || baseUpper === "USD") {
+      setConvertBaseCurrency("RLUSD");
+    }
+    if (quoteUpper === "XRP" || quoteUpper === "USD") {
+      setConvertQuoteCurrency("RLUSD");
+    }
+  }, [convertBaseCurrency, convertQuoteCurrency, setConvertBaseCurrency, setConvertQuoteCurrency]);
   const {
     currencyLineCode,
     setCurrencyLineCode,
@@ -849,6 +868,13 @@ export default function WalletDashboard({
     swapCurrencyOptions,
   } = useWalletTokens({ displayTokens, currencyLines });
 
+  const selectableTokens = useMemo(() => {
+    return (augmentedTokens || []).filter((token) => {
+      const code = String(token?.currency || "").trim().toUpperCase();
+      return code !== "XRP" && code !== "USD";
+    });
+  }, [augmentedTokens]);
+
   const hasRlusdTrustline = useMemo(() => {
     return (augmentedTokens || []).some((token) => {
       const code = String(token?.currency || "").toUpperCase();
@@ -861,8 +887,9 @@ export default function WalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
-      if (token?.key) labels[token.key] = code;
-      labels[code] = code;
+      const display = getDisplayCurrencyCode(code);
+      if (token?.key) labels[token.key] = display;
+      labels[code] = display;
     });
     return labels;
   }, [augmentedTokens]);
@@ -889,11 +916,12 @@ export default function WalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
+      const display = getDisplayCurrencyCode(code);
       const amount = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amount)
         ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
         : "0";
-      const label = `${code} (${amountLabel})`;
+      const label = `${display} (${amountLabel})`;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
@@ -905,10 +933,11 @@ export default function WalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
-      const icon = CRYPTO_ICONS?.[code]
-        ? { src: CRYPTO_ICONS[code], alt: code }
-        : token?.isTrustlineOnly
-          ? getCurrencyFlag(code)
+      const display = getDisplayCurrencyCode(code);
+      const icon = CRYPTO_ICONS?.[display]
+        ? { src: CRYPTO_ICONS[display], alt: display }
+        : token?.isTrustlineOnly || display !== code
+          ? getCurrencyFlag(display)
           : getTokenIcon(code);
       if (token?.key) icons[token.key] = icon;
       icons[code] = icon;
@@ -938,14 +967,14 @@ export default function WalletDashboard({
 
   const currencyLineCodes = useMemo(() => {
     const codes = new Set();
-    (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      if (code) codes.add(code);
-    });
-    // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
-    ["XRP", "RLUSD", "RLUSD"].forEach((c) => codes.delete(c));
-    return Array.from(codes);
-  }, [currencyLines]);
+	    (currencyLines || []).forEach((line) => {
+	      const code = String(line?.currencyCode || "").trim().toUpperCase();
+	      if (code) codes.add(code);
+	    });
+	    // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
+	    ["XRP", "RLUSD", "USD"].forEach((c) => codes.delete(c));
+	    return Array.from(codes);
+	  }, [currencyLines]);
 
   const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
     useRlusdPerUnitRates(currencyLineCodes);
@@ -1074,6 +1103,14 @@ export default function WalletDashboard({
       };
     });
   }, [allocatedRlusdByCurrency, augmentedTokens, rlusdPerUnitRates]);
+
+  const tokenListTokens = useMemo(() => {
+    const tokens = isPreviewMode ? displayTokens : displayTokensWithCurrencyLines;
+    return (tokens || []).filter((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      return code !== "XRP";
+    });
+  }, [displayTokens, displayTokensWithCurrencyLines, isPreviewMode]);
   const { handleDemoConvert } = useSwapConversion({
     isPreviewMode,
     effectiveIsConnected,
@@ -1103,8 +1140,8 @@ export default function WalletDashboard({
   });
 
   const selectedSendToken =
-    augmentedTokens.find((t) => t.key === sendAssetKey) ||
-    augmentedTokens[0] ||
+    selectableTokens.find((t) => t.key === sendAssetKey) ||
+    selectableTokens[0] ||
     null;
 
   const sendFxInfo = useMemo(() => {
@@ -2228,13 +2265,13 @@ export default function WalletDashboard({
 
           {/* Token list */}
 	          <div className="flex-1 flex flex-col min-h-0">
-		          <WalletDashboardTokenList
-		            layout={layout}
-		            tokens={isPreviewMode ? displayTokens : displayTokensWithCurrencyLines}
-		            renderTokenRow={renderTokenRow}
-		            headerTitle={
-		              <button
-		                type="button"
+			          <WalletDashboardTokenList
+			            layout={layout}
+			            tokens={tokenListTokens}
+			            renderTokenRow={renderTokenRow}
+			            headerTitle={
+			              <button
+			                type="button"
 		                onClick={handleOpenGlobalStatement}
 		                className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
 		              >
@@ -2320,7 +2357,7 @@ export default function WalletDashboard({
               </div>
             ) : null}
             {showInlineSend ? (
-              <WalletDashboardSendModal
+	              <WalletDashboardSendModal
                 open
                 inline
                 onClose={() => setActiveAction(null)}
@@ -2331,7 +2368,7 @@ export default function WalletDashboard({
                 sendTab={sendTab}
                 setSendTab={setSendTab}
                 renderWalletMeta={renderWalletMeta}
-                augmentedTokens={augmentedTokens}
+	                augmentedTokens={selectableTokens}
                 selectedSendToken={selectedSendToken}
                 sendFxInfo={sendFxInfo}
                 setSendAssetKey={setSendAssetKey}
@@ -2355,7 +2392,7 @@ export default function WalletDashboard({
             ) : null}
 
             {showInlineReceive ? (
-              <WalletDashboardReceiveModal
+	          <WalletDashboardReceiveModal
                 open
                 inline
                 onClose={() => setActiveAction(null)}
@@ -2376,7 +2413,7 @@ export default function WalletDashboard({
                 selectLabelRightByCurrency={selectLabelRightByAssetKey}
                 selectIconByCurrency={selectIconByAssetKey}
                 selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-                augmentedTokens={augmentedTokens}
+	            augmentedTokens={selectableTokens}
                 requestMemo={requestMemo}
                 setRequestMemo={setRequestMemo}
                 rlusdPerUnitRates={rlusdPerUnitRates}
@@ -2433,7 +2470,7 @@ export default function WalletDashboard({
             ) : null}
 
 	            {showInlineCash ? (
-	              <WalletDashboardCashModal
+			      <WalletDashboardCashModal
 	                open
 	                inline
 	                onClose={() => {
@@ -2448,7 +2485,7 @@ export default function WalletDashboard({
 	                renderWalletMeta={renderWalletMeta}
 	                walletLabel={walletLabel}
 	                hideWalletAddress={walletHasCustomLabel}
-	                availableTokens={augmentedTokens}
+			        availableTokens={selectableTokens}
 	                rlusdPerUnitRates={rlusdPerUnitRates}
 	                selectLabelByCurrency={selectLabelByAssetKey}
 	                selectLabelRightByCurrency={selectLabelRightByAssetKey}
@@ -2523,7 +2560,7 @@ export default function WalletDashboard({
 
 	            {showInlineCurrencyStatement ? (
 	              <WalletDashboardStatementModals
-	                augmentedTokens={augmentedTokens}
+	                augmentedTokens={selectableTokens}
 	                backendWalletAddress={backendWalletAddress}
 	                effectiveWallet={effectiveWallet}
 	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
@@ -2546,7 +2583,7 @@ export default function WalletDashboard({
 
 	            {showInlineGlobalStatement ? (
 	              <WalletDashboardStatementModals
-	                augmentedTokens={augmentedTokens}
+	                augmentedTokens={selectableTokens}
 	                backendWalletAddress={backendWalletAddress}
 	                effectiveWallet={effectiveWallet}
 	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
@@ -2583,7 +2620,7 @@ export default function WalletDashboard({
             sendTab={sendTab}
             setSendTab={setSendTab}
             renderWalletMeta={renderWalletMeta}
-            augmentedTokens={augmentedTokens}
+	            augmentedTokens={selectableTokens}
             selectedSendToken={selectedSendToken}
             sendFxInfo={sendFxInfo}
             setSendAssetKey={setSendAssetKey}
@@ -2625,7 +2662,7 @@ export default function WalletDashboard({
             selectLabelRightByCurrency={selectLabelRightByAssetKey}
             selectIconByCurrency={selectIconByAssetKey}
             selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-            augmentedTokens={augmentedTokens}
+	            augmentedTokens={selectableTokens}
             requestMemo={requestMemo}
             setRequestMemo={setRequestMemo}
             rlusdPerUnitRates={rlusdPerUnitRates}

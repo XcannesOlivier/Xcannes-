@@ -2,16 +2,22 @@
 
 import Image from "next/image";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-import {
-  getCurrencyFlag,
-  getTokenIcon,
-  USD_STABLECOINS } from
-"../walletDashboardConfig";
+	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+	import {
+	  getCurrencyFlag,
+	  getTokenIcon,
+	  getDisplayCurrencyCode,
+	  USD_STABLECOINS } from
+	"../walletDashboardConfig";
 import { useTranslation } from "next-i18next";
 
 function renderTokenIcon(token) {
   const code = String(token?.currency || "").toUpperCase();
+  const displayCode = getDisplayCurrencyCode(code);
+
+  if (displayCode !== code) {
+    return getCurrencyFlag(displayCode);
+  }
 
   if (code && CRYPTO_ICONS[code]) {
     return (
@@ -40,19 +46,21 @@ export default function WalletDashboardTokenRow({
   isWalletActivated,
   onActivateWallet,
   onOpenRlusdProgram
-}) {
-  const { t } = useTranslation("common");
-  const currencyCode = String(token?.currency || "").toUpperCase();
-  const rawValue = Number(token?.value || 0);
-  const isMissingTrustline = !!token?.isMissingTrustline;
-  const isLineCurrency = Boolean(token?.isTrustlineOnly);
-  const isNativeAsset = currencyCode === "XRP" || currencyCode === "RLUSD";
-  const hasCryptoIcon = Boolean(currencyCode && CRYPTO_ICONS?.[currencyCode]);
-  const isFlagIcon = isLineCurrency && !hasCryptoIcon;
-  const iconSizeClass = isFlagIcon
-    ? "w-11 h-11 text-[20px] sm:w-12 sm:h-12 sm:text-[22px]"
-    : isLineCurrency
-      ? "w-9 h-9 text-[16px]"
+		}) {
+		  const { t } = useTranslation("common");
+		  const currencyCode = String(token?.currency || "").toUpperCase();
+		  const displayCode = getDisplayCurrencyCode(currencyCode);
+		  const isDisplayOverride = displayCode !== currencyCode;
+		  const rawValue = Number(token?.value || 0);
+	  const isMissingTrustline = !!token?.isMissingTrustline;
+	  const isLineCurrency = Boolean(token?.isTrustlineOnly);
+	  const isNativeAsset = currencyCode === "XRP";
+	  const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
+	  const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
+	  const iconSizeClass = isFlagIcon
+	    ? "w-11 h-11 text-[20px] sm:w-12 sm:h-12 sm:text-[22px]"
+	    : isLineCurrency
+	      ? "w-9 h-9 text-[16px]"
       : "w-7 h-7 text-[13px]";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
@@ -62,17 +70,17 @@ export default function WalletDashboardTokenRow({
   Math.min(rawValue, 5) :
   rawValue;
 
-  const currencyLabel =
-    currencyCode === "XRP"
-      ? "XRP · Native"
-      : currencyCode === "RLUSD"
-      ? "RLUSD Token"
-      : getCurrencyDescription(currencyCode) ||
-        (isStablecoin(currencyCode)
-          ? "XRPL Stablecoin"
-          : isLineCurrency
-          ? `${getCurrencyDescription(currencyCode)}`
-          : "XRPL Token");
+		  const currencyLabel =
+		    currencyCode === "XRP"
+		      ? "XRP · Native"
+		      : isDisplayOverride
+		      ? getCurrencyDescription(displayCode) || displayCode
+		      : getCurrencyDescription(currencyCode) ||
+		        (isStablecoin(currencyCode)
+		          ? "XRPL Stablecoin"
+		          : isLineCurrency
+	          ? `${getCurrencyDescription(currencyCode)}`
+	          : "XRPL Token");
 
 		  const showWalletActivationNotice =
 		  currencyCode === "XRP" && isWalletActivated === false;
@@ -107,9 +115,9 @@ export default function WalletDashboardTokenRow({
 	            </div>
 		            <div className="min-w-0">
 		              <div className="flex items-baseline gap-2 min-w-0">
-			                <span className="text-[14px] md:text-[15px] text-primary truncate">{token?.currency}</span>
-			                <span className="text-[13px] md:text-[14px] text-muted truncate">{currencyLabel}</span>
-			              </div>
+				                <span className="text-[14px] md:text-[15px] text-primary truncate">{displayCode}</span>
+				                <span className="text-[13px] md:text-[14px] text-muted truncate">{currencyLabel}</span>
+				              </div>
 			            </div>
 			          </div>
           {showWalletActivationNotice ? (
@@ -159,16 +167,16 @@ export default function WalletDashboardTokenRow({
                 <span>
                   <span className="hidden md:inline">
                     {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
-                    {t(
-                      "ui_authorize_rlusd_wallet_2c1e5f9a",
-                      "Autoriser RLUSD sur votre wallet."
-                    )}
+	                    {t(
+	                      "ui_authorize_rlusd_wallet_2c1e5f9a",
+	                      "Autoriser USD sur votre wallet."
+	                    )}
                   </span>
                   <span className="md:hidden">
-                    {t(
-                      "ui_authorize_rlusd_wallet_short_2c1e5f9d",
-                      "Autoriser RLUSD sur votre wallet."
-                    )}
+	                    {t(
+	                      "ui_authorize_rlusd_wallet_short_2c1e5f9d",
+	                      "Autoriser USD sur votre wallet."
+	                    )}
                   </span>{" "}
                 </span>
                 <span
@@ -198,9 +206,9 @@ export default function WalletDashboardTokenRow({
                   <span className="hidden md:inline">
                     {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
                     {t(
-                      "ui_rlusd_benefits_notice_2c1e5f9b",
-                      "Elle permet de détenir du RLUSD et de profiter d'avantages."
-                    )}
+	                      "ui_rlusd_benefits_notice_2c1e5f9b",
+	                      "Elle permet de détenir des USD et de profiter d'avantages."
+	                    )}
                   </span>
                   <span className="md:hidden">
                     {t(

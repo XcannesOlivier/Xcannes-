@@ -131,13 +131,15 @@ export default function WalletDashboardReceiveModal({
       return;
     }
 
-    const targetCurrencyCode = requestCurrencyCode || "RLUSD";
-    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
-    let amountRlusd = null;
-    let fxRate = null;
-    let fxSource = null;
+	    const targetCurrencyCode = requestCurrencyCode || "RLUSD";
+	    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
+	    const displayCurrencyUpper =
+	      targetCurrencyUpper === "RLUSD" ? "USD" : targetCurrencyUpper;
+	    let amountRlusd = null;
+	    let fxRate = null;
+	    let fxSource = null;
 
-    if (targetCurrencyUpper === "RLUSD") {
+    if (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD") {
       amountRlusd = amount;
       fxRate = 1;
       fxSource = "PYTH";
@@ -168,16 +170,16 @@ export default function WalletDashboardReceiveModal({
     const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
     const beneficiaryLabel = String(walletLabel || "").trim() || null;
-    const req = {
-      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
-      to: effectiveWallet,
-      targetCurrency: targetCurrencyUpper,
-      displayAmount: amount,
-      displayCurrency: targetCurrencyUpper,
-      amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
-      fxRate,
-      fxSource,
-      issuer,
+	    const req = {
+	      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
+	      to: effectiveWallet,
+	      targetCurrency: targetCurrencyUpper,
+	      displayAmount: amount,
+	      displayCurrency: displayCurrencyUpper,
+	      amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
+	      fxRate,
+	      fxSource,
+	      issuer,
       memo: requestMemo || "",
       beneficiaryLabel,
       createdAt: new Date().toISOString()
@@ -281,14 +283,14 @@ export default function WalletDashboardReceiveModal({
                 )}
               </span>
             ) : null}
-            {showRlusdNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t(
-                  "wallet_rlusd_not_activated_title",
-                  "RLUSD not activated. Authorize RLUSD on your wallet."
-                )}
-              </span>
-            ) : null}
+	            {showRlusdNotActivatedNotice ? (
+	              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+	                {t(
+	                  "wallet_rlusd_not_activated_title",
+	                  "USD not activated. Authorize USD on your wallet."
+	                )}
+	              </span>
+	            ) : null}
           </div>
           {renderWalletMeta?.("mb-2")}
 
@@ -517,21 +519,27 @@ export default function WalletDashboardReceiveModal({
                       </button>
                     ) : null}
                   </div>
-                  {!showRequestPlaceholder ? (
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
-                      {isFxRequest
-                        ? t("ui_request_settlement_note_6a1c9d2f3b", {
-                            defaultValue:
-                              "Payment will settle on-chain in RLUSD, and be credited to the {{currency}} line for the receiver.",
-                            currency: requestCurrencyCode,
-                          })
-                        : t("ui_request_prepared_for_5d2a8b1c3f", {
-                            defaultValue:
-                              "Payment request prepared for {{currency}}.",
-                            currency: requestCurrencyCode || "RLUSD",
-                          })}
-                    </div>
-                  ) : null}
+	                  {!showRequestPlaceholder ? (
+	                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
+	                      {(() => {
+	                        const currencyLabel =
+	                          selectLabelByCurrency?.[requestCurrencyCode] ||
+	                          selectLabelByCurrency?.[String(requestCurrencyCode || "").toUpperCase()] ||
+	                          requestCurrencyCode;
+	                        return isFxRequest
+	                          ? t("ui_request_settlement_note_6a1c9d2f3b", {
+	                              defaultValue:
+	                                "Payment will settle on-chain in USD, and be credited to the {{currency}} line for the receiver.",
+	                              currency: currencyLabel,
+	                            })
+	                          : t("ui_request_prepared_for_5d2a8b1c3f", {
+	                              defaultValue:
+	                                "Payment request prepared for {{currency}}.",
+	                              currency: currencyLabel || "USD",
+	                            });
+	                      })()}
+	                    </div>
+	                  ) : null}
                 </div>
           }
               </div>

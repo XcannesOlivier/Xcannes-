@@ -79,7 +79,7 @@ export default function WalletDashboardSendModal({
   const payreqQrDecorPosition = useDemoQrDecor ? "center 12px" : "center 24px";
   const payreqQrDecor = manualQrDecor;
   const fauxPayreqExample =
-    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"RLUSD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && (isDesktop || isDemoMode));
   const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
   const useUnifiedPayreqPanel = useDexStyleLayout;
@@ -274,14 +274,14 @@ export default function WalletDashboardSendModal({
                 {t("wallet_not_connected_title", "Wallet not connected")}
               </span>
             ) : null}
-            {showRlusdNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t(
-                  "wallet_rlusd_not_activated_title",
-                  "RLUSD not activated. Authorize RLUSD on your wallet."
-                )}
-              </span>
-            ) : null}
+	            {showRlusdNotActivatedNotice ? (
+	              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+	                {t(
+	                  "wallet_rlusd_not_activated_title",
+	                  "USD not activated. Authorize USD on your wallet."
+	                )}
+	              </span>
+	            ) : null}
           </div>
           {renderWalletMeta?.("mb-2")}
 
@@ -363,13 +363,13 @@ export default function WalletDashboardSendModal({
             <p className="mt-1 text-[11px] text-white/40">{t("ui_balance_340cdcff7a", "Balance:")}
 
               <span className="text-white/70">
-                      {selectedSendToken.value.toLocaleString("en-US", {
-                  maximumFractionDigits: 6
-                })}{" "}
-                      {selectedSendToken.currency}
-                    </span>
-                  </p>
-            }
+	                      {selectedSendToken.value.toLocaleString("en-US", {
+	                  maximumFractionDigits: 6
+	                })}{" "}
+	                      {selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency}
+	                    </span>
+	                  </p>
+	            }
               </div>
               {sendPaymentRequest?.beneficiaryLabel ?
                 <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
@@ -392,30 +392,34 @@ export default function WalletDashboardSendModal({
                     </span> :
                     null}
                 </div>
-              <TokenAmountInput
-              value={sendAmount}
-              onChange={setSendAmount}
-              max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
-              placeholder="0.0000"
-              token={selectedSendToken?.currency || "XRP"}
-              tokenClassName="text-white"
-	              containerClassName="focus-within:!border-xcannes-green/80" />
+	              <TokenAmountInput
+	              value={sendAmount}
+	              onChange={setSendAmount}
+	              max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
+	              placeholder="0.0000"
+	              token={
+	                selectedSendToken
+	                  ? selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency
+	                  : "RLUSD"
+	              }
+	              tokenClassName="text-white"
+		              containerClassName="focus-within:!border-xcannes-green/80" />
 
               </div>
 
-              {sendFxInfo &&
-          <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                  <div className="text-[11px] font-semibold text-white/80">{t("ui_payment_fx_base_usd_r_gleme_4818b8a6c3", "Paiement FX (base USD · règlement XRPL via RLUSD)")}
-
-            </div>
+	              {sendFxInfo &&
+	          <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+	                  <div className="text-[11px] font-semibold text-white/80">{t("ui_payment_fx_base_usd_r_gleme_4818b8a6c3", "Paiement FX (base USD · règlement XRPL via USD)")}
+	
+	            </div>
                   <p className="mt-1 text-[11px] text-white/60">
                     ≈{" "}
                     <span className="font-mono">
-                      {Number(sendFxInfo.paymentRlusd || 0).toLocaleString("en-US", {
-                  maximumFractionDigits: 6
-                })}{" "}{t("ui_rlusd_ff5048a674", "RLUSD")}
-
-              </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
+	                      {Number(sendFxInfo.paymentRlusd || 0).toLocaleString("en-US", {
+	                  maximumFractionDigits: 6
+	                })}{" "}{t("ui_rlusd_ff5048a674", "USD")}
+	
+	              </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
 
             </p>
                   {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 &&
@@ -431,11 +435,11 @@ export default function WalletDashboardSendModal({
               )}
               :{" "}
               <span className="font-mono">
-                {Number(sendFxInfo.spreadFeeRlusd || 0).toLocaleString("en-US", {
-                  maximumFractionDigits: 6
-                })}{" "}{t("ui_rlusd_ff5048a674", "RLUSD")}
-              </span>
-            </p>
+	                {Number(sendFxInfo.spreadFeeRlusd || 0).toLocaleString("en-US", {
+	                  maximumFractionDigits: 6
+	                })}{" "}{t("ui_rlusd_ff5048a674", "USD")}
+	              </span>
+	            </p>
             }
                   <p className="mt-2 text-[10px] text-white/45">
                     {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?

@@ -6,7 +6,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
   const allocatedRlusdByCurrency = useMemo(() => {
     const map = new Map();
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
+      const code = String(line?.currencyCode || "").trim().toUpperCase();
       if (!code) return;
       const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0);
       map.set(code, Number.isFinite(allocated) ? allocated : 0);
@@ -17,7 +17,7 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
   const augmentedTokens = useMemo(() => {
     const byCurrency = new Map();
     (displayTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
+      const code = String(token?.currency || "").trim().toUpperCase();
       if (!code) return;
       if (!byCurrency.has(code)) {
         byCurrency.set(code, { ...token, currency: code });
@@ -25,7 +25,8 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     });
 
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
+      const code = String(line?.currencyCode || "").trim().toUpperCase();
+      if (code === "USD") return;
       if (!code || byCurrency.has(code)) return;
       byCurrency.set(code, {
         key: `CL:${code}`,
@@ -52,7 +53,8 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     const seen = new Set();
     const list = [];
     (augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
+      const code = String(token?.currency || "").trim().toUpperCase();
+      if (code === "XRP" || code === "USD") return;
       if (!code || seen.has(code)) return;
       seen.add(code);
       list.push(code);
@@ -68,14 +70,13 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
     });
     candidates.add("RLUSD");
     (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      if (code) candidates.add(code);
+      const code = String(line?.currencyCode || "").trim().toUpperCase();
+      if (code && code !== "USD") candidates.add(code);
     });
+    candidates.delete("USD");
 
     const weight = (code) => {
       if (code === "RLUSD") return 0;
-      if (code === "XRP") return 1;
-      if (code === "RLUSD") return 2;
       return 3;
     };
 

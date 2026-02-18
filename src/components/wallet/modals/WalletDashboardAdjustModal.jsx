@@ -67,7 +67,7 @@ export default function WalletDashboardAdjustModal({
     return activeLines.map((line) => {
       const code = String(line?.currencyCode || "").toUpperCase();
       const allocatedRlusd = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
-      const rateRaw = rlusdPerUnitRates?.[code];
+      const rateRaw = code === "RLUSD" || code === "USD" ? 1 : rlusdPerUnitRates?.[code];
       const rlusdPerUnit = Number.isFinite(Number(rateRaw))
         ? Number(rateRaw)
         : Number.NaN;

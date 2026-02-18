@@ -15,6 +15,7 @@ import {
 } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
+import { getDisplayCurrencyCode } from "../walletDashboardConfig";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -117,6 +118,10 @@ export default function CurrencyStatement({
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),
     [currency]
+  );
+  const displayCurrency = useMemo(
+    () => getDisplayCurrencyCode(normalizedCurrency),
+    [normalizedCurrency]
   );
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
@@ -886,15 +891,16 @@ export default function CurrencyStatement({
     (code) => {
       const upper = String(code || "").toUpperCase();
       if (!upper) return null;
-      if (CRYPTO_ICONS?.[upper]) {
-        const iconSrc = CRYPTO_ICONS[upper];
+      const display = getDisplayCurrencyCode(upper);
+      if (CRYPTO_ICONS?.[display]) {
+        const iconSrc = CRYPTO_ICONS[display];
         return (
           <span className="inline-flex items-center gap-1">
             {isSvgIcon(iconSrc) ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={iconSrc}
-                alt={upper}
+                alt={display}
                 width={16}
                 height={16}
                 className="w-4 h-4 rounded-sm"
@@ -902,20 +908,20 @@ export default function CurrencyStatement({
             ) : (
               <Image
                 src={iconSrc}
-                alt={upper}
+                alt={display}
                 width={16}
                 height={16}
                 className="w-4 h-4 rounded-sm"
               />
             )}
-            <span className="text-white/80 text-xs md:text-sm">{upper}</span>
+            <span className="text-white/80 text-xs md:text-sm">{display}</span>
           </span>
         );
       }
       return (
         <span className="inline-flex items-center gap-1">
-          <span className="text-base md:text-lg">{getCurrencyFlag(upper)}</span>
-          <span className="text-white/80 text-xs md:text-sm">{upper}</span>
+          <span className="text-base md:text-lg">{getCurrencyFlag(display)}</span>
+          <span className="text-white/80 text-xs md:text-sm">{display}</span>
         </span>
       );
     },
@@ -1217,35 +1223,35 @@ export default function CurrencyStatement({
 		        <div className={`flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}>
 	          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-              {CRYPTO_ICONS?.[normalizedCurrency] ? (
-                isSvgIcon(CRYPTO_ICONS[normalizedCurrency]) ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={CRYPTO_ICONS[normalizedCurrency]}
-                    alt={normalizedCurrency}
-                    width={32}
-                    height={32}
-                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
-                  />
-                ) : (
-                  <Image
-                    src={CRYPTO_ICONS[normalizedCurrency]}
-                    alt={normalizedCurrency}
-                    width={32}
-                    height={32}
-                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
-                  />
-                )
-              ) : (
+	              {CRYPTO_ICONS?.[displayCurrency] ? (
+	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
+	                  // eslint-disable-next-line @next/next/no-img-element
+	                  <img
+	                    src={CRYPTO_ICONS[displayCurrency]}
+	                    alt={displayCurrency}
+	                    width={32}
+	                    height={32}
+	                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+	                  />
+	                ) : (
+	                  <Image
+	                    src={CRYPTO_ICONS[displayCurrency]}
+	                    alt={displayCurrency}
+	                    width={32}
+	                    height={32}
+	                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+	                  />
+	                )
+	              ) : (
                 <span className="text-2xl md:text-3xl flex-shrink-0">
-                  {getCurrencyFlag(currency)}
-                </span>
-              )}
+	                  {getCurrencyFlag(displayCurrency)}
+	                </span>
+	              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-lg md:text-xl font-bold text-white truncate">
-                    {currency} {t("ui_statement_a87c93acb8", "Statement")}
-                  </h2>
+	                  <h2 className="text-lg md:text-xl font-bold text-white truncate">
+	                    {displayCurrency} {t("ui_statement_a87c93acb8", "Statement")}
+	                  </h2>
                   {noticeVariant === "demo" ? (
                     <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
@@ -1319,9 +1325,9 @@ export default function CurrencyStatement({
             </div>
             <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_balance_445d830d72", "Balance")}</p>
-              <p className="text-sm text-white font-semibold">
-                {formatAmount(balance)} {currency}
-              </p>
+	              <p className="text-sm text-white font-semibold">
+	                {formatAmount(balance)} {displayCurrency}
+	              </p>
               <p className="text-[11px] text-white/50">
                 ≈ {formatAmount(estimatedUsd)}{t("ui_usd_506842b2ba", "USD")}
             </p>

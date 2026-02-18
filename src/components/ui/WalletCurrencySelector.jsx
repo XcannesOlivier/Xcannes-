@@ -22,6 +22,7 @@ const POPULAR_CURRENCIES = [
 { code: "AUD", name: "Australian Dollar" },
 { code: "CAD", name: "Canadian Dollar" }];
 
+const normalizeCode = (code) => String(code || "").trim().toUpperCase();
 
 function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
@@ -47,7 +48,8 @@ export default function WalletCurrencySelector({
   placeholder = "Select currency...",
   extraOptions = [],
   quickOptions = [],
-  showQuickAdd = true
+  showQuickAdd = true,
+  excludeCodes = []
 }) {
   const { t } = useTranslation("common");
   const [currencies, setCurrencies] = useState([]);
@@ -56,6 +58,10 @@ export default function WalletCurrencySelector({
   const [open, setOpen] = useState(false);
   const popupRef = useRef(null);
   const triggerRef = useRef(null);
+
+  const excludedSet = useMemo(() => {
+    return new Set((excludeCodes || []).map(normalizeCode).filter(Boolean));
+  }, [excludeCodes]);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,7 +72,15 @@ export default function WalletCurrencySelector({
           setCurrencies([]);
           return;
         }
-        setCurrencies(list);
+        setCurrencies(
+          list
+            .map((c) => {
+              const code = normalizeCode(c?.code);
+              if (!code) return null;
+              return { ...c, code };
+            })
+            .filter(Boolean)
+        );
       } catch (err) {
         setCurrencies([]);
       } finally {
@@ -95,30 +109,41 @@ export default function WalletCurrencySelector({
       .map((item) => {
         if (!item) return null;
         if (typeof item === "string") {
-          return { code: item, name: item };
+          const code = normalizeCode(item);
+          if (!code) return null;
+          return { code, name: code };
         }
-        return { code: item.code, name: item.name || item.code };
+        const code = normalizeCode(item.code);
+        if (!code) return null;
+        return { code, name: item.name || code };
       })
-      .filter(Boolean);
-  }, [quickOptions]);
+      .filter(Boolean)
+      .filter((c) => !excludedSet.has(normalizeCode(c.code)));
+  }, [excludedSet, quickOptions]);
 
   const mergedCurrencies = useMemo(() => {
-    const extras = [...(extraOptions || []), ...normalizedQuickOptions].map((item) => ({
-      code: item.code,
-      name: item.name || item.code
-    }));
+    const extras = [...(extraOptions || []), ...normalizedQuickOptions]
+      .map((item) => {
+        const code = normalizeCode(item?.code);
+        if (!code) return null;
+        return { code, name: item?.name || code };
+      })
+      .filter(Boolean);
     const baseMap = new Map();
     currencies.forEach((c) => {
-      baseMap.set(c.code.toUpperCase(), c);
+      const code = normalizeCode(c?.code);
+      if (!code || excludedSet.has(code)) return;
+      baseMap.set(code, { ...c, code });
     });
     extras.forEach((c) => {
-      const upper = c.code.toUpperCase();
-      if (!baseMap.has(upper)) {
-        baseMap.set(upper, c);
+      const code = normalizeCode(c?.code);
+      if (!code || excludedSet.has(code)) return;
+      if (!baseMap.has(code)) {
+        baseMap.set(code, { ...c, code });
       }
     });
     return Array.from(baseMap.values());
-  }, [currencies, extraOptions, normalizedQuickOptions]);
+  }, [currencies, extraOptions, excludedSet, normalizedQuickOptions]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -132,16 +157,16 @@ export default function WalletCurrencySelector({
 
   const selected = useMemo(() => {
     if (!value) return null;
-    const upper = String(value).toUpperCase();
-    return mergedCurrencies.find((c) => c.code.toUpperCase() === upper) || {
+    const upper = normalizeCode(value);
+    return mergedCurrencies.find((c) => normalizeCode(c.code) === upper) || {
       code: upper,
-      name: upper
+      name: upper,
     };
   }, [value, mergedCurrencies]);
 
   const handleSelect = (code) => {
     if (onChange) {
-      onChange(code.toUpperCase());
+      onChange(normalizeCode(code));
     }
     setOpen(false);
   };
