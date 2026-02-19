@@ -61,6 +61,7 @@ export default function DemoWalletDashboardReceiveModal({
   const [generateError, setGenerateError] = useState(null);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [copyToast, setCopyToast] = useState("");
   const copyToastTimerRef = useRef(null);
   const qrContainerRef = useRef(null);
@@ -116,6 +117,19 @@ export default function DemoWalletDashboardReceiveModal({
     if (typeof window === "undefined") return;
     const media = window.matchMedia("(min-width: 768px)");
     const handleChange = () => setIsDesktop(media.matches);
+    handleChange();
+    if (media.addEventListener) {
+      media.addEventListener("change", handleChange);
+      return () => media.removeEventListener("change", handleChange);
+    }
+    media.addListener(handleChange);
+    return () => media.removeListener(handleChange);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia("(orientation: portrait)");
+    const handleChange = () => setIsPortrait(media.matches);
     handleChange();
     if (media.addEventListener) {
       media.addEventListener("change", handleChange);
@@ -440,7 +454,7 @@ export default function DemoWalletDashboardReceiveModal({
     }
   }, [requestValue]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
-  const qrDisplaySize = inline ? 240 : 220;
+  const qrDisplaySize = inline ? 240 : isDesktop ? 220 : isPortrait ? 240 : 220;
   const qrPixelSize = inline ? 360 : (hasGeneratedRequest ? 520 : 420);
   const requestDisplayCurrency = String(
     generatedRequest?.displayCurrency || requestCurrencyCode || "USD"
@@ -555,7 +569,7 @@ export default function DemoWalletDashboardReceiveModal({
               bgColor="#ffffff"
               fgColor="#000000"
               includeMargin={true}
-              level={hasGeneratedRequest ? "L" : "Q"} />
+              level="M" />
 
               </div>
               {hasGeneratedRequest ? (

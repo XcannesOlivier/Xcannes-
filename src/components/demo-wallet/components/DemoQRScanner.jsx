@@ -133,11 +133,31 @@ export default function DemoQRScanner({
 
         const viewW = window.innerWidth || 360;
         const viewH = window.innerHeight || 640;
-        const boxSize = Math.max(220, Math.min(360, Math.floor(Math.min(viewW, viewH) * 0.7)));
+        const boxSize = Math.floor(Math.min(viewW, viewH) * 0.9);
+        let cameraIdOrConfig = { facingMode: "environment" };
+        try {
+          const devices = await Html5Qrcode.getCameras();
+          if (Array.isArray(devices) && devices.length > 0) {
+            const labeled = devices.filter((d) => (d?.label || "").trim());
+            const backMatch =
+              labeled.find((d) => /back|rear|environment/i.test(d.label || "")) ||
+              null;
+            if (backMatch?.id) {
+              cameraIdOrConfig = backMatch.id;
+            } else if (devices.length === 1) {
+              cameraIdOrConfig = devices[0].id;
+            } else {
+              cameraIdOrConfig = devices[devices.length - 1].id;
+            }
+          }
+        } catch {
+          // fallback to facingMode
+        }
+
         await html5QrCode.start(
-          { facingMode: "environment" },
+          cameraIdOrConfig,
           {
-            fps: 12,
+            fps: 20,
             qrbox: { width: boxSize, height: boxSize },
             disableFlip: true,
             experimentalFeatures: { useBarCodeDetectorIfSupported: true }
