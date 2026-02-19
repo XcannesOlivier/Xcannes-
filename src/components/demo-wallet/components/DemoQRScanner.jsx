@@ -13,6 +13,7 @@ export default function DemoQRScanner({
   onScan,
   onClose,
   embedded = false,
+  edgeToEdge = false,
   showClose = true,
   className = "",
   fileInputId,
@@ -38,9 +39,17 @@ export default function DemoQRScanner({
   );
   const activeRef = useRef(false);
   const lastDecodedRef = useRef("");
+  const zoomCapabilityRef = useRef(null);
   const [error, setError] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [zoomState, setZoomState] = useState({
+    supported: false,
+    min: 1,
+    max: 1,
+    step: 0.1,
+    value: 1,
+  });
 
   const stopScanner = async () => {
     const instance = html5QrCodeRef.current;
@@ -60,6 +69,8 @@ export default function DemoQRScanner({
     }activeRef.current = false;
     setIsScanning(false);
     setIsStarting(false);
+    zoomCapabilityRef.current = null;
+    setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
   };
 
   const cameraEnabled = enableCamera && !showStaticImage;
@@ -72,6 +83,8 @@ export default function DemoQRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
+      zoomCapabilityRef.current = null;
+      setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
       return;
     }
 
@@ -81,6 +94,8 @@ export default function DemoQRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
+      zoomCapabilityRef.current = null;
+      setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
       return;
     }
 
@@ -164,6 +179,26 @@ export default function DemoQRScanner({
         activeRef.current = true;
         setIsStarting(false);
         setIsScanning(true);
+        try {
+          const caps = html5QrCode.getRunningTrackCameraCapabilities?.();
+          const zoomFeature = caps?.zoomFeature?.();
+          if (zoomFeature && zoomFeature.isSupported()) {
+            zoomCapabilityRef.current = zoomFeature;
+            const min = zoomFeature.min();
+            const max = zoomFeature.max();
+            const step = zoomFeature.step() || 0.1;
+            const current = zoomFeature.value() ?? min;
+            setZoomState({
+              supported: true,
+              min,
+              max,
+              step,
+              value: current,
+            });
+          }
+        } catch {
+          // ignore zoom capability failures
+        }
       } catch (err) {
         console.error("QR Scanner error:", err);
 
@@ -187,6 +222,8 @@ export default function DemoQRScanner({
 
         setIsScanning(false);
         setIsStarting(false);
+        zoomCapabilityRef.current = null;
+        setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
       }
     };
 
@@ -239,6 +276,23 @@ export default function DemoQRScanner({
     }
   };
 
+  const handleZoomChange = async (event) => {
+    const next = Number(event?.target?.value ?? zoomState.value);
+    setZoomState((prev) => ({ ...prev, value: next }));
+    try {
+      const zoomFeature = zoomCapabilityRef.current;
+      if (zoomFeature && zoomFeature.isSupported()) {
+        await zoomFeature.apply(next);
+        return;
+      }
+      await html5QrCodeRef.current?.applyVideoConstraints?.({
+        advanced: [{ zoom: next }]
+      });
+    } catch {
+      // ignore zoom errors
+    }
+  };
+
   const resolvedFileInputId = fileInputId || `${readerIdRef.current}-file`;
 
   const fauxQrBackground =
@@ -250,7 +304,9 @@ export default function DemoQRScanner({
 	  <div
 	    className={[
 	    embedded ?
-	    "relative rounded-xl border border-white/10 bg-black/20 p-4" :
+	    (edgeToEdge
+	      ? "relative border-y border-white/10 bg-black/20 p-0 rounded-none"
+	      : "relative rounded-xl border border-white/10 bg-black/20 p-4") :
 	    "relative w-full max-w-md bg-[#0b0f10] border border-white/10 rounded-2xl p-6 shadow-2xl",
 	    showEmbeddedFauxQr ? "overflow-hidden" : "",
 	    embedded ? "wallet-inline-zoom-in" : "",
@@ -290,7 +346,12 @@ export default function DemoQRScanner({
       {/* Scanner / Static Demo */}
       {showStaticQr ? (
         <div className="mb-4 space-y-3">
-          <div className="relative rounded-lg overflow-hidden border border-white/10 bg-black/40">
+          <div
+            className={[
+              "relative overflow-hidden border border-white/10 bg-black/40",
+              edgeToEdge ? "rounded-none border-x-0" : "rounded-lg",
+            ].join(" ")}
+          >
             {staticContent ? (
               <div
                 className={[
@@ -331,10 +392,10 @@ export default function DemoQRScanner({
           ) : null}
         </div>
       ) : (
-        <div className="mb-4">
+        <div className={edgeToEdge ? "mb-0" : "mb-4"}>
           <div
             id={readerIdRef.current}
-            className="rounded-lg overflow-hidden"
+            className={edgeToEdge ? "overflow-hidden" : "rounded-lg overflow-hidden"}
           />
         </div>
       )}
@@ -376,6 +437,23 @@ export default function DemoQRScanner({
           </p>
         </div>
     }
+      {zoomState.supported && isScanning && !showStaticQr && (
+        <div className="mt-3 rounded-lg border border-white/15 bg-white/5 px-3 py-2">
+          <div className="flex items-center justify-between text-[11px] text-white/70">
+            <span>{t("ui_camera_zoom_7f2a1b9c5e", "Zoom")}</span>
+            <span className="font-mono">{zoomState.value.toFixed(1)}x</span>
+          </div>
+          <input
+            type="range"
+            min={zoomState.min}
+            max={zoomState.max}
+            step={zoomState.step}
+            value={zoomState.value}
+            onChange={handleZoomChange}
+            className="w-full mt-2 accent-xcannes-green"
+          />
+        </div>
+      )}
       </div>
     </div>;
 
