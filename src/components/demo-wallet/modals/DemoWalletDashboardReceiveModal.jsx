@@ -235,29 +235,71 @@ export default function DemoWalletDashboardReceiveModal({
   const handleCopyQr = async () => {
     const canvas = qrContainerRef.current?.querySelector?.("canvas");
     if (!canvas) return;
-    const blob = await new Promise((resolve) =>
-      canvas.toBlob(resolve, "image/png")
-    );
-    if (!blob) {
-      flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
-      return;
-    }
-
-    const canWriteImage =
-      typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write;
-
-    if (canWriteImage) {
-      const item = new ClipboardItem({ "image/png": blob });
-      await navigator.clipboard.write([item]);
-      flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"));
-      return;
-    }
-
     const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
+
+    const dataUrl = canvas.toDataURL("image/png");
+    const dataUrlToBlob = (url) => {
+      const parts = url.split(",");
+      if (parts.length !== 2) return null;
+      const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
+      const binary = atob(parts[1]);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i += 1) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new Blob([bytes], { type: mime });
+    };
+
+    if (typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write) {
+      try {
+        const blob = dataUrlToBlob(dataUrl);
+        if (blob) {
+          const items = { "image/png": blob };
+          if (fallbackText) {
+            items["text/plain"] = new Blob([fallbackText], {
+              type: "text/plain"
+            });
+          }
+          const item = new ClipboardItem(items);
+          await navigator.clipboard.write([item]);
+          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"));
+          return;
+        }
+      } catch {
+        // fall through to text copy
+      }
+    }
+
     if (navigator?.clipboard?.writeText && fallbackText) {
-      await navigator.clipboard.writeText(fallbackText);
-      flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
-      return;
+      try {
+        await navigator.clipboard.writeText(fallbackText);
+        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+        return;
+      } catch {
+        // fall through to execCommand
+      }
+    }
+
+    if (fallbackText) {
+      try {
+        const el = document.createElement("textarea");
+        el.value = fallbackText;
+        el.setAttribute("readonly", "");
+        el.style.position = "fixed";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.focus();
+        el.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(el);
+        if (ok) {
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+          return;
+        }
+      } catch {
+        // fall through
+      }
     }
 
     flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
