@@ -248,27 +248,45 @@ export default function DemoWalletDashboardReceiveModal({
   const buildQrBlob = () => {
     const canvas = qrContainerRef.current?.querySelector?.("canvas");
     if (!canvas) return null;
+    const srcWidth = canvas.width;
+    const srcHeight = canvas.height;
+    const scale = 4;
+    const margin = Math.max(16, Math.round(srcWidth * 0.08));
     const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = canvas.width;
-    exportCanvas.height = canvas.height;
+    exportCanvas.width = (srcWidth + margin * 2) * scale;
+    exportCanvas.height = (srcHeight + margin * 2) * scale;
     const ctx = exportCanvas.getContext("2d");
     if (!ctx) return null;
-    ctx.drawImage(canvas, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    const offset = margin * scale;
+    ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
     try {
-      const imageData = ctx.getImageData(0, 0, exportCanvas.width, exportCanvas.height);
-      const data = imageData.data;
-      const isDarkBg = data[0] + data[1] + data[2] < 128 * 3;
+      const srcCtx = canvas.getContext("2d");
+      const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
+      const isDarkBg =
+        srcPixel && srcPixel.length >= 3
+          ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3
+          : false;
       if (isDarkBg) {
+        const imageData = ctx.getImageData(
+          offset,
+          offset,
+          srcWidth * scale,
+          srcHeight * scale
+        );
+        const data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
           data[i] = 255 - data[i];
           data[i + 1] = 255 - data[i + 1];
           data[i + 2] = 255 - data[i + 2];
         }
-        ctx.putImageData(imageData, 0, 0);
+        ctx.putImageData(imageData, offset, offset);
       }
     } catch {
       // fallback to raw canvas if pixel access fails
-      ctx.drawImage(canvas, 0, 0);
+      ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
     }
     const dataUrl = exportCanvas.toDataURL("image/png");
     return dataUrlToBlob(dataUrl);

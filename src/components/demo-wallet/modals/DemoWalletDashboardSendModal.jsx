@@ -202,6 +202,13 @@ export default function DemoWalletDashboardSendModal({
   const handlePastePayload = (event) => {
     const clipboard = event.clipboardData;
     if (!clipboard) return false;
+    const text = clipboard.getData("text") || "";
+    if (looksLikeQrPayload(text)) {
+      event.preventDefault();
+      handlePaymentRequestScan?.(text);
+      setScanActive(false);
+      return true;
+    }
     const items = clipboard.items || [];
     for (const item of items) {
       if (item.kind === "file" && String(item.type || "").startsWith("image/")) {
@@ -212,13 +219,6 @@ export default function DemoWalletDashboardSendModal({
           return true;
         }
       }
-    }
-    const text = clipboard.getData("text") || "";
-    if (looksLikeQrPayload(text)) {
-      event.preventDefault();
-      handlePaymentRequestScan?.(text);
-      setScanActive(false);
-      return true;
     }
     return false;
   };
