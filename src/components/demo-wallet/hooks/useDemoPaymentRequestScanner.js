@@ -27,8 +27,24 @@ export function useDemoPaymentRequestScanner({
   const handlePaymentRequestScan = useCallback(
     (data) => {
       const raw = String(data || "").trim();
+      const decodePrefixedPayreq = (value) => {
+        const match = value.match(/^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i);
+        if (!match) return null;
+        const payload = String(match[2] || "").trim();
+        if (!payload) return null;
+        try {
+          const padded =
+            payload.replace(/-/g, "+").replace(/_/g, "/") +
+            "===".slice((payload.length + 3) % 4);
+          return Buffer.from(padded, "base64").toString("utf8");
+        } catch {
+          return null;
+        }
+      };
+      const prefixedDecoded = decodePrefixedPayreq(raw);
+      const payload = prefixedDecoded || raw;
 
-      const looksLikeXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(raw);
+      const looksLikeXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(payload);
 
       const tryParseUri = (value) => {
         try {
@@ -92,7 +108,7 @@ export function useDemoPaymentRequestScanner({
 
       try {
         // 1) JSON
-        const request = JSON.parse(raw);
+        const request = JSON.parse(payload);
         if (request && request.to) {
           const schema = String(request.schema || request.kind || "").toLowerCase();
           const isXcannesPayReq =
@@ -179,12 +195,12 @@ export function useDemoPaymentRequestScanner({
 
       // 2) XRPL address only
       if (looksLikeXrplAddress) {
-        applyPrefill({ to: raw });
+        applyPrefill({ to: payload });
         return;
       }
 
       // 3) URI/URL formats (xrpl://..., xrpl:..., https://...?to=... etc.)
-      const parsed = tryParseUri(raw);
+      const parsed = tryParseUri(payload);
       if (parsed?.request?.to) {
         const request = parsed.request;
         const schema = String(request.schema || request.kind || "").toLowerCase();
@@ -269,12 +285,12 @@ export function useDemoPaymentRequestScanner({
       }
 
       // 4) Xumm/Xaman payload links: open directly
-      if (/xumm\.app|xaman|xumm:\/\//i.test(raw)) {
+      if (/xumm\.app|xaman|xumm:\/\//i.test(payload)) {
         const ok = confirm(
           "This looks like a Xumm/Xaman request link. Open it now?"
         );
         if (ok && typeof window !== "undefined") {
-          window.location.href = raw;
+          window.location.href = payload;
         }
         setPaymentRequestScannerOpen(false);
         return;

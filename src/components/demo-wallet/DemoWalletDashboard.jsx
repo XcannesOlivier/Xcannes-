@@ -26,7 +26,6 @@ import DemoWalletInfoModal from "./modals/DemoWalletInfoModal";
 import DemoQRScanner from "./components/DemoQRScanner";
 import { QRCodeCanvas } from "qrcode.react";
 import { useDemoSendForm } from "./hooks/useDemoSendForm";
-import { useDemoReceiveForm } from "./hooks/useDemoReceiveForm";
 import { useDemoPaymentRequestForm } from "./hooks/useDemoPaymentRequestForm";
 import { useDemoPaymentRequestScanner } from "./hooks/useDemoPaymentRequestScanner";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
@@ -142,7 +141,6 @@ function formatDemoAddressShort(address) {
 
 	const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 	const DEMO_SAVED_ADDRESSES_STORAGE_KEY = "xcannes_demo_saved_addresses_v1";
-	const DEMO_DEFAULT_DESTINATION_ADDRESS = "rDe_Receverpresentation_xxxxxxxxxxxxxxxxxxxxxx";
 	const DEMO_LATENCY_MS_MIN = 450;
 	const DEMO_LATENCY_MS_MAX = 1100;
 	const DEMO_RATES_REFRESH_MS = 60_000;
@@ -443,19 +441,6 @@ export default function DemoWalletDashboard({
   const { savedAddresses: demoSavedAddresses, saveAddress: saveDemoAddress } =
     useDemoSavedAddresses(DEMO_SAVED_ADDRESSES_STORAGE_KEY);
 
-	  useEffect(() => {
-	    if (typeof window === "undefined") return;
-	    const hasStored = Boolean(
-	      window.localStorage.getItem(DEMO_SAVED_ADDRESSES_STORAGE_KEY)
-	    );
-	    if (hasStored) return;
-	    if ((demoSavedAddresses || []).length > 0) return;
-	    saveDemoAddress(
-	      DEMO_DEFAULT_DESTINATION_ADDRESS,
-	      t("demo_counterparty_label", "Merchant")
-	    );
-	  }, [demoSavedAddresses, saveDemoAddress, t]);
-
   useEffect(() => {
     if (isExternalState) return;
     if (typeof window === "undefined") return;
@@ -508,8 +493,6 @@ export default function DemoWalletDashboard({
     defaultSendAssetKey: "RLUSD"
   });
 
-  const { receiveTab, setReceiveTab } = useDemoReceiveForm();
-
   const {
     requestAmount,
     setRequestAmount,
@@ -554,7 +537,6 @@ export default function DemoWalletDashboard({
       setSendPaymentRequest(null);
     }
     if (prevAction === "receive" && activeAction !== "receive") {
-      setReceiveTab("receive");
       setRequestAmount("");
       setRequestCurrency("RLUSD");
       setRequestMemo("");
@@ -578,7 +560,6 @@ export default function DemoWalletDashboard({
     setConvertBaseCurrency,
     setConvertPreview,
     setConvertQuoteCurrency,
-    setReceiveTab,
     setRequestAmount,
     setRequestCurrency,
     setRequestMemo,
@@ -2090,7 +2071,6 @@ export default function DemoWalletDashboard({
             type="button"
 	            onClick={() => {
 	              setSendTab("manual");
-	              setSendDestination(DEMO_DEFAULT_DESTINATION_ADDRESS);
 	              setActiveAction("send");
 	            }}
             title={t("demo_tt_send", "Envoyer un paiement dans la devise choisie.")}
@@ -2116,7 +2096,6 @@ export default function DemoWalletDashboard({
           <button
             type="button"
             onClick={() => {
-              setReceiveTab("receive");
               setActiveAction("receive");
             }}
             title={t("demo_tt_receive", "Recevoir des fonds ou créer une demande.")}
@@ -2365,8 +2344,6 @@ export default function DemoWalletDashboard({
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
         walletId={activeWalletId}
-        receiveTab={receiveTab}
-        setReceiveTab={setReceiveTab}
         renderWalletMeta={renderWalletMeta}
         effectiveWallet={effectiveWallet}
         handleCopyAddress={async () => {
