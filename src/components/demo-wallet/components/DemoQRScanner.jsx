@@ -39,17 +39,9 @@ export default function DemoQRScanner({
   );
   const activeRef = useRef(false);
   const lastDecodedRef = useRef("");
-  const zoomCapabilityRef = useRef(null);
   const [error, setError] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
-  const [zoomState, setZoomState] = useState({
-    supported: false,
-    min: 1,
-    max: 1,
-    step: 0.1,
-    value: 1,
-  });
 
   const stopScanner = async () => {
     const instance = html5QrCodeRef.current;
@@ -69,8 +61,6 @@ export default function DemoQRScanner({
     }activeRef.current = false;
     setIsScanning(false);
     setIsStarting(false);
-    zoomCapabilityRef.current = null;
-    setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
   };
 
   const cameraEnabled = enableCamera && !showStaticImage;
@@ -83,8 +73,6 @@ export default function DemoQRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
-      zoomCapabilityRef.current = null;
-      setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
       return;
     }
 
@@ -94,8 +82,6 @@ export default function DemoQRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
-      zoomCapabilityRef.current = null;
-      setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
       return;
     }
 
@@ -180,24 +166,21 @@ export default function DemoQRScanner({
         setIsStarting(false);
         setIsScanning(true);
         try {
+          const desiredZoom = 2.5;
           const caps = html5QrCode.getRunningTrackCameraCapabilities?.();
           const zoomFeature = caps?.zoomFeature?.();
           if (zoomFeature && zoomFeature.isSupported()) {
-            zoomCapabilityRef.current = zoomFeature;
             const min = zoomFeature.min();
             const max = zoomFeature.max();
-            const step = zoomFeature.step() || 0.1;
-            const current = zoomFeature.value() ?? min;
-            setZoomState({
-              supported: true,
-              min,
-              max,
-              step,
-              value: current,
+            const clipped = Math.min(max, Math.max(min, desiredZoom));
+            await zoomFeature.apply(clipped);
+          } else {
+            await html5QrCode.applyVideoConstraints?.({
+              advanced: [{ zoom: desiredZoom }],
             });
           }
         } catch {
-          // ignore zoom capability failures
+          // ignore zoom errors
         }
       } catch (err) {
         console.error("QR Scanner error:", err);
@@ -222,8 +205,6 @@ export default function DemoQRScanner({
 
         setIsScanning(false);
         setIsStarting(false);
-        zoomCapabilityRef.current = null;
-        setZoomState({ supported: false, min: 1, max: 1, step: 0.1, value: 1 });
       }
     };
 
@@ -273,23 +254,6 @@ export default function DemoQRScanner({
         )
       );
       setIsStarting(false);
-    }
-  };
-
-  const handleZoomChange = async (event) => {
-    const next = Number(event?.target?.value ?? zoomState.value);
-    setZoomState((prev) => ({ ...prev, value: next }));
-    try {
-      const zoomFeature = zoomCapabilityRef.current;
-      if (zoomFeature && zoomFeature.isSupported()) {
-        await zoomFeature.apply(next);
-        return;
-      }
-      await html5QrCodeRef.current?.applyVideoConstraints?.({
-        advanced: [{ zoom: next }]
-      });
-    } catch {
-      // ignore zoom errors
     }
   };
 
@@ -437,23 +401,6 @@ export default function DemoQRScanner({
           </p>
         </div>
     }
-      {zoomState.supported && isScanning && !showStaticQr && (
-        <div className="mt-3 rounded-lg border border-white/15 bg-white/5 px-3 py-2">
-          <div className="flex items-center justify-between text-[11px] text-white/70">
-            <span>{t("ui_camera_zoom_7f2a1b9c5e", "Zoom")}</span>
-            <span className="font-mono">{zoomState.value.toFixed(1)}x</span>
-          </div>
-          <input
-            type="range"
-            min={zoomState.min}
-            max={zoomState.max}
-            step={zoomState.step}
-            value={zoomState.value}
-            onChange={handleZoomChange}
-            className="w-full mt-2 accent-xcannes-green"
-          />
-        </div>
-      )}
       </div>
     </div>;
 
