@@ -232,11 +232,8 @@ export default function DemoWalletDashboardReceiveModal({
     }, 1300);
   };
 
-  const buildQrBlob = () => {
-    const canvas = qrContainerRef.current?.querySelector?.("canvas");
-    if (!canvas) return null;
-    const dataUrl = canvas.toDataURL("image/png");
-    const parts = dataUrl.split(",");
+  const dataUrlToBlob = (url) => {
+    const parts = url.split(",");
     if (parts.length !== 2) return null;
     const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
     const binary = atob(parts[1]);
@@ -246,6 +243,35 @@ export default function DemoWalletDashboardReceiveModal({
       bytes[i] = binary.charCodeAt(i);
     }
     return new Blob([bytes], { type: mime });
+  };
+
+  const buildQrBlob = () => {
+    const canvas = qrContainerRef.current?.querySelector?.("canvas");
+    if (!canvas) return null;
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = canvas.width;
+    exportCanvas.height = canvas.height;
+    const ctx = exportCanvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(canvas, 0, 0);
+    try {
+      const imageData = ctx.getImageData(0, 0, exportCanvas.width, exportCanvas.height);
+      const data = imageData.data;
+      const isDarkBg = data[0] + data[1] + data[2] < 128 * 3;
+      if (isDarkBg) {
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = 255 - data[i];
+          data[i + 1] = 255 - data[i + 1];
+          data[i + 2] = 255 - data[i + 2];
+        }
+        ctx.putImageData(imageData, 0, 0);
+      }
+    } catch {
+      // fallback to raw canvas if pixel access fails
+      ctx.drawImage(canvas, 0, 0);
+    }
+    const dataUrl = exportCanvas.toDataURL("image/png");
+    return dataUrlToBlob(dataUrl);
   };
 
   const downloadBlob = (blob, filename) => {
@@ -265,27 +291,11 @@ export default function DemoWalletDashboardReceiveModal({
   };
 
   const handleCopyQr = async () => {
-    const canvas = qrContainerRef.current?.querySelector?.("canvas");
-    if (!canvas) return;
     const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
-
-    const dataUrl = canvas.toDataURL("image/png");
-    const dataUrlToBlob = (url) => {
-      const parts = url.split(",");
-      if (parts.length !== 2) return null;
-      const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
-      const binary = atob(parts[1]);
-      const len = binary.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i += 1) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-      return new Blob([bytes], { type: mime });
-    };
+    const blob = buildQrBlob();
 
     if (typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write) {
       try {
-        const blob = dataUrlToBlob(dataUrl);
         if (blob) {
           const items = { "image/png": blob };
           if (fallbackText) {
