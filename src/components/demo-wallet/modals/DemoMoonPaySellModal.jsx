@@ -127,8 +127,7 @@ const DemoMoonPaySellModal = ({
     selectLabelByCurrency,
     selectLabelRightByCurrency,
     selectIconByCurrency,
-    selectLabelMobileByCurrency,
-    t
+    selectLabelMobileByCurrency
   ]);
 
   useEffect(() => {
