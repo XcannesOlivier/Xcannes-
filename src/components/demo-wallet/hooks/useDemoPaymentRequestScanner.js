@@ -106,9 +106,28 @@ export function useDemoPaymentRequestScanner({
         setPaymentRequestScannerOpen(false);
       };
 
+      const normalizePayreqPayload = (request) => {
+        if (!request || typeof request !== "object") return request;
+        const normalized = { ...request };
+        if (request.s && !normalized.schema) normalized.schema = request.s;
+        if (request.tc && !normalized.targetCurrency) normalized.targetCurrency = request.tc;
+        if (request.t && !normalized.to) normalized.to = request.t;
+        if (request.da != null && normalized.displayAmount == null) normalized.displayAmount = request.da;
+        if (request.dc && !normalized.displayCurrency) normalized.displayCurrency = request.dc;
+        if (request.ar != null && normalized.amountRlusd == null) normalized.amountRlusd = request.ar;
+        if (request.fr != null && normalized.fxRate == null) normalized.fxRate = request.fr;
+        if (request.fs && !normalized.fxSource) normalized.fxSource = request.fs;
+        if (request.i && !normalized.issuer) normalized.issuer = request.i;
+        if (request.m && !normalized.memo) normalized.memo = request.m;
+        if (request.b && !normalized.beneficiaryLabel) normalized.beneficiaryLabel = request.b;
+        if (request.c && !normalized.createdAt) normalized.createdAt = request.c;
+        return normalized;
+      };
+
       try {
         // 1) JSON
-        const request = JSON.parse(payload);
+        const requestRaw = JSON.parse(payload);
+        const request = normalizePayreqPayload(requestRaw);
         if (request && request.to) {
           const schema = String(request.schema || request.kind || "").toLowerCase();
           const isXcannesPayReq =
@@ -124,7 +143,10 @@ export function useDemoPaymentRequestScanner({
             .toUpperCase();
 
           const displayAmount = request.displayAmount ?? request.amount ?? null;
-          const amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+          let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+          if ((amountRlusd == null || Number.isNaN(Number(amountRlusd))) && targetCurrency === "RLUSD") {
+            amountRlusd = displayAmount;
+          }
           const fxRate = request.fxRate ?? null;
           const fxSource = request.fxSource ?? null;
           const memo = request.memo ?? null;
@@ -202,7 +224,7 @@ export function useDemoPaymentRequestScanner({
       // 3) URI/URL formats (xrpl://..., xrpl:..., https://...?to=... etc.)
       const parsed = tryParseUri(payload);
       if (parsed?.request?.to) {
-        const request = parsed.request;
+        const request = normalizePayreqPayload(parsed.request);
         const schema = String(request.schema || request.kind || "").toLowerCase();
         const isXcannesPayReq =
           schema.includes("xcannes") || schema.includes("payreq") || Boolean(request.targetCurrency);
@@ -217,7 +239,10 @@ export function useDemoPaymentRequestScanner({
           .toUpperCase();
 
         const displayAmount = request.displayAmount ?? request.amount ?? null;
-        const amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+        let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+        if ((amountRlusd == null || Number.isNaN(Number(amountRlusd))) && targetCurrency === "RLUSD") {
+          amountRlusd = displayAmount;
+        }
         const fxRate = request.fxRate ?? null;
         const fxSource = request.fxSource ?? null;
         const memo = request.memo ?? null;
