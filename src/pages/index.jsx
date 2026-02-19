@@ -152,7 +152,6 @@ export default function Home() {
       valueModalCloseTimerRef.current = null;
     }
   }, [valueModalOpen]);
-
   const openValueModal = () => {
     setValueModalClosing(false);
     setValueModalOpen(true);
