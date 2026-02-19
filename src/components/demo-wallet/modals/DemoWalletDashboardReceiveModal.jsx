@@ -423,7 +423,7 @@ export default function DemoWalletDashboardReceiveModal({
     }
   }, [requestValue]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
-  const qrSize = inline ? 240 : 180;
+  const qrSize = inline ? 240 : 220;
   const requestDisplayCurrency = String(
     generatedRequest?.displayCurrency || requestCurrencyCode || "USD"
   )
@@ -533,8 +533,10 @@ export default function DemoWalletDashboardReceiveModal({
                 <QRCodeCanvas
               value={hasGeneratedRequest ? requestQrValue : receiveQrValue}
               size={qrSize}
-              bgColor="#000000"
-              fgColor="#ffffff" />
+              bgColor="#ffffff"
+              fgColor="#000000"
+              includeMargin={true}
+              level="H" />
 
               </div>
               {hasGeneratedRequest ? (
