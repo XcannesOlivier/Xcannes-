@@ -1117,10 +1117,17 @@ export default function DemoWalletDashboard({
       }
     }
 
+    const toWalletId =
+      toAddress &&
+      effectiveWallet &&
+      String(toAddress).trim() === String(effectiveWallet).trim()
+        ? activeWalletId
+        : null;
+
     const result = applyDemoSend({
       state: nextState,
       fromWalletId: activeWalletId,
-      toWalletId: null,
+      toWalletId,
       toAddress,
       currencyCode: currency,
       amountUnits: amount,
