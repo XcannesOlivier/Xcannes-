@@ -37,6 +37,13 @@ class XcannesAPI {
       defaultTtlMs: API_CONFIG.CACHE_TTL,
     });
     this.healthStatus = { isHealthy: true, lastCheck: 0 };
+    this.request = this.request.bind(this);
+    this.getHealthStatus = this.getHealthStatus.bind(this);
+    this.getMarkets = this.getMarkets.bind(this);
+    this.getAllMarkets = this.getAllMarkets.bind(this);
+    this.getTicker = this.getTicker.bind(this);
+    this.getFxEod = this.getFxEod.bind(this);
+    this.getFxCurrencies = this.getFxCurrencies.bind(this);
   }
 
   /**

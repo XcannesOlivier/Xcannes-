@@ -910,7 +910,7 @@ export default function DemoWalletDashboard({
       labels[code] = label;
     });
     return labels;
-  }, [allocationSummary.unallocatedRlusd, augmentedTokens, locale, t]);
+  }, [allocationSummary.unallocatedRlusd, augmentedTokens, locale]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};

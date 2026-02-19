@@ -410,7 +410,6 @@ export default function DemoQRScanner({
       ) : (
         <div className={edgeToEdge ? "mb-0" : "mb-4"}>
           <div
-            id={readerIdRef.current}
             ref={readerElRef}
             className={
               edgeToEdge
@@ -418,6 +417,7 @@ export default function DemoQRScanner({
                 : "relative w-[90%] mx-auto rounded-lg overflow-hidden"
             }
           >
+            <div id={readerIdRef.current} className="w-full h-full" />
             {!showStaticQr && qrBoxSize > 0 && (isScanning || isStarting) ? (
               <div
                 className="pointer-events-none absolute left-1/2 top-1/2 z-10"
