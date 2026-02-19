@@ -1,3 +1,5 @@
+import { isFxConversion } from "./utils/demoWalletSpread";
+
 const DEFAULT_RATES_USD_PER_UNIT = {
   RLUSD: 1,
   XRP: 0.55,
@@ -15,6 +17,10 @@ const DEFAULT_RATES_USD_PER_UNIT = {
   PHP: 0.018,
   XAF: 0.0017,
 };
+
+const DEMO_ALLOCATIONS_MODE = "usd_v2";
+const DEMO_UNALLOCATED_USD = 250;
+const DEMO_NATIVE_CURRENCIES = new Set(["XRP", "RLUSD"]);
 
 const DEFAULT_DEMO_WALLETS = {
   A: {
@@ -55,6 +61,10 @@ function safeNumber(value) {
   return Number.isFinite(num) ? num : null;
 }
 
+function isDemoNativeCurrency(code) {
+  return DEMO_NATIVE_CURRENCIES.has(String(code || "").toUpperCase());
+}
+
 function clone(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
   return JSON.parse(JSON.stringify(value));
@@ -84,6 +94,80 @@ function clampNumber(value, min, max) {
 
 function formatUnits(value) {
   return Number(Number(value).toFixed(6));
+}
+
+function normalizeAllocationUsd(currency, amountUnits, ratesUsdPerUnit) {
+  const upper = String(currency || "").toUpperCase();
+  const numeric = safeNumber(amountUnits) ?? 0;
+  if (!numeric) return 0;
+  if (isDemoNativeCurrency(upper)) return formatUnits(numeric);
+  const rate = Number(ratesUsdPerUnit?.[upper]);
+  if (!Number.isFinite(rate) || rate <= 0) return 0;
+  return formatUnits(numeric * rate);
+}
+
+function normalizeWalletAllocationsToUsd(wallet, ratesUsdPerUnit) {
+  if (!wallet?.allocations) return;
+  const next = {};
+  let totalAllocatedUsd = 0;
+  let rlusdOnChain = 0;
+  Object.entries(wallet.allocations).forEach(([code, value]) => {
+    const upper = String(code || "").toUpperCase();
+    const normalized = normalizeAllocationUsd(upper, value, ratesUsdPerUnit);
+    next[upper] = normalized;
+    if (upper === "RLUSD") {
+      rlusdOnChain = normalized;
+    } else if (!isDemoNativeCurrency(upper)) {
+      totalAllocatedUsd += normalized;
+    }
+  });
+  if (rlusdOnChain > 0) {
+    const reserve = Math.max(0, Math.min(DEMO_UNALLOCATED_USD, rlusdOnChain));
+    const maxAllocated = Math.max(0, rlusdOnChain - reserve);
+    if (totalAllocatedUsd > maxAllocated && totalAllocatedUsd > 0) {
+      const scale = maxAllocated / totalAllocatedUsd;
+      Object.entries(next).forEach(([code, value]) => {
+        const upper = String(code || "").toUpperCase();
+        if (!isDemoNativeCurrency(upper)) {
+          next[upper] = formatUnits(Number(value || 0) * scale);
+        }
+      });
+    }
+  }
+  wallet.allocations = next;
+}
+
+function scaleWalletAllocationsToReserve(wallet) {
+  if (!wallet?.allocations) return;
+  const allocations = wallet.allocations;
+  const rlusdOnChain = safeNumber(allocations.RLUSD) ?? 0;
+  if (rlusdOnChain <= 0) return;
+  const reserve = Math.max(0, Math.min(DEMO_UNALLOCATED_USD, rlusdOnChain));
+  const maxAllocated = Math.max(0, rlusdOnChain - reserve);
+  const totalAllocatedUsd = Object.entries(allocations).reduce((sum, [code, value]) => {
+    const upper = String(code || "").toUpperCase();
+    if (upper === "RLUSD" || upper === "XRP") return sum;
+    return sum + (safeNumber(value) ?? 0);
+  }, 0);
+  if (totalAllocatedUsd > maxAllocated && totalAllocatedUsd > 0) {
+    const scale = maxAllocated / totalAllocatedUsd;
+    Object.entries(allocations).forEach(([code, value]) => {
+      const upper = String(code || "").toUpperCase();
+      if (!isDemoNativeCurrency(upper)) {
+        allocations[upper] = formatUnits(Number(value || 0) * scale);
+      }
+    });
+  }
+}
+
+function resolveDemoUnitsFromAllocation(currency, allocationValue, ratesUsdPerUnit) {
+  const upper = String(currency || "").toUpperCase();
+  const allocation = safeNumber(allocationValue) ?? 0;
+  if (!allocation) return 0;
+  if (isDemoNativeCurrency(upper)) return allocation;
+  const rate = Number(ratesUsdPerUnit?.[upper]);
+  if (!Number.isFinite(rate) || rate <= 0) return 0;
+  return formatUnits(allocation / rate);
 }
 
 function buildDemoTimestamp(nextIndex, rand) {
@@ -240,6 +324,7 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
   uniqueCurrencies.forEach((currency, idx) => {
     const allocation = resolveWalletAllocation(walletA, currency);
     if (!allocation) return;
+    const displayUnits = resolveDemoUnitsFromAllocation(currency, allocation, ratesUsdPerUnit);
 
     // Occasional trustline operations for non-native currencies.
     if (currency !== "XRP" && currency !== "RLUSD") {
@@ -249,7 +334,7 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
 
     // Outgoing payments.
     const counterparty = counterpartyForIndex(idx);
-    const debitAmount = pickDemoAmount(allocation, { factor: 0.012, min: 0.2 });
+    const debitAmount = pickDemoAmount(displayUnits, { factor: 0.012, min: 0.2 });
     if (debitAmount) {
       events.push(
         buildSendEvent({
@@ -267,7 +352,7 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
     }
 
     // Incoming settlements (credit) for realism.
-    const creditAmount = pickDemoAmount(allocation, { factor: 0.006, min: 0.2 });
+    const creditAmount = pickDemoAmount(displayUnits, { factor: 0.006, min: 0.2 });
     if (creditAmount && idx % 3 === 0) {
       const fromParty = counterpartyForIndex(idx + 1);
       events.push(
@@ -287,7 +372,7 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
 
     // Conversions (exclude RLUSD->RLUSD).
     if (currency !== "RLUSD") {
-      const convertAmount = pickDemoAmount(allocation, { factor: 0.004, min: 0.1 });
+      const convertAmount = pickDemoAmount(displayUnits, { factor: 0.004, min: 0.1 });
       const event = buildConvertEvent({
         walletId: "A",
         fromCurrency: currency,
@@ -337,7 +422,8 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
     const currency = String(code).toUpperCase();
     const allocation = resolveWalletAllocation(walletA, currency);
     if (!allocation) return;
-    const amount = pickDemoAmount(allocation, { factor: 0.007, min: 0.2 });
+    const displayUnits = resolveDemoUnitsFromAllocation(currency, allocation, ratesUsdPerUnit);
+    const amount = pickDemoAmount(displayUnits, { factor: 0.007, min: 0.2 });
     events.push(
       buildCashEvent({
         walletId: "A",
@@ -360,15 +446,21 @@ export function getDemoRatesUsdPerUnit(overrides = {}) {
 
 export function buildDefaultDemoState() {
   const wallets = clone(DEFAULT_DEMO_WALLETS);
+  Object.values(wallets).forEach((wallet) => {
+    normalizeWalletAllocationsToUsd(wallet, DEFAULT_RATES_USD_PER_UNIT);
+  });
   return {
     wallets,
     events: buildDemoEvents(wallets, DEFAULT_RATES_USD_PER_UNIT),
+    meta: { allocationsMode: DEMO_ALLOCATIONS_MODE },
   };
 }
 
 export function migrateDemoState(state) {
   if (!state || typeof state !== "object") return state;
   const base = buildDefaultDemoState();
+  const previousMode = state?.meta?.allocationsMode || null;
+  const shouldNormalizeAllocations = previousMode !== DEMO_ALLOCATIONS_MODE;
   const wallets = state.wallets || {};
   const allowedWalletIds = new Set(Object.keys(base.wallets || {}));
 
@@ -382,8 +474,16 @@ export function migrateDemoState(state) {
       target.allocations = {};
     }
     Object.entries(allocations || {}).forEach(([code, value]) => {
-      target.allocations[code] = value;
+      const upper = String(code || "").toUpperCase();
+      target.allocations[upper] = value;
     });
+    if (shouldNormalizeAllocations) {
+      if (previousMode === "usd") {
+        scaleWalletAllocationsToReserve(target);
+      } else {
+        normalizeWalletAllocationsToUsd(target, DEFAULT_RATES_USD_PER_UNIT);
+      }
+    }
 
     // Wallet label rules (demo): default is "Mr et Mme Dupont", user can rename once then lock.
     if (walletId === "A") {
@@ -416,20 +516,14 @@ export function migrateDemoState(state) {
 
   const incomingEvents = Array.isArray(state.events) ? clone(state.events) : [];
   base.events = incomingEvents.length ? incomingEvents : base.events;
+  base.meta = { ...(base.meta || {}), allocationsMode: DEMO_ALLOCATIONS_MODE };
 
   return base;
 }
 
 export function walletUsdTotal(wallet, ratesUsdPerUnit) {
-  const allocations = wallet?.allocations || {};
-  return Object.entries(allocations).reduce((sum, [code, units]) => {
-    if (String(code || "").toUpperCase() === "XRP") return sum;
-    const usdPerUnit = ratesUsdPerUnit?.[String(code).toUpperCase()] ?? null;
-    if (!usdPerUnit) return sum;
-    const safeUnits = safeNumber(units);
-    if (safeUnits === null || safeUnits <= 0) return sum;
-    return sum + safeUnits * usdPerUnit;
-  }, 0);
+  const rlusd = safeNumber(wallet?.allocations?.RLUSD);
+  return rlusd && rlusd > 0 ? rlusd : 0;
 }
 
 export function ensureAllocation(wallet, currencyCode) {
@@ -465,6 +559,46 @@ function pushEvent(state, event) {
   state.events.unshift(event);
 }
 
+function resolveDemoAmountUsd(currency, amountUnits, ratesUsdPerUnit) {
+  const upper = String(currency || "").toUpperCase();
+  const usdPerUnit = ratesUsdPerUnit?.[upper];
+  if (!usdPerUnit) return null;
+  const units = safeNumber(amountUnits);
+  if (units === null) return null;
+  return units * usdPerUnit;
+}
+
+function resolveDemoAvailableUsd(wallet, currency, ratesUsdPerUnit) {
+  const upper = String(currency || "").toUpperCase();
+  const usdPerUnit = ratesUsdPerUnit?.[upper];
+  if (!usdPerUnit) return null;
+  const stored = safeNumber(wallet?.allocations?.[upper]) ?? 0;
+  if (isDemoNativeCurrency(upper)) return stored * usdPerUnit;
+  return stored;
+}
+
+function applyDemoDebitAllocation(wallet, currency, amountUnits, amountUsd) {
+  const upper = String(currency || "").toUpperCase();
+  ensureAllocation(wallet, upper);
+  const current = safeNumber(wallet.allocations[upper]) ?? 0;
+  if (isDemoNativeCurrency(upper)) {
+    wallet.allocations[upper] = Number((current - amountUnits).toFixed(6));
+  } else {
+    wallet.allocations[upper] = Number((current - amountUsd).toFixed(6));
+  }
+}
+
+function applyDemoCreditAllocation(wallet, currency, amountUnits, amountUsd) {
+  const upper = String(currency || "").toUpperCase();
+  ensureAllocation(wallet, upper);
+  const current = safeNumber(wallet.allocations[upper]) ?? 0;
+  if (isDemoNativeCurrency(upper)) {
+    wallet.allocations[upper] = Number((current + amountUnits).toFixed(6));
+  } else {
+    wallet.allocations[upper] = Number((current + amountUsd).toFixed(6));
+  }
+}
+
 export function applyDemoSend({
   state,
   fromWalletId,
@@ -485,22 +619,28 @@ export function applyDemoSend({
   if (toWalletId && !toWallet) return { ok: false, error: "invalid_wallet" };
 
   const currency = String(currencyCode || "").toUpperCase();
-  const usdPerUnit = ratesUsdPerUnit?.[currency] ?? null;
-  if (!usdPerUnit) return { ok: false, error: "unsupported_currency" };
+  const amountUsd = resolveDemoAmountUsd(currency, amount, ratesUsdPerUnit);
+  if (!amountUsd) return { ok: false, error: "unsupported_currency" };
 
-  ensureAllocation(fromWallet, currency);
-  if (toWallet) ensureAllocation(toWallet, currency);
+  const availableUsd = resolveDemoAvailableUsd(fromWallet, currency, ratesUsdPerUnit);
+  if (availableUsd === null) return { ok: false, error: "unsupported_currency" };
+  if (amountUsd > availableUsd) return { ok: false, error: "insufficient_funds" };
 
-  const available = safeNumber(fromWallet.allocations[currency]) ?? 0;
-  if (amount > available) return { ok: false, error: "insufficient_funds" };
-
-  fromWallet.allocations[currency] = Number((available - amount).toFixed(6));
+  applyDemoDebitAllocation(fromWallet, currency, amount, amountUsd);
+  if (!isDemoNativeCurrency(currency)) {
+    ensureAllocation(fromWallet, "RLUSD");
+    const rlusdCurrent = safeNumber(fromWallet.allocations.RLUSD) ?? 0;
+    fromWallet.allocations.RLUSD = Number((rlusdCurrent - amountUsd).toFixed(6));
+  }
   if (toWallet) {
-    const toBalance = safeNumber(toWallet.allocations[currency]) ?? 0;
-    toWallet.allocations[currency] = Number((toBalance + amount).toFixed(6));
+    applyDemoCreditAllocation(toWallet, currency, amount, amountUsd);
+    if (!isDemoNativeCurrency(currency)) {
+      ensureAllocation(toWallet, "RLUSD");
+      const rlusdCurrent = safeNumber(toWallet.allocations.RLUSD) ?? 0;
+      toWallet.allocations.RLUSD = Number((rlusdCurrent + amountUsd).toFixed(6));
+    }
   }
 
-  const usdValue = amount * usdPerUnit;
   const event = {
     id: newId(),
     ts: Date.now(),
@@ -508,7 +648,7 @@ export function applyDemoSend({
     from: fromWalletId,
     currency,
     amount,
-    usdValue,
+    usdValue: amountUsd,
     memo: String(memo || "").slice(0, 80),
   };
   if (toWalletId) event.to = toWalletId;
@@ -546,20 +686,49 @@ export function applyDemoConvert({
     return { ok: false, error: "unsupported_currency" };
   }
 
-  ensureAllocation(wallet, fromCurrency);
-  ensureAllocation(wallet, toCurrency);
-
-  const available = safeNumber(wallet.allocations[fromCurrency]) ?? 0;
-  if (amount > available) return { ok: false, error: "insufficient_funds" };
-
   const usdGross = amount * fromUsdPerUnit;
   const feeUsd = (usdGross * spreadBps) / 10_000;
   const usdNet = Math.max(0, usdGross - feeUsd);
   const toAmount = usdNet / toUsdPerUnit;
 
-  wallet.allocations[fromCurrency] = Number((available - amount).toFixed(6));
-  const prevTo = safeNumber(wallet.allocations[toCurrency]) ?? 0;
-  wallet.allocations[toCurrency] = Number((prevTo + toAmount).toFixed(6));
+  const rlusdCurrent = safeNumber(wallet.allocations?.RLUSD) ?? 0;
+  if (feeUsd > rlusdCurrent + 1e-9) return { ok: false, error: "insufficient_funds" };
+
+  const isFromNative = isDemoNativeCurrency(fromCurrency);
+  const isToNative = isDemoNativeCurrency(toCurrency);
+  const isFromRlusd = fromCurrency === "RLUSD";
+  const isToRlusd = toCurrency === "RLUSD";
+
+  if (isFromRlusd && !isToNative) {
+    const rlusdOnChain = safeNumber(wallet.allocations?.RLUSD) ?? 0;
+    const totalAllocatedUsd = Object.entries(wallet.allocations || {}).reduce((sum, [code, value]) => {
+      const upper = String(code || "").toUpperCase();
+      if (upper === "RLUSD" || upper === "XRP") return sum;
+      return sum + (safeNumber(value) ?? 0);
+    }, 0);
+    const unallocatedUsd = rlusdOnChain - totalAllocatedUsd;
+    if (usdGross > unallocatedUsd) return { ok: false, error: "insufficient_funds" };
+    applyDemoCreditAllocation(wallet, toCurrency, toAmount, usdNet);
+  } else if (isToRlusd && !isFromNative) {
+    const availableUsd = resolveDemoAvailableUsd(wallet, fromCurrency, ratesUsdPerUnit);
+    if (availableUsd === null) return { ok: false, error: "unsupported_currency" };
+    if (usdGross > availableUsd) return { ok: false, error: "insufficient_funds" };
+    applyDemoDebitAllocation(wallet, fromCurrency, amount, usdGross);
+  } else {
+    const availableUsd = resolveDemoAvailableUsd(wallet, fromCurrency, ratesUsdPerUnit);
+    if (availableUsd === null) return { ok: false, error: "unsupported_currency" };
+    if (usdGross > availableUsd) return { ok: false, error: "insufficient_funds" };
+
+    applyDemoDebitAllocation(wallet, fromCurrency, amount, usdGross);
+    applyDemoCreditAllocation(wallet, toCurrency, toAmount, usdNet);
+  }
+
+  if (feeUsd > 0) {
+    ensureAllocation(wallet, "RLUSD");
+    wallet.allocations.RLUSD = Number(
+      (Number(wallet.allocations.RLUSD || 0) - feeUsd).toFixed(6)
+    );
+  }
 
   const event = {
     id: newId(),

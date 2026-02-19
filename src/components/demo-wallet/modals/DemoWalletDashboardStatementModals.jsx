@@ -28,6 +28,9 @@ export default function DemoWalletDashboardStatementModals({
   setShowCurrencyStatement,
   selectedStatementToken,
   setSelectedStatementToken,
+  statementBalance = null,
+  statementTotalBalanceUsd = null,
+  globalStatementTokens = null,
   inlineGlobalStatement = false,
   inlineGlobalStatementClassName = "",
   inlineStatementVariant,
@@ -313,7 +316,7 @@ export default function DemoWalletDashboardStatementModals({
       {inlineGlobalStatement ? (
         <div className={inlineGlobalStatementClassName}>
           <DemoGlobalStatement
-            tokens={augmentedTokens}
+            tokens={globalStatementTokens || augmentedTokens}
             walletAddress={effectiveWallet}
             walletLabelOverride={walletDisplayLabel}
             isPreviewMode={isPreviewMode}
@@ -321,14 +324,15 @@ export default function DemoWalletDashboardStatementModals({
             hasRlusdTrustline={hasRlusdTrustline}
             noticeVariant={noticeVariant}
             noticeContextLabel={noticeContextLabel}
-            walletId={walletId}
-            period="December 2025"
-            isFullPage={isFullPageView}
-            variant={inlineStatementVariant || "inline-desktop"}
-            inline
-            usdRates={usdRates}
-            movements={canFetchStatements ? globalMovements : previewMovements}
-            movementsLoading={canFetchStatements ? globalLoading : false}
+          walletId={walletId}
+          period="December 2025"
+          isFullPage={isFullPageView}
+          variant={inlineStatementVariant || "inline-desktop"}
+          inline
+          usdRates={usdRates}
+          totalBalanceOverride={statementTotalBalanceUsd}
+          movements={canFetchStatements ? globalMovements : previewMovements}
+          movementsLoading={canFetchStatements ? globalLoading : false}
             movementsError={canFetchStatements ? globalError : null}
             movementsHasMore={canFetchStatements ? globalHasMore : false}
             movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
@@ -344,10 +348,14 @@ export default function DemoWalletDashboardStatementModals({
 
 	      {inlineCurrencyStatement && selectedStatementToken ? (
 	        <div className={inlineCurrencyStatementClassName}>
-		          <DemoCurrencyStatement
-	            currency={selectedStatementToken.currency}
-	            balance={parseFloat(selectedStatementToken.value || 0)}
-	            issuer={selectedStatementToken.issuer}
+          <DemoCurrencyStatement
+            currency={selectedStatementToken.currency}
+            balance={
+              Number.isFinite(Number(statementBalance))
+                ? Number(statementBalance)
+                : parseFloat(selectedStatementToken.value || 0)
+            }
+            issuer={selectedStatementToken.issuer}
 	            walletAddress={effectiveWallet}
 	            walletLabelOverride={walletDisplayLabel}
 	            backendWalletAddress={backendWalletAddress}
@@ -387,7 +395,7 @@ export default function DemoWalletDashboardStatementModals({
 
       {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
         <DemoGlobalStatement
-          tokens={augmentedTokens}
+          tokens={globalStatementTokens || augmentedTokens}
           walletAddress={effectiveWallet}
           walletLabelOverride={walletDisplayLabel}
           isPreviewMode={isPreviewMode}
@@ -400,6 +408,7 @@ export default function DemoWalletDashboardStatementModals({
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}
+          totalBalanceOverride={statementTotalBalanceUsd}
           movements={canFetchStatements ? globalMovements : previewMovements}
           movementsLoading={canFetchStatements ? globalLoading : false}
           movementsError={canFetchStatements ? globalError : null}
@@ -419,7 +428,11 @@ export default function DemoWalletDashboardStatementModals({
       {currencyModalTransition.shouldRender && effectiveCurrencyToken && !inlineCurrencyStatement ? (
         <DemoCurrencyStatement
           currency={effectiveCurrencyToken.currency}
-          balance={parseFloat(effectiveCurrencyToken.value || 0)}
+          balance={
+            Number.isFinite(Number(statementBalance))
+              ? Number(statementBalance)
+              : parseFloat(effectiveCurrencyToken.value || 0)
+          }
           issuer={effectiveCurrencyToken.issuer}
           walletAddress={effectiveWallet}
           walletLabelOverride={walletDisplayLabel}

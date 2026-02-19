@@ -38,7 +38,13 @@ import { useDemoSavedAddresses } from "./hooks/useDemoSavedAddresses";
 import xcannesApi from "@/lib/xcannesApi";
 	import { CRYPTO_ICONS } from "./utils/demoMarketConstants";
 	import { getCurrencyDescription } from "./utils/demoCurrencyDescriptions";
-import { getDisplayCurrencyCode, USD_STABLECOINS } from "./demoWalletDashboardConfig";
+import {
+  DEMO_CURRENCY_LINE_ORDER,
+  formatAmountWithSymbol,
+  getDisplayCurrencyCode,
+  getCurrencySymbol,
+  USD_STABLECOINS
+} from "./demoWalletDashboardConfig";
 
 const DEMO_WALLET_ACCENTS = {
   A: {
@@ -97,22 +103,17 @@ function renderDemoTokenIcon(code) {
 		function getDemoCurrencyLabel(code) {
 		  const upper = String(code || "").toUpperCase();
 		  if (upper === "XRP") return "XRP · Native";
+      if (upper === "USD") return "US Dollar";
 		  if (upper === "RLUSD") return "US Dollar";
 		  if (USD_STABLECOINS.includes(upper)) return "XRPL Stablecoin";
 		  return getCurrencyDescription(upper) || upper;
 		}
 
 function formatMoney(locale, amount, currency) {
-  const safeLocale = locale || "en";
-  try {
-    return new Intl.NumberFormat(safeLocale, {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 2
-    }).format(amount);
-  } catch {
-    return `${Number(amount || 0).toFixed(2)} ${currency}`;
-  }
+  return formatAmountWithSymbol(locale, amount, currency, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 
 function formatUnits(locale, amount) {
@@ -124,6 +125,12 @@ function formatUnits(locale, amount) {
   } catch {
     return String(amount);
   }
+}
+
+function formatUnitsWithSymbol(locale, amount, currencyCode) {
+  const value = formatUnits(locale, amount);
+  const symbol = getCurrencySymbol(currencyCode, locale);
+  return symbol ? `${value} ${symbol}` : value;
 }
 
 function formatDemoAddressShort(address) {
@@ -138,7 +145,7 @@ function formatDemoAddressShort(address) {
 	const DEMO_DEFAULT_DESTINATION_ADDRESS = "rDe_Receverpresentation_xxxxxxxxxxxxxxxxxxxxxx";
 	const DEMO_LATENCY_MS_MIN = 450;
 	const DEMO_LATENCY_MS_MAX = 1100;
-	const DEMO_RATES_REFRESH_MS = 15_000;
+	const DEMO_RATES_REFRESH_MS = 60_000;
 	const DEMO_RATES_STALE_AFTER_MS = 30_000;
 const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
 
@@ -328,6 +335,7 @@ export default function DemoWalletDashboard({
   const [walletHeaderToast, setWalletHeaderToast] = useState("");
   const toastTimerRef = useRef(null);
   const refreshTimerRef = useRef(null);
+  const prevActiveActionRef = useRef(activeAction);
 
   useEffect(() => {
     setWalletLabelDraft(walletContextLabel);
@@ -495,7 +503,10 @@ export default function DemoWalletDashboard({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest
-  } = useDemoSendForm({ defaultSendTab: "scan-request" });
+  } = useDemoSendForm({
+    defaultSendTab: "manual",
+    defaultSendAssetKey: "RLUSD"
+  });
 
   const { receiveTab, setReceiveTab } = useDemoReceiveForm();
 
@@ -522,8 +533,8 @@ export default function DemoWalletDashboard({
     convertProcessing,
     setConvertProcessing
   } = useDemoConvertForm({
-    defaultBaseCurrency: "EUR",
-    defaultQuoteCurrency: "RLUSD"
+    defaultBaseCurrency: "RLUSD",
+    defaultQuoteCurrency: "EUR"
   });
 
   const {
@@ -532,6 +543,53 @@ export default function DemoWalletDashboard({
     currencyLineAllocatedRlusd,
     setCurrencyLineAllocatedRlusd
   } = useDemoCurrencyLinesForm();
+
+  useEffect(() => {
+    const prevAction = prevActiveActionRef.current;
+    if (prevAction === "send" && activeAction !== "send") {
+      setSendTab("manual");
+      setSendAssetKey("RLUSD");
+      setSendAmount("");
+      setSendDestination("");
+      setSendPaymentRequest(null);
+    }
+    if (prevAction === "receive" && activeAction !== "receive") {
+      setReceiveTab("receive");
+      setRequestAmount("");
+      setRequestCurrency("RLUSD");
+      setRequestMemo("");
+    }
+    if (prevAction === "swap" && activeAction !== "swap") {
+      setConvertBaseCurrency("RLUSD");
+      setConvertQuoteCurrency("EUR");
+      setConvertAmount("");
+      setConvertPreview("");
+      setSwapDefaultView("convert");
+      setSwapLockedView(null);
+    }
+    if (prevAction === "cash" && activeAction !== "cash") {
+      setCashModalTab("buy");
+    }
+    prevActiveActionRef.current = activeAction;
+  }, [
+    activeAction,
+    setCashModalTab,
+    setConvertAmount,
+    setConvertBaseCurrency,
+    setConvertPreview,
+    setConvertQuoteCurrency,
+    setReceiveTab,
+    setRequestAmount,
+    setRequestCurrency,
+    setRequestMemo,
+    setSendAmount,
+    setSendAssetKey,
+    setSendDestination,
+    setSendPaymentRequest,
+    setSendTab,
+    setSwapDefaultView,
+    setSwapLockedView,
+  ]);
 
   useEffect(() => {
     const id = setInterval(() => setRatesNowTs(Date.now()), 5000);
@@ -671,16 +729,61 @@ export default function DemoWalletDashboard({
   const displayCurrency = "USD";
   const displayAmount = usdTotal;
 
+  const currencyOrderIndex = useMemo(() => {
+    const entries = Array.isArray(DEMO_CURRENCY_LINE_ORDER)
+      ? DEMO_CURRENCY_LINE_ORDER
+      : [];
+    const index = new Map();
+    entries.forEach((code, idx) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper) return;
+      if (!index.has(upper)) index.set(upper, idx);
+    });
+    return index;
+  }, []);
+
+  const allocationSummary = useMemo(() => {
+    const allocations = activeWallet?.allocations || {};
+    const rlusdOnChain = Number(allocations?.RLUSD || 0);
+    const totalAllocatedUsd = Object.entries(allocations).reduce((sum, [code, value]) => {
+      const upper = String(code || "").toUpperCase();
+      if (upper === "RLUSD" || upper === "XRP" || upper === "USD") return sum;
+      return sum + (Number(value) || 0);
+    }, 0);
+    const unallocatedRlusd = Math.max(0, rlusdOnChain - totalAllocatedUsd);
+    return { rlusdOnChain, totalAllocatedUsd, unallocatedRlusd };
+  }, [activeWallet?.allocations]);
+
   const tokens = useMemo(() => {
     const allocations = activeWallet?.allocations || {};
-    return Object.entries(allocations)
-      .map(([code, units]) => {
+    const unallocatedUsd = allocationSummary.unallocatedRlusd;
+
+    const entries = Object.entries(allocations)
+      .map(([code, storedValue]) => {
         const upper = String(code || "").toUpperCase();
-        const unitsNum = Number(units) || 0;
-        const rate = effectiveUsdPerUnitRates?.[upper] ?? null;
-        const usdValue = Number.isFinite(Number(rate)) ? unitsNum * Number(rate) : null;
-        return { code: upper, units: unitsNum, usdValue };
+        const storedNum = Number(storedValue) || 0;
+        const rate = Number(effectiveUsdPerUnitRates?.[upper] ?? 0);
+        const isNative = isDemoNativeCurrency(upper);
+        const allocationUsd = isNative
+          ? upper === "XRP"
+            ? storedNum * rate
+            : storedNum
+          : storedNum;
+        const units = isNative ? storedNum : rate > 0 ? storedNum / rate : 0;
+        const usdValue = Number.isFinite(allocationUsd) ? allocationUsd : null;
+        return { code: upper, units, usdValue, allocationUsd };
       })
+      .filter((entry) => entry.code !== "RLUSD" && entry.code !== "USD");
+
+    entries.push({
+      code: "USD",
+      units: unallocatedUsd,
+      usdValue: unallocatedUsd,
+      allocationUsd: unallocatedUsd,
+      isDerived: true
+    });
+
+    return entries
       .sort((a, b) => {
         const aPriority =
           Object.prototype.hasOwnProperty.call(DEMO_TOKEN_PRIORITY, a.code)
@@ -691,38 +794,53 @@ export default function DemoWalletDashboard({
             ? DEMO_TOKEN_PRIORITY[b.code]
             : Number.POSITIVE_INFINITY;
         if (aPriority !== bPriority) return aPriority - bPriority;
-        const diff = (b.usdValue || 0) - (a.usdValue || 0);
-        if (diff !== 0) return diff;
+        const aOrder = currencyOrderIndex.get(a.code) ?? Number.POSITIVE_INFINITY;
+        const bOrder = currencyOrderIndex.get(b.code) ?? Number.POSITIVE_INFINITY;
+        if (aOrder !== bOrder) return aOrder - bOrder;
         return a.code.localeCompare(b.code);
       });
-  }, [activeWallet?.allocations, effectiveUsdPerUnitRates]);
+  }, [
+    activeWallet?.allocations,
+    allocationSummary.unallocatedRlusd,
+    currencyOrderIndex,
+    effectiveUsdPerUnitRates
+  ]);
 
   const rlusdPerUnitRates = useMemo(
     () => effectiveUsdPerUnitRates,
     [effectiveUsdPerUnitRates]
   );
   const rlusdPerUnitSources = useMemo(() => ({ ...usdPerUnitSources }), [usdPerUnitSources]);
+  const rlusdPerUnitRatesRef = useRef(rlusdPerUnitRates);
+
+  useEffect(() => {
+    rlusdPerUnitRatesRef.current = rlusdPerUnitRates;
+  }, [rlusdPerUnitRates]);
 
   const augmentedTokens = useMemo(() => {
     const allocations = activeWallet?.allocations || {};
     const entries = Object.entries(allocations).map(([code, units]) => {
       const currency = String(code || "").toUpperCase();
-      const value = Number(units) || 0;
+      const storedValue = Number(units) || 0;
       const isTrustlineOnly = !isDemoNativeCurrency(currency);
       const rlusdPerUnit = Number(rlusdPerUnitRates?.[currency] || 0);
-      const nativeRate = Number(rlusdPerUnitRates?.[currency] || 0);
-      const demoRlusdValue = isTrustlineOnly
-        ? value * (rlusdPerUnit || 0)
-        : currency === "RLUSD"
-          ? value
-          : nativeRate > 0
-            ? value * nativeRate
-            : value;
+      const allocationUsd = isTrustlineOnly
+        ? storedValue
+        : currency === "XRP"
+          ? storedValue * rlusdPerUnit
+          : storedValue;
+      const displayUnits = isTrustlineOnly
+        ? rlusdPerUnit > 0
+          ? storedValue / rlusdPerUnit
+          : 0
+        : storedValue;
+      const demoRlusdValue = allocationUsd;
 
       return {
         key: currency,
         currency,
-        value,
+        value: displayUnits,
+        allocationUsd,
         issuer: undefined,
         isTrustlineOnly,
         isMissingTrustline: false,
@@ -740,13 +858,28 @@ export default function DemoWalletDashboard({
             ? DEMO_TOKEN_PRIORITY[b.currency]
             : Number.POSITIVE_INFINITY;
         if (aPriority !== bPriority) return aPriority - bPriority;
-        const diff =
-          Number(b.demoRlusdValue || 0) - Number(a.demoRlusdValue || 0);
-        if (diff !== 0) return diff;
+        const aOrder = currencyOrderIndex.get(a.currency) ?? Number.POSITIVE_INFINITY;
+        const bOrder = currencyOrderIndex.get(b.currency) ?? Number.POSITIVE_INFINITY;
+        if (aOrder !== bOrder) return aOrder - bOrder;
         return String(a.currency || "").localeCompare(String(b.currency || ""));
       }
     );
-  }, [activeWallet?.allocations, rlusdPerUnitRates]);
+  }, [activeWallet?.allocations, currencyOrderIndex, rlusdPerUnitRates]);
+
+  const globalStatementTokens = useMemo(() => {
+    const base = (augmentedTokens || []).filter((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      return code && code !== "XRP" && code !== "USD" && code !== "RLUSD";
+    });
+    base.push({
+      currency: "USD",
+      value: allocationSummary.unallocatedRlusd,
+      issuer: undefined,
+      isTrustlineOnly: true,
+      isDerivedUsd: true
+    });
+    return base;
+  }, [allocationSummary.unallocatedRlusd, augmentedTokens]);
 
   const selectableTokens = useMemo(() => {
     return (augmentedTokens || []).filter((token) => {
@@ -784,31 +917,35 @@ export default function DemoWalletDashboard({
 
   const selectLabelRightByAssetKey = useMemo(() => {
     const labels = {};
-    const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
-      const amountLabel = formatUnits(locale, token.value || 0);
-      const label = `${balanceLabel} = ${amountLabel}`;
+      const amountValue =
+        code === "RLUSD" ? allocationSummary.unallocatedRlusd : token.value || 0;
+      const display = getDisplayCurrencyCode(code);
+      const amountLabel = formatUnitsWithSymbol(locale, amountValue, display);
+      const label = amountLabel;
       if (token.key) labels[token.key] = label;
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens, locale, t]);
+  }, [allocationSummary.unallocatedRlusd, augmentedTokens, locale, t]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
-      const amountLabel = formatUnits(locale, token.value || 0);
+      const amountValue =
+        code === "RLUSD" ? allocationSummary.unallocatedRlusd : token.value || 0;
       const display = getDisplayCurrencyCode(code);
+      const amountLabel = formatUnitsWithSymbol(locale, amountValue, display);
       const label = `${display} (${amountLabel})`;
       if (token.key) labels[token.key] = label;
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens, locale]);
+  }, [allocationSummary.unallocatedRlusd, augmentedTokens, locale]);
 
   const selectIconByAssetKey = useMemo(() => {
     const icons = {};
@@ -989,11 +1126,12 @@ export default function DemoWalletDashboard({
 
     const nextState = clone(state);
 
-    if (isFxSend && spreadFeeUnits > 0) {
+    if (isFxSend && spreadFeeRlusd > 0) {
       const fromWallet = nextState.wallets?.[activeWalletId];
-      const available = Number(fromWallet?.allocations?.[currency] || 0);
-      const totalDebit = Number(amount) + Number(spreadFeeUnits || 0);
-      if (!Number.isFinite(available) || available + 1e-9 < totalDebit) {
+      const availableUsd = Number(fromWallet?.allocations?.[currency] || 0);
+      const amountUsd = Number(amount) * Number(fxRate || 0);
+      const totalDebitUsd = amountUsd + Number(spreadFeeRlusd || 0);
+      if (!Number.isFinite(availableUsd) || availableUsd + 1e-9 < totalDebitUsd) {
         return { error: t("demo_error_insufficient", "Solde insuffisant (démo).") };
       }
     }
@@ -1022,12 +1160,16 @@ export default function DemoWalletDashboard({
       recordStatementHighlight(activeWalletId, currency, sendEvent.id);
     }
 
-    if (isFxSend && spreadFeeUnits > 0) {
+    if (isFxSend && spreadFeeRlusd > 0) {
       const fromWallet = nextState.wallets?.[activeWalletId];
       if (fromWallet) {
         ensureAllocation(fromWallet, currency);
         fromWallet.allocations[currency] = Number(
-          (Number(fromWallet.allocations[currency] || 0) - Number(spreadFeeUnits)).toFixed(6)
+          (Number(fromWallet.allocations[currency] || 0) - Number(spreadFeeRlusd)).toFixed(6)
+        );
+        ensureAllocation(fromWallet, "RLUSD");
+        fromWallet.allocations.RLUSD = Number(
+          (Number(fromWallet.allocations.RLUSD || 0) - Number(spreadFeeRlusd)).toFixed(6)
         );
       }
     }
@@ -1140,9 +1282,9 @@ export default function DemoWalletDashboard({
     }
   };
 
-  const currencyLines = useMemo(() => {
+  const currencyLinesBase = useMemo(() => {
     return (augmentedTokens || [])
-      .filter((token) => token.isTrustlineOnly)
+      .filter((token) => token.isTrustlineOnly && token.currency !== "USD")
       .map((token) => {
         const code = String(token.currency || "").toUpperCase();
         const rate = Number(rlusdPerUnitRates?.[code] || 0);
@@ -1152,14 +1294,30 @@ export default function DemoWalletDashboard({
   }, [augmentedTokens, rlusdPerUnitRates]);
 
   const currencyLinesSummary = useMemo(() => {
-    const rlusdOnChain = Number(activeWallet?.allocations?.RLUSD) || 0;
-    const totalAllocatedRlusd = currencyLines.reduce(
-      (sum, line) => sum + Number(line?.allocatedRlusd || 0),
-      0
-    );
-    const unallocatedRlusd = Math.max(0, rlusdOnChain - totalAllocatedRlusd);
+    const rlusdOnChain = allocationSummary.rlusdOnChain;
+    const totalAllocatedRlusd = allocationSummary.totalAllocatedUsd;
+    const unallocatedRlusd = allocationSummary.unallocatedRlusd;
     return { rlusdOnChain, totalAllocatedRlusd, unallocatedRlusd };
-  }, [activeWallet?.allocations?.RLUSD, currencyLines]);
+  }, [allocationSummary]);
+
+  const currencyLines = useMemo(() => {
+    const lines = [
+      ...(currencyLinesBase || []),
+      {
+        currencyCode: "USD",
+        allocatedRlusd: allocationSummary.unallocatedRlusd,
+        isDerived: true,
+      },
+    ];
+    return lines.sort((a, b) => {
+      const aCode = String(a?.currencyCode || "").toUpperCase();
+      const bCode = String(b?.currencyCode || "").toUpperCase();
+      const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+      const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return aCode.localeCompare(bCode);
+    });
+  }, [allocationSummary.unallocatedRlusd, currencyLinesBase, currencyOrderIndex]);
 
   const swapCurrencyOptions = useMemo(() => {
     const codes = new Set(
@@ -1291,20 +1449,21 @@ export default function DemoWalletDashboard({
     const nextState = clone(state);
     const wallet = nextState.wallets?.[activeWalletId];
     if (!wallet) return;
-    const prevUnits = Number(wallet.allocations?.[code] || 0);
-    const prevAllocated = Number.isFinite(prevUnits) ? prevUnits * rate : 0;
-    const deltaAllocated = allocated - prevAllocated;
     const currentRlusd = Number(wallet.allocations?.RLUSD || 0);
-    const nextRlusd = currentRlusd - deltaAllocated;
+    const allocations = wallet.allocations || {};
+    const nextTotalAllocated = Object.entries(allocations).reduce((sum, [entryCode, entryValue]) => {
+      const upper = String(entryCode || "").toUpperCase();
+      if (upper === "RLUSD" || upper === "XRP") return sum;
+      const value = upper === code ? allocated : Number(entryValue || 0);
+      return sum + value;
+    }, 0);
 
-    if (nextRlusd + 1e-9 < 0) {
+    if (nextTotalAllocated > currentRlusd + 1e-9) {
       alert(t("demo_error_insufficient", "Solde insuffisant (démo)."));
       return;
     }
 
-    const units = allocated / rate;
-    wallet.allocations.RLUSD = Number(Math.max(0, nextRlusd).toFixed(6));
-    wallet.allocations[code] = Number(units.toFixed(6));
+    wallet.allocations[code] = Number(allocated.toFixed(6));
     setState(nextState);
   };
 
@@ -1384,17 +1543,24 @@ export default function DemoWalletDashboard({
     }
     const currency = String(selectedStatementToken.currency || "").toUpperCase();
     const events = walletEvents || []; // newest -> oldest
+    const ratesSnapshot = rlusdPerUnitRatesRef.current || {};
     let running = Number(activeWallet?.allocations?.[currency]) || 0;
+    const runningRate = Number(ratesSnapshot?.[currency] || 0);
+    if (!isDemoNativeCurrency(currency) && runningRate > 0) {
+      running = running / runningRate;
+    }
     const txs = [];
 
     events.forEach((evt) => {
       const createdAt = new Date(evt.ts).toISOString();
+      const runningSnapshot = running;
       let amount = 0;
       let delta = 0;
       let type = "credit";
       let category = "other";
       let description = t("demo_statement_movement", "Mouvement");
       let counterparty = "";
+      let postEventTx = null;
 
       if (evt.kind === "send" && String(evt.currency).toUpperCase() === currency) {
         amount = Number(evt.amount || 0);
@@ -1461,6 +1627,39 @@ export default function DemoWalletDashboard({
             fromCurrency: evt.fromCurrency,
             toCurrency: evt.toCurrency
           });
+          const feeUsd = Number(evt.feeUsd || 0);
+          const quoteRate = Number(ratesSnapshot?.[currency] || 0);
+          const fromLabel = getDisplayCurrencyCode(evt.fromCurrency);
+          const toLabel = getDisplayCurrencyCode(evt.toCurrency);
+          const feeQuote =
+            Number.isFinite(feeUsd) && feeUsd > 0 && quoteRate > 0
+              ? feeUsd / quoteRate
+              : 0;
+          if (Number.isFinite(feeQuote) && feeQuote > 0) {
+            const feeUsdLabel = feeUsd.toLocaleString(locale, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
+            postEventTx = {
+              id: `${evt.id}_fee`,
+              date: createdAt,
+              createdAt,
+              category: "fee",
+              type: "debit",
+              description: t("demo_statement_fee_spread_pair", {
+                defaultValue:
+                  "Frais conversion {{fromCurrency}} → {{toCurrency}} ({{fee}} USD)",
+                fromCurrency: fromLabel,
+                toCurrency: toLabel,
+                fee: feeUsdLabel
+              }),
+              counterparty: "",
+              amount: feeQuote,
+              runningBalance: runningSnapshot,
+              displayRunningBalance: runningSnapshot,
+              suppressDescriptionFlags: true
+            };
+          }
         } else {
           return;
         }
@@ -1536,17 +1735,62 @@ export default function DemoWalletDashboard({
         runningBalance: running
       });
       running -= delta;
+
+      if (postEventTx) {
+        txs.push(postEventTx);
+      }
     });
 
     setPreviewCurrencyTransactions(txs);
   }, [
     activeWallet?.allocations,
     activeWalletId,
+    locale,
     selectedStatementToken,
     state,
     t,
     walletEvents
   ]);
+
+  const statementBalance = useMemo(() => {
+    if (!selectedStatementToken) return null;
+    const currency = String(selectedStatementToken.currency || "").toUpperCase();
+    const isDerivedUsd = Boolean(selectedStatementToken?.isDerivedUsd);
+    let currentBalance = 0;
+    if (currency === "USD" || (currency === "RLUSD" && isDerivedUsd)) {
+      const allocations = activeWallet?.allocations || {};
+      const rlusdOnChain = Number(allocations?.RLUSD || 0);
+      const totalAllocatedUsd = Object.entries(allocations).reduce((sum, [code, value]) => {
+        const upper = String(code || "").toUpperCase();
+        if (upper === "RLUSD" || upper === "XRP" || upper === "USD") return sum;
+        return sum + (Number(value) || 0);
+      }, 0);
+      currentBalance = Math.max(0, rlusdOnChain - totalAllocatedUsd);
+    } else {
+      const stored = Number(activeWallet?.allocations?.[currency] || 0);
+      if (isDemoNativeCurrency(currency)) {
+        currentBalance = stored;
+      } else {
+        const rate = Number(rlusdPerUnitRates?.[currency] || 0);
+        if (!Number.isFinite(rate) || rate <= 0) return null;
+        currentBalance = stored / rate;
+      }
+    }
+    return Number.isFinite(currentBalance) ? currentBalance : null;
+  }, [activeWallet?.allocations, rlusdPerUnitRates, selectedStatementToken]);
+
+  useEffect(() => {
+    if (statementBalance == null) return;
+    setPreviewCurrencyTransactions((prev) => {
+      if (!Array.isArray(prev) || prev.length === 0) return prev;
+      const first = prev[0];
+      if (!first) return prev;
+      if (Number(first.displayRunningBalance) === Number(statementBalance)) return prev;
+      const next = [...prev];
+      next[0] = { ...first, displayRunningBalance: statementBalance };
+      return next;
+    });
+  }, [statementBalance]);
 
   const highlightTransactionId = useMemo(() => {
     if (!selectedStatementToken) return null;
@@ -1968,13 +2212,13 @@ export default function DemoWalletDashboard({
 	            </button>
 	          </div>
 	          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1 space-y-1.5">
-			            {tokens.map((row) => {
-			              const upperCode = String(row.code || "").toUpperCase();
-			              if (upperCode === "XRP" || upperCode === "USD") return null;
-			              const displayCode = getDisplayCurrencyCode(upperCode);
-			              const isNativeAsset = upperCode === "XRP";
-			              const hasCryptoIcon = Boolean(CRYPTO_ICONS?.[displayCode]);
-			              const isFlagIcon = !isNativeAsset && !hasCryptoIcon;
+            {tokens.map((row) => {
+              const upperCode = String(row.code || "").toUpperCase();
+              if (upperCode === "XRP" || upperCode === "RLUSD") return null;
+              const displayCode = getDisplayCurrencyCode(upperCode);
+              const isNativeAsset = upperCode === "XRP";
+              const hasCryptoIcon = Boolean(CRYPTO_ICONS?.[displayCode]);
+              const isFlagIcon = !isNativeAsset && !hasCryptoIcon;
 	              const iconSizeClass = isNativeAsset
 		                ? "w-7 h-7 text-[13px]"
 	                : isFlagIcon
@@ -1986,14 +2230,19 @@ export default function DemoWalletDashboard({
                 <button
                 type="button"
                 onClick={() => {
+                  const statementCode = upperCode === "USD" ? "RLUSD" : upperCode;
                   const token =
                   augmentedTokens.find(
                     (tok) =>
-                    String(tok?.currency || "").toUpperCase() === row.code
+                    String(tok?.currency || "").toUpperCase() === statementCode
                   ) || {
-                    currency: row.code,
-                    value: row.units
+                    currency: statementCode,
+                    value: row.units,
+                    isDerivedUsd: upperCode === "USD"
                   };
+                  if (upperCode === "USD" && token) {
+                    token.isDerivedUsd = true;
+                  }
                   setSelectedStatementToken(token);
                   setShowGlobalStatement(false);
                   setShowCurrencyStatement(true);
@@ -2007,14 +2256,13 @@ export default function DemoWalletDashboard({
 		                      "bg-black/20 hover:bg-black/15",
 		                    ].join(" ")}
 		                  >
-	                    <div className="flex items-center gap-2 min-w-0">
+	                    <div className="flex items-center gap-3 min-w-0">
 	                      <div className={`${iconSizeClass} ${iconRadiusClass} flex items-center justify-center font-semibold text-primary overflow-hidden`}>
 	                        {renderDemoTokenIcon(row.code)}
 	                      </div>
 		                      <div className="min-w-0">
 		                        <div className="flex items-baseline gap-2 min-w-0">
-				                          <span className="text-[14px] md:text-[15px] text-primary truncate">{displayCode}</span>
-				                          <span className="text-[13px] md:text-[14px] text-muted truncate">
+				                          <span className="text-[15px] md:text-[16px] text-white/90 font-semibold truncate">
 				                            {getDemoCurrencyLabel(row.code)}
 				                          </span>
 		                        </div>
@@ -2022,7 +2270,7 @@ export default function DemoWalletDashboard({
 		                    </div>
 				                    <div className="text-right text-[14px] md:text-[15px] text-primary">
 				                      <div className="font-mono">
-				                        {formatUnits(locale, row.units)}
+				                        {formatUnitsWithSymbol(locale, row.units, displayCode)}
 				                      </div>
 			                    </div>
 	                  </div>
@@ -2133,6 +2381,7 @@ export default function DemoWalletDashboard({
         setRequestAmount={setRequestAmount}
         requestCurrency={requestCurrency}
         setRequestCurrency={setRequestCurrency}
+        unallocatedUsd={allocationSummary?.unallocatedRlusd ?? 0}
         selectLabelByCurrency={selectLabelByAssetKey}
         selectLabelRightByCurrency={selectLabelRightByAssetKey}
         selectIconByCurrency={selectIconByAssetKey}
@@ -2272,7 +2521,10 @@ export default function DemoWalletDashboard({
         showCurrencyStatement={showCurrencyStatement}
         setShowCurrencyStatement={setShowCurrencyStatement}
         selectedStatementToken={selectedStatementToken}
-        setSelectedStatementToken={setSelectedStatementToken} />
+        setSelectedStatementToken={setSelectedStatementToken}
+        statementBalance={statementBalance}
+        statementTotalBalanceUsd={usdTotal}
+        globalStatementTokens={globalStatementTokens} />
 
 
       <DemoQRScanner

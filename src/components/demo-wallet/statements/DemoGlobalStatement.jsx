@@ -12,7 +12,11 @@ import {
   sha256Hex
 } from "../utils/demoStatementExport";
 import DemoStatementMonthSelect from "./DemoStatementMonthSelect";
-import { getDisplayCurrencyCode } from "../demoWalletDashboardConfig";
+import {
+  formatAmountWithSymbol,
+  getCurrencySymbol,
+  getDisplayCurrencyCode
+} from "../demoWalletDashboardConfig";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -45,6 +49,7 @@ export default function DemoGlobalStatement({
   isClosing = false,
   inline = false,
   usdRates = {},
+  totalBalanceOverride = null,
   movements = [],
   movementsLoading = false,
   movementsError = null,
@@ -122,10 +127,13 @@ export default function DemoGlobalStatement({
   }, [isUsdStablecoin, usdRates]);
 
   // Calculer les totaux
-  const totalBalance = tokens.reduce((sum, token) => {
+  const computedTotalBalance = tokens.reduce((sum, token) => {
     const usdValue = getUsdValue(token);
     return sum + (Number.isFinite(usdValue) ? usdValue : 0);
   }, 0);
+  const totalBalance = Number.isFinite(Number(totalBalanceOverride))
+    ? Number(totalBalanceOverride)
+    : computedTotalBalance;
 
   // Trier les tokens
   const sortedTokens = [...tokens].sort((a, b) => {
@@ -137,13 +145,6 @@ export default function DemoGlobalStatement({
     }
     return 0;
   });
-
-  const formatAmount = useCallback((amount) => {
-    return parseFloat(amount || 0).toLocaleString(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }, [locale]);
 
   const ledgerEvidenceCount = useMemo(() => {
     return (movements || []).filter((m) => m?.txHash).length;
@@ -233,7 +234,7 @@ export default function DemoGlobalStatement({
     const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const totalBalanceDisplay = Number.isFinite(Number(totalBalance)) ?
-    `$${formatAmount(totalBalance)}` :
+    formatAmountWithSymbol(locale, totalBalance, "USD") :
     "-";
     const balancesRows = (sortedTokens || []).map((token) => {
       const usdValue = getUsdValue(token);
@@ -241,8 +242,15 @@ export default function DemoGlobalStatement({
       return `
         <tr>
           <td>${escapeHtml(displayCode || "-")}</td>
-          <td class="right">${escapeHtml(formatAmount(token?.value))}</td>
-          <td class="right">${Number.isFinite(usdValue) ? escapeHtml(`$${formatAmount(usdValue)}`) : "-"}</td>
+          <td class="right">${escapeHtml(formatAmountWithSymbol(locale, token?.value, token?.currency, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 6
+          }))}</td>
+          <td class="right">${
+            Number.isFinite(usdValue)
+              ? escapeHtml(formatAmountWithSymbol(locale, usdValue, "USD"))
+              : "-"
+          }</td>
         </tr>
       `;
     }).join("");
@@ -265,7 +273,6 @@ export default function DemoGlobalStatement({
       return `
         <tr>
           <td>${escapeHtml(when)}</td>
-          <td>${escapeHtml(m?.kind || "")}</td>
           <td>${escapeHtml(from)}</td>
           <td>${escapeHtml(to)}</td>
           <td class="right">${escapeHtml(
@@ -279,7 +286,7 @@ export default function DemoGlobalStatement({
     }).join("");
     const movementsEmpty = `
       <tr>
-        <td colspan="6" class="muted">${escapeHtml(
+        <td colspan="5" class="muted">${escapeHtml(
           t("ui_no_movements_found_2b7c1a9d5e", "No movements available")
         )}</td>
       </tr>
@@ -314,7 +321,6 @@ export default function DemoGlobalStatement({
         <thead>
           <tr>
             <th>${escapeHtml(t("ui_date_label_7a2c1b9d5e", "Date"))}</th>
-            <th>${escapeHtml(t("ui_type_label_8b1a4d2c7e", "Type"))}</th>
             <th>${escapeHtml(t("ui_from_label_2c7a1d9b5e", "From"))}</th>
             <th>${escapeHtml(t("ui_to_label_7b2c1a9d5e", "To"))}</th>
             <th class="right">${escapeHtml(t("ui_amount_rlusd_label_2c7a1d9b5e", "Amount (RLUSD)"))}</th>
@@ -330,7 +336,6 @@ export default function DemoGlobalStatement({
   currentPeriod,
   docHash,
   fallbackPeriod,
-  formatAmount,
   getUsdValue,
   ledgerLastIndex,
   ledgerStatusLabel,
@@ -469,27 +474,6 @@ export default function DemoGlobalStatement({
       ZMW: "🇿🇲", ZWL: "🇿🇼"
     };
     return flags[code] || "💱";
-  };
-
-  const getCategoryBadge = (token) => {
-	    if (token.currency === "XRP") {
-	      return {
-	        label: t("ui_label_native_2d7a1c9b4e", "Native"),
-	        color: "blue"
-	      };
-	    }
-	    if (isUsdStablecoin(token.currency))
-	    return {
-	      label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
-	      color: "purple"
-    };
-    if (token.isTrustlineOnly) {
-      return {
-        label: t("ui_label_exchange_rate_5a1c7b9d3e", "Exchange Rate"),
-        color: "orange"
-      };
-    }
-    return { label: t("ui_label_token_1c7b3a9d5e", "Token"), color: "gray" };
   };
 
   const STATEMENT_LAYOUTS = {
@@ -648,10 +632,10 @@ export default function DemoGlobalStatement({
 	              </p>
 	              <div className="flex items-baseline justify-between gap-2">
 	                <p className="text-sm text-white">
-	                  ≈ {formatAmount(totalBalance)} {t("ui_usd_fb11d8df09", "USD")}
+	                  ≈ {formatAmountWithSymbol(locale, totalBalance, "USD")}
 	                </p>
 	                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/10 text-white/80 text-xs font-semibold whitespace-nowrap">
-	                  {tokens.length} {t("ui_currencies_5e5bf1a8a1", "Devises")}
+	                  {tokens.length} {t("ui_currencies_wallet_lines_f4", "Devises")}
 	                </span>
 	              </div>
 	            </div>
@@ -694,7 +678,6 @@ export default function DemoGlobalStatement({
 	                <thead className="sticky top-0 bg-black z-10">
 	                  <tr>
 	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_asset_e3ae76ddf7", "Asset")}</th>
-	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_type_c5068d5570", "Type")}</th>
 	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_balance_0ad2d5b8eb", "Balance")}</th>
 	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_usd_value_6925fe3f7e", "≈ USD Value")}</th>
 	                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_action_96db311a48", "Action")}</th>
@@ -702,7 +685,6 @@ export default function DemoGlobalStatement({
 	                </thead>
                 <tbody>
                   {sortedTokens.map((token, idx) => {
-                  const badge = getCategoryBadge(token);
                   const usdValue = getUsdValue(token);
 
                   return (
@@ -723,32 +705,28 @@ export default function DemoGlobalStatement({
                             <div className="min-w-0">
                               <p className="text-white font-medium text-xs sm:text-sm truncate">{getDisplayCurrencyCode(token.currency)}</p>
                               <p className="text-[9px] sm:text-xs text-white/40 truncate">
-                                {token.currency === "XRP" ?
-                                  t("ui_label_native_2d7a1c9b4e", "Native") :
-                                  token.issuer?.slice(0, 8) + "..."}
+                                {token.currency === "XRP"
+                                  ? t("ui_label_native_2d7a1c9b4e", "Native")
+                                  : token.issuer
+                                    ? `${token.issuer.slice(0, 8)}...`
+                                    : ""}
                               </p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3">
-                          <span className={`inline-block px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[9px] sm:text-xs font-medium whitespace-nowrap
-                            ${badge.color === "blue" ? "bg-blue-500/20 text-blue-300 border border-blue-500/30" : ""}
-                            ${badge.color === "green" ? "bg-green-500/20 text-green-300 border border-green-500/30" : ""}
-                            ${badge.color === "purple" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" : ""}
-                            ${badge.color === "orange" ? "bg-orange-500/20 text-orange-300 border border-orange-500/30" : ""}
-                            ${badge.color === "gray" ? "bg-white/10 text-white/60 border border-white/20" : ""}
-                          `}>
-                            {badge.label}
-                          </span>
-                        </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white font-medium text-[10px] sm:text-sm">
-                          <div className="truncate">{formatAmount(token.value)}</div>
-                          <div className="text-[9px] sm:text-xs text-white/50">{getDisplayCurrencyCode(token.currency)}</div>
+                          <div className="truncate">
+                            {formatAmountWithSymbol(locale, token.value, token.currency, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                          </div>
+                          <div className="text-[9px] sm:text-xs text-white/50"></div>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
-                          {Number.isFinite(usdValue) ?
-                        `$${formatAmount(usdValue)}` :
-                        "--"}
+                          {Number.isFinite(usdValue)
+                            ? formatAmountWithSymbol(locale, usdValue, "USD")
+                            : "--"}
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
 	                          <button

@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/utils/useModalTransition";
+import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
 
 export default function DemoWalletDashboardSendModal({
   open,
@@ -45,7 +46,8 @@ export default function DemoWalletDashboardSendModal({
   showFauxPayreqDecor,
   inline = false
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showRlusdNotActivatedNotice =
     !isPreviewMode &&
@@ -259,11 +261,6 @@ export default function DemoWalletDashboardSendModal({
             ✕
           </button>
 	          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-	            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-	              {sendTab === "manual"
-	                ? t("ui_send_assets_title_2c9b1a7d5e", "Send assets")
-	                : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
-	            </h3>
 	            {showNotConnectedNotice ? (
 	              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
 	                {t("wallet_not_connected_title", "Wallet not connected")}
@@ -354,17 +351,7 @@ export default function DemoWalletDashboardSendModal({
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
 	              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
-                {selectedSendToken &&
-            <p className="mt-1 text-[11px] text-white/40">{t("ui_balance_340cdcff7a", "Balance:")}
-
-              <span className="text-white/70">
-	                      {selectedSendToken.value.toLocaleString("en-US", {
-	                  maximumFractionDigits: 6
-	                })}{" "}
-	                      {selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency}
-	                    </span>
-	                  </p>
-	            }
+                {selectedSendToken ? null : null}
               </div>
               {sendPaymentRequest?.beneficiaryLabel ?
                 <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
@@ -390,7 +377,6 @@ export default function DemoWalletDashboardSendModal({
 	              <TokenAmountInput
 	              value={sendAmount}
 	              onChange={setSendAmount}
-	              max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
 	              placeholder="0.0000"
 	              token={
 	                selectedSendToken
@@ -410,9 +396,12 @@ export default function DemoWalletDashboardSendModal({
                   <p className="mt-1 text-[11px] text-white/60">
                     ≈{" "}
                     <span className="font-mono">
-	                      {Number(sendFxInfo.paymentRlusd || 0).toLocaleString("en-US", {
-	                  maximumFractionDigits: 6
-	                })}{" "}{t("ui_rlusd_ff5048a674", "USD")}
+	                      {formatAmountWithSymbol(
+                          locale,
+                          Number(sendFxInfo.paymentRlusd || 0),
+                          "USD",
+                          { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                        )}
 	
 	              </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
 
@@ -430,9 +419,12 @@ export default function DemoWalletDashboardSendModal({
               )}
               :{" "}
               <span className="font-mono">
-	                {Number(sendFxInfo.spreadFeeRlusd || 0).toLocaleString("en-US", {
-	                  maximumFractionDigits: 6
-	                })}{" "}{t("ui_rlusd_ff5048a674", "USD")}
+	                {formatAmountWithSymbol(
+                    locale,
+                    Number(sendFxInfo.spreadFeeRlusd || 0),
+                    "USD",
+                    { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                  )}
 	              </span>
 	            </p>
             }
@@ -518,7 +510,7 @@ export default function DemoWalletDashboardSendModal({
                   className="block text-[11px] md:text-xs text-white/60 mb-1"
                   title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
                 >
-                  {t("ui_destination_xrpl_address_9c2b94554c", "Destination (XRPL address)")}
+                  {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
 
             </label>
 

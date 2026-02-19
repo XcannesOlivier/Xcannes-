@@ -8,6 +8,10 @@ import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import DemoWalletDashboardCurrencyLinesPanel from "../components/DemoWalletDashboardCurrencyLinesPanel";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
+import {
+  DEMO_CURRENCY_LINE_ORDER,
+  formatAmountWithSymbol
+} from "../demoWalletDashboardConfig";
 import { computeSpreadQuote, isFxConversion } from "../utils/demoWalletSpread";
 import { useModalTransition } from "@/utils/useModalTransition";
 
@@ -57,7 +61,8 @@ export default function DemoWalletDashboardSwapModal({
   selectLabelMobileByCurrency,
   inline = false
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -103,10 +108,15 @@ export default function DemoWalletDashboardSwapModal({
     return set;
   }, [currencyLines]);
 
-  const suggestedCurrencies = useMemo(
-    () => ["EUR", "GBP", "CHF", "CAD", "AED", "SAR", "XOF", "XAF", "JPY"],
-    []
-  );
+  const suggestedCurrencies = useMemo(() => {
+    const base = Array.isArray(DEMO_CURRENCY_LINE_ORDER)
+      ? DEMO_CURRENCY_LINE_ORDER
+      : [];
+    return base.filter((code) => {
+      const upper = String(code || "").toUpperCase();
+      return upper && upper !== "USD" && upper !== "RLUSD" && upper !== "XRP";
+    });
+  }, []);
 
   const swapCurrencyOptionsSanitized = useMemo(() => {
     return (swapCurrencyOptions || []).filter(
@@ -171,16 +181,6 @@ export default function DemoWalletDashboardSwapModal({
 
     return { type: "allocation" };
   }, [baseCode, quoteCode, t]);
-
-  const formatAmount = (value, digits = 6) => {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return "-";
-    return num.toLocaleString("en-US", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: digits,
-    });
-  };
-
 
   useEffect(() => {
     if (!open) return;
@@ -371,11 +371,6 @@ export default function DemoWalletDashboardSwapModal({
           }`}
           style={{ WebkitOverflowScrolling: "touch" }}>
 	            <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-	              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-	                {view === "lines"
-	                  ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
-	                  : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
-	              </h3>
 	              {showNotConnectedNotice ? (
 	                <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
 	                  {t("wallet_not_connected_title", "Wallet not connected")}
@@ -531,16 +526,24 @@ export default function DemoWalletDashboardSwapModal({
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
                   </div>
                   <div className="text-sm text-white/90">
-                    {formatAmount(previewAmount, 6)}{" "}
-                    {selectLabelByCurrency?.[convertQuoteCurrency] || convertQuoteCurrency || "-"}
+                    {formatAmountWithSymbol(
+                      locale,
+                      previewAmount,
+                      convertQuoteCurrency || "",
+                      { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                    )}
                   </div>
                   {previewMeta?.route === "allocation" &&
                   previewMeta?.isFx &&
                   previewMeta?.spreadFeeRlusd > 0 ? (
                       <div className="text-[10px] text-white/45">
-                        {t("ui_spread_fee_6c2a8d5e1b", "Conversion fee (1%)")}:{" "}
-                        ≈ {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
-                        {"USD"}
+                        {t("ui_conversion_fee_simple_6c2a8d5e1b", "Frais de conversion")} :{" "}
+                        {formatAmountWithSymbol(
+                          locale,
+                          previewMeta.spreadFeeRlusd,
+                          "USD",
+                          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                        )}
                       </div>
                   ) : null}
                 </div>
@@ -557,11 +560,6 @@ export default function DemoWalletDashboardSwapModal({
                   </div>
                 ) : null}
 
-                {convertPreview ? (
-                  <p className="text-[11px] text-white/60">
-                    {convertPreview}
-                  </p>
-                ) : null}
               </div>
               </div>
 

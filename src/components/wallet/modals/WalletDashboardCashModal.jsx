@@ -96,11 +96,6 @@ export default function WalletDashboardCashModal({
           <div className="border-b border-white/10">
             <div className="flex items-center justify-between p-4 pb-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                  {cashModalTab === "sell"
-                    ? t("ui_crypto_gateway_title_6b2a4f7e91", "Crypto→Fiat")
-                    : t("ui_fiat_gateway_2b14cbec79", "Fiat→Crypto")}
-                </h3>
                 {noticeVariant === "demo" ? (
                   <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
@@ -137,10 +132,6 @@ export default function WalletDashboardCashModal({
               </button>
             </div>
             <div className="px-4 pb-3 space-y-1.5">
-              <p className="text-[11px] text-white/50 leading-relaxed">
-                <span className="font-semibold text-white/70">{t("ui_fiat_label_9f2c1d7b4e", "Fiat")}</span>{" "}
-                {t("ui_fiat_label_detail_7a4e2c9d1f", "Argent bancaire (euros, dollars…)")}
-              </p>
               {renderWalletMeta?.()}
             </div>
 

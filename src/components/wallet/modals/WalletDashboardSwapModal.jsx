@@ -371,11 +371,6 @@ export default function WalletDashboardSwapModal({
           }`}
           style={{ WebkitOverflowScrolling: "touch" }}>
             <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-              <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                {view === "lines"
-                  ? t("ui_manage_currency_lines_4d1a1c9f9e", "Manage currency lines")
-                  : t("ui_convert_assets_cfc8bae6b0", "Convert assets")}
-              </h3>
               {noticeVariant === "demo" ? (
                 <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                   {t("demo_notice_title", "Mode démo")}

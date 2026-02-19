@@ -7,6 +7,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "../utils/demoXrpl";
+import { getCurrencySymbol } from "../demoWalletDashboardConfig";
 import { XCANNES_MEMO_SCHEMAS } from "../utils/demoXrplMemo";
 import { useModalTransition } from "@/utils/useModalTransition";
 
@@ -29,6 +30,7 @@ export default function DemoWalletDashboardReceiveModal({
   setRequestAmount,
   requestCurrency,
   setRequestCurrency,
+  unallocatedUsd = null,
   selectLabelByCurrency,
   selectLabelRightByCurrency,
   selectIconByCurrency,
@@ -42,7 +44,8 @@ export default function DemoWalletDashboardReceiveModal({
   onRequestGenerated,
   inline = false
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -62,6 +65,23 @@ export default function DemoWalletDashboardReceiveModal({
   const [isDesktop, setIsDesktop] = useState(false);
   const showPersistentRequestPreview = false;
   const showWalletPageRequestDecor = false;
+  const formatUnits = (value, currencyCode = "USD") => {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return "0";
+    const symbol = getCurrencySymbol(currencyCode, locale);
+    try {
+      const formatted = new Intl.NumberFormat(undefined, {
+        maximumFractionDigits: 2
+      }).format(num);
+      return symbol ? `${formatted} ${symbol}` : formatted;
+    } catch {
+      const formatted = num.toFixed(2);
+      return symbol ? `${formatted} ${symbol}` : formatted;
+    }
+  };
+  const unallocatedUsdValue = Number.isFinite(Number(unallocatedUsd))
+    ? Number(unallocatedUsd)
+    : null;
 
   const requestCurrencyCode = useMemo(
     () => String(requestCurrency || "").trim().toUpperCase(),
@@ -257,14 +277,6 @@ export default function DemoWalletDashboardReceiveModal({
             ✕
           </button>
 	          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-	            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-	              {receiveTab === "receive"
-	                ? t(
-	                    "ui_receive_assets_title_b3c7f4d2a1",
-	                    "Receive assets"
-	                  )
-	                : t("ui_request_payment_c62b99fb16", "Request Payment")}
-	            </h3>
 	            {showNotConnectedNotice ? (
 	              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
 	                {t("wallet_not_connected_title", "Wallet not connected")}
@@ -385,10 +397,14 @@ export default function DemoWalletDashboardReceiveModal({
                     selectLabelByCurrency?.[token.currency] ||
                     selectLabelByCurrency?.[currencyUpper] ||
                     token.currency;
-                  const labelRight =
+                  const baseLabelRight =
                     selectLabelRightByCurrency?.[token.currency] ||
                     selectLabelRightByCurrency?.[currencyUpper] ||
                     null;
+                  const labelRight =
+                    currencyUpper === "RLUSD" && unallocatedUsdValue !== null
+                      ? formatUnits(unallocatedUsdValue, "USD")
+                      : baseLabelRight;
                   return {
                     value: token.currency,
                     icon:
