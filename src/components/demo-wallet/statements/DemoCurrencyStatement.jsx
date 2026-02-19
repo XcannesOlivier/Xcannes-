@@ -14,7 +14,10 @@ import {
 } from "../utils/demoStatementExport";
 import { useTranslation } from "next-i18next";
 import DemoStatementMonthSelect from "./DemoStatementMonthSelect";
-import { getDisplayCurrencyCode } from "../demoWalletDashboardConfig";
+import {
+  formatAmountWithSymbol,
+  getDisplayCurrencyCode
+} from "../demoWalletDashboardConfig";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -943,17 +946,38 @@ export default function DemoCurrencyStatement({
     });
   }, [locale]);
 
+  const formatAmountWithSymbolLocal = useCallback(
+    (amount) =>
+      formatAmountWithSymbol(locale, amount, displayCurrency, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    [displayCurrency, locale]
+  );
+
+  const formatUsdWithSymbol = useCallback(
+    (amount) =>
+      formatAmountWithSymbol(locale, amount, "USD", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
     const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const docHashLabel = docHash || "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const balanceValue = Number.isFinite(Number(balance)) ? Number(balance) : 0;
-    const balanceDisplay = `${formatAmount(balanceValue)} ${normalizedCurrency}`;
+    const balanceDisplay = formatAmountWithSymbol(locale, balanceValue, displayCurrency, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
     const descriptionLabel = t("ui_description_4c9f6b1a2d", "Description");
     const typeLabel = t("ui_type_label_8b1a4d2c7e", "Type");
-    const amountLabel = `${t("ui_amount_0bb3c64b1d", "Amount")} (${normalizedCurrency})`;
-    const balanceLabel = `${t("ui_balance_label_7f2a1b9c5e", "Balance")} (${normalizedCurrency})`;
+    const amountLabel = `${t("ui_amount_0bb3c64b1d", "Amount")} (${displayCurrency})`;
+    const balanceLabel = `${t("ui_balance_label_7f2a1b9c5e", "Balance")} (${displayCurrency})`;
     const rowsHtml = (transactionsWithDisplayBalance || []).map((tx) => {
       const isDebit = tx?.type === "debit";
       const txType = isDebit ?
@@ -971,10 +995,16 @@ export default function DemoCurrencyStatement({
           <td>${escapeHtml(formatDate(tx?.date))}</td>
           <td>${escapeHtml(fullDescription)}</td>
           <td>${escapeHtml(txType)}</td>
-          <td class="right">${escapeHtml(`${isDebit ? "-" : "+"}${formatAmount(tx?.amount)}`)}</td>
+          <td class="right">${escapeHtml(`${isDebit ? "-" : "+"}${formatAmountWithSymbol(locale, tx?.amount, displayCurrency, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}`)}</td>
           <td class="right">${escapeHtml(
-            formatAmount(
-              tx?.displayRunningBalance != null ? tx.displayRunningBalance : tx?.runningBalance
+            formatAmountWithSymbol(
+              locale,
+              tx?.displayRunningBalance != null ? tx.displayRunningBalance : tx?.runningBalance,
+              displayCurrency,
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 }
             )
           )}</td>
         </tr>
@@ -989,7 +1019,7 @@ export default function DemoCurrencyStatement({
     `;
 
     return `
-      <h1>${escapeHtml(`${normalizedCurrency} ${t("ui_statement_a87c93acb8", "Statement")}`)}</h1>
+      <h1>${escapeHtml(`${displayCurrency} ${t("ui_statement_a87c93acb8", "Statement")}`)}</h1>
       <div class="meta">
         <div><strong>${escapeHtml(t("ui_account_holder_3eef963295", "Account Holder"))}:</strong> ${escapeHtml(walletLabelText)}</div>
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
@@ -1019,15 +1049,14 @@ export default function DemoCurrencyStatement({
   balance,
   currentPeriod,
   docHash,
+  displayCurrency,
   fallbackPeriod,
   getLocalizedDescription,
   transactionsWithDisplayBalance,
   formatDate,
-  formatAmount,
   ledgerLastIndex,
   ledgerStatusLabel,
   locale,
-  normalizedCurrency,
   t,
   walletAddress,
   walletLabel]);
@@ -1037,7 +1066,7 @@ export default function DemoCurrencyStatement({
     try {
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const ok = openPrintWindow({
-        title: `XCANNES ${normalizedCurrency || "Statement"} ${suffix}`,
+        title: `XCANNES ${displayCurrency || "Statement"} ${suffix}`,
         bodyHtml: buildPrintHtml()
       });
       if (!ok && typeof window !== "undefined") {
@@ -1051,12 +1080,12 @@ export default function DemoCurrencyStatement({
     } finally {
       setExportFormat(null);
     }
-  }, [buildPrintHtml, docHash, normalizedCurrency, t]);
+  }, [buildPrintHtml, docHash, displayCurrency, t]);
 
   const handlePrint = useCallback(() => {
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
     const ok = openPrintWindow({
-      title: `XCANNES ${normalizedCurrency || "Statement"} ${suffix}`,
+      title: `XCANNES ${displayCurrency || "Statement"} ${suffix}`,
       bodyHtml: buildPrintHtml()
     });
     if (!ok && typeof window !== "undefined") {
@@ -1067,7 +1096,7 @@ export default function DemoCurrencyStatement({
         )
       );
     }
-  }, [buildPrintHtml, docHash, normalizedCurrency, t]);
+  }, [buildPrintHtml, docHash, displayCurrency, t]);
 
   const handleExportCsv = useCallback(() => {
     setExportFormat("csv");
@@ -1099,14 +1128,14 @@ export default function DemoCurrencyStatement({
           : "",
         Number.isFinite(Number(balance)) ? Number(balance) : "",
         tx?.counterparty || "",
-        normalizedCurrency || "",
+        displayCurrency || "",
         ledgerStatus,
         ledgerLastIndex != null ? ledgerLastIndex : "",
         docHash || ""
       ]));
       const csv = buildCsvString(headers, rows);
       downloadTextFile({
-        filename: `xcannes-statement-${String(normalizedCurrency || "currency").toLowerCase()}-${suffix}.csv`,
+        filename: `xcannes-statement-${String(displayCurrency || "currency").toLowerCase()}-${suffix}.csv`,
         content: csv,
         type: "text/csv;charset=utf-8"
       });
@@ -1116,11 +1145,11 @@ export default function DemoCurrencyStatement({
   }, [
   balance,
   docHash,
+  displayCurrency,
   getLocalizedDescription,
   transactionsWithDisplayBalance,
   ledgerLastIndex,
-  ledgerStatus,
-  normalizedCurrency]);
+  ledgerStatus]);
 
   const STATEMENT_LAYOUTS = {
     full: {
@@ -1302,7 +1331,7 @@ export default function DemoCurrencyStatement({
 	                    {t("ui_balance_445d830d72", "Balance")}
 	                  </p>
 		                  <p className="text-sm text-white font-semibold">
-		                    {formatAmount(balance)} {displayCurrency}
+		                    {formatAmountWithSymbolLocal(balance)}
 		                  </p>
 	                </div>
 	                <div className="text-right">
@@ -1310,7 +1339,7 @@ export default function DemoCurrencyStatement({
 	                    {t("demo_indexed_stability_label_f4", "Stabilité Indexée")}
 	                  </p>
 	                  <p className="text-[11px] text-white/50">
-	                    ≈ {formatUsdAmount(estimatedUsd)} {t("ui_usd_506842b2ba", "USD")}
+	                    ≈ {formatUsdWithSymbol(estimatedUsd)}
 	                  </p>
 	                </div>
 	              </div>
@@ -1543,20 +1572,25 @@ export default function DemoCurrencyStatement({
                                   <p className="text-sm text-white/90 truncate">
                                     {(() => {
                                       const localizedDescription = getLocalizedDescription(tx);
-                                      return tx.category === "exchange"
-                                        ? renderConversionDescription(localizedDescription, {
-                                            withLabel: !isMobileDate,
-                                          }) ||
+                                      const suppressFlags = Boolean(tx?.suppressDescriptionFlags);
+                                      if (tx.category === "exchange") {
+                                        return renderConversionDescription(localizedDescription, {
+                                          withLabel: !isMobileDate,
+                                        }) ||
                                           (isMobileDate
                                             ? simplifyMobileDescription(localizedDescription, tx.category)
-                                            : enrichDescription(localizedDescription))
-                                        : isMobileDate
-                                          ? (tx.kind === "XRPL_PAYMENT_IN"
-                                              ? t("statement_xrpl_mobile_in", "Reçu")
-                                              : tx.kind === "XRPL_PAYMENT_OUT"
-                                                ? t("statement_xrpl_mobile_out", "Envoyé")
-                                                : simplifyMobileDescription(localizedDescription, tx.category))
-                                          : enrichDescription(localizedDescription);
+                                            : enrichDescription(localizedDescription));
+                                      }
+                                      if (suppressFlags) {
+                                        return localizedDescription;
+                                      }
+                                      return isMobileDate
+                                        ? (tx.kind === "XRPL_PAYMENT_IN"
+                                            ? t("statement_xrpl_mobile_in", "Reçu")
+                                            : tx.kind === "XRPL_PAYMENT_OUT"
+                                              ? t("statement_xrpl_mobile_out", "Envoyé")
+                                              : simplifyMobileDescription(localizedDescription, tx.category))
+                                        : enrichDescription(localizedDescription);
                                     })()}
                                   </p>
                                   {tx.counterparty && (
@@ -1573,10 +1607,10 @@ export default function DemoCurrencyStatement({
                               }`}
                             >
                               {tx.type === "debit" ? "−" : "+"}
-                              {formatAmount(tx.amount)}
+                              {formatAmountWithSymbolLocal(tx.amount)}
                             </td>
                             <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                              {formatAmount(
+                              {formatAmountWithSymbolLocal(
                                 tx?.displayRunningBalance != null
                                   ? tx.displayRunningBalance
                                   : tx.runningBalance

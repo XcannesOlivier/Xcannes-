@@ -56,6 +56,8 @@ const DemoMoonPaySellModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
+  const displayError =
+    error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
 
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState('RLUSD');
@@ -85,12 +87,11 @@ const DemoMoonPaySellModal = ({
         selectLabelByCurrency?.[currencyRaw] ||
         selectLabelByCurrency?.[currency] ||
         currency;
-      const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
       const amountValue = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amountValue)
         ? amountValue.toLocaleString("en-US", { maximumFractionDigits: 4 })
         : "0";
-      const fallbackRight = `${balanceLabel} = ${amountLabel}`;
+      const fallbackRight = amountLabel;
       let labelRight =
         selectLabelRightByCurrency?.[currencyRaw] ||
         selectLabelRightByCurrency?.[currency] ||
@@ -508,10 +509,10 @@ const DemoMoonPaySellModal = ({
 		                </div>
 
                 {/* Error message */}
-                {error &&
+                {displayError &&
       <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
                     <XCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-400">{error}</p>
+                    <p className="text-sm text-red-400">{displayError}</p>
                   </div>
       }
 
@@ -614,7 +615,7 @@ const DemoMoonPaySellModal = ({
 	                  {t("moonpay_error_title", "Something went wrong")}
 	                </h4>
                 <p className="text-white/60 text-center mb-4">
-                  {error ||
+                  {displayError ||
                     t(
                       "moonpay_error_try_again_later_6f2b1c9d8a",
                       "Please try again later."

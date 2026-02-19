@@ -257,14 +257,6 @@ export default function WalletDashboardReceiveModal({
             ✕
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {receiveTab === "receive"
-                ? t(
-                    "ui_receive_assets_title_b3c7f4d2a1",
-                    "Receive assets"
-                  )
-                : t("ui_request_payment_c62b99fb16", "Request Payment")}
-            </h3>
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
