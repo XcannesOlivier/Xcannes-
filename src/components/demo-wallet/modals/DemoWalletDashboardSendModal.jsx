@@ -168,6 +168,60 @@ export default function DemoWalletDashboardSendModal({
       );
     }
   };
+  const looksLikeXrplAddress = (value) =>
+    /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
+  const looksLikeQrPayload = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw) return false;
+    if (/^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(raw)) return true;
+    if (/^xrpl:/i.test(raw)) return true;
+    if (looksLikeXrplAddress(raw)) return true;
+    if (raw.startsWith("{") && /"to"|"targetCurrency"|"schema"|"payreq"/i.test(raw)) {
+      return true;
+    }
+    if (/^https?:/i.test(raw)) {
+      try {
+        const url = new URL(raw);
+        const req =
+          url.searchParams.get("req") ||
+          url.searchParams.get("payreq") ||
+          url.searchParams.get("xcannes_payreq");
+        if (req) return true;
+        const candidate =
+          url.searchParams.get("to") ||
+          url.searchParams.get("destination") ||
+          (url.hostname && url.hostname !== "xrpl" ? url.hostname : "") ||
+          (url.pathname || "").replace(/^\/+/, "");
+        if (candidate && looksLikeXrplAddress(candidate)) return true;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+  const handlePastePayload = (event) => {
+    const clipboard = event.clipboardData;
+    if (!clipboard) return false;
+    const items = clipboard.items || [];
+    for (const item of items) {
+      if (item.kind === "file" && String(item.type || "").startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) {
+          event.preventDefault();
+          void handleManualQrFile(file);
+          return true;
+        }
+      }
+    }
+    const text = clipboard.getData("text") || "";
+    if (looksLikeQrPayload(text)) {
+      event.preventDefault();
+      handlePaymentRequestScan?.(text);
+      setScanActive(false);
+      return true;
+    }
+    return false;
+  };
   const handleScan = (data) => {
     handlePaymentRequestScan?.(data);
     setScanActive(false);
@@ -476,7 +530,6 @@ export default function DemoWalletDashboardSendModal({
                     handleManualQrFile(file);
                   }}
                 />
-                <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
               </div>
             </div>
           ) : null}
@@ -496,6 +549,7 @@ export default function DemoWalletDashboardSendModal({
                     list="saved-addresses"
                     value={sendDestination}
                     onChange={(e) => setSendDestination(e.target.value)}
+                    onPaste={handlePastePayload}
                     placeholder={t(
                       "ui_enter_or_import_address",
                       "Compte Bénéficiaire"
@@ -621,6 +675,7 @@ export default function DemoWalletDashboardSendModal({
                   setScanActive(false);
                 }
               }}
+              onPaste={handlePastePayload}
               placeholder={t(
                 "ui_enter_or_import_address",
                 "Compte Bénéficiaire"
@@ -707,6 +762,7 @@ export default function DemoWalletDashboardSendModal({
               ) : null}
             </div>
           </div>
+          <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
 
         </div>
       </div>

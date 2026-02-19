@@ -1196,20 +1196,61 @@ export default function DemoWalletDashboard({
 	    const amountNum = Number.parseFloat(sendAmount || "0");
 	    if (!Number.isFinite(amountNum) || amountNum <= 0) return { ok: false };
 
-	    const dest = String(sendDestination || "").trim();
-    if (!dest) {
-      alert(t("demo_error_destination_required", "Veuillez saisir une adresse de destination (démo)."));
-      return { ok: false };
-    }
-    if (sendPaymentRequest?.to && dest !== String(sendPaymentRequest.to).trim()) {
-      alert(
-        t(
-          "demo_error_request_destination_mismatch",
-          "La destination de la demande de paiement ne correspond pas (démo)."
-        )
-      );
-      return { ok: false };
-    }
+	    const normalizeDestination = (value) => {
+	      const raw = String(value || "").trim();
+	      if (!raw) return "";
+	      if (/^xrpl:/i.test(raw)) {
+	        const cleaned = raw
+	          .replace(/^xrpl:\/\//i, "xrpl://")
+	          .replace(/^xrpl:/i, "xrpl://");
+	        try {
+	          const url = new URL(cleaned);
+	          const candidate =
+	            url.searchParams.get("to") ||
+	            url.searchParams.get("destination") ||
+	            (url.hostname && url.hostname !== "xrpl" ? url.hostname : "") ||
+	            (url.pathname || "").replace(/^\/+/, "");
+	          if (candidate) return candidate;
+	        } catch {
+	          // fall back to stripping prefix
+	        }
+	        return raw.replace(/^xrpl:\/*/i, "");
+	      }
+	      if (/^https?:/i.test(raw)) {
+	        try {
+	          const url = new URL(raw);
+	          const candidate =
+	            url.searchParams.get("to") ||
+	            url.searchParams.get("destination") ||
+	            "";
+	          if (candidate) return candidate;
+	          const host = url.hostname || "";
+	          const path = (url.pathname || "").replace(/^\/+/, "");
+	          if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(host)) return host;
+	          if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(path)) return path;
+	        } catch {
+	          // ignore
+	        }
+	      }
+	      return raw;
+	    };
+	    const dest = normalizeDestination(sendDestination);
+	    if (dest && dest !== String(sendDestination || "").trim()) {
+	      setSendDestination(dest);
+	    }
+	    if (!dest) {
+	      alert(t("demo_error_destination_required", "Veuillez saisir une adresse de destination (démo)."));
+	      return { ok: false };
+	    }
+	    if (sendPaymentRequest?.to && dest !== String(sendPaymentRequest.to).trim()) {
+	      alert(
+	        t(
+	          "demo_error_request_destination_mismatch",
+	          "La destination de la demande de paiement ne correspond pas (démo)."
+	        )
+	      );
+	      return { ok: false };
+	    }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
     const requestTargetCurrency = String(sendPaymentRequest?.targetCurrencyCode || "")
