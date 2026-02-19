@@ -37,11 +37,13 @@ export default function DemoQRScanner({
   const readerIdRef = useRef(
     `qr-reader-${Math.random().toString(36).slice(2, 10)}`
   );
+  const readerElRef = useRef(null);
   const activeRef = useRef(false);
   const lastDecodedRef = useRef("");
   const [error, setError] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [qrBoxSize, setQrBoxSize] = useState(0);
 
   const stopScanner = async () => {
     const instance = html5QrCodeRef.current;
@@ -61,6 +63,7 @@ export default function DemoQRScanner({
     }activeRef.current = false;
     setIsScanning(false);
     setIsStarting(false);
+    setQrBoxSize(0);
   };
 
   const cameraEnabled = enableCamera && !showStaticImage;
@@ -73,6 +76,7 @@ export default function DemoQRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
+      setQrBoxSize(0);
       return;
     }
 
@@ -82,6 +86,7 @@ export default function DemoQRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
+      setQrBoxSize(0);
       return;
     }
 
@@ -133,7 +138,13 @@ export default function DemoQRScanner({
 
         const viewW = window.innerWidth || 360;
         const viewH = window.innerHeight || 640;
-        const boxSize = Math.floor(Math.min(viewW, viewH) * 0.7);
+        const readerEl = document.getElementById(readerIdRef.current);
+        const containerW = readerEl?.clientWidth || 0;
+        const containerH = readerEl?.clientHeight || 0;
+        const baseW = containerW > 0 ? containerW : Math.min(viewW, viewH);
+        const baseH = containerH > 0 ? containerH : Math.min(viewW, viewH);
+        const boxSize = Math.floor(Math.min(baseW, baseH) * 0.7);
+        setQrBoxSize(boxSize);
         let cameraIdOrConfig = { facingMode: "environment" };
         try {
           const devices = await Html5Qrcode.getCameras();
@@ -225,6 +236,7 @@ export default function DemoQRScanner({
 
         setIsScanning(false);
         setIsStarting(false);
+        setQrBoxSize(0);
       }
     };
 
@@ -237,6 +249,26 @@ export default function DemoQRScanner({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraEnabled, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = readerElRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const updateSize = (width, height) => {
+      if (!width || !height) return;
+      const next = Math.floor(Math.min(width, height) * 0.7);
+      setQrBoxSize((prev) => (prev !== next ? next : prev));
+    };
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries?.[0];
+      if (!entry) return;
+      const rect = entry.contentRect;
+      updateSize(rect.width, rect.height);
+    });
+    observer.observe(el);
+    updateSize(el.clientWidth, el.clientHeight);
+    return () => observer.disconnect();
+  }, [isOpen]);
 
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
@@ -379,8 +411,31 @@ export default function DemoQRScanner({
         <div className={edgeToEdge ? "mb-0" : "mb-4"}>
           <div
             id={readerIdRef.current}
-            className={edgeToEdge ? "overflow-hidden" : "rounded-lg overflow-hidden"}
-          />
+            ref={readerElRef}
+            className={
+              edgeToEdge
+                ? "relative w-[90%] mx-auto overflow-hidden"
+                : "relative w-[90%] mx-auto rounded-lg overflow-hidden"
+            }
+          >
+            {!showStaticQr && qrBoxSize > 0 && (isScanning || isStarting) ? (
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 z-10"
+                style={{
+                  width: `${qrBoxSize}px`,
+                  height: `${qrBoxSize}px`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <div className="absolute inset-0 rounded-md border border-white/15 shadow-[0_0_0_1px_rgba(34,197,94,0.25)]" />
+                <span className="absolute -top-1 -left-1 h-6 w-6 border-t-2 border-l-2 border-[#22C55E]/90 rounded-tl-md" />
+                <span className="absolute -top-1 -right-1 h-6 w-6 border-t-2 border-r-2 border-[#22C55E]/90 rounded-tr-md" />
+                <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-2 border-l-2 border-[#22C55E]/90 rounded-bl-md" />
+                <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-2 border-r-2 border-[#22C55E]/90 rounded-br-md" />
+                <div className="absolute left-2 right-2 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#22C55E]/80 to-transparent animate-[xcannes-scanline_2.2s_ease-in-out_infinite]" />
+              </div>
+            ) : null}
+          </div>
         </div>
       )}
 
@@ -424,8 +479,31 @@ export default function DemoQRScanner({
       </div>
     </div>;
 
+  const scannerStyles = (
+    <style jsx>{`
+      @keyframes xcannes-scanline {
+        0% {
+          transform: translateY(0);
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.9;
+        }
+        100% {
+          transform: translateY(calc(100% - 2px));
+          opacity: 0.3;
+        }
+      }
+    `}</style>
+  );
+
   if (embedded) {
-    return scannerCard;
+    return (
+      <>
+        {scannerCard}
+        {scannerStyles}
+      </>
+    );
   }
 
   const content =
@@ -435,6 +513,7 @@ export default function DemoQRScanner({
     }`}
   >
       {scannerCard}
+      {scannerStyles}
     </div>;
 
   // Utiliser createPortal pour rendre dans document.body
