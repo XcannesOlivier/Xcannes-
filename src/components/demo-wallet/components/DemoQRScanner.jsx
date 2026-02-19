@@ -130,11 +130,16 @@ export default function DemoQRScanner({
         const html5QrCode = new Html5Qrcode(readerIdRef.current);
         html5QrCodeRef.current = html5QrCode;
 
+        const viewW = window.innerWidth || 360;
+        const viewH = window.innerHeight || 640;
+        const boxSize = Math.max(220, Math.min(360, Math.floor(Math.min(viewW, viewH) * 0.7)));
         await html5QrCode.start(
           { facingMode: "environment" },
           {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
+            fps: 12,
+            qrbox: { width: boxSize, height: boxSize },
+            disableFlip: true,
+            experimentalFeatures: { useBarCodeDetectorIfSupported: true }
           },
           (decodedText) => {
             // QR code scanné avec succès

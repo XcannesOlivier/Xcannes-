@@ -250,8 +250,8 @@ export default function DemoWalletDashboardReceiveModal({
     if (!canvas) return null;
     const srcWidth = canvas.width;
     const srcHeight = canvas.height;
-    const scale = hasGeneratedRequest ? 8 : 6;
-    const marginRatio = hasGeneratedRequest ? 0.14 : 0.1;
+    const scale = hasGeneratedRequest ? 4 : 3;
+    const marginRatio = hasGeneratedRequest ? 0.12 : 0.1;
     const margin = Math.max(24, Math.round(srcWidth * marginRatio));
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = (srcWidth + margin * 2) * scale;
@@ -440,7 +440,8 @@ export default function DemoWalletDashboardReceiveModal({
     }
   }, [requestValue]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
-  const qrSize = inline ? 240 : 220;
+  const qrDisplaySize = inline ? 240 : 220;
+  const qrPixelSize = inline ? 360 : (hasGeneratedRequest ? 520 : 420);
   const requestDisplayCurrency = String(
     generatedRequest?.displayCurrency || requestCurrencyCode || "USD"
   )
@@ -549,11 +550,12 @@ export default function DemoWalletDashboardReceiveModal({
               >
                 <QRCodeCanvas
               value={hasGeneratedRequest ? requestQrValue : receiveQrValue}
-              size={qrSize}
+              size={qrPixelSize}
+              style={{ width: qrDisplaySize, height: qrDisplaySize }}
               bgColor="#ffffff"
               fgColor="#000000"
               includeMargin={true}
-              level={hasGeneratedRequest ? "M" : "Q"} />
+              level={hasGeneratedRequest ? "L" : "Q"} />
 
               </div>
               {hasGeneratedRequest ? (
