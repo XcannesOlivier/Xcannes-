@@ -248,6 +248,22 @@ export default function DemoWalletDashboardReceiveModal({
     return new Blob([bytes], { type: mime });
   };
 
+  const downloadBlob = (blob, filename) => {
+    if (!blob || !filename) return;
+    try {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      // noop
+    }
+  };
+
   const handleCopyQr = async () => {
     const canvas = qrContainerRef.current?.querySelector?.("canvas");
     if (!canvas) return;
@@ -323,7 +339,19 @@ export default function DemoWalletDashboardReceiveModal({
 
   const handleShareQr = async () => {
     const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
-    if (!navigator?.share) {
+    const blob = buildQrBlob();
+
+    if (isDesktop || !navigator?.share) {
+      if (blob) {
+        downloadBlob(blob, "xcannes-qr.png");
+        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"));
+        return;
+      }
+      if (fallbackText) {
+        downloadBlob(new Blob([fallbackText], { type: "text/plain" }), "xcannes-qr.txt");
+        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"));
+        return;
+      }
       flashCopyToast(t("ui_share_unavailable_3b7c1a9d5e", "Partager indisponible"));
       return;
     }
@@ -332,7 +360,6 @@ export default function DemoWalletDashboardReceiveModal({
     if (fallbackText) shareData.text = fallbackText;
     shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
 
-    const blob = buildQrBlob();
     if (blob && typeof File !== "undefined") {
       const file = new File([blob], "xcannes-qr.png", { type: blob.type || "image/png" });
       if (!navigator.canShare || navigator.canShare({ files: [file] })) {
@@ -523,7 +550,9 @@ export default function DemoWalletDashboardReceiveModal({
                   }}
                   className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
                 >
-                  {t("ui_share_qr_9b5c1a2d7e", "Partager")}
+                  {isDesktop
+                    ? t("ui_download_qr_5c1d2e7f9a", "Télécharger")
+                    : t("ui_share_qr_9b5c1a2d7e", "Partager")}
                 </button>
               </div>
               {copyToast ? (
