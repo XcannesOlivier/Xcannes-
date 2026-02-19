@@ -2351,7 +2351,6 @@ export default function DemoWalletDashboard({
 	        savedAddresses={demoSavedAddresses}
 	        sendDestination={sendDestination}
 	        setSendDestination={setSendDestination}
-	        setQrScannerOpen={setQrScannerOpen}
 	        handlePaymentRequestScan={handlePaymentRequestScan}
 	        handleSendSubmit={handleSendSubmit}
 	        sendProcessing={sendProcessing}

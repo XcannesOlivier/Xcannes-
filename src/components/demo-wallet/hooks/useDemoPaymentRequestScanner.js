@@ -85,6 +85,7 @@ export function useDemoPaymentRequestScanner({
             setSendAssetKey?.(matchingToken.key);
           }
         }
+        setSendPaymentRequest?.(null);
         setSendTab?.("manual");
         setPaymentRequestScannerOpen(false);
       };
