@@ -635,13 +635,14 @@ export default function DemoWalletDashboardSendModal({
   );
 
   const scannerPanel = (
-    <div className="space-y-2">
+    <div className={`space-y-2 ${inline ? "" : "-mx-4 md:-mx-5"}`}>
       {scanActive ? (
         <DemoQRScanner
           key={scanKey}
           isOpen={true}
           onScan={handleScan}
           embedded={true}
+          edgeToEdge={!inline}
           showClose={false}
           fileInputId={scanQrFileInputId}
           enableCamera={true}
@@ -649,7 +650,7 @@ export default function DemoWalletDashboardSendModal({
           className="bg-black/30 border-white/10"
         />
       ) : (
-        <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center justify-between">
+        <div className={`rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center justify-between ${inline ? "" : "mx-4 md:mx-5"}`}>
           <span className="text-xs text-white/60">
             {t("ui_scan_qr_code_481606b590", "Scan QR Code")}
           </span>
