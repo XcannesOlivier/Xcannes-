@@ -250,8 +250,9 @@ export default function DemoWalletDashboardReceiveModal({
     if (!canvas) return null;
     const srcWidth = canvas.width;
     const srcHeight = canvas.height;
-    const scale = 4;
-    const margin = Math.max(16, Math.round(srcWidth * 0.08));
+    const scale = hasGeneratedRequest ? 8 : 6;
+    const marginRatio = hasGeneratedRequest ? 0.14 : 0.1;
+    const margin = Math.max(24, Math.round(srcWidth * marginRatio));
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = (srcWidth + margin * 2) * scale;
     exportCanvas.height = (srcHeight + margin * 2) * scale;
@@ -407,7 +408,23 @@ export default function DemoWalletDashboardReceiveModal({
   const requestValue = useMemo(() => {
     if (!generatedRequest) return "";
     try {
-      return JSON.stringify(generatedRequest);
+      const compact = {
+        s: generatedRequest.schema,
+        to: generatedRequest.to,
+        tc: generatedRequest.targetCurrency || generatedRequest.targetCurrencyCode,
+        da: generatedRequest.displayAmount ?? generatedRequest.amount ?? null,
+        dc: generatedRequest.displayCurrency || null,
+        ar: generatedRequest.amountRlusd ?? null,
+        fr: generatedRequest.fxRate ?? null,
+        fs: generatedRequest.fxSource ?? null,
+        i: generatedRequest.issuer ?? null,
+        m: generatedRequest.memo ?? null,
+        b: generatedRequest.beneficiaryLabel ?? null,
+      };
+      Object.keys(compact).forEach((key) => {
+        if (compact[key] == null || compact[key] === "") delete compact[key];
+      });
+      return JSON.stringify(compact);
     } catch {
       return "";
     }
@@ -536,7 +553,7 @@ export default function DemoWalletDashboardReceiveModal({
               bgColor="#ffffff"
               fgColor="#000000"
               includeMargin={true}
-              level="H" />
+              level={hasGeneratedRequest ? "M" : "Q"} />
 
               </div>
               {hasGeneratedRequest ? (
