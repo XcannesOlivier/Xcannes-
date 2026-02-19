@@ -232,6 +232,22 @@ export default function DemoWalletDashboardReceiveModal({
     }, 1300);
   };
 
+  const buildQrBlob = () => {
+    const canvas = qrContainerRef.current?.querySelector?.("canvas");
+    if (!canvas) return null;
+    const dataUrl = canvas.toDataURL("image/png");
+    const parts = dataUrl.split(",");
+    if (parts.length !== 2) return null;
+    const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
+    const binary = atob(parts[1]);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mime });
+  };
+
   const handleCopyQr = async () => {
     const canvas = qrContainerRef.current?.querySelector?.("canvas");
     if (!canvas) return;
@@ -303,6 +319,34 @@ export default function DemoWalletDashboardReceiveModal({
     }
 
     flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
+  };
+
+  const handleShareQr = async () => {
+    const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
+    if (!navigator?.share) {
+      flashCopyToast(t("ui_share_unavailable_3b7c1a9d5e", "Partager indisponible"));
+      return;
+    }
+
+    const shareData = {};
+    if (fallbackText) shareData.text = fallbackText;
+    shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
+
+    const blob = buildQrBlob();
+    if (blob && typeof File !== "undefined") {
+      const file = new File([blob], "xcannes-qr.png", { type: blob.type || "image/png" });
+      if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+    }
+
+    try {
+      await navigator.share(shareData);
+      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"));
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+      flashCopyToast(t("ui_share_failed_1a2b3c", "Partage impossible"));
+    }
   };
 
   const requestValue = useMemo(() => {
@@ -450,23 +494,38 @@ export default function DemoWalletDashboardReceiveModal({
                   </div>
                 </div>
               ) : null}
-              <button
-            type="button"
-            onClick={async (e) => {
-              e.stopPropagation();
-              try {
-                await handleCopyQr();
-              } catch {
-                // ignore
-              }
-            }}
-	            className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors">
-                {hasGeneratedRequest
-                  ? t("ui_copy_request_32a3f4409b", "Copy request")
-                  : t("ui_copy_address_779691d570", "Copy address")}
-
-	
-	          </button>
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await handleCopyQr();
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
+                >
+                  {hasGeneratedRequest
+                    ? t("ui_copy_request_32a3f4409b", "Copy request")
+                    : t("ui_copy_address_779691d570", "Copy address")}
+                </button>
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await handleShareQr();
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
+                >
+                  {t("ui_share_qr_9b5c1a2d7e", "Partager")}
+                </button>
+              </div>
               {copyToast ? (
                 <div className="text-[10px] text-xcannes-green/90">
                   {copyToast}
