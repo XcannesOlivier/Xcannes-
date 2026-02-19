@@ -133,7 +133,7 @@ export default function DemoQRScanner({
 
         const viewW = window.innerWidth || 360;
         const viewH = window.innerHeight || 640;
-        const boxSize = Math.floor(Math.min(viewW, viewH) * 0.9);
+        const boxSize = Math.floor(Math.min(viewW, viewH) * 0.7);
         let cameraIdOrConfig = { facingMode: "environment" };
         try {
           const devices = await Html5Qrcode.getCameras();
