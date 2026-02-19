@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Buffer } from "buffer";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -21,8 +22,6 @@ export default function DemoWalletDashboardReceiveModal({
   noticeContextLabel = "",
   walletId = "",
   dashboardVariant = "default",
-  receiveTab,
-  setReceiveTab,
   renderWalletMeta,
   effectiveWallet,
   handleCopyAddress,
@@ -58,13 +57,13 @@ export default function DemoWalletDashboardReceiveModal({
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
     "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
-  const greenTabInactive =
-    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
+  const [isRequestOpen, setIsRequestOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const showPersistentRequestPreview = false;
-  const showWalletPageRequestDecor = false;
+  const [copyToast, setCopyToast] = useState("");
+  const copyToastTimerRef = useRef(null);
+  const qrContainerRef = useRef(null);
   const formatUnits = (value, currencyCode = "USD") => {
     const num = Number(value);
     if (!Number.isFinite(num)) return "0";
@@ -100,8 +99,18 @@ export default function DemoWalletDashboardReceiveModal({
     if (!open) {
       setGeneratedRequest(null);
       setGenerateError(null);
+      setIsRequestOpen(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    return () => {
+      if (copyToastTimerRef.current) {
+        window.clearTimeout(copyToastTimerRef.current);
+        copyToastTimerRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -207,6 +216,51 @@ export default function DemoWalletDashboardReceiveModal({
 
     setGeneratedRequest(req);
     onRequestGenerated?.(req);
+    setIsRequestOpen(false);
+  };
+
+  const flashCopyToast = (message) => {
+    const text = String(message || "").trim();
+    if (!text) return;
+    setCopyToast(text);
+    if (copyToastTimerRef.current) {
+      window.clearTimeout(copyToastTimerRef.current);
+    }
+    copyToastTimerRef.current = window.setTimeout(() => {
+      setCopyToast("");
+      copyToastTimerRef.current = null;
+    }, 1300);
+  };
+
+  const handleCopyQr = async () => {
+    const canvas = qrContainerRef.current?.querySelector?.("canvas");
+    if (!canvas) return;
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, "image/png")
+    );
+    if (!blob) {
+      flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
+      return;
+    }
+
+    const canWriteImage =
+      typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write;
+
+    if (canWriteImage) {
+      const item = new ClipboardItem({ "image/png": blob });
+      await navigator.clipboard.write([item]);
+      flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"));
+      return;
+    }
+
+    const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
+    if (navigator?.clipboard?.writeText && fallbackText) {
+      await navigator.clipboard.writeText(fallbackText);
+      flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+      return;
+    }
+
+    flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
   };
 
   const requestValue = useMemo(() => {
@@ -217,14 +271,32 @@ export default function DemoWalletDashboardReceiveModal({
       return "";
     }
   }, [generatedRequest]);
-  const requestDecorValue = useMemo(() => {
-    if (effectiveWallet) return `xcannes-request:${effectiveWallet}`;
-    return "xcannes-request";
-  }, [effectiveWallet]);
-  const shouldShowRequestPreview =
-    showPersistentRequestPreview || (Boolean(generatedRequest) && Boolean(requestValue));
-  const showRequestPlaceholder = !generatedRequest || !requestValue;
+  const requestQrValue = useMemo(() => {
+    if (!requestValue) return "";
+    try {
+      const base64 = Buffer.from(requestValue, "utf8").toString("base64");
+      const base64Url = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      return `xcannes-payreq:${base64Url}`;
+    } catch {
+      return "";
+    }
+  }, [requestValue]);
+  const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
   const qrSize = inline ? 240 : 180;
+  const requestDisplayCurrency = String(
+    generatedRequest?.displayCurrency || requestCurrencyCode || "USD"
+  )
+    .trim()
+    .toUpperCase();
+  const requestDisplayAmount =
+    generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || "0");
+  const requestDisplayAmountLabel = Number.isFinite(Number(requestDisplayAmount))
+    ? formatUnits(requestDisplayAmount, requestDisplayCurrency)
+    : formatUnits(0, requestDisplayCurrency);
+  const requestBeneficiaryLabel =
+    String(generatedRequest?.beneficiaryLabel || walletLabel || "").trim() ||
+    t("ui_beneficiary_unknown", "Bénéficiaire");
+  const receiveQrValue = effectiveWallet ? `xrpl:${effectiveWallet}` : "";
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -301,72 +373,85 @@ export default function DemoWalletDashboardReceiveModal({
           </div>
           {renderWalletMeta?.("mb-2")}
 
-
-          {/* Tabs */}
-          <div className="flex gap-2 mb-3">
-            <button
-            type="button"
-            onClick={() => setReceiveTab("receive")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-            receiveTab === "receive" ? greenActionBtnMuted : greenTabInactive
-            }`}>{t("ui_receive_b7d6ae4037", "Receive")}
-
-
-          </button>
-            <button
-            type="button"
-            onClick={() => setReceiveTab("request")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-            receiveTab === "request" ? greenActionBtnMuted : greenTabInactive
-            }`}>{t("ui_request_payment_c62b99fb16", "Request Payment")}
-
-
-          </button>
-          </div>
-
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div key={receiveTab} className="wallet-tab-unfold-in">
+            <div className="wallet-tab-unfold-in">
               <p className="text-xs md:text-sm text-white/50 mb-3">
-                {receiveTab === "receive"
-                  ? t(
-                      "ui_receive_assets_desc_1b7f2c9d4e",
-                      "Share this XRPL address to receive funds."
-                    )
-                  : t(
-                      "ui_request_payment_desc_9c2b1a7d4f",
-                      "Create a payment request to send to another wallet."
-                    )}
+                {t(
+                  "ui_receive_and_request_desc_2f1a7c9d5e",
+                  "Share this XRPL address to receive funds, or create a payment request to send to another wallet."
+                )}
               </p>
 
               {/* Tab Content: Receive */}
-              {receiveTab === "receive" && effectiveWallet &&
+              {effectiveWallet &&
         <div className={`flex flex-col items-center gap-3 ${inline ? "flex-1 min-h-0 justify-center" : ""}`}>
-              <div className="bg-black/60 border border-white/10 rounded-xl p-3">
+              <div
+                ref={qrContainerRef}
+                className="bg-black/60 border border-white/10 rounded-xl p-3 text-[0px]"
+              >
                 <QRCodeCanvas
-              value={effectiveWallet}
+              value={hasGeneratedRequest ? requestQrValue : receiveQrValue}
               size={qrSize}
               bgColor="#000000"
               fgColor="#ffffff" />
 
               </div>
-              <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 break-all">
-                {effectiveWallet}
-              </div>
+              {hasGeneratedRequest ? (
+                <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white/60">{t("ui_amount_7668986206", "Amount")}</span>
+                    <span className="font-mono text-white/90">{requestDisplayAmountLabel}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white/60">{t("ui_currency_1ed55673be", "Currency")}</span>
+                    <span className="font-semibold text-white/90">{requestDisplayCurrency}</span>
+                  </div>
+                </div>
+              ) : null}
               <button
             type="button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-	              handleCopyAddress();
-	            }}
-	            className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors">{t("ui_copy_address_779691d570", "Copy address")}
+              try {
+                await handleCopyQr();
+              } catch {
+                // ignore
+              }
+            }}
+	            className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors">
+                {hasGeneratedRequest
+                  ? t("ui_copy_request_32a3f4409b", "Copy request")
+                  : t("ui_copy_address_779691d570", "Copy address")}
 
 	
 	          </button>
+              {copyToast ? (
+                <div className="text-[10px] text-xcannes-green/90">
+                  {copyToast}
+                </div>
+              ) : null}
             </div>
         }
 
-              {/* Tab Content: Request Payment */}
-              {receiveTab === "request" && effectiveWallet &&
+              {effectiveWallet ? (
+                <div className="mt-2 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsRequestOpen((prev) => !prev);
+                    }}
+                    className={`px-4 py-2 text-xs md:text-sm ${greenActionBtnMuted}`}
+                  >
+                    {isRequestOpen
+                      ? t("ui_hide_request_payment", "Masquer la demande")
+                      : t("ui_request_payment_c62b99fb16", "Créer une demande")}
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Request Payment */}
+              {effectiveWallet && isRequestOpen &&
         <div className={`space-y-4 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
               <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-4"}>
               <div className="space-y-4">
@@ -424,7 +509,6 @@ export default function DemoWalletDashboardReceiveModal({
                 buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                 menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
                 selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
-                hideMobileSelectedRight={receiveTab === "request"}
               />
                 </div>
               </div>
@@ -468,91 +552,6 @@ export default function DemoWalletDashboardReceiveModal({
 
               </div>
 
-              {shouldShowRequestPreview &&
-          <div className="space-y-3">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 overflow-hidden">
-                      {showWalletPageRequestDecor ? (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="opacity-30" style={{ filter: "brightness(0.2)" }}>
-                            <QRCodeCanvas
-                              value={requestDecorValue}
-                              size={qrSize}
-                              bgColor="#000000"
-                              fgColor="#ffffff"
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-                      <div className="relative z-10">
-                        {showRequestPlaceholder ? (
-                          <div
-                            className="flex items-center justify-center text-center text-xs text-white/50"
-                            style={{ width: qrSize, height: qrSize }}
-                          >
-                            {t(
-                              "ui_request_qr_placeholder_2c4f7a1d9b",
-                              "Votre QR code sera créé ici"
-                            )}
-                          </div>
-                        ) : (
-                          <QRCodeCanvas
-                            value={requestValue}
-                            size={qrSize}
-                            bgColor="#000000"
-                            fgColor="#ffffff"
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all ${showRequestPlaceholder ? "text-center" : ""}`}>
-                      {showRequestPlaceholder
-                        ? t(
-                            "ui_request_code_placeholder_8c1e7b4d2a",
-                            "Votre code de demande de paiement apparaîtra ici"
-                          )
-                        : requestValue}
-                    </div>
-                    {!showRequestPlaceholder ? (
-                      <button
-                        type="button"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            await navigator.clipboard.writeText(requestValue);
-                          } catch {
-                            // ignore
-                          }
-                        }}
-                        className={`px-4 py-2 text-xs ${greenActionBtnBase}`}
-                      >
-                        {t("ui_copy_request_32a3f4409b", "Copy request")}
-                      </button>
-                    ) : null}
-                  </div>
-	                  {!showRequestPlaceholder ? (
-	                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
-	                      {(() => {
-	                        const currencyLabel =
-	                          selectLabelByCurrency?.[requestCurrencyCode] ||
-	                          selectLabelByCurrency?.[String(requestCurrencyCode || "").toUpperCase()] ||
-	                          requestCurrencyCode;
-	                        return isFxRequest
-	                          ? t("ui_request_settlement_note_6a1c9d2f3b", {
-	                              defaultValue:
-	                                "Payment will settle on-chain in USD, and be credited to the {{currency}} line for the receiver.",
-	                              currency: currencyLabel,
-	                            })
-	                          : t("ui_request_prepared_for_5d2a8b1c3f", {
-	                              defaultValue:
-	                                "Payment request prepared for {{currency}}.",
-	                              currency: currencyLabel || "USD",
-	                            });
-	                      })()}
-	                    </div>
-	                  ) : null}
-                </div>
-          }
               </div>
             </div>
           }

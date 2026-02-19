@@ -96,24 +96,19 @@ export default function DemoQRScanner({
         window.isSecureContext ||
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1";
+        const cameraFallbackMessage = t(
+          "ui_camera_unavailable_premium_9f0b1a2c3d",
+          "La caméra n’est pas disponible sur cet appareil.\nVeuillez renseigner le compte du bénéficiaire."
+        );
+
         if (!isSecure) {
-          setError(
-            t(
-              "ui_camera_blocked_http_7d6a0c9b2e",
-              "Camera is blocked on HTTP. Use HTTPS (or localhost) or upload a QR image below."
-            )
-          );
+          setError(cameraFallbackMessage);
           setIsScanning(false);
           return;
         }
 
         if (!navigator?.mediaDevices?.getUserMedia) {
-          setError(
-            t(
-              "ui_camera_unavailable_device_4f2a90f1c3",
-              "Camera is not available on this device. You can upload a QR image below."
-            )
-          );
+          setError(cameraFallbackMessage);
           setIsScanning(false);
           return;
         }
@@ -171,29 +166,18 @@ export default function DemoQRScanner({
 
         // Messages d'erreur personnalisés
         const errStr = err.toString();
+        const cameraFallbackMessage = t(
+          "ui_camera_unavailable_premium_9f0b1a2c3d",
+          "La caméra n’est pas disponible sur cet appareil.\nVeuillez renseigner le compte du bénéficiaire."
+        );
         if (errStr.includes('NotAllowedError') || errStr.includes('Permission')) {
-          setError(
-            t(
-              "ui_camera_access_denied_5b9f8c2a10",
-              "Camera access denied. Please allow camera access in your browser settings and try again."
-            )
-          );
+          setError(cameraFallbackMessage);
         } else if (errStr.includes('NotFoundError')) {
-          setError(t("ui_camera_not_found_9a1c3b4d5e", "No camera found on this device."));
+          setError(cameraFallbackMessage);
         } else if (errStr.includes('NotReadableError')) {
-          setError(
-            t(
-              "ui_camera_in_use_6d8f2a1c0b",
-              "Camera is already in use by another application."
-            )
-          );
+          setError(cameraFallbackMessage);
         } else {
-          setError(
-            t(
-              "ui_camera_access_failed_2c4e6f8a1b",
-              "Unable to access camera. Please check permissions and try again."
-            )
-          );
+          setError(cameraFallbackMessage);
         }
 
         setIsScanning(false);
@@ -374,18 +358,8 @@ export default function DemoQRScanner({
 
       {/* Error */}
       {error &&
-    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
-          <p className="text-sm text-red-400 text-center mb-3">{error}</p>
-
-          {/* Instructions pour activer la caméra */}
-          <div className="text-left bg-black/40 rounded-lg p-3 mt-3">
-            <p className="text-xs text-white/80 font-semibold mb-2">{t("ui_how_to_enable_camera_c08cd802b3", "How to enable camera:")}</p>
-            <ul className="text-xs text-white/60 space-y-1 list-disc list-inside">
-              <li><strong>{t("ui_chrome_safari_ccea2d8ed8", "Chrome/Safari:")}</strong>{t("ui_tap_the_or_icon_in_address_b_a73a7d8dd4", "Tap the 🔒 or ⓘ icon in address bar → Site Settings → Camera → Allow")}</li>
-              <li><strong>{t("ui_firefox_c359393414", "Firefox:")}</strong>{t("ui_tap_the_icon_permissions_cam_3c2f8b49ec", "Tap the 🔒 icon → Permissions → Camera → Allow")}</li>
-              <li>{t("ui_then_close_and_reopen_this_s_8c994bb219", "Then close and reopen this scanner")}</li>
-            </ul>
-          </div>
+    <div className="bg-white/5 border border-white/15 rounded-lg p-4 mb-4">
+          <p className="text-sm text-white/80 text-center">{error}</p>
         </div>
     }
 
