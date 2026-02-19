@@ -10,6 +10,7 @@ import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/utils/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
+import { normalizeQrImageFile } from "../utils/demoQrImage";
 
 export default function DemoWalletDashboardSendModal({
   open,
@@ -142,13 +143,28 @@ export default function DemoWalletDashboardSendModal({
   const handleManualQrFile = async (file) => {
     if (!file) return;
     try {
+      let scanFile = file;
+      try {
+        scanFile = await normalizeQrImageFile(file, { maxDimension: 1600 });
+      } catch {
+        scanFile = file;
+      }
       const { Html5Qrcode } = await import("html5-qrcode");
       const readerId = manualQrReaderIdRef.current;
       const instance =
         manualQrScannerRef.current || new Html5Qrcode(readerId);
       manualQrScannerRef.current = instance;
 
-      const decodedText = await instance.scanFile(file, true);
+      let decodedText;
+      try {
+        decodedText = await instance.scanFile(scanFile, true);
+      } catch (err) {
+        if (scanFile !== file) {
+          decodedText = await instance.scanFile(file, true);
+        } else {
+          throw err;
+        }
+      }
       try {
         await instance.clear();
       } catch (err) {
