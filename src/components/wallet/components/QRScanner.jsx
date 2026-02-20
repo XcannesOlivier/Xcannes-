@@ -30,7 +30,9 @@ export default function QRScanner({
   showFileInputWhenStatic = false,
   showFauxQrBackground = false,
   fauxQrBackgroundSize = "240px",
-  fauxQrBackgroundOpacity = 0.08
+  fauxQrBackgroundOpacity = 0.08,
+  hideWhenUnavailable = false,
+  onCameraUnavailableChange = null
 }) {
   const { t } = useTranslation("common");
   const html5QrCodeRef = useRef(null);
@@ -40,6 +42,7 @@ export default function QRScanner({
   const activeRef = useRef(false);
   const lastDecodedRef = useRef("");
   const [error, setError] = useState(null);
+  const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
 
@@ -66,10 +69,17 @@ export default function QRScanner({
   const cameraEnabled = enableCamera && !showStaticImage;
 
   useEffect(() => {
+    if (typeof onCameraUnavailableChange === "function") {
+      onCameraUnavailableChange(cameraUnavailable);
+    }
+  }, [cameraUnavailable, onCameraUnavailableChange]);
+
+  useEffect(() => {
     if (!isOpen) {
       // Cleanup when closing
       stopScanner().catch(console.error);
       setError(null);
+      setCameraUnavailable(false);
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
@@ -79,6 +89,7 @@ export default function QRScanner({
     if (!cameraEnabled) {
       stopScanner().catch(console.error);
       setError(null);
+      setCameraUnavailable(false);
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
@@ -104,6 +115,7 @@ export default function QRScanner({
               "Camera is blocked on HTTP. Use HTTPS (or localhost) or upload a QR image below."
             )
           );
+          setCameraUnavailable(true);
           setIsScanning(false);
           return;
         }
@@ -115,6 +127,7 @@ export default function QRScanner({
               "Camera is not available on this device. You can upload a QR image below."
             )
           );
+          setCameraUnavailable(true);
           setIsScanning(false);
           return;
         }
@@ -165,6 +178,7 @@ export default function QRScanner({
         activeRef.current = true;
         setIsStarting(false);
         setIsScanning(true);
+        setCameraUnavailable(false);
       } catch (err) {
         console.error("QR Scanner error:", err);
 
@@ -179,8 +193,10 @@ export default function QRScanner({
               "Camera access denied. Please allow camera access in your browser settings and try again."
             )
           );
+          setCameraUnavailable(true);
         } else if (errStr.includes('NotFoundError')) {
           setError(t("ui_camera_not_found_9a1c3b4d5e", "No camera found on this device."));
+          setCameraUnavailable(true);
         } else if (errStr.includes('NotReadableError')) {
           setError(
             t(
@@ -188,6 +204,7 @@ export default function QRScanner({
               "Camera is already in use by another application."
             )
           );
+          setCameraUnavailable(true);
         } else {
           setError(
             t(
@@ -195,6 +212,7 @@ export default function QRScanner({
               "Unable to access camera. Please check permissions and try again."
             )
           );
+          setCameraUnavailable(true);
         }
 
         setIsScanning(false);
@@ -263,8 +281,10 @@ export default function QRScanner({
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 22 22' shape-rendering='crispEdges'%3E%3Crect width='22' height='22' fill='none'/%3E%3Crect x='0' y='0' width='6' height='6' fill='%23fff'/%3E%3Crect x='16' y='0' width='6' height='6' fill='%23fff'/%3E%3Crect x='0' y='16' width='6' height='6' fill='%23fff'/%3E%3Crect x='8' y='2' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='2' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='5' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='7' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='17' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
   const showEmbeddedFauxQr = embedded && showFauxQrBackground && !showStaticImage;
   const showStaticQr = showStaticImage && (staticImageSrc || staticContent);
+  const hideReader = hideWhenUnavailable && cameraUnavailable;
+  const hideScannerCard = hideWhenUnavailable && cameraUnavailable && !showStaticQr;
 
-	  const scannerCard =
+  const scannerCard =
 	  <div
 	    className={[
 	    embedded ?
@@ -348,7 +368,7 @@ export default function QRScanner({
             </div>
           ) : null}
         </div>
-      ) : (
+      ) : hideReader ? null : (
         <div className="mb-4">
           <div
             id={readerIdRef.current}
@@ -408,6 +428,7 @@ export default function QRScanner({
     </div>;
 
   if (embedded) {
+    if (hideScannerCard) return null;
     return scannerCard;
   }
 
@@ -420,6 +441,7 @@ export default function QRScanner({
       {scannerCard}
     </div>;
 
+  if (hideScannerCard) return null;
   // Utiliser createPortal pour rendre dans document.body
   return typeof document !== 'undefined' ? createPortal(content, document.body) : null;
 }
