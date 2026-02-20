@@ -30,6 +30,9 @@ export default function WalletDashboardStatementModals({
   setShowCurrencyStatement,
   selectedStatementToken,
   setSelectedStatementToken,
+  statementBalance = null,
+  statementTotalBalanceUsd = null,
+  globalStatementTokens = null,
   inlineGlobalStatement = false,
   inlineGlobalStatementClassName = "",
   inlineStatementVariant,
@@ -338,7 +341,7 @@ export default function WalletDashboardStatementModals({
       {inlineGlobalStatement ? (
         <div className={inlineGlobalStatementClassName}>
           <GlobalStatement
-            tokens={augmentedTokens}
+            tokens={globalStatementTokens || augmentedTokens}
             walletAddress={effectiveWallet}
             walletLabelOverride={walletDisplayLabel}
             isPreviewMode={isPreviewMode}
@@ -352,6 +355,7 @@ export default function WalletDashboardStatementModals({
             variant={inlineStatementVariant || "inline-desktop"}
             inline
             usdRates={usdRates}
+            totalBalanceOverride={statementTotalBalanceUsd}
             movements={canFetchStatements ? globalMovements : previewMovements}
             movementsLoading={canFetchStatements ? globalLoading : false}
             movementsError={canFetchStatements ? globalError : null}
@@ -371,7 +375,14 @@ export default function WalletDashboardStatementModals({
 	        <div className={inlineCurrencyStatementClassName}>
 	          <CurrencyStatement
 	            currency={selectedStatementToken.currency}
-	            balance={parseFloat(selectedStatementToken.value || 0)}
+	            balance={
+                statementBalance !== null &&
+                statementBalance !== undefined &&
+                statementBalance !== "" &&
+                Number.isFinite(Number(statementBalance))
+                  ? Number(statementBalance)
+                  : parseFloat(selectedStatementToken.value || 0)
+              }
 	            issuer={selectedStatementToken.issuer}
 	            walletAddress={effectiveWallet}
 	            walletLabelOverride={walletDisplayLabel}
@@ -412,7 +423,7 @@ export default function WalletDashboardStatementModals({
 
       {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
         <GlobalStatement
-          tokens={augmentedTokens}
+          tokens={globalStatementTokens || augmentedTokens}
           walletAddress={effectiveWallet}
           walletLabelOverride={walletDisplayLabel}
           isPreviewMode={isPreviewMode}
@@ -425,6 +436,7 @@ export default function WalletDashboardStatementModals({
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}
+          totalBalanceOverride={statementTotalBalanceUsd}
           movements={canFetchStatements ? globalMovements : previewMovements}
           movementsLoading={canFetchStatements ? globalLoading : false}
           movementsError={canFetchStatements ? globalError : null}
@@ -444,7 +456,14 @@ export default function WalletDashboardStatementModals({
       {currencyModalTransition.shouldRender && effectiveCurrencyToken && !inlineCurrencyStatement ? (
         <CurrencyStatement
           currency={effectiveCurrencyToken.currency}
-          balance={parseFloat(effectiveCurrencyToken.value || 0)}
+          balance={
+            statementBalance !== null &&
+            statementBalance !== undefined &&
+            statementBalance !== "" &&
+            Number.isFinite(Number(statementBalance))
+              ? Number(statementBalance)
+              : parseFloat(effectiveCurrencyToken.value || 0)
+          }
           issuer={effectiveCurrencyToken.issuer}
           walletAddress={effectiveWallet}
           walletLabelOverride={walletDisplayLabel}

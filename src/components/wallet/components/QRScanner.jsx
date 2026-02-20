@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useModalTransition } from "@/utils/useModalTransition";
+import { normalizeQrImageFile } from "@/utils/qrImage";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
@@ -235,7 +236,13 @@ export default function QRScanner({
       html5QrCodeRef.current || new Html5Qrcode(readerIdRef.current);
       html5QrCodeRef.current = html5QrCode;
 
-      const decodedText = await html5QrCode.scanFile(file, true);
+      let scanFile = file;
+      try {
+        scanFile = await normalizeQrImageFile(file, { maxDimension: 1600 });
+      } catch {
+        scanFile = file;
+      }
+      const decodedText = await html5QrCode.scanFile(scanFile, true);
       await stopScanner();
       onScan(decodedText);
     } catch (err) {

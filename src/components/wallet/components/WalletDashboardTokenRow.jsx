@@ -7,6 +7,7 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 	  getCurrencyFlag,
 	  getTokenIcon,
 	  getDisplayCurrencyCode,
+	  formatAmountWithSymbol,
 	  USD_STABLECOINS } from
 	"../walletDashboardConfig";
 import { useTranslation } from "next-i18next";
@@ -47,7 +48,8 @@ export default function WalletDashboardTokenRow({
   onActivateWallet,
   onOpenRlusdProgram
 		}) {
-		  const { t } = useTranslation("common");
+		  const { t, i18n } = useTranslation("common");
+		  const locale = i18n?.language || "en";
 		  const currencyCode = String(token?.currency || "").toUpperCase();
 		  const displayCode = getDisplayCurrencyCode(currencyCode);
 		  const isDisplayOverride = displayCode !== currencyCode;
@@ -242,11 +244,15 @@ export default function WalletDashboardTokenRow({
           )}
 			          <div className="text-right text-[14px] md:text-[15px] text-primary shrink-0">
 			            <div className="font-mono">
-			              {Number.isFinite(displayValue) ?
-			              displayValue.toLocaleString("en-US", {
-		                maximumFractionDigits: 4
-	              }) :
-	              "0"}
+			            {Number.isFinite(displayValue)
+			              ? formatAmountWithSymbol(locale, displayValue, displayCode, {
+			                  minimumFractionDigits: 0,
+			                  maximumFractionDigits: 4,
+			                })
+			              : formatAmountWithSymbol(locale, 0, displayCode, {
+			                  minimumFractionDigits: 0,
+			                  maximumFractionDigits: 4,
+			                })}
 	            </div>
 	          </div>
 	        </div>

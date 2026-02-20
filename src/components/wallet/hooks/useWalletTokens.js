@@ -1,8 +1,24 @@
 "use client";
 
 import { useMemo } from "react";
+import { WALLET_CURRENCY_LINE_ORDER } from "../walletDashboardConfig";
+
+const WALLET_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
 
 export function useWalletTokens({ displayTokens, currencyLines }) {
+  const currencyOrderIndex = useMemo(() => {
+    const entries = Array.isArray(WALLET_CURRENCY_LINE_ORDER)
+      ? WALLET_CURRENCY_LINE_ORDER
+      : [];
+    const index = new Map();
+    entries.forEach((code, idx) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper) return;
+      if (!index.has(upper)) index.set(upper, idx);
+    });
+    return index;
+  }, []);
+
   const allocatedRlusdByCurrency = useMemo(() => {
     const map = new Map();
     (currencyLines || []).forEach((line) => {
@@ -46,8 +62,22 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
       return { ...token, allocatedRlusd: allocated };
     });
 
-    return withAllocations;
-  }, [allocatedRlusdByCurrency, currencyLines, displayTokens]);
+    return withAllocations.sort((a, b) => {
+      const aCode = String(a?.currency || "").toUpperCase();
+      const bCode = String(b?.currency || "").toUpperCase();
+      const aPriority = Object.prototype.hasOwnProperty.call(WALLET_TOKEN_PRIORITY, aCode)
+        ? WALLET_TOKEN_PRIORITY[aCode]
+        : Number.POSITIVE_INFINITY;
+      const bPriority = Object.prototype.hasOwnProperty.call(WALLET_TOKEN_PRIORITY, bCode)
+        ? WALLET_TOKEN_PRIORITY[bCode]
+        : Number.POSITIVE_INFINITY;
+      if (aPriority !== bPriority) return aPriority - bPriority;
+      const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+      const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return aCode.localeCompare(bCode);
+    });
+  }, [allocatedRlusdByCurrency, currencyLines, currencyOrderIndex, displayTokens]);
 
   const walletCurrencyOptions = useMemo(() => {
     const seen = new Set();

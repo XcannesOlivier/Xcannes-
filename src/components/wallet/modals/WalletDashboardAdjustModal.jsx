@@ -9,6 +9,7 @@ import {
   XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 import { useModalTransition } from "@/utils/useModalTransition";
+import { formatAmountWithSymbol, getDisplayCurrencyCode } from "../walletDashboardConfig";
 
 const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
 
@@ -31,7 +32,8 @@ export default function WalletDashboardAdjustModal({
   adjustmentFeeRlusd = DEFAULT_ADJUSTMENT_FEE_RLUSD,
   inline = false,
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -61,7 +63,9 @@ export default function WalletDashboardAdjustModal({
 
   const lineRows = useMemo(() => {
     const activeLines = Array.isArray(currencyLines)
-      ? currencyLines.filter((line) => line?.active !== false)
+      ? currencyLines.filter(
+        (line) => line?.active !== false && !line?.isDerived
+      )
       : [];
 
     return activeLines.map((line) => {
@@ -232,11 +236,19 @@ export default function WalletDashboardAdjustModal({
 
   if (!shouldRender) return null;
 
+  const formatWithCurrency = (amount, currency, options = {}) => {
+    const display = getDisplayCurrencyCode(currency);
+    return formatAmountWithSymbol(locale, amount, display, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 6,
+      ...options,
+    });
+  };
   const remainingLabel = Number.isFinite(totals.remaining)
-    ? totals.remaining.toLocaleString("en-US", { maximumFractionDigits: 6 })
+    ? formatWithCurrency(totals.remaining, "RLUSD", { maximumFractionDigits: 6 })
     : "-";
   const requiredLabel = Number.isFinite(requiredTotalRlusd)
-    ? requiredTotalRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })
+    ? formatWithCurrency(requiredTotalRlusd, "RLUSD", { maximumFractionDigits: 6 })
     : "-";
 
   const wrapperClass = inline
@@ -345,7 +357,7 @@ export default function WalletDashboardAdjustModal({
                 )}
                 :{" "}
                 <span className="font-semibold text-amber-100">
-                  {requiredLabel} RLUSD
+                  {requiredLabel}
                 </span>{" "}
                 <span className="text-amber-200/60">
                   ({t("ui_includes_fee_2d1c9b7a5e", "inclut frais")} {feeRlusd}{" "}
@@ -365,7 +377,7 @@ export default function WalletDashboardAdjustModal({
                       : "text-amber-100 font-semibold"
                   }
                 >
-                  {remainingLabel} RLUSD
+                  {remainingLabel}
                 </span>
               </div>
             </div>
@@ -383,18 +395,18 @@ export default function WalletDashboardAdjustModal({
                   const unitsLabel =
                     row.units == null || !Number.isFinite(row.units)
                       ? "-"
-                      : row.units.toLocaleString("en-US", {
+                      : formatWithCurrency(row.units, row.code, {
                           maximumFractionDigits: 6,
                         });
-                  const rlusdLabel = row.allocatedRlusd.toLocaleString("en-US", {
+                  const rlusdLabel = formatWithCurrency(row.allocatedRlusd, "RLUSD", {
                     maximumFractionDigits: 6,
                   });
-                  const deltaRlusdLabel = row.deltaRlusd.toLocaleString("en-US", {
+                  const deltaRlusdLabel = formatWithCurrency(row.deltaRlusd, "RLUSD", {
                     maximumFractionDigits: 6,
                   });
                   const rateLabel =
                     Number.isFinite(row.rlusdPerUnit) && row.rlusdPerUnit > 0
-                      ? row.rlusdPerUnit.toLocaleString("en-US", {
+                      ? formatWithCurrency(row.rlusdPerUnit, "RLUSD", {
                           maximumFractionDigits: 6,
                         })
                       : null;
@@ -418,15 +430,15 @@ export default function WalletDashboardAdjustModal({
                             )}
                             :{" "}
                             <span className="text-white/80">
-                              {unitsLabel} {row.code}
+                              {unitsLabel}
                             </span>{" "}
                             <span className="text-white/40">
-                              (≈ {rlusdLabel} RLUSD)
+                              (≈ {rlusdLabel})
                             </span>
                           </div>
                           {rateLabel ? (
                             <div className="text-[10px] text-white/35">
-                              1 {row.code} ≈ {rateLabel} RLUSD
+                              1 {row.code} ≈ {rateLabel}
                             </div>
                           ) : (
                             <div className="text-[10px] text-amber-200/70">
@@ -464,7 +476,7 @@ export default function WalletDashboardAdjustModal({
                             )}
                             :{" "}
                             <span className="text-white/70">
-                              {deltaRlusdLabel} RLUSD
+                              {deltaRlusdLabel}
                             </span>
                           </div>
                         </div>

@@ -29,9 +29,8 @@ export default function WalletDashboardCurrencyLinesPanel({
   const normalizedLines = useMemo(() => {
     return (currencyLines || []).map((line) => {
       const code = String(line?.currencyCode || "").toUpperCase();
-      if (code === "USD") return null;
       const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
-      return { code, allocated };
+      return { code, allocated, isDerived: Boolean(line?.isDerived) };
     }).filter(Boolean);
   }, [currencyLines]);
   useEffect(() => {
@@ -99,9 +98,9 @@ export default function WalletDashboardCurrencyLinesPanel({
 
         <div className={listClassName}>
 	            {normalizedLines.map((line) => {
-	              const displayCode = getDisplayCurrencyCode(line.code);
-	              const isConfirming = confirmingCode === line.code;
-	              const canDelete = Number(line.allocated || 0) <= 0;
+              const displayCode = getDisplayCurrencyCode(line.code);
+              const isConfirming = confirmingCode === line.code;
+              const canDelete = !line.isDerived && Number(line.allocated || 0) <= 0;
 	              return (
 	                <div key={line.code} className="space-y-2">
 	                  <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-2">
@@ -118,18 +117,24 @@ export default function WalletDashboardCurrencyLinesPanel({
                         </div>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setConfirmingCode((prev) =>
-                          prev === line.code ? null : line.code
-                        );
-                      }}
-                      className={`px-2 py-1 text-[10px] ${redActionBtnMuted}`}>
+                    {!line.isDerived ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmingCode((prev) =>
+                            prev === line.code ? null : line.code
+                          );
+                        }}
+                        className={`px-2 py-1 text-[10px] ${redActionBtnMuted}`}>
 
-                      {t("delete", "Delete")}
-                    </button>
+                        {t("delete", "Delete")}
+                      </button>
+                    ) : (
+                      <div className="px-2 py-1 text-[10px] rounded-md border border-white/15 text-white/40">
+                        {t("ui_currency_line_reserved_label_f4", "Reserve")}
+                      </div>
+                    )}
                   </div>
                   {isConfirming ? (
                     <div

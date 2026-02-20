@@ -27,8 +27,43 @@ export function usePaymentRequestScanner({
   const handlePaymentRequestScan = useCallback(
     (data) => {
       const raw = String(data || "").trim();
+      const decodePrefixedPayreq = (value) => {
+        const match = String(value || "").match(
+          /^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i
+        );
+        if (!match) return null;
+        const payload = String(match[2] || "").trim();
+        if (!payload) return null;
+        try {
+          const padded =
+            payload.replace(/-/g, "+").replace(/_/g, "/") +
+            "===".slice((payload.length + 3) % 4);
+          return Buffer.from(padded, "base64").toString("utf8");
+        } catch {
+          return null;
+        }
+      };
+      const normalizePayreqPayload = (request) => {
+        if (!request || typeof request !== "object") return request;
+        const normalized = { ...request };
+        if (request.s && !normalized.schema) normalized.schema = request.s;
+        if (request.tc && !normalized.targetCurrency) normalized.targetCurrency = request.tc;
+        if (request.t && !normalized.to) normalized.to = request.t;
+        if (request.da != null && normalized.displayAmount == null) normalized.displayAmount = request.da;
+        if (request.dc && !normalized.displayCurrency) normalized.displayCurrency = request.dc;
+        if (request.ar != null && normalized.amountRlusd == null) normalized.amountRlusd = request.ar;
+        if (request.fr != null && normalized.fxRate == null) normalized.fxRate = request.fr;
+        if (request.fs && !normalized.fxSource) normalized.fxSource = request.fs;
+        if (request.i && !normalized.issuer) normalized.issuer = request.i;
+        if (request.m && !normalized.memo) normalized.memo = request.m;
+        if (request.b && !normalized.beneficiaryLabel) normalized.beneficiaryLabel = request.b;
+        if (request.c && !normalized.createdAt) normalized.createdAt = request.c;
+        return normalized;
+      };
+      const prefixedDecoded = decodePrefixedPayreq(raw);
+      const payload = prefixedDecoded || raw;
 
-      const looksLikeXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(raw);
+      const looksLikeXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(payload);
 
       const tryParseUri = (value) => {
         try {
@@ -85,13 +120,15 @@ export function usePaymentRequestScanner({
             setSendAssetKey?.(matchingToken.key);
           }
         }
+        setSendPaymentRequest?.(null);
         setSendTab?.("manual");
         setPaymentRequestScannerOpen(false);
       };
 
       try {
         // 1) JSON
-        const request = JSON.parse(raw);
+        const requestRaw = JSON.parse(payload);
+        const request = normalizePayreqPayload(requestRaw);
         if (request && request.to) {
           const schema = String(request.schema || request.kind || "").toLowerCase();
           const isXcannesPayReq =
@@ -107,7 +144,13 @@ export function usePaymentRequestScanner({
             .toUpperCase();
 
           const displayAmount = request.displayAmount ?? request.amount ?? null;
-          const amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+          let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+          if (
+            (amountRlusd == null || Number.isNaN(Number(amountRlusd))) &&
+            targetCurrency === "RLUSD"
+          ) {
+            amountRlusd = displayAmount;
+          }
           const fxRate = request.fxRate ?? null;
           const fxSource = request.fxSource ?? null;
           const memo = request.memo ?? null;
@@ -178,14 +221,14 @@ export function usePaymentRequestScanner({
 
       // 2) XRPL address only
       if (looksLikeXrplAddress) {
-        applyPrefill({ to: raw });
+        applyPrefill({ to: payload });
         return;
       }
 
       // 3) URI/URL formats (xrpl://..., xrpl:..., https://...?to=... etc.)
-      const parsed = tryParseUri(raw);
+      const parsed = tryParseUri(payload);
       if (parsed?.request?.to) {
-        const request = parsed.request;
+        const request = normalizePayreqPayload(parsed.request);
         const schema = String(request.schema || request.kind || "").toLowerCase();
         const isXcannesPayReq =
           schema.includes("xcannes") || schema.includes("payreq") || Boolean(request.targetCurrency);
@@ -200,7 +243,13 @@ export function usePaymentRequestScanner({
           .toUpperCase();
 
         const displayAmount = request.displayAmount ?? request.amount ?? null;
-        const amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+        let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
+        if (
+          (amountRlusd == null || Number.isNaN(Number(amountRlusd))) &&
+          targetCurrency === "RLUSD"
+        ) {
+          amountRlusd = displayAmount;
+        }
         const fxRate = request.fxRate ?? null;
         const fxSource = request.fxSource ?? null;
         const memo = request.memo ?? null;

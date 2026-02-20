@@ -34,6 +34,7 @@ export function useSwapConversion({
   getAllMarkets,
   getTicker,
   getFxEod,
+  onDemoConvert,
 }) {
   useEffect(() => {
     if (!swapCurrencyOptions?.length) return;
@@ -311,6 +312,17 @@ export function useSwapConversion({
           return next;
         });
 
+        onDemoConvert?.({
+          base,
+          quote,
+          amountBase,
+          amountQuote: quoteUnits,
+          amountRlusdGross: grossRlusd,
+          amountRlusdNet: netRlusd,
+          spreadFeeRlusd: spreadFee,
+          ts: Date.now(),
+        });
+
         const spreadLabel =
           spread?.isFx && spreadFee > 0
             ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
@@ -524,6 +536,7 @@ export function useSwapConversion({
     isPreviewMode,
     refreshBalance,
     refreshCurrencyLines,
+    onDemoConvert,
     setConvertAmount,
     setConvertPreview,
     setConvertProcessing,
