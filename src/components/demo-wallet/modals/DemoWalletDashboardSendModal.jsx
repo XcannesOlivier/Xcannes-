@@ -59,6 +59,7 @@ export default function DemoWalletDashboardSendModal({
   const [isDesktop, setIsDesktop] = useState(false);
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
+  const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const scanQrFileInputId = "send-qr-file";
   const manualQrFileInputId = "manual-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -256,6 +257,7 @@ export default function DemoWalletDashboardSendModal({
   const handleScanAgain = () => {
     setScanActive(true);
     setScanKey((prev) => prev + 1);
+    setCameraUnavailable(false);
   };
   const handleScanQrUpload = () => {
     const input = document.getElementById(scanQrFileInputId);
@@ -267,6 +269,7 @@ export default function DemoWalletDashboardSendModal({
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
       setRequestText("");
+      setCameraUnavailable(false);
     }
   }, [open]);
 
@@ -290,6 +293,7 @@ export default function DemoWalletDashboardSendModal({
     }
     setScanActive(true);
     setScanKey((prev) => prev + 1);
+    setCameraUnavailable(false);
   }, [open]);
 
   useEffect(() => {
@@ -362,6 +366,37 @@ export default function DemoWalletDashboardSendModal({
           </div>
         ) : null}
       </div>
+    </div>
+  ) : null;
+
+  const saveAddressBlock = canSaveDestination ? (
+    <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
+      <label className="flex items-center gap-2 text-[11px] text-white/60">
+        <input
+          type="checkbox"
+          checked={saveNewAddress}
+          onChange={(e) => setSaveNewAddress(e.target.checked)}
+          className="accent-xcannes-green"
+        />
+        {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
+      </label>
+      {saveNewAddress ? (
+        <div className="space-y-1">
+          <div className="text-[11px] text-white/60">
+            {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
+          </div>
+          <input
+            type="text"
+            value={saveNewAddressLabel}
+            onChange={(e) => setSaveNewAddressLabel(e.target.value)}
+            placeholder={t(
+              "ui_e_g_exchange_friend_11008b5e9e",
+              "e.g., Exchange, Friend, ..."
+            )}
+            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
+          />
+        </div>
+      ) : null}
     </div>
   ) : null;
 
@@ -596,36 +631,7 @@ export default function DemoWalletDashboardSendModal({
                 </div>
               </div>
 
-              {canSaveDestination ? (
-                <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
-                  <label className="flex items-center gap-2 text-[11px] text-white/60">
-                    <input
-                      type="checkbox"
-                      checked={saveNewAddress}
-                      onChange={(e) => setSaveNewAddress(e.target.checked)}
-                      className="accent-xcannes-green"
-                    />
-                    {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
-                  </label>
-                  {saveNewAddress ? (
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-white/60">
-                        {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
-                      </div>
-                      <input
-                        type="text"
-                        value={saveNewAddressLabel}
-                        onChange={(e) => setSaveNewAddressLabel(e.target.value)}
-                        placeholder={t(
-                          "ui_e_g_exchange_friend_11008b5e9e",
-                          "e.g., Exchange, Friend, ..."
-                        )}
-                        className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
+              {saveAddressBlock}
             </div>
           </div>
         </div>
@@ -674,6 +680,8 @@ export default function DemoWalletDashboardSendModal({
           showClose={false}
           fileInputId={scanQrFileInputId}
           enableCamera={true}
+          hideWhenUnavailable={isDesktop}
+          onCameraUnavailableChange={setCameraUnavailable}
           showFauxQrBackground={false}
           className="bg-black/30 border-white/10"
         />
@@ -696,13 +704,15 @@ export default function DemoWalletDashboardSendModal({
 
   const scanRequestFooter = (
     <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
-      <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
-        <span className="h-px flex-1 bg-white/10" />
-        <span className="text-base md:text-lg font-semibold text-white/60">
-          {t("ui_or_8a4c1f83bd", "ou")}
-        </span>
-        <span className="h-px flex-1 bg-white/10" />
-      </div>
+      {!cameraUnavailable ? (
+        <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
+          <span className="h-px flex-1 bg-white/10" />
+          <span className="text-base md:text-lg font-semibold text-white/60">
+            {t("ui_or_8a4c1f83bd", "ou")}
+          </span>
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+      ) : null}
 
       <div
         className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${
@@ -711,7 +721,7 @@ export default function DemoWalletDashboardSendModal({
       >
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
           <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
-            {t("demo_payreq_token", "Request token")}
+            {t("demo_payreq_token", "Enter your QR code")}
           </div>
           <button
             type="button"
@@ -810,14 +820,24 @@ export default function DemoWalletDashboardSendModal({
           {/* Send layout */}
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="space-y-4">
-              {scannerPanel}
-              {scanActive ? scanRequestFooter : null}
-              {!scanActive ? (
+              {hasPaymentRequest ? (
                 <>
-                  {hasPaymentRequest ? requestDetailsPanel : manualForm}
+                  {requestDetailsPanel}
+                  {saveAddressBlock}
                   {sendActions}
                 </>
-              ) : null}
+              ) : (
+                <>
+                  {scannerPanel}
+                  {scanActive ? scanRequestFooter : null}
+                  {!scanActive ? (
+                    <>
+                      {manualForm}
+                      {sendActions}
+                    </>
+                  ) : null}
+                </>
+              )}
             </div>
           </div>
           <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />

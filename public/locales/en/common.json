@@ -136,7 +136,7 @@
   "demo_payreq_generate": "Generate Request",
   "demo_payreq_title": "Request payment (demo)",
   "demo_payreq_to": "To",
-  "demo_payreq_token": "Enter your payment code",
+  "demo_payreq_token": "Enter your QR code",
   "demo_quote": "Preview",
   "demo_quote_backed": "USD base",
   "demo_quote_fee": "fee",

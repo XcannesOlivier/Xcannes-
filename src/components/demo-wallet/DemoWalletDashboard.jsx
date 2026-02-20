@@ -2557,6 +2557,7 @@ export default function DemoWalletDashboard({
         onClose={() => setQrScannerOpen(false)}
         enableCamera={!showDemoMobileScannerQr}
         showStaticImage={showDemoMobileScannerQr}
+        hideWhenUnavailable={isDesktop}
         staticContent={showDemoMobileScannerQr ? (
           <QRCodeCanvas
             value={DEMO_FAUX_PAYREQ_EXAMPLE}

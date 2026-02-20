@@ -2950,6 +2950,7 @@ export default function WalletDashboard({
                   embedded
                   onScan={handleAddressScan}
                   onClose={() => setQrScannerOpen(false)}
+                  hideWhenUnavailable
                   className="h-full"
                 />
               </div>
