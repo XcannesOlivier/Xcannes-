@@ -513,41 +513,46 @@ export default function DemoWalletDashboardReceiveModal({
           if (!inline) e.stopPropagation();
         }}>
 
-          <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
+          <div className="flex items-start justify-between gap-3 mb-1 pr-6">
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <div>
+                {renderWalletMeta?.("pr-8")}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {showNotConnectedNotice ? (
+                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
+                {showNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t(
+                      "wallet_not_activated_title",
+                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                    )}
+                  </span>
+                ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "USD not activated. Authorize USD on your wallet."
+                    )}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+            <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
 
-            ✕
-          </button>
-	          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-	            {showNotConnectedNotice ? (
-	              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-	                {t("wallet_not_connected_title", "Wallet not connected")}
-	              </span>
-	            ) : null}
-            {showNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t(
-                  "wallet_not_activated_title",
-                  "Wallet not activated: a minimum reserve of 1 XRP is required."
-                )}
-              </span>
-            ) : null}
-	            {showRlusdNotActivatedNotice ? (
-	              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-	                {t(
-	                  "wallet_rlusd_not_activated_title",
-	                  "USD not activated. Authorize USD on your wallet."
-	                )}
-	              </span>
-	            ) : null}
+              ✕
+            </button>
           </div>
-          {renderWalletMeta?.("mb-2")}
-
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="wallet-tab-unfold-in">
               <p className="text-xs md:text-sm text-white/50 mb-3">

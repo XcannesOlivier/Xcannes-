@@ -94,21 +94,25 @@ export default function DemoWalletDashboardCashModal({
 
           {/* Header avec onglets Buy/Sell */}
           <div className="border-b border-white/10">
-            <div className="flex items-center justify-between p-4 pb-0">
-	              <div className="flex flex-wrap items-center gap-2">
-	                {showNotConnectedNotice ? (
-	                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-	                    {t("wallet_not_connected_title", "Wallet not connected")}
-	                  </span>
-	                ) : null}
-                {showNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t(
-                      "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required."
-                    )}
-                  </span>
-                ) : null}
+            <div className="flex items-start justify-between p-4 pb-0 gap-3">
+              <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
+                <div>
+                  {renderWalletMeta?.("pr-8")}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {showNotConnectedNotice ? (
+                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                      {t("wallet_not_connected_title", "Wallet not connected")}
+                    </span>
+                  ) : null}
+                  {showNotActivatedNotice ? (
+                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                      {t(
+                        "wallet_not_activated_title",
+                        "Wallet not activated: a minimum reserve of 1 XRP is required."
+                      )}
+                    </span>
+                  ) : null}
 	                {showRlusdNotActivatedNotice ? (
 	                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
 	                    {t(
@@ -117,6 +121,7 @@ export default function DemoWalletDashboardCashModal({
 	                    )}
 	                  </span>
 	                ) : null}
+                </div>
               </div>
               <button
               type="button"
@@ -126,10 +131,6 @@ export default function DemoWalletDashboardCashModal({
                 ✕
               </button>
             </div>
-            <div className="px-4 pb-3 space-y-1.5">
-              {renderWalletMeta?.()}
-            </div>
-
             {/* Onglets Buy/Sell */}
             <div className="flex gap-2 px-4 pt-3">
               <button
