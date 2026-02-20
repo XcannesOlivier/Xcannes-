@@ -680,7 +680,7 @@ export default function DemoWalletDashboardSendModal({
           showClose={false}
           fileInputId={scanQrFileInputId}
           enableCamera={true}
-          hideWhenUnavailable={isDesktop}
+          hideWhenUnavailable
           onCameraUnavailableChange={setCameraUnavailable}
           showFauxQrBackground={false}
           className="bg-black/30 border-white/10"

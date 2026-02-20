@@ -781,7 +781,7 @@ export default function WalletDashboardSendModal({
           showClose={false}
           fileInputId={payreqFileInputId}
           enableCamera={true}
-          hideWhenUnavailable={isDesktop}
+          hideWhenUnavailable
           onCameraUnavailableChange={setCameraUnavailable}
           showFauxQrBackground={showFauxPayreq}
           fauxQrBackgroundSize={fauxQrSize}
