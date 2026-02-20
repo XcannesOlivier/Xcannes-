@@ -5,7 +5,6 @@ import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
-import WalletDashboardCurrencyLinesPanel from "../components/WalletDashboardCurrencyLinesPanel";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
@@ -21,8 +20,6 @@ export default function WalletDashboardSwapModal({
   onClose,
   renderWalletMeta,
   isPreviewMode,
-  defaultView = "convert",
-  lockedView = null,
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
@@ -34,12 +31,8 @@ export default function WalletDashboardSwapModal({
   hasOnChainRlusd,
   onInstallTrustline,
   onActivateCurrencyLine,
-  refreshCurrencyLines,
   currencyLinesLoading,
-  currencyLinesError,
-  currencyLinesSummary,
   currencyLines,
-  handleRemoveCurrencyLine,
   swapCurrencyOptions,
   convertBaseCurrency,
   setConvertBaseCurrency,
@@ -76,16 +69,8 @@ export default function WalletDashboardSwapModal({
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
     "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
-  const greenTabInactive =
-    "rounded-lg border border-[#22C55E]/40 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-[#22C55E]/60 hover:text-white/80";
-  const [view, setView] = useState("convert"); // 'convert' | 'lines'
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
-  useEffect(() => {
-    if (!open) return;
-    const nextView = lockedView || defaultView || "convert";
-    setView(nextView);
-  }, [defaultView, lockedView, open]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -134,15 +119,8 @@ export default function WalletDashboardSwapModal({
     inline &&
     isDesktop &&
     noticeVariant !== "demo" &&
-    dashboardVariant === "full" &&
-    view === "convert";
+    dashboardVariant === "full";
   const useDesktopWalletConvertLayout = showDesktopWalletConvertNote;
-  const lockLinesScrollToList =
-    inline &&
-    isDesktop &&
-    noticeVariant !== "demo" &&
-    dashboardVariant === "full" &&
-    view === "lines";
   const [previewState, setPreviewState] = useState({ status: "idle", error: null });
   const [previewAmount, setPreviewAmount] = useState(null);
   const [previewMeta, setPreviewMeta] = useState(null);
@@ -314,19 +292,6 @@ export default function WalletDashboardSwapModal({
       onClose?.();
     }
   };
-  const handleDeleteLine = async (code) => {
-    let didDelete = false;
-    try {
-      const result = await handleRemoveCurrencyLine?.(code);
-      didDelete = Boolean(result);
-    } catch (error) {
-      console.error("[wallet/swap] delete currency line failed:", error);
-    }
-    if (didDelete) {
-      onClose?.();
-    }
-  };
-
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -366,86 +331,57 @@ export default function WalletDashboardSwapModal({
           if (!inline) e.stopPropagation();
         }}>
 
-          <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
-          className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
-
-            ✕
-          </button>
           <div
-          className={`flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-3 md:space-y-4 ${
-            lockLinesScrollToList ? "overflow-hidden" : "overflow-y-auto"
-          }`}
+          className="flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}>
-            <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-              {noticeVariant === "demo" ? (
-                <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                  {t("demo_notice_title", "Mode démo")}
-                </span>
-              ) : null}
-              {showNotConnectedNotice ? (
-                <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                  {t("wallet_not_connected_title", "Wallet not connected")}
-                </span>
-              ) : null}
-              {showNotActivatedNotice ? (
-                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                  {t(
-                    "wallet_not_activated_title",
-                    "Wallet not activated: a minimum reserve of 1 XRP is required."
-                  )}
-                </span>
-              ) : null}
-              {showRlusdNotActivatedNotice ? (
-                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                  {t(
-                    "wallet_rlusd_not_activated_title",
-                    "USD not activated. Authorize USD on your wallet."
-                  )}
-                </span>
-              ) : null}
-            </div>
-	            {renderWalletMeta?.("mb-2")}
-
-
-            {!lockedView ? (
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setView("convert");
-                  }}
-                  className={`px-3 py-2 text-xs md:text-sm ${
-                    view === "convert" ? greenActionBtnMuted : greenTabInactive
-                  }`}
-                >
-                  {t("ui_convert_8408e969ec", "Convert")}
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setView("lines");
-                  }}
-                  className={`px-3 py-2 text-xs md:text-sm ${
-                    view === "lines" ? greenActionBtnMuted : greenTabInactive
-                  }`}
-                >
-                  {t("ui_currency_lines_267fc2eff3", "Currency lines")}
-                </button>
+            <div className="flex items-start justify-between gap-3 mb-1 pr-6">
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <div>
+                  {renderWalletMeta?.("pr-8")}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {noticeVariant === "demo" ? (
+                    <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                      {t("demo_notice_title", "Mode démo")}
+                    </span>
+                  ) : null}
+                  {showNotConnectedNotice ? (
+                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                      {t("wallet_not_connected_title", "Wallet not connected")}
+                    </span>
+                  ) : null}
+                  {showNotActivatedNotice ? (
+                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                      {t(
+                        "wallet_not_activated_title",
+                        "Wallet not activated: a minimum reserve of 1 XRP is required."
+                      )}
+                    </span>
+                  ) : null}
+                  {showRlusdNotActivatedNotice ? (
+                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                      {t(
+                        "wallet_rlusd_not_activated_title",
+                        "USD not activated. Authorize USD on your wallet."
+                      )}
+                    </span>
+                  ) : null}
+                </div>
               </div>
-            ) : null}
+              <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
 
+                ✕
+              </button>
+            </div>
           <div
-            key={view}
             className={inline ? "wallet-tab-unfold-in flex-1 min-h-0 flex flex-col" : "wallet-tab-unfold-in"}
           >
-	            {view === "convert" ?
 		        <div className={`space-y-5 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
 		              <div className={useDesktopWalletConvertLayout
 		                ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
@@ -511,6 +447,58 @@ export default function WalletDashboardSwapModal({
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
             />
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                <div className="text-[11px] font-semibold text-white/80">
+                  {t("ui_available_currencies_267b159a9a", "Available currencies")}
+                </div>
+                {!canMutateLines ? (
+                  <p className="mt-1 text-[10px] text-white/45">
+                    {!effectiveIsConnected ?
+                      t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.") :
+                      isWalletActivated === false ?
+                        t("ui_wallet_activation_required_f4", "Wallet must be activated to create currency lines.") :
+                        t("ui_trustlines_required_currency_lines_f4", "USD trustline is required to create currency lines.")}
+                  </p>
+                ) : null}
+
+                <div className="mt-2 grid grid-cols-1 gap-2">
+	                  <WalletCurrencySelector
+	                value={activateCurrencyCode}
+	                onChange={setActivateCurrencyCode}
+	                placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
+	                quickOptions={suggestedCurrencies}
+	                excludeCodes={["USD"]}
+	                showQuickAdd={false} />
+
+                  {isLineAlreadyActive ? (
+                    <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+                      {t(
+                        "ui_currency_line_already_active_5df2d3b1a8",
+                        "Ligne de compte déjà active"
+                      )}
+                    </div>
+                  ) : null}
+
+                  <SwipeConfirmButton
+                label={t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+                onConfirm={handleActivateLine}
+                disabled={activateLineDisabled}
+                variant="green"
+                className="md:hidden" />
+                  <button
+                type="button"
+                disabled={activateLineDisabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleActivateLine();
+                }}
+                className={`hidden md:block w-full px-3 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+
+
+              </button>
+                </div>
               </div>
 
               <div>
@@ -625,85 +613,9 @@ export default function WalletDashboardSwapModal({
 
                 
               </div>
-            </div> :
-
-        <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-              <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-                <div className="text-[11px] font-semibold text-white/80">{t("ui_available_currencies_267b159a9a", "Available currencies")}
-
             </div>
-                {!canMutateLines &&
-            <p className="mt-1 text-[10px] text-white/45">
-                  {!effectiveIsConnected ?
-              t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.") :
-              isWalletActivated === false ?
-              t("ui_wallet_activation_required_f4", "Wallet must be activated to create currency lines.") :
-	              t("ui_trustlines_required_currency_lines_f4", "USD trustline is required to create currency lines.")}
-                </p>
-            }
-
-                <div className="mt-2 grid grid-cols-1 gap-2">
-	                  <WalletCurrencySelector
-	                value={activateCurrencyCode}
-	                onChange={setActivateCurrencyCode}
-	                placeholder={t("ui_select_a_currency_to_activat_776d6af637", "Select a currency to activate...")}
-	                quickOptions={suggestedCurrencies}
-	                excludeCodes={["USD"]}
-	                showQuickAdd={false} />
-
-                  {isLineAlreadyActive ? (
-                    <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
-                      {t(
-                        "ui_currency_line_already_active_5df2d3b1a8",
-                        "Ligne de compte déjà active"
-                      )}
-                    </div>
-                  ) : null}
-
-                  <SwipeConfirmButton
-                label={t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
-                onConfirm={handleActivateLine}
-                disabled={activateLineDisabled}
-                variant="green"
-                className="md:hidden" />
-                  <button
-                type="button"
-                disabled={activateLineDisabled}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleActivateLine();
-                }}
-                className={`hidden md:block w-full px-3 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
-
-
-              </button>
-                </div>
-              </div>
-
-              <WalletDashboardCurrencyLinesPanel
-            currencyLinesLoading={currencyLinesLoading}
-            currencyLinesError={currencyLinesError}
-            currencyLinesSummary={currencyLinesSummary}
-            currencyLines={currencyLines}
-            selectIconByCurrency={selectIconByCurrency}
-            onRefresh={refreshCurrencyLines}
-            onDelete={handleDeleteLine}
-            inline={inline}
-            className={inline ? "flex-1 min-h-0" : ""} />
-
-
-            </div>
-        }
           </div>
           </div>
-          {view === "lines" ? (
-            <div className="border-t border-white/10 px-4 md:px-5 py-2 text-[10px] text-white/45">
-              {t(
-                "ui_currency_lines_footer_tip_f4",
-                "Besoin d'une nouvelle devise ? Activez une ligne en quelques secondes."
-              )}
-            </div>
-          ) : null}
         </div>
       </div>
     </>;
