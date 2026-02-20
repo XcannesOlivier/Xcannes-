@@ -44,7 +44,6 @@ export default function WalletDashboardSendModal({
   handleSendSubmit,
   sendProcessing,
   enableSaveAddress = false,
-  showFauxPayreqDecor,
   inline = false
 }) {
   const { t, i18n } = useTranslation("common");
@@ -83,7 +82,7 @@ export default function WalletDashboardSendModal({
   const payreqQrDecor = manualQrDecor;
   const fauxPayreqExample =
     '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
-  const showFauxPayreq = Boolean((showFauxPayreqDecor ?? inline) && (isDesktop || isDemoMode));
+  const showFauxPayreq = false;
   const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
   const useUnifiedPayreqPanel = useDexStyleLayout;
   const showManualQrUpload = useDexStyleLayout;
@@ -139,7 +138,6 @@ export default function WalletDashboardSendModal({
     Boolean(normalizedDestination) &&
     Number.isFinite(normalizedSendAmount) &&
     normalizedSendAmount > 0;
-  const canLoadRequest = Boolean(requestText.trim());
   const handleManualSend = async () => {
     const result = await handleSendSubmit?.({
       saveDestination:
@@ -150,9 +148,6 @@ export default function WalletDashboardSendModal({
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
     }
-  };
-  const handleLoadRequest = () => {
-    handlePaymentRequestScan?.(requestText);
   };
   const handleManualQrFile = async (file) => {
     if (!file) return;
@@ -241,6 +236,68 @@ export default function WalletDashboardSendModal({
     }
     return false;
   };
+  const scanRequestFooter = (
+    <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
+      <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
+        <span className="h-px flex-1 bg-white/10" />
+        <span className="text-base md:text-lg font-semibold text-white/60">
+          {t("ui_or_8a4c1f83bd", "ou")}
+        </span>
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
+
+      <div
+        className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${
+          inline ? "flex-1 min-h-0 flex flex-col" : ""
+        }`}
+      >
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
+          <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
+            {t("demo_payreq_token", "Request token")}
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              const input = document.getElementById(payreqFileInputId);
+              input?.click();
+            }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+          >
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+              +
+            </span>
+            {t(
+              "ui_or_upload_a_qr_image_works_e_df6baa8039",
+              "Charger une image qrcode"
+            )}
+          </button>
+        </div>
+        <div className="relative">
+          {showFauxPayreq ? (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 p-3 pointer-events-none"
+            >
+              {fauxPayreqOverlay}
+            </div>
+          ) : null}
+          <textarea
+            value={requestText}
+            onChange={(e) => setRequestText(e.target.value)}
+            onPaste={handlePastePayload}
+            className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
+              inline ? "flex-1 min-h-[160px]" : ""
+            }`}
+            placeholder={t(
+              "ui_payreq_placeholder_3a9c1b7d2e",
+              "xcannes-payreq:... / JSON"
+            )}
+          />
+        </div>
+      </div>
+    </div>
+  );
 
   useEffect(() => {
     if (!open) {
@@ -709,25 +766,6 @@ export default function WalletDashboardSendModal({
           <>
                 <div className={`rounded-lg border border-white/10 bg-black/30 p-4 space-y-3 md:rounded-xl ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
                   <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-end md:gap-3">
-                      <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const input = document.getElementById(payreqFileInputId);
-                        input?.click();
-                      }}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white">
-
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                          +
-                        </span>
-                        {t(
-                          "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                          "Charger une image qrcode"
-                        )}
-                      </button>
-                    </div>
                     <div className="relative h-[160px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[200px]">
                       <div
                         aria-hidden="true"
@@ -766,54 +804,9 @@ export default function WalletDashboardSendModal({
                         </div>
                       ) : null}
                     </div>
-                    <div className="hidden md:flex items-center justify-center">
-                      <span className="text-xs md:text-sm font-semibold text-white/50">
-                        Ou
-                      </span>
-                      <span className="ml-2 text-xs font-semibold text-white/50">
-                        Indiquez votre code de paiement
-                      </span>
-                    </div>
-                    <div className={`relative ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-                      {showFauxPayreq ? (
-                        <div
-                          aria-hidden="true"
-                          className="absolute inset-0 p-3 pointer-events-none"
-                        >
-                          {fauxPayreqOverlay}
-                        </div>
-                      ) : null}
-                      <textarea
-                      value={requestText}
-                      onChange={(e) => setRequestText(e.target.value)}
-                      onPaste={handlePastePayload}
-                      className={`relative w-full min-h-[120px] overflow-y-auto text-xs text-white/80 placeholder:text-white/20 focus:outline-none font-mono md:min-h-[140px] ${useUnifiedPayreqPanel ? "bg-transparent border-transparent rounded-none px-0 py-2 focus:ring-0" : "rounded-md bg-black/40 border border-white/10 px-3 py-2 focus:ring-2 focus:ring-xcannes-green/30 md:border-white/15 md:bg-black/50"} ${inline ? "flex-1 min-h-[160px]" : ""}`}
-                      placeholder={useUnifiedPayreqPanel ?
-                        "" :
-                        t(
-                          "ui_payreq_placeholder_3a9c1b7d2e",
-                          "xcannes-payreq:... / JSON"
-                        )} />
-                    </div>
                   </div>
                 </div>
-                <SwipeConfirmButton
-                label={t("demo_scan_parse", "Load request")}
-                onConfirm={handleLoadRequest}
-	                disabled={!canLoadRequest}
-	                variant="green"
-	                className="md:hidden" />
-                <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleLoadRequest();
-	                }}
-	                disabled={!canLoadRequest}
-	                className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${greenActionBtnBase}`}>
-
-                  {t("demo_scan_parse", "Load request")}
-                </button>
+                {scanRequestFooter}
               </> :
           <>
                 <QRScanner
@@ -854,79 +847,7 @@ export default function WalletDashboardSendModal({
               fauxQrBackgroundSize={fauxQrSize}
               fauxQrBackgroundOpacity={fauxQrOpacity}
               className={inline ? "flex-1 min-h-[210px] bg-black/30 border-white/10" : "bg-black/30 border-white/10"} />
-
-                <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
-                  {!isDesktop &&
-                  <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
-                    <span className="h-px flex-1 bg-white/10" />
-                    <span className="text-base md:text-lg font-semibold text-white/60">
-                      {t("ui_or_8a4c1f83bd", "ou")}
-                    </span>
-                    <span className="h-px flex-1 bg-white/10" />
-                  </div>
-                  }
-
-                  <div className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
-                      <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
-                        {t("demo_payreq_token", "Request token")}
-                      </div>
-                      <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const input = document.getElementById(payreqFileInputId);
-                        input?.click();
-                      }}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white">
-
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                          +
-                        </span>
-                        {t(
-                          "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                          "Charger une image qrcode"
-                        )}
-                      </button>
-                    </div>
-                    <div className="relative">
-                      {showFauxPayreq ? (
-                        <div
-                          aria-hidden="true"
-                          className="absolute inset-0 p-3 pointer-events-none"
-                        >
-                          {fauxPayreqOverlay}
-                        </div>
-                      ) : null}
-                      <textarea
-                      value={requestText}
-                      onChange={(e) => setRequestText(e.target.value)}
-                      onPaste={handlePastePayload}
-                      className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${inline ? "flex-1 min-h-[160px]" : ""}`}
-                      placeholder={t(
-                        "ui_payreq_placeholder_3a9c1b7d2e",
-                        "xcannes-payreq:... / JSON"
-                      )} />
-                    </div>
-	                    <SwipeConfirmButton
-	                    label={t("demo_scan_parse", "Load request")}
-	                    onConfirm={handleLoadRequest}
-	                    disabled={!canLoadRequest}
-	                    variant="green"
-	                    className="md:hidden" />
-                    <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleLoadRequest();
-                    }}
-                    disabled={!canLoadRequest}
-                    className={`hidden md:block w-full px-3 py-2 text-xs md:py-2.5 ${greenActionBtnBase}`}>
-
-                      {t("demo_scan_parse", "Load request")}
-                    </button>
-                  </div>
-                </div>
+                {scanRequestFooter}
               </>
           }
 
