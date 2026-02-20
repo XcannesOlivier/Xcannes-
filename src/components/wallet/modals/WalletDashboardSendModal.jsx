@@ -7,7 +7,6 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/utils/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { normalizeQrImageFile } from "@/utils/qrImage";
@@ -62,25 +61,14 @@ export default function WalletDashboardSendModal({
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const payreqFileInputId = "payreq-qr-file";
-  const manualQrFileInputId = "manual-qr-file";
   const manualQrReaderIdRef = useRef(
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`
   );
   const manualQrScannerRef = useRef(null);
-  const manualQrDecor =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 24 24' shape-rendering='crispEdges'%3E%3Crect width='24' height='24' fill='none'/%3E%3Crect x='0' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='17' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='18' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='19' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='0' y='17' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='18' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='19' width='3' height='3' fill='%23fff'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='4' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='13' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='20' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
   const isDemoMode = noticeVariant === "demo";
-  const useDemoQrDecor = isDemoMode && isDesktop;
-  const manualQrDecorSize = useDemoQrDecor ? "170px" : inline && isDesktop ? "120px" : "130px";
-  const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
   const fauxPayreqExample =
     '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = false;
-  const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
-  const showManualQrUpload = useDexStyleLayout;
-  const showRealDesktopQrImage = !isDemoMode && isDesktop;
-  const showManualStaticQr = isDesktop;
-  const useDexSizing = inline || qrSizingVariant === "dex";
   const fauxPayreqTextClass = isDemoMode && isDesktop
     ? "text-[11px] text-white/70"
     : isDemoMode
@@ -95,7 +83,6 @@ export default function WalletDashboardSendModal({
   ) : null;
   const fauxQrSize = inline ? (isDesktop ? "120px" : "200px") : "160px";
   const fauxQrOpacity = inline ? 0.08 : 0.06;
-  const demoQrSize = useDexSizing ? 200 : 160;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -615,67 +602,6 @@ export default function WalletDashboardSendModal({
           }
         </div>
         <div className={inline ? "space-y-2" : ""}>
-          {showManualQrUpload ?
-            <div className="space-y-3">
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const input = document.getElementById(manualQrFileInputId);
-                    input?.click();
-                  }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-                >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                    +
-                  </span>
-                  {t(
-                    "ui_upload_recipient_qr_code_1e7c2d9a5b",
-                    "Charger le QR code de l'adresse du destinataire"
-                  )}
-                </button>
-              </div>
-              <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-3 space-y-3 overflow-hidden md:p-6 md:space-y-4 md:min-h-[180px]">
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: showManualStaticQr ? "none" : `url("${manualQrDecor}")`,
-                    backgroundSize: `${manualQrDecorSize} ${manualQrDecorSize}`,
-                    opacity: manualQrDecorOpacity,
-                  }}
-                />
-                {showManualStaticQr ? (
-                  <div className="relative z-10 flex items-center justify-center">
-                    <div className="rounded-lg border border-white/10 bg-black/60 p-2">
-                      <div
-                        className={showRealDesktopQrImage ? "opacity-90" : ""}
-                        style={showRealDesktopQrImage ? { filter: "brightness(0.15)" } : undefined}
-                      >
-                        <QRCodeCanvas
-                          value={fauxPayreqExample}
-                          size={demoQrSize}
-                          bgColor="#000000"
-                          fgColor="#ffffff"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-                <input
-                  id={manualQrFileInputId}
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    e.target.value = "";
-                    handleManualQrFile(file);
-                  }} />
-              </div>
-            </div> :
-            null}
           <div>
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
@@ -836,9 +762,6 @@ export default function WalletDashboardSendModal({
             ✕
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {t("ui_send_assets_title_2c9b1a7d5e", "Send assets")}
-            </h3>
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}

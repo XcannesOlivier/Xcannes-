@@ -265,9 +265,6 @@ export default function WalletDashboardPayreqModal({
             ✕
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-            <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {t("ui_payment_request_details", "Payment request")}
-            </h3>
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
