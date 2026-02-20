@@ -1342,11 +1342,11 @@ export default function CurrencyStatement({
 	              <p className="text-sm text-white font-semibold truncate">
 	                {walletLabel || t("nav_wallet", "Wallet")}
 	              </p>
-	              {!walletLabel ? (
-	                <p className="text-[11px] text-white/50 font-mono break-all">
-	                  {walletAddress}
-	                </p>
-	              ) : null}
+              {walletAddress ? (
+                <p className="text-[11px] text-white/50 font-mono break-all">
+                  {walletAddress}
+                </p>
+              ) : null}
 	            </div>
 	            <div>
 	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_6dedec11d9", "Statement Period")}</p>

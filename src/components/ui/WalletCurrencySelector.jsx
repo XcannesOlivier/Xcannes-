@@ -231,6 +231,7 @@ export default function WalletCurrencySelector({
                   }}
                   className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-white/80 hover:border-accent-rlusd shrink-0 active:scale-95">
 
+                      <span className="text-sm">{getFlag(c.code)}</span>
                       <span className="font-mono">{c.code}</span>
                     </button>
                 )}
@@ -267,6 +268,7 @@ export default function WalletCurrencySelector({
                         handleSelect(c.code);
                       }}
                       className="w-full px-3 py-1.5 text-xs text-white/80 hover:bg-white/5 flex items-center gap-2 text-left active:scale-98">
+                      <span className="text-sm">{getFlag(c.code)}</span>
                       <span className="font-mono text-[11px]">{c.code}</span>
                       <span className="text-[11px] text-white/45 truncate">
                         {c.name}
