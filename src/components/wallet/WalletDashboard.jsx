@@ -54,7 +54,9 @@ import {
   getCurrencyFlag,
   getDisplayCurrencyCode,
   getTokenIcon,
+  formatAmountWithSymbol,
   resolveWalletLayout,
+  WALLET_CURRENCY_LINE_ORDER,
   USD_STABLECOINS,
 } from "./walletDashboardConfig";
 
@@ -76,6 +78,9 @@ const ADJUSTMENT_FEE_RLUSD = (() => {
 
 const DEFAULT_ACTIVATION_XRP_AMOUNT = 1;
 const ACTIVATION_BUNDLE_XRP_AMOUNT = 1.4;
+const WALLET_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
+const PREVIEW_WALLET_ID = "PREVIEW";
+const MAX_PREVIEW_EVENTS = 120;
 
 const MOONPAY_SELL_WALLETS = new Set(
   String(process.env.NEXT_PUBLIC_MOONPAY_WALLETS || "")
@@ -119,7 +124,8 @@ export default function WalletDashboard({
   allowBackgroundScrollOnMobile = false,
   allowPageScrollOnMobile = false,
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   // Preview wallet (non connecté) : tout à 0 pour éviter de faire croire à un solde réel.
   const DEMO_RLUSD_TOTAL = 0;
   const layout = useMemo(
@@ -317,6 +323,82 @@ export default function WalletDashboard({
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
+  const [previewEvents, setPreviewEvents] = useState([]);
+  const [statementHighlightByCurrency, setStatementHighlightByCurrency] = useState({});
+  const previewEventCounterRef = useRef(0);
+
+  const formatPreviewAddressShort = useCallback((address) => {
+    const clean = String(address || "").trim();
+    if (!clean) return "";
+    if (clean.length <= 12) return clean;
+    return `${clean.slice(0, 6)}...${clean.slice(-4)}`;
+  }, []);
+
+  const buildPreviewEventId = useCallback((prefix = "evt") => {
+    previewEventCounterRef.current += 1;
+    return `${prefix}_${Date.now()}_${previewEventCounterRef.current}`;
+  }, []);
+
+  const recordStatementHighlight = useCallback((currency, eventId) => {
+    const key = String(currency || "").trim().toUpperCase();
+    if (!key || !eventId) return;
+    setStatementHighlightByCurrency((prev) => ({
+      ...(prev || {}),
+      [key]: { eventId, ts: Date.now() },
+    }));
+  }, []);
+
+  const pushPreviewEvent = useCallback(
+    (event) => {
+      if (!isPreviewMode) return;
+      if (!event || !event.id) return;
+      setPreviewEvents((prev) => {
+        const next = [event, ...(Array.isArray(prev) ? prev : [])];
+        if (next.length > MAX_PREVIEW_EVENTS) {
+          next.length = MAX_PREVIEW_EVENTS;
+        }
+        return next;
+      });
+    },
+    [isPreviewMode]
+  );
+
+  const handlePreviewConvert = useCallback(
+    (payload) => {
+      if (!isPreviewMode || !payload) return;
+      const base = String(payload?.base || payload?.fromCurrency || "")
+        .trim()
+        .toUpperCase();
+      const quote = String(payload?.quote || payload?.toCurrency || "")
+        .trim()
+        .toUpperCase();
+      if (!base || !quote) return;
+      const eventId = buildPreviewEventId("convert");
+      const event = {
+        id: eventId,
+        ts: Number(payload?.ts) || Date.now(),
+        kind: "convert",
+        wallet: PREVIEW_WALLET_ID,
+        fromCurrency: base,
+        toCurrency: quote,
+        fromAmount: Number(payload?.amountBase ?? payload?.fromAmount ?? 0),
+        toAmount: Number(payload?.amountQuote ?? payload?.toAmount ?? 0),
+        usdGross: Number(
+          payload?.amountRlusdGross ?? payload?.rlusdGross ?? payload?.usdGross ?? 0
+        ),
+        usdNet: Number(
+          payload?.amountRlusdNet ?? payload?.rlusdNet ?? payload?.usdNet ?? 0
+        ),
+        feeUsd: Number(
+          payload?.spreadFeeRlusd ?? payload?.feeRlusd ?? payload?.feeUsd ?? 0
+        ),
+      };
+      pushPreviewEvent(event);
+      recordStatementHighlight(base, eventId);
+      recordStatementHighlight(quote, eventId);
+    },
+    [buildPreviewEventId, isPreviewMode, pushPreviewEvent, recordStatementHighlight]
+  );
   
   const { demoLines, setDemoLines } = useSwapDemoLines({
     demoRlusdTotal: DEMO_RLUSD_TOTAL,
@@ -336,6 +418,19 @@ export default function WalletDashboard({
         return sum + (Number.isFinite(v) ? v : 0);
       }, 0);
   }, [baseTokens, isStablecoin]);
+
+  const currencyOrderIndex = useMemo(() => {
+    const entries = Array.isArray(WALLET_CURRENCY_LINE_ORDER)
+      ? WALLET_CURRENCY_LINE_ORDER
+      : [];
+    const index = new Map();
+    entries.forEach((code, idx) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper) return;
+      if (!index.has(upper)) index.set(upper, idx);
+    });
+    return index;
+  }, []);
 
   const displayTokens = useMemo(() => {
     // Mode démo: on affiche la "composition" virtuelle du capital RLUSD
@@ -391,18 +486,20 @@ export default function WalletDashboard({
         });
       }
 
-      const weight = (currency) => {
-        if (currency === "XRP") return 0;
-        if (currency === "RLUSD") return 1;
-        if (currency === "RLUSD") return 2;
-        return 3;
-      };
-
       tokens.sort((a, b) => {
-        const wa = weight(a.currency);
-        const wb = weight(b.currency);
-        if (wa !== wb) return wa - wb;
-        return (b.demoRlusdValue || b.value || 0) - (a.demoRlusdValue || a.value || 0);
+        const aCode = String(a?.currency || "").toUpperCase();
+        const bCode = String(b?.currency || "").toUpperCase();
+        const aPriority = Object.prototype.hasOwnProperty.call(WALLET_TOKEN_PRIORITY, aCode)
+          ? WALLET_TOKEN_PRIORITY[aCode]
+          : Number.POSITIVE_INFINITY;
+        const bPriority = Object.prototype.hasOwnProperty.call(WALLET_TOKEN_PRIORITY, bCode)
+          ? WALLET_TOKEN_PRIORITY[bCode]
+          : Number.POSITIVE_INFINITY;
+        if (aPriority !== bPriority) return aPriority - bPriority;
+        const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+        const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return aCode.localeCompare(bCode);
       });
 
       return tokens;
@@ -424,12 +521,6 @@ export default function WalletDashboard({
       })),
     ];
 
-    const weight = (currency) => {
-      if (currency === "XRP") return 0;
-      if (currency === "RLUSD") return 1;
-      return 2;
-    };
-
     // S'assurer qu'il y a toujours une ligne RLUSD juste après XRP,
     // même si aucune position ou trustline n'existe encore.
     const hasRlusd = tokens.some(
@@ -446,14 +537,23 @@ export default function WalletDashboard({
     }
 
     tokens.sort((a, b) => {
-      const wa = weight(a.currency);
-      const wb = weight(b.currency);
-      if (wa !== wb) return wa - wb;
-      return b.value - a.value;
+      const aCode = String(a?.currency || "").toUpperCase();
+      const bCode = String(b?.currency || "").toUpperCase();
+      const aPriority = Object.prototype.hasOwnProperty.call(WALLET_TOKEN_PRIORITY, aCode)
+        ? WALLET_TOKEN_PRIORITY[aCode]
+        : Number.POSITIVE_INFINITY;
+      const bPriority = Object.prototype.hasOwnProperty.call(WALLET_TOKEN_PRIORITY, bCode)
+        ? WALLET_TOKEN_PRIORITY[bCode]
+        : Number.POSITIVE_INFINITY;
+      if (aPriority !== bPriority) return aPriority - bPriority;
+      const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+      const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return aCode.localeCompare(bCode);
     });
 
     return tokens;
-  }, [baseTokens, xrpAmount, isPreviewMode, demoLines]);
+  }, [baseTokens, currencyOrderIndex, xrpAmount, isPreviewMode, demoLines]);
 
   // Adresse backend (session API)
   const backendWalletAddress = isPreviewMode ? null : effectiveWallet || null;
@@ -491,8 +591,15 @@ export default function WalletDashboard({
         allocatedRlusd: Number(line?.rlusd || 0),
         fxSource: "DEMO",
       }))
-      .sort((a, b) => a.currencyCode.localeCompare(b.currencyCode));
-  }, [demoLines, isPreviewMode]);
+      .sort((a, b) => {
+        const aCode = String(a?.currencyCode || "").toUpperCase();
+        const bCode = String(b?.currencyCode || "").toUpperCase();
+        const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+        const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return aCode.localeCompare(bCode);
+      });
+  }, [currencyOrderIndex, demoLines, isPreviewMode]);
 
   const demoCurrencyLinesSummary = useMemo(() => {
     if (!isPreviewMode) return null;
@@ -513,10 +620,40 @@ export default function WalletDashboard({
     };
   }, [demoLines, isPreviewMode]);
 
-  const effectiveCurrencyLines = isPreviewMode ? demoCurrencyLines : currencyLines;
   const effectiveCurrencyLinesSummary = isPreviewMode
     ? demoCurrencyLinesSummary
     : currencyLinesSummary;
+  const effectiveCurrencyLines = useMemo(() => {
+    const base = isPreviewMode ? demoCurrencyLines : currencyLines;
+    const lines = Array.isArray(base) ? [...base] : [];
+    const unallocatedRaw = effectiveCurrencyLinesSummary?.unallocatedRlusd;
+    const unallocated = Number(unallocatedRaw);
+    const hasUsdLine = lines.some(
+      (line) => String(line?.currencyCode || "").toUpperCase() === "USD"
+    );
+    if (!hasUsdLine && unallocatedRaw != null && Number.isFinite(unallocated)) {
+      lines.push({
+        currencyCode: "USD",
+        allocatedRlusd: unallocated,
+        isDerived: true,
+        active: false,
+      });
+    }
+    return lines.sort((a, b) => {
+      const aCode = String(a?.currencyCode || "").toUpperCase();
+      const bCode = String(b?.currencyCode || "").toUpperCase();
+      const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+      const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return aCode.localeCompare(bCode);
+    });
+  }, [
+    currencyLines,
+    currencyOrderIndex,
+    demoCurrencyLines,
+    effectiveCurrencyLinesSummary,
+    isPreviewMode,
+  ]);
   const effectiveCurrencyLinesLoading = isPreviewMode ? false : currencyLinesLoading;
   const effectiveCurrencyLinesError = isPreviewMode ? null : currencyLinesError;
   const effectiveRefreshCurrencyLines = useMemo(() => {
@@ -612,6 +749,15 @@ export default function WalletDashboard({
           next[currencyCode] = { currency: currencyCode, rlusd: 0, units: 0, rate: 0 };
           return next;
         });
+        const eventId = buildPreviewEventId("line");
+        pushPreviewEvent({
+          id: eventId,
+          ts: Date.now(),
+          kind: "trustline_add",
+          wallet: PREVIEW_WALLET_ID,
+          currency: currencyCode,
+        });
+        recordStatementHighlight(currencyCode, eventId);
         return true;
       }
 
@@ -661,10 +807,13 @@ export default function WalletDashboard({
     },
     [
       backendWalletAddress,
+      buildPreviewEventId,
       currencyLines,
       hasOnChainRlusd,
       isPreviewMode,
       isWalletActivated,
+      pushPreviewEvent,
+      recordStatementHighlight,
       submitCurrencyLineAction,
       refreshCurrencyLines,
       setDemoLines,
@@ -768,6 +917,15 @@ export default function WalletDashboard({
           delete next[currencyCode];
           return next;
         });
+        const eventId = buildPreviewEventId("line");
+        pushPreviewEvent({
+          id: eventId,
+          ts: Date.now(),
+          kind: "trustline_remove",
+          wallet: PREVIEW_WALLET_ID,
+          currency: currencyCode,
+        });
+        recordStatementHighlight(currencyCode, eventId);
         return true;
       }
 
@@ -803,7 +961,16 @@ export default function WalletDashboard({
       }
       return true;
     },
-    [currencyLines, isPreviewMode, refreshCurrencyLines, setDemoLines, submitCurrencyLineAction]
+    [
+      buildPreviewEventId,
+      currencyLines,
+      isPreviewMode,
+      pushPreviewEvent,
+      recordStatementHighlight,
+      refreshCurrencyLines,
+      setDemoLines,
+      submitCurrencyLineAction,
+    ]
   );
 
   const handleRefresh = async () => {
@@ -900,16 +1067,23 @@ export default function WalletDashboard({
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
+      const display = getDisplayCurrencyCode(code);
       const amount = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amount)
-        ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
-        : "0";
+        ? formatAmountWithSymbol(locale, amount, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          })
+        : formatAmountWithSymbol(locale, 0, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          });
       const label = `${balanceLabel} = ${amountLabel}`;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens, t]);
+  }, [augmentedTokens, locale, t]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};
@@ -919,14 +1093,20 @@ export default function WalletDashboard({
       const display = getDisplayCurrencyCode(code);
       const amount = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amount)
-        ? amount.toLocaleString(undefined, { maximumFractionDigits: 4 })
-        : "0";
+        ? formatAmountWithSymbol(locale, amount, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          })
+        : formatAmountWithSymbol(locale, 0, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          });
       const label = `${display} (${amountLabel})`;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens]);
+  }, [augmentedTokens, locale]);
 
   const selectIconByAssetKey = useMemo(() => {
     const icons = {};
@@ -978,6 +1158,362 @@ export default function WalletDashboard({
 
   const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
     useRlusdPerUnitRates(currencyLineCodes);
+
+  const previewRates = useMemo(() => {
+    if (!isPreviewMode) return {};
+    const next = { ...(rlusdPerUnitRates || {}) };
+    Object.entries(demoLines || {}).forEach(([code, line]) => {
+      const upper = String(code || "").toUpperCase();
+      if (!upper) return;
+      const units = Number(line?.units || 0);
+      const rlusd = Number(line?.rlusd || 0);
+      if (
+        Number.isFinite(units) &&
+        units > 0 &&
+        Number.isFinite(rlusd) &&
+        rlusd > 0
+      ) {
+        next[upper] = rlusd / units;
+      }
+    });
+    next.RLUSD = 1;
+    next.USD = 1;
+    return next;
+  }, [demoLines, isPreviewMode, rlusdPerUnitRates]);
+
+  const resolvePreviewRlusdPerUnit = useCallback(
+    (currency) => {
+      const code = String(currency || "").trim().toUpperCase();
+      if (!code) return Number.NaN;
+      const rate = Number(previewRates?.[code]);
+      if (Number.isFinite(rate) && rate > 0) return rate;
+      if (code === "RLUSD" || code === "USD") return 1;
+      return Number.NaN;
+    },
+    [previewRates]
+  );
+
+  const previewUnallocatedRlusd = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const candidate = Number(effectiveCurrencyLinesSummary?.unallocatedRlusd);
+    if (Number.isFinite(candidate)) return candidate;
+    const fallback = Number(demoLines?.RLUSD?.rlusd);
+    return Number.isFinite(fallback) ? fallback : null;
+  }, [demoLines, effectiveCurrencyLinesSummary, isPreviewMode]);
+
+  const previewTotalRlusd = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const candidate = Number(effectiveCurrencyLinesSummary?.rlusdOnChain);
+    if (Number.isFinite(candidate)) return candidate;
+    const sum = Object.entries(demoLines || {}).reduce((acc, [, line]) => {
+      const value = Number(line?.rlusd || 0);
+      return acc + (Number.isFinite(value) ? value : 0);
+    }, 0);
+    return Number.isFinite(sum) ? sum : null;
+  }, [demoLines, effectiveCurrencyLinesSummary, isPreviewMode]);
+
+  const statementTotalBalanceUsd = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const total = Number(previewTotalRlusd);
+    return Number.isFinite(total) ? total : null;
+  }, [isPreviewMode, previewTotalRlusd]);
+
+  const globalStatementTokens = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const base = (augmentedTokens || []).filter((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      return code && code !== "XRP" && code !== "USD" && code !== "RLUSD";
+    });
+    if (previewUnallocatedRlusd != null && Number.isFinite(Number(previewUnallocatedRlusd))) {
+      base.push({
+        key: "DERIVED:USD",
+        currency: "USD",
+        value: Number(previewUnallocatedRlusd),
+        issuer: undefined,
+        isTrustlineOnly: true,
+        isDerivedUsd: true,
+      });
+    }
+    return base;
+  }, [augmentedTokens, isPreviewMode, previewUnallocatedRlusd]);
+
+  const statementBalance = useMemo(() => {
+    if (!isPreviewMode || !selectedStatementToken) return null;
+    const currency = String(selectedStatementToken.currency || "").toUpperCase();
+    if (!currency) return null;
+    const isDerivedUsd = Boolean(selectedStatementToken?.isDerivedUsd || selectedStatementToken?.isDerived);
+    if (currency === "USD" && isDerivedUsd) {
+      return previewUnallocatedRlusd != null &&
+        Number.isFinite(Number(previewUnallocatedRlusd))
+        ? Number(previewUnallocatedRlusd)
+        : 0;
+    }
+    if (currency === "RLUSD") {
+      const value = Number(demoLines?.RLUSD?.units ?? demoLines?.RLUSD?.rlusd ?? 0);
+      return Number.isFinite(value) ? value : 0;
+    }
+    const demoLine = demoLines?.[currency];
+    if (demoLine) {
+      const units = Number(demoLine?.units ?? 0);
+      if (Number.isFinite(units)) return units;
+      const rlusd = Number(demoLine?.rlusd ?? 0);
+      const rate = resolvePreviewRlusdPerUnit(currency);
+      if (Number.isFinite(rlusd) && Number.isFinite(rate) && rate > 0) {
+        return rlusd / rate;
+      }
+    }
+    const fallback = Number(selectedStatementToken?.value ?? 0);
+    return Number.isFinite(fallback) ? fallback : null;
+  }, [
+    demoLines,
+    isPreviewMode,
+    previewUnallocatedRlusd,
+    resolvePreviewRlusdPerUnit,
+    selectedStatementToken,
+  ]);
+
+  const previewGlobalMovements = useMemo(() => {
+    if (!isPreviewMode) return null;
+    const events = Array.isArray(previewEvents) ? previewEvents : [];
+    return events
+      .map((evt) => {
+        if (!evt) return null;
+        const createdAt = evt?.createdAt ? new Date(evt.createdAt) : new Date(evt?.ts || Date.now());
+        const createdAtIso = createdAt.toISOString();
+        const resolveAmountRlusd = () => {
+          const direct = Number(
+            evt?.amountRlusd ?? evt?.usdNet ?? evt?.usdGross ?? evt?.usdValue ?? evt?.amount
+          );
+          if (Number.isFinite(direct)) return direct;
+          const currency = String(evt?.currency || "").toUpperCase();
+          const amount = Number(evt?.amount || 0);
+          const rate = resolvePreviewRlusdPerUnit(currency);
+          if (Number.isFinite(rate) && rate > 0) return amount * rate;
+          return Number.isFinite(amount) ? amount : 0;
+        };
+        if (evt.kind === "convert") {
+          return {
+            movementId: evt.id,
+            createdAt: createdAtIso,
+            fromCurrencyCode: evt.fromCurrency,
+            toCurrencyCode: evt.toCurrency,
+            amountRlusd: resolveAmountRlusd(),
+          };
+        }
+        if (evt.kind === "send") {
+          return {
+            movementId: evt.id,
+            createdAt: createdAtIso,
+            fromCurrencyCode: evt.currency,
+            toCurrencyCode: evt.currency,
+            amountRlusd: resolveAmountRlusd(),
+          };
+        }
+        if (evt.kind === "buy" || evt.kind === "sell" || evt.kind === "spread_fee") {
+          return {
+            movementId: evt.id,
+            createdAt: createdAtIso,
+            fromCurrencyCode: evt.currency || "RLUSD",
+            toCurrencyCode: evt.currency || "RLUSD",
+            amountRlusd: resolveAmountRlusd(),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }, [isPreviewMode, previewEvents, resolvePreviewRlusdPerUnit]);
+
+  const previewCurrencyTransactions = useMemo(() => {
+    if (!isPreviewMode || !selectedStatementToken) return [];
+    const currency = String(selectedStatementToken.currency || "").toUpperCase();
+    if (!currency) return [];
+    const events = Array.isArray(previewEvents) ? previewEvents : [];
+    const startingBalanceRaw =
+      statementBalance != null && Number.isFinite(Number(statementBalance))
+        ? Number(statementBalance)
+        : Number(selectedStatementToken?.value ?? 0);
+    let running = Number.isFinite(startingBalanceRaw) ? startingBalanceRaw : 0;
+    const txs = [];
+    const ratesSnapshot = previewRates || {};
+
+    events.forEach((evt) => {
+      const createdAt = new Date(evt?.ts || Date.now()).toISOString();
+      const runningSnapshot = running;
+      let amount = 0;
+      let delta = 0;
+      let type = "credit";
+      let category = "other";
+      let description = t("demo_statement_movement", "Mouvement");
+      let counterparty = "";
+      let postEventTx = null;
+
+      if (evt.kind === "send" && String(evt.currency || "").toUpperCase() === currency) {
+        amount = Number(evt.amount || 0);
+        delta = -amount;
+        type = "debit";
+        const destAddress = String(evt.toAddress || evt.toLabel || "").trim();
+        const destLabel = destAddress
+          ? formatPreviewAddressShort(destAddress)
+          : t("demo_counterparty_unknown", "Destination");
+        counterparty = destAddress || destLabel;
+        description = t("demo_statement_send_to", {
+          defaultValue: "Envoyé à {{to}}",
+          to: destLabel,
+        });
+      } else if (evt.kind === "convert") {
+        category = "exchange";
+        const fromCurrency = String(evt.fromCurrency || "").toUpperCase();
+        const toCurrency = String(evt.toCurrency || "").toUpperCase();
+        const fromLabel = getDisplayCurrencyCode(fromCurrency);
+        const toLabel = getDisplayCurrencyCode(toCurrency);
+        if (fromCurrency === currency) {
+          type = "debit";
+          amount = Number(evt.fromAmount || 0);
+          delta = -amount;
+          description = t("demo_statement_exchange", {
+            defaultValue: "Conversion {{fromCurrency}} → {{toCurrency}}",
+            fromCurrency: fromLabel,
+            toCurrency: toLabel,
+          });
+        } else if (toCurrency === currency) {
+          type = "credit";
+          amount = Number(evt.toAmount || 0);
+          delta = amount;
+          description = t("demo_statement_exchange", {
+            defaultValue: "Conversion {{fromCurrency}} → {{toCurrency}}",
+            fromCurrency: fromLabel,
+            toCurrency: toLabel,
+          });
+          const feeUsd = Number(evt.feeUsd || 0);
+          const quoteRate = Number(ratesSnapshot?.[currency] || 0);
+          const feeQuote =
+            Number.isFinite(feeUsd) && feeUsd > 0 && quoteRate > 0
+              ? feeUsd / quoteRate
+              : 0;
+          if (Number.isFinite(feeQuote) && feeQuote > 0) {
+            const feeUsdLabel = feeUsd.toLocaleString(locale, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+            postEventTx = {
+              id: `${evt.id}_fee`,
+              date: createdAt,
+              createdAt,
+              category: "fee",
+              type: "debit",
+              description: t("demo_statement_fee_spread_pair", {
+                defaultValue:
+                  "Frais conversion {{fromCurrency}} → {{toCurrency}} ({{fee}} USD)",
+                fromCurrency: fromLabel,
+                toCurrency: toLabel,
+                fee: feeUsdLabel,
+              }),
+              counterparty: "",
+              amount: feeQuote,
+              runningBalance: runningSnapshot,
+              displayRunningBalance: runningSnapshot,
+            };
+          }
+        } else {
+          return;
+        }
+      } else if (evt.kind === "buy" && String(evt.currency || "").toUpperCase() === currency) {
+        category = "buy";
+        type = "credit";
+        amount = Number(evt.amount || 0);
+        delta = amount;
+        description = t("demo_statement_buy_moonpay", "Achat via MoonPay (démo)");
+      } else if (evt.kind === "sell" && String(evt.currency || "").toUpperCase() === currency) {
+        category = "sell";
+        type = "debit";
+        amount = Number(evt.amount || 0);
+        delta = -amount;
+        description = t("demo_statement_sell_moonpay", "Vente via MoonPay (démo)");
+      } else if (
+        evt.kind === "spread_fee" &&
+        String(evt.currency || "").toUpperCase() === currency
+      ) {
+        category = "fee";
+        type = "debit";
+        amount = Number(evt.amount || 0);
+        delta = -amount;
+        description = t("demo_statement_fee_spread", "Frais de conversion (1 %)");
+      } else if (
+        evt.kind === "trustline_add" &&
+        String(evt.currency || "").toUpperCase() === currency
+      ) {
+        category = "operation";
+        type = "credit";
+        amount = 0;
+        delta = 0;
+        description = t("demo_statement_trustline_add", {
+          defaultValue: "Activation de ligne {{currency}}",
+          currency,
+        });
+      } else if (
+        evt.kind === "trustline_remove" &&
+        String(evt.currency || "").toUpperCase() === currency
+      ) {
+        category = "operation";
+        type = "debit";
+        amount = 0;
+        delta = 0;
+        description = t("demo_statement_trustline_remove", {
+          defaultValue: "Désactivation de ligne {{currency}}",
+          currency,
+        });
+      } else {
+        return;
+      }
+
+      if (!Number.isFinite(amount) || (amount <= 0 && category !== "operation")) return;
+
+      txs.push({
+        id: evt.id,
+        date: createdAt,
+        createdAt,
+        category,
+        type,
+        description,
+        counterparty,
+        amount,
+        runningBalance: running,
+      });
+      running -= delta;
+
+      if (postEventTx) {
+        txs.push(postEventTx);
+      }
+    });
+
+    if (
+      txs.length > 0 &&
+      statementBalance != null &&
+      Number.isFinite(Number(statementBalance))
+    ) {
+      const first = txs[0];
+      if (first && Number(first.displayRunningBalance) !== Number(statementBalance)) {
+        txs[0] = { ...first, displayRunningBalance: Number(statementBalance) };
+      }
+    }
+
+    return txs;
+  }, [
+    formatPreviewAddressShort,
+    isPreviewMode,
+    locale,
+    previewEvents,
+    previewRates,
+    selectedStatementToken,
+    statementBalance,
+    t,
+  ]);
+
+  const highlightTransactionId = useMemo(() => {
+    if (!isPreviewMode || !selectedStatementToken) return null;
+    const key = String(selectedStatementToken?.currency || "").trim().toUpperCase();
+    return statementHighlightByCurrency?.[key]?.eventId || null;
+  }, [isPreviewMode, selectedStatementToken, statementHighlightByCurrency]);
 
   // Toast "crédité en EUR" (etc.) quand un paiement entrant est détecté.
   const lastIncomingToastRef = useRef(null);
@@ -1137,6 +1673,7 @@ export default function WalletDashboard({
     getAllMarkets: xcannesApi.getAllMarkets,
     getTicker: xcannesApi.getTicker,
     getFxEod: xcannesApi.getFxEod,
+    onDemoConvert: handlePreviewConvert,
   });
 
   const selectedSendToken =
@@ -1719,6 +2256,38 @@ export default function WalletDashboard({
             return next;
           });
 
+          const previewTs = Date.now();
+          const sendEventId = buildPreviewEventId("send");
+          pushPreviewEvent({
+            id: sendEventId,
+            ts: previewTs,
+            kind: "send",
+            from: PREVIEW_WALLET_ID,
+            currency,
+            amount: effectiveAmountNum,
+            amountRlusd: paymentRlusd,
+            toAddress: dest,
+            memo: sendPaymentRequest?.memo || null,
+          });
+          recordStatementHighlight(currency, sendEventId);
+
+          if (Number.isFinite(spreadFeeRlusd) && spreadFeeRlusd > 0) {
+            const spreadFeeUnits =
+              Number.isFinite(rlusdPerUnit) && rlusdPerUnit > 0
+                ? spreadFeeRlusd / rlusdPerUnit
+                : spreadFeeRlusd;
+            const feeEventId = buildPreviewEventId("fee");
+            pushPreviewEvent({
+              id: feeEventId,
+              ts: previewTs,
+              kind: "spread_fee",
+              wallet: PREVIEW_WALLET_ID,
+              currency,
+              amount: spreadFeeUnits,
+              amountRlusd: spreadFeeRlusd,
+            });
+          }
+
           alert(
             `✅ (Demo) Signature 1/2 simulée: frais de conversion → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
               `✅ (Demo) Signature 2/2 simulée: paiement → destinataire (${dest})`
@@ -1881,6 +2450,21 @@ export default function WalletDashboard({
             return next;
           });
         }
+
+        const previewTs = Date.now();
+        const sendEventId = buildPreviewEventId("send");
+        pushPreviewEvent({
+          id: sendEventId,
+          ts: previewTs,
+          kind: "send",
+          from: PREVIEW_WALLET_ID,
+          currency,
+          amount: amountNum,
+          amountRlusd: currency === "RLUSD" ? amountNum : null,
+          toAddress: dest,
+          memo: sendPaymentRequest?.memo || null,
+        });
+        recordStatementHighlight(currency, sendEventId);
 
         alert(`✅ (Demo) Paiement simulé: ${amountNum} ${currency} → ${dest}`);
         handleAddressSave(dest);
@@ -2086,19 +2670,33 @@ export default function WalletDashboard({
 
   const previewTotalLabel = useMemo(() => {
     if (!isPreviewMode) return null;
-    const total =
-      effectiveCurrencyLinesSummary?.rlusdOnChain != null
-        ? Number(effectiveCurrencyLinesSummary.rlusdOnChain)
-        : Object.entries(demoLines || {}).reduce((sum, [_code, line]) => {
-            const value = Number(line?.rlusd || 0);
-            return sum + (Number.isFinite(value) ? value : 0);
-          }, 0);
+    const total = Number(previewTotalRlusd);
     const safe = Number.isFinite(total) ? total : 0;
     return `${safe.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })} USD`;
-  }, [demoLines, effectiveCurrencyLinesSummary, isPreviewMode]);
+  }, [isPreviewMode, previewTotalRlusd]);
+
+  const previewStatementProps = useMemo(() => {
+    if (!isPreviewMode) return {};
+    return {
+      previewGlobalMovements,
+      previewCurrencyTransactions,
+      highlightTransactionId,
+      statementBalance,
+      statementTotalBalanceUsd,
+      globalStatementTokens,
+    };
+  }, [
+    globalStatementTokens,
+    highlightTransactionId,
+    isPreviewMode,
+    previewCurrencyTransactions,
+    previewGlobalMovements,
+    statementBalance,
+    statementTotalBalanceUsd,
+  ]);
 
   const xrplConnectionIndicator = useXrplConnectionIndicator({
     isPreviewMode,
@@ -2565,10 +3163,11 @@ export default function WalletDashboard({
 	                effectiveWallet={effectiveWallet}
 	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
 	                isPreviewMode={isPreviewMode}
-	                isWalletActivated={isWalletActivated}
-	                isFullPageView={isFullPageView}
-	                statementVariant={statementVariant}
+                isWalletActivated={isWalletActivated}
+                isFullPageView={isFullPageView}
+                statementVariant={statementVariant}
                 usdRates={usdRates}
+                {...previewStatementProps}
                 showGlobalStatement={showGlobalStatement}
                 setShowGlobalStatement={setShowGlobalStatement}
                 showCurrencyStatement={showCurrencyStatement}
@@ -2588,10 +3187,11 @@ export default function WalletDashboard({
 	                effectiveWallet={effectiveWallet}
 	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
 	                isPreviewMode={isPreviewMode}
-	                isWalletActivated={isWalletActivated}
-	                isFullPageView={isFullPageView}
-	                statementVariant={statementVariant}
+                isWalletActivated={isWalletActivated}
+                isFullPageView={isFullPageView}
+                statementVariant={statementVariant}
                 usdRates={usdRates}
+                {...previewStatementProps}
                 showGlobalStatement={showGlobalStatement}
                 setShowGlobalStatement={setShowGlobalStatement}
                 showCurrencyStatement={showCurrencyStatement}
@@ -2798,6 +3398,7 @@ export default function WalletDashboard({
 	          isFullPageView={isFullPageView}
 	          statementVariant={statementVariant}
 	          usdRates={usdRates}
+	          {...previewStatementProps}
           showGlobalStatement={showGlobalStatement}
           setShowGlobalStatement={setShowGlobalStatement}
           showCurrencyStatement={showCurrencyStatement}

@@ -13,7 +13,7 @@ import {
   sha256Hex
 } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
-import { getDisplayCurrencyCode } from "../walletDashboardConfig";
+import { formatAmountWithSymbol, getDisplayCurrencyCode } from "../walletDashboardConfig";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -46,6 +46,7 @@ export default function GlobalStatement({
   isClosing = false,
   inline = false,
   usdRates = {},
+  totalBalanceOverride = null,
   movements = [],
   movementsLoading = false,
   movementsError = null,
@@ -153,10 +154,18 @@ export default function GlobalStatement({
   }, [isUsdStablecoin, usdRates]);
 
   // Calculer les totaux
-  const totalBalance = tokens.reduce((sum, token) => {
+  const computedTotalBalance = tokens.reduce((sum, token) => {
     const usdValue = getUsdValue(token);
     return sum + (Number.isFinite(usdValue) ? usdValue : 0);
   }, 0);
+  const totalBalanceOverrideValue = Number(totalBalanceOverride);
+  const totalBalance =
+    totalBalanceOverride !== null &&
+    totalBalanceOverride !== undefined &&
+    totalBalanceOverride !== "" &&
+    Number.isFinite(totalBalanceOverrideValue)
+      ? totalBalanceOverrideValue
+      : computedTotalBalance;
 
   // Trier les tokens
   const sortedTokens = [...tokens].sort((a, b) => {
@@ -169,12 +178,15 @@ export default function GlobalStatement({
     return 0;
   });
 
-  const formatAmount = useCallback((amount) => {
-    return parseFloat(amount || 0).toLocaleString(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }, [locale]);
+  const formatAmountWithSymbolLocal = useCallback(
+    (amount, currency, options = {}) =>
+      formatAmountWithSymbol(locale, amount, currency, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        ...options,
+      }),
+    [locale]
+  );
 
   const ledgerEvidenceCount = useMemo(() => {
     return (movements || []).filter((m) => m?.txHash).length;
@@ -263,17 +275,24 @@ export default function GlobalStatement({
     const docHashLabel = docHash || "-";
     const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
-    const totalBalanceDisplay = Number.isFinite(Number(totalBalance)) ?
-    `$${formatAmount(totalBalance)}` :
-    "-";
+    const totalBalanceDisplay = Number.isFinite(Number(totalBalance))
+      ? formatAmountWithSymbolLocal(totalBalance, "USD")
+      : "-";
     const balancesRows = (sortedTokens || []).map((token) => {
       const usdValue = getUsdValue(token);
       const displayCode = getDisplayCurrencyCode(token?.currency);
       return `
         <tr>
           <td>${escapeHtml(displayCode || "-")}</td>
-          <td class="right">${escapeHtml(formatAmount(token?.value))}</td>
-          <td class="right">${Number.isFinite(usdValue) ? escapeHtml(`$${formatAmount(usdValue)}`) : "-"}</td>
+          <td class="right">${escapeHtml(formatAmountWithSymbol(locale, token?.value, token?.currency, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 6
+          }))}</td>
+          <td class="right">${
+            Number.isFinite(usdValue)
+              ? escapeHtml(formatAmountWithSymbolLocal(usdValue, "USD"))
+              : "-"
+          }</td>
         </tr>
       `;
     }).join("");
@@ -361,7 +380,7 @@ export default function GlobalStatement({
   currentPeriod,
   docHash,
   fallbackPeriod,
-  formatAmount,
+  formatAmountWithSymbolLocal,
   getUsdValue,
   ledgerLastIndex,
   ledgerStatusLabel,
@@ -680,7 +699,7 @@ export default function GlobalStatement({
             </div>
             <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_total_assets_918e935125", "Total Assets")}</p>
-              <p className="text-sm text-white">≈ {formatAmount(totalBalance)}{t("ui_usd_fb11d8df09", "USD")}</p>
+              <p className="text-sm text-white">≈ {formatAmountWithSymbolLocal(totalBalance, "USD")}</p>
               <p className="text-[11px] text-white/50">{tokens.length}{t("ui_currencies_5e5bf1a8a1", "Currencies")}</p>
             </div>
           </div>
@@ -770,13 +789,17 @@ export default function GlobalStatement({
                           </span>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white font-medium text-[10px] sm:text-sm">
-                          <div className="truncate">{formatAmount(token.value)}</div>
-                          <div className="text-[9px] sm:text-xs text-white/50">{getDisplayCurrencyCode(token.currency)}</div>
+                          <div className="truncate">
+                            {formatAmountWithSymbolLocal(token.value, token.currency)}
+                          </div>
+                          <div className="text-[9px] sm:text-xs text-white/50">
+                            {getDisplayCurrencyCode(token.currency)}
+                          </div>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
-                          {Number.isFinite(usdValue) ?
-                        `$${formatAmount(usdValue)}` :
-                        "--"}
+                          {Number.isFinite(usdValue)
+                            ? formatAmountWithSymbolLocal(usdValue, "USD")
+                            : "--"}
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
 	                          <button

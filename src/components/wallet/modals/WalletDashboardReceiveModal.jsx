@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Buffer } from "buffer";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -9,6 +10,7 @@ import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
 import { useModalTransition } from "@/utils/useModalTransition";
+import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 export default function WalletDashboardReceiveModal({
   open,
@@ -20,11 +22,8 @@ export default function WalletDashboardReceiveModal({
   noticeContextLabel = "",
   walletId = "",
   dashboardVariant = "default",
-  receiveTab,
-  setReceiveTab,
   renderWalletMeta,
   effectiveWallet,
-  handleCopyAddress,
   requestAmount,
   setRequestAmount,
   requestCurrency,
@@ -42,7 +41,8 @@ export default function WalletDashboardReceiveModal({
   onRequestGenerated,
   inline = false
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -55,13 +55,13 @@ export default function WalletDashboardReceiveModal({
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
     "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
-  const greenTabInactive =
-    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const [isDesktop, setIsDesktop] = useState(false);
-  const showPersistentRequestPreview = false;
-  const showWalletPageRequestDecor = false;
+  const [copyToast, setCopyToast] = useState("");
+  const copyToastTimerRef = useRef(null);
+  const qrContainerRef = useRef(null);
+  const [isRequestOpen, setIsRequestOpen] = useState(false);
 
   const requestCurrencyCode = useMemo(
     () => String(requestCurrency || "").trim().toUpperCase(),
@@ -80,8 +80,18 @@ export default function WalletDashboardReceiveModal({
     if (!open) {
       setGeneratedRequest(null);
       setGenerateError(null);
+      setIsRequestOpen(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    return () => {
+      if (copyToastTimerRef.current) {
+        window.clearTimeout(copyToastTimerRef.current);
+        copyToastTimerRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -187,24 +197,252 @@ export default function WalletDashboardReceiveModal({
 
     setGeneratedRequest(req);
     onRequestGenerated?.(req);
+    setIsRequestOpen(false);
+  };
+
+  const flashCopyToast = (message) => {
+    const text = String(message || "").trim();
+    if (!text) return;
+    setCopyToast(text);
+    if (copyToastTimerRef.current) {
+      window.clearTimeout(copyToastTimerRef.current);
+    }
+    copyToastTimerRef.current = window.setTimeout(() => {
+      setCopyToast("");
+      copyToastTimerRef.current = null;
+    }, 1300);
+  };
+
+  const dataUrlToBlob = (url) => {
+    const parts = url.split(",");
+    if (parts.length !== 2) return null;
+    const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
+    const binary = atob(parts[1]);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: mime });
+  };
+
+  const buildQrBlob = (useRequest = hasGeneratedRequest) => {
+    const canvas = qrContainerRef.current?.querySelector?.("canvas");
+    if (!canvas) return null;
+    const srcWidth = canvas.width;
+    const srcHeight = canvas.height;
+    const scale = useRequest ? 4 : 3;
+    const marginRatio = useRequest ? 0.12 : 0.1;
+    const margin = Math.max(24, Math.round(srcWidth * marginRatio));
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = (srcWidth + margin * 2) * scale;
+    exportCanvas.height = (srcHeight + margin * 2) * scale;
+    const ctx = exportCanvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    const offset = margin * scale;
+    ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
+    try {
+      const srcCtx = canvas.getContext("2d");
+      const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
+      const isDarkBg =
+        srcPixel && srcPixel.length >= 3
+          ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3
+          : false;
+      if (isDarkBg) {
+        const imageData = ctx.getImageData(
+          offset,
+          offset,
+          srcWidth * scale,
+          srcHeight * scale
+        );
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          data[i] = 255 - data[i];
+          data[i + 1] = 255 - data[i + 1];
+          data[i + 2] = 255 - data[i + 2];
+        }
+        ctx.putImageData(imageData, offset, offset);
+      }
+    } catch {
+      // fallback to raw canvas if pixel access fails
+      ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
+    }
+    const dataUrl = exportCanvas.toDataURL("image/png");
+    return dataUrlToBlob(dataUrl);
+  };
+
+  const downloadBlob = (blob, filename) => {
+    if (!blob || !filename) return;
+    try {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      // noop
+    }
+  };
+
+  const handleCopyQr = async (useRequest = hasGeneratedRequest) => {
+    const fallbackText = useRequest ? requestQrValue : receiveQrValue;
+    const blob = buildQrBlob(useRequest);
+
+    if (typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write) {
+      try {
+        if (blob) {
+          const items = { "image/png": blob };
+          if (fallbackText) {
+            items["text/plain"] = new Blob([fallbackText], {
+              type: "text/plain"
+            });
+          }
+          const item = new ClipboardItem(items);
+          await navigator.clipboard.write([item]);
+          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"));
+          return;
+        }
+      } catch {
+        // fall through to text copy
+      }
+    }
+
+    if (navigator?.clipboard?.writeText && fallbackText) {
+      try {
+        await navigator.clipboard.writeText(fallbackText);
+        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+        return;
+      } catch {
+        // fall through to execCommand
+      }
+    }
+
+    if (fallbackText) {
+      try {
+        const el = document.createElement("textarea");
+        el.value = fallbackText;
+        el.setAttribute("readonly", "");
+        el.style.position = "fixed";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.focus();
+        el.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(el);
+        if (ok) {
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+          return;
+        }
+      } catch {
+        // fall through
+      }
+    }
+
+    flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
+  };
+
+  const handleShareQr = async (useRequest = hasGeneratedRequest) => {
+    const fallbackText = useRequest ? requestQrValue : receiveQrValue;
+    const blob = buildQrBlob(useRequest);
+
+    if (isDesktop || !navigator?.share) {
+      if (blob) {
+        downloadBlob(blob, "xcannes-qr.png");
+        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"));
+        return;
+      }
+      if (fallbackText) {
+        downloadBlob(new Blob([fallbackText], { type: "text/plain" }), "xcannes-qr.txt");
+        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"));
+        return;
+      }
+      flashCopyToast(t("ui_share_unavailable_3b7c1a9d5e", "Partager indisponible"));
+      return;
+    }
+
+    const shareData = {};
+    if (fallbackText) shareData.text = fallbackText;
+    shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
+
+    if (blob && typeof File !== "undefined") {
+      const file = new File([blob], "xcannes-qr.png", { type: blob.type || "image/png" });
+      if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+    }
+
+    try {
+      await navigator.share(shareData);
+      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"));
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+      flashCopyToast(t("ui_share_failed_1a2b3c", "Partage impossible"));
+    }
   };
 
   const requestValue = useMemo(() => {
     if (!generatedRequest) return "";
     try {
-      return JSON.stringify(generatedRequest);
+      const compact = {
+        s: generatedRequest.schema,
+        to: generatedRequest.to,
+        tc: generatedRequest.targetCurrency || generatedRequest.targetCurrencyCode,
+        da: generatedRequest.displayAmount ?? generatedRequest.amount ?? null,
+        dc: generatedRequest.displayCurrency || null,
+        ar: generatedRequest.amountRlusd ?? null,
+        fr: generatedRequest.fxRate ?? null,
+        fs: generatedRequest.fxSource ?? null,
+        i: generatedRequest.issuer ?? null,
+        m: generatedRequest.memo ?? null,
+        b: generatedRequest.beneficiaryLabel ?? null,
+      };
+      Object.keys(compact).forEach((key) => {
+        if (compact[key] == null || compact[key] === "") delete compact[key];
+      });
+      return JSON.stringify(compact);
     } catch {
       return "";
     }
   }, [generatedRequest]);
-  const requestDecorValue = useMemo(() => {
-    if (effectiveWallet) return `xcannes-request:${effectiveWallet}`;
-    return "xcannes-request";
-  }, [effectiveWallet]);
-  const shouldShowRequestPreview =
-    showPersistentRequestPreview || (Boolean(generatedRequest) && Boolean(requestValue));
-  const showRequestPlaceholder = !generatedRequest || !requestValue;
-  const qrSize = inline ? 240 : 180;
+  const requestQrValue = useMemo(() => {
+    if (!requestValue) return "";
+    try {
+      const base64 = Buffer.from(requestValue, "utf8").toString("base64");
+      const base64Url = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      return `xcannes-payreq:${base64Url}`;
+    } catch {
+      return "";
+    }
+  }, [requestValue]);
+  const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
+  const showRequestPreview = hasGeneratedRequest;
+  const requestDisplayCurrency = String(
+    generatedRequest?.displayCurrency || requestCurrencyCode || "USD"
+  )
+    .trim()
+    .toUpperCase();
+  const requestDisplayAmount =
+    generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || "0");
+  const requestDisplayAmountLabel = Number.isFinite(Number(requestDisplayAmount))
+    ? formatAmountWithSymbol(
+        locale,
+        Number(requestDisplayAmount),
+        requestDisplayCurrency,
+        { minimumFractionDigits: 0, maximumFractionDigits: 2 }
+      )
+    : formatAmountWithSymbol(locale, 0, requestDisplayCurrency, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+  const receiveQrValue = effectiveWallet ? `xrpl:${effectiveWallet}` : "";
+  const qrDisplaySize = inline ? 240 : 220;
+  const qrPixelSize = inline ? 360 : (hasGeneratedRequest ? 520 : 420);
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -287,72 +525,110 @@ export default function WalletDashboardReceiveModal({
           {renderWalletMeta?.("mb-2")}
 
 
-          {/* Tabs */}
-          <div className="flex gap-2 mb-3">
-            <button
-            type="button"
-            onClick={() => setReceiveTab("receive")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-            receiveTab === "receive" ? greenActionBtnMuted : greenTabInactive
-            }`}>{t("ui_receive_b7d6ae4037", "Receive")}
-
-
-          </button>
-            <button
-            type="button"
-            onClick={() => setReceiveTab("request")}
-            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-            receiveTab === "request" ? greenActionBtnMuted : greenTabInactive
-            }`}>{t("ui_request_payment_c62b99fb16", "Request Payment")}
-
-
-          </button>
-          </div>
-
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div key={receiveTab} className="wallet-tab-unfold-in">
+            <div className="wallet-tab-unfold-in">
               <p className="text-xs md:text-sm text-white/50 mb-3">
-                {receiveTab === "receive"
-                  ? t(
-                      "ui_receive_assets_desc_1b7f2c9d4e",
-                      "Share this XRPL address to receive funds."
-                    )
-                  : t(
-                      "ui_request_payment_desc_9c2b1a7d4f",
-                      "Create a payment request to send to another wallet."
-                    )}
+                {t(
+                  "ui_receive_and_request_desc_2f1a7c9d5e",
+                  "Share this XRPL address to receive funds, or create a payment request to send to another wallet."
+                )}
               </p>
 
-              {/* Tab Content: Receive */}
-              {receiveTab === "receive" && effectiveWallet &&
-        <div className={`flex flex-col items-center gap-3 ${inline ? "flex-1 min-h-0 justify-center" : ""}`}>
-              <div className="bg-black/60 border border-white/10 rounded-xl p-3">
+              {effectiveWallet &&
+        <div className={
+          `flex flex-col items-center gap-3 ${inline ? "flex-1 min-h-0 justify-center" : ""}`
+        }>
+              <div
+                ref={qrContainerRef}
+                className="bg-black/60 border border-white/10 rounded-xl p-3 text-[0px]"
+              >
                 <QRCodeCanvas
-              value={effectiveWallet}
-              size={qrSize}
-              bgColor="#000000"
-              fgColor="#ffffff" />
+              value={showRequestPreview ? requestQrValue : receiveQrValue}
+              size={qrPixelSize}
+              style={{ width: qrDisplaySize, height: qrDisplaySize }}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              includeMargin={true}
+              level="M" />
 
               </div>
-              <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 break-all">
-                {effectiveWallet}
+              {showRequestPreview ? (
+                <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white/60">{t("ui_amount_7668986206", "Amount")}</span>
+                    <span className="font-mono text-white/90">{requestDisplayAmountLabel}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white/60">{t("ui_currency_1ed55673be", "Currency")}</span>
+                    <span className="font-semibold text-white/90">{requestDisplayCurrency}</span>
+                  </div>
+                </div>
+              ) : null}
+              <div className="flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await handleCopyQr(showRequestPreview);
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
+                >
+                  {showRequestPreview
+                    ? t("ui_copy_request_32a3f4409b", "Copy request")
+                    : t("ui_copy_address_779691d570", "Copy address")}
+                </button>
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    try {
+                      await handleShareQr(showRequestPreview);
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
+                >
+                  {isDesktop
+                    ? t("ui_download_qr_5c1d2e7f9a", "Télécharger")
+                    : t("ui_share_qr_9b5c1a2d7e", "Partager")}
+                </button>
               </div>
-              <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-	              handleCopyAddress();
-	            }}
-	            className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors">{t("ui_copy_address_779691d570", "Copy address")}
-
-	
-	          </button>
+              {copyToast ? (
+                <div className="text-[10px] text-xcannes-green/90">
+                  {copyToast}
+                </div>
+              ) : null}
             </div>
         }
 
-              {/* Tab Content: Request Payment */}
-              {receiveTab === "request" && effectiveWallet &&
-        <div className={`space-y-4 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+              {effectiveWallet ? (
+                <div className="mt-2 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsRequestOpen((prev) => !prev);
+                    }}
+                    className={
+                      `px-4 py-2 text-xs md:text-sm ${greenActionBtnMuted}`
+                    }
+                  >
+                    {isRequestOpen
+                      ? t("ui_hide_request_payment", "Masquer la demande")
+                      : t("ui_request_payment_c62b99fb16", "Créer une demande")}
+                  </button>
+                </div>
+              ) : null}
+
+              {effectiveWallet && isRequestOpen &&
+        <div className={
+          `space-y-4 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`
+        }>
               <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-4"}>
               <div className="space-y-4">
               {/* Amount & Currency */}
@@ -405,7 +681,6 @@ export default function WalletDashboardReceiveModal({
                 buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                 menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
                 selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
-                hideMobileSelectedRight={receiveTab === "request"}
               />
                 </div>
               </div>
@@ -436,7 +711,9 @@ export default function WalletDashboardReceiveModal({
               e.stopPropagation();
               handleGenerateRequest();
             }}
-            className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnMuted}`}>{t("ui_generate_request_58584f23a2", "Generate Request")}
+            className={
+              `hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnMuted}`
+            }>{t("ui_generate_request_58584f23a2", "Generate Request")}
 
 
           </button>
@@ -449,94 +726,12 @@ export default function WalletDashboardReceiveModal({
 
               </div>
 
-              {shouldShowRequestPreview &&
-          <div className="space-y-3">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative bg-black/60 border border-white/10 rounded-xl p-3 overflow-hidden">
-                      {showWalletPageRequestDecor ? (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="opacity-30" style={{ filter: "brightness(0.2)" }}>
-                            <QRCodeCanvas
-                              value={requestDecorValue}
-                              size={qrSize}
-                              bgColor="#000000"
-                              fgColor="#ffffff"
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-                      <div className="relative z-10">
-                        {showRequestPlaceholder ? (
-                          <div
-                            className="flex items-center justify-center text-center text-xs text-white/50"
-                            style={{ width: qrSize, height: qrSize }}
-                          >
-                            {t(
-                              "ui_request_qr_placeholder_2c4f7a1d9b",
-                              "Votre QR code sera créé ici"
-                            )}
-                          </div>
-                        ) : (
-                          <QRCodeCanvas
-                            value={requestValue}
-                            size={qrSize}
-                            bgColor="#000000"
-                            fgColor="#ffffff"
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all ${showRequestPlaceholder ? "text-center" : ""}`}>
-                      {showRequestPlaceholder
-                        ? t(
-                            "ui_request_code_placeholder_8c1e7b4d2a",
-                            "Votre code de demande de paiement apparaîtra ici"
-                          )
-                        : requestValue}
-                    </div>
-                    {!showRequestPlaceholder ? (
-                      <button
-                        type="button"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            await navigator.clipboard.writeText(requestValue);
-                          } catch {
-                            // ignore
-                          }
-                        }}
-                        className={`px-4 py-2 text-xs ${greenActionBtnBase}`}
-                      >
-                        {t("ui_copy_request_32a3f4409b", "Copy request")}
-                      </button>
-                    ) : null}
-                  </div>
-	                  {!showRequestPlaceholder ? (
-	                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-[11px] text-white/60">
-	                      {(() => {
-	                        const currencyLabel =
-	                          selectLabelByCurrency?.[requestCurrencyCode] ||
-	                          selectLabelByCurrency?.[String(requestCurrencyCode || "").toUpperCase()] ||
-	                          requestCurrencyCode;
-	                        return isFxRequest
-	                          ? t("ui_request_settlement_note_6a1c9d2f3b", {
-	                              defaultValue:
-	                                "Payment will settle on-chain in USD, and be credited to the {{currency}} line for the receiver.",
-	                              currency: currencyLabel,
-	                            })
-	                          : t("ui_request_prepared_for_5d2a8b1c3f", {
-	                              defaultValue:
-	                                "Payment request prepared for {{currency}}.",
-	                              currency: currencyLabel || "USD",
-	                            });
-	                      })()}
-	                    </div>
-	                  ) : null}
-                </div>
-          }
+
               </div>
             </div>
           }
+            </div>
+
             </div>
           </div>
         </div>

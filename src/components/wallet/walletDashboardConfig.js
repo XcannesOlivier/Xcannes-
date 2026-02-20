@@ -13,6 +13,37 @@ export const CURRENCY_FLAG_OVERRIDES = {
   XCD: "🌴",
 };
 
+const CURRENCY_SYMBOL_OVERRIDES = {
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  CNY: "¥",
+  CHF: "CHF",
+  CAD: "$",
+  AUD: "$",
+  NZD: "$",
+  HKD: "$",
+  SGD: "$",
+  MXN: "$",
+  BRL: "R$",
+  INR: "₹",
+  NGN: "₦",
+  PHP: "₱",
+  KRW: "₩",
+  ZAR: "R",
+  TRY: "₺",
+  RUB: "₽",
+  PLN: "zł",
+  SEK: "kr",
+  NOK: "kr",
+  DKK: "kr",
+  XOF: "FCFA",
+  XAF: "FCFA",
+  AED: "د.إ",
+  SAR: "﷼",
+};
+
 export const USD_STABLECOINS = [
   "RLUSD",
   "USD",
@@ -25,9 +56,63 @@ export const USD_STABLECOINS = [
   "GUSD",
 ];
 
+export const WALLET_CURRENCY_LINE_ORDER = [
+  "USD",
+  "EUR",
+  "CHF",
+  "GBP",
+  "CAD",
+  "JPY",
+  "AED",
+  "SAR",
+  "XOF",
+  "XAF",
+  "MXN",
+  "BRL",
+  "INR",
+  "NGN",
+  "PHP",
+  "ARS",
+];
+
 export function getDisplayCurrencyCode(code) {
   const upper = String(code || "").toUpperCase();
   return upper === "RLUSD" ? "USD" : upper;
+}
+
+export function getCurrencySymbol(code, locale = "en") {
+  const upper = String(code || "").toUpperCase();
+  if (!upper) return "";
+  try {
+    const parts = new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: upper,
+      currencyDisplay: "narrowSymbol",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).formatToParts(0);
+    const symbol = parts.find((part) => part.type === "currency")?.value;
+    if (symbol) return symbol;
+  } catch {
+    // ignore
+  }
+  return CURRENCY_SYMBOL_OVERRIDES[upper] || upper;
+}
+
+export function formatAmountWithSymbol(
+  locale,
+  amount,
+  currencyCode,
+  { minimumFractionDigits = 2, maximumFractionDigits = 2 } = {}
+) {
+  const num = Number(amount);
+  if (!Number.isFinite(num)) return "-";
+  const value = new Intl.NumberFormat(locale || "en", {
+    minimumFractionDigits,
+    maximumFractionDigits,
+  }).format(num);
+  const symbol = getCurrencySymbol(currencyCode, locale);
+  return symbol ? `${value} ${symbol}` : value;
 }
 
 export function countryCodeToFlag(countryCode) {

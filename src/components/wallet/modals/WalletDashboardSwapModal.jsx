@@ -10,6 +10,11 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
 import { useModalTransition } from "@/utils/useModalTransition";
+import {
+  formatAmountWithSymbol,
+  getDisplayCurrencyCode,
+  WALLET_CURRENCY_LINE_ORDER
+} from "../walletDashboardConfig";
 
 export default function WalletDashboardSwapModal({
   open,
@@ -57,7 +62,8 @@ export default function WalletDashboardSwapModal({
   selectLabelMobileByCurrency,
   inline = false
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -103,10 +109,15 @@ export default function WalletDashboardSwapModal({
     return set;
   }, [currencyLines]);
 
-  const suggestedCurrencies = useMemo(
-    () => ["EUR", "GBP", "CHF", "CAD", "AED", "SAR", "XOF", "XAF", "JPY"],
-    []
-  );
+  const suggestedCurrencies = useMemo(() => {
+    const base = Array.isArray(WALLET_CURRENCY_LINE_ORDER)
+      ? WALLET_CURRENCY_LINE_ORDER
+      : [];
+    return base.filter((code) => {
+      const upper = String(code || "").toUpperCase();
+      return upper && upper !== "USD" && upper !== "RLUSD" && upper !== "XRP";
+    });
+  }, []);
 
   const swapCurrencyOptionsSanitized = useMemo(() => {
     return (swapCurrencyOptions || []).filter(
@@ -172,12 +183,12 @@ export default function WalletDashboardSwapModal({
     return { type: "allocation" };
   }, [baseCode, quoteCode, t]);
 
-  const formatAmount = (value, digits = 6) => {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return "-";
-    return num.toLocaleString("en-US", {
+  const formatAmountWithSymbolLocal = (value, currency, options = {}) => {
+    const display = getDisplayCurrencyCode(currency);
+    return formatAmountWithSymbol(locale, value, display, {
       minimumFractionDigits: 0,
-      maximumFractionDigits: digits,
+      maximumFractionDigits: 6,
+      ...options,
     });
   };
 
@@ -531,16 +542,21 @@ export default function WalletDashboardSwapModal({
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
                   </div>
                   <div className="text-sm text-white/90">
-                    {formatAmount(previewAmount, 6)}{" "}
-                    {selectLabelByCurrency?.[convertQuoteCurrency] || convertQuoteCurrency || "-"}
+                    {formatAmountWithSymbolLocal(
+                      previewAmount,
+                      convertQuoteCurrency || "",
+                      { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                    )}
                   </div>
                   {previewMeta?.route === "allocation" &&
                   previewMeta?.isFx &&
                   previewMeta?.spreadFeeRlusd > 0 ? (
                       <div className="text-[10px] text-white/45">
                         {t("ui_spread_fee_6c2a8d5e1b", "Conversion fee (1%)")}:{" "}
-                        ≈ {formatAmount(previewMeta.spreadFeeRlusd, 6)}{" "}
-                        {"USD"}
+                        {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </div>
                   ) : null}
                 </div>

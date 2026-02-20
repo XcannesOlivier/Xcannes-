@@ -5,6 +5,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { useXumm } from "@/context/XummContext";
 import { useModalTransition } from "@/utils/useModalTransition";
+import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -47,7 +48,8 @@ const MoonPaySellModal = ({
   selectIconByCurrency,
   selectLabelMobileByCurrency
 }) => {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const { signTransaction, isWalletActivated, balance } = useXumm();
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
@@ -100,8 +102,14 @@ const MoonPaySellModal = ({
       const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
       const amountValue = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amountValue)
-        ? amountValue.toLocaleString("en-US", { maximumFractionDigits: 4 })
-        : "0";
+        ? formatAmountWithSymbol(locale, amountValue, currency, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          })
+        : formatAmountWithSymbol(locale, 0, currency, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          });
       const fallbackRight = `${balanceLabel} = ${amountLabel}`;
       let labelRight =
         selectLabelRightByCurrency?.[currencyRaw] ||
@@ -524,9 +532,10 @@ const MoonPaySellModal = ({
                             "ui_rate_unavailable_base_5c1a9b7d2e",
                             "Rate unavailable for base currency."
                           )
-                        : `≈ ${Number(rlusdEquivalent || 0).toLocaleString("en-US", {
+                        : `≈ ${formatAmountWithSymbol(locale, Number(rlusdEquivalent || 0), "USD", {
+                            minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
-                          })} ${t("ui_rlusd_ff5048a674", "RLUSD")}`}
+                          })}`}
                     </p>
                   )}
 	                </div>

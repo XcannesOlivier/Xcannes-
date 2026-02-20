@@ -15,7 +15,7 @@ import {
 } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
-import { getDisplayCurrencyCode } from "../walletDashboardConfig";
+import { formatAmountWithSymbol, getDisplayCurrencyCode } from "../walletDashboardConfig";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -961,12 +961,22 @@ export default function CurrencyStatement({
     return date.toLocaleDateString(locale, options);
   }, [isMobileDate, locale, t]);
 
-  const formatAmount = useCallback((amount) => {
-    return parseFloat(amount || 0).toLocaleString(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 6
-    });
-  }, [locale]);
+  const formatAmountWithSymbolLocal = useCallback(
+    (amount) =>
+      formatAmountWithSymbol(locale, amount, displayCurrency, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    [displayCurrency, locale]
+  );
+  const formatUsdWithSymbol = useCallback(
+    (amount) =>
+      formatAmountWithSymbol(locale, amount, "USD", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
 
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
@@ -974,11 +984,16 @@ export default function CurrencyStatement({
     const docHashLabel = docHash || "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const balanceValue = Number.isFinite(Number(balance)) ? Number(balance) : 0;
-    const balanceDisplay = `${formatAmount(balanceValue)} ${normalizedCurrency}`;
+    const balanceDisplay = formatAmountWithSymbol(
+      locale,
+      balanceValue,
+      displayCurrency,
+      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+    );
     const descriptionLabel = t("ui_description_4c9f6b1a2d", "Description");
     const typeLabel = t("ui_type_label_8b1a4d2c7e", "Type");
-    const amountLabel = `${t("ui_amount_0bb3c64b1d", "Amount")} (${normalizedCurrency})`;
-    const balanceLabel = `${t("ui_balance_label_7f2a1b9c5e", "Balance")} (${normalizedCurrency})`;
+    const amountLabel = `${t("ui_amount_0bb3c64b1d", "Amount")} (${displayCurrency})`;
+    const balanceLabel = `${t("ui_balance_label_7f2a1b9c5e", "Balance")} (${displayCurrency})`;
     const rowsHtml = (transactionsWithDisplayBalance || []).map((tx) => {
       const isDebit = tx?.type === "debit";
       const txType = isDebit ?
@@ -997,10 +1012,16 @@ export default function CurrencyStatement({
           <td>${escapeHtml(formatDate(tx?.date))}</td>
           <td>${escapeHtml(fullDescription)}</td>
           <td>${escapeHtml(txType)}</td>
-          <td class="right">${escapeHtml(`${isDebit ? "-" : "+"}${formatAmount(tx?.amount)}`)}</td>
+          <td class="right">${escapeHtml(`${isDebit ? "-" : "+"}${formatAmountWithSymbol(locale, tx?.amount, displayCurrency, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}`)}</td>
           <td class="right">${escapeHtml(
-            formatAmount(
-              tx?.displayRunningBalance != null ? tx.displayRunningBalance : tx?.runningBalance
+            formatAmountWithSymbol(
+              locale,
+              tx?.displayRunningBalance != null ? tx.displayRunningBalance : tx?.runningBalance,
+              displayCurrency,
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 }
             )
           )}</td>
         </tr>
@@ -1045,11 +1066,11 @@ export default function CurrencyStatement({
   balance,
   currentPeriod,
   docHash,
+  displayCurrency,
   fallbackPeriod,
   getLocalizedDescription,
   transactionsWithDisplayBalance,
   formatDate,
-  formatAmount,
   ledgerLastIndex,
   ledgerStatusLabel,
   locale,
@@ -1326,10 +1347,10 @@ export default function CurrencyStatement({
             <div>
               <p className="text-xs text-white/50 mb-1">{t("ui_balance_445d830d72", "Balance")}</p>
 	              <p className="text-sm text-white font-semibold">
-	                {formatAmount(balance)} {displayCurrency}
+	                {formatAmountWithSymbolLocal(balance)}
 	              </p>
               <p className="text-[11px] text-white/50">
-                ≈ {formatAmount(estimatedUsd)}{t("ui_usd_506842b2ba", "USD")}
+                ≈ {formatUsdWithSymbol(estimatedUsd)}
             </p>
 
 	              {(normalizedCurrency === "XRP") &&
@@ -1590,10 +1611,10 @@ export default function CurrencyStatement({
                               }`}
                             >
                               {tx.type === "debit" ? "−" : "+"}
-                              {formatAmount(tx.amount)}
+                              {formatAmountWithSymbolLocal(tx.amount)}
                             </td>
                             <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                              {formatAmount(
+                              {formatAmountWithSymbolLocal(
                                 tx?.displayRunningBalance != null
                                   ? tx.displayRunningBalance
                                   : tx.runningBalance
