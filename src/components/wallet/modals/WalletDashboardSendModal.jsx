@@ -22,8 +22,6 @@ export default function WalletDashboardSendModal({
   noticeContextLabel = "",
   walletId = "",
   qrSizingVariant = "default",
-  sendTab,
-  setSendTab,
   renderWalletMeta,
   augmentedTokens,
   selectedSendToken,
@@ -56,14 +54,12 @@ export default function WalletDashboardSendModal({
     hasRlusdTrustline === false;
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
-  const greenActionBtnMuted =
-    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
-  const greenTabInactive =
-    "rounded-lg border border-white/20 bg-transparent text-white/60 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/80";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [requestText, setRequestText] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
+  const [scanActive, setScanActive] = useState(false);
+  const [scanKey, setScanKey] = useState(0);
   const payreqFileInputId = "payreq-qr-file";
   const manualQrFileInputId = "manual-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -76,22 +72,13 @@ export default function WalletDashboardSendModal({
   const useDemoQrDecor = isDemoMode && isDesktop;
   const manualQrDecorSize = useDemoQrDecor ? "170px" : inline && isDesktop ? "120px" : "130px";
   const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
-  const payreqQrDecorSize = useDemoQrDecor ? "170px" : inline && isDesktop ? "120px" : "130px";
-  const payreqQrDecorOpacity = useDemoQrDecor ? 1 : 0.06;
-  const payreqQrDecorPosition = useDemoQrDecor ? "center 12px" : "center 24px";
-  const payreqQrDecor = manualQrDecor;
   const fauxPayreqExample =
     '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = false;
   const useDexStyleLayout = isDesktop && (noticeVariant !== "demo" || !inline);
-  const useUnifiedPayreqPanel = useDexStyleLayout;
   const showManualQrUpload = useDexStyleLayout;
-  const showDemoMobileQrImage = isDemoMode && !isDesktop;
-  const showDemoDesktopQrImage = isDemoMode && isDesktop;
-  const showDemoDesktopPayreqQr = isDemoMode && isDesktop;
   const showRealDesktopQrImage = !isDemoMode && isDesktop;
   const showManualStaticQr = isDesktop;
-  const showStaticQrImage = showDemoMobileQrImage || showDemoDesktopQrImage || showRealDesktopQrImage;
   const useDexSizing = inline || qrSizingVariant === "dex";
   const fauxPayreqTextClass = isDemoMode && isDesktop
     ? "text-[11px] text-white/70"
@@ -108,7 +95,6 @@ export default function WalletDashboardSendModal({
   const fauxQrSize = inline ? (isDesktop ? "120px" : "200px") : "160px";
   const fauxQrOpacity = inline ? 0.08 : 0.06;
   const demoQrSize = useDexSizing ? 200 : 160;
-  const payreqPreviewSize = useDexSizing ? 170 : 150;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -138,6 +124,39 @@ export default function WalletDashboardSendModal({
     Boolean(normalizedDestination) &&
     Number.isFinite(normalizedSendAmount) &&
     normalizedSendAmount > 0;
+  const hasPaymentRequest = Boolean(sendPaymentRequest);
+  const showManualForm = !hasPaymentRequest;
+  const requestCurrencyCode = String(
+    sendPaymentRequest?.displayCurrency ||
+      sendPaymentRequest?.targetCurrencyCode ||
+      selectedSendToken?.currency ||
+      ""
+  )
+    .trim()
+    .toUpperCase();
+  const requestAmountValue =
+    sendPaymentRequest?.displayAmount ??
+    sendPaymentRequest?.amountRlusd ??
+    (Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0
+      ? normalizedSendAmount
+      : null);
+  const requestAmountLabel =
+    requestAmountValue != null && requestCurrencyCode
+      ? formatAmountWithSymbol(locale, Number(requestAmountValue), requestCurrencyCode, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 6
+        })
+      : null;
+  const requestBeneficiaryLabel = sendPaymentRequest?.beneficiaryLabel
+    ? String(sendPaymentRequest.beneficiaryLabel)
+    : "";
+  const requestDestination = String(
+    sendPaymentRequest?.to || normalizedDestination || ""
+  ).trim();
+  const requestDestinationLabel =
+    requestDestination.length > 14
+      ? `${requestDestination.slice(0, 6)}...${requestDestination.slice(-4)}`
+      : requestDestination;
   const handleManualSend = async () => {
     const result = await handleSendSubmit?.({
       saveDestination:
@@ -172,6 +191,7 @@ export default function WalletDashboardSendModal({
       }
       if (decodedText) {
         handlePaymentRequestScan?.(decodedText);
+        setScanActive(false);
       }
     } catch (err) {
       console.error("QR scanFile error:", err);
@@ -221,6 +241,7 @@ export default function WalletDashboardSendModal({
     if (looksLikeQrPayload(text)) {
       event.preventDefault();
       handlePaymentRequestScan?.(text);
+      setScanActive(false);
       return true;
     }
     const items = clipboard.items || [];
@@ -235,6 +256,18 @@ export default function WalletDashboardSendModal({
       }
     }
     return false;
+  };
+  const handleScan = (data) => {
+    handlePaymentRequestScan?.(data);
+    setScanActive(false);
+  };
+  const handleScanAgain = () => {
+    setScanActive(true);
+    setScanKey((prev) => prev + 1);
+  };
+  const handleScanQrUpload = () => {
+    const input = document.getElementById(payreqFileInputId);
+    input?.click();
   };
   const scanRequestFooter = (
     <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
@@ -259,8 +292,7 @@ export default function WalletDashboardSendModal({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              const input = document.getElementById(payreqFileInputId);
-              input?.click();
+              handleScanQrUpload();
             }}
             className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
           >
@@ -308,6 +340,15 @@ export default function WalletDashboardSendModal({
   }, [open]);
 
   useEffect(() => {
+    if (!open) {
+      setScanActive(false);
+      return;
+    }
+    setScanActive(true);
+    setScanKey((prev) => prev + 1);
+  }, [open]);
+
+  useEffect(() => {
     if (typeof window === "undefined") return;
     const media = window.matchMedia("(min-width: 768px)");
     const handleChange = () => setIsDesktop(media.matches);
@@ -346,6 +387,448 @@ export default function WalletDashboardSendModal({
     !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
   ].join(" ");
 
+  const requestDetailsPanel = hasPaymentRequest ? (
+    <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 space-y-2">
+      <div className="text-[11px] uppercase tracking-wide text-amber-200/70 font-semibold">
+        {t("ui_payment_request_details", "Payment request")}
+      </div>
+      <div className="space-y-1 text-xs text-white/80">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-white/60">
+            {t("ui_beneficiary_label", "Bénéficiaire")}
+          </span>
+          <span className="font-semibold text-white/90">
+            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+          </span>
+        </div>
+        {requestAmountLabel ? (
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_amount_52cea2dd3d", "Amount")}
+            </span>
+            <span className="font-mono text-white/90">{requestAmountLabel}</span>
+          </div>
+        ) : null}
+        {requestCurrencyCode ? (
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_currency_label", "Currency")}
+            </span>
+            <span className="font-semibold text-white/90">
+              {requestCurrencyCode}
+            </span>
+          </div>
+        ) : null}
+        {requestDestination ? (
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
+            </span>
+            <span className="font-mono text-white/80">
+              {requestDestinationLabel || requestDestination}
+            </span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  ) : null;
+
+  const manualForm = showManualForm ? (
+    <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
+      <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
+        <div className={inline ? "space-y-3" : ""}>
+          <div>
+            <label
+              className="block text-[11px] md:text-xs text-white/60 mb-1"
+              title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
+            >
+              {t("ui_asset_e5170a7a06", "Asset")}
+
+            </label>
+            <ModalSelect
+              value={selectedSendToken ? selectedSendToken.key : ""}
+              onChange={setSendAssetKey}
+              options={(augmentedTokens || []).map((token) => {
+                const labelLeft =
+                  selectLabelByAssetKey?.[token.key] ||
+                  selectLabelByAssetKey?.[token.currency] ||
+                  token.currency;
+                const labelRight =
+                  selectLabelRightByAssetKey?.[token.key] ||
+                  selectLabelRightByAssetKey?.[token.currency] ||
+                  null;
+                return {
+                  value: token.key,
+                  icon:
+                    selectIconByAssetKey?.[token.key] ||
+                    selectIconByAssetKey?.[token.currency] ||
+                    null,
+                  label: labelLeft,
+                  labelLeft,
+                  labelRight,
+                  labelMobile:
+                    selectLabelMobileByAssetKey?.[token.key] ||
+                    selectLabelMobileByAssetKey?.[token.currency] ||
+                    labelLeft,
+                };
+              })}
+              useNativeSelect={false}
+              showMobileOptionRight={true}
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+            />
+            {selectedSendToken &&
+              <p className="mt-1 text-[11px] text-white/40">{t("ui_balance_340cdcff7a", "Balance:")}
+
+                <span className="text-white/70">
+                  {formatAmountWithSymbol(
+                    locale,
+                    selectedSendToken.value,
+                    selectedSendToken.currency,
+                    { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                  )}
+                </span>
+              </p>
+            }
+          </div>
+          {sendPaymentRequest?.beneficiaryLabel ?
+            <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+              <span className="text-white/70">{t("ui_beneficiary_label", "Bénéficiaire")}:</span>{" "}
+              <span className="font-semibold">{String(sendPaymentRequest.beneficiaryLabel)}</span>
+            </div> :
+            null}
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                className="block text-[11px] md:text-xs text-white/60 mb-1"
+                title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
+              >
+                {t("ui_amount_52cea2dd3d", "Amount")}
+
+              </label>
+              {showCalculatedAmountLabel ?
+                <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
+                  {t("ui_calculated_amount_label", "Montant calculé")}
+                </span> :
+                null}
+            </div>
+            <TokenAmountInput
+              value={sendAmount}
+              onChange={setSendAmount}
+              max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
+              placeholder="0.0000"
+              token={
+                selectedSendToken
+                  ? selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency
+                  : "RLUSD"
+              }
+              tokenClassName="text-white"
+              containerClassName="focus-within:!border-xcannes-green/80" />
+
+          </div>
+
+          {sendFxInfo &&
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+              <div className="text-[11px] font-semibold text-white/80">{t("ui_payment_fx_base_usd_r_gleme_4818b8a6c3", "Paiement FX (base USD · règlement XRPL via USD)")}
+
+              </div>
+              <p className="mt-1 text-[11px] text-white/60">
+                ≈{" "}
+                <span className="font-mono">
+                  {formatAmountWithSymbol(
+                    locale,
+                    Number(sendFxInfo.paymentRlusd || 0),
+                    "USD",
+                    { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                  )}
+
+                </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
+
+              </p>
+              {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 &&
+                <p className="mt-1 text-[11px] text-white/60">
+                  {t("ui_spread_xcannes_tier_7ad17576d3", "Conversion fee (1%)")}
+                  {sendFxInfo.fxSource ? (
+                    <>
+                      {" "}· {t("ui_source_507c065942", "source")}{" "}
+                      <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
+                    </>
+                  ) : (
+                    <>{" "}· {t("ui_source_unknown_4c1a7d9b2e", "unknown source")}</>
+                  )}
+                  :{" "}
+                  <span className="font-mono">
+                    {formatAmountWithSymbol(
+                      locale,
+                      Number(sendFxInfo.spreadFeeRlusd || 0),
+                      "USD",
+                      { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                    )}
+                  </span>
+                </p>
+              }
+              <p className="mt-2 text-[10px] text-white/45">
+                {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
+                  t(
+                    "ui_xumm_signatures_two_8d1c7a2b9e",
+                    "2 Xumm signatures: conversion fee (1%) → XCANNES, then payment → recipient."
+                  ) :
+                  t(
+                    "ui_xumm_signatures_one_5b2c1a7d9f",
+                    "1 Xumm signature: payment → recipient."
+                  )}
+              </p>
+            </div>
+          }
+        </div>
+        <div className={inline ? "space-y-2" : ""}>
+          {showManualQrUpload ?
+            <div className="space-y-3">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const input = document.getElementById(manualQrFileInputId);
+                    input?.click();
+                  }}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+                    +
+                  </span>
+                  {t(
+                    "ui_upload_recipient_qr_code_1e7c2d9a5b",
+                    "Charger le QR code de l'adresse du destinataire"
+                  )}
+                </button>
+              </div>
+              <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-3 space-y-3 overflow-hidden md:p-6 md:space-y-4 md:min-h-[180px]">
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: showManualStaticQr ? "none" : `url("${manualQrDecor}")`,
+                    backgroundSize: `${manualQrDecorSize} ${manualQrDecorSize}`,
+                    opacity: manualQrDecorOpacity,
+                  }}
+                />
+                {showManualStaticQr ? (
+                  <div className="relative z-10 flex items-center justify-center">
+                    <div className="rounded-lg border border-white/10 bg-black/60 p-2">
+                      <div
+                        className={showRealDesktopQrImage ? "opacity-90" : ""}
+                        style={showRealDesktopQrImage ? { filter: "brightness(0.15)" } : undefined}
+                      >
+                        <QRCodeCanvas
+                          value={fauxPayreqExample}
+                          size={demoQrSize}
+                          bgColor="#000000"
+                          fgColor="#ffffff"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+                <input
+                  id={manualQrFileInputId}
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    e.target.value = "";
+                    handleManualQrFile(file);
+                  }} />
+              </div>
+            </div> :
+            null}
+          <div>
+            <label
+              className="block text-[11px] md:text-xs text-white/60 mb-1"
+              title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
+            >
+              {t("ui_destination_xrpl_address_9c2b94554c", "Destination (XRPL address)")}
+
+            </label>
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    list="saved-addresses"
+                    value={sendDestination}
+                    onChange={(e) => setSendDestination(e.target.value)}
+                    onPaste={handlePastePayload}
+                    placeholder={(savedAddresses || []).length > 0 ?
+                      t("ui_select_saved_address_60c28f89c1", "Select saved address...") :
+                      t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
+                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]" />
+                  <datalist id="saved-addresses">
+                    {(savedAddresses || []).map((addr, idx) =>
+                      <option
+                        key={idx}
+                        value={addr.address}
+                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`} />
+                    )}
+                  </datalist>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setQrScannerOpen(true);
+                  }}
+                  className="md:hidden px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
+                  title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}>
+
+                  <svg
+                    className="w-5 h-5 text-white/80"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+
+                  </svg>
+                </button>
+              </div>
+
+              {canSaveDestination ?
+                <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
+                  <label className="flex items-center gap-2 text-[11px] text-white/60">
+                    <input
+                      type="checkbox"
+                      checked={saveNewAddress}
+                      onChange={(e) => setSaveNewAddress(e.target.checked)}
+                      className="accent-xcannes-green" />
+                    {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
+                  </label>
+                  {saveNewAddress ?
+                    <div className="space-y-1">
+                      <div className="text-[11px] text-white/60">
+                        {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
+                      </div>
+                      <input
+                        type="text"
+                        value={saveNewAddressLabel}
+                        onChange={(e) => setSaveNewAddressLabel(e.target.value)}
+                        placeholder={t("ui_e_g_exchange_friend_11008b5e9e", "e.g., Exchange, Friend, ...")}
+                        className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80" />
+                    </div> :
+                    null}
+                </div> :
+                null}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  const sendActions = (
+    <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
+      <SwipeConfirmButton
+        label={
+          sendProcessing
+            ? t("ui_sending_3b8c1a7d5e", "Sending...")
+            : t("ui_send_504b64a87b", "Send")
+        }
+        onConfirm={handleManualSend}
+        disabled={sendProcessing || !canManualSend}
+        variant="green"
+        className="mt-2 md:hidden"
+      />
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleManualSend();
+        }}
+        disabled={sendProcessing || !canManualSend}
+        className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}
+      >
+        {sendProcessing
+          ? t("ui_sending_3b8c1a7d5e", "Sending...")
+          : t("ui_send_504b64a87b", "Send")}
+      </button>
+    </div>
+  );
+
+  const scannerPanel = (
+    <div className={`space-y-2 ${inline ? "" : "-mx-4 md:-mx-5"}`}>
+      {scanActive ? (
+        <QRScanner
+          key={scanKey}
+          isOpen={true}
+          onScan={handleScan}
+          embedded={true}
+          showClose={false}
+          fileInputId={payreqFileInputId}
+          enableCamera={true}
+          showFauxQrBackground={showFauxPayreq}
+          fauxQrBackgroundSize={fauxQrSize}
+          fauxQrBackgroundOpacity={fauxQrOpacity}
+          className="bg-black/30 border-white/10"
+        />
+      ) : (
+        <div className={`rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center justify-between ${inline ? "" : "mx-4 md:mx-5"}`}>
+          <span className="text-xs text-white/60">
+            {t("ui_scan_qr_code_481606b590", "Scan QR Code")}
+          </span>
+          <button
+            type="button"
+            onClick={handleScanAgain}
+            className="text-[11px] px-2.5 py-1 rounded-md border border-white/20 bg-white/10 text-white/80 hover:bg-white/15"
+          >
+            {t("ui_scan_again", "Scanner")}
+          </button>
+        </div>
+      )}
+      {scanActive ? (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={sendDestination}
+              onChange={(e) => {
+                const next = e.target.value;
+                setSendDestination(next);
+                if (String(next || "").trim()) {
+                  setScanActive(false);
+                }
+              }}
+              onPaste={handlePastePayload}
+              placeholder={t(
+                "ui_enter_or_import_address",
+                "Compte Bénéficiaire"
+              )}
+              className="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+            />
+            <button
+              type="button"
+              onClick={handleScanQrUpload}
+              className="px-3 py-2 rounded-lg border border-white/20 bg-white/10 text-white/80 hover:bg-white/15"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode"
+              )}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+
   const content =
   <>
       {/* Backdrop */}
@@ -379,9 +862,7 @@ export default function WalletDashboardSendModal({
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-              {sendTab === "manual"
-                ? t("ui_send_assets_title_2c9b1a7d5e", "Send assets")
-                : t("ui_pay_request_title_7b1c9a2d5e", "Pay Request")}
+              {t("ui_send_assets_title_2c9b1a7d5e", "Send assets")}
             </h3>
             {noticeVariant === "demo" ? (
               <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
@@ -405,456 +886,20 @@ export default function WalletDashboardSendModal({
           {renderWalletMeta?.("mb-2")}
 
 
-          {/* Tabs */}
-          <div className="flex gap-2 mb-3">
-            <button
-            type="button"
-            onClick={() => setSendTab("scan-request")}
-	            title={t("ui_send_tab_payreq_tip", "Payer via un code de demande.")}
-	            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-	            sendTab === "scan-request" ? greenActionBtnMuted : greenTabInactive
-	            }`}>{t("ui_scan_request_44801f50d1", "Scan Request")}
-
-
-          </button>
-            <button
-            type="button"
-            onClick={() => setSendTab("manual")}
-	            title={t("ui_send_tab_manual_tip", "Envoyer manuellement à une adresse.")}
-	            className={`flex-1 px-3 py-2 text-xs md:text-sm ${
-	            sendTab === "manual" ? greenActionBtnMuted : greenTabInactive
-	            }`}>{t("ui_manual_send_d5de1bf948", "Manual Send")}
-
-
-          </button>
-          </div>
-
-
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div key={sendTab} className="wallet-tab-unfold-in">
-              {/* Tab Content: Manual Send */}
-              {sendTab === "manual" &&
-        <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-              <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
-                <div className={inline ? "space-y-3" : ""}>
-              <div>
-                <label
-                  className="block text-[11px] md:text-xs text-white/60 mb-1"
-                  title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
-                >
-                  {t("ui_asset_e5170a7a06", "Asset")}
-
-            </label>
-                <ModalSelect
-              value={selectedSendToken ? selectedSendToken.key : ""}
-              onChange={setSendAssetKey}
-              options={(augmentedTokens || []).map((token) => {
-                const labelLeft =
-                  selectLabelByAssetKey?.[token.key] ||
-                  selectLabelByAssetKey?.[token.currency] ||
-                  token.currency;
-                const labelRight =
-                  selectLabelRightByAssetKey?.[token.key] ||
-                  selectLabelRightByAssetKey?.[token.currency] ||
-                  null;
-                return {
-                  value: token.key,
-                  icon:
-                    selectIconByAssetKey?.[token.key] ||
-                    selectIconByAssetKey?.[token.currency] ||
-                    null,
-                  label: labelLeft,
-                  labelLeft,
-                  labelRight,
-                  labelMobile:
-                    selectLabelMobileByAssetKey?.[token.key] ||
-                    selectLabelMobileByAssetKey?.[token.currency] ||
-                    labelLeft,
-                };
-              })}
-              useNativeSelect={false}
-              showMobileOptionRight={true}
-	              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-              menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-	              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-            />
-                {selectedSendToken &&
-            <p className="mt-1 text-[11px] text-white/40">{t("ui_balance_340cdcff7a", "Balance:")}
-
-              <span className="text-white/70">
-	                      {formatAmountWithSymbol(
-	                        locale,
-	                        selectedSendToken.value,
-	                        selectedSendToken.currency,
-	                        { minimumFractionDigits: 0, maximumFractionDigits: 6 }
-	                      )}
-	                    </span>
-	                  </p>
-	            }
-              </div>
-              {sendPaymentRequest?.beneficiaryLabel ?
-                <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
-                  <span className="text-white/70">{t("ui_beneficiary_label", "Bénéficiaire")}:</span>{" "}
-                  <span className="font-semibold">{String(sendPaymentRequest.beneficiaryLabel)}</span>
-                </div> :
-                null}
-              <div>
-                <div className="flex items-center justify-between">
-                  <label
-                    className="block text-[11px] md:text-xs text-white/60 mb-1"
-                    title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
-                  >
-                    {t("ui_amount_52cea2dd3d", "Amount")}
-
-                  </label>
-                  {showCalculatedAmountLabel ?
-                    <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
-                      {t("ui_calculated_amount_label", "Montant calculé")}
-                    </span> :
-                    null}
-                </div>
-	              <TokenAmountInput
-	              value={sendAmount}
-	              onChange={setSendAmount}
-	              max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
-	              placeholder="0.0000"
-	              token={
-	                selectedSendToken
-	                  ? selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency
-	                  : "RLUSD"
-	              }
-	              tokenClassName="text-white"
-		              containerClassName="focus-within:!border-xcannes-green/80" />
-
-              </div>
-
-	              {sendFxInfo &&
-	          <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-	                  <div className="text-[11px] font-semibold text-white/80">{t("ui_payment_fx_base_usd_r_gleme_4818b8a6c3", "Paiement FX (base USD · règlement XRPL via USD)")}
-	
-	            </div>
-                  <p className="mt-1 text-[11px] text-white/60">
-                    ≈{" "}
-                    <span className="font-mono">
-	                      {formatAmountWithSymbol(
-	                        locale,
-	                        Number(sendFxInfo.paymentRlusd || 0),
-	                        "USD",
-	                        { minimumFractionDigits: 0, maximumFractionDigits: 6 }
-	                      )}
-	
-	              </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
-
-            </p>
-                  {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 &&
-            <p className="mt-1 text-[11px] text-white/60">
-              {t("ui_spread_xcannes_tier_7ad17576d3", "Conversion fee (1%)")}
-              {sendFxInfo.fxSource ? (
+            <div className="space-y-4">
+              {scannerPanel}
+              {scanActive ? scanRequestFooter : null}
+              {!scanActive ? (
                 <>
-                  {" "}· {t("ui_source_507c065942", "source")}{" "}
-                  <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
+                  {hasPaymentRequest ? requestDetailsPanel : manualForm}
+                  {sendActions}
                 </>
-              ) : (
-                <>{" "}· {t("ui_source_unknown_4c1a7d9b2e", "unknown source")}</>
-              )}
-              :{" "}
-              <span className="font-mono">
-	                {formatAmountWithSymbol(
-	                  locale,
-	                  Number(sendFxInfo.spreadFeeRlusd || 0),
-	                  "USD",
-	                  { minimumFractionDigits: 0, maximumFractionDigits: 6 }
-	                )}
-	              </span>
-	            </p>
-            }
-                  <p className="mt-2 text-[10px] text-white/45">
-                    {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
-              t(
-                "ui_xumm_signatures_two_8d1c7a2b9e",
-                "2 Xumm signatures: conversion fee (1%) → XCANNES, then payment → recipient."
-              ) :
-              t(
-                "ui_xumm_signatures_one_5b2c1a7d9f",
-                "1 Xumm signature: payment → recipient."
-              )}
-                  </p>
-                </div>
-          }
-              </div>
-              <div className={inline ? "space-y-2" : ""}>
-                {showManualQrUpload ?
-            <div className="space-y-3">
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const input = document.getElementById(manualQrFileInputId);
-                          input?.click();
-                        }}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-                      >
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                          +
-                        </span>
-                        {t(
-                          "ui_upload_recipient_qr_code_1e7c2d9a5b",
-                          "Charger le QR code de l'adresse du destinataire"
-                        )}
-                      </button>
-                    </div>
-                    <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-3 space-y-3 overflow-hidden md:p-6 md:space-y-4 md:min-h-[180px]">
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
-                        style={{
-                          backgroundImage: showManualStaticQr ? "none" : `url("${manualQrDecor}")`,
-                          backgroundSize: `${manualQrDecorSize} ${manualQrDecorSize}`,
-                          opacity: manualQrDecorOpacity,
-                        }}
-                      />
-                      {showManualStaticQr ? (
-                        <div className="relative z-10 flex items-center justify-center">
-                          <div className="rounded-lg border border-white/10 bg-black/60 p-2">
-                            <div
-                              className={showRealDesktopQrImage ? "opacity-90" : ""}
-                              style={showRealDesktopQrImage ? { filter: "brightness(0.15)" } : undefined}
-                            >
-                              <QRCodeCanvas
-                                value={fauxPayreqExample}
-                                size={demoQrSize}
-                                bgColor="#000000"
-                                fgColor="#ffffff"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ) : null}
-                    <input
-                    id={manualQrFileInputId}
-                    type="file"
-                    accept="image/*"
-                      className="sr-only"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        e.target.value = "";
-                        handleManualQrFile(file);
-                      }} />
-                      <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
-                    </div>
-                  </div> :
-            null}
-                <div>
-                <label
-                  className="block text-[11px] md:text-xs text-white/60 mb-1"
-                  title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
-                >
-                  {t("ui_destination_xrpl_address_9c2b94554c", "Destination (XRPL address)")}
-
-            </label>
-
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                    <input
-                    type="text"
-                    list="saved-addresses"
-                    value={sendDestination}
-                    onChange={(e) => setSendDestination(e.target.value)}
-                    onPaste={handlePastePayload}
-                    placeholder={(savedAddresses || []).length > 0 ?
-                    t("ui_select_saved_address_60c28f89c1", "Select saved address...") :
-                    t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
-	                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]" />
-                      <datalist id="saved-addresses">
-                        {(savedAddresses || []).map((addr, idx) =>
-                  <option
-                    key={idx}
-                    value={addr.address}
-                    label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`} />
-                  )}
-                      </datalist>
-                    </div>
-
-                  <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setQrScannerOpen(true);
-                }}
-                className="md:hidden px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
-                title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}>
-
-                    <svg
-                  className="w-5 h-5 text-white/80"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24">
-
-                      <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-
-                    </svg>
-                  </button>
-                  </div>
-
-                  {canSaveDestination ?
-              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
-                      <label className="flex items-center gap-2 text-[11px] text-white/60">
-                        <input
-                      type="checkbox"
-                      checked={saveNewAddress}
-                      onChange={(e) => setSaveNewAddress(e.target.checked)}
-                      className="accent-xcannes-green" />
-                        {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
-                      </label>
-                      {saveNewAddress ?
-                <div className="space-y-1">
-                          <div className="text-[11px] text-white/60">
-                            {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
-                          </div>
-                          <input
-                      type="text"
-                      value={saveNewAddressLabel}
-                      onChange={(e) => setSaveNewAddressLabel(e.target.value)}
-                      placeholder={t("ui_e_g_exchange_friend_11008b5e9e", "e.g., Exchange, Friend, ...")}
-                      className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80" />
-                        </div> :
-                null}
-                    </div> :
-              null}
-                </div>
-              </div>
-              </div>
-              </div>
-              <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
-                <SwipeConfirmButton
-                label={
-                  sendProcessing
-                    ? t("ui_sending_3b8c1a7d5e", "Sending...")
-                    : t("ui_send_504b64a87b", "Send")
-                }
-                onConfirm={handleManualSend}
-	                disabled={sendProcessing || !canManualSend}
-	                variant="green"
-	                className="mt-2 md:hidden" />
-                <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleManualSend();
-              }}
-	              disabled={sendProcessing || !canManualSend}
-	              className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}>
-
-                  {sendProcessing
-                    ? t("ui_sending_3b8c1a7d5e", "Sending...")
-                    : t("ui_send_504b64a87b", "Send")}
-                </button>
-              </div>
-            </div>
-        }
-
-              {/* Tab Content: Scan Request */}
-              {sendTab === "scan-request" &&
-        <div className={`space-y-6 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-              {useUnifiedPayreqPanel ?
-          <>
-                <div className={`rounded-lg border border-white/10 bg-black/30 p-4 space-y-3 md:rounded-xl ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-                  <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-                    <div className="relative h-[160px] overflow-hidden rounded-lg border border-white/10 bg-black/20 md:h-[200px]">
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-0 pointer-events-none bg-no-repeat"
-                        style={{
-                          backgroundImage: showRealDesktopQrImage || showDemoDesktopPayreqQr ? "none" : `url("${payreqQrDecor}")`,
-                          backgroundSize: `${payreqQrDecorSize} ${payreqQrDecorSize}`,
-                          backgroundPosition: payreqQrDecorPosition,
-                          opacity: payreqQrDecorOpacity
-                        }}
-                      />
-                      {showDemoDesktopPayreqQr ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="rounded-lg border border-white/10 bg-black/60 p-3">
-                            <QRCodeCanvas
-                              value={fauxPayreqExample}
-                              size={payreqPreviewSize}
-                              bgColor="#000000"
-                              fgColor="#ffffff"
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-                      {showRealDesktopQrImage ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="rounded-lg border border-white/10 bg-black/60 p-3">
-                            <div className="opacity-90" style={{ filter: "brightness(0.15)" }}>
-                              <QRCodeCanvas
-                                value={fauxPayreqExample}
-                                size={payreqPreviewSize}
-                                bgColor="#000000"
-                                fgColor="#ffffff"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-                {scanRequestFooter}
-              </> :
-          <>
-                <QRScanner
-              isOpen={sendTab === "scan-request"}
-              onScan={handlePaymentRequestScan}
-              embedded={true}
-              showClose={false}
-              fileInputId={payreqFileInputId}
-              enableCamera={!isDesktop && !showStaticQrImage}
-              showStaticImage={showStaticQrImage}
-              showFileInputWhenStatic={showDemoDesktopQrImage || showRealDesktopQrImage}
-              staticContent={showStaticQrImage ? (
-                showRealDesktopQrImage ? (
-                  <div className="opacity-90" style={{ filter: "brightness(0.15)" }}>
-                    <QRCodeCanvas
-                      value={fauxPayreqExample}
-                      size={demoQrSize}
-                      bgColor="#000000"
-                      fgColor="#ffffff"
-                    />
-                  </div>
-                ) : (
-                  <QRCodeCanvas
-                    value={fauxPayreqExample}
-                    size={demoQrSize}
-                    bgColor="#000000"
-                    fgColor="#ffffff"
-                  />
-                )
               ) : null}
-              staticContentClassName="bg-black/60"
-              staticFooter={showDemoMobileQrImage ? (
-                <div className="w-full rounded-xl border border-[#1f4d3d] bg-[#0f1f1a] px-4 py-3 text-center text-sm font-semibold text-white/80">
-                  Point your camera at a QR code
-                </div>
-              ) : null}
-              showFauxQrBackground={showFauxPayreq}
-              fauxQrBackgroundSize={fauxQrSize}
-              fauxQrBackgroundOpacity={fauxQrOpacity}
-              className={inline ? "flex-1 min-h-[210px] bg-black/30 border-white/10" : "bg-black/30 border-white/10"} />
-                {scanRequestFooter}
-              </>
-          }
-
-            </div>
-          }
             </div>
           </div>
+          <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
+
         </div>
       </div>
     </>;
