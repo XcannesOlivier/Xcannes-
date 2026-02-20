@@ -351,6 +351,12 @@ export default function DemoQRScanner({
   const showStaticQr = showStaticImage && (staticImageSrc || staticContent);
   const hideReader = hideWhenUnavailable && cameraUnavailable;
   const hideScannerCard = hideWhenUnavailable && cameraUnavailable && !showStaticQr;
+  const fallbackOverlaySize =
+    typeof window !== "undefined"
+      ? Math.max(160, Math.min(Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.6), 320))
+      : 220;
+  const overlaySize = qrBoxSize > 0 ? qrBoxSize : fallbackOverlaySize;
+  const showCornerOverlay = cameraEnabled && !cameraUnavailable && !showStaticQr;
 
 	  const scannerCard =
 	  <div
@@ -454,19 +460,19 @@ export default function DemoQRScanner({
             }
           >
             <div id={readerIdRef.current} className="w-full h-full" />
-            {!showStaticQr && qrBoxSize > 0 && (isScanning || isStarting) ? (
+            {showCornerOverlay && overlaySize > 0 ? (
               <div
                 className="pointer-events-none absolute left-1/2 top-1/2 z-10"
                 style={{
-                  width: `${qrBoxSize}px`,
-                  height: `${qrBoxSize}px`,
+                  width: `${overlaySize}px`,
+                  height: `${overlaySize}px`,
                   transform: "translate(-50%, -50%)",
                 }}
               >
-                <span className="absolute -top-1 -left-1 h-6 w-6 border-t-[3px] border-l-[3px] border-[#22C55E]/90 rounded-tl-md" />
-                <span className="absolute -top-1 -right-1 h-6 w-6 border-t-[3px] border-r-[3px] border-[#22C55E]/90 rounded-tr-md" />
-                <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-[3px] border-l-[3px] border-[#22C55E]/90 rounded-bl-md" />
-                <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-[3px] border-r-[3px] border-[#22C55E]/90 rounded-br-md" />
+                <span className="absolute -top-1 -left-1 h-7 w-7 border-t-[3px] border-l-[3px] border-[#22C55E]/90 rounded-tl-md" />
+                <span className="absolute -top-1 -right-1 h-7 w-7 border-t-[3px] border-r-[3px] border-[#22C55E]/90 rounded-tr-md" />
+                <span className="absolute -bottom-1 -left-1 h-7 w-7 border-b-[3px] border-l-[3px] border-[#22C55E]/90 rounded-bl-md" />
+                <span className="absolute -bottom-1 -right-1 h-7 w-7 border-b-[3px] border-r-[3px] border-[#22C55E]/90 rounded-br-md" />
               </div>
             ) : null}
           </div>
