@@ -254,11 +254,6 @@ export default function DemoWalletDashboardSendModal({
     handlePaymentRequestScan?.(data);
     setScanActive(false);
   };
-  const handleScanAgain = () => {
-    setScanActive(true);
-    setScanKey((prev) => prev + 1);
-    setCameraUnavailable(false);
-  };
   const handleScanQrUpload = () => {
     const input = document.getElementById(scanQrFileInputId);
     input?.click();
@@ -684,20 +679,7 @@ export default function DemoWalletDashboardSendModal({
           showFauxQrBackground={false}
           className="bg-black/30 border-white/10"
         />
-      ) : (
-        <div className={`rounded-xl border border-white/10 bg-black/30 px-3 py-2 flex items-center justify-between ${inline ? "" : "mx-4 md:mx-5"}`}>
-          <span className="text-xs text-white/60">
-            {t("ui_scan_qr_code_481606b590", "Scan QR Code")}
-          </span>
-          <button
-            type="button"
-            onClick={handleScanAgain}
-            className="text-[11px] px-2.5 py-1 rounded-md border border-white/20 bg-white/10 text-white/80 hover:bg-white/15"
-          >
-            {t("ui_scan_again", "Scanner")}
-          </button>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 
