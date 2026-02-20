@@ -147,6 +147,7 @@ const MoonPaySellModal = ({
     selectLabelRightByCurrency,
     selectIconByCurrency,
     selectLabelMobileByCurrency,
+    locale,
     t
   ]);
 
