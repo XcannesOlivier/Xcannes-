@@ -42,6 +42,7 @@ import XummQRModal from "@/components/xumm/XummQRModal";
 import WalletDashboardCashModal from "./modals/WalletDashboardCashModal";
 import WalletDashboardReceiveModal from "./modals/WalletDashboardReceiveModal";
 import WalletDashboardSendModal from "./modals/WalletDashboardSendModal";
+import WalletDashboardPayreqModal from "./modals/WalletDashboardPayreqModal";
 import WalletDashboardStatementModals from "./modals/WalletDashboardStatementModals";
 import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
 import WalletDashboardAdjustModal from "./modals/WalletDashboardAdjustModal";
@@ -2756,8 +2757,19 @@ export default function WalletDashboard({
   const isXummInlineOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
   const showInlineXumm = isDesktopPanel && isXummInlineOpen;
   const showInlineQrScanner = isDesktopPanel && !showInlineXumm && qrScannerOpen;
+  const hasPayreq = Boolean(sendPaymentRequest);
   const showInlineSend =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && activeAction === "send";
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    activeAction === "send" &&
+    !hasPayreq;
+  const showInlinePayreq =
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    activeAction === "send" &&
+    hasPayreq;
   const showInlineReceive =
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && activeAction === "receive";
   const showInlineSwap =
@@ -2799,6 +2811,7 @@ export default function WalletDashboard({
     showInlineXumm ||
     showInlineQrScanner ||
     showInlineSend ||
+    showInlinePayreq ||
     showInlineReceive ||
     showInlineSwap ||
     showInlineCash ||
@@ -2985,6 +2998,28 @@ export default function WalletDashboard({
                 sendProcessing={sendProcessing}
                 enableSaveAddress={true}
                 {...payreqDecorProps}
+              />
+            ) : null}
+            {showInlinePayreq ? (
+              <WalletDashboardPayreqModal
+                open
+                inline
+                onClose={() => {
+                  setSendPaymentRequest(null);
+                  setActiveAction(null);
+                }}
+                isPreviewMode={isPreviewMode}
+                isWalletActivated={isWalletActivated}
+                hasRlusdTrustline={hasRlusdTrustline}
+                renderWalletMeta={renderWalletMeta}
+                selectedSendToken={selectedSendToken}
+                sendPaymentRequest={sendPaymentRequest}
+                sendDestination={sendDestination}
+                sendAmount={sendAmount}
+                sendProcessing={sendProcessing}
+                handleSendSubmit={handleSendSubmit}
+                savedAddresses={savedAddresses}
+                enableSaveAddress={true}
               />
             ) : null}
 
@@ -3210,7 +3245,7 @@ export default function WalletDashboard({
       {!isDesktopPanel && typeof document !== 'undefined' && createPortal(
         <>
           <WalletDashboardSendModal
-            open={activeAction === "send"}
+            open={activeAction === "send" && !hasPayreq}
             onClose={() => setActiveAction(null)}
             isPreviewMode={isPreviewMode}
             isWalletActivated={isWalletActivated}
@@ -3237,6 +3272,25 @@ export default function WalletDashboard({
             sendProcessing={sendProcessing}
             enableSaveAddress={true}
             {...payreqDecorProps}
+          />
+          <WalletDashboardPayreqModal
+            open={activeAction === "send" && hasPayreq}
+            onClose={() => {
+              setSendPaymentRequest(null);
+              setActiveAction(null);
+            }}
+            isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
+            renderWalletMeta={renderWalletMeta}
+            selectedSendToken={selectedSendToken}
+            sendPaymentRequest={sendPaymentRequest}
+            sendDestination={sendDestination}
+            sendAmount={sendAmount}
+            sendProcessing={sendProcessing}
+            handleSendSubmit={handleSendSubmit}
+            savedAddresses={savedAddresses}
+            enableSaveAddress={true}
           />
 
           <WalletDashboardReceiveModal

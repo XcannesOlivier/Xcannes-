@@ -18,6 +18,7 @@ import {
   walletUsdTotal
 } from "./DemoWalletModel";
 import DemoWalletDashboardSendModal from "./modals/DemoWalletDashboardSendModal";
+import DemoWalletDashboardPayreqModal from "./modals/DemoWalletDashboardPayreqModal";
 import DemoWalletDashboardReceiveModal from "./modals/DemoWalletDashboardReceiveModal";
 import DemoWalletDashboardSwapModal from "./modals/DemoWalletDashboardSwapModal";
 import DemoWalletDashboardCashModal from "./modals/DemoWalletDashboardCashModal";
@@ -492,6 +493,7 @@ export default function DemoWalletDashboard({
     defaultSendTab: "manual",
     defaultSendAssetKey: "RLUSD"
   });
+  const hasPayreq = Boolean(sendPaymentRequest);
 
   const {
     requestAmount,
@@ -2352,22 +2354,20 @@ export default function DemoWalletDashboard({
 	        noticeContextLabel={demoNoticeContextLabel}
 	      />
 
-		      <DemoWalletDashboardSendModal
-	        open={activeAction === "send"}
-	        onClose={() => {
-	          setActiveAction(null);
-	          setSendPaymentRequest(null);
-	        }}
-	        isPreviewMode={true}
-	        noticeVariant="demo"
-	        noticeContextLabel={demoNoticeContextLabel}
-	        walletId={activeWalletId}
-	        sendTab={sendTab}
-	        setSendTab={setSendTab}
-	        renderWalletMeta={renderWalletMeta}
-		        augmentedTokens={selectableTokens}
-	        selectedSendToken={selectedSendToken}
-	        sendFxInfo={sendFxInfo}
+	      <DemoWalletDashboardSendModal
+        open={activeAction === "send" && !hasPayreq}
+        onClose={() => {
+          setActiveAction(null);
+          setSendPaymentRequest(null);
+        }}
+        isPreviewMode={true}
+        noticeVariant="demo"
+        noticeContextLabel={demoNoticeContextLabel}
+        walletId={activeWalletId}
+        renderWalletMeta={renderWalletMeta}
+	        augmentedTokens={selectableTokens}
+        selectedSendToken={selectedSendToken}
+        sendFxInfo={sendFxInfo}
 	        setSendAssetKey={setSendAssetKey}
 	        sendAmount={sendAmount}
 	        setSendAmount={setSendAmount}
@@ -2380,9 +2380,30 @@ export default function DemoWalletDashboard({
 	        setSendDestination={setSendDestination}
 	        handlePaymentRequestScan={handlePaymentRequestScan}
 	        handleSendSubmit={handleSendSubmit}
-	        sendProcessing={sendProcessing}
-	        enableSaveAddress={true}
-	        showFauxPayreqDecor={true} />
+        sendProcessing={sendProcessing}
+        enableSaveAddress={true}
+        showFauxPayreqDecor={true} />
+
+        <DemoWalletDashboardPayreqModal
+          open={activeAction === "send" && hasPayreq}
+          onClose={() => {
+            setActiveAction(null);
+            setSendPaymentRequest(null);
+          }}
+          isPreviewMode={true}
+          noticeVariant="demo"
+          noticeContextLabel={demoNoticeContextLabel}
+          walletId={activeWalletId}
+          renderWalletMeta={renderWalletMeta}
+          selectedSendToken={selectedSendToken}
+          sendPaymentRequest={sendPaymentRequest}
+          sendDestination={sendDestination}
+          sendAmount={sendAmount}
+          sendProcessing={sendProcessing}
+          handleSendSubmit={handleSendSubmit}
+          savedAddresses={demoSavedAddresses}
+          enableSaveAddress={true}
+        />
 
 
 	      <DemoWalletDashboardReceiveModal
