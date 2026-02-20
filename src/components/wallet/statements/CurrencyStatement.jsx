@@ -30,6 +30,26 @@ const USD_STABLECOINS = [
 const HIGHLIGHT_DURATION_MS = 5000;
 const STATEMENT_HISTORY_MONTHS = 13;
 
+const stripCountSuffix = (label) => String(label || "")
+  .replace(/\s*[\(\uFF08]\s*$/, "")
+  .trim();
+
+const ShareIcon = ({ className = "" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
 const isSvgIcon = (src) => {
   if (!src) return false;
   return String(src).toLowerCase().endsWith(".svg");
@@ -121,6 +141,10 @@ export default function CurrencyStatement({
   );
   const displayCurrency = useMemo(
     () => getDisplayCurrencyCode(normalizedCurrency),
+    [normalizedCurrency]
+  );
+  const currencyDescription = useMemo(
+    () => String(getCurrencyDescription(normalizedCurrency) || "").trim(),
     [normalizedCurrency]
   );
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
@@ -1038,7 +1062,7 @@ export default function CurrencyStatement({
     return `
       <h1>${escapeHtml(`${normalizedCurrency} ${t("ui_statement_a87c93acb8", "Statement")}`)}</h1>
       <div class="meta">
-        <div><strong>${escapeHtml(t("ui_account_holder_3eef963295", "Account Holder"))}:</strong> ${escapeHtml(walletLabelText)}</div>
+        <div>${escapeHtml(walletLabelText)}</div>
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
         <div><strong>${escapeHtml(t("ui_balance_label_7f2a1b9c5e", "Balance"))}:</strong> ${escapeHtml(balanceDisplay)}</div>
@@ -1270,8 +1294,8 @@ export default function CurrencyStatement({
 	              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 min-w-0">
-	                  <h2 className="text-lg md:text-xl font-bold text-white truncate">
-	                    {displayCurrency} {t("ui_statement_a87c93acb8", "Statement")}
+	                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+	                    <span className="truncate">{currencyDescription || displayCurrency}</span>
 	                  </h2>
                   {noticeVariant === "demo" ? (
                     <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
@@ -1300,9 +1324,7 @@ export default function CurrencyStatement({
                     </span>
                   ) : null}
                 </div>
-                <p className="text-xs md:text-sm text-white/60 truncate">
-                  {getCurrencyDescription(currency)}
-                </p>
+                {/* Description merged into title */}
               </div>
             </div>
             <button
@@ -1317,7 +1339,6 @@ export default function CurrencyStatement({
 	          {/* Account Info dans le header */}
 	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 	            <div>
-	              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_3eef963295", "Account Holder")}</p>
 	              <p className="text-sm text-white font-semibold truncate">
 	                {walletLabel || t("nav_wallet", "Wallet")}
 	              </p>
@@ -1469,9 +1490,7 @@ export default function CurrencyStatement({
 	              filter === "all" ?
 	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
 	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{t("ui_all_0c90d41d71", "All (")}
-
-              {periodTransactions.length})
+	              }>{stripCountSuffix(t("ui_all_0c90d41d71", "All"))}
                 </button>
 	                <button
 	              onClick={() => setFilter("credit")}
@@ -1479,9 +1498,7 @@ export default function CurrencyStatement({
 	              filter === "credit" ?
 	              "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300" :
 	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{t("ui_credits_b8166276a0", "Credits (")}
-
-              {credits.length})
+	              }>{stripCountSuffix(t("ui_credits_b8166276a0", "Credits"))}
                 </button>
 	                <button
 	              onClick={() => setFilter("debit")}
@@ -1489,9 +1506,7 @@ export default function CurrencyStatement({
 	              filter === "debit" ?
 	              "bg-red-500/20 hover:bg-red-500/30 text-red-300" :
 	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{t("ui_debits_38c870b18f", "Debits (")}
-
-              {debits.length})
+	              }>{stripCountSuffix(t("ui_debits_38c870b18f", "Debits"))}
                 </button>
 	                <button
 	              onClick={() => setFilter("conversion")}
@@ -1499,9 +1514,7 @@ export default function CurrencyStatement({
 	              filter === "conversion" ?
 	              "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300" :
 	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{t("ui_conversions_b604b5ef8b", "Conversions (")}
-
-              {conversions.length})
+	              }>{stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions"))}
                 </button>
               </div>
           </div>
@@ -1667,19 +1680,29 @@ export default function CurrencyStatement({
 	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
 
               {exportFormat === "pdf" ? (
-                <span className="text-[13px] sm:text-inherit">
-                  {t("ui_loading_1386baebe9", "Loading…")}
-                </span>
+                <>
+                  <span className="md:hidden" aria-hidden>
+                    <ShareIcon className="w-5 h-5 opacity-60" />
+                  </span>
+                  <span className="hidden md:inline text-[13px] sm:text-inherit">
+                    {t("ui_loading_1386baebe9", "Loading…")}
+                  </span>
+                </>
               ) : (
-                <span className="text-[13px] sm:text-inherit">
-                  {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
-                </span>
+                <>
+                  <span className="md:hidden" aria-hidden>
+                    <ShareIcon className="w-5 h-5" />
+                  </span>
+                  <span className="hidden md:inline text-[13px] sm:text-inherit">
+                    {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+                  </span>
+                </>
               )}
             </button>
 	            <button
 	            onClick={handleExportCsv}
 	            disabled={exportFormat === "csv"}
-	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
+	            className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
 
               {exportFormat === "csv" ?
                 t("ui_loading_1386baebe9", "Loading…") :

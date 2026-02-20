@@ -12,6 +12,22 @@ import { getCurrencySymbol } from "../demoWalletDashboardConfig";
 import { XCANNES_MEMO_SCHEMAS } from "../utils/demoXrplMemo";
 import { useModalTransition } from "@/utils/useModalTransition";
 
+const ShareIcon = ({ className = "" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
 export default function DemoWalletDashboardReceiveModal({
   open,
   onClose,
@@ -597,11 +613,18 @@ export default function DemoWalletDashboardReceiveModal({
                       // ignore
                     }
                   }}
-                  className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
+                  className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors inline-flex items-center justify-center"
                 >
                   {isDesktop
                     ? t("ui_download_qr_5c1d2e7f9a", "Télécharger")
-                    : t("ui_share_qr_9b5c1a2d7e", "Partager")}
+                    : (
+                      <>
+                        <ShareIcon className="w-5 h-5" />
+                        <span className="sr-only">
+                          {t("ui_share_qr_9b5c1a2d7e", "Partager")}
+                        </span>
+                      </>
+                    )}
                 </button>
               </div>
               {copyToast ? (
