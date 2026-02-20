@@ -792,40 +792,6 @@ export default function WalletDashboardSendModal({
           </button>
         </div>
       )}
-      {scanActive ? (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={sendDestination}
-              onChange={(e) => {
-                const next = e.target.value;
-                setSendDestination(next);
-                if (String(next || "").trim()) {
-                  setScanActive(false);
-                }
-              }}
-              onPaste={handlePastePayload}
-              placeholder={t(
-                "ui_enter_or_import_address",
-                "Compte Bénéficiaire"
-              )}
-              className="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
-            />
-            <button
-              type="button"
-              onClick={handleScanQrUpload}
-              className="px-3 py-2 rounded-lg border border-white/20 bg-white/10 text-white/80 hover:bg-white/15"
-              title={t(
-                "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                "Charger une image qrcode"
-              )}
-            >
-              +
-            </button>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 
