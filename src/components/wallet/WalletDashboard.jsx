@@ -2963,8 +2963,6 @@ export default function WalletDashboard({
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
                 qrSizingVariant={qrSizingVariant}
-                sendTab={sendTab}
-                setSendTab={setSendTab}
                 renderWalletMeta={renderWalletMeta}
 	                augmentedTokens={selectableTokens}
                 selectedSendToken={selectedSendToken}
@@ -3217,10 +3215,8 @@ export default function WalletDashboard({
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
             qrSizingVariant={qrSizingVariant}
-            sendTab={sendTab}
-            setSendTab={setSendTab}
             renderWalletMeta={renderWalletMeta}
-	            augmentedTokens={selectableTokens}
+            augmentedTokens={selectableTokens}
             selectedSendToken={selectedSendToken}
             sendFxInfo={sendFxInfo}
             setSendAssetKey={setSendAssetKey}
