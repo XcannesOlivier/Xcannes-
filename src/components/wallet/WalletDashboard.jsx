@@ -2963,6 +2963,7 @@ export default function WalletDashboard({
                   embedded
                   onScan={handleAddressScan}
                   onClose={() => setQrScannerOpen(false)}
+                  hideTitle
                   hideWhenUnavailable
                   className="h-full"
                 />
@@ -3416,6 +3417,7 @@ export default function WalletDashboard({
           isOpen={qrScannerOpen}
           onScan={handleAddressScan}
           onClose={() => setQrScannerOpen(false)}
+          hideTitle
         />
       ) : null}
 
