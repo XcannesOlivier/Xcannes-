@@ -259,7 +259,7 @@ export default function WalletDashboard({
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
     walletLabel,
-    hideAddress: walletHasCustomLabel,
+    hideAddress: false,
   });
 
   const [cashBuyPrefill, setCashBuyPrefill] = useState(null);
