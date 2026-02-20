@@ -1666,7 +1666,7 @@ export default function CurrencyStatement({
 	            <button
 	            onClick={handleExportPdf}
 	            disabled={exportFormat === "pdf"}
-	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
+	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70">
 
               {exportFormat === "pdf" ? (
                 <>

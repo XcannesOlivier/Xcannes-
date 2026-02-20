@@ -463,12 +463,10 @@ export default function DemoQRScanner({
                   transform: "translate(-50%, -50%)",
                 }}
               >
-                <div className="absolute inset-0 rounded-md border border-white/15 shadow-[0_0_0_1px_rgba(34,197,94,0.25)]" />
-                <span className="absolute -top-1 -left-1 h-6 w-6 border-t-2 border-l-2 border-[#22C55E]/90 rounded-tl-md" />
-                <span className="absolute -top-1 -right-1 h-6 w-6 border-t-2 border-r-2 border-[#22C55E]/90 rounded-tr-md" />
-                <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-2 border-l-2 border-[#22C55E]/90 rounded-bl-md" />
-                <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-2 border-r-2 border-[#22C55E]/90 rounded-br-md" />
-                <div className="absolute left-2 right-2 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#22C55E]/80 to-transparent animate-[xcannes-scanline_2.2s_ease-in-out_infinite]" />
+                <span className="absolute -top-1 -left-1 h-6 w-6 border-t-[3px] border-l-[3px] border-[#22C55E]/90 rounded-tl-md" />
+                <span className="absolute -top-1 -right-1 h-6 w-6 border-t-[3px] border-r-[3px] border-[#22C55E]/90 rounded-tr-md" />
+                <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-[3px] border-l-[3px] border-[#22C55E]/90 rounded-bl-md" />
+                <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-[3px] border-r-[3px] border-[#22C55E]/90 rounded-br-md" />
               </div>
             ) : null}
           </div>
