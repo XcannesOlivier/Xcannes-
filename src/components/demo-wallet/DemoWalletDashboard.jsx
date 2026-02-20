@@ -56,7 +56,7 @@ const DEMO_WALLET_ACCENTS = {
 };
 
 const DEMO_FAUX_PAYREQ_EXAMPLE =
-  '{"schema":"xcannes-payreq-v1","to":"rGt_Comptedepresentation_xxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+  '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
 
 function clone(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
@@ -258,7 +258,7 @@ function needsDemoStateMigration(value) {
   }
   if (
     address.startsWith("rGt_Comptedepresentation_") &&
-    address !== "rGt_Comptedepresentation_xxxxxxxxxxxxxxx"
+    address !== "GtxxxxXcannes123xxxxxxxxxxx"
   ) {
     return true;
   }
