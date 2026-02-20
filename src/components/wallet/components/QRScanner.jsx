@@ -40,12 +40,14 @@ export default function QRScanner({
   const readerIdRef = useRef(
     `qr-reader-${Math.random().toString(36).slice(2, 10)}`
   );
+  const readerElRef = useRef(null);
   const activeRef = useRef(false);
   const lastDecodedRef = useRef("");
   const [error, setError] = useState(null);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [qrBoxSize, setQrBoxSize] = useState(0);
 
   const stopScanner = async () => {
     const instance = html5QrCodeRef.current;
@@ -65,6 +67,7 @@ export default function QRScanner({
     }activeRef.current = false;
     setIsScanning(false);
     setIsStarting(false);
+    setQrBoxSize(0);
   };
 
   const cameraEnabled = enableCamera && !showStaticImage;
@@ -84,6 +87,7 @@ export default function QRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
+      setQrBoxSize(0);
       return;
     }
 
@@ -94,6 +98,7 @@ export default function QRScanner({
       setIsScanning(false);
       setIsStarting(false);
       lastDecodedRef.current = "";
+      setQrBoxSize(0);
       return;
     }
 
@@ -150,11 +155,42 @@ export default function QRScanner({
         const html5QrCode = new Html5Qrcode(readerIdRef.current);
         html5QrCodeRef.current = html5QrCode;
 
+        const viewW = window.innerWidth || 360;
+        const viewH = window.innerHeight || 640;
+        const readerEl = readerElRef.current || document.getElementById(readerIdRef.current);
+        const containerW = readerEl?.clientWidth || 0;
+        const containerH = readerEl?.clientHeight || 0;
+        const baseW = containerW > 0 ? containerW : Math.min(viewW, viewH);
+        const baseH = containerH > 0 ? containerH : Math.min(viewW, viewH);
+        const boxSize = Math.floor(Math.min(baseW, baseH) * 0.7);
+        setQrBoxSize(boxSize);
+        let cameraIdOrConfig = { facingMode: "environment" };
+        try {
+          const devices = await Html5Qrcode.getCameras();
+          if (Array.isArray(devices) && devices.length > 0) {
+            const labeled = devices.filter((d) => (d?.label || "").trim());
+            const backMatch =
+              labeled.find((d) => /back|rear|environment/i.test(d.label || "")) ||
+              null;
+            if (backMatch?.id) {
+              cameraIdOrConfig = backMatch.id;
+            } else if (devices.length === 1) {
+              cameraIdOrConfig = devices[0].id;
+            } else {
+              cameraIdOrConfig = devices[devices.length - 1].id;
+            }
+          }
+        } catch {
+          // fallback to facingMode
+        }
+
         await html5QrCode.start(
-          { facingMode: "environment" },
+          cameraIdOrConfig,
           {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
+            fps: 20,
+            qrbox: { width: boxSize, height: boxSize },
+            disableFlip: true,
+            experimentalFeatures: { useBarCodeDetectorIfSupported: true }
           },
           (decodedText) => {
             // QR code scanné avec succès
@@ -180,6 +216,23 @@ export default function QRScanner({
         setIsStarting(false);
         setIsScanning(true);
         setCameraUnavailable(false);
+        try {
+          const desiredZoom = 2.5;
+          const caps = html5QrCode.getRunningTrackCameraCapabilities?.();
+          const zoomFeature = caps?.zoomFeature?.();
+          if (zoomFeature && zoomFeature.isSupported()) {
+            const min = zoomFeature.min();
+            const max = zoomFeature.max();
+            const clipped = Math.min(max, Math.max(min, desiredZoom));
+            await zoomFeature.apply(clipped);
+          } else {
+            await html5QrCode.applyVideoConstraints?.({
+              advanced: [{ zoom: desiredZoom }],
+            });
+          }
+        } catch {
+          // ignore zoom errors
+        }
       } catch (err) {
         console.error("QR Scanner error:", err);
 
@@ -218,6 +271,7 @@ export default function QRScanner({
 
         setIsScanning(false);
         setIsStarting(false);
+        setQrBoxSize(0);
       }
     };
 
@@ -230,6 +284,26 @@ export default function QRScanner({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cameraEnabled, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const el = readerElRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const updateSize = (width, height) => {
+      if (!width || !height) return;
+      const next = Math.floor(Math.min(width, height) * 0.7);
+      setQrBoxSize((prev) => (prev !== next ? next : prev));
+    };
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries?.[0];
+      if (!entry) return;
+      const rect = entry.contentRect;
+      updateSize(rect.width, rect.height);
+    });
+    observer.observe(el);
+    updateSize(el.clientWidth, el.clientHeight);
+    return () => observer.disconnect();
+  }, [isOpen]);
 
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
@@ -374,9 +448,26 @@ export default function QRScanner({
       ) : hideReader ? null : (
         <div className="mb-4">
           <div
-            id={readerIdRef.current}
-            className="rounded-lg overflow-hidden"
-          />
+            ref={readerElRef}
+            className="relative w-[90%] mx-auto rounded-lg overflow-hidden"
+          >
+            <div id={readerIdRef.current} className="w-full h-full" />
+            {!showStaticQr && qrBoxSize > 0 && (isScanning || isStarting) ? (
+              <div
+                className="pointer-events-none absolute left-1/2 top-1/2 z-10"
+                style={{
+                  width: `${qrBoxSize}px`,
+                  height: `${qrBoxSize}px`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <span className="absolute -top-1 -left-1 h-6 w-6 border-t-[3px] border-l-[3px] border-[#22C55E]/90 rounded-tl-md" />
+                <span className="absolute -top-1 -right-1 h-6 w-6 border-t-[3px] border-r-[3px] border-[#22C55E]/90 rounded-tr-md" />
+                <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-[3px] border-l-[3px] border-[#22C55E]/90 rounded-bl-md" />
+                <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-[3px] border-r-[3px] border-[#22C55E]/90 rounded-br-md" />
+              </div>
+            ) : null}
+          </div>
         </div>
       )}
 
@@ -430,9 +521,32 @@ export default function QRScanner({
       </div>
     </div>;
 
+  const scannerStyles = (
+    <style jsx>{`
+      @keyframes xcannes-scanline {
+        0% {
+          transform: translateY(0);
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.9;
+        }
+        100% {
+          transform: translateY(calc(100% - 2px));
+          opacity: 0.3;
+        }
+      }
+    `}</style>
+  );
+
   if (embedded) {
     if (hideScannerCard) return null;
-    return scannerCard;
+    return (
+      <>
+        {scannerCard}
+        {scannerStyles}
+      </>
+    );
   }
 
   const content =
@@ -442,6 +556,7 @@ export default function QRScanner({
     }`}
   >
       {scannerCard}
+      {scannerStyles}
     </div>;
 
   if (hideScannerCard) return null;

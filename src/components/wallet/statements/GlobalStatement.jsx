@@ -839,41 +839,39 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer Actions */}
-	        <div className="px-3 sm:px-6 py-3 sm:py-4 bg-transparent sm:bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
-	          <div className="flex gap-2 flex-wrap">
+        <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30">
+          <div className="flex gap-2 flex-wrap">
             <button
-            onClick={handleExportPdf}
-            disabled={exportFormat === "pdf"}
-            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-sm font-medium transition-colors border border-transparent disabled:opacity-50">
-
+              onClick={handleExportPdf}
+              disabled={exportFormat === "pdf"}
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70"
+            >
               {exportFormat === "pdf" ? (
                 <>
-                  <span className="sm:hidden" aria-hidden>
+                  <span className="md:hidden" aria-hidden>
                     <ShareIcon className="w-5 h-5 opacity-60" />
                   </span>
-                  <span className="hidden sm:inline sm:text-inherit">
+                  <span className="hidden md:inline text-[13px] sm:text-inherit">
                     {t("ui_loading_1386baebe9", "Loading…")}
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="sm:hidden" aria-hidden>
+                  <span className="md:hidden" aria-hidden>
                     <ShareIcon className="w-5 h-5" />
                   </span>
-                  <span className="hidden sm:inline sm:text-inherit">
+                  <span className="hidden md:inline text-[13px] sm:text-inherit">
                     {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
                   </span>
                 </>
               )}
-
-
-          </button>
-	            <button
-	            onClick={handlePrint}
-	            className="hidden md:inline-flex md:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-sm font-medium transition-colors border border-transparent">{t("ui_print_eb5de3a228", "🖨️ Print")}
-
-
-          </button>
+            </button>
+            <button
+              onClick={handlePrint}
+              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70"
+            >
+              {t("ui_print_eb5de3a228", "🖨️ Print")}
+            </button>
           </div>
         </div>
       </div>
