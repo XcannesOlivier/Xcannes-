@@ -1064,7 +1064,6 @@ export default function WalletDashboard({
 
   const selectLabelRightByAssetKey = useMemo(() => {
     const labels = {};
-    const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
     (augmentedTokens || []).forEach((token) => {
       const code = String(token?.currency || "").toUpperCase();
       if (!code) return;
@@ -1079,7 +1078,7 @@ export default function WalletDashboard({
             minimumFractionDigits: 0,
             maximumFractionDigits: 4,
           });
-      const label = `${balanceLabel} = ${amountLabel}`;
+      const label = amountLabel;
       if (token?.key) labels[token.key] = label;
       labels[code] = label;
     });
