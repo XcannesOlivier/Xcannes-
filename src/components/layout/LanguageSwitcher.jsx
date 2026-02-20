@@ -159,7 +159,18 @@ export default function LanguageSwitcher({
 
     onSelect?.();
     const { pathname, asPath, query } = router;
-    router.push({ pathname, query }, asPath, { locale });
+    if (router.locale === locale) {
+      setOpen(false);
+      setOpenRegion(null);
+      return;
+    }
+    router
+      .push({ pathname, query }, asPath, { locale })
+      .then(() => {
+        if (typeof window !== "undefined") {
+          window.location.reload();
+        }
+      });
     setOpen(false);
     setOpenRegion(null);
   };
