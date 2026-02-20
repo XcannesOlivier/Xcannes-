@@ -496,15 +496,15 @@ const DemoMoonPaySellModal = ({
 		                  <p className="text-xs text-white/60 mb-1">
 		                    {t("moonpay_from_wallet", "From wallet")}
 		                  </p>
-		                  {hideWalletAddress && String(walletLabel || "").trim() ? (
-		                    <p className="text-sm text-white/90 font-semibold truncate">
-		                      {walletLabel}
-		                    </p>
-		                  ) : (
-		                    <p className="text-sm text-white/90 font-mono break-all">
-		                      {walletAddress}
-		                    </p>
-		                  )}
+                  {hideWalletAddress && String(walletLabel || "").trim() ? (
+                    <p className="text-lg text-white/90 font-semibold truncate">
+                      {walletLabel}
+                    </p>
+                  ) : (
+                    <p className="text-lg text-white/90 font-mono break-all">
+                      {walletAddress}
+                    </p>
+                  )}
 		                </div>
 
                 {/* Error message */}

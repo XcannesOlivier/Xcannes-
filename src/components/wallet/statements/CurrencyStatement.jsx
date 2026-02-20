@@ -1068,7 +1068,6 @@ export default function CurrencyStatement({
         <div><strong>${escapeHtml(t("ui_balance_label_7f2a1b9c5e", "Balance"))}:</strong> ${escapeHtml(balanceDisplay)}</div>
         <div><strong>${escapeHtml(t("ui_generated_on_ae324c9048", "Generated on"))}:</strong> ${escapeHtml(generatedAt)}</div>
         <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
-        <div><strong>${escapeHtml(t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index"))}:</strong> ${escapeHtml(ledgerIndexLabel)}</div>
         <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
       </div>
       <table>
@@ -1198,7 +1197,7 @@ export default function CurrencyStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl"
+      "w-full xcannes-fullscreen-safe rounded-none border border-white/10 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl"
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
@@ -1210,7 +1209,7 @@ export default function CurrencyStatement({
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border-0"
+      "w-full xcannes-fullscreen-safe rounded-none border border-white/10"
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
@@ -1658,21 +1657,11 @@ export default function CurrencyStatement({
             </button>
         }
 
-		          {/* Watermark */}
-			          <div className="hidden sm:block text-center py-3 md:py-4">
-		            <div className="space-y-1">
-		              {ledgerLastIndex != null ?
-		            <p className="text-xs text-white/20 font-mono">
-		                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-		                  {ledgerLastIndex}
-	                </p> :
-	            null}
-	            </div>
-	          </div>
+	          {/* Watermark removed */}
 	        </div>
 
 	        {/* Footer Actions */}
-	        <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-black/30">
+        <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30">
 	          <div className="flex gap-2 flex-wrap">
 	            <button
 	            onClick={handleExportPdf}
@@ -1698,15 +1687,6 @@ export default function CurrencyStatement({
                   </span>
                 </>
               )}
-            </button>
-	            <button
-	            onClick={handleExportCsv}
-	            disabled={exportFormat === "csv"}
-	            className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
-
-              {exportFormat === "csv" ?
-                t("ui_loading_1386baebe9", "Loading…") :
-                t("ui_export_csv_2f8a1b9d5e", "Export CSV")}
             </button>
 	            <button
 	            onClick={handlePrint}

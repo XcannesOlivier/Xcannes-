@@ -26,6 +26,24 @@ const USD_STABLECOINS = [
 "USDP",
 "GUSD"];
 
+const ShareIcon = ({ className = "" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <path d="M8.59 13.51l6.83 3.98" />
+    <path d="M15.41 6.51L8.59 10.49" />
+  </svg>
+);
+
 
 /**
  * Composant de relevé bancaire global (toutes les devises consolidées)
@@ -338,12 +356,10 @@ export default function GlobalStatement({
     return `
       <h1>${escapeHtml(t("ui_global_statement_13e29aa8aa", "Global Statement"))}</h1>
       <div class="meta">
-        <div><strong>${escapeHtml(t("ui_account_holder_3eef963295", "Account Holder"))}:</strong> ${escapeHtml(walletLabelText)}</div>
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
         <div><strong>${escapeHtml(t("ui_total_balance_label_2c7a1d9b5e", "Total balance (USD)"))}:</strong> ${escapeHtml(totalBalanceDisplay)}</div>
         <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
-        <div><strong>${escapeHtml(t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index"))}:</strong> ${escapeHtml(ledgerIndexLabel)}</div>
         <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
       </div>
       <h2>${escapeHtml(t("ui_balances_label_1c7a2d9b5e", "Balances"))}</h2>
@@ -670,15 +686,14 @@ export default function GlobalStatement({
           {/* Account Info dans le header */}
 	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
 	            <div>
-	              <p className="text-xs text-white/50 mb-1">{t("ui_account_holder_1bfc3cd21c", "Account Holder")}</p>
 	              <p className="text-sm text-white font-semibold truncate">
 	                {walletLabel || t("nav_wallet", "Wallet")}
 	              </p>
-	              {!walletLabel ? (
-	                <p className="text-[11px] text-white/50 font-mono break-all">
-	                  {walletAddress}
-	                </p>
-	              ) : null}
+              {walletAddress ? (
+                <p className="text-[11px] text-white/50 font-mono break-all">
+                  {walletAddress}
+                </p>
+              ) : null}
 	            </div>
 	            <div>
 	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_4674b18f25", "Statement Period")}</p>
@@ -820,53 +835,42 @@ export default function GlobalStatement({
             </div>
           </div>
 
-	          {/* Watermark */}
-		          <div className="hidden sm:block text-center py-3 sm:py-4">
-		            <div className="space-y-1">
-		              {ledgerLastIndex != null ?
-		            <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
-		                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-		                  {ledgerLastIndex}
-	                </p> :
-	            null}
-	            </div>
-	          </div>
+	          {/* Watermark removed */}
         </div>
 
         {/* Footer Actions */}
-	        <div className="px-3 sm:px-6 py-3 sm:py-4 bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
+	        <div className="px-3 sm:px-6 py-3 sm:py-4 bg-transparent sm:bg-black/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4">
 	          <div className="flex gap-2 flex-wrap">
-	            <button
-	            onClick={handleExportPdf}
-	            disabled={exportFormat === "pdf"}
-	            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-transparent disabled:opacity-50">
+            <button
+            onClick={handleExportPdf}
+            disabled={exportFormat === "pdf"}
+            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-sm font-medium transition-colors border border-transparent disabled:opacity-50">
 
-	              {exportFormat === "pdf" ? (
-	                <span className="text-[9px] sm:text-inherit">
-                  {t("ui_loading_1386baebe9", "Loading…")}
-                </span>
+              {exportFormat === "pdf" ? (
+                <>
+                  <span className="sm:hidden" aria-hidden>
+                    <ShareIcon className="w-5 h-5 opacity-60" />
+                  </span>
+                  <span className="hidden sm:inline sm:text-inherit">
+                    {t("ui_loading_1386baebe9", "Loading…")}
+                  </span>
+                </>
               ) : (
-                <span className="text-[9px] sm:text-inherit">
-                  {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
-                </span>
+                <>
+                  <span className="sm:hidden" aria-hidden>
+                    <ShareIcon className="w-5 h-5" />
+                  </span>
+                  <span className="hidden sm:inline sm:text-inherit">
+                    {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+                  </span>
+                </>
               )}
 
 
           </button>
 	            <button
-	            onClick={handleExportCsv}
-	            disabled={exportFormat === "csv"}
-	            className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-transparent disabled:opacity-50">
-
-	              {exportFormat === "csv" ?
-	              t("ui_loading_1386baebe9", "Loading…") :
-              t("ui_export_csv_2f8a1b9d5e", "Export CSV")}
-
-
-          </button>
-	            <button
 	            onClick={handlePrint}
-	            className="hidden md:inline-flex md:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-xs font-medium transition-colors border border-transparent">{t("ui_print_eb5de3a228", "🖨️ Print")}
+	            className="hidden md:inline-flex md:flex-none px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/15 text-white/70 rounded-lg text-[10px] sm:text-sm font-medium transition-colors border border-transparent">{t("ui_print_eb5de3a228", "🖨️ Print")}
 
 
           </button>

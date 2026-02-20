@@ -503,7 +503,7 @@ export default function WalletDashboardReceiveModal({
           <div className="flex items-start justify-between gap-3 mb-1 pr-6">
             <div className="flex min-w-0 flex-col gap-1.5">
               <div>
-                {renderWalletMeta?.("pr-8")}
+                {renderWalletMeta?.("pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap")}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (

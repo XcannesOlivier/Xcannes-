@@ -321,21 +321,21 @@ export default function DemoWalletDashboardSwapModal({
         }}>
 
           <div
-          className="flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto"
+          className="flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-5 overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}>
             <div className="flex items-start justify-between gap-3 mb-1 pr-6">
               <div className="flex min-w-0 flex-col gap-1.5">
                 <div>
-                  {renderWalletMeta?.("pr-8")}
+                  {renderWalletMeta?.("pr-8 wallet-meta--plus-4")}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {showNotConnectedNotice ? (
-                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    <span className="inline-flex items-center text-xcannes-yellow text-lg md:text-lg font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                       {t("wallet_not_connected_title", "Wallet not connected")}
                     </span>
                   ) : null}
                   {showNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    <span className="inline-flex items-center text-amber-300 text-lg md:text-lg font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                       {t(
                         "wallet_not_activated_title",
                         "Wallet not activated: a minimum reserve of 1 XRP is required."
@@ -343,7 +343,7 @@ export default function DemoWalletDashboardSwapModal({
                     </span>
                   ) : null}
                   {showRlusdNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    <span className="inline-flex items-center text-amber-300 text-lg md:text-lg font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                       {t(
                         "wallet_rlusd_not_activated_title",
                         "USD not activated. Authorize USD on your wallet."
@@ -374,7 +374,7 @@ export default function DemoWalletDashboardSwapModal({
 		                : "space-y-5"}>
 		              <div className={useDesktopWalletConvertLayout ? "space-y-7" : inline ? "space-y-6" : ""}>
               <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
+                <label className="block text-[17px] md:text-lg text-white/60 mb-1">{t("ui_base_6d4184e1ef", "Base")}
 
             </label>
 	                <ModalSelect
@@ -397,14 +397,14 @@ export default function DemoWalletDashboardSwapModal({
                 })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
             />
               </div>
 
               <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_quote_e3761255be", "Quote")}
+                <label className="block text-[17px] md:text-lg text-white/60 mb-1">{t("ui_quote_e3761255be", "Quote")}
 
             </label>
 	                <ModalSelect
@@ -427,15 +427,15 @@ export default function DemoWalletDashboardSwapModal({
                 })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
               menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
             />
               </div>
 
               <div className="rounded-xl border border-white/10 p-3">
                 {!canMutateLines ? (
-                  <p className="mt-1 text-[10px] text-white/45">
+                  <p className="mt-1 text-[16px] text-white/45">
                     {!effectiveIsConnected ?
                       t("ui_connect_your_wallet_to_activ_ec68e6f427", "Connect your wallet to activate currency lines.") :
                       isWalletActivated === false ?
@@ -454,7 +454,7 @@ export default function DemoWalletDashboardSwapModal({
 	                showQuickAdd={false} />
 
                   {isLineAlreadyActive ? (
-                    <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+                    <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
                       {t(
                         "ui_currency_line_already_active_5df2d3b1a8",
                         "Ligne de compte déjà active"
@@ -477,7 +477,7 @@ export default function DemoWalletDashboardSwapModal({
                       e.stopPropagation();
                       handleActivateLine();
                     }}
-                    className={`hidden md:block w-full px-3 py-2 text-xs ${greenActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
+                    className={`hidden md:block w-full px-3 py-2 text-lg ${greenActionBtnBase}`}>{t("ui_activate_currency_line_32843c5eeb", "Activate currency line")}
 
 
                   </button>
@@ -487,7 +487,7 @@ export default function DemoWalletDashboardSwapModal({
               </div>
 
               <div>
-                <label className="block text-[11px] md:text-xs text-white/60 mb-1">{t("ui_amount_52a20b2992", "Amount")}
+                <label className="block text-[17px] md:text-lg text-white/60 mb-1">{t("ui_amount_52a20b2992", "Amount")}
 
             </label>
               <TokenAmountInput
@@ -506,15 +506,15 @@ export default function DemoWalletDashboardSwapModal({
 
               <div className={inline ? "space-y-2" : "space-y-2"}>
                 {sameCurrencySelected ? (
-                  <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
+                  <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
                     {t("ui_convert_same_asset_warning_6f13d5c9c2", "Veuillez choisir 2 actifs différents.")}
                   </div>
                 ) : null}
                 <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
-                  <div className="uppercase tracking-[0.16em] text-[9px] text-white/50">
+                  <div className="uppercase tracking-[0.16em] text-[15px] text-white/50">
                     {t("ui_estimated_receive_0c5a3b7e9a", "Estimated receive")}
                   </div>
-                  <div className="text-sm text-white/90">
+                  <div className="text-xl text-white/90">
                     {formatAmountWithSymbol(
                       locale,
                       previewAmount,
@@ -525,7 +525,7 @@ export default function DemoWalletDashboardSwapModal({
                   {previewMeta?.route === "allocation" &&
                   previewMeta?.isFx &&
                   previewMeta?.spreadFeeRlusd > 0 ? (
-                      <div className="text-[10px] text-white/45">
+                      <div className="text-[16px] text-white/45">
                         {t("ui_conversion_fee_simple_6c2a8d5e1b", "Frais de conversion")} :{" "}
                         {formatAmountWithSymbol(
                           locale,
@@ -538,13 +538,13 @@ export default function DemoWalletDashboardSwapModal({
                 </div>
 
                 {previewState.status === "loading" ? (
-                  <div className="text-[11px] text-white/50">
+                  <div className="text-[17px] text-white/50">
                     {t("ui_loading_market_data_1d5d6ed3c4", "Refreshing market data...")}
                   </div>
                 ) : null}
 
                 {previewState.status === "error" ? (
-                  <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                  <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[17px] text-red-200">
                     {previewState.error}
                   </div>
                 ) : null}
@@ -560,7 +560,7 @@ export default function DemoWalletDashboardSwapModal({
                       e.stopPropagation();
                       onConnectWallet?.();
                     }}
-                    className={`w-full mt-1 text-sm py-2.5 ${greenActionBtnBase}`}
+                    className={`w-full mt-1 text-xl py-2.5 ${greenActionBtnBase}`}
                   >
                     {t("wallet_connect_cta", "Connect wallet")}
                   </button>
@@ -579,7 +579,7 @@ export default function DemoWalletDashboardSwapModal({
                         e.stopPropagation();
                         handleConvertAction();
                       }}
-                      className={`hidden md:block w-full mt-1 text-sm py-2.5 ${greenActionBtnBase}`}
+                      className={`hidden md:block w-full mt-1 text-xl py-2.5 ${greenActionBtnBase}`}
                       disabled={convertButtonDisabled}
                     >
                       {convertButtonLabel}
@@ -587,14 +587,6 @@ export default function DemoWalletDashboardSwapModal({
                   </>
                 )}
 
-                {showDesktopWalletConvertNote ? (
-                  <div className="text-[11px] text-white/55 leading-relaxed">
-                    La conversion est disponible pour les devises actives.
-                    Activez simplement la devise de votre choix pour effectuer une conversion.
-                  </div>
-                ) : null}
-
-                
               </div>
             </div>
           </div>
