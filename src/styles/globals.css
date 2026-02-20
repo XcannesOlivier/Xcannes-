@@ -181,8 +181,8 @@
 
 @media (max-width: 767px) {
   .xcannes-fullscreen-safe {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: calc(env(safe-area-inset-top) + 8px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
   }
 }
 
@@ -283,7 +283,7 @@ body.wallet-page .wallet-edge-arrow {
 body.wallet-page .header-nav-link.header-nav-link-compact:hover,
 body.wallet-page .header-nav-link.header-nav-link-compact:focus-visible,
 body.wallet-page .header-nav-link.header-nav-link-compact.is-animating {
-  color: #15803d;
+  color: #ffffff;
 }
 
 /* Wallet page: align surfaces with home (#0b0f10) */
@@ -373,6 +373,26 @@ body.wallet-page {
 
 .wallet-cash-modal :where(*) {
   border-width: 0 !important;
+}
+
+.wallet-meta--plus-4 {
+  font-size: 14px;
+}
+
+.wallet-meta--plus-4 > div:first-child {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  .wallet-meta--plus-4 > div:first-child {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .wallet-meta--desktop-gap > div:first-child {
+    margin-bottom: 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -180,7 +180,7 @@ export default function WalletCurrencySelector({
           setOpen((v) => !v);
         }}
         ref={triggerRef}
-        className="w-full bg-black/20 border border-white/10 rounded-md px-2.5 py-1.5 text-[11px] text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98">
+        className="w-full bg-black/20 border border-white/10 rounded-md px-2.5 py-1.5 text-[15px] text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98">
 
         <div className="flex items-center gap-2">
           <span className="truncate">
@@ -215,7 +215,7 @@ export default function WalletCurrencySelector({
             {showQuickAdd ?
             <>
                 {normalizedQuickOptions.length > 0 ?
-              <div className="text-[10px] font-semibold text-white/60">
+              <div className="text-[14px] font-semibold text-white/60">
                     {t("ui_quick_add_e62e925d4f", "Quick add")}
                   </div> :
               null}
@@ -229,9 +229,9 @@ export default function WalletCurrencySelector({
                     e.stopPropagation();
                     handleSelect(c.code);
                   }}
-                  className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2 py-1 text-[11px] text-white/80 hover:border-accent-rlusd shrink-0 active:scale-95">
+                  className="flex items-center gap-1 rounded-full border border-white/10 bg-black/30 px-2 py-1 text-[15px] text-white/80 hover:border-accent-rlusd shrink-0 active:scale-95">
 
-                      <span className="text-sm">{getFlag(c.code)}</span>
+                      <span className="text-lg">{getFlag(c.code)}</span>
                       <span className="font-mono">{c.code}</span>
                     </button>
                 )}
@@ -244,17 +244,17 @@ export default function WalletCurrencySelector({
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
             placeholder={t("ui_search_currency_045b7c357f", "Search currency...")}
-            className="w-full bg-black/30 border border-white/10 rounded px-2 py-1.5 text-xs text-white/80 placeholder:text-white/40 focus:outline-none focus:border-accent-rlusd" />
+            className="w-full bg-black/30 border border-white/10 rounded px-2 py-1.5 text-base text-white/80 placeholder:text-white/40 focus:outline-none focus:border-accent-rlusd" />
 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
             {loading ? (
-              <div className="px-3 py-3 text-xs text-muted flex items-center gap-2">
+              <div className="px-3 py-3 text-base text-muted flex items-center gap-2">
                 <div className="w-4 h-4 border-2 border-xcannes-green border-t-transparent rounded-full animate-spin" />
                 {t("ui_loading_currencies_9af59a0977", "Loading currencies...")}
               </div>
             ) : filtered.length === 0 ? (
-              <div className="px-3 py-3 text-xs text-muted">
+              <div className="px-3 py-3 text-base text-muted">
                 {t("ui_no_currencies_found_b70888825e", "No currencies found.")}
               </div>
             ) : (
@@ -267,10 +267,10 @@ export default function WalletCurrencySelector({
                         e.stopPropagation();
                         handleSelect(c.code);
                       }}
-                      className="w-full px-3 py-1.5 text-xs text-white/80 hover:bg-white/5 flex items-center gap-2 text-left active:scale-98">
-                      <span className="text-sm">{getFlag(c.code)}</span>
-                      <span className="font-mono text-[11px]">{c.code}</span>
-                      <span className="text-[11px] text-white/45 truncate">
+                      className="w-full px-3 py-1.5 text-base text-white/80 hover:bg-white/5 flex items-center gap-2 text-left active:scale-98">
+                      <span className="text-lg">{getFlag(c.code)}</span>
+                      <span className="font-mono text-[15px]">{c.code}</span>
+                      <span className="text-[15px] text-white/45 truncate">
                         {c.name}
                       </span>
                     </button>

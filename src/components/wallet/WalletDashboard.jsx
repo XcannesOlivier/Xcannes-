@@ -2864,7 +2864,6 @@ export default function WalletDashboard({
 	          onSaveWalletLabel={handleSaveWalletLabel}
 	          onCancelWalletLabel={handleCancelWalletLabel}
 	          showMobileHomeLink={showMobileHomeLink}
-	          hideWalletAddress={walletHasCustomLabel}
 	        />
 
           {/* Action row: Send / Receive / Exchange / Buy */}

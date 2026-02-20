@@ -770,7 +770,7 @@
   "ui_convert_assets_cfc8bae6b0": "Convertir des actifs",
   "ui_converting_71c2b9a4e5": "Conversion en cours...",
   "ui_convert_demo_no_tx_4d8a1c7b2e": "Convertir (démo, pas de transaction réelle)",
-  "ui_convert_allocation_6b2c1a9d5e": "Convertir l'allocation",
+  "ui_convert_allocation_6b2c1a9d5e": "Convertir",
   "ui_convert_between_lines_alloca_8439f5b49f": "Conversion entre lignes (allocation uniquement – MVP, sans FX on-chain).",
   "ui_convert_e0fbc97f15": "Convertir",
   "ui_convert_interne_1_signature__c7b5a8e4dd": "Conversion interne : 1 signature Xaman. Si une demande de paiement est réglée dans une devise non détenue (ou solde insuffisant), 2 transactions/signes sont nécessaires : frais de conversion vers le wallet XCANNES, puis paiement au bénéficiaire.",
