@@ -27,7 +27,7 @@ const DEFAULT_DEMO_WALLETS = {
     id: "A",
     label: "Mr et Mme Dupont",
     labelLocked: false,
-    address: "rGt_Comptedepresentation_xxxxxxxxxxxxxxx",
+    address: "GtxxxxXcannes123xxxxxxxxxxx",
     allocations: {
       XRP: 12.345678,
       RLUSD: 1000,
