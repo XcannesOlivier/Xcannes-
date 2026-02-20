@@ -118,17 +118,17 @@
 
 /* Send - Blue-green (neutral transfer) */
 .wallet-action-send .wallet-action-icon {
-  background: #16A34A;
+  background: transparent;
   color: #ffffff;
-  border-color: rgba(22, 163, 74, 0.55);
+  border-color: transparent;
 }
 
 .wallet-action-send:hover .wallet-action-icon {
-  background: #1dbb5b;
+  background: transparent;
 }
 
 .wallet-action-send:active .wallet-action-icon {
-  background: #149747;
+  background: transparent;
 }
 
 /* Receive - Green (incoming, positive) */
@@ -166,26 +166,26 @@
 
 .wallet-action-send {
   /* Subtle but permanent emphasis */
-  background: rgba(22, 163, 74, 0.16);
-  border-color: rgba(22, 163, 74, 0.25);
+  background: rgba(34, 197, 94, 0.18);
+  border-color: transparent;
 }
 
 .wallet-action-send .wallet-action-icon {
-  background: #16A34A;
+  background: transparent;
   color: #ffffff;
-  border-color: rgba(22, 163, 74, 0.55);
+  border-color: transparent;
 }
 
 .wallet-action-send:hover {
-  background: rgba(22, 163, 74, 0.22);
+  background: rgba(34, 197, 94, 0.26);
 }
 
 .wallet-action-send:hover .wallet-action-icon {
-  background: #1dbb5b;
+  background: transparent;
 }
 
 .wallet-action-send:active .wallet-action-icon {
-  background: #149747;
+  background: transparent;
 }
 
 .wallet-action-send .wallet-action-label {
