@@ -779,7 +779,6 @@ export default function WalletDashboardSendModal({
           onScan={handleScan}
           embedded={true}
           showClose={false}
-          fileInputId={payreqFileInputId}
           enableCamera={true}
           hideWhenUnavailable
           onCameraUnavailableChange={setCameraUnavailable}
@@ -884,6 +883,17 @@ export default function WalletDashboardSendModal({
               )}
             </div>
           </div>
+          <input
+            id={payreqFileInputId}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              e.target.value = "";
+              handleManualQrFile(file);
+            }}
+          />
           <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
 
         </div>
