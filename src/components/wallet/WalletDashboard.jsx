@@ -1083,7 +1083,7 @@ export default function WalletDashboard({
       labels[code] = label;
     });
     return labels;
-  }, [augmentedTokens, locale, t]);
+  }, [augmentedTokens, locale]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};
