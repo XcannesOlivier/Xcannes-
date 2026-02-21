@@ -36,6 +36,8 @@ export default function Home() {
   const [valueModalClosing, setValueModalClosing] = useState(false);
   const valueModalCloseTimerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [visibleCards, setVisibleCards] = useState(new Set());
+  const cardRefs = useRef([]);
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
 
@@ -152,6 +154,37 @@ export default function Home() {
       valueModalCloseTimerRef.current = null;
     }
   }, [valueModalOpen]);
+
+  // Intersection Observer pour l'animation au scroll des cartes hero
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = cardRefs.current.indexOf(entry.target);
+            if (index !== -1) {
+              setVisibleCards((prev) => new Set([...prev, index]));
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      }
+    );
+
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   const openValueModal = () => {
     setValueModalClosing(false);
     setValueModalOpen(true);
@@ -399,11 +432,13 @@ export default function Home() {
                         <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
-                }].map((item) => {
+                }].map((item, index) => {
                   const isClickable = Boolean(item.link?.onClick);
+                  const isVisible = visibleCards.has(index);
                   return (
                     <div
                       key={item.title}
+                      ref={(el) => (cardRefs.current[index] = el)}
                       role={isClickable ? "button" : undefined}
                       tabIndex={isClickable ? 0 : undefined}
                       onClick={isClickable ? item.link.onClick : undefined}
@@ -422,8 +457,17 @@ export default function Home() {
 		                        isClickable
 		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
 		                          : "",
-		                        item.className
-	                      ].filter(Boolean).join(" ")}>
+		                        item.className,
+		                        // Animation au scroll sur mobile
+		                        "md:opacity-100 md:translate-y-0",
+		                        isVisible 
+		                          ? "opacity-100 translate-y-0" 
+		                          : "opacity-0 translate-y-8",
+		                        "transition-all duration-700 ease-out"
+	                      ].filter(Boolean).join(" ")}
+	                      style={{
+	                        transitionDelay: isVisible ? `${index * 150}ms` : "0ms"
+	                      }}>
 
                     <div
                       className={[
