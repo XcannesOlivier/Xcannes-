@@ -737,6 +737,9 @@ export default function WalletDashboard({
     return null;
   }, [refreshBalance, signTransaction, wallet]);
 
+  // 🆕 MISE À JOUR : Activation automatique et GRATUITE lors de la conversion
+  // Les currency lines ne nécessitent plus d'activation manuelle payante.
+  // Elles s'activent automatiquement lors de la première conversion.
   const handleActivateCurrencyLine = useCallback(
     async (code) => {
       const currencyCode = String(code || "").trim().toUpperCase();
@@ -762,62 +765,61 @@ export default function WalletDashboard({
         return true;
       }
 
+      // 🆕 Mode réel : Informer l'utilisateur du nouveau système gratuit
+      // Au lieu d'activer manuellement, suggérer une conversion
       if (!backendWalletAddress) {
         alert("Please connect your Xumm wallet first.");
         return false;
       }
 
+      // 🆕 Vérifier si la ligne est déjà active
       const alreadyActive = (currencyLines || []).some(
         (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
       );
-      if (alreadyActive) return false;
-
-      if (isWalletActivated === false) {
+      if (alreadyActive) {
         alert(
-          t("ui_wallet_activation_required_f4", {
-            defaultValue: "Wallet must be activated to create currency lines.",
+          t("ui_currency_line_already_active", {
+            defaultValue: "Cette devise est déjà activée dans votre wallet.",
           })
         );
         return false;
       }
 
-      if (!hasOnChainRlusd) {
-        alert("RLUSD trustline is not installed yet. Please install it first.");
-        return false;
-      }
-
-      const memoPayload = buildCurrencyLineMemo({
-        action: "activate",
+      // 🆕 NOUVEAU SYSTÈME : Activation gratuite via conversion
+      // Au lieu de payer 1 RLUSD pour activer, suggérer une conversion
+      const confirmMessage = t("ui_currency_lines_auto_activate_info", {
+        defaultValue: `L'activation des devises est maintenant GRATUITE !\n\nPour activer ${currencyCode}, convertissez simplement une petite somme :\n- Exemple : 10 USD → ${currencyCode}\n\nLa devise ${currencyCode} apparaîtra automatiquement dans votre wallet.\n\nVoulez-vous ouvrir le convertisseur maintenant ?`,
         currencyCode,
-        allocatedRlusdAfter: 0,
       });
-      if (!memoPayload) {
-        alert("Invalid currency line memo.");
-        return false;
-      }
-      const xummUuid = await submitCurrencyLineAction({
-        action: "wallet:currency-lines:upsert",
-        memoPayload,
-      });
-      if (!xummUuid) return false;
 
-      if (refreshCurrencyLines) {
-        setTimeout(() => refreshCurrencyLines(), 3500);
+      if (window.confirm(confirmMessage)) {
+        // Ouvrir le modal de conversion avec la devise présélectionnée
+        setConvertBaseCurrency("RLUSD");
+        setConvertQuoteCurrency(currencyCode);
+        setConvertAmount("");
+        setSwapDefaultView("convert");
+        setSwapLockedView(null);
+        setActiveAction("swap");
+        return true;
       }
-      return true;
+
+      return false;
     },
     [
       backendWalletAddress,
       buildPreviewEventId,
       currencyLines,
-      hasOnChainRlusd,
       isPreviewMode,
-      isWalletActivated,
       pushPreviewEvent,
       recordStatementHighlight,
-      submitCurrencyLineAction,
       refreshCurrencyLines,
+      setActiveAction,
+      setConvertAmount,
+      setConvertBaseCurrency,
+      setConvertQuoteCurrency,
       setDemoLines,
+      setSwapDefaultView,
+      setSwapLockedView,
       t,
     ]
   );
