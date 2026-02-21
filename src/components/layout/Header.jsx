@@ -221,10 +221,10 @@ export default function Header({ fixed = true }) {
         <span className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white">
           {t("ui_xcannes_43b38baa2c", "XCANNES")}
         </span>
-        <span className="text-[10px] sm:text-[11px] text-white/40 font-light">
+        <span className="hidden sm:inline text-[10px] sm:text-[11px] text-white/40 font-light">
           |
         </span>
-        <span className="text-[15px] sm:text-[17px] md:text-[16px] text-white/60 font-light italic tracking-wide truncate">
+        <span className="hidden sm:inline text-[15px] sm:text-[17px] md:text-[16px] text-white/60 font-light italic tracking-wide truncate">
           {t("header_tagline", "Compte multi-devises")}
         </span>
       </div>

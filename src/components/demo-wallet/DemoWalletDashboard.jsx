@@ -306,7 +306,6 @@ export default function DemoWalletDashboard({
   const state = isExternalState ? demoState : localState;
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
-  const [walletSwitchAnimating, setWalletSwitchAnimating] = useState(false);
 	  const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
 	  const [swapDefaultView, setSwapDefaultView] = useState("convert");
 	  const [swapLockedView, setSwapLockedView] = useState(null);
@@ -1831,51 +1830,11 @@ export default function DemoWalletDashboard({
     return walletMap?.[currencyKey]?.eventId || null;
   }, [activeWalletId, selectedStatementToken, statementHighlightByWallet]);
 
-  const walletSwitchTimeoutRef = useRef(null);
-  const walletSwitchRafRef = useRef(null);
-  const prevWalletIdRef = useRef(activeWalletId);
-
-  useEffect(() => {
-    if (prevWalletIdRef.current === activeWalletId) return;
-    prevWalletIdRef.current = activeWalletId;
-
-    setWalletSwitchAnimating(false);
-
-    if (walletSwitchTimeoutRef.current) {
-      window.clearTimeout(walletSwitchTimeoutRef.current);
-      walletSwitchTimeoutRef.current = null;
-    }
-    if (walletSwitchRafRef.current) {
-      window.cancelAnimationFrame(walletSwitchRafRef.current);
-      walletSwitchRafRef.current = null;
-    }
-
-    walletSwitchRafRef.current = window.requestAnimationFrame(() => {
-      setWalletSwitchAnimating(true);
-      walletSwitchTimeoutRef.current = window.setTimeout(() => {
-        setWalletSwitchAnimating(false);
-        walletSwitchTimeoutRef.current = null;
-      }, 500);
-    });
-
-    return () => {
-      if (walletSwitchTimeoutRef.current) {
-        window.clearTimeout(walletSwitchTimeoutRef.current);
-        walletSwitchTimeoutRef.current = null;
-      }
-      if (walletSwitchRafRef.current) {
-        window.cancelAnimationFrame(walletSwitchRafRef.current);
-        walletSwitchRafRef.current = null;
-      }
-    };
-  }, [activeWalletId]);
-
   return (
 	    <div
 	      className={[
 		      "h-full flex flex-col min-h-0 ring-1 rounded-md overflow-hidden bg-[#0b0f10] border border-white/10",
 	      "demo-wallet-tooltip-scope",
-	      walletSwitchAnimating ? "demo-wallet-switch-in" : "",
 	      panelRingClass,
 	      demoBottomBorderClass].
 	      join(" ")}>
@@ -1883,35 +1842,13 @@ export default function DemoWalletDashboard({
 			      <div className="panel-header">
 			        <div className="flex items-center justify-between gap-3">
 			          <div className="flex items-center gap-1 min-w-0">
+			          </div>
+			          <div className="flex items-center gap-1">
 			            <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">{t("ui_xcannes_30015bef4b", "XCANNES")}
 
 			            </span>
 			          </div>
 				        </div>
-
-	        {showWalletSwitcher &&
-	        <div className="mt-3 flex items-center justify-between gap-3">
-	            <div className="inline-flex rounded-lg bg-black/20 border border-white/10 p-1">
-	              {["A"].map((id) =>
-	            <button
-	              key={id}
-	              type="button"
-	              onClick={() => setActiveWalletId(id)}
-	              className={[
-	              "px-3 py-1.5 text-xs rounded-md transition-colors border",
-	              activeWalletId === id ?
-	              id === "A" ?
-	              "bg-white/5 border-white/15 text-white hover:bg-white/10" :
-              "bg-xcannes-blue-light/10 border-xcannes-blue-light/30 text-xcannes-blue-light" :
-              "border-transparent text-white/60 hover:text-white"].
-              join(" ")}>
-
-	                  {t("demo_wallet_label", "Wallet")} {id}
-	                </button>
-	            )}
-	            </div>
-	          </div>
-	        }
 
 	        <div className="mt-4 flex flex-col items-center gap-2">
 	          <div className="text-[11px] md:text-xs text-white/55 tracking-[0.18em] uppercase">
@@ -2128,7 +2065,7 @@ export default function DemoWalletDashboard({
 
 	            <div className="wallet-action-icon">
 	              <svg
-	                className="w-4 h-4"
+	                className="w-5 h-5"
 	                viewBox="0 0 24 24"
 	                fill="none"
 	                stroke="currentColor"
@@ -2140,7 +2077,7 @@ export default function DemoWalletDashboard({
                 <polyline points="7 7 17 7 17 17"></polyline>
               </svg>
             </div>
-            <span className="wallet-action-label !text-sm !font-normal">{t("demo_tab_send", "Envoyer")}</span>
+            <span className="wallet-action-label !text-base !font-medium">{t("demo_tab_send", "Envoyer")}</span>
           </button>
 
           <button

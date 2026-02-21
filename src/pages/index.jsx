@@ -276,12 +276,6 @@ export default function Home() {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-28">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-[11px] tracking-[0.25em] text-white/60 mb-5">
-                <span className="inline-block italic -skew-x-[16deg] uppercase text-[14px]">
-                  {t("home_v2_hero_badge", "XCANNES")}
-                </span>
-              </p>
-
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
                   {t("home_v2_hero_title", "Payez local.")}
                   <span className="block mt-1 text-[21px] sm:text-[26px] md:text-[32px] font-medium text-white/85">

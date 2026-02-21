@@ -441,16 +441,33 @@ export function useSwapConversion({
         return;
       }
 
+      // 🆕 Construction de lineStates : inclut les lignes existantes ET les nouvelles
       const lineStates = [];
       const baseAllocated = allocatedRlusdByCurrency?.get(base);
       const quoteAllocated = allocatedRlusdByCurrency?.get(quote);
-      if (base !== "RLUSD" && Number.isFinite(baseAllocated)) {
-        const after = Math.max(0, Number(baseAllocated) - grossRlusd);
-        lineStates.push({ currencyCode: base, allocatedRlusdAfter: after });
+      
+      // Base currency (source de la conversion)
+      if (base !== "RLUSD") {
+        if (Number.isFinite(baseAllocated)) {
+          // Ligne existante : débit
+          const after = Math.max(0, Number(baseAllocated) - grossRlusd);
+          lineStates.push({ currencyCode: base, allocatedRlusdAfter: after });
+        } else {
+          // 🆕 Nouvelle ligne : activation automatique avec allocation 0 (car débit complet)
+          lineStates.push({ currencyCode: base, allocatedRlusdAfter: 0 });
+        }
       }
-      if (quote !== "RLUSD" && Number.isFinite(quoteAllocated)) {
-        const after = Math.max(0, Number(quoteAllocated) + netRlusd);
-        lineStates.push({ currencyCode: quote, allocatedRlusdAfter: after });
+      
+      // Quote currency (destination de la conversion)
+      if (quote !== "RLUSD") {
+        if (Number.isFinite(quoteAllocated)) {
+          // Ligne existante : crédit
+          const after = Math.max(0, Number(quoteAllocated) + netRlusd);
+          lineStates.push({ currencyCode: quote, allocatedRlusdAfter: after });
+        } else {
+          // 🆕 Nouvelle ligne : activation automatique avec allocation du montant converti
+          lineStates.push({ currencyCode: quote, allocatedRlusdAfter: netRlusd });
+        }
       }
 
       const memoPayload = buildConversionMemo({

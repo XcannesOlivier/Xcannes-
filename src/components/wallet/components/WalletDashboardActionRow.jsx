@@ -18,7 +18,7 @@ export default function WalletDashboardActionRow({
 
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-5 h-5"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -30,7 +30,7 @@ export default function WalletDashboardActionRow({
               <polyline points="7 7 17 7 17 17"></polyline>
             </svg>
           </div>
-          <span className="wallet-action-label !text-sm !font-normal">{t("ui_send_bee4f9e2f5", "Send")}</span>
+          <span className="wallet-action-label !text-base !font-medium">{t("ui_send_bee4f9e2f5", "Send")}</span>
         </button>
 
         <button
