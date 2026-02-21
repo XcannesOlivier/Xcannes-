@@ -189,11 +189,16 @@ export default function Header({ fixed = true }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Ferme le menu mobile lors du scroll
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (!menuOpen || !isMobile) return;
-    return lockBodyScroll();
+    if (!menuOpen) return;
+    
+    const handleScroll = () => {
+      setMenuOpen(false);
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [menuOpen]);
 
   const headerBgClass = (() => {
