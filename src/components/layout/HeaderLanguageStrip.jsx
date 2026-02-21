@@ -9,7 +9,7 @@ function formatLocaleInitials(locale) {
   return base.toUpperCase();
 }
 
-export default function HeaderLanguageStrip({ className = "" }) {
+export default function HeaderLanguageStrip({ className = "", compact = false }) {
   const router = useRouter();
   const { t } = useTranslation("common");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -153,6 +153,26 @@ export default function HeaderLanguageStrip({ className = "" }) {
   };
 
   if (isMobile) {
+    // Mode compact : juste les initiales comme sur desktop (pour affichage temporaire après animation)
+    if (compact) {
+      return (
+        <div
+          ref={stripRef}
+          className={`relative flex items-center ${className}`}
+        >
+          <button
+            type="button"
+            onClick={() => changeLanguage(currentLanguage.code)}
+            aria-label={t("langswitcher_current", "Langue actuelle")}
+            className="h-7 px-2.5 text-sm font-medium transition-colors hover:text-white text-white"
+          >
+            {formatLocaleInitials(currentLanguage.code)}
+          </button>
+        </div>
+      );
+    }
+    
+    // Mode normal mobile : avec label "Langue" et menu complet
     return (
       <div ref={stripRef} className={`flex flex-col items-start gap-2 ${className}`}>
         <div className="flex items-center gap-3">

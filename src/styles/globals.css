@@ -208,7 +208,12 @@
   }
 
   .header-nav-link .header-nav-label {
-    font-size: 1.5rem;
+    font-size: 1rem; /* Réduit pour mobile de 1.5rem à 1rem pour être plus compact */
+  }
+  
+  /* Navigation mobile temporaire après animation hero */
+  nav.mobile-temp-nav {
+    font-size: 0.9rem;
   }
 }
 
@@ -786,5 +791,22 @@ body {
 @media (max-width: 768px) {
   .price-ticker-track {
     animation: priceTickerScroll 12s linear infinite;
+  }
+}
+
+/* ====== HOME PAGE CONTENT WRAPPER (ajustement pour animation header) ====== */
+
+.home-content-wrapper {
+  transition: padding-top 500ms ease-in-out;
+}
+
+body.header-hero-mode .home-content-wrapper {
+  padding-top: 384px !important; /* h-96 = 24rem = 384px */
+}
+
+/* Ajustement du padding pour le header desktop agrandi (h-20 au lieu de h-16) */
+@media (min-width: 768px) {
+  .home-content-wrapper {
+    padding-top: 80px; /* h-20 = 5rem = 80px sur desktop */
   }
 }
