@@ -166,7 +166,7 @@
 
 .wallet-action-send {
   /* Subtle but permanent emphasis */
-  background: rgba(34, 197, 94, 0.18);
+  background: #15803d;
   border-color: transparent;
 }
 
@@ -176,12 +176,22 @@
   border-color: transparent;
 }
 
+.wallet-action-send .wallet-action-icon svg {
+  color: #ffffff;
+  opacity: 1;
+}
+
 .wallet-action-send:hover {
-  background: rgba(34, 197, 94, 0.26);
+  background: #166534;
 }
 
 .wallet-action-send:hover .wallet-action-icon {
   background: transparent;
+}
+
+.wallet-action-send:hover .wallet-action-icon svg {
+  color: #ffffff;
+  opacity: 1;
 }
 
 .wallet-action-send:active .wallet-action-icon {

@@ -14,6 +14,7 @@ import {
 } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
 import { formatAmountWithSymbol, getDisplayCurrencyCode } from "../walletDashboardConfig";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 
 const USD_STABLECOINS = [
 "RLUSD",
@@ -35,12 +36,10 @@ const ShareIcon = ({ className = "" }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-  >
-    <circle cx="18" cy="5" r="3" />
-    <circle cx="6" cy="12" r="3" />
-    <circle cx="18" cy="19" r="3" />
-    <path d="M8.59 13.51l6.83 3.98" />
-    <path d="M15.41 6.51L8.59 10.49" />
+    aria-hidden="true">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" y1="3" x2="12" y2="15" />
   </svg>
 );
 
@@ -756,7 +755,6 @@ export default function GlobalStatement({
 	                <thead className="sticky top-0 bg-black z-10">
 	                  <tr>
 	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_asset_e3ae76ddf7", "Asset")}</th>
-	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_type_c5068d5570", "Type")}</th>
 	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_balance_0ad2d5b8eb", "Balance")}</th>
 	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_usd_value_6925fe3f7e", "≈ USD Value")}</th>
 	                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_action_96db311a48", "Action")}</th>
@@ -783,32 +781,29 @@ export default function GlobalStatement({
                           <span className="text-lg sm:text-2xl flex-shrink-0">{getCurrencyFlag(getDisplayCurrencyCode(token.currency))}</span>
                           }
                             <div className="min-w-0">
-                              <p className="text-white font-medium text-xs sm:text-sm truncate">{getDisplayCurrencyCode(token.currency)}</p>
-                              <p className="text-[9px] sm:text-xs text-white/40 truncate">
-                                {token.currency === "XRP" ?
-                                  t("ui_label_native_2d7a1c9b4e", "Native") :
-                                  token.issuer?.slice(0, 8) + "..."}
+                              <p className="text-white font-medium text-xs sm:text-sm truncate">
+                                {isPreviewMode ? (
+                                  <>
+                                    <span className="md:hidden">{getDisplayCurrencyCode(token.currency)}</span>
+                                    <span className="hidden md:inline">{getCurrencyDescription(getDisplayCurrencyCode(token.currency)) || getDisplayCurrencyCode(token.currency)}</span>
+                                  </>
+                                ) : (
+                                  getDisplayCurrencyCode(token.currency)
+                                )}
                               </p>
+                              {isPreviewMode && (
+                                <p className="text-[9px] sm:text-xs text-white/40 truncate">
+                                  {token.currency === "XRP" ?
+                                    t("ui_label_native_2d7a1c9b4e", "Native") :
+                                    token.issuer?.slice(0, 8) + "..."}
+                                </p>
+                              )}
                             </div>
                           </div>
-                        </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3">
-                          <span className={`inline-block px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[9px] sm:text-xs font-medium whitespace-nowrap
-                            ${badge.color === "blue" ? "bg-blue-500/20 text-blue-300 border border-blue-500/30" : ""}
-                            ${badge.color === "green" ? "bg-green-500/20 text-green-300 border border-green-500/30" : ""}
-                            ${badge.color === "purple" ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" : ""}
-                            ${badge.color === "orange" ? "bg-orange-500/20 text-orange-300 border border-orange-500/30" : ""}
-                            ${badge.color === "gray" ? "bg-white/10 text-white/60 border border-white/20" : ""}
-                          `}>
-                            {badge.label}
-                          </span>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white font-medium text-[10px] sm:text-sm">
                           <div className="truncate">
                             {formatAmountWithSymbolLocal(token.value, token.currency)}
-                          </div>
-                          <div className="text-[9px] sm:text-xs text-white/50">
-                            {getDisplayCurrencyCode(token.currency)}
                           </div>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
