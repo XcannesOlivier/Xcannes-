@@ -14,6 +14,14 @@ export default function Header({ fixed = true }) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  
+  // Animation du header sur la page index (desktop uniquement)
+  const [showHeroHeader, setShowHeroHeader] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const hasAnimatedRef = useRef(false);
+  
+  // État pour l'affichage temporaire des boutons sur mobile après l'animation
+  const [showMobileButtons, setShowMobileButtons] = useState(false);
 
   const withHardNavFallback = useCallback(
     (href, { onBeforeFallback } = {}) =>
@@ -201,6 +209,54 @@ export default function Header({ fixed = true }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [menuOpen]);
 
+  // Animation d'ouverture du header sur la page index (desktop ET mobile)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isHome) return;
+    
+    // L'animation ne se joue qu'une seule fois
+    if (hasAnimatedRef.current) {
+      setAnimationComplete(true);
+      return;
+    }
+    
+    hasAnimatedRef.current = true;
+    setShowHeroHeader(true);
+    
+    // Ajoute la classe au body pour ajuster le padding du contenu
+    document.body.classList.add('header-hero-mode');
+    
+    // Titre complet : "XCANNES" (8 lettres) + " | " + "Compte multi-devises" (21 caractères) = 32 caractères
+    // Durée : ~60ms par caractère pour l'apparition + 1200ms pour arrière-avant
+    const titleLength = "XCANNES | Compte multi-devises".length;
+    const charDelay = 60; // ms par caractère pour l'apparition (accéléré pour effet high-tech)
+    const backForwardDuration = 1200; // 500ms arrière + 700ms avant (plus long et visible)
+    const totalAnimationDuration = titleLength * charDelay + backForwardDuration + 300; // +300ms de pause
+    
+    const timer = setTimeout(() => {
+      setShowHeroHeader(false);
+      setAnimationComplete(true);
+      // Retire la classe du body pour que le contenu remonte
+      document.body.classList.remove('header-hero-mode');
+      
+      // Sur mobile uniquement : affiche les boutons pendant 3 secondes
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        setShowMobileButtons(true);
+        
+        const mobileButtonsTimer = setTimeout(() => {
+          setShowMobileButtons(false);
+        }, 3000); // 3 secondes
+        
+        return () => clearTimeout(mobileButtonsTimer);
+      }
+    }, totalAnimationDuration);
+    
+    return () => {
+      clearTimeout(timer);
+      document.body.classList.remove('header-hero-mode');
+    };
+  }, [isHome]);
+
   const headerBgClass = (() => {
     // Home: fond noir uniforme
     if (isHome) {
@@ -215,28 +271,146 @@ export default function Header({ fixed = true }) {
     "bg-[#07090A] backdrop-blur-sm border-white/5";
   })();
 
+  // Composant pour l'animation lettre par lettre
+  const AnimatedTitle = ({ text, delay = 50, isMobile = false }) => {
+    const [displayedText, setDisplayedText] = useState("");
+    const [finalAnimation, setFinalAnimation] = useState(''); // '', 'back', 'forward'
+    
+    useEffect(() => {
+      let currentIndex = 0;
+      const interval = setInterval(() => {
+        if (currentIndex <= text.length) {
+          setDisplayedText(text.slice(0, currentIndex));
+          currentIndex++;
+        } else {
+          clearInterval(interval);
+          // Après l'apparition complète, animation arrière-avant
+          setTimeout(() => {
+            setFinalAnimation('back');
+            setTimeout(() => {
+              setFinalAnimation('forward');
+            }, 500); // Durée de l'arrière (augmentée pour visibilité)
+          }, 200); // Pause avant le début de l'animation
+        }
+      }, delay);
+      
+      return () => clearInterval(interval);
+    }, [text, delay]);
+    
+    // Sépare "XCANNES" (bold) de " | " (light, opacité 40%) et "Compte multi-devises" (light italic, opacité 60%)
+    const xcannesToShow = displayedText.slice(0, 8); // "XCANNES"
+    const pipeToShow = displayedText.slice(8, 11); // " | "
+    const restToShow = displayedText.slice(11); // "Compte multi-devises"
+    // Pour mobile : on récupère "Compte multi-devises" sans le pipe, mais avec l'espace avant
+    const mobileRestToShow = displayedText.slice(9).trim(); // Après "XCANNES ", en retirant l'espace au début et le pipe
+    
+    const renderText = (textPart, className) => {
+      return textPart.split('').map((char, idx) => {
+        // Pour les espaces, utiliser un caractère non-sécable et une largeur minimale
+        const isSpace = char === ' ';
+        return (
+          <span
+            key={idx}
+            className={`inline-block ${className} ${isSpace ? 'min-w-[0.5rem]' : ''}`}
+          >
+            {isSpace ? '\u00A0' : char}
+          </span>
+        );
+      });
+    };
+    
+    // Classes pour l'animation arrière-avant finale
+    const getContainerClass = () => {
+      if (finalAnimation === 'back') {
+        return 'animate-title-back';
+      }
+      if (finalAnimation === 'forward') {
+        return 'animate-title-forward';
+      }
+      return '';
+    };
+    
+    // Sur mobile : retour à la ligne, sans pipe
+    if (isMobile) {
+      return (
+        <span className={`relative ${getContainerClass()} flex flex-col items-center gap-2`}>
+          <span className="font-bold block">
+            {renderText(xcannesToShow, '')}
+          </span>
+          <span className="font-thin italic text-white/90 block text-2xl">
+            {renderText(mobileRestToShow, '')}
+          </span>
+        </span>
+      );
+    }
+    
+    // Sur desktop : une seule ligne avec pipe
+    return (
+      <span className={`relative ${getContainerClass()}`}>
+        <span className="font-bold inline-block">
+          {renderText(xcannesToShow, '')}
+        </span>
+        <span className="font-thin text-white/90 inline-block mx-2">
+          {renderText(pipeToShow, '')}
+        </span>
+        <span className="font-thin italic text-white/90 inline-block">
+          {renderText(restToShow, '')}
+        </span>
+      </span>
+    );
+  };
+
+  // État hero avec animation (desktop ET mobile, page index)
+  const isHeroMode = isHome && showHeroHeader;
+  const [isMobileView, setIsMobileView] = useState(false);
+  
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    
+    const checkMobile = () => {
+      setIsMobileView(window.matchMedia("(max-width: 767px)").matches);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <header
-      className={`w-full h-16 ${
-      fixed ? "fixed top-0 left-0 z-50" : "relative z-20"} px-6 flex items-center justify-between font-montserrat transition-all duration-300 border-b ${
+      className={`w-full ${isHeroMode ? 'h-96 md:h-96' : 'h-16 md:h-20'} ${
+      fixed ? "fixed top-0 left-0 z-50" : "relative z-20"} px-6 flex items-center ${isHeroMode ? 'justify-center' : 'justify-between'} font-montserrat transition-all duration-500 border-b ${
       headerBgClass} text-white`}>
 
-      {/* Logo simple texte style banque suisse */}
-      <div className="flex items-center gap-2 whitespace-nowrap min-w-0">
-        <span className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold tracking-tight text-white">
-          {t("ui_xcannes_43b38baa2c", "XCANNES")}
-        </span>
-        <span className="hidden sm:inline text-[10px] sm:text-[11px] text-white/40 font-light">
-          |
-        </span>
-        <span className="hidden sm:inline text-[15px] sm:text-[17px] md:text-[16px] text-white/60 font-light italic tracking-wide truncate">
-          {t("header_tagline", "Compte multi-devises")}
-        </span>
-      </div>
+      {isHeroMode ? (
+        // Mode Hero : titre centré avec animation lettre par lettre + effet high-tech
+        <div className="flex flex-col items-center justify-center" style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}>
+          <h1 className="text-4xl md:text-8xl font-orbitron tracking-tight text-white" style={{ textShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(59, 130, 246, 0.2)' }}>
+            <AnimatedTitle text="XCANNES | Compte multi-devises" delay={60} isMobile={isMobileView} />
+          </h1>
+        </div>
+      ) : (
+        <>
+          {/* Logo simple texte style banque suisse */}
+          <div className="flex items-center gap-2 whitespace-nowrap min-w-0">
+            <span className="text-lg sm:text-xl md:text-3xl font-orbitron font-bold tracking-tight text-white">
+              {t("ui_xcannes_43b38baa2c", "XCANNES")}
+            </span>
+            <span className="hidden sm:inline text-[10px] sm:text-[11px] md:text-[13px] text-white/40 font-light">
+              |
+            </span>
+            <span className="hidden sm:inline text-[15px] sm:text-[17px] md:text-[19px] text-white/60 font-light italic tracking-wide truncate">
+              {t("header_tagline", "Compte multi-devises")}
+            </span>
+          </div>
 
-      <div className="flex items-center gap-5">
-        {/* Navigation épurée */}
-        <nav className="hidden md:flex items-center gap-30 font-[300] text-lg">
+          <div className="flex items-center gap-5">
+        {/* Navigation épurée - Desktop toujours, Mobile temporairement après animation */}
+        <nav className={`items-center gap-30 font-[300] transition-opacity duration-300 ${
+          // Desktop : hidden md:flex avec text-xl
+          // Mobile : affichage conditionnel avec showMobileButtons et text réduit
+          showMobileButtons ? 'flex md:flex text-sm md:text-xl' : 'hidden md:flex md:text-xl'
+        } ${animationComplete || !isHome ? 'opacity-100' : 'opacity-0'}`}>
           {!isHome &&
           <Link
             href="/"
@@ -271,11 +445,16 @@ export default function Header({ fixed = true }) {
 
         </nav>
 
-        <HeaderLanguageStrip className="hidden md:flex ml-4" />
+        <HeaderLanguageStrip 
+          className={`${showMobileButtons ? 'flex md:flex' : 'hidden md:flex'} ml-4 transition-opacity duration-300 ${animationComplete || !isHome ? 'opacity-100' : 'opacity-0'}`} 
+          compact={showMobileButtons}
+        />
 
-	        {/* Menu mobile minimaliste */}
+	        {/* Menu mobile minimaliste - masqué pendant l'animation et pendant l'affichage des boutons, puis visible */}
 	        <button
-	          className="md:hidden text-white focus:outline-none hover:text-white/90 transition-colors"
+	          className={`md:hidden text-white focus:outline-none hover:text-white/90 transition-opacity duration-300 ${
+	            (animationComplete || !isHome) && !showMobileButtons ? 'opacity-100' : 'opacity-0 pointer-events-none'
+	          }`}
 	          onClick={() => setMenuOpen(!menuOpen)}
 	          aria-label={t("ui_toggle_menu_9e88e70e51", "Toggle menu")}
 	          aria-expanded={menuOpen}>
@@ -288,7 +467,7 @@ export default function Header({ fixed = true }) {
       </div>
 
       <div
-        className={`fixed top-16 left-0 right-0 bottom-0 md:hidden bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed ${isHeroMode ? 'top-96' : 'top-16'} left-0 right-0 bottom-0 md:hidden bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setMenuOpen(false)}
@@ -296,7 +475,7 @@ export default function Header({ fixed = true }) {
       />
 
       <div
-        className={`absolute top-16 left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out z-50 ${
+        className={`absolute ${isHeroMode ? 'top-96' : 'top-16'} left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out z-50 ${
           menuOpen
             ? "opacity-100 translate-y-0 pointer-events-auto max-h-[420px] py-8"
             : "opacity-0 -translate-y-2 pointer-events-none max-h-0 py-0"
@@ -343,6 +522,9 @@ export default function Header({ fixed = true }) {
           </div>
 
         </div>
-    </header>);
+        </>
+      )}
+    </header>
+  );
 
 }

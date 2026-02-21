@@ -267,7 +267,7 @@ export default function Home() {
 
       <Header />
 
-      <div className="pt-16 bg-[#0b0f10]">
+      <div className="pt-16 home-content-wrapper bg-[#0b0f10]">
 
         {/* HERO (more “private bank” tone) */}
         <main className="relative overflow-hidden">
