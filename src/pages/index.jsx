@@ -9,6 +9,7 @@ import SupportAssistantWidget from "@/components/layout/SupportAssistantWidget";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import WalletProductSection from "@/components/home/WalletProductSection";
+import MobileHeroCarousel from "@/components/home/MobileHeroCarousel";
 import { bankButtonClassName } from "@/components/ui/bankButtonClassName";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
@@ -38,11 +39,7 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [visibleCards, setVisibleCards] = useState(new Set());
   const cardRefs = useRef([]);
-  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
-  const [carouselFading, setCarouselFading] = useState(false);
-  const [carouselProgress, setCarouselProgress] = useState(0); // Progression de 0 à 100 pour la barre mobile
   const [desktopCarouselIndex, setDesktopCarouselIndex] = useState(0); // Carrousel desktop pour carte 4 et 5
-  const [desktopCarouselProgress, setDesktopCarouselProgress] = useState(0); // Progression de 0 à 100 pour la barre desktop
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   
@@ -248,16 +245,6 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Effet de fondu lors du changement de carte
-  useEffect(() => {
-    setCarouselFading(true);
-    const timer = setTimeout(() => {
-      setCarouselFading(false);
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, [currentCarouselIndex]);
-
   const openValueModal = () => {
     setValueModalClosing(false);
     setValueModalOpen(true);
@@ -275,75 +262,6 @@ export default function Home() {
       valueModalCloseTimerRef.current = null;
     }, getModalCloseDelay());
   };
-
-  // Auto-rotation du carrousel mobile
-  useEffect(() => {
-    if (!isMobile) return;
-    const interval = setInterval(() => {
-      setCurrentCarouselIndex((prev) => (prev === 4 ? 0 : prev + 1)); // 5 cartes (0-4)
-    }, 5000); // Change toutes les 5 secondes
-    return () => clearInterval(interval);
-  }, [isMobile]);
-
-  // Animation de la barre de progression du carrousel mobile
-  useEffect(() => {
-    if (!isMobile) return;
-    
-    // Délai initial pour attendre la fin de l'animation du header (2360ms)
-    const headerAnimationDelay = 2360;
-    
-    const initialTimer = setTimeout(() => {
-      // Reset la progression à 0 quand l'index change
-      setCarouselProgress(0);
-      
-      // Anime la progression de 0 à 100 sur 5 secondes
-      const startTime = Date.now();
-      const duration = 5000; // 5 secondes
-      
-      const animateProgress = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min((elapsed / duration) * 100, 100);
-        setCarouselProgress(progress);
-        
-        if (progress < 100) {
-          requestAnimationFrame(animateProgress);
-        }
-      };
-      
-      requestAnimationFrame(animateProgress);
-    }, currentCarouselIndex === 0 ? headerAnimationDelay : 0);
-    
-    return () => clearTimeout(initialTimer);
-  }, [currentCarouselIndex, isMobile]);
-
-  // Animation de la barre de progression du carrousel desktop
-  useEffect(() => {
-    // Délai initial pour attendre la fin de l'animation du header (2360ms)
-    const headerAnimationDelay = 2360;
-    
-    const initialTimer = setTimeout(() => {
-      // Reset la progression à 0 quand l'index change
-      setDesktopCarouselProgress(0);
-      
-      // Anime la progression de 0 à 100 sur 5 secondes
-      const startTime = Date.now();
-      const duration = 5000; // 5 secondes
-      
-      const animateProgress = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min((elapsed / duration) * 100, 100);
-        setDesktopCarouselProgress(progress);
-        
-        if (progress < 100) {
-          requestAnimationFrame(animateProgress);
-        }
-      };
-      
-      requestAnimationFrame(animateProgress);
-    }, desktopCarouselIndex === 0 ? headerAnimationDelay : 0);
-    
-    return () => clearTimeout(initialTimer);
-  }, [desktopCarouselIndex]);
 
   const openSecurityModal = () => {
     setSecurityModalClosing(false);
@@ -416,19 +334,19 @@ export default function Home() {
           <div className="absolute inset-0 bg-[#0b0f10] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0b0f10] md:h-36" />
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-28">
-            <div className="mx-auto max-w-3xl text-center">
-                <h1 className={`text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight transition-all duration-700 ${
+            <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-24 md:py-32">
+            <div className="mx-auto max-w-6xl text-center">
+                <h1 className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-montserrat font-bold text-white leading-[1.1] tracking-tight transition-all duration-700 ${
                   showHeroTitle ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
                 }`}>
-                  {t("home_v2_hero_title", "Payez local.")}
-                  <span className="block mt-1 text-[21px] sm:text-[26px] md:text-[32px] font-medium text-white/85">
-                    {t("home_v2_hero_title_emphasis", "Gardez la valeur.")}
+                  {t("home_v2_hero_title", "Votre argent, stable dans 160+ devises.")}
+                  <span className="block mt-3 md:mt-4 text-[21px] sm:text-[26px] md:text-[42px] lg:text-[52px] font-semibold text-white/90">
+                    {t("home_v2_hero_title_emphasis", "Indexation USD réglementée.")}
                   </span>
                 </h1>
 
                 {/* Texte sur desktop uniquement */}
-                <p className={`mt-6 text-base sm:text-lg text-white/90 font-light leading-relaxed italic hidden md:block transition-all duration-700 delay-200 ${
+                <p className={`mt-8 md:mt-12 text-lg md:text-xl lg:text-2xl text-white/90 font-light leading-relaxed hidden md:block transition-all duration-700 delay-200 ${
                   showHeroSubtitle ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 translate-x-16 translate-y-8'
                 }`}>
                   <span dangerouslySetInnerHTML={{
@@ -440,158 +358,13 @@ export default function Home() {
                 </p>
 
                 {/* Carrousel des cartes sur mobile uniquement */}
-                <div className={`mt-12 md:hidden transition-all duration-700 delay-300 ${
-                  showHeroCarousel ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
-                }`}>
-                  {(() => {
-                    const heroCards = [
-                      {
-                        title: t("home_v2_hero_pillar_1_title", "Exécution instantanée"),
-                        stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
-                        subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
-                        icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
-                            <path d="M10 13l2 2 7-7" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M12 22A10 10 0 1 0 2 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        ),
-                      },
-                      {
-                        title: t("home_v2_hero_pillar_2_title", "Contrôle des transactions"),
-                        desc: t("home_v2_hero_pillar_2_desc", "Validation sécurisée sous votre autorité."),
-                        icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
-                            <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        ),
-                      },
-                      {
-                        title: t("home_v2_hero_pillar_3_title", "Transparence des frais"),
-                        desc: t("home_v2_hero_pillar_3_desc", "Frais affichés avant chaque confirmation."),
-                        icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
-                            <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        ),
-                      },
-                      {
-                        title: t("home_v2_hero_pillar_4_title", "Stabilité réglementée"),
-                        desc: t("home_v2_hero_pillar_4_desc", "Indexation USD conforme aux standards financiers.\nConversion multi-devises instantanée."),
-                        icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
-                            <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        ),
-                      },
-                      {
-                        title: t("home_v2_hero_pillar_5_title", "Pour qui ?"),
-                        desc: t("home_v2_hero_pillar_5_desc", "Particuliers et entreprises recherchant stabilité et contrôle."),
-                        icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        ),
-                      },
-                    ];
-
-                    const currentCard = heroCards[currentCarouselIndex];
-
-                    const handleTouchStart = (e) => {
-                      const touchStartX = e.touches[0].clientX;
-                      e.currentTarget.setAttribute('data-touch-start', touchStartX);
-                    };
-
-                    const handleTouchEnd = (e) => {
-                      const touchStartX = parseFloat(e.currentTarget.getAttribute('data-touch-start') || '0');
-                      const touchEndX = e.changedTouches[0].clientX;
-                      const diff = touchStartX - touchEndX;
-
-                      if (Math.abs(diff) > 50) { // Minimum swipe distance
-                        if (diff > 0) {
-                          // Swipe left - next
-                          setCurrentCarouselIndex((prev) => (prev === heroCards.length - 1 ? 0 : prev + 1));
-                        } else {
-                          // Swipe right - previous
-                          setCurrentCarouselIndex((prev) => (prev === 0 ? heroCards.length - 1 : prev - 1));
-                        }
-                      }
-                    };
-
-                    return (
-                      <div className="relative">
-                        {/* Carte du carrousel */}
-                        <div 
-                          className={`bg-white/90 rounded-lg px-5 py-6 min-h-[160px] flex items-start gap-3 touch-pan-y transition-all duration-500 ease-in-out ${
-                            carouselFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-                          }`}
-                          onTouchStart={handleTouchStart}
-                          onTouchEnd={handleTouchEnd}
-                        >
-                          <div className="flex items-center justify-center w-10 h-10 shrink-0 mt-0.5">
-                            {currentCard.icon}
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="text-[19px] font-semibold text-black/90 mb-1">
-                              {currentCard.title}
-                            </div>
-                            {currentCard.subtitle && (
-                              <div className="text-[15px] text-black/70 italic leading-relaxed">
-                                {currentCard.subtitle}
-                              </div>
-                            )}
-                            {currentCard.stat && (
-                              <div className="mt-3 text-center">
-                                <div className="text-3xl font-semibold text-black/90 leading-tight">
-                                  {currentCard.stat}
-                                </div>
-                              </div>
-                            )}
-                            {currentCard.desc && (
-                              <div className="text-[15px] text-black/70 leading-relaxed italic mt-1">
-                                {currentCard.title === t("home_v2_hero_pillar_4_title", "Stabilité réglementée")
-                                  ? currentCard.desc.split('\n')[0]
-                                  : currentCard.desc}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Barre de progression */}
-                        <div className="mt-4 w-full px-2">
-                        {/* Barre de progression */}
-                        <div className="mt-4 w-full px-2">
-                          {/* Indicateurs de pagination (points cliquables) */}
-                          <div className="flex justify-center gap-2 mb-2">
-                            {heroCards.map((_, index) => (
-                              <button
-                                key={index}
-                                onClick={() => setCurrentCarouselIndex(index)}
-                                className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                                  index === currentCarouselIndex
-                                    ? 'bg-white/50 scale-125'
-                                    : 'bg-white/20 hover:bg-white/40'
-                                }`}
-                                aria-label={`Aller à la carte ${index + 1}`}
-                              />
-                            ))}
-                          </div>
-                          
-                          {/* Barre de progression animée */}
-                          <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gradient-to-r from-white/40 to-white/60 rounded-full transition-all duration-100 ease-linear"
-                              style={{ width: `${carouselProgress}%` }}
-                            />
-                          </div>
-                        </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
+                <MobileHeroCarousel 
+                  show={showHeroCarousel}
+                  onSpeedClick={openSpeedModal}
+                  onSecurityClick={openSecurityModal}
+                  onFeesClick={openFeesModal}
+                  onValueClick={openValueModal}
+                />
 
                 <div className={`mt-10 hidden md:flex flex-col items-center justify-center gap-4 transition-all duration-700 delay-500 ${
                   showHeroBadges ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 translate-x-16 translate-y-8'
@@ -758,7 +531,8 @@ export default function Home() {
                           : undefined
                         }
 		                      className={[
-		                        "flex items-start gap-2.5 bg-white/90 hover:bg-white/80 rounded-md px-4 py-7 md:py-4 transition-[background-color] duration-200",
+		                        "relative flex items-start gap-2.5 bg-white/90 rounded-md px-4 py-7 md:py-4 transition-all duration-300 ease-out",
+		                        "md:hover:bg-white md:hover:scale-[1.05] md:hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:hover:z-10",
 		                        isClickable
 		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
 		                          : "",
@@ -767,8 +541,7 @@ export default function Home() {
 		                        "md:opacity-100 md:translate-y-0",
 		                        isVisible 
 		                          ? "opacity-100 translate-y-0" 
-		                          : "opacity-0 translate-y-8",
-		                        "transition-all duration-700 ease-out"
+		                          : "opacity-0 translate-y-8"
 	                      ].filter(Boolean).join(" ")}
 	                      style={{
 	                        transitionDelay: isVisible ? `${index * 150}ms` : "0ms"
@@ -855,7 +628,7 @@ export default function Home() {
                               }
                             : undefined
                           }
-                        className="flex items-start gap-2.5 bg-white/90 hover:bg-white/80 rounded-md px-4 py-5 md:py-4 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
+                        className="flex items-start gap-2.5 bg-white/90 hover:bg-white/80 rounded-md px-4 py-5 md:py-4 min-h-[140px] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
                       >
                         <div className="mt-0.5 flex items-center justify-center w-8 h-8 lg:w-11 lg:h-11 shrink-0">
                           {card.icon}
@@ -874,33 +647,6 @@ export default function Home() {
                     </div>
                     );
                   })}
-                  
-                  {/* Indicateurs de pagination et barre de progression */}
-                  <div className="absolute bottom-2 right-4 left-4 flex flex-col gap-1.5">
-                    {/* Points de pagination */}
-                    <div className="flex justify-end gap-2">
-                      {carouselCards.map((_, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setDesktopCarouselIndex(idx)}
-                          className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                            idx === desktopCarouselIndex
-                              ? 'bg-black/50 scale-125'
-                              : 'bg-black/15 hover:bg-black/30'
-                          }`}
-                          aria-label={`Aller à la carte ${idx + 1}`}
-                        />
-                      ))}
-                    </div>
-                    
-                    {/* Barre de progression */}
-                    <div className="w-full h-1 bg-black/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-black/30 to-black/50 rounded-full transition-all duration-100 ease-linear"
-                        style={{ width: `${desktopCarouselProgress}%` }}
-                      />
-                    </div>
-                  </div>
                 </div>
               </>
             );
