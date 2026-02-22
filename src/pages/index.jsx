@@ -524,7 +524,7 @@ export default function Home() {
                       <div className="relative">
                         {/* Carte du carrousel */}
                         <div 
-                          className={`bg-white/90 rounded-lg px-5 py-6 pb-10 min-h-[160px] flex items-start gap-3 touch-pan-y transition-all duration-500 ease-in-out relative ${
+                          className={`bg-white/90 rounded-lg px-5 py-6 min-h-[160px] flex items-start gap-3 touch-pan-y transition-all duration-500 ease-in-out ${
                             carouselFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
                           }`}
                           onTouchStart={handleTouchStart}
@@ -557,11 +557,14 @@ export default function Home() {
                               </div>
                             )}
                           </div>
+                        </div>
 
-                          {/* Barre de progression */}
-                          <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1.5">
+                        {/* Barre de progression */}
+                        <div className="mt-4 w-full px-2">
+                        {/* Barre de progression */}
+                        <div className="mt-4 w-full px-2">
                           {/* Indicateurs de pagination (points cliquables) */}
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-center gap-2 mb-2">
                             {heroCards.map((_, index) => (
                               <button
                                 key={index}
@@ -577,7 +580,7 @@ export default function Home() {
                           </div>
                           
                           {/* Barre de progression animée */}
-                          <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-gradient-to-r from-white/40 to-white/60 rounded-full transition-all duration-100 ease-linear"
                               style={{ width: `${carouselProgress}%` }}
@@ -873,7 +876,7 @@ export default function Home() {
                   })}
                   
                   {/* Indicateurs de pagination et barre de progression */}
-                  <div className="absolute bottom-3 right-4 flex flex-col items-end gap-1.5">
+                  <div className="absolute bottom-2 right-4 left-4 flex flex-col gap-1.5">
                     {/* Points de pagination */}
                     <div className="flex justify-end gap-2">
                       {carouselCards.map((_, idx) => (
@@ -891,7 +894,7 @@ export default function Home() {
                     </div>
                     
                     {/* Barre de progression */}
-                    <div className="w-32 h-1 bg-black/10 rounded-full overflow-hidden">
+                    <div className="w-full h-1 bg-black/10 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-black/30 to-black/50 rounded-full transition-all duration-100 ease-linear"
                         style={{ width: `${desktopCarouselProgress}%` }}
