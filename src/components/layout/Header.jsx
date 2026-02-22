@@ -171,6 +171,7 @@ export default function Header({ fixed = true }) {
     ? t("nav_sign_out", "Se déconnecter")
     : t("nav_sign_in", "Se connecter");
   const showHomeWalletLink = isHome && isConnected;
+  const showHomeWalletLinkInBurger = isHome && isConnected; // Pour le menu burger
   const walletActionToneClass = isConnected
     ? "text-white hover:text-white border border-white/25 hover:border-white/40 bg-transparent hover:bg-white/10 transition-transform duration-200 hover:scale-105 active:scale-95 header-nav-link-no-arrow-anim"
     : "text-white/80 hover:text-white bg-transparent header-nav-link-no-arrow-anim";
@@ -227,11 +228,11 @@ export default function Header({ fixed = true }) {
     document.body.classList.add('header-hero-mode');
     
     // Titre complet : "XCANNES" (8 lettres seulement pour l'animation)
-    // Durée : ~120ms par caractère pour l'apparition + 1200ms pour arrière-avant
+    // Durée : ~120ms par caractère pour l'apparition + 800ms pour arrière-avant + 600ms de pause
     const titleLength = "XCANNES".length;
     const charDelay = 120; // ms par caractère pour l'apparition (ralenti pour plus d'effet)
-    const backForwardDuration = 1200; // 500ms arrière + 700ms avant (plus long et visible)
-    const totalAnimationDuration = titleLength * charDelay + backForwardDuration + 300; // +300ms de pause
+    const backForwardDuration = 800; // 350ms arrière + 450ms avant (optimisé pour fluidité)
+    const totalAnimationDuration = titleLength * charDelay + backForwardDuration + 600; // +600ms de pause
     
     const timer = setTimeout(() => {
       setShowHeroHeader(false);
@@ -239,13 +240,13 @@ export default function Header({ fixed = true }) {
       // Retire la classe du body pour que le contenu remonte
       document.body.classList.remove('header-hero-mode');
       
-      // Sur mobile uniquement : affiche les boutons pendant 3 secondes
+      // Sur mobile uniquement : affiche les boutons pendant 2 secondes
       if (window.matchMedia("(max-width: 767px)").matches) {
         setShowMobileButtons(true);
         
         const mobileButtonsTimer = setTimeout(() => {
           setShowMobileButtons(false);
-        }, 3000); // 3 secondes
+        }, 2000); // 2 secondes (réduit pour plus de fluidité)
         
         return () => clearTimeout(mobileButtonsTimer);
       }
@@ -288,12 +289,12 @@ export default function Header({ fixed = true }) {
           clearInterval(interval);
           // Affiche immédiatement le sous-titre après XCANNES
           setShowSubtitle(true);
-          // Après l'apparition complète, animation arrière-avant
+          // Après l'apparition complète, animation arrière-avant (optimisée)
           setTimeout(() => {
             setFinalAnimation('back');
             setTimeout(() => {
               setFinalAnimation('forward');
-            }, 500); // Durée de l'arrière (augmentée pour visibilité)
+            }, 350); // Durée de l'arrière (réduite pour plus de fluidité)
           }, 200); // Pause avant le début de l'animation
         }
       }, delay);
@@ -410,17 +411,7 @@ export default function Header({ fixed = true }) {
             </Link>
           }
 
-	          {showHomeWalletLink &&
-	          <Link
-	            href="/wallet"
-	            className="header-nav-link header-nav-link-white-hover"
-	            onClick={withHardNavFallback("/wallet")}>
-
-	              <span className="header-nav-label">
-	                {t("nav_multi_currency_account", "Mes comptes")}
-	              </span>
-	            </Link>
-	          }
+	          {/* Le lien "Mes comptes" n'apparaît pas dans la navigation temporaire mobile, seulement dans le menu burger */}
 
 	          <button
 	            type="button"
@@ -481,7 +472,7 @@ export default function Header({ fixed = true }) {
             </Link>
         }
 
-	          {showHomeWalletLink &&
+	          {showHomeWalletLinkInBurger &&
 	          <Link
 	            href="/wallet"
 	            onClick={withMobileNavDelay("/wallet")}
