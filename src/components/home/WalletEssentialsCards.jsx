@@ -11,6 +11,10 @@ export default function WalletEssentialsCards({ variant = "home" }) {
   const [modalClosing, setModalClosing] = useState(false);
   const closeTimerRef = useRef(null);
   const isCompact = variant === "compare";
+  
+  // États pour l'animation au scroll des cartes (desktop uniquement)
+  const [visibleCardIndices, setVisibleCardIndices] = useState(new Set());
+  const cardRefsMap = useRef(new Map());
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -1724,6 +1728,41 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     return lockBodyScroll();
   }, [activeActionKey]);
 
+  // Intersection Observer pour l'animation au scroll des cartes (desktop uniquement)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isCompact) return; // Seulement pour variant="home"
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = entry.target.dataset.cardIndex;
+            if (index !== undefined) {
+              setVisibleCardIndices((prev) => {
+                const newSet = new Set(prev);
+                newSet.add(parseInt(index, 10));
+                return newSet;
+              });
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: "0px 0px -100px 0px",
+      }
+    );
+
+    cardRefsMap.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isCompact]);
+
   const rootClassName = isCompact
     ? "h-full w-full flex flex-col min-h-0 gap-4"
     : "";
@@ -1764,12 +1803,26 @@ export default function WalletEssentialsCards({ variant = "home" }) {
     : [];
 
   const renderActionCard = (action, options = {}) => {
-    const { wrapperClassNameOverride = "", keySuffix = "" } = options;
+    const { wrapperClassNameOverride = "", keySuffix = "", cardIndex } = options;
     const cardLayoutClassName = baseLayoutClassName;
     const descLayoutClassName = "";
     const wrapperClassName =
       wrapperClassNameOverride || action.orderClassName || "";
     const isActive = activeActionKey === action.key;
+    
+    // Animation au scroll
+    const isCardVisible = cardIndex === undefined || visibleCardIndices.has(cardIndex);
+    const animationDelay = !isCompact && cardIndex !== undefined ? cardIndex * 100 : 0;
+    
+    // Mobile/Tablet : depuis la droite | Desktop : depuis la gauche
+    const animationClass = !isCompact && cardIndex !== undefined
+      ? `transition-all duration-700 ease-out ${
+          isCardVisible 
+            ? 'opacity-100 translate-x-0' 
+            : 'opacity-0 translate-x-full lg:-translate-x-full'
+        }`
+      : '';
+    
     const cardClasses = [
 	      action.isPlain
 	        ? "bg-transparent border-none rounded-none shadow-none"
@@ -1790,9 +1843,8 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             .join(" "),
       action.isPlain ? cardPaddingClassName : "",
       action.isPlain ? "" : cardLayoutClassName,
-      action.isPlain
-        ? ""
-        : "",
+      action.isPlain ? "" : "",
+      animationClass,
     ]
       .filter(Boolean)
       .join(" ");
@@ -1931,6 +1983,13 @@ export default function WalletEssentialsCards({ variant = "home" }) {
         <div
           key={`${action.key}${keySuffix ? `-${keySuffix}` : ""}`}
           className={wrapperClassName}
+          ref={(el) => {
+            if (cardIndex !== undefined && el) {
+              cardRefsMap.current.set(cardIndex, el);
+            }
+          }}
+          data-card-index={cardIndex}
+          style={!isCompact && cardIndex !== undefined ? { transitionDelay: `${animationDelay}ms` } : {}}
         >
           <div className={cardClasses}>{cardContent}</div>
         </div>
@@ -1941,6 +2000,13 @@ export default function WalletEssentialsCards({ variant = "home" }) {
       <div
         key={`${action.key}${keySuffix ? `-${keySuffix}` : ""}`}
         className={wrapperClassName}
+        ref={(el) => {
+          if (cardIndex !== undefined && el) {
+            cardRefsMap.current.set(cardIndex, el);
+          }
+        }}
+        data-card-index={cardIndex}
+        style={!isCompact && cardIndex !== undefined ? { transitionDelay: `${animationDelay}ms` } : {}}
       >
         <button
           type="button"
@@ -1986,23 +2052,23 @@ export default function WalletEssentialsCards({ variant = "home" }) {
             <p className="col-span-full px-5 pl-6 text-[10px] uppercase tracking-[0.22em] text-white/60">
               {t("home_v2_demo_nav_operations_label", "OPÉRATIONS")}
             </p>
-            {operationActions.map((action) =>
-              renderActionCard(action, { wrapperClassNameOverride: "order-none" })
+            {operationActions.map((action, index) =>
+              renderActionCard(action, { wrapperClassNameOverride: "order-none", cardIndex: index })
             )}
             <p className="col-span-full mt-2 px-5 pl-6 text-[10px] uppercase tracking-[0.22em] text-white/60">
               {t("home_v2_demo_nav_configuration_label", "CONFIGURATION")}
             </p>
-            {configurationActions.map((action) =>
-              renderActionCard(action, { wrapperClassNameOverride: "order-none" })
+            {configurationActions.map((action, index) =>
+              renderActionCard(action, { wrapperClassNameOverride: "order-none", cardIndex: operationActions.length + index })
             )}
           </>
         ) : (
-          listActions.map((action) => renderActionCard(action))
+          listActions.map((action, index) => renderActionCard(action, { cardIndex: index }))
         )}
         {!isCompact &&
           demoAction &&
           renderActionCard(demoAction, {
-            wrapperClassNameOverride: "lg:hidden mt-18",
+            wrapperClassNameOverride: "hidden",
             keySuffix: "mobile",
           })}
       </div>

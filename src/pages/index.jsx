@@ -42,6 +42,15 @@ export default function Home() {
   const [carouselFading, setCarouselFading] = useState(false);
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
+  
+  // États pour l'animation séquencée du hero après l'animation du header
+  const [heroAnimationStarted, setHeroAnimationStarted] = useState(false);
+  const [showHeroTitle, setShowHeroTitle] = useState(false);
+  const [showHeroSubtitle, setShowHeroSubtitle] = useState(false);
+  const [showHeroCarousel, setShowHeroCarousel] = useState(false);
+  const [showHeroBadges, setShowHeroBadges] = useState(false);
+  const [showHeroCards, setShowHeroCards] = useState(false);
+  const heroAnimationRef = useRef(false);
 
   const getModalCloseDelay = () => {
     if (typeof window === "undefined") return 400;
@@ -156,6 +165,46 @@ export default function Home() {
       valueModalCloseTimerRef.current = null;
     }
   }, [valueModalOpen]);
+
+  // Animation séquencée du hero après l'animation du header
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (heroAnimationRef.current) return;
+    
+    // Durée de l'animation du header : 8 lettres * 120ms + 1200ms (back-forward) + 300ms pause = 2460ms
+    const headerAnimationDuration = 2460;
+    
+    heroAnimationRef.current = true;
+    
+    const timer1 = setTimeout(() => {
+      setHeroAnimationStarted(true);
+      setShowHeroTitle(true);
+    }, headerAnimationDuration);
+    
+    const timer2 = setTimeout(() => {
+      setShowHeroSubtitle(true);
+    }, headerAnimationDuration + 400);
+    
+    const timer3 = setTimeout(() => {
+      setShowHeroCarousel(true);
+    }, headerAnimationDuration + 600);
+    
+    const timer4 = setTimeout(() => {
+      setShowHeroBadges(true);
+    }, headerAnimationDuration + 800);
+    
+    const timer5 = setTimeout(() => {
+      setShowHeroCards(true);
+    }, headerAnimationDuration + 1000);
+    
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+      clearTimeout(timer5);
+    };
+  }, []);
 
   // Intersection Observer pour l'animation au scroll des cartes hero
   useEffect(() => {
@@ -306,7 +355,9 @@ export default function Home() {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 md:py-28">
             <div className="mx-auto max-w-3xl text-center">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight">
+                <h1 className={`text-4xl sm:text-5xl md:text-6xl font-montserrat font-semibold text-white leading-tight tracking-tight transition-all duration-700 ${
+                  showHeroTitle ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
+                }`}>
                   {t("home_v2_hero_title", "Payez local.")}
                   <span className="block mt-1 text-[21px] sm:text-[26px] md:text-[32px] font-medium text-white/85">
                     {t("home_v2_hero_title_emphasis", "Gardez la valeur.")}
@@ -314,7 +365,9 @@ export default function Home() {
                 </h1>
 
                 {/* Texte sur desktop uniquement */}
-                <p className="mt-6 text-base sm:text-lg text-white/90 font-light leading-relaxed italic hidden md:block">
+                <p className={`mt-6 text-base sm:text-lg text-white/90 font-light leading-relaxed italic hidden md:block transition-all duration-700 delay-200 ${
+                  showHeroSubtitle ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 translate-x-16 translate-y-8'
+                }`}>
                   <span dangerouslySetInnerHTML={{
                     __html: t(
                       "home_v2_hero_subtitle",
@@ -324,7 +377,9 @@ export default function Home() {
                 </p>
 
                 {/* Carrousel des cartes sur mobile uniquement */}
-                <div className="mt-12 md:hidden">
+                <div className={`mt-12 md:hidden transition-all duration-700 delay-300 ${
+                  showHeroCarousel ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
+                }`}>
                   {(() => {
                     const heroCards = [
                       {
@@ -450,7 +505,9 @@ export default function Home() {
                   })()}
                 </div>
 
-                <div className="mt-10 hidden md:flex flex-col items-center justify-center gap-4">
+                <div className={`mt-10 hidden md:flex flex-col items-center justify-center gap-4 transition-all duration-700 delay-500 ${
+                  showHeroBadges ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 translate-x-16 translate-y-8'
+                }`}>
                   <p className="text-sm text-white/70">
                     {t(
                       "home_v2_hero_store_cta_hint",
@@ -497,7 +554,9 @@ export default function Home() {
                 </div>
 
                 {/* 4 essentials (keep light, avoid jargon) */}
-                <div className="mt-14 md:mt-16 hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className={`mt-14 md:mt-16 hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 transition-all duration-700 delay-700 ${
+                  showHeroCards ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
+                }`}>
                   {[
                   {
                   title: t("home_v2_hero_pillar_1_title", "Exécution instantanée"),
@@ -1142,54 +1201,6 @@ export default function Home() {
             valueModalRoot
           )}
       </div>
-
-      <section className="md:hidden px-6 pb-6 -mt-2 bg-[#0b0f10]">
-        <div className="flex flex-col items-center justify-center gap-4 text-center">
-          <p className="text-sm text-white/70">
-            {t(
-              "home_v2_hero_store_cta_hint",
-              "Téléchargez l'application XCANNES sur votre mobile."
-            )}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex"
-              aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
-            >
-              <Image
-                src={appStoreBadgeSrc}
-                alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
-                className="h-12 w-auto"
-                width={250}
-                height={83}
-                loading="lazy"
-                unoptimized
-              />
-            </a>
-
-            <a
-              href="#"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex"
-              aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
-            >
-              <Image
-                src={googlePlayBadgeSrc}
-                alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
-                className="h-[60px] w-auto"
-                width={646}
-                height={250}
-                loading="lazy"
-                unoptimized
-              />
-            </a>
-          </div>
-        </div>
-      </section>
 
       {/* CONTENT SECTIONS */}
       <div className="bg-[#0b0f10]">
