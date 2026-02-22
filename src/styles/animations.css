@@ -26,6 +26,23 @@
   animation: pulse-slow 3s ease-in-out infinite;
 }
 
+/* ====== CAROUSEL CARD FADE ====== */
+
+@keyframes carouselFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.carousel-card-fade {
+  animation: carouselFadeIn 0.4s ease-out;
+}
+
 /* ====== MODAL SLIDE (HOME VALUE CARD) ====== */
 
 @keyframes modalSlideDown {
