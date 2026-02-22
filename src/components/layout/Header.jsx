@@ -334,12 +334,12 @@ export default function Header({ fixed = true }) {
     
     // Desktop ET Mobile : retour à la ligne, sans pipe
     return (
-      <span className={`relative ${getContainerClass()} flex flex-col items-center gap-2 md:gap-3`}>
-        <span className="font-bold block">
+      <span className={`relative ${getContainerClass()} flex flex-col items-center gap-2 md:gap-4 w-full`}>
+        <span className="font-bold block w-full text-center">
           {renderText(xcannesToShow, '')}
         </span>
         {showSubtitle && (
-          <span className="font-thin italic text-white/90 block text-3xl md:text-5xl">
+          <span className="font-thin italic text-white/90 block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl w-full text-center">
             {subtitle}
           </span>
         )}
@@ -365,15 +365,15 @@ export default function Header({ fixed = true }) {
 
   return (
     <header
-      className={`w-full ${isHeroMode ? 'h-96 md:h-[28rem]' : 'h-16 md:h-20'} ${
+      className={`w-full ${isHeroMode ? 'h-screen' : 'h-16 md:h-20'} ${
       fixed ? "fixed top-0 left-0 z-50" : "relative z-20"} px-6 flex items-center ${isHeroMode ? 'justify-center' : 'justify-between'} font-montserrat transition-all duration-500 border-b ${
       headerBgClass} text-white ${isHeroMode ? 'header-with-shadow' : ''}`}
       style={isHeroMode ? { boxShadow: '0 8px 32px rgba(255, 255, 255, 0.15), 0 4px 16px rgba(255, 255, 255, 0.1)' } : {}}>
 
       {isHeroMode ? (
         // Mode Hero : titre centré avec animation lettre par lettre + effet high-tech
-        <div className="flex flex-col items-center justify-center" style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}>
-          <h1 className="text-5xl md:text-9xl font-orbitron tracking-tight text-white" style={{ textShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(59, 130, 246, 0.2)' }}>
+        <div className="flex flex-col items-center justify-center w-full px-4" style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}>
+          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[12rem] font-orbitron tracking-tight text-white text-center leading-tight" style={{ textShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(59, 130, 246, 0.2)' }}>
             <AnimatedTitle text="XCANNES | Compte multi-devises" delay={120} isMobile={isMobileView} />
           </h1>
         </div>
@@ -455,7 +455,7 @@ export default function Header({ fixed = true }) {
       </div>
 
       <div
-        className={`fixed ${isHeroMode ? 'top-96' : 'top-16'} left-0 right-0 bottom-0 md:hidden bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed ${isHeroMode ? 'top-full' : 'top-16'} left-0 right-0 bottom-0 md:hidden bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setMenuOpen(false)}
@@ -463,7 +463,7 @@ export default function Header({ fixed = true }) {
       />
 
       <div
-        className={`absolute ${isHeroMode ? 'top-96' : 'top-16'} left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out z-50 ${
+        className={`absolute ${isHeroMode ? 'top-full' : 'top-16'} left-0 w-full bg-black/95 backdrop-blur-md text-white flex flex-col items-center gap-6 md:hidden border-b border-white/10 overflow-hidden transition-all duration-500 ease-out z-50 ${
           menuOpen
             ? "opacity-100 translate-y-0 pointer-events-auto max-h-[420px] py-8"
             : "opacity-0 -translate-y-2 pointer-events-none max-h-0 py-0"
