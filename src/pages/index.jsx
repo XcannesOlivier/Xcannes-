@@ -40,7 +40,9 @@ export default function Home() {
   const cardRefs = useRef([]);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [carouselFading, setCarouselFading] = useState(false);
+  const [carouselProgress, setCarouselProgress] = useState(0); // Progression de 0 à 100 pour la barre mobile
   const [desktopCarouselIndex, setDesktopCarouselIndex] = useState(0); // Carrousel desktop pour carte 4 et 5
+  const [desktopCarouselProgress, setDesktopCarouselProgress] = useState(0); // Progression de 0 à 100 pour la barre desktop
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   
@@ -172,8 +174,8 @@ export default function Home() {
     if (typeof window === "undefined") return;
     if (heroAnimationRef.current) return;
     
-    // Durée de l'animation du header : 8 lettres * 120ms + 1200ms (back-forward) + 300ms pause = 2460ms
-    const headerAnimationDuration = 2460;
+    // Durée de l'animation du header : 8 lettres * 120ms + 800ms (back-forward) + 600ms pause = 2360ms
+    const headerAnimationDuration = 2360;
     
     heroAnimationRef.current = true;
     
@@ -184,19 +186,19 @@ export default function Home() {
     
     const timer2 = setTimeout(() => {
       setShowHeroSubtitle(true);
-    }, headerAnimationDuration + 400);
+    }, headerAnimationDuration + 200);
     
     const timer3 = setTimeout(() => {
       setShowHeroCarousel(true);
-    }, headerAnimationDuration + 600);
+    }, headerAnimationDuration + 300);
     
     const timer4 = setTimeout(() => {
       setShowHeroBadges(true);
-    }, headerAnimationDuration + 800);
+    }, headerAnimationDuration + 400);
     
     const timer5 = setTimeout(() => {
       setShowHeroCards(true);
-    }, headerAnimationDuration + 1000);
+    }, headerAnimationDuration + 500);
     
     return () => {
       clearTimeout(timer1);
@@ -282,6 +284,56 @@ export default function Home() {
     }, 5000); // Change toutes les 5 secondes
     return () => clearInterval(interval);
   }, [isMobile]);
+
+  // Animation de la barre de progression du carrousel mobile
+  useEffect(() => {
+    if (!isMobile) return;
+    
+    // Reset la progression à 0 quand l'index change
+    setCarouselProgress(0);
+    
+    // Anime la progression de 0 à 100 sur 5 secondes
+    const startTime = Date.now();
+    const duration = 5000; // 5 secondes
+    
+    const animateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / duration) * 100, 100);
+      setCarouselProgress(progress);
+      
+      if (progress < 100) {
+        requestAnimationFrame(animateProgress);
+      }
+    };
+    
+    const animationFrame = requestAnimationFrame(animateProgress);
+    
+    return () => cancelAnimationFrame(animationFrame);
+  }, [currentCarouselIndex, isMobile]);
+
+  // Animation de la barre de progression du carrousel desktop
+  useEffect(() => {
+    // Reset la progression à 0 quand l'index change
+    setDesktopCarouselProgress(0);
+    
+    // Anime la progression de 0 à 100 sur 5 secondes
+    const startTime = Date.now();
+    const duration = 5000; // 5 secondes
+    
+    const animateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min((elapsed / duration) * 100, 100);
+      setDesktopCarouselProgress(progress);
+      
+      if (progress < 100) {
+        requestAnimationFrame(animateProgress);
+      }
+    };
+    
+    const animationFrame = requestAnimationFrame(animateProgress);
+    
+    return () => cancelAnimationFrame(animationFrame);
+  }, [desktopCarouselIndex]);
 
   const openSecurityModal = () => {
     setSecurityModalClosing(false);
@@ -497,20 +549,31 @@ export default function Home() {
                           </div>
                         </div>
 
-                        {/* Indicateurs de pagination */}
-                        <div className="flex justify-center gap-2 mt-4">
-                          {heroCards.map((_, index) => (
-                            <button
-                              key={index}
-                              onClick={() => setCurrentCarouselIndex(index)}
-                              className={`h-1.5 rounded-full transition-all duration-300 ${
-                                index === currentCarouselIndex
-                                  ? 'w-8 bg-white/30'
-                                  : 'w-1.5 bg-white/30 hover:bg-white/50'
-                              }`}
-                              aria-label={`Aller à la carte ${index + 1}`}
+                        {/* Barre de progression */}
+                        <div className="mt-4 w-full px-2">
+                          {/* Indicateurs de pagination (points cliquables) */}
+                          <div className="flex justify-center gap-2 mb-2">
+                            {heroCards.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setCurrentCarouselIndex(index)}
+                                className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
+                                  index === currentCarouselIndex
+                                    ? 'bg-white/50 scale-125'
+                                    : 'bg-white/20 hover:bg-white/40'
+                                }`}
+                                aria-label={`Aller à la carte ${index + 1}`}
+                              />
+                            ))}
+                          </div>
+                          
+                          {/* Barre de progression animée */}
+                          <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-white/40 to-white/60 rounded-full transition-all duration-100 ease-linear"
+                              style={{ width: `${carouselProgress}%` }}
                             />
-                          ))}
+                          </div>
                         </div>
                       </div>
                     );
@@ -799,20 +862,31 @@ export default function Home() {
                     );
                   })}
                   
-                  {/* Indicateurs de pagination */}
-                  <div className="absolute bottom-2 right-4 flex gap-2">
-                    {carouselCards.map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setDesktopCarouselIndex(idx)}
-                        className={`h-1.5 rounded-full transition-all duration-300 ${
-                          idx === desktopCarouselIndex
-                            ? 'w-8 bg-black/30'
-                            : 'w-1.5 bg-black/15 hover:bg-black/25'
-                        }`}
-                        aria-label={`Aller à la carte ${idx + 1}`}
+                  {/* Indicateurs de pagination et barre de progression */}
+                  <div className="absolute bottom-2 right-4 left-4 flex flex-col gap-1.5">
+                    {/* Points de pagination */}
+                    <div className="flex justify-end gap-2">
+                      {carouselCards.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setDesktopCarouselIndex(idx)}
+                          className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
+                            idx === desktopCarouselIndex
+                              ? 'bg-black/50 scale-125'
+                              : 'bg-black/15 hover:bg-black/30'
+                          }`}
+                          aria-label={`Aller à la carte ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                    
+                    {/* Barre de progression */}
+                    <div className="w-full h-1 bg-black/10 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-black/30 to-black/50 rounded-full transition-all duration-100 ease-linear"
+                        style={{ width: `${desktopCarouselProgress}%` }}
                       />
-                    ))}
+                    </div>
                   </div>
                 </div>
               </>
