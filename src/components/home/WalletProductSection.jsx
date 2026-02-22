@@ -11,7 +11,7 @@ export default function WalletProductSection() {
     "https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png";
 
   return (
-    <section id="demo" className="relative py-24 px-4 sm:px-6 overflow-hidden">
+    <section id="demo" className="relative py-24 pt-16 md:pt-24 px-4 sm:px-6 overflow-hidden">
       <div className="relative max-w-7xl mx-auto">
         <div className="text-center">
           <h2 className="text-3xl sm:text-4xl font-montserrat font-semibold mb-3 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
