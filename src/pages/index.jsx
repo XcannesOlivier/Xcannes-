@@ -38,6 +38,8 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [visibleCards, setVisibleCards] = useState(new Set());
   const cardRefs = useRef([]);
+  const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
+  const [carouselFading, setCarouselFading] = useState(false);
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
 
@@ -185,6 +187,25 @@ export default function Home() {
     };
   }, []);
 
+  // Auto-avancement du carrousel toutes les 4 secondes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentCarouselIndex((prev) => (prev === 3 ? 0 : prev + 1));
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Effet de fondu lors du changement de carte
+  useEffect(() => {
+    setCarouselFading(true);
+    const timer = setTimeout(() => {
+      setCarouselFading(false);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [currentCarouselIndex]);
+
   const openValueModal = () => {
     setValueModalClosing(false);
     setValueModalOpen(true);
@@ -202,6 +223,15 @@ export default function Home() {
       valueModalCloseTimerRef.current = null;
     }, getModalCloseDelay());
   };
+
+  // Auto-rotation du carrousel mobile
+  useEffect(() => {
+    if (!isMobile) return;
+    const interval = setInterval(() => {
+      setCurrentCarouselIndex((prev) => (prev === 3 ? 0 : prev + 1));
+    }, 5000); // Change toutes les 5 secondes
+    return () => clearInterval(interval);
+  }, [isMobile]);
 
   const openSecurityModal = () => {
     setSecurityModalClosing(false);
@@ -283,7 +313,8 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="mt-6 text-base sm:text-lg text-white/90 font-light leading-relaxed italic">
+                {/* Texte sur desktop uniquement */}
+                <p className="mt-6 text-base sm:text-lg text-white/90 font-light leading-relaxed italic hidden md:block">
                   <span dangerouslySetInnerHTML={{
                     __html: t(
                       "home_v2_hero_subtitle",
@@ -292,19 +323,129 @@ export default function Home() {
                   }} />
                 </p>
 
-                <div className="mt-10 flex justify-center items-center md:hidden">
-                  <Link
-                    href="/wallet"
-                    className={bankButtonClassName({
-                      tone: "neutral",
-                      variant: "solid",
-                      size: "lg",
-                      className:
-                        "w-full max-w-[360px] bg-gradient-to-b from-neutral-500 to-neutral-950 hover:from-neutral-400 hover:to-neutral-900 text-white border-white/55 hover:border-white/70 focus:ring-white/30 shadow-[0_18px_44px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.35)] hover:shadow-[0_22px_58px_rgba(0,0,0,0.72),inset_0_1px_0_rgba(255,255,255,0.14)] font-semibold tracking-wide",
-                    })}
-                  >
-                    {t("nav_sign_in", "Se connecter")}
-                  </Link>
+                {/* Carrousel des cartes sur mobile uniquement */}
+                <div className="mt-12 md:hidden">
+                  {(() => {
+                    const heroCards = [
+                      {
+                        title: t("home_v2_hero_pillar_1_title", "Exécution instantanée"),
+                        stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
+                        subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
+                        icon: (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                            <path d="M10 13l2 2 7-7" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M12 22A10 10 0 1 0 2 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ),
+                      },
+                      {
+                        title: t("home_v2_hero_pillar_2_title", "Contrôle des transactions"),
+                        desc: t("home_v2_hero_pillar_2_desc", "Validation sécurisée sous votre autorité."),
+                        icon: (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                            <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ),
+                      },
+                      {
+                        title: t("home_v2_hero_pillar_3_title", "Transparence des frais"),
+                        desc: t("home_v2_hero_pillar_3_desc", "Frais affichés avant chaque confirmation."),
+                        icon: (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                            <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ),
+                      },
+                      {
+                        title: t("home_v2_hero_pillar_4_title", "Stabilité réglementée"),
+                        desc: t("home_v2_hero_pillar_4_desc", "Indexation USD conforme aux standards financiers.\nConversion multi-devises instantanée."),
+                        icon: (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                            <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ),
+                      },
+                    ];
+
+                    const currentCard = heroCards[currentCarouselIndex];
+
+                    const handleTouchStart = (e) => {
+                      const touchStartX = e.touches[0].clientX;
+                      e.currentTarget.setAttribute('data-touch-start', touchStartX);
+                    };
+
+                    const handleTouchEnd = (e) => {
+                      const touchStartX = parseFloat(e.currentTarget.getAttribute('data-touch-start') || '0');
+                      const touchEndX = e.changedTouches[0].clientX;
+                      const diff = touchStartX - touchEndX;
+
+                      if (Math.abs(diff) > 50) { // Minimum swipe distance
+                        if (diff > 0) {
+                          // Swipe left - next
+                          setCurrentCarouselIndex((prev) => (prev === heroCards.length - 1 ? 0 : prev + 1));
+                        } else {
+                          // Swipe right - previous
+                          setCurrentCarouselIndex((prev) => (prev === 0 ? heroCards.length - 1 : prev - 1));
+                        }
+                      }
+                    };
+
+                    return (
+                      <div className="relative">
+                        {/* Carte du carrousel */}
+                        <div 
+                          className={`bg-black/30 rounded-lg px-5 py-6 min-h-[160px] flex items-start gap-3 touch-pan-y transition-all duration-500 ease-in-out ${
+                            carouselFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                          }`}
+                          onTouchStart={handleTouchStart}
+                          onTouchEnd={handleTouchEnd}
+                        >
+                          <div className="flex items-center justify-center w-10 h-10 shrink-0 mt-0.5">
+                            {currentCard.icon}
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="text-[19px] font-semibold text-white/90 mb-1">
+                              {currentCard.title}
+                            </div>
+                            {currentCard.subtitle && (
+                              <div className="text-[15px] text-white/75 italic leading-relaxed">
+                                {currentCard.subtitle}
+                              </div>
+                            )}
+                            {currentCard.stat && (
+                              <div className="mt-3 text-center">
+                                <div className="text-3xl font-semibold text-white/90 leading-tight">
+                                  {currentCard.stat}
+                                </div>
+                              </div>
+                            )}
+                            {currentCard.desc && (
+                              <div className="text-[15px] text-white/75 leading-relaxed italic whitespace-pre-line mt-1">
+                                {currentCard.desc}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Indicateurs de pagination */}
+                        <div className="flex justify-center gap-2 mt-4">
+                          {heroCards.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentCarouselIndex(index)}
+                              className={`h-1.5 rounded-full transition-all duration-300 ${
+                                index === currentCarouselIndex
+                                  ? 'w-8 bg-white/30'
+                                  : 'w-1.5 bg-white/30 hover:bg-white/50'
+                              }`}
+                              aria-label={`Aller à la carte ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 <div className="mt-10 hidden md:flex flex-col items-center justify-center gap-4">
@@ -354,7 +495,7 @@ export default function Home() {
                 </div>
 
                 {/* 4 essentials (keep light, avoid jargon) */}
-                <div className="mt-14 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="mt-14 md:mt-16 hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
                   {
                   title: t("home_v2_hero_pillar_1_title", "Exécution instantanée"),
