@@ -226,10 +226,10 @@ export default function Header({ fixed = true }) {
     // Ajoute la classe au body pour ajuster le padding du contenu
     document.body.classList.add('header-hero-mode');
     
-    // Titre complet : "XCANNES" (8 lettres) + " | " + "Compte multi-devises" (21 caractères) = 32 caractères
-    // Durée : ~60ms par caractère pour l'apparition + 1200ms pour arrière-avant
-    const titleLength = "XCANNES | Compte multi-devises".length;
-    const charDelay = 60; // ms par caractère pour l'apparition (accéléré pour effet high-tech)
+    // Titre complet : "XCANNES" (8 lettres seulement pour l'animation)
+    // Durée : ~120ms par caractère pour l'apparition + 1200ms pour arrière-avant
+    const titleLength = "XCANNES".length;
+    const charDelay = 120; // ms par caractère pour l'apparition (ralenti pour plus d'effet)
     const backForwardDuration = 1200; // 500ms arrière + 700ms avant (plus long et visible)
     const totalAnimationDuration = titleLength * charDelay + backForwardDuration + 300; // +300ms de pause
     
@@ -274,16 +274,20 @@ export default function Header({ fixed = true }) {
   // Composant pour l'animation lettre par lettre
   const AnimatedTitle = ({ text, delay = 50, isMobile = false }) => {
     const [displayedText, setDisplayedText] = useState("");
+    const [showSubtitle, setShowSubtitle] = useState(false);
     const [finalAnimation, setFinalAnimation] = useState(''); // '', 'back', 'forward'
     
     useEffect(() => {
+      const xcannesText = "XCANNES";
       let currentIndex = 0;
       const interval = setInterval(() => {
-        if (currentIndex <= text.length) {
-          setDisplayedText(text.slice(0, currentIndex));
+        if (currentIndex <= xcannesText.length) {
+          setDisplayedText(xcannesText.slice(0, currentIndex));
           currentIndex++;
         } else {
           clearInterval(interval);
+          // Affiche immédiatement le sous-titre après XCANNES
+          setShowSubtitle(true);
           // Après l'apparition complète, animation arrière-avant
           setTimeout(() => {
             setFinalAnimation('back');
@@ -297,12 +301,10 @@ export default function Header({ fixed = true }) {
       return () => clearInterval(interval);
     }, [text, delay]);
     
-    // Sépare "XCANNES" (bold) de " | " (light, opacité 40%) et "Compte multi-devises" (light italic, opacité 60%)
-    const xcannesToShow = displayedText.slice(0, 8); // "XCANNES"
-    const pipeToShow = displayedText.slice(8, 11); // " | "
-    const restToShow = displayedText.slice(11); // "Compte multi-devises"
-    // Pour mobile : on récupère "Compte multi-devises" sans le pipe, mais avec l'espace avant
-    const mobileRestToShow = displayedText.slice(9).trim(); // Après "XCANNES ", en retirant l'espace au début et le pipe
+    // "XCANNES" avec animation
+    const xcannesToShow = displayedText;
+    // "Compte multi-devises" apparaît directement
+    const subtitle = "Compte multi-devises";
     
     const renderText = (textPart, className) => {
       return textPart.split('').map((char, idx) => {
@@ -330,32 +332,17 @@ export default function Header({ fixed = true }) {
       return '';
     };
     
-    // Sur mobile : retour à la ligne, sans pipe
-    if (isMobile) {
-      return (
-        <span className={`relative ${getContainerClass()} flex flex-col items-center gap-2`}>
-          <span className="font-bold block">
-            {renderText(xcannesToShow, '')}
-          </span>
-          <span className="font-thin italic text-white/90 block text-2xl">
-            {renderText(mobileRestToShow, '')}
-          </span>
-        </span>
-      );
-    }
-    
-    // Sur desktop : une seule ligne avec pipe
+    // Desktop ET Mobile : retour à la ligne, sans pipe
     return (
-      <span className={`relative ${getContainerClass()} inline-block`}>
-        <span className="font-bold inline-block">
+      <span className={`relative ${getContainerClass()} flex flex-col items-center gap-2 md:gap-3`}>
+        <span className="font-bold block">
           {renderText(xcannesToShow, '')}
         </span>
-        <span className="font-thin text-white/90 inline-block mx-2">
-          {renderText(pipeToShow, '')}
-        </span>
-        <span className="font-thin italic text-white/90 inline-block">
-          {renderText(restToShow, '')}
-        </span>
+        {showSubtitle && (
+          <span className="font-thin italic text-white/90 block text-3xl md:text-5xl">
+            {subtitle}
+          </span>
+        )}
       </span>
     );
   };
@@ -378,7 +365,7 @@ export default function Header({ fixed = true }) {
 
   return (
     <header
-      className={`w-full ${isHeroMode ? 'h-96 md:h-96' : 'h-16 md:h-20'} ${
+      className={`w-full ${isHeroMode ? 'h-96 md:h-[28rem]' : 'h-16 md:h-20'} ${
       fixed ? "fixed top-0 left-0 z-50" : "relative z-20"} px-6 flex items-center ${isHeroMode ? 'justify-center' : 'justify-between'} font-montserrat transition-all duration-500 border-b ${
       headerBgClass} text-white ${isHeroMode ? 'header-with-shadow' : ''}`}
       style={isHeroMode ? { boxShadow: '0 8px 32px rgba(255, 255, 255, 0.15), 0 4px 16px rgba(255, 255, 255, 0.1)' } : {}}>
@@ -386,8 +373,8 @@ export default function Header({ fixed = true }) {
       {isHeroMode ? (
         // Mode Hero : titre centré avec animation lettre par lettre + effet high-tech
         <div className="flex flex-col items-center justify-center" style={{ perspective: '2000px', perspectiveOrigin: 'center center' }}>
-          <h1 className="text-4xl md:text-8xl font-orbitron tracking-tight text-white" style={{ textShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(59, 130, 246, 0.2)' }}>
-            <AnimatedTitle text="XCANNES | Compte multi-devises" delay={60} isMobile={isMobileView} />
+          <h1 className="text-5xl md:text-9xl font-orbitron tracking-tight text-white" style={{ textShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(59, 130, 246, 0.2)' }}>
+            <AnimatedTitle text="XCANNES | Compte multi-devises" delay={120} isMobile={isMobileView} />
           </h1>
         </div>
       ) : (
