@@ -332,7 +332,7 @@ export default function Home() {
                         stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
                         subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
                         icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                             <path d="M10 13l2 2 7-7" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M12 22A10 10 0 1 0 2 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
@@ -342,7 +342,7 @@ export default function Home() {
                         title: t("home_v2_hero_pillar_2_title", "Contrôle des transactions"),
                         desc: t("home_v2_hero_pillar_2_desc", "Validation sécurisée sous votre autorité."),
                         icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                             <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ),
@@ -351,7 +351,7 @@ export default function Home() {
                         title: t("home_v2_hero_pillar_3_title", "Transparence des frais"),
                         desc: t("home_v2_hero_pillar_3_desc", "Frais affichés avant chaque confirmation."),
                         icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                             <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                             <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
@@ -361,7 +361,7 @@ export default function Home() {
                         title: t("home_v2_hero_pillar_4_title", "Stabilité réglementée"),
                         desc: t("home_v2_hero_pillar_4_desc", "Indexation USD conforme aux standards financiers.\nConversion multi-devises instantanée."),
                         icon: (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                             <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ),
@@ -395,7 +395,7 @@ export default function Home() {
                       <div className="relative">
                         {/* Carte du carrousel */}
                         <div 
-                          className={`bg-black/30 rounded-lg px-5 py-6 min-h-[160px] flex items-start gap-3 touch-pan-y transition-all duration-500 ease-in-out ${
+                          className={`bg-white/90 rounded-lg px-5 py-6 min-h-[160px] flex items-start gap-3 touch-pan-y transition-all duration-500 ease-in-out ${
                             carouselFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
                           }`}
                           onTouchStart={handleTouchStart}
@@ -405,24 +405,26 @@ export default function Home() {
                             {currentCard.icon}
                           </div>
                           <div className="flex-1 text-left">
-                            <div className="text-[19px] font-semibold text-white/90 mb-1">
+                            <div className="text-[19px] font-semibold text-black/90 mb-1">
                               {currentCard.title}
                             </div>
                             {currentCard.subtitle && (
-                              <div className="text-[15px] text-white/75 italic leading-relaxed">
+                              <div className="text-[15px] text-black/70 italic leading-relaxed">
                                 {currentCard.subtitle}
                               </div>
                             )}
                             {currentCard.stat && (
                               <div className="mt-3 text-center">
-                                <div className="text-3xl font-semibold text-white/90 leading-tight">
+                                <div className="text-3xl font-semibold text-black/90 leading-tight">
                                   {currentCard.stat}
                                 </div>
                               </div>
                             )}
                             {currentCard.desc && (
-                              <div className="text-[15px] text-white/75 leading-relaxed italic whitespace-pre-line mt-1">
-                                {currentCard.desc}
+                              <div className="text-[15px] text-black/70 leading-relaxed italic mt-1">
+                                {currentCard.title === t("home_v2_hero_pillar_4_title", "Stabilité réglementée")
+                                  ? currentCard.desc.split('\n')[0]
+                                  : currentCard.desc}
                               </div>
                             )}
                           </div>
@@ -507,7 +509,7 @@ export default function Home() {
                     onClick: () => openSpeedModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                         <path d="M10 13l2 2 7-7" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M12 22A10 10 0 1 0 2 12" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
@@ -525,7 +527,7 @@ export default function Home() {
                     onClick: () => openSecurityModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                         <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 0 0 8 11a4 4 0 1 1 8 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0 0 15.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 0 0 8 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
@@ -542,7 +544,7 @@ export default function Home() {
                     onClick: () => openFeesModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                         <path d="M7 7h11l-2-2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M17 17H6l2 2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
@@ -556,14 +558,14 @@ export default function Home() {
                   ),
 	                  descClassName: "text-[16px] sm:text-[13px]",
 	                  className:
-	                    "order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 bg-black/30 hover:bg-black/20 py-5 md:py-4 shadow-none hover:shadow-none",
+	                    "order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 bg-white/90 hover:bg-white/80 py-5 md:py-4 shadow-none hover:shadow-none",
 	                  iconWrapperClassName: "w-8 h-8 lg:w-11 lg:h-11",
 	                  link: {
 	                    label: t("home_v2_hero_pillar_4_link", "Détails"),
 	                    onClick: () => openValueModal(),
                   },
                   icon:
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white/65">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
                         <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
@@ -588,9 +590,9 @@ export default function Home() {
                           : undefined
                         }
 		                      className={[
-		                        "flex items-start gap-2.5 bg-black/20 hover:bg-black/10 rounded-md px-4 py-7 md:py-4 transition-[background-color] duration-200",
+		                        "flex items-start gap-2.5 bg-white/90 hover:bg-white/80 rounded-md px-4 py-7 md:py-4 transition-[background-color] duration-200",
 		                        isClickable
-		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/30"
+		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
 		                          : "",
 		                        item.className,
 		                        // Animation au scroll sur mobile
@@ -614,17 +616,17 @@ export default function Home() {
                     </div>
                     <div className="min-w-0 text-left flex-1 h-full flex flex-col">
                     <div className="flex w-full items-baseline justify-between gap-3">
-                      <div className="text-[18px] sm:text-[17px] font-semibold text-white/90">{item.title}</div>
+                      <div className="text-[18px] sm:text-[17px] font-semibold text-black/90">{item.title}</div>
                       {item.link ? null : null}
                     </div>
                     {item.subtitle ? (
-                      <div className="mt-0.5 text-[17.5px] sm:text-[14.5px] text-white/75 italic">
+                      <div className="mt-0.5 text-[17.5px] sm:text-[14.5px] text-black/75 italic">
                         {item.subtitle}
                       </div>
                     ) : null}
                     {item.stat ? (
                       <div className="mt-2 text-center">
-                        <div className="text-3xl font-semibold text-white/90 leading-tight">
+                        <div className="text-3xl font-semibold text-black/90 leading-tight">
                           {item.stat}
                         </div>
                       </div>
@@ -632,7 +634,7 @@ export default function Home() {
                     {item.desc ? (
                       <div
                         className={[
-                          "text-[17.5px] sm:text-[14.5px] text-white/75 leading-relaxed italic whitespace-pre-line",
+                          "text-[17.5px] sm:text-[14.5px] text-black/75 leading-relaxed italic whitespace-pre-line",
                           item.stat ? "mt-1 text-center" : "",
                           item.descClassName
                         ].filter(Boolean).join(" ")}
@@ -647,7 +649,7 @@ export default function Home() {
                           event.stopPropagation();
                           item.link.onClick();
                         }}
-                        className="inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-xcannes-green/80 transition-colors shrink-0 mt-auto self-end pt-3"
+                        className="inline-flex items-center gap-1 text-[11px] text-black/70 hover:text-xcannes-green/80 transition-colors shrink-0 mt-auto self-end pt-3"
                       >
                         {item.link.label}
                       </button>
