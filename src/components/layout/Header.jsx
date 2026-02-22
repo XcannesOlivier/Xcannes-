@@ -346,7 +346,7 @@ export default function Header({ fixed = true }) {
     
     // Sur desktop : une seule ligne avec pipe
     return (
-      <span className={`relative ${getContainerClass()}`}>
+      <span className={`relative ${getContainerClass()} inline-block`}>
         <span className="font-bold inline-block">
           {renderText(xcannesToShow, '')}
         </span>
@@ -380,7 +380,8 @@ export default function Header({ fixed = true }) {
     <header
       className={`w-full ${isHeroMode ? 'h-96 md:h-96' : 'h-16 md:h-20'} ${
       fixed ? "fixed top-0 left-0 z-50" : "relative z-20"} px-6 flex items-center ${isHeroMode ? 'justify-center' : 'justify-between'} font-montserrat transition-all duration-500 border-b ${
-      headerBgClass} text-white`}>
+      headerBgClass} text-white ${isHeroMode ? 'header-with-shadow' : ''}`}
+      style={isHeroMode ? { boxShadow: '0 8px 32px rgba(255, 255, 255, 0.15), 0 4px 16px rgba(255, 255, 255, 0.1)' } : {}}>
 
       {isHeroMode ? (
         // Mode Hero : titre centré avec animation lettre par lettre + effet high-tech
