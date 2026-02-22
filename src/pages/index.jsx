@@ -40,6 +40,7 @@ export default function Home() {
   const cardRefs = useRef([]);
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState(0);
   const [carouselFading, setCarouselFading] = useState(false);
+  const [desktopCarouselIndex, setDesktopCarouselIndex] = useState(0); // Carrousel desktop pour carte 4 et 5
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   
@@ -236,11 +237,11 @@ export default function Home() {
     };
   }, []);
 
-  // Auto-avancement du carrousel toutes les 4 secondes
+  // Auto-avancement du carrousel desktop (cartes 4 et 5) toutes les 5 secondes
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentCarouselIndex((prev) => (prev === 3 ? 0 : prev + 1));
-    }, 4000);
+      setDesktopCarouselIndex((prev) => (prev === 1 ? 0 : 1)); // 2 cartes (0-1)
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -277,7 +278,7 @@ export default function Home() {
   useEffect(() => {
     if (!isMobile) return;
     const interval = setInterval(() => {
-      setCurrentCarouselIndex((prev) => (prev === 3 ? 0 : prev + 1));
+      setCurrentCarouselIndex((prev) => (prev === 4 ? 0 : prev + 1)); // 5 cartes (0-4)
     }, 5000); // Change toutes les 5 secondes
     return () => clearInterval(interval);
   }, [isMobile]);
@@ -421,6 +422,17 @@ export default function Home() {
                           </svg>
                         ),
                       },
+                      {
+                        title: t("home_v2_hero_pillar_5_title", "Pour qui ?"),
+                        desc: t("home_v2_hero_pillar_5_desc", "Particuliers et entreprises recherchant stabilité et contrôle."),
+                        icon: (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                            <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        ),
+                      },
                     ];
 
                     const currentCard = heroCards[currentCarouselIndex];
@@ -553,11 +565,12 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 4 essentials (keep light, avoid jargon) */}
+                {/* 3 premières cartes + carrousel pour les 2 dernières */}
                 <div className={`mt-14 md:mt-16 hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 transition-all duration-700 delay-700 ${
                   showHeroCards ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
                 }`}>
-                  {[
+                  {(() => {
+                    const allCards = [
                   {
                   title: t("home_v2_hero_pillar_1_title", "Exécution instantanée"),
                   stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
@@ -616,9 +629,6 @@ export default function Home() {
                     "Indexation USD conforme aux standards financiers.\nConversion multi-devises instantanée."
                   ),
 	                  descClassName: "text-[16px] sm:text-[13px]",
-	                  className:
-	                    "order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 bg-white/90 hover:bg-white/80 py-5 md:py-4 shadow-none hover:shadow-none",
-	                  iconWrapperClassName: "w-8 h-8 lg:w-11 lg:h-11",
 	                  link: {
 	                    label: t("home_v2_hero_pillar_4_link", "Détails"),
 	                    onClick: () => openValueModal(),
@@ -628,9 +638,32 @@ export default function Home() {
                         <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
 
-                }].map((item, index) => {
-                  const isClickable = Boolean(item.link?.onClick);
-                  const isVisible = visibleCards.has(index);
+                },
+                {
+                  title: t("home_v2_hero_pillar_5_title", "Pour qui ?"),
+                  desc: t(
+                    "home_v2_hero_pillar_5_desc",
+                    "Particuliers et entreprises recherchant stabilité et contrôle."
+                  ),
+	                  descClassName: "text-[16px] sm:text-[13px]",
+                  icon:
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-black/65">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+
+                }];
+                    
+                    const firstThreeCards = allCards.slice(0, 3);
+                    const carouselCards = allCards.slice(3, 5);
+                    
+                    return (
+                      <>
+                        {/* 3 premières cartes */}
+                        {firstThreeCards.map((item, index) => {
+                          const isClickable = Boolean(item.link?.onClick);
+                          const isVisible = visibleCards.has(index);
                   return (
                     <div
                       key={item.title}
@@ -676,7 +709,6 @@ export default function Home() {
                     <div className="min-w-0 text-left flex-1 h-full flex flex-col">
                     <div className="flex w-full items-baseline justify-between gap-3">
                       <div className="text-[18px] sm:text-[17px] font-semibold text-black/90">{item.title}</div>
-                      {item.link ? null : null}
                     </div>
                     {item.subtitle ? (
                       <div className="mt-0.5 text-[17.5px] sm:text-[14.5px] text-black/75 italic">
@@ -717,10 +749,79 @@ export default function Home() {
                   </div>
                 );
               })}
-              </div>
-            </div>
-          </div>
-        </main>
+                
+                {/* Carrousel pour les cartes 4 et 5 */}
+                <div className="order-first sm:order-none lg:order-first lg:col-span-3 mb-5 sm:mb-0 lg:mb-6 relative">
+                  {carouselCards.map((card, idx) => {
+                    const cardIndex = idx + 3;
+                    const isCardClickable = Boolean(card.link?.onClick);
+                    return (
+                    <div
+                      key={card.title}
+                      className={`transition-all duration-500 ease-in-out ${
+                        idx === desktopCarouselIndex
+                          ? 'opacity-100 relative'
+                          : 'opacity-0 absolute inset-0 pointer-events-none'
+                      }`}
+                    >
+                      <div
+                        ref={(el) => (cardRefs.current[cardIndex] = el)}
+                        role={isCardClickable ? "button" : undefined}
+                        tabIndex={isCardClickable ? 0 : undefined}
+                        onClick={isCardClickable ? card.link.onClick : undefined}
+                        onKeyDown={
+                          isCardClickable
+                            ? (event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  event.preventDefault();
+                                  card.link.onClick();
+                                }
+                              }
+                            : undefined
+                          }
+                        className="flex items-start gap-2.5 bg-white/90 hover:bg-white/80 rounded-md px-4 py-5 md:py-4 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
+                      >
+                        <div className="mt-0.5 flex items-center justify-center w-8 h-8 lg:w-11 lg:h-11 shrink-0">
+                          {card.icon}
+                        </div>
+                        <div className="min-w-0 text-left flex-1 h-full flex flex-col">
+                          <div className="flex w-full items-baseline justify-between gap-3">
+                            <div className="text-[18px] sm:text-[17px] font-semibold text-black/90">{card.title}</div>
+                          </div>
+                          {card.desc ? (
+                            <div className={["text-[17.5px] sm:text-[14.5px] text-black/75 leading-relaxed italic whitespace-pre-line", card.descClassName].filter(Boolean).join(" ")}>
+                              {card.desc}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                    );
+                  })}
+                  
+                  {/* Indicateurs de pagination */}
+                  <div className="absolute bottom-2 right-4 flex gap-2">
+                    {carouselCards.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setDesktopCarouselIndex(idx)}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          idx === desktopCarouselIndex
+                            ? 'w-8 bg-black/30'
+                            : 'w-1.5 bg-black/15 hover:bg-black/25'
+                        }`}
+                        aria-label={`Aller à la carte ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      </div>
+    </div>
+  </main>
         {speedModalRoot &&
           (speedModalOpen || speedModalClosing) &&
           createPortal(
