@@ -289,50 +289,60 @@ export default function Home() {
   useEffect(() => {
     if (!isMobile) return;
     
-    // Reset la progression à 0 quand l'index change
-    setCarouselProgress(0);
+    // Délai initial pour attendre la fin de l'animation du header (2360ms)
+    const headerAnimationDelay = 2360;
     
-    // Anime la progression de 0 à 100 sur 5 secondes
-    const startTime = Date.now();
-    const duration = 5000; // 5 secondes
-    
-    const animateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min((elapsed / duration) * 100, 100);
-      setCarouselProgress(progress);
+    const initialTimer = setTimeout(() => {
+      // Reset la progression à 0 quand l'index change
+      setCarouselProgress(0);
       
-      if (progress < 100) {
-        requestAnimationFrame(animateProgress);
-      }
-    };
+      // Anime la progression de 0 à 100 sur 5 secondes
+      const startTime = Date.now();
+      const duration = 5000; // 5 secondes
+      
+      const animateProgress = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min((elapsed / duration) * 100, 100);
+        setCarouselProgress(progress);
+        
+        if (progress < 100) {
+          requestAnimationFrame(animateProgress);
+        }
+      };
+      
+      requestAnimationFrame(animateProgress);
+    }, currentCarouselIndex === 0 ? headerAnimationDelay : 0);
     
-    const animationFrame = requestAnimationFrame(animateProgress);
-    
-    return () => cancelAnimationFrame(animationFrame);
+    return () => clearTimeout(initialTimer);
   }, [currentCarouselIndex, isMobile]);
 
   // Animation de la barre de progression du carrousel desktop
   useEffect(() => {
-    // Reset la progression à 0 quand l'index change
-    setDesktopCarouselProgress(0);
+    // Délai initial pour attendre la fin de l'animation du header (2360ms)
+    const headerAnimationDelay = 2360;
     
-    // Anime la progression de 0 à 100 sur 5 secondes
-    const startTime = Date.now();
-    const duration = 5000; // 5 secondes
-    
-    const animateProgress = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min((elapsed / duration) * 100, 100);
-      setDesktopCarouselProgress(progress);
+    const initialTimer = setTimeout(() => {
+      // Reset la progression à 0 quand l'index change
+      setDesktopCarouselProgress(0);
       
-      if (progress < 100) {
-        requestAnimationFrame(animateProgress);
-      }
-    };
+      // Anime la progression de 0 à 100 sur 5 secondes
+      const startTime = Date.now();
+      const duration = 5000; // 5 secondes
+      
+      const animateProgress = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min((elapsed / duration) * 100, 100);
+        setDesktopCarouselProgress(progress);
+        
+        if (progress < 100) {
+          requestAnimationFrame(animateProgress);
+        }
+      };
+      
+      requestAnimationFrame(animateProgress);
+    }, desktopCarouselIndex === 0 ? headerAnimationDelay : 0);
     
-    const animationFrame = requestAnimationFrame(animateProgress);
-    
-    return () => cancelAnimationFrame(animationFrame);
+    return () => clearTimeout(initialTimer);
   }, [desktopCarouselIndex]);
 
   const openSecurityModal = () => {
