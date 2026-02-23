@@ -493,7 +493,7 @@ export default function Home() {
         </div>
 
         {/* LAYER 2 : Pillar cards – sticky, recouvrent le Hero */}
-        <div className="sticky-layer sticky-layer--cover z-[2] bg-[#0b0f10] overflow-x-clip">
+        <div className="sticky-layer sticky-layer--cover z-[2] bg-[#0b0f10]">
           <div className="relative z-10 max-w-[1600px] mx-auto px-6 pt-4 pb-10 md:pt-10 md:pb-24 overflow-visible">
             <div className="mx-auto max-w-6xl overflow-visible">
 
@@ -518,7 +518,7 @@ export default function Home() {
                   stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
                   subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
                   showLinkButton: false,
-                  image: "/images/Ex%C3%A9cution%20instantan%C3%A9e%20et%20finance%20num%C3%A9rique.png",
+                  image: "/images/Rapidit%C3%A9%20transactions.png",
                   link: {
                     label: t("home_v2_hero_pillar_1_link", "Détails"),
                     onClick: () => openSpeedModal(),
@@ -627,15 +627,14 @@ export default function Home() {
                           : undefined
                         }
 		                      className={[
-		                        "relative rounded-md transition-all duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden",
-		                        item.image
-		                          ? "p-0 bg-transparent"
-		                          : "flex items-start gap-2.5 bg-white/90 px-4 py-7 md:py-4",
-		                        "md:hover:scale-[1.05] md:hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:hover:z-10",
+		                        "relative rounded-md",
+		                        !item.image && "flex items-start gap-2.5 bg-white/90 px-4 py-7 md:py-4 overflow-hidden",
+		                        !item.image && "md:hover:scale-[1.05] md:hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:hover:z-10 transition-all duration-300",
 		                        isClickable
 		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
 		                          : "",
 		                        item.className,
+		                        "transition-[opacity,transform] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
 		                        isVisible 
 		                          ? "opacity-100 translate-x-0 translate-y-0" 
 		                          : [
@@ -651,14 +650,27 @@ export default function Home() {
 	                      }}>
 
                     {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={600}
-                        height={400}
-                        className="w-full h-auto rounded-md"
-                        unoptimized
-                      />
+                      <div className="flip-card" style={{ perspective: '1200px' }}>
+                        <div className="flip-card-inner">
+                          {/* RECTO */}
+                          <div className="flip-card-front">
+                            <Image
+                              src={item.image}
+                              alt={item.title}
+                              width={600}
+                              height={400}
+                              className="w-full h-auto rounded-md"
+                              unoptimized
+                            />
+                          </div>
+                          {/* VERSO */}
+                          <div className="flip-card-back">
+                            <span className="text-[28px] font-montserrat font-light tracking-wide text-white/90">
+                              Bonjour
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     ) : (
                     <>
                     <div
