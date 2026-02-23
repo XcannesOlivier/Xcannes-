@@ -72,8 +72,8 @@ export default function MobileHeroCarousel({ show, onSpeedClick, onSecurityClick
   ];
 
   return (
-    <div className={`mt-12 md:hidden transition-all duration-700 delay-300 ${
-      show ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
+    <div className={`mt-12 md:hidden transition-opacity duration-700 delay-300 ${
+      show ? 'opacity-100' : 'opacity-0'
     }`}>
       <div className="relative">
         {/* Embla Carousel */}

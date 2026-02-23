@@ -39,6 +39,8 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [visibleCards, setVisibleCards] = useState(new Set());
   const cardRefs = useRef([]);
+  const pillarGridRef = useRef(null);
+  const [pillarGridVisible, setPillarGridVisible] = useState(false);
   const [desktopCarouselIndex, setDesktopCarouselIndex] = useState(0); // Carrousel desktop pour carte 4 et 5
   const isHeroModalOpen =
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
@@ -234,6 +236,25 @@ export default function Home() {
     return () => {
       observer.disconnect();
     };
+  }, []);
+
+  // Intersection Observer pour le conteneur grille des 3 cartes images (desktop)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const el = pillarGridRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setPillarGridVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   // Auto-avancement du carrousel desktop (cartes 4 et 5) toutes les 5 secondes
@@ -472,9 +493,9 @@ export default function Home() {
         </div>
 
         {/* LAYER 2 : Pillar cards – sticky, recouvrent le Hero */}
-        <div className="sticky-layer sticky-layer--cover z-[2] bg-[#0b0f10]">
-          <div className="relative z-10 max-w-[1600px] mx-auto px-6 pt-4 pb-10 md:pt-10 md:pb-24">
-            <div className="mx-auto max-w-6xl">
+        <div className="sticky-layer sticky-layer--cover z-[2] bg-[#0b0f10] overflow-x-clip">
+          <div className="relative z-10 max-w-[1600px] mx-auto px-6 pt-4 pb-10 md:pt-10 md:pb-24 overflow-visible">
+            <div className="mx-auto max-w-6xl overflow-visible">
 
                 {/* Carrousel des cartes sur mobile uniquement */}
                 <MobileHeroCarousel 
@@ -486,9 +507,10 @@ export default function Home() {
                 />
 
                 {/* 3 premières cartes + carrousel pour les 2 dernières */}
-                <div className={`hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 transition-all duration-700 delay-700 ${
-                  showHeroCards ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
-                }`}>
+                <div
+                  ref={pillarGridRef}
+                  className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-visible"
+                >
                   {(() => {
                     const allCards = [
                   {
@@ -496,7 +518,7 @@ export default function Home() {
                   stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
                   subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
                   showLinkButton: false,
-                  image: "/images/Ex\u00e9cution instantan\u00e9e et finance num\u00e9rique.png",
+                  image: "/images/Ex%C3%A9cution%20instantan%C3%A9e%20et%20finance%20num%C3%A9rique.png",
                   link: {
                     label: t("home_v2_hero_pillar_1_link", "Détails"),
                     onClick: () => openSpeedModal(),
@@ -515,7 +537,7 @@ export default function Home() {
                     "Validation sécurisée sous votre autorité."
                   ),
                   showLinkButton: false,
-                  image: "/images/Contr\u00f4le s\u00e9curis\u00e9 des transactions num\u00e9riques.png",
+                  image: "/images/Contr%C3%B4le%20s%C3%A9curis%C3%A9%20des%20transactions%20num%C3%A9riques.png",
                   link: {
                     label: t("home_v2_hero_pillar_2_link", "Détails"),
                     onClick: () => openSecurityModal(),
@@ -533,7 +555,7 @@ export default function Home() {
                     "Frais affichés avant chaque confirmation."
                   ),
                   showLinkButton: false,
-                  image: "/images/Transparence des frais en Suisse et Colombie.png",
+                  image: "/images/Transparence%20des%20frais%20en%20Suisse%20et%20Colombie.png",
                   link: {
                     label: t("home_v2_hero_pillar_3_link", "Détails"),
                     onClick: () => openFeesModal(),
@@ -586,7 +608,7 @@ export default function Home() {
                         {/* 3 premières cartes */}
                         {firstThreeCards.map((item, index) => {
                           const isClickable = Boolean(item.link?.onClick);
-                          const isVisible = visibleCards.has(index);
+                          const isVisible = pillarGridVisible || visibleCards.has(index);
                   return (
                     <div
                       key={item.title}
@@ -605,7 +627,7 @@ export default function Home() {
                           : undefined
                         }
 		                      className={[
-		                        "relative rounded-md transition-all duration-300 ease-out overflow-hidden",
+		                        "relative rounded-md transition-all duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden",
 		                        item.image
 		                          ? "p-0 bg-transparent"
 		                          : "flex items-start gap-2.5 bg-white/90 px-4 py-7 md:py-4",
@@ -614,14 +636,18 @@ export default function Home() {
 		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
 		                          : "",
 		                        item.className,
-		                        // Animation au scroll sur mobile
-		                        "md:opacity-100 md:translate-y-0",
 		                        isVisible 
-		                          ? "opacity-100 translate-y-0" 
-		                          : "opacity-0 translate-y-8"
+		                          ? "opacity-100 translate-x-0 translate-y-0" 
+		                          : [
+		                              "opacity-0",
+		                              // Desktop : gauche / bas / droite selon index
+		                              index === 0 ? "md:-translate-x-[100vw] -translate-x-0 translate-y-8" :
+		                              index === 1 ? "md:translate-y-[100vh] translate-y-8" :
+		                              "md:translate-x-[100vw] translate-x-0 translate-y-8"
+		                            ].join(" ")
 	                      ].filter(Boolean).join(" ")}
 	                      style={{
-	                        transitionDelay: isVisible ? `${index * 150}ms` : "0ms"
+	                        transitionDelay: isVisible ? `${index * 350}ms` : "0ms"
 	                      }}>
 
                     {item.image ? (
