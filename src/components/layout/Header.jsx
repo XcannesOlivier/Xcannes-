@@ -335,12 +335,12 @@ export default function Header({ fixed = true }) {
     
     // Desktop ET Mobile : retour à la ligne, sans pipe
     return (
-      <span className={`relative ${getContainerClass()} flex flex-col items-center gap-2 md:gap-4 w-full`}>
+      <span className="relative flex flex-col items-center gap-2 md:gap-4 w-full">
         <span className="font-bold block w-full text-center">
           {renderText(xcannesToShow, '')}
         </span>
         {showSubtitle && (
-          <span className="font-thin italic text-white/90 block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl w-full text-center">
+          <span className={`font-thin italic text-white/90 block text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl w-full text-center ${getContainerClass()}`}>
             {subtitle}
           </span>
         )}
