@@ -6,6 +6,10 @@ import { useTranslation } from 'next-i18next';
 
 export default function MobileHeroCarousel({ show, onSpeedClick, onSecurityClick, onFeesClick, onValueClick }) {
   const { t } = useTranslation('common');
+  const [flippedIndex, setFlippedIndex] = useState(null);
+  const longPressTimer = useRef(null);
+  const touchStartPos = useRef({ x: 0, y: 0 });
+  const didLongPress = useRef(false);
   const autoplayRef = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: false })
   );
@@ -47,7 +51,7 @@ export default function MobileHeroCarousel({ show, onSpeedClick, onSecurityClick
   const heroCards = [
     {
       title: t('home_v2_hero_pillar_1_title', 'Exécution instantanée'),
-      image: '/images/Exécution instantanée et finance numérique.png',
+      image: '/images/Rapidité transactions.png',
       onClick: onSpeedClick,
     },
     {
@@ -85,20 +89,66 @@ export default function MobileHeroCarousel({ show, onSpeedClick, onSecurityClick
                 className="flex-[0_0_85%] min-w-0 px-2"
               >
                 <div 
-                  className={`rounded-xl overflow-hidden transition-transform duration-300 ${
-                    card.onClick ? 'cursor-pointer active:scale-[0.97]' : ''
-                  }`}
-                  onClick={card.onClick ? card.onClick : undefined}
+                  className="rounded-xl select-none"
+                  style={{ perspective: '1200px', WebkitTouchCallout: 'none', WebkitUserSelect: 'none' }}
+                  onContextMenu={(e) => e.preventDefault()}
+                  onTouchStart={(e) => {
+                    const touch = e.touches[0];
+                    touchStartPos.current = { x: touch.clientX, y: touch.clientY };
+                    didLongPress.current = false;
+                    longPressTimer.current = setTimeout(() => {
+                      didLongPress.current = true;
+                      setFlippedIndex((prev) => prev === index ? null : index);
+                    }, 400);
+                  }}
+                  onTouchMove={(e) => {
+                    const touch = e.touches[0];
+                    const dx = Math.abs(touch.clientX - touchStartPos.current.x);
+                    const dy = Math.abs(touch.clientY - touchStartPos.current.y);
+                    if (dx > 10 || dy > 10) {
+                      clearTimeout(longPressTimer.current);
+                      longPressTimer.current = null;
+                    }
+                  }}
+                  onTouchEnd={() => {
+                    clearTimeout(longPressTimer.current);
+                    longPressTimer.current = null;
+                  }}
                 >
-                  <Image
-                    src={card.image}
-                    alt={card.title}
-                    width={600}
-                    height={800}
-                    className="w-full h-auto object-cover rounded-xl"
-                    loading="lazy"
-                    unoptimized
-                  />
+                  <div
+                    className="relative w-full transition-transform duration-700"
+                    style={{
+                      transformStyle: 'preserve-3d',
+                      transform: flippedIndex === index ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                    }}
+                  >
+                    {/* RECTO */}
+                    <div style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}>
+                      <Image
+                        src={card.image}
+                        alt={card.title}
+                        width={600}
+                        height={800}
+                        className="w-full h-auto object-cover rounded-xl"
+                        loading="lazy"
+                        unoptimized
+                      />
+                    </div>
+                    {/* VERSO */}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center rounded-xl"
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                        transform: 'rotateY(180deg)',
+                        background: 'linear-gradient(135deg, #0f1a1a 0%, #1a2e2e 50%, #0f1a1a 100%)',
+                      }}
+                    >
+                      <span className="text-[28px] font-montserrat font-light tracking-wide text-white/90">
+                        Bonjour
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
