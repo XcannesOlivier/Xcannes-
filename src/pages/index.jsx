@@ -337,14 +337,26 @@ export default function Home() {
 
             <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-24 md:py-32">
             <div className="mx-auto max-w-6xl text-center">
-                <h1 className={`text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-montserrat font-bold text-white leading-[1.1] tracking-tight transition-all duration-700 ${
+                <h1 className={`text-[42px] sm:text-5xl md:text-7xl lg:text-8xl font-montserrat font-bold text-white leading-[1.05] tracking-tight transition-all duration-700 ${
                   showHeroTitle ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
                 }`}>
                   {t("home_v2_hero_title", "Votre argent, stable dans 160+ devises.")}
-                  <span className="block mt-3 md:mt-4 text-[21px] sm:text-[26px] md:text-[42px] lg:text-[52px] font-semibold text-white/90">
+                  <span className="block mt-3 md:mt-4 text-[26px] sm:text-[26px] md:text-[42px] lg:text-[52px] font-semibold text-white/90">
                     {t("home_v2_hero_title_emphasis", "Indexation USD réglementée.")}
                   </span>
                 </h1>
+
+                {/* Sous-titre sur mobile */}
+                <p className={`mt-6 text-[17px] text-white/85 font-light leading-relaxed md:hidden transition-all duration-700 delay-200 ${
+                  showHeroSubtitle ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}>
+                  <span dangerouslySetInnerHTML={{
+                    __html: t(
+                      "home_v2_hero_subtitle",
+                      "Payez, recevez et convertissez en toute simplicité.<br/>Rapide. Sécurisé. Transparent."
+                    ).replace('⮕', '<span class="inline-block text-xcannes-green animate-pulse">⮕</span>')
+                  }} />
+                </p>
 
                 {/* Badges store – visible sur mobile sous le titre, sur desktop après le sous-titre */}
                 <div className={`mt-8 flex md:hidden flex-col items-center justify-center gap-4 transition-all duration-700 delay-300 ${

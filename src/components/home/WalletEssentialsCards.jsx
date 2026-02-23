@@ -2049,13 +2049,13 @@ export default function WalletEssentialsCards({ variant = "home" }) {
           })}
         {showInstitutionalNav ? (
           <>
-            <p className="col-span-full px-5 pl-6 text-[10px] uppercase tracking-[0.22em] text-white/60">
+            <p className="col-span-full px-5 pl-6 text-[13px] sm:text-[12px] font-semibold uppercase tracking-[0.22em] text-white/80">
               {t("home_v2_demo_nav_operations_label", "OPÉRATIONS")}
             </p>
             {operationActions.map((action, index) =>
               renderActionCard(action, { wrapperClassNameOverride: "order-none", cardIndex: index })
             )}
-            <p className="col-span-full mt-2 px-5 pl-6 text-[10px] uppercase tracking-[0.22em] text-white/60">
+            <p className="col-span-full mt-2 px-5 pl-6 text-[13px] sm:text-[12px] font-semibold uppercase tracking-[0.22em] text-white/80">
               {t("home_v2_demo_nav_configuration_label", "CONFIGURATION")}
             </p>
             {configurationActions.map((action, index) =>

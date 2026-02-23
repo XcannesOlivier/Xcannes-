@@ -15,6 +15,7 @@ export default function MobileHeroCarousel({ show, onSpeedClick, onSecurityClick
       align: 'center',
       skipSnaps: false,
       dragFree: false,
+      duration: 40,
     },
     [autoplayRef.current]
   );
