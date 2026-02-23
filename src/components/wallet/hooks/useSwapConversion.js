@@ -38,17 +38,15 @@ export function useSwapConversion({
 }) {
   useEffect(() => {
     if (!swapCurrencyOptions?.length) return;
-    const baseCandidate = swapCurrencyOptions.includes("RLUSD")
-      ? "RLUSD"
-      : swapCurrencyOptions.includes("XRP")
-        ? "XRP"
-        : swapCurrencyOptions[0];
+    const baseCandidate = swapCurrencyOptions.includes("USD")
+      ? "USD"
+      : swapCurrencyOptions[0];
     const effectiveBase = convertBaseCurrency || baseCandidate;
     if (!convertBaseCurrency) {
       setConvertBaseCurrency(baseCandidate);
     }
     if (!convertQuoteCurrency) {
-      const preferredQuotes = ["RLUSD", "RLUSD", "USD", "USDT", "USDC"];
+      const preferredQuotes = ["USD", "EUR", "GBP", "CHF"];
       const firstPreferred =
         preferredQuotes.find(
           (c) => swapCurrencyOptions.includes(c) && c !== effectiveBase

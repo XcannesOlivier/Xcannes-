@@ -184,8 +184,15 @@ export default function GlobalStatement({
       ? totalBalanceOverrideValue
       : computedTotalBalance;
 
-  // Trier les tokens
-  const sortedTokens = [...tokens].sort((a, b) => {
+  // Filtrer RLUSD (invisible — décomposé en USD + lignes).
+  // Trier les tokens — XRP toujours en dernière position (infrastructure discrète).
+  const sortedTokens = [...tokens]
+    .filter((t) => String(t.currency || "").toUpperCase() !== "RLUSD")
+    .sort((a, b) => {
+    const aIsXrp = String(a.currency || "").toUpperCase() === "XRP";
+    const bIsXrp = String(b.currency || "").toUpperCase() === "XRP";
+    if (aIsXrp && !bIsXrp) return 1;
+    if (!aIsXrp && bIsXrp) return -1;
     if (sortBy === "balance") {
       return parseFloat(b.value || 0) - parseFloat(a.value || 0);
     }
