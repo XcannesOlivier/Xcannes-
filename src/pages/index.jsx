@@ -327,9 +327,10 @@ export default function Home() {
 
       <Header />
 
-      <div className="pt-16 home-content-wrapper bg-[#0b0f10]">
+      <div className="pt-16 home-content-wrapper">
 
-        {/* HERO (more “private bank” tone) */}
+        {/* LAYER 1 : Hero – sticky, reste derrière (desktop) */}
+        <div className="sticky-layer sticky-layer--hero md:z-[1] bg-[#0b0f10]">
         <main className="relative overflow-hidden">
           <div className="absolute inset-0 bg-[#0b0f10] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0b0f10] md:h-36" />
@@ -414,8 +415,18 @@ export default function Home() {
                   </div>
                 </div>
 
+            </div>
+          </div>
+        </main>
+        </div>
+
+        {/* LAYER 2 : Pillar cards – sticky, recouvrent le Hero (desktop) */}
+        <div className="sticky-layer sticky-layer--cover md:z-[2] bg-[#0b0f10]">
+          <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-16 md:py-24">
+            <div className="mx-auto max-w-6xl">
+
                 {/* 3 premières cartes + carrousel pour les 2 dernières */}
-                <div className={`mt-14 md:mt-16 hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 transition-all duration-700 delay-700 ${
+                <div className={`hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 transition-all duration-700 delay-700 ${
                   showHeroCards ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 -translate-x-16 translate-y-8'
                 }`}>
                   {(() => {
@@ -652,9 +663,23 @@ export default function Home() {
             );
           })()}
         </div>
-      </div>
-    </div>
-  </main>
+            </div>
+          </div>
+        </div>
+
+        {/* LAYER 3 : Reste de la page – recouvre les cartes (desktop) */}
+        <div className="sticky-layer--cover relative md:z-[3] bg-[#0b0f10]">
+          <WalletProductSection />
+          <section className="relative py-14 sm:py-16 px-4 sm:px-6">
+            <div className="max-w-4xl mx-auto text-center">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-montserrat font-[300] text-white/90 tracking-[0.02em]">
+                {t("home_v2_demo_slogan", "Votre argent. Partout. Intact.")}
+              </h3>
+            </div>
+          </section>
+          <FooterPro />
+        </div>
+
         {speedModalRoot &&
           (speedModalOpen || speedModalClosing) &&
           createPortal(
@@ -1135,20 +1160,6 @@ export default function Home() {
             valueModalRoot
           )}
       </div>
-
-      {/* CONTENT SECTIONS */}
-      <div className="bg-[#0b0f10]">
-        <WalletProductSection />
-        <section className="relative py-14 sm:py-16 px-4 sm:px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-montserrat font-[300] text-white/90 tracking-[0.02em]">
-              {t("home_v2_demo_slogan", "Votre argent. Partout. Intact.")}
-            </h3>
-          </div>
-        </section>
-      </div>
-
-      <FooterPro />
 
       <SupportAssistantWidget />
     </>);
