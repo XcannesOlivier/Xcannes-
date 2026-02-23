@@ -67,7 +67,7 @@ export default function WalletDashboardSendModal({
   const manualQrScannerRef = useRef(null);
   const isDemoMode = noticeVariant === "demo";
   const fauxPayreqExample =
-    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"USD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = false;
   const fauxPayreqTextClass = isDemoMode && isDesktop
     ? "text-[11px] text-white/70"
@@ -535,7 +535,7 @@ export default function WalletDashboardSendModal({
               token={
                 selectedSendToken
                   ? selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency
-                  : "RLUSD"
+                  : "USD"
               }
               tokenClassName="text-white"
               containerClassName="focus-within:!border-xcannes-green/80" />

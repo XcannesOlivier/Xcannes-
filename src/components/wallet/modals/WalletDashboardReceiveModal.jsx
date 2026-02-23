@@ -130,7 +130,7 @@ export default function WalletDashboardReceiveModal({
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
     if (!requestCurrencyCode) return false;
-    return requestCurrencyCode !== "XRP" && requestCurrencyCode !== "RLUSD" && requestCurrencyCode !== "RLUSD";
+    return requestCurrencyCode !== "XRP" && requestCurrencyCode !== "RLUSD" && requestCurrencyCode !== "USD";
   }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
 
   const handleGenerateRequest = () => {
@@ -157,7 +157,7 @@ export default function WalletDashboardReceiveModal({
       return;
     }
 
-	    const targetCurrencyCode = requestCurrencyCode || "RLUSD";
+	    const targetCurrencyCode = requestCurrencyCode || "USD";
 	    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
 	    const displayCurrencyUpper =
 	      targetCurrencyUpper === "RLUSD" ? "USD" : targetCurrencyUpper;
@@ -187,12 +187,11 @@ export default function WalletDashboardReceiveModal({
 
     const issuerCandidate = String(selectedRequestToken?.issuer || "").trim();
     const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuerCandidate);
+    // USD et RLUSD utilisent le même issuer on-chain (RLUSD)
     const knownIssuer =
-      targetCurrencyUpper === "RLUSD"
+      (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD")
         ? XRPL_KNOWN_ISSUERS.RLUSD
-        : targetCurrencyUpper === "RLUSD"
-          ? XRPL_KNOWN_ISSUERS.RLUSD
-          : null;
+        : null;
     const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
     const beneficiaryLabel = String(walletLabel || "").trim() || null;

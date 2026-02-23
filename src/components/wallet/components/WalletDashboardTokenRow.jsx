@@ -45,6 +45,7 @@ export default function WalletDashboardTokenRow({
   onClick,
   onInstallTrustline,
   isWalletActivated,
+  hasRlusdTrustline,
   onActivateWallet,
   onOpenRlusdProgram
 		}) {
@@ -86,8 +87,9 @@ export default function WalletDashboardTokenRow({
 
 		  const showWalletActivationNotice =
 		  currencyCode === "XRP" && isWalletActivated === false;
-		  const showRlusdTrustlineNotice =
-		  currencyCode === "RLUSD" && isMissingTrustline;
+		  // Pas de notice trustline sur la ligne USD : l'activation de la
+		  // trustline RLUSD est gérée lors de l'onboarding guidé.
+		  const showRlusdTrustlineNotice = false;
 	  const rowSurfaceClass = "bg-black/20 hover:bg-black/15";
 
   const handleRowKeyDown = (event) => {
@@ -186,54 +188,16 @@ export default function WalletDashboardTokenRow({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    onInstallTrustline?.(currencyCode);
+                    onInstallTrustline?.("RLUSD");
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
                       e.stopPropagation();
-                      onInstallTrustline?.(currencyCode);
+                      onInstallTrustline?.("RLUSD");
                     }
                   }}
                   className="text-amber-100 underline underline-offset-2 hover:text-amber-50 whitespace-nowrap">
-                  {t("ui_activate_7f2974ed87", "Activer")}
-                </span>
-              </div>
-            </div>
-          ) : showRlusdTrustlineNotice ? (
-            <div className="flex-1 min-w-0 px-2">
-              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-white/90 md:text-amber-200/90 text-center leading-snug">
-                <span>
-                  <span className="hidden md:inline">
-                    {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
-                    {t(
-	                      "ui_rlusd_benefits_notice_2c1e5f9b",
-	                      "Elle permet de détenir des USD et de profiter d'avantages."
-	                    )}
-                  </span>
-                  <span className="md:hidden">
-                    {t(
-                      "ui_rlusd_benefits_notice_short_2c1e5f9c",
-                      "Profiter d'avantages."
-                    )}
-                  </span>{" "}
-                </span>
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onInstallTrustline?.(currencyCode);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onInstallTrustline?.(currencyCode);
-                    }
-                  }}
-                  className="text-white underline underline-offset-2 hover:text-white/90 md:text-amber-100 md:hover:text-amber-50 whitespace-nowrap">
                   {t("ui_activate_7f2974ed87", "Activer")}
                 </span>
               </div>

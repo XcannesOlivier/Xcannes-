@@ -13,6 +13,7 @@ export function useUsdTotalLabel({
   getAllMarkets,
   getTicker,
   getFxEod,
+  rlusdOnChain,
 } = {}) {
   const [usdRates, setUsdRates] = useState({});
 
@@ -172,6 +173,17 @@ export function useUsdTotalLabel({
         })} USD`
       : null;
 
+  // En mode réel, le total exact = rlusdOnChain (source de vérité on-chain).
+  // En mode preview, utilise demoTotalUsd ; fallback sur stableUsd si FX non chargés.
+  const rlusdOnChainTotal = Number(rlusdOnChain);
+  const rlusdOnChainLabel =
+    !isPreviewMode && Number.isFinite(rlusdOnChainTotal) && rlusdOnChainTotal >= 0
+      ? `${rlusdOnChainTotal.toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} USD`
+      : null;
+
   const fallbackTotalLabel = isPreviewMode
     ? `${Number(demoTotalUsd || 0).toLocaleString("en-US", {
         minimumFractionDigits: 0,
@@ -184,7 +196,8 @@ export function useUsdTotalLabel({
         })} USD`
       : `0.00 USD`;
 
-  const totalLabel = totalUsdLabel || fallbackTotalLabel;
+  // Priorité : rlusdOnChain (exact) > FX-based total > fallback
+  const totalLabel = rlusdOnChainLabel || totalUsdLabel || fallbackTotalLabel;
 
   return {
     usdRates,

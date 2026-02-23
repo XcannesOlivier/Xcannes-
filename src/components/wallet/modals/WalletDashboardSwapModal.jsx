@@ -104,9 +104,11 @@ export default function WalletDashboardSwapModal({
     });
   }, []);
 
+  // USD est une devise convertible comme les autres — ne pas le filtrer.
+  // Seul RLUSD est masqué (infrastructure invisible).
   const swapCurrencyOptionsSanitized = useMemo(() => {
     return (swapCurrencyOptions || []).filter(
-      (code) => String(code || "").trim().toUpperCase() !== "USD"
+      (code) => String(code || "").trim().toUpperCase() !== "RLUSD"
     );
   }, [swapCurrencyOptions]);
 
@@ -153,7 +155,7 @@ export default function WalletDashboardSwapModal({
         type: "unsupported",
         error: t(
           "ui_xrpl_conversion_temporarily_unavailable_1f8b72d3aa",
-          "XRP/RLUSD conversion is temporarily unavailable."
+          "XRP/USD conversion is temporarily unavailable."
         ),
       };
     }
@@ -513,7 +515,7 @@ export default function WalletDashboardSwapModal({
               token={
                 selectLabelByCurrency?.[convertBaseCurrency] ||
                 convertBaseCurrency ||
-                "RLUSD"
+                "USD"
               }
               tokenClassName="text-white"
               containerClassName="focus-within:!border-xcannes-green/80" />

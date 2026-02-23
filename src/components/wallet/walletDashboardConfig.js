@@ -56,6 +56,14 @@ export const USD_STABLECOINS = [
   "GUSD",
 ];
 
+/**
+ * Actifs XRPL acceptés dans le wallet XCANNES (hors XRP natif qui est
+ * toujours affiché). Tout autre token/trustline du ledger est ignoré.
+ * Les lignes de devises internes (EUR, GBP…) sont gérées séparément
+ * via le système d'allocations RLUSD — elles ne passent pas par ce filtre.
+ */
+export const WALLET_ACCEPTED_TOKENS = new Set(["RLUSD"]);
+
 export const WALLET_CURRENCY_LINE_ORDER = [
   "USD",
   "EUR",

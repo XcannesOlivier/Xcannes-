@@ -59,6 +59,7 @@ import {
   resolveWalletLayout,
   WALLET_CURRENCY_LINE_ORDER,
   USD_STABLECOINS,
+  WALLET_ACCEPTED_TOKENS,
 } from "./walletDashboardConfig";
 
 const DEFAULT_WALLET_LABEL_FEE_RLUSD = 1;
@@ -79,7 +80,18 @@ const ADJUSTMENT_FEE_RLUSD = (() => {
 
 const DEFAULT_ACTIVATION_XRP_AMOUNT = 1;
 const ACTIVATION_BUNDLE_XRP_AMOUNT = 1.4;
-const WALLET_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
+// Priorité d'affichage synchronisée avec useWalletTokens.
+const WALLET_TOKEN_PRIORITY = { USD: 0, XRP: 999 };
+
+/**
+ * Filtre les tokens on-chain: seuls les actifs acceptés par XCANNES sont
+ * gardés. XRP est natif (pas dans account_lines), RLUSD est le seul token
+ * accepté. Tout autre trustline (XCS, USDC, random tokens…) est ignoré.
+ */
+function isAcceptedOnChainToken(currency) {
+  const code = String(currency || "").toUpperCase();
+  return WALLET_ACCEPTED_TOKENS.has(code);
+}
 const PREVIEW_WALLET_ID = "PREVIEW";
 const MAX_PREVIEW_EVENTS = 120;
 
@@ -172,7 +184,9 @@ export default function WalletDashboard({
     : balance;
 
   const baseTokens = useMemo(
-    () => effectiveBalance?.tokens || [],
+    () => (effectiveBalance?.tokens || []).filter(
+      (t) => isAcceptedOnChainToken(t?.currency)
+    ),
     [effectiveBalance?.tokens]
   );
   const hasOnChainRlusd = (baseTokens || []).some(
@@ -293,23 +307,26 @@ export default function WalletDashboard({
     setConvertPreview,
     convertProcessing,
     setConvertProcessing,
-  } = useConvertForm();
+  } = useConvertForm({ defaultBaseCurrency: "USD", defaultQuoteCurrency: "EUR" });
 
+  // Empêcher la sélection de XRP ou RLUSD comme devise de requête de paiement.
+  // USD est le terme visible pour l'utilisateur — ne pas le forcer sur RLUSD.
   useEffect(() => {
     const upper = String(requestCurrency || "").trim().toUpperCase();
-    if (upper === "XRP" || upper === "USD") {
-      setRequestCurrency("RLUSD");
+    if (upper === "XRP" || upper === "RLUSD") {
+      setRequestCurrency("USD");
     }
   }, [requestCurrency, setRequestCurrency]);
 
+  // Empêcher XRP/RLUSD dans les sélecteurs de conversion.
   useEffect(() => {
     const baseUpper = String(convertBaseCurrency || "").trim().toUpperCase();
     const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
-    if (baseUpper === "XRP" || baseUpper === "USD") {
-      setConvertBaseCurrency("RLUSD");
+    if (baseUpper === "XRP" || baseUpper === "RLUSD") {
+      setConvertBaseCurrency("USD");
     }
-    if (quoteUpper === "XRP" || quoteUpper === "USD") {
-      setConvertQuoteCurrency("RLUSD");
+    if (quoteUpper === "XRP" || quoteUpper === "RLUSD") {
+      setConvertQuoteCurrency("USD");
     }
   }, [convertBaseCurrency, convertQuoteCurrency, setConvertBaseCurrency, setConvertQuoteCurrency]);
   const {
@@ -506,7 +523,12 @@ export default function WalletDashboard({
       return tokens;
     }
 
-    // Mode "réel": on affiche les soldes XRPL
+    // Mode "réel": seul XRP est affiché comme token on-chain.
+    // RLUSD n'apparaît plus directement — il est décomposé en :
+    //   - ligne USD (pool non alloué) via currencyLines
+    //   - lignes de devises internes (EUR, GBP…) via currencyLines
+    // Le solde RLUSD on-chain reste accessible via baseTokens / hasOnChainRlusd
+    // pour la cohérence (invariant) et les opérations internes.
     const tokens = [
       {
         key: "XRP",
@@ -514,28 +536,7 @@ export default function WalletDashboard({
         issuer: "Native",
         value: xrpAmount,
       },
-      ...baseTokens.map((t) => ({
-        key: `${t.currency}:${t.issuer || "issuer"}`,
-        currency: t.currency,
-        issuer: t.issuer,
-        value: parseFloat(t.value) || 0,
-      })),
     ];
-
-    // S'assurer qu'il y a toujours une ligne RLUSD juste après XRP,
-    // même si aucune position ou trustline n'existe encore.
-    const hasRlusd = tokens.some(
-      (t) => String(t.currency || "").toUpperCase() === "RLUSD"
-    );
-    if (!hasRlusd) {
-      tokens.push({
-        key: "RLUSD:auto",
-        currency: "RLUSD",
-        issuer: "Trustline",
-        value: 0,
-        isMissingTrustline: true,
-      });
-    }
 
     tokens.sort((a, b) => {
       const aCode = String(a?.currency || "").toUpperCase();
@@ -627,19 +628,47 @@ export default function WalletDashboard({
   const effectiveCurrencyLines = useMemo(() => {
     const base = isPreviewMode ? demoCurrencyLines : currencyLines;
     const lines = Array.isArray(base) ? [...base] : [];
+    const existing = new Set(
+      lines.map((l) => String(l?.currencyCode || "").toUpperCase()).filter(Boolean)
+    );
+
+    // Lignes par défaut affichées dans tout wallet (même nouveau).
+    const DEFAULT_LINES = ["USD", "EUR", "CHF", "GBP", "CAD", "JPY", "AED"];
+
+    // Injecter la ligne USD synthétique avec le montant non alloué.
     const unallocatedRaw = effectiveCurrencyLinesSummary?.unallocatedRlusd;
     const unallocated = Number(unallocatedRaw);
-    const hasUsdLine = lines.some(
-      (line) => String(line?.currencyCode || "").toUpperCase() === "USD"
-    );
-    if (!hasUsdLine && unallocatedRaw != null && Number.isFinite(unallocated)) {
+    if (!existing.has("USD") && unallocatedRaw != null && Number.isFinite(unallocated)) {
       lines.push({
         currencyCode: "USD",
         allocatedRlusd: unallocated,
         isDerived: true,
         active: false,
       });
+      existing.add("USD");
+    } else if (!existing.has("USD")) {
+      lines.push({
+        currencyCode: "USD",
+        allocatedRlusd: 0,
+        isDerived: true,
+        active: false,
+      });
+      existing.add("USD");
     }
+
+    // Injecter les autres lignes par défaut (allocation 0) si absentes.
+    DEFAULT_LINES.forEach((code) => {
+      if (!existing.has(code)) {
+        lines.push({
+          currencyCode: code,
+          allocatedRlusd: 0,
+          isDerived: true,
+          active: false,
+        });
+        existing.add(code);
+      }
+    });
+
     return lines.sort((a, b) => {
       const aCode = String(a?.currencyCode || "").toUpperCase();
       const bCode = String(b?.currencyCode || "").toUpperCase();
@@ -1036,96 +1065,23 @@ export default function WalletDashboard({
     augmentedTokens,
     allocatedRlusdByCurrency,
     swapCurrencyOptions,
-  } = useWalletTokens({ displayTokens, currencyLines });
+  } = useWalletTokens({ displayTokens, currencyLines: effectiveCurrencyLines });
 
   const selectableTokens = useMemo(() => {
     return (augmentedTokens || []).filter((token) => {
       const code = String(token?.currency || "").trim().toUpperCase();
-      return code !== "XRP" && code !== "USD";
+      // XRP et RLUSD ne sont pas sélectionnables dans les modales Send/Receive.
+      // USD est une devise sélectionnable comme EUR, CHF, etc.
+      return code !== "XRP" && code !== "RLUSD";
     });
   }, [augmentedTokens]);
 
-  const hasRlusdTrustline = useMemo(() => {
-    return (augmentedTokens || []).some((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      return code === "RLUSD" && !token?.isMissingTrustline;
-    });
-  }, [augmentedTokens]);
+  // RLUSD n'est plus dans augmentedTokens (décomposé en USD+lignes).
+  // On se base sur baseTokens (solde on-chain) pour savoir si la trustline existe.
+  const hasRlusdTrustline = hasOnChainRlusd;
 
-  const selectLabelByAssetKey = useMemo(() => {
-    const labels = {};
-    (augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      if (token?.key) labels[token.key] = display;
-      labels[code] = display;
-    });
-    return labels;
-  }, [augmentedTokens]);
-
-  const selectLabelRightByAssetKey = useMemo(() => {
-    const labels = {};
-    (augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      const amount = Number(token?.value || 0);
-      const amountLabel = Number.isFinite(amount)
-        ? formatAmountWithSymbol(locale, amount, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          })
-        : formatAmountWithSymbol(locale, 0, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          });
-      const label = amountLabel;
-      if (token?.key) labels[token.key] = label;
-      labels[code] = label;
-    });
-    return labels;
-  }, [augmentedTokens, locale]);
-
-  const selectLabelMobileByAssetKey = useMemo(() => {
-    const labels = {};
-    (augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      const amount = Number(token?.value || 0);
-      const amountLabel = Number.isFinite(amount)
-        ? formatAmountWithSymbol(locale, amount, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          })
-        : formatAmountWithSymbol(locale, 0, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          });
-      const label = `${display} (${amountLabel})`;
-      if (token?.key) labels[token.key] = label;
-      labels[code] = label;
-    });
-    return labels;
-  }, [augmentedTokens, locale]);
-
-  const selectIconByAssetKey = useMemo(() => {
-    const icons = {};
-    (augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      const icon = CRYPTO_ICONS?.[display]
-        ? { src: CRYPTO_ICONS[display], alt: display }
-        : token?.isTrustlineOnly || display !== code
-          ? getCurrencyFlag(display)
-          : getTokenIcon(code);
-      if (token?.key) icons[token.key] = icon;
-      icons[code] = icon;
-    });
-    return icons;
-  }, [augmentedTokens]);
+  // Les labels des sélecteurs sont calculés plus bas, après displayTokensWithCurrencyLines,
+  // pour disposer des valeurs en devise locale (allocation / taux FX).
 
   const swapCurrencyOptionsForModal = useMemo(() => {
     const candidates = new Set((swapCurrencyOptions || []).map((c) => String(c || "").toUpperCase()).filter(Boolean));
@@ -1133,9 +1089,7 @@ export default function WalletDashboard({
     if (convertQuoteCurrency) candidates.add(String(convertQuoteCurrency || "").toUpperCase());
 
     const weight = (code) => {
-      if (code === "RLUSD") return 0;
-      if (code === "XRP") return 1;
-      if (code === "RLUSD") return 2;
+      if (code === "USD") return 0;
       return 3;
     };
 
@@ -1622,16 +1576,17 @@ export default function WalletDashboard({
       // - valeur principale en devise (units), basée sur l'allocation RLUSD et un taux indicatif
       // - valeur secondaire "≈ RLUSD" = allocation RLUSD
       if (!token?.isTrustlineOnly) return token;
-      if (currency === "XRP" || currency === "RLUSD" || currency === "RLUSD") return token;
+      if (currency === "XRP") return token;
 
       const allocated =
         allocatedRlusdByCurrency?.get?.(currency) ??
         (Number.isFinite(Number(token?.allocatedRlusd)) ? Number(token.allocatedRlusd) : 0);
 
-      const rate = Number(rlusdPerUnitRates?.[currency]);
+      // USD et RLUSD ont un taux fixe de 1 (stablecoin pegged 1:1).
+      const rawRate = (currency === "USD" || currency === "RLUSD") ? 1 : Number(rlusdPerUnitRates?.[currency]);
       const units =
-        Number.isFinite(rate) && rate > 0 && Number.isFinite(allocated) && allocated > 0
-          ? allocated / rate
+        Number.isFinite(rawRate) && rawRate > 0 && Number.isFinite(allocated) && allocated > 0
+          ? allocated / rawRate
           : 0;
 
       return {
@@ -1642,11 +1597,90 @@ export default function WalletDashboard({
     });
   }, [allocatedRlusdByCurrency, augmentedTokens, rlusdPerUnitRates]);
 
+  // --- Labels des sélecteurs (calculés après displayTokensWithCurrencyLines
+  //     pour disposer des valeurs en devise locale). ---
+  const selectLabelByAssetKey = useMemo(() => {
+    const labels = {};
+    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const display = getDisplayCurrencyCode(code);
+      if (token?.key) labels[token.key] = display;
+      labels[code] = display;
+    });
+    return labels;
+  }, [displayTokensWithCurrencyLines, augmentedTokens]);
+
+  const selectLabelRightByAssetKey = useMemo(() => {
+    const labels = {};
+    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const display = getDisplayCurrencyCode(code);
+      const amount = Number(token?.value || 0);
+      const amountLabel = Number.isFinite(amount)
+        ? formatAmountWithSymbol(locale, amount, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          })
+        : formatAmountWithSymbol(locale, 0, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          });
+      if (token?.key) labels[token.key] = amountLabel;
+      labels[code] = amountLabel;
+    });
+    return labels;
+  }, [displayTokensWithCurrencyLines, augmentedTokens, locale]);
+
+  const selectLabelMobileByAssetKey = useMemo(() => {
+    const labels = {};
+    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const display = getDisplayCurrencyCode(code);
+      const amount = Number(token?.value || 0);
+      const amountLabel = Number.isFinite(amount)
+        ? formatAmountWithSymbol(locale, amount, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          })
+        : formatAmountWithSymbol(locale, 0, display, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 4,
+          });
+      const label = `${display} (${amountLabel})`;
+      if (token?.key) labels[token.key] = label;
+      labels[code] = label;
+    });
+    return labels;
+  }, [displayTokensWithCurrencyLines, augmentedTokens, locale]);
+
+  const selectIconByAssetKey = useMemo(() => {
+    const icons = {};
+    (augmentedTokens || []).forEach((token) => {
+      const code = String(token?.currency || "").toUpperCase();
+      if (!code) return;
+      const display = getDisplayCurrencyCode(code);
+      const icon = CRYPTO_ICONS?.[display]
+        ? { src: CRYPTO_ICONS[display], alt: display }
+        : token?.isTrustlineOnly || display !== code
+          ? getCurrencyFlag(display)
+          : getTokenIcon(code);
+      if (token?.key) icons[token.key] = icon;
+      icons[code] = icon;
+    });
+    return icons;
+  }, [augmentedTokens]);
+
   const tokenListTokens = useMemo(() => {
     const tokens = isPreviewMode ? displayTokens : displayTokensWithCurrencyLines;
+    // XRP n'apparaît pas dans les lignes de devises du wallet.
+    // Il est visible uniquement dans le relevé global (dernière ligne).
+    // RLUSD est masqué (décomposé en USD + lignes).
     return (tokens || []).filter((token) => {
       const code = String(token?.currency || "").toUpperCase();
-      return code !== "XRP";
+      return code !== "XRP" && code !== "RLUSD";
     });
   }, [displayTokens, displayTokensWithCurrencyLines, isPreviewMode]);
   const { handleDemoConvert } = useSwapConversion({
@@ -1686,7 +1720,8 @@ export default function WalletDashboard({
   const sendFxInfo = useMemo(() => {
     const code = String(selectedSendToken?.currency || "").toUpperCase();
     if (!code) return null;
-    if (code === "XRP" || code === "RLUSD" || code === "RLUSD") return null;
+    // USD (pool non alloué = RLUSD) et XRP ne sont pas des conversions FX.
+    if (code === "XRP" || code === "RLUSD" || code === "USD") return null;
     if (!selectedSendToken?.isTrustlineOnly) return null;
 
     const amountFx = Number.parseFloat(sendAmount || "0");
@@ -1999,6 +2034,7 @@ export default function WalletDashboard({
         tokenRowClass={layout.tokenRowClass}
         onInstallTrustline={handleInstallRequiredTrustline}
         isWalletActivated={isWalletActivated}
+        hasRlusdTrustline={hasRlusdTrustline}
         onActivateWallet={handleOpenActivationModal}
         onClick={() => handleOpenCurrencyStatement(token)}
       />
@@ -2007,6 +2043,7 @@ export default function WalletDashboard({
       handleInstallRequiredTrustline,
       handleOpenActivationModal,
       handleOpenCurrencyStatement,
+      hasRlusdTrustline,
       isWalletActivated,
       layout.tokenRowClass,
     ]
@@ -2038,15 +2075,7 @@ export default function WalletDashboard({
       return { ok: false };
     }
     if (
-      selectedSendToken?.currency === "RLUSD" &&
-      !hasOnChainRlusd &&
-      !isPreviewMode
-    ) {
-      alert("RLUSD trustline is not installed yet. Please install it first.");
-      return { ok: false };
-    }
-    if (
-      selectedSendToken?.currency === "RLUSD" &&
+      (selectedSendToken?.currency === "RLUSD" || selectedSendToken?.currency === "USD") &&
       !hasOnChainRlusd &&
       !isPreviewMode
     ) {
@@ -2067,11 +2096,12 @@ export default function WalletDashboard({
     }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
+    // USD (pool non alloué) est envoyé comme RLUSD natif, pas comme une conversion FX.
     const isFxSend =
       selectedSendToken?.isTrustlineOnly &&
       currency !== "XRP" &&
       currency !== "RLUSD" &&
-      currency !== "RLUSD";
+      currency !== "USD";
 
     setSendProcessing(true);
     setActiveAction(null);
@@ -2478,6 +2508,18 @@ export default function WalletDashboard({
       let Amount;
       if (selectedSendToken.currency === "XRP" && selectedSendToken.issuer === "Native") {
         Amount = Math.round(amountNum * 1_000_000).toString();
+      } else if (currency === "USD" || currency === "RLUSD") {
+        // USD (pool non alloué) et RLUSD sont envoyés comme RLUSD on-chain.
+        const rlusdTxjson = buildRlusdPaymentTxjson({
+          account: wallet,
+          destination: dest,
+          amountRlusd: amountNum,
+        });
+        if (!rlusdTxjson) {
+          alert("Failed to build RLUSD payment.");
+          return { ok: false };
+        }
+        Amount = rlusdTxjson.Amount;
       } else {
         const normalized = amountNum.toFixed(8).replace(/\.?0+$/, "") || "0";
         Amount = {
@@ -2496,7 +2538,7 @@ export default function WalletDashboard({
 
       // If this payment comes from a XCANNES request, attach a memo so the receiver
       // can auto-credit the right currency line (only meaningful for RLUSD payments).
-      if (currency === "RLUSD" && sendPaymentRequest?.targetCurrencyCode) {
+      if ((currency === "RLUSD" || currency === "USD") && sendPaymentRequest?.targetCurrencyCode) {
         const target = String(sendPaymentRequest.targetCurrencyCode || "")
           .trim()
           .toUpperCase();
@@ -2668,6 +2710,7 @@ export default function WalletDashboard({
     getAllMarkets: xcannesApi.getAllMarkets,
     getTicker: xcannesApi.getTicker,
     getFxEod: xcannesApi.getFxEod,
+    rlusdOnChain: effectiveCurrencyLinesSummary?.rlusdOnChain ?? null,
   });
 
   const previewTotalLabel = useMemo(() => {
@@ -3193,7 +3236,7 @@ export default function WalletDashboard({
 
 	            {showInlineCurrencyStatement ? (
 	              <WalletDashboardStatementModals
-	                augmentedTokens={selectableTokens}
+	                augmentedTokens={displayTokensWithCurrencyLines || augmentedTokens}
 	                backendWalletAddress={backendWalletAddress}
 	                effectiveWallet={effectiveWallet}
 	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
@@ -3217,7 +3260,7 @@ export default function WalletDashboard({
 
 	            {showInlineGlobalStatement ? (
 	              <WalletDashboardStatementModals
-	                augmentedTokens={selectableTokens}
+	                augmentedTokens={displayTokensWithCurrencyLines || augmentedTokens}
 	                backendWalletAddress={backendWalletAddress}
 	                effectiveWallet={effectiveWallet}
 	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
@@ -3442,7 +3485,7 @@ export default function WalletDashboard({
 
 	      {!isDesktopPanel ? (
 	        <WalletDashboardStatementModals
-	          augmentedTokens={augmentedTokens}
+	          augmentedTokens={displayTokensWithCurrencyLines || augmentedTokens}
 	          backendWalletAddress={backendWalletAddress}
 	          effectiveWallet={effectiveWallet}
 	          walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
