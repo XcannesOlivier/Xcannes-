@@ -810,3 +810,21 @@ body.header-hero-mode .home-content-wrapper {
     padding-top: 80px; /* h-20 = 5rem = 80px sur desktop */
   }
 }
+
+/* ====== STACKED STICKY SCROLL – desktop only ====== */
+@media (min-width: 768px) {
+  .sticky-layer {
+    position: sticky;
+    top: 0;
+  }
+
+  /* Le hero occupe la pleine hauteur du viewport */
+  .sticky-layer--hero {
+    min-height: 100vh;
+  }
+
+  /* Ombre portée sur le bord supérieur des couches qui recouvrent */
+  .sticky-layer--cover {
+    box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.55);
+  }
+}
