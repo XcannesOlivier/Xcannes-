@@ -811,20 +811,19 @@ body.header-hero-mode .home-content-wrapper {
   }
 }
 
-/* ====== STACKED STICKY SCROLL – desktop only ====== */
-@media (min-width: 768px) {
-  .sticky-layer {
-    position: sticky;
-    top: 0;
-  }
+/* ====== STACKED STICKY SCROLL ====== */
+.sticky-layer {
+  position: sticky;
+  top: 0;
+}
 
-  /* Le hero occupe la pleine hauteur du viewport */
-  .sticky-layer--hero {
-    min-height: 100vh;
-  }
+/* Le hero occupe la pleine hauteur du viewport */
+.sticky-layer--hero {
+  min-height: 100vh;
+  min-height: 100svh; /* safe viewport height pour iOS */
+}
 
-  /* Ombre portée sur le bord supérieur des couches qui recouvrent */
-  .sticky-layer--cover {
-    box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.55);
-  }
+/* Ombre portée sur le bord supérieur des couches qui recouvrent */
+.sticky-layer--cover {
+  box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.55);
 }

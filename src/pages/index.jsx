@@ -330,7 +330,7 @@ export default function Home() {
       <div className="pt-16 home-content-wrapper">
 
         {/* LAYER 1 : Hero – sticky, reste derrière (desktop) */}
-        <div className="sticky-layer sticky-layer--hero md:z-[1] bg-[#0b0f10]">
+        <div className="sticky-layer sticky-layer--hero z-[1] bg-[#0b0f10]">
         <main className="relative overflow-hidden">
           <div className="absolute inset-0 bg-[#0b0f10] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0b0f10] md:h-36" />
@@ -346,6 +346,54 @@ export default function Home() {
                   </span>
                 </h1>
 
+                {/* Badges store – visible sur mobile sous le titre, sur desktop après le sous-titre */}
+                <div className={`mt-8 flex md:hidden flex-col items-center justify-center gap-4 transition-all duration-700 delay-300 ${
+                  showHeroBadges ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}>
+                  <p className="text-sm text-white/70">
+                    {t(
+                      "home_v2_hero_store_cta_hint",
+                      "Téléchargez l'application XCANNES sur votre mobile."
+                    )}
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    <a
+                      href="#"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex"
+                      aria-label={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                    >
+                      <Image
+                        src={appStoreBadgeSrc}
+                        alt={t("home_v2_hero_app_store_aria", "Télécharger XCANNES sur l'App Store")}
+                        className="h-12 w-auto"
+                        width={250}
+                        height={83}
+                        loading="lazy"
+                        unoptimized
+                      />
+                    </a>
+                    <a
+                      href="#"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex"
+                      aria-label={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                    >
+                      <Image
+                        src={googlePlayBadgeSrc}
+                        alt={t("home_v2_hero_google_play_aria", "Télécharger XCANNES sur Google Play")}
+                        className="h-[60px] w-auto"
+                        width={646}
+                        height={250}
+                        loading="lazy"
+                        unoptimized
+                      />
+                    </a>
+                  </div>
+                </div>
+
                 {/* Texte sur desktop uniquement */}
                 <p className={`mt-8 md:mt-12 text-lg md:text-xl lg:text-2xl text-white/90 font-light leading-relaxed hidden md:block transition-all duration-700 delay-200 ${
                   showHeroSubtitle ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 translate-x-16 translate-y-8'
@@ -357,15 +405,6 @@ export default function Home() {
                     ).replace('⮕', '<span class="inline-block text-xcannes-green animate-pulse">⮕</span>')
                   }} />
                 </p>
-
-                {/* Carrousel des cartes sur mobile uniquement */}
-                <MobileHeroCarousel 
-                  show={showHeroCarousel}
-                  onSpeedClick={openSpeedModal}
-                  onSecurityClick={openSecurityModal}
-                  onFeesClick={openFeesModal}
-                  onValueClick={openValueModal}
-                />
 
                 <div className={`mt-10 hidden md:flex flex-col items-center justify-center gap-4 transition-all duration-700 delay-500 ${
                   showHeroBadges ? 'opacity-100 translate-x-0 translate-y-0' : 'opacity-0 translate-x-16 translate-y-8'
@@ -420,10 +459,19 @@ export default function Home() {
         </main>
         </div>
 
-        {/* LAYER 2 : Pillar cards – sticky, recouvrent le Hero (desktop) */}
-        <div className="sticky-layer sticky-layer--cover md:z-[2] bg-[#0b0f10]">
-          <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-16 md:py-24">
+        {/* LAYER 2 : Pillar cards – sticky, recouvrent le Hero */}
+        <div className="sticky-layer sticky-layer--cover z-[2] bg-[#0b0f10]">
+          <div className="relative z-10 max-w-[1600px] mx-auto px-6 pt-4 pb-10 md:pt-10 md:pb-24">
             <div className="mx-auto max-w-6xl">
+
+                {/* Carrousel des cartes sur mobile uniquement */}
+                <MobileHeroCarousel 
+                  show={showHeroCarousel}
+                  onSpeedClick={openSpeedModal}
+                  onSecurityClick={openSecurityModal}
+                  onFeesClick={openFeesModal}
+                  onValueClick={openValueModal}
+                />
 
                 {/* 3 premières cartes + carrousel pour les 2 dernières */}
                 <div className={`hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 transition-all duration-700 delay-700 ${
@@ -668,7 +716,7 @@ export default function Home() {
         </div>
 
         {/* LAYER 3 : Reste de la page – recouvre les cartes (desktop) */}
-        <div className="sticky-layer--cover relative md:z-[3] bg-[#0b0f10]">
+        <div className="sticky-layer--cover relative z-[3] bg-[#0b0f10]">
           <WalletProductSection />
           <section className="relative py-14 sm:py-16 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
