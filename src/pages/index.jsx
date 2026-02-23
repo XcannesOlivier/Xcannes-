@@ -496,6 +496,7 @@ export default function Home() {
                   stat: t("home_v2_hero_pillar_1_stat", "≤ 3 s"),
                   subtitle: t("home_v2_hero_pillar_1_caption", "Paiement et conversion en temps réel."),
                   showLinkButton: false,
+                  image: "/images/Ex\u00e9cution instantan\u00e9e et finance num\u00e9rique.png",
                   link: {
                     label: t("home_v2_hero_pillar_1_link", "Détails"),
                     onClick: () => openSpeedModal(),
@@ -514,6 +515,7 @@ export default function Home() {
                     "Validation sécurisée sous votre autorité."
                   ),
                   showLinkButton: false,
+                  image: "/images/Contr\u00f4le s\u00e9curis\u00e9 des transactions num\u00e9riques.png",
                   link: {
                     label: t("home_v2_hero_pillar_2_link", "Détails"),
                     onClick: () => openSecurityModal(),
@@ -531,6 +533,7 @@ export default function Home() {
                     "Frais affichés avant chaque confirmation."
                   ),
                   showLinkButton: false,
+                  image: "/images/Transparence des frais en Suisse et Colombie.png",
                   link: {
                     label: t("home_v2_hero_pillar_3_link", "Détails"),
                     onClick: () => openFeesModal(),
@@ -602,8 +605,11 @@ export default function Home() {
                           : undefined
                         }
 		                      className={[
-		                        "relative flex items-start gap-2.5 bg-white/90 rounded-md px-4 py-7 md:py-4 transition-all duration-300 ease-out",
-		                        "md:hover:bg-white md:hover:scale-[1.05] md:hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:hover:z-10",
+		                        "relative rounded-md transition-all duration-300 ease-out overflow-hidden",
+		                        item.image
+		                          ? "p-0 bg-transparent"
+		                          : "flex items-start gap-2.5 bg-white/90 px-4 py-7 md:py-4",
+		                        "md:hover:scale-[1.05] md:hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:hover:z-10",
 		                        isClickable
 		                          ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black/30"
 		                          : "",
@@ -618,6 +624,17 @@ export default function Home() {
 	                        transitionDelay: isVisible ? `${index * 150}ms` : "0ms"
 	                      }}>
 
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        width={600}
+                        height={400}
+                        className="w-full h-auto rounded-md"
+                        unoptimized
+                      />
+                    ) : (
+                    <>
                     <div
                       className={[
                         "mt-0.5 flex items-center justify-center w-8 h-8 shrink-0",
@@ -666,6 +683,8 @@ export default function Home() {
                       </button>
                     ) : null}
                   </div>
+                  </>
+                    )}
                   </div>
                 );
               })}
