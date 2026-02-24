@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
-import { buildRlusdPaymentTxjson, XCANNES_ACTIVATION_WALLET_ADDRESS } from "@/utils/walletSpread";
 import { buildXrplJsonMemo, buildWalletLabelMemo } from "@/utils/xrplMemo";
 
 export function useWalletLabel({
@@ -13,8 +12,6 @@ export function useWalletLabel({
   hasOnChainRlusd = null,
   defaultLabel = "",
   signTransaction,
-  activationDestination = XCANNES_ACTIVATION_WALLET_ADDRESS,
-  renameFeeRlusd = 1,
 } = {}) {
   const [walletLabel, setWalletLabel] = useState(defaultLabel);
   const [walletLabelDraft, setWalletLabelDraft] = useState(defaultLabel);
@@ -157,36 +154,9 @@ export function useWalletLabel({
       return;
     }
 
-    if (hasOnChainRlusd === false) {
-      flashWalletHeaderToast(
-        "RLUSD trustline is not installed yet.",
-        2200
-      );
-      return;
-    }
-
-    const destination = String(activationDestination || "").trim();
-    if (!destination) {
-      flashWalletHeaderToast("Activation wallet not configured.", 2000);
-      return;
-    }
-
-    const fee = Number(renameFeeRlusd);
-    if (!Number.isFinite(fee) || fee <= 0) {
-      flashWalletHeaderToast("Invalid rename fee.", 2000);
-      return;
-    }
-
-    const txjson = buildRlusdPaymentTxjson({
-      account: walletAddress,
-      destination,
-      amountRlusd: fee,
-    });
-    if (!txjson) {
-      flashWalletHeaderToast("Unable to build rename payment.", 2000);
-      return;
-    }
-
+    // Fallback naming: 1-drop XRP self-payment with wallet_label memo.
+    // This path is used when RLUSD was activated outside of XCANNES
+    // and the wallet still needs a name.
     const memoPayload = buildWalletLabelMemo({ label: trimmed });
     if (!memoPayload) {
       flashWalletHeaderToast("Invalid wallet label memo.", 2000);
@@ -197,7 +167,14 @@ export function useWalletLabel({
       flashWalletHeaderToast("Invalid wallet label memo.", 2000);
       return;
     }
-    txjson.Memos = memos;
+
+    const txjson = {
+      TransactionType: "Payment",
+      Account: walletAddress,
+      Destination: walletAddress,
+      Amount: "1",
+      Memos: memos,
+    };
 
     const result = await signTransaction(txjson, { action: "wallet:label" });
     if (!result?.signed) {
@@ -213,15 +190,12 @@ export function useWalletLabel({
 
     flashWalletHeaderToast("Nom enregistré", 1600);
   }, [
-    activationDestination,
     flashWalletHeaderToast,
-    hasOnChainRlusd,
     isConnected,
     isPreviewMode,
     isWalletActivated,
     isWalletLabelLocked,
     loadWalletLabel,
-    renameFeeRlusd,
     signTransaction,
     walletAddress,
     walletLabel,

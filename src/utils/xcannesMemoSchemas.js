@@ -108,7 +108,10 @@ function inferXcannesMemoType(payload) {
 function normalizeWalletLabelPayload(payload, errors) {
   const label = normalizeString(payload?.label);
   if (!label || !isValidWalletLabel(label)) errors.push('wallet_label.label');
-  return { label };
+  const defaultCurrency = normalizeCurrencyCode(payload?.defaultCurrency);
+  const normalized = { label };
+  if (defaultCurrency) normalized.defaultCurrency = defaultCurrency;
+  return normalized;
 }
 
 function normalizeCurrencyLinePayload(payload, errors) {
