@@ -412,6 +412,17 @@ export default function Header({ fixed = true }) {
           }
 
 	          {/* Le lien "Mes comptes" n'apparaît pas dans la navigation temporaire mobile, seulement dans le menu burger */}
+	          {showHomeWalletLink &&
+	          <Link
+	            href="/wallet"
+	            className="hidden md:inline-flex header-nav-link header-nav-link-white-hover"
+	            onClick={withHardNavFallback("/wallet")}>
+	              <span className="header-nav-label">
+	                {t("nav_multi_currency_account", "Mes comptes")}
+	              </span>
+	              <span aria-hidden="true" className="header-nav-arrow">&gt;</span>
+	          </Link>
+	          }
 
 	          <button
 	            type="button"
