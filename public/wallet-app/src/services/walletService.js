@@ -5,42 +5,45 @@
  * and LOCAL transaction signing.
  * 
  * Uses the xrpl.js library loaded from CDN in the PWA.
- * The seed NEVER leaves this module unencrypted.
- * The seed is NEVER sent to any server.
+ * The seed / mnemonic NEVER leaves this module unencrypted.
+ * The seed / mnemonic is NEVER sent to any server.
+ * 
+ * Mnemonic standard: BIP39 (12 words) — compatible with Trust Wallet, Ledger, etc.
  * 
  * xrpl.js functions used:
- *   Wallet.generate, Wallet.fromSeed, Wallet.fromMnemonic, Wallet.fromEntropy
+ *   Wallet.fromMnemonic, Wallet.fromSeed, Wallet.fromEntropy
  *   wallet.sign, wallet.verifyTransaction, wallet.getXAddress
  *   verifySignature, isValidAddress, isValidClassicAddress, isValidSecret
- *   deriveKeypair, deriveAddress, keyToRFC1751Mnemonic, rfc1751MnemonicToKey
+ *   deriveKeypair, deriveAddress
  *   walletFromSecretNumbers, validate
  *   xrpToDrops, dropsToXrp, convertStringToHex, convertHexToString
  */
 
-/**
- * Generate a new XRPL wallet.
- * Returns the seed + address + mnemonic backup.
- * The seed must be encrypted immediately by the caller using cryptoService.encryptSeed().
- *
- * @returns {{ address: string, seed: string, publicKey: string, mnemonic: string, xAddress: string }}
- */
-export function generateWallet() {
-  // xrpl is loaded globally via CDN <script> tag
-  const wallet = xrpl.Wallet.generate();
+import { generateMnemonic } from './bip39.js';
 
-  // Generate RFC1751 mnemonic (12 words) for human-readable backup
-  let mnemonic = '';
-  try {
-    mnemonic = xrpl.keyToRFC1751Mnemonic(wallet.privateKey);
-  } catch {
-    // Fallback: seed itself is the backup
-  }
+/**
+ * Generate a new XRPL wallet using BIP39 mnemonic.
+ * The mnemonic (12 words) IS the master secret — it replaces the traditional seed.
+ * The mnemonic must be encrypted immediately by the caller using cryptoService.encryptSeed().
+ *
+ * Flow: generateMnemonic() → Wallet.fromMnemonic(mnemonic)
+ * This ensures the mnemonic is always the canonical backup.
+ *
+ * @returns {Promise<{ address: string, seed: string, publicKey: string, mnemonic: string, xAddress: string }>}
+ */
+export async function generateWallet() {
+  // 1. Generate a BIP39 12-word mnemonic (128-bit entropy + SHA-256 checksum)
+  const mnemonic = await generateMnemonic();
+
+  // 2. Derive XRPL wallet from mnemonic via BIP44 path
+  // xrpl is loaded globally via CDN <script> tag
+  const wallet = xrpl.Wallet.fromMnemonic(mnemonic);
 
   return {
     address: wallet.classicAddress,
-    seed: wallet.seed,
+    seed: mnemonic,      // Store mnemonic as the "seed" — no traditional sXXXX seed
     publicKey: wallet.publicKey,
-    mnemonic,
+    mnemonic,            // Same value, explicit for backup display
     xAddress: wallet.getXAddress(),
   };
 }
@@ -80,23 +83,8 @@ export function walletFromMnemonic(mnemonic) {
   };
 }
 
-/**
- * Restore a wallet from RFC1751 mnemonic (12 words — Xcannes backup format).
- *
- * @param {string} mnemonic - Space-separated 12 RFC1751 words
- * @returns {{ address: string, publicKey: string, wallet: object, seed: string }}
- */
-export function walletFromRFC1751Mnemonic(mnemonic) {
-  const keyBytes = xrpl.rfc1751MnemonicToKey(mnemonic.trim());
-  const seed = xrpl.encodeSeed(keyBytes, 'ed25519');
-  const wallet = xrpl.Wallet.fromSeed(seed);
-  return {
-    address: wallet.classicAddress,
-    publicKey: wallet.publicKey,
-    wallet,
-    seed,
-  };
-}
+// walletFromRFC1751Mnemonic() removed — Xcannes now uses BIP39 only.
+// Legacy RFC1751 wallets can still be imported via seed (sXXXX format).
 
 /**
  * Restore a wallet from Xaman/XUMM "secret numbers" format.

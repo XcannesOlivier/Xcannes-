@@ -6,7 +6,7 @@
  * The actual signing is always online (needs relay).
  */
 
-const CACHE_NAME = 'xcannes-wallet-v1';
+const CACHE_NAME = 'xcannes-wallet-v4';
 // Paths relative to SW scope (/wallet-app/)
 const ASSETS_TO_CACHE = [
   './',
@@ -14,25 +14,22 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './src/styles/main.css',
   './src/components/App.js',
+  './src/services/bip39.js',
   './src/services/cryptoService.js',
   './src/services/webauthnService.js',
   './src/services/walletService.js',
   './src/services/storageService.js',
   './src/services/qrService.js',
   './src/services/relayService.js',
-];
-
-// External CDN assets (xrpl.js, jsQR)
-const CDN_ASSETS = [
-  'https://unpkg.com/xrpl@4.4.3/build/xrpl-latest-min.js',
-  'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js',
+  './lib/xrpl-4.4.3.min.js',
+  './lib/jsQR-1.4.0.js',
 ];
 
 // Install: cache all app shell assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([...ASSETS_TO_CACHE, ...CDN_ASSETS]);
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
   self.skipWaiting();

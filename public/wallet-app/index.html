@@ -7,6 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Xcannes Wallet">
+
+  <!-- CSP: only allow scripts from same origin, block all external/inline scripts -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.xcannes.com; media-src 'self' blob:; object-src 'none'; frame-src 'none';">
+
   <base href="/wallet-app/">
   <title>Xcannes Wallet</title>
 
@@ -18,130 +22,300 @@
   <!-- Styles -->
   <link rel="stylesheet" href="src/styles/main.css">
 
-  <!-- xrpl.js from CDN (browser bundle) -->
-  <script src="https://unpkg.com/xrpl@4.4.3/build/xrpl-latest-min.js"></script>
+  <!-- xrpl.js — self-hosted, no external CDN dependency -->
+  <script src="lib/xrpl-4.4.3.min.js"></script>
 
   <!-- jsQR fallback for QR scanning (browsers without BarcodeDetector) -->
-  <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="lib/jsQR-1.4.0.js"></script>
 </head>
 <body>
   <div id="app">
 
-    <!-- ========== LOADING SCREEN ========== -->
-    <div id="screen-loading" class="screen">
+    <!-- ========== 1. SPLASH SCREEN ========== -->
+    <div id="screen-splash" class="screen">
       <div class="screen-content center">
-        <div class="logo">X</div>
-        <h1>Xcannes Wallet</h1>
-        <p class="subtitle">Chargement...</p>
-        <div class="spinner"></div>
+        <div class="splash-logo" id="splash-logo">X</div>
+        <p class="splash-label" id="splash-label">Xcannes Wallet</p>
       </div>
     </div>
 
-    <!-- ========== WELCOME SCREEN ========== -->
+    <!-- ========== 2. WELCOME SCREEN ========== -->
     <div id="screen-welcome" class="screen hidden">
       <div class="screen-content center">
         <div class="logo">X</div>
         <h1>Xcannes Wallet</h1>
-        <p class="subtitle">Votre wallet XRPL sécurisé par Face ID</p>
+        <p class="subtitle">Votre wallet XRPL,<br>sécurisé par Face ID.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-icon">🔐</span>
+            <span>Clés chiffrées sur votre appareil</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">👆</span>
+            <span>Déverrouillage biométrique</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🌐</span>
+            <span>Connexion à Xcannes en un scan</span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="btn-welcome-continue" class="btn btn-primary">Continuer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 3. TERMS SCREEN ========== -->
+    <div id="screen-terms" class="screen hidden">
+      <div class="screen-content">
+        <div class="screen-header">
+          <button class="btn-back" id="btn-terms-back">‹</button>
+          <h2>Conditions d'utilisation</h2>
+          <span></span>
+        </div>
+
+        <div class="terms-box">
+          <div class="terms-scroll" id="terms-text">
+            <h3>Xcannes Wallet — Conditions</h3>
+            <p>En utilisant Xcannes Wallet, vous acceptez les conditions suivantes :</p>
+            <ul>
+              <li><strong>Non-custodial</strong> — Vos clés privées sont générées et stockées exclusivement sur votre appareil. Xcannes n'a jamais accès à vos fonds.</li>
+              <li><strong>Responsabilité</strong> — Vous êtes seul responsable de la sauvegarde de votre phrase de récupération (mnemonic). En cas de perte, vos fonds sont irrécupérables.</li>
+              <li><strong>Pas de garantie</strong> — Le logiciel est fourni "tel quel". Xcannes ne peut être tenu responsable de toute perte liée à l'utilisation du wallet.</li>
+              <li><strong>Sécurité</strong> — Le chiffrement repose sur la biométrie de votre appareil (Face ID / Touch ID). Protégez l'accès à votre téléphone.</li>
+              <li><strong>Réseau XRPL</strong> — Les transactions sont irréversibles une fois soumises au XRP Ledger.</li>
+              <li><strong>Activation</strong> — Un compte XRPL nécessite un dépôt minimum de 10 XRP pour être activé sur le ledger.</li>
+            </ul>
+            <p>En continuant, vous confirmez avoir lu et accepté l'ensemble de ces conditions.</p>
+          </div>
+        </div>
+
+        <div class="terms-footer">
+          <label class="checkbox-label" for="terms-agree">
+            <input type="checkbox" id="terms-agree">
+            <span class="checkbox-custom"></span>
+            <span>J'ai lu et j'accepte les conditions</span>
+          </label>
+          <button id="btn-terms-accept" class="btn btn-primary" disabled>Accepter et continuer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 4. BIOMETRIC CHECK SCREEN ========== -->
+    <div id="screen-biometric-check" class="screen hidden">
+      <div class="screen-content center">
+        <div class="icon-large">👆</div>
+        <h2>Sécurité biométrique</h2>
+        <p class="subtitle">Xcannes Wallet utilise Face ID ou Touch ID pour protéger vos clés privées.</p>
+        <p class="hint-text">Aucun mot de passe à retenir.<br>Votre visage ou empreinte est la clé.</p>
+        <div id="biometric-status" class="status"></div>
+        <div class="spinner hidden" id="biometric-spinner"></div>
+        <div class="button-group">
+          <button id="btn-biometric-continue" class="btn btn-primary" disabled>Vérification…</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 5. CHOICE SCREEN ========== -->
+    <div id="screen-choice" class="screen hidden">
+      <div class="screen-content center">
+        <div class="logo logo-sm">X</div>
+        <h2>Configurez votre wallet</h2>
+        <p class="subtitle">Créez un nouveau wallet XRPL<br>ou importez un wallet existant.</p>
 
         <div class="button-group">
           <button id="btn-create-wallet" class="btn btn-primary">
-            Créer un wallet
+            Créer un nouveau wallet
           </button>
           <button id="btn-import-wallet" class="btn btn-secondary">
-            Importer un seed existant
+            Importer un wallet existant
           </button>
         </div>
 
         <p class="notice">
-          🔒 Votre seed est chiffré et stocké uniquement sur cet appareil.<br>
-          Aucune donnée sensible n'est envoyée à Xcannes.
+          🔒 Votre phrase de récupération est chiffrée et stockée uniquement sur cet appareil.<br>
+          Aucune donnée n'est envoyée à un serveur.
         </p>
       </div>
     </div>
 
-    <!-- ========== CREATE WALLET SCREEN ========== -->
-    <div id="screen-create" class="screen hidden">
+    <!-- ========== 6. CREATE — GENERATING ========== -->
+    <div id="screen-creating" class="screen hidden">
       <div class="screen-content center">
         <div class="icon-large">🔐</div>
         <h2>Création du wallet</h2>
-        <p id="create-status" class="status">Initialisation...</p>
+        <p id="creating-status" class="status">Génération des clés…</p>
         <div class="spinner"></div>
       </div>
     </div>
 
-    <!-- ========== BACKUP SCREEN ========== -->
+    <!-- ========== 7. BACKUP — SHOW MNEMONIC ========== -->
     <div id="screen-backup" class="screen hidden">
       <div class="screen-content">
-        <h2>⚠️ Sauvegardez votre seed</h2>
-        <p class="warning">
-          Notez ce seed dans un endroit sûr. C'est le <strong>seul moyen</strong> de récupérer votre wallet.
-          Il ne sera <strong>plus jamais affiché</strong>.
-        </p>
+        <div class="screen-header">
+          <span></span>
+          <h2>Sauvegardez votre phrase</h2>
+          <span></span>
+        </div>
 
-        <div class="seed-display">
-          <code id="backup-seed">...</code>
+        <div class="warning">
+          ⚠️ Notez ces <strong>12 mots</strong> dans l'ordre, dans un endroit sûr.<br>
+          C'est le <strong>seul moyen</strong> de récupérer votre wallet.<br>
+          Ils ne seront <strong>plus jamais affichés</strong>.
+        </div>
+
+        <div class="mnemonic-grid" id="mnemonic-grid">
+          <!-- 12 word slots filled by JS -->
         </div>
 
         <div class="info-box">
-          <p><strong>Adresse :</strong></p>
-          <code id="backup-address">...</code>
+          <p class="info-label">Adresse XRPL</p>
+          <code id="backup-address">…</code>
         </div>
 
-        <div class="confirm-box">
-          <label for="backup-confirm-input">
-            Tapez les 4 derniers caractères du seed pour confirmer :
-          </label>
-          <input
-            type="text"
-            id="backup-confirm-input"
-            maxlength="4"
-            autocomplete="off"
-            autocorrect="off"
-            spellcheck="false"
-            placeholder="####"
-          />
-          <button id="btn-backup-confirm" class="btn btn-primary">
-            Confirmer la sauvegarde
-          </button>
+        <div class="button-group">
+          <button id="btn-backup-regenerate" class="btn btn-secondary btn-sm">🔄 Nouvelle liste</button>
+          <button id="btn-backup-continue" class="btn btn-primary">J'ai noté mes 12 mots</button>
         </div>
       </div>
     </div>
 
-    <!-- ========== IMPORT SCREEN ========== -->
+    <!-- ========== 8. BACKUP — VERIFY ALL 12 WORDS ========== -->
+    <div id="screen-backup-verify" class="screen hidden">
+      <div class="screen-content">
+        <div class="screen-header">
+          <button class="btn-back" id="btn-verify-back">‹</button>
+          <h2>Vérification</h2>
+          <span></span>
+        </div>
+        <p class="verify-intro">Confirmez chaque mot, un par un, dans l’ordre.</p>
+
+        <div class="verify-progress">
+          <span id="verify-progress-text">Mot 1 / 12</span>
+          <div class="verify-progress-bar">
+            <div class="verify-progress-fill" id="verify-progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="verify-sequential" id="verify-sequential">
+          <!-- 12 rows rendered by JS -->
+        </div>
+
+        <p id="verify-status" class="status"></p>
+
+        <div class="button-group">
+          <button id="btn-verify-confirm" class="btn btn-primary" disabled>Confirmer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 9. IMPORT SCREEN ========== -->
     <div id="screen-import" class="screen hidden">
       <div class="screen-content">
-        <h2>Importer un wallet</h2>
-        <p>Entrez votre seed XRPL existant.</p>
+        <div class="screen-header">
+          <button class="btn-back" id="btn-import-back">‹</button>
+          <h2>Importer un wallet</h2>
+          <span></span>
+        </div>
 
-        <div class="input-group">
-          <input
-            type="password"
-            id="import-seed-input"
-            placeholder="sXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-            autocomplete="off"
-            autocorrect="off"
-            spellcheck="false"
-          />
-          <button id="btn-import-confirm" class="btn btn-primary">
-            Importer
-          </button>
+        <!-- Tabs -->
+        <div class="tabs" id="import-tabs">
+          <button class="tab active" data-tab="mnemonic">12 mots</button>
+          <button class="tab" data-tab="seed">Seed</button>
+          <button class="tab" data-tab="secretnumbers">Xumm</button>
+        </div>
+
+        <!-- Tab: Mnemonic (default — BIP39 is now the primary format) -->
+        <div class="tab-panel active" id="panel-mnemonic">
+          <p class="tab-desc">Entrez votre phrase de récupération BIP39 (12 mots séparés par des espaces)</p>
+          <div class="input-group">
+            <textarea id="import-mnemonic-input" rows="4" placeholder="abandon ability able about …"
+              autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+          </div>
+        </div>
+
+        <!-- Tab: Seed (legacy sXXXX format) -->
+        <div class="tab-panel" id="panel-seed">
+          <p class="tab-desc">Entrez votre seed XRPL legacy (format sXXXX…)</p>
+          <div class="input-group">
+            <input type="password" id="import-seed-input" placeholder="sXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+              autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+        </div>
+
+        <!-- Tab: Secret Numbers (Xumm/Xaman) -->
+        <div class="tab-panel" id="panel-secretnumbers">
+          <p class="tab-desc">Entrez les 8 rangées de 6 chiffres de votre wallet Xumm / Xaman</p>
+          <div class="secret-numbers-grid" id="secret-numbers-grid">
+            <div class="sn-row"><label>A</label><input type="text" maxlength="6" inputmode="numeric" data-row="A" placeholder="000000"></div>
+            <div class="sn-row"><label>B</label><input type="text" maxlength="6" inputmode="numeric" data-row="B" placeholder="000000"></div>
+            <div class="sn-row"><label>C</label><input type="text" maxlength="6" inputmode="numeric" data-row="C" placeholder="000000"></div>
+            <div class="sn-row"><label>D</label><input type="text" maxlength="6" inputmode="numeric" data-row="D" placeholder="000000"></div>
+            <div class="sn-row"><label>E</label><input type="text" maxlength="6" inputmode="numeric" data-row="E" placeholder="000000"></div>
+            <div class="sn-row"><label>F</label><input type="text" maxlength="6" inputmode="numeric" data-row="F" placeholder="000000"></div>
+            <div class="sn-row"><label>G</label><input type="text" maxlength="6" inputmode="numeric" data-row="G" placeholder="000000"></div>
+            <div class="sn-row"><label>H</label><input type="text" maxlength="6" inputmode="numeric" data-row="H" placeholder="000000"></div>
+          </div>
         </div>
 
         <p id="import-status" class="status"></p>
 
-        <button class="btn btn-link" onclick="document.getElementById('screen-import').classList.add('hidden'); document.getElementById('screen-welcome').classList.remove('hidden');">
-          ← Retour
-        </button>
+        <div class="button-group">
+          <button id="btn-import-confirm" class="btn btn-primary">Importer</button>
+        </div>
       </div>
     </div>
 
-    <!-- ========== UNLOCK SCREEN ========== -->
+    <!-- ========== 10. HOME SCREEN ========== -->
+    <div id="screen-home" class="screen hidden">
+      <div class="screen-content">
+        <div class="home-header">
+          <div class="home-brand">
+            <div class="logo logo-xs">X</div>
+            <span class="home-title">Xcannes Wallet</span>
+          </div>
+          <button id="btn-lock" class="btn-icon-round" title="Verrouiller">🔒</button>
+        </div>
+
+        <!-- Wallet card -->
+        <div class="wallet-card">
+          <div class="wallet-card-top">
+            <span class="wallet-label" id="home-wallet-label">Mon Wallet</span>
+            <span class="wallet-badge hidden" id="home-badge-inactive">Non activé</span>
+            <span class="wallet-badge wallet-badge-active hidden" id="home-badge-active">Activé</span>
+          </div>
+          <div class="wallet-address" id="home-address">rXXX…XXXX</div>
+          <div class="wallet-balance" id="home-balance">
+            <span class="balance-amount" id="home-balance-amount">0</span>
+            <span class="balance-currency">XRP</span>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="home-actions">
+          <button id="btn-scan" class="btn btn-primary btn-scan">
+            <span class="scan-icon">📷</span>
+            Scanner un QR code
+          </button>
+          <p class="home-hint">Scannez le QR affiché sur xcannes.com<br>pour connecter votre wallet ou signer une transaction.</p>
+        </div>
+
+        <!-- Info notice for non-activated accounts -->
+        <div class="activation-notice hidden" id="activation-notice">
+          <p><strong>Compte non activé</strong></p>
+          <p>Pour activer votre compte XRPL, envoyez au minimum <strong>10 XRP</strong> à votre adresse ci-dessus depuis un exchange ou un autre wallet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 11. UNLOCK SCREEN ========== -->
     <div id="screen-unlock" class="screen hidden">
       <div class="screen-content center">
-        <div class="icon-large">🔓</div>
+        <div class="logo">X</div>
         <h2>Déverrouiller</h2>
-        <p id="unlock-address" class="address-preview">...</p>
+        <p id="unlock-address" class="address-preview">…</p>
 
         <button id="btn-unlock" class="btn btn-primary btn-biometric">
           <span class="biometric-icon">👆</span>
@@ -152,12 +326,13 @@
       </div>
     </div>
 
-    <!-- ========== SCANNER SCREEN ========== -->
+    <!-- ========== 12. SCANNER SCREEN ========== -->
     <div id="screen-scanner" class="screen hidden">
       <div class="screen-content scanner-layout">
         <div class="scanner-header">
-          <span id="scanner-address" class="address-chip">...</span>
-          <button id="btn-lock" class="btn btn-icon" title="Verrouiller">🔒</button>
+          <button class="btn-back btn-back-light" id="btn-scanner-back">‹</button>
+          <span id="scanner-address" class="address-chip">…</span>
+          <button id="btn-scanner-lock" class="btn-icon-round" title="Verrouiller">🔒</button>
         </div>
 
         <div class="scanner-viewport">
@@ -167,27 +342,29 @@
           </div>
         </div>
 
-        <p id="scanner-status" class="status">Scannez le QR code affiché sur votre écran</p>
+        <p id="scanner-status" class="status scanner-bottom-status">Scannez le QR code affiché sur votre écran</p>
         <p id="scanner-tx-details" class="tx-details hidden"></p>
       </div>
     </div>
 
-    <!-- ========== SUCCESS SCREEN ========== -->
+    <!-- ========== 13. SUCCESS SCREEN ========== -->
     <div id="screen-success" class="screen hidden">
       <div class="screen-content center">
         <div class="icon-large success-icon">✅</div>
         <h2 id="success-title">Succès</h2>
-        <p id="success-message"></p>
+        <p id="success-message" class="subtitle"></p>
       </div>
     </div>
 
-    <!-- ========== ERROR SCREEN ========== -->
+    <!-- ========== 14. ERROR SCREEN ========== -->
     <div id="screen-error" class="screen hidden">
       <div class="screen-content center">
         <div class="icon-large">❌</div>
         <h2>Erreur</h2>
-        <p id="error-message" class="error"></p>
-        <button id="btn-error-retry" class="btn btn-primary">Réessayer</button>
+        <p id="error-message" class="error-text"></p>
+        <div class="button-group" style="margin-top:24px">
+          <button id="btn-error-retry" class="btn btn-primary">Réessayer</button>
+        </div>
       </div>
     </div>
 
