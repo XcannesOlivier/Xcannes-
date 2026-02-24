@@ -89,23 +89,69 @@ function updateStatus(el, text, isError = false) {
 export async function init() {
   showScreen('splash');
 
-  // Animated splash for 1.8s, then route
-  await delay(1800);
-
-  // Returning user with wallet → unlock
+  // Check immediately if returning user (during splash)
   const existingWallets = await hasWallets();
-  if (existingWallets) {
-    const onboarded = await getSetting(SETTING_ONBOARDED);
-    if (onboarded) {
-      showScreen('unlock');
-      setupUnlockScreen();
+  const onboarded = existingWallets ? await getSetting(SETTING_ONBOARDED) : false;
+
+  if (existingWallets && onboarded) {
+    // Returning user — launch Face ID in parallel with splash animation
+    // Face ID triggers DURING the splash, just like Xumm
+    const unlockResult = await attemptInstantUnlock();
+
+    if (unlockResult.success) {
+      // Face ID succeeded during splash — go straight to Home
+      showScreen('home');
+      setupHomeScreen();
+      resetInactivityTimer();
       return;
     }
+
+    // Face ID failed — show unlock screen with retry button visible
+    showScreen('unlock');
+    setupUnlockScreenManual(unlockResult.error);
+    return;
   }
 
-  // First-time user → welcome
+  // First-time user → wait for splash then welcome
+  await delay(1800);
   showScreen('welcome');
   setupWelcomeScreen();
+}
+
+/**
+ * Attempt instant unlock during splash — Face ID fires before app is visible.
+ * Returns { success: true } or { success: false, error }.
+ */
+async function attemptInstantUnlock() {
+  try {
+    const walletData = await getLastUsedWallet();
+    if (!walletData) return { success: false, error: 'no_wallet' };
+
+    // Trigger Face ID immediately (user sees it over the splash)
+    const prfOutput = await promptBiometric(walletData.credentialId);
+
+    const seed = await decryptSeed(walletData.encryptedSeed, prfOutput);
+
+    let wallet, address, publicKey;
+    if (seed.includes(' ')) {
+      const result = walletFromMnemonic(seed);
+      wallet = result.wallet;
+      address = result.address;
+      publicKey = result.publicKey;
+    } else {
+      const result = walletFromSeed(seed);
+      wallet = result.wallet;
+      address = result.address;
+      publicKey = result.publicKey;
+    }
+
+    currentWallet = { wallet, address, publicKey };
+    isUnlocked = true;
+    return { success: true };
+
+  } catch (err) {
+    return { success: false, error: err };
+  }
 }
 
 // ==========================================
@@ -650,7 +696,10 @@ async function checkBalance(address) {
 function setupUnlockScreen() {
   const btnUnlock = document.getElementById('btn-unlock');
   const addressEl = document.getElementById('unlock-address');
-  let unlocking = false; // Guard against double-trigger
+  const statusEl = document.getElementById('unlock-status');
+
+  // Hide button initially — Face ID will auto-trigger
+  if (btnUnlock) btnUnlock.style.display = 'none';
 
   getLastUsedWallet().then(wallet => {
     if (wallet && addressEl) {
@@ -658,16 +707,51 @@ function setupUnlockScreen() {
     }
   });
 
-  const triggerUnlock = () => {
-    if (unlocking) return; // Already in progress
-    unlocking = true;
-    doUnlock().finally(() => { unlocking = false; });
-  };
+  // Auto-trigger Face ID (Xumm-style)
+  setTimeout(async () => {
+    try {
+      await doUnlock();
+    } catch {
+      // Face ID failed → show retry button
+      showRetryButton();
+    }
+  }, 300);
+}
 
-  btnUnlock?.addEventListener('click', triggerUnlock, { once: true });
+/**
+ * Show unlock screen in manual retry mode (after instant unlock failed).
+ * Button is immediately visible, no auto-trigger.
+ */
+function setupUnlockScreenManual(error) {
+  const btnUnlock = document.getElementById('btn-unlock');
+  const addressEl = document.getElementById('unlock-address');
+  const statusEl = document.getElementById('unlock-status');
 
-  // Auto-trigger biometric after short delay
-  setTimeout(triggerUnlock, 600);
+  getLastUsedWallet().then(wallet => {
+    if (wallet && addressEl) {
+      addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
+    }
+  });
+
+  // Show error from instant attempt
+  if (error && error !== 'no_wallet') {
+    if (error.name === 'NotAllowedError') {
+      updateStatus(statusEl, 'Authentification annulée. Réessayez.', true);
+    } else if (error.message) {
+      updateStatus(statusEl, `Erreur : ${error.message}`, true);
+    }
+  }
+
+  // Button visible immediately for manual retry
+  showRetryButton();
+}
+
+function showRetryButton() {
+  const btn = document.getElementById('btn-unlock');
+  if (btn) {
+    btn.style.display = '';
+    btn.addEventListener('click', () => doUnlock(), { once: true });
+  }
 }
 
 async function doUnlock() {
@@ -716,9 +800,15 @@ async function doUnlock() {
     } else {
       updateStatus(statusEl, `Erreur : ${err.message}`, true);
     }
-    // Re-arm button
+    // Show and re-arm button for manual retry
     const btn = document.getElementById('btn-unlock');
-    btn?.addEventListener('click', () => doUnlock(), { once: true });
+    if (btn) {
+      btn.style.display = '';
+      btn.addEventListener('click', () => doUnlock(), { once: true });
+    }
+    // Re-throw so setupUnlockScreen knows it failed
+    throw err;
+  }
   }
 }
 
