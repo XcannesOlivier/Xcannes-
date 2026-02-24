@@ -47,7 +47,8 @@ export default function WalletDashboardTokenRow({
   isWalletActivated,
   hasRlusdTrustline,
   onActivateWallet,
-  onOpenRlusdProgram
+  onOpenRlusdProgram,
+  onOpenRlusdSetup,
 		}) {
 		  const { t, i18n } = useTranslation("common");
 		  const locale = i18n?.language || "en";
@@ -87,9 +88,13 @@ export default function WalletDashboardTokenRow({
 
 		  const showWalletActivationNotice =
 		  currencyCode === "XRP" && isWalletActivated === false;
-		  // Pas de notice trustline sur la ligne USD : l'activation de la
-		  // trustline RLUSD est gérée lors de l'onboarding guidé.
-		  const showRlusdTrustlineNotice = false;
+		  // La notice trustline RLUSD s'affiche si le wallet est activé
+		  // mais que RLUSD n'est pas encore installé. L'activation passe par
+		  // le setup modal qui collecte le nom + devise par défaut.
+		  const showRlusdTrustlineNotice =
+		    currencyCode === "RLUSD" &&
+		    isWalletActivated === true &&
+		    hasRlusdTrustline === false;
 	  const rowSurfaceClass = "bg-black/20 hover:bg-black/15";
 
   const handleRowKeyDown = (event) => {
@@ -188,13 +193,13 @@ export default function WalletDashboardTokenRow({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    onInstallTrustline?.("RLUSD");
+                    onOpenRlusdSetup?.();
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
                       e.stopPropagation();
-                      onInstallTrustline?.("RLUSD");
+                      onOpenRlusdSetup?.();
                     }
                   }}
                   className="text-amber-100 underline underline-offset-2 hover:text-amber-50 whitespace-nowrap">

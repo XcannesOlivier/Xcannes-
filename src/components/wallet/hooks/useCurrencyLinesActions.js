@@ -9,7 +9,6 @@ export function useCurrencyLinesActions({
   setCurrencyLineCode,
   setCurrencyLineAllocatedRlusd,
   upsertCurrencyLine,
-  removeCurrencyLine,
 }) {
   const handleUpsertCurrencyLine = useCallback(async () => {
     if (!backendWalletAddress) {
@@ -49,18 +48,5 @@ export function useCurrencyLinesActions({
     upsertCurrencyLine,
   ]);
 
-  const handleRemoveCurrencyLine = useCallback(
-    async (code) => {
-      if (!backendWalletAddress) return false;
-      const currencyCode = String(code || "").trim().toUpperCase();
-      if (!currencyCode) return false;
-      const ok = confirm(`Delete currency line ${currencyCode}?`);
-      if (!ok) return false;
-      await removeCurrencyLine?.(currencyCode);
-      return true;
-    },
-    [backendWalletAddress, removeCurrencyLine]
-  );
-
-  return { handleUpsertCurrencyLine, handleRemoveCurrencyLine };
+  return { handleUpsertCurrencyLine };
 }

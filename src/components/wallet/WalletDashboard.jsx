@@ -49,7 +49,8 @@ import WalletDashboardAdjustModal from "./modals/WalletDashboardAdjustModal";
 import WalletInfoModal from "./modals/WalletInfoModal";
 import WalletActivationModal from "./modals/WalletActivationModal";
 import WalletActivationRequestModal from "./modals/WalletActivationRequestModal";
-import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
+import WalletRlusdSetupModal from "./modals/WalletRlusdSetupModal";
+import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
   getCurrencyFlag,
@@ -62,13 +63,8 @@ import {
   WALLET_ACCEPTED_TOKENS,
 } from "./walletDashboardConfig";
 
-const DEFAULT_WALLET_LABEL_FEE_RLUSD = 1;
-const WALLET_LABEL_FEE_RLUSD = (() => {
-  const raw = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_LABEL_FEE_RLUSD || ""
-  );
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_WALLET_LABEL_FEE_RLUSD;
-})();
+// Wallet label fee removed — naming is now free (embedded in TrustSet memo
+// or via 1-drop XRP self-payment fallback).
 
 const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
 const ADJUSTMENT_FEE_RLUSD = (() => {
@@ -201,6 +197,7 @@ export default function WalletDashboard({
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showActivationRequestModal, setShowActivationRequestModal] = useState(false);
+  const [showRlusdSetupModal, setShowRlusdSetupModal] = useState(false);
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
   const adjustmentAutoOpenedRef = useRef(false);
@@ -255,6 +252,7 @@ export default function WalletDashboard({
     openWalletLabelEditor: handleOpenWalletLabelEditor,
     saveWalletLabel: handleSaveWalletLabel,
     cancelWalletLabel: handleCancelWalletLabel,
+    loadWalletLabel,
   } = useWalletLabel({
     walletAddress: effectiveWallet,
     isConnected: effectiveIsConnected,
@@ -263,8 +261,6 @@ export default function WalletDashboard({
     hasOnChainRlusd,
     defaultLabel: t("nav_wallet", "Wallet"),
     signTransaction,
-    activationDestination: XCANNES_ACTIVATION_WALLET_ADDRESS,
-    renameFeeRlusd: WALLET_LABEL_FEE_RLUSD,
   });
   const defaultWalletLabel = t("nav_wallet", "Wallet");
   const walletHasCustomLabel = Boolean(
@@ -567,7 +563,6 @@ export default function WalletDashboard({
     error: currencyLinesError,
     refresh: refreshCurrencyLines,
     upsertCurrencyLine,
-    removeCurrencyLine,
   } = useWalletCurrencyLines(backendWalletAddress, { signTransaction });
 
   const {
@@ -580,7 +575,6 @@ export default function WalletDashboard({
       setCurrencyLineCode,
       setCurrencyLineAllocatedRlusd,
       upsertCurrencyLine,
-      removeCurrencyLine,
     });
 
   const demoCurrencyLines = useMemo(() => {
@@ -932,79 +926,6 @@ export default function WalletDashboard({
     setDemoLines,
   ]);
 
-  const handleRemoveCurrencyLine = useCallback(
-    async (code) => {
-      const currencyCode = String(code || "").trim().toUpperCase();
-      if (!currencyCode || currencyCode === "RLUSD") return false;
-
-      if (isPreviewMode) {
-        setDemoLines((prev) => {
-          const next = { ...(prev || {}) };
-          const allocated = Number(next?.[currencyCode]?.rlusd || 0);
-          if (allocated > 0) {
-            const pool = next.RLUSD || { currency: "RLUSD", rlusd: 0, units: 0, rate: 1 };
-            const nextPoolRlusd = Math.max(0, Number(pool.rlusd || 0) + allocated);
-            next.RLUSD = { ...pool, rlusd: nextPoolRlusd, units: nextPoolRlusd, rate: 1 };
-          }
-          delete next[currencyCode];
-          return next;
-        });
-        const eventId = buildPreviewEventId("line");
-        pushPreviewEvent({
-          id: eventId,
-          ts: Date.now(),
-          kind: "trustline_remove",
-          wallet: PREVIEW_WALLET_ID,
-          currency: currencyCode,
-        });
-        recordStatementHighlight(currencyCode, eventId);
-        return true;
-      }
-
-      const line = (currencyLines || []).find(
-        (entry) => String(entry?.currencyCode || "").toUpperCase() === currencyCode
-      );
-      const allocated = Number(line?.allocatedRlusd || 0);
-      if (Number.isFinite(allocated) && allocated > 0) {
-        alert("La ligne doit être à zéro pour être supprimée.");
-        return false;
-      }
-
-      const ok = confirm(`Supprimer la ligne ${currencyCode} ?`);
-      if (!ok) return false;
-
-      const deleteMemo = buildCurrencyLineMemo({
-        action: "delete",
-        currencyCode,
-        allocatedRlusdAfter: 0,
-      });
-      if (!deleteMemo) {
-        alert("Invalid currency line memo.");
-        return false;
-      }
-      const xummUuid = await submitCurrencyLineAction({
-        action: "wallet:currency-lines:delete",
-        memoPayload: deleteMemo,
-      });
-      if (!xummUuid) return false;
-
-      if (refreshCurrencyLines) {
-        setTimeout(() => refreshCurrencyLines(), 3500);
-      }
-      return true;
-    },
-    [
-      buildPreviewEventId,
-      currencyLines,
-      isPreviewMode,
-      pushPreviewEvent,
-      recordStatementHighlight,
-      refreshCurrencyLines,
-      setDemoLines,
-      submitCurrencyLineAction,
-    ]
-  );
-
   const handleRefresh = async () => {
     if (!refreshBalance) return;
     setIsRefreshing(true);
@@ -1013,7 +934,7 @@ export default function WalletDashboard({
   };
 
   const handleInstallRequiredTrustline = useCallback(
-    async (currencyCode) => {
+    async (currencyCode, { walletSetup } = {}) => {
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return;
       if (!isConnected || !wallet) {
@@ -1043,12 +964,31 @@ export default function WalletDashboard({
         },
       };
 
+      // Attach wallet_label memo when setup info is provided (name + optional default currency)
+      if (walletSetup?.label) {
+        const memoData = { label: walletSetup.label };
+        if (walletSetup.defaultCurrency) {
+          memoData.defaultCurrency = walletSetup.defaultCurrency;
+        }
+        const memoPayload = buildWalletLabelMemo(memoData);
+        if (memoPayload) {
+          const memos = buildXrplJsonMemo(memoPayload);
+          if (memos) {
+            txjson.Memos = memos;
+          }
+        }
+      }
+
       try {
         const result = await signTransaction(txjson);
         if (result && result.signed) {
           alert(`✅ Trustline ${code} submitted via Xumm.`);
           if (refreshBalance) {
             setTimeout(() => refreshBalance(), 2500);
+          }
+          // If label was set via TrustSet memo, refresh wallet label
+          if (walletSetup?.label && loadWalletLabel) {
+            setTimeout(() => loadWalletLabel(), 3000);
           }
         } else {
           alert("Transaction cancelled or expired.");
@@ -1058,7 +998,23 @@ export default function WalletDashboard({
         alert("Error while preparing trustline: " + (err?.message || String(err)));
       }
     },
-    [isConnected, refreshBalance, signTransaction, wallet]
+    [isConnected, loadWalletLabel, refreshBalance, signTransaction, wallet]
+  );
+
+  // ── RLUSD setup: opens a form to collect name + default currency,
+  //    then triggers RLUSD TrustSet with wallet_label memo attached.
+  const handleOpenRlusdSetup = useCallback(() => {
+    setShowRlusdSetupModal(true);
+  }, []);
+
+  const handleRlusdSetupConfirm = useCallback(
+    ({ label, defaultCurrency } = {}) => {
+      setShowRlusdSetupModal(false);
+      handleInstallRequiredTrustline("RLUSD", {
+        walletSetup: { label, defaultCurrency },
+      });
+    },
+    [handleInstallRequiredTrustline]
   );
 
   const {
@@ -2036,6 +1992,7 @@ export default function WalletDashboard({
         isWalletActivated={isWalletActivated}
         hasRlusdTrustline={hasRlusdTrustline}
         onActivateWallet={handleOpenActivationModal}
+        onOpenRlusdSetup={handleOpenRlusdSetup}
         onClick={() => handleOpenCurrencyStatement(token)}
       />
     ),
@@ -2043,6 +2000,7 @@ export default function WalletDashboard({
       handleInstallRequiredTrustline,
       handleOpenActivationModal,
       handleOpenCurrencyStatement,
+      handleOpenRlusdSetup,
       hasRlusdTrustline,
       isWalletActivated,
       layout.tokenRowClass,
@@ -2979,6 +2937,11 @@ export default function WalletDashboard({
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
               />
+              <WalletRlusdSetupModal
+                open={showRlusdSetupModal}
+                onClose={() => setShowRlusdSetupModal(false)}
+                onConfirm={handleRlusdSetupConfirm}
+              />
             </>
           ) : null}
         </div>
@@ -3121,7 +3084,6 @@ export default function WalletDashboard({
                 currencyLinesError={effectiveCurrencyLinesError}
                 currencyLinesSummary={effectiveCurrencyLinesSummary}
                 currencyLines={effectiveCurrencyLines}
-                handleRemoveCurrencyLine={handleRemoveCurrencyLine}
                 swapCurrencyOptions={swapCurrencyOptionsForModal}
                 convertBaseCurrency={convertBaseCurrency}
                 setConvertBaseCurrency={setConvertBaseCurrency}
@@ -3220,6 +3182,14 @@ export default function WalletDashboard({
                 isPreviewMode={isPreviewMode}
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
+              />
+            ) : null}
+
+            {showRlusdSetupModal ? (
+              <WalletRlusdSetupModal
+                open
+                onClose={() => setShowRlusdSetupModal(false)}
+                onConfirm={handleRlusdSetupConfirm}
               />
             ) : null}
 
@@ -3386,7 +3356,6 @@ export default function WalletDashboard({
             currencyLinesError={effectiveCurrencyLinesError}
             currencyLinesSummary={effectiveCurrencyLinesSummary}
             currencyLines={effectiveCurrencyLines}
-            handleRemoveCurrencyLine={handleRemoveCurrencyLine}
             swapCurrencyOptions={swapCurrencyOptionsForModal}
             convertBaseCurrency={convertBaseCurrency}
             setConvertBaseCurrency={setConvertBaseCurrency}

@@ -129,57 +129,6 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
     [address, requestWalletSignature]
   );
 
-  const removeCurrencyLine = useCallback(
-    async (currencyCode) => {
-      if (!address || !currencyCode) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const xummUuid = await requestWalletSignature(
-          "wallet:currency-lines:delete"
-        );
-        if (!xummUuid) return;
-
-        const res = await fetch(apiUrl("/wallet/currency-lines"), {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            // no session headers
-          },
-          body: JSON.stringify({
-            address,
-            currencyCode,
-            xummUuid,
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok || data.error) {
-          throw new Error(data.error || "Failed to delete wallet currency line");
-        }
-
-        setLines(Array.isArray(data.lines) ? data.lines : []);
-        setSummary({
-          rlusdOnChain: data.rlusdOnChain ?? null,
-          totalAllocatedRlusd: Number(data.totalAllocatedRlusd || 0),
-          unallocatedRlusd: data.unallocatedRlusd ?? null,
-          invariantOk: data.invariantOk ?? null,
-          excessAllocatedRlusd: data.excessAllocatedRlusd ?? null,
-        });
-
-        return data;
-      } catch (err) {
-        console.error("[useWalletCurrencyLines] removeCurrencyLine error:", err);
-        setError(err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [address, requestWalletSignature]
-  );
-
   const convertAllocation = useCallback(
     async ({
       fromCurrencyCode,
@@ -256,7 +205,6 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
     error,
     refresh: fetchCurrencyLines,
     upsertCurrencyLine,
-    removeCurrencyLine,
     convertAllocation,
   };
 }
