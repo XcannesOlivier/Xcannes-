@@ -43,7 +43,19 @@ function resetInactivityTimer() {
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && isUnlocked) lockWallet();
+  if (document.hidden && isUnlocked) {
+    lockWallet();
+  } else if (!document.hidden && !isUnlocked) {
+    // App came back to foreground — auto-trigger Face ID after a short delay
+    // (Safari needs time to fully resume before WebAuthn works)
+    const walletScreen = document.getElementById('screen-unlock');
+    if (walletScreen && !walletScreen.classList.contains('hidden')) {
+      setTimeout(() => {
+        const btn = document.getElementById('btn-unlock');
+        if (btn) btn.click();
+      }, 500);
+    }
+  }
 });
 
 ['touchstart', 'mousedown', 'keydown', 'scroll'].forEach(evt => {
@@ -819,16 +831,10 @@ async function doUnlock() {
     } else {
       updateStatus(statusEl, `Erreur : ${err.message}`, true);
     }
-    // Show and re-arm button for manual retry
-    const btn = document.getElementById('btn-unlock');
-    if (btn) {
-      btn.style.display = '';
-      btn.addEventListener('click', () => doUnlock(), { once: true });
-    }
-    // Re-throw so setupUnlockScreen knows it failed
-    throw err;
+    // Show retry button (only place that does this — no double)
+    showRetryButton();
   }
-  }
+}
 
 async function unlockAndGoHome() {
   try {
@@ -1027,8 +1033,11 @@ function lockWallet() {
   pendingMnemonic = null;
   pendingWalletData = null;
   if (qrScanner) qrScanner.stop();
+
+  // Show unlock screen with button visible (no auto-trigger here —
+  // visibilitychange handler will auto-trigger when app comes back to foreground)
   showScreen('unlock');
-  setupUnlockScreen();
+  setupUnlockScreenManual();
 }
 
 function showSuccess(title, message) {
