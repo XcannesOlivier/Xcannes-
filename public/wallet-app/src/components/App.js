@@ -17,11 +17,11 @@ import { saveWallet, getLastUsedWallet, hasWallets, saveSetting, getSetting } fr
 import { createQRScanner, parseQRCode } from '../services/qrService.js';
 import { setRelayUrl, fetchChallenge, submitConnect, submitTransaction, pingRelay } from '../services/relayService.js';
 
-// --- Production: silence console ---
+// --- Production: silence console (keep error for critical failures) ---
 if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-  console.error = () => {};
   console.log = () => {};
   console.warn = () => {};
+  // console.error kept active for debugging critical issues
 }
 
 // --- State ---
@@ -89,33 +89,52 @@ function updateStatus(el, text, isError = false) {
 export async function init() {
   showScreen('splash');
 
-  // Check immediately if returning user (during splash)
-  const existingWallets = await hasWallets();
-  const onboarded = existingWallets ? await getSetting(SETTING_ONBOARDED) : false;
+  try {
+    // Check immediately if returning user (during splash)
+    const existingWallets = await hasWallets();
+    const onboarded = existingWallets ? await getSetting(SETTING_ONBOARDED) : false;
 
-  if (existingWallets && onboarded) {
-    // Returning user — launch Face ID in parallel with splash animation
-    // Face ID triggers DURING the splash, just like Xumm
-    const unlockResult = await attemptInstantUnlock();
+    if (existingWallets && onboarded) {
+      // Returning user — launch Face ID in parallel with splash animation
+      // Face ID triggers DURING the splash, just like Xumm
+      const unlockResult = await attemptInstantUnlock();
 
-    if (unlockResult.success) {
-      // Face ID succeeded during splash — go straight to Home
-      showScreen('home');
-      setupHomeScreen();
-      resetInactivityTimer();
+      if (unlockResult.success) {
+        // Face ID succeeded during splash — go straight to Home
+        showScreen('home');
+        setupHomeScreen();
+        resetInactivityTimer();
+        return;
+      }
+
+      // Face ID failed — show unlock screen with retry button visible
+      showScreen('unlock');
+      setupUnlockScreenManual(unlockResult.error);
       return;
     }
 
-    // Face ID failed — show unlock screen with retry button visible
-    showScreen('unlock');
-    setupUnlockScreenManual(unlockResult.error);
-    return;
-  }
+    // First-time user → wait for splash then welcome
+    await delay(1800);
+    showScreen('welcome');
+    setupWelcomeScreen();
 
-  // First-time user → wait for splash then welcome
-  await delay(1800);
-  showScreen('welcome');
-  setupWelcomeScreen();
+  } catch (err) {
+    console.error('[init] Critical error:', err);
+    // Fallback: show unlock if wallets exist, otherwise welcome
+    try {
+      const hasW = await hasWallets();
+      if (hasW) {
+        showScreen('unlock');
+        setupUnlockScreenManual(err);
+      } else {
+        showScreen('welcome');
+        setupWelcomeScreen();
+      }
+    } catch {
+      showScreen('welcome');
+      setupWelcomeScreen();
+    }
+  }
 }
 
 /**
@@ -810,7 +829,6 @@ async function doUnlock() {
     throw err;
   }
   }
-}
 
 async function unlockAndGoHome() {
   try {
