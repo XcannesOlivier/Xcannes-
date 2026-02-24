@@ -6,7 +6,7 @@
  * The actual signing is always online (needs relay).
  */
 
-const CACHE_NAME = 'xcannes-wallet-v4';
+const CACHE_NAME = 'xcannes-wallet-v5';
 // Paths relative to SW scope (/wallet-app/)
 const ASSETS_TO_CACHE = [
   './',
@@ -57,13 +57,34 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App shell — cache first, fallback to network
+  // Navigation requests (opening the app) — network first, fallback to cached index.html
+  // This avoids the Safari "Response served by service worker has redirections" error
+  // which happens when a cached 301 redirect is served for a navigation request.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Only cache non-redirect, successful responses
+          if (response.ok && !response.redirected) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => {
+          // Offline: serve cached index.html
+          return caches.match('./index.html');
+        })
+    );
+    return;
+  }
+
+  // App shell assets — cache first, fallback to network
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
       return fetch(event.request).then((response) => {
-        // Cache new assets
-        if (response.ok) {
+        if (response.ok && !response.redirected) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);
