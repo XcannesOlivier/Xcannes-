@@ -650,6 +650,7 @@ async function checkBalance(address) {
 function setupUnlockScreen() {
   const btnUnlock = document.getElementById('btn-unlock');
   const addressEl = document.getElementById('unlock-address');
+  let unlocking = false; // Guard against double-trigger
 
   getLastUsedWallet().then(wallet => {
     if (wallet && addressEl) {
@@ -657,10 +658,16 @@ function setupUnlockScreen() {
     }
   });
 
-  btnUnlock?.addEventListener('click', () => doUnlock(), { once: true });
+  const triggerUnlock = () => {
+    if (unlocking) return; // Already in progress
+    unlocking = true;
+    doUnlock().finally(() => { unlocking = false; });
+  };
+
+  btnUnlock?.addEventListener('click', triggerUnlock, { once: true });
 
   // Auto-trigger biometric after short delay
-  setTimeout(() => doUnlock(), 600);
+  setTimeout(triggerUnlock, 600);
 }
 
 async function doUnlock() {
