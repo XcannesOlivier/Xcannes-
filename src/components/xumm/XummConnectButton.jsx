@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useXumm } from "@/context/XummContext";
+import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
 import { useModalTransition } from "@/utils/useModalTransition";
@@ -49,7 +49,7 @@ export default function XummConnectButton({
   connectLabel,
   connectedLabel
 }) {
-  const { wallet, isConnected, isConnecting, connect, disconnect } = useXumm();
+  const { wallet, isConnected, isConnecting, connect, disconnect } = useWallet();
   const { t } = useTranslation("common");
   const [showSetupModal, setShowSetupModal] = useState(false);
   const { shouldRender: shouldRenderSetupModal, isClosing: setupModalClosing } =

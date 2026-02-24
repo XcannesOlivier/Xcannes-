@@ -7,12 +7,12 @@ import { useRouter } from "next/router";
 		import { getPageTranslations } from "@/i18n/getPageTranslations";
 		import WalletDashboard from "@/components/wallet/WalletDashboard";
 		import SEOHead from "@/components/layout/SEOHead";
-		import { useXumm } from "@/context/XummContext";
+		import { useWallet } from "@/context/WalletContext";
 
 export default function Wallet() {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const { isConnected, isConnecting, isSessionReady } = useXumm();
+  const { isConnected, isConnecting, isSessionReady } = useWallet();
 
   useEffect(() => {
     if (typeof document === "undefined") return;

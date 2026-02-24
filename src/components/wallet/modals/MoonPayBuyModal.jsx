@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
-import { useXumm } from "@/context/XummContext";
+import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { useModalTransition } from "@/utils/useModalTransition";
@@ -66,7 +66,7 @@ const MoonPayBuyModal = ({
   const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
-  const { isWalletActivated, balance, signTransaction } = useXumm();
+  const { isWalletActivated, balance, signTransaction } = useWallet();
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
 

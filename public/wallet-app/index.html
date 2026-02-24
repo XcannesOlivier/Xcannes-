@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Xcannes Wallet">
+  <title>Xcannes Wallet</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" sizes="192x192" href="icons/icon-192.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="src/styles/main.css">
+
+  <!-- xrpl.js from CDN (browser bundle) -->
+  <script src="https://unpkg.com/xrpl@4.4.3/build/xrpl-latest-min.js"></script>
+
+  <!-- jsQR fallback for QR scanning (browsers without BarcodeDetector) -->
+  <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- ========== LOADING SCREEN ========== -->
+    <div id="screen-loading" class="screen">
+      <div class="screen-content center">
+        <div class="logo">X</div>
+        <h1>Xcannes Wallet</h1>
+        <p class="subtitle">Chargement...</p>
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- ========== WELCOME SCREEN ========== -->
+    <div id="screen-welcome" class="screen hidden">
+      <div class="screen-content center">
+        <div class="logo">X</div>
+        <h1>Xcannes Wallet</h1>
+        <p class="subtitle">Votre wallet XRPL sécurisé par Face ID</p>
+
+        <div class="button-group">
+          <button id="btn-create-wallet" class="btn btn-primary">
+            Créer un wallet
+          </button>
+          <button id="btn-import-wallet" class="btn btn-secondary">
+            Importer un seed existant
+          </button>
+        </div>
+
+        <p class="notice">
+          🔒 Votre seed est chiffré et stocké uniquement sur cet appareil.<br>
+          Aucune donnée sensible n'est envoyée à Xcannes.
+        </p>
+      </div>
+    </div>
+
+    <!-- ========== CREATE WALLET SCREEN ========== -->
+    <div id="screen-create" class="screen hidden">
+      <div class="screen-content center">
+        <div class="icon-large">🔐</div>
+        <h2>Création du wallet</h2>
+        <p id="create-status" class="status">Initialisation...</p>
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- ========== BACKUP SCREEN ========== -->
+    <div id="screen-backup" class="screen hidden">
+      <div class="screen-content">
+        <h2>⚠️ Sauvegardez votre seed</h2>
+        <p class="warning">
+          Notez ce seed dans un endroit sûr. C'est le <strong>seul moyen</strong> de récupérer votre wallet.
+          Il ne sera <strong>plus jamais affiché</strong>.
+        </p>
+
+        <div class="seed-display">
+          <code id="backup-seed">...</code>
+        </div>
+
+        <div class="info-box">
+          <p><strong>Adresse :</strong></p>
+          <code id="backup-address">...</code>
+        </div>
+
+        <div class="confirm-box">
+          <label for="backup-confirm-input">
+            Tapez les 4 derniers caractères du seed pour confirmer :
+          </label>
+          <input
+            type="text"
+            id="backup-confirm-input"
+            maxlength="4"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+            placeholder="####"
+          />
+          <button id="btn-backup-confirm" class="btn btn-primary">
+            Confirmer la sauvegarde
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== IMPORT SCREEN ========== -->
+    <div id="screen-import" class="screen hidden">
+      <div class="screen-content">
+        <h2>Importer un wallet</h2>
+        <p>Entrez votre seed XRPL existant.</p>
+
+        <div class="input-group">
+          <input
+            type="password"
+            id="import-seed-input"
+            placeholder="sXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+          <button id="btn-import-confirm" class="btn btn-primary">
+            Importer
+          </button>
+        </div>
+
+        <p id="import-status" class="status"></p>
+
+        <button class="btn btn-link" onclick="document.getElementById('screen-import').classList.add('hidden'); document.getElementById('screen-welcome').classList.remove('hidden');">
+          ← Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- ========== UNLOCK SCREEN ========== -->
+    <div id="screen-unlock" class="screen hidden">
+      <div class="screen-content center">
+        <div class="icon-large">🔓</div>
+        <h2>Déverrouiller</h2>
+        <p id="unlock-address" class="address-preview">...</p>
+
+        <button id="btn-unlock" class="btn btn-primary btn-biometric">
+          <span class="biometric-icon">👆</span>
+          Face ID / Touch ID
+        </button>
+
+        <p id="unlock-status" class="status"></p>
+      </div>
+    </div>
+
+    <!-- ========== SCANNER SCREEN ========== -->
+    <div id="screen-scanner" class="screen hidden">
+      <div class="screen-content scanner-layout">
+        <div class="scanner-header">
+          <span id="scanner-address" class="address-chip">...</span>
+          <button id="btn-lock" class="btn btn-icon" title="Verrouiller">🔒</button>
+        </div>
+
+        <div class="scanner-viewport">
+          <video id="scanner-video" autoplay playsinline muted></video>
+          <div class="scanner-overlay">
+            <div class="scanner-frame"></div>
+          </div>
+        </div>
+
+        <p id="scanner-status" class="status">Scannez le QR code affiché sur votre écran</p>
+        <p id="scanner-tx-details" class="tx-details hidden"></p>
+      </div>
+    </div>
+
+    <!-- ========== SUCCESS SCREEN ========== -->
+    <div id="screen-success" class="screen hidden">
+      <div class="screen-content center">
+        <div class="icon-large success-icon">✅</div>
+        <h2 id="success-title">Succès</h2>
+        <p id="success-message"></p>
+      </div>
+    </div>
+
+    <!-- ========== ERROR SCREEN ========== -->
+    <div id="screen-error" class="screen hidden">
+      <div class="screen-content center">
+        <div class="icon-large">❌</div>
+        <h2>Erreur</h2>
+        <p id="error-message" class="error"></p>
+        <button id="btn-error-retry" class="btn btn-primary">Réessayer</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- App entry point -->
+  <script type="module" src="src/components/App.js"></script>
+
+  <!-- Register service worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[SW] Registered:', reg.scope))
+          .catch(err => console.warn('[SW] Registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>

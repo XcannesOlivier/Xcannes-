@@ -3,7 +3,7 @@ import { XCircleIcon, CheckCircleIcon, ArrowDownIcon } from '@heroicons/react/24
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
-import { useXumm } from "@/context/XummContext";
+import { useWallet } from "@/context/WalletContext";
 import { useModalTransition } from "@/utils/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
@@ -50,7 +50,7 @@ const MoonPaySellModal = ({
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const { signTransaction, isWalletActivated, balance } = useXumm();
+  const { signTransaction, isWalletActivated, balance } = useWallet();
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
