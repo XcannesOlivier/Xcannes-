@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
-import { useXumm } from "@/context/XummContext";
+import { useWallet } from "@/context/WalletContext";
 import XummConnectButton from "@/components/xumm/XummConnectButton";
 import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
@@ -9,7 +9,7 @@ import SEOHead from "@/components/layout/SEOHead";
 
 export default function SuccessPage() {
   const { t } = useTranslation("common");
-  const { isConnected, wallet } = useXumm();
+  const { isConnected, wallet } = useWallet();
 
   return (
     <>

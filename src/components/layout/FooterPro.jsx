@@ -2,12 +2,12 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
-import { useXumm } from "@/context/XummContext";
+import { useWallet } from "@/context/WalletContext";
 
 export default function FooterPro() {
   const { t } = useTranslation("common");
   const router = useRouter();
-  const { wallet, isConnected, isConnecting, connect, disconnect } = useXumm();
+  const { wallet, isConnected, isConnecting, connect, disconnect } = useWallet();
 
   const [xrplConnected, setXrplConnected] = useState(true); // Backend gère la connexion
   const [xrplLoading, setXrplLoading] = useState(false);

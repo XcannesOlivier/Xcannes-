@@ -3,14 +3,16 @@ import "@/styles/animations.css";
 import "@/styles/wallet-actions.css";
 import { appWithTranslation } from "next-i18next";
 import nextI18NextConfig from "../../next-i18next.config";
-import { XummProvider, useXumm } from "@/context/XummContext";
+import { XummProvider } from "@/context/XummContext";
+import { NativeWalletProvider } from "@/context/NativeWalletContext";
+import { WalletProviderSwitch, useWallet } from "@/context/WalletContext";
 import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket centralisé
 import XummQRModal from "@/components/xumm/XummQRModal";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 function XummModalLayer({ children }) {
-  const { qrModalData, closeQrModal } = useXumm();
+  const { qrModalData, closeQrModal } = useWallet();
   const router = useRouter();
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -107,20 +109,24 @@ function App({ Component, pageProps }) {
 
   return (
     <XummProvider>
-      <XcannesWSProvider>
-        <div className="font-sans">
-          <XummModalLayer>
-            <div
-              key={router.asPath}
-              className={`page-transition page-transition--${transitionDirection}${
-                isRouteChanging ? " page-transition--exit" : ""
-              }`}
-            >
-              <Component {...pageProps} />
+      <NativeWalletProvider>
+        <WalletProviderSwitch>
+          <XcannesWSProvider>
+            <div className="font-sans">
+              <XummModalLayer>
+                <div
+                  key={router.asPath}
+                  className={`page-transition page-transition--${transitionDirection}${
+                    isRouteChanging ? " page-transition--exit" : ""
+                  }`}
+                >
+                  <Component {...pageProps} />
+                </div>
+              </XummModalLayer>
             </div>
-          </XummModalLayer>
-        </div>
-      </XcannesWSProvider>
+          </XcannesWSProvider>
+        </WalletProviderSwitch>
+      </NativeWalletProvider>
     </XummProvider>
   );
 }

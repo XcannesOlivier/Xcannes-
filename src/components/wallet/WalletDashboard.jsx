@@ -2,7 +2,7 @@
 
 	import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 	import { createPortal } from "react-dom";
-	import { useXumm } from "@/context/XummContext";
+	import { useWallet } from "@/context/WalletContext";
 import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
 	import { CRYPTO_ICONS } from "@/utils/marketConstants";
@@ -158,7 +158,7 @@ export default function WalletDashboard({
     disconnect,
     signTransaction,
     closeQrModal,
-  } = useXumm();
+  } = useWallet();
 
   // Mode "preview" ne doit JAMAIS faire croire que le wallet est connecté.
   // On l'utilise uniquement pour afficher des données de démonstration
