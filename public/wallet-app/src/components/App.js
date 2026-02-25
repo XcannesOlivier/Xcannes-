@@ -607,19 +607,8 @@ function buildMnemonicImportGrid(count) {
   // Auto-advance on space or tab
   const inputs = grid.querySelectorAll('.import-word-input');
   inputs.forEach((inp, i) => {
-    inp.addEventListener('input', () => {
-      // If user pastes all words at once
-      const val = inp.value.trim();
-      if (val.includes(' ')) {
-        const words = val.split(/\s+/).filter(Boolean);
-        words.forEach((w, j) => {
-          if (inputs[i + j]) inputs[i + j].value = w;
-        });
-        const nextIdx = Math.min(i + words.length, inputs.length - 1);
-        inputs[nextIdx].focus();
-        return;
-      }
-    });
+    // Block paste for security
+    inp.addEventListener('paste', (e) => e.preventDefault());
     inp.addEventListener('keydown', (e) => {
       if (e.key === ' ') {
         e.preventDefault();
