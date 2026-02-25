@@ -130,7 +130,6 @@ export function useWalletTokens({ displayTokens, currencyLines }) {
 
   return {
     augmentedTokens,
-    walletCurrencyOptions,
     allocatedRlusdByCurrency,
     swapCurrencyOptions,
   };

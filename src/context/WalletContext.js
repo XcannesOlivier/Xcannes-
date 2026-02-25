@@ -103,8 +103,4 @@ export const WalletProviderSwitch = ({ children }) => {
  */
 export const useWallet = () => useContext(WalletContext);
 
-/**
- * Backward compatibility: re-export as useXumm so existing imports still work
- * after migrating to WalletContext.
- */
-export const useXummCompat = () => useContext(WalletContext);
+
