@@ -181,15 +181,6 @@ export async function getLastUsedWallet() {
   return wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0))[0];
 }
 
-/**
- * Get wallet count.
- * @returns {Promise<number>}
- */
-export async function getWalletCount() {
-  const wallets = await getAllWallets();
-  return wallets.length;
-}
-
 // ==========================================
 // SETTINGS OPERATIONS (App-level)
 // ==========================================

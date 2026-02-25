@@ -415,13 +415,6 @@ h3 {
   pointer-events: none;
 }
 
-/* Shake animation for wrong PIN */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 50%, 90% { transform: translateX(-6px); }
-  30%, 70% { transform: translateX(6px); }
-}
-
 .pin-dots.shake {
   animation: shake 0.5s ease-in-out;
 }
@@ -551,10 +544,6 @@ h3 {
 
 .biometric-icon {
   font-size: 20px;
-}
-
-.btn-icon-left {
-  font-size: 16px;
 }
 
 .btn-icon-round {
@@ -773,13 +762,6 @@ textarea.error {
 
 .verify-progress {
   margin-bottom: 20px;
-}
-
-.verify-progress-text {
-  font-size: 12px;
-  color: var(--text-tertiary);
-  margin-bottom: 6px;
-  display: block;
 }
 
 #verify-progress-text {
@@ -1324,11 +1306,6 @@ textarea.error {
   100% { transform: scale(1); opacity: 1; }
 }
 
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 /* ===== SAFE AREAS (iPhone notch / Dynamic Island) ===== */
 
 @supports (padding: env(safe-area-inset-bottom)) {
@@ -1383,7 +1360,7 @@ textarea.error {
   border-radius: 20px;
   border: 1px solid rgba(148, 163, 184, 0.25);
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -1391,8 +1368,8 @@ textarea.error {
 }
 
 .word-toggle-btn.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
 }
 
@@ -1415,12 +1392,12 @@ textarea.error {
 }
 
 .import-word-cell:focus-within {
-  border-color: var(--color-primary);
+  border-color: var(--accent);
 }
 
 .import-word-num {
   font-size: 0.65rem;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary);
   min-width: 16px;
   text-align: center;
   font-weight: 600;
@@ -1431,7 +1408,7 @@ textarea.error {
   width: 100%;
   border: none;
   background: transparent;
-  color: var(--color-text);
+  color: var(--text-primary);
   font-size: 0.8rem;
   font-family: inherit;
   outline: none;
@@ -1491,18 +1468,18 @@ textarea.error {
 .wl-label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--text-primary);
 }
 
 .wl-address {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary);
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   letter-spacing: 0.02em;
 }
 
 .wl-active-badge {
-  color: var(--color-primary);
+  color: var(--accent);
   font-size: 0.6rem;
   margin-left: 12px;
   flex-shrink: 0;
@@ -1522,14 +1499,14 @@ textarea.error {
   border-radius: 12px;
   border: 1px dashed rgba(148, 163, 184, 0.25);
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
 }
 
 .btn-add-wallet:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .add-icon {
@@ -1540,5 +1517,5 @@ textarea.error {
 .btn-outline {
   background: transparent;
   border: 1px solid rgba(148, 163, 184, 0.25);
-  color: var(--color-text-muted);
+  color: var(--text-tertiary);
 }

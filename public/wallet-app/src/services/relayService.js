@@ -27,14 +27,6 @@ export function setRelayUrl(url) {
 }
 
 /**
- * Get the current relay URL.
- * @returns {string}
- */
-export function getRelayUrl() {
-  return relayBaseUrl;
-}
-
-/**
  * Fetch a challenge payload from the relay server.
  * Called after scanning a QR code on the desktop.
  *
@@ -119,18 +111,4 @@ export async function submitTransaction(challengeId, signedTx) {
   return response.json();
 }
 
-/**
- * Ping the relay to check connectivity.
- * @returns {Promise<boolean>}
- */
-export async function pingRelay() {
-  try {
-    const response = await fetch(`${relayBaseUrl}/wallet-relay/ping`, {
-      method: 'GET',
-      signal: AbortSignal.timeout(5000),
-    });
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
+
