@@ -1,36 +1,52 @@
 /**
  * Xcannes Wallet — Main App (PWA)
  *
- * Xumm-style onboarding flow:
- *   Splash → Welcome → Terms → Choice (Create / Import)
- *   → Create: Generate → PIN Creation → Optional Face ID → Mnemonic Backup → Verify 12 words → Home
- *   → Import: Mnemonic (BIP39) / Seed / Secret Numbers → PIN Creation → Optional Face ID → Home
- *   Returning user: Face ID instant (if enabled) or PIN → Home
+ * Architecture: App-level master key + multi-wallet
  *
- * Auth: PIN primary (PBKDF2 → AES-256-GCM) + WebAuthn/Face ID optional.
+ * First launch:
+ *   Splash → Welcome → Terms → PIN Creation → Optional Face ID → Choice (Create / Import)
+ *   → Create: Generate → Mnemonic Backup → Verify → Home
+ *   → Import: Mnemonic/Seed/SecretNumbers → Home
+ *
+ * Returning user:
+ *   Splash → Face ID (instant) or PIN → Home (wallet list)
+ *
+ * Auth: PIN derives a master AES-256-GCM key. All wallets are encrypted with the same master key.
+ *        Face ID wraps/unwraps the master key via WebAuthn PRF.
+ *
  * Vanilla JS — no framework dependency, minimal footprint.
  */
 
 import { generateWallet, walletFromSeed, walletFromMnemonic, walletFromSecretNumbers, signTransaction, signChallenge, clearWalletFromMemory, isValidSeed } from '../services/walletService.js';
-import { encryptSeed, decryptSeed } from '../services/cryptoService.js';
 import { registerBiometric, promptBiometric, isBiometricAvailable } from '../services/webauthnService.js';
-import { saveWallet, getLastUsedWallet, getWallet, hasWallets, saveSetting, getSetting, updateWalletAuth, clearAllData } from '../services/storageService.js';
-import { encryptSeedWithPIN, decryptSeedWithPIN, checkPINLockout, getNextLockoutDelay } from '../services/pinService.js';
+import {
+  saveWallet, getWallet, getAllWallets, getLastUsedWallet, hasWallets, deleteWallet, touchWallet,
+  saveSetting,
+  saveAuthConfig, getAuthConfig, isAppSetup,
+  clearAllData,
+} from '../services/storageService.js';
+import {
+  deriveKeyFromPIN, createPINVerifyHash, verifyPIN,
+  encryptWithMasterKey, decryptWithMasterKey,
+  wrapMasterKeyWithPRF, unwrapMasterKeyWithPRF,
+  generateSalt, checkPINLockout, getNextLockoutDelay,
+  getMasterKey, setMasterKey, clearMasterKey,
+  base64ToUint8Array,
+} from '../services/pinService.js';
 import { createQRScanner, parseQRCode } from '../services/qrService.js';
-import { setRelayUrl, fetchChallenge, submitConnect, submitTransaction, pingRelay } from '../services/relayService.js';
+import { setRelayUrl, fetchChallenge, submitConnect, submitTransaction } from '../services/relayService.js';
 
 // --- Production: silence console (keep error for critical failures) ---
 if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
   console.log = () => {};
   console.warn = () => {};
-  // console.error kept active for debugging critical issues
 }
 
 // --- State ---
 let currentWallet = null;  // { address, wallet (xrpl instance), publicKey }
 let isUnlocked = false;
-let pendingMnemonic = null; // Held in memory during onboarding backup flow
-let pendingWalletData = null; // { address, seed, publicKey, mnemonic }
+let pendingMnemonic = null;
+let pendingWalletData = null; // { address, seed, publicKey, mnemonic, wallet }
 
 // --- Auto-lock ---
 const AUTO_LOCK_MS = 5 * 60 * 1000;
@@ -48,14 +64,12 @@ document.addEventListener('visibilitychange', async () => {
   if (document.hidden && isUnlocked) {
     lockWallet();
   } else if (!document.hidden && !isUnlocked) {
-    // App came back to foreground — check auth mode before auto-triggering
-    const walletScreen = document.getElementById('screen-unlock');
-    if (walletScreen && !walletScreen.classList.contains('hidden')) {
-      // Only auto-trigger Face ID if wallet has valid WebAuthn credentials
+    // App came back — try Face ID auto-unlock if on unlock screen
+    const unlockScreen = document.getElementById('screen-unlock');
+    if (unlockScreen && !unlockScreen.classList.contains('hidden')) {
       try {
-        const walletData = await getLastUsedWallet();
-        const authMode = walletData?.authMode;
-        if (authMode && authMode.includes('webauthn') && walletData?.credentialId) {
+        const authConfig = await getAuthConfig();
+        if (authConfig?.credentialId && authConfig?.wrappedMasterKey) {
           setTimeout(() => {
             const btn = document.getElementById('btn-unlock');
             if (btn && btn.style.display !== 'none') btn.click();
@@ -63,7 +77,7 @@ document.addEventListener('visibilitychange', async () => {
         }
       } catch { /* ignore */ }
     }
-    // For PIN screen — auto-focus the input
+    // For PIN screen — auto-focus input
     const pinScreen = document.getElementById('screen-pin-unlock');
     if (pinScreen && !pinScreen.classList.contains('hidden')) {
       setTimeout(() => {
@@ -118,122 +132,70 @@ export async function init() {
   showScreen('splash');
 
   try {
-    // Check immediately if returning user (during splash)
-    const existingWallets = await hasWallets();
-    const onboarded = existingWallets ? await getSetting(SETTING_ONBOARDED) : false;
+    const appSetup = await isAppSetup();
 
-    if (existingWallets && onboarded) {
-      // Returning user — check auth mode
-      const walletData = await getLastUsedWallet();
-      const authMode = walletData?.authMode; // undefined for legacy wallets
+    if (appSetup) {
+      // Returning user — app has a PIN set up
+      const authConfig = await getAuthConfig();
 
-      // --- LEGACY WALLET DETECTION ---
-      // Wallets created before the PIN system have no authMode field.
-      // They were encrypted with WebAuthn PRF — if the passkey was deleted
-      // or Face ID fails, the user is permanently locked out.
-      // → Force reset + start fresh with PIN.
-      if (!authMode) {
-        console.warn('[init] Legacy wallet detected (no authMode). Directing to reset.');
-        await delay(800);
-        showScreen('unlock');
-        setupLegacyWalletScreen(walletData);
-        return;
-      }
-
-      if (authMode.includes('webauthn') && walletData?.credentialId) {
-        // Has Face ID — try instant unlock during splash
-        const unlockResult = await attemptInstantUnlock();
+      // Try Face ID instant unlock if configured
+      if (authConfig?.credentialId && authConfig?.wrappedMasterKey) {
+        const unlockResult = await attemptInstantUnlock(authConfig);
 
         if (unlockResult.success) {
-          showScreen('home');
-          setupHomeScreen();
-          resetInactivityTimer();
+          await goToHome();
           return;
         }
-
         // Face ID failed — show unlock screen with retry + PIN fallback
         showScreen('unlock');
         setupUnlockScreenManual(unlockResult.error);
         return;
       }
 
-      // PIN-only mode — show PIN screen after short splash
+      // PIN-only — show PIN screen after short splash
       await delay(800);
       showScreen('pin-unlock');
       setupEnterPINScreen();
       return;
     }
 
-    // First-time user → wait for splash then welcome
+    // Check for legacy wallets (pre-master-key system)
+    const hasLegacy = await hasWallets();
+    if (hasLegacy) {
+      await delay(800);
+      showScreen('unlock');
+      setupLegacyWalletScreen();
+      return;
+    }
+
+    // First-time user → welcome
     await delay(1800);
     showScreen('welcome');
     setupWelcomeScreen();
 
   } catch (err) {
     console.error('[init] Critical error:', err);
-    // Fallback: show unlock if wallets exist, otherwise welcome
-    try {
-      const hasW = await hasWallets();
-      if (hasW) {
-        showScreen('unlock');
-        setupUnlockScreenManual(err);
-      } else {
-        showScreen('welcome');
-        setupWelcomeScreen();
-      }
-    } catch {
-      showScreen('welcome');
-      setupWelcomeScreen();
-    }
+    showScreen('welcome');
+    setupWelcomeScreen();
   }
 }
 
 /**
- * Attempt instant unlock during splash — Face ID fires before app is visible.
- * Only used when authMode includes 'webauthn'.
- * Returns { success: true } or { success: false, error }.
+ * Attempt instant Face ID unlock during splash.
+ * Unwraps the master key using WebAuthn PRF.
  */
-async function attemptInstantUnlock() {
+async function attemptInstantUnlock(authConfig) {
   try {
-    const walletData = await getLastUsedWallet();
-    if (!walletData) return { success: false, error: 'no_wallet' };
-
-    if (!walletData.credentialId) {
-      return { success: false, error: 'no_webauthn' };
+    if (!authConfig?.credentialId || !authConfig?.wrappedMasterKey) {
+      return { success: false, error: 'no_faceid' };
     }
 
-    // Trigger Face ID immediately (user sees it over the splash)
-    const prfOutput = await promptBiometric(walletData.credentialId);
-
-    // Choose the right encrypted seed for WebAuthn decryption
-    const authMode = walletData.authMode || 'webauthn';
-    let encryptedData;
-    if (authMode === 'pin+webauthn' && walletData.encryptedSeedWebAuthn) {
-      encryptedData = walletData.encryptedSeedWebAuthn;
-    } else {
-      // Legacy mode: encryptedSeed was encrypted with WebAuthn
-      encryptedData = walletData.encryptedSeed;
-    }
-
-    const seed = await decryptSeed(encryptedData, prfOutput);
-
-    let wallet, address, publicKey;
-    if (seed.includes(' ')) {
-      const result = walletFromMnemonic(seed);
-      wallet = result.wallet;
-      address = result.address;
-      publicKey = result.publicKey;
-    } else {
-      const result = walletFromSeed(seed);
-      wallet = result.wallet;
-      address = result.address;
-      publicKey = result.publicKey;
-    }
-
-    currentWallet = { wallet, address, publicKey };
+    const prfOutput = await promptBiometric(authConfig.credentialId);
+    const masterKey = await unwrapMasterKeyWithPRF(authConfig.wrappedMasterKey, prfOutput);
+    setMasterKey(masterKey);
     isUnlocked = true;
-    return { success: true };
 
+    return { success: true };
   } catch (err) {
     return { success: false, error: err };
   }
@@ -260,9 +222,7 @@ function setupTermsScreen() {
   const btnAccept = document.getElementById('btn-terms-accept');
   const btnBack = document.getElementById('btn-terms-back');
 
-  const toggle = () => {
-    btnAccept.disabled = !checkbox.checked;
-  };
+  const toggle = () => { btnAccept.disabled = !checkbox.checked; };
   checkbox?.addEventListener('change', toggle);
 
   btnBack?.addEventListener('click', () => {
@@ -272,14 +232,55 @@ function setupTermsScreen() {
 
   btnAccept?.addEventListener('click', async () => {
     await saveSetting(SETTING_TERMS_ACCEPTED, Date.now());
-    showScreen('choice');
-    setupChoiceScreen();
+    // First-time: create PIN before anything else
+    showScreen('pin-create');
+    setupCreatePINScreen(async (pin) => {
+      try {
+        // Derive master key + save auth config
+        const masterSalt = generateSalt();
+        const verifySalt = generateSalt();
+        const masterKey = await deriveKeyFromPIN(pin, base64ToUint8Array(masterSalt));
+        const verifyHash = await createPINVerifyHash(pin, base64ToUint8Array(verifySalt));
+
+        setMasterKey(masterKey);
+
+        const authConfig = {
+          masterSalt,
+          verifySalt,
+          verifyHash,
+          credentialId: null,
+          wrappedMasterKey: null,
+          pinAttempts: 0,
+          pinLockedUntil: 0,
+        };
+        await saveAuthConfig(authConfig);
+
+        // Offer Face ID
+        const biometricOk = await isBiometricAvailable();
+        if (biometricOk) {
+          showScreen('faceid-setup');
+          setupEnableFaceIDScreen(() => {
+            goToChoice();
+          });
+        } else {
+          goToChoice();
+        }
+      } catch (err) {
+        showError(`Erreur : ${err.message}`);
+      }
+    });
   }, { once: true });
 }
 
 // ==========================================
 // 4. CHOICE — Create or Import
 // ==========================================
+
+function goToChoice() {
+  isUnlocked = true;
+  showScreen('choice');
+  setupChoiceScreen();
+}
 
 function setupChoiceScreen() {
   const btnCreate = document.getElementById('btn-create-wallet');
@@ -293,7 +294,7 @@ function setupChoiceScreen() {
 }
 
 // ==========================================
-// 6. CREATE WALLET
+// 5. CREATE WALLET
 // ==========================================
 
 async function startCreateWallet() {
@@ -302,48 +303,29 @@ async function startCreateWallet() {
 
   try {
     updateStatus(statusEl, 'Génération des clés…');
-    await delay(400); // UX: let screen paint
+    await delay(400);
 
-    // 1. Generate wallet locally (BIP39 mnemonic → XRPL wallet)
     const walletData = await generateWallet();
-
-    // 2. Keep xrpl wallet instance in memory for direct use after backup
     const walletInstance = walletFromMnemonic(walletData.mnemonic);
     pendingWalletData = { ...walletData, wallet: walletInstance.wallet };
     pendingMnemonic = walletData.mnemonic;
 
-    // 3. Show PIN creation screen
-    showScreen('pin-create');
-    setupCreatePINScreen(async (pin) => {
-      try {
-        // 4. Encrypt seed with PIN
-        const encryptedSeed = await encryptSeedWithPIN(walletData.seed, pin);
+    // Encrypt with master key (already in memory)
+    const masterKey = getMasterKey();
+    const encryptedSeed = await encryptWithMasterKey(walletData.seed, masterKey);
 
-        // 5. Save to IndexedDB (PIN auth initially)
-        await saveWallet({
-          address: walletData.address,
-          encryptedSeed,
-          authMode: 'pin',
-          credentialId: null,
-          encryptedSeedWebAuthn: null,
-        });
-
-        // 6. Offer Face ID if biometric is available
-        const biometricOk = await isBiometricAvailable();
-        if (biometricOk) {
-          showScreen('faceid-setup');
-          setupEnableFaceIDScreen(walletData, () => {
-            showScreen('backup');
-            setupBackupScreen(pendingWalletData);
-          });
-        } else {
-          showScreen('backup');
-          setupBackupScreen(pendingWalletData);
-        }
-      } catch (err) {
-        showError(`Erreur : ${err.message}`);
-      }
+    // Save wallet
+    await saveWallet({
+      address: walletData.address,
+      encryptedSeed,
+      label: null,
     });
+
+    await saveSetting(SETTING_ONBOARDED, true);
+
+    // Go to backup
+    showScreen('backup');
+    setupBackupScreen(pendingWalletData);
 
   } catch (err) {
     showError(`Erreur lors de la création : ${err.message}`);
@@ -351,7 +333,7 @@ async function startCreateWallet() {
 }
 
 // ==========================================
-// 7. BACKUP — Show Mnemonic
+// 6. BACKUP — Show Mnemonic
 // ==========================================
 
 function setupBackupScreen(walletData) {
@@ -360,10 +342,8 @@ function setupBackupScreen(walletData) {
   const btnContinue = document.getElementById('btn-backup-continue');
   const btnRegenerate = document.getElementById('btn-backup-regenerate');
 
-  // Parse BIP39 mnemonic into words
   const words = walletData.mnemonic.trim().split(/\s+/);
 
-  // Render 12-word grid
   grid.innerHTML = '';
   words.forEach((word, i) => {
     const div = document.createElement('div');
@@ -377,60 +357,29 @@ function setupBackupScreen(walletData) {
 
   if (addressEl) addressEl.textContent = walletData.address;
 
-  // --- Regenerate: generate a brand new mnemonic + wallet ---
   btnRegenerate?.addEventListener('click', async () => {
     btnRegenerate.disabled = true;
     btnRegenerate.textContent = '⏳ Génération…';
-
     try {
-      // 1. New wallet
+      // Delete old wallet
+      if (pendingWalletData?.address) await deleteWallet(pendingWalletData.address);
+
+      // Create new
       const newWalletData = await generateWallet();
       const newWalletInstance = walletFromMnemonic(newWalletData.mnemonic);
 
-      // 2. PIN is needed — show PIN creation again
-      showScreen('pin-create');
-      setupCreatePINScreen(async (pin) => {
-        try {
-          // 3. Encrypt with PIN
-          const encryptedSeed = await encryptSeedWithPIN(newWalletData.seed, pin);
+      // Encrypt with master key
+      const masterKey = getMasterKey();
+      const encryptedSeed = await encryptWithMasterKey(newWalletData.seed, masterKey);
+      await saveWallet({ address: newWalletData.address, encryptedSeed, label: null });
 
-          // 4. Overwrite in IndexedDB
-          await saveWallet({
-            address: newWalletData.address,
-            encryptedSeed,
-            authMode: 'pin',
-            credentialId: null,
-            encryptedSeedWebAuthn: null,
-          });
+      pendingMnemonic = newWalletData.mnemonic;
+      pendingWalletData = { ...newWalletData, wallet: newWalletInstance.wallet };
 
-          // 5. Offer Face ID again
-          const biometricOk = await isBiometricAvailable();
-
-          // 6. Update in-memory refs
-          pendingMnemonic = newWalletData.mnemonic;
-          pendingWalletData = { ...newWalletData, wallet: newWalletInstance.wallet };
-
-          if (biometricOk) {
-            showScreen('faceid-setup');
-            setupEnableFaceIDScreen(newWalletData, () => {
-              btnRegenerate.disabled = false;
-              btnRegenerate.textContent = '🔄 Nouvelle liste';
-              showScreen('backup');
-              setupBackupScreen(pendingWalletData);
-            });
-          } else {
-            btnRegenerate.disabled = false;
-            btnRegenerate.textContent = '🔄 Nouvelle liste';
-            showScreen('backup');
-            setupBackupScreen(pendingWalletData);
-          }
-        } catch (err) {
-          btnRegenerate.disabled = false;
-          btnRegenerate.textContent = '🔄 Nouvelle liste';
-          showError(`Erreur : ${err.message}`);
-        }
-      });
-
+      btnRegenerate.disabled = false;
+      btnRegenerate.textContent = '🔄 Nouvelle liste';
+      showScreen('backup');
+      setupBackupScreen(pendingWalletData);
     } catch (err) {
       btnRegenerate.disabled = false;
       btnRegenerate.textContent = '🔄 Nouvelle liste';
@@ -445,7 +394,7 @@ function setupBackupScreen(walletData) {
 }
 
 // ==========================================
-// 8. BACKUP — Verify ALL 12 Words (sequential)
+// 7. BACKUP — Verify ALL 12 Words
 // ==========================================
 
 function setupBackupVerifyScreen(words) {
@@ -457,8 +406,6 @@ function setupBackupVerifyScreen(words) {
   const btnBack = document.getElementById('btn-verify-back');
 
   let currentIndex = 0;
-
-  // Render all 12 rows
   container.innerHTML = '';
   const rows = [];
   const inputs = [];
@@ -468,7 +415,7 @@ function setupBackupVerifyScreen(words) {
     row.className = `verify-row ${i === 0 ? 'active' : 'locked'}`;
     row.innerHTML = `
       <span class="row-num">${i + 1}</span>
-      <input class="row-input" type="text" autocomplete="off" autocorrect="off" 
+      <input class="row-input" type="text" autocomplete="off" autocorrect="off"
              autocapitalize="off" spellcheck="false"
              placeholder="Mot #${i + 1}" ${i !== 0 ? 'disabled' : ''}>
       <span class="row-status"></span>
@@ -501,7 +448,6 @@ function setupBackupVerifyScreen(words) {
         inp.disabled = false;
         inp.value = '';
         inp.focus();
-        // Scroll row into view
         r.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         r.className = 'verify-row locked';
@@ -514,14 +460,9 @@ function setupBackupVerifyScreen(words) {
     btnConfirm.disabled = true;
   }
 
-  // Handle input on each field
   inputs.forEach((inp, i) => {
     inp.addEventListener('input', () => {
-      const val = inp.value.trim().toLowerCase();
-      const expected = words[i].toLowerCase();
       const row = rows[i];
-
-      // Clear error state while typing
       if (row.classList.contains('error')) {
         row.classList.remove('error');
         row.classList.add('active');
@@ -529,58 +470,42 @@ function setupBackupVerifyScreen(words) {
       }
     });
 
-    // Validate on Enter key or blur
     const handleValidate = () => {
       if (i !== currentIndex) return;
       const val = inp.value.trim().toLowerCase();
       const expected = words[i].toLowerCase();
       const row = rows[i];
-
-      if (!val) return; // Don't validate empty
+      if (!val) return;
 
       if (val === expected) {
-        // Correct!
         row.className = 'verify-row done';
         row.querySelector('.row-status').textContent = '✔';
         row.querySelector('.row-error-msg').style.display = 'none';
         inp.disabled = true;
 
         if (i === 11) {
-          // All 12 done!
           updateProgress(12);
           btnConfirm.disabled = false;
           updateStatus(statusEl, '');
         } else {
-          // Advance to next
           activateRow(i + 1);
         }
       } else {
-        // Wrong!
         row.className = 'verify-row error';
         row.querySelector('.row-status').textContent = '✖';
         updateStatus(statusEl, `❌ Le mot #${i + 1} est incorrect. Réessayez.`, true);
-        // Select the text for easy re-typing
         inp.select();
       }
     };
 
     inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleValidate();
-      }
+      if (e.key === 'Enter') { e.preventDefault(); handleValidate(); }
     });
-
-    // Also validate on blur (mobile: user taps elsewhere)
     inp.addEventListener('blur', () => {
-      // Small delay to avoid conflict with Enter
-      setTimeout(() => {
-        if (i === currentIndex && inp.value.trim()) handleValidate();
-      }, 100);
+      setTimeout(() => { if (i === currentIndex && inp.value.trim()) handleValidate(); }, 100);
     });
   });
 
-  // Focus first input
   setTimeout(() => inputs[0]?.focus(), 200);
 
   btnBack?.addEventListener('click', () => {
@@ -589,33 +514,26 @@ function setupBackupVerifyScreen(words) {
   }, { once: true });
 
   btnConfirm?.addEventListener('click', async () => {
-    // Clear mnemonic from memory (no longer needed)
     pendingMnemonic = null;
 
-    // Set wallet directly from pending data — no need to re-authenticate
+    // Set wallet in memory
     currentWallet = {
       wallet: pendingWalletData.wallet,
       address: pendingWalletData.address,
       publicKey: pendingWalletData.publicKey,
     };
     isUnlocked = true;
+    await touchWallet(currentWallet.address);
     pendingWalletData = null;
 
-    // Mark onboarding complete
-    await saveSetting(SETTING_ONBOARDED, true);
-
-    // Show success then go to home
     showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
     await delay(2500);
-
-    showScreen('home');
-    setupHomeScreen();
-    resetInactivityTimer();
+    await goToHome();
   }, { once: true });
 }
 
 // ==========================================
-// 9. IMPORT
+// 8. IMPORT
 // ==========================================
 
 function setupImportScreen() {
@@ -625,25 +543,20 @@ function setupImportScreen() {
   const btnConfirm = document.getElementById('btn-import-confirm');
   const statusEl = document.getElementById('import-status');
 
-  // Tab switching
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       panels.forEach(p => p.classList.remove('active'));
       tab.classList.add('active');
-      const panel = document.getElementById(`panel-${tab.dataset.tab}`);
-      panel?.classList.add('active');
+      document.getElementById(`panel-${tab.dataset.tab}`)?.classList.add('active');
     });
   });
 
-  // Auto-advance secret number inputs
   const snInputs = document.querySelectorAll('#secret-numbers-grid input');
   snInputs.forEach((inp, i) => {
     inp.addEventListener('input', () => {
       inp.value = inp.value.replace(/\D/g, '').slice(0, 6);
-      if (inp.value.length === 6 && i < snInputs.length - 1) {
-        snInputs[i + 1].focus();
-      }
+      if (inp.value.length === 6 && i < snInputs.length - 1) snInputs[i + 1].focus();
     });
   });
 
@@ -659,8 +572,7 @@ async function handleImport(statusEl) {
   const activeTab = document.querySelector('#import-tabs .tab.active')?.dataset.tab;
 
   try {
-    let walletResult;
-    let seedForStorage;
+    let walletResult, seedForStorage;
 
     if (activeTab === 'seed') {
       const seed = document.getElementById('import-seed-input')?.value?.trim();
@@ -677,7 +589,6 @@ async function handleImport(statusEl) {
       if (wordCount !== 12) { updateStatus(statusEl, `❌ ${wordCount} mots détectés. Attendu : 12.`, true); rearmImport(statusEl); return; }
       updateStatus(statusEl, 'Restauration…');
       walletResult = walletFromMnemonic(mnemonic);
-      // For mnemonic-based wallets, store the mnemonic itself as the "seed" since they don't have a traditional seed
       seedForStorage = mnemonic;
 
     } else if (activeTab === 'secretnumbers') {
@@ -693,7 +604,6 @@ async function handleImport(statusEl) {
       updateStatus(statusEl, 'Restauration depuis Xumm…');
       const secretNumbers = rows.join(' ');
       walletResult = walletFromSecretNumbers(secretNumbers);
-      // Secret numbers wallets: extract seed from the wallet instance
       seedForStorage = walletResult.wallet?.seed || secretNumbers;
 
     } else {
@@ -707,40 +617,31 @@ async function handleImport(statusEl) {
     document.getElementById('import-mnemonic-input') && (document.getElementById('import-mnemonic-input').value = '');
     document.querySelectorAll('#secret-numbers-grid input').forEach(inp => inp.value = '');
 
-    // Keep wallet instance for direct use after setup
-    const importedWallet = walletResult;
-    const importedSeed = seedForStorage;
+    // Encrypt with master key
+    const masterKey = getMasterKey();
+    const encryptedSeed = await encryptWithMasterKey(seedForStorage, masterKey);
 
-    // Show PIN creation screen
-    showScreen('pin-create');
-    setupCreatePINScreen(async (pin) => {
-      try {
-        // Encrypt seed with PIN
-        const encryptedSeed = await encryptSeedWithPIN(importedSeed, pin);
-
-        // Save to IndexedDB (PIN auth initially)
-        await saveWallet({
-          address: importedWallet.address,
-          encryptedSeed,
-          authMode: 'pin',
-          credentialId: null,
-          encryptedSeedWebAuthn: null,
-        });
-
-        // Offer Face ID if available
-        const biometricOk = await isBiometricAvailable();
-        if (biometricOk) {
-          showScreen('faceid-setup');
-          setupEnableFaceIDScreen({ address: importedWallet.address, seed: importedSeed }, async () => {
-            await finishImport(importedWallet);
-          });
-        } else {
-          await finishImport(importedWallet);
-        }
-      } catch (err) {
-        showError(`Erreur : ${err.message}`);
-      }
+    // Save wallet
+    await saveWallet({
+      address: walletResult.address,
+      encryptedSeed,
+      label: null,
     });
+
+    await saveSetting(SETTING_ONBOARDED, true);
+
+    // Set as current wallet
+    currentWallet = {
+      wallet: walletResult.wallet,
+      address: walletResult.address,
+      publicKey: walletResult.publicKey,
+    };
+    isUnlocked = true;
+    await touchWallet(currentWallet.address);
+
+    showSuccess('Wallet importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
+    await delay(2500);
+    await goToHome();
 
   } catch (err) {
     updateStatus(statusEl, `❌ ${err.message}`, true);
@@ -748,49 +649,56 @@ async function handleImport(statusEl) {
   }
 }
 
-/**
- * Complete the import flow: set wallet in memory, mark onboarded, go to home.
- */
-async function finishImport(walletResult) {
-  await saveSetting(SETTING_ONBOARDED, true);
-
-  currentWallet = {
-    wallet: walletResult.wallet,
-    address: walletResult.address,
-    publicKey: walletResult.publicKey,
-  };
-  isUnlocked = true;
-
-  showSuccess('Wallet importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
-  await delay(2500);
-  showScreen('home');
-  setupHomeScreen();
-  resetInactivityTimer();
-}
-
 function rearmImport(statusEl) {
-  // Re-attach the click handler since we used { once: true }
   const btn = document.getElementById('btn-import-confirm');
   btn?.addEventListener('click', () => handleImport(statusEl), { once: true });
 }
 
 // ==========================================
-// 10. HOME SCREEN
+// 9. HOME SCREEN (Multi-wallet)
 // ==========================================
+
+async function goToHome() {
+  // Load last used wallet if not already set
+  if (!currentWallet) {
+    const wallets = await getAllWallets();
+    if (wallets.length > 0) {
+      const lastUsed = wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0))[0];
+      const masterKey = getMasterKey();
+      try {
+        const seed = await decryptWithMasterKey(lastUsed.encryptedSeed, masterKey);
+        let w;
+        if (seed.includes(' ')) { w = walletFromMnemonic(seed); } else { w = walletFromSeed(seed); }
+        currentWallet = { wallet: w.wallet, address: w.address, publicKey: w.publicKey };
+      } catch {
+        // Cannot decrypt — show choice
+        showScreen('choice');
+        setupChoiceScreen();
+        return;
+      }
+    }
+  }
+
+  showScreen('home');
+  setupHomeScreen();
+  resetInactivityTimer();
+}
 
 function setupHomeScreen() {
   const btnScan = document.getElementById('btn-scan');
   const btnLock = document.getElementById('btn-lock');
+  const btnAddWallet = document.getElementById('btn-add-wallet');
 
   if (currentWallet) {
     const addr = currentWallet.address;
     setText('home-address', addr);
     setText('home-wallet-label', 'Mon Wallet');
     setText('home-balance-amount', '0');
-
-    // Check relay for balance
     checkBalance(addr);
   }
+
+  // Render wallet list
+  renderWalletList();
 
   btnScan?.addEventListener('click', () => {
     showScreen('scanner');
@@ -798,6 +706,79 @@ function setupHomeScreen() {
   }, { once: true });
 
   btnLock?.addEventListener('click', () => lockWallet(), { once: true });
+
+  // Add wallet button
+  if (btnAddWallet) {
+    const freshBtn = btnAddWallet.cloneNode(true);
+    btnAddWallet.replaceWith(freshBtn);
+    document.getElementById('btn-add-wallet')?.addEventListener('click', () => {
+      showScreen('choice');
+      setupChoiceScreen();
+    }, { once: true });
+  }
+}
+
+/**
+ * Render the wallet list at the bottom of the home screen.
+ * Highlights the active wallet, shows all wallets, allows switching.
+ */
+async function renderWalletList() {
+  const container = document.getElementById('wallet-list');
+  if (!container) return;
+
+  const wallets = await getAllWallets();
+  container.innerHTML = '';
+
+  if (wallets.length <= 1) {
+    container.classList.add('hidden');
+    return;
+  }
+
+  container.classList.remove('hidden');
+
+  // Sort by lastUsedAt desc
+  wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0));
+
+  wallets.forEach((w) => {
+    const isActive = currentWallet && w.address === currentWallet.address;
+    const item = document.createElement('div');
+    item.className = `wallet-list-item${isActive ? ' active' : ''}`;
+    item.innerHTML = `
+      <div class="wl-info">
+        <span class="wl-label">${w.label || 'Wallet'}</span>
+        <span class="wl-address">${w.address.slice(0, 8)}…${w.address.slice(-6)}</span>
+      </div>
+      ${isActive ? '<span class="wl-active-badge">●</span>' : ''}
+    `;
+
+    if (!isActive) {
+      item.addEventListener('click', () => switchWallet(w.address));
+    }
+
+    container.appendChild(item);
+  });
+}
+
+async function switchWallet(address) {
+  try {
+    const walletData = await getWallet(address);
+    if (!walletData) return;
+
+    const masterKey = getMasterKey();
+    const seed = await decryptWithMasterKey(walletData.encryptedSeed, masterKey);
+
+    let w;
+    if (seed.includes(' ')) { w = walletFromMnemonic(seed); } else { w = walletFromSeed(seed); }
+
+    if (currentWallet) clearWalletFromMemory(currentWallet);
+    currentWallet = { wallet: w.wallet, address: w.address, publicKey: w.publicKey };
+    await touchWallet(address);
+
+    showScreen('home');
+    setupHomeScreen();
+  } catch (err) {
+    console.error('[switchWallet] Error:', err);
+  }
 }
 
 async function checkBalance(address) {
@@ -806,33 +787,26 @@ async function checkBalance(address) {
     const data = await res.json().catch(() => ({}));
 
     if (res.ok && data.xrp !== undefined) {
-      // Account is activated
       setText('home-balance-amount', parseFloat(data.xrp).toFixed(2));
       document.getElementById('home-badge-inactive')?.classList.add('hidden');
       document.getElementById('home-badge-active')?.classList.remove('hidden');
       document.getElementById('activation-notice')?.classList.add('hidden');
     } else if (res.status === 404) {
-      // Not activated
       setText('home-balance-amount', '0');
       document.getElementById('home-badge-inactive')?.classList.remove('hidden');
       document.getElementById('home-badge-active')?.classList.add('hidden');
       document.getElementById('activation-notice')?.classList.remove('hidden');
     }
-  } catch {
-    // Offline or error — keep defaults
-  }
+  } catch { /* offline */ }
 }
 
 // ==========================================
-// 10b. PIN-BASED AUTH SCREENS
+// 10. PIN SCREENS
 // ==========================================
 
 /**
- * Setup the "Create PIN" screen.
- * Two-step flow: enter 6 digits, then confirm.
- * Calls onComplete(pin) when both entries match.
- *
- * @param {function(string): void} onComplete - Called with the confirmed PIN
+ * Create PIN screen — two-step (enter + confirm).
+ * @param {function(string): void} onComplete
  */
 function setupCreatePINScreen(onComplete) {
   const titleEl = document.getElementById('pin-create-title');
@@ -844,25 +818,15 @@ function setupCreatePINScreen(onComplete) {
   let firstPIN = null;
   let isConfirming = false;
 
-  function resetDots() {
-    dotsContainer.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
-  }
-  function updateDots(length) {
-    dotsContainer.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('filled', i < length));
-  }
-  function resetForEntry() {
-    input.value = '';
-    resetDots();
-    updateStatus(statusEl, '');
-    setTimeout(() => input.focus(), 100);
-  }
+  function resetDots() { dotsContainer.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled')); }
+  function updateDots(len) { dotsContainer.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('filled', i < len)); }
+  function resetForEntry() { input.value = ''; resetDots(); updateStatus(statusEl, ''); setTimeout(() => input.focus(), 100); }
 
-  // Initial state
   titleEl.textContent = 'Créez votre code PIN';
-  subtitleEl.textContent = 'Ce code à 6 chiffres protège votre wallet.';
+  subtitleEl.textContent = 'Ce code à 6 chiffres protège tous vos wallets.';
   resetForEntry();
 
-  // Remove old listeners by replacing input
+  // Fresh input (remove old listeners)
   const freshInput = input.cloneNode(true);
   input.replaceWith(freshInput);
   const pinInput = document.getElementById('pin-create-input');
@@ -870,15 +834,11 @@ function setupCreatePINScreen(onComplete) {
   pinInput.addEventListener('input', () => {
     pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 6);
     updateDots(pinInput.value.length);
-
-    if (pinInput.value.length === 6) {
-      setTimeout(() => handlePINComplete(pinInput.value), 200);
-    }
+    if (pinInput.value.length === 6) setTimeout(() => handlePINComplete(pinInput.value), 200);
   });
 
   function handlePINComplete(pin) {
     if (!isConfirming) {
-      // First entry — store and ask to confirm
       firstPIN = pin;
       isConfirming = true;
       titleEl.textContent = 'Confirmez votre code PIN';
@@ -888,19 +848,16 @@ function setupCreatePINScreen(onComplete) {
       updateStatus(statusEl, '');
       setTimeout(() => pinInput.focus(), 100);
     } else {
-      // Confirm entry
       if (pin === firstPIN) {
-        // Match — continue flow
         onComplete(pin);
       } else {
-        // Mismatch — shake and restart
         dotsContainer.classList.add('shake');
         setTimeout(() => dotsContainer.classList.remove('shake'), 500);
         updateStatus(statusEl, '❌ Les codes ne correspondent pas. Recommencez.', true);
         firstPIN = null;
         isConfirming = false;
         titleEl.textContent = 'Créez votre code PIN';
-        subtitleEl.textContent = 'Ce code à 6 chiffres protège votre wallet.';
+        subtitleEl.textContent = 'Ce code à 6 chiffres protège tous vos wallets.';
         pinInput.value = '';
         resetDots();
         setTimeout(() => pinInput.focus(), 800);
@@ -908,13 +865,11 @@ function setupCreatePINScreen(onComplete) {
     }
   }
 
-  // Focus input when user taps the dots area
   dotsContainer?.addEventListener('click', () => pinInput.focus());
 }
 
 /**
- * Setup the "Enter PIN" screen for unlock.
- * Decrypts the seed with the entered PIN, handles lockout.
+ * PIN unlock screen — verify PIN, derive master key.
  */
 function setupEnterPINScreen() {
   const dotsContainer = document.getElementById('pin-unlock-dots');
@@ -924,23 +879,17 @@ function setupEnterPINScreen() {
   const btnFaceID = document.getElementById('btn-pin-unlock-faceid');
   const btnReset = document.getElementById('btn-reset-wallet-pin');
 
-  function resetDots() {
-    dotsContainer.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
-  }
-  function updateDots(length) {
-    dotsContainer.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('filled', i < length));
-  }
-
-  // Show address + configure Face ID link
+  // Show most recent wallet address
   getLastUsedWallet().then(wallet => {
     if (wallet && addressEl) {
       addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
     }
-    // Show Face ID toggle link if available
-    const authMode = wallet?.authMode || 'webauthn';
-    if (authMode.includes('webauthn') && wallet?.credentialId && btnFaceID) {
+  });
+
+  // Show Face ID link if available
+  getAuthConfig().then(authConfig => {
+    if (authConfig?.credentialId && authConfig?.wrappedMasterKey && btnFaceID) {
       btnFaceID.classList.remove('hidden');
-      // Remove old listeners
       const freshBtn = btnFaceID.cloneNode(true);
       btnFaceID.replaceWith(freshBtn);
       document.getElementById('btn-pin-unlock-faceid')?.addEventListener('click', () => {
@@ -949,25 +898,24 @@ function setupEnterPINScreen() {
       }, { once: true });
     }
 
-    // Check lockout state on load
-    if (wallet) {
-      const lockout = checkPINLockout(wallet);
+    // Check lockout
+    if (authConfig) {
+      const lockout = checkPINLockout(authConfig);
       if (lockout.locked) {
         updateStatus(statusEl, `⏳ Trop de tentatives. Réessayez dans ${lockout.remainingSec}s.`, true);
         pinInput.disabled = true;
-        setTimeout(() => {
-          pinInput.disabled = false;
-          updateStatus(statusEl, '');
-          pinInput.focus();
-        }, lockout.remainingSec * 1000);
+        setTimeout(() => { pinInput.disabled = false; updateStatus(statusEl, ''); pinInput.focus(); }, lockout.remainingSec * 1000);
       }
     }
   });
 
-  // Reset state
+  // Fresh input
   const freshInput = input.cloneNode(true);
   input.replaceWith(freshInput);
   const pinInput = document.getElementById('pin-unlock-input');
+
+  function resetDots() { dotsContainer.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled')); }
+  function updateDots(len) { dotsContainer.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('filled', i < len)); }
 
   pinInput.value = '';
   resetDots();
@@ -977,63 +925,47 @@ function setupEnterPINScreen() {
   pinInput.addEventListener('input', () => {
     pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 6);
     updateDots(pinInput.value.length);
-
-    if (pinInput.value.length === 6) {
-      setTimeout(() => attemptPINUnlock(pinInput.value), 200);
-    }
+    if (pinInput.value.length === 6) setTimeout(() => attemptPINUnlock(pinInput.value), 200);
   });
 
   async function attemptPINUnlock(pin) {
     try {
-      const walletData = await getLastUsedWallet();
-      if (!walletData) { showScreen('welcome'); setupWelcomeScreen(); return; }
+      const authConfig = await getAuthConfig();
+      if (!authConfig) { showScreen('welcome'); setupWelcomeScreen(); return; }
 
-      // Check lockout
-      const lockout = checkPINLockout(walletData);
+      // Lockout check
+      const lockout = checkPINLockout(authConfig);
       if (lockout.locked) {
         updateStatus(statusEl, `⏳ Trop de tentatives. Réessayez dans ${lockout.remainingSec}s.`, true);
-        pinInput.value = '';
-        resetDots();
+        pinInput.value = ''; resetDots();
         return;
       }
 
-      // Attempt decrypt
-      const seed = await decryptSeedWithPIN(walletData.encryptedSeed, pin);
+      // Verify PIN
+      const pinOk = await verifyPIN(pin, authConfig.verifyHash, authConfig.verifySalt);
+      if (!pinOk) throw new Error('wrong_pin');
 
-      // Success — reset attempts
-      await updateWalletAuth(walletData.address, { pinAttempts: 0, pinLockedUntil: null });
-
-      // Restore wallet
-      let wallet, address, publicKey;
-      if (seed.includes(' ')) {
-        const result = walletFromMnemonic(seed);
-        wallet = result.wallet; address = result.address; publicKey = result.publicKey;
-      } else {
-        const result = walletFromSeed(seed);
-        wallet = result.wallet; address = result.address; publicKey = result.publicKey;
-      }
-
-      currentWallet = { wallet, address, publicKey };
+      // Success — derive master key
+      const masterKey = await deriveKeyFromPIN(pin, base64ToUint8Array(authConfig.masterSalt));
+      setMasterKey(masterKey);
       isUnlocked = true;
 
-      showScreen('home');
-      setupHomeScreen();
-      resetInactivityTimer();
+      // Reset attempts
+      await saveAuthConfig({ ...authConfig, pinAttempts: 0, pinLockedUntil: 0 });
+
+      await goToHome();
 
     } catch (err) {
-      // AES-GCM throws OperationError on wrong key (wrong PIN)
-      const walletData = await getLastUsedWallet();
-      const attempts = (walletData?.pinAttempts || 0) + 1;
-
-      let lockedUntil = null;
+      // Wrong PIN
+      const authConfig = await getAuthConfig();
+      const attempts = (authConfig?.pinAttempts || 0) + 1;
+      let lockedUntil = 0;
       if (attempts >= 5) {
         const lockDelay = getNextLockoutDelay(attempts);
         lockedUntil = Date.now() + lockDelay;
       }
+      await saveAuthConfig({ ...authConfig, pinAttempts: attempts, pinLockedUntil: lockedUntil });
 
-      await updateWalletAuth(walletData.address, { pinAttempts: attempts, pinLockedUntil: lockedUntil });
-
-      // Visual feedback
       dotsContainer.classList.add('shake');
       setTimeout(() => dotsContainer.classList.remove('shake'), 500);
 
@@ -1045,22 +977,15 @@ function setupEnterPINScreen() {
         updateStatus(statusEl, `❌ PIN incorrect. ${remaining} tentative${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}.`, true);
       }
 
-      pinInput.value = '';
-      resetDots();
-
-      // Disable input during lockout
+      pinInput.value = ''; resetDots();
       pinInput.disabled = true;
-      setTimeout(() => {
-        pinInput.disabled = false;
-        pinInput.focus();
-      }, lockedUntil ? Math.min(lockedUntil - Date.now(), 30000) : 1000);
+      setTimeout(() => { pinInput.disabled = false; pinInput.focus(); }, lockedUntil ? Math.min(lockedUntil - Date.now(), 30000) : 1000);
     }
   }
 
-  // Focus input on dots tap
   dotsContainer?.addEventListener('click', () => pinInput.focus());
 
-  // Setup reset button
+  // Reset button
   if (btnReset) {
     const freshReset = btnReset.cloneNode(true);
     btnReset.replaceWith(freshReset);
@@ -1069,18 +994,14 @@ function setupEnterPINScreen() {
 }
 
 /**
- * Setup the "Enable Face ID" optional screen.
- * Registers WebAuthn + encrypts seed with PRF, or skips.
- *
- * @param {{ address: string, seed: string }} walletData - Wallet address + plaintext seed
- * @param {function(): void} onComplete - Called after Face ID setup or skip
+ * Enable Face ID — wraps the master key with WebAuthn PRF.
+ * @param {function(): void} onComplete
  */
-function setupEnableFaceIDScreen(walletData, onComplete) {
+function setupEnableFaceIDScreen(onComplete) {
   const btnActivate = document.getElementById('btn-faceid-activate');
   const btnSkip = document.getElementById('btn-faceid-skip');
   const statusEl = document.getElementById('faceid-setup-status');
 
-  // Remove old listeners
   const freshActivate = btnActivate.cloneNode(true);
   const freshSkip = btnSkip.cloneNode(true);
   btnActivate.replaceWith(freshActivate);
@@ -1094,17 +1015,22 @@ function setupEnableFaceIDScreen(walletData, onComplete) {
       updateStatus(statusEl, 'Enregistrement Face ID…');
       newActivate.disabled = true;
 
-      // 1. Register biometric
-      const { credentialId, signature } = await registerBiometric(walletData.address);
+      // Use a stable user ID for the credential
+      const userId = 'xcannes-wallet-user';
 
-      // 2. Encrypt seed with WebAuthn PRF
-      const encryptedSeedWebAuthn = await encryptSeed(walletData.seed, signature);
+      // Register biometric
+      const { credentialId, signature: prfOutput } = await registerBiometric(userId);
 
-      // 3. Update wallet in IndexedDB
-      await updateWalletAuth(walletData.address, {
+      // Wrap master key with PRF
+      const masterKey = getMasterKey();
+      const wrappedMasterKey = await wrapMasterKeyWithPRF(masterKey, prfOutput);
+
+      // Update auth config
+      const authConfig = await getAuthConfig();
+      await saveAuthConfig({
+        ...authConfig,
         credentialId,
-        encryptedSeedWebAuthn,
-        authMode: 'pin+webauthn',
+        wrappedMasterKey,
       });
 
       updateStatus(statusEl, '✅ Face ID activé !');
@@ -1123,13 +1049,11 @@ function setupEnableFaceIDScreen(walletData, onComplete) {
     }
   }, { once: true });
 
-  newSkip?.addEventListener('click', () => {
-    onComplete();
-  }, { once: true });
+  newSkip?.addEventListener('click', () => onComplete(), { once: true });
 }
 
 // ==========================================
-// 11. UNLOCK SCREEN
+// 11. UNLOCK SCREEN (Face ID)
 // ==========================================
 
 function setupUnlockScreen() {
@@ -1137,74 +1061,54 @@ function setupUnlockScreen() {
   const addressEl = document.getElementById('unlock-address');
   const statusEl = document.getElementById('unlock-status');
 
-  // Hide button initially — Face ID will auto-trigger
   if (btnUnlock) btnUnlock.style.display = 'none';
 
   getLastUsedWallet().then(wallet => {
-    if (wallet && addressEl) {
-      addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
-    }
-    // Show PIN fallback link if wallet has PIN auth
-    const authMode = wallet?.authMode || 'webauthn';
-    const btnUsePIN = document.getElementById('btn-unlock-use-pin');
-    if (btnUsePIN) {
-      if (authMode.includes('pin')) {
-        btnUsePIN.classList.remove('hidden');
-        btnUsePIN.addEventListener('click', () => {
-          showScreen('pin-unlock');
-          setupEnterPINScreen();
-        }, { once: true });
-      } else {
-        btnUsePIN.classList.add('hidden');
-      }
-    }
+    if (wallet && addressEl) addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
   });
 
-  // Auto-trigger Face ID (Xumm-style)
+  // PIN fallback link
+  const btnUsePIN = document.getElementById('btn-unlock-use-pin');
+  if (btnUsePIN) {
+    btnUsePIN.classList.remove('hidden');
+    const freshBtn = btnUsePIN.cloneNode(true);
+    btnUsePIN.replaceWith(freshBtn);
+    document.getElementById('btn-unlock-use-pin')?.addEventListener('click', () => {
+      showScreen('pin-unlock');
+      setupEnterPINScreen();
+    }, { once: true });
+  }
+
+  // Auto-trigger Face ID
   setTimeout(async () => {
-    try {
-      await doUnlock();
-    } catch {
-      // Face ID failed → show retry button
-      showRetryButton();
-    }
+    try { await doUnlock(); } catch { showRetryButton(); }
   }, 300);
 
-  // Setup reset button (available even before Face ID attempt)
   setupResetButton();
 }
 
-/**
- * Show unlock screen in manual retry mode (after instant unlock failed).
- * Button is immediately visible, no auto-trigger.
- */
 function setupUnlockScreenManual(error) {
   const btnUnlock = document.getElementById('btn-unlock');
   const addressEl = document.getElementById('unlock-address');
   const statusEl = document.getElementById('unlock-status');
 
   getLastUsedWallet().then(wallet => {
-    if (wallet && addressEl) {
-      addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
-    }
-    // Show PIN fallback link if wallet has PIN auth
-    const authMode = wallet?.authMode || 'webauthn';
-    const btnUsePIN = document.getElementById('btn-unlock-use-pin');
-    if (btnUsePIN) {
-      if (authMode.includes('pin')) {
-        btnUsePIN.classList.remove('hidden');
-        btnUsePIN.addEventListener('click', () => {
-          showScreen('pin-unlock');
-          setupEnterPINScreen();
-        }, { once: true });
-      } else {
-        btnUsePIN.classList.add('hidden');
-      }
-    }
+    if (wallet && addressEl) addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
   });
 
-  // Show error from instant attempt
-  if (error && error !== 'no_wallet') {
+  // PIN fallback
+  const btnUsePIN = document.getElementById('btn-unlock-use-pin');
+  if (btnUsePIN) {
+    btnUsePIN.classList.remove('hidden');
+    const freshBtn = btnUsePIN.cloneNode(true);
+    btnUsePIN.replaceWith(freshBtn);
+    document.getElementById('btn-unlock-use-pin')?.addEventListener('click', () => {
+      showScreen('pin-unlock');
+      setupEnterPINScreen();
+    }, { once: true });
+  }
+
+  if (error && error !== 'no_faceid') {
     if (error.name === 'NotAllowedError') {
       updateStatus(statusEl, 'Authentification annulée. Réessayez.', true);
     } else if (error.message) {
@@ -1212,10 +1116,7 @@ function setupUnlockScreenManual(error) {
     }
   }
 
-  // Button visible immediately for manual retry
   showRetryButton();
-
-  // Setup reset button
   setupResetButton();
 }
 
@@ -1227,25 +1128,75 @@ function showRetryButton() {
   }
 }
 
-/**
- * Setup the reset wallet button on the unlock screen.
- * Shows a confirmation before wiping all data.
- */
+async function doUnlock() {
+  const statusEl = document.getElementById('unlock-status');
+  try {
+    updateStatus(statusEl, 'Authentification biométrique…');
+
+    const authConfig = await getAuthConfig();
+    if (!authConfig?.credentialId || !authConfig?.wrappedMasterKey) {
+      showScreen('pin-unlock');
+      setupEnterPINScreen();
+      return;
+    }
+
+    const prfOutput = await promptBiometric(authConfig.credentialId);
+    updateStatus(statusEl, 'Déverrouillage…');
+
+    const masterKey = await unwrapMasterKeyWithPRF(authConfig.wrappedMasterKey, prfOutput);
+    setMasterKey(masterKey);
+    isUnlocked = true;
+
+    updateStatus(statusEl, '');
+    await goToHome();
+
+  } catch (err) {
+    if (err.name === 'NotAllowedError') {
+      updateStatus(statusEl, 'Authentification annulée. Réessayez.', true);
+    } else {
+      updateStatus(statusEl, `Erreur : ${err.message}`, true);
+    }
+    showRetryButton();
+  }
+}
+
+// ==========================================
+// LEGACY WALLET HANDLING
+// ==========================================
+
+function setupLegacyWalletScreen() {
+  const addressEl = document.getElementById('unlock-address');
+  const statusEl = document.getElementById('unlock-status');
+  const btnUnlock = document.getElementById('btn-unlock');
+  const btnUsePIN = document.getElementById('btn-unlock-use-pin');
+
+  getLastUsedWallet().then(wallet => {
+    if (wallet && addressEl) addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
+  });
+
+  if (btnUnlock) btnUnlock.style.display = 'none';
+  if (btnUsePIN) btnUsePIN.classList.add('hidden');
+
+  updateStatus(statusEl,
+    '⚠️ Ce wallet utilise un ancien format de sécurité.\nRéinitialisez pour utiliser le nouveau système PIN.',
+    true
+  );
+
+  setupResetButton();
+}
+
+// ==========================================
+// RESET
+// ==========================================
+
 function setupResetButton() {
   const btnReset = document.getElementById('btn-reset-wallet');
   if (!btnReset) return;
-
-  // Remove old listeners
   const newBtn = btnReset.cloneNode(true);
   btnReset.replaceWith(newBtn);
-
   newBtn.addEventListener('click', () => performFullReset(), { once: true });
 }
 
-/**
- * Full wallet reset — shared by all reset buttons.
- * Deletes IndexedDB, caches, service workers, and reloads.
- */
 async function performFullReset() {
   const confirmed = confirm(
     '⚠️ Réinitialiser le wallet ?\n\n'
@@ -1260,168 +1211,55 @@ async function performFullReset() {
   if (!confirmed) return;
 
   try {
-    // 1. Clear IndexedDB (wallets + settings)
     await clearAllData();
-
-    // 2. Clear Service Worker cache
     if ('caches' in window) {
       const cacheNames = await caches.keys();
       await Promise.all(cacheNames.map(name => caches.delete(name)));
     }
-
-    // 3. Unregister service worker
     if ('serviceWorker' in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map(reg => reg.unregister()));
     }
-
-    // 4. Clear in-memory state
     currentWallet = null;
     isUnlocked = false;
     pendingMnemonic = null;
     pendingWalletData = null;
-
-    // 5. Hard reload to get a completely fresh start
+    clearMasterKey();
     window.location.reload();
-
   } catch (err) {
     alert(`Erreur lors de la réinitialisation : ${err.message}`);
   }
 }
 
-/**
- * Show a special unlock screen for legacy wallets (pre-PIN system).
- * These wallets cannot be unlocked reliably (WebAuthn passkey may be deleted).
- * Shows the address + explanation + reset button. No Face ID auto-trigger.
- */
-function setupLegacyWalletScreen(walletData) {
-  const addressEl = document.getElementById('unlock-address');
-  const statusEl = document.getElementById('unlock-status');
-  const btnUnlock = document.getElementById('btn-unlock');
-  const btnUsePIN = document.getElementById('btn-unlock-use-pin');
+// ==========================================
+// LOCK
+// ==========================================
 
-  if (addressEl && walletData) {
-    addressEl.textContent = `${walletData.address.slice(0, 8)}…${walletData.address.slice(-6)}`;
+async function lockWallet() {
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  if (currentWallet) {
+    clearWalletFromMemory(currentWallet);
+    currentWallet = null;
   }
+  isUnlocked = false;
+  pendingMnemonic = null;
+  pendingWalletData = null;
+  clearMasterKey();
+  if (qrScanner) qrScanner.stop();
 
-  // Hide Face ID button — legacy credentials are likely invalid
-  if (btnUnlock) btnUnlock.style.display = 'none';
-
-  // Hide PIN link — legacy wallets have no PIN
-  if (btnUsePIN) btnUsePIN.classList.add('hidden');
-
-  updateStatus(statusEl,
-    '⚠️ Ce wallet utilise un ancien format de sécurité.\n'
-    + 'Réinitialisez pour utiliser le nouveau système PIN.',
-    true
-  );
-
-  // Setup reset button
-  setupResetButton();
-}
-
-async function doUnlock() {
-  const statusEl = document.getElementById('unlock-status');
-
+  // Choose unlock screen
   try {
-    updateStatus(statusEl, 'Authentification biométrique…');
-
-    const walletData = await getLastUsedWallet();
-    if (!walletData) {
-      showScreen('welcome');
-      setupWelcomeScreen();
-      return;
-    }
-
-    const prfOutput = await promptBiometric(walletData.credentialId);
-
-    updateStatus(statusEl, 'Déverrouillage…');
-
-    // Choose the right encrypted seed for WebAuthn decryption
-    const authMode = walletData.authMode || 'webauthn';
-    let encryptedData;
-    if (authMode === 'pin+webauthn' && walletData.encryptedSeedWebAuthn) {
-      encryptedData = walletData.encryptedSeedWebAuthn;
+    const authConfig = await getAuthConfig();
+    if (authConfig?.credentialId && authConfig?.wrappedMasterKey) {
+      showScreen('unlock');
+      setupUnlockScreenManual();
     } else {
-      encryptedData = walletData.encryptedSeed;
-    }
-
-    const seed = await decryptSeed(encryptedData, prfOutput);
-
-    // Check if it's a mnemonic (contains spaces) or a seed
-    let wallet, address, publicKey;
-    if (seed.includes(' ')) {
-      const result = walletFromMnemonic(seed);
-      wallet = result.wallet;
-      address = result.address;
-      publicKey = result.publicKey;
-    } else {
-      const result = walletFromSeed(seed);
-      wallet = result.wallet;
-      address = result.address;
-      publicKey = result.publicKey;
-    }
-
-    currentWallet = { wallet, address, publicKey };
-    isUnlocked = true;
-
-    updateStatus(statusEl, '');
-    showScreen('home');
-    setupHomeScreen();
-    resetInactivityTimer();
-
-  } catch (err) {
-    if (err.name === 'NotAllowedError') {
-      updateStatus(statusEl, 'Authentification annulée. Réessayez.', true);
-    } else {
-      updateStatus(statusEl, `Erreur : ${err.message}`, true);
-    }
-    // Show retry button (only place that does this — no double)
-    showRetryButton();
-  }
-}
-
-/**
- * unlockAndGoHome — Legacy fallback. Only used for backward-compat edge cases.
- * New flows (create/import) set currentWallet directly from memory.
- */
-async function unlockAndGoHome() {
-  try {
-    const walletData = await getLastUsedWallet();
-    if (!walletData) return;
-
-    const authMode = walletData.authMode || 'webauthn';
-
-    if (authMode.includes('webauthn') && walletData.credentialId) {
-      const prfOutput = await promptBiometric(walletData.credentialId);
-      const encryptedData = (authMode === 'pin+webauthn' && walletData.encryptedSeedWebAuthn)
-        ? walletData.encryptedSeedWebAuthn
-        : walletData.encryptedSeed;
-      const seed = await decryptSeed(encryptedData, prfOutput);
-
-      let wallet, address, publicKey;
-      if (seed.includes(' ')) {
-        const result = walletFromMnemonic(seed);
-        wallet = result.wallet; address = result.address; publicKey = result.publicKey;
-      } else {
-        const result = walletFromSeed(seed);
-        wallet = result.wallet; address = result.address; publicKey = result.publicKey;
-      }
-
-      currentWallet = { wallet, address, publicKey };
-      isUnlocked = true;
-      showScreen('home');
-      setupHomeScreen();
-      resetInactivityTimer();
-    } else {
-      // PIN-only — show PIN screen
       showScreen('pin-unlock');
       setupEnterPINScreen();
     }
-  } catch (err) {
-    // If biometric fails, go to unlock screen
-    showScreen('unlock');
-    setupUnlockScreen();
+  } catch {
+    showScreen('pin-unlock');
+    setupEnterPINScreen();
   }
 }
 
@@ -1451,7 +1289,6 @@ function setupScannerScreen() {
     (rawQR) => handleQRScanned(rawQR, statusEl),
     (err) => updateStatus(statusEl, '❌ Erreur caméra. Vérifiez les permissions.', true)
   );
-
   qrScanner.start();
 
   btnBack?.addEventListener('click', () => {
@@ -1468,13 +1305,9 @@ function setupScannerScreen() {
 
 async function handleQRScanned(rawQR, statusEl) {
   const parsed = parseQRCode(rawQR);
-
   if (!parsed) {
     updateStatus(statusEl, '❌ QR code non reconnu.', true);
-    setTimeout(() => {
-      updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran');
-      qrScanner?.start();
-    }, 2000);
+    setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 2000);
     return;
   }
 
@@ -1489,10 +1322,7 @@ async function handleQRScanned(rawQR, statusEl) {
     }
   } catch (err) {
     updateStatus(statusEl, `❌ ${err.message}`, true);
-    setTimeout(() => {
-      updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran');
-      qrScanner?.start();
-    }, 3000);
+    setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 3000);
   }
 }
 
@@ -1513,11 +1343,7 @@ async function handleConnect(challenge, statusEl) {
   });
 
   showSuccess('Connecté !', `Wallet ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
-
-  setTimeout(() => {
-    showScreen('home');
-    setupHomeScreen();
-  }, 3000);
+  setTimeout(() => { showScreen('home'); setupHomeScreen(); }, 3000);
 }
 
 // ==========================================
@@ -1529,39 +1355,26 @@ async function handleSign(challenge, statusEl) {
 
   const txDetails = formatTxDetails(challenge.txjson);
   const detailsEl = document.getElementById('scanner-tx-details');
-  if (detailsEl) {
-    detailsEl.textContent = txDetails;
-    detailsEl.classList.remove('hidden');
-  }
+  if (detailsEl) { detailsEl.textContent = txDetails; detailsEl.classList.remove('hidden'); }
 
-  // Require confirmation before signing
-  const walletData = await getLastUsedWallet();
-  const authMode = walletData?.authMode || 'webauthn';
-
-  if (authMode.includes('webauthn') && walletData?.credentialId) {
-    // Face ID confirmation
+  // Require confirmation
+  const authConfig = await getAuthConfig();
+  if (authConfig?.credentialId) {
     updateStatus(statusEl, 'Confirmez avec Face ID / Touch ID…');
     try {
-      await promptBiometric(walletData.credentialId);
+      await promptBiometric(authConfig.credentialId);
     } catch {
       updateStatus(statusEl, 'Signature annulée.', true);
       if (detailsEl) detailsEl.classList.add('hidden');
-      setTimeout(() => {
-        updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran');
-        qrScanner?.start();
-      }, 2000);
+      setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 2000);
       return;
     }
   } else {
-    // PIN-only: wallet already authenticated — confirm via dialog
     const confirmed = confirm('Confirmer la signature de cette transaction ?');
     if (!confirmed) {
       updateStatus(statusEl, 'Signature annulée.', true);
       if (detailsEl) detailsEl.classList.add('hidden');
-      setTimeout(() => {
-        updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran');
-        qrScanner?.start();
-      }, 2000);
+      setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 2000);
       return;
     }
   }
@@ -1584,46 +1397,12 @@ async function handleSign(challenge, statusEl) {
     showError(`Erreur XRPL: ${result.txResult?.resultCode || 'Inconnue'}`);
   }
 
-  setTimeout(() => {
-    showScreen('home');
-    setupHomeScreen();
-  }, 4000);
+  setTimeout(() => { showScreen('home'); setupHomeScreen(); }, 4000);
 }
 
 // ==========================================
 // HELPERS
 // ==========================================
-
-async function lockWallet() {
-  if (inactivityTimer) clearTimeout(inactivityTimer);
-  if (currentWallet) {
-    clearWalletFromMemory(currentWallet);
-    currentWallet = null;
-  }
-  isUnlocked = false;
-  pendingMnemonic = null;
-  pendingWalletData = null;
-  if (qrScanner) qrScanner.stop();
-
-  // Choose unlock screen based on authMode
-  try {
-    const walletData = await getLastUsedWallet();
-    const authMode = walletData?.authMode || 'webauthn';
-
-    if (authMode.includes('webauthn') && walletData?.credentialId) {
-      // Has Face ID — show unlock screen (auto-trigger disabled, manual retry)
-      showScreen('unlock');
-      setupUnlockScreenManual();
-    } else {
-      // PIN-only
-      showScreen('pin-unlock');
-      setupEnterPINScreen();
-    }
-  } catch {
-    showScreen('unlock');
-    setupUnlockScreenManual();
-  }
-}
 
 function showSuccess(title, message) {
   showScreen('success');
@@ -1634,71 +1413,15 @@ function showSuccess(title, message) {
 function showError(message) {
   showScreen('error');
   setText('error-message', message);
-
-  const btn = document.getElementById('btn-error-retry');
-  btn?.addEventListener('click', () => init(), { once: true });
+  document.getElementById('btn-error-retry')?.addEventListener('click', () => init(), { once: true });
 }
 
-// ==========================================
-// BIOMETRIC ENROLLMENT ERROR DETECTION
-// ==========================================
-
-/**
- * Detect if a WebAuthn error is caused by missing biometric/passcode enrollment.
- * This happens when the device has Face ID hardware but no passcode is configured.
- * The browser shows its own confusing fallback UI (QR code, etc.).
- *
- * @param {Error} err
- * @returns {boolean}
- */
 function isBiometricEnrollmentError(err) {
-  // NotAllowedError: user cancelled OR no biometric/passcode enrolled
-  // SecurityError: some browsers use this when no authenticator is available
-  // AbortError: timeout or abort due to missing enrollment
   if (['NotAllowedError', 'SecurityError', 'AbortError'].includes(err.name)) {
-    // Exclude PRF-specific errors (already handled by webauthnService)
     if (err.message?.includes('PRF')) return false;
     return true;
   }
   return false;
-}
-
-/**
- * Show the "Biometric Setup Required" screen.
- * Displayed when the device has no passcode/Face ID/Touch ID configured.
- *
- * @param {string} returnScreen - Screen to go back to ('choice' | 'import')
- */
-function showBiometricSetupRequired(returnScreen) {
-  showScreen('biometric-required');
-
-  const btnRetry = document.getElementById('btn-biometric-required-retry');
-  const btnBack = document.getElementById('btn-biometric-required-back');
-
-  btnRetry?.replaceWith(btnRetry.cloneNode(true)); // Remove old listeners
-  btnBack?.replaceWith(btnBack.cloneNode(true));
-
-  const newBtnRetry = document.getElementById('btn-biometric-required-retry');
-  const newBtnBack = document.getElementById('btn-biometric-required-back');
-
-  newBtnRetry?.addEventListener('click', () => {
-    // Return to choice screen — user can retry Face ID from there
-    showScreen('choice');
-    setupChoiceScreen();
-  }, { once: true });
-
-  newBtnBack?.addEventListener('click', () => {
-    if (returnScreen === 'import') {
-      showScreen('import');
-      setupImportScreen();
-    } else if (returnScreen === 'choice') {
-      showScreen('choice');
-      setupChoiceScreen();
-    } else {
-      showScreen('welcome');
-      setupWelcomeScreen();
-    }
-  }, { once: true });
 }
 
 function setText(id, text) {
