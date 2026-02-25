@@ -22,7 +22,7 @@ import { generateMnemonic } from './bip39.js';
 /**
  * Generate a new XRPL wallet using BIP39 mnemonic.
  * The mnemonic (12 words) IS the master secret — it replaces the traditional seed.
- * The mnemonic must be encrypted immediately by the caller using cryptoService.encryptSeed().
+ * The mnemonic must be encrypted immediately by the caller using pinService.encryptWithMasterKey().
  *
  * Flow: generateMnemonic() → Wallet.fromMnemonic(mnemonic)
  * This ensures the mnemonic is always the canonical backup.
@@ -80,9 +80,6 @@ export function walletFromMnemonic(mnemonic) {
     xAddress: wallet.getXAddress(),
   };
 }
-
-// walletFromRFC1751Mnemonic() removed — Xcannes now uses BIP39 only.
-// Legacy RFC1751 wallets can still be imported via seed (sXXXX format).
 
 /**
  * Restore a wallet from Xaman/XUMM "secret numbers" format.

@@ -180,7 +180,7 @@ export async function promptBiometric(credentialId) {
   return result.prfOutput; // Deterministic secret for AES key derivation
 }
 
-// --- Base64 helpers (duplicated from cryptoService for module independence) ---
+// --- Base64 helpers ---
 
 function arrayBufferToBase64(buffer) {
   const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
