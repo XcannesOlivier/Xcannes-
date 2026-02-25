@@ -219,7 +219,6 @@ export function useWalletLabel({
     isEditingWalletLabel,
     isWalletLabelRequired,
     isWalletLabelLocked,
-    isWalletLabelLoading,
     walletHeaderToast,
     flashWalletHeaderToast,
     openWalletLabelEditor,

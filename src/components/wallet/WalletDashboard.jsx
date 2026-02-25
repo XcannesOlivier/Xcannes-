@@ -10,7 +10,6 @@ import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import {
   buildRlusdPaymentTxjson,
   computeSpreadQuote,
-  XCANNES_ACTIVATION_WALLET_ADDRESS,
   XCANNES_SPREAD_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
@@ -50,7 +49,7 @@ import WalletInfoModal from "./modals/WalletInfoModal";
 import WalletActivationModal from "./modals/WalletActivationModal";
 import WalletActivationRequestModal from "./modals/WalletActivationRequestModal";
 import WalletRlusdSetupModal from "./modals/WalletRlusdSetupModal";
-import { buildCurrencyLineMemo, buildMoonpayMemo, buildPayreqMemo, buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { buildMoonpayMemo, buildPayreqMemo, buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
   getCurrencyFlag,
@@ -291,7 +290,6 @@ export default function WalletDashboard({
     setRequestMemo,
   } = usePaymentRequestForm();
   
-  const [selectedWallet, setSelectedWallet] = useState("");
   const {
     convertBaseCurrency,
     setConvertBaseCurrency,
@@ -489,16 +487,7 @@ export default function WalletDashboard({
         seen.add("RLUSD");
       }
 
-      // S'assurer qu'il y a toujours une ligne RLUSD visible (même si demoLines a été modifié)
-      if (!seen.has("RLUSD")) {
-        tokens.push({
-          key: "DEMO:RLUSD",
-          currency: "RLUSD",
-          issuer: "Demo",
-          value: DEMO_RLUSD_TOTAL,
-          demoRlusdValue: DEMO_RLUSD_TOTAL,
-        });
-      }
+
 
       tokens.sort((a, b) => {
         const aCode = String(a?.currency || "").toUpperCase();
@@ -925,13 +914,6 @@ export default function WalletDashboard({
     setCurrencyLineCode,
     setDemoLines,
   ]);
-
-  const handleRefresh = async () => {
-    if (!refreshBalance) return;
-    setIsRefreshing(true);
-    await refreshBalance();
-    setTimeout(() => setIsRefreshing(false), 800);
-  };
 
   const handleInstallRequiredTrustline = useCallback(
     async (currencyCode, { walletSetup } = {}) => {
@@ -2654,9 +2636,6 @@ export default function WalletDashboard({
     };
   }, []);
 
-  useEffect(() => {
-    setSelectedWallet(wallet || "");
-  }, [wallet]);
   const { usdRates, totalLabel } = useUsdTotalLabel({
     augmentedTokens,
     isPreviewMode,
