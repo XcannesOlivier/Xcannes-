@@ -761,6 +761,9 @@ function confirmWithAuth(title, subtitle) {
     const newBio = document.getElementById('btn-confirm-biometric');
     const newPIN = document.getElementById('btn-confirm-pin');
 
+    // Hide PIN link until Face ID fails
+    newPIN.classList.add('hidden');
+
     // Check if Face ID is available
     getAuthConfig().then(async (authConfig) => {
       if (authConfig?.credentialId) {
@@ -776,6 +779,7 @@ function confirmWithAuth(title, subtitle) {
             resolve(true);
           } catch {
             updateStatus(statusEl, 'Face ID échoué. Utilisez votre code PIN.', true);
+            newPIN.classList.remove('hidden');
             showPINFallback();
           }
         }, 400);
@@ -790,6 +794,7 @@ function confirmWithAuth(title, subtitle) {
             resolve(true);
           } catch {
             updateStatus(statusEl, 'Face ID échoué. Utilisez votre code PIN.', true);
+            newPIN.classList.remove('hidden');
             showPINFallback();
           }
         }, { once: true });
@@ -1257,10 +1262,10 @@ function setupUnlockScreen() {
     if (wallet && addressEl) addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
   });
 
-  // PIN fallback link
+  // PIN fallback link — hidden until Face ID fails
   const btnUsePIN = document.getElementById('btn-unlock-use-pin');
   if (btnUsePIN) {
-    btnUsePIN.classList.remove('hidden');
+    btnUsePIN.classList.add('hidden');
     const freshBtn = btnUsePIN.cloneNode(true);
     btnUsePIN.replaceWith(freshBtn);
     document.getElementById('btn-unlock-use-pin')?.addEventListener('click', () => {
@@ -1286,10 +1291,10 @@ function setupUnlockScreenManual(error) {
     if (wallet && addressEl) addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
   });
 
-  // PIN fallback
+  // PIN fallback — hidden until Face ID fails
   const btnUsePIN = document.getElementById('btn-unlock-use-pin');
   if (btnUsePIN) {
-    btnUsePIN.classList.remove('hidden');
+    btnUsePIN.classList.add('hidden');
     const freshBtn = btnUsePIN.cloneNode(true);
     btnUsePIN.replaceWith(freshBtn);
     document.getElementById('btn-unlock-use-pin')?.addEventListener('click', () => {
@@ -1304,6 +1309,9 @@ function setupUnlockScreenManual(error) {
     } else if (error.message) {
       updateStatus(statusEl, `Erreur : ${error.message}`, true);
     }
+    // Face ID already failed — show PIN fallback
+    const pinLink = document.getElementById('btn-unlock-use-pin');
+    if (pinLink) pinLink.classList.remove('hidden');
   }
 
   showRetryButton();
@@ -1346,6 +1354,9 @@ async function doUnlock() {
     } else {
       updateStatus(statusEl, `Erreur : ${err.message}`, true);
     }
+    // Show PIN fallback only after Face ID failure
+    const btnUsePIN = document.getElementById('btn-unlock-use-pin');
+    if (btnUsePIN) btnUsePIN.classList.remove('hidden');
     showRetryButton();
   }
 }
