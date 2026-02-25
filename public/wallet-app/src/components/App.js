@@ -4,8 +4,8 @@
  * Architecture: App-level master key + multi-wallet
  *
  * First launch:
- *   Splash → Welcome → Terms → PIN Creation → Choice (Create / Import)
- *   → Create: Generate → Mnemonic Backup → Verify → Optional Face ID → Home
+ *   Splash → Welcome → Terms → PIN Creation → Optional Face ID → Choice (Create / Import)
+ *   → Create: Generate → Mnemonic Backup → Verify → Home
  *   → Import: Mnemonic/Seed/SecretNumbers → Home
  *
  * Returning user:
@@ -255,8 +255,16 @@ function setupTermsScreen() {
         };
         await saveAuthConfig(authConfig);
 
-        // Go directly to choice — Face ID will be offered after first wallet verification
-        goToChoice();
+        // Offer Face ID / Touch ID right after PIN creation
+        const biometricOk = await isBiometricAvailable();
+        if (biometricOk) {
+          showScreen('faceid-setup');
+          setupEnableFaceIDScreen(() => {
+            goToChoice();
+          });
+        } else {
+          goToChoice();
+        }
       } catch (err) {
         showError(`Erreur : ${err.message}`);
       }
@@ -511,21 +519,6 @@ function setupBackupVerifyScreen(words) {
       await touchWallet(currentWallet.address);
       pendingMnemonic = null;
       pendingWalletData = null;
-
-      // Offer Face ID if not yet configured
-      const authConfig = await getAuthConfig();
-      if (!authConfig?.credentialId) {
-        const biometricOk = await isBiometricAvailable();
-        if (biometricOk) {
-          showScreen('faceid-setup');
-          setupEnableFaceIDScreen(async () => {
-            showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
-            await delay(2500);
-            await goToHome();
-          });
-          return;
-        }
-      }
 
       showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
       await delay(2500);
