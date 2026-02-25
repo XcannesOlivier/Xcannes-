@@ -497,6 +497,15 @@ function setupBackupVerifyScreen(words) {
 
   btnConfirm?.addEventListener('click', async () => {
     try {
+      // Ask for Face ID or PIN confirmation before saving
+      const confirmed = await confirmWithAuth('Sécurisez ce wallet', 'Confirmez votre identité pour chiffrer et sauvegarder ce wallet.');
+      if (!confirmed) {
+        // User cancelled — stay on verify screen
+        showScreen('backup-verify');
+        setupBackupVerifyScreen(words);
+        return;
+      }
+
       // Verification complete — NOW encrypt and save the wallet
       const masterKey = getMasterKey();
       const encryptedSeed = await encryptWithMasterKey(pendingWalletData.seed, masterKey);
@@ -672,6 +681,15 @@ async function handleImport(statusEl) {
     document.querySelectorAll('#import-mnemonic-grid .import-word-input').forEach(inp => inp.value = '');
     document.querySelectorAll('#secret-numbers-grid input').forEach(inp => inp.value = '');
 
+    // Confirm with Face ID or PIN before saving
+    const confirmed = await confirmWithAuth('Sécurisez ce wallet', `Confirmez pour chiffrer et sauvegarder le wallet ${walletResult.address.slice(0, 8)}…`);
+    if (!confirmed) {
+      showScreen('import');
+      setupImportScreen();
+      rearmImport(statusEl);
+      return;
+    }
+
     // Encrypt with master key
     const masterKey = getMasterKey();
     const encryptedSeed = await encryptWithMasterKey(seedForStorage, masterKey);
@@ -707,6 +725,123 @@ async function handleImport(statusEl) {
 function rearmImport(statusEl) {
   const btn = document.getElementById('btn-import-confirm');
   btn?.addEventListener('click', () => handleImport(statusEl), { once: true });
+}
+
+// ==========================================
+// CONFIRM WITH AUTH (Face ID + PIN fallback)
+// ==========================================
+
+/**
+ * Show a confirmation screen: try Face ID first, fallback to PIN.
+ * Returns true if confirmed, false if cancelled.
+ */
+function confirmWithAuth(title, subtitle) {
+  return new Promise((resolve) => {
+    showScreen('confirm-secure');
+
+    const titleEl = document.getElementById('confirm-secure-title');
+    const subtitleEl = document.getElementById('confirm-secure-subtitle');
+    const statusEl = document.getElementById('confirm-secure-status');
+    const btnBio = document.getElementById('btn-confirm-biometric');
+    const btnPIN = document.getElementById('btn-confirm-pin');
+    const pinSection = document.getElementById('confirm-pin-section');
+    const pinDots = document.getElementById('confirm-pin-dots');
+    const pinInput = document.getElementById('confirm-pin-input');
+
+    if (titleEl) titleEl.textContent = title || 'Sécurisez ce wallet';
+    if (subtitleEl) subtitleEl.textContent = subtitle || '';
+    updateStatus(statusEl, '');
+    pinSection.classList.add('hidden');
+
+    // Fresh buttons
+    const freshBio = btnBio.cloneNode(true);
+    const freshPIN = btnPIN.cloneNode(true);
+    btnBio.replaceWith(freshBio);
+    btnPIN.replaceWith(freshPIN);
+    const newBio = document.getElementById('btn-confirm-biometric');
+    const newPIN = document.getElementById('btn-confirm-pin');
+
+    // Check if Face ID is available
+    getAuthConfig().then(async (authConfig) => {
+      if (authConfig?.credentialId) {
+        newBio.classList.remove('hidden');
+
+        // Auto-trigger Face ID
+        setTimeout(async () => {
+          try {
+            updateStatus(statusEl, 'Authentification biométrique…');
+            const prfOutput = await promptBiometric(authConfig.credentialId);
+            updateStatus(statusEl, '✅ Confirmé');
+            await delay(600);
+            resolve(true);
+          } catch {
+            updateStatus(statusEl, 'Face ID échoué. Utilisez votre code PIN.', true);
+            showPINFallback();
+          }
+        }, 400);
+
+        // Manual retry
+        newBio.addEventListener('click', async () => {
+          try {
+            updateStatus(statusEl, 'Authentification biométrique…');
+            const prfOutput = await promptBiometric(authConfig.credentialId);
+            updateStatus(statusEl, '✅ Confirmé');
+            await delay(600);
+            resolve(true);
+          } catch {
+            updateStatus(statusEl, 'Face ID échoué. Utilisez votre code PIN.', true);
+            showPINFallback();
+          }
+        }, { once: true });
+      } else {
+        // No Face ID — go straight to PIN
+        newBio.classList.add('hidden');
+        showPINFallback();
+      }
+    });
+
+    newPIN.addEventListener('click', () => showPINFallback(), { once: true });
+
+    function showPINFallback() {
+      pinSection.classList.remove('hidden');
+      const freshInput = pinInput.cloneNode(true);
+      pinInput.replaceWith(freshInput);
+      const inp = document.getElementById('confirm-pin-input');
+      const dots = document.getElementById('confirm-pin-dots');
+
+      inp.value = '';
+      dots.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
+      setTimeout(() => inp.focus(), 100);
+
+      inp.addEventListener('input', () => {
+        inp.value = inp.value.replace(/\D/g, '').slice(0, 6);
+        dots.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('filled', i < inp.value.length));
+        if (inp.value.length === 6) setTimeout(() => checkPIN(inp.value), 200);
+      });
+
+      dots?.addEventListener('click', () => inp.focus());
+    }
+
+    async function checkPIN(pin) {
+      const authConfig = await getAuthConfig();
+      const pinOk = await verifyPIN(pin, authConfig.verifyHash, authConfig.verifySalt);
+
+      if (pinOk) {
+        updateStatus(statusEl, '✅ Confirmé');
+        await delay(600);
+        resolve(true);
+      } else {
+        const dots = document.getElementById('confirm-pin-dots');
+        const inp = document.getElementById('confirm-pin-input');
+        dots.classList.add('shake');
+        setTimeout(() => dots.classList.remove('shake'), 500);
+        updateStatus(statusEl, '❌ Code incorrect. Réessayez.', true);
+        inp.value = '';
+        dots.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled'));
+        setTimeout(() => inp.focus(), 800);
+      }
+    }
+  });
 }
 
 // ==========================================
