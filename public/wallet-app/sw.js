@@ -1,12 +1,15 @@
 /**
  * Xcannes Wallet — Service Worker
- * 
+ *
  * Enables offline support and "Add to Home Screen" (PWA install).
  * Caches the app shell so the wallet loads even without internet.
  * The actual signing is always online (needs relay).
+ *
+ * Strategy: stale-while-revalidate for JS/CSS (serve cached, update in background).
+ * This ensures the user always gets the latest code on next load.
  */
 
-const CACHE_NAME = 'xcannes-wallet-v5';
+const CACHE_NAME = 'xcannes-wallet-v10';
 // Paths relative to SW scope (/wallet-app/)
 const ASSETS_TO_CACHE = [
   './',
@@ -16,6 +19,7 @@ const ASSETS_TO_CACHE = [
   './src/components/App.js',
   './src/services/bip39.js',
   './src/services/cryptoService.js',
+  './src/services/pinService.js',
   './src/services/webauthnService.js',
   './src/services/walletService.js',
   './src/services/storageService.js',
@@ -35,7 +39,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// Activate: clean up ALL old caches + claim clients immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -47,7 +51,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: cache-first for app shell, network-first for API calls
+// Fetch: network-first for API, stale-while-revalidate for app shell
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -57,40 +61,37 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Navigation requests (opening the app) — network first, fallback to cached index.html
-  // This avoids the Safari "Response served by service worker has redirections" error
-  // which happens when a cached 301 redirect is served for a navigation request.
+  // Navigation requests — network first, fallback to cached index.html
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Only cache non-redirect, successful responses
           if (response.ok && !response.redirected) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
           return response;
         })
-        .catch(() => {
-          // Offline: serve cached index.html
-          return caches.match('./index.html');
-        })
+        .catch(() => caches.match('./index.html'))
     );
     return;
   }
 
-  // App shell assets — cache first, fallback to network
+  // App shell assets — STALE-WHILE-REVALIDATE
+  // Serve cached immediately (fast), but fetch fresh copy in background.
+  // Next load will always have the latest version.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
-        if (response.ok && !response.redirected) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return response;
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(event.request).then((cached) => {
+        const networkFetch = fetch(event.request).then((response) => {
+          if (response.ok && !response.redirected) {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        }).catch(() => cached); // Offline → return cached
+
+        // Return cached immediately if available, otherwise wait for network
+        return cached || networkFetch;
       });
     })
   );

@@ -196,3 +196,75 @@ export async function getLastUsedWallet() {
   if (wallets.length === 0) return null;
   return wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0))[0];
 }
+
+/**
+ * Update specific fields on a wallet record (merge + put).
+ * Used for auth mode changes, PIN attempt tracking, etc.
+ *
+ * @param {string} address - Wallet address (primary key)
+ * @param {object} fields - Fields to merge into the wallet record
+ * @returns {Promise<void>}
+ */
+export async function updateWalletAuth(address, fields) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_WALLETS, 'readwrite');
+    const store = tx.objectStore(STORE_WALLETS);
+    const req = store.get(address);
+
+    req.onsuccess = () => {
+      if (req.result) {
+        const updated = { ...req.result, ...fields };
+        store.put(updated);
+      }
+      tx.oncomplete = () => { db.close(); resolve(); };
+    };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+
+/**
+ * NUCLEAR RESET: Delete the entire IndexedDB database.
+ * Removes ALL wallets, ALL settings — complete fresh start.
+ *
+ * On iOS Safari, deleteDatabase can be blocked if connections are open.
+ * We first clear all stores manually, THEN try to delete the DB.
+ * This guarantees data is wiped even if deleteDatabase is blocked.
+ *
+ * @returns {Promise<void>}
+ */
+export async function clearAllData() {
+  // Step 1: Clear all object stores (works even if deleteDatabase is blocked)
+  try {
+    const db = await openDB();
+    const storeNames = Array.from(db.objectStoreNames);
+    if (storeNames.length > 0) {
+      const tx = db.transaction(storeNames, 'readwrite');
+      for (const name of storeNames) {
+        tx.objectStore(name).clear();
+      }
+      await new Promise((resolve, reject) => {
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+    db.close();
+  } catch (err) {
+    console.warn('[storageService] clearStores failed (DB may not exist):', err.message);
+  }
+
+  // Step 2: Try to delete the database entirely
+  return new Promise((resolve) => {
+    try {
+      const delReq = indexedDB.deleteDatabase(DB_NAME);
+      delReq.onsuccess = () => resolve();
+      delReq.onerror = () => resolve(); // Resolve anyway — stores are already empty
+      delReq.onblocked = () => {
+        console.warn('[storageService] deleteDatabase blocked — stores already cleared');
+        resolve(); // Safe: stores are empty from Step 1
+      };
+    } catch {
+      resolve(); // IndexedDB not available — nothing to clear
+    }
+  });
+}
