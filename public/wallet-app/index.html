@@ -304,18 +304,19 @@
 
         <!-- Tabs -->
         <div class="tabs" id="import-tabs">
-          <button class="tab active" data-tab="mnemonic">12 mots</button>
+          <button class="tab active" data-tab="mnemonic">Mnemonic</button>
           <button class="tab" data-tab="seed">Seed</button>
           <button class="tab" data-tab="secretnumbers">Xumm</button>
         </div>
 
-        <!-- Tab: Mnemonic (default — BIP39 is now the primary format) -->
+        <!-- Tab: Mnemonic (default — BIP39 grid) -->
         <div class="tab-panel active" id="panel-mnemonic">
-          <p class="tab-desc">Entrez votre phrase de récupération BIP39 (12 mots séparés par des espaces)</p>
-          <div class="input-group">
-            <textarea id="import-mnemonic-input" rows="4" placeholder="abandon ability able about …"
-              autocomplete="off" autocorrect="off" spellcheck="false"></textarea>
+          <p class="tab-desc">Entrez votre phrase de récupération BIP39</p>
+          <div class="import-word-toggle">
+            <button class="word-toggle-btn active" data-words="12">12 mots</button>
+            <button class="word-toggle-btn" data-words="24">24 mots</button>
           </div>
+          <div class="import-mnemonic-grid" id="import-mnemonic-grid"></div>
         </div>
 
         <!-- Tab: Seed (legacy sXXXX format) -->
