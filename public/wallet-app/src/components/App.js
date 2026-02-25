@@ -4,8 +4,8 @@
  * Architecture: App-level master key + multi-wallet
  *
  * First launch:
- *   Splash → Welcome → Terms → PIN Creation → Optional Face ID → Choice (Create / Import)
- *   → Create: Generate → Mnemonic Backup → Verify → Home
+ *   Splash → Welcome → Terms → PIN Creation → Choice (Create / Import)
+ *   → Create: Generate → Mnemonic Backup → Verify → Optional Face ID → Home
  *   → Import: Mnemonic/Seed/SecretNumbers → Home
  *
  * Returning user:
@@ -255,16 +255,8 @@ function setupTermsScreen() {
         };
         await saveAuthConfig(authConfig);
 
-        // Offer Face ID
-        const biometricOk = await isBiometricAvailable();
-        if (biometricOk) {
-          showScreen('faceid-setup');
-          setupEnableFaceIDScreen(() => {
-            goToChoice();
-          });
-        } else {
-          goToChoice();
-        }
+        // Go directly to choice — Face ID will be offered after first wallet verification
+        goToChoice();
       } catch (err) {
         showError(`Erreur : ${err.message}`);
       }
@@ -310,20 +302,8 @@ async function startCreateWallet() {
     pendingWalletData = { ...walletData, wallet: walletInstance.wallet };
     pendingMnemonic = walletData.mnemonic;
 
-    // Encrypt with master key (already in memory)
-    const masterKey = getMasterKey();
-    const encryptedSeed = await encryptWithMasterKey(walletData.seed, masterKey);
-
-    // Save wallet
-    await saveWallet({
-      address: walletData.address,
-      encryptedSeed,
-      label: null,
-    });
-
-    await saveSetting(SETTING_ONBOARDED, true);
-
-    // Go to backup
+    // DO NOT save wallet yet — wait for mnemonic verification
+    // Go to backup screen
     showScreen('backup');
     setupBackupScreen(pendingWalletData);
 
@@ -361,17 +341,9 @@ function setupBackupScreen(walletData) {
     btnRegenerate.disabled = true;
     btnRegenerate.textContent = '⏳ Génération…';
     try {
-      // Delete old wallet
-      if (pendingWalletData?.address) await deleteWallet(pendingWalletData.address);
-
-      // Create new
+      // Generate new wallet (in memory only — not saved until verified)
       const newWalletData = await generateWallet();
       const newWalletInstance = walletFromMnemonic(newWalletData.mnemonic);
-
-      // Encrypt with master key
-      const masterKey = getMasterKey();
-      const encryptedSeed = await encryptWithMasterKey(newWalletData.seed, masterKey);
-      await saveWallet({ address: newWalletData.address, encryptedSeed, label: null });
 
       pendingMnemonic = newWalletData.mnemonic;
       pendingWalletData = { ...newWalletData, wallet: newWalletInstance.wallet };
@@ -514,21 +486,51 @@ function setupBackupVerifyScreen(words) {
   }, { once: true });
 
   btnConfirm?.addEventListener('click', async () => {
-    pendingMnemonic = null;
+    try {
+      // Verification complete — NOW encrypt and save the wallet
+      const masterKey = getMasterKey();
+      const encryptedSeed = await encryptWithMasterKey(pendingWalletData.seed, masterKey);
 
-    // Set wallet in memory
-    currentWallet = {
-      wallet: pendingWalletData.wallet,
-      address: pendingWalletData.address,
-      publicKey: pendingWalletData.publicKey,
-    };
-    isUnlocked = true;
-    await touchWallet(currentWallet.address);
-    pendingWalletData = null;
+      await saveWallet({
+        address: pendingWalletData.address,
+        encryptedSeed,
+        label: null,
+      });
 
-    showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
-    await delay(2500);
-    await goToHome();
+      await saveSetting(SETTING_ONBOARDED, true);
+
+      // Set wallet in memory
+      currentWallet = {
+        wallet: pendingWalletData.wallet,
+        address: pendingWalletData.address,
+        publicKey: pendingWalletData.publicKey,
+      };
+      isUnlocked = true;
+      await touchWallet(currentWallet.address);
+      pendingMnemonic = null;
+      pendingWalletData = null;
+
+      // Offer Face ID if not yet configured
+      const authConfig = await getAuthConfig();
+      if (!authConfig?.credentialId) {
+        const biometricOk = await isBiometricAvailable();
+        if (biometricOk) {
+          showScreen('faceid-setup');
+          setupEnableFaceIDScreen(async () => {
+            showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
+            await delay(2500);
+            await goToHome();
+          });
+          return;
+        }
+      }
+
+      showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
+      await delay(2500);
+      await goToHome();
+    } catch (err) {
+      showError(`Erreur lors de la sauvegarde : ${err.message}`);
+    }
   }, { once: true });
 }
 
