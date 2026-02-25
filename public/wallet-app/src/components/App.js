@@ -540,6 +540,8 @@ function setupBackupVerifyScreen(words) {
 // 8. IMPORT
 // ==========================================
 
+let importWordCount = 12;
+
 function setupImportScreen() {
   const tabs = document.querySelectorAll('#import-tabs .tab');
   const panels = document.querySelectorAll('.tab-panel');
@@ -553,6 +555,20 @@ function setupImportScreen() {
       panels.forEach(p => p.classList.remove('active'));
       tab.classList.add('active');
       document.getElementById(`panel-${tab.dataset.tab}`)?.classList.add('active');
+    });
+  });
+
+  // Build mnemonic grid
+  buildMnemonicImportGrid(importWordCount);
+
+  // 12/24 toggle
+  const toggleBtns = document.querySelectorAll('.word-toggle-btn');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      importWordCount = parseInt(btn.dataset.words, 10);
+      buildMnemonicImportGrid(importWordCount);
     });
   });
 
@@ -572,6 +588,53 @@ function setupImportScreen() {
   btnConfirm?.addEventListener('click', () => handleImport(statusEl), { once: true });
 }
 
+function buildMnemonicImportGrid(count) {
+  const grid = document.getElementById('import-mnemonic-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'import-word-cell';
+    cell.innerHTML = `
+      <span class="import-word-num">${i + 1}</span>
+      <input class="import-word-input" type="text"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+             placeholder="mot ${i + 1}" data-index="${i}">
+    `;
+    grid.appendChild(cell);
+  }
+
+  // Auto-advance on space or tab
+  const inputs = grid.querySelectorAll('.import-word-input');
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      // If user pastes all words at once
+      const val = inp.value.trim();
+      if (val.includes(' ')) {
+        const words = val.split(/\s+/).filter(Boolean);
+        words.forEach((w, j) => {
+          if (inputs[i + j]) inputs[i + j].value = w;
+        });
+        const nextIdx = Math.min(i + words.length, inputs.length - 1);
+        inputs[nextIdx].focus();
+        return;
+      }
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (i < inputs.length - 1) inputs[i + 1].focus();
+      }
+      if (e.key === 'Backspace' && inp.value === '' && i > 0) {
+        e.preventDefault();
+        inputs[i - 1].focus();
+      }
+    });
+  });
+
+  setTimeout(() => inputs[0]?.focus(), 100);
+}
+
 async function handleImport(statusEl) {
   const activeTab = document.querySelector('#import-tabs .tab.active')?.dataset.tab;
 
@@ -587,10 +650,16 @@ async function handleImport(statusEl) {
       seedForStorage = seed;
 
     } else if (activeTab === 'mnemonic') {
-      const mnemonic = document.getElementById('import-mnemonic-input')?.value?.trim();
-      if (!mnemonic) { updateStatus(statusEl, '❌ Veuillez entrer votre mnemonic.', true); rearmImport(statusEl); return; }
-      const wordCount = mnemonic.split(/\s+/).length;
-      if (wordCount !== 12) { updateStatus(statusEl, `❌ ${wordCount} mots détectés. Attendu : 12.`, true); rearmImport(statusEl); return; }
+      const inputs = document.querySelectorAll('#import-mnemonic-grid .import-word-input');
+      const words = [];
+      let emptyCount = 0;
+      inputs.forEach(inp => {
+        const w = inp.value.trim().toLowerCase();
+        if (!w) emptyCount++;
+        words.push(w);
+      });
+      if (emptyCount > 0) { updateStatus(statusEl, `❌ ${emptyCount} mot${emptyCount > 1 ? 's' : ''} manquant${emptyCount > 1 ? 's' : ''}.`, true); rearmImport(statusEl); return; }
+      const mnemonic = words.join(' ');
       updateStatus(statusEl, 'Restauration…');
       walletResult = walletFromMnemonic(mnemonic);
       seedForStorage = mnemonic;
@@ -618,7 +687,7 @@ async function handleImport(statusEl) {
 
     // Clear inputs
     document.getElementById('import-seed-input') && (document.getElementById('import-seed-input').value = '');
-    document.getElementById('import-mnemonic-input') && (document.getElementById('import-mnemonic-input').value = '');
+    document.querySelectorAll('#import-mnemonic-grid .import-word-input').forEach(inp => inp.value = '');
     document.querySelectorAll('#secret-numbers-grid input').forEach(inp => inp.value = '');
 
     // Encrypt with master key
