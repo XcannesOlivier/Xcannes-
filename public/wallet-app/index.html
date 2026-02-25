@@ -103,58 +103,6 @@
       </div>
     </div>
 
-    <!-- ========== 4. BIOMETRIC CHECK SCREEN ========== -->
-    <div id="screen-biometric-check" class="screen hidden">
-      <div class="screen-content center">
-        <div class="icon-large">👆</div>
-        <h2>Sécurité biométrique</h2>
-        <p class="subtitle">Xcannes Wallet utilise Face ID ou Touch ID pour protéger vos clés privées.</p>
-        <p class="hint-text">Aucun mot de passe à retenir.<br>Votre visage ou empreinte est la clé.</p>
-        <div id="biometric-status" class="status"></div>
-        <div class="spinner hidden" id="biometric-spinner"></div>
-        <div class="button-group">
-          <button id="btn-biometric-continue" class="btn btn-primary" disabled>Vérification…</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========== 4b. BIOMETRIC SETUP REQUIRED ========== -->
-    <div id="screen-biometric-required" class="screen hidden">
-      <div class="screen-content center">
-        <div class="icon-large">🔧</div>
-        <h2>Configuration requise</h2>
-        <p class="subtitle">Pour sécuriser votre wallet, votre appareil doit avoir <strong>Face ID</strong>, <strong>Touch ID</strong> ou un <strong>code d'accès</strong> configuré.</p>
-
-        <div class="setup-instructions">
-          <div class="setup-item">
-            <span class="setup-icon">📱</span>
-            <div>
-              <strong>iPhone / iPad</strong>
-              <p>Réglages → Face ID et code<br>(ou Touch ID et code)</p>
-            </div>
-          </div>
-          <div class="setup-item">
-            <span class="setup-icon">🤖</span>
-            <div>
-              <strong>Android</strong>
-              <p>Paramètres → Sécurité →<br>Verrouillage de l'écran</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="warning">
-          ⚠️ Sans code d'accès ni biométrie, impossible de chiffrer et protéger vos clés privées.
-        </div>
-
-        <p class="hint-text">Configurez votre appareil, puis revenez ici.</p>
-
-        <div class="button-group">
-          <button id="btn-biometric-required-retry" class="btn btn-primary">Réessayer</button>
-          <button id="btn-biometric-required-back" class="btn btn-secondary">Retour</button>
-        </div>
-      </div>
-    </div>
-
     <!-- ========== 5. CHOICE SCREEN ========== -->
     <div id="screen-choice" class="screen hidden">
       <div class="screen-content center">

@@ -247,15 +247,6 @@ export function getNextLockoutDelay(attempts) {
 }
 
 /**
- * Validate PIN format (exactly 6 digits).
- * @param {string} pin
- * @returns {boolean}
- */
-export function isValidPIN(pin) {
-  return typeof pin === 'string' && /^\d{6}$/.test(pin);
-}
-
-/**
  * Convert base64 string to Uint8Array.
  * @param {string} b64
  * @returns {Uint8Array}
