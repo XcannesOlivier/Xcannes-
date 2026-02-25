@@ -453,6 +453,8 @@ function setupBackupVerifyScreen(words) {
         row.className = 'verify-row done';
         row.querySelector('.row-status').textContent = '✔';
         row.querySelector('.row-error-msg').style.display = 'none';
+        // Mask the validated word with asterisks
+        inp.value = '•'.repeat(expected.length);
         inp.disabled = true;
 
         if (i === 11) {
