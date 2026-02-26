@@ -32,6 +32,8 @@ export default function WalletDashboardPayreqModal({
   selectIconByAssetKey,
   selectLabelMobileByAssetKey,
   enableSaveAddress = false,
+  savePayreq,
+  removePayreq,
   inline = false
 }) {
   const { t, i18n } = useTranslation("common");
@@ -47,6 +49,15 @@ export default function WalletDashboardPayreqModal({
 
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
+  const [savedForLater, setSavedForLater] = useState(false);
+
+  // Détection de solde insuffisant dans la devise demandée
+  const insufficientBalance = useMemo(() => {
+    if (!sendPaymentRequest || !selectedSendToken) return false;
+    const requiredAmount = Number(sendAmount || 0);
+    const available = Number(selectedSendToken.value || 0);
+    return requiredAmount > 0 && available < requiredAmount;
+  }, [sendPaymentRequest, selectedSendToken, sendAmount]);
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -98,16 +109,6 @@ export default function WalletDashboardPayreqModal({
       ? `${requestDestination.slice(0, 6)}...${requestDestination.slice(-4)}`
       : requestDestination;
 
-  const payingCurrency = String(selectedSendToken?.currency || "").toUpperCase();
-  const targetCurrency = String(
-    sendPaymentRequest?.targetCurrencyCode || ""
-  ).trim().toUpperCase();
-  const isAlternateCurrency =
-    Boolean(sendPaymentRequest) &&
-    Boolean(targetCurrency) &&
-    Boolean(payingCurrency) &&
-    targetCurrency !== payingCurrency;
-
   const handleManualSend = async () => {
     const result = await handleSendSubmit?.({
       saveDestination:
@@ -124,6 +125,7 @@ export default function WalletDashboardPayreqModal({
     if (!open) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
+      setSavedForLater(false);
     }
   }, [open]);
 
@@ -240,26 +242,8 @@ export default function WalletDashboardPayreqModal({
       {sendFxInfo ? (
         <div className="text-[11px] text-white/50">
           ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
-          {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ? (
-            <> + {formatAmountWithSymbol(locale, Number(sendFxInfo.spreadFeeRlusd), "USD", { maximumFractionDigits: 6 })} {t("ui_conversion_fee_short", "frais")}</>
-          ) : null}
         </div>
       ) : null}
-    </div>
-  ) : null;
-
-  const alternateCurrencyBanner = isAlternateCurrency ? (
-    <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-[11px] text-orange-200/90 space-y-1">
-      <div className="font-semibold">
-        {t("ui_currency_change_notice", "Changement de devise")}
-      </div>
-      <div>
-        {t(
-          "ui_currency_change_detail",
-          "La demande est en {{requested}} mais vous payez en {{paying}}. Des frais de conversion de 1 % seront appliqués.",
-          { requested: targetCurrency, paying: payingCurrency }
-        )}
-      </div>
     </div>
   ) : null;
 
@@ -284,6 +268,40 @@ export default function WalletDashboardPayreqModal({
             onChange={(e) => setSaveNewAddressLabel(e.target.value)}
             placeholder={t("ui_e_g_exchange_friend_11008b5e9e", "e.g., Exchange, Friend, ...")}
             className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80" />
+        </div>
+      ) : null}
+    </div>
+  ) : null;
+
+  const insufficientBanner = insufficientBalance ? (
+    <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-[11px] text-orange-200/90 space-y-2">
+      <div className="font-semibold">
+        {t("ui_insufficient_balance_title", "Solde insuffisant")}
+      </div>
+      <div>
+        {t(
+          "ui_insufficient_balance_detail",
+          "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
+          { currency: String(selectedSendToken?.currency || "").toUpperCase() }
+        )}
+      </div>
+      {savePayreq && !savedForLater ? (
+        <button
+          type="button"
+          onClick={() => {
+            if (sendPaymentRequest) {
+              savePayreq(sendPaymentRequest);
+              setSavedForLater(true);
+            }
+          }}
+          className="w-full rounded-md border border-amber-400/40 bg-amber-400/20 px-3 py-1.5 text-[11px] font-semibold text-amber-100 hover:bg-amber-400/30 transition-colors"
+        >
+          {t("ui_save_payreq_for_later", "Sauvegarder la demande")}
+        </button>
+      ) : null}
+      {savedForLater ? (
+        <div className="text-[10px] text-amber-200/70 text-center">
+          ✓ {t("ui_payreq_saved_confirmation", "Demande sauvegardée. Vous la retrouverez dans votre wallet.")}
         </div>
       ) : null}
     </div>
@@ -373,7 +391,7 @@ export default function WalletDashboardPayreqModal({
             <div className="space-y-4">
               {requestDetailsPanel}
               {currencySelectorBlock}
-              {alternateCurrencyBanner}
+              {insufficientBanner}
               {saveAddressBlock}
               {sendActions}
             </div>
