@@ -16,7 +16,7 @@ export default function WalletActivationModal({
   isPreviewMode = false,
   isWalletActivated = null,
   hasRlusdTrustline = null,
-  inline = false
+  inline = false,
 }) {
   const { t } = useTranslation("common");
   const showNotConnectedNotice = isPreviewMode;
@@ -38,11 +38,13 @@ export default function WalletActivationModal({
   const actionArrowBase =
     "text-white/30 transition-colors duration-200 group-hover:text-white/60";
   const currentActivationAmountLabel =
-    Number(activationAmountXrp) === 1.4 ? "1.40" : String(activationAmountXrp || "1");
+    Number(activationAmountXrp) === 1.4
+      ? "1.40"
+      : String(activationAmountXrp || "1");
   const bundleAmountLabel = "1.40";
-  const bundleCardClass = activationBundleEnabled ?
-    "border-emerald-400/40 bg-emerald-500/10" :
-    "border-white/10 bg-black/30";
+  const bundleCardClass = activationBundleEnabled
+    ? "border-emerald-400/40 bg-emerald-500/10"
+    : "border-white/10 bg-black/30";
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -52,7 +54,11 @@ export default function WalletActivationModal({
       ? "relative w-full wallet-modal-panel h-full bg-elevated border border-subtle rounded-xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl overflow-y-auto"
       : "relative w-full wallet-modal-panel max-w-md bg-elevated border border-subtle rounded-2xl p-4 md:p-5 space-y-4 pointer-events-auto shadow-2xl",
     inline ? "wallet-inline-zoom-in" : "",
-    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+    !inline
+      ? isClosing
+        ? "wallet-modal-lift-out"
+        : "wallet-modal-lift-in"
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -76,7 +82,8 @@ export default function WalletActivationModal({
           className={panelClass}
           onClick={(e) => {
             if (!inline) e.stopPropagation();
-          }}>
+          }}
+        >
           <button
             type="button"
             onClick={() => {
@@ -84,7 +91,8 @@ export default function WalletActivationModal({
               onClose?.();
             }}
             className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl"
-            aria-label={t("ui_close_08378568ba", "Close")}>
+            aria-label={t("ui_close_08378568ba", "Close")}
+          >
             ✕
           </button>
 
@@ -101,9 +109,13 @@ export default function WalletActivationModal({
                 })}
               </h3>
               <p className="text-sm text-white/70">
-                {t("ui_need_1_xrp_to_activate_8b6c7f2c5f", "Il faut {{amount}} XRP pour activer.", {
-                  amount: currentActivationAmountLabel,
-                })}
+                {t(
+                  "ui_need_1_xrp_to_activate_8b6c7f2c5f",
+                  "Il faut {{amount}} XRP pour activer.",
+                  {
+                    amount: currentActivationAmountLabel,
+                  },
+                )}
               </p>
               <div className="flex flex-wrap items-center gap-2">
                 {showNotConnectedNotice ? (
@@ -111,14 +123,14 @@ export default function WalletActivationModal({
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
-	                {showRlusdNotActivatedNotice ? (
-	                  <span className="inline-flex items-center text-amber-300 text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
-	                    {t(
-	                      "wallet_rlusd_not_activated_title",
-	                      "USD not activated. Authorize USD on your wallet."
-	                    )}
-	                  </span>
-	                ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "USD not activated. Authorize USD on your wallet.",
+                    )}
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
@@ -133,24 +145,32 @@ export default function WalletActivationModal({
               />
               <div className="space-y-1">
                 <div className="text-sm font-semibold text-white">
-                  {t("ui_activation_bundle_title_8c1d7f2b9e", "Option {{amount}} XRP", {
-                    amount: bundleAmountLabel,
-                  })}
+                  {t(
+                    "ui_activation_bundle_title_8c1d7f2b9e",
+                    "Option {{amount}} XRP",
+                    {
+                      amount: bundleAmountLabel,
+                    },
+                  )}
                 </div>
                 <div className="text-[11px] text-white/60">
-	                  {t(
-	                    "ui_activation_bundle_desc_4b7a1c9e2d",
-	                    "Activer le wallet et avoir de quoi activer USD."
-	                  )}
-	                </div>
+                  {t(
+                    "ui_activation_bundle_desc_4b7a1c9e2d",
+                    "Activer le wallet et avoir de quoi activer USD.",
+                  )}
+                </div>
               </div>
             </label>
           </div>
           {activationBundleEnabled ? (
             <div className="text-[11px] text-emerald-200/90">
-              {t("ui_activation_amount_summary_7a2c9d1e5b", "Montant choisi : {{amount}} XRP", {
-                amount: bundleAmountLabel,
-              })}
+              {t(
+                "ui_activation_amount_summary_7a2c9d1e5b",
+                "Montant choisi : {{amount}} XRP",
+                {
+                  amount: bundleAmountLabel,
+                },
+              )}
             </div>
           ) : null}
 
@@ -158,24 +178,52 @@ export default function WalletActivationModal({
             <button
               type="button"
               onClick={() => onRequestFromThirdParty?.()}
-              className={`${actionCardBase} order-1 md:order-2`}>
+              className={`${actionCardBase} order-1 md:order-2`}
+            >
               <div className="flex items-center gap-3">
                 <div className={actionIconBase}>
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 7h10a3 3 0 0 1 0 6H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M9 13l-3 3 3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M14 4h6v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M20 4l-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M4 7h10a3 3 0 0 1 0 6H9"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9 13l-3 3 3 3"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M14 4h6v6"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M20 4l-8 8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
                   <div className={actionTitle}>
-                    {t("ui_activation_request_third_party_2a4d2f92e3", "Demander a un tiers (QR XUMM)")}
+                    {t(
+                      "ui_activation_request_third_party_2a4d2f92e3",
+                      "Demander a un tiers (QR XUMM)",
+                    )}
                   </div>
                   <div className={actionDesc}>
                     {t(
                       "ui_activation_request_desc_2a5a1c7b4d",
-                      "Generer un QR XUMM a scanner ou partager."
+                      "Generer un QR XUMM a scanner ou partager.",
                     )}
                   </div>
                 </div>
@@ -186,23 +234,38 @@ export default function WalletActivationModal({
             <button
               type="button"
               onClick={() => onSendFromWallet?.()}
-              className={`${actionCardBase} order-2 md:order-1`}>
+              className={`${actionCardBase} order-2 md:order-1`}
+            >
               <div className="flex items-center gap-3">
                 <div className={actionIconBase}>
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 12h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M14 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M4 12h16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M14 6l6 6-6 6"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
                   <div className={actionTitle}>
-                    {t("ui_activation_send_other_wallet_4d9b7f2a1e", "Envoyer depuis un autre wallet (XUMM)")}
+                    {t(
+                      "ui_activation_send_other_wallet_4d9b7f2a1e",
+                      "Envoyer depuis un autre wallet (XUMM)",
+                    )}
                   </div>
                   <div className={actionDesc}>
                     {t(
                       "ui_activation_send_other_wallet_desc_4b3a2d9c7f",
                       "Ouvre XUMM et envoie {{amount}} XRP depuis un autre wallet.",
-                      { amount: currentActivationAmountLabel }
+                      { amount: currentActivationAmountLabel },
                     )}
                   </div>
                 </div>
@@ -213,23 +276,37 @@ export default function WalletActivationModal({
             <button
               type="button"
               onClick={() => onBuyViaMoonpay?.()}
-              className={`${actionCardBase} order-3`}>
+              className={`${actionCardBase} order-3`}
+            >
               <div className="flex items-center gap-3">
                 <div className={actionIconBase}>
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <path d="M3 7h18v10H3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                    <path
+                      d="M3 7h18v10H3z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    />
                     <path d="M3 10h18" stroke="currentColor" strokeWidth="2" />
-                    <path d="M7 15h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    <path
+                      d="M7 15h4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
                   </svg>
                 </div>
                 <div className="flex-1">
                   <div className={actionTitle}>
-                    {t("ui_activation_buy_moonpay_23a9c1d5fe", "Acheter via partenaire (MoonPay)")}
+                    {t(
+                      "ui_activation_buy_moonpay_23a9c1d5fe",
+                      "Acheter via partenaire (MoonPay)",
+                    )}
                   </div>
                   <div className={actionDesc}>
                     {t(
                       "ui_activation_buy_moonpay_desc_5c1d9a2b7e",
-                      "Acheter du XRP avec carte ou virement."
+                      "Acheter du XRP avec carte ou virement.",
                     )}
                   </div>
                 </div>

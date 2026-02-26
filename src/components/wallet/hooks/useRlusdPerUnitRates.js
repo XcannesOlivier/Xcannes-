@@ -34,7 +34,8 @@ async function resolveUsdPerUnit(code, pythPairsMap) {
       const meta = pythPairsMap.get(inverseKey);
       const ticker = await xcannesApi.getTicker(meta?.symbol || inverseKey);
       const price = extractTickerPrice(ticker);
-      if (Number.isFinite(price) && price > 0) return { rate: 1 / price, source: "PYTH" };
+      if (Number.isFinite(price) && price > 0)
+        return { rate: 1 / price, source: "PYTH" };
     }
   } catch (_err) {
     // fallback below
@@ -52,7 +53,8 @@ async function resolveUsdPerUnit(code, pythPairsMap) {
           : Number.NaN;
 
     // API returns USD->QUOTE (QUOTE per USD), so USD per 1 QUOTE is 1/close.
-    if (Number.isFinite(close) && close > 0) return { rate: 1 / close, source: "FAWAZ" };
+    if (Number.isFinite(close) && close > 0)
+      return { rate: 1 / close, source: "FAWAZ" };
   } catch (_err) {
     // ignore
   }
@@ -103,7 +105,7 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
             const resolved = await resolveUsdPerUnit(code, pythPairsMap);
             next[code] = resolved?.rate;
             nextSources[code] = resolved?.source || null;
-          })
+          }),
         );
 
         if (!cancelled) {
@@ -112,7 +114,10 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
         }
       } catch (err) {
         if (!cancelled) {
-          console.warn("[useRlusdPerUnitRates] Failed to load rates:", err?.message || err);
+          console.warn(
+            "[useRlusdPerUnitRates] Failed to load rates:",
+            err?.message || err,
+          );
           setUsdPerUnit({});
           setSourceByCode({});
         }

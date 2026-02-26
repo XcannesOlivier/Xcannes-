@@ -143,7 +143,7 @@ export default function WalletMobileModals({
               availableTokens={augmentedTokens}
             />
           </>,
-          document.body
+          document.body,
         )}
 
       {/* QR Scanner Modal for Address */}

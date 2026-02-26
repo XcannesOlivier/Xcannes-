@@ -32,17 +32,27 @@ export default function WalletPendingPayreqs({
       <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
         {pendingPayreqs.map((entry) => {
           const pr = entry.payreq || {};
-          const beneficiary = pr.beneficiaryLabel || pr.to
-            ? (pr.beneficiaryLabel || `${String(pr.to || "").slice(0, 6)}...${String(pr.to || "").slice(-4)}`)
-            : t("ui_wallet_unknown", "Unknown wallet");
-          const currency = String(pr.targetCurrencyCode || pr.displayCurrency || "").toUpperCase();
+          const beneficiary =
+            pr.beneficiaryLabel || pr.to
+              ? pr.beneficiaryLabel ||
+                `${String(pr.to || "").slice(0, 6)}...${String(pr.to || "").slice(-4)}`
+              : t("ui_wallet_unknown", "Unknown wallet");
+          const currency = String(
+            pr.targetCurrencyCode || pr.displayCurrency || "",
+          ).toUpperCase();
           const displayAmount = pr.displayAmount ?? pr.amountRlusd ?? null;
-          const amountLabel = displayAmount != null && currency
-            ? formatAmountWithSymbol(locale, Number(displayAmount), currency, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 6,
-              })
-            : null;
+          const amountLabel =
+            displayAmount != null && currency
+              ? formatAmountWithSymbol(
+                  locale,
+                  Number(displayAmount),
+                  currency,
+                  {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 6,
+                  },
+                )
+              : null;
 
           const savedDate = entry.savedAt
             ? new Date(entry.savedAt).toLocaleDateString(locale, {
@@ -66,9 +76,7 @@ export default function WalletPendingPayreqs({
                   {amountLabel ? (
                     <span className="font-mono">{amountLabel}</span>
                   ) : null}
-                  {savedDate ? (
-                    <span>· {savedDate}</span>
-                  ) : null}
+                  {savedDate ? <span>· {savedDate}</span> : null}
                 </div>
               </div>
 

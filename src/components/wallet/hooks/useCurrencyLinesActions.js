@@ -16,7 +16,9 @@ export function useCurrencyLinesActions({
       return;
     }
 
-    const code = String(currencyLineCode || "").trim().toUpperCase();
+    const code = String(currencyLineCode || "")
+      .trim()
+      .toUpperCase();
     if (!code || code.length < 2) {
       alert("Select a valid currency.");
       return;

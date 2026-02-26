@@ -111,7 +111,7 @@ export function formatAmountWithSymbol(
   locale,
   amount,
   currencyCode,
-  { minimumFractionDigits = 2, maximumFractionDigits = 2 } = {}
+  { minimumFractionDigits = 2, maximumFractionDigits = 2 } = {},
 ) {
   const num = Number(amount);
   if (!Number.isFinite(num)) return "-";
@@ -126,7 +126,7 @@ export function formatAmountWithSymbol(
 export function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
   const codePoints = [...countryCode.toUpperCase()].map(
-    (c) => 0x1f1e6 + (c.charCodeAt(0) - 65)
+    (c) => 0x1f1e6 + (c.charCodeAt(0) - 65),
   );
   return String.fromCodePoint(...codePoints);
 }

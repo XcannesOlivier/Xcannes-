@@ -1,20 +1,20 @@
 "use client";
 
-	import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-	import { useWallet } from "@/context/WalletContext";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWallet } from "@/context/WalletContext";
 import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
-	import { CRYPTO_ICONS } from "@/utils/marketConstants";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
-	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
-	import { useConvertForm } from "./hooks/useConvertForm";
-	import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
+import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
+import { useConvertForm } from "./hooks/useConvertForm";
+import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
 import { useCurrencyLinesActions } from "./hooks/useCurrencyLinesActions";
-	import { useSavedAddresses } from "./hooks/useSavedAddresses";
-	import { usePaymentRequestScanner } from "./hooks/usePaymentRequestScanner";
-	import { usePaymentRequestForm } from "./hooks/usePaymentRequestForm";
-	import { useReceiveForm } from "./hooks/useReceiveForm";
-	import { useSendForm } from "./hooks/useSendForm";
+import { useSavedAddresses } from "./hooks/useSavedAddresses";
+import { usePaymentRequestScanner } from "./hooks/usePaymentRequestScanner";
+import { usePaymentRequestForm } from "./hooks/usePaymentRequestForm";
+import { useReceiveForm } from "./hooks/useReceiveForm";
+import { useSendForm } from "./hooks/useSendForm";
 import { useSwapConversion } from "./hooks/useSwapConversion";
 import { useWalletTokens } from "./hooks/useWalletTokens";
 import { useRlusdPerUnitRates } from "./hooks/useRlusdPerUnitRates";
@@ -53,15 +53,13 @@ import {
 const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
 const ADJUSTMENT_FEE_RLUSD = (() => {
   const raw = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_ADJUSTMENT_FEE_RLUSD || ""
+    process.env.NEXT_PUBLIC_WALLET_ADJUSTMENT_FEE_RLUSD || "",
   );
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ADJUSTMENT_FEE_RLUSD;
 })();
 
 const DEFAULT_ACTIVATION_XRP_AMOUNT = 1;
 const ACTIVATION_BUNDLE_XRP_AMOUNT = 1.4;
-// Priorité d'affichage synchronisée avec useWalletTokens.
-const WALLET_TOKEN_PRIORITY = { USD: 0, XRP: 999 };
 
 /**
  * Filtre les tokens on-chain: seuls les actifs acceptés par XCANNES sont
@@ -72,8 +70,6 @@ function isAcceptedOnChainToken(currency) {
   const code = String(currency || "").toUpperCase();
   return WALLET_ACCEPTED_TOKENS.has(code);
 }
-
-
 
 export default function WalletDashboard({
   isFullPage = false,
@@ -89,7 +85,7 @@ export default function WalletDashboard({
   const locale = i18n?.language || "en";
   const layout = useMemo(
     () => resolveWalletLayout(variant, isFullPage),
-    [variant, isFullPage]
+    [variant, isFullPage],
   );
   const isFullPageView = layout.isFullPage;
   const statementVariant = layout.statementVariant;
@@ -110,20 +106,22 @@ export default function WalletDashboard({
     closeQrModal,
   } = useWallet();
 
-  const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } = useWalletToast();
+  const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } =
+    useWalletToast();
 
   const effectiveIsConnected = isConnected;
   const effectiveWallet = wallet;
   const effectiveBalance = balance;
 
   const baseTokens = useMemo(
-    () => (effectiveBalance?.tokens || []).filter(
-      (t) => isAcceptedOnChainToken(t?.currency)
-    ),
-    [effectiveBalance?.tokens]
+    () =>
+      (effectiveBalance?.tokens || []).filter((tok) =>
+        isAcceptedOnChainToken(tok?.currency),
+      ),
+    [effectiveBalance?.tokens],
   );
   const hasOnChainRlusd = (baseTokens || []).some(
-    (t) => String(t?.currency || "").toUpperCase() === "RLUSD"
+    (tok) => String(tok?.currency || "").toUpperCase() === "RLUSD",
   );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -132,7 +130,8 @@ export default function WalletDashboard({
   const [swapLockedView, setSwapLockedView] = useState(null);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
-  const [showActivationRequestModal, setShowActivationRequestModal] = useState(false);
+  const [showActivationRequestModal, setShowActivationRequestModal] =
+    useState(false);
   const [showRlusdSetupModal, setShowRlusdSetupModal] = useState(false);
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
@@ -169,17 +168,13 @@ export default function WalletDashboard({
     sendPaymentRequest,
     setSendPaymentRequest,
   } = useSendForm();
-  
+
   // Adresses sauvegardées
   const { savedAddresses, saveAddress } = useSavedAddresses();
 
   // Demandes de paiement en attente (sauvegardées localement)
-  const {
-    pendingPayreqs,
-    savePayreq,
-    removePayreq,
-    pendingCount,
-  } = usePayreqStorage({ walletAddress: effectiveWallet?.address || null });
+  const { pendingPayreqs, savePayreq, removePayreq, pendingCount } =
+    usePayreqStorage({ walletAddress: effectiveWallet?.address || null });
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
   const [addressLabel, setAddressLabel] = useState("");
@@ -207,7 +202,8 @@ export default function WalletDashboard({
   });
   const defaultWalletLabel = t("nav_wallet", "Wallet");
   const walletHasCustomLabel = Boolean(
-    String(walletLabel || "").trim() && String(walletLabel || "").trim() !== defaultWalletLabel
+    String(walletLabel || "").trim() &&
+    String(walletLabel || "").trim() !== defaultWalletLabel,
   );
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: effectiveWallet,
@@ -219,11 +215,11 @@ export default function WalletDashboard({
 
   const [cashModalTab, setCashModalTab] = useState("buy"); // 'buy' | 'sell' - Onglet actif dans la modal Cash
   const [activationBundleEnabled, setActivationBundleEnabled] = useState(false);
-  const activationXrpAmount = activationBundleEnabled ?
-    ACTIVATION_BUNDLE_XRP_AMOUNT :
-    DEFAULT_ACTIVATION_XRP_AMOUNT;
+  const activationXrpAmount = activationBundleEnabled
+    ? ACTIVATION_BUNDLE_XRP_AMOUNT
+    : DEFAULT_ACTIVATION_XRP_AMOUNT;
   const activationXrpAmountLabel = activationBundleEnabled ? "1.40" : "1";
-  
+
   // États pour Payment Request
   const {
     requestAmount,
@@ -233,7 +229,7 @@ export default function WalletDashboard({
     requestMemo,
     setRequestMemo,
   } = usePaymentRequestForm();
-  
+
   const {
     convertBaseCurrency,
     setConvertBaseCurrency,
@@ -245,12 +241,17 @@ export default function WalletDashboard({
     setConvertPreview,
     convertProcessing,
     setConvertProcessing,
-  } = useConvertForm({ defaultBaseCurrency: "USD", defaultQuoteCurrency: "EUR" });
+  } = useConvertForm({
+    defaultBaseCurrency: "USD",
+    defaultQuoteCurrency: "EUR",
+  });
 
   // Empêcher la sélection de XRP ou RLUSD comme devise de requête de paiement.
   // USD est le terme visible pour l'utilisateur — ne pas le forcer sur RLUSD.
   useEffect(() => {
-    const upper = String(requestCurrency || "").trim().toUpperCase();
+    const upper = String(requestCurrency || "")
+      .trim()
+      .toUpperCase();
     if (upper === "XRP" || upper === "RLUSD") {
       setRequestCurrency("USD");
     }
@@ -258,22 +259,31 @@ export default function WalletDashboard({
 
   // Empêcher XRP/RLUSD dans les sélecteurs de conversion.
   useEffect(() => {
-    const baseUpper = String(convertBaseCurrency || "").trim().toUpperCase();
-    const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
+    const baseUpper = String(convertBaseCurrency || "")
+      .trim()
+      .toUpperCase();
+    const quoteUpper = String(convertQuoteCurrency || "")
+      .trim()
+      .toUpperCase();
     if (baseUpper === "XRP" || baseUpper === "RLUSD") {
       setConvertBaseCurrency("USD");
     }
     if (quoteUpper === "XRP" || quoteUpper === "RLUSD") {
       setConvertQuoteCurrency("USD");
     }
-  }, [convertBaseCurrency, convertQuoteCurrency, setConvertBaseCurrency, setConvertQuoteCurrency]);
+  }, [
+    convertBaseCurrency,
+    convertQuoteCurrency,
+    setConvertBaseCurrency,
+    setConvertQuoteCurrency,
+  ]);
   const {
     currencyLineCode,
     setCurrencyLineCode,
     currencyLineAllocatedRlusd,
     setCurrencyLineAllocatedRlusd,
   } = useCurrencyLinesForm();
-  
+
   // États pour les relevés bancaires
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
@@ -288,9 +298,9 @@ export default function WalletDashboard({
 
   const stableUsd = useMemo(() => {
     return baseTokens
-      .filter((t) => isStablecoin(t.currency))
-      .reduce((sum, t) => {
-        const v = parseFloat(t.value);
+      .filter((tok) => isStablecoin(tok.currency))
+      .reduce((sum, tok) => {
+        const v = parseFloat(tok.value);
         return sum + (Number.isFinite(v) ? v : 0);
       }, 0);
   }, [baseTokens, isStablecoin]);
@@ -335,9 +345,7 @@ export default function WalletDashboard({
     upsertCurrencyLine,
   } = useWalletCurrencyLines(backendWalletAddress, { signTransaction });
 
-  const {
-    handleUpsertCurrencyLine: handleUpsertCurrencyLineReal,
-  } =
+  const { handleUpsertCurrencyLine: handleUpsertCurrencyLineReal } =
     useCurrencyLinesActions({
       backendWalletAddress,
       currencyLineCode,
@@ -351,7 +359,9 @@ export default function WalletDashboard({
   const effectiveCurrencyLines = useMemo(() => {
     const lines = Array.isArray(currencyLines) ? [...currencyLines] : [];
     const existing = new Set(
-      lines.map((l) => String(l?.currencyCode || "").toUpperCase()).filter(Boolean)
+      lines
+        .map((l) => String(l?.currencyCode || "").toUpperCase())
+        .filter(Boolean),
     );
 
     // Lignes par défaut affichées dans tout wallet (même nouveau).
@@ -360,7 +370,11 @@ export default function WalletDashboard({
     // Injecter la ligne USD synthétique avec le montant non alloué.
     const unallocatedRaw = effectiveCurrencyLinesSummary?.unallocatedRlusd;
     const unallocated = Number(unallocatedRaw);
-    if (!existing.has("USD") && unallocatedRaw != null && Number.isFinite(unallocated)) {
+    if (
+      !existing.has("USD") &&
+      unallocatedRaw != null &&
+      Number.isFinite(unallocated)
+    ) {
       lines.push({
         currencyCode: "USD",
         allocatedRlusd: unallocated,
@@ -399,11 +413,7 @@ export default function WalletDashboard({
       if (aOrder !== bOrder) return aOrder - bOrder;
       return aCode.localeCompare(bCode);
     });
-  }, [
-    currencyLines,
-    currencyOrderIndex,
-    effectiveCurrencyLinesSummary,
-  ]);
+  }, [currencyLines, currencyOrderIndex, effectiveCurrencyLinesSummary]);
   const effectiveCurrencyLinesLoading = currencyLinesLoading;
   const effectiveCurrencyLinesError = currencyLinesError;
   const effectiveRefreshCurrencyLines = refreshCurrencyLines;
@@ -419,24 +429,24 @@ export default function WalletDashboard({
     };
 
     window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
-    return () => window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+    return () =>
+      window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
   }, [backendWalletAddress, effectiveRefreshCurrencyLines]);
 
   const adjustmentDeficitRlusd = Number(
-    effectiveCurrencyLinesSummary?.excessAllocatedRlusd ?? 0
+    effectiveCurrencyLinesSummary?.excessAllocatedRlusd ?? 0,
   );
   const hasAdjustmentDeficit =
     Number.isFinite(adjustmentDeficitRlusd) && adjustmentDeficitRlusd > 1e-9;
 
-  const {
-    augmentedTokens,
-    allocatedRlusdByCurrency,
-    swapCurrencyOptions,
-  } = useWalletTokens({ displayTokens, currencyLines: effectiveCurrencyLines });
+  const { augmentedTokens, allocatedRlusdByCurrency, swapCurrencyOptions } =
+    useWalletTokens({ displayTokens, currencyLines: effectiveCurrencyLines });
 
   const selectableTokens = useMemo(() => {
     return (augmentedTokens || []).filter((token) => {
-      const code = String(token?.currency || "").trim().toUpperCase();
+      const code = String(token?.currency || "")
+        .trim()
+        .toUpperCase();
       // XRP et RLUSD ne sont pas sélectionnables dans les modales Send/Receive.
       // USD est une devise sélectionnable comme EUR, CHF, etc.
       return code !== "XRP" && code !== "RLUSD";
@@ -451,9 +461,15 @@ export default function WalletDashboard({
   // pour disposer des valeurs en devise locale (allocation / taux FX).
 
   const swapCurrencyOptionsForModal = useMemo(() => {
-    const candidates = new Set((swapCurrencyOptions || []).map((c) => String(c || "").toUpperCase()).filter(Boolean));
-    if (convertBaseCurrency) candidates.add(String(convertBaseCurrency || "").toUpperCase());
-    if (convertQuoteCurrency) candidates.add(String(convertQuoteCurrency || "").toUpperCase());
+    const candidates = new Set(
+      (swapCurrencyOptions || [])
+        .map((c) => String(c || "").toUpperCase())
+        .filter(Boolean),
+    );
+    if (convertBaseCurrency)
+      candidates.add(String(convertBaseCurrency || "").toUpperCase());
+    if (convertQuoteCurrency)
+      candidates.add(String(convertQuoteCurrency || "").toUpperCase());
 
     const weight = (code) => {
       if (code === "USD") return 0;
@@ -470,14 +486,16 @@ export default function WalletDashboard({
 
   const currencyLineCodes = useMemo(() => {
     const codes = new Set();
-	    (currencyLines || []).forEach((line) => {
-	      const code = String(line?.currencyCode || "").trim().toUpperCase();
-	      if (code) codes.add(code);
-	    });
-	    // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
-	    ["XRP", "RLUSD", "USD"].forEach((c) => codes.delete(c));
-	    return Array.from(codes);
-	  }, [currencyLines]);
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "")
+        .trim()
+        .toUpperCase();
+      if (code) codes.add(code);
+    });
+    // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
+    ["XRP", "RLUSD", "USD"].forEach((c) => codes.delete(c));
+    return Array.from(codes);
+  }, [currencyLines]);
 
   const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
     useRlusdPerUnitRates(currencyLineCodes);
@@ -506,13 +524,15 @@ export default function WalletDashboard({
         params.set("address", backendWalletAddress);
         params.set("limit", "5");
         params.set("source", "onchain");
-        const res = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
+        const res = await fetch(
+          apiUrl(`/wallet/statement?${params.toString()}`),
+        );
         const data = await res.json().catch(() => ({}));
         if (!res.ok) return;
 
         const movements = Array.isArray(data?.movements) ? data.movements : [];
         const incoming = movements.find(
-          (m) => String(m?.kind || "").toUpperCase() === "PAYMENT_IN"
+          (m) => String(m?.kind || "").toUpperCase() === "PAYMENT_IN",
         );
         if (!incoming) return;
 
@@ -520,9 +540,13 @@ export default function WalletDashboard({
         if (!movementId) return;
         if (movementId && lastIncomingToastRef.current === movementId) return;
 
-        const createdAt = incoming?.createdAt ? new Date(incoming.createdAt) : null;
+        const createdAt = incoming?.createdAt
+          ? new Date(incoming.createdAt)
+          : null;
         const createdAtMs =
-          createdAt && Number.isFinite(createdAt.getTime()) ? createdAt.getTime() : null;
+          createdAt && Number.isFinite(createdAt.getTime())
+            ? createdAt.getTime()
+            : null;
         if (createdAtMs != null && createdAtMs < mountedAtRef.current) {
           lastIncomingToastRef.current = movementId;
           try {
@@ -564,7 +588,10 @@ export default function WalletDashboard({
       } catch (error) {
         // Best effort only.
         if (process.env.NEXT_PUBLIC_DEBUG_LOGS === "true") {
-          console.warn("[wallet] incoming toast poll failed:", error?.message || error);
+          console.warn(
+            "[wallet] incoming toast poll failed:",
+            error?.message || error,
+          );
         }
       }
     };
@@ -616,7 +643,7 @@ export default function WalletDashboard({
   });
 
   const selectedSendToken =
-    selectableTokens.find((t) => t.key === sendAssetKey) ||
+    selectableTokens.find((tok) => tok.key === sendAssetKey) ||
     selectableTokens[0] ||
     null;
 
@@ -631,9 +658,8 @@ export default function WalletDashboard({
     if (!Number.isFinite(amountFx) || amountFx <= 0) return null;
 
     const rawRate = Number(rlusdPerUnitRates?.[code]);
-    const rlusdPerUnit = Number.isFinite(rawRate) && rawRate > 0
-      ? rawRate
-      : Number.NaN;
+    const rlusdPerUnit =
+      Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
     if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) return null;
 
     const paymentRlusd = amountFx * rlusdPerUnit;
@@ -645,12 +671,7 @@ export default function WalletDashboard({
       amountFx,
       paymentRlusd,
     };
-  }, [
-    rlusdPerUnitRates,
-    rlusdPerUnitSources,
-    selectedSendToken,
-    sendAmount,
-  ]);
+  }, [rlusdPerUnitRates, rlusdPerUnitSources, selectedSendToken, sendAmount]);
 
   useEffect(() => {
     if (!sendPaymentRequest || !selectedSendToken) return;
@@ -660,13 +681,14 @@ export default function WalletDashboard({
     const targetCurrency = String(sendPaymentRequest?.targetCurrencyCode || "")
       .trim()
       .toUpperCase();
-    const selectedCurrency = String(selectedSendToken?.currency || "").toUpperCase();
+    const selectedCurrency = String(
+      selectedSendToken?.currency || "",
+    ).toUpperCase();
     if (!selectedCurrency) return;
 
     const rawRate = Number(rlusdPerUnitRates?.[selectedCurrency]);
-    const fallbackRate = Number.isFinite(rawRate) && rawRate > 0
-      ? rawRate
-      : Number.NaN;
+    const fallbackRate =
+      Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
 
     let nextAmount = null;
 
@@ -679,7 +701,9 @@ export default function WalletDashboard({
       } else {
         const requestedFxRate = Number(sendPaymentRequest?.fxRate);
         const rate =
-          Number.isFinite(requestedFxRate) && requestedFxRate > 0 ? requestedFxRate : fallbackRate;
+          Number.isFinite(requestedFxRate) && requestedFxRate > 0
+            ? requestedFxRate
+            : fallbackRate;
         if (Number.isFinite(rate) && rate > 0) {
           nextAmount = requestedRlusd / rate;
         }
@@ -694,12 +718,7 @@ export default function WalletDashboard({
 
     const formatted = nextAmount.toFixed(6).replace(/\.?0+$/, "");
     setSendAmount(formatted);
-  }, [
-    rlusdPerUnitRates,
-    sendPaymentRequest,
-    selectedSendToken,
-    setSendAmount,
-  ]);
+  }, [rlusdPerUnitRates, sendPaymentRequest, selectedSendToken, setSendAmount]);
 
   const {
     qrScannerOpen,
@@ -729,24 +748,30 @@ export default function WalletDashboard({
       if (pr.to) setSendDestination(pr.to);
       const targetCurrency = String(pr.targetCurrencyCode || "").toUpperCase();
       const matchingToken = (augmentedTokens || []).find(
-        (t) => String(t.currency || "").toUpperCase() === targetCurrency
+        (tok) => String(tok.currency || "").toUpperCase() === targetCurrency,
       );
       if (matchingToken) {
         setSendAssetKey(matchingToken.key);
         if (pr.displayAmount != null) setSendAmount(String(pr.displayAmount));
-      } else {
-        // Fallback to RLUSD
-        const rlusdToken = (augmentedTokens || []).find(
-          (t) => String(t.currency || "").toUpperCase() === "RLUSD"
-        );
-        if (rlusdToken) setSendAssetKey(rlusdToken.key);
-        if (pr.amountRlusd != null) setSendAmount(String(pr.amountRlusd));
+      } else if (pr.amountRlusd != null) {
+        // Fallback: utiliser le montant RLUSD brut avec le premier token disponible.
+        const fallbackToken = (augmentedTokens || [])[0];
+        if (fallbackToken) setSendAssetKey(fallbackToken.key);
+        setSendAmount(String(pr.amountRlusd));
       }
       setSendPaymentRequest(pr);
       setSendTab("manual");
       setActiveAction("send");
     },
-    [augmentedTokens, setSendDestination, setSendAssetKey, setSendAmount, setSendPaymentRequest, setSendTab, setActiveAction]
+    [
+      augmentedTokens,
+      setSendDestination,
+      setSendAssetKey,
+      setSendAmount,
+      setSendPaymentRequest,
+      setSendTab,
+      setActiveAction,
+    ],
   );
 
   const {
@@ -845,7 +870,7 @@ export default function WalletDashboard({
       hasRlusdTrustline,
       isWalletActivated,
       layout.tokenRowClass,
-    ]
+    ],
   );
 
   const { handleSendSubmit } = useSendTransaction({
@@ -928,9 +953,12 @@ export default function WalletDashboard({
     walletInfoOpen,
   ]);
 
-  const isXummInlineOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
+  const isXummInlineOpen = Boolean(
+    qrModalData && (qrModalData.visible ?? true),
+  );
   const showInlineXumm = isDesktopPanel && isXummInlineOpen;
-  const showInlineQrScanner = isDesktopPanel && !showInlineXumm && qrScannerOpen;
+  const showInlineQrScanner =
+    isDesktopPanel && !showInlineXumm && qrScannerOpen;
   const hasPayreq = Boolean(sendPaymentRequest);
   const showInlineSend =
     isDesktopPanel &&
@@ -945,17 +973,35 @@ export default function WalletDashboard({
     activeAction === "send" &&
     hasPayreq;
   const showInlineReceive =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && activeAction === "receive";
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    activeAction === "receive";
   const showInlineSwap =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && activeAction === "swap";
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    activeAction === "swap";
   const showInlineCash =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && activeAction === "cash";
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    activeAction === "cash";
   const showInlineAdjust =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && showAdjustmentModal;
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    showAdjustmentModal;
   const showInlineActivation =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && showActivationModal;
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    showActivationModal;
   const showInlineActivationRequest =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && showActivationRequestModal;
+    isDesktopPanel &&
+    !showInlineXumm &&
+    !showInlineQrScanner &&
+    showActivationRequestModal;
   const showInlineInfo =
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && walletInfoOpen;
   const hasInlineModal =
@@ -1096,12 +1142,16 @@ export default function WalletDashboard({
     !isDesktopPanel && (showGlobalStatement || showCurrencyStatement);
   const allowBackgroundScrollForActions =
     !isDesktopPanel &&
-    ((activeAction === "cash") ||
+    (activeAction === "cash" ||
       (activeAction === "swap" && swapLockedView === "lines") ||
       (activeAction === "send" && sendTab === "payreq"));
-  const lockForActiveAction = Boolean(activeAction && !allowBackgroundScrollForActions);
-  const lockForStatements =
-    Boolean((showGlobalStatement || showCurrencyStatement) && !allowBackgroundScrollForStatements);
+  const lockForActiveAction = Boolean(
+    activeAction && !allowBackgroundScrollForActions,
+  );
+  const lockForStatements = Boolean(
+    (showGlobalStatement || showCurrencyStatement) &&
+    !allowBackgroundScrollForStatements,
+  );
   const shouldLockBodyScroll =
     !isDesktopPanel &&
     !allowBackgroundScrollOnMobile &&
@@ -1113,7 +1163,7 @@ export default function WalletDashboard({
       walletInfoOpen ||
       qrScannerOpen ||
       showSaveAddressPrompt ||
-      lockForStatements
+      lockForStatements,
     );
 
   useEffect(() => {
@@ -1123,44 +1173,41 @@ export default function WalletDashboard({
 
   return (
     <>
-	      <div
-	        className={`bg-[#0b0f10] h-full min-h-0 ${layout.containerClass} ${
-	          showDesktopStatementPanel
-	            ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-6"
-	            : "flex flex-col"
-	        }`}
-	      >
+      <div
+        className={`bg-[#0b0f10] h-full min-h-0 ${layout.containerClass} ${
+          showDesktopStatementPanel
+            ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-6"
+            : "flex flex-col"
+        }`}
+      >
         <div className="flex flex-col min-h-0">
           {/* Header */}
-		        <WalletDashboardHeader
-		          layout={layout}
-		          effectiveIsConnected={effectiveIsConnected}
-		          effectiveWallet={effectiveWallet}
-		          onDisconnect={disconnect}
-		          totalLabel={totalLabel}
-		          xrplConnectionIndicator={xrplConnectionIndicator}
-		          walletLabel={walletLabel}
-		          walletHeaderToast={walletHeaderToast}
-		          onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
-	          onCopyAddress={handleCopyAddress}
-	          onRefreshWallet={handleRefreshWallet}
-	          isConnecting={isConnecting}
-	          isRefreshing={isRefreshing}
-	          isEditingWalletLabel={isEditingWalletLabel}
-	          isWalletLabelRequired={isWalletLabelRequired}
-	          isWalletLabelLocked={isWalletLabelLocked}
-	          walletLabelDraft={walletLabelDraft}
-	          onWalletLabelDraftChange={setWalletLabelDraft}
-	          onSaveWalletLabel={handleSaveWalletLabel}
-	          onCancelWalletLabel={handleCancelWalletLabel}
-	          showMobileHomeLink={showMobileHomeLink}
-	        />
+          <WalletDashboardHeader
+            layout={layout}
+            effectiveIsConnected={effectiveIsConnected}
+            effectiveWallet={effectiveWallet}
+            onDisconnect={disconnect}
+            totalLabel={totalLabel}
+            xrplConnectionIndicator={xrplConnectionIndicator}
+            walletLabel={walletLabel}
+            walletHeaderToast={walletHeaderToast}
+            onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
+            onCopyAddress={handleCopyAddress}
+            onRefreshWallet={handleRefreshWallet}
+            isConnecting={isConnecting}
+            isRefreshing={isRefreshing}
+            isEditingWalletLabel={isEditingWalletLabel}
+            isWalletLabelRequired={isWalletLabelRequired}
+            isWalletLabelLocked={isWalletLabelLocked}
+            walletLabelDraft={walletLabelDraft}
+            onWalletLabelDraftChange={setWalletLabelDraft}
+            onSaveWalletLabel={handleSaveWalletLabel}
+            onCancelWalletLabel={handleCancelWalletLabel}
+            showMobileHomeLink={showMobileHomeLink}
+          />
 
           {/* Action row: Send / Receive / Exchange / Buy */}
-          <WalletDashboardActionRow
-            layout={layout}
-            onAction={handleAction}
-          />
+          <WalletDashboardActionRow layout={layout} onAction={handleAction} />
 
           {/* Pending payment requests */}
           {pendingCount > 0 ? (
@@ -1174,28 +1221,28 @@ export default function WalletDashboard({
           ) : null}
 
           {/* Token list */}
-	          <div className="flex-1 flex flex-col min-h-0">
-			          <WalletDashboardTokenList
-			            layout={layout}
-			            tokens={tokenListTokens}
-			            renderTokenRow={renderTokenRow}
-			            headerTitle={
-			              <button
-			                type="button"
-		                onClick={handleOpenGlobalStatement}
-		                className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
-		              >
-		                {t(
-		                  "ui_consult_global_statement_3b89f4a7a2",
-		                  "Consulter votre Relevé global"
-		                )}
-		              </button>
-		            }
-		            className="touch-pan-y"
-		            style={{ WebkitOverflowScrolling: "touch" }}
-		            disableInternalScroll={allowPageScrollOnMobile && !isDesktopPanel}
-		          />
-	          </div>
+          <div className="flex-1 flex flex-col min-h-0">
+            <WalletDashboardTokenList
+              layout={layout}
+              tokens={tokenListTokens}
+              renderTokenRow={renderTokenRow}
+              headerTitle={
+                <button
+                  type="button"
+                  onClick={handleOpenGlobalStatement}
+                  className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
+                >
+                  {t(
+                    "ui_consult_global_statement_3b89f4a7a2",
+                    "Consulter votre Relevé global",
+                  )}
+                </button>
+              }
+              className="touch-pan-y"
+              style={{ WebkitOverflowScrolling: "touch" }}
+              disableInternalScroll={allowPageScrollOnMobile && !isDesktopPanel}
+            />
+          </div>
 
           <WalletDashboardFooter
             layout={layout}

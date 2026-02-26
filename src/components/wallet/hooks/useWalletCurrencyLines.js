@@ -13,23 +13,26 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const requestWalletSignature = useCallback(async (action) => {
-    if (!signTransaction) {
-      setError("Xumm signature required. Please connect your wallet.");
-      return null;
-    }
+  const requestWalletSignature = useCallback(
+    async (action) => {
+      if (!signTransaction) {
+        setError("Xumm signature required. Please connect your wallet.");
+        return null;
+      }
 
-    const result = await signTransaction(
-      { TransactionType: "SignIn" },
-      { action }
-    );
-    if (!result?.signed || !result?.uuid) {
-      setError("Signature cancelled or expired.");
-      return null;
-    }
+      const result = await signTransaction(
+        { TransactionType: "SignIn" },
+        { action },
+      );
+      if (!result?.signed || !result?.uuid) {
+        setError("Signature cancelled or expired.");
+        return null;
+      }
 
-    return result.uuid;
-  }, [signTransaction]);
+      return result.uuid;
+    },
+    [signTransaction],
+  );
 
   const fetchCurrencyLines = useCallback(async () => {
     if (!address) {
@@ -51,7 +54,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
       setError(null);
 
       const res = await fetch(
-        apiUrl(`/wallet/currency-lines?address=${encodeURIComponent(address)}`)
+        apiUrl(`/wallet/currency-lines?address=${encodeURIComponent(address)}`),
       );
       const data = await res.json();
 
@@ -76,7 +79,13 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
   }, [address]);
 
   const upsertCurrencyLine = useCallback(
-    async ({ currencyCode, allocatedRlusd, fxRate, fxSource, xummUuid } = {}) => {
+    async ({
+      currencyCode,
+      allocatedRlusd,
+      fxRate,
+      fxSource,
+      xummUuid,
+    } = {}) => {
       if (!address || !currencyCode) return;
 
       try {
@@ -120,13 +129,16 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
 
         return data;
       } catch (err) {
-        console.error("[useWalletCurrencyLines] upsertCurrencyLine error:", err);
+        console.error(
+          "[useWalletCurrencyLines] upsertCurrencyLine error:",
+          err,
+        );
         setError(err.message || "Unknown error");
       } finally {
         setLoading(false);
       }
     },
-    [address, requestWalletSignature]
+    [address, requestWalletSignature],
   );
 
   const convertAllocation = useCallback(
@@ -191,7 +203,7 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
         setLoading(false);
       }
     },
-    [address, requestWalletSignature]
+    [address, requestWalletSignature],
   );
 
   useEffect(() => {

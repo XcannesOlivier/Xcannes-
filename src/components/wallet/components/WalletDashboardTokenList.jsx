@@ -27,11 +27,15 @@ export default function WalletDashboardTokenList({
           }`}
         >
           {typeof headerTitle === "string" ? (
-            <div className={`text-xs text-white/45 ${showHeaderAction ? "" : "ml-auto"}`}>
+            <div
+              className={`text-xs text-white/45 ${showHeaderAction ? "" : "ml-auto"}`}
+            >
               {headerTitle}
             </div>
           ) : headerTitle ? (
-            <div className={showHeaderAction ? "" : "ml-auto"}>{headerTitle}</div>
+            <div className={showHeaderAction ? "" : "ml-auto"}>
+              {headerTitle}
+            </div>
           ) : null}
           {showHeaderAction ? (
             <button
@@ -45,7 +49,9 @@ export default function WalletDashboardTokenList({
         </div>
       )}
       <div className={listClassName}>
-        <div className="space-y-1.5 md:hidden">{tokens.map(renderTokenRow)}</div>
+        <div className="space-y-1.5 md:hidden">
+          {tokens.map(renderTokenRow)}
+        </div>
         <div className="hidden md:flex md:flex-col md:space-y-1.5">
           {tokens.map(renderTokenRow)}
         </div>

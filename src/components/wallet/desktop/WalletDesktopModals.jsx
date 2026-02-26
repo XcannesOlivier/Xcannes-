@@ -68,9 +68,7 @@ export default function WalletDesktopModals({
 }) {
   return (
     <aside className="hidden lg:flex lg:flex-col min-h-0 relative">
-      {showInlineXumm ? (
-        <XummQRModal isOpen inline {...xummQrProps} />
-      ) : null}
+      {showInlineXumm ? <XummQRModal isOpen inline {...xummQrProps} /> : null}
 
       {showInlineQrScanner ? (
         <div className="flex-1 min-h-0">

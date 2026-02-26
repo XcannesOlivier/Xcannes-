@@ -58,7 +58,7 @@ export function usePayreqStorage({ walletAddress } = {}) {
         // quota exceeded — silently ignore
       }
     },
-    [storageKey]
+    [storageKey],
   );
 
   // ----------------------------------------------------------------
@@ -77,14 +77,24 @@ export function usePayreqStorage({ walletAddress } = {}) {
       // Deduplicate: same destination + same amount + same currency → update
       const dest = String(payreq.to || "").trim();
       const amount = Number(payreq.amountRlusd || payreq.displayAmount || 0);
-      const currency = String(payreq.targetCurrencyCode || payreq.displayCurrency || "").toUpperCase();
+      const currency = String(
+        payreq.targetCurrencyCode || payreq.displayCurrency || "",
+      ).toUpperCase();
 
       setPendingPayreqs((prev) => {
         const filtered = prev.filter((p) => {
           const pDest = String(p.payreq?.to || "").trim();
-          const pAmount = Number(p.payreq?.amountRlusd || p.payreq?.displayAmount || 0);
-          const pCurrency = String(p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "").toUpperCase();
-          return !(pDest === dest && pAmount === amount && pCurrency === currency);
+          const pAmount = Number(
+            p.payreq?.amountRlusd || p.payreq?.displayAmount || 0,
+          );
+          const pCurrency = String(
+            p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "",
+          ).toUpperCase();
+          return !(
+            pDest === dest &&
+            pAmount === amount &&
+            pCurrency === currency
+          );
         });
         const updated = [entry, ...filtered].slice(0, 20); // max 20 pending
         writeToStorage(updated);
@@ -93,7 +103,7 @@ export function usePayreqStorage({ walletAddress } = {}) {
 
       return id;
     },
-    [storageKey, writeToStorage]
+    [storageKey, writeToStorage],
   );
 
   // ----------------------------------------------------------------
@@ -108,7 +118,7 @@ export function usePayreqStorage({ walletAddress } = {}) {
         return updated;
       });
     },
-    [storageKey, writeToStorage]
+    [storageKey, writeToStorage],
   );
 
   // ----------------------------------------------------------------

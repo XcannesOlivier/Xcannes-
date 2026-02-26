@@ -7,4 +7,3 @@ export function useReceiveForm({ defaultReceiveTab = "receive" } = {}) {
 
   return { receiveTab, setReceiveTab };
 }
-

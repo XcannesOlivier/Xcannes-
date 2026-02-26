@@ -87,7 +87,9 @@ export function useUsdTotalLabel({
 
       try {
         const fxResult = await getFxEod?.("USD", upper, 30);
-        const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];
+        const candles = Array.isArray(fxResult?.candles)
+          ? fxResult.candles
+          : [];
         const last = candles[candles.length - 1];
         const close =
           last && last.close != null
@@ -119,7 +121,7 @@ export function useUsdTotalLabel({
         pythPairs.forEach((pair) => {
           if (!pair?.base || !pair?.quote) return;
           const key = `${String(pair.base).toUpperCase()}_${String(
-            pair.quote
+            pair.quote,
           ).toUpperCase()}`;
           pythPairsMap.set(key, pair);
         });
@@ -129,7 +131,7 @@ export function useUsdTotalLabel({
         await Promise.all(
           codes.map(async (code) => {
             rates[code] = await resolveUsdRate(code, pythPairsMap);
-          })
+          }),
         );
 
         if (!cancelled) {
@@ -177,7 +179,9 @@ export function useUsdTotalLabel({
   // En mode preview, utilise demoTotalUsd ; fallback sur stableUsd si FX non chargés.
   const rlusdOnChainTotal = Number(rlusdOnChain);
   const rlusdOnChainLabel =
-    !isPreviewMode && Number.isFinite(rlusdOnChainTotal) && rlusdOnChainTotal >= 0
+    !isPreviewMode &&
+    Number.isFinite(rlusdOnChainTotal) &&
+    rlusdOnChainTotal >= 0
       ? `${rlusdOnChainTotal.toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,

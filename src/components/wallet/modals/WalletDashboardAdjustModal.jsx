@@ -9,7 +9,10 @@ import {
   XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 import { useModalTransition } from "@/utils/useModalTransition";
-import { formatAmountWithSymbol, getDisplayCurrencyCode } from "../walletDashboardConfig";
+import {
+  formatAmountWithSymbol,
+  getDisplayCurrencyCode,
+} from "../walletDashboardConfig";
 
 const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
 
@@ -47,7 +50,8 @@ export default function WalletDashboardAdjustModal({
 
   const effectiveDeficit = Number(deficitRlusd || 0);
   const feeRlusd =
-    Number.isFinite(Number(adjustmentFeeRlusd)) && Number(adjustmentFeeRlusd) > 0
+    Number.isFinite(Number(adjustmentFeeRlusd)) &&
+    Number(adjustmentFeeRlusd) > 0
       ? Number(adjustmentFeeRlusd)
       : DEFAULT_ADJUSTMENT_FEE_RLUSD;
   const requiredTotalRlusd =
@@ -64,14 +68,15 @@ export default function WalletDashboardAdjustModal({
   const lineRows = useMemo(() => {
     const activeLines = Array.isArray(currencyLines)
       ? currencyLines.filter(
-        (line) => line?.active !== false && !line?.isDerived
-      )
+          (line) => line?.active !== false && !line?.isDerived,
+        )
       : [];
 
     return activeLines.map((line) => {
       const code = String(line?.currencyCode || "").toUpperCase();
       const allocatedRlusd = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
-      const rateRaw = code === "RLUSD" || code === "USD" ? 1 : rlusdPerUnitRates?.[code];
+      const rateRaw =
+        code === "RLUSD" || code === "USD" ? 1 : rlusdPerUnitRates?.[code];
       const rlusdPerUnit = Number.isFinite(Number(rateRaw))
         ? Number(rateRaw)
         : Number.NaN;
@@ -103,8 +108,9 @@ export default function WalletDashboardAdjustModal({
 
   const totals = useMemo(() => {
     const totalDeltaRlusd = lineRows.reduce(
-      (sum, row) => sum + (Number.isFinite(row.deltaRlusd) ? row.deltaRlusd : 0),
-      0
+      (sum, row) =>
+        sum + (Number.isFinite(row.deltaRlusd) ? row.deltaRlusd : 0),
+      0,
     );
     const remaining = requiredTotalRlusd + totalDeltaRlusd;
     return {
@@ -115,7 +121,7 @@ export default function WalletDashboardAdjustModal({
 
   const epsilon = 1e-6;
   const hasValidAdjustments = lineRows.some(
-    (row) => Math.abs(row.deltaRlusd) > epsilon
+    (row) => Math.abs(row.deltaRlusd) > epsilon,
   );
   const hasInvalidAdjustments = lineRows.some((row) => {
     if (!Number.isFinite(row.deltaRlusd)) return true;
@@ -245,10 +251,14 @@ export default function WalletDashboardAdjustModal({
     });
   };
   const remainingLabel = Number.isFinite(totals.remaining)
-    ? formatWithCurrency(totals.remaining, "RLUSD", { maximumFractionDigits: 6 })
+    ? formatWithCurrency(totals.remaining, "RLUSD", {
+        maximumFractionDigits: 6,
+      })
     : "-";
   const requiredLabel = Number.isFinite(requiredTotalRlusd)
-    ? formatWithCurrency(requiredTotalRlusd, "RLUSD", { maximumFractionDigits: 6 })
+    ? formatWithCurrency(requiredTotalRlusd, "RLUSD", {
+        maximumFractionDigits: 6,
+      })
     : "-";
 
   const wrapperClass = inline
@@ -256,11 +266,17 @@ export default function WalletDashboardAdjustModal({
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
-    inline ? "h-full max-h-none rounded-xl min-h-0" : "max-w-2xl max-h-[92vh] rounded-2xl",
+    inline
+      ? "h-full max-h-none rounded-xl min-h-0"
+      : "max-w-2xl max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
-    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+    !inline
+      ? isClosing
+        ? "wallet-modal-lift-out"
+        : "wallet-modal-lift-in"
+      : "",
   ].join(" ");
 
   const listContainerClass = inline
@@ -291,7 +307,7 @@ export default function WalletDashboardAdjustModal({
               e.stopPropagation();
               onClose?.();
             }}
-          className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
+            className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
           >
             X
           </button>
@@ -304,7 +320,7 @@ export default function WalletDashboardAdjustModal({
               <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
                 {t(
                   "ui_adjustment_modal_title_7b1c2d3e4f",
-                  "RLUSD adjustment required"
+                  "RLUSD adjustment required",
                 )}
               </h3>
               {noticeVariant === "demo" ? (
@@ -321,7 +337,7 @@ export default function WalletDashboardAdjustModal({
                 <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                   {t(
                     "wallet_not_activated_title",
-                    "Wallet not activated: a minimum reserve of 1 XRP is required."
+                    "Wallet not activated: a minimum reserve of 1 XRP is required.",
                   )}
                 </span>
               ) : null}
@@ -329,7 +345,7 @@ export default function WalletDashboardAdjustModal({
                 <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                   {t(
                     "wallet_rlusd_not_activated_title",
-                    "RLUSD not activated. Authorize RLUSD on your wallet."
+                    "RLUSD not activated. Authorize RLUSD on your wallet.",
                   )}
                 </span>
               ) : null}
@@ -340,20 +356,17 @@ export default function WalletDashboardAdjustModal({
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 md:p-4 space-y-2">
               <div className="text-sm text-amber-200">
                 <strong>
-                  {t(
-                    "ui_adjustment_required_94b2c1d5aa",
-                    "Ajustement requis:"
-                  )}
+                  {t("ui_adjustment_required_94b2c1d5aa", "Ajustement requis:")}
                 </strong>{" "}
                 {t(
                   "ui_adjustment_required_desc_4f7a2c1b9e",
-                  "Le pool RLUSD ne couvre plus toutes les allocations."
+                  "Le pool RLUSD ne couvre plus toutes les allocations.",
                 )}
               </div>
               <div className="text-xs text-amber-200/80">
                 {t(
                   "ui_adjustment_required_amount_2c7b1a9d5e",
-                  "Montant total a ajuster"
+                  "Montant total a ajuster",
                 )}
                 :{" "}
                 <span className="font-semibold text-amber-100">
@@ -365,11 +378,7 @@ export default function WalletDashboardAdjustModal({
                 </span>
               </div>
               <div className="text-xs text-amber-100/90">
-                {t(
-                  "ui_adjustment_remaining_3a9c1b7d5e",
-                  "Reste a ajuster"
-                )}
-                :{" "}
+                {t("ui_adjustment_remaining_3a9c1b7d5e", "Reste a ajuster")}:{" "}
                 <span
                   className={
                     Math.abs(totals.remaining) <= epsilon
@@ -387,7 +396,7 @@ export default function WalletDashboardAdjustModal({
                 <div className="text-sm text-white/50">
                   {t(
                     "ui_adjustment_no_lines_41b2c9d5e",
-                    "No active currency lines available."
+                    "No active currency lines available.",
                   )}
                 </div>
               ) : (
@@ -398,12 +407,20 @@ export default function WalletDashboardAdjustModal({
                       : formatWithCurrency(row.units, row.code, {
                           maximumFractionDigits: 6,
                         });
-                  const rlusdLabel = formatWithCurrency(row.allocatedRlusd, "RLUSD", {
-                    maximumFractionDigits: 6,
-                  });
-                  const deltaRlusdLabel = formatWithCurrency(row.deltaRlusd, "RLUSD", {
-                    maximumFractionDigits: 6,
-                  });
+                  const rlusdLabel = formatWithCurrency(
+                    row.allocatedRlusd,
+                    "RLUSD",
+                    {
+                      maximumFractionDigits: 6,
+                    },
+                  );
+                  const deltaRlusdLabel = formatWithCurrency(
+                    row.deltaRlusd,
+                    "RLUSD",
+                    {
+                      maximumFractionDigits: 6,
+                    },
+                  );
                   const rateLabel =
                     Number.isFinite(row.rlusdPerUnit) && row.rlusdPerUnit > 0
                       ? formatWithCurrency(row.rlusdPerUnit, "RLUSD", {
@@ -426,12 +443,10 @@ export default function WalletDashboardAdjustModal({
                           <div className="text-[11px] text-white/50">
                             {t(
                               "ui_line_balance_label_7d2c1b9e5a",
-                              "Solde ligne"
+                              "Solde ligne",
                             )}
                             :{" "}
-                            <span className="text-white/80">
-                              {unitsLabel}
-                            </span>{" "}
+                            <span className="text-white/80">{unitsLabel}</span>{" "}
                             <span className="text-white/40">
                               (≈ {rlusdLabel})
                             </span>
@@ -444,7 +459,7 @@ export default function WalletDashboardAdjustModal({
                             <div className="text-[10px] text-amber-200/70">
                               {t(
                                 "ui_rate_unavailable_9c1b2d4e5f",
-                                "Rate unavailable"
+                                "Rate unavailable",
                               )}
                             </div>
                           )}
@@ -453,26 +468,32 @@ export default function WalletDashboardAdjustModal({
                           <label className="text-[10px] text-white/50">
                             {t(
                               "ui_adjustment_input_label_8c1b2d5e4f",
-                              "Ajustement (devise)"
+                              "Ajustement (devise)",
                             )}
                           </label>
                           <input
                             type="number"
                             inputMode="decimal"
                             step="0.01"
-                            min={Number.isFinite(row.minUnits) ? row.minUnits : undefined}
+                            min={
+                              Number.isFinite(row.minUnits)
+                                ? row.minUnits
+                                : undefined
+                            }
                             value={row.rawDelta ?? ""}
                             onChange={(e) =>
                               handleAdjustChange(row.code, e.target.value)
                             }
-                            onBlur={() => handleAdjustBlur(row.code, row.minUnits)}
+                            onBlur={() =>
+                              handleAdjustBlur(row.code, row.minUnits)
+                            }
                             disabled={inputDisabled || isPreviewMode}
                             className="w-32 md:w-40 bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/60 disabled:opacity-60"
                           />
                           <div className="text-[10px] text-white/45">
                             {t(
                               "ui_adjustment_delta_rlusd_1b2c3d4e5f",
-                              "Delta RLUSD"
+                              "Delta RLUSD",
                             )}
                             :{" "}
                             <span className="text-white/70">
@@ -506,7 +527,7 @@ export default function WalletDashboardAdjustModal({
                   ? t("ui_adjusting_6b2c1a9d5e", "Adjusting...")
                   : t(
                       "ui_adjustment_confirm_4c1b2d5e6f",
-                      "Valider l ajustement"
+                      "Valider l ajustement",
                     )}
               </button>
             </div>

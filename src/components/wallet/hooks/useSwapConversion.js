@@ -5,7 +5,7 @@ import { buildXrplJsonMemo, buildConversionMemo } from "@/utils/xrplMemo";
 import {
   buildRlusdPaymentTxjson,
   computeSpreadQuote,
-  XCANNES_ACTIVATION_WALLET_ADDRESS
+  XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 
 export function useSwapConversion({
@@ -49,9 +49,8 @@ export function useSwapConversion({
       const preferredQuotes = ["USD", "EUR", "GBP", "CHF"];
       const firstPreferred =
         preferredQuotes.find(
-          (c) => swapCurrencyOptions.includes(c) && c !== effectiveBase
-        ) ||
-        preferredQuotes.find((c) => swapCurrencyOptions.includes(c));
+          (c) => swapCurrencyOptions.includes(c) && c !== effectiveBase,
+        ) || preferredQuotes.find((c) => swapCurrencyOptions.includes(c));
       const fromWallet =
         firstPreferred ||
         (swapCurrencyOptions.length > 1
@@ -103,7 +102,9 @@ export function useSwapConversion({
         try {
           const pairSymbol = `${code}_RLUSD`;
           const ticker = await getTicker?.(pairSymbol);
-          const lastPrice = ticker?.lastPrice ? Number(ticker.lastPrice) : Number.NaN;
+          const lastPrice = ticker?.lastPrice
+            ? Number(ticker.lastPrice)
+            : Number.NaN;
           if (Number.isFinite(lastPrice) && lastPrice > 0) {
             return lastPrice;
           }
@@ -149,7 +150,9 @@ export function useSwapConversion({
       try {
         const baseForFx = "USD";
         const fxResult = await getFxEod?.(baseForFx, code, 30);
-        const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];
+        const candles = Array.isArray(fxResult?.candles)
+          ? fxResult.candles
+          : [];
         const last = candles[candles.length - 1];
         const close =
           last && last.close != null
@@ -167,7 +170,7 @@ export function useSwapConversion({
 
       return 1;
     },
-    [demoLines, getAllMarkets, getFxEod, getTicker]
+    [demoLines, getAllMarkets, getFxEod, getTicker],
   );
 
   const getFxSource = useCallback(
@@ -182,8 +185,11 @@ export function useSwapConversion({
         const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
         const keys = new Set(
           pythPairs
-            .map((p) => `${String(p?.base || "").toUpperCase()}_${String(p?.quote || "").toUpperCase()}`)
-            .filter(Boolean)
+            .map(
+              (p) =>
+                `${String(p?.base || "").toUpperCase()}_${String(p?.quote || "").toUpperCase()}`,
+            )
+            .filter(Boolean),
         );
         const hasUsdPair = keys.has(`${code}_USD`) || keys.has(`USD_${code}`);
         return hasUsdPair ? "PYTH" : "FAWAZ";
@@ -191,7 +197,7 @@ export function useSwapConversion({
         return "FAWAZ";
       }
     },
-    [getAllMarkets]
+    [getAllMarkets],
   );
 
   const handleDemoConvert = useCallback(async () => {
@@ -210,10 +216,13 @@ export function useSwapConversion({
         return;
       }
 
-      const baseLine = demoLines?.[base] || (base === "RLUSD" ? demoLines?.RLUSD : null);
+      const baseLine =
+        demoLines?.[base] || (base === "RLUSD" ? demoLines?.RLUSD : null);
 
       if (!baseLine || !Number.isFinite(Number(baseLine.units || 0))) {
-        alert("Aucun solde démo disponible dans la devise de base sélectionnée.");
+        alert(
+          "Aucun solde démo disponible dans la devise de base sélectionnée.",
+        );
         return;
       }
 
@@ -222,8 +231,8 @@ export function useSwapConversion({
         alert(
           `Montant trop élevé. Solde disponible en ${base}: ${availableBaseUnits.toLocaleString(
             "en-US",
-            { maximumFractionDigits: 4 }
-          )}.`
+            { maximumFractionDigits: 4 },
+          )}.`,
         );
         return;
       }
@@ -239,12 +248,18 @@ export function useSwapConversion({
           !Number.isFinite(rlusdPerQuote) ||
           rlusdPerQuote <= 0
         ) {
-          alert("Impossible de récupérer les taux de conversion pour cette paire.");
+          alert(
+            "Impossible de récupérer les taux de conversion pour cette paire.",
+          );
           return;
         }
 
         const grossRlusd = amountBase * rlusdPerBase;
-        const spread = computeSpreadQuote({ base, quote, amountRlusd: grossRlusd });
+        const spread = computeSpreadQuote({
+          base,
+          quote,
+          amountRlusd: grossRlusd,
+        });
         const spreadFee = Number(spread?.spreadFeeRlusd || 0);
         const netRlusd = Math.max(0, grossRlusd - spreadFee);
         const quoteUnits = netRlusd / rlusdPerQuote;
@@ -280,8 +295,14 @@ export function useSwapConversion({
             rate: 0,
           };
 
-          const newBaseRlusd = Math.max(0, Number(baseLineNext.rlusd || 0) - grossRlusd);
-          const newBaseUnits = Math.max(0, Number(baseLineNext.units || 0) - amountBase);
+          const newBaseRlusd = Math.max(
+            0,
+            Number(baseLineNext.rlusd || 0) - grossRlusd,
+          );
+          const newBaseUnits = Math.max(
+            0,
+            Number(baseLineNext.units || 0) - amountBase,
+          );
 
           next[base] = {
             ...baseLineNext,
@@ -325,7 +346,7 @@ export function useSwapConversion({
           spread?.isFx && spreadFee > 0
             ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
                 "en-US",
-                { maximumFractionDigits: 6 }
+                { maximumFractionDigits: 6 },
               )} RLUSD)`
             : "";
         setConvertPreview(
@@ -333,12 +354,15 @@ export function useSwapConversion({
             maximumFractionDigits: 4,
           })} ${base} ≈ ${quoteUnits.toLocaleString("en-US", {
             maximumFractionDigits: 2,
-          })} ${quote}${spreadLabel} (${priceSource})`
+          })} ${quote}${spreadLabel} (${priceSource})`,
         );
         setConvertAmount("");
       } catch (error) {
         console.error("Demo convert error:", error);
-        alert("Erreur lors de la conversion démo: " + (error?.message || String(error)));
+        alert(
+          "Erreur lors de la conversion démo: " +
+            (error?.message || String(error)),
+        );
       } finally {
         setConvertProcessing(false);
       }
@@ -376,7 +400,8 @@ export function useSwapConversion({
     setConvertProcessing(true);
     try {
       const rlusdPerBase = await getRlusdPerUnit(base);
-      const rlusdPerQuote = quote === "RLUSD" ? 1 : await getRlusdPerUnit(quote);
+      const rlusdPerQuote =
+        quote === "RLUSD" ? 1 : await getRlusdPerUnit(quote);
 
       if (
         !Number.isFinite(rlusdPerBase) ||
@@ -384,12 +409,18 @@ export function useSwapConversion({
         !Number.isFinite(rlusdPerQuote) ||
         rlusdPerQuote <= 0
       ) {
-        alert("Impossible de récupérer les taux de conversion pour cette paire.");
+        alert(
+          "Impossible de récupérer les taux de conversion pour cette paire.",
+        );
         return;
       }
 
       const grossRlusd = amountBase * rlusdPerBase;
-      const spread = computeSpreadQuote({ base, quote, amountRlusd: grossRlusd });
+      const spread = computeSpreadQuote({
+        base,
+        quote,
+        amountRlusd: grossRlusd,
+      });
       const spreadFee = Number(spread?.spreadFeeRlusd || 0);
       const netRlusd = Math.max(0, grossRlusd - spreadFee);
       const amountQuote = netRlusd / rlusdPerQuote;
@@ -397,12 +428,15 @@ export function useSwapConversion({
 
       const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
       if (base === "RLUSD") {
-        if (Number.isFinite(unallocated) && unallocated + epsilon < grossRlusd) {
+        if (
+          Number.isFinite(unallocated) &&
+          unallocated + epsilon < grossRlusd
+        ) {
           alert(
             `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString(
               "en-US",
-              { maximumFractionDigits: 6 }
-            )} RLUSD.`
+              { maximumFractionDigits: 6 },
+            )} RLUSD.`,
           );
           return;
         }
@@ -411,21 +445,24 @@ export function useSwapConversion({
       if (base !== "RLUSD") {
         const availableAllocated = allocatedRlusdByCurrency?.get(base) || 0;
         if (availableAllocated + epsilon < grossRlusd) {
-          const maxUnits = availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
+          const maxUnits =
+            availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
           alert(
             `Montant trop élevé. Allocation disponible en ${base}: ${maxUnits.toLocaleString(
               "en-US",
-              { maximumFractionDigits: 6 }
+              { maximumFractionDigits: 6 },
             )} ${base} (≈ ${availableAllocated.toLocaleString("en-US", {
               maximumFractionDigits: 6,
-            })} RLUSD).`
+            })} RLUSD).`,
           );
           return;
         }
       }
 
       const fxSource = await getFxSource(base);
-      const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();
+      const destination = String(
+        XCANNES_ACTIVATION_WALLET_ADDRESS || "",
+      ).trim();
       if (!destination) {
         throw new Error("Missing activation wallet address");
       }
@@ -443,7 +480,7 @@ export function useSwapConversion({
       const lineStates = [];
       const baseAllocated = allocatedRlusdByCurrency?.get(base);
       const quoteAllocated = allocatedRlusdByCurrency?.get(quote);
-      
+
       // Base currency (source de la conversion)
       if (base !== "RLUSD") {
         if (Number.isFinite(baseAllocated)) {
@@ -455,7 +492,7 @@ export function useSwapConversion({
           lineStates.push({ currencyCode: base, allocatedRlusdAfter: 0 });
         }
       }
-      
+
       // Quote currency (destination de la conversion)
       if (quote !== "RLUSD") {
         if (Number.isFinite(quoteAllocated)) {
@@ -464,7 +501,10 @@ export function useSwapConversion({
           lineStates.push({ currencyCode: quote, allocatedRlusdAfter: after });
         } else {
           // 🆕 Nouvelle ligne : activation automatique avec allocation du montant converti
-          lineStates.push({ currencyCode: quote, allocatedRlusdAfter: netRlusd });
+          lineStates.push({
+            currencyCode: quote,
+            allocatedRlusdAfter: netRlusd,
+          });
         }
       }
 
@@ -512,7 +552,7 @@ export function useSwapConversion({
         spread?.isFx && spreadFee > 0
           ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
               "en-US",
-              { maximumFractionDigits: 6 }
+              { maximumFractionDigits: 6 },
             )} RLUSD)`
           : "";
       setConvertPreview(
@@ -522,7 +562,7 @@ export function useSwapConversion({
           maximumFractionDigits: 6,
         })} ${quote} (≈ ${netRlusd.toLocaleString("en-US", {
           maximumFractionDigits: 6,
-        })} RLUSD${spreadLabel})`
+        })} RLUSD${spreadLabel})`,
       );
 
       setConvertAmount("");

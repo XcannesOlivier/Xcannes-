@@ -1,6 +1,4 @@
-import {
-  buildRlusdPaymentTxjson,
-} from "@/utils/walletSpread";
+import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
 import {
   buildMoonpayMemo,
   buildPayreqMemo,
@@ -15,7 +13,7 @@ const MOONPAY_SELL_WALLETS = new Set(
   String(process.env.NEXT_PUBLIC_MOONPAY_WALLETS || "")
     .split(",")
     .map((entry) => entry.trim())
-    .filter(Boolean)
+    .filter(Boolean),
 );
 
 const isMoonpaySellDestination = (address) => {
@@ -23,14 +21,19 @@ const isMoonpaySellDestination = (address) => {
   return dest && MOONPAY_SELL_WALLETS.has(dest);
 };
 
-const buildMoonpaySellMemos = (destination, { currency, amount, amountRlusd } = {}) => {
+const buildMoonpaySellMemos = (
+  destination,
+  { currency, amount, amountRlusd } = {},
+) => {
   if (!isMoonpaySellDestination(destination)) return null;
   const payload = buildMoonpayMemo({
     side: "sell",
     provider: "moonpay",
     currencyCode: currency || null,
     amount: Number.isFinite(Number(amount)) ? Number(amount) : null,
-    amountRlusd: Number.isFinite(Number(amountRlusd)) ? Number(amountRlusd) : null,
+    amountRlusd: Number.isFinite(Number(amountRlusd))
+      ? Number(amountRlusd)
+      : null,
   });
   if (!payload) return null;
   return buildXrplJsonMemo(payload);
@@ -98,13 +101,18 @@ export function useSendTransaction({
   // ------------------------------------------------------------------
   // handleSendSubmit
   // ------------------------------------------------------------------
-  const handleSendSubmit = async ({ saveDestination = "", saveLabel = "" } = {}) => {
+  const handleSendSubmit = async ({
+    saveDestination = "",
+    saveLabel = "",
+  } = {}) => {
     const normalizedSaveDestination = String(saveDestination || "").trim();
 
     const handleAddressSave = (dest) => {
       const normalizedDest = String(dest || "").trim();
       if (!normalizedDest) return;
-      const isAlreadySaved = savedAddresses.some((a) => a.address === normalizedDest);
+      const isAlreadySaved = savedAddresses.some(
+        (a) => a.address === normalizedDest,
+      );
       if (!isAlreadySaved && normalizedSaveDestination === normalizedDest) {
         saveAddress(normalizedDest, saveLabel);
         return;
@@ -124,10 +132,13 @@ export function useSendTransaction({
       return { ok: false };
     }
     if (
-      (selectedSendToken?.currency === "RLUSD" || selectedSendToken?.currency === "USD") &&
+      (selectedSendToken?.currency === "RLUSD" ||
+        selectedSendToken?.currency === "USD") &&
       !hasOnChainRlusd
     ) {
-      toast.error("RLUSD trustline is not installed yet. Please install it first.");
+      toast.error(
+        "RLUSD trustline is not installed yet. Please install it first.",
+      );
       return { ok: false };
     }
 
@@ -172,7 +183,9 @@ export function useSendTransaction({
       });
     } catch (err) {
       console.error("Send payment error:", err);
-      toast.error("Error while preparing payment: " + (err?.message || String(err)));
+      toast.error(
+        "Error while preparing payment: " + (err?.message || String(err)),
+      );
       return { ok: false };
     } finally {
       setSendProcessing(false);
@@ -182,21 +195,27 @@ export function useSendTransaction({
   // ------------------------------------------------------------------
   // FX send — single RLUSD transaction (no spread fee on sends)
   // ------------------------------------------------------------------
-  async function handleFxSend({ amountNum, dest, currency, handleAddressSave }) {
+  async function handleFxSend({
+    amountNum,
+    dest,
+    currency,
+    handleAddressSave,
+  }) {
     if (!backendWalletAddress) {
       toast.error("Please connect your Xumm wallet first.");
       return { ok: false };
     }
     if (!hasOnChainRlusd) {
-      toast.error("RLUSD trustline is not installed yet. Please install it first.");
+      toast.error(
+        "RLUSD trustline is not installed yet. Please install it first.",
+      );
       return { ok: false };
     }
 
     // --- FX rate resolution ---
     const rawRate = Number(rlusdPerUnitRates?.[currency]);
-    const rlusdPerUnit = Number.isFinite(rawRate) && rawRate > 0
-      ? rawRate
-      : Number.NaN;
+    const rlusdPerUnit =
+      Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
     if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) {
       toast.error(`Impossible de récupérer le taux pour ${currency}.`);
       return { ok: false };
@@ -211,14 +230,20 @@ export function useSendTransaction({
         ? Number(selectedSendToken.allocatedRlusd)
         : Number.NaN);
     const epsilon = 1e-9;
-    if (Number.isFinite(availableAllocatedRlusd) && availableAllocatedRlusd + epsilon < paymentRlusd) {
-      const maxFx = availableAllocatedRlusd > 0 ? availableAllocatedRlusd / rlusdPerUnit : 0;
+    if (
+      Number.isFinite(availableAllocatedRlusd) &&
+      availableAllocatedRlusd + epsilon < paymentRlusd
+    ) {
+      const maxFx =
+        availableAllocatedRlusd > 0
+          ? availableAllocatedRlusd / rlusdPerUnit
+          : 0;
       toast.warn(
         `Allocation insuffisante en ${currency}.\n\n` +
           `Disponible: ≈ ${availableAllocatedRlusd.toLocaleString("en-US", {
             maximumFractionDigits: 6,
           })} RLUSD\n` +
-          `Maximum: ≈ ${maxFx.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}`
+          `Maximum: ≈ ${maxFx.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}`,
       );
       return { ok: false };
     }
@@ -228,13 +253,15 @@ export function useSendTransaction({
       `Paiement en RLUSD (affiché en ${currency}).\n\n` +
         `Montant: ${amountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
         `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n\n` +
-        `1 signature Xumm sera demandée.`
+        `1 signature Xumm sera demandée.`,
     );
     if (!ok) return { ok: false };
 
     // --- Build & sign single RLUSD payment ---
     const fxSource =
-      (sendPaymentRequest?.fxSource ? String(sendPaymentRequest.fxSource) : null) ||
+      (sendPaymentRequest?.fxSource
+        ? String(sendPaymentRequest.fxSource)
+        : null) ||
       rlusdPerUnitSources?.[currency] ||
       null;
 
@@ -248,15 +275,20 @@ export function useSendTransaction({
     }
 
     const targetCurrencyForMemo = sendPaymentRequest?.targetCurrencyCode
-      ? String(sendPaymentRequest.targetCurrencyCode).trim().toUpperCase() || currency
+      ? String(sendPaymentRequest.targetCurrencyCode).trim().toUpperCase() ||
+        currency
       : currency;
     const displayAmountForMemo = sendPaymentRequest
-      ? sendPaymentRequest?.displayAmount ?? amountNum
+      ? (sendPaymentRequest?.displayAmount ?? amountNum)
       : amountNum;
     const displayCurrencyForMemo = sendPaymentRequest
-      ? sendPaymentRequest?.displayCurrency ?? targetCurrencyForMemo ?? currency
+      ? (sendPaymentRequest?.displayCurrency ??
+        targetCurrencyForMemo ??
+        currency)
       : currency;
-    const targetAllocatedBefore = allocatedRlusdByCurrency?.get(targetCurrencyForMemo);
+    const targetAllocatedBefore = allocatedRlusdByCurrency?.get(
+      targetCurrencyForMemo,
+    );
     const paymentAllocatedAfter = Number.isFinite(targetAllocatedBefore)
       ? Math.max(0, Number(targetAllocatedBefore) - paymentRlusd)
       : null;
@@ -286,7 +318,7 @@ export function useSendTransaction({
         currency,
         amount: amountNum,
         amountRlusd: paymentRlusd,
-      })
+      }),
     );
 
     const payResult = await signTransaction(payTx, {
@@ -300,12 +332,24 @@ export function useSendTransaction({
       // Auto-suppression de la payreq des demandes en attente
       if (sendPaymentRequest && removePayreq && pendingPayreqs?.length) {
         const matchDest = String(sendPaymentRequest.to || "").trim();
-        const matchAmount = Number(sendPaymentRequest.amountRlusd || sendPaymentRequest.displayAmount || 0);
-        const matchCurrency = String(sendPaymentRequest.targetCurrencyCode || sendPaymentRequest.displayCurrency || "").toUpperCase();
+        const matchAmount = Number(
+          sendPaymentRequest.amountRlusd ||
+            sendPaymentRequest.displayAmount ||
+            0,
+        );
+        const matchCurrency = String(
+          sendPaymentRequest.targetCurrencyCode ||
+            sendPaymentRequest.displayCurrency ||
+            "",
+        ).toUpperCase();
         const match = pendingPayreqs.find((p) => {
           const pd = String(p.payreq?.to || "").trim();
-          const pa = Number(p.payreq?.amountRlusd || p.payreq?.displayAmount || 0);
-          const pc = String(p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "").toUpperCase();
+          const pa = Number(
+            p.payreq?.amountRlusd || p.payreq?.displayAmount || 0,
+          );
+          const pc = String(
+            p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "",
+          ).toUpperCase();
           return pd === matchDest && pa === matchAmount && pc === matchCurrency;
         });
         if (match) removePayreq(match.id);
@@ -323,9 +367,17 @@ export function useSendTransaction({
   // ------------------------------------------------------------------
   // Direct send — XRP drops, RLUSD/USD native, or trustline tokens
   // ------------------------------------------------------------------
-  async function handleDirectSend({ amountNum, dest, currency, handleAddressSave }) {
+  async function handleDirectSend({
+    amountNum,
+    dest,
+    currency,
+    handleAddressSave,
+  }) {
     let Amount;
-    if (selectedSendToken.currency === "XRP" && selectedSendToken.issuer === "Native") {
+    if (
+      selectedSendToken.currency === "XRP" &&
+      selectedSendToken.issuer === "Native"
+    ) {
       Amount = Math.round(amountNum * 1_000_000).toString();
     } else if (currency === "USD" || currency === "RLUSD") {
       // USD (pool non alloué) et RLUSD sont envoyés comme RLUSD on-chain.
@@ -357,7 +409,10 @@ export function useSendTransaction({
 
     // If this payment comes from a XCANNES request, attach a memo so the receiver
     // can auto-credit the right currency line (only meaningful for RLUSD payments).
-    if ((currency === "RLUSD" || currency === "USD") && sendPaymentRequest?.targetCurrencyCode) {
+    if (
+      (currency === "RLUSD" || currency === "USD") &&
+      sendPaymentRequest?.targetCurrencyCode
+    ) {
       const target = String(sendPaymentRequest.targetCurrencyCode || "")
         .trim()
         .toUpperCase();
@@ -369,7 +424,8 @@ export function useSendTransaction({
         origin: "payreq",
         targetCurrencyCode: target || null,
         displayAmount: sendPaymentRequest?.displayAmount ?? null,
-        displayCurrencyCode: (sendPaymentRequest?.displayCurrency ?? target) || null,
+        displayCurrencyCode:
+          (sendPaymentRequest?.displayCurrency ?? target) || null,
         amountRlusd: amountNum,
         allocatedRlusdAfter: paymentAllocatedAfter,
         fxRate: sendPaymentRequest?.fxRate ?? null,
@@ -392,7 +448,7 @@ export function useSendTransaction({
         currency,
         amount: amountNum,
         amountRlusd: currency === "RLUSD" ? amountNum : null,
-      })
+      }),
     );
 
     const result = await signTransaction(txjson);
@@ -405,12 +461,24 @@ export function useSendTransaction({
       // Auto-suppression de la payreq des demandes en attente
       if (sendPaymentRequest && removePayreq && pendingPayreqs?.length) {
         const matchDest = String(sendPaymentRequest.to || "").trim();
-        const matchAmount = Number(sendPaymentRequest.amountRlusd || sendPaymentRequest.displayAmount || 0);
-        const matchCurrency = String(sendPaymentRequest.targetCurrencyCode || sendPaymentRequest.displayCurrency || "").toUpperCase();
+        const matchAmount = Number(
+          sendPaymentRequest.amountRlusd ||
+            sendPaymentRequest.displayAmount ||
+            0,
+        );
+        const matchCurrency = String(
+          sendPaymentRequest.targetCurrencyCode ||
+            sendPaymentRequest.displayCurrency ||
+            "",
+        ).toUpperCase();
         const match = pendingPayreqs.find((p) => {
           const pd = String(p.payreq?.to || "").trim();
-          const pa = Number(p.payreq?.amountRlusd || p.payreq?.displayAmount || 0);
-          const pc = String(p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "").toUpperCase();
+          const pa = Number(
+            p.payreq?.amountRlusd || p.payreq?.displayAmount || 0,
+          );
+          const pc = String(
+            p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "",
+          ).toUpperCase();
           return pd === matchDest && pa === matchAmount && pc === matchCurrency;
         });
         if (match) removePayreq(match.id);

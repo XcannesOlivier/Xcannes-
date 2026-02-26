@@ -10,22 +10,26 @@ import {
   downloadTextFile,
   escapeHtml,
   openPrintWindow,
-  sha256Hex
+  sha256Hex,
 } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
-import { formatAmountWithSymbol, getDisplayCurrencyCode } from "../walletDashboardConfig";
+import {
+  formatAmountWithSymbol,
+  getDisplayCurrencyCode,
+} from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 
 const USD_STABLECOINS = [
-"RLUSD",
-"USD",
-"USDC",
-"USDT",
-"BUSD",
-"DAI",
-"TUSD",
-"USDP",
-"GUSD"];
+  "RLUSD",
+  "USD",
+  "USDC",
+  "USDT",
+  "BUSD",
+  "DAI",
+  "TUSD",
+  "USDP",
+  "GUSD",
+];
 
 const ShareIcon = ({ className = "" }) => (
   <svg
@@ -36,13 +40,13 @@ const ShareIcon = ({ className = "" }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    aria-hidden="true">
+    aria-hidden="true"
+  >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
     <polyline points="17 8 12 3 7 8" />
     <line x1="12" y1="3" x2="12" y2="15" />
   </svg>
 );
-
 
 /**
  * Composant de relevé bancaire global (toutes les devises consolidées)
@@ -71,7 +75,7 @@ export default function GlobalStatement({
   movementsLoadingMore = false,
   onLoadMoreMovements,
   onClose,
-  onViewCurrency
+  onViewCurrency,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -83,12 +87,12 @@ export default function GlobalStatement({
   const resolvedLabelOverride = String(walletLabelOverride || "").trim();
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
-    "December 2025"
+    "December 2025",
   );
   const archivesLabel = t("ui_archives_label_3c1f8a7b2e", "Archives");
   const archivesLongLabel = t(
     "ui_archives_12plus_7b3c9a1d5e",
-    "Archives (12+ months)"
+    "Archives (12+ months)",
   );
   const fallbackPeriod = period || defaultPeriod;
 
@@ -106,7 +110,7 @@ export default function GlobalStatement({
     const loadLabel = async () => {
       try {
         const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`)
+          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
         );
         const data = await res.json();
         if (!res.ok) {
@@ -132,43 +136,60 @@ export default function GlobalStatement({
     const currentDate = new Date();
 
     for (let i = 0; i < 12; i++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() - i,
+        1,
+      );
       months.push({
         value: i,
-        label: date.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
-        displayLabel: date.toLocaleDateString(locale, { month: 'long' }) // Juste le mois pour l'affichage
+        label: date.toLocaleDateString(locale, {
+          month: "long",
+          year: "numeric",
+        }),
+        displayLabel: date.toLocaleDateString(locale, { month: "long" }), // Juste le mois pour l'affichage
       });
     }
 
     months.push({
-      value: 'archives',
+      value: "archives",
       label: archivesLongLabel,
-      displayLabel: archivesLabel
+      displayLabel: archivesLabel,
     });
     return months;
   };
 
   const availableMonths = generateMonths();
-  const currentPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.label || fallbackPeriod;
-  const currentDisplayPeriod = selectedMonth === 'archives' ? archivesLabel : availableMonths[selectedMonth]?.displayLabel || String(fallbackPeriod).split(' ')[0]; // Affiche juste le mois
+  const currentPeriod =
+    selectedMonth === "archives"
+      ? archivesLabel
+      : availableMonths[selectedMonth]?.label || fallbackPeriod;
+  const currentDisplayPeriod =
+    selectedMonth === "archives"
+      ? archivesLabel
+      : availableMonths[selectedMonth]?.displayLabel ||
+        String(fallbackPeriod).split(" ")[0]; // Affiche juste le mois
 
   const isUsdStablecoin = useCallback(
     (currency) =>
-    USD_STABLECOINS.includes(String(currency || "").toUpperCase()),
-    []
+      USD_STABLECOINS.includes(String(currency || "").toUpperCase()),
+    [],
   );
 
-  const getUsdValue = useCallback((token) => {
-    const value = parseFloat(token.value || 0);
-    if (!Number.isFinite(value)) return null;
-    if (value === 0) return 0;
-    const code = String(token.currency || "").toUpperCase();
-    if (code === "XRP") return null;
-    const rate = usdRates?.[code];
-    if (Number.isFinite(rate)) return value * rate;
-    if (isUsdStablecoin(code)) return value;
-    return null;
-  }, [isUsdStablecoin, usdRates]);
+  const getUsdValue = useCallback(
+    (token) => {
+      const value = parseFloat(token.value || 0);
+      if (!Number.isFinite(value)) return null;
+      if (value === 0) return 0;
+      const code = String(token.currency || "").toUpperCase();
+      if (code === "XRP") return null;
+      const rate = usdRates?.[code];
+      if (Number.isFinite(rate)) return value * rate;
+      if (isUsdStablecoin(code)) return value;
+      return null;
+    },
+    [isUsdStablecoin, usdRates],
+  );
 
   // Calculer les totaux
   const computedTotalBalance = tokens.reduce((sum, token) => {
@@ -189,18 +210,18 @@ export default function GlobalStatement({
   const sortedTokens = [...tokens]
     .filter((t) => String(t.currency || "").toUpperCase() !== "RLUSD")
     .sort((a, b) => {
-    const aIsXrp = String(a.currency || "").toUpperCase() === "XRP";
-    const bIsXrp = String(b.currency || "").toUpperCase() === "XRP";
-    if (aIsXrp && !bIsXrp) return 1;
-    if (!aIsXrp && bIsXrp) return -1;
-    if (sortBy === "balance") {
-      return parseFloat(b.value || 0) - parseFloat(a.value || 0);
-    }
-    if (sortBy === "name") {
-      return a.currency.localeCompare(b.currency);
-    }
-    return 0;
-  });
+      const aIsXrp = String(a.currency || "").toUpperCase() === "XRP";
+      const bIsXrp = String(b.currency || "").toUpperCase() === "XRP";
+      if (aIsXrp && !bIsXrp) return 1;
+      if (!aIsXrp && bIsXrp) return -1;
+      if (sortBy === "balance") {
+        return parseFloat(b.value || 0) - parseFloat(a.value || 0);
+      }
+      if (sortBy === "name") {
+        return a.currency.localeCompare(b.currency);
+      }
+      return 0;
+    });
 
   const formatAmountWithSymbolLocal = useCallback(
     (amount, currency, options = {}) =>
@@ -209,7 +230,7 @@ export default function GlobalStatement({
         maximumFractionDigits: 2,
         ...options,
       }),
-    [locale]
+    [locale],
   );
 
   const ledgerEvidenceCount = useMemo(() => {
@@ -233,44 +254,51 @@ export default function GlobalStatement({
 
   const ledgerStatusLabel = useMemo(() => {
     if (ledgerStatus === "verified") {
-      return t("ui_verified_on_xrp_ledger_334f28ce50", "Verified on XRP Ledger");
+      return t(
+        "ui_verified_on_xrp_ledger_334f28ce50",
+        "Verified on XRP Ledger",
+      );
     }
     if (ledgerStatus === "available") {
       return t(
         "ui_ledger_available_no_tx_f4",
-        "Ledger available (no transactions yet)"
+        "Ledger available (no transactions yet)",
       );
     }
     if (ledgerStatus === "offchain") {
       return t(
         "ui_ledger_offchain_allocations_f4",
-        "Ledger validation unavailable for off-chain allocations"
+        "Ledger validation unavailable for off-chain allocations",
       );
     }
     return t(
       "ui_ledger_preview_unavailable_f4",
-      "Ledger validation unavailable (preview)"
+      "Ledger validation unavailable (preview)",
     );
   }, [ledgerStatus, t]);
 
   const statementHashInput = useMemo(() => {
-    const safeTotal = Number.isFinite(Number(totalBalance)) ? Number(totalBalance) : 0;
+    const safeTotal = Number.isFinite(Number(totalBalance))
+      ? Number(totalBalance)
+      : 0;
     const tokenPayload = (tokens || []).map((token) => ({
       currency: token?.currency || "",
       value: Number.isFinite(Number(token?.value)) ? Number(token.value) : 0,
       issuer: token?.issuer || "",
-      isTrustlineOnly: Boolean(token?.isTrustlineOnly)
+      isTrustlineOnly: Boolean(token?.isTrustlineOnly),
     }));
     const movementPayload = (movements || []).map((m) => ({
       kind: m?.kind || "",
       fromCurrencyCode: m?.fromCurrencyCode || "",
       toCurrencyCode: m?.toCurrencyCode || "",
-      amountRlusd: Number.isFinite(Number(m?.amountRlusd)) ? Number(m.amountRlusd) : 0,
+      amountRlusd: Number.isFinite(Number(m?.amountRlusd))
+        ? Number(m.amountRlusd)
+        : 0,
       fxRate: Number.isFinite(Number(m?.fxRate)) ? Number(m.fxRate) : null,
       fxSource: m?.fxSource || "",
       txHash: m?.txHash || "",
       note: m?.note || "",
-      createdAt: m?.createdAt || ""
+      createdAt: m?.createdAt || "",
     }));
     return JSON.stringify({
       version: 1,
@@ -279,9 +307,16 @@ export default function GlobalStatement({
       period: currentPeriod || fallbackPeriod,
       totalBalance: safeTotal,
       tokens: tokenPayload,
-      movements: movementPayload
+      movements: movementPayload,
     });
-  }, [currentPeriod, fallbackPeriod, movements, tokens, totalBalance, walletAddress]);
+  }, [
+    currentPeriod,
+    fallbackPeriod,
+    movements,
+    tokens,
+    totalBalance,
+    walletAddress,
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -297,21 +332,25 @@ export default function GlobalStatement({
 
   const buildPrintHtml = useCallback(() => {
     const docHashLabel = docHash || "-";
-    const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
+    const ledgerIndexLabel =
+      ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const totalBalanceDisplay = Number.isFinite(Number(totalBalance))
       ? formatAmountWithSymbolLocal(totalBalance, "USD")
       : "-";
-    const balancesRows = (sortedTokens || []).map((token) => {
-      const usdValue = getUsdValue(token);
-      const displayCode = getDisplayCurrencyCode(token?.currency);
-      return `
+    const balancesRows = (sortedTokens || [])
+      .map((token) => {
+        const usdValue = getUsdValue(token);
+        const displayCode = getDisplayCurrencyCode(token?.currency);
+        return `
         <tr>
           <td>${escapeHtml(displayCode || "-")}</td>
-          <td class="right">${escapeHtml(formatAmountWithSymbol(locale, token?.value, token?.currency, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 6
-          }))}</td>
+          <td class="right">${escapeHtml(
+            formatAmountWithSymbol(locale, token?.value, token?.currency, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 6,
+            }),
+          )}</td>
           <td class="right">${
             Number.isFinite(usdValue)
               ? escapeHtml(formatAmountWithSymbolLocal(usdValue, "USD"))
@@ -319,42 +358,45 @@ export default function GlobalStatement({
           }</td>
         </tr>
       `;
-    }).join("");
+      })
+      .join("");
     const balancesEmpty = `
       <tr>
         <td colspan="3" class="muted">${escapeHtml(
-          t("ui_no_balances_found_2c7a1d9b5e", "No balances available")
+          t("ui_no_balances_found_2c7a1d9b5e", "No balances available"),
         )}</td>
       </tr>
     `;
-    const movementRows = (movements || []).map((m) => {
-      const from = String(m?.fromCurrencyCode || "").toUpperCase();
-      const to = String(m?.toCurrencyCode || "").toUpperCase();
-      const amount = Number(m?.amountRlusd || 0);
-      const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
-      const when =
-      createdAt && Number.isFinite(createdAt.getTime()) ?
-      createdAt.toLocaleString(locale) :
-      "";
-      return `
+    const movementRows = (movements || [])
+      .map((m) => {
+        const from = String(m?.fromCurrencyCode || "").toUpperCase();
+        const to = String(m?.toCurrencyCode || "").toUpperCase();
+        const amount = Number(m?.amountRlusd || 0);
+        const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
+        const when =
+          createdAt && Number.isFinite(createdAt.getTime())
+            ? createdAt.toLocaleString(locale)
+            : "";
+        return `
         <tr>
           <td>${escapeHtml(when)}</td>
           <td>${escapeHtml(m?.kind || "")}</td>
           <td>${escapeHtml(from)}</td>
           <td>${escapeHtml(to)}</td>
           <td class="right">${escapeHtml(
-            Number.isFinite(amount) ?
-            amount.toLocaleString(locale, { maximumFractionDigits: 6 }) :
-            "-"
+            Number.isFinite(amount)
+              ? amount.toLocaleString(locale, { maximumFractionDigits: 6 })
+              : "-",
           )}</td>
           <td>${escapeHtml(m?.txHash || "")}</td>
         </tr>
       `;
-    }).join("");
+      })
+      .join("");
     const movementsEmpty = `
       <tr>
         <td colspan="6" class="muted">${escapeHtml(
-          t("ui_no_movements_found_2b7c1a9d5e", "No movements available")
+          t("ui_no_movements_found_2b7c1a9d5e", "No movements available"),
         )}</td>
       </tr>
     `;
@@ -399,20 +441,21 @@ export default function GlobalStatement({
       </table>
     `;
   }, [
-  currentPeriod,
-  docHash,
-  fallbackPeriod,
-  formatAmountWithSymbolLocal,
-  getUsdValue,
-  ledgerLastIndex,
-  ledgerStatusLabel,
-  locale,
-  movements,
-  sortedTokens,
-  t,
-  totalBalance,
-  walletAddress,
-  walletLabel]);
+    currentPeriod,
+    docHash,
+    fallbackPeriod,
+    formatAmountWithSymbolLocal,
+    getUsdValue,
+    ledgerLastIndex,
+    ledgerStatusLabel,
+    locale,
+    movements,
+    sortedTokens,
+    t,
+    totalBalance,
+    walletAddress,
+    walletLabel,
+  ]);
 
   const handleExportPdf = useCallback(() => {
     setExportFormat("pdf");
@@ -420,14 +463,14 @@ export default function GlobalStatement({
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const ok = openPrintWindow({
         title: `XCANNES Global Statement ${suffix}`,
-        bodyHtml: buildPrintHtml()
+        bodyHtml: buildPrintHtml(),
       });
       if (!ok && typeof window !== "undefined") {
         window.alert(
           t(
             "ui_popup_blocked_1c7a9d3b5e",
-            "Popup blocked. Please allow popups to export or print."
-          )
+            "Popup blocked. Please allow popups to export or print.",
+          ),
         );
       }
     } finally {
@@ -439,14 +482,14 @@ export default function GlobalStatement({
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
     const ok = openPrintWindow({
       title: `XCANNES Global Statement ${suffix}`,
-      bodyHtml: buildPrintHtml()
+      bodyHtml: buildPrintHtml(),
     });
     if (!ok && typeof window !== "undefined") {
       window.alert(
         t(
           "ui_popup_blocked_1c7a9d3b5e",
-          "Popup blocked. Please allow popups to export or print."
-        )
+          "Popup blocked. Please allow popups to export or print.",
+        ),
       );
     }
   }, [buildPrintHtml, docHash, t]);
@@ -456,18 +499,19 @@ export default function GlobalStatement({
     try {
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const headers = [
-      "created_at",
-      "kind",
-      "from_currency",
-      "to_currency",
-      "amount_rlusd",
-      "fx_rate",
-      "fx_source",
-      "tx_hash",
-      "total_balance_usd",
-      "ledger_status",
-      "doc_hash"];
-      const rows = (movements || []).map((m) => ([
+        "created_at",
+        "kind",
+        "from_currency",
+        "to_currency",
+        "amount_rlusd",
+        "fx_rate",
+        "fx_source",
+        "tx_hash",
+        "total_balance_usd",
+        "ledger_status",
+        "doc_hash",
+      ];
+      const rows = (movements || []).map((m) => [
         m?.createdAt || "",
         m?.kind || "",
         m?.fromCurrencyCode || "",
@@ -478,13 +522,13 @@ export default function GlobalStatement({
         m?.txHash || "",
         Number.isFinite(Number(totalBalance)) ? Number(totalBalance) : "",
         ledgerStatus,
-        docHash || ""
-      ]));
+        docHash || "",
+      ]);
       const csv = buildCsvString(headers, rows);
       downloadTextFile({
         filename: `xcannes-statement-global-${suffix}.csv`,
         content: csv,
-        type: "text/csv;charset=utf-8"
+        type: "text/csv;charset=utf-8",
       });
     } finally {
       setExportFormat(null);
@@ -492,53 +536,176 @@ export default function GlobalStatement({
   }, [docHash, ledgerStatus, movements, totalBalance]);
 
   const getCurrencyFlag = (currency) => {
-    const code = String(currency || "").trim().toUpperCase();
+    const code = String(currency || "")
+      .trim()
+      .toUpperCase();
     const flags = {
-      EUR: "🇪🇺", USD: "🇺🇸", GBP: "🇬🇧", JPY: "🇯🇵",
-      CHF: "🇨🇭", CAD: "🇨🇦", AUD: "🇦🇺", NZD: "🇳🇿",
-      CNY: "🇨🇳", INR: "🇮🇳", KRW: "🇰🇷", SGD: "🇸🇬",
-      HKD: "🇭🇰", MXN: "🇲🇽", BRL: "🇧🇷", ZAR: "🇿🇦",
-      TRY: "🇹🇷", RUB: "🇷🇺", SEK: "🇸🇪", NOK: "🇳🇴",
-      DKK: "🇩🇰", PLN: "🇵🇱", THB: "🇹🇭", IDR: "🇮🇩",
-      MYR: "🇲🇾", PHP: "🇵🇭", CZK: "🇨🇿", ILS: "🇮🇱",
-      CLP: "🇨🇱", AED: "🇦🇪", SAR: "🇸🇦",
+      EUR: "🇪🇺",
+      USD: "🇺🇸",
+      GBP: "🇬🇧",
+      JPY: "🇯🇵",
+      CHF: "🇨🇭",
+      CAD: "🇨🇦",
+      AUD: "🇦🇺",
+      NZD: "🇳🇿",
+      CNY: "🇨🇳",
+      INR: "🇮🇳",
+      KRW: "🇰🇷",
+      SGD: "🇸🇬",
+      HKD: "🇭🇰",
+      MXN: "🇲🇽",
+      BRL: "🇧🇷",
+      ZAR: "🇿🇦",
+      TRY: "🇹🇷",
+      RUB: "🇷🇺",
+      SEK: "🇸🇪",
+      NOK: "🇳🇴",
+      DKK: "🇩🇰",
+      PLN: "🇵🇱",
+      THB: "🇹🇭",
+      IDR: "🇮🇩",
+      MYR: "🇲🇾",
+      PHP: "🇵🇭",
+      CZK: "🇨🇿",
+      ILS: "🇮🇱",
+      CLP: "🇨🇱",
+      AED: "🇦🇪",
+      SAR: "🇸🇦",
       XRP: "✕",
       // Global statement: show RLUSD as USD for clarity.
       RLUSD: "🇺🇸",
-      BTC: "₿", ETH: "Ξ", USDT: "₮", USDC: "💵",
-      BNB: "🔶", ADA: "₳", DOGE: "Ð",
-      XLM: "🚀", LINK: "⬡", DOT: "⚫", UNI: "🦄",
-      MATIC: "🔷", LTC: "Ł", BCH: "₿", AVAX: "🔺",
-      ATOM: "⚛️", XMR: "ɱ", TRX: "◇", ETC: "Ξ",
-      AFN: "🇦🇫", ALL: "🇦🇱", DZD: "🇩🇿", AOA: "🇦🇴",
-      ARS: "🇦🇷", AMD: "🇦🇲", AWG: "🇦🇼", AZN: "🇦🇿",
-      BSD: "🇧🇸", BHD: "🇧🇭", BDT: "🇧🇩", BBD: "🇧🇧",
-      BYN: "🇧🇾", BZD: "🇧🇿", BMD: "🇧🇲", BTN: "🇧🇹",
-      BOB: "🇧🇴", BAM: "🇧🇦", BWP: "🇧🇼", BND: "🇧🇳",
-      BGN: "🇧🇬", BIF: "🇧🇮", KHR: "🇰🇭", CVE: "🇨🇻",
-      XAF: "🇨🇫", XOF: "🇧🇫", KMF: "🇰🇲", CDF: "🇨🇩",
-      CRC: "🇨🇷", CUP: "🇨🇺", CYP: "🇨🇾",
-      DJF: "🇩🇯", DOP: "🇩🇴", XCD: "🇦🇬", EGP: "🇪🇬",
-      ERN: "🇪🇷", ETB: "🇪🇹", FJD: "🇫🇯", GMD: "🇬🇲",
-      GEL: "🇬🇪", GHS: "🇬🇭", GTQ: "🇬🇹", GNF: "🇬🇳",
-      GYD: "🇬🇾", HTG: "🇭🇹", HNL: "🇭🇳", HUF: "🇭🇺",
-      ISK: "🇮🇸", IQD: "🇮🇶", JMD: "🇯🇲", JOD: "🇯🇴",
-      KZT: "🇰🇿", KES: "🇰🇪", KWD: "🇰🇼", KGS: "🇰🇬",
-      LAK: "🇱🇦", LBP: "🇱🇧", LSL: "🇱🇸", LRD: "🇱🇷",
-      LYD: "🇱🇾", MOP: "🇲🇴", MKD: "🇲🇰", MGA: "🇲🇬",
-      MWK: "🇲🇼", MVR: "🇲🇻", MRU: "🇲🇷", MUR: "🇲🇺",
-      MDL: "🇲🇩", MNT: "🇲🇳", MAD: "🇲🇦", MZN: "🇲🇿",
-      MMK: "🇲🇲", NAD: "🇳🇦", NPR: "🇳🇵", NIO: "🇳🇮",
-      NGN: "🇳🇬", OMR: "🇴🇲", PKR: "🇵🇰", PAB: "🇵🇦",
-      PGK: "🇵🇬", PYG: "🇵🇾", PEN: "🇵🇪", SOL: "🇵🇪", QAR: "🇶🇦",
-      RON: "🇷🇴", RWF: "🇷🇼", WST: "🇼🇸", STN: "🇸🇹",
-      RSD: "🇷🇸", SCR: "🇸🇨", SOS: "🇸🇴",
-      LKR: "🇱🇰", SDG: "🇸🇩", SRD: "🇸🇷", SZL: "🇸🇿",
-      SYP: "🇸🇾", TWD: "🇹🇼", TJS: "🇹🇯", TZS: "🇹🇿",
-      TOP: "🇹🇴", TTD: "🇹🇹", TND: "🇹🇳", TMT: "🇹🇲",
-      UGX: "🇺🇬", UAH: "🇺🇦", UYU: "🇺🇾", UZS: "🇺🇿",
-      VUV: "🇻🇺", VES: "🇻🇪", VND: "🇻🇳", YER: "🇾🇪",
-      ZMW: "🇿🇲", ZWL: "🇿🇼"
+      BTC: "₿",
+      ETH: "Ξ",
+      USDT: "₮",
+      USDC: "💵",
+      BNB: "🔶",
+      ADA: "₳",
+      DOGE: "Ð",
+      XLM: "🚀",
+      LINK: "⬡",
+      DOT: "⚫",
+      UNI: "🦄",
+      MATIC: "🔷",
+      LTC: "Ł",
+      BCH: "₿",
+      AVAX: "🔺",
+      ATOM: "⚛️",
+      XMR: "ɱ",
+      TRX: "◇",
+      ETC: "Ξ",
+      AFN: "🇦🇫",
+      ALL: "🇦🇱",
+      DZD: "🇩🇿",
+      AOA: "🇦🇴",
+      ARS: "🇦🇷",
+      AMD: "🇦🇲",
+      AWG: "🇦🇼",
+      AZN: "🇦🇿",
+      BSD: "🇧🇸",
+      BHD: "🇧🇭",
+      BDT: "🇧🇩",
+      BBD: "🇧🇧",
+      BYN: "🇧🇾",
+      BZD: "🇧🇿",
+      BMD: "🇧🇲",
+      BTN: "🇧🇹",
+      BOB: "🇧🇴",
+      BAM: "🇧🇦",
+      BWP: "🇧🇼",
+      BND: "🇧🇳",
+      BGN: "🇧🇬",
+      BIF: "🇧🇮",
+      KHR: "🇰🇭",
+      CVE: "🇨🇻",
+      XAF: "🇨🇫",
+      XOF: "🇧🇫",
+      KMF: "🇰🇲",
+      CDF: "🇨🇩",
+      CRC: "🇨🇷",
+      CUP: "🇨🇺",
+      CYP: "🇨🇾",
+      DJF: "🇩🇯",
+      DOP: "🇩🇴",
+      XCD: "🇦🇬",
+      EGP: "🇪🇬",
+      ERN: "🇪🇷",
+      ETB: "🇪🇹",
+      FJD: "🇫🇯",
+      GMD: "🇬🇲",
+      GEL: "🇬🇪",
+      GHS: "🇬🇭",
+      GTQ: "🇬🇹",
+      GNF: "🇬🇳",
+      GYD: "🇬🇾",
+      HTG: "🇭🇹",
+      HNL: "🇭🇳",
+      HUF: "🇭🇺",
+      ISK: "🇮🇸",
+      IQD: "🇮🇶",
+      JMD: "🇯🇲",
+      JOD: "🇯🇴",
+      KZT: "🇰🇿",
+      KES: "🇰🇪",
+      KWD: "🇰🇼",
+      KGS: "🇰🇬",
+      LAK: "🇱🇦",
+      LBP: "🇱🇧",
+      LSL: "🇱🇸",
+      LRD: "🇱🇷",
+      LYD: "🇱🇾",
+      MOP: "🇲🇴",
+      MKD: "🇲🇰",
+      MGA: "🇲🇬",
+      MWK: "🇲🇼",
+      MVR: "🇲🇻",
+      MRU: "🇲🇷",
+      MUR: "🇲🇺",
+      MDL: "🇲🇩",
+      MNT: "🇲🇳",
+      MAD: "🇲🇦",
+      MZN: "🇲🇿",
+      MMK: "🇲🇲",
+      NAD: "🇳🇦",
+      NPR: "🇳🇵",
+      NIO: "🇳🇮",
+      NGN: "🇳🇬",
+      OMR: "🇴🇲",
+      PKR: "🇵🇰",
+      PAB: "🇵🇦",
+      PGK: "🇵🇬",
+      PYG: "🇵🇾",
+      PEN: "🇵🇪",
+      SOL: "🇵🇪",
+      QAR: "🇶🇦",
+      RON: "🇷🇴",
+      RWF: "🇷🇼",
+      WST: "🇼🇸",
+      STN: "🇸🇹",
+      RSD: "🇷🇸",
+      SCR: "🇸🇨",
+      SOS: "🇸🇴",
+      LKR: "🇱🇰",
+      SDG: "🇸🇩",
+      SRD: "🇸🇷",
+      SZL: "🇸🇿",
+      SYP: "🇸🇾",
+      TWD: "🇹🇼",
+      TJS: "🇹🇯",
+      TZS: "🇹🇿",
+      TOP: "🇹🇴",
+      TTD: "🇹🇹",
+      TND: "🇹🇳",
+      TMT: "🇹🇲",
+      UGX: "🇺🇬",
+      UAH: "🇺🇦",
+      UYU: "🇺🇾",
+      UZS: "🇺🇿",
+      VUV: "🇻🇺",
+      VES: "🇻🇪",
+      VND: "🇻🇳",
+      YER: "🇾🇪",
+      ZMW: "🇿🇲",
+      ZWL: "🇿🇼",
     };
     return flags[code] || "💱";
   };
@@ -547,24 +714,24 @@ export default function GlobalStatement({
     if (token.currency === "XRP") {
       return {
         label: t("ui_label_native_2d7a1c9b4e", "Native"),
-        color: "blue"
+        color: "blue",
       };
     }
     if (token.currency === "RLUSD") {
       return {
         label: t("ui_label_platform_7c1a9d3b5e", "Platform"),
-        color: "green"
+        color: "green",
       };
     }
     if (isUsdStablecoin(token.currency))
-    return {
-      label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
-      color: "purple"
-    };
+      return {
+        label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
+        color: "purple",
+      };
     if (token.isTrustlineOnly) {
       return {
         label: t("ui_label_exchange_rate_5a1c7b9d3e", "Exchange Rate"),
-        color: "orange"
+        color: "orange",
       };
     }
     return { label: t("ui_label_token_1c7b3a9d5e", "Token"), color: "gray" };
@@ -575,40 +742,40 @@ export default function GlobalStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl"
+        "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-3 md:px-4",
       panelClass:
-      "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]"
+        "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]",
     },
     "dex-mobile": {
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
-      panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border-0"
+      panelClass: "w-full xcannes-fullscreen-safe rounded-none border-0",
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-4",
       panelClass:
-      "max-w-5xl lg:max-w-6xl rounded-2xl border border-white/10 max-h-[92vh]"
+        "max-w-5xl lg:max-w-6xl rounded-2xl border border-white/10 max-h-[92vh]",
     },
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass:
-      "w-full h-full rounded-xl border border-white/10"
-    }
+      panelClass: "w-full h-full rounded-xl border border-white/10",
+    },
   };
 
-  const resolvedLayout = STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+  const resolvedLayout =
+    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
 
-  const modalBgClass = noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
+  const modalBgClass =
+    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -618,31 +785,34 @@ export default function GlobalStatement({
     isWalletActivated === true &&
     hasRlusdTrustline === false;
 
-  const content =
-  <div
-    className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
-      inline
-        ? ""
-        : `${resolvedLayout.backdropClass} ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`
-    }`}
-    onClick={(e) => {
-      if (inline) return;
-      // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
-      if (e.target === e.currentTarget) {
-        onClose?.();
-      }
-    }}>
-
+  const content = (
+    <div
+      className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
+        inline
+          ? ""
+          : `${resolvedLayout.backdropClass} ${
+              isClosing
+                ? "wallet-modal-backdrop-out"
+                : "wallet-modal-backdrop-in"
+            }`
+      }`}
+      onClick={(e) => {
+        if (inline) return;
+        // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
+        if (e.target === e.currentTarget) {
+          onClose?.();
+        }
+      }}
+    >
       <div
-      className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
-        resolvedLayout.panelClass
-      } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}>
-
-        
+        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
+          resolvedLayout.panelClass
+        } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+      >
         {/* Header avec Account Info intégré */}
-        <div className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4`}>
+        <div
+          className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4`}
+        >
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-3xl flex-shrink-0">🌍</span>
@@ -664,7 +834,7 @@ export default function GlobalStatement({
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t(
                       "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
                     )}
                   </span>
                 ) : null}
@@ -672,7 +842,7 @@ export default function GlobalStatement({
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t(
                       "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet."
+                      "RLUSD not activated. Authorize RLUSD on your wallet.",
                     )}
                   </span>
                 ) : null}
@@ -680,30 +850,31 @@ export default function GlobalStatement({
             </div>
             {!inline ? (
               <button
-              onClick={onClose}
-              className="wallet-modal-close text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0">
-
+                onClick={onClose}
+                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0"
+              >
                 ✕
               </button>
             ) : null}
           </div>
 
-          
           {/* Account Info dans le header */}
-	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-	            <div>
-	              <p className="text-sm text-white font-semibold truncate">
-	                {walletLabel || t("nav_wallet", "Wallet")}
-	              </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <p className="text-sm text-white font-semibold truncate">
+                {walletLabel || t("nav_wallet", "Wallet")}
+              </p>
               {walletAddress ? (
                 <p className="text-[11px] text-white/50 font-mono break-all">
                   {walletAddress}
                 </p>
               ) : null}
-	            </div>
-	            <div>
-	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_4674b18f25", "Statement Period")}</p>
-	              {/* Month Selector - simplifié */}
+            </div>
+            <div>
+              <p className="text-xs text-white/50 mb-1">
+                {t("ui_statement_period_4674b18f25", "Statement Period")}
+              </p>
+              {/* Month Selector - simplifié */}
               <StatementMonthSelect
                 value={selectedMonth}
                 onChange={(nextValue) => {
@@ -719,80 +890,110 @@ export default function GlobalStatement({
               />
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">{t("ui_total_assets_918e935125", "Total Assets")}</p>
-              <p className="text-sm text-white">≈ {formatAmountWithSymbolLocal(totalBalance, "USD")}</p>
-              <p className="text-[11px] text-white/50">{tokens.length}{t("ui_currencies_5e5bf1a8a1", "Currencies")}</p>
+              <p className="text-xs text-white/50 mb-1">
+                {t("ui_total_assets_918e935125", "Total Assets")}
+              </p>
+              <p className="text-sm text-white">
+                ≈ {formatAmountWithSymbolLocal(totalBalance, "USD")}
+              </p>
+              <p className="text-[11px] text-white/50">
+                {tokens.length}
+                {t("ui_currencies_5e5bf1a8a1", "Currencies")}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 overflow-hidden px-4 md:px-5 py-4 flex flex-col gap-4 min-h-0">
-
           {/* Controls */}
-	          <div className="flex items-center justify-between gap-2">
-	            <div className="flex gap-2 flex-wrap">
-	              <button
-	              onClick={() => setSortBy("balance")}
-	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-	              sortBy === "balance" ?
-	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
-	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{t("ui_sort_by_balance_17aed9021c", "Sort by Balance")}
-
-
-            </button>
-	              <button
-	              onClick={() => setSortBy("name")}
-	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-	              sortBy === "name" ?
-	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
-	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{t("ui_sort_by_name_2590e44f12", "Sort by Name")}
-
-
-            </button>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setSortBy("balance")}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                  sortBy === "balance"
+                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                }`}
+              >
+                {t("ui_sort_by_balance_17aed9021c", "Sort by Balance")}
+              </button>
+              <button
+                onClick={() => setSortBy("name")}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                  sortBy === "name"
+                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                }`}
+              >
+                {t("ui_sort_by_name_2590e44f12", "Sort by Name")}
+              </button>
             </div>
           </div>
 
-	          {/* Assets Table */}
-	          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
-	            <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
-	              <table className="w-full text-sm">
-	                <thead className="sticky top-0 bg-black z-10">
-	                  <tr>
-	                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_asset_e3ae76ddf7", "Asset")}</th>
-	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_balance_0ad2d5b8eb", "Balance")}</th>
-	                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_usd_value_6925fe3f7e", "≈ USD Value")}</th>
-	                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_action_96db311a48", "Action")}</th>
-	                  </tr>
-	                </thead>
+          {/* Assets Table */}
+          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
+            <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-black z-10">
+                  <tr>
+                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
+                      {t("ui_asset_e3ae76ddf7", "Asset")}
+                    </th>
+                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
+                      {t("ui_balance_0ad2d5b8eb", "Balance")}
+                    </th>
+                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">
+                      {t("ui_usd_value_6925fe3f7e", "≈ USD Value")}
+                    </th>
+                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
+                      {t("ui_action_96db311a48", "Action")}
+                    </th>
+                  </tr>
+                </thead>
                 <tbody>
                   {sortedTokens.map((token, idx) => {
-                  const badge = getCategoryBadge(token);
-                  const usdValue = getUsdValue(token);
+                    const badge = getCategoryBadge(token);
+                    const usdValue = getUsdValue(token);
 
-                  return (
-                    <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                    return (
+                      <tr
+                        key={idx}
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                      >
                         <td className="px-3 md:px-4 py-2.5 md:py-3">
                           <div className="flex items-center gap-2">
-                            {['XRP', 'RLUSD', 'RLUSD'].includes(token.currency) ?
-                          <Image
-                            src={`/symbols/${token.currency.toLowerCase()}.png`}
-                            alt={token.currency}
-                            width={24}
-                            height={24}
-                            className="flex-shrink-0 w-6 h-6 rounded-md" /> :
-
-
-                          <span className="text-lg sm:text-2xl flex-shrink-0">{getCurrencyFlag(getDisplayCurrencyCode(token.currency))}</span>
-                          }
+                            {["XRP", "RLUSD", "RLUSD"].includes(
+                              token.currency,
+                            ) ? (
+                              <Image
+                                src={`/symbols/${token.currency.toLowerCase()}.png`}
+                                alt={token.currency}
+                                width={24}
+                                height={24}
+                                className="flex-shrink-0 w-6 h-6 rounded-md"
+                              />
+                            ) : (
+                              <span className="text-lg sm:text-2xl flex-shrink-0">
+                                {getCurrencyFlag(
+                                  getDisplayCurrencyCode(token.currency),
+                                )}
+                              </span>
+                            )}
                             <div className="min-w-0">
                               <p className="text-white font-medium text-xs sm:text-sm truncate">
                                 {isPreviewMode ? (
                                   <>
-                                    <span className="md:hidden">{getDisplayCurrencyCode(token.currency)}</span>
-                                    <span className="hidden md:inline">{getCurrencyDescription(getDisplayCurrencyCode(token.currency)) || getDisplayCurrencyCode(token.currency)}</span>
+                                    <span className="md:hidden">
+                                      {getDisplayCurrencyCode(token.currency)}
+                                    </span>
+                                    <span className="hidden md:inline">
+                                      {getCurrencyDescription(
+                                        getDisplayCurrencyCode(token.currency),
+                                      ) ||
+                                        getDisplayCurrencyCode(token.currency)}
+                                    </span>
                                   </>
                                 ) : (
                                   getDisplayCurrencyCode(token.currency)
@@ -800,9 +1001,9 @@ export default function GlobalStatement({
                               </p>
                               {isPreviewMode && (
                                 <p className="text-[9px] sm:text-xs text-white/40 truncate">
-                                  {token.currency === "XRP" ?
-                                    t("ui_label_native_2d7a1c9b4e", "Native") :
-                                    token.issuer?.slice(0, 8) + "..."}
+                                  {token.currency === "XRP"
+                                    ? t("ui_label_native_2d7a1c9b4e", "Native")
+                                    : token.issuer?.slice(0, 8) + "..."}
                                 </p>
                               )}
                             </div>
@@ -810,7 +1011,10 @@ export default function GlobalStatement({
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white font-medium text-[10px] sm:text-sm">
                           <div className="truncate">
-                            {formatAmountWithSymbolLocal(token.value, token.currency)}
+                            {formatAmountWithSymbolLocal(
+                              token.value,
+                              token.currency,
+                            )}
                           </div>
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
@@ -819,25 +1023,29 @@ export default function GlobalStatement({
                             : "--"}
                         </td>
                         <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
-	                          <button
-	                          onClick={() => onViewCurrency && onViewCurrency(token)}
-	                          className="px-2 sm:px-3 py-1 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded text-[9px] sm:text-xs font-medium transition-colors border border-transparent whitespace-nowrap">
-
-	                            <span className="hidden sm:inline">
-	                              {t("view_statement", "View Statement")}
-	                            </span>
-                            <span className="sm:hidden">{t("view", "View")}</span>
+                          <button
+                            onClick={() =>
+                              onViewCurrency && onViewCurrency(token)
+                            }
+                            className="px-2 sm:px-3 py-1 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded text-[9px] sm:text-xs font-medium transition-colors border border-transparent whitespace-nowrap"
+                          >
+                            <span className="hidden sm:inline">
+                              {t("view_statement", "View Statement")}
+                            </span>
+                            <span className="sm:hidden">
+                              {t("view", "View")}
+                            </span>
                           </button>
                         </td>
-                      </tr>);
-
-                })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
 
-	          {/* Watermark removed */}
+          {/* Watermark removed */}
         </div>
 
         {/* Footer Actions */}
@@ -877,8 +1085,8 @@ export default function GlobalStatement({
           </div>
         </div>
       </div>
-    </div>;
-
+    </div>
+  );
 
   if (inline) {
     return content;

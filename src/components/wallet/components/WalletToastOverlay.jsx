@@ -36,7 +36,10 @@ function ToastItem({ toast, onDismiss }) {
       onClick={() => onDismiss(toast.id)}
     >
       {icon && (
-        <span className="mt-0.5 text-base leading-none shrink-0" aria-hidden="true">
+        <span
+          className="mt-0.5 text-base leading-none shrink-0"
+          aria-hidden="true"
+        >
           {icon}
         </span>
       )}
@@ -160,6 +163,6 @@ export default function WalletToastOverlay({
         <ConfirmDialog confirmState={confirmState} onResolve={resolveConfirm} />
       )}
     </>,
-    document.body
+    document.body,
   );
 }

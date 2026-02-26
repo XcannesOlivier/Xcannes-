@@ -60,7 +60,9 @@ export function useWalletNavigation({
 
   const handleActivateCurrencyLine = useCallback(
     async (code) => {
-      const currencyCode = String(code || "").trim().toUpperCase();
+      const currencyCode = String(code || "")
+        .trim()
+        .toUpperCase();
       if (!currencyCode || currencyCode.length < 2) return false;
       if (currencyCode === "RLUSD" || currencyCode === "XRP") return false;
 
@@ -70,13 +72,14 @@ export function useWalletNavigation({
       }
 
       const alreadyActive = (currencyLines || []).some(
-        (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
+        (line) =>
+          String(line?.currencyCode || "").toUpperCase() === currencyCode,
       );
       if (alreadyActive) {
         toast.info(
           t("ui_currency_line_already_active", {
             defaultValue: "Cette devise est déjà activée dans votre wallet.",
-          })
+          }),
         );
         return false;
       }
@@ -100,7 +103,7 @@ export function useWalletNavigation({
       setSwapDefaultView,
       setSwapLockedView,
       t,
-    ]
+    ],
   );
 
   // ─── Currency line upsert (delegate) ──────────────────────────────────
@@ -136,7 +139,7 @@ export function useWalletNavigation({
       setSwapDefaultView,
       setSwapLockedView,
       setCashBuyPrefill,
-    ]
+    ],
   );
 
   // ─── Open currency lines view ─────────────────────────────────────────
@@ -165,7 +168,7 @@ export function useWalletNavigation({
       setSelectedStatementToken(token);
       setShowCurrencyStatement(true);
     },
-    [closeInlineQr, isDesktopPanel]
+    [closeInlineQr, isDesktopPanel],
   );
 
   // ─── Open info panel ──────────────────────────────────────────────────
@@ -242,7 +245,7 @@ export function useWalletNavigation({
         window.dispatchEvent(
           new CustomEvent("xcannes:wallet:refresh", {
             detail: { address: backendWalletAddress },
-          })
+          }),
         );
       }
       if (tasks.length > 0) await Promise.allSettled(tasks);
@@ -286,15 +289,21 @@ export function useWalletNavigation({
       setWalletInfoOpen(false);
       const detail = event?.detail || {};
       const action = String(detail.action || "").toLowerCase();
-      const base = String(detail.base || "").trim().toUpperCase();
-      const quote = String(detail.quote || "").trim().toUpperCase();
+      const base = String(detail.base || "")
+        .trim()
+        .toUpperCase();
+      const quote = String(detail.quote || "")
+        .trim()
+        .toUpperCase();
       if (!base || !quote) return;
 
       const desiredBase = action === "buy" ? quote : base;
       const desiredQuote = action === "buy" ? base : quote;
 
       setConvertBaseCurrency(desiredBase);
-      setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
+      setConvertQuoteCurrency(
+        desiredQuote === desiredBase ? "RLUSD" : desiredQuote,
+      );
       setConvertAmount("");
       setSwapDefaultView("convert");
       setSwapLockedView(null);
@@ -302,7 +311,8 @@ export function useWalletNavigation({
     };
 
     window.addEventListener("xcannes:wallet:open-convert", handler);
-    return () => window.removeEventListener("xcannes:wallet:open-convert", handler);
+    return () =>
+      window.removeEventListener("xcannes:wallet:open-convert", handler);
   }, [
     closeInlineQr,
     handleActivateCurrencyLine,

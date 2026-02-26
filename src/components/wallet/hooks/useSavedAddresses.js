@@ -30,10 +30,13 @@ export function useSavedAddresses(storageKey = DEFAULT_STORAGE_KEY) {
       try {
         window.localStorage.setItem(storageKey, JSON.stringify(next));
       } catch (err) {
-        console.error("[useSavedAddresses] Error persisting saved addresses:", err);
+        console.error(
+          "[useSavedAddresses] Error persisting saved addresses:",
+          err,
+        );
       }
     },
-    [storageKey]
+    [storageKey],
   );
 
   const saveAddress = useCallback(
@@ -50,7 +53,7 @@ export function useSavedAddresses(storageKey = DEFAULT_STORAGE_KEY) {
         return next;
       });
     },
-    [persist]
+    [persist],
   );
 
   const deleteAddress = useCallback(
@@ -61,9 +64,8 @@ export function useSavedAddresses(storageKey = DEFAULT_STORAGE_KEY) {
         return next;
       });
     },
-    [persist]
+    [persist],
   );
 
   return { savedAddresses, saveAddress, deleteAddress };
 }
-

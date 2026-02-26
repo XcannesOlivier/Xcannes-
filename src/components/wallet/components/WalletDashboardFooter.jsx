@@ -25,106 +25,105 @@ export default function WalletDashboardFooter({
   // Sur mobile (DEX), on veut un fallback "hard reload" si la navigation Next échoue
   // (souvent visible comme: URL qui change mais page qui ne se met pas à jour).
   const withHardNavFallback = useCallback(
-    (href) =>
-      (e) => {
-        if (typeof window === "undefined") return;
-        if (!e || e.defaultPrevented) return;
-        if (e.button != null && e.button !== 0) return;
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    (href) => (e) => {
+      if (typeof window === "undefined") return;
+      if (!e || e.defaultPrevented) return;
+      if (e.button != null && e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 
-        const rawHref =
-          e?.currentTarget?.getAttribute?.("href") || String(href || "");
-        if (!rawHref) return;
+      const rawHref =
+        e?.currentTarget?.getAttribute?.("href") || String(href || "");
+      if (!rawHref) return;
 
-        let didStart = false;
-        let didComplete = false;
-        let didError = false;
-        let didFallback = false;
-        const events = router?.events;
-        let quickFallbackTimer;
-        let stuckFallbackTimer;
+      let didStart = false;
+      let didComplete = false;
+      let didError = false;
+      let didFallback = false;
+      const events = router?.events;
+      let quickFallbackTimer;
+      let stuckFallbackTimer;
 
-        const hrefUrl = new URL(rawHref, window.location.origin);
-        const targetPath = hrefUrl.pathname + hrefUrl.search + hrefUrl.hash;
+      const hrefUrl = new URL(rawHref, window.location.origin);
+      const targetPath = hrefUrl.pathname + hrefUrl.search + hrefUrl.hash;
 
-        const normalizeAsPath = (value) => {
-          if (!value) return "";
-          try {
-            const u = new URL(String(value), window.location.origin);
-            return u.pathname + u.search + u.hash;
-          } catch {
-            return String(value);
-          }
-        };
-
-        const stripLocalePrefix = (asPath) => {
-          const normalized = normalizeAsPath(asPath);
-          const locales = router?.locales || [];
-          for (const locale of locales) {
-            const prefix = `/${locale}`;
-            if (normalized === prefix) return "/";
-            if (normalized.startsWith(`${prefix}/`)) {
-              return normalized.slice(prefix.length) || "/";
-            }
-          }
-          return normalized;
-        };
-
-        const matchesTarget = (url) => {
-          const normalized = normalizeAsPath(url);
-          return stripLocalePrefix(normalized) === stripLocalePrefix(targetPath);
-        };
-
-        const cleanup = () => {
-          if (!events?.off) return;
-          events.off("routeChangeStart", markStart);
-          events.off("routeChangeComplete", markComplete);
-          events.off("routeChangeError", markError);
-          if (quickFallbackTimer) window.clearTimeout(quickFallbackTimer);
-          if (stuckFallbackTimer) window.clearTimeout(stuckFallbackTimer);
-        };
-
-        const doFallback = () => {
-          if (didFallback) return;
-          if (didComplete) return;
-          didFallback = true;
-          cleanup();
-          window.location.assign(hrefUrl.toString());
-        };
-
-        const markStart = (url) => {
-          if (!matchesTarget(url)) return;
-          didStart = true;
-        };
-        const markComplete = (url) => {
-          if (!matchesTarget(url)) return;
-          didComplete = true;
-          cleanup();
-        };
-        const markError = (url) => {
-          if (!matchesTarget(url)) return;
-          didError = true;
-          cleanup();
-          window.setTimeout(doFallback, 0);
-        };
-
-        if (events?.on) {
-          events.on("routeChangeStart", markStart);
-          events.on("routeChangeComplete", markComplete);
-          events.on("routeChangeError", markError);
+      const normalizeAsPath = (value) => {
+        if (!value) return "";
+        try {
+          const u = new URL(String(value), window.location.origin);
+          return u.pathname + u.search + u.hash;
+        } catch {
+          return String(value);
         }
+      };
 
-        quickFallbackTimer = window.setTimeout(() => {
-          if (didComplete) return;
-          if (!didStart) doFallback();
-        }, 450);
+      const stripLocalePrefix = (asPath) => {
+        const normalized = normalizeAsPath(asPath);
+        const locales = router?.locales || [];
+        for (const locale of locales) {
+          const prefix = `/${locale}`;
+          if (normalized === prefix) return "/";
+          if (normalized.startsWith(`${prefix}/`)) {
+            return normalized.slice(prefix.length) || "/";
+          }
+        }
+        return normalized;
+      };
 
-        stuckFallbackTimer = window.setTimeout(() => {
-          if (didComplete) return;
-          if (didError || didStart) doFallback();
-        }, 2200);
-      },
-    [router?.events, router?.locales]
+      const matchesTarget = (url) => {
+        const normalized = normalizeAsPath(url);
+        return stripLocalePrefix(normalized) === stripLocalePrefix(targetPath);
+      };
+
+      const cleanup = () => {
+        if (!events?.off) return;
+        events.off("routeChangeStart", markStart);
+        events.off("routeChangeComplete", markComplete);
+        events.off("routeChangeError", markError);
+        if (quickFallbackTimer) window.clearTimeout(quickFallbackTimer);
+        if (stuckFallbackTimer) window.clearTimeout(stuckFallbackTimer);
+      };
+
+      const doFallback = () => {
+        if (didFallback) return;
+        if (didComplete) return;
+        didFallback = true;
+        cleanup();
+        window.location.assign(hrefUrl.toString());
+      };
+
+      const markStart = (url) => {
+        if (!matchesTarget(url)) return;
+        didStart = true;
+      };
+      const markComplete = (url) => {
+        if (!matchesTarget(url)) return;
+        didComplete = true;
+        cleanup();
+      };
+      const markError = (url) => {
+        if (!matchesTarget(url)) return;
+        didError = true;
+        cleanup();
+        window.setTimeout(doFallback, 0);
+      };
+
+      if (events?.on) {
+        events.on("routeChangeStart", markStart);
+        events.on("routeChangeComplete", markComplete);
+        events.on("routeChangeError", markError);
+      }
+
+      quickFallbackTimer = window.setTimeout(() => {
+        if (didComplete) return;
+        if (!didStart) doFallback();
+      }, 450);
+
+      stuckFallbackTimer = window.setTimeout(() => {
+        if (didComplete) return;
+        if (didError || didStart) doFallback();
+      }, 2200);
+    },
+    [router?.events, router?.locales],
   );
 
   return (
@@ -162,25 +161,26 @@ export default function WalletDashboardFooter({
             </Link>
           )}
 
-		          {showInfoButton && (
-		            <button
-		              type="button"
-		              onClick={onOpenInfo}
-		              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 font-medium transition-all duration-300"
-		              title={t("wallet_footer_info_title", "Wallet info & fees")}
-		            >
+          {showInfoButton && (
+            <button
+              type="button"
+              onClick={onOpenInfo}
+              className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 font-medium transition-all duration-300"
+              title={t("wallet_footer_info_title", "Wallet info & fees")}
+            >
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
                 i
               </span>
               <span className="hidden sm:inline">
                 {t("wallet_footer_info_fees", "Info & Fees")}
               </span>
-              <span className="sm:hidden">{t("wallet_footer_info", "Info")}</span>
-	            </button>
-	          )}
-
-	        </div>
-	      </div>
-	    </div>
-	  );
-	}
+              <span className="sm:hidden">
+                {t("wallet_footer_info", "Info")}
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

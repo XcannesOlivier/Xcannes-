@@ -40,12 +40,20 @@ export function useTokenDisplayLabels({
 
       const allocated =
         allocatedRlusdByCurrency?.get?.(currency) ??
-        (Number.isFinite(Number(token?.allocatedRlusd)) ? Number(token.allocatedRlusd) : 0);
+        (Number.isFinite(Number(token?.allocatedRlusd))
+          ? Number(token.allocatedRlusd)
+          : 0);
 
       // USD et RLUSD ont un taux fixe de 1 (stablecoin pegged 1:1).
-      const rawRate = (currency === "USD" || currency === "RLUSD") ? 1 : Number(rlusdPerUnitRates?.[currency]);
+      const rawRate =
+        currency === "USD" || currency === "RLUSD"
+          ? 1
+          : Number(rlusdPerUnitRates?.[currency]);
       const units =
-        Number.isFinite(rawRate) && rawRate > 0 && Number.isFinite(allocated) && allocated > 0
+        Number.isFinite(rawRate) &&
+        rawRate > 0 &&
+        Number.isFinite(allocated) &&
+        allocated > 0
           ? allocated / rawRate
           : 0;
 
@@ -60,58 +68,64 @@ export function useTokenDisplayLabels({
 
   const selectLabelByAssetKey = useMemo(() => {
     const labels = {};
-    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      if (token?.key) labels[token.key] = display;
-      labels[code] = display;
-    });
+    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach(
+      (token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        if (!code) return;
+        const display = getDisplayCurrencyCode(code);
+        if (token?.key) labels[token.key] = display;
+        labels[code] = display;
+      },
+    );
     return labels;
   }, [displayTokensWithCurrencyLines, augmentedTokens]);
 
   const selectLabelRightByAssetKey = useMemo(() => {
     const labels = {};
-    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      const amount = Number(token?.value || 0);
-      const amountLabel = Number.isFinite(amount)
-        ? formatAmountWithSymbol(locale, amount, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          })
-        : formatAmountWithSymbol(locale, 0, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          });
-      if (token?.key) labels[token.key] = amountLabel;
-      labels[code] = amountLabel;
-    });
+    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach(
+      (token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        if (!code) return;
+        const display = getDisplayCurrencyCode(code);
+        const amount = Number(token?.value || 0);
+        const amountLabel = Number.isFinite(amount)
+          ? formatAmountWithSymbol(locale, amount, display, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 4,
+            })
+          : formatAmountWithSymbol(locale, 0, display, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 4,
+            });
+        if (token?.key) labels[token.key] = amountLabel;
+        labels[code] = amountLabel;
+      },
+    );
     return labels;
   }, [displayTokensWithCurrencyLines, augmentedTokens, locale]);
 
   const selectLabelMobileByAssetKey = useMemo(() => {
     const labels = {};
-    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach((token) => {
-      const code = String(token?.currency || "").toUpperCase();
-      if (!code) return;
-      const display = getDisplayCurrencyCode(code);
-      const amount = Number(token?.value || 0);
-      const amountLabel = Number.isFinite(amount)
-        ? formatAmountWithSymbol(locale, amount, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          })
-        : formatAmountWithSymbol(locale, 0, display, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
-          });
-      const label = `${display} (${amountLabel})`;
-      if (token?.key) labels[token.key] = label;
-      labels[code] = label;
-    });
+    (displayTokensWithCurrencyLines || augmentedTokens || []).forEach(
+      (token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        if (!code) return;
+        const display = getDisplayCurrencyCode(code);
+        const amount = Number(token?.value || 0);
+        const amountLabel = Number.isFinite(amount)
+          ? formatAmountWithSymbol(locale, amount, display, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 4,
+            })
+          : formatAmountWithSymbol(locale, 0, display, {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 4,
+            });
+        const label = `${display} (${amountLabel})`;
+        if (token?.key) labels[token.key] = label;
+        labels[code] = label;
+      },
+    );
     return labels;
   }, [displayTokensWithCurrencyLines, augmentedTokens, locale]);
 

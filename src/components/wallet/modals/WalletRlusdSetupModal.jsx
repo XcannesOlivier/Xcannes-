@@ -4,7 +4,13 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 const AVAILABLE_DEFAULT_CURRENCIES = [
-  "EUR", "USD", "GBP", "CHF", "CAD", "JPY", "AUD",
+  "EUR",
+  "USD",
+  "GBP",
+  "CHF",
+  "CAD",
+  "JPY",
+  "AUD",
 ];
 
 /**
@@ -13,11 +19,7 @@ const AVAILABLE_DEFAULT_CURRENCIES = [
  * The collected data will be embedded as a wallet_label memo
  * on the TrustSet transaction → free naming, no RLUSD payment.
  */
-export default function WalletRlusdSetupModal({
-  open,
-  onClose,
-  onConfirm,
-}) {
+export default function WalletRlusdSetupModal({ open, onClose, onConfirm }) {
   const { t } = useTranslation("common");
   const [label, setLabel] = useState("");
   const [defaultCurrency, setDefaultCurrency] = useState("");
@@ -37,8 +39,8 @@ export default function WalletRlusdSetupModal({
       setError(
         t(
           "ui_wallet_label_validation_error_f4",
-          "1 or 2 words, max 7 letters per word, A-Z only."
-        )
+          "1 or 2 words, max 7 letters per word, A-Z only.",
+        ),
       );
       return;
     }
@@ -60,7 +62,7 @@ export default function WalletRlusdSetupModal({
         onClose?.();
       }
     },
-    [handleConfirm, onClose]
+    [handleConfirm, onClose],
   );
 
   if (!open) return null;
@@ -76,7 +78,7 @@ export default function WalletRlusdSetupModal({
           <p className="text-[11px] text-white/50">
             {t(
               "ui_rlusd_setup_subtitle_f4",
-              "Choose a name and optionally your default currency. This will be recorded on the RLUSD trustline activation."
+              "Choose a name and optionally your default currency. This will be recorded on the RLUSD trustline activation.",
             )}
           </p>
         </div>
@@ -94,16 +96,20 @@ export default function WalletRlusdSetupModal({
               setError("");
             }}
             onKeyDown={handleKeyDown}
-            placeholder={t("ui_rlusd_setup_placeholder_f4", "e.g. John or My Wallet")}
+            placeholder={t(
+              "ui_rlusd_setup_placeholder_f4",
+              "e.g. John or My Wallet",
+            )}
             autoFocus
             maxLength={15}
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-white/30 focus:ring-1 focus:ring-white/20 transition-all"
           />
-          {error && (
-            <p className="text-[10px] text-red-400">{error}</p>
-          )}
+          {error && <p className="text-[10px] text-red-400">{error}</p>}
           <p className="text-[10px] text-white/40">
-            {t("ui_rlusd_setup_label_hint_f4", "1 or 2 words, max 7 letters each, A-Z only.")}
+            {t(
+              "ui_rlusd_setup_label_hint_f4",
+              "1 or 2 words, max 7 letters each, A-Z only.",
+            )}
           </p>
         </div>
 
@@ -120,7 +126,9 @@ export default function WalletRlusdSetupModal({
               <button
                 key={code}
                 type="button"
-                onClick={() => setDefaultCurrency((prev) => (prev === code ? "" : code))}
+                onClick={() =>
+                  setDefaultCurrency((prev) => (prev === code ? "" : code))
+                }
                 className={[
                   "px-3 py-1.5 rounded-lg border text-xs font-mono transition-all",
                   defaultCurrency === code

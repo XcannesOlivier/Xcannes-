@@ -43,4 +43,3 @@ export function useXrplConnectionIndicator({
     };
   }, [isConnected, isConnecting, isPreviewMode]);
 }
-
