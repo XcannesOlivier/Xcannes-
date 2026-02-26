@@ -38,7 +38,7 @@ import { useWalletToast } from "./hooks/useWalletToast";
 import WalletDesktopModals from "./desktop/WalletDesktopModals";
 import WalletMobileModals from "./mobile/WalletMobileModals";
 import WalletToastOverlay from "./components/WalletToastOverlay";
-import { buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { useWalletNavigation } from "./hooks/useWalletNavigation";
 import { useTranslation } from "next-i18next";
 import {
   getCurrencyFlag,
@@ -131,7 +131,6 @@ export default function WalletDashboard({
   );
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const refreshTimerRef = useRef(null);
   const [activeAction, setActiveAction] = useState(null); // 'send' | 'receive' | 'swap' | 'buy' | 'sell' | null
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
   const [swapLockedView, setSwapLockedView] = useState(null);
@@ -141,7 +140,6 @@ export default function WalletDashboard({
   const [showRlusdSetupModal, setShowRlusdSetupModal] = useState(false);
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
-  const adjustmentAutoOpenedRef = useRef(false);
   const { receiveTab, setReceiveTab } = useReceiveForm();
 
   useEffect(() => {
@@ -425,119 +423,6 @@ export default function WalletDashboard({
   );
   const hasAdjustmentDeficit =
     Number.isFinite(adjustmentDeficitRlusd) && adjustmentDeficitRlusd > 1e-9;
-
-  const submitCurrencyLineAction = useCallback(async ({ action, memoPayload, memoPayloads } = {}) => {
-    if (!wallet || !signTransaction) {
-      toast.error("Please connect your Xumm wallet first.");
-      return null;
-    }
-
-    const payloadList = [];
-    if (Array.isArray(memoPayloads)) {
-      payloadList.push(...memoPayloads);
-    }
-    if (memoPayload) {
-      payloadList.push(memoPayload);
-    }
-    if (payloadList.length > 0) {
-      const memos = [];
-      for (const payload of payloadList) {
-        if (!payload) {
-          toast.error("Invalid memo payload.");
-          return null;
-        }
-        const built = buildXrplJsonMemo(payload);
-        if (!built) {
-          toast.error("Invalid memo payload.");
-          return null;
-        }
-        memos.push(...built);
-      }
-      if (memos.length === 0) {
-        toast.error("Invalid memo payload.");
-        return null;
-      }
-      const txjson = {
-        TransactionType: "Payment",
-        Account: wallet,
-        Destination: wallet,
-        Amount: "1", // 1 drop XRP (memo-only trace, no RLUSD fee)
-        Memos: memos,
-      };
-      const result = await signTransaction(txjson, { action });
-      if (!result?.signed || !result?.uuid) {
-        toast.warn("Action cancelled or expired.");
-        return null;
-      }
-
-      if (refreshBalance) {
-        setTimeout(() => refreshBalance(), 2500);
-      }
-
-      return result.uuid;
-    }
-    toast.error("Invalid memo payload.");
-    return null;
-  }, [refreshBalance, signTransaction, toast, wallet]);
-
-  // 🆕 MISE À JOUR : Activation automatique et GRATUITE lors de la conversion
-  // Les currency lines ne nécessitent plus d'activation manuelle payante.
-  // Elles s'activent automatiquement lors de la première conversion.
-  const handleActivateCurrencyLine = useCallback(
-    async (code) => {
-      const currencyCode = String(code || "").trim().toUpperCase();
-      if (!currencyCode || currencyCode.length < 2) return false;
-      if (currencyCode === "RLUSD" || currencyCode === "XRP") return false;
-
-      // Les lignes de devises sont activées automatiquement et gratuitement
-      // lorsqu'un paiement arrive ou qu'une conversion est effectuée.
-      // Ouvrir le convertisseur pour que l'utilisateur puisse allouer sa première conversion.
-      if (!backendWalletAddress) {
-        toast.error("Please connect your Xumm wallet first.");
-        return false;
-      }
-
-      const alreadyActive = (currencyLines || []).some(
-        (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
-      );
-      if (alreadyActive) {
-        toast.info(
-          t("ui_currency_line_already_active", {
-            defaultValue: "Cette devise est déjà activée dans votre wallet.",
-          })
-        );
-        return false;
-      }
-
-      // Ouvrir le convertisseur avec la devise présélectionnée (activation gratuite)
-      setConvertBaseCurrency("RLUSD");
-      setConvertQuoteCurrency(currencyCode);
-      setConvertAmount("");
-      setSwapDefaultView("convert");
-      setSwapLockedView(null);
-      setActiveAction("swap");
-      return true;
-    },
-    [
-      backendWalletAddress,
-      currencyLines,
-      setActiveAction,
-      setConvertAmount,
-      setConvertBaseCurrency,
-      setConvertQuoteCurrency,
-      setSwapDefaultView,
-      setSwapLockedView,
-      t,
-    ]
-  );
-
-
-
-  const handleUpsertCurrencyLine = useCallback(async () => {
-    await handleUpsertCurrencyLineReal?.();
-  }, [
-    handleUpsertCurrencyLineReal,
-  ]);
 
   const {
     augmentedTokens,
@@ -979,150 +864,50 @@ export default function WalletDashboard({
     activationXrpAmountLabel,
   });
 
-  const handleAction = useCallback(
-    (nextAction) => {
-      closeInlineQr();
-      setWalletInfoOpen(false);
-      // Label requirement disabled — will be re-enabled later.
-      // if (effectiveIsConnected && isWalletLabelRequired) {
-      //   flashWalletHeaderToast("Nom du wallet requis.", 2000);
-      // }
-      if (nextAction === "swap") {
-        setSwapDefaultView("convert");
-        setSwapLockedView(null);
-      }
-      if (nextAction === "cash") {
-        setCashBuyPrefill(null);
-      }
-      setActiveAction(nextAction);
-    },
-    [
-      closeInlineQr,
-      effectiveIsConnected,
-      flashWalletHeaderToast,
-      isWalletLabelRequired,
-      setSwapDefaultView,
-      setSwapLockedView,
-      setCashBuyPrefill,
-    ]
-  );
-
-  const handleOpenCurrencyLines = useCallback(() => {
-    closeInlineQr();
-    setWalletInfoOpen(false);
-    setSwapDefaultView("lines");
-    setSwapLockedView("lines");
-    setActiveAction("swap");
-  }, [closeInlineQr, setSwapDefaultView, setSwapLockedView]);
-
-
-
-  const handleOpenCurrencyStatement = useCallback(
-    (token) => {
-      closeInlineQr();
-      setWalletInfoOpen(false);
-      if (isDesktopPanel) {
-        setActiveAction(null);
-        setShowAdjustmentModal(false);
-        setShowActivationModal(false);
-        setShowActivationRequestModal(false);
-        setShowGlobalStatement(false);
-      }
-      setSelectedStatementToken(token);
-      setShowCurrencyStatement(true);
-    },
-    [
-      closeInlineQr,
-      isDesktopPanel,
-    ]
-  );
-
-  const handleOpenInfo = useCallback(() => {
-    closeInlineQr();
-    if (isDesktopPanel) {
-      setActiveAction(null);
-      setShowAdjustmentModal(false);
-      setShowActivationModal(false);
-      setShowActivationRequestModal(false);
-      setShowCurrencyStatement(false);
-      setSelectedStatementToken(null);
-      setShowGlobalStatement(false);
-    }
-    setWalletInfoOpen(true);
-  }, [closeInlineQr, isDesktopPanel]);
-
-  // Ouvrir le convert (swap modal) depuis d'autres briques UI.
-  // Event detail:
-  // - action: "buy" | "sell"
-  // - base, quote: codes devises (ex: EUR/USD)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const handler = async (event) => {
-      closeInlineQr();
-      setWalletInfoOpen(false);
-      const detail = event?.detail || {};
-      const action = String(detail.action || "").toLowerCase();
-      const base = String(detail.base || "").trim().toUpperCase();
-      const quote = String(detail.quote || "").trim().toUpperCase();
-      if (!base || !quote) return;
-
-      const desiredBase = action === "buy" ? quote : base;
-      const desiredQuote = action === "buy" ? base : quote;
-
-      setConvertBaseCurrency(desiredBase);
-      setConvertQuoteCurrency(desiredQuote === desiredBase ? "RLUSD" : desiredQuote);
-      setConvertAmount("");
-      setSwapDefaultView("convert");
-      setSwapLockedView(null);
-      setActiveAction("swap");
-
-    };
-
-    window.addEventListener("xcannes:wallet:open-convert", handler);
-    return () => window.removeEventListener("xcannes:wallet:open-convert", handler);
-  }, [
-    closeInlineQr,
+  const {
     handleActivateCurrencyLine,
-    setActiveAction,
-    setConvertAmount,
-    setConvertBaseCurrency,
-    setConvertQuoteCurrency,
-    setSwapDefaultView,
-    setSwapLockedView,
-  ]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handler = () => {
-      closeInlineQr();
-      setWalletInfoOpen(false);
-      setShowAdjustmentModal(true);
-    };
-    window.addEventListener("xcannes:wallet:open-adjustment", handler);
-    return () =>
-      window.removeEventListener("xcannes:wallet:open-adjustment", handler);
-  }, [closeInlineQr]);
-
-  useEffect(() => {
-    if (!backendWalletAddress) return;
-    if (!hasAdjustmentDeficit) {
-      adjustmentAutoOpenedRef.current = false;
-      return;
-    }
-    if (adjustmentAutoOpenedRef.current) return;
-    if (activeAction || showAdjustmentModal) return;
-    closeInlineQr();
-    setWalletInfoOpen(false);
-    setShowAdjustmentModal(true);
-    adjustmentAutoOpenedRef.current = true;
-  }, [
-    activeAction,
+    handleUpsertCurrencyLine,
+    handleAction,
+    handleOpenCurrencyLines,
+    handleOpenCurrencyStatement,
+    handleOpenInfo,
+    handleOpenGlobalStatement,
+    handleCopyAddress,
+    handleRefreshWallet,
+  } = useWalletNavigation({
+    effectiveWallet,
+    effectiveIsConnected,
     backendWalletAddress,
-    closeInlineQr,
+    isDesktopPanel,
+    isConnecting,
+    isRefreshing,
+    setIsRefreshing,
+    refreshBalance,
+    currencyLines,
+    handleUpsertCurrencyLineReal,
+    activeAction,
     hasAdjustmentDeficit,
     showAdjustmentModal,
-  ]);
+    closeInlineQr,
+    setActiveAction,
+    setWalletInfoOpen,
+    setSwapDefaultView,
+    setSwapLockedView,
+    setCashBuyPrefill,
+    setShowAdjustmentModal,
+    setShowActivationModal,
+    setShowActivationRequestModal,
+    setShowGlobalStatement,
+    setShowCurrencyStatement,
+    setSelectedStatementToken,
+    setConvertBaseCurrency,
+    setConvertQuoteCurrency,
+    setConvertAmount,
+    flashWalletHeaderToast,
+    isWalletLabelRequired,
+    t,
+    toast,
+  });
 
   const renderTokenRow = useCallback(
     (token) => (
@@ -1177,81 +962,6 @@ export default function WalletDashboard({
     confirm,
   });
 
-  const handleCopyAddress = useCallback(async () => {
-    if (!effectiveWallet || typeof navigator === "undefined") return;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(effectiveWallet);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = effectiveWallet;
-        textarea.setAttribute("readonly", "");
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
-      flashWalletHeaderToast("Adresse copiée", 1600);
-    } catch (e) {
-      console.error("Copy error:", e);
-      flashWalletHeaderToast("Copie impossible", 2000);
-    }
-  }, [effectiveWallet, flashWalletHeaderToast]);
-
-
-
-  const handleRefreshWallet = useCallback(async () => {
-    if (isConnecting || isRefreshing) return;
-    const startedAt = Date.now();
-    setIsRefreshing(true);
-    try {
-      const tasks = [];
-      if (typeof refreshBalance === "function") {
-        tasks.push(Promise.resolve(refreshBalance()));
-      }
-      if (typeof window !== "undefined" && backendWalletAddress) {
-        window.dispatchEvent(
-          new CustomEvent("xcannes:wallet:refresh", {
-            detail: { address: backendWalletAddress },
-          })
-        );
-      }
-      if (tasks.length > 0) await Promise.allSettled(tasks);
-    } finally {
-      const minDurationMs = 700;
-      const elapsed = Date.now() - startedAt;
-      const remaining = minDurationMs - elapsed;
-      if (refreshTimerRef.current) {
-        clearTimeout(refreshTimerRef.current);
-        refreshTimerRef.current = null;
-      }
-      if (remaining > 0) {
-        refreshTimerRef.current = setTimeout(() => {
-          setIsRefreshing(false);
-          refreshTimerRef.current = null;
-        }, remaining);
-      } else {
-        setIsRefreshing(false);
-      }
-    }
-  }, [
-    backendWalletAddress,
-    isConnecting,
-    isRefreshing,
-    refreshBalance,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      if (refreshTimerRef.current) {
-        clearTimeout(refreshTimerRef.current);
-        refreshTimerRef.current = null;
-      }
-    };
-  }, []);
-
   const { usdRates, totalLabel } = useUsdTotalLabel({
     augmentedTokens,
     isPreviewMode: false,
@@ -1300,25 +1010,6 @@ export default function WalletDashboard({
     showAdjustmentModal,
     showCurrencyStatement,
     walletInfoOpen,
-  ]);
-
-  const handleOpenGlobalStatement = useCallback(() => {
-    closeInlineQr();
-    setWalletInfoOpen(false);
-    if (isDesktopPanel) {
-      setActiveAction(null);
-      setShowAdjustmentModal(false);
-      setShowActivationModal(false);
-      setShowActivationRequestModal(false);
-      setShowCurrencyStatement(false);
-      setSelectedStatementToken(null);
-      setShowGlobalStatement(false);
-      return;
-    }
-    setShowGlobalStatement(true);
-  }, [
-    closeInlineQr,
-    isDesktopPanel,
   ]);
 
   const isXummInlineOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
