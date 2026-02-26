@@ -34,6 +34,9 @@ export function useWalletActivation({
   // Activation XRP
   activationXrpAmount,
   activationXrpAmountLabel,
+  // useWalletToast()
+  toast,
+  confirm,
 }) {
   // ------------------------------------------------------------------
   // handleInstallRequiredTrustline
@@ -43,17 +46,17 @@ export function useWalletActivation({
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return;
       if (!isConnected || !wallet) {
-        alert("Please connect your Xumm wallet first.");
+        toast.error("Please connect your Xumm wallet first.");
         return;
       }
 
       const issuer = XRPL_KNOWN_ISSUERS?.[code] || null;
       if (!issuer) {
-        alert(`Missing issuer configuration for ${code}.`);
+        toast.error(`Missing issuer configuration for ${code}.`);
         return;
       }
 
-      const ok = confirm(
+      const ok = await confirm(
         `Install XRPL trustline for ${code}?\n\nThis will open Xumm to sign a TrustSet transaction.`
       );
       if (!ok) return;
@@ -87,7 +90,7 @@ export function useWalletActivation({
       try {
         const result = await signTransaction(txjson);
         if (result && result.signed) {
-          alert(`✅ Trustline ${code} submitted via Xumm.`);
+          toast.success(`✅ Trustline ${code} submitted via Xumm.`);
           if (refreshBalance) {
             setTimeout(() => refreshBalance(), 2500);
           }
@@ -96,14 +99,14 @@ export function useWalletActivation({
             setTimeout(() => loadWalletLabel(), 3000);
           }
         } else {
-          alert("Transaction cancelled or expired.");
+          toast.warn("Transaction cancelled or expired.");
         }
       } catch (err) {
         console.error("Install trustline error:", err);
-        alert("Error while preparing trustline: " + (err?.message || String(err)));
+        toast.error("Error while preparing trustline: " + (err?.message || String(err)));
       }
     },
-    [isConnected, loadWalletLabel, refreshBalance, signTransaction, wallet]
+    [isConnected, loadWalletLabel, refreshBalance, signTransaction, toast, confirm, wallet]
   );
 
   // ------------------------------------------------------------------
@@ -159,7 +162,7 @@ export function useWalletActivation({
   const handleActivationSendFromWallet = useCallback(async () => {
     setShowActivationModal(false);
     if (!wallet || !signTransaction) {
-      alert("Please connect your Xumm wallet first.");
+      toast.error("Please connect your Xumm wallet first.");
       return;
     }
 

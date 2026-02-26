@@ -34,8 +34,10 @@ import WalletDashboardTokenRow from "./components/WalletDashboardTokenRow";
 import { useWalletModalProps } from "./hooks/useWalletModalProps";
 import { useSendTransaction } from "./hooks/useSendTransaction";
 import { useWalletActivation } from "./hooks/useWalletActivation";
+import { useWalletToast } from "./hooks/useWalletToast";
 import WalletDesktopModals from "./desktop/WalletDesktopModals";
 import WalletMobileModals from "./mobile/WalletMobileModals";
+import WalletToastOverlay from "./components/WalletToastOverlay";
 import { buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
@@ -111,6 +113,8 @@ export default function WalletDashboard({
     signTransaction,
     closeQrModal,
   } = useWallet();
+
+  const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } = useWalletToast();
 
   const effectiveIsConnected = isConnected;
   const effectiveWallet = wallet;
@@ -424,7 +428,7 @@ export default function WalletDashboard({
 
   const submitCurrencyLineAction = useCallback(async ({ action, memoPayload, memoPayloads } = {}) => {
     if (!wallet || !signTransaction) {
-      alert("Please connect your Xumm wallet first.");
+      toast.error("Please connect your Xumm wallet first.");
       return null;
     }
 
@@ -439,18 +443,18 @@ export default function WalletDashboard({
       const memos = [];
       for (const payload of payloadList) {
         if (!payload) {
-          alert("Invalid memo payload.");
+          toast.error("Invalid memo payload.");
           return null;
         }
         const built = buildXrplJsonMemo(payload);
         if (!built) {
-          alert("Invalid memo payload.");
+          toast.error("Invalid memo payload.");
           return null;
         }
         memos.push(...built);
       }
       if (memos.length === 0) {
-        alert("Invalid memo payload.");
+        toast.error("Invalid memo payload.");
         return null;
       }
       const txjson = {
@@ -462,7 +466,7 @@ export default function WalletDashboard({
       };
       const result = await signTransaction(txjson, { action });
       if (!result?.signed || !result?.uuid) {
-        alert("Action cancelled or expired.");
+        toast.warn("Action cancelled or expired.");
         return null;
       }
 
@@ -472,9 +476,9 @@ export default function WalletDashboard({
 
       return result.uuid;
     }
-    alert("Invalid memo payload.");
+    toast.error("Invalid memo payload.");
     return null;
-  }, [refreshBalance, signTransaction, wallet]);
+  }, [refreshBalance, signTransaction, toast, wallet]);
 
   // 🆕 MISE À JOUR : Activation automatique et GRATUITE lors de la conversion
   // Les currency lines ne nécessitent plus d'activation manuelle payante.
@@ -489,7 +493,7 @@ export default function WalletDashboard({
       // lorsqu'un paiement arrive ou qu'une conversion est effectuée.
       // Ouvrir le convertisseur pour que l'utilisateur puisse allouer sa première conversion.
       if (!backendWalletAddress) {
-        alert("Please connect your Xumm wallet first.");
+        toast.error("Please connect your Xumm wallet first.");
         return false;
       }
 
@@ -497,7 +501,7 @@ export default function WalletDashboard({
         (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
       );
       if (alreadyActive) {
-        alert(
+        toast.info(
           t("ui_currency_line_already_active", {
             defaultValue: "Cette devise est déjà activée dans votre wallet.",
           })
@@ -960,6 +964,8 @@ export default function WalletDashboard({
     signTransaction,
     refreshBalance,
     loadWalletLabel,
+    toast,
+    confirm,
     closeInlineQr,
     setWalletInfoOpen,
     setShowActivationModal,
@@ -1167,6 +1173,8 @@ export default function WalletDashboard({
     rlusdPerUnitSources,
     allocatedRlusdByCurrency,
     refreshCurrencyLines,
+    toast,
+    confirm,
   });
 
   const handleCopyAddress = useCallback(async () => {
@@ -1608,6 +1616,12 @@ export default function WalletDashboard({
           />
         ) : null}
       </div>
+      <WalletToastOverlay
+        toasts={toasts}
+        confirmState={confirmState}
+        dismissToast={dismissToast}
+        resolveConfirm={resolveConfirm}
+      />
     </>
   );
 }

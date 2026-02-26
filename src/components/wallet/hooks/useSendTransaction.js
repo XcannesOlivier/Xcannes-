@@ -88,6 +88,9 @@ export function useSendTransaction({
   allocatedRlusdByCurrency,
   // useWalletCurrencyLines()
   refreshCurrencyLines,
+  // useWalletToast()
+  toast,
+  confirm,
 }) {
   // ------------------------------------------------------------------
   // handleSendSubmit
@@ -110,30 +113,30 @@ export function useSendTransaction({
     };
 
     if (!isConnected || !wallet) {
-      alert("Please connect your Xumm wallet first.");
+      toast.error("Please connect your Xumm wallet first.");
       return { ok: false };
     }
     if (!selectedSendToken) {
-      alert("No asset selected.");
+      toast.error("No asset selected.");
       return { ok: false };
     }
     if (
       (selectedSendToken?.currency === "RLUSD" || selectedSendToken?.currency === "USD") &&
       !hasOnChainRlusd
     ) {
-      alert("RLUSD trustline is not installed yet. Please install it first.");
+      toast.error("RLUSD trustline is not installed yet. Please install it first.");
       return { ok: false };
     }
 
     const amountNum = parseFloat(sendAmount);
     if (!Number.isFinite(amountNum) || amountNum <= 0) {
-      alert("Please enter a valid amount.");
+      toast.error("Please enter a valid amount.");
       return { ok: false };
     }
 
     const dest = (sendDestination || "").trim();
     if (!dest || !dest.startsWith("r") || dest.length < 25) {
-      alert("Please enter a valid XRPL destination address.");
+      toast.error("Please enter a valid XRPL destination address.");
       return { ok: false };
     }
 
@@ -166,7 +169,7 @@ export function useSendTransaction({
       });
     } catch (err) {
       console.error("Send payment error:", err);
-      alert("Error while preparing payment: " + (err?.message || String(err)));
+      toast.error("Error while preparing payment: " + (err?.message || String(err)));
       return { ok: false };
     } finally {
       setSendProcessing(false);
@@ -178,11 +181,11 @@ export function useSendTransaction({
   // ------------------------------------------------------------------
   async function handleFxSend({ amountNum, dest, currency, handleAddressSave }) {
     if (!backendWalletAddress) {
-      alert("Please connect your Xumm wallet first.");
+      toast.error("Please connect your Xumm wallet first.");
       return { ok: false };
     }
     if (!hasOnChainRlusd) {
-      alert("RLUSD trustline is not installed yet. Please install it first.");
+      toast.error("RLUSD trustline is not installed yet. Please install it first.");
       return { ok: false };
     }
 
@@ -208,7 +211,7 @@ export function useSendTransaction({
       ? effectiveRate
       : Number.NaN;
     if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) {
-      alert(`Impossible de récupérer le taux pour ${currency}.`);
+      toast.error(`Impossible de récupérer le taux pour ${currency}.`);
       return { ok: false };
     }
 
@@ -224,14 +227,14 @@ export function useSendTransaction({
 
     if (requestTargetCurrency && requestTargetCurrency !== currency) {
       if (!Number.isFinite(requestedRlusd) || requestedRlusd <= 0) {
-        alert("Montant RLUSD demandé manquant pour cette demande.");
+        toast.error("Montant RLUSD demandé manquant pour cette demande.");
         return { ok: false };
       }
       isAlternateCurrency = true;
       paymentRlusd = requestedRlusd;
       effectiveAmountNum = paymentRlusd / rlusdPerUnit;
       if (!Number.isFinite(effectiveAmountNum) || effectiveAmountNum <= 0) {
-        alert("Impossible de calculer le montant dans la devise sélectionnée.");
+        toast.error("Impossible de calculer le montant dans la devise sélectionnée.");
         return { ok: false };
       }
     }
@@ -239,7 +242,7 @@ export function useSendTransaction({
     if (Number.isFinite(requestedRlusd)) {
       const diff = Math.abs(paymentRlusd - requestedRlusd);
       if (diff > Math.max(0.01, requestedRlusd * 0.005)) {
-        alert(
+        toast.warn(
           `Montant RLUSD différent de la demande.\n\n` +
             `Demandé: ≈ ${requestedRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n` +
             `Calculé: ≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n\n` +
@@ -270,7 +273,7 @@ export function useSendTransaction({
           ? availableAllocatedRlusd / (1 + Number(spread.halfSpreadFraction))
           : availableAllocatedRlusd;
       const maxFx = maxPaymentRlusd > 0 ? maxPaymentRlusd / rlusdPerUnit : 0;
-      alert(
+      toast.warn(
         `Allocation insuffisante en ${currency} pour couvrir paiement + frais de conversion.\n\n` +
           `Disponible: ≈ ${availableAllocatedRlusd.toLocaleString("en-US", {
             maximumFractionDigits: 6,
@@ -290,7 +293,7 @@ export function useSendTransaction({
     const requestedDisplayCurrency =
       sendPaymentRequest?.displayCurrency || requestTargetCurrency || null;
 
-    const ok = confirm(
+    const ok = await confirm(
       `Paiement en RLUSD (affiché en ${currency}).\n\n` +
         (isAlternateCurrency && requestedDisplayCurrency
           ? `Demande: ${requestedDisplayAmount != null
@@ -355,7 +358,7 @@ export function useSendTransaction({
         action: "wallet:convert",
       });
       if (!spreadResult?.signed) {
-        alert("Conversion fee payment cancelled or expired.");
+        toast.warn("Conversion fee payment cancelled or expired.");
         return { ok: false };
       }
     }
@@ -418,7 +421,7 @@ export function useSendTransaction({
       action: "wallet:convert",
     });
     if (payResult?.signed) {
-      alert("✅ Payment submitted via Xumm.");
+      toast.success("✅ Payment submitted via Xumm.");
 
       handleAddressSave(dest);
 
@@ -429,7 +432,7 @@ export function useSendTransaction({
       if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 3000);
       return { ok: true };
     } else {
-      alert(
+      toast.warn(
         spreadFeeRlusd > 0
           ? "Payment cancelled or expired. (Conversion fee was already paid.)"
           : "Transaction cancelled or expired."
@@ -453,7 +456,7 @@ export function useSendTransaction({
         amountRlusd: amountNum,
       });
       if (!rlusdTxjson) {
-        alert("Failed to build RLUSD payment.");
+        toast.error("Failed to build RLUSD payment.");
         return { ok: false };
       }
       Amount = rlusdTxjson.Amount;
@@ -515,7 +518,7 @@ export function useSendTransaction({
 
     const result = await signTransaction(txjson);
     if (result && result.signed) {
-      alert("✅ Payment submitted via Xumm.");
+      toast.success("✅ Payment submitted via Xumm.");
       handleAddressSave(dest);
 
       setSendAmount("");
@@ -526,7 +529,7 @@ export function useSendTransaction({
       }
       return { ok: true };
     } else {
-      alert("Transaction cancelled or expired.");
+      toast.warn("Transaction cancelled or expired.");
       return { ok: false };
     }
   }
