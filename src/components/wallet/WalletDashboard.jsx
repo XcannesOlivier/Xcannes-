@@ -1789,9 +1789,10 @@ export default function WalletDashboard({
     (nextAction) => {
       closeInlineQr();
       setWalletInfoOpen(false);
-      if (effectiveIsConnected && isWalletLabelRequired) {
-        flashWalletHeaderToast("Nom du wallet requis.", 2000);
-      }
+      // Label requirement disabled — will be re-enabled later.
+      // if (effectiveIsConnected && isWalletLabelRequired) {
+      //   flashWalletHeaderToast("Nom du wallet requis.", 2000);
+      // }
       if (nextAction === "swap") {
         setSwapDefaultView("convert");
         setSwapLockedView(null);
