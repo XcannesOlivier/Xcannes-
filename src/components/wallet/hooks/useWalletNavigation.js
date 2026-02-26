@@ -15,8 +15,8 @@ import { useCallback, useEffect, useRef } from "react";
  */
 export function useWalletNavigation({
   // wallet state
-  effectiveWallet,
-  effectiveIsConnected,
+  wallet,
+  isConnected,
   backendWalletAddress,
   isDesktopPanel,
   isConnecting,
@@ -119,7 +119,7 @@ export function useWalletNavigation({
       closeInlineQr();
       setWalletInfoOpen(false);
       // Label requirement disabled — will be re-enabled later.
-      // if (effectiveIsConnected && isWalletLabelRequired) {
+      // if (isConnected && isWalletLabelRequired) {
       //   flashWalletHeaderToast("Nom du wallet requis.", 2000);
       // }
       if (nextAction === "swap") {
@@ -133,7 +133,7 @@ export function useWalletNavigation({
     },
     [
       closeInlineQr,
-      effectiveIsConnected,
+      isConnected,
       flashWalletHeaderToast,
       isWalletLabelRequired,
       setSwapDefaultView,
@@ -208,13 +208,13 @@ export function useWalletNavigation({
   // ─── Copy wallet address ──────────────────────────────────────────────
 
   const handleCopyAddress = useCallback(async () => {
-    if (!effectiveWallet || typeof navigator === "undefined") return;
+    if (!wallet || typeof navigator === "undefined") return;
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(effectiveWallet);
+        await navigator.clipboard.writeText(wallet);
       } else {
         const textarea = document.createElement("textarea");
-        textarea.value = effectiveWallet;
+        textarea.value = wallet;
         textarea.setAttribute("readonly", "");
         textarea.style.position = "fixed";
         textarea.style.left = "-9999px";
@@ -228,7 +228,7 @@ export function useWalletNavigation({
       console.error("Copy error:", e);
       flashWalletHeaderToast("Copie impossible", 2000);
     }
-  }, [effectiveWallet, flashWalletHeaderToast]);
+  }, [wallet, flashWalletHeaderToast]);
 
   // ─── Refresh wallet ───────────────────────────────────────────────────
 

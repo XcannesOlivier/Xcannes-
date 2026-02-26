@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { getCurrencyFlag, getDisplayCurrencyCode, getTokenIcon, TOKEN_ICONS } from "../demoWalletDashboardConfig";
+import {
+  getCurrencyFlag,
+  getDisplayCurrencyCode,
+  getTokenIcon,
+  TOKEN_ICONS,
+} from "../demoWalletDashboardConfig";
 
 export default function DemoWalletDashboardCurrencyLinesPanel({
   currencyLinesLoading,
@@ -13,7 +18,7 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
   onRefresh,
   onDelete,
   inline = false,
-  className = ""
+  className = "",
 }) {
   const { t } = useTranslation("common");
   const neutralActionBtnMuted =
@@ -27,11 +32,13 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
   const [confirmingCode, setConfirmingCode] = useState(null);
   const confirmBubbleRef = useRef(null);
   const normalizedLines = useMemo(() => {
-    return (currencyLines || []).map((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
-      return { code, allocated, isDerived: Boolean(line?.isDerived) };
-    }).filter(Boolean);
+    return (currencyLines || [])
+      .map((line) => {
+        const code = String(line?.currencyCode || "").toUpperCase();
+        const allocated = Number.parseFloat(line?.allocatedRlusd ?? 0) || 0;
+        return { code, allocated, isDerived: Boolean(line?.isDerived) };
+      })
+      .filter(Boolean);
   }, [currencyLines]);
   useEffect(() => {
     if (!confirmingCode) return;
@@ -70,48 +77,55 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
     if (typeof icon === "string" || typeof icon === "number") {
       return <span className="text-lg leading-none">{icon}</span>;
     }
-    return <span className="text-lg leading-none">{resolveFallbackIcon(upper)}</span>;
+    return (
+      <span className="text-lg leading-none">{resolveFallbackIcon(upper)}</span>
+    );
   };
   const rootClassName = [
     "rounded-xl border border-white/10 bg-black/20 p-3 space-y-2",
     inline ? "flex flex-col min-h-0" : "",
-    className
-  ].filter(Boolean).join(" ");
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const listClassName = inline
     ? "flex-1 min-h-0 overflow-y-auto pr-1 space-y-2"
     : "max-h-44 overflow-y-auto pr-1 space-y-2";
   return (
     <div className={rootClassName}>
       <div className="flex items-center justify-between gap-2">
-        <div className="text-[11px] font-semibold text-white/80">{t("ui_currency_lines_active_f4", "Active currency lines")}
-
+        <div className="text-[11px] font-semibold text-white/80">
+          {t("ui_currency_lines_active_f4", "Active currency lines")}
         </div>
       </div>
 
-      {currencyLinesError &&
-      <div className="text-[11px] text-red-400">{currencyLinesError}</div>
-      }
+      {currencyLinesError && (
+        <div className="text-[11px] text-red-400">{currencyLinesError}</div>
+      )}
 
       <div className={inline ? "flex flex-col min-h-0 gap-2" : "space-y-2"}>
-        {normalizedLines.length === 0 ?
-        <div className="text-[11px] text-white/40">{t("ui_no_currency_lines_yet_9630af229d", "No currency lines yet.")}</div> :
-
-        <div className={listClassName}>
-	            {normalizedLines.map((line) => {
+        {normalizedLines.length === 0 ? (
+          <div className="text-[11px] text-white/40">
+            {t("ui_no_currency_lines_yet_9630af229d", "No currency lines yet.")}
+          </div>
+        ) : (
+          <div className={listClassName}>
+            {normalizedLines.map((line) => {
               const displayCode = getDisplayCurrencyCode(line.code);
               const isConfirming = confirmingCode === line.code;
-              const canDelete = !line.isDerived && Number(line.allocated || 0) <= 0;
-	              return (
-	                <div key={line.code} className="space-y-2">
-	                  <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-2">
+              const canDelete =
+                !line.isDerived && Number(line.allocated || 0) <= 0;
+              return (
+                <div key={line.code} className="space-y-2">
+                  <div className="flex items-center justify-between gap-2 rounded-lg border border-white/10 bg-black/30 px-2 py-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-8 h-8 flex items-center justify-center rounded-full">
                         {renderLineIcon(line.code)}
                       </div>
-	                      <div className="min-w-0">
-	                        <div className="font-mono text-[11px] text-white/80">
-	                          {displayCode}
-	                        </div>
+                      <div className="min-w-0">
+                        <div className="font-mono text-[11px] text-white/80">
+                          {displayCode}
+                        </div>
                         <div className="text-[10px] text-white/40">
                           {t("ui_currency_line_active_label_f4", "Active")}
                         </div>
@@ -123,11 +137,11 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
                         onClick={(e) => {
                           e.stopPropagation();
                           setConfirmingCode((prev) =>
-                            prev === line.code ? null : line.code
+                            prev === line.code ? null : line.code,
                           );
                         }}
-                        className={`px-2 py-1 text-[10px] ${redActionBtnMuted}`}>
-
+                        className={`px-2 py-1 text-[10px] ${redActionBtnMuted}`}
+                      >
                         {t("delete", "Delete")}
                       </button>
                     ) : (
@@ -147,7 +161,7 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
                           <div className="font-semibold">
                             {t(
                               "ui_currency_line_delete_title_f4",
-                              "Delete currency line"
+                              "Delete currency line",
                             )}
                           </div>
                           <div className="text-red-200/80">
@@ -155,12 +169,12 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
                               ? t(
                                   "ui_currency_line_delete_confirm_f4",
                                   "Delete {{code}} ?",
-                                  { code: line.code }
+                                  { code: line.code },
                                 )
                               : t(
                                   "ui_currency_line_delete_zero_note_f4",
                                   "Balance must be 0 {{code}} to delete this line.",
-                                  { code: line.code }
+                                  { code: line.code },
                                 )}
                           </div>
                         </div>
@@ -207,8 +221,8 @@ export default function DemoWalletDashboardCurrencyLinesPanel({
               );
             })}
           </div>
-        }
+        )}
       </div>
-    </div>);
-
+    </div>
+  );
 }

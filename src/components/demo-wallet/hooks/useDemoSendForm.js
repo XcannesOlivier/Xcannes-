@@ -10,7 +10,9 @@ export function useDemoSendForm({
 } = {}) {
   const [sendTab, setSendTab] = useState(defaultSendTab); // 'manual' | 'scan-request'
   const [sendAssetKey, setSendAssetKey] = useState(defaultSendAssetKey);
-  const [sendDestination, setSendDestination] = useState(defaultSendDestination);
+  const [sendDestination, setSendDestination] = useState(
+    defaultSendDestination,
+  );
   const [sendAmount, setSendAmount] = useState(defaultSendAmount);
   const [sendProcessing, setSendProcessing] = useState(false);
   const [sendPaymentRequest, setSendPaymentRequest] = useState(null);

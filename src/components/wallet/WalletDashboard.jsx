@@ -109,16 +109,12 @@ export default function WalletDashboard({
   const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } =
     useWalletToast();
 
-  const effectiveIsConnected = isConnected;
-  const effectiveWallet = wallet;
-  const effectiveBalance = balance;
-
   const baseTokens = useMemo(
     () =>
-      (effectiveBalance?.tokens || []).filter((tok) =>
+      (balance?.tokens || []).filter((tok) =>
         isAcceptedOnChainToken(tok?.currency),
       ),
-    [effectiveBalance?.tokens],
+    [balance?.tokens],
   );
   const hasOnChainRlusd = (baseTokens || []).some(
     (tok) => String(tok?.currency || "").toUpperCase() === "RLUSD",
@@ -174,7 +170,7 @@ export default function WalletDashboard({
 
   // Demandes de paiement en attente (sauvegardées localement)
   const { pendingPayreqs, savePayreq, removePayreq, pendingCount } =
-    usePayreqStorage({ walletAddress: effectiveWallet?.address || null });
+    usePayreqStorage({ walletAddress: wallet?.address || null });
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
   const [addressLabel, setAddressLabel] = useState("");
@@ -192,8 +188,8 @@ export default function WalletDashboard({
     cancelWalletLabel: handleCancelWalletLabel,
     loadWalletLabel,
   } = useWalletLabel({
-    walletAddress: effectiveWallet,
-    isConnected: effectiveIsConnected,
+    walletAddress: wallet,
+    isConnected: isConnected,
     isPreviewMode: false,
     isWalletActivated,
     hasOnChainRlusd,
@@ -206,7 +202,7 @@ export default function WalletDashboard({
     String(walletLabel || "").trim() !== defaultWalletLabel,
   );
   const { renderWalletMeta } = useWalletMeta({
-    walletAddress: effectiveWallet,
+    walletAddress: wallet,
     walletLabel,
     hideAddress: false,
   });
@@ -290,7 +286,7 @@ export default function WalletDashboard({
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
 
-  const xrpAmount = parseFloat(effectiveBalance?.xrp || 0) || 0;
+  const xrpAmount = parseFloat(balance?.xrp || 0) || 0;
 
   const isStablecoin = useCallback((currency) => {
     return USD_STABLECOINS.includes(String(currency || "").toUpperCase());
@@ -334,7 +330,7 @@ export default function WalletDashboard({
   }, [xrpAmount]);
 
   // Adresse backend (session API)
-  const backendWalletAddress = effectiveWallet || null;
+  const backendWalletAddress = wallet || null;
 
   const {
     lines: currencyLines,
@@ -619,7 +615,7 @@ export default function WalletDashboard({
   });
   useSwapConversion({
     isPreviewMode: false,
-    effectiveIsConnected,
+    isConnected,
     backendWalletAddress,
     walletAddress: wallet,
     signTransaction,
@@ -783,8 +779,8 @@ export default function WalletDashboard({
     handleActivationBuyViaMoonpay,
     handleActivationSendFromWallet,
   } = useWalletActivation({
-    isConnected: effectiveIsConnected,
-    wallet: effectiveWallet,
+    isConnected: isConnected,
+    wallet: wallet,
     signTransaction,
     refreshBalance,
     loadWalletLabel,
@@ -814,8 +810,8 @@ export default function WalletDashboard({
     handleCopyAddress,
     handleRefreshWallet,
   } = useWalletNavigation({
-    effectiveWallet,
-    effectiveIsConnected,
+    wallet,
+    isConnected,
     backendWalletAddress,
     isDesktopPanel,
     isConnecting,
@@ -874,8 +870,8 @@ export default function WalletDashboard({
   );
 
   const { handleSendSubmit } = useSendTransaction({
-    isConnected: effectiveIsConnected,
-    wallet: effectiveWallet,
+    isConnected: isConnected,
+    wallet: wallet,
     signTransaction,
     refreshBalance,
     hasOnChainRlusd,
@@ -920,7 +916,7 @@ export default function WalletDashboard({
   const xrplConnectionIndicator = useXrplConnectionIndicator({
     isPreviewMode: false,
     isConnecting,
-    isConnected: effectiveIsConnected,
+    isConnected: isConnected,
   });
 
   useEffect(() => {
@@ -1026,8 +1022,8 @@ export default function WalletDashboard({
 
   // --- Shared modal props (desktop & mobile) ---
   const modalProps = useWalletModalProps({
-    effectiveWallet,
-    effectiveIsConnected,
+    wallet,
+    isConnected,
     variant,
     isWalletActivated,
     hasRlusdTrustline,
@@ -1184,8 +1180,8 @@ export default function WalletDashboard({
           {/* Header */}
           <WalletDashboardHeader
             layout={layout}
-            effectiveIsConnected={effectiveIsConnected}
-            effectiveWallet={effectiveWallet}
+            isConnected={isConnected}
+            wallet={wallet}
             onDisconnect={disconnect}
             totalLabel={totalLabel}
             xrplConnectionIndicator={xrplConnectionIndicator}

@@ -7,10 +7,10 @@ export function useDemoCurrencyLinesForm({
   defaultAllocatedRlusd = "",
 } = {}) {
   const [currencyLineCode, setCurrencyLineCode] = useState(
-    defaultCurrencyLineCode
+    defaultCurrencyLineCode,
   );
   const [currencyLineAllocatedRlusd, setCurrencyLineAllocatedRlusd] = useState(
-    defaultAllocatedRlusd
+    defaultAllocatedRlusd,
   );
 
   return {

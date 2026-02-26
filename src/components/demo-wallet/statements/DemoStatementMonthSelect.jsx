@@ -6,7 +6,7 @@ export default function DemoStatementMonthSelect({
   value,
   onChange,
   options = [],
-  menuClassName = "bg-elevated"
+  menuClassName = "bg-elevated",
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -16,7 +16,8 @@ export default function DemoStatementMonthSelect({
     if (!open) return;
     const handleClick = (event) => {
       if (menuRef.current && menuRef.current.contains(event.target)) return;
-      if (triggerRef.current && triggerRef.current.contains(event.target)) return;
+      if (triggerRef.current && triggerRef.current.contains(event.target))
+        return;
       setOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
