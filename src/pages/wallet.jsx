@@ -55,7 +55,6 @@ export default function Wallet() {
 	        <div className="w-full md:max-w-5xl lg:max-w-[1600px] min-h-[100svh] h-auto md:h-full md:min-h-0 mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6">
 	          <div className="bg-[#0b0f10] min-h-[100svh] h-auto overflow-visible md:h-full md:min-h-0 md:overflow-hidden border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]">
 	            <WalletDashboard
-	              preview={false}
 	              variant="full"
               showDesktopStatement
               qrSizingVariant="dex"
