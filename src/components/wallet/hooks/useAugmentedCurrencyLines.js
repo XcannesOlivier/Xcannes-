@@ -108,7 +108,10 @@ export function useAugmentedCurrencyLines({
 
   const currencyLineCodes = useMemo(() => {
     const codes = new Set();
-    (currencyLines || []).forEach((line) => {
+    // Utiliser augmentedCurrencyLines (inclut les lignes par défaut
+    // USD, EUR, CHF, GBP, CAD, JPY, AED…) pour que useRlusdPerUnitRates
+    // récupère les taux de TOUTES les devises affichées.
+    (augmentedCurrencyLines || []).forEach((line) => {
       const code = String(line?.currencyCode || "")
         .trim()
         .toUpperCase();
@@ -117,7 +120,7 @@ export function useAugmentedCurrencyLines({
     // Exclure les actifs XRPL (affichés on-chain), garder les devises "UX".
     ["XRP", "RLUSD", "USD"].forEach((c) => codes.delete(c));
     return Array.from(codes);
-  }, [currencyLines]);
+  }, [augmentedCurrencyLines]);
 
   return {
     augmentedCurrencyLines,
