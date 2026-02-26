@@ -21,14 +21,16 @@ export function useDemoPaymentRequestScanner({
       setSendDestination?.(address);
       setQrScannerOpen(false);
     },
-    [setSendDestination]
+    [setSendDestination],
   );
 
   const handlePaymentRequestScan = useCallback(
     (data) => {
       const raw = String(data || "").trim();
       const decodePrefixedPayreq = (value) => {
-        const match = value.match(/^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i);
+        const match = value.match(
+          /^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i,
+        );
         if (!match) return null;
         const payload = String(match[2] || "").trim();
         if (!payload) return null;
@@ -44,7 +46,9 @@ export function useDemoPaymentRequestScanner({
       const prefixedDecoded = decodePrefixedPayreq(raw);
       const payload = prefixedDecoded || raw;
 
-      const looksLikeXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(payload);
+      const looksLikeXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(
+        payload,
+      );
 
       const tryParseUri = (value) => {
         try {
@@ -67,7 +71,9 @@ export function useDemoPaymentRequestScanner({
                 "===".slice((raw.length + 3) % 4);
               const json = Buffer.from(padded, "base64").toString("utf8");
               const parsed = JSON.parse(json);
-              return parsed && typeof parsed === "object" ? { request: parsed } : null;
+              return parsed && typeof parsed === "object"
+                ? { request: parsed }
+                : null;
             } catch {
               // fallthrough
             }
@@ -95,7 +101,7 @@ export function useDemoPaymentRequestScanner({
         if (currency) {
           const upper = String(currency).toUpperCase();
           const matchingToken = (augmentedTokens || []).find(
-            (t) => String(t.currency || "").toUpperCase() === upper
+            (t) => String(t.currency || "").toUpperCase() === upper,
           );
           if (matchingToken) {
             setSendAssetKey?.(matchingToken.key);
@@ -110,17 +116,25 @@ export function useDemoPaymentRequestScanner({
         if (!request || typeof request !== "object") return request;
         const normalized = { ...request };
         if (request.s && !normalized.schema) normalized.schema = request.s;
-        if (request.tc && !normalized.targetCurrency) normalized.targetCurrency = request.tc;
+        if (request.tc && !normalized.targetCurrency)
+          normalized.targetCurrency = request.tc;
         if (request.t && !normalized.to) normalized.to = request.t;
-        if (request.da != null && normalized.displayAmount == null) normalized.displayAmount = request.da;
-        if (request.dc && !normalized.displayCurrency) normalized.displayCurrency = request.dc;
-        if (request.ar != null && normalized.amountRlusd == null) normalized.amountRlusd = request.ar;
-        if (request.fr != null && normalized.fxRate == null) normalized.fxRate = request.fr;
-        if (request.fs && !normalized.fxSource) normalized.fxSource = request.fs;
+        if (request.da != null && normalized.displayAmount == null)
+          normalized.displayAmount = request.da;
+        if (request.dc && !normalized.displayCurrency)
+          normalized.displayCurrency = request.dc;
+        if (request.ar != null && normalized.amountRlusd == null)
+          normalized.amountRlusd = request.ar;
+        if (request.fr != null && normalized.fxRate == null)
+          normalized.fxRate = request.fr;
+        if (request.fs && !normalized.fxSource)
+          normalized.fxSource = request.fs;
         if (request.i && !normalized.issuer) normalized.issuer = request.i;
         if (request.m && !normalized.memo) normalized.memo = request.m;
-        if (request.b && !normalized.beneficiaryLabel) normalized.beneficiaryLabel = request.b;
-        if (request.c && !normalized.createdAt) normalized.createdAt = request.c;
+        if (request.b && !normalized.beneficiaryLabel)
+          normalized.beneficiaryLabel = request.b;
+        if (request.c && !normalized.createdAt)
+          normalized.createdAt = request.c;
         return normalized;
       };
 
@@ -129,22 +143,29 @@ export function useDemoPaymentRequestScanner({
         const requestRaw = JSON.parse(payload);
         const request = normalizePayreqPayload(requestRaw);
         if (request && request.to) {
-          const schema = String(request.schema || request.kind || "").toLowerCase();
+          const schema = String(
+            request.schema || request.kind || "",
+          ).toLowerCase();
           const isXcannesPayReq =
-            schema.includes("xcannes") || schema.includes("payreq") || Boolean(request.targetCurrency);
+            schema.includes("xcannes") ||
+            schema.includes("payreq") ||
+            Boolean(request.targetCurrency);
 
           const targetCurrency = String(
             request.targetCurrency ||
               request.targetCurrencyCode ||
               request.currency ||
-              ""
+              "",
           )
             .trim()
             .toUpperCase();
 
           const displayAmount = request.displayAmount ?? request.amount ?? null;
           let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
-          if ((amountRlusd == null || Number.isNaN(Number(amountRlusd))) && targetCurrency === "RLUSD") {
+          if (
+            (amountRlusd == null || Number.isNaN(Number(amountRlusd))) &&
+            targetCurrency === "RLUSD"
+          ) {
             amountRlusd = displayAmount;
           }
           const fxRate = request.fxRate ?? null;
@@ -159,10 +180,10 @@ export function useDemoPaymentRequestScanner({
 
           if (isXcannesPayReq && targetCurrency) {
             const matchingToken = (augmentedTokens || []).find(
-              (t) => String(t.currency || "").toUpperCase() === targetCurrency
+              (t) => String(t.currency || "").toUpperCase() === targetCurrency,
             );
             const rlusdToken = (augmentedTokens || []).find(
-              (t) => String(t.currency || "").toUpperCase() === "RLUSD"
+              (t) => String(t.currency || "").toUpperCase() === "RLUSD",
             );
 
             // Prefer paying from the requested currency allocation when available, otherwise pay directly in RLUSD.
@@ -190,8 +211,7 @@ export function useDemoPaymentRequestScanner({
               displayAmount:
                 displayAmount != null ? Number(displayAmount) : null,
               displayCurrency: targetCurrency || null,
-              amountRlusd:
-                amountRlusd != null ? Number(amountRlusd) : null,
+              amountRlusd: amountRlusd != null ? Number(amountRlusd) : null,
               fxRate: fxRate != null ? Number(fxRate) : null,
               fxSource: fxSource != null ? String(fxSource) : null,
               memo: memo != null ? String(memo) : null,
@@ -225,22 +245,29 @@ export function useDemoPaymentRequestScanner({
       const parsed = tryParseUri(payload);
       if (parsed?.request?.to) {
         const request = normalizePayreqPayload(parsed.request);
-        const schema = String(request.schema || request.kind || "").toLowerCase();
+        const schema = String(
+          request.schema || request.kind || "",
+        ).toLowerCase();
         const isXcannesPayReq =
-          schema.includes("xcannes") || schema.includes("payreq") || Boolean(request.targetCurrency);
+          schema.includes("xcannes") ||
+          schema.includes("payreq") ||
+          Boolean(request.targetCurrency);
 
         const targetCurrency = String(
           request.targetCurrency ||
             request.targetCurrencyCode ||
             request.currency ||
-            ""
+            "",
         )
           .trim()
           .toUpperCase();
 
         const displayAmount = request.displayAmount ?? request.amount ?? null;
         let amountRlusd = request.amountRlusd ?? request.rlusd ?? null;
-        if ((amountRlusd == null || Number.isNaN(Number(amountRlusd))) && targetCurrency === "RLUSD") {
+        if (
+          (amountRlusd == null || Number.isNaN(Number(amountRlusd))) &&
+          targetCurrency === "RLUSD"
+        ) {
           amountRlusd = displayAmount;
         }
         const fxRate = request.fxRate ?? null;
@@ -255,10 +282,10 @@ export function useDemoPaymentRequestScanner({
 
         if (isXcannesPayReq && targetCurrency) {
           const matchingToken = (augmentedTokens || []).find(
-            (t) => String(t.currency || "").toUpperCase() === targetCurrency
+            (t) => String(t.currency || "").toUpperCase() === targetCurrency,
           );
           const rlusdToken = (augmentedTokens || []).find(
-            (t) => String(t.currency || "").toUpperCase() === "RLUSD"
+            (t) => String(t.currency || "").toUpperCase() === "RLUSD",
           );
 
           if (matchingToken && displayAmount != null) {
@@ -281,8 +308,7 @@ export function useDemoPaymentRequestScanner({
             schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
             to: request.to,
             targetCurrencyCode: targetCurrency || null,
-            displayAmount:
-              displayAmount != null ? Number(displayAmount) : null,
+            displayAmount: displayAmount != null ? Number(displayAmount) : null,
             displayCurrency: targetCurrency || null,
             amountRlusd: amountRlusd != null ? Number(amountRlusd) : null,
             fxRate: fxRate != null ? Number(fxRate) : null,
@@ -312,7 +338,7 @@ export function useDemoPaymentRequestScanner({
       // 4) Xumm/Xaman payload links: open directly
       if (/xumm\.app|xaman|xumm:\/\//i.test(payload)) {
         const ok = confirm(
-          "This looks like a Xumm/Xaman request link. Open it now?"
+          "This looks like a Xumm/Xaman request link. Open it now?",
         );
         if (ok && typeof window !== "undefined") {
           window.location.href = payload;
@@ -330,7 +356,7 @@ export function useDemoPaymentRequestScanner({
       setSendDestination,
       setSendPaymentRequest,
       setSendTab,
-    ]
+    ],
   );
 
   return {

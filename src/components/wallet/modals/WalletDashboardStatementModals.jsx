@@ -14,7 +14,7 @@ import { useModalTransition } from "@/utils/useModalTransition";
 export default function WalletDashboardStatementModals({
   augmentedTokens,
   backendWalletAddress,
-  effectiveWallet,
+  wallet,
   walletDisplayLabel = "",
   isPreviewMode = false,
   isWalletActivated = null,
@@ -358,7 +358,7 @@ export default function WalletDashboardStatementModals({
         <div className={inlineGlobalStatementClassName}>
           <GlobalStatement
             tokens={globalStatementTokens || augmentedTokens}
-            walletAddress={effectiveWallet}
+            walletAddress={wallet}
             walletLabelOverride={walletDisplayLabel}
             isPreviewMode={isPreviewMode}
             isWalletActivated={isWalletActivated}
@@ -402,7 +402,7 @@ export default function WalletDashboardStatementModals({
                 : parseFloat(selectedStatementToken.value || 0)
             }
             issuer={selectedStatementToken.issuer}
-            walletAddress={effectiveWallet}
+            walletAddress={wallet}
             walletLabelOverride={walletDisplayLabel}
             backendWalletAddress={backendWalletAddress}
             isPreviewMode={isPreviewMode}
@@ -442,7 +442,7 @@ export default function WalletDashboardStatementModals({
       {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
         <GlobalStatement
           tokens={globalStatementTokens || augmentedTokens}
-          walletAddress={effectiveWallet}
+          walletAddress={wallet}
           walletLabelOverride={walletDisplayLabel}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}
@@ -485,7 +485,7 @@ export default function WalletDashboardStatementModals({
               : parseFloat(effectiveCurrencyToken.value || 0)
           }
           issuer={effectiveCurrencyToken.issuer}
-          walletAddress={effectiveWallet}
+          walletAddress={wallet}
           walletLabelOverride={walletDisplayLabel}
           backendWalletAddress={backendWalletAddress}
           isPreviewMode={isPreviewMode}

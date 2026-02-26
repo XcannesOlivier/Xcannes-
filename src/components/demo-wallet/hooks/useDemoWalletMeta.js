@@ -8,7 +8,7 @@ export function useDemoWalletMeta({
   hideAddress = false,
   addressBadge,
   addressBadgeClassName = "",
-  addressTitle = ""
+  addressTitle = "",
 } = {}) {
   const renderWalletMeta = useCallback(
     (className = "") => {
@@ -25,26 +25,23 @@ export function useDemoWalletMeta({
               <span className="break-all" title={addressTitle || undefined}>
                 {resolvedAddress}
               </span>
-            {addressBadge ? (
-              <span
-                className={[
-                  "text-[10px] font-semibold",
-                  addressBadgeClassName,
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                {addressBadge}
-              </span>
-            ) : null}
+              {addressBadge ? (
+                <span
+                  className={[
+                    "text-[10px] font-semibold",
+                    addressBadgeClassName,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                >
+                  {addressBadge}
+                </span>
+              ) : null}
             </div>
           ) : addressBadge ? (
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={[
-                  "text-[10px] font-semibold",
-                  addressBadgeClassName,
-                ]
+                className={["text-[10px] font-semibold", addressBadgeClassName]
                   .filter(Boolean)
                   .join(" ")}
               >
@@ -62,7 +59,7 @@ export function useDemoWalletMeta({
       hideAddress,
       walletAddress,
       walletLabel,
-    ]
+    ],
   );
 
   return { renderWalletMeta };

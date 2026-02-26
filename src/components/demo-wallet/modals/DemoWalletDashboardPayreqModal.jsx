@@ -23,7 +23,7 @@ export default function DemoWalletDashboardPayreqModal({
   handleSendSubmit,
   savedAddresses,
   enableSaveAddress = false,
-  inline = false
+  inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -41,11 +41,11 @@ export default function DemoWalletDashboardPayreqModal({
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
-    [sendDestination]
+    [sendDestination],
   );
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
-      (addr) => addr.address === normalizedDestination
+      (addr) => addr.address === normalizedDestination,
     );
   }, [savedAddresses, normalizedDestination]);
   const canSaveDestination =
@@ -61,7 +61,7 @@ export default function DemoWalletDashboardPayreqModal({
     sendPaymentRequest?.displayCurrency ||
       sendPaymentRequest?.targetCurrencyCode ||
       selectedSendToken?.currency ||
-      ""
+      "",
   )
     .trim()
     .toUpperCase();
@@ -73,16 +73,21 @@ export default function DemoWalletDashboardPayreqModal({
       : null);
   const requestAmountLabel =
     requestAmountValue != null && requestCurrencyCode
-      ? formatAmountWithSymbol(locale, Number(requestAmountValue), requestCurrencyCode, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 6
-        })
+      ? formatAmountWithSymbol(
+          locale,
+          Number(requestAmountValue),
+          requestCurrencyCode,
+          {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 6,
+          },
+        )
       : null;
   const requestBeneficiaryLabel = sendPaymentRequest?.beneficiaryLabel
     ? String(sendPaymentRequest.beneficiaryLabel)
     : "";
   const requestDestination = String(
-    sendPaymentRequest?.to || normalizedDestination || ""
+    sendPaymentRequest?.to || normalizedDestination || "",
   ).trim();
   const requestDestinationLabel =
     requestDestination.length > 14
@@ -93,7 +98,7 @@ export default function DemoWalletDashboardPayreqModal({
     const result = await handleSendSubmit?.({
       saveDestination:
         saveNewAddress && canSaveDestination ? normalizedDestination : "",
-      saveLabel: saveNewAddressLabel
+      saveLabel: saveNewAddressLabel,
     });
     if (result?.ok) {
       setSaveNewAddress(false);
@@ -127,11 +132,17 @@ export default function DemoWalletDashboardPayreqModal({
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-send-modal wallet-payreq-modal border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
-    inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+    inline
+      ? "h-full max-h-none rounded-xl"
+      : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
-    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+    !inline
+      ? isClosing
+        ? "wallet-modal-lift-out"
+        : "wallet-modal-lift-in"
+      : "",
   ].join(" ");
 
   const requestDetailsPanel = sendPaymentRequest ? (
@@ -145,7 +156,8 @@ export default function DemoWalletDashboardPayreqModal({
             {t("ui_beneficiary_label", "Bénéficiaire")}
           </span>
           <span className="font-semibold text-white/90">
-            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+            {requestBeneficiaryLabel ||
+              t("ui_wallet_unknown", "Unknown wallet")}
           </span>
         </div>
         {requestAmountLabel ? (
@@ -153,7 +165,9 @@ export default function DemoWalletDashboardPayreqModal({
             <span className="text-white/60">
               {t("ui_amount_52cea2dd3d", "Amount")}
             </span>
-            <span className="font-mono text-white/90">{requestAmountLabel}</span>
+            <span className="font-mono text-white/90">
+              {requestAmountLabel}
+            </span>
           </div>
         ) : null}
         {requestCurrencyCode ? (
@@ -202,7 +216,7 @@ export default function DemoWalletDashboardPayreqModal({
             onChange={(e) => setSaveNewAddressLabel(e.target.value)}
             placeholder={t(
               "ui_e_g_exchange_friend_11008b5e9e",
-              "e.g., Exchange, Friend, ..."
+              "e.g., Exchange, Friend, ...",
             )}
             className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
           />
@@ -240,8 +254,8 @@ export default function DemoWalletDashboardPayreqModal({
     </div>
   );
 
-  const content =
-  <>
+  const content = (
+    <>
       {!inline ? (
         <div
           className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
@@ -253,20 +267,20 @@ export default function DemoWalletDashboardPayreqModal({
 
       <div className={wrapperClass}>
         <div
-        className={panelClass}
-        style={{ WebkitOverflowScrolling: "touch" }}
-        onClick={(e) => {
-          if (!inline) e.stopPropagation();
-        }}>
-
-          <button
-          type="button"
+          className={panelClass}
+          style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(e) => {
-            e.stopPropagation();
-            onClose();
+            if (!inline) e.stopPropagation();
           }}
-          className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
-
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
+          >
             ✕
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
@@ -284,7 +298,7 @@ export default function DemoWalletDashboardPayreqModal({
               <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                 {t(
                   "wallet_rlusd_not_activated_title",
-                  "USD not activated. Authorize USD on your wallet."
+                  "USD not activated. Authorize USD on your wallet.",
                 )}
               </span>
             ) : null}
@@ -300,7 +314,8 @@ export default function DemoWalletDashboardPayreqModal({
           </div>
         </div>
       </div>
-    </>;
+    </>
+  );
 
   if (inline) return content;
   if (typeof document === "undefined") return null;

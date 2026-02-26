@@ -10,7 +10,7 @@ import {
 
 export function useSwapConversion({
   isPreviewMode,
-  effectiveIsConnected,
+  isConnected,
   backendWalletAddress,
   walletAddress,
   signTransaction,
@@ -370,7 +370,7 @@ export function useSwapConversion({
       return;
     }
 
-    if (!effectiveIsConnected || !backendWalletAddress) {
+    if (!isConnected || !backendWalletAddress) {
       alert("Please connect your Xumm wallet first.");
       return;
     }
@@ -584,7 +584,7 @@ export function useSwapConversion({
     currencyLinesSummary,
     demoLines,
     demoRlusdTotal,
-    effectiveIsConnected,
+    isConnected,
     getFxSource,
     getRlusdPerUnit,
     hasOnChainRlusd,

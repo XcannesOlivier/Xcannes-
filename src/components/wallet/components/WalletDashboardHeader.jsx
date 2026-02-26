@@ -6,8 +6,8 @@ import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardHeader({
   layout,
-  effectiveIsConnected,
-  effectiveWallet,
+  isConnected,
+  wallet,
   onDisconnect,
   totalLabel,
   onOpenGlobalStatement,
@@ -75,7 +75,7 @@ export default function WalletDashboardHeader({
           <div />
         )}
         {/* Bouton Connect ou Déconnecter */}
-        {effectiveIsConnected && effectiveWallet ? (
+        {isConnected && wallet ? (
           <button
             type="button"
             onClick={() => onDisconnect?.()}
@@ -121,7 +121,7 @@ export default function WalletDashboardHeader({
         </a>
 
         {/* Affichage du wallet connecté à la place du menu déroulant */}
-        {effectiveIsConnected && effectiveWallet && (
+        {isConnected && wallet && (
           <div className="w-full mt-1.5 px-2 flex justify-center">
             <div className="flex items-center gap-2 w-full max-w-[460px]">
               <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
@@ -149,8 +149,7 @@ export default function WalletDashboardHeader({
                     {!hideWalletAddress ? (
                       <div className="mt-0.5 flex items-center gap-2 min-w-0">
                         <span className="font-mono text-[10px] text-white/55 truncate">
-                          {effectiveWallet.slice(0, 10)}…
-                          {effectiveWallet.slice(-8)}
+                          {wallet.slice(0, 10)}…{wallet.slice(-8)}
                         </span>
                         {walletHeaderToast ? (
                           <span className="text-[10px] text-xcannes-green/90">

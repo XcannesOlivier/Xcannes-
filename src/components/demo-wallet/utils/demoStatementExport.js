@@ -29,7 +29,7 @@ export function escapeCsvValue(value) {
   if (value == null) return "";
   const raw = String(value);
   if (/[\",\n\r]/.test(raw)) {
-    return `"${raw.replace(/\"/g, "\"\"")}"`;
+    return `"${raw.replace(/\"/g, '""')}"`;
   }
   return raw;
 }
@@ -45,7 +45,11 @@ export function buildCsvString(headers, rows) {
   return lines.join("\n");
 }
 
-export function downloadTextFile({ filename, content, type = "text/plain;charset=utf-8" }) {
+export function downloadTextFile({
+  filename,
+  content,
+  type = "text/plain;charset=utf-8",
+}) {
   if (typeof window === "undefined") return false;
   const blob = new Blob([content], { type });
   const url = window.URL.createObjectURL(blob);
@@ -84,7 +88,11 @@ export async function sha256Hex(input) {
 
 export function openPrintWindow({ title, bodyHtml, styles = "" }) {
   if (typeof window === "undefined") return false;
-  const win = window.open("", "_blank", "height=720,width=960,noopener,noreferrer");
+  const win = window.open(
+    "",
+    "_blank",
+    "height=720,width=960,noopener,noreferrer",
+  );
   if (!win) return false;
 
   const safeTitle = escapeHtml(title || "XCANNES Statement");

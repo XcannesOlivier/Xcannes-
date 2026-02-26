@@ -1,6 +1,13 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "../utils/demoCurrencyDescriptions";
@@ -10,31 +17,33 @@ import {
   downloadTextFile,
   escapeHtml,
   openPrintWindow,
-  sha256Hex
+  sha256Hex,
 } from "../utils/demoStatementExport";
 import { useTranslation } from "next-i18next";
 import DemoStatementMonthSelect from "./DemoStatementMonthSelect";
 import {
   formatAmountWithSymbol,
-  getDisplayCurrencyCode
+  getDisplayCurrencyCode,
 } from "../demoWalletDashboardConfig";
 
 const USD_STABLECOINS = [
-"RLUSD",
-"USD",
-"USDC",
-"USDT",
-"BUSD",
-"DAI",
-"TUSD",
-"USDP",
-"GUSD"];
+  "RLUSD",
+  "USD",
+  "USDC",
+  "USDT",
+  "BUSD",
+  "DAI",
+  "TUSD",
+  "USDP",
+  "GUSD",
+];
 const HIGHLIGHT_DURATION_MS = 5000;
 const STATEMENT_HISTORY_MONTHS = 13;
 
-const stripCountSuffix = (label) => String(label || "")
-  .replace(/\s*[\(\uFF08]\s*$/, "")
-  .trim();
+const stripCountSuffix = (label) =>
+  String(label || "")
+    .replace(/\s*[\(\uFF08]\s*$/, "")
+    .trim();
 
 const ShareIcon = ({ className = "" }) => (
   <svg
@@ -45,7 +54,8 @@ const ShareIcon = ({ className = "" }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    aria-hidden="true">
+    aria-hidden="true"
+  >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
     <polyline points="17 8 12 3 7 8" />
     <line x1="12" y1="3" x2="12" y2="15" />
@@ -69,7 +79,9 @@ const buildDefaultMonthKeys = (months) => {
   const now = new Date();
   const list = [];
   for (let i = 0; i < months; i += 1) {
-    const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    const date = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1),
+    );
     const key = buildMonthKeyUtc(date);
     if (key) list.push(key);
   }
@@ -83,7 +95,9 @@ const getMonthKeyFromTransaction = (tx) => {
   }
   const dateRaw = String(tx?.date || "").trim();
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateRaw)) {
-    const [year, month] = dateRaw.split("-").map((value) => Number.parseInt(value, 10));
+    const [year, month] = dateRaw
+      .split("-")
+      .map((value) => Number.parseInt(value, 10));
     if (Number.isFinite(year) && Number.isFinite(month)) {
       return `${year}-${String(month).padStart(2, "0")}`;
     }
@@ -93,15 +107,16 @@ const getMonthKeyFromTransaction = (tx) => {
 
 const formatMonthLabel = (monthKey, locale, { monthOnly = false } = {}) => {
   if (!monthKey) return "";
-  const [year, month] = String(monthKey).split("-").map((value) => Number.parseInt(value, 10));
+  const [year, month] = String(monthKey)
+    .split("-")
+    .map((value) => Number.parseInt(value, 10));
   if (!Number.isFinite(year) || !Number.isFinite(month)) return monthKey;
   const date = new Date(year, month - 1, 1);
-  return date.toLocaleDateString(locale || "en", monthOnly
-    ? { month: "long" }
-    : { month: "long", year: "numeric" });
+  return date.toLocaleDateString(
+    locale || "en",
+    monthOnly ? { month: "long" } : { month: "long", year: "numeric" },
+  );
 };
-
-
 
 /**
  * Composant de relevé bancaire pour une devise spécifique
@@ -133,21 +148,21 @@ export default function DemoCurrencyStatement({
   rlusdBalance = null,
   statementMonths = [],
   highlightTransactionId = null,
-  onClose
+  onClose,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),
-    [currency]
+    [currency],
   );
   const displayCurrency = useMemo(
     () => getDisplayCurrencyCode(normalizedCurrency),
-    [normalizedCurrency]
+    [normalizedCurrency],
   );
   const currencyDescription = useMemo(
     () => String(getCurrencyDescription(normalizedCurrency) || "").trim(),
-    [normalizedCurrency]
+    [normalizedCurrency],
   );
   const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
   const [exportFormat, setExportFormat] = useState(null);
@@ -157,17 +172,18 @@ export default function DemoCurrencyStatement({
   const [docHash, setDocHash] = useState("");
   const resolvedLabelOverride = String(walletLabelOverride || "").trim();
   const [walletLabel, setWalletLabel] = useState(resolvedLabelOverride);
-  const [highlightedTransactionId, setHighlightedTransactionId] = useState(null);
+  const [highlightedTransactionId, setHighlightedTransactionId] =
+    useState(null);
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
-    "December 2025"
+    "December 2025",
   );
   const archivesLabel = t("ui_archives_label_3c1f8a7b2e", "Archives");
   const archivesLongLabel = t(
     "ui_archives_12plus_7b3c9a1d5e",
-    "Archives (12+ months)"
+    "Archives (12+ months)",
   );
   const fallbackPeriod = period || defaultPeriod;
 
@@ -233,12 +249,14 @@ export default function DemoCurrencyStatement({
 
   const baseTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
-    [transactions]
+    [transactions],
   );
 
   const statementMonthKeys = useMemo(() => {
     const provided = Array.isArray(statementMonths)
-      ? statementMonths.filter((key) => typeof key === "string" && key.length >= 7)
+      ? statementMonths.filter(
+          (key) => typeof key === "string" && key.length >= 7,
+        )
       : [];
     if (provided.length > 0) return provided;
 
@@ -261,27 +279,31 @@ export default function DemoCurrencyStatement({
       value: idx,
       key,
       label: formatMonthLabel(key, locale),
-      displayLabel: formatMonthLabel(key, locale, { monthOnly: true })
+      displayLabel: formatMonthLabel(key, locale, { monthOnly: true }),
     }));
     if (keys.length > 12) {
       months.push({
-        value: 'archives',
-        key: 'archives',
+        value: "archives",
+        key: "archives",
         label: archivesLongLabel,
-        displayLabel: archivesLabel
+        displayLabel: archivesLabel,
       });
     }
     return months;
   }, [statementMonthKeys, locale, archivesLongLabel, archivesLabel]);
 
   useEffect(() => {
-    const hasArchives = availableMonths.some((option) => option.value === "archives");
+    const hasArchives = availableMonths.some(
+      (option) => option.value === "archives",
+    );
     if (selectedMonth === "archives" && !hasArchives) {
       setSelectedMonth(0);
       return;
     }
     if (typeof selectedMonth === "number") {
-      const maxIndex = availableMonths.filter((option) => typeof option.value === "number").length - 1;
+      const maxIndex =
+        availableMonths.filter((option) => typeof option.value === "number")
+          .length - 1;
       if (maxIndex >= 0 && selectedMonth > maxIndex) {
         setSelectedMonth(0);
       }
@@ -291,17 +313,23 @@ export default function DemoCurrencyStatement({
   const selectedMonthKey = useMemo(() => {
     if (selectedMonth === "archives") return null;
     const option = availableMonths.find(
-      (item) => typeof item?.value === "number" && Number(item.value) === Number(selectedMonth)
+      (item) =>
+        typeof item?.value === "number" &&
+        Number(item.value) === Number(selectedMonth),
     );
     return option?.key || null;
   }, [availableMonths, selectedMonth]);
 
-  const currentPeriod = selectedMonth === 'archives'
-    ? archivesLabel
-    : availableMonths.find((option) => option.value === selectedMonth)?.label || fallbackPeriod;
-  const currentDisplayPeriod = selectedMonth === 'archives'
-    ? archivesLabel
-    : availableMonths.find((option) => option.value === selectedMonth)?.displayLabel || String(fallbackPeriod).split(' ')[0];
+  const currentPeriod =
+    selectedMonth === "archives"
+      ? archivesLabel
+      : availableMonths.find((option) => option.value === selectedMonth)
+          ?.label || fallbackPeriod;
+  const currentDisplayPeriod =
+    selectedMonth === "archives"
+      ? archivesLabel
+      : availableMonths.find((option) => option.value === selectedMonth)
+          ?.displayLabel || String(fallbackPeriod).split(" ")[0];
 
   const selectedMonthKeys = useMemo(() => {
     if (selectedMonth === "archives") {
@@ -322,20 +350,30 @@ export default function DemoCurrencyStatement({
   // Calculer les statistiques (sur la période sélectionnée)
   const credits = periodTransactions.filter((t) => t.type === "credit");
   const debits = periodTransactions.filter((t) => t.type === "debit");
-  const conversions = periodTransactions.filter((t) => t.category === "exchange");
+  const conversions = periodTransactions.filter(
+    (t) => t.category === "exchange",
+  );
 
-  const totalCredits = credits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
-  const totalDebits = debits.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  const totalCredits = credits.reduce(
+    (sum, t) => sum + parseFloat(t.amount || 0),
+    0,
+  );
+  const totalDebits = debits.reduce(
+    (sum, t) => sum + parseFloat(t.amount || 0),
+    0,
+  );
 
   const openingBalance = balance - totalCredits + totalDebits;
   const closingBalance = balance;
   const netChange = closingBalance - openingBalance;
-  const percentChange = openingBalance !== 0 ? netChange / openingBalance * 100 : 0;
+  const percentChange =
+    openingBalance !== 0 ? (netChange / openingBalance) * 100 : 0;
 
   // Statistiques supplémentaires
-  const avgTransaction = periodTransactions.length > 0
-    ? (totalCredits + totalDebits) / periodTransactions.length
-    : 0;
+  const avgTransaction =
+    periodTransactions.length > 0
+      ? (totalCredits + totalDebits) / periodTransactions.length
+      : 0;
   const largestTransaction = periodTransactions.reduce((max, t) => {
     const amount = parseFloat(t.amount || 0);
     return amount > max ? amount : max;
@@ -343,7 +381,7 @@ export default function DemoCurrencyStatement({
 
   // Catégorisation par type
   const transactionsByCategory = periodTransactions.reduce((acc, tx) => {
-    const cat = tx.category || 'other';
+    const cat = tx.category || "other";
     if (!acc[cat]) acc[cat] = { count: 0, amount: 0 };
     acc[cat].count++;
     acc[cat].amount += parseFloat(tx.amount || 0);
@@ -352,14 +390,14 @@ export default function DemoCurrencyStatement({
 
   // Données pour graphiques (fictives basées sur les transactions)
   const monthlyData = [
-  { day: '01', balance: openingBalance * 0.95 },
-  { day: '05', balance: openingBalance * 0.92 },
-  { day: '10', balance: openingBalance * 0.98 },
-  { day: '15', balance: openingBalance * 1.05 },
-  { day: '20', balance: openingBalance * 1.02 },
-  { day: '25', balance: openingBalance * 1.08 },
-  { day: '28', balance: closingBalance }];
-
+    { day: "01", balance: openingBalance * 0.95 },
+    { day: "05", balance: openingBalance * 0.92 },
+    { day: "10", balance: openingBalance * 0.98 },
+    { day: "15", balance: openingBalance * 1.05 },
+    { day: "20", balance: openingBalance * 1.02 },
+    { day: "25", balance: openingBalance * 1.08 },
+    { day: "28", balance: closingBalance },
+  ];
 
   // Filtrer les transactions
   const filteredTransactions = useMemo(() => {
@@ -381,10 +419,12 @@ export default function DemoCurrencyStatement({
 
     for (const tx of list) {
       if (stopDisplayBalance) continue;
-      const kind = String(tx?.kind || "").trim().toUpperCase();
+      const kind = String(tx?.kind || "")
+        .trim()
+        .toUpperCase();
       const displayAmount = Number(tx?.displayAmount ?? tx?.amount ?? NaN);
       const displayCurrency = String(
-        tx?.displayCurrencyCode || normalizedCurrency || ""
+        tx?.displayCurrencyCode || normalizedCurrency || "",
       )
         .trim()
         .toUpperCase();
@@ -423,7 +463,7 @@ export default function DemoCurrencyStatement({
     return statementMonthKeys.map((key) => ({
       key,
       label: formatMonthLabel(key, locale),
-      transactions: map.get(key) || []
+      transactions: map.get(key) || [],
     }));
   }, [statementMonthKeys, transactionsWithDisplayBalance, locale]);
 
@@ -431,21 +471,30 @@ export default function DemoCurrencyStatement({
     const map = new Map(transactionsByMonth.map((group) => [group.key, group]));
     if (selectedMonth === "archives") {
       const archiveKeys = statementMonthKeys.slice(12);
-      return archiveKeys.map((key) => map.get(key) || {
-        key,
-        label: formatMonthLabel(key, locale),
-        transactions: []
-      });
+      return archiveKeys.map(
+        (key) =>
+          map.get(key) || {
+            key,
+            label: formatMonthLabel(key, locale),
+            transactions: [],
+          },
+      );
     }
     if (!selectedMonthKey) return [];
     return [
       map.get(selectedMonthKey) || {
         key: selectedMonthKey,
         label: formatMonthLabel(selectedMonthKey, locale),
-        transactions: []
-      }
+        transactions: [],
+      },
     ];
-  }, [transactionsByMonth, selectedMonth, selectedMonthKey, statementMonthKeys, locale]);
+  }, [
+    transactionsByMonth,
+    selectedMonth,
+    selectedMonthKey,
+    statementMonthKeys,
+    locale,
+  ]);
 
   const showMonthHeaders = selectedMonth === "archives";
 
@@ -487,30 +536,34 @@ export default function DemoCurrencyStatement({
 
   const ledgerStatus = useMemo(() => {
     if (isPreviewMode) return "preview";
-    if (!["XRP", "RLUSD", "RLUSD"].includes(normalizedCurrency)) return "offchain";
+    if (!["XRP", "RLUSD", "RLUSD"].includes(normalizedCurrency))
+      return "offchain";
     if (ledgerEvidenceCount > 0) return "verified";
     return "available";
   }, [isPreviewMode, ledgerEvidenceCount, normalizedCurrency]);
 
   const ledgerStatusLabel = useMemo(() => {
     if (ledgerStatus === "verified") {
-      return t("ui_verified_on_xrp_ledger_334f28ce50", "Verified on XRP Ledger");
+      return t(
+        "ui_verified_on_xrp_ledger_334f28ce50",
+        "Verified on XRP Ledger",
+      );
     }
     if (ledgerStatus === "available") {
       return t(
         "ui_ledger_available_no_tx_f4",
-        "Ledger available (no transactions yet)"
+        "Ledger available (no transactions yet)",
       );
     }
     if (ledgerStatus === "offchain") {
       return t(
         "ui_ledger_offchain_allocations_f4",
-        "Ledger validation unavailable for off-chain allocations"
+        "Ledger validation unavailable for off-chain allocations",
       );
     }
     return t(
       "ui_ledger_preview_unavailable_f4",
-      "Ledger validation unavailable (preview)"
+      "Ledger validation unavailable (preview)",
     );
   }, [ledgerStatus, t]);
 
@@ -525,8 +578,8 @@ export default function DemoCurrencyStatement({
       runningBalance: Number.isFinite(Number(tx?.displayRunningBalance))
         ? Number(tx.displayRunningBalance)
         : Number.isFinite(Number(tx?.runningBalance))
-        ? Number(tx.runningBalance)
-        : 0,
+          ? Number(tx.runningBalance)
+          : 0,
       counterparty: tx?.counterparty || "",
     }));
 
@@ -540,12 +593,13 @@ export default function DemoCurrencyStatement({
       transactions: txPayload,
     });
   }, [
-  balance,
-  currentPeriod,
-  fallbackPeriod,
-  transactionsWithDisplayBalance,
-  normalizedCurrency,
-  walletAddress]);
+    balance,
+    currentPeriod,
+    fallbackPeriod,
+    transactionsWithDisplayBalance,
+    normalizedCurrency,
+    walletAddress,
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -559,13 +613,13 @@ export default function DemoCurrencyStatement({
     };
   }, [statementHashInput]);
 
-
   // Icône par type de transaction
   const getTransactionIcon = (category) => {
-    if (isPreviewMode && (category === "buy" || category === "sell")) return null;
+    if (isPreviewMode && (category === "buy" || category === "sell"))
+      return null;
     const icons = {
       buy: "+",
-      sell: "−"
+      sell: "−",
     };
     return icons[category] || null;
   };
@@ -574,218 +628,221 @@ export default function DemoCurrencyStatement({
   const getCurrencyFlag = useCallback((curr) => {
     const flags = {
       // Devises fiat - Monde entier
-      "USD": "🇺🇸", // Dollar américain
-      "EUR": "🇪🇺", // Euro
-      "GBP": "🇬🇧", // Livre sterling
-      "JPY": "🇯🇵", // Yen japonais
-      "CHF": "🇨🇭", // Franc suisse
-      "CAD": "🇨🇦", // Dollar canadien
-      "AUD": "🇦🇺", // Dollar australien
-      "CNY": "🇨🇳", // Yuan chinois
-      "INR": "🇮🇳", // Roupie indienne
-      "BRL": "🇧🇷", // Real brésilien
-      "MXN": "🇲🇽", // Peso mexicain
-      "KRW": "🇰🇷", // Won sud-coréen
-      "RUB": "🇷🇺", // Rouble russe
-      "ZAR": "🇿🇦", // Rand sud-africain
-      "SGD": "🇸🇬", // Dollar de Singapour
-      "HKD": "🇭🇰", // Dollar de Hong Kong
-      "NOK": "🇳🇴", // Couronne norvégienne
-      "SEK": "🇸🇪", // Couronne suédoise
-      "DKK": "🇩🇰", // Couronne danoise
-      "PLN": "🇵🇱", // Zloty polonais
-      "TRY": "🇹🇷", // Livre turque
-      "AED": "🇦🇪", // Dirham des EAU
-      "SAR": "🇸🇦", // Riyal saoudien
-      "THB": "🇹🇭", // Baht thaïlandais
-      "IDR": "🇮🇩", // Roupie indonésienne
-      "MYR": "🇲🇾", // Ringgit malaisien
-      "PHP": "🇵🇭", // Peso philippin
-      "NZD": "🇳🇿", // Dollar néo-zélandais
-      "ARS": "🇦🇷", // Peso argentin
-      "CLP": "🇨🇱", // Peso chilien
-      "COP": "🇨🇴", // Peso colombien
-      "PEN": "🇵🇪", // Sol péruvien
-      "EGP": "🇪🇬", // Livre égyptienne
-      "NGN": "🇳🇬", // Naira nigérian
-      "KES": "🇰🇪", // Shilling kényan
-      "GHS": "🇬🇭", // Cedi ghanéen
-      "MAD": "🇲🇦", // Dirham marocain
-      "TND": "🇹🇳", // Dinar tunisien
+      USD: "🇺🇸", // Dollar américain
+      EUR: "🇪🇺", // Euro
+      GBP: "🇬🇧", // Livre sterling
+      JPY: "🇯🇵", // Yen japonais
+      CHF: "🇨🇭", // Franc suisse
+      CAD: "🇨🇦", // Dollar canadien
+      AUD: "🇦🇺", // Dollar australien
+      CNY: "🇨🇳", // Yuan chinois
+      INR: "🇮🇳", // Roupie indienne
+      BRL: "🇧🇷", // Real brésilien
+      MXN: "🇲🇽", // Peso mexicain
+      KRW: "🇰🇷", // Won sud-coréen
+      RUB: "🇷🇺", // Rouble russe
+      ZAR: "🇿🇦", // Rand sud-africain
+      SGD: "🇸🇬", // Dollar de Singapour
+      HKD: "🇭🇰", // Dollar de Hong Kong
+      NOK: "🇳🇴", // Couronne norvégienne
+      SEK: "🇸🇪", // Couronne suédoise
+      DKK: "🇩🇰", // Couronne danoise
+      PLN: "🇵🇱", // Zloty polonais
+      TRY: "🇹🇷", // Livre turque
+      AED: "🇦🇪", // Dirham des EAU
+      SAR: "🇸🇦", // Riyal saoudien
+      THB: "🇹🇭", // Baht thaïlandais
+      IDR: "🇮🇩", // Roupie indonésienne
+      MYR: "🇲🇾", // Ringgit malaisien
+      PHP: "🇵🇭", // Peso philippin
+      NZD: "🇳🇿", // Dollar néo-zélandais
+      ARS: "🇦🇷", // Peso argentin
+      CLP: "🇨🇱", // Peso chilien
+      COP: "🇨🇴", // Peso colombien
+      PEN: "🇵🇪", // Sol péruvien
+      EGP: "🇪🇬", // Livre égyptienne
+      NGN: "🇳🇬", // Naira nigérian
+      KES: "🇰🇪", // Shilling kényan
+      GHS: "🇬🇭", // Cedi ghanéen
+      MAD: "🇲🇦", // Dirham marocain
+      TND: "🇹🇳", // Dinar tunisien
 
       // Afrique
-      "XOF": "🇸🇳", // Franc CFA (Sénégal)
-      "XAF": "🇨🇲", // Franc CFA (Cameroun)
-      "UGX": "🇺🇬", // Shilling ougandais
-      "TZS": "🇹🇿", // Shilling tanzanien
-      "ETB": "🇪🇹", // Birr éthiopien
-      "MUR": "🇲🇺", // Roupie mauricienne
-      "BWP": "🇧🇼", // Pula botswanais
-      "ZMW": "🇿🇲", // Kwacha zambien
-      "AOA": "🇦🇴", // Kwanza angolais
-      "MZN": "🇲🇿", // Metical mozambicain
+      XOF: "🇸🇳", // Franc CFA (Sénégal)
+      XAF: "🇨🇲", // Franc CFA (Cameroun)
+      UGX: "🇺🇬", // Shilling ougandais
+      TZS: "🇹🇿", // Shilling tanzanien
+      ETB: "🇪🇹", // Birr éthiopien
+      MUR: "🇲🇺", // Roupie mauricienne
+      BWP: "🇧🇼", // Pula botswanais
+      ZMW: "🇿🇲", // Kwacha zambien
+      AOA: "🇦🇴", // Kwanza angolais
+      MZN: "🇲🇿", // Metical mozambicain
 
       // Amérique Latine
-      "VES": "🇻🇪", // Bolivar vénézuélien
-      "UYU": "🇺🇾", // Peso uruguayen
-      "PYG": "🇵🇾", // Guarani paraguayen
-      "BOB": "🇧🇴", // Boliviano bolivien
-      "CRC": "🇨🇷", // Colon costaricain
-      "GTQ": "🇬🇹", // Quetzal guatémaltèque
-      "HNL": "🇭🇳", // Lempira hondurien
-      "NIO": "🇳🇮", // Cordoba nicaraguayen
-      "PAB": "🇵🇦", // Balboa panaméen
-      "SOL": "🇵🇪", // Sol péruvien (affichage)
-      "DOP": "🇩🇴", // Peso dominicain
-      "HTG": "🇭🇹", // Gourde haïtienne
-      "JMD": "🇯🇲", // Dollar jamaïcain
-      "TTD": "🇹🇹", // Dollar de Trinité-et-Tobago
+      VES: "🇻🇪", // Bolivar vénézuélien
+      UYU: "🇺🇾", // Peso uruguayen
+      PYG: "🇵🇾", // Guarani paraguayen
+      BOB: "🇧🇴", // Boliviano bolivien
+      CRC: "🇨🇷", // Colon costaricain
+      GTQ: "🇬🇹", // Quetzal guatémaltèque
+      HNL: "🇭🇳", // Lempira hondurien
+      NIO: "🇳🇮", // Cordoba nicaraguayen
+      PAB: "🇵🇦", // Balboa panaméen
+      SOL: "🇵🇪", // Sol péruvien (affichage)
+      DOP: "🇩🇴", // Peso dominicain
+      HTG: "🇭🇹", // Gourde haïtienne
+      JMD: "🇯🇲", // Dollar jamaïcain
+      TTD: "🇹🇹", // Dollar de Trinité-et-Tobago
 
       // Asie-Pacifique
-      "VND": "🇻🇳", // Dong vietnamien
-      "LAK": "🇱🇦", // Kip laotien
-      "KHR": "🇰🇭", // Riel cambodgien
-      "MMK": "🇲🇲", // Kyat birman
-      "BDT": "🇧🇩", // Taka bangladais
-      "PKR": "🇵🇰", // Roupie pakistanaise
-      "LKR": "🇱🇰", // Roupie srilankaise
-      "NPR": "🇳🇵", // Roupie népalaise
-      "AFN": "🇦🇫", // Afghani afghan
-      "MNT": "🇲🇳", // Tugrik mongol
-      "KZT": "🇰🇿", // Tenge kazakh
-      "UZS": "🇺🇿", // Som ouzbek
-      "TJS": "🇹🇯", // Somoni tadjik
-      "KGS": "🇰🇬", // Som kirghiz
-      "TWD": "🇹🇼", // Dollar taïwanais
+      VND: "🇻🇳", // Dong vietnamien
+      LAK: "🇱🇦", // Kip laotien
+      KHR: "🇰🇭", // Riel cambodgien
+      MMK: "🇲🇲", // Kyat birman
+      BDT: "🇧🇩", // Taka bangladais
+      PKR: "🇵🇰", // Roupie pakistanaise
+      LKR: "🇱🇰", // Roupie srilankaise
+      NPR: "🇳🇵", // Roupie népalaise
+      AFN: "🇦🇫", // Afghani afghan
+      MNT: "🇲🇳", // Tugrik mongol
+      KZT: "🇰🇿", // Tenge kazakh
+      UZS: "🇺🇿", // Som ouzbek
+      TJS: "🇹🇯", // Somoni tadjik
+      KGS: "🇰🇬", // Som kirghiz
+      TWD: "🇹🇼", // Dollar taïwanais
 
       // Moyen-Orient
-      "ILS": "🇮🇱", // Shekel israélien
-      "JOD": "🇯🇴", // Dinar jordanien
-      "KWD": "🇰🇼", // Dinar koweïtien
-      "BHD": "🇧🇭", // Dinar bahreïni
-      "OMR": "🇴🇲", // Rial omanais
-      "QAR": "🇶🇦", // Riyal qatari
-      "IQD": "🇮🇶", // Dinar irakien
-      "SYP": "🇸🇾", // Livre syrienne
-      "LBP": "🇱🇧", // Livre libanaise
-      "YER": "🇾🇪", // Rial yéménite
+      ILS: "🇮🇱", // Shekel israélien
+      JOD: "🇯🇴", // Dinar jordanien
+      KWD: "🇰🇼", // Dinar koweïtien
+      BHD: "🇧🇭", // Dinar bahreïni
+      OMR: "🇴🇲", // Rial omanais
+      QAR: "🇶🇦", // Riyal qatari
+      IQD: "🇮🇶", // Dinar irakien
+      SYP: "🇸🇾", // Livre syrienne
+      LBP: "🇱🇧", // Livre libanaise
+      YER: "🇾🇪", // Rial yéménite
 
       // Europe de l'Est et autres
-      "CZK": "🇨🇿", // Couronne tchèque
-      "HUF": "🇭🇺", // Forint hongrois
-      "RON": "🇷🇴", // Leu roumain
-      "BGN": "🇧🇬", // Lev bulgare
-      "RSD": "🇷🇸", // Dinar serbe
-      "UAH": "🇺🇦", // Hryvnia ukrainienne
-      "BYN": "🇧🇾", // Rouble biélorusse
-      "GEL": "🇬🇪", // Lari géorgien
-      "AMD": "🇦🇲", // Dram arménien
-      "AZN": "🇦🇿", // Manat azerbaïdjanais
-      "MDL": "🇲🇩", // Leu moldave
-      "ALL": "🇦🇱", // Lek albanais
-      "MKD": "🇲🇰", // Denar macédonien
-      "BAM": "🇧🇦", // Mark convertible bosniaque
-      "ISK": "🇮🇸", // Couronne islandaise
+      CZK: "🇨🇿", // Couronne tchèque
+      HUF: "🇭🇺", // Forint hongrois
+      RON: "🇷🇴", // Leu roumain
+      BGN: "🇧🇬", // Lev bulgare
+      RSD: "🇷🇸", // Dinar serbe
+      UAH: "🇺🇦", // Hryvnia ukrainienne
+      BYN: "🇧🇾", // Rouble biélorusse
+      GEL: "🇬🇪", // Lari géorgien
+      AMD: "🇦🇲", // Dram arménien
+      AZN: "🇦🇿", // Manat azerbaïdjanais
+      MDL: "🇲🇩", // Leu moldave
+      ALL: "🇦🇱", // Lek albanais
+      MKD: "🇲🇰", // Denar macédonien
+      BAM: "🇧🇦", // Mark convertible bosniaque
+      ISK: "🇮🇸", // Couronne islandaise
 
       // Océanie et autres
-      "FJD": "🇫🇯", // Dollar fidjien
-      "PGK": "🇵🇬", // Kina papouasien
-      "WST": "🇼🇸", // Tala samoan
-      "TOP": "🇹🇴", // Pa'anga tongien
-      "VUV": "🇻🇺", // Vatu vanuatais
+      FJD: "🇫🇯", // Dollar fidjien
+      PGK: "🇵🇬", // Kina papouasien
+      WST: "🇼🇸", // Tala samoan
+      TOP: "🇹🇴", // Pa'anga tongien
+      VUV: "🇻🇺", // Vatu vanuatais
 
-	      // Stablecoins et tokens fiat
-	      "RLUSD": "🇺🇸", // USD
-	      "BUSD": "🟡", // Binance USD
-	      "DAI": "🟠", // DAI Stablecoin
-	      "TUSD": "🔷", // TrueUSD
-	      "USDP": "⚪", // Pax Dollar
-      "GUSD": "💚", // Gemini Dollar
-      "USDD": "⚫", // USDD Stablecoin
-      "FRAX": "🔲", // Frax
-      "LUSD": "🟦", // Liquity USD
-      "sUSD": "🔶", // Synthetix USD
+      // Stablecoins et tokens fiat
+      RLUSD: "🇺🇸", // USD
+      BUSD: "🟡", // Binance USD
+      DAI: "🟠", // DAI Stablecoin
+      TUSD: "🔷", // TrueUSD
+      USDP: "⚪", // Pax Dollar
+      GUSD: "💚", // Gemini Dollar
+      USDD: "⚫", // USDD Stablecoin
+      FRAX: "🔲", // Frax
+      LUSD: "🟦", // Liquity USD
+      sUSD: "🔶", // Synthetix USD
 
       // Cryptomonnaies
-      "XRP": "⚡", // XRP Ledger
-      "BTC": "₿", // Bitcoin
-      "ETH": "Ξ", // Ethereum
-      "USDT": "₮", // Tether
-      "USDC": "🔵", // USD Coin
-      "BNB": "🔶", // Binance Coin
-      "ADA": "₳", // Cardano
-      "DOGE": "Ð", // Dogecoin
-      "MATIC": "🟣", // Polygon
-      "DOT": "⬤", // Polkadot
-      "LINK": "🔗", // Chainlink
-      "AVAX": "🔺", // Avalanche
-      "UNI": "🦄", // Uniswap
-      "ATOM": "⚛️", // Cosmos
-      "XLM": "🚀", // Stellar
-      "ALGO": "◬", // Algorand
-      "VET": "💎", // VeChain
-      "ICP": "∞", // Internet Computer
-      "FIL": "📁", // Filecoin
-      "NEAR": "Ⓝ", // Near Protocol
-      "APT": "🅰️", // Aptos
-      "ARB": "🔷", // Arbitrum
-      "OP": "🔴", // Optimism
-      "SAND": "🏖️", // The Sandbox
-	      "MANA": "🎮", // Decentraland
-	      "SHIB": "🐕", // Shiba Inu
-      "TRX": "🔺", // Tron
-      "LTC": "Ł", // Litecoin
-      "BCH": "₿", // Bitcoin Cash
-      "XMR": "ɱ", // Monero
-      "ETC": "Ξ", // Ethereum Classic
-      "XTZ": "ꜩ", // Tezos
-      "EOS": "🔷", // EOS
-      "AAVE": "👻", // Aave
-      "MKR": "Ⓜ️", // Maker
-      "COMP": "🏦", // Compound
-      "SNX": "🔷", // Synthetix
-      "CRV": "🌊", // Curve
-      "SUSHI": "🍣", // SushiSwap
-      "YFI": "💼", // Yearn Finance
-      "BAT": "🦇", // Basic Attention Token
-      "ZRX": "Ⓩ", // 0x
-      "ENJ": "🎮", // Enjin Coin
-      "CHZ": "⚽", // Chiliz
-      "THETA": "📺", // Theta
-      "FTM": "👻", // Fantom
-      "HBAR": "ℏ", // Hedera
-      "EGLD": "🏔️", // MultiversX (Elrond)
-      "FLR": "🔥", // Flare
-      "XDC": "🌐", // XDC Network
-      "KAVA": "🌾", // Kava
-      "ZIL": "💎", // Zilliqa
-      "QTUM": "⬡", // Qtum
-      "WAVES": "🌊", // Waves
-      "ICX": "🔷", // ICON
-      "ONT": "⭕", // Ontology
-      "ZEC": "🛡️", // Zcash
-	      "DASH": "💸", // Dash
-	      "DCR": "🔷", // Decred
-	    };
+      XRP: "⚡", // XRP Ledger
+      BTC: "₿", // Bitcoin
+      ETH: "Ξ", // Ethereum
+      USDT: "₮", // Tether
+      USDC: "🔵", // USD Coin
+      BNB: "🔶", // Binance Coin
+      ADA: "₳", // Cardano
+      DOGE: "Ð", // Dogecoin
+      MATIC: "🟣", // Polygon
+      DOT: "⬤", // Polkadot
+      LINK: "🔗", // Chainlink
+      AVAX: "🔺", // Avalanche
+      UNI: "🦄", // Uniswap
+      ATOM: "⚛️", // Cosmos
+      XLM: "🚀", // Stellar
+      ALGO: "◬", // Algorand
+      VET: "💎", // VeChain
+      ICP: "∞", // Internet Computer
+      FIL: "📁", // Filecoin
+      NEAR: "Ⓝ", // Near Protocol
+      APT: "🅰️", // Aptos
+      ARB: "🔷", // Arbitrum
+      OP: "🔴", // Optimism
+      SAND: "🏖️", // The Sandbox
+      MANA: "🎮", // Decentraland
+      SHIB: "🐕", // Shiba Inu
+      TRX: "🔺", // Tron
+      LTC: "Ł", // Litecoin
+      BCH: "₿", // Bitcoin Cash
+      XMR: "ɱ", // Monero
+      ETC: "Ξ", // Ethereum Classic
+      XTZ: "ꜩ", // Tezos
+      EOS: "🔷", // EOS
+      AAVE: "👻", // Aave
+      MKR: "Ⓜ️", // Maker
+      COMP: "🏦", // Compound
+      SNX: "🔷", // Synthetix
+      CRV: "🌊", // Curve
+      SUSHI: "🍣", // SushiSwap
+      YFI: "💼", // Yearn Finance
+      BAT: "🦇", // Basic Attention Token
+      ZRX: "Ⓩ", // 0x
+      ENJ: "🎮", // Enjin Coin
+      CHZ: "⚽", // Chiliz
+      THETA: "📺", // Theta
+      FTM: "👻", // Fantom
+      HBAR: "ℏ", // Hedera
+      EGLD: "🏔️", // MultiversX (Elrond)
+      FLR: "🔥", // Flare
+      XDC: "🌐", // XDC Network
+      KAVA: "🌾", // Kava
+      ZIL: "💎", // Zilliqa
+      QTUM: "⬡", // Qtum
+      WAVES: "🌊", // Waves
+      ICX: "🔷", // ICON
+      ONT: "⭕", // Ontology
+      ZEC: "🛡️", // Zcash
+      DASH: "💸", // Dash
+      DCR: "🔷", // Decred
+    };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
   }, []);
 
   // Fonction pour enrichir la description avec des drapeaux
-  const enrichDescription = useCallback((description) => {
-    if (!description) return description;
+  const enrichDescription = useCallback(
+    (description) => {
+      if (!description) return description;
 
-    // Remplacer les codes de devises par leurs drapeaux + code
-    let enriched = description;
+      // Remplacer les codes de devises par leurs drapeaux + code
+      let enriched = description;
 
-    // Chercher les patterns courants: "XXX → YYY" ou "XXX/YYY"
-    const currencyPattern = /\b([A-Z]{3,6})\b/g;
-    enriched = enriched.replace(currencyPattern, (match) => {
-      const flag = getCurrencyFlag(match);
-      return `${flag} ${match}`;
-    });
+      // Chercher les patterns courants: "XXX → YYY" ou "XXX/YYY"
+      const currencyPattern = /\b([A-Z]{3,6})\b/g;
+      enriched = enriched.replace(currencyPattern, (match) => {
+        const flag = getCurrencyFlag(match);
+        return `${flag} ${match}`;
+      });
 
-    return enriched;
-  }, [getCurrencyFlag]);
+      return enriched;
+    },
+    [getCurrencyFlag],
+  );
   const simplifyMobileDescription = useCallback(
     (description, category) => {
       if (!description) return description;
@@ -798,32 +855,47 @@ export default function DemoCurrencyStatement({
         }
         if (lower.startsWith("achat")) return "Achat";
         if (lower.startsWith("vente")) return "Vente";
-        if (lower.startsWith("recevoir") || lower.startsWith("reçu") || lower.startsWith("recu")) {
+        if (
+          lower.startsWith("recevoir") ||
+          lower.startsWith("reçu") ||
+          lower.startsWith("recu")
+        ) {
           return "Reçu";
         }
-        if (lower.startsWith("envoyer") || lower.startsWith("envoyé") || lower.startsWith("envoye")) {
+        if (
+          lower.startsWith("envoyer") ||
+          lower.startsWith("envoyé") ||
+          lower.startsWith("envoye")
+        ) {
           return "Envoyé";
         }
         if (lower.startsWith("payer")) return "Envoyé";
-        if (lower.includes("recevoir") && lower.includes("wallet")) return "Reçu";
-        if (lower.includes("envoyer") && lower.includes("wallet")) return "Envoyé";
+        if (lower.includes("recevoir") && lower.includes("wallet"))
+          return "Reçu";
+        if (lower.includes("envoyer") && lower.includes("wallet"))
+          return "Envoyé";
         return enrichDescription(safeDescription);
       }
-      const arrowMatch = safeDescription.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
+      const arrowMatch = safeDescription.match(
+        /([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/,
+      );
       if (arrowMatch) {
         return enrichDescription(`${arrowMatch[1]} → ${arrowMatch[2]}`);
       }
-      const slashMatch = safeDescription.match(/([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/);
+      const slashMatch = safeDescription.match(
+        /([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/,
+      );
       if (slashMatch) {
         return enrichDescription(`${slashMatch[1]} → ${slashMatch[2]}`);
       }
       const firstCurrencyIndex = safeDescription.search(/\b[A-Z]{3}\b/);
-      const trimmed = firstCurrencyIndex >= 0
-        ? safeDescription.slice(firstCurrencyIndex)
-        : safeDescription.replace(/^\s*conversion\s*/i, "").trim();
+      const trimmed =
+        firstCurrencyIndex >= 0
+          ? safeDescription.slice(firstCurrencyIndex)
+          : safeDescription.replace(/^\s*conversion\s*/i, "").trim();
       return enrichDescription(trimmed);
     },
-    [enrichDescription]
+    [enrichDescription],
   );
 
   const parseConversionPair = useCallback((description) => {
@@ -837,21 +909,31 @@ export default function DemoCurrencyStatement({
     return { from: match[1], to: match[2] };
   }, []);
 
-	  const getLocalizedDescription = useCallback(
-	    (tx) => {
-	      const kind = String(tx?.kind || "").trim().toUpperCase();
-	      const rawCounterparty = tx?.counterparty ? String(tx.counterparty).trim() : "";
-	      const counterparty = rawCounterparty;
-	      const category = String(tx?.category || "").trim().toLowerCase();
+  const getLocalizedDescription = useCallback(
+    (tx) => {
+      const kind = String(tx?.kind || "")
+        .trim()
+        .toUpperCase();
+      const rawCounterparty = tx?.counterparty
+        ? String(tx.counterparty).trim()
+        : "";
+      const counterparty = rawCounterparty;
+      const category = String(tx?.category || "")
+        .trim()
+        .toLowerCase();
 
       if (kind === "PAYMENT_OUT") {
         return counterparty
-          ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", { counterparty })
+          ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", {
+              counterparty,
+            })
           : t("statement_payment_out_generic", "Paiement envoyé");
       }
       if (kind === "PAYMENT_IN") {
         return counterparty
-          ? t("statement_payment_in_from", "Reçu de {{counterparty}}", { counterparty })
+          ? t("statement_payment_in_from", "Reçu de {{counterparty}}", {
+              counterparty,
+            })
           : t("statement_payment_in_generic", "Paiement reçu");
       }
       if (kind === "XRPL_PAYMENT_OUT") {
@@ -875,7 +957,7 @@ export default function DemoCurrencyStatement({
 
       return tx?.description || "";
     },
-    [parseConversionPair, t]
+    [parseConversionPair, t],
   );
 
   const renderCurrencyBadge = useCallback(
@@ -911,12 +993,14 @@ export default function DemoCurrencyStatement({
       }
       return (
         <span className="inline-flex items-center gap-1">
-          <span className="text-base md:text-lg">{getCurrencyFlag(display)}</span>
+          <span className="text-base md:text-lg">
+            {getCurrencyFlag(display)}
+          </span>
           <span className="text-white/80 text-xs md:text-sm">{display}</span>
         </span>
       );
     },
-    [getCurrencyFlag]
+    [getCurrencyFlag],
   );
 
   const renderConversionDescription = useCallback(
@@ -940,31 +1024,40 @@ export default function DemoCurrencyStatement({
         </span>
       );
     },
-    [parseConversionPair, renderCurrencyBadge, t]
+    [parseConversionPair, renderCurrencyBadge, t],
   );
 
-  const formatDate = useCallback((dateStr) => {
-    if (!dateStr) return t("ui_not_available_9c2a1f7b3d", "N/A");
-    const date = new Date(dateStr);
-    const options = isMobileDate ?
-    { day: "2-digit", month: "2-digit" } :
-    { day: "2-digit", month: "2-digit", year: "numeric" };
-    return date.toLocaleDateString(locale, options);
-  }, [isMobileDate, locale, t]);
+  const formatDate = useCallback(
+    (dateStr) => {
+      if (!dateStr) return t("ui_not_available_9c2a1f7b3d", "N/A");
+      const date = new Date(dateStr);
+      const options = isMobileDate
+        ? { day: "2-digit", month: "2-digit" }
+        : { day: "2-digit", month: "2-digit", year: "numeric" };
+      return date.toLocaleDateString(locale, options);
+    },
+    [isMobileDate, locale, t],
+  );
 
-  const formatAmount = useCallback((amount) => {
-    return parseFloat(amount || 0).toLocaleString(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 6
-    });
-  }, [locale]);
+  const formatAmount = useCallback(
+    (amount) => {
+      return parseFloat(amount || 0).toLocaleString(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6,
+      });
+    },
+    [locale],
+  );
 
-  const formatUsdAmount = useCallback((amount) => {
-    return parseFloat(amount || 0).toLocaleString(locale, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }, [locale]);
+  const formatUsdAmount = useCallback(
+    (amount) => {
+      return parseFloat(amount || 0).toLocaleString(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    },
+    [locale],
+  );
 
   const formatAmountWithSymbolLocal = useCallback(
     (amount) =>
@@ -972,7 +1065,7 @@ export default function DemoCurrencyStatement({
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       }),
-    [displayCurrency, locale]
+    [displayCurrency, locale],
   );
 
   const formatUsdWithSymbol = useCallback(
@@ -981,59 +1074,77 @@ export default function DemoCurrencyStatement({
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       }),
-    [locale]
+    [locale],
   );
 
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
-    const ledgerIndexLabel = ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
+    const ledgerIndexLabel =
+      ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const docHashLabel = docHash || "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const balanceValue = Number.isFinite(Number(balance)) ? Number(balance) : 0;
-    const balanceDisplay = formatAmountWithSymbol(locale, balanceValue, displayCurrency, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+    const balanceDisplay = formatAmountWithSymbol(
+      locale,
+      balanceValue,
+      displayCurrency,
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      },
+    );
     const descriptionLabel = t("ui_description_4c9f6b1a2d", "Description");
     const typeLabel = t("ui_type_label_8b1a4d2c7e", "Type");
     const amountLabel = `${t("ui_amount_0bb3c64b1d", "Amount")} (${displayCurrency})`;
     const balanceLabel = `${t("ui_balance_label_7f2a1b9c5e", "Balance")} (${displayCurrency})`;
-    const rowsHtml = (transactionsWithDisplayBalance || []).map((tx) => {
-      const isDebit = tx?.type === "debit";
-      const txType = isDebit ?
-      t("ui_debit_0f7c2a1b9e", "Debit") :
-      t("ui_credit_93bc2a1d7e", "Credit");
-	      const txDescription = getLocalizedDescription(tx);
-	      const counterparty =
-	        tx?.counterparty &&
-	        !txDescription.includes(tx.counterparty)
-	          ? `(${tx.counterparty})`
-	          : "";
-      const fullDescription = [txDescription, counterparty].filter(Boolean).join(" ");
-      return `
+    const rowsHtml = (transactionsWithDisplayBalance || [])
+      .map((tx) => {
+        const isDebit = tx?.type === "debit";
+        const txType = isDebit
+          ? t("ui_debit_0f7c2a1b9e", "Debit")
+          : t("ui_credit_93bc2a1d7e", "Credit");
+        const txDescription = getLocalizedDescription(tx);
+        const counterparty =
+          tx?.counterparty && !txDescription.includes(tx.counterparty)
+            ? `(${tx.counterparty})`
+            : "";
+        const fullDescription = [txDescription, counterparty]
+          .filter(Boolean)
+          .join(" ");
+        return `
         <tr>
           <td>${escapeHtml(formatDate(tx?.date))}</td>
           <td>${escapeHtml(fullDescription)}</td>
           <td>${escapeHtml(txType)}</td>
-          <td class="right">${escapeHtml(`${isDebit ? "-" : "+"}${formatAmountWithSymbol(locale, tx?.amount, displayCurrency, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          })}`)}</td>
+          <td class="right">${escapeHtml(
+            `${isDebit ? "-" : "+"}${formatAmountWithSymbol(
+              locale,
+              tx?.amount,
+              displayCurrency,
+              {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              },
+            )}`,
+          )}</td>
           <td class="right">${escapeHtml(
             formatAmountWithSymbol(
               locale,
-              tx?.displayRunningBalance != null ? tx.displayRunningBalance : tx?.runningBalance,
+              tx?.displayRunningBalance != null
+                ? tx.displayRunningBalance
+                : tx?.runningBalance,
               displayCurrency,
-              { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-            )
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+            ),
           )}</td>
         </tr>
       `;
-    }).join("");
+      })
+      .join("");
     const emptyRow = `
       <tr>
         <td colspan="5" class="muted">${escapeHtml(
-          t("ui_no_transactions_found_af217af8de", "No transactions found")
+          t("ui_no_transactions_found_af217af8de", "No transactions found"),
         )}</td>
       </tr>
     `;
@@ -1065,20 +1176,21 @@ export default function DemoCurrencyStatement({
       </table>
     `;
   }, [
-  balance,
-  currentPeriod,
-  docHash,
-  displayCurrency,
-  fallbackPeriod,
-  getLocalizedDescription,
-  transactionsWithDisplayBalance,
-  formatDate,
-  ledgerLastIndex,
-  ledgerStatusLabel,
-  locale,
-  t,
-  walletAddress,
-  walletLabel]);
+    balance,
+    currentPeriod,
+    docHash,
+    displayCurrency,
+    fallbackPeriod,
+    getLocalizedDescription,
+    transactionsWithDisplayBalance,
+    formatDate,
+    ledgerLastIndex,
+    ledgerStatusLabel,
+    locale,
+    t,
+    walletAddress,
+    walletLabel,
+  ]);
 
   const handleExportPdf = useCallback(() => {
     setExportFormat("pdf");
@@ -1086,14 +1198,14 @@ export default function DemoCurrencyStatement({
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const ok = openPrintWindow({
         title: `XCANNES ${displayCurrency || "Statement"} ${suffix}`,
-        bodyHtml: buildPrintHtml()
+        bodyHtml: buildPrintHtml(),
       });
       if (!ok && typeof window !== "undefined") {
         window.alert(
           t(
             "ui_popup_blocked_1c7a9d3b5e",
-            "Popup blocked. Please allow popups to export or print."
-          )
+            "Popup blocked. Please allow popups to export or print.",
+          ),
         );
       }
     } finally {
@@ -1105,14 +1217,14 @@ export default function DemoCurrencyStatement({
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
     const ok = openPrintWindow({
       title: `XCANNES ${displayCurrency || "Statement"} ${suffix}`,
-      bodyHtml: buildPrintHtml()
+      bodyHtml: buildPrintHtml(),
     });
     if (!ok && typeof window !== "undefined") {
       window.alert(
         t(
           "ui_popup_blocked_1c7a9d3b5e",
-          "Popup blocked. Please allow popups to export or print."
-        )
+          "Popup blocked. Please allow popups to export or print.",
+        ),
       );
     }
   }, [buildPrintHtml, docHash, displayCurrency, t]);
@@ -1122,19 +1234,20 @@ export default function DemoCurrencyStatement({
     try {
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const headers = [
-      "date",
-      "type",
-      "category",
-      "description",
-      "amount",
-      "running_balance",
-      "statement_balance",
-      "counterparty",
-      "currency",
-      "ledger_status",
-      "ledger_index",
-      "doc_hash"];
-      const rows = (transactionsWithDisplayBalance || []).map((tx) => ([
+        "date",
+        "type",
+        "category",
+        "description",
+        "amount",
+        "running_balance",
+        "statement_balance",
+        "counterparty",
+        "currency",
+        "ledger_status",
+        "ledger_index",
+        "doc_hash",
+      ];
+      const rows = (transactionsWithDisplayBalance || []).map((tx) => [
         tx?.date || "",
         tx?.type || "",
         tx?.category || "",
@@ -1143,72 +1256,72 @@ export default function DemoCurrencyStatement({
         Number.isFinite(Number(tx?.displayRunningBalance))
           ? Number(tx.displayRunningBalance)
           : Number.isFinite(Number(tx?.runningBalance))
-          ? Number(tx.runningBalance)
-          : "",
+            ? Number(tx.runningBalance)
+            : "",
         Number.isFinite(Number(balance)) ? Number(balance) : "",
         tx?.counterparty || "",
         displayCurrency || "",
         ledgerStatus,
         ledgerLastIndex != null ? ledgerLastIndex : "",
-        docHash || ""
-      ]));
+        docHash || "",
+      ]);
       const csv = buildCsvString(headers, rows);
       downloadTextFile({
         filename: `xcannes-statement-${String(displayCurrency || "currency").toLowerCase()}-${suffix}.csv`,
         content: csv,
-        type: "text/csv;charset=utf-8"
+        type: "text/csv;charset=utf-8",
       });
     } finally {
       setExportFormat(null);
     }
   }, [
-  balance,
-  docHash,
-  displayCurrency,
-  getLocalizedDescription,
-  transactionsWithDisplayBalance,
-  ledgerLastIndex,
-  ledgerStatus]);
+    balance,
+    docHash,
+    displayCurrency,
+    getLocalizedDescription,
+    transactionsWithDisplayBalance,
+    ledgerLastIndex,
+    ledgerStatus,
+  ]);
 
   const STATEMENT_LAYOUTS = {
     full: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border border-white/10 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl"
+        "w-full xcannes-fullscreen-safe rounded-none border border-white/10 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl",
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-3 md:px-4",
-      panelClass:
-      "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[90vh]"
+      panelClass: "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[90vh]",
     },
     "dex-mobile": {
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-      "w-full xcannes-fullscreen-safe rounded-none border border-white/10"
+        "w-full xcannes-fullscreen-safe rounded-none border border-white/10",
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-center justify-center px-4",
-      panelClass:
-      "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[92vh]"
+      panelClass: "max-w-4xl lg:max-w-5xl rounded-2xl max-h-[92vh]",
     },
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass:
-      "w-full h-full rounded-xl"
-    }
+      panelClass: "w-full h-full rounded-xl",
+    },
   };
 
-  const resolvedLayout = STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+  const resolvedLayout =
+    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
 
-  const modalBgClass = noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
+  const modalBgClass =
+    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
   const showNotActivatedNotice =
     !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
@@ -1218,72 +1331,77 @@ export default function DemoCurrencyStatement({
     isWalletActivated === true &&
     hasRlusdTrustline === false;
 
-  const content =
-  <div
-    className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
-      inline
-        ? ""
-        : `${resolvedLayout.backdropClass} ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`
-    }`}
-    onClick={(e) => {
-      if (inline) return;
-      // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
-      if (e.target === e.currentTarget) {
-        onClose?.();
-      }
-    }}>
-
+  const content = (
+    <div
+      className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
+        inline
+          ? ""
+          : `${resolvedLayout.backdropClass} ${
+              isClosing
+                ? "wallet-modal-backdrop-out"
+                : "wallet-modal-backdrop-in"
+            }`
+      }`}
+      onClick={(e) => {
+        if (inline) return;
+        // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
+        if (e.target === e.currentTarget) {
+          onClose?.();
+        }
+      }}
+    >
       <div
-      className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
-        resolvedLayout.panelClass
-      } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}>
-
-        
-	        {/* Header avec Account Info intégré */}
-		        <div className={`flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}>
-	          <div className="flex items-start justify-between gap-3 mb-3">
+        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
+          resolvedLayout.panelClass
+        } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+      >
+        {/* Header avec Account Info intégré */}
+        <div
+          className={`flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-	              {CRYPTO_ICONS?.[displayCurrency] ? (
-	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
-	                  // eslint-disable-next-line @next/next/no-img-element
-	                  <img
-	                    src={CRYPTO_ICONS[displayCurrency]}
-	                    alt={displayCurrency}
-	                    width={32}
-	                    height={32}
-	                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
-	                  />
-	                ) : (
-	                  <Image
-	                    src={CRYPTO_ICONS[displayCurrency]}
-	                    alt={displayCurrency}
-	                    width={32}
-	                    height={32}
-	                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
-	                  />
-	                )
-	              ) : (
+              {CRYPTO_ICONS?.[displayCurrency] ? (
+                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={CRYPTO_ICONS[displayCurrency]}
+                    alt={displayCurrency}
+                    width={32}
+                    height={32}
+                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                  />
+                ) : (
+                  <Image
+                    src={CRYPTO_ICONS[displayCurrency]}
+                    alt={displayCurrency}
+                    width={32}
+                    height={32}
+                    className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 rounded-md"
+                  />
+                )
+              ) : (
                 <span className="text-2xl md:text-3xl flex-shrink-0">
-	                  {getCurrencyFlag(displayCurrency)}
-	                </span>
-	              )}
+                  {getCurrencyFlag(displayCurrency)}
+                </span>
+              )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 min-w-0">
-		                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
-		                    <span className="truncate">{currencyDescription || displayCurrency}</span>
-			                  </h2>
-	                  {showNotConnectedNotice ? (
-	                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-	                      {t("wallet_not_connected_title", "Wallet not connected")}
-	                    </span>
-	                  ) : null}
+                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+                    <span className="truncate">
+                      {currencyDescription || displayCurrency}
+                    </span>
+                  </h2>
+                  {showNotConnectedNotice ? (
+                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
+                      {t("wallet_not_connected_title", "Wallet not connected")}
+                    </span>
+                  ) : null}
                   {showNotActivatedNotice ? (
                     <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                       {t(
                         "wallet_not_activated_title",
-                        "Wallet not activated: a minimum reserve of 1 XRP is required."
+                        "Wallet not activated: a minimum reserve of 1 XRP is required.",
                       )}
                     </span>
                   ) : null}
@@ -1291,39 +1409,40 @@ export default function DemoCurrencyStatement({
                     <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                       {t(
                         "wallet_rlusd_not_activated_title",
-                        "RLUSD not activated. Authorize RLUSD on your wallet."
+                        "RLUSD not activated. Authorize RLUSD on your wallet.",
                       )}
                     </span>
                   ) : null}
                 </div>
-	                {/* Description merged into title */}
-	              </div>
+                {/* Description merged into title */}
+              </div>
             </div>
             <button
-            onClick={onClose}
-            className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2">
-
+              onClick={onClose}
+              className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
+            >
               ×
             </button>
-	          </div>
+          </div>
 
-	          
-	          {/* Account Info dans le header */}
-	          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-	            <div>
-		              <p className="text-sm text-white font-semibold truncate">
-		                {walletLabel || t("nav_wallet", "Wallet")}
-		              </p>
-		              {walletAddress ? (
-		                <p className="text-[11px] text-white/50 font-mono break-all">
-		                  {walletAddress}
-		                </p>
-		              ) : null}
-	            </div>
-	            <div>
-	              <p className="text-xs text-white/50 mb-1">{t("ui_statement_period_6dedec11d9", "Statement Period")}</p>
-	              {/* Month Selector - Version simplifiée */}
-                <DemoStatementMonthSelect
+          {/* Account Info dans le header */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <p className="text-sm text-white font-semibold truncate">
+                {walletLabel || t("nav_wallet", "Wallet")}
+              </p>
+              {walletAddress ? (
+                <p className="text-[11px] text-white/50 font-mono break-all">
+                  {walletAddress}
+                </p>
+              ) : null}
+            </div>
+            <div>
+              <p className="text-xs text-white/50 mb-1">
+                {t("ui_statement_period_6dedec11d9", "Statement Period")}
+              </p>
+              {/* Month Selector - Version simplifiée */}
+              <DemoStatementMonthSelect
                 value={selectedMonth}
                 onChange={(nextValue) => {
                   if (nextValue === "archives") {
@@ -1337,111 +1456,157 @@ export default function DemoCurrencyStatement({
                 menuClassName={modalBgClass}
               />
             </div>
-	            <div>
-	              <div className="flex items-start justify-between gap-3">
-	                <div className="pl-1">
-	                  <p className="text-xs text-white/50 mb-1">
-	                    {t("ui_balance_445d830d72", "Balance")}
-	                  </p>
-		                  <p className="text-sm text-white font-semibold">
-		                    {formatAmountWithSymbolLocal(balance)}
-		                  </p>
-	                </div>
-	                <div className="text-right">
-	                  <p className="text-xs text-white/50 mb-1">
-	                    {t("demo_indexed_stability_label_f4", "Stabilité Indexée")}
-	                  </p>
-	                  <p className="text-[11px] text-white/50">
-	                    ≈ {formatUsdWithSymbol(estimatedUsd)}
-	                  </p>
-	                </div>
-	              </div>
-
-		              {(normalizedCurrency === "XRP") &&
-		            <div className="mt-2 relative">
-	                  <div className="flex items-center justify-between gap-2">
-	                    <div>
-	                      <p className="text-xs text-white/50 whitespace-pre-line">{t("ui_reserve_2d584ec9c7", "Reserve")}</p>
-	                      <p className="text-[11px] text-white/70 font-mono">
-	                        {xrpReserveDetails
-	                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
-	                          : reservePlaceholder}
+            <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="pl-1">
+                  <p className="text-xs text-white/50 mb-1">
+                    {t("ui_balance_445d830d72", "Balance")}
                   </p>
+                  <p className="text-sm text-white font-semibold">
+                    {formatAmountWithSymbolLocal(balance)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-white/50 mb-1">
+                    {t("demo_indexed_stability_label_f4", "Stabilité Indexée")}
+                  </p>
+                  <p className="text-[11px] text-white/50">
+                    ≈ {formatUsdWithSymbol(estimatedUsd)}
+                  </p>
+                </div>
+              </div>
+
+              {normalizedCurrency === "XRP" && (
+                <div className="mt-2 relative">
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-xs text-white/50 whitespace-pre-line">
+                        {t("ui_reserve_2d584ec9c7", "Reserve")}
+                      </p>
+                      <p className="text-[11px] text-white/70 font-mono">
+                        {xrpReserveDetails
+                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
+                          : reservePlaceholder}
+                      </p>
                     </div>
                     <button
-                  type="button"
-	                  onClick={() => setReserveOpen((v) => !v)}
-	                  disabled={!xrpReserveDetails}
-	                  className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
-	                  aria-expanded={reserveOpen}
-	                  aria-disabled={!xrpReserveDetails}
-	                  aria-label={t("ui_reserve_breakdown_de2c3de53e", "Reserve breakdown")}>{t("ui_details_e9615e470d", "Details")}
+                      type="button"
+                      onClick={() => setReserveOpen((v) => !v)}
+                      disabled={!xrpReserveDetails}
+                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
+                      aria-expanded={reserveOpen}
+                      aria-disabled={!xrpReserveDetails}
+                      aria-label={t(
+                        "ui_reserve_breakdown_de2c3de53e",
+                        "Reserve breakdown",
+                      )}
+                    >
+                      {t("ui_details_e9615e470d", "Details")}
+                    </button>
+                  </div>
 
-
-                </button>
-	                  </div>
-
-	                  {reserveOpen &&
-	              <div className="mt-2 rounded-lg bg-black/60 p-3 space-y-2">
-	                      <div className="text-[11px] text-white/70">
-	                        <div className="flex items-center justify-between gap-2">
-	                          <span>{t("ui_activation_wallet_1dcd314549", "Activation wallet")}</span>
-                          <span className="font-mono">{xrpReserveDetails.activationXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
+                  {reserveOpen && (
+                    <div className="mt-2 rounded-lg bg-black/60 p-3 space-y-2">
+                      <div className="text-[11px] text-white/70">
+                        <div className="flex items-center justify-between gap-2">
+                          <span>
+                            {t(
+                              "ui_activation_wallet_1dcd314549",
+                              "Activation wallet",
+                            )}
+                          </span>
+                          <span className="font-mono">
+                            {xrpReserveDetails.activationXrp.toFixed(2)}
+                            {t("ui_xrp_034964b994", "XRP")}
+                          </span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
                           <span>
-                            {t("ui_trustline_rlusd_9c077313dc", "Trustline RLUSD")}{" "}
-                            {hasRlusdTrustline ?
-                              t("ui_status_active_short_4c8b1a7d2e", "(active)") :
-                              t("ui_status_to_activate_short_7a1c4d9b2e", "(to activate)")}
+                            {t(
+                              "ui_trustline_rlusd_9c077313dc",
+                              "Trustline RLUSD",
+                            )}{" "}
+                            {hasRlusdTrustline
+                              ? t(
+                                  "ui_status_active_short_4c8b1a7d2e",
+                                  "(active)",
+                                )
+                              : t(
+                                  "ui_status_to_activate_short_7a1c4d9b2e",
+                                  "(to activate)",
+                                )}
                           </span>
-                          <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
+                          <span className="font-mono">
+                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}
+                            {t("ui_xrp_034964b994", "XRP")}
+                          </span>
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-2">
                           <span>
-                            {t("ui_trustline_rlusd_91682deeea", "Trustline RLUSD")}{" "}
-                            {hasRlusdTrustline ?
-                              t("ui_status_active_short_4c8b1a7d2e", "(active)") :
-                              t("ui_status_to_activate_short_7a1c4d9b2e", "(to activate)")}
+                            {t(
+                              "ui_trustline_rlusd_91682deeea",
+                              "Trustline RLUSD",
+                            )}{" "}
+                            {hasRlusdTrustline
+                              ? t(
+                                  "ui_status_active_short_4c8b1a7d2e",
+                                  "(active)",
+                                )
+                              : t(
+                                  "ui_status_to_activate_short_7a1c4d9b2e",
+                                  "(to activate)",
+                                )}
                           </span>
-                          <span className="font-mono">{xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{t("ui_xrp_034964b994", "XRP")}</span>
+                          <span className="font-mono">
+                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}
+                            {t("ui_xrp_034964b994", "XRP")}
+                          </span>
                         </div>
                       </div>
                     </div>
-              }
+                  )}
                 </div>
-            }
-
+              )}
             </div>
           </div>
         </div>
 
         {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
-          
           {/* Archive Notice */}
-          {selectedMonth === 'archives' &&
-	        <div className="bg-blue-500/10 rounded-lg p-3 md:p-4">
+          {selectedMonth === "archives" && (
+            <div className="bg-blue-500/10 rounded-lg p-3 md:p-4">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <span className="text-xl">📁</span>
-                <span><strong>{t("ui_archives_743254edfe", "Archives:")}</strong>{t("ui_displaying_transactions_olde_e408b4a17d", "Displaying transactions older than 12 months.")}</span>
+                <span>
+                  <strong>{t("ui_archives_743254edfe", "Archives:")}</strong>
+                  {t(
+                    "ui_displaying_transactions_olde_e408b4a17d",
+                    "Displaying transactions older than 12 months.",
+                  )}
+                </span>
               </p>
             </div>
-        }
+          )}
 
-          {adjustmentInfo.required &&
-	        <div className="bg-amber-500/10 rounded-lg p-3 md:p-4">
+          {adjustmentInfo.required && (
+            <div className="bg-amber-500/10 rounded-lg p-3 md:p-4">
               <p className="text-sm text-amber-200 flex items-center gap-2">
                 <span className="text-xl">⚠️</span>
                 <span>
-                  <strong>{t("ui_adjustment_required_94b2c1d5aa", "Ajustement requis:")}</strong>{" "}
+                  <strong>
+                    {t(
+                      "ui_adjustment_required_94b2c1d5aa",
+                      "Ajustement requis:",
+                    )}
+                  </strong>{" "}
                   {t(
                     "ui_adjustment_required_desc_4f7a2c1b9e",
-                    "Le pool RLUSD ne couvre plus toutes les allocations."
+                    "Le pool RLUSD ne couvre plus toutes les allocations.",
                   )}
-                  {Number.isFinite(adjustmentInfo.deficit) ?
-                ` (${adjustmentInfo.deficit.toLocaleString(locale, { maximumFractionDigits: 6 })} RLUSD)` :
-                ""}
+                  {Number.isFinite(adjustmentInfo.deficit)
+                    ? ` (${adjustmentInfo.deficit.toLocaleString(locale, { maximumFractionDigits: 6 })} RLUSD)`
+                    : ""}
                 </span>
               </p>
               <div className="mt-2 flex justify-end">
@@ -1450,223 +1615,287 @@ export default function DemoCurrencyStatement({
                   onClick={() => {
                     if (typeof window === "undefined") return;
                     window.dispatchEvent(
-                      new CustomEvent("xcannes:wallet:open-adjustment")
+                      new CustomEvent("xcannes:wallet:open-adjustment"),
                     );
-	                  }}
-	                  className="px-3 py-1.5 text-xs rounded-lg bg-amber-300/20 text-amber-100 hover:bg-amber-300/30 transition-colors"
-	                >
+                  }}
+                  className="px-3 py-1.5 text-xs rounded-lg bg-amber-300/20 text-amber-100 hover:bg-amber-300/30 transition-colors"
+                >
                   {t(
                     "ui_adjustment_open_modal_3c2b1a9d5e",
-                    "Ajuster maintenant"
+                    "Ajuster maintenant",
                   )}
                 </button>
               </div>
             </div>
-        }
+          )}
 
           {/* Filters */}
-	          <div className="flex items-center justify-between gap-2 flex-wrap">
-	            <div className="flex gap-1.5 flex-wrap">
-	                <button
-	              onClick={() => setFilter("all")}
-	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-	              filter === "all" ?
-	              "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green" :
-	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{stripCountSuffix(t("ui_all_0c90d41d71", "All"))}
-                </button>
-	                <button
-	              onClick={() => setFilter("credit")}
-	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-	              filter === "credit" ?
-	              "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300" :
-	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{stripCountSuffix(t("ui_credits_b8166276a0", "Credits"))}
-                </button>
-	                <button
-	              onClick={() => setFilter("debit")}
-	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-	              filter === "debit" ?
-	              "bg-red-500/20 hover:bg-red-500/30 text-red-300" :
-	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{stripCountSuffix(t("ui_debits_38c870b18f", "Debits"))}
-                </button>
-	                <button
-	              onClick={() => setFilter("conversion")}
-	              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-	              filter === "conversion" ?
-	              "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300" :
-	              "bg-white/5 text-white/60 hover:bg-white/10"}`
-	              }>{stripCountSuffix(t("ui_conversions_b604b5ef8b", "Conversions"))}
-                </button>
-              </div>
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex gap-1.5 flex-wrap">
+              <button
+                onClick={() => setFilter("all")}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                  filter === "all"
+                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                }`}
+              >
+                {stripCountSuffix(t("ui_all_0c90d41d71", "All"))}
+              </button>
+              <button
+                onClick={() => setFilter("credit")}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                  filter === "credit"
+                    ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                }`}
+              >
+                {stripCountSuffix(t("ui_credits_b8166276a0", "Credits"))}
+              </button>
+              <button
+                onClick={() => setFilter("debit")}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                  filter === "debit"
+                    ? "bg-red-500/20 hover:bg-red-500/30 text-red-300"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                }`}
+              >
+                {stripCountSuffix(t("ui_debits_38c870b18f", "Debits"))}
+              </button>
+              <button
+                onClick={() => setFilter("conversion")}
+                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                  filter === "conversion"
+                    ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300"
+                    : "bg-white/5 text-white/60 hover:bg-white/10"
+                }`}
+              >
+                {stripCountSuffix(
+                  t("ui_conversions_b604b5ef8b", "Conversions"),
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Transactions Table */}
-	          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
-	            {error &&
-	          <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
-	                {error}
-	              </div>
-	          }
+          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
+            {error && (
+              <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
+                {error}
+              </div>
+            )}
             <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
-	              <table className="w-full text-sm">
-	                <thead className="sticky top-0 bg-black/85 backdrop-blur-md z-10">
-	                <tr>
-	                      <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_date_bb69dc2fa3", "Date")}</th>
-	                      <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_description_d37d7cf577", "Description")}</th>
-	                      <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">{t("ui_amount_1843418f56", "Amount")}</th>
-	                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">{t("ui_balance_445d830d72", "Balance")}</th>
-	                    </tr>
-	                </thead>
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-black/85 backdrop-blur-md z-10">
+                  <tr>
+                    <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
+                      {t("ui_date_bb69dc2fa3", "Date")}
+                    </th>
+                    <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
+                      {t("ui_description_d37d7cf577", "Description")}
+                    </th>
+                    <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
+                      {t("ui_amount_1843418f56", "Amount")}
+                    </th>
+                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">
+                      {t("ui_balance_445d830d72", "Balance")}
+                    </th>
+                  </tr>
+                </thead>
                 <tbody>
-                  {loading ?
-                <tr>
-                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_loading_948e39804b", "Loading…")}
-
-                  </td>
-                    </tr> :
-                (!visibleGroups || visibleGroups.length === 0) ?
-                <tr>
-                      <td colSpan="4" className="text-center py-12 text-white/40 text-sm">{t("ui_no_transactions_found_af217af8de", "No transactions found")}
-
-                  </td>
-                    </tr> :
-
-                (visibleGroups || []).map((group, groupIdx) => (
-                  <Fragment key={group.key || groupIdx}>
-                    {showMonthHeaders ? (
-                      <tr className="bg-white/5">
-                        <td colSpan="4" className="px-2 md:px-4 py-2 text-xs font-semibold text-white/70 uppercase tracking-wide">
-                          {group.label || group.key}
-                        </td>
-                      </tr>
-                    ) : null}
-                    {group.transactions.length === 0 ? (
-	                      <tr>
-	                        <td colSpan="4" className="text-center py-6 text-white/40 text-sm">
-	                          {t("ui_no_transactions_found_af217af8de", "No transactions found")}
-	                        </td>
-	                      </tr>
-                    ) : (
-                      group.transactions.map((tx, idx) => {
-                        const icon = getTransactionIcon(tx.category);
-                        const transactionId = tx?.id || null;
-                        const isHighlighted =
-                          highlightedTransactionId && transactionId === highlightedTransactionId;
-                        const rowClassName = isHighlighted
-                          ? "border-b border-white/5 bg-xcannes-green/10 transition-colors"
-                          : "border-b border-white/5 hover:bg-white/5 transition-colors";
-                        return (
-                          <tr
-                            key={`${group.key || groupIdx}-${idx}`}
-                            ref={isHighlighted ? highlightRowRef : null}
-                            className={rowClassName}
-                          >
-                            <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
-                              {formatDate(tx.date)}
-                            </td>
-                            <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
-                              <div className="flex items-center gap-2">
-                                {icon ? (
-                                  <span className="transaction-icon text-lg flex-shrink-0">
-                                    {icon}
-                                  </span>
-                                ) : null}
-                                <div className="min-w-0">
-                                  <p className="text-sm text-white/90 truncate">
-                                    {(() => {
-                                      const localizedDescription = getLocalizedDescription(tx);
-                                      const suppressFlags = Boolean(tx?.suppressDescriptionFlags);
-                                      if (tx.category === "exchange") {
-                                        return renderConversionDescription(localizedDescription, {
-                                          withLabel: !isMobileDate,
-                                        }) ||
-                                          (isMobileDate
-                                            ? simplifyMobileDescription(localizedDescription, tx.category)
-                                            : enrichDescription(localizedDescription));
-                                      }
-                                      if (suppressFlags) {
-                                        return localizedDescription;
-                                      }
-                                      return isMobileDate
-                                        ? (tx.kind === "XRPL_PAYMENT_IN"
-                                            ? t("statement_xrpl_mobile_in", "Reçu")
-                                            : tx.kind === "XRPL_PAYMENT_OUT"
-                                              ? t("statement_xrpl_mobile_out", "Envoyé")
-                                              : simplifyMobileDescription(localizedDescription, tx.category))
-                                        : enrichDescription(localizedDescription);
-                                    })()}
-                                  </p>
-                                  {tx.counterparty && (
-                                    <p className="text-xs text-white/40 font-mono truncate hidden md:block">
-                                      {tx.counterparty.slice(0, 10)}...{tx.counterparty.slice(-6)}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
+                  {loading ? (
+                    <tr>
+                      <td
+                        colSpan="4"
+                        className="text-center py-12 text-white/40 text-sm"
+                      >
+                        {t("ui_loading_948e39804b", "Loading…")}
+                      </td>
+                    </tr>
+                  ) : !visibleGroups || visibleGroups.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="4"
+                        className="text-center py-12 text-white/40 text-sm"
+                      >
+                        {t(
+                          "ui_no_transactions_found_af217af8de",
+                          "No transactions found",
+                        )}
+                      </td>
+                    </tr>
+                  ) : (
+                    (visibleGroups || []).map((group, groupIdx) => (
+                      <Fragment key={group.key || groupIdx}>
+                        {showMonthHeaders ? (
+                          <tr className="bg-white/5">
                             <td
-                              className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${
-                                tx.type === "debit" ? "text-red-400" : "text-green-400"
-                              }`}
+                              colSpan="4"
+                              className="px-2 md:px-4 py-2 text-xs font-semibold text-white/70 uppercase tracking-wide"
                             >
-                              {tx.type === "debit" ? "−" : "+"}
-                              {formatAmountWithSymbolLocal(tx.amount)}
+                              {group.label || group.key}
                             </td>
-                            <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                              {formatAmountWithSymbolLocal(
-                                tx?.displayRunningBalance != null
-                                  ? tx.displayRunningBalance
-                                  : tx.runningBalance
+                          </tr>
+                        ) : null}
+                        {group.transactions.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan="4"
+                              className="text-center py-6 text-white/40 text-sm"
+                            >
+                              {t(
+                                "ui_no_transactions_found_af217af8de",
+                                "No transactions found",
                               )}
                             </td>
                           </tr>
-                        );
-                      })
-                    )}
-                  </Fragment>
-                ))
-                }
+                        ) : (
+                          group.transactions.map((tx, idx) => {
+                            const icon = getTransactionIcon(tx.category);
+                            const transactionId = tx?.id || null;
+                            const isHighlighted =
+                              highlightedTransactionId &&
+                              transactionId === highlightedTransactionId;
+                            const rowClassName = isHighlighted
+                              ? "border-b border-white/5 bg-xcannes-green/10 transition-colors"
+                              : "border-b border-white/5 hover:bg-white/5 transition-colors";
+                            return (
+                              <tr
+                                key={`${group.key || groupIdx}-${idx}`}
+                                ref={isHighlighted ? highlightRowRef : null}
+                                className={rowClassName}
+                              >
+                                <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
+                                  {formatDate(tx.date)}
+                                </td>
+                                <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
+                                  <div className="flex items-center gap-2">
+                                    {icon ? (
+                                      <span className="transaction-icon text-lg flex-shrink-0">
+                                        {icon}
+                                      </span>
+                                    ) : null}
+                                    <div className="min-w-0">
+                                      <p className="text-sm text-white/90 truncate">
+                                        {(() => {
+                                          const localizedDescription =
+                                            getLocalizedDescription(tx);
+                                          const suppressFlags = Boolean(
+                                            tx?.suppressDescriptionFlags,
+                                          );
+                                          if (tx.category === "exchange") {
+                                            return (
+                                              renderConversionDescription(
+                                                localizedDescription,
+                                                {
+                                                  withLabel: !isMobileDate,
+                                                },
+                                              ) ||
+                                              (isMobileDate
+                                                ? simplifyMobileDescription(
+                                                    localizedDescription,
+                                                    tx.category,
+                                                  )
+                                                : enrichDescription(
+                                                    localizedDescription,
+                                                  ))
+                                            );
+                                          }
+                                          if (suppressFlags) {
+                                            return localizedDescription;
+                                          }
+                                          return isMobileDate
+                                            ? tx.kind === "XRPL_PAYMENT_IN"
+                                              ? t(
+                                                  "statement_xrpl_mobile_in",
+                                                  "Reçu",
+                                                )
+                                              : tx.kind === "XRPL_PAYMENT_OUT"
+                                                ? t(
+                                                    "statement_xrpl_mobile_out",
+                                                    "Envoyé",
+                                                  )
+                                                : simplifyMobileDescription(
+                                                    localizedDescription,
+                                                    tx.category,
+                                                  )
+                                            : enrichDescription(
+                                                localizedDescription,
+                                              );
+                                        })()}
+                                      </p>
+                                      {tx.counterparty && (
+                                        <p className="text-xs text-white/40 font-mono truncate hidden md:block">
+                                          {tx.counterparty.slice(0, 10)}...
+                                          {tx.counterparty.slice(-6)}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td
+                                  className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${
+                                    tx.type === "debit"
+                                      ? "text-red-400"
+                                      : "text-green-400"
+                                  }`}
+                                >
+                                  {tx.type === "debit" ? "−" : "+"}
+                                  {formatAmountWithSymbolLocal(tx.amount)}
+                                </td>
+                                <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
+                                  {formatAmountWithSymbolLocal(
+                                    tx?.displayRunningBalance != null
+                                      ? tx.displayRunningBalance
+                                      : tx.runningBalance,
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </Fragment>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
 
-          {hasMore &&
-        <button
-          type="button"
-	          onClick={() => onLoadMore && onLoadMore()}
-	          disabled={loadingMore}
-	          className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70">
-
-              {loadingMore ?
-                t("ui_loading_1386baebe9", "Loading…") :
-                t("ui_load_more_3f7a1c9d5b", "Load more")}
+          {hasMore && (
+            <button
+              type="button"
+              onClick={() => onLoadMore && onLoadMore()}
+              disabled={loadingMore}
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70"
+            >
+              {loadingMore
+                ? t("ui_loading_1386baebe9", "Loading…")
+                : t("ui_load_more_3f7a1c9d5b", "Load more")}
             </button>
-        }
+          )}
 
-		          {/* Watermark */}
-			          <div className="hidden sm:block text-center py-3 md:py-4">
-		            <div className="space-y-1">
-		              {ledgerLastIndex != null ?
-		            <p className="text-xs text-white/20 font-mono">
-		                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
-		                  {ledgerLastIndex}
-	                </p> :
-	            null}
-	            </div>
-	          </div>
-	        </div>
+          {/* Watermark */}
+          <div className="hidden sm:block text-center py-3 md:py-4">
+            <div className="space-y-1">
+              {ledgerLastIndex != null ? (
+                <p className="text-xs text-white/20 font-mono">
+                  {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
+                  {ledgerLastIndex}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        </div>
 
-	        {/* Footer Actions */}
+        {/* Footer Actions */}
         <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30">
-	          <div className="flex gap-2 flex-wrap">
-	            <button
-	            onClick={handleExportPdf}
-	            disabled={exportFormat === "pdf"}
-	            className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70">
-
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={handleExportPdf}
+              disabled={exportFormat === "pdf"}
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70"
+            >
               {exportFormat === "pdf" ? (
                 <>
                   <span className="md:hidden" aria-hidden>
@@ -1687,17 +1916,17 @@ export default function DemoCurrencyStatement({
                 </>
               )}
             </button>
-	            <button
-	            onClick={handlePrint}
-	            className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70">{t("ui_print_1313eff37c", "🖨️ Print")}
-
-
-          </button>
+            <button
+              onClick={handlePrint}
+              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70"
+            >
+              {t("ui_print_1313eff37c", "🖨️ Print")}
+            </button>
           </div>
         </div>
       </div>
-    </div>;
-
+    </div>
+  );
 
   if (inline) {
     return content;

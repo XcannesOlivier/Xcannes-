@@ -9,7 +9,7 @@ import { useModalTransition } from "@/utils/useModalTransition";
 export default function DemoWalletDashboardStatementModals({
   augmentedTokens,
   backendWalletAddress,
-  effectiveWallet,
+  wallet,
   walletDisplayLabel = "",
   isPreviewMode = false,
   isWalletActivated = null,
@@ -45,7 +45,7 @@ export default function DemoWalletDashboardStatementModals({
 
   const rlusdBalance = useMemo(() => {
     const token = (augmentedTokens || []).find(
-      (entry) => String(entry?.currency || "").toUpperCase() === "RLUSD"
+      (entry) => String(entry?.currency || "").toUpperCase() === "RLUSD",
     );
     const value = Number.parseFloat(token?.value ?? token?.balance ?? 0);
     return Number.isFinite(value) ? value : 0;
@@ -63,7 +63,8 @@ export default function DemoWalletDashboardStatementModals({
   const [currencyTransactions, setCurrencyTransactions] = useState([]);
   const [currencyStatementMonths, setCurrencyStatementMonths] = useState([]);
   const [currencyCursorNext, setCurrencyCursorNext] = useState(null);
-  const [currencyBalanceAfterNext, setCurrencyBalanceAfterNext] = useState(null);
+  const [currencyBalanceAfterNext, setCurrencyBalanceAfterNext] =
+    useState(null);
   const [currencyHasMore, setCurrencyHasMore] = useState(false);
   const [currencyLoadingMore, setCurrencyLoadingMore] = useState(false);
   const [currencyLoading, setCurrencyLoading] = useState(false);
@@ -74,8 +75,8 @@ export default function DemoWalletDashboardStatementModals({
     throw new Error(
       t(
         "demo_wallet_statements_live_disabled_8f4c2a1d9e",
-        "On-chain statements are disabled in the demo wallet."
-      )
+        "On-chain statements are disabled in the demo wallet.",
+      ),
     );
   }, [t]);
 
@@ -95,7 +96,7 @@ export default function DemoWalletDashboardStatementModals({
       console.error("[wallet/statement] global load error:", err);
       setGlobalError(
         err?.message ||
-          t("ui_statement_load_failed_9b1c7a2d5e", "Failed to load statement.")
+          t("ui_statement_load_failed_9b1c7a2d5e", "Failed to load statement."),
       );
       setGlobalMovements([]);
       setGlobalHasMore(false);
@@ -126,8 +127,8 @@ export default function DemoWalletDashboardStatementModals({
         err?.message ||
           t(
             "ui_statement_load_more_movements_failed_2a7c1b9d5e",
-            "Failed to load more movements."
-          )
+            "Failed to load more movements.",
+          ),
       );
     } finally {
       setGlobalLoadingMore(false);
@@ -145,7 +146,9 @@ export default function DemoWalletDashboardStatementModals({
   const loadCurrencyFirstPage = useCallback(
     async (currencyCode) => {
       if (!canFetchStatements) return;
-      const code = String(currencyCode || "").trim().toUpperCase();
+      const code = String(currencyCode || "")
+        .trim()
+        .toUpperCase();
       if (!code) return;
 
       setCurrencyLoading(true);
@@ -163,10 +166,10 @@ export default function DemoWalletDashboardStatementModals({
           limit: 100,
         });
         setCurrencyTransactions(
-          Array.isArray(data?.transactions) ? data.transactions : []
+          Array.isArray(data?.transactions) ? data.transactions : [],
         );
         setCurrencyStatementMonths(
-          Array.isArray(data?.statementMonths) ? data.statementMonths : []
+          Array.isArray(data?.statementMonths) ? data.statementMonths : [],
         );
         setCurrencyHasMore(Boolean(data?.hasMore));
         setCurrencyCursorNext(data?.cursorNext || null);
@@ -177,8 +180,8 @@ export default function DemoWalletDashboardStatementModals({
           err?.message ||
             t(
               "ui_statement_load_failed_9b1c7a2d5e",
-              "Failed to load statement."
-            )
+              "Failed to load statement.",
+            ),
         );
         setCurrencyTransactions([]);
         setCurrencyStatementMonths([]);
@@ -189,13 +192,15 @@ export default function DemoWalletDashboardStatementModals({
         setCurrencyLoading(false);
       }
     },
-    [backendWalletAddress, canFetchStatements, fetchStatement, t]
+    [backendWalletAddress, canFetchStatements, fetchStatement, t],
   );
 
   const loadCurrencyMore = useCallback(
     async (currencyCode) => {
       if (!canFetchStatements || currencyLoadingMore) return;
-      const code = String(currencyCode || "").trim().toUpperCase();
+      const code = String(currencyCode || "")
+        .trim()
+        .toUpperCase();
       if (!code || !currencyHasMore || !currencyCursorNext) return;
 
       setCurrencyLoadingMore(true);
@@ -226,8 +231,8 @@ export default function DemoWalletDashboardStatementModals({
           err?.message ||
             t(
               "ui_statement_load_more_transactions_failed_1c7b2a9d5e",
-              "Failed to load more transactions."
-            )
+              "Failed to load more transactions.",
+            ),
         );
       } finally {
         setCurrencyLoadingMore(false);
@@ -243,7 +248,7 @@ export default function DemoWalletDashboardStatementModals({
       currencyStatementMonths,
       fetchStatement,
       t,
-    ]
+    ],
   );
 
   const shouldLoadGlobal = showGlobalStatement || inlineGlobalStatement;
@@ -275,7 +280,8 @@ export default function DemoWalletDashboardStatementModals({
     };
 
     window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
-    return () => window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
+    return () =>
+      window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
   }, [
     backendWalletAddress,
     canFetchStatements,
@@ -286,12 +292,16 @@ export default function DemoWalletDashboardStatementModals({
     shouldLoadGlobal,
   ]);
 
-  const previewMovements = canFetchStatements ? null : (previewGlobalMovements || []);
+  const previewMovements = canFetchStatements
+    ? null
+    : previewGlobalMovements || [];
   const previewTransactions = canFetchStatements
     ? null
-    : (previewCurrencyTransactions || []);
+    : previewCurrencyTransactions || [];
   const effectiveCurrencyToken = selectedStatementToken || closingCurrencyToken;
-  const currencyModalOpen = Boolean(showCurrencyStatement && selectedStatementToken);
+  const currencyModalOpen = Boolean(
+    showCurrencyStatement && selectedStatementToken,
+  );
   const globalModalTransition = useModalTransition(showGlobalStatement, {
     enabled: !inlineGlobalStatement,
   });
@@ -317,25 +327,27 @@ export default function DemoWalletDashboardStatementModals({
         <div className={inlineGlobalStatementClassName}>
           <DemoGlobalStatement
             tokens={globalStatementTokens || augmentedTokens}
-            walletAddress={effectiveWallet}
+            walletAddress={wallet}
             walletLabelOverride={walletDisplayLabel}
             isPreviewMode={isPreviewMode}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
             noticeVariant={noticeVariant}
             noticeContextLabel={noticeContextLabel}
-          walletId={walletId}
-          period="December 2025"
-          isFullPage={isFullPageView}
-          variant={inlineStatementVariant || "inline-desktop"}
-          inline
-          usdRates={usdRates}
-          totalBalanceOverride={statementTotalBalanceUsd}
-          movements={canFetchStatements ? globalMovements : previewMovements}
-          movementsLoading={canFetchStatements ? globalLoading : false}
+            walletId={walletId}
+            period="December 2025"
+            isFullPage={isFullPageView}
+            variant={inlineStatementVariant || "inline-desktop"}
+            inline
+            usdRates={usdRates}
+            totalBalanceOverride={statementTotalBalanceUsd}
+            movements={canFetchStatements ? globalMovements : previewMovements}
+            movementsLoading={canFetchStatements ? globalLoading : false}
             movementsError={canFetchStatements ? globalError : null}
             movementsHasMore={canFetchStatements ? globalHasMore : false}
-            movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
+            movementsLoadingMore={
+              canFetchStatements ? globalLoadingMore : false
+            }
             onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
             onClose={() => {}}
             onViewCurrency={(token) => {
@@ -346,8 +358,8 @@ export default function DemoWalletDashboardStatementModals({
         </div>
       ) : null}
 
-	      {inlineCurrencyStatement && selectedStatementToken ? (
-	        <div className={inlineCurrencyStatementClassName}>
+      {inlineCurrencyStatement && selectedStatementToken ? (
+        <div className={inlineCurrencyStatementClassName}>
           <DemoCurrencyStatement
             currency={selectedStatementToken.currency}
             balance={
@@ -356,12 +368,12 @@ export default function DemoWalletDashboardStatementModals({
                 : parseFloat(selectedStatementToken.value || 0)
             }
             issuer={selectedStatementToken.issuer}
-	            walletAddress={effectiveWallet}
-	            walletLabelOverride={walletDisplayLabel}
-	            backendWalletAddress={backendWalletAddress}
-	            isPreviewMode={isPreviewMode}
-	            isWalletActivated={isWalletActivated}
-	            hasRlusdTrustline={hasRlusdTrustline}
+            walletAddress={wallet}
+            walletLabelOverride={walletDisplayLabel}
+            backendWalletAddress={backendWalletAddress}
+            isPreviewMode={isPreviewMode}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
             noticeVariant={noticeVariant}
             noticeContextLabel={noticeContextLabel}
             walletId={walletId}
@@ -396,7 +408,7 @@ export default function DemoWalletDashboardStatementModals({
       {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
         <DemoGlobalStatement
           tokens={globalStatementTokens || augmentedTokens}
-          walletAddress={effectiveWallet}
+          walletAddress={wallet}
           walletLabelOverride={walletDisplayLabel}
           isPreviewMode={isPreviewMode}
           isWalletActivated={isWalletActivated}
@@ -425,7 +437,9 @@ export default function DemoWalletDashboardStatementModals({
         />
       ) : null}
 
-      {currencyModalTransition.shouldRender && effectiveCurrencyToken && !inlineCurrencyStatement ? (
+      {currencyModalTransition.shouldRender &&
+      effectiveCurrencyToken &&
+      !inlineCurrencyStatement ? (
         <DemoCurrencyStatement
           currency={effectiveCurrencyToken.currency}
           balance={
@@ -434,7 +448,7 @@ export default function DemoWalletDashboardStatementModals({
               : parseFloat(effectiveCurrencyToken.value || 0)
           }
           issuer={effectiveCurrencyToken.issuer}
-          walletAddress={effectiveWallet}
+          walletAddress={wallet}
           walletLabelOverride={walletDisplayLabel}
           backendWalletAddress={backendWalletAddress}
           isPreviewMode={isPreviewMode}
@@ -452,9 +466,7 @@ export default function DemoWalletDashboardStatementModals({
               ? currencyTransactions
               : previewTransactions || []
           }
-          statementMonths={
-            canFetchStatements ? currencyStatementMonths : null
-          }
+          statementMonths={canFetchStatements ? currencyStatementMonths : null}
           hasMore={canFetchStatements ? currencyHasMore : false}
           loadingMore={canFetchStatements ? currencyLoadingMore : false}
           onLoadMore={

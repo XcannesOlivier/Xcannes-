@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
-import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { useMemo, useState, useEffect, useRef } from "react";
+import { XCircleIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
@@ -10,17 +10,21 @@ const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
 const MOONPAY_TAG_XRP = Number.parseInt(
   process.env.NEXT_PUBLIC_MOONPAY_TAG_XRP || "589",
-  10
+  10,
 );
 const MOONPAY_TAG_RLUSD = Number.parseInt(
   process.env.NEXT_PUBLIC_MOONPAY_TAG_RLUSD || "590",
-  10
+  10,
 );
 
 const resolveMoonpayTag = (currencyCode) => {
-  const code = String(currencyCode || "").trim().toUpperCase();
-  if (code === "XRP") return Number.isFinite(MOONPAY_TAG_XRP) ? MOONPAY_TAG_XRP : null;
-  if (code === "RLUSD") return Number.isFinite(MOONPAY_TAG_RLUSD) ? MOONPAY_TAG_RLUSD : null;
+  const code = String(currencyCode || "")
+    .trim()
+    .toUpperCase();
+  if (code === "XRP")
+    return Number.isFinite(MOONPAY_TAG_XRP) ? MOONPAY_TAG_XRP : null;
+  if (code === "RLUSD")
+    return Number.isFinite(MOONPAY_TAG_RLUSD) ? MOONPAY_TAG_RLUSD : null;
   return null;
 };
 
@@ -37,7 +41,7 @@ const isTrustedMoonPayOrigin = (origin) => {
 
 /**
  * MoonPayBuyModal - Modal pour acheter des cryptos avec MoonPay
- * 
+ *
  * @param {boolean} isOpen - Modal ouverte ou fermée
  * @param {function} onClose - Callback de fermeture
  * @param {string} walletAddress - Adresse XRPL de destination
@@ -55,40 +59,41 @@ const DemoMoonPayBuyModal = ({
   noticeContextLabel = "",
   demoMode = false,
   onDemoSubmit,
-  prefill = null
-	}) => {
-	  const { t } = useTranslation("common");
-	  const stripLeadingNoticePrefix = (value) =>
-	    String(value || "").replace(/^\s*[^:：]{1,60}\s*[:：]\s*/, "");
-	  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-	  const [iframeUrl, setIframeUrl] = useState(null);
-	  const [loading, setLoading] = useState(false);
-	  const [error, setError] = useState(null);
-  const [step, setStep] = useState('form'); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
+  prefill = null,
+}) => {
+  const { t } = useTranslation("common");
+  const stripLeadingNoticePrefix = (value) =>
+    String(value || "").replace(/^\s*[^:：]{1,60}\s*[:：]\s*/, "");
+  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
+  const [iframeUrl, setIframeUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const showNotActivatedNotice = false;
 
   // Options d'achat (RLUSD par défaut)
-  const [currency, setCurrency] = useState('RLUSD');
-  const [amount, setAmount] = useState('');
-  const [amountType, setAmountType] = useState('fiat');
-  const [fiatCurrency, setFiatCurrency] = useState('USD');
+  const [currency, setCurrency] = useState("RLUSD");
+  const [amount, setAmount] = useState("");
+  const [amountType, setAmountType] = useState("fiat");
+  const [fiatCurrency, setFiatCurrency] = useState("USD");
   const [fiatCurrencies, setFiatCurrencies] = useState([]);
   const [fiatLoading, setFiatLoading] = useState(false);
   const [fiatError, setFiatError] = useState(null);
   const resolveFiatErrorMessage = (data) => {
-    if (!data) return 'Failed to load fiat currencies';
-    if (typeof data === 'string') return data;
-    if (typeof data?.error === 'string') return data.error;
+    if (!data) return "Failed to load fiat currencies";
+    if (typeof data === "string") return data;
+    if (typeof data?.error === "string") return data.error;
     if (data?.error?.message) return data.error.message;
     if (data?.message) return data.message;
-    return 'Failed to load fiat currencies';
+    return "Failed to load fiat currencies";
   };
 
   // Cryptos supportées par MoonPay (USD via RLUSD)
   const supportedCurrencies = [
-  { code: 'RLUSD', name: 'USD Stablecoin', icon: CRYPTO_ICONS.RLUSD }];
+    { code: "RLUSD", name: "USD Stablecoin", icon: CRYPTO_ICONS.RLUSD },
+  ];
 
   const PRODUCT_MIN_USD = 5;
 
@@ -126,7 +131,6 @@ const DemoMoonPayBuyModal = ({
     }
   }, [isOpen, prefill, prefillSignature]);
 
-
   const showRlusdNotActivatedNotice = false;
 
   const selectedFiat = useMemo(() => {
@@ -135,13 +139,12 @@ const DemoMoonPayBuyModal = ({
 
   const minFiatAmount = useMemo(() => {
     const candidate = Number(
-      selectedFiat?.minBuyAmount ??
-      selectedFiat?.minAmount
+      selectedFiat?.minBuyAmount ?? selectedFiat?.minAmount,
     );
     if (Number.isFinite(candidate) && candidate > 0) {
       return candidate;
     }
-    if (fiatCurrency === 'USD') {
+    if (fiatCurrency === "USD") {
       return PRODUCT_MIN_USD;
     }
     return null;
@@ -155,20 +158,20 @@ const DemoMoonPayBuyModal = ({
       setFiatLoading(true);
       setFiatError(null);
       try {
-        const response = await fetch('/api/moonpay/fiat-currencies');
+        const response = await fetch("/api/moonpay/fiat-currencies");
         const data = await response.json();
         if (!response.ok) {
           throw new Error(resolveFiatErrorMessage(data));
         }
         const list = data?.currencies || data?.data || data || [];
-        const normalized = Array.isArray(list) ?
-        list
-          .map((fiat) => ({
-            ...fiat,
-            code: String(fiat?.code || '').toUpperCase(),
-          }))
-          .filter((fiat) => fiat.code) :
-        [];
+        const normalized = Array.isArray(list)
+          ? list
+              .map((fiat) => ({
+                ...fiat,
+                code: String(fiat?.code || "").toUpperCase(),
+              }))
+              .filter((fiat) => fiat.code)
+          : [];
 
         if (!active) return;
         setFiatCurrencies(normalized);
@@ -176,12 +179,12 @@ const DemoMoonPayBuyModal = ({
           if (normalized.some((fiat) => fiat.code === prev)) {
             return prev;
           }
-          const usd = normalized.find((fiat) => fiat.code === 'USD');
-          return usd?.code || normalized[0]?.code || 'USD';
+          const usd = normalized.find((fiat) => fiat.code === "USD");
+          return usd?.code || normalized[0]?.code || "USD";
         });
       } catch (error) {
         if (!active) return;
-        setFiatError(error?.message || 'Failed to load fiat currencies');
+        setFiatError(error?.message || "Failed to load fiat currencies");
         setFiatCurrencies([]);
       } finally {
         if (active) setFiatLoading(false);
@@ -201,8 +204,8 @@ const DemoMoonPayBuyModal = ({
       setError(
         t(
           "moonpay_error_wallet_required_5f2a1c9d3e",
-          "Wallet address is required."
-        )
+          "Wallet address is required.",
+        ),
       );
       return;
     }
@@ -211,19 +214,23 @@ const DemoMoonPayBuyModal = ({
       setError(
         t(
           "moonpay_error_invalid_amount_8c3b1a6d2f",
-          "Please enter a valid amount."
-        )
+          "Please enter a valid amount.",
+        ),
       );
       return;
     }
 
-    if (amountType === 'fiat' && minFiatAmount !== null && parseFloat(amount) < minFiatAmount) {
+    if (
+      amountType === "fiat" &&
+      minFiatAmount !== null &&
+      parseFloat(amount) < minFiatAmount
+    ) {
       setError(
         t("moonpay_error_minimum_fiat", {
           defaultValue: "Minimum amount is {{amount}} {{currency}}.",
           amount: minFiatAmount,
           currency: fiatCurrency,
-        })
+        }),
       );
       return;
     }
@@ -238,14 +245,14 @@ const DemoMoonPayBuyModal = ({
             currencyCode: String(currency || "RLUSD").toUpperCase(),
             baseCurrencyCode: String(fiatCurrency || "USD").toUpperCase(),
             amountType,
-            amount: parseFloat(amount)
-          })
+            amount: parseFloat(amount),
+          }),
         );
         if (res?.error) {
           throw new Error(res.error);
         }
         setIframeUrl(null);
-        setStep('success');
+        setStep("success");
         setTimeout(() => {
           onClose?.();
         }, 1200);
@@ -255,19 +262,19 @@ const DemoMoonPayBuyModal = ({
       throw new Error(
         t(
           "demo_wallet_moonpay_live_disabled_8f4c2a1d9e",
-          "MoonPay is disabled in the demo wallet."
-        )
+          "MoonPay is disabled in the demo wallet.",
+        ),
       );
     } catch (err) {
-      console.error('Error generating buy URL:', err);
+      console.error("Error generating buy URL:", err);
       setError(
         err.message ||
           t(
             "moonpay_error_load_widget_3c1a7d8b2e",
-            "Failed to load MoonPay widget."
-          )
+            "Failed to load MoonPay widget.",
+          ),
       );
-      setStep('error');
+      setStep("error");
     } finally {
       setLoading(false);
     }
@@ -282,40 +289,40 @@ const DemoMoonPayBuyModal = ({
       const { type, status } = event.data;
 
       if (DEBUG_LOGS) {
-        console.log('MoonPay message received:', event.data);
+        console.log("MoonPay message received:", event.data);
       }
 
       // Transaction complétée
-      if (type === 'transaction_completed' || status === 'completed') {
-        setStep('success');
+      if (type === "transaction_completed" || status === "completed") {
+        setStep("success");
         setTimeout(() => {
           onClose();
         }, 3000);
       }
 
       // Transaction échouée
-      if (type === 'transaction_failed' || status === 'failed') {
+      if (type === "transaction_failed" || status === "failed") {
         setError(
           t(
             "moonpay_error_transaction_failed_9a2c1b7d5e",
-            "Transaction failed. Please try again."
-          )
+            "Transaction failed. Please try again.",
+          ),
         );
-        setStep('error');
+        setStep("error");
       }
 
       // Utilisateur a fermé le widget
-      if (type === 'close' || type === 'widget_closed') {
+      if (type === "close" || type === "widget_closed") {
         onClose();
       }
     };
 
     if (isOpen) {
-      window.addEventListener('message', handleMessage);
+      window.addEventListener("message", handleMessage);
     }
 
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
     };
   }, [isOpen, onClose, t]);
 
@@ -333,11 +340,10 @@ const DemoMoonPayBuyModal = ({
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
   const showFiatError = fiatError && !fiatLoading;
-  const fiatOptions =
-    fiatCurrencies.map((fiat) => ({
-      value: fiat.code,
-      label: `${fiat.name || fiat.code} (${fiat.code})`,
-    }));
+  const fiatOptions = fiatCurrencies.map((fiat) => ({
+    value: fiat.code,
+    label: `${fiat.name || fiat.code} (${fiat.code})`,
+  }));
   const fiatSelectValue = fiatCurrencies.length === 0 ? "" : fiatCurrency;
 
   const shouldAnimate = !embedded;
@@ -352,256 +358,251 @@ const DemoMoonPayBuyModal = ({
   }
 
   // Mode embedded: retourner seulement le contenu
-  const renderContent = () =>
-  <div className={embedded ? "" : "p-4 md:p-5"}>
-            {/* Form */}
-            {step === 'form' &&
-    <div className="space-y-4">
+  const renderContent = () => (
+    <div className={embedded ? "" : "p-4 md:p-5"}>
+      {/* Form */}
+      {step === "form" && (
+        <div className="space-y-4">
+          {/* Currency selector */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">
+              {t("moonpay_select_cryptocurrency", "Select cryptocurrency")}
+            </label>
+            <ModalSelect
+              value={currency}
+              onChange={setCurrency}
+              options={supportedCurrencies.map((curr) => ({
+                value: curr.code,
+                label: curr.name,
+                icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
+              }))}
+              useNativeSelect={false}
+              buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
+              menuClassName={
+                noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+              }
+              selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
+            />
+          </div>
 
-                {/* Currency selector */}
-	                <div>
-	                  <label className="block text-sm font-medium text-white/80 mb-2">
-	                    {t(
-	                      "moonpay_select_cryptocurrency",
-	                      "Select cryptocurrency"
-	                    )}
-	                  </label>
-	                  <ModalSelect
-	          value={currency}
-	          onChange={setCurrency}
-          options={supportedCurrencies.map((curr) => ({
-            value: curr.code,
-            label: curr.name,
-            icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
-          }))}
-	          useNativeSelect={false}
-	          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
-	          menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-	          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
-	        />
-	                </div>
+          {/* Fiat currency selector */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">
+              {t("moonpay_fiat_currency_label", "Fiat currency")}
+            </label>
+            <ModalSelect
+              value={fiatSelectValue}
+              onChange={setFiatCurrency}
+              options={fiatOptions}
+              placeholder={fiatPlaceholder}
+              disabled={fiatLoading || fiatCurrencies.length === 0}
+              buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
+              menuClassName={
+                noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+              }
+              selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
+            />
+            {fiatLoading && (
+              <p className="text-xs text-white/50 mt-1">
+                {t("moonpay_fiat_loading", "Loading fiat currencies...")}
+              </p>
+            )}
+            {showFiatError && (
+              <p className="text-xs text-red-400 mt-1">{fiatError}</p>
+            )}
+            {!fiatLoading && !fiatError && fiatUnavailable && (
+              <p className="text-xs text-white/50 mt-1">
+                {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
+              </p>
+            )}
+          </div>
 
-                {/* Fiat currency selector */}
-	                <div>
-	                  <label className="block text-sm font-medium text-white/80 mb-2">
-	                    {t("moonpay_fiat_currency_label", "Fiat currency")}
-	                  </label>
-	                  <ModalSelect
-	          value={fiatSelectValue}
-	          onChange={setFiatCurrency}
-          options={fiatOptions}
-	          placeholder={fiatPlaceholder}
-	          disabled={fiatLoading || fiatCurrencies.length === 0}
-	          buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
-	          menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-	          selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
-	        />
-	                  {fiatLoading && (
-	                    <p className="text-xs text-white/50 mt-1">
-                      {t("moonpay_fiat_loading", "Loading fiat currencies...")}
-                    </p>
-                  )}
-                  {showFiatError && (
-                    <p className="text-xs text-red-400 mt-1">{fiatError}</p>
-                  )}
-                  {!fiatLoading && !fiatError && fiatUnavailable && (
-                    <p className="text-xs text-white/50 mt-1">
-                      {t(
-                        "moonpay_fiat_unavailable",
-                        "Fiat currencies unavailable"
-                      )}
-                    </p>
-                  )}
-                </div>
+          {/* Amount input */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">
+              {t("moonpay_amount_in_currency_8b1c7d2a9e", {
+                defaultValue: "Amount in {{currency}}",
+                currency: amountType === "fiat" ? fiatCurrency : currency,
+              })}
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder={amountType === "fiat" ? "100" : "1.0"}
+                step={amountType === "fiat" ? "10" : "0.1"}
+                min="0"
+                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none pr-16"
+              />
 
-                {/* Amount input */}
-                <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
-                    {t("moonpay_amount_in_currency_8b1c7d2a9e", {
-                      defaultValue: "Amount in {{currency}}",
-                      currency: amountType === 'fiat' ? fiatCurrency : currency,
-                    })}
-                  </label>
-                  <div className="relative">
-                    <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder={amountType === 'fiat' ? '100' : '1.0'}
-            step={amountType === 'fiat' ? '10' : '0.1'}
-            min="0"
-            className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none pr-16" />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
+                {amountType === "fiat" ? fiatCurrency : currency}
+              </span>
+            </div>
+            {amountType === "fiat" && minFiatAmount !== null && (
+              <p className="text-xs text-white/40 mt-1">
+                {t("moonpay_minimum_prefix", "Minimum:")} {minFiatAmount}{" "}
+                {fiatCurrency}
+              </p>
+            )}
+          </div>
 
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-	                      {amountType === 'fiat' ?
-	                      fiatCurrency :
-	                      currency}
-	                    </span>
-                  </div>
-	                  {amountType === 'fiat' && minFiatAmount !== null &&
-	        <p className="text-xs text-white/40 mt-1">
-	                      {t("moonpay_minimum_prefix", "Minimum:")}{" "}
-	                      {minFiatAmount} {fiatCurrency}
-	                    </p>
-	        }
-                </div>
+          {/* Wallet address display */}
+          <div className="bg-black/40 border border-white/10 rounded-lg p-3">
+            <p className="text-xs text-white/60 mb-1">
+              {t("moonpay_destination_wallet", "Destination wallet")}
+            </p>
+            {hideWalletAddress && String(walletLabel || "").trim() ? (
+              <p className="text-lg text-white/90 font-semibold truncate">
+                {walletLabel}
+              </p>
+            ) : (
+              <p className="text-lg text-white/90 font-mono break-all">
+                {walletAddress}
+              </p>
+            )}
+          </div>
 
-		                {/* Wallet address display */}
-		                <div className="bg-black/40 border border-white/10 rounded-lg p-3">
-		                  <p className="text-xs text-white/60 mb-1">
-		                    {t("moonpay_destination_wallet", "Destination wallet")}
-		                  </p>
-                  {hideWalletAddress && String(walletLabel || "").trim() ? (
-                    <p className="text-lg text-white/90 font-semibold truncate">
-                      {walletLabel}
-                    </p>
-                  ) : (
-                    <p className="text-lg text-white/90 font-mono break-all">
-                      {walletAddress}
-                    </p>
-                  )}
-		                </div>
+          {/* Error message */}
+          {displayError && (
+            <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <XCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-400">{displayError}</p>
+            </div>
+          )}
 
-                {/* Error message */}
-                {displayError &&
-      <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <XCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-400">{displayError}</p>
-                  </div>
-      }
-
-                {/* Info box */}
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-		                  <p className="text-xs text-blue-400">
-		                    {demoMode
-		                      ? `ℹ️ ${stripLeadingNoticePrefix(
-		                          t(
-		                            "moonpay_info_buy_demo_1b7d2c9a5e",
-		                            "No MoonPay redirect. The buy is simulated."
-		                          )
-		                        )}`
-		                      : `ℹ️ ${t(
-		                          "moonpay_info_buy_live_3c8a1d6b2f",
-		                          "You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer."
-		                        )}`}{" "}
-		                    {t(
-		                      "moonpay_minimum_note",
-	                      "Minimums depend on MoonPay (currency, country, payment method)."
-	                    )}
-	                  </p>
-                </div>
-
-                {/* Continue button */}
-                <SwipeConfirmButton
-        label={continueLabel}
-        onConfirm={generateBuyUrl}
-        disabled={continueDisabled}
-        variant="xcannesGreen"
-        className="md:hidden" />
-                <button
-        type="button"
-        onClick={generateBuyUrl}
-        disabled={continueDisabled}
-        className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-[#10B981]/10 disabled:text-[#10B981]/60 disabled:border-[#10B981]/25 disabled:hover:scale-100">
-
-                  {continueLabel}
-                </button>
-              </div>
-    }
-
-	                {/* Loading */}
-	            {step === 'loading' &&
-	    <div className="flex flex-col items-center justify-center py-12">
-	                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-xcannes-green mb-4"></div>
-	                <p className="text-white/80">
-	                  {t(
-	                    "moonpay_loading_widget",
-	                    "Loading MoonPay widget..."
-	                  )}
-	                </p>
-	              </div>
-	    }
-
-            {/* MoonPay iframe */}
-            {step === 'iframe' && iframeUrl &&
-    <div className="relative" style={{ height: '600px' }}>
-	                <iframe
-	        src={iframeUrl}
-	        className="w-full h-full rounded-lg"
-	        allow="payment"
-	        title={t("moonpay_widget_title_buy", "MoonPay Widget")} />
-
-                <button
-        type="button"
-        onClick={onClose}
-        className="absolute top-2 right-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors">
-
-	                  {t("close", "Close")}
-	                </button>
-              </div>
-    }
-
-            {/* Success */}
-            {step === 'success' &&
-    <div className="flex flex-col items-center justify-center py-12">
-                <CheckCircleIcon className="w-16 h-16 text-green-400 mb-4" />
-	                <h4 className="text-xl font-bold text-white mb-2">
-	                  {t("moonpay_buy_success_title", "Transaction Completed!")}
-	                </h4>
-	                <p className="text-white/60 text-center mb-4">
-	                  {t(
-	                    "moonpay_buy_success_body",
-	                    "Your crypto will be sent to your wallet shortly."
-	                  )}
-	                </p>
-                <button
-        type="button"
-        onClick={onClose}
-        className="px-6 py-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold rounded-lg transition-colors">
-
-	                  {t("close", "Close")}
-	                </button>
-              </div>
-    }
-
-            {/* Error */}
-            {step === 'error' &&
-    <div className="flex flex-col items-center justify-center py-12">
-                <XCircleIcon className="w-16 h-16 text-red-400 mb-4" />
-	                <h4 className="text-xl font-bold text-white mb-2">
-	                  {t("moonpay_error_title", "Something went wrong")}
-	                </h4>
-                <p className="text-white/60 text-center mb-4">
-                  {displayError ||
+          {/* Info box */}
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+            <p className="text-xs text-blue-400">
+              {demoMode
+                ? `ℹ️ ${stripLeadingNoticePrefix(
                     t(
-                      "moonpay_error_try_again_later_6f2b1c9d8a",
-                      "Please try again later."
-                    )}
-                </p>
-                <div className="flex gap-3">
-                  <button
-          type="button"
-          onClick={() => {
-            setStep('form');
-            setError(null);
-            setIframeUrl(null);
-          }}
-          className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors">
+                      "moonpay_info_buy_demo_1b7d2c9a5e",
+                      "No MoonPay redirect. The buy is simulated.",
+                    ),
+                  )}`
+                : `ℹ️ ${t(
+                    "moonpay_info_buy_live_3c8a1d6b2f",
+                    "You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer.",
+                  )}`}{" "}
+              {t(
+                "moonpay_minimum_note",
+                "Minimums depend on MoonPay (currency, country, payment method).",
+              )}
+            </p>
+          </div>
 
-	                    {t("try_again", "Try Again")}
-	                  </button>
-                  <button
-          type="button"
-          onClick={onClose}
-          className="px-6 py-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold rounded-lg transition-colors">
+          {/* Continue button */}
+          <SwipeConfirmButton
+            label={continueLabel}
+            onConfirm={generateBuyUrl}
+            disabled={continueDisabled}
+            variant="xcannesGreen"
+            className="md:hidden"
+          />
+          <button
+            type="button"
+            onClick={generateBuyUrl}
+            disabled={continueDisabled}
+            className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-[#10B981]/10 disabled:text-[#10B981]/60 disabled:border-[#10B981]/25 disabled:hover:scale-100"
+          >
+            {continueLabel}
+          </button>
+        </div>
+      )}
 
-	                    {t("close", "Close")}
-	                  </button>
-                </div>
-              </div>
-    }
-    </div>;
+      {/* Loading */}
+      {step === "loading" && (
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-xcannes-green mb-4"></div>
+          <p className="text-white/80">
+            {t("moonpay_loading_widget", "Loading MoonPay widget...")}
+          </p>
+        </div>
+      )}
 
+      {/* MoonPay iframe */}
+      {step === "iframe" && iframeUrl && (
+        <div className="relative" style={{ height: "600px" }}>
+          <iframe
+            src={iframeUrl}
+            className="w-full h-full rounded-lg"
+            allow="payment"
+            title={t("moonpay_widget_title_buy", "MoonPay Widget")}
+          />
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-2 right-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors"
+          >
+            {t("close", "Close")}
+          </button>
+        </div>
+      )}
+
+      {/* Success */}
+      {step === "success" && (
+        <div className="flex flex-col items-center justify-center py-12">
+          <CheckCircleIcon className="w-16 h-16 text-green-400 mb-4" />
+          <h4 className="text-xl font-bold text-white mb-2">
+            {t("moonpay_buy_success_title", "Transaction Completed!")}
+          </h4>
+          <p className="text-white/60 text-center mb-4">
+            {t(
+              "moonpay_buy_success_body",
+              "Your crypto will be sent to your wallet shortly.",
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold rounded-lg transition-colors"
+          >
+            {t("close", "Close")}
+          </button>
+        </div>
+      )}
+
+      {/* Error */}
+      {step === "error" && (
+        <div className="flex flex-col items-center justify-center py-12">
+          <XCircleIcon className="w-16 h-16 text-red-400 mb-4" />
+          <h4 className="text-xl font-bold text-white mb-2">
+            {t("moonpay_error_title", "Something went wrong")}
+          </h4>
+          <p className="text-white/60 text-center mb-4">
+            {displayError ||
+              t(
+                "moonpay_error_try_again_later_6f2b1c9d8a",
+                "Please try again later.",
+              )}
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setStep("form");
+                setError(null);
+                setIframeUrl(null);
+              }}
+              className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+            >
+              {t("try_again", "Try Again")}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold rounded-lg transition-colors"
+            >
+              {t("close", "Close")}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   // Mode embedded: retourner seulement le contenu
   if (embedded) {
@@ -616,73 +617,75 @@ const DemoMoonPayBuyModal = ({
         className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
           isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
         }`}
-        onClick={step === 'iframe' ? null : onClose}
+        onClick={step === "iframe" ? null : onClose}
       />
 
-      
-	      {/* Modal */}
-	      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
-	        <div
-	          className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
-	            noticeVariant === "demo"
-	              ? "bg-[#0b0f10] border-white/10"
-	              : "bg-elevated border-subtle"
-	          } ${
-	            isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
-	          }`}
-	          onClick={(e) => e.stopPropagation()}
-	        >
-
+      {/* Modal */}
+      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
+        <div
+          className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
+            noticeVariant === "demo"
+              ? "bg-[#0b0f10] border-white/10"
+              : "bg-elevated border-subtle"
+          } ${isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
             <div>
-	              <div className="flex items-center gap-2 flex-wrap">
-	                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">{t("ui_buy_crypto_with_fiat_f09c7b4228", "Buy Crypto with Fiat")}
-
-	                </h3>
-	                {showNotConnectedNotice ? (
-	                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
-	                    {t("wallet_not_connected_title", "Wallet not connected")}
-	                  </span>
-	                ) : null}
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+                  {t(
+                    "ui_buy_crypto_with_fiat_f09c7b4228",
+                    "Buy Crypto with Fiat",
+                  )}
+                </h3>
+                {showNotConnectedNotice ? (
+                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
+                    {t("wallet_not_connected_title", "Wallet not connected")}
+                  </span>
+                ) : null}
                 {showNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
                     {t(
                       "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
                     )}
                   </span>
                 ) : null}
                 {showRlusdNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-                      {t(
-                        "wallet_rlusd_not_activated_title",
-                        "USD not activated. Authorize USD on your wallet."
-                      )}
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "USD not activated. Authorize USD on your wallet.",
+                    )}
                   </span>
                 ) : null}
               </div>
-              <p className="text-xs text-white/60 mt-1">{t("ui_powered_by_moonpay_secure_ch_0bcfb2aeb5", "Powered by MoonPay • Secure checkout")}
-
+              <p className="text-xs text-white/60 mt-1">
+                {t(
+                  "ui_powered_by_moonpay_secure_ch_0bcfb2aeb5",
+                  "Powered by MoonPay • Secure checkout",
+                )}
               </p>
             </div>
-            {step !== 'iframe' &&
-            <button
-              type="button"
-              onClick={onClose}
-              className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl">
-
+            {step !== "iframe" && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+              >
                 ✕
               </button>
-            }
+            )}
           </div>
 
           {/* Content */}
           {renderContent()}
         </div>
       </div>
-    </>);
-
+    </>
+  );
 };
 
 export default DemoMoonPayBuyModal;

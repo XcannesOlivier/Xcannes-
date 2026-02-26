@@ -24,7 +24,7 @@ export default function WalletDashboardSwapModal({
   noticeContextLabel = "",
   walletId = "",
   dashboardVariant = "default",
-  effectiveIsConnected,
+  isConnected,
   isWalletActivated,
   hasRlusdTrustline = null,
   onConnectWallet,
@@ -117,7 +117,7 @@ export default function WalletDashboardSwapModal({
 
   const canMutateLines =
     isPreviewMode ||
-    (effectiveIsConnected && isWalletActivated === true && hasOnChainRlusd);
+    (isConnected && isWalletActivated === true && hasOnChainRlusd);
   const showDesktopWalletConvertNote =
     inline &&
     isDesktop &&
@@ -507,7 +507,7 @@ export default function WalletDashboardSwapModal({
                     <div className="rounded-xl border border-white/10 p-3">
                       {!canMutateLines ? (
                         <p className="mt-1 text-[16px] text-white/45">
-                          {!effectiveIsConnected
+                          {!isConnected
                             ? t(
                                 "ui_connect_your_wallet_to_activ_ec68e6f427",
                                 "Connect your wallet to activate currency lines.",
@@ -671,7 +671,7 @@ export default function WalletDashboardSwapModal({
                       : ""
                   }
                 >
-                  {!effectiveIsConnected && !isPreviewMode ? (
+                  {!isConnected && !isPreviewMode ? (
                     <button
                       type="button"
                       onClick={(e) => {

@@ -40,7 +40,7 @@ export default function WalletDashboardReceiveModal({
   walletId = "",
   dashboardVariant = "default",
   renderWalletMeta,
-  effectiveWallet,
+  wallet,
   requestAmount,
   setRequestAmount,
   requestCurrency,
@@ -129,7 +129,7 @@ export default function WalletDashboardReceiveModal({
   useEffect(() => {
     setGeneratedRequest(null);
     setGenerateError(null);
-  }, [effectiveWallet, requestAmount, requestCurrency, requestMemo]);
+  }, [wallet, requestAmount, requestCurrency, requestMemo]);
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -155,7 +155,7 @@ export default function WalletDashboardReceiveModal({
       return;
     }
 
-    if (!effectiveWallet) {
+    if (!wallet) {
       setGenerateError(
         t(
           "ui_request_error_missing_wallet_4f7a2c9b1e",
@@ -209,7 +209,7 @@ export default function WalletDashboardReceiveModal({
     const beneficiaryLabel = String(walletLabel || "").trim() || null;
     const req = {
       schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
-      to: effectiveWallet,
+      to: wallet,
       targetCurrency: targetCurrencyUpper,
       displayAmount: amount,
       displayCurrency: displayCurrencyUpper,
@@ -487,7 +487,7 @@ export default function WalletDashboardReceiveModal({
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       });
-  const receiveQrValue = effectiveWallet ? `xrpl:${effectiveWallet}` : "";
+  const receiveQrValue = wallet ? `xrpl:${wallet}` : "";
   const qrDisplaySize = inline ? 240 : 220;
   const qrPixelSize = inline ? 360 : hasGeneratedRequest ? 520 : 420;
 
@@ -593,7 +593,7 @@ export default function WalletDashboardReceiveModal({
                 )}
               </p>
 
-              {effectiveWallet ? (
+              {wallet ? (
                 <div
                   className={`flex flex-col items-center gap-3 ${
                     inline ? "flex-1 min-h-0 justify-center" : ""
@@ -684,7 +684,7 @@ export default function WalletDashboardReceiveModal({
                 </div>
               ) : null}
 
-              {effectiveWallet ? (
+              {wallet ? (
                 <div className="mt-2 flex justify-center">
                   <button
                     type="button"
@@ -701,7 +701,7 @@ export default function WalletDashboardReceiveModal({
                 </div>
               ) : null}
 
-              {effectiveWallet && isRequestOpen ? (
+              {wallet && isRequestOpen ? (
                 <div
                   className={`space-y-4 ${
                     inline ? "flex-1 min-h-0 flex flex-col" : ""

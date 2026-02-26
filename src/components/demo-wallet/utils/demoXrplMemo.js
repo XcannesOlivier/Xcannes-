@@ -15,7 +15,7 @@ import {
 } from "./demoXcannesMemoSchemas";
 
 const MEMO_METRICS_LOG_INTERVAL_MS = Number(
-  process.env.NEXT_PUBLIC_MEMO_METRICS_LOG_INTERVAL_MS || 60000
+  process.env.NEXT_PUBLIC_MEMO_METRICS_LOG_INTERVAL_MS || 60000,
 );
 const MEMO_METRICS_LOG_ENABLED =
   process.env.NEXT_PUBLIC_MEMO_METRICS_LOG_ENABLED !== "false";
@@ -30,7 +30,8 @@ function maybeLogMemoMetrics(force = false) {
   if (!MEMO_METRICS_LOG_ENABLED) return;
   if (!memoMetrics.dirty) return;
   const now = Date.now();
-  if (!force && now - memoMetrics.lastLogAt < MEMO_METRICS_LOG_INTERVAL_MS) return;
+  if (!force && now - memoMetrics.lastLogAt < MEMO_METRICS_LOG_INTERVAL_MS)
+    return;
   memoMetrics.lastLogAt = now;
   memoMetrics.dirty = false;
   console.info(
@@ -38,7 +39,7 @@ function maybeLogMemoMetrics(force = false) {
       type: "MEMO_METRICS",
       counters: { ...memoMetrics.counters },
       timestamp: new Date().toISOString(),
-    })
+    }),
   );
 }
 
@@ -60,7 +61,7 @@ function encodeUtf8ToHex(value) {
 
 export function buildXrplJsonMemo(
   payload,
-  { memoType = XCANNES_MEMO_TYPE, validate = true } = {}
+  { memoType = XCANNES_MEMO_TYPE, validate = true } = {},
 ) {
   let memoPayload = payload;
   if (validate && payload && typeof payload === "object") {
@@ -78,7 +79,10 @@ export function buildXrplJsonMemo(
     json = JSON.stringify(memoPayload ?? {});
   } catch (error) {
     recordMemoMetric("memo_encode_json_error");
-    console.error("[xrplMemo] Memo JSON stringify failed:", error?.message || error);
+    console.error(
+      "[xrplMemo] Memo JSON stringify failed:",
+      error?.message || error,
+    );
     return null;
   }
 
@@ -87,7 +91,10 @@ export function buildXrplJsonMemo(
     memoData = encodeUtf8ToHex(json);
   } catch (error) {
     recordMemoMetric("memo_encode_hex_error");
-    console.error("[xrplMemo] Memo hex encode failed:", error?.message || error);
+    console.error(
+      "[xrplMemo] Memo hex encode failed:",
+      error?.message || error,
+    );
     return null;
   }
   if (!memoData) {
@@ -102,7 +109,10 @@ export function buildXrplJsonMemo(
     formatHex = encodeUtf8ToHex(XCANNES_MEMO_FORMAT);
   } catch (error) {
     recordMemoMetric("memo_encode_hex_error");
-    console.error("[xrplMemo] Memo type/format hex encode failed:", error?.message || error);
+    console.error(
+      "[xrplMemo] Memo type/format hex encode failed:",
+      error?.message || error,
+    );
     return null;
   }
 
@@ -133,7 +143,11 @@ function decodeHexToUtf8Detailed(hex) {
     return { ok: false, value: "", reason: "invalid_hex" };
   }
   try {
-    return { ok: true, value: Buffer.from(raw, "hex").toString("utf8"), reason: null };
+    return {
+      ok: true,
+      value: Buffer.from(raw, "hex").toString("utf8"),
+      reason: null,
+    };
   } catch {
     return { ok: false, value: "", reason: "decode_error" };
   }

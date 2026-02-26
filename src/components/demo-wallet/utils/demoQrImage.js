@@ -1,7 +1,4 @@
-export async function normalizeQrImageFile(
-  file,
-  { maxDimension = 1600 } = {}
-) {
+export async function normalizeQrImageFile(file, { maxDimension = 1600 } = {}) {
   if (!file || typeof window === "undefined") return file;
 
   const createBitmap = async () => {
@@ -77,13 +74,13 @@ export async function normalizeQrImageFile(
   if (isBitmap && source.close) source.close();
 
   const blob = await new Promise((resolve) =>
-    canvas.toBlob((result) => resolve(result), "image/png")
+    canvas.toBlob((result) => resolve(result), "image/png"),
   );
   if (!blob) return file;
 
   const safeName = file.name ? file.name.replace(/\.[^/.]+$/, "") : "qr";
   if (typeof File === "undefined") return blob;
   return new File([blob], `${safeName}.png`, {
-    type: "image/png"
+    type: "image/png",
   });
 }
