@@ -92,6 +92,7 @@ export function useWalletModalProps({
   currencyLineAllocatedRlusd,
   setCurrencyLineAllocatedRlusd,
   handleUpsertCurrencyLine,
+  handleDemoConvert,
 
   // --- Cash ---
   cashModalTab,
@@ -341,6 +342,7 @@ export function useWalletModalProps({
       currencyLineAllocatedRlusd,
       setCurrencyLineAllocatedRlusd,
       handleUpsertCurrencyLine,
+      handleDemoConvert,
       convertProcessing,
       rlusdPerUnitRates,
     }),
@@ -379,6 +381,7 @@ export function useWalletModalProps({
       currencyLineAllocatedRlusd,
       setCurrencyLineAllocatedRlusd,
       handleUpsertCurrencyLine,
+      handleDemoConvert,
       convertProcessing,
       rlusdPerUnitRates,
     ],

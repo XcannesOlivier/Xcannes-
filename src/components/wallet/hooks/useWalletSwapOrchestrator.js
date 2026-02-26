@@ -93,7 +93,7 @@ export function useWalletSwapOrchestrator({
   }, [convertBaseCurrency, convertQuoteCurrency, swapCurrencyOptions]);
 
   // ── Swap conversion engine ─────────────────────────────────
-  useSwapConversion({
+  const { handleDemoConvert } = useSwapConversion({
     isPreviewMode: false,
     isConnected,
     backendWalletAddress,
@@ -138,6 +138,7 @@ export function useWalletSwapOrchestrator({
     setConvertAmount,
     convertPreview,
     convertProcessing,
+    handleDemoConvert,
     // Options
     swapCurrencyOptionsForModal,
   };
