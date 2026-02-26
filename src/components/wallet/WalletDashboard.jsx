@@ -6,9 +6,6 @@ import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
 	import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
-import {
-  computeSpreadQuote,
-} from "@/utils/walletSpread";
 	import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 	import { useConvertForm } from "./hooks/useConvertForm";
 	import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
@@ -40,6 +37,8 @@ import WalletMobileModals from "./mobile/WalletMobileModals";
 import WalletToastOverlay from "./components/WalletToastOverlay";
 import { useWalletNavigation } from "./hooks/useWalletNavigation";
 import { useTokenDisplayLabels } from "./hooks/useTokenDisplayLabels";
+import { usePayreqStorage } from "./hooks/usePayreqStorage";
+import WalletPendingPayreqs from "./components/WalletPendingPayreqs";
 import { useTranslation } from "next-i18next";
 import {
   resolveWalletLayout,
@@ -173,6 +172,14 @@ export default function WalletDashboard({
   
   // Adresses sauvegardées
   const { savedAddresses, saveAddress } = useSavedAddresses();
+
+  // Demandes de paiement en attente (sauvegardées localement)
+  const {
+    pendingPayreqs,
+    savePayreq,
+    removePayreq,
+    pendingCount,
+  } = usePayreqStorage({ walletAddress: effectiveWallet?.address || null });
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
   const [addressLabel, setAddressLabel] = useState("");
@@ -631,34 +638,18 @@ export default function WalletDashboard({
 
     const paymentRlusd = amountFx * rlusdPerUnit;
 
-    // Same-currency payreq → no spread fee (1 tx direct).
-    const isSameCurrencyPayreq =
-      sendPaymentRequest &&
-      String(sendPaymentRequest?.targetCurrencyCode || "").toUpperCase() === code;
-    const spread = isSameCurrencyPayreq
-      ? { isFx: false, spreadFraction: 0, halfSpreadFraction: 0, spreadFeeRlusd: 0, tier: null }
-      : computeSpreadQuote({ base: code, quote: "RLUSD", amountRlusd: paymentRlusd });
-    const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
-
     return {
       currency: code,
       fxSource: rlusdPerUnitSources?.[code] || null,
       rlusdPerUnit,
       amountFx,
       paymentRlusd,
-      spreadFeeRlusd,
-      spreadTier: spread?.tier || null,
-      spreadPercentTotal:
-        spread?.isFx && Number.isFinite(Number(spread?.spreadFraction))
-          ? Number(spread.spreadFraction) * 100
-          : 0,
     };
   }, [
     rlusdPerUnitRates,
     rlusdPerUnitSources,
     selectedSendToken,
     sendAmount,
-    sendPaymentRequest,
   ]);
 
   useEffect(() => {
@@ -729,6 +720,34 @@ export default function WalletDashboard({
     setQrScannerOpen(false);
     closeQrModal?.();
   }, [closeQrModal, isDesktopPanel, setQrScannerOpen]);
+
+  // Reprendre une demande sauvegardée → charge dans le form + ouvre le payreq modal
+  const handleResumePayreq = useCallback(
+    (entry) => {
+      if (!entry?.payreq) return;
+      const pr = entry.payreq;
+      if (pr.to) setSendDestination(pr.to);
+      const targetCurrency = String(pr.targetCurrencyCode || "").toUpperCase();
+      const matchingToken = (augmentedTokens || []).find(
+        (t) => String(t.currency || "").toUpperCase() === targetCurrency
+      );
+      if (matchingToken) {
+        setSendAssetKey(matchingToken.key);
+        if (pr.displayAmount != null) setSendAmount(String(pr.displayAmount));
+      } else {
+        // Fallback to RLUSD
+        const rlusdToken = (augmentedTokens || []).find(
+          (t) => String(t.currency || "").toUpperCase() === "RLUSD"
+        );
+        if (rlusdToken) setSendAssetKey(rlusdToken.key);
+        if (pr.amountRlusd != null) setSendAmount(String(pr.amountRlusd));
+      }
+      setSendPaymentRequest(pr);
+      setSendTab("manual");
+      setActiveAction("send");
+    },
+    [augmentedTokens, setSendDestination, setSendAssetKey, setSendAmount, setSendPaymentRequest, setSendTab, setActiveAction]
+  );
 
   const {
     handleInstallRequiredTrustline,
@@ -855,6 +874,8 @@ export default function WalletDashboard({
     refreshCurrencyLines,
     toast,
     confirm,
+    removePayreq,
+    pendingPayreqs,
   });
 
   const { usdRates, totalLabel } = useUsdTotalLabel({
@@ -995,6 +1016,8 @@ export default function WalletDashboard({
     sendProcessing,
     payreqDecorProps,
     hasPayreq,
+    savePayreq,
+    removePayreq,
     receiveTab,
     setReceiveTab,
     handleCopyAddress,
@@ -1138,6 +1161,17 @@ export default function WalletDashboard({
             layout={layout}
             onAction={handleAction}
           />
+
+          {/* Pending payment requests */}
+          {pendingCount > 0 ? (
+            <div className="px-1">
+              <WalletPendingPayreqs
+                pendingPayreqs={pendingPayreqs}
+                onResume={handleResumePayreq}
+                onRemove={removePayreq}
+              />
+            </div>
+          ) : null}
 
           {/* Token list */}
 	          <div className="flex-1 flex flex-col min-h-0">

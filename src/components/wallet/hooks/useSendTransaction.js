@@ -1,7 +1,5 @@
 import {
   buildRlusdPaymentTxjson,
-  computeSpreadQuote,
-  XCANNES_SPREAD_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
 import {
   buildMoonpayMemo,
@@ -49,12 +47,14 @@ const appendMemos = (txjson, extraMemos) => {
 // ---------------------------------------------------------------------------
 
 /**
- * Encapsulates the full "send" flow: validation, FX spread double-signature,
+ * Encapsulates the full "send" flow: validation, FX rate conversion,
  * trustline-based payments, RLUSD/USD native payments, XRP drops, memos,
  * MoonPay sell detection, and post-send cleanup.
  *
- * Returns `{ handleSendSubmit }` — drop-in replacement for the 412-line
- * inline handler that was in WalletDashboard.
+ * No spread fee is charged on sends. Users handle currency conversion
+ * themselves via the Convert modal (which charges the 1% spread).
+ *
+ * Returns `{ handleSendSubmit }` — single-signature send handler.
  */
 export function useSendTransaction({
   // useWallet()
@@ -91,6 +91,9 @@ export function useSendTransaction({
   // useWalletToast()
   toast,
   confirm,
+  // usePayreqStorage()
+  removePayreq,
+  pendingPayreqs,
 }) {
   // ------------------------------------------------------------------
   // handleSendSubmit
@@ -177,7 +180,7 @@ export function useSendTransaction({
   };
 
   // ------------------------------------------------------------------
-  // FX send — double-signature (spread fee → XCANNES, payment → dest)
+  // FX send — single RLUSD transaction (no spread fee on sends)
   // ------------------------------------------------------------------
   async function handleFxSend({ amountNum, dest, currency, handleAddressSave }) {
     if (!backendWalletAddress) {
@@ -189,92 +192,29 @@ export function useSendTransaction({
       return { ok: false };
     }
 
-    const requestTargetCurrency = String(
-      sendPaymentRequest?.targetCurrencyCode || ""
-    )
-      .trim()
-      .toUpperCase();
-
-    const requestedFxRate =
-      sendPaymentRequest?.fxRate != null
-        ? Number(sendPaymentRequest.fxRate)
-        : Number.NaN;
-
+    // --- FX rate resolution ---
     const rawRate = Number(rlusdPerUnitRates?.[currency]);
-    const effectiveRate =
-      requestTargetCurrency && requestTargetCurrency === currency &&
-      Number.isFinite(requestedFxRate) && requestedFxRate > 0
-        ? requestedFxRate
-        : rawRate;
-
-    const rlusdPerUnit = Number.isFinite(effectiveRate) && effectiveRate > 0
-      ? effectiveRate
+    const rlusdPerUnit = Number.isFinite(rawRate) && rawRate > 0
+      ? rawRate
       : Number.NaN;
     if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) {
       toast.error(`Impossible de récupérer le taux pour ${currency}.`);
       return { ok: false };
     }
 
-    const requestedRlusd =
-      sendPaymentRequest?.amountRlusd != null &&
-      Number.isFinite(Number(sendPaymentRequest.amountRlusd))
-        ? Number(sendPaymentRequest.amountRlusd)
-        : null;
+    const paymentRlusd = amountNum * rlusdPerUnit;
 
-    let paymentRlusd = amountNum * rlusdPerUnit;
-    let effectiveAmountNum = amountNum;
-    let isAlternateCurrency = false;
-
-    if (requestTargetCurrency && requestTargetCurrency !== currency) {
-      if (!Number.isFinite(requestedRlusd) || requestedRlusd <= 0) {
-        toast.error("Montant RLUSD demandé manquant pour cette demande.");
-        return { ok: false };
-      }
-      isAlternateCurrency = true;
-      paymentRlusd = requestedRlusd;
-      effectiveAmountNum = paymentRlusd / rlusdPerUnit;
-      if (!Number.isFinite(effectiveAmountNum) || effectiveAmountNum <= 0) {
-        toast.error("Impossible de calculer le montant dans la devise sélectionnée.");
-        return { ok: false };
-      }
-    }
-
-    if (Number.isFinite(requestedRlusd)) {
-      const diff = Math.abs(paymentRlusd - requestedRlusd);
-      if (diff > Math.max(0.01, requestedRlusd * 0.005)) {
-        toast.warn(
-          `Montant RLUSD différent de la demande.\n\n` +
-            `Demandé: ≈ ${requestedRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n` +
-            `Calculé: ≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD\n\n` +
-            `Scannez à nouveau la demande ou vérifiez le taux.`
-        );
-        return { ok: false };
-      }
-    }
-
-    // Same-currency payreq → no spread, 1 single transaction.
-    const isSameCurrencyPayreq =
-      sendPaymentRequest && requestTargetCurrency && requestTargetCurrency === currency;
-    const spread = isSameCurrencyPayreq
-      ? { isFx: false, spreadFraction: 0, halfSpreadFraction: 0, spreadFeeRlusd: 0, tier: null }
-      : computeSpreadQuote({ base: currency, quote: "RLUSD", amountRlusd: paymentRlusd });
-    const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
-    const totalToSpendRlusd = paymentRlusd + spreadFeeRlusd;
-    const epsilon = 1e-9;
-
+    // --- Balance check ---
     const availableAllocatedRlusd =
       allocatedRlusdByCurrency?.get?.(currency) ??
       (Number.isFinite(Number(selectedSendToken?.allocatedRlusd))
         ? Number(selectedSendToken.allocatedRlusd)
         : Number.NaN);
-    if (Number.isFinite(availableAllocatedRlusd) && availableAllocatedRlusd + epsilon < totalToSpendRlusd) {
-      const maxPaymentRlusd =
-        spread?.halfSpreadFraction != null && Number(spread.halfSpreadFraction) > 0
-          ? availableAllocatedRlusd / (1 + Number(spread.halfSpreadFraction))
-          : availableAllocatedRlusd;
-      const maxFx = maxPaymentRlusd > 0 ? maxPaymentRlusd / rlusdPerUnit : 0;
+    const epsilon = 1e-9;
+    if (Number.isFinite(availableAllocatedRlusd) && availableAllocatedRlusd + epsilon < paymentRlusd) {
+      const maxFx = availableAllocatedRlusd > 0 ? availableAllocatedRlusd / rlusdPerUnit : 0;
       toast.warn(
-        `Allocation insuffisante en ${currency} pour couvrir paiement + frais de conversion.\n\n` +
+        `Allocation insuffisante en ${currency}.\n\n` +
           `Disponible: ≈ ${availableAllocatedRlusd.toLocaleString("en-US", {
             maximumFractionDigits: 6,
           })} RLUSD\n` +
@@ -283,87 +223,21 @@ export function useSendTransaction({
       return { ok: false };
     }
 
-    const requestedDisplayAmount =
-      sendPaymentRequest?.displayAmount ??
-      (Number.isFinite(requestedRlusd) &&
-      Number.isFinite(Number(sendPaymentRequest?.fxRate)) &&
-      Number(sendPaymentRequest?.fxRate) > 0
-        ? requestedRlusd / Number(sendPaymentRequest.fxRate)
-        : null);
-    const requestedDisplayCurrency =
-      sendPaymentRequest?.displayCurrency || requestTargetCurrency || null;
-
+    // --- Confirmation ---
     const ok = await confirm(
       `Paiement en RLUSD (affiché en ${currency}).\n\n` +
-        (isAlternateCurrency && requestedDisplayCurrency
-          ? `Demande: ${requestedDisplayAmount != null
-              ? Number(requestedDisplayAmount).toLocaleString("en-US", { maximumFractionDigits: 6 })
-              : "-"} ${requestedDisplayCurrency}\n`
-          : "") +
-        `Montant: ${effectiveAmountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
-        `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n` +
-        (spreadFeeRlusd > 0
-          ? `Frais de conversion (1 %) : ≈ ${spreadFeeRlusd.toLocaleString("en-US", {
-              maximumFractionDigits: 6,
-            })} RLUSD\n`
-          : "") +
-        `Total RLUSD à débiter: ≈ ${totalToSpendRlusd.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
-        })} RLUSD\n\n` +
-        (spreadFeeRlusd > 0
-          ? `2 signatures Xumm seront demandées (frais de conversion → XCANNES, puis paiement → destinataire).`
-          : `1 signature Xumm sera demandée (paiement → destinataire).`)
+        `Montant: ${amountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
+        `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n\n` +
+        `1 signature Xumm sera demandée.`
     );
     if (!ok) return { ok: false };
 
-    // 1) Paiement des frais de conversion → wallet entreprise XCANNES
+    // --- Build & sign single RLUSD payment ---
     const fxSource =
       (sendPaymentRequest?.fxSource ? String(sendPaymentRequest.fxSource) : null) ||
       rlusdPerUnitSources?.[currency] ||
       null;
-    if (spreadFeeRlusd > 0) {
-      const spreadAllocatedBefore = allocatedRlusdByCurrency?.get(currency);
-      const spreadAllocatedAfter = Number.isFinite(spreadAllocatedBefore)
-        ? Math.max(0, Number(spreadAllocatedBefore) - spreadFeeRlusd)
-        : null;
-      const spreadTx = buildRlusdPaymentTxjson({
-        account: wallet,
-        destination: XCANNES_SPREAD_WALLET_ADDRESS,
-        amountRlusd: spreadFeeRlusd,
-      });
-      if (!spreadTx) {
-        throw new Error("Invalid RLUSD conversion fee payment");
-      }
-      const spreadMemoPayload = buildPayreqMemo({
-        origin: "spread",
-        targetCurrencyCode: currency,
-        displayAmount: spreadFeeRlusd,
-        displayCurrencyCode: "RLUSD",
-        amountRlusd: spreadFeeRlusd,
-        allocatedRlusdAfter: spreadAllocatedAfter,
-        fxRate: rlusdPerUnit,
-        fxSource,
-        note: "spread",
-      });
-      if (!spreadMemoPayload) {
-        throw new Error("Invalid conversion fee memo payload");
-      }
-      const spreadMemos = buildXrplJsonMemo(spreadMemoPayload);
-      if (!spreadMemos) {
-        throw new Error("Invalid conversion fee memo");
-      }
-      spreadTx.Memos = spreadMemos;
 
-      const spreadResult = await signTransaction(spreadTx, {
-        action: "wallet:convert",
-      });
-      if (!spreadResult?.signed) {
-        toast.warn("Conversion fee payment cancelled or expired.");
-        return { ok: false };
-      }
-    }
-
-    // 2) Paiement principal → destinataire
     const payTx = buildRlusdPaymentTxjson({
       account: wallet,
       destination: dest,
@@ -374,19 +248,17 @@ export function useSendTransaction({
     }
 
     const targetCurrencyForMemo = sendPaymentRequest?.targetCurrencyCode
-      ? requestTargetCurrency || currency
+      ? String(sendPaymentRequest.targetCurrencyCode).trim().toUpperCase() || currency
       : currency;
     const displayAmountForMemo = sendPaymentRequest
-      ? sendPaymentRequest?.displayAmount ?? effectiveAmountNum
-      : effectiveAmountNum;
+      ? sendPaymentRequest?.displayAmount ?? amountNum
+      : amountNum;
     const displayCurrencyForMemo = sendPaymentRequest
       ? sendPaymentRequest?.displayCurrency ?? targetCurrencyForMemo ?? currency
       : currency;
     const targetAllocatedBefore = allocatedRlusdByCurrency?.get(targetCurrencyForMemo);
-    const paymentDebitRlusd =
-      targetCurrencyForMemo === currency ? totalToSpendRlusd : paymentRlusd;
     const paymentAllocatedAfter = Number.isFinite(targetAllocatedBefore)
-      ? Math.max(0, Number(targetAllocatedBefore) - paymentDebitRlusd)
+      ? Math.max(0, Number(targetAllocatedBefore) - paymentRlusd)
       : null;
 
     const memoPayload = buildPayreqMemo({
@@ -412,31 +284,38 @@ export function useSendTransaction({
       payTx,
       buildMoonpaySellMemos(dest, {
         currency,
-        amount: effectiveAmountNum,
+        amount: amountNum,
         amountRlusd: paymentRlusd,
       })
     );
 
     const payResult = await signTransaction(payTx, {
-      action: "wallet:convert",
+      action: "wallet:send",
     });
     if (payResult?.signed) {
       toast.success("✅ Payment submitted via Xumm.");
-
       handleAddressSave(dest);
-
       setSendAmount("");
       setSendDestination("");
+      // Auto-suppression de la payreq des demandes en attente
+      if (sendPaymentRequest && removePayreq && pendingPayreqs?.length) {
+        const matchDest = String(sendPaymentRequest.to || "").trim();
+        const matchAmount = Number(sendPaymentRequest.amountRlusd || sendPaymentRequest.displayAmount || 0);
+        const matchCurrency = String(sendPaymentRequest.targetCurrencyCode || sendPaymentRequest.displayCurrency || "").toUpperCase();
+        const match = pendingPayreqs.find((p) => {
+          const pd = String(p.payreq?.to || "").trim();
+          const pa = Number(p.payreq?.amountRlusd || p.payreq?.displayAmount || 0);
+          const pc = String(p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "").toUpperCase();
+          return pd === matchDest && pa === matchAmount && pc === matchCurrency;
+        });
+        if (match) removePayreq(match.id);
+      }
       setSendPaymentRequest(null);
       if (refreshBalance) setTimeout(() => refreshBalance(), 3000);
       if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 3000);
       return { ok: true };
     } else {
-      toast.warn(
-        spreadFeeRlusd > 0
-          ? "Payment cancelled or expired. (Conversion fee was already paid.)"
-          : "Transaction cancelled or expired."
-      );
+      toast.warn("Transaction cancelled or expired.");
       return { ok: false };
     }
   }
@@ -523,6 +402,19 @@ export function useSendTransaction({
 
       setSendAmount("");
       setSendDestination("");
+      // Auto-suppression de la payreq des demandes en attente
+      if (sendPaymentRequest && removePayreq && pendingPayreqs?.length) {
+        const matchDest = String(sendPaymentRequest.to || "").trim();
+        const matchAmount = Number(sendPaymentRequest.amountRlusd || sendPaymentRequest.displayAmount || 0);
+        const matchCurrency = String(sendPaymentRequest.targetCurrencyCode || sendPaymentRequest.displayCurrency || "").toUpperCase();
+        const match = pendingPayreqs.find((p) => {
+          const pd = String(p.payreq?.to || "").trim();
+          const pa = Number(p.payreq?.amountRlusd || p.payreq?.displayAmount || 0);
+          const pc = String(p.payreq?.targetCurrencyCode || p.payreq?.displayCurrency || "").toUpperCase();
+          return pd === matchDest && pa === matchAmount && pc === matchCurrency;
+        });
+        if (match) removePayreq(match.id);
+      }
       setSendPaymentRequest(null);
       if (refreshBalance) {
         setTimeout(() => refreshBalance(), 3000);

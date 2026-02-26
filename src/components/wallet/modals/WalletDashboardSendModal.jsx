@@ -99,20 +99,6 @@ export default function WalletDashboardSendModal({
     if (!target || !selectedCurrency) return false;
     return target !== selectedCurrency;
   }, [sendPaymentRequest, selectedSendToken]);
-  const payingCurrency = useMemo(() => {
-    return String(selectedSendToken?.currency || "").toUpperCase();
-  }, [selectedSendToken]);
-  const payreqTargetCurrency = useMemo(() => {
-    return String(sendPaymentRequest?.targetCurrencyCode || "").trim().toUpperCase();
-  }, [sendPaymentRequest]);
-  const isAlternateCurrency = useMemo(() => {
-    return (
-      Boolean(sendPaymentRequest) &&
-      Boolean(payreqTargetCurrency) &&
-      Boolean(payingCurrency) &&
-      payreqTargetCurrency !== payingCurrency
-    );
-  }, [sendPaymentRequest, payreqTargetCurrency, payingCurrency]);
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
       (addr) => addr.address === normalizedDestination
@@ -476,26 +462,8 @@ export default function WalletDashboardSendModal({
       {sendFxInfo ? (
         <div className="text-[11px] text-white/50">
           ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
-          {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ? (
-            <> + {formatAmountWithSymbol(locale, Number(sendFxInfo.spreadFeeRlusd), "USD", { maximumFractionDigits: 6 })} {t("ui_conversion_fee_short", "frais")}</>
-          ) : null}
         </div>
       ) : null}
-    </div>
-  ) : null;
-
-  const payreqAlternateCurrencyBanner = isAlternateCurrency ? (
-    <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-[11px] text-orange-200/90 space-y-1">
-      <div className="font-semibold">
-        {t("ui_currency_change_notice", "Changement de devise")}
-      </div>
-      <div>
-        {t(
-          "ui_currency_change_detail",
-          "La demande est en {{requested}} mais vous payez en {{paying}}. Des frais de conversion de 1 % seront appliqués.",
-          { requested: payreqTargetCurrency, paying: payingCurrency }
-        )}
-      </div>
     </div>
   ) : null;
 
@@ -638,35 +606,14 @@ export default function WalletDashboardSendModal({
                 </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
 
               </p>
-              {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 &&
+              {sendFxInfo.fxSource &&
                 <p className="mt-1 text-[11px] text-white/60">
-                  {t("ui_spread_xcannes_tier_7ad17576d3", "Conversion fee (1%)")}
-                  {sendFxInfo.fxSource ? (
-                    <>
-                      {" "}· {t("ui_source_507c065942", "source")}{" "}
-                      <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
-                    </>
-                  ) : (
-                    <>{" "}· {t("ui_source_unknown_4c1a7d9b2e", "unknown source")}</>
-                  )}
-                  :{" "}
-                  <span className="font-mono">
-                    {formatAmountWithSymbol(
-                      locale,
-                      Number(sendFxInfo.spreadFeeRlusd || 0),
-                      "USD",
-                      { minimumFractionDigits: 0, maximumFractionDigits: 6 }
-                    )}
-                  </span>
+                  {t("ui_source_507c065942", "source")}{" "}
+                  <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
                 </p>
               }
               <p className="mt-2 text-[10px] text-white/45">
-                {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ?
-                  t(
-                    "ui_xumm_signatures_two_8d1c7a2b9e",
-                    "2 Xumm signatures: conversion fee (1%) → XCANNES, then payment → recipient."
-                  ) :
-                  t(
+                {t(
                     "ui_xumm_signatures_one_5b2c1a7d9f",
                     "1 Xumm signature: payment → recipient."
                   )}
@@ -854,7 +801,6 @@ export default function WalletDashboardSendModal({
                 <>
                   {requestDetailsPanel}
                   {payreqCurrencySelectorBlock}
-                  {payreqAlternateCurrencyBanner}
                   {saveAddressBlock}
                   {sendActions}
                 </>

@@ -52,6 +52,8 @@ export function useWalletModalProps({
   sendProcessing,
   payreqDecorProps,
   hasPayreq,
+  savePayreq,
+  removePayreq,
 
   // --- Receive ---
   receiveTab,
@@ -223,6 +225,8 @@ export function useWalletModalProps({
       selectIconByAssetKey,
       selectLabelMobileByAssetKey,
       enableSaveAddress: true,
+      savePayreq,
+      removePayreq,
     }),
     [
       isWalletActivated,
@@ -243,6 +247,8 @@ export function useWalletModalProps({
       selectLabelRightByAssetKey,
       selectIconByAssetKey,
       selectLabelMobileByAssetKey,
+      savePayreq,
+      removePayreq,
     ]
   );
 
