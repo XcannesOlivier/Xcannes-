@@ -1,7 +1,6 @@
 "use client";
 
 	import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-	import { createPortal } from "react-dom";
 	import { useWallet } from "@/context/WalletContext";
 import xcannesApi from "@/lib/xcannesApi";
 import { apiUrl } from "@/lib/runtimeConfig";
@@ -34,20 +33,9 @@ import WalletDashboardHeader from "./components/WalletDashboardHeader";
 import WalletDashboardActionRow from "./components/WalletDashboardActionRow";
 import WalletDashboardTokenList from "./components/WalletDashboardTokenList";
 import WalletDashboardTokenRow from "./components/WalletDashboardTokenRow";
-import WalletDashboardSaveAddressPrompt from "./components/WalletDashboardSaveAddressPrompt";
-import QRScanner from "./components/QRScanner";
-import XummQRModal from "@/components/xumm/XummQRModal";
-import WalletDashboardCashModal from "./modals/WalletDashboardCashModal";
-import WalletDashboardReceiveModal from "./modals/WalletDashboardReceiveModal";
-import WalletDashboardSendModal from "./modals/WalletDashboardSendModal";
-import WalletDashboardPayreqModal from "./modals/WalletDashboardPayreqModal";
-import WalletDashboardStatementModals from "./modals/WalletDashboardStatementModals";
-import WalletDashboardSwapModal from "./modals/WalletDashboardSwapModal";
-import WalletDashboardAdjustModal from "./modals/WalletDashboardAdjustModal";
-import WalletInfoModal from "./modals/WalletInfoModal";
-import WalletActivationModal from "./modals/WalletActivationModal";
-import WalletActivationRequestModal from "./modals/WalletActivationRequestModal";
-import WalletRlusdSetupModal from "./modals/WalletRlusdSetupModal";
+import { useWalletModalProps } from "./hooks/useWalletModalProps";
+import WalletDesktopModals from "./desktop/WalletDesktopModals";
+import WalletMobileModals from "./mobile/WalletMobileModals";
 import { buildMoonpayMemo, buildPayreqMemo, buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { useTranslation } from "next-i18next";
 import {
@@ -1871,6 +1859,138 @@ export default function WalletDashboard({
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && showActivationRequestModal;
   const showInlineInfo =
     isDesktopPanel && !showInlineXumm && !showInlineQrScanner && walletInfoOpen;
+  const hasInlineModal =
+    showInlineXumm ||
+    showInlineQrScanner ||
+    showInlineSend ||
+    showInlinePayreq ||
+    showInlineReceive ||
+    showInlineSwap ||
+    showInlineCash ||
+    showInlineAdjust ||
+    showInlineActivation ||
+    showInlineActivationRequest ||
+    showInlineInfo;
+  const showInlineCurrencyStatement =
+    isDesktopPanel &&
+    !hasInlineModal &&
+    showCurrencyStatement &&
+    selectedStatementToken;
+  const showInlineGlobalStatement =
+    isDesktopPanel && !hasInlineModal && !showInlineCurrencyStatement;
+
+  // --- Shared modal props (desktop & mobile) ---
+  const modalProps = useWalletModalProps({
+    effectiveWallet,
+    effectiveIsConnected,
+    variant,
+    isWalletActivated,
+    hasRlusdTrustline,
+    hasOnChainRlusd,
+    walletLabel,
+    walletHasCustomLabel,
+    renderWalletMeta,
+    signTransaction,
+    connect,
+    activeAction,
+    setActiveAction,
+    qrSizingVariant,
+    selectableTokens,
+    augmentedTokens,
+    selectedSendToken,
+    sendFxInfo,
+    setSendAssetKey,
+    sendAmount,
+    setSendAmount,
+    sendPaymentRequest,
+    setSendPaymentRequest,
+    selectLabelByAssetKey,
+    selectLabelRightByAssetKey,
+    selectIconByAssetKey,
+    selectLabelMobileByAssetKey,
+    savedAddresses,
+    sendDestination,
+    setSendDestination,
+    setQrScannerOpen,
+    handlePaymentRequestScan,
+    handleSendSubmit,
+    sendProcessing,
+    payreqDecorProps,
+    hasPayreq,
+    receiveTab,
+    setReceiveTab,
+    handleCopyAddress,
+    requestAmount,
+    setRequestAmount,
+    requestCurrency,
+    setRequestCurrency,
+    requestMemo,
+    setRequestMemo,
+    rlusdPerUnitRates,
+    rlusdPerUnitSources,
+    swapDefaultView,
+    swapLockedView,
+    swapCurrencyOptionsForModal,
+    convertBaseCurrency,
+    setConvertBaseCurrency,
+    convertQuoteCurrency,
+    setConvertQuoteCurrency,
+    convertAmount,
+    setConvertAmount,
+    convertPreview,
+    convertProcessing,
+    handleInstallRequiredTrustline,
+    handleActivateCurrencyLine,
+    effectiveRefreshCurrencyLines,
+    effectiveCurrencyLinesLoading,
+    effectiveCurrencyLinesError,
+    effectiveCurrencyLinesSummary,
+    effectiveCurrencyLines,
+    currencyLineCode,
+    setCurrencyLineCode,
+    currencyLineAllocatedRlusd,
+    setCurrencyLineAllocatedRlusd,
+    handleUpsertCurrencyLine,
+    cashModalTab,
+    setCashModalTab,
+    cashBuyPrefill,
+    setCashBuyPrefill,
+    showAdjustmentModal,
+    setShowAdjustmentModal,
+    adjustmentDeficitRlusd,
+    refreshBalance,
+    adjustmentFeeRlusd: ADJUSTMENT_FEE_RLUSD,
+    showActivationModal,
+    setShowActivationModal,
+    handleActivationSendFromWallet,
+    handleActivationRequestFromThirdParty,
+    handleActivationBuyViaMoonpay,
+    activationBundleEnabled,
+    setActivationBundleEnabled,
+    activationXrpAmount,
+    showActivationRequestModal,
+    setShowActivationRequestModal,
+    showRlusdSetupModal,
+    setShowRlusdSetupModal,
+    handleRlusdSetupConfirm,
+    walletInfoOpen,
+    setWalletInfoOpen,
+    displayTokensWithCurrencyLines,
+    backendWalletAddress,
+    isFullPageView,
+    statementVariant,
+    usdRates,
+    showGlobalStatement,
+    setShowGlobalStatement,
+    showCurrencyStatement,
+    setShowCurrencyStatement,
+    selectedStatementToken,
+    setSelectedStatementToken,
+    qrModalData,
+    closeQrModal,
+    qrScannerOpen,
+    handleAddressScan,
+  });
   const allowBackgroundScrollForStatements =
     !isDesktopPanel && (showGlobalStatement || showCurrencyStatement);
   const allowBackgroundScrollForActions =
@@ -1894,25 +2014,6 @@ export default function WalletDashboard({
       showSaveAddressPrompt ||
       lockForStatements
     );
-  const hasInlineModal =
-    showInlineXumm ||
-    showInlineQrScanner ||
-    showInlineSend ||
-    showInlinePayreq ||
-    showInlineReceive ||
-    showInlineSwap ||
-    showInlineCash ||
-    showInlineAdjust ||
-    showInlineActivation ||
-    showInlineActivationRequest ||
-    showInlineInfo;
-  const showInlineCurrencyStatement =
-    isDesktopPanel &&
-    !hasInlineModal &&
-    showCurrencyStatement &&
-    selectedStatementToken;
-  const showInlineGlobalStatement =
-    isDesktopPanel && !hasInlineModal && !showInlineCurrencyStatement;
 
   useEffect(() => {
     if (!shouldLockBodyScroll) return;
@@ -1991,562 +2092,38 @@ export default function WalletDashboard({
             onOpenInfo={handleOpenInfo}
           />
           {!isDesktopPanel ? (
-            <>
-              <WalletInfoModal
-                isOpen={walletInfoOpen}
-                onClose={() => setWalletInfoOpen(false)}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-              />
-              <WalletActivationModal
-                open={showActivationModal}
-                onClose={() => setShowActivationModal(false)}
-                onSendFromWallet={handleActivationSendFromWallet}
-                onRequestFromThirdParty={handleActivationRequestFromThirdParty}
-                onBuyViaMoonpay={handleActivationBuyViaMoonpay}
-                activationBundleEnabled={activationBundleEnabled}
-                onToggleActivationBundle={setActivationBundleEnabled}
-                activationAmountXrp={activationXrpAmount}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-              />
-              <WalletActivationRequestModal
-                open={showActivationRequestModal}
-                onClose={() => setShowActivationRequestModal(false)}
-                walletAddress={effectiveWallet}
-                walletLabel={walletLabel}
-                activationAmountXrp={activationXrpAmount}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-              />
-              <WalletRlusdSetupModal
-                open={showRlusdSetupModal}
-                onClose={() => setShowRlusdSetupModal(false)}
-                onConfirm={handleRlusdSetupConfirm}
-              />
-            </>
+            <WalletMobileModals
+              {...modalProps}
+              showSaveAddressPrompt={showSaveAddressPrompt}
+              setShowSaveAddressPrompt={setShowSaveAddressPrompt}
+              addressToSave={addressToSave}
+              setAddressToSave={setAddressToSave}
+              addressLabel={addressLabel}
+              setAddressLabel={setAddressLabel}
+              saveAddress={saveAddress}
+            />
           ) : null}
         </div>
 
         {isDesktopPanel ? (
-          <aside className="hidden lg:flex lg:flex-col min-h-0 relative">
-            {showInlineXumm ? (
-              <XummQRModal
-                isOpen
-                inline
-                onClose={closeQrModal}
-                uuid={qrModalData?.uuid}
-                qrUrl={qrModalData?.qrUrl}
-                deepLink={qrModalData?.deepLink}
-                type={qrModalData?.type || "connect"}
-                status={qrModalData?.status}
-                enablePolling={false}
-              />
-            ) : null}
-
-            {showInlineQrScanner ? (
-              <div className="flex-1 min-h-0">
-                <QRScanner
-                  isOpen
-                  embedded
-                  onScan={handleAddressScan}
-                  onClose={() => setQrScannerOpen(false)}
-                  hideTitle
-                  hideWhenUnavailable
-                  className="h-full"
-                />
-              </div>
-            ) : null}
-            {showInlineSend ? (
-	              <WalletDashboardSendModal
-                open
-                inline
-                onClose={() => setActiveAction(null)}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-                qrSizingVariant={qrSizingVariant}
-                renderWalletMeta={renderWalletMeta}
-	                augmentedTokens={selectableTokens}
-                selectedSendToken={selectedSendToken}
-                sendFxInfo={sendFxInfo}
-                setSendAssetKey={setSendAssetKey}
-                sendAmount={sendAmount}
-                setSendAmount={setSendAmount}
-                sendPaymentRequest={sendPaymentRequest}
-                selectLabelByAssetKey={selectLabelByAssetKey}
-                selectLabelRightByAssetKey={selectLabelRightByAssetKey}
-                selectIconByAssetKey={selectIconByAssetKey}
-                selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
-                savedAddresses={savedAddresses}
-                sendDestination={sendDestination}
-                setSendDestination={setSendDestination}
-                setQrScannerOpen={setQrScannerOpen}
-                handlePaymentRequestScan={handlePaymentRequestScan}
-                handleSendSubmit={handleSendSubmit}
-                sendProcessing={sendProcessing}
-                enableSaveAddress={true}
-                {...payreqDecorProps}
-              />
-            ) : null}
-            {showInlinePayreq ? (
-              <WalletDashboardPayreqModal
-                open
-                inline
-                onClose={() => {
-                  setSendPaymentRequest(null);
-                  setActiveAction(null);
-                }}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-                renderWalletMeta={renderWalletMeta}
-                augmentedTokens={selectableTokens}
-                selectedSendToken={selectedSendToken}
-                sendFxInfo={sendFxInfo}
-                setSendAssetKey={setSendAssetKey}
-                setSendAmount={setSendAmount}
-                sendPaymentRequest={sendPaymentRequest}
-                sendDestination={sendDestination}
-                sendAmount={sendAmount}
-                sendProcessing={sendProcessing}
-                handleSendSubmit={handleSendSubmit}
-                savedAddresses={savedAddresses}
-                selectLabelByAssetKey={selectLabelByAssetKey}
-                selectLabelRightByAssetKey={selectLabelRightByAssetKey}
-                selectIconByAssetKey={selectIconByAssetKey}
-                selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
-                enableSaveAddress={true}
-              />
-            ) : null}
-
-            {showInlineReceive ? (
-	          <WalletDashboardReceiveModal
-                open
-                inline
-                onClose={() => setActiveAction(null)}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-                dashboardVariant={variant}
-                receiveTab={receiveTab}
-                setReceiveTab={setReceiveTab}
-                renderWalletMeta={renderWalletMeta}
-                effectiveWallet={effectiveWallet}
-                handleCopyAddress={handleCopyAddress}
-                requestAmount={requestAmount}
-                setRequestAmount={setRequestAmount}
-                requestCurrency={requestCurrency}
-                setRequestCurrency={setRequestCurrency}
-                selectLabelByCurrency={selectLabelByAssetKey}
-                selectLabelRightByCurrency={selectLabelRightByAssetKey}
-                selectIconByCurrency={selectIconByAssetKey}
-                selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-	            augmentedTokens={selectableTokens}
-                requestMemo={requestMemo}
-                setRequestMemo={setRequestMemo}
-                rlusdPerUnitRates={rlusdPerUnitRates}
-                rlusdPerUnitSources={rlusdPerUnitSources}
-                walletLabel={walletLabel}
-              />
-            ) : null}
-
-            {showInlineSwap ? (
-              <WalletDashboardSwapModal
-                open
-                inline
-                onClose={() => setActiveAction(null)}
-                renderWalletMeta={renderWalletMeta}
-                defaultView={swapDefaultView}
-                lockedView={swapLockedView}
-                dashboardVariant={variant}
-                effectiveIsConnected={effectiveIsConnected}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-                walletAddress={effectiveWallet}
-                onConnectWallet={connect}
-                hasOnChainRlusd={hasOnChainRlusd}
-                onInstallTrustline={handleInstallRequiredTrustline}
-                onActivateCurrencyLine={handleActivateCurrencyLine}
-                refreshCurrencyLines={effectiveRefreshCurrencyLines}
-                currencyLinesLoading={effectiveCurrencyLinesLoading}
-                currencyLinesError={effectiveCurrencyLinesError}
-                currencyLinesSummary={effectiveCurrencyLinesSummary}
-                currencyLines={effectiveCurrencyLines}
-                swapCurrencyOptions={swapCurrencyOptionsForModal}
-                convertBaseCurrency={convertBaseCurrency}
-                setConvertBaseCurrency={setConvertBaseCurrency}
-                convertQuoteCurrency={convertQuoteCurrency}
-                setConvertQuoteCurrency={setConvertQuoteCurrency}
-                convertAmount={convertAmount}
-                setConvertAmount={setConvertAmount}
-                convertPreview={convertPreview}
-                selectLabelByCurrency={selectLabelByAssetKey}
-                selectLabelRightByCurrency={selectLabelRightByAssetKey}
-                selectIconByCurrency={selectIconByAssetKey}
-                selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-                currencyLineCode={currencyLineCode}
-                setCurrencyLineCode={setCurrencyLineCode}
-                currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}
-                setCurrencyLineAllocatedRlusd={setCurrencyLineAllocatedRlusd}
-                handleUpsertCurrencyLine={handleUpsertCurrencyLine}
-                convertProcessing={convertProcessing}
-                rlusdPerUnitRates={rlusdPerUnitRates}
-              />
-            ) : null}
-
-	            {showInlineCash ? (
-			      <WalletDashboardCashModal
-	                open
-	                inline
-	                onClose={() => {
-	                  setActiveAction(null);
-	                  setCashBuyPrefill(null);
-	                }}
-	                isWalletActivated={isWalletActivated}
-	                hasRlusdTrustline={hasRlusdTrustline}
-	                cashModalTab={cashModalTab}
-	                setCashModalTab={setCashModalTab}
-	                renderWalletMeta={renderWalletMeta}
-	                walletLabel={walletLabel}
-	                hideWalletAddress={walletHasCustomLabel}
-			        availableTokens={selectableTokens}
-	                rlusdPerUnitRates={rlusdPerUnitRates}
-	                selectLabelByCurrency={selectLabelByAssetKey}
-	                selectLabelRightByCurrency={selectLabelRightByAssetKey}
-	                selectIconByCurrency={selectIconByAssetKey}
-                selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-                walletAddress={effectiveWallet || ""}
-                buyPrefill={cashBuyPrefill}
-              />
-            ) : null}
-
-            {showInlineAdjust ? (
-              <WalletDashboardAdjustModal
-                open
-                inline
-                onClose={() => setShowAdjustmentModal(false)}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-                renderWalletMeta={renderWalletMeta}
-                walletAddress={effectiveWallet}
-                signTransaction={signTransaction}
-                deficitRlusd={adjustmentDeficitRlusd}
-                currencyLines={effectiveCurrencyLines}
-                rlusdPerUnitRates={rlusdPerUnitRates}
-                refreshBalance={refreshBalance}
-                refreshCurrencyLines={effectiveRefreshCurrencyLines}
-                adjustmentFeeRlusd={ADJUSTMENT_FEE_RLUSD}
-              />
-            ) : null}
-
-            {showInlineActivation ? (
-              <WalletActivationModal
-                open
-                inline
-                onClose={() => setShowActivationModal(false)}
-                onSendFromWallet={handleActivationSendFromWallet}
-                onRequestFromThirdParty={handleActivationRequestFromThirdParty}
-                onBuyViaMoonpay={handleActivationBuyViaMoonpay}
-                activationBundleEnabled={activationBundleEnabled}
-                onToggleActivationBundle={setActivationBundleEnabled}
-                activationAmountXrp={activationXrpAmount}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-              />
-            ) : null}
-
-            {showInlineActivationRequest ? (
-              <WalletActivationRequestModal
-                open
-                inline
-                onClose={() => setShowActivationRequestModal(false)}
-                walletAddress={effectiveWallet}
-                walletLabel={walletLabel}
-                activationAmountXrp={activationXrpAmount}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-              />
-            ) : null}
-
-            {showRlusdSetupModal ? (
-              <WalletRlusdSetupModal
-                open
-                onClose={() => setShowRlusdSetupModal(false)}
-                onConfirm={handleRlusdSetupConfirm}
-              />
-            ) : null}
-
-            {showInlineInfo ? (
-              <WalletInfoModal
-                isOpen
-                inline
-                onClose={() => setWalletInfoOpen(false)}
-                isWalletActivated={isWalletActivated}
-                hasRlusdTrustline={hasRlusdTrustline}
-              />
-            ) : null}
-
-	            {showInlineCurrencyStatement ? (
-	              <WalletDashboardStatementModals
-	                augmentedTokens={displayTokensWithCurrencyLines || augmentedTokens}
-	                backendWalletAddress={backendWalletAddress}
-	                effectiveWallet={effectiveWallet}
-	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
-                isWalletActivated={isWalletActivated}
-                isFullPageView={isFullPageView}
-                statementVariant={statementVariant}
-                usdRates={usdRates}
-                showGlobalStatement={showGlobalStatement}
-                setShowGlobalStatement={setShowGlobalStatement}
-                showCurrencyStatement={showCurrencyStatement}
-                setShowCurrencyStatement={setShowCurrencyStatement}
-                selectedStatementToken={selectedStatementToken}
-                setSelectedStatementToken={setSelectedStatementToken}
-                inlineCurrencyStatement
-                inlineCurrencyStatementClassName="flex-1 min-h-0"
-                inlineStatementVariant="inline-desktop"
-              />
-            ) : null}
-
-	            {showInlineGlobalStatement ? (
-	              <WalletDashboardStatementModals
-	                augmentedTokens={displayTokensWithCurrencyLines || augmentedTokens}
-	                backendWalletAddress={backendWalletAddress}
-	                effectiveWallet={effectiveWallet}
-	                walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
-                isWalletActivated={isWalletActivated}
-                isFullPageView={isFullPageView}
-                statementVariant={statementVariant}
-                usdRates={usdRates}
-                showGlobalStatement={showGlobalStatement}
-                setShowGlobalStatement={setShowGlobalStatement}
-                showCurrencyStatement={showCurrencyStatement}
-                setShowCurrencyStatement={setShowCurrencyStatement}
-                selectedStatementToken={selectedStatementToken}
-                setSelectedStatementToken={setSelectedStatementToken}
-                inlineGlobalStatement
-                inlineGlobalStatementClassName="flex-1 min-h-0"
-                inlineStatementVariant="inline-desktop"
-              />
-            ) : null}
-          </aside>
+          <WalletDesktopModals
+            showInlineXumm={showInlineXumm}
+            showInlineQrScanner={showInlineQrScanner}
+            showInlineSend={showInlineSend}
+            showInlinePayreq={showInlinePayreq}
+            showInlineReceive={showInlineReceive}
+            showInlineSwap={showInlineSwap}
+            showInlineCash={showInlineCash}
+            showInlineAdjust={showInlineAdjust}
+            showInlineActivation={showInlineActivation}
+            showInlineActivationRequest={showInlineActivationRequest}
+            showInlineInfo={showInlineInfo}
+            showInlineCurrencyStatement={showInlineCurrencyStatement}
+            showInlineGlobalStatement={showInlineGlobalStatement}
+            {...modalProps}
+          />
         ) : null}
       </div>
-
-      {/* Modales via Portal pour éviter les problèmes de z-index et overflow */}
-      {!isDesktopPanel && typeof document !== 'undefined' && createPortal(
-        <>
-          <WalletDashboardSendModal
-            open={activeAction === "send" && !hasPayreq}
-            onClose={() => setActiveAction(null)}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            qrSizingVariant={qrSizingVariant}
-            renderWalletMeta={renderWalletMeta}
-            augmentedTokens={selectableTokens}
-            selectedSendToken={selectedSendToken}
-            sendFxInfo={sendFxInfo}
-            setSendAssetKey={setSendAssetKey}
-            sendAmount={sendAmount}
-            setSendAmount={setSendAmount}
-            sendPaymentRequest={sendPaymentRequest}
-            selectLabelByAssetKey={selectLabelByAssetKey}
-            selectLabelRightByAssetKey={selectLabelRightByAssetKey}
-            selectIconByAssetKey={selectIconByAssetKey}
-            selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
-            savedAddresses={savedAddresses}
-            sendDestination={sendDestination}
-            setSendDestination={setSendDestination}
-            setQrScannerOpen={setQrScannerOpen}
-            handlePaymentRequestScan={handlePaymentRequestScan}
-            handleSendSubmit={handleSendSubmit}
-            sendProcessing={sendProcessing}
-            enableSaveAddress={true}
-            {...payreqDecorProps}
-          />
-          <WalletDashboardPayreqModal
-            open={activeAction === "send" && hasPayreq}
-            onClose={() => {
-              setSendPaymentRequest(null);
-              setActiveAction(null);
-            }}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            renderWalletMeta={renderWalletMeta}
-            augmentedTokens={selectableTokens}
-            selectedSendToken={selectedSendToken}
-            sendFxInfo={sendFxInfo}
-            setSendAssetKey={setSendAssetKey}
-            setSendAmount={setSendAmount}
-            sendPaymentRequest={sendPaymentRequest}
-            sendDestination={sendDestination}
-            sendAmount={sendAmount}
-            sendProcessing={sendProcessing}
-            handleSendSubmit={handleSendSubmit}
-            savedAddresses={savedAddresses}
-            selectLabelByAssetKey={selectLabelByAssetKey}
-            selectLabelRightByAssetKey={selectLabelRightByAssetKey}
-            selectIconByAssetKey={selectIconByAssetKey}
-            selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
-            enableSaveAddress={true}
-          />
-
-          <WalletDashboardReceiveModal
-            open={activeAction === "receive"}
-            onClose={() => setActiveAction(null)}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            dashboardVariant={variant}
-            receiveTab={receiveTab}
-            setReceiveTab={setReceiveTab}
-            renderWalletMeta={renderWalletMeta}
-            effectiveWallet={effectiveWallet}
-            handleCopyAddress={handleCopyAddress}
-            requestAmount={requestAmount}
-            setRequestAmount={setRequestAmount}
-            requestCurrency={requestCurrency}
-            setRequestCurrency={setRequestCurrency}
-            selectLabelByCurrency={selectLabelByAssetKey}
-            selectLabelRightByCurrency={selectLabelRightByAssetKey}
-            selectIconByCurrency={selectIconByAssetKey}
-            selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-	            augmentedTokens={selectableTokens}
-            requestMemo={requestMemo}
-            setRequestMemo={setRequestMemo}
-            rlusdPerUnitRates={rlusdPerUnitRates}
-            rlusdPerUnitSources={rlusdPerUnitSources}
-            walletLabel={walletLabel}
-          />
-
-            <WalletDashboardSwapModal
-              open={activeAction === "swap"}
-              onClose={() => setActiveAction(null)}
-              renderWalletMeta={renderWalletMeta}
-              defaultView={swapDefaultView}
-              lockedView={swapLockedView}
-              dashboardVariant={variant}
-              effectiveIsConnected={effectiveIsConnected}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            walletAddress={effectiveWallet}
-            onConnectWallet={connect}
-            hasOnChainRlusd={hasOnChainRlusd}
-            onInstallTrustline={handleInstallRequiredTrustline}
-            onActivateCurrencyLine={handleActivateCurrencyLine}
-            refreshCurrencyLines={effectiveRefreshCurrencyLines}
-            currencyLinesLoading={effectiveCurrencyLinesLoading}
-            currencyLinesError={effectiveCurrencyLinesError}
-            currencyLinesSummary={effectiveCurrencyLinesSummary}
-            currencyLines={effectiveCurrencyLines}
-            swapCurrencyOptions={swapCurrencyOptionsForModal}
-            convertBaseCurrency={convertBaseCurrency}
-            setConvertBaseCurrency={setConvertBaseCurrency}
-            convertQuoteCurrency={convertQuoteCurrency}
-            setConvertQuoteCurrency={setConvertQuoteCurrency}
-            convertAmount={convertAmount}
-            setConvertAmount={setConvertAmount}
-            convertPreview={convertPreview}
-            selectLabelByCurrency={selectLabelByAssetKey}
-            selectLabelRightByCurrency={selectLabelRightByAssetKey}
-            selectIconByCurrency={selectIconByAssetKey}
-            selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-            currencyLineCode={currencyLineCode}
-            setCurrencyLineCode={setCurrencyLineCode}
-            currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}
-            setCurrencyLineAllocatedRlusd={setCurrencyLineAllocatedRlusd}
-            handleUpsertCurrencyLine={handleUpsertCurrencyLine}
-            convertProcessing={convertProcessing}
-            rlusdPerUnitRates={rlusdPerUnitRates}
-          />
-
-          <WalletDashboardAdjustModal
-            open={showAdjustmentModal}
-            onClose={() => setShowAdjustmentModal(false)}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            renderWalletMeta={renderWalletMeta}
-            walletAddress={effectiveWallet}
-            signTransaction={signTransaction}
-            deficitRlusd={adjustmentDeficitRlusd}
-            currencyLines={effectiveCurrencyLines}
-            rlusdPerUnitRates={rlusdPerUnitRates}
-            refreshBalance={refreshBalance}
-            refreshCurrencyLines={effectiveRefreshCurrencyLines}
-            adjustmentFeeRlusd={ADJUSTMENT_FEE_RLUSD}
-          />
-
-		      <WalletDashboardCashModal
-		        open={activeAction === "cash"}
-		        onClose={() => {
-		          setActiveAction(null);
-		          setCashBuyPrefill(null);
-		        }}
-	          isWalletActivated={isWalletActivated}
-	          hasRlusdTrustline={hasRlusdTrustline}
-		        cashModalTab={cashModalTab}
-		        setCashModalTab={setCashModalTab}
-		        renderWalletMeta={renderWalletMeta}
-		        walletLabel={walletLabel}
-		        hideWalletAddress={walletHasCustomLabel}
-		        availableTokens={augmentedTokens}
-		        rlusdPerUnitRates={rlusdPerUnitRates}
-		        selectLabelByCurrency={selectLabelByAssetKey}
-		        selectLabelRightByCurrency={selectLabelRightByAssetKey}
-		        selectIconByCurrency={selectIconByAssetKey}
-	        selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-	        walletAddress={effectiveWallet || ""}
-          buyPrefill={cashBuyPrefill}
-	      />
-
-        </>,
-        document.body
-      )}
-
-      {/* QR Scanner Modal for Address */}
-      {!isDesktopPanel ? (
-        <QRScanner
-          isOpen={qrScannerOpen}
-          onScan={handleAddressScan}
-          onClose={() => setQrScannerOpen(false)}
-          hideTitle
-        />
-      ) : null}
-
-      <WalletDashboardSaveAddressPrompt
-        open={showSaveAddressPrompt}
-        addressToSave={addressToSave}
-        addressLabel={addressLabel}
-        setAddressLabel={setAddressLabel}
-        onClose={() => {
-          setShowSaveAddressPrompt(false);
-          setAddressLabel("");
-          setAddressToSave("");
-        }}
-        onSave={() => {
-          saveAddress(addressToSave, addressLabel);
-          setShowSaveAddressPrompt(false);
-          setAddressLabel("");
-          setAddressToSave("");
-          alert("✅ Address saved!");
-        }}
-      />
-
-	      {!isDesktopPanel ? (
-	        <WalletDashboardStatementModals
-	          augmentedTokens={displayTokensWithCurrencyLines || augmentedTokens}
-	          backendWalletAddress={backendWalletAddress}
-	          effectiveWallet={effectiveWallet}
-	          walletDisplayLabel={walletHasCustomLabel ? walletLabel : ""}
-	          isWalletActivated={isWalletActivated}
-	          isFullPageView={isFullPageView}
-	          statementVariant={statementVariant}
-	          usdRates={usdRates}
-          showGlobalStatement={showGlobalStatement}
-          setShowGlobalStatement={setShowGlobalStatement}
-          showCurrencyStatement={showCurrencyStatement}
-          setShowCurrencyStatement={setShowCurrencyStatement}
-          selectedStatementToken={selectedStatementToken}
-          setSelectedStatementToken={setSelectedStatementToken}
-        />
-      ) : null}
     </>
   );
 }
