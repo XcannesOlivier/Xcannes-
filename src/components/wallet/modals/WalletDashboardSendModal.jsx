@@ -99,6 +99,20 @@ export default function WalletDashboardSendModal({
     if (!target || !selectedCurrency) return false;
     return target !== selectedCurrency;
   }, [sendPaymentRequest, selectedSendToken]);
+  const payingCurrency = useMemo(() => {
+    return String(selectedSendToken?.currency || "").toUpperCase();
+  }, [selectedSendToken]);
+  const payreqTargetCurrency = useMemo(() => {
+    return String(sendPaymentRequest?.targetCurrencyCode || "").trim().toUpperCase();
+  }, [sendPaymentRequest]);
+  const isAlternateCurrency = useMemo(() => {
+    return (
+      Boolean(sendPaymentRequest) &&
+      Boolean(payreqTargetCurrency) &&
+      Boolean(payingCurrency) &&
+      payreqTargetCurrency !== payingCurrency
+    );
+  }, [sendPaymentRequest, payreqTargetCurrency, payingCurrency]);
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
       (addr) => addr.address === normalizedDestination
@@ -417,6 +431,70 @@ export default function WalletDashboardSendModal({
             </span>
           </div>
         ) : null}
+      </div>
+    </div>
+  ) : null;
+
+  const payreqCurrencySelectorBlock = hasPaymentRequest && augmentedTokens && setSendAssetKey ? (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
+      <div className="text-[11px] uppercase tracking-wide text-white/50 font-semibold">
+        {t("ui_pay_with_currency", "Payer avec")}
+      </div>
+      <ModalSelect
+        value={selectedSendToken ? selectedSendToken.key : ""}
+        onChange={setSendAssetKey}
+        options={(augmentedTokens || []).map((token) => {
+          const labelLeft =
+            selectLabelByAssetKey?.[token.key] ||
+            selectLabelByAssetKey?.[token.currency] ||
+            token.currency;
+          const labelRight =
+            selectLabelRightByAssetKey?.[token.key] ||
+            selectLabelRightByAssetKey?.[token.currency] ||
+            null;
+          return {
+            value: token.key,
+            icon:
+              selectIconByAssetKey?.[token.key] ||
+              selectIconByAssetKey?.[token.currency] ||
+              null,
+            label: labelLeft,
+            labelLeft,
+            labelRight,
+            labelMobile:
+              selectLabelMobileByAssetKey?.[token.key] ||
+              selectLabelMobileByAssetKey?.[token.currency] ||
+              labelLeft,
+          };
+        })}
+        useNativeSelect={false}
+        showMobileOptionRight={true}
+        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+        menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
+        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+      />
+      {sendFxInfo ? (
+        <div className="text-[11px] text-white/50">
+          ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
+          {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ? (
+            <> + {formatAmountWithSymbol(locale, Number(sendFxInfo.spreadFeeRlusd), "USD", { maximumFractionDigits: 6 })} {t("ui_conversion_fee_short", "frais")}</>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  ) : null;
+
+  const payreqAlternateCurrencyBanner = isAlternateCurrency ? (
+    <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-[11px] text-orange-200/90 space-y-1">
+      <div className="font-semibold">
+        {t("ui_currency_change_notice", "Changement de devise")}
+      </div>
+      <div>
+        {t(
+          "ui_currency_change_detail",
+          "La demande est en {{requested}} mais vous payez en {{paying}}. Des frais de conversion de 1 % seront appliqués.",
+          { requested: payreqTargetCurrency, paying: payingCurrency }
+        )}
       </div>
     </div>
   ) : null;
@@ -775,6 +853,8 @@ export default function WalletDashboardSendModal({
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}
+                  {payreqCurrencySelectorBlock}
+                  {payreqAlternateCurrencyBanner}
                   {saveAddressBlock}
                   {sendActions}
                 </>

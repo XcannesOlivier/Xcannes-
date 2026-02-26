@@ -16,7 +16,7 @@ const SCHEMA_TO_TYPE = Object.entries(XCANNES_MEMO_SCHEMAS).reduce((acc, [type, 
 }, {});
 
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
-const VALID_LINE_ACTIONS = new Set(['activate', 'delete']);
+const VALID_LINE_ACTIONS = new Set(['activate']);
 const VALID_ALLOC_ACTIONS = new Set(['allocate', 'deallocate']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
 const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD', 'RLUSD']);

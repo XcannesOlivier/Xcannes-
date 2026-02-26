@@ -777,14 +777,14 @@ export default function WalletDashboard({
         return true;
       }
 
-      // 🆕 Mode réel : Informer l'utilisateur du nouveau système gratuit
-      // Au lieu d'activer manuellement, suggérer une conversion
+      // Mode réel : les lignes de devises sont activées automatiquement et gratuitement
+      // lorsqu'un paiement arrive ou qu'une conversion est effectuée.
+      // Ouvrir le convertisseur pour que l'utilisateur puisse allouer sa première conversion.
       if (!backendWalletAddress) {
         alert("Please connect your Xumm wallet first.");
         return false;
       }
 
-      // 🆕 Vérifier si la ligne est déjà active
       const alreadyActive = (currencyLines || []).some(
         (line) => String(line?.currencyCode || "").toUpperCase() === currencyCode
       );
@@ -797,25 +797,14 @@ export default function WalletDashboard({
         return false;
       }
 
-      // 🆕 NOUVEAU SYSTÈME : Activation gratuite via conversion
-      // Au lieu de payer 1 RLUSD pour activer, suggérer une conversion
-      const confirmMessage = t("ui_currency_lines_auto_activate_info", {
-        defaultValue: `L'activation des devises est maintenant GRATUITE !\n\nPour activer ${currencyCode}, convertissez simplement une petite somme :\n- Exemple : 10 USD → ${currencyCode}\n\nLa devise ${currencyCode} apparaîtra automatiquement dans votre wallet.\n\nVoulez-vous ouvrir le convertisseur maintenant ?`,
-        currencyCode,
-      });
-
-      if (window.confirm(confirmMessage)) {
-        // Ouvrir le modal de conversion avec la devise présélectionnée
-        setConvertBaseCurrency("RLUSD");
-        setConvertQuoteCurrency(currencyCode);
-        setConvertAmount("");
-        setSwapDefaultView("convert");
-        setSwapLockedView(null);
-        setActiveAction("swap");
-        return true;
-      }
-
-      return false;
+      // Ouvrir le convertisseur avec la devise présélectionnée (activation gratuite)
+      setConvertBaseCurrency("RLUSD");
+      setConvertQuoteCurrency(currencyCode);
+      setConvertAmount("");
+      setSwapDefaultView("convert");
+      setSwapLockedView(null);
+      setActiveAction("swap");
+      return true;
     },
     [
       backendWalletAddress,
@@ -824,7 +813,6 @@ export default function WalletDashboard({
       isPreviewMode,
       pushPreviewEvent,
       recordStatementHighlight,
-      refreshCurrencyLines,
       setActiveAction,
       setConvertAmount,
       setConvertBaseCurrency,
@@ -1682,11 +1670,14 @@ export default function WalletDashboard({
     if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) return null;
 
     const paymentRlusd = amountFx * rlusdPerUnit;
-    const spread = computeSpreadQuote({
-      base: code,
-      quote: "RLUSD",
-      amountRlusd: paymentRlusd,
-    });
+
+    // Same-currency payreq → no spread fee (1 tx direct).
+    const isSameCurrencyPayreq =
+      sendPaymentRequest &&
+      String(sendPaymentRequest?.targetCurrencyCode || "").toUpperCase() === code;
+    const spread = isSameCurrencyPayreq
+      ? { isFx: false, spreadFraction: 0, halfSpreadFraction: 0, spreadFeeRlusd: 0, tier: null }
+      : computeSpreadQuote({ base: code, quote: "RLUSD", amountRlusd: paymentRlusd });
     const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
 
     return {
@@ -1709,6 +1700,7 @@ export default function WalletDashboard({
     rlusdPerUnitSources,
     selectedSendToken,
     sendAmount,
+    sendPaymentRequest,
   ]);
 
   useEffect(() => {
@@ -2130,7 +2122,12 @@ export default function WalletDashboard({
           }
         }
 
-        const spread = computeSpreadQuote({ base: currency, quote: "RLUSD", amountRlusd: paymentRlusd });
+        // Same-currency payreq → no spread, 1 single transaction.
+        const isSameCurrencyPayreq =
+          sendPaymentRequest && requestTargetCurrency && requestTargetCurrency === currency;
+        const spread = isSameCurrencyPayreq
+          ? { isFx: false, spreadFraction: 0, halfSpreadFraction: 0, spreadFeeRlusd: 0, tier: null }
+          : computeSpreadQuote({ base: currency, quote: "RLUSD", amountRlusd: paymentRlusd });
         const spreadFeeRlusd = Number(spread?.spreadFeeRlusd || 0);
         const totalToSpendRlusd = paymentRlusd + spreadFeeRlusd;
         const epsilon = 1e-9;
@@ -2261,8 +2258,10 @@ export default function WalletDashboard({
           }
 
           alert(
-            `✅ (Demo) Signature 1/2 simulée: frais de conversion → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
-              `✅ (Demo) Signature 2/2 simulée: paiement → destinataire (${dest})`
+            spreadFeeRlusd > 0
+              ? `✅ (Demo) Signature 1/2 simulée: frais de conversion → XCANNES (${XCANNES_SPREAD_WALLET_ADDRESS})\n` +
+                `✅ (Demo) Signature 2/2 simulée: paiement → destinataire (${dest})`
+              : `✅ (Demo) Signature simulée: paiement → destinataire (${dest})`
           );
           handleAddressSave(dest);
           setSendAmount("");
@@ -2998,13 +2997,21 @@ export default function WalletDashboard({
                 isWalletActivated={isWalletActivated}
                 hasRlusdTrustline={hasRlusdTrustline}
                 renderWalletMeta={renderWalletMeta}
+                augmentedTokens={selectableTokens}
                 selectedSendToken={selectedSendToken}
+                sendFxInfo={sendFxInfo}
+                setSendAssetKey={setSendAssetKey}
+                setSendAmount={setSendAmount}
                 sendPaymentRequest={sendPaymentRequest}
                 sendDestination={sendDestination}
                 sendAmount={sendAmount}
                 sendProcessing={sendProcessing}
                 handleSendSubmit={handleSendSubmit}
                 savedAddresses={savedAddresses}
+                selectLabelByAssetKey={selectLabelByAssetKey}
+                selectLabelRightByAssetKey={selectLabelRightByAssetKey}
+                selectIconByAssetKey={selectIconByAssetKey}
+                selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
                 enableSaveAddress={true}
               />
             ) : null}
@@ -3276,13 +3283,21 @@ export default function WalletDashboard({
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
             renderWalletMeta={renderWalletMeta}
+            augmentedTokens={selectableTokens}
             selectedSendToken={selectedSendToken}
+            sendFxInfo={sendFxInfo}
+            setSendAssetKey={setSendAssetKey}
+            setSendAmount={setSendAmount}
             sendPaymentRequest={sendPaymentRequest}
             sendDestination={sendDestination}
             sendAmount={sendAmount}
             sendProcessing={sendProcessing}
             handleSendSubmit={handleSendSubmit}
             savedAddresses={savedAddresses}
+            selectLabelByAssetKey={selectLabelByAssetKey}
+            selectLabelRightByAssetKey={selectLabelRightByAssetKey}
+            selectIconByAssetKey={selectIconByAssetKey}
+            selectLabelMobileByAssetKey={selectLabelMobileByAssetKey}
             enableSaveAddress={true}
           />
 
