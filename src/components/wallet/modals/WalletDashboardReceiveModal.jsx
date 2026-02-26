@@ -21,7 +21,8 @@ const ShareIcon = ({ className = "" }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
     className={className}
-    aria-hidden="true">
+    aria-hidden="true"
+  >
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
     <polyline points="17 8 12 3 7 8" />
     <line x1="12" y1="3" x2="12" y2="15" />
@@ -55,7 +56,7 @@ export default function WalletDashboardReceiveModal({
   rlusdPerUnitSources,
   walletLabel,
   onRequestGenerated,
-  inline = false
+  inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -80,16 +81,19 @@ export default function WalletDashboardReceiveModal({
   const [isRequestOpen, setIsRequestOpen] = useState(false);
 
   const requestCurrencyCode = useMemo(
-    () => String(requestCurrency || "").trim().toUpperCase(),
-    [requestCurrency]
+    () =>
+      String(requestCurrency || "")
+        .trim()
+        .toUpperCase(),
+    [requestCurrency],
   );
 
   const selectedRequestToken = useMemo(() => {
     return (
       (augmentedTokens || []).find(
-        (t) => String(t?.currency || "").toUpperCase() === requestCurrencyCode
-      ) || null);
-
+        (t) => String(t?.currency || "").toUpperCase() === requestCurrencyCode,
+      ) || null
+    );
   }, [augmentedTokens, requestCurrencyCode]);
 
   useEffect(() => {
@@ -130,7 +134,11 @@ export default function WalletDashboardReceiveModal({
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
     if (!requestCurrencyCode) return false;
-    return requestCurrencyCode !== "XRP" && requestCurrencyCode !== "RLUSD" && requestCurrencyCode !== "USD";
+    return (
+      requestCurrencyCode !== "XRP" &&
+      requestCurrencyCode !== "RLUSD" &&
+      requestCurrencyCode !== "USD"
+    );
   }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
 
   const handleGenerateRequest = () => {
@@ -141,8 +149,8 @@ export default function WalletDashboardReceiveModal({
       setGenerateError(
         t(
           "ui_request_error_invalid_amount_5bd214c9a7",
-          "Please enter a valid amount."
-        )
+          "Please enter a valid amount.",
+        ),
       );
       return;
     }
@@ -151,19 +159,19 @@ export default function WalletDashboardReceiveModal({
       setGenerateError(
         t(
           "ui_request_error_missing_wallet_4f7a2c9b1e",
-          "Wallet address is missing."
-        )
+          "Wallet address is missing.",
+        ),
       );
       return;
     }
 
-	    const targetCurrencyCode = requestCurrencyCode || "USD";
-	    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
-	    const displayCurrencyUpper =
-	      targetCurrencyUpper === "RLUSD" ? "USD" : targetCurrencyUpper;
-	    let amountRlusd = null;
-	    let fxRate = null;
-	    let fxSource = null;
+    const targetCurrencyCode = requestCurrencyCode || "USD";
+    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
+    const displayCurrencyUpper =
+      targetCurrencyUpper === "RLUSD" ? "USD" : targetCurrencyUpper;
+    let amountRlusd = null;
+    let fxRate = null;
+    let fxSource = null;
 
     if (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD") {
       amountRlusd = amount;
@@ -176,7 +184,7 @@ export default function WalletDashboardReceiveModal({
           t("ui_request_error_rate_unavailable_8c2e1a7b5d", {
             defaultValue: "Rate unavailable for {{currency}}.",
             currency: targetCurrencyUpper,
-          })
+          }),
         );
         return;
       }
@@ -186,28 +194,32 @@ export default function WalletDashboardReceiveModal({
     }
 
     const issuerCandidate = String(selectedRequestToken?.issuer || "").trim();
-    const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuerCandidate);
+    const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(
+      issuerCandidate,
+    );
     // USD et RLUSD utilisent le même issuer on-chain (RLUSD)
     const knownIssuer =
-      (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD")
+      targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD"
         ? XRPL_KNOWN_ISSUERS.RLUSD
         : null;
-    const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
+    const issuer = isFxRequest
+      ? null
+      : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
     const beneficiaryLabel = String(walletLabel || "").trim() || null;
-	    const req = {
-	      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
-	      to: effectiveWallet,
-	      targetCurrency: targetCurrencyUpper,
-	      displayAmount: amount,
-	      displayCurrency: displayCurrencyUpper,
-	      amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
-	      fxRate,
-	      fxSource,
-	      issuer,
+    const req = {
+      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
+      to: effectiveWallet,
+      targetCurrency: targetCurrencyUpper,
+      displayAmount: amount,
+      displayCurrency: displayCurrencyUpper,
+      amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
+      fxRate,
+      fxSource,
+      issuer,
       memo: requestMemo || "",
       beneficiaryLabel,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     setGeneratedRequest(req);
@@ -271,7 +283,7 @@ export default function WalletDashboardReceiveModal({
           offset,
           offset,
           srcWidth * scale,
-          srcHeight * scale
+          srcHeight * scale,
         );
         const data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
@@ -283,7 +295,13 @@ export default function WalletDashboardReceiveModal({
       }
     } catch {
       // fallback to raw canvas if pixel access fails
-      ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
+      ctx.drawImage(
+        canvas,
+        offset,
+        offset,
+        srcWidth * scale,
+        srcHeight * scale,
+      );
     }
     const dataUrl = exportCanvas.toDataURL("image/png");
     return dataUrlToBlob(dataUrl);
@@ -315,7 +333,7 @@ export default function WalletDashboardReceiveModal({
           const items = { "image/png": blob };
           if (fallbackText) {
             items["text/plain"] = new Blob([fallbackText], {
-              type: "text/plain"
+              type: "text/plain",
             });
           }
           const item = new ClipboardItem(items);
@@ -373,11 +391,16 @@ export default function WalletDashboardReceiveModal({
         return;
       }
       if (fallbackText) {
-        downloadBlob(new Blob([fallbackText], { type: "text/plain" }), "xcannes-qr.txt");
+        downloadBlob(
+          new Blob([fallbackText], { type: "text/plain" }),
+          "xcannes-qr.txt",
+        );
         flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"));
         return;
       }
-      flashCopyToast(t("ui_share_unavailable_3b7c1a9d5e", "Partager indisponible"));
+      flashCopyToast(
+        t("ui_share_unavailable_3b7c1a9d5e", "Partager indisponible"),
+      );
       return;
     }
 
@@ -386,7 +409,9 @@ export default function WalletDashboardReceiveModal({
     shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
 
     if (blob && typeof File !== "undefined") {
-      const file = new File([blob], "xcannes-qr.png", { type: blob.type || "image/png" });
+      const file = new File([blob], "xcannes-qr.png", {
+        type: blob.type || "image/png",
+      });
       if (!navigator.canShare || navigator.canShare({ files: [file] })) {
         shareData.files = [file];
       }
@@ -407,7 +432,9 @@ export default function WalletDashboardReceiveModal({
       const compact = {
         s: generatedRequest.schema,
         to: generatedRequest.to,
-        tc: generatedRequest.targetCurrency || generatedRequest.targetCurrencyCode,
+        tc:
+          generatedRequest.targetCurrency ||
+          generatedRequest.targetCurrencyCode,
         da: generatedRequest.displayAmount ?? generatedRequest.amount ?? null,
         dc: generatedRequest.displayCurrency || null,
         ar: generatedRequest.amountRlusd ?? null,
@@ -429,7 +456,10 @@ export default function WalletDashboardReceiveModal({
     if (!requestValue) return "";
     try {
       const base64 = Buffer.from(requestValue, "utf8").toString("base64");
-      const base64Url = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      const base64Url = base64
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/g, "");
       return `xcannes-payreq:${base64Url}`;
     } catch {
       return "";
@@ -438,18 +468,20 @@ export default function WalletDashboardReceiveModal({
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
   const showRequestPreview = hasGeneratedRequest;
   const requestDisplayCurrency = String(
-    generatedRequest?.displayCurrency || requestCurrencyCode || "USD"
+    generatedRequest?.displayCurrency || requestCurrencyCode || "USD",
   )
     .trim()
     .toUpperCase();
   const requestDisplayAmount =
     generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || "0");
-  const requestDisplayAmountLabel = Number.isFinite(Number(requestDisplayAmount))
+  const requestDisplayAmountLabel = Number.isFinite(
+    Number(requestDisplayAmount),
+  )
     ? formatAmountWithSymbol(
         locale,
         Number(requestDisplayAmount),
         requestDisplayCurrency,
-        { minimumFractionDigits: 0, maximumFractionDigits: 2 }
+        { minimumFractionDigits: 0, maximumFractionDigits: 2 },
       )
     : formatAmountWithSymbol(locale, 0, requestDisplayCurrency, {
         minimumFractionDigits: 0,
@@ -457,7 +489,7 @@ export default function WalletDashboardReceiveModal({
       });
   const receiveQrValue = effectiveWallet ? `xrpl:${effectiveWallet}` : "";
   const qrDisplaySize = inline ? 240 : 220;
-  const qrPixelSize = inline ? 360 : (hasGeneratedRequest ? 520 : 420);
+  const qrPixelSize = inline ? 360 : hasGeneratedRequest ? 520 : 420;
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -471,15 +503,21 @@ export default function WalletDashboardReceiveModal({
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-receive-modal border border-white/10 p-4 md:p-5 space-y-3 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
-    inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+    inline
+      ? "h-full max-h-none rounded-xl"
+      : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
-    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+    !inline
+      ? isClosing
+        ? "wallet-modal-lift-out"
+        : "wallet-modal-lift-in"
+      : "",
   ].join(" ");
 
-  const content =
-  <>
+  const content = (
+    <>
       {/* Backdrop */}
       {!inline ? (
         <div
@@ -493,16 +531,18 @@ export default function WalletDashboardReceiveModal({
       {/* Modale */}
       <div className={wrapperClass}>
         <div
-        className={panelClass}
-        style={{ WebkitOverflowScrolling: "touch" }}
-        onClick={(e) => {
-          if (!inline) e.stopPropagation();
-        }}>
-
+          className={panelClass}
+          style={{ WebkitOverflowScrolling: "touch" }}
+          onClick={(e) => {
+            if (!inline) e.stopPropagation();
+          }}
+        >
           <div className="flex items-start justify-between gap-3 mb-1 pr-6">
             <div className="flex min-w-0 flex-col gap-1.5">
               <div>
-                {renderWalletMeta?.("pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap")}
+                {renderWalletMeta?.(
+                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
@@ -519,28 +559,28 @@ export default function WalletDashboardReceiveModal({
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t(
                       "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required."
+                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
                     )}
                   </span>
                 ) : null}
-	              {showRlusdNotActivatedNotice ? (
-	                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-	                  {t(
-	                    "wallet_rlusd_not_activated_title",
-	                    "USD not activated. Authorize USD on your wallet."
-	                  )}
-	                </span>
-	              ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "USD not activated. Authorize USD on your wallet.",
+                    )}
+                  </span>
+                ) : null}
               </div>
             </div>
             <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
-
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
+            >
               ✕
             </button>
           </div>
@@ -549,7 +589,7 @@ export default function WalletDashboardReceiveModal({
               <p className="text-xs md:text-sm text-white/50 mb-3">
                 {t(
                   "ui_receive_and_request_desc_2f1a7c9d5e",
-                  "Share this XRPL address to receive funds, or create a payment request to send to another wallet."
+                  "Share this XRPL address to receive funds, or create a payment request to send to another wallet.",
                 )}
               </p>
 
@@ -564,7 +604,9 @@ export default function WalletDashboardReceiveModal({
                     className="bg-black/60 border border-white/10 rounded-xl p-3 text-[0px]"
                   >
                     <QRCodeCanvas
-                      value={showRequestPreview ? requestQrValue : receiveQrValue}
+                      value={
+                        showRequestPreview ? requestQrValue : receiveQrValue
+                      }
                       size={qrPixelSize}
                       style={{ width: qrDisplaySize, height: qrDisplaySize }}
                       bgColor="#ffffff"
@@ -616,22 +658,22 @@ export default function WalletDashboardReceiveModal({
                         e.stopPropagation();
                         try {
                           await handleShareQr(showRequestPreview);
-                    } catch {
-                      // ignore
-                    }
-                  }}
+                        } catch {
+                          // ignore
+                        }
+                      }}
                       className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors inline-flex items-center justify-center"
                     >
-                      {isDesktop
-                        ? t("ui_download_qr_5c1d2e7f9a", "Télécharger")
-                        : (
-                          <>
-                            <ShareIcon className="w-5 h-5" />
-                            <span className="sr-only">
-                              {t("ui_share_qr_9b5c1a2d7e", "Partager")}
-                            </span>
-                          </>
-                        )}
+                      {isDesktop ? (
+                        t("ui_download_qr_5c1d2e7f9a", "Télécharger")
+                      ) : (
+                        <>
+                          <ShareIcon className="w-5 h-5" />
+                          <span className="sr-only">
+                            {t("ui_share_qr_9b5c1a2d7e", "Partager")}
+                          </span>
+                        </>
+                      )}
                     </button>
                   </div>
                   {copyToast ? (
@@ -695,7 +737,9 @@ export default function WalletDashboardReceiveModal({
                             value={requestCurrency}
                             onChange={setRequestCurrency}
                             options={(augmentedTokens || []).map((token) => {
-                              const currencyUpper = String(token.currency || "").toUpperCase();
+                              const currencyUpper = String(
+                                token.currency || "",
+                              ).toUpperCase();
                               const labelLeft =
                                 selectLabelByCurrency?.[token.currency] ||
                                 selectLabelByCurrency?.[currencyUpper] ||
@@ -714,14 +758,22 @@ export default function WalletDashboardReceiveModal({
                                 labelLeft,
                                 labelRight,
                                 labelMobile:
-                                  selectLabelMobileByCurrency?.[token.currency] ||
-                                  selectLabelMobileByCurrency?.[currencyUpper] ||
+                                  selectLabelMobileByCurrency?.[
+                                    token.currency
+                                  ] ||
+                                  selectLabelMobileByCurrency?.[
+                                    currencyUpper
+                                  ] ||
                                   labelLeft,
                               };
                             })}
                             useNativeSelect={false}
                             buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
-                            menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
+                            menuClassName={
+                              noticeVariant === "demo"
+                                ? "bg-[#0b0f10]"
+                                : "bg-elevated"
+                            }
                             selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
                           />
                         </div>
@@ -736,14 +788,20 @@ export default function WalletDashboardReceiveModal({
                           type="text"
                           value={requestMemo}
                           onChange={(e) => setRequestMemo(e.target.value)}
-                          placeholder={t("ui_payment_for_82ec86ac25", "Payment for...")}
+                          placeholder={t(
+                            "ui_payment_for_82ec86ac25",
+                            "Payment for...",
+                          )}
                           className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
                         />
                       </div>
 
                       {/* Generate Button */}
                       <SwipeConfirmButton
-                        label={t("ui_generate_request_58584f23a2", "Generate Request")}
+                        label={t(
+                          "ui_generate_request_58584f23a2",
+                          "Generate Request",
+                        )}
                         onConfirm={handleGenerateRequest}
                         variant="green"
                         className="mt-2 md:hidden"
@@ -756,7 +814,10 @@ export default function WalletDashboardReceiveModal({
                         }}
                         className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnMuted}`}
                       >
-                        {t("ui_generate_request_58584f23a2", "Generate Request")}
+                        {t(
+                          "ui_generate_request_58584f23a2",
+                          "Generate Request",
+                        )}
                       </button>
 
                       {generateError ? (
@@ -772,8 +833,8 @@ export default function WalletDashboardReceiveModal({
           </div>
         </div>
       </div>
-    </>;
-
+    </>
+  );
 
   if (inline) return content;
   if (typeof document === "undefined") return null;

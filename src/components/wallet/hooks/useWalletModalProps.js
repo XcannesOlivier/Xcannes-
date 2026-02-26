@@ -200,7 +200,7 @@ export function useWalletModalProps({
       handleSendSubmit,
       sendProcessing,
       payreqDecorProps,
-    ]
+    ],
   );
 
   // --- Payreq modal props ---
@@ -249,7 +249,7 @@ export function useWalletModalProps({
       selectLabelMobileByAssetKey,
       savePayreq,
       removePayreq,
-    ]
+    ],
   );
 
   // --- Receive modal props ---
@@ -301,7 +301,7 @@ export function useWalletModalProps({
       rlusdPerUnitRates,
       rlusdPerUnitSources,
       walletLabel,
-    ]
+    ],
   );
 
   // --- Swap modal props ---
@@ -381,7 +381,7 @@ export function useWalletModalProps({
       handleUpsertCurrencyLine,
       convertProcessing,
       rlusdPerUnitRates,
-    ]
+    ],
   );
 
   // --- Cash modal props ---
@@ -417,7 +417,7 @@ export function useWalletModalProps({
       selectLabelMobileByAssetKey,
       effectiveWallet,
       cashBuyPrefill,
-    ]
+    ],
   );
 
   // --- Adjust modal props ---
@@ -447,7 +447,7 @@ export function useWalletModalProps({
       refreshBalance,
       effectiveRefreshCurrencyLines,
       adjustmentFeeRlusd,
-    ]
+    ],
   );
 
   // --- Activation modal props ---
@@ -471,7 +471,7 @@ export function useWalletModalProps({
       activationXrpAmount,
       isWalletActivated,
       hasRlusdTrustline,
-    ]
+    ],
   );
 
   // --- Activation Request modal props ---
@@ -483,7 +483,13 @@ export function useWalletModalProps({
       isWalletActivated,
       hasRlusdTrustline,
     }),
-    [effectiveWallet, walletLabel, activationXrpAmount, isWalletActivated, hasRlusdTrustline]
+    [
+      effectiveWallet,
+      walletLabel,
+      activationXrpAmount,
+      isWalletActivated,
+      hasRlusdTrustline,
+    ],
   );
 
   // --- Info modal props ---
@@ -492,7 +498,7 @@ export function useWalletModalProps({
       isWalletActivated,
       hasRlusdTrustline,
     }),
-    [isWalletActivated, hasRlusdTrustline]
+    [isWalletActivated, hasRlusdTrustline],
   );
 
   // --- Statement shared props ---
@@ -530,7 +536,7 @@ export function useWalletModalProps({
       setShowCurrencyStatement,
       selectedStatementToken,
       setSelectedStatementToken,
-    ]
+    ],
   );
 
   // --- RLUSD Setup modal props ---
@@ -538,7 +544,7 @@ export function useWalletModalProps({
     () => ({
       onConfirm: handleRlusdSetupConfirm,
     }),
-    [handleRlusdSetupConfirm]
+    [handleRlusdSetupConfirm],
   );
 
   // --- Xumm QR modal props ---
@@ -552,7 +558,7 @@ export function useWalletModalProps({
       status: qrModalData?.status,
       enablePolling: false,
     }),
-    [closeQrModal, qrModalData]
+    [closeQrModal, qrModalData],
   );
 
   return {

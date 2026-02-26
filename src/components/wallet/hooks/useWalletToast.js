@@ -26,16 +26,19 @@ export function useWalletToast() {
   const confirmResolveRef = useRef(null);
 
   // ── Toast API ─────────────────────────────────────────────────────
-  const pushToast = useCallback((message, variant = "info", durationMs = 4000) => {
-    const id = ++idCounter.current;
-    setToasts((prev) => [...prev, { id, message, variant, durationMs }]);
-    if (durationMs > 0) {
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, durationMs);
-    }
-    return id;
-  }, []);
+  const pushToast = useCallback(
+    (message, variant = "info", durationMs = 4000) => {
+      const id = ++idCounter.current;
+      setToasts((prev) => [...prev, { id, message, variant, durationMs }]);
+      if (durationMs > 0) {
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, durationMs);
+      }
+      return id;
+    },
+    [],
+  );
 
   const dismissToast = useCallback((id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));

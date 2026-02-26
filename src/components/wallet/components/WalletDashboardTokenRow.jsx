@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
-	import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-	import {
-	  getCurrencyFlag,
-	  getTokenIcon,
-	  getDisplayCurrencyCode,
-	  formatAmountWithSymbol,
-	  USD_STABLECOINS } from
-	"../walletDashboardConfig";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
+import {
+  getCurrencyFlag,
+  getTokenIcon,
+  getDisplayCurrencyCode,
+  formatAmountWithSymbol,
+  USD_STABLECOINS,
+} from "../walletDashboardConfig";
 import { useTranslation } from "next-i18next";
 
 function renderTokenIcon(token) {
@@ -27,9 +27,9 @@ function renderTokenIcon(token) {
         alt={code}
         width={20}
         height={20}
-        className="w-5 h-5 object-cover" />);
-
-
+        className="w-5 h-5 object-cover"
+      />
+    );
   }
 
   return token?.isTrustlineOnly ? getCurrencyFlag(code) : getTokenIcon(code);
@@ -49,53 +49,53 @@ export default function WalletDashboardTokenRow({
   onActivateWallet,
   onOpenRlusdProgram,
   onOpenRlusdSetup,
-		}) {
-		  const { t, i18n } = useTranslation("common");
-		  const locale = i18n?.language || "en";
-		  const currencyCode = String(token?.currency || "").toUpperCase();
-		  const displayCode = getDisplayCurrencyCode(currencyCode);
-		  const isDisplayOverride = displayCode !== currencyCode;
-		  const rawValue = Number(token?.value || 0);
-	  const isMissingTrustline = !!token?.isMissingTrustline;
-	  const isLineCurrency = Boolean(token?.isTrustlineOnly);
-	  const isNativeAsset = currencyCode === "XRP";
-	  const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
-	  const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
-	  const iconSizeClass = isFlagIcon
-	    ? "w-11 h-11 text-[20px] sm:w-12 sm:h-12 sm:text-[22px]"
-	    : isLineCurrency
-	      ? "w-9 h-9 text-[16px]"
+}) {
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
+  const currencyCode = String(token?.currency || "").toUpperCase();
+  const displayCode = getDisplayCurrencyCode(currencyCode);
+  const isDisplayOverride = displayCode !== currencyCode;
+  const rawValue = Number(token?.value || 0);
+  const isMissingTrustline = !!token?.isMissingTrustline;
+  const isLineCurrency = Boolean(token?.isTrustlineOnly);
+  const isNativeAsset = currencyCode === "XRP";
+  const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
+  const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
+  const iconSizeClass = isFlagIcon
+    ? "w-11 h-11 text-[20px] sm:w-12 sm:h-12 sm:text-[22px]"
+    : isLineCurrency
+      ? "w-9 h-9 text-[16px]"
       : "w-7 h-7 text-[13px]";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
   const displayValue =
-  currencyCode === "XRP" && Number.isFinite(rawValue) ?
-  Math.min(rawValue, 5) :
-  rawValue;
+    currencyCode === "XRP" && Number.isFinite(rawValue)
+      ? Math.min(rawValue, 5)
+      : rawValue;
 
-		  const currencyLabel =
-		    currencyCode === "XRP"
-		      ? "XRP · Native"
-		      : isDisplayOverride
-		      ? getCurrencyDescription(displayCode) || displayCode
-		      : getCurrencyDescription(currencyCode) ||
-		        (isStablecoin(currencyCode)
-		          ? "XRPL Stablecoin"
-		          : isLineCurrency
-	          ? `${getCurrencyDescription(currencyCode)}`
-	          : "XRPL Token");
+  const currencyLabel =
+    currencyCode === "XRP"
+      ? "XRP · Native"
+      : isDisplayOverride
+        ? getCurrencyDescription(displayCode) || displayCode
+        : getCurrencyDescription(currencyCode) ||
+          (isStablecoin(currencyCode)
+            ? "XRPL Stablecoin"
+            : isLineCurrency
+              ? `${getCurrencyDescription(currencyCode)}`
+              : "XRPL Token");
 
-		  const showWalletActivationNotice =
-		  currencyCode === "XRP" && isWalletActivated === false;
-		  // La notice trustline RLUSD s'affiche si le wallet est activé
-		  // mais que RLUSD n'est pas encore installé. L'activation passe par
-		  // le setup modal qui collecte le nom + devise par défaut.
-		  const showRlusdTrustlineNotice =
-		    currencyCode === "RLUSD" &&
-		    isWalletActivated === true &&
-		    hasRlusdTrustline === false;
-	  const rowSurfaceClass = "bg-black/20 hover:bg-black/15";
+  const showWalletActivationNotice =
+    currencyCode === "XRP" && isWalletActivated === false;
+  // La notice trustline RLUSD s'affiche si le wallet est activé
+  // mais que RLUSD n'est pas encore installé. L'activation passe par
+  // le setup modal qui collecte le nom + devise par défaut.
+  const showRlusdTrustlineNotice =
+    currencyCode === "RLUSD" &&
+    isWalletActivated === true &&
+    hasRlusdTrustline === false;
+  const rowSurfaceClass = "bg-black/20 hover:bg-black/15";
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;
@@ -113,21 +113,25 @@ export default function WalletDashboardTokenRow({
         tabIndex={0}
         onClick={onClick}
         onKeyDown={handleRowKeyDown}
-        className="w-full text-left">
-
+        className="w-full text-left"
+      >
         <div
-          className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}>
-
+          className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors cursor-pointer ${rowSurfaceClass} ${tokenRowClass}`}
+        >
           <div className={`flex items-center ${iconTextGapClass} min-w-0`}>
-	            <div className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}>
-	              {renderTokenIcon(token)}
-	            </div>
-		            <div className="min-w-0">
-		              <div className="flex items-baseline gap-2 min-w-0">
-				                <span className="text-[14px] md:text-[15px] text-primary truncate">{currencyLabel}</span>
-				              </div>
-			            </div>
-			          </div>
+            <div
+              className={`${iconSizeClass} ${iconRadiusClass} ${iconEdgeSpacingClass} flex items-center justify-center font-semibold text-primary overflow-hidden leading-none flex-shrink-0`}
+            >
+              {renderTokenIcon(token)}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-baseline gap-2 min-w-0">
+                <span className="text-[14px] md:text-[15px] text-primary truncate">
+                  {currencyLabel}
+                </span>
+              </div>
+            </div>
+          </div>
           {showWalletActivationNotice ? (
             <div className="flex-1 min-w-0 px-2">
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-blue-200/90 text-center leading-snug">
@@ -135,17 +139,21 @@ export default function WalletDashboardTokenRow({
                   <span className="hidden md:inline">
                     {t(
                       "ui_for_activate_your_wallet_su_75416099a8",
-                      "Pour activer votre wallet sur le reseau XRPL, une reserve minimale de"
+                      "Pour activer votre wallet sur le reseau XRPL, une reserve minimale de",
                     )}{" "}
-                    <span className="font-mono">{t("ui_1_xrp_5436c63b66", "1 XRP")}</span>{" "}
+                    <span className="font-mono">
+                      {t("ui_1_xrp_5436c63b66", "1 XRP")}
+                    </span>{" "}
                     {t("ui_est_requise_38539df503", "est requise.")}{" "}
                   </span>
                   <span className="md:hidden">
                     {t(
                       "ui_min_xrp_reserve_short_6c2a5f9b1d",
-                      "Sur le reseau XRPL, une reserve minimale de"
+                      "Sur le reseau XRPL, une reserve minimale de",
                     )}{" "}
-                    <span className="font-mono">{t("ui_1_xrp_5436c63b66", "1 XRP")}</span>{" "}
+                    <span className="font-mono">
+                      {t("ui_1_xrp_5436c63b66", "1 XRP")}
+                    </span>{" "}
                     {t("ui_est_requis_5b9c2d7f1a", "est requis.")}{" "}
                   </span>
                 </span>
@@ -164,7 +172,8 @@ export default function WalletDashboardTokenRow({
                       onActivateWallet?.();
                     }
                   }}
-                  className="text-blue-100 underline underline-offset-2 hover:text-blue-50 whitespace-nowrap">
+                  className="text-blue-100 underline underline-offset-2 hover:text-blue-50 whitespace-nowrap"
+                >
                   {t("ui_activate_wallet_btn_7d6b90e42f", "Activer le wallet")}
                 </span>
               </div>
@@ -175,16 +184,16 @@ export default function WalletDashboardTokenRow({
                 <span>
                   <span className="hidden md:inline">
                     {t("ui_currency_not_activated_f4", "Devise non activée")}.{" "}
-	                    {t(
-	                      "ui_authorize_rlusd_wallet_2c1e5f9a",
-	                      "Autoriser USD sur votre wallet."
-	                    )}
+                    {t(
+                      "ui_authorize_rlusd_wallet_2c1e5f9a",
+                      "Autoriser USD sur votre wallet.",
+                    )}
                   </span>
                   <span className="md:hidden">
-	                    {t(
-	                      "ui_authorize_rlusd_wallet_short_2c1e5f9d",
-	                      "Autoriser USD sur votre wallet."
-	                    )}
+                    {t(
+                      "ui_authorize_rlusd_wallet_short_2c1e5f9d",
+                      "Autoriser USD sur votre wallet.",
+                    )}
                   </span>{" "}
                 </span>
                 <span
@@ -202,7 +211,8 @@ export default function WalletDashboardTokenRow({
                       onOpenRlusdSetup?.();
                     }
                   }}
-                  className="text-amber-100 underline underline-offset-2 hover:text-amber-50 whitespace-nowrap">
+                  className="text-amber-100 underline underline-offset-2 hover:text-amber-50 whitespace-nowrap"
+                >
                   {t("ui_activate_7f2974ed87", "Activer")}
                 </span>
               </div>
@@ -210,22 +220,21 @@ export default function WalletDashboardTokenRow({
           ) : (
             <div className="flex-1" />
           )}
-			          <div className="text-right text-[14px] md:text-[15px] text-primary shrink-0">
-			            <div className="font-mono">
-			            {Number.isFinite(displayValue)
-			              ? formatAmountWithSymbol(locale, displayValue, displayCode, {
-			                  minimumFractionDigits: 0,
-			                  maximumFractionDigits: 4,
-			                })
-			              : formatAmountWithSymbol(locale, 0, displayCode, {
-			                  minimumFractionDigits: 0,
-			                  maximumFractionDigits: 4,
-			                })}
-	            </div>
-	          </div>
-	        </div>
-	      </div>
-
-    </div>);
-
+          <div className="text-right text-[14px] md:text-[15px] text-primary shrink-0">
+            <div className="font-mono">
+              {Number.isFinite(displayValue)
+                ? formatAmountWithSymbol(locale, displayValue, displayCode, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 4,
+                  })
+                : formatAmountWithSymbol(locale, 0, displayCode, {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 4,
+                  })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

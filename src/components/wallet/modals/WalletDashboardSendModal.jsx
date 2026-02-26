@@ -41,7 +41,7 @@ export default function WalletDashboardSendModal({
   handleSendSubmit,
   sendProcessing,
   enableSaveAddress = false,
-  inline = false
+  inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -62,22 +62,25 @@ export default function WalletDashboardSendModal({
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
-    `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`
+    `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
   );
   const manualQrScannerRef = useRef(null);
   const isDemoMode = noticeVariant === "demo";
   const fauxPayreqExample =
     '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"USD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showFauxPayreq = false;
-  const fauxPayreqTextClass = isDemoMode && isDesktop
-    ? "text-[11px] text-white/70"
-    : isDemoMode
-      ? "text-[10px] text-white/70"
-      : showFauxPayreq && !inline
-        ? "text-[9px] text-white/10"
-        : "text-[10px] text-white/15";
+  const fauxPayreqTextClass =
+    isDemoMode && isDesktop
+      ? "text-[11px] text-white/70"
+      : isDemoMode
+        ? "text-[10px] text-white/70"
+        : showFauxPayreq && !inline
+          ? "text-[9px] text-white/10"
+          : "text-[10px] text-white/15";
   const fauxPayreqOverlay = showFauxPayreq ? (
-    <div className={`h-full w-full overflow-y-auto pr-2 leading-snug font-mono whitespace-pre-wrap break-words ${fauxPayreqTextClass}`}>
+    <div
+      className={`h-full w-full overflow-y-auto pr-2 leading-snug font-mono whitespace-pre-wrap break-words ${fauxPayreqTextClass}`}
+    >
       {fauxPayreqExample}
     </div>
   ) : null;
@@ -86,7 +89,7 @@ export default function WalletDashboardSendModal({
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
-    [sendDestination]
+    [sendDestination],
   );
   const showCalculatedAmountLabel = useMemo(() => {
     if (!sendPaymentRequest || !selectedSendToken) return false;
@@ -101,7 +104,7 @@ export default function WalletDashboardSendModal({
   }, [sendPaymentRequest, selectedSendToken]);
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
-      (addr) => addr.address === normalizedDestination
+      (addr) => addr.address === normalizedDestination,
     );
   }, [savedAddresses, normalizedDestination]);
   const canSaveDestination =
@@ -118,7 +121,7 @@ export default function WalletDashboardSendModal({
     sendPaymentRequest?.displayCurrency ||
       sendPaymentRequest?.targetCurrencyCode ||
       selectedSendToken?.currency ||
-      ""
+      "",
   )
     .trim()
     .toUpperCase();
@@ -130,16 +133,21 @@ export default function WalletDashboardSendModal({
       : null);
   const requestAmountLabel =
     requestAmountValue != null && requestCurrencyCode
-      ? formatAmountWithSymbol(locale, Number(requestAmountValue), requestCurrencyCode, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 6
-        })
+      ? formatAmountWithSymbol(
+          locale,
+          Number(requestAmountValue),
+          requestCurrencyCode,
+          {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 6,
+          },
+        )
       : null;
   const requestBeneficiaryLabel = sendPaymentRequest?.beneficiaryLabel
     ? String(sendPaymentRequest.beneficiaryLabel)
     : "";
   const requestDestination = String(
-    sendPaymentRequest?.to || normalizedDestination || ""
+    sendPaymentRequest?.to || normalizedDestination || "",
   ).trim();
   const requestDestinationLabel =
     requestDestination.length > 14
@@ -149,7 +157,7 @@ export default function WalletDashboardSendModal({
     const result = await handleSendSubmit?.({
       saveDestination:
         saveNewAddress && canSaveDestination ? normalizedDestination : "",
-      saveLabel: saveNewAddressLabel
+      saveLabel: saveNewAddressLabel,
     });
     if (result?.ok) {
       setSaveNewAddress(false);
@@ -167,8 +175,7 @@ export default function WalletDashboardSendModal({
       }
       const { Html5Qrcode } = await import("html5-qrcode");
       const readerId = manualQrReaderIdRef.current;
-      const instance =
-        manualQrScannerRef.current || new Html5Qrcode(readerId);
+      const instance = manualQrScannerRef.current || new Html5Qrcode(readerId);
       manualQrScannerRef.current = instance;
 
       const decodedText = await instance.scanFile(scanFile, true);
@@ -186,8 +193,8 @@ export default function WalletDashboardSendModal({
       alert(
         t(
           "ui_qr_decode_failed_3b5d7f9a2c",
-          "Unable to decode this image. Try a clearer screenshot."
-        )
+          "Unable to decode this image. Try a clearer screenshot.",
+        ),
       );
     }
   };
@@ -199,7 +206,10 @@ export default function WalletDashboardSendModal({
     if (/^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(raw)) return true;
     if (/^xrpl:/i.test(raw)) return true;
     if (looksLikeXrplAddress(raw)) return true;
-    if (raw.startsWith("{") && /"to"|"targetCurrency"|"schema"|"payreq"/i.test(raw)) {
+    if (
+      raw.startsWith("{") &&
+      /"to"|"targetCurrency"|"schema"|"payreq"/i.test(raw)
+    ) {
       return true;
     }
     if (/^https?:/i.test(raw)) {
@@ -234,7 +244,10 @@ export default function WalletDashboardSendModal({
     }
     const items = clipboard.items || [];
     for (const item of items) {
-      if (item.kind === "file" && String(item.type || "").startsWith("image/")) {
+      if (
+        item.kind === "file" &&
+        String(item.type || "").startsWith("image/")
+      ) {
         const file = item.getAsFile();
         if (file) {
           event.preventDefault();
@@ -254,7 +267,11 @@ export default function WalletDashboardSendModal({
     input?.click();
   };
   const scanRequestFooter = (
-    <div className={inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"}>
+    <div
+      className={
+        inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"
+      }
+    >
       {!cameraUnavailable ? (
         <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
           <span className="h-px flex-1 bg-white/10" />
@@ -287,7 +304,7 @@ export default function WalletDashboardSendModal({
             </span>
             {t(
               "ui_or_upload_a_qr_image_works_e_df6baa8039",
-              "Charger une image qrcode"
+              "Charger une image qrcode",
             )}
           </button>
         </div>
@@ -309,7 +326,7 @@ export default function WalletDashboardSendModal({
             }`}
             placeholder={t(
               "ui_payreq_placeholder_3a9c1b7d2e",
-              "xcannes-payreq:... / JSON"
+              "xcannes-payreq:... / JSON",
             )}
           />
         </div>
@@ -368,11 +385,17 @@ export default function WalletDashboardSendModal({
     : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-send-modal border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
-    inline ? "h-full max-h-none rounded-xl" : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+    inline
+      ? "h-full max-h-none rounded-xl"
+      : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
-    !inline ? (isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in") : "",
+    !inline
+      ? isClosing
+        ? "wallet-modal-lift-out"
+        : "wallet-modal-lift-in"
+      : "",
   ].join(" ");
 
   const requestDetailsPanel = hasPaymentRequest ? (
@@ -386,7 +409,8 @@ export default function WalletDashboardSendModal({
             {t("ui_beneficiary_label", "Bénéficiaire")}
           </span>
           <span className="font-semibold text-white/90">
-            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+            {requestBeneficiaryLabel ||
+              t("ui_wallet_unknown", "Unknown wallet")}
           </span>
         </div>
         {requestAmountLabel ? (
@@ -394,7 +418,9 @@ export default function WalletDashboardSendModal({
             <span className="text-white/60">
               {t("ui_amount_52cea2dd3d", "Amount")}
             </span>
-            <span className="font-mono text-white/90">{requestAmountLabel}</span>
+            <span className="font-mono text-white/90">
+              {requestAmountLabel}
+            </span>
           </div>
         ) : null}
         {requestCurrencyCode ? (
@@ -421,51 +447,60 @@ export default function WalletDashboardSendModal({
     </div>
   ) : null;
 
-  const payreqCurrencySelectorBlock = hasPaymentRequest && augmentedTokens && setSendAssetKey ? (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
-      <div className="text-[11px] uppercase tracking-wide text-white/50 font-semibold">
-        {t("ui_pay_with_currency", "Payer avec")}
-      </div>
-      <ModalSelect
-        value={selectedSendToken ? selectedSendToken.key : ""}
-        onChange={setSendAssetKey}
-        options={(augmentedTokens || []).map((token) => {
-          const labelLeft =
-            selectLabelByAssetKey?.[token.key] ||
-            selectLabelByAssetKey?.[token.currency] ||
-            token.currency;
-          const labelRight =
-            selectLabelRightByAssetKey?.[token.key] ||
-            selectLabelRightByAssetKey?.[token.currency] ||
-            null;
-          return {
-            value: token.key,
-            icon:
-              selectIconByAssetKey?.[token.key] ||
-              selectIconByAssetKey?.[token.currency] ||
-              null,
-            label: labelLeft,
-            labelLeft,
-            labelRight,
-            labelMobile:
-              selectLabelMobileByAssetKey?.[token.key] ||
-              selectLabelMobileByAssetKey?.[token.currency] ||
-              labelLeft,
-          };
-        })}
-        useNativeSelect={false}
-        showMobileOptionRight={true}
-        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-        menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
-        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-      />
-      {sendFxInfo ? (
-        <div className="text-[11px] text-white/50">
-          ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
+  const payreqCurrencySelectorBlock =
+    hasPaymentRequest && augmentedTokens && setSendAssetKey ? (
+      <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
+        <div className="text-[11px] uppercase tracking-wide text-white/50 font-semibold">
+          {t("ui_pay_with_currency", "Payer avec")}
         </div>
-      ) : null}
-    </div>
-  ) : null;
+        <ModalSelect
+          value={selectedSendToken ? selectedSendToken.key : ""}
+          onChange={setSendAssetKey}
+          options={(augmentedTokens || []).map((token) => {
+            const labelLeft =
+              selectLabelByAssetKey?.[token.key] ||
+              selectLabelByAssetKey?.[token.currency] ||
+              token.currency;
+            const labelRight =
+              selectLabelRightByAssetKey?.[token.key] ||
+              selectLabelRightByAssetKey?.[token.currency] ||
+              null;
+            return {
+              value: token.key,
+              icon:
+                selectIconByAssetKey?.[token.key] ||
+                selectIconByAssetKey?.[token.currency] ||
+                null,
+              label: labelLeft,
+              labelLeft,
+              labelRight,
+              labelMobile:
+                selectLabelMobileByAssetKey?.[token.key] ||
+                selectLabelMobileByAssetKey?.[token.currency] ||
+                labelLeft,
+            };
+          })}
+          useNativeSelect={false}
+          showMobileOptionRight={true}
+          buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+          menuClassName={
+            noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+          }
+          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+        />
+        {sendFxInfo ? (
+          <div className="text-[11px] text-white/50">
+            ≈{" "}
+            {formatAmountWithSymbol(
+              locale,
+              Number(sendFxInfo.paymentRlusd || 0),
+              "USD",
+              { maximumFractionDigits: 6 },
+            )}
+          </div>
+        ) : null}
+      </div>
+    ) : null;
 
   const saveAddressBlock = canSaveDestination ? (
     <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
@@ -474,10 +509,11 @@ export default function WalletDashboardSendModal({
           type="checkbox"
           checked={saveNewAddress}
           onChange={(e) => setSaveNewAddress(e.target.checked)}
-          className="accent-xcannes-green" />
+          className="accent-xcannes-green"
+        />
         {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
       </label>
-      {saveNewAddress ?
+      {saveNewAddress ? (
         <div className="space-y-1">
           <div className="text-[11px] text-white/60">
             {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
@@ -486,24 +522,38 @@ export default function WalletDashboardSendModal({
             type="text"
             value={saveNewAddressLabel}
             onChange={(e) => setSaveNewAddressLabel(e.target.value)}
-            placeholder={t("ui_e_g_exchange_friend_11008b5e9e", "e.g., Exchange, Friend, ...")}
-            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80" />
-        </div> :
-        null}
+            placeholder={t(
+              "ui_e_g_exchange_friend_11008b5e9e",
+              "e.g., Exchange, Friend, ...",
+            )}
+            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
+          />
+        </div>
+      ) : null}
     </div>
   ) : null;
 
   const manualForm = showManualForm ? (
-    <div className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}>
-      <div className={inline ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]" : "space-y-3"}>
+    <div
+      className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}
+    >
+      <div
+        className={
+          inline
+            ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]"
+            : "space-y-3"
+        }
+      >
         <div className={inline ? "space-y-3" : ""}>
           <div>
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
-              title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
+              title={t(
+                "ui_send_asset_tip",
+                "Sélectionnez la devise à envoyer.",
+              )}
             >
               {t("ui_asset_e5170a7a06", "Asset")}
-
             </label>
             <ModalSelect
               value={selectedSendToken ? selectedSendToken.key : ""}
@@ -535,63 +585,82 @@ export default function WalletDashboardSendModal({
               useNativeSelect={false}
               showMobileOptionRight={true}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-              menuClassName={noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"}
+              menuClassName={
+                noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+              }
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
-            {selectedSendToken &&
-              <p className="mt-1 text-[11px] text-white/40">{t("ui_balance_340cdcff7a", "Balance:")}
+            {selectedSendToken && (
+              <p className="mt-1 text-[11px] text-white/40">
+                {t("ui_balance_340cdcff7a", "Balance:")}
 
                 <span className="text-white/70">
                   {formatAmountWithSymbol(
                     locale,
                     selectedSendToken.value,
                     selectedSendToken.currency,
-                    { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                    { minimumFractionDigits: 0, maximumFractionDigits: 6 },
                   )}
                 </span>
               </p>
-            }
+            )}
           </div>
-          {sendPaymentRequest?.beneficiaryLabel ?
+          {sendPaymentRequest?.beneficiaryLabel ? (
             <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-[11px] text-amber-100/90">
-              <span className="text-white/70">{t("ui_beneficiary_label", "Bénéficiaire")}:</span>{" "}
-              <span className="font-semibold">{String(sendPaymentRequest.beneficiaryLabel)}</span>
-            </div> :
-            null}
+              <span className="text-white/70">
+                {t("ui_beneficiary_label", "Bénéficiaire")}:
+              </span>{" "}
+              <span className="font-semibold">
+                {String(sendPaymentRequest.beneficiaryLabel)}
+              </span>
+            </div>
+          ) : null}
           <div>
             <div className="flex items-center justify-between">
               <label
                 className="block text-[11px] md:text-xs text-white/60 mb-1"
-                title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
+                title={t(
+                  "ui_send_amount_tip",
+                  "Saisissez le montant à envoyer.",
+                )}
               >
                 {t("ui_amount_52cea2dd3d", "Amount")}
-
               </label>
-              {showCalculatedAmountLabel ?
+              {showCalculatedAmountLabel ? (
                 <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
                   {t("ui_calculated_amount_label", "Montant calculé")}
-                </span> :
-                null}
+                </span>
+              ) : null}
             </div>
             <TokenAmountInput
               value={sendAmount}
               onChange={setSendAmount}
-              max={sendFxInfo ? undefined : selectedSendToken ? selectedSendToken.value : undefined}
+              max={
+                sendFxInfo
+                  ? undefined
+                  : selectedSendToken
+                    ? selectedSendToken.value
+                    : undefined
+              }
               placeholder="0.0000"
               token={
                 selectedSendToken
-                  ? selectLabelByAssetKey?.[selectedSendToken.currency] || selectedSendToken.currency
+                  ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
+                    selectedSendToken.currency
                   : "USD"
               }
               tokenClassName="text-white"
-              containerClassName="focus-within:!border-xcannes-green/80" />
-
+              containerClassName="focus-within:!border-xcannes-green/80"
+            />
           </div>
 
-          {sendFxInfo &&
+          {sendFxInfo && (
             <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <div className="text-[11px] font-semibold text-white/80">{t("ui_payment_fx_base_usd_r_gleme_4818b8a6c3", "Paiement FX (base USD · règlement XRPL via USD)")}
-
+              <div className="text-[11px] font-semibold text-white/80">
+                {t(
+                  "ui_payment_fx_base_usd_r_gleme_4818b8a6c3",
+                  "Paiement FX (base USD · règlement XRPL via USD)",
+                )}
               </div>
               <p className="mt-1 text-[11px] text-white/60">
                 ≈{" "}
@@ -600,35 +669,41 @@ export default function WalletDashboardSendModal({
                     locale,
                     Number(sendFxInfo.paymentRlusd || 0),
                     "USD",
-                    { minimumFractionDigits: 0, maximumFractionDigits: 6 }
+                    { minimumFractionDigits: 0, maximumFractionDigits: 6 },
                   )}
-
-                </span>{" "}{t("ui_au_recipient_67dcc85cec", "au destinataire")}
-
+                </span>{" "}
+                {t("ui_au_recipient_67dcc85cec", "au destinataire")}
               </p>
-              {sendFxInfo.fxSource &&
+              {sendFxInfo.fxSource && (
                 <p className="mt-1 text-[11px] text-white/60">
                   {t("ui_source_507c065942", "source")}{" "}
-                  <span className="font-mono">{String(sendFxInfo.fxSource).toUpperCase()}</span>
+                  <span className="font-mono">
+                    {String(sendFxInfo.fxSource).toUpperCase()}
+                  </span>
                 </p>
-              }
+              )}
               <p className="mt-2 text-[10px] text-white/45">
                 {t(
-                    "ui_xumm_signatures_one_5b2c1a7d9f",
-                    "1 Xumm signature: payment → recipient."
-                  )}
+                  "ui_xumm_signatures_one_5b2c1a7d9f",
+                  "1 Xumm signature: payment → recipient.",
+                )}
               </p>
             </div>
-          }
+          )}
         </div>
         <div className={inline ? "space-y-2" : ""}>
           <div>
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
-              title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
+              title={t(
+                "ui_send_destination_tip",
+                "Adresse XRPL du destinataire.",
+              )}
             >
-              {t("ui_destination_xrpl_address_9c2b94554c", "Destination (XRPL address)")}
-
+              {t(
+                "ui_destination_xrpl_address_9c2b94554c",
+                "Destination (XRPL address)",
+              )}
             </label>
 
             <div className="space-y-2">
@@ -640,17 +715,27 @@ export default function WalletDashboardSendModal({
                     value={sendDestination}
                     onChange={(e) => setSendDestination(e.target.value)}
                     onPaste={handlePastePayload}
-                    placeholder={(savedAddresses || []).length > 0 ?
-                      t("ui_select_saved_address_60c28f89c1", "Select saved address...") :
-                      t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")}
-                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]" />
+                    placeholder={
+                      (savedAddresses || []).length > 0
+                        ? t(
+                            "ui_select_saved_address_60c28f89c1",
+                            "Select saved address...",
+                          )
+                        : t(
+                            "ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a",
+                            "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                          )
+                    }
+                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+                  />
                   <datalist id="saved-addresses">
-                    {(savedAddresses || []).map((addr, idx) =>
+                    {(savedAddresses || []).map((addr, idx) => (
                       <option
                         key={idx}
                         value={addr.address}
-                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`} />
-                    )}
+                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
+                      />
+                    ))}
                   </datalist>
                 </div>
 
@@ -661,20 +746,20 @@ export default function WalletDashboardSendModal({
                     setQrScannerOpen(true);
                   }}
                   className="md:hidden px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
-                  title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}>
-
+                  title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+                >
                   <svg
                     className="w-5 h-5 text-white/80"
                     fill="none"
                     stroke="currentColor"
-                    viewBox="0 0 24 24">
-
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-
+                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                    />
                   </svg>
                 </button>
               </div>
@@ -737,8 +822,8 @@ export default function WalletDashboardSendModal({
     </div>
   );
 
-  const content =
-  <>
+  const content = (
+    <>
       {/* Backdrop */}
       {!inline ? (
         <div
@@ -752,16 +837,18 @@ export default function WalletDashboardSendModal({
       {/* Modale */}
       <div className={wrapperClass}>
         <div
-        className={panelClass}
-        style={{ WebkitOverflowScrolling: "touch" }}
-        onClick={(e) => {
-          if (!inline) e.stopPropagation();
-        }}>
-
+          className={panelClass}
+          style={{ WebkitOverflowScrolling: "touch" }}
+          onClick={(e) => {
+            if (!inline) e.stopPropagation();
+          }}
+        >
           <div className="flex items-start justify-between gap-3 mb-1 pr-6">
             <div className="flex min-w-0 flex-col gap-1.5">
               <div>
-                {renderWalletMeta?.("pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap")}
+                {renderWalletMeta?.(
+                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
@@ -774,24 +861,24 @@ export default function WalletDashboardSendModal({
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
-	              {showRlusdNotActivatedNotice ? (
-	                <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-	                  {t(
-	                    "wallet_rlusd_not_activated_title",
-	                    "USD not activated. Authorize USD on your wallet."
-	                  )}
-	                </span>
-	              ) : null}
+                {showRlusdNotActivatedNotice ? (
+                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
+                    {t(
+                      "wallet_rlusd_not_activated_title",
+                      "USD not activated. Authorize USD on your wallet.",
+                    )}
+                  </span>
+                ) : null}
               </div>
             </div>
             <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10">
-
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
+            >
               ✕
             </button>
           </div>
@@ -829,12 +916,15 @@ export default function WalletDashboardSendModal({
               handleManualQrFile(file);
             }}
           />
-          <div id={manualQrReaderIdRef.current} className="hidden" aria-hidden />
-
+          <div
+            id={manualQrReaderIdRef.current}
+            className="hidden"
+            aria-hidden
+          />
         </div>
       </div>
-    </>;
-
+    </>
+  );
 
   if (inline) return content;
   if (typeof document === "undefined") return null;

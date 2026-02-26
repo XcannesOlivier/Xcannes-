@@ -38,7 +38,7 @@ export function useWalletLabel({
         toastTimeoutRef.current = null;
       }, durationMs);
     },
-    [clearToastTimer]
+    [clearToastTimer],
   );
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export function useWalletLabel({
     try {
       const res = await fetch(
         apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-        {}
+        {},
       );
       const data = await res.json().catch(() => ({}));
       if (token !== loadTokenRef.current) return;
@@ -121,7 +121,7 @@ export function useWalletLabel({
     if (!isValid) {
       flashWalletHeaderToast(
         "Nom du wallet: 1 ou 2 mots, 7 lettres max par mot, lettres A-Z uniquement (sans accents).",
-        2600
+        2600,
       );
       return;
     }
@@ -145,10 +145,7 @@ export function useWalletLabel({
     }
 
     if (isWalletActivated === false) {
-      flashWalletHeaderToast(
-        "Wallet must be activated to rename.",
-        2200
-      );
+      flashWalletHeaderToast("Wallet must be activated to rename.", 2200);
       return;
     }
 

@@ -57,7 +57,7 @@ export function useWalletActivation({
       }
 
       const ok = await confirm(
-        `Install XRPL trustline for ${code}?\n\nThis will open Xumm to sign a TrustSet transaction.`
+        `Install XRPL trustline for ${code}?\n\nThis will open Xumm to sign a TrustSet transaction.`,
       );
       if (!ok) return;
 
@@ -103,10 +103,20 @@ export function useWalletActivation({
         }
       } catch (err) {
         console.error("Install trustline error:", err);
-        toast.error("Error while preparing trustline: " + (err?.message || String(err)));
+        toast.error(
+          "Error while preparing trustline: " + (err?.message || String(err)),
+        );
       }
     },
-    [isConnected, loadWalletLabel, refreshBalance, signTransaction, toast, confirm, wallet]
+    [
+      isConnected,
+      loadWalletLabel,
+      refreshBalance,
+      signTransaction,
+      toast,
+      confirm,
+      wallet,
+    ],
   );
 
   // ------------------------------------------------------------------
@@ -123,7 +133,7 @@ export function useWalletActivation({
         walletSetup: { label, defaultCurrency },
       });
     },
-    [handleInstallRequiredTrustline, setShowRlusdSetupModal]
+    [handleInstallRequiredTrustline, setShowRlusdSetupModal],
   );
 
   // ------------------------------------------------------------------
@@ -134,14 +144,24 @@ export function useWalletActivation({
     setWalletInfoOpen(false);
     setActivationBundleEnabled(false);
     setShowActivationModal(true);
-  }, [closeInlineQr, setActivationBundleEnabled, setShowActivationModal, setWalletInfoOpen]);
+  }, [
+    closeInlineQr,
+    setActivationBundleEnabled,
+    setShowActivationModal,
+    setWalletInfoOpen,
+  ]);
 
   const handleActivationRequestFromThirdParty = useCallback(() => {
     closeInlineQr();
     setWalletInfoOpen(false);
     setShowActivationModal(false);
     setShowActivationRequestModal(true);
-  }, [closeInlineQr, setShowActivationModal, setShowActivationRequestModal, setWalletInfoOpen]);
+  }, [
+    closeInlineQr,
+    setShowActivationModal,
+    setShowActivationRequestModal,
+    setWalletInfoOpen,
+  ]);
 
   const handleActivationBuyViaMoonpay = useCallback(() => {
     closeInlineQr();
@@ -154,7 +174,15 @@ export function useWalletActivation({
     });
     setCashModalTab("buy");
     setActiveAction("cash");
-  }, [activationXrpAmountLabel, closeInlineQr, setActiveAction, setCashBuyPrefill, setCashModalTab, setShowActivationModal, setWalletInfoOpen]);
+  }, [
+    activationXrpAmountLabel,
+    closeInlineQr,
+    setActiveAction,
+    setCashBuyPrefill,
+    setCashModalTab,
+    setShowActivationModal,
+    setWalletInfoOpen,
+  ]);
 
   // ------------------------------------------------------------------
   // Self-send XRP to activate wallet
@@ -166,18 +194,28 @@ export function useWalletActivation({
       return;
     }
 
-    const amountDrops = String(Math.round(Number(activationXrpAmount) * 1_000_000));
+    const amountDrops = String(
+      Math.round(Number(activationXrpAmount) * 1_000_000),
+    );
     const txjson = {
       TransactionType: "Payment",
       Destination: wallet,
       Amount: amountDrops,
     };
 
-    const result = await signTransaction(txjson, { action: "wallet:activate_xrp" });
+    const result = await signTransaction(txjson, {
+      action: "wallet:activate_xrp",
+    });
     if (result?.signed && refreshBalance) {
       setTimeout(() => refreshBalance(), 3000);
     }
-  }, [activationXrpAmount, refreshBalance, setShowActivationModal, signTransaction, wallet]);
+  }, [
+    activationXrpAmount,
+    refreshBalance,
+    setShowActivationModal,
+    signTransaction,
+    wallet,
+  ]);
 
   return {
     handleInstallRequiredTrustline,
