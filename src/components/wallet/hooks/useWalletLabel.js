@@ -63,12 +63,10 @@ export function useWalletLabel({
       const label = String(data?.label || "").trim();
       setWalletLabel(label || defaultLabel);
       setWalletLabelDraft(label || defaultLabel);
-      const required = !label;
-      setIsWalletLabelRequired(required);
+      // Label requirement disabled — will be re-enabled later.
+      // const required = !label;
+      // setIsWalletLabelRequired(required);
       setIsWalletLabelLocked(Boolean(label));
-      if (required) {
-        setIsEditingWalletLabel(true);
-      }
     } catch (err) {
       console.error("[useWalletLabel] Error fetching wallet label:", err);
       if (token === loadTokenRef.current) {
