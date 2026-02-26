@@ -809,32 +809,6 @@ export function applyDemoEnableCurrency({ state, walletId, currencyCode }) {
   return { ok: true };
 }
 
-export function applyDemoDisableCurrency({ state, walletId, currencyCode }) {
-  if (!state || !state.wallets) return { ok: false, error: "invalid_state" };
-  const wallet = state.wallets[walletId];
-  if (!wallet) return { ok: false, error: "invalid_wallet" };
-
-  const currency = String(currencyCode || "").toUpperCase();
-  if (!currency) return { ok: false, error: "invalid_currency" };
-
-  const current = safeNumber(wallet.allocations?.[currency]) ?? 0;
-  if (current !== 0) return { ok: false, error: "non_zero_balance" };
-
-  if (wallet.allocations && wallet.allocations[currency] !== undefined) {
-    delete wallet.allocations[currency];
-  }
-
-  pushEvent(state, {
-    id: newId(),
-    ts: Date.now(),
-    kind: "trustline_remove",
-    wallet: walletId,
-    currency,
-  });
-
-  return { ok: true };
-}
-
 export function listWalletEvents(state, walletId) {
   const events = state?.events || [];
   return events.filter((evt) => {

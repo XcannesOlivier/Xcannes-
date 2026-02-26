@@ -7,7 +7,6 @@ import { useTranslation } from "next-i18next";
 import {
   applyDemoBuySell,
   applyDemoConvert,
-  applyDemoDisableCurrency,
   applyDemoEnableCurrency,
   applyDemoSend,
   buildDefaultDemoState,
@@ -1450,26 +1449,6 @@ export default function DemoWalletDashboard({
     return true;
   };
 
-  const handleRemoveCurrencyLine = (code) => {
-    const nextState = clone(state);
-    const res = applyDemoDisableCurrency({
-      state: nextState,
-      walletId: activeWalletId,
-      currencyCode: code
-    });
-    if (!res.ok) {
-      alert(
-        res.error === "non_zero_balance" ?
-        t("demo_trustlines_delete_disabled", "Convertissez vers 0 avant suppression.") :
-        t("demo_error_generic", "Action impossible (démo).")
-      );
-      return false;
-    }
-    setState(nextState);
-    setActiveAction(null);
-    return true;
-  };
-
   const handleUpsertCurrencyLine = () => {
     const code = String(currencyLineCode || "").toUpperCase();
     const allocated = Number.parseFloat(currencyLineAllocatedRlusd || "0");
@@ -2395,7 +2374,6 @@ export default function DemoWalletDashboard({
         currencyLinesError={null}
         currencyLinesSummary={currencyLinesSummary}
         currencyLines={currencyLines}
-        handleRemoveCurrencyLine={handleRemoveCurrencyLine}
         swapCurrencyOptions={swapCurrencyOptions}
         convertBaseCurrency={convertBaseCurrency}
         setConvertBaseCurrency={setConvertBaseCurrency}

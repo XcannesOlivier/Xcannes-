@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
+import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/utils/useModalTransition";
@@ -15,13 +16,21 @@ export default function WalletDashboardPayreqModal({
   hasRlusdTrustline = null,
   noticeVariant = "preview",
   renderWalletMeta,
+  augmentedTokens,
   selectedSendToken,
+  sendFxInfo,
+  setSendAssetKey,
+  setSendAmount,
   sendPaymentRequest,
   sendDestination,
   sendAmount,
   sendProcessing,
   handleSendSubmit,
   savedAddresses,
+  selectLabelByAssetKey,
+  selectLabelRightByAssetKey,
+  selectIconByAssetKey,
+  selectLabelMobileByAssetKey,
   enableSaveAddress = false,
   inline = false
 }) {
@@ -88,6 +97,16 @@ export default function WalletDashboardPayreqModal({
     requestDestination.length > 14
       ? `${requestDestination.slice(0, 6)}...${requestDestination.slice(-4)}`
       : requestDestination;
+
+  const payingCurrency = String(selectedSendToken?.currency || "").toUpperCase();
+  const targetCurrency = String(
+    sendPaymentRequest?.targetCurrencyCode || ""
+  ).trim().toUpperCase();
+  const isAlternateCurrency =
+    Boolean(sendPaymentRequest) &&
+    Boolean(targetCurrency) &&
+    Boolean(payingCurrency) &&
+    targetCurrency !== payingCurrency;
 
   const handleManualSend = async () => {
     const result = await handleSendSubmit?.({
@@ -176,6 +195,70 @@ export default function WalletDashboardPayreqModal({
             </span>
           </div>
         ) : null}
+      </div>
+    </div>
+  ) : null;
+
+  const currencySelectorBlock = sendPaymentRequest && augmentedTokens && setSendAssetKey ? (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
+      <div className="text-[11px] uppercase tracking-wide text-white/50 font-semibold">
+        {t("ui_pay_with_currency", "Payer avec")}
+      </div>
+      <ModalSelect
+        value={selectedSendToken ? selectedSendToken.key : ""}
+        onChange={setSendAssetKey}
+        options={(augmentedTokens || []).map((token) => {
+          const labelLeft =
+            selectLabelByAssetKey?.[token.key] ||
+            selectLabelByAssetKey?.[token.currency] ||
+            token.currency;
+          const labelRight =
+            selectLabelRightByAssetKey?.[token.key] ||
+            selectLabelRightByAssetKey?.[token.currency] ||
+            null;
+          return {
+            value: token.key,
+            icon:
+              selectIconByAssetKey?.[token.key] ||
+              selectIconByAssetKey?.[token.currency] ||
+              null,
+            label: labelLeft,
+            labelLeft,
+            labelRight,
+            labelMobile:
+              selectLabelMobileByAssetKey?.[token.key] ||
+              selectLabelMobileByAssetKey?.[token.currency] ||
+              labelLeft,
+          };
+        })}
+        useNativeSelect={false}
+        showMobileOptionRight={true}
+        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+        menuClassName="bg-elevated"
+        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+      />
+      {sendFxInfo ? (
+        <div className="text-[11px] text-white/50">
+          ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
+          {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 ? (
+            <> + {formatAmountWithSymbol(locale, Number(sendFxInfo.spreadFeeRlusd), "USD", { maximumFractionDigits: 6 })} {t("ui_conversion_fee_short", "frais")}</>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  ) : null;
+
+  const alternateCurrencyBanner = isAlternateCurrency ? (
+    <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-[11px] text-orange-200/90 space-y-1">
+      <div className="font-semibold">
+        {t("ui_currency_change_notice", "Changement de devise")}
+      </div>
+      <div>
+        {t(
+          "ui_currency_change_detail",
+          "La demande est en {{requested}} mais vous payez en {{paying}}. Des frais de conversion de 1 % seront appliqués.",
+          { requested: targetCurrency, paying: payingCurrency }
+        )}
       </div>
     </div>
   ) : null;
@@ -289,6 +372,8 @@ export default function WalletDashboardPayreqModal({
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="space-y-4">
               {requestDetailsPanel}
+              {currencySelectorBlock}
+              {alternateCurrencyBanner}
               {saveAddressBlock}
               {sendActions}
             </div>
