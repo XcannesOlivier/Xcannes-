@@ -12,115 +12,36 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import { apiUrl } from "@/lib/runtimeConfig";
 import {
   buildCsvString,
   downloadTextFile,
   escapeHtml,
   openPrintWindow,
-  sha256Hex,
 } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
+  USD_STABLECOINS,
 } from "../walletDashboardConfig";
-
-const USD_STABLECOINS = [
-  "RLUSD",
-  "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
-];
-const HIGHLIGHT_DURATION_MS = 5000;
-const STATEMENT_HISTORY_MONTHS = 13;
-
-const stripCountSuffix = (label) =>
-  String(label || "")
-    .replace(/\s*[\(\uFF08]\s*$/, "")
-    .trim();
-
-const ShareIcon = ({ className = "" }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
-
-const isSvgIcon = (src) => {
-  if (!src) return false;
-  return String(src).toLowerCase().endsWith(".svg");
-};
-
-const buildMonthKeyUtc = (date) => {
-  if (!(date instanceof Date)) return null;
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  if (!Number.isFinite(year) || !Number.isFinite(month)) return null;
-  return `${year}-${String(month).padStart(2, "0")}`;
-};
-
-const buildDefaultMonthKeys = (months) => {
-  const now = new Date();
-  const list = [];
-  for (let i = 0; i < months; i += 1) {
-    const date = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1),
-    );
-    const key = buildMonthKeyUtc(date);
-    if (key) list.push(key);
-  }
-  return list;
-};
-
-const getMonthKeyFromTransaction = (tx) => {
-  const createdAt = tx?.createdAt ? new Date(tx.createdAt) : null;
-  if (createdAt && Number.isFinite(createdAt.getTime())) {
-    return buildMonthKeyUtc(createdAt);
-  }
-  const dateRaw = String(tx?.date || "").trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateRaw)) {
-    const [year, month] = dateRaw
-      .split("-")
-      .map((value) => Number.parseInt(value, 10));
-    if (Number.isFinite(year) && Number.isFinite(month)) {
-      return `${year}-${String(month).padStart(2, "0")}`;
-    }
-  }
-  return null;
-};
-
-const formatMonthLabel = (monthKey, locale, { monthOnly = false } = {}) => {
-  if (!monthKey) return "";
-  const [year, month] = String(monthKey)
-    .split("-")
-    .map((value) => Number.parseInt(value, 10));
-  if (!Number.isFinite(year) || !Number.isFinite(month)) return monthKey;
-  const date = new Date(year, month - 1, 1);
-  return date.toLocaleDateString(
-    locale || "en",
-    monthOnly ? { month: "long" } : { month: "long", year: "numeric" },
-  );
-};
+import {
+  HIGHLIGHT_DURATION_MS,
+  STATEMENT_LAYOUTS,
+  ShareIcon,
+  getCurrencyFlag,
+  isSvgIcon,
+  stripCountSuffix,
+} from "./statementShared";
+import useStatementWalletLabel from "./useStatementWalletLabel";
+import useStatementDocHash from "./useStatementDocHash";
+import useCurrencyStatementData from "./useCurrencyStatementData";
+import useCurrencyStatementFormatters from "./useCurrencyStatementFormatters";
 
 /**
- * Composant de relevé bancaire pour une devise spécifique
+ * Composant de relevé bancaire pour une devise spécifique.
+ * Refactorisé : la logique data / formatters / walletLabel / docHash
+ * est déléguée à des hooks dédiés.
  */
 export default function CurrencyStatement({
   currency,
@@ -165,14 +86,13 @@ export default function CurrencyStatement({
     () => String(getCurrencyDescription(normalizedCurrency) || "").trim(),
     [normalizedCurrency],
   );
-  const [filter, setFilter] = useState("all"); // all, credit, debit, conversion
+
+  /* ── local state ───────────────────────────────────────── */
+  const [filter, setFilter] = useState("all");
   const [exportFormat, setExportFormat] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
+  const [selectedMonth, setSelectedMonth] = useState(0);
   const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
   const [reserveOpen, setReserveOpen] = useState(false);
-  const [docHash, setDocHash] = useState("");
-  const [walletLabel, setWalletLabel] = useState("");
-  const resolvedLabelOverride = String(walletLabelOverride || "").trim();
   const [highlightedTransactionId, setHighlightedTransactionId] =
     useState(null);
   const highlightRowRef = useRef(null);
@@ -181,423 +101,59 @@ export default function CurrencyStatement({
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
   );
-  const archivesLabel = t("ui_archives_label_3c1f8a7b2e", "Archives");
-  const archivesLongLabel = t(
-    "ui_archives_12plus_7b3c9a1d5e",
-    "Archives (12+ months)",
-  );
   const fallbackPeriod = period || defaultPeriod;
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const update = () => {
-      setIsMobileDate(window.innerWidth < 640);
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  useEffect(() => {
-    if (!highlightTransactionId) return undefined;
-    setHighlightedTransactionId(highlightTransactionId);
-    if (highlightTimerRef.current) {
-      clearTimeout(highlightTimerRef.current);
-    }
-    highlightTimerRef.current = setTimeout(() => {
-      setHighlightedTransactionId(null);
-    }, HIGHLIGHT_DURATION_MS);
-    return () => {
-      if (highlightTimerRef.current) {
-        clearTimeout(highlightTimerRef.current);
-      }
-    };
-  }, [highlightTransactionId]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (resolvedLabelOverride) {
-      setWalletLabel(resolvedLabelOverride);
-      return () => {};
-    }
-    if (!walletAddress) {
-      setWalletLabel("");
-      return () => {};
-    }
-
-    const loadLabel = async () => {
-      try {
-        const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Failed to load wallet label");
-        }
-        if (cancelled) return;
-        setWalletLabel(String(data?.label || "").trim());
-      } catch (err) {
-        console.error("Error loading wallet label:", err);
-        if (!cancelled) setWalletLabel("");
-      }
-    };
-
-    loadLabel();
-    return () => {
-      cancelled = true;
-    };
-  }, [resolvedLabelOverride, walletAddress]);
-
-  const estimatedUsd = useMemo(() => {
-    const value = Number.parseFloat(balance || 0) || 0;
-    const code = normalizedCurrency;
-    if (!code) return value;
-    const rate = usdRates?.[code];
-    if (Number.isFinite(rate)) return value * rate;
-    if (USD_STABLECOINS.includes(code)) return value;
-    if (code === "XRP") return value * 0.5;
-    return value;
-  }, [balance, normalizedCurrency, usdRates]);
-
-  const showReserveDetails = isPreviewMode || isWalletActivated === true;
-  const reservePlaceholder = "—";
-
-  const xrpReserveDetails = useMemo(() => {
-    const code = normalizedCurrency;
-    if (code !== "XRP" || !showReserveDetails) return null;
-
-    const activationXrp = 1;
-    const trustlineReserveXrp = 0.2;
-    const trustlineRlusdXrp = hasRlusdTrustline ? trustlineReserveXrp : 0;
-    const totalReserveXrp = activationXrp + trustlineRlusdXrp;
-
-    return {
-      totalReserveXrp,
-      activationXrp,
-      trustlineRlusdXrp,
-    };
-  }, [hasRlusdTrustline, normalizedCurrency, showReserveDetails]);
-
-  const baseTransactions = useMemo(
-    () => (Array.isArray(transactions) ? transactions : []),
-    [transactions],
+  /* ── extracted hooks ───────────────────────────────────── */
+  const walletLabel = useStatementWalletLabel(
+    walletAddress,
+    walletLabelOverride,
   );
 
-  const statementMonthKeys = useMemo(() => {
-    const provided = Array.isArray(statementMonths)
-      ? statementMonths.filter(
-          (key) => typeof key === "string" && key.length >= 7,
-        )
-      : [];
-    if (provided.length > 0) return provided;
-
-    const derived = new Set();
-    for (const tx of baseTransactions || []) {
-      const key = getMonthKeyFromTransaction(tx);
-      if (key) derived.add(key);
-    }
-    if (derived.size > 0) {
-      return Array.from(derived).sort((a, b) => b.localeCompare(a));
-    }
-
-    return buildDefaultMonthKeys(STATEMENT_HISTORY_MONTHS);
-  }, [statementMonths, baseTransactions]);
-
-  const availableMonths = useMemo(() => {
-    const keys = statementMonthKeys || [];
-    const visibleKeys = keys.slice(0, 12);
-    const months = visibleKeys.map((key, idx) => ({
-      value: idx,
-      key,
-      label: formatMonthLabel(key, locale),
-      displayLabel: formatMonthLabel(key, locale, { monthOnly: true }),
-    }));
-    if (keys.length > 12) {
-      months.push({
-        value: "archives",
-        key: "archives",
-        label: archivesLongLabel,
-        displayLabel: archivesLabel,
-      });
-    }
-    return months;
-  }, [statementMonthKeys, locale, archivesLongLabel, archivesLabel]);
-
-  useEffect(() => {
-    const hasArchives = availableMonths.some(
-      (option) => option.value === "archives",
-    );
-    if (selectedMonth === "archives" && !hasArchives) {
-      setSelectedMonth(0);
-      return;
-    }
-    if (typeof selectedMonth === "number") {
-      const maxIndex =
-        availableMonths.filter((option) => typeof option.value === "number")
-          .length - 1;
-      if (maxIndex >= 0 && selectedMonth > maxIndex) {
-        setSelectedMonth(0);
-      }
-    }
-  }, [availableMonths, selectedMonth]);
-
-  const selectedMonthKey = useMemo(() => {
-    if (selectedMonth === "archives") return null;
-    const option = availableMonths.find(
-      (item) =>
-        typeof item?.value === "number" &&
-        Number(item.value) === Number(selectedMonth),
-    );
-    return option?.key || null;
-  }, [availableMonths, selectedMonth]);
-
-  const currentPeriod =
-    selectedMonth === "archives"
-      ? archivesLabel
-      : availableMonths.find((option) => option.value === selectedMonth)
-          ?.label || fallbackPeriod;
-  const currentDisplayPeriod =
-    selectedMonth === "archives"
-      ? archivesLabel
-      : availableMonths.find((option) => option.value === selectedMonth)
-          ?.displayLabel || String(fallbackPeriod).split(" ")[0];
-
-  const selectedMonthKeys = useMemo(() => {
-    if (selectedMonth === "archives") {
-      return statementMonthKeys.slice(12);
-    }
-    return selectedMonthKey ? [selectedMonthKey] : [];
-  }, [selectedMonth, selectedMonthKey, statementMonthKeys]);
-
-  const periodTransactions = useMemo(() => {
-    if (!selectedMonthKeys.length) return [];
-    const keySet = new Set(selectedMonthKeys);
-    return baseTransactions.filter((tx) => {
-      const key = getMonthKeyFromTransaction(tx);
-      return key && keySet.has(key);
-    });
-  }, [baseTransactions, selectedMonthKeys]);
-
-  // Calculer les statistiques (sur la période sélectionnée)
-  const credits = periodTransactions.filter((t) => t.type === "credit");
-  const debits = periodTransactions.filter((t) => t.type === "debit");
-  const conversions = periodTransactions.filter(
-    (t) => t.category === "exchange",
-  );
-
-  const totalCredits = credits.reduce(
-    (sum, t) => sum + parseFloat(t.amount || 0),
-    0,
-  );
-  const totalDebits = debits.reduce(
-    (sum, t) => sum + parseFloat(t.amount || 0),
-    0,
-  );
-
-  const openingBalance = balance - totalCredits + totalDebits;
-  const closingBalance = balance;
-  const netChange = closingBalance - openingBalance;
-  const percentChange =
-    openingBalance !== 0 ? (netChange / openingBalance) * 100 : 0;
-
-  // Statistiques supplémentaires
-  const avgTransaction =
-    periodTransactions.length > 0
-      ? (totalCredits + totalDebits) / periodTransactions.length
-      : 0;
-  const largestTransaction = periodTransactions.reduce((max, t) => {
-    const amount = parseFloat(t.amount || 0);
-    return amount > max ? amount : max;
-  }, 0);
-
-  // Catégorisation par type
-  const transactionsByCategory = periodTransactions.reduce((acc, tx) => {
-    const cat = tx.category || "other";
-    if (!acc[cat]) acc[cat] = { count: 0, amount: 0 };
-    acc[cat].count++;
-    acc[cat].amount += parseFloat(tx.amount || 0);
-    return acc;
-  }, {});
-
-  // Données pour graphiques (fictives basées sur les transactions)
-  const monthlyData = [
-    { day: "01", balance: openingBalance * 0.95 },
-    { day: "05", balance: openingBalance * 0.92 },
-    { day: "10", balance: openingBalance * 0.98 },
-    { day: "15", balance: openingBalance * 1.05 },
-    { day: "20", balance: openingBalance * 1.02 },
-    { day: "25", balance: openingBalance * 1.08 },
-    { day: "28", balance: closingBalance },
-  ];
-
-  // Filtrer les transactions
-  const filteredTransactions = useMemo(() => {
-    return periodTransactions.filter((t) => {
-      if (filter === "credit") return t.type === "credit";
-      if (filter === "debit") return t.type === "debit";
-      if (filter === "conversion") return t.category === "exchange";
-      return true;
-    });
-  }, [periodTransactions, filter]);
-
-  const transactionsWithDisplayBalance = useMemo(() => {
-    const list = (filteredTransactions || []).map((tx) => ({ ...tx }));
-    const currentDisplayBalance = Number.isFinite(Number(balance))
-      ? Number(balance)
-      : null;
-    let displayBalance = currentDisplayBalance;
-    let stopDisplayBalance = false;
-
-    for (const tx of list) {
-      if (stopDisplayBalance) continue;
-      const kind = String(tx?.kind || "")
-        .trim()
-        .toUpperCase();
-      const displayAmount = Number(tx?.displayAmount ?? tx?.amount ?? NaN);
-      const displayCurrency = String(
-        tx?.displayCurrencyCode || normalizedCurrency || "",
-      )
-        .trim()
-        .toUpperCase();
-      const isMoonpay = kind === "MOONPAY_BUY" || kind === "MOONPAY_SELL";
-      const hasDisplay =
-        isMoonpay &&
-        Number.isFinite(displayBalance) &&
-        Number.isFinite(displayAmount) &&
-        displayAmount > 0 &&
-        displayCurrency &&
-        displayCurrency === normalizedCurrency;
-      if (!hasDisplay) continue;
-
-      if (kind === "MOONPAY_BUY") {
-        tx.displayRunningBalance = displayBalance;
-        const delta = Math.abs(displayAmount);
-        displayBalance -= delta;
-        continue;
-      }
-
-      if (kind === "MOONPAY_SELL") {
-        stopDisplayBalance = true;
-      }
-    }
-
-    return list;
-  }, [filteredTransactions, balance, normalizedCurrency]);
-  const transactionsByMonth = useMemo(() => {
-    const map = new Map(statementMonthKeys.map((key) => [key, []]));
-    for (const tx of transactionsWithDisplayBalance || []) {
-      const key = getMonthKeyFromTransaction(tx);
-      if (!key) continue;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key).push(tx);
-    }
-    return statementMonthKeys.map((key) => ({
-      key,
-      label: formatMonthLabel(key, locale),
-      transactions: map.get(key) || [],
-    }));
-  }, [statementMonthKeys, transactionsWithDisplayBalance, locale]);
-
-  const visibleGroups = useMemo(() => {
-    const map = new Map(transactionsByMonth.map((group) => [group.key, group]));
-    if (selectedMonth === "archives") {
-      const archiveKeys = statementMonthKeys.slice(12);
-      return archiveKeys.map(
-        (key) =>
-          map.get(key) || {
-            key,
-            label: formatMonthLabel(key, locale),
-            transactions: [],
-          },
-      );
-    }
-    if (!selectedMonthKey) return [];
-    return [
-      map.get(selectedMonthKey) || {
-        key: selectedMonthKey,
-        label: formatMonthLabel(selectedMonthKey, locale),
-        transactions: [],
-      },
-    ];
-  }, [
-    transactionsByMonth,
+  const data = useCurrencyStatementData({
+    transactions,
+    statementMonths,
+    balance,
+    normalizedCurrency,
+    filter,
     selectedMonth,
-    selectedMonthKey,
-    statementMonthKeys,
+    setSelectedMonth,
     locale,
-  ]);
+  });
 
-  const showMonthHeaders = selectedMonth === "archives";
+  const fmt = useCurrencyStatementFormatters({
+    locale,
+    displayCurrency,
+    normalizedCurrency,
+    isMobileDate,
+    isPreviewMode,
+  });
 
-  const adjustmentInfo = useMemo(() => {
-    let required = false;
-    let deficit = null;
-    for (const tx of transactions || []) {
-      if (!tx?.adjustmentRequired) continue;
-      required = true;
-      const value = Number(tx?.adjustmentDeficitRlusd);
-      if (Number.isFinite(value)) {
-        deficit = Math.max(deficit ?? 0, value);
-      }
-    }
-    return { required, deficit };
-  }, [transactions]);
+  /* ── destructure data hook ─────────────────────────────── */
+  const {
+    availableMonths,
+    visibleGroups,
+    showMonthHeaders,
+    adjustmentInfo,
+    transactionsWithDisplayBalance,
+  } = data;
 
-  useEffect(() => {
-    if (!highlightedTransactionId) return;
-    const node = highlightRowRef.current;
-    if (!node) return;
-    const raf = requestAnimationFrame(() => {
-      node.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [filter, highlightedTransactionId, transactions]);
+  const currentPeriod = data.currentPeriod || fallbackPeriod;
+  const currentDisplayPeriod =
+    data.currentDisplayPeriod || String(fallbackPeriod).split(" ")[0];
 
-  const ledgerEvidenceCount = useMemo(() => {
-    return (transactions || []).filter((t) => t?.txHash).length;
-  }, [transactions]);
+  /* ── destructure formatters hook ───────────────────────── */
+  const {
+    enrichDescription,
+    simplifyMobileDescription,
+    getLocalizedDescription,
+    renderConversionDescription,
+    formatDate,
+    formatAmountLocal: formatAmountWithSymbolLocal,
+    formatUsd: formatUsdWithSymbol,
+    getTransactionIcon,
+  } = fmt;
 
-  const ledgerLastIndex = useMemo(() => {
-    const indexes = (transactions || [])
-      .map((t) => Number(t?.ledgerIndex))
-      .filter((v) => Number.isFinite(v));
-    if (!indexes.length) return null;
-    return Math.max(...indexes);
-  }, [transactions]);
-
-  const ledgerStatus = useMemo(() => {
-    if (isPreviewMode) return "preview";
-    if (!["XRP", "RLUSD", "RLUSD"].includes(normalizedCurrency))
-      return "offchain";
-    if (ledgerEvidenceCount > 0) return "verified";
-    return "available";
-  }, [isPreviewMode, ledgerEvidenceCount, normalizedCurrency]);
-
-  const ledgerStatusLabel = useMemo(() => {
-    if (ledgerStatus === "verified") {
-      return t(
-        "ui_verified_on_xrp_ledger_334f28ce50",
-        "Verified on XRP Ledger",
-      );
-    }
-    if (ledgerStatus === "available") {
-      return t(
-        "ui_ledger_available_no_tx_f4",
-        "Ledger available (no transactions yet)",
-      );
-    }
-    if (ledgerStatus === "offchain") {
-      return t(
-        "ui_ledger_offchain_allocations_f4",
-        "Ledger validation unavailable for off-chain allocations",
-      );
-    }
-    return t(
-      "ui_ledger_preview_unavailable_f4",
-      "Ledger validation unavailable (preview)",
-    );
-  }, [ledgerStatus, t]);
-
+  /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {
     const safeBalance = Number.isFinite(Number(balance)) ? Number(balance) : 0;
     const txPayload = (transactionsWithDisplayBalance || []).map((tx) => ({
@@ -613,485 +169,128 @@ export default function CurrencyStatement({
           : 0,
       counterparty: tx?.counterparty || "",
     }));
-
     return JSON.stringify({
       version: 1,
       type: "currency_statement",
       walletAddress: walletAddress || "",
       currency: normalizedCurrency,
-      period: currentPeriod || fallbackPeriod,
+      period: currentPeriod,
       balance: safeBalance,
       transactions: txPayload,
     });
   }, [
     balance,
     currentPeriod,
-    fallbackPeriod,
     transactionsWithDisplayBalance,
     normalizedCurrency,
     walletAddress,
   ]);
 
+  const docHash = useStatementDocHash(statementHashInput);
+
+  /* ── resize listener ───────────────────────────────────── */
   useEffect(() => {
-    let cancelled = false;
-    if (typeof window === "undefined") return () => {};
-    (async () => {
-      const hash = await sha256Hex(statementHashInput);
-      if (!cancelled) setDocHash(hash);
-    })();
+    if (typeof window === "undefined") return;
+    const update = () => setIsMobileDate(window.innerWidth < 640);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  /* ── highlight timer ───────────────────────────────────── */
+  useEffect(() => {
+    if (!highlightTransactionId) return undefined;
+    setHighlightedTransactionId(highlightTransactionId);
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+    highlightTimerRef.current = setTimeout(() => {
+      setHighlightedTransactionId(null);
+    }, HIGHLIGHT_DURATION_MS);
     return () => {
-      cancelled = true;
+      if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
     };
-  }, [statementHashInput]);
+  }, [highlightTransactionId]);
 
-  // Icône par type de transaction
-  const getTransactionIcon = (category) => {
-    if (isPreviewMode && (category === "buy" || category === "sell"))
-      return null;
-    const icons = {
-      buy: "+",
-      sell: "−",
+  useEffect(() => {
+    if (!highlightedTransactionId) return;
+    const node = highlightRowRef.current;
+    if (!node) return;
+    const raf = requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [filter, highlightedTransactionId, transactions]);
+
+  /* ── estimated USD ─────────────────────────────────────── */
+  const estimatedUsd = useMemo(() => {
+    const value = Number.parseFloat(balance || 0) || 0;
+    const code = normalizedCurrency;
+    if (!code) return value;
+    const rate = usdRates?.[code];
+    if (Number.isFinite(rate)) return value * rate;
+    if (USD_STABLECOINS.includes(code)) return value;
+    if (code === "XRP") return value * 0.5;
+    return value;
+  }, [balance, normalizedCurrency, usdRates]);
+
+  /* ── XRP reserve ───────────────────────────────────────── */
+  const showReserveDetails = isPreviewMode || isWalletActivated === true;
+  const reservePlaceholder = "\u2014";
+
+  const xrpReserveDetails = useMemo(() => {
+    if (normalizedCurrency !== "XRP" || !showReserveDetails) return null;
+    const activationXrp = 1;
+    const trustlineReserveXrp = 0.2;
+    const trustlineRlusdXrp = hasRlusdTrustline ? trustlineReserveXrp : 0;
+    return {
+      totalReserveXrp: activationXrp + trustlineRlusdXrp,
+      activationXrp,
+      trustlineRlusdXrp,
     };
-    return icons[category] || null;
-  };
+  }, [hasRlusdTrustline, normalizedCurrency, showReserveDetails]);
 
-  // Fonction pour obtenir le drapeau de la devise
-  const getCurrencyFlag = useCallback((curr) => {
-    const flags = {
-      // Devises fiat - Monde entier
-      USD: "🇺🇸", // Dollar américain
-      EUR: "🇪🇺", // Euro
-      GBP: "🇬🇧", // Livre sterling
-      JPY: "🇯🇵", // Yen japonais
-      CHF: "🇨🇭", // Franc suisse
-      CAD: "🇨🇦", // Dollar canadien
-      AUD: "🇦🇺", // Dollar australien
-      CNY: "🇨🇳", // Yuan chinois
-      INR: "🇮🇳", // Roupie indienne
-      BRL: "🇧🇷", // Real brésilien
-      MXN: "🇲🇽", // Peso mexicain
-      KRW: "🇰🇷", // Won sud-coréen
-      RUB: "🇷🇺", // Rouble russe
-      ZAR: "🇿🇦", // Rand sud-africain
-      SGD: "🇸🇬", // Dollar de Singapour
-      HKD: "🇭🇰", // Dollar de Hong Kong
-      NOK: "🇳🇴", // Couronne norvégienne
-      SEK: "🇸🇪", // Couronne suédoise
-      DKK: "🇩🇰", // Couronne danoise
-      PLN: "🇵🇱", // Zloty polonais
-      TRY: "🇹🇷", // Livre turque
-      AED: "🇦🇪", // Dirham des EAU
-      SAR: "🇸🇦", // Riyal saoudien
-      THB: "🇹🇭", // Baht thaïlandais
-      IDR: "🇮🇩", // Roupie indonésienne
-      MYR: "🇲🇾", // Ringgit malaisien
-      PHP: "🇵🇭", // Peso philippin
-      NZD: "🇳🇿", // Dollar néo-zélandais
-      ARS: "🇦🇷", // Peso argentin
-      CLP: "🇨🇱", // Peso chilien
-      COP: "🇨🇴", // Peso colombien
-      PEN: "🇵🇪", // Sol péruvien
-      EGP: "🇪🇬", // Livre égyptienne
-      NGN: "🇳🇬", // Naira nigérian
-      KES: "🇰🇪", // Shilling kényan
-      GHS: "🇬🇭", // Cedi ghanéen
-      MAD: "🇲🇦", // Dirham marocain
-      TND: "🇹🇳", // Dinar tunisien
-
-      // Afrique
-      XOF: "🇸🇳", // Franc CFA (Sénégal)
-      XAF: "🇨🇲", // Franc CFA (Cameroun)
-      UGX: "🇺🇬", // Shilling ougandais
-      TZS: "🇹🇿", // Shilling tanzanien
-      ETB: "🇪🇹", // Birr éthiopien
-      MUR: "🇲🇺", // Roupie mauricienne
-      BWP: "🇧🇼", // Pula botswanais
-      ZMW: "🇿🇲", // Kwacha zambien
-      AOA: "🇦🇴", // Kwanza angolais
-      MZN: "🇲🇿", // Metical mozambicain
-
-      // Amérique Latine
-      VES: "🇻🇪", // Bolivar vénézuélien
-      UYU: "🇺🇾", // Peso uruguayen
-      PYG: "🇵🇾", // Guarani paraguayen
-      BOB: "🇧🇴", // Boliviano bolivien
-      CRC: "🇨🇷", // Colon costaricain
-      GTQ: "🇬🇹", // Quetzal guatémaltèque
-      HNL: "🇭🇳", // Lempira hondurien
-      NIO: "🇳🇮", // Cordoba nicaraguayen
-      PAB: "🇵🇦", // Balboa panaméen
-      SOL: "🇵🇪", // Sol péruvien (affichage)
-      DOP: "🇩🇴", // Peso dominicain
-      HTG: "🇭🇹", // Gourde haïtienne
-      JMD: "🇯🇲", // Dollar jamaïcain
-      TTD: "🇹🇹", // Dollar de Trinité-et-Tobago
-
-      // Asie-Pacifique
-      VND: "🇻🇳", // Dong vietnamien
-      LAK: "🇱🇦", // Kip laotien
-      KHR: "🇰🇭", // Riel cambodgien
-      MMK: "🇲🇲", // Kyat birman
-      BDT: "🇧🇩", // Taka bangladais
-      PKR: "🇵🇰", // Roupie pakistanaise
-      LKR: "🇱🇰", // Roupie srilankaise
-      NPR: "🇳🇵", // Roupie népalaise
-      AFN: "🇦🇫", // Afghani afghan
-      MNT: "🇲🇳", // Tugrik mongol
-      KZT: "🇰🇿", // Tenge kazakh
-      UZS: "🇺🇿", // Som ouzbek
-      TJS: "🇹🇯", // Somoni tadjik
-      KGS: "🇰🇬", // Som kirghiz
-      TWD: "🇹🇼", // Dollar taïwanais
-
-      // Moyen-Orient
-      ILS: "🇮🇱", // Shekel israélien
-      JOD: "🇯🇴", // Dinar jordanien
-      KWD: "🇰🇼", // Dinar koweïtien
-      BHD: "🇧🇭", // Dinar bahreïni
-      OMR: "🇴🇲", // Rial omanais
-      QAR: "🇶🇦", // Riyal qatari
-      IQD: "🇮🇶", // Dinar irakien
-      SYP: "🇸🇾", // Livre syrienne
-      LBP: "🇱🇧", // Livre libanaise
-      YER: "🇾🇪", // Rial yéménite
-
-      // Europe de l'Est et autres
-      CZK: "🇨🇿", // Couronne tchèque
-      HUF: "🇭🇺", // Forint hongrois
-      RON: "🇷🇴", // Leu roumain
-      BGN: "🇧🇬", // Lev bulgare
-      RSD: "🇷🇸", // Dinar serbe
-      UAH: "🇺🇦", // Hryvnia ukrainienne
-      BYN: "🇧🇾", // Rouble biélorusse
-      GEL: "🇬🇪", // Lari géorgien
-      AMD: "🇦🇲", // Dram arménien
-      AZN: "🇦🇿", // Manat azerbaïdjanais
-      MDL: "🇲🇩", // Leu moldave
-      ALL: "🇦🇱", // Lek albanais
-      MKD: "🇲🇰", // Denar macédonien
-      BAM: "🇧🇦", // Mark convertible bosniaque
-      ISK: "🇮🇸", // Couronne islandaise
-
-      // Océanie et autres
-      FJD: "🇫🇯", // Dollar fidjien
-      PGK: "🇵🇬", // Kina papouasien
-      WST: "🇼🇸", // Tala samoan
-      TOP: "🇹🇴", // Pa'anga tongien
-      VUV: "🇻🇺", // Vatu vanuatais
-
-      // Stablecoins et tokens fiat
-      RLUSD: "🔵", // Ripple USD (Stablecoin)
-      BUSD: "🟡", // Binance USD
-      DAI: "🟠", // DAI Stablecoin
-      TUSD: "🔷", // TrueUSD
-      USDP: "⚪", // Pax Dollar
-      GUSD: "💚", // Gemini Dollar
-      USDD: "⚫", // USDD Stablecoin
-      FRAX: "🔲", // Frax
-      LUSD: "🟦", // Liquity USD
-      sUSD: "🔶", // Synthetix USD
-
-      // Cryptomonnaies
-      XRP: "⚡", // XRP Ledger
-      BTC: "₿", // Bitcoin
-      ETH: "Ξ", // Ethereum
-      USDT: "₮", // Tether
-      USDC: "🔵", // USD Coin
-      BNB: "🔶", // Binance Coin
-      ADA: "₳", // Cardano
-      DOGE: "Ð", // Dogecoin
-      MATIC: "🟣", // Polygon
-      DOT: "⬤", // Polkadot
-      LINK: "🔗", // Chainlink
-      AVAX: "🔺", // Avalanche
-      UNI: "🦄", // Uniswap
-      ATOM: "⚛️", // Cosmos
-      XLM: "🚀", // Stellar
-      ALGO: "◬", // Algorand
-      VET: "💎", // VeChain
-      ICP: "∞", // Internet Computer
-      FIL: "📁", // Filecoin
-      NEAR: "Ⓝ", // Near Protocol
-      APT: "🅰️", // Aptos
-      ARB: "🔷", // Arbitrum
-      OP: "🔴", // Optimism
-      SAND: "🏖️", // The Sandbox
-      MANA: "🎮", // Decentraland
-      RLUSD: "🌟", // Xcannes Coin
-      SHIB: "🐕", // Shiba Inu
-      TRX: "🔺", // Tron
-      LTC: "Ł", // Litecoin
-      BCH: "₿", // Bitcoin Cash
-      XMR: "ɱ", // Monero
-      ETC: "Ξ", // Ethereum Classic
-      XTZ: "ꜩ", // Tezos
-      EOS: "🔷", // EOS
-      AAVE: "👻", // Aave
-      MKR: "Ⓜ️", // Maker
-      COMP: "🏦", // Compound
-      SNX: "🔷", // Synthetix
-      CRV: "🌊", // Curve
-      SUSHI: "🍣", // SushiSwap
-      YFI: "💼", // Yearn Finance
-      BAT: "🦇", // Basic Attention Token
-      ZRX: "Ⓩ", // 0x
-      ENJ: "🎮", // Enjin Coin
-      CHZ: "⚽", // Chiliz
-      THETA: "📺", // Theta
-      FTM: "👻", // Fantom
-      HBAR: "ℏ", // Hedera
-      EGLD: "🏔️", // MultiversX (Elrond)
-      FLR: "🔥", // Flare
-      XDC: "🌐", // XDC Network
-      KAVA: "🌾", // Kava
-      ZIL: "💎", // Zilliqa
-      QTUM: "⬡", // Qtum
-      WAVES: "🌊", // Waves
-      ICX: "🔷", // ICON
-      ONT: "⭕", // Ontology
-      ZEC: "🛡️", // Zcash
-      DASH: "💸", // Dash
-      DCR: "🔷", // Decred
-      RLUSD: "🌟", // Xcannes Coin
-    };
-    return flags[curr] || "💱"; // Fallback sur l'emoji exchange
-  }, []);
-
-  // Fonction pour enrichir la description avec des drapeaux
-  const enrichDescription = useCallback(
-    (description) => {
-      if (!description) return description;
-
-      // Remplacer les codes de devises par leurs drapeaux + code
-      let enriched = description;
-
-      // Chercher les patterns courants: "XXX → YYY" ou "XXX/YYY"
-      const currencyPattern = /\b([A-Z]{3,6})\b/g;
-      enriched = enriched.replace(currencyPattern, (match) => {
-        const flag = getCurrencyFlag(match);
-        return `${flag} ${match}`;
-      });
-
-      return enriched;
-    },
-    [getCurrencyFlag],
+  /* ── ledger status ─────────────────────────────────────── */
+  const ledgerEvidenceCount = useMemo(
+    () => (transactions || []).filter((tok) => tok?.txHash).length,
+    [transactions],
   );
-  const simplifyMobileDescription = useCallback(
-    (description, category) => {
-      if (!description) return description;
-      const safeDescription = String(description).trim();
-      const lower = safeDescription.toLowerCase();
-      if (category !== "exchange") {
-        if (lower.includes("moonpay")) {
-          if (lower.includes("achat")) return "Achat";
-          if (lower.includes("vente")) return "Vente";
-        }
-        if (lower.startsWith("achat")) return "Achat";
-        if (lower.startsWith("vente")) return "Vente";
-        if (
-          lower.startsWith("recevoir") ||
-          lower.startsWith("reçu") ||
-          lower.startsWith("recu")
-        ) {
-          return "Reçu";
-        }
-        if (
-          lower.startsWith("envoyer") ||
-          lower.startsWith("envoyé") ||
-          lower.startsWith("envoye")
-        ) {
-          return "Envoyé";
-        }
-        if (lower.startsWith("payer")) return "Envoyé";
-        if (lower.includes("recevoir") && lower.includes("wallet"))
-          return "Reçu";
-        if (lower.includes("envoyer") && lower.includes("wallet"))
-          return "Envoyé";
-        return enrichDescription(safeDescription);
-      }
-      const arrowMatch = safeDescription.match(
-        /([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/,
+
+  const ledgerLastIndex = useMemo(() => {
+    const indexes = (transactions || [])
+      .map((tok) => Number(tok?.ledgerIndex))
+      .filter((v) => Number.isFinite(v));
+    return indexes.length ? Math.max(...indexes) : null;
+  }, [transactions]);
+
+  const ledgerStatus = useMemo(() => {
+    if (isPreviewMode) return "preview";
+    if (!["XRP", "RLUSD"].includes(normalizedCurrency)) return "offchain";
+    if (ledgerEvidenceCount > 0) return "verified";
+    return "available";
+  }, [isPreviewMode, ledgerEvidenceCount, normalizedCurrency]);
+
+  const ledgerStatusLabel = useMemo(() => {
+    if (ledgerStatus === "verified")
+      return t(
+        "ui_verified_on_xrp_ledger_334f28ce50",
+        "Verified on XRP Ledger",
       );
-      if (arrowMatch) {
-        return enrichDescription(`${arrowMatch[1]} → ${arrowMatch[2]}`);
-      }
-      const slashMatch = safeDescription.match(
-        /([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/,
+    if (ledgerStatus === "available")
+      return t(
+        "ui_ledger_available_no_tx_f4",
+        "Ledger available (no transactions yet)",
       );
-      if (slashMatch) {
-        return enrichDescription(`${slashMatch[1]} → ${slashMatch[2]}`);
-      }
-      const firstCurrencyIndex = safeDescription.search(/\b[A-Z]{3}\b/);
-      const trimmed =
-        firstCurrencyIndex >= 0
-          ? safeDescription.slice(firstCurrencyIndex)
-          : safeDescription.replace(/^\s*conversion\s*/i, "").trim();
-      return enrichDescription(trimmed);
-    },
-    [enrichDescription],
-  );
-
-  const parseConversionPair = useCallback((description) => {
-    if (!description) return null;
-    const text = String(description).trim();
-    let match = text.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
-    if (!match) {
-      match = text.match(/([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/);
-    }
-    if (!match) return null;
-    return { from: match[1], to: match[2] };
-  }, []);
-
-  const getLocalizedDescription = useCallback(
-    (tx) => {
-      const kind = String(tx?.kind || "")
-        .trim()
-        .toUpperCase();
-      const rawCounterparty = tx?.counterparty
-        ? String(tx.counterparty).trim()
-        : "";
-      const counterparty =
-        rawCounterparty && rawCounterparty.toUpperCase() !== "XCANNES"
-          ? rawCounterparty
-          : "";
-      const category = String(tx?.category || "")
-        .trim()
-        .toLowerCase();
-
-      if (kind === "PAYMENT_OUT") {
-        return counterparty
-          ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", {
-              counterparty,
-            })
-          : t("statement_payment_out_generic", "Paiement envoyé");
-      }
-      if (kind === "PAYMENT_IN") {
-        return counterparty
-          ? t("statement_payment_in_from", "Reçu de {{counterparty}}", {
-              counterparty,
-            })
-          : t("statement_payment_in_generic", "Paiement reçu");
-      }
-      if (kind === "XRPL_PAYMENT_OUT") {
-        return t("statement_xrpl_payment_out", "Paiement envoyé");
-      }
-      if (kind === "XRPL_PAYMENT_IN") {
-        return t("statement_xrpl_payment_in", "Paiement reçu");
-      }
-      if (kind === "MOONPAY_BUY") {
-        return t("statement_buy_bank", "Purchase by bank payment");
-      }
-      if (kind === "MOONPAY_SELL") {
-        return t("statement_sell_bank", "Sale to bank account");
-      }
-      if (category === "exchange") {
-        const pair = parseConversionPair(tx?.description || "");
-        if (pair) {
-          return `${t("statement_conversion_label", "Conversion")} ${pair.from} → ${pair.to}`;
-        }
-      }
-
-      return tx?.description || "";
-    },
-    [parseConversionPair, t],
-  );
-
-  const renderCurrencyBadge = useCallback(
-    (code) => {
-      const upper = String(code || "").toUpperCase();
-      if (!upper) return null;
-      const display = getDisplayCurrencyCode(upper);
-      if (CRYPTO_ICONS?.[display]) {
-        const iconSrc = CRYPTO_ICONS[display];
-        return (
-          <span className="inline-flex items-center gap-1">
-            {isSvgIcon(iconSrc) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={iconSrc}
-                alt={display}
-                width={16}
-                height={16}
-                className="w-4 h-4 rounded-sm"
-              />
-            ) : (
-              <Image
-                src={iconSrc}
-                alt={display}
-                width={16}
-                height={16}
-                className="w-4 h-4 rounded-sm"
-              />
-            )}
-            <span className="text-white/80 text-xs md:text-sm">{display}</span>
-          </span>
-        );
-      }
-      return (
-        <span className="inline-flex items-center gap-1">
-          <span className="text-base md:text-lg">
-            {getCurrencyFlag(display)}
-          </span>
-          <span className="text-white/80 text-xs md:text-sm">{display}</span>
-        </span>
+    if (ledgerStatus === "offchain")
+      return t(
+        "ui_ledger_offchain_allocations_f4",
+        "Ledger validation unavailable for off-chain allocations",
       );
-    },
-    [getCurrencyFlag],
-  );
+    return t(
+      "ui_ledger_preview_unavailable_f4",
+      "Ledger validation unavailable (preview)",
+    );
+  }, [ledgerStatus, t]);
 
-  const renderConversionDescription = useCallback(
-    (description, { withLabel = false } = {}) => {
-      const pair = parseConversionPair(description);
-      if (!pair) return null;
-      const badges = (
-        <span className="inline-flex items-center gap-2">
-          {renderCurrencyBadge(pair.from)}
-          <span className="text-white/50 text-xs md:text-sm">→</span>
-          {renderCurrencyBadge(pair.to)}
-        </span>
-      );
-      if (!withLabel) return badges;
-      return (
-        <span className="inline-flex items-center gap-2">
-          <span className="text-white/70 text-xs md:text-sm">
-            {t("statement_conversion_label", "Conversion")}
-          </span>
-          {badges}
-        </span>
-      );
-    },
-    [parseConversionPair, renderCurrencyBadge, t],
-  );
-
-  const formatDate = useCallback(
-    (dateStr) => {
-      if (!dateStr) return t("ui_not_available_9c2a1f7b3d", "N/A");
-      const date = new Date(dateStr);
-      const options = isMobileDate
-        ? { day: "2-digit", month: "2-digit" }
-        : { day: "2-digit", month: "2-digit", year: "numeric" };
-      return date.toLocaleDateString(locale, options);
-    },
-    [isMobileDate, locale, t],
-  );
-
-  const formatAmountWithSymbolLocal = useCallback(
-    (amount) =>
-      formatAmountWithSymbol(locale, amount, displayCurrency, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
-    [displayCurrency, locale],
-  );
-  const formatUsdWithSymbol = useCallback(
-    (amount) =>
-      formatAmountWithSymbol(locale, amount, "USD", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
-    [locale],
-  );
-
+  /* ── export helpers ────────────────────────────────────── */
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
     const ledgerIndexLabel =
@@ -1135,10 +334,7 @@ export default function CurrencyStatement({
               locale,
               tx?.amount,
               displayCurrency,
-              {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              },
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 },
             )}`,
           )}</td>
           <td class="right">${escapeHtml(
@@ -1299,44 +495,12 @@ export default function CurrencyStatement({
     normalizedCurrency,
   ]);
 
-  const STATEMENT_LAYOUTS = {
-    full: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
-      wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
-      panelClass:
-        "w-full xcannes-fullscreen-safe rounded-none border border-white/10 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl",
-    },
-    "dex-desktop": {
-      backdropClass: "bg-black/75 md:backdrop-blur-sm",
-      wrapperClass: "items-center justify-center px-3 md:px-4",
-      panelClass:
-        "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]",
-    },
-    "dex-mobile": {
-      backdropClass: "bg-black/90 md:backdrop-blur-sm",
-      wrapperClass: "items-stretch justify-center px-0",
-      panelClass:
-        "w-full xcannes-fullscreen-safe rounded-none border border-white/10",
-    },
-    default: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
-      wrapperClass: "items-center justify-center px-4",
-      panelClass:
-        "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[92vh]",
-    },
-    "inline-desktop": {
-      backdropClass: "",
-      wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass: "w-full h-full rounded-xl border border-white/10",
-    },
-  };
-
+  /* ── layout ────────────────────────────────────────────── */
   const resolvedLayout =
     STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
-
   const modalBgClass =
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -1348,6 +512,7 @@ export default function CurrencyStatement({
     isWalletActivated === true &&
     hasRlusdTrustline === false;
 
+  /* ── render ────────────────────────────────────────────── */
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
@@ -1361,10 +526,7 @@ export default function CurrencyStatement({
       }`}
       onClick={(e) => {
         if (inline) return;
-        // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
-        if (e.target === e.currentTarget) {
-          onClose?.();
-        }
+        if (e.target === e.currentTarget) onClose?.();
       }}
     >
       <div
@@ -1436,7 +598,6 @@ export default function CurrencyStatement({
                     </span>
                   ) : null}
                 </div>
-                {/* Description merged into title */}
               </div>
             </div>
             <button
@@ -1463,7 +624,6 @@ export default function CurrencyStatement({
               <p className="text-xs text-white/50 mb-1">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
-              {/* Month Selector - Version simplifiée */}
               <StatementMonthSelect
                 value={selectedMonth}
                 onChange={(nextValue) => {
@@ -1584,7 +744,7 @@ export default function CurrencyStatement({
           </div>
         </div>
 
-        {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
+        {/* Content - Zone scrollable */}
         <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
           {/* Archive Notice */}
           {selectedMonth === "archives" && (
@@ -1878,8 +1038,6 @@ export default function CurrencyStatement({
                 : t("ui_load_more_3f7a1c9d5b", "Load more")}
             </button>
           )}
-
-          {/* Watermark removed */}
         </div>
 
         {/* Footer Actions */}
@@ -1922,13 +1080,7 @@ export default function CurrencyStatement({
     </div>
   );
 
-  if (inline) {
-    return content;
-  }
-
-  if (typeof document === "undefined") {
-    return null;
-  }
-
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
   return createPortal(content, document.body);
 }

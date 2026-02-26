@@ -1,55 +1,30 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
-import { apiUrl } from "@/lib/runtimeConfig";
 import {
   buildCsvString,
   downloadTextFile,
   escapeHtml,
   openPrintWindow,
-  sha256Hex,
 } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
+  USD_STABLECOINS,
 } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-
-const USD_STABLECOINS = [
-  "RLUSD",
-  "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
-];
-
-const ShareIcon = ({ className = "" }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
+import { getCurrencyFlag, ShareIcon } from "./statementShared";
+import useStatementWalletLabel from "./useStatementWalletLabel";
+import useStatementDocHash from "./useStatementDocHash";
 
 /**
- * Composant de relevé bancaire global (toutes les devises consolidées)
+ * Composant de relevé bancaire global (toutes les devises consolidées).
+ * Refactorisé : walletLabel, docHash, getCurrencyFlag et ShareIcon
+ * sont délégués aux modules partagés.
  */
 export default function GlobalStatement({
   tokens = [],
@@ -79,12 +54,11 @@ export default function GlobalStatement({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const [sortBy, setSortBy] = useState("balance"); // balance, change, name
-  const [selectedMonth, setSelectedMonth] = useState(0); // 0 = current month, 1 = last month, etc.
+
+  /* ── local state ───────────────────────────────────────── */
+  const [sortBy, setSortBy] = useState("balance");
+  const [selectedMonth, setSelectedMonth] = useState(0);
   const [exportFormat, setExportFormat] = useState(null);
-  const [docHash, setDocHash] = useState("");
-  const [walletLabel, setWalletLabel] = useState("");
-  const resolvedLabelOverride = String(walletLabelOverride || "").trim();
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -96,45 +70,16 @@ export default function GlobalStatement({
   );
   const fallbackPeriod = period || defaultPeriod;
 
-  useEffect(() => {
-    let cancelled = false;
-    if (resolvedLabelOverride) {
-      setWalletLabel(resolvedLabelOverride);
-      return () => {};
-    }
-    if (!walletAddress) {
-      setWalletLabel("");
-      return () => {};
-    }
+  /* ── extracted hooks ───────────────────────────────────── */
+  const walletLabel = useStatementWalletLabel(
+    walletAddress,
+    walletLabelOverride,
+  );
 
-    const loadLabel = async () => {
-      try {
-        const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(walletAddress)}`),
-        );
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data?.error || "Failed to load wallet label");
-        }
-        if (cancelled) return;
-        setWalletLabel(String(data?.label || "").trim());
-      } catch (err) {
-        console.error("Error loading wallet label:", err);
-        if (!cancelled) setWalletLabel("");
-      }
-    };
-
-    loadLabel();
-    return () => {
-      cancelled = true;
-    };
-  }, [resolvedLabelOverride, walletAddress]);
-
-  // Générer les 12 derniers mois
+  /* ── month selector ────────────────────────────────────── */
   const generateMonths = () => {
     const months = [];
     const currentDate = new Date();
-
     for (let i = 0; i < 12; i++) {
       const date = new Date(
         currentDate.getFullYear(),
@@ -147,10 +92,9 @@ export default function GlobalStatement({
           month: "long",
           year: "numeric",
         }),
-        displayLabel: date.toLocaleDateString(locale, { month: "long" }), // Juste le mois pour l'affichage
+        displayLabel: date.toLocaleDateString(locale, { month: "long" }),
       });
     }
-
     months.push({
       value: "archives",
       label: archivesLongLabel,
@@ -168,8 +112,9 @@ export default function GlobalStatement({
     selectedMonth === "archives"
       ? archivesLabel
       : availableMonths[selectedMonth]?.displayLabel ||
-        String(fallbackPeriod).split(" ")[0]; // Affiche juste le mois
+        String(fallbackPeriod).split(" ")[0];
 
+  /* ── helpers ───────────────────────────────────────────── */
   const isUsdStablecoin = useCallback(
     (currency) =>
       USD_STABLECOINS.includes(String(currency || "").toUpperCase()),
@@ -191,7 +136,7 @@ export default function GlobalStatement({
     [isUsdStablecoin, usdRates],
   );
 
-  // Calculer les totaux
+  /* ── totals ────────────────────────────────────────────── */
   const computedTotalBalance = tokens.reduce((sum, token) => {
     const usdValue = getUsdValue(token);
     return sum + (Number.isFinite(usdValue) ? usdValue : 0);
@@ -205,10 +150,9 @@ export default function GlobalStatement({
       ? totalBalanceOverrideValue
       : computedTotalBalance;
 
-  // Filtrer RLUSD (invisible — décomposé en USD + lignes).
-  // Trier les tokens — XRP toujours en dernière position (infrastructure discrète).
+  /* ── sorted tokens ─────────────────────────────────────── */
   const sortedTokens = [...tokens]
-    .filter((t) => String(t.currency || "").toUpperCase() !== "RLUSD")
+    .filter((tok) => String(tok.currency || "").toUpperCase() !== "RLUSD")
     .sort((a, b) => {
       const aIsXrp = String(a.currency || "").toUpperCase() === "XRP";
       const bIsXrp = String(b.currency || "").toUpperCase() === "XRP";
@@ -233,16 +177,17 @@ export default function GlobalStatement({
     [locale],
   );
 
-  const ledgerEvidenceCount = useMemo(() => {
-    return (movements || []).filter((m) => m?.txHash).length;
-  }, [movements]);
+  /* ── ledger status ─────────────────────────────────────── */
+  const ledgerEvidenceCount = useMemo(
+    () => (movements || []).filter((m) => m?.txHash).length,
+    [movements],
+  );
 
   const ledgerLastIndex = useMemo(() => {
     const indexes = (movements || [])
       .map((m) => Number(m?.ledgerIndex))
       .filter((v) => Number.isFinite(v));
-    if (!indexes.length) return null;
-    return Math.max(...indexes);
+    return indexes.length ? Math.max(...indexes) : null;
   }, [movements]);
 
   const ledgerStatus = useMemo(() => {
@@ -253,30 +198,28 @@ export default function GlobalStatement({
   }, [isPreviewMode, ledgerEvidenceCount, movements]);
 
   const ledgerStatusLabel = useMemo(() => {
-    if (ledgerStatus === "verified") {
+    if (ledgerStatus === "verified")
       return t(
         "ui_verified_on_xrp_ledger_334f28ce50",
         "Verified on XRP Ledger",
       );
-    }
-    if (ledgerStatus === "available") {
+    if (ledgerStatus === "available")
       return t(
         "ui_ledger_available_no_tx_f4",
         "Ledger available (no transactions yet)",
       );
-    }
-    if (ledgerStatus === "offchain") {
+    if (ledgerStatus === "offchain")
       return t(
         "ui_ledger_offchain_allocations_f4",
         "Ledger validation unavailable for off-chain allocations",
       );
-    }
     return t(
       "ui_ledger_preview_unavailable_f4",
       "Ledger validation unavailable (preview)",
     );
   }, [ledgerStatus, t]);
 
+  /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {
     const safeTotal = Number.isFinite(Number(totalBalance))
       ? Number(totalBalance)
@@ -318,18 +261,9 @@ export default function GlobalStatement({
     walletAddress,
   ]);
 
-  useEffect(() => {
-    let cancelled = false;
-    if (typeof window === "undefined") return () => {};
-    (async () => {
-      const hash = await sha256Hex(statementHashInput);
-      if (!cancelled) setDocHash(hash);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [statementHashInput]);
+  const docHash = useStatementDocHash(statementHashInput);
 
+  /* ── export helpers ────────────────────────────────────── */
   const buildPrintHtml = useCallback(() => {
     const docHashLabel = docHash || "-";
     const ledgerIndexLabel =
@@ -535,181 +469,7 @@ export default function GlobalStatement({
     }
   }, [docHash, ledgerStatus, movements, totalBalance]);
 
-  const getCurrencyFlag = (currency) => {
-    const code = String(currency || "")
-      .trim()
-      .toUpperCase();
-    const flags = {
-      EUR: "🇪🇺",
-      USD: "🇺🇸",
-      GBP: "🇬🇧",
-      JPY: "🇯🇵",
-      CHF: "🇨🇭",
-      CAD: "🇨🇦",
-      AUD: "🇦🇺",
-      NZD: "🇳🇿",
-      CNY: "🇨🇳",
-      INR: "🇮🇳",
-      KRW: "🇰🇷",
-      SGD: "🇸🇬",
-      HKD: "🇭🇰",
-      MXN: "🇲🇽",
-      BRL: "🇧🇷",
-      ZAR: "🇿🇦",
-      TRY: "🇹🇷",
-      RUB: "🇷🇺",
-      SEK: "🇸🇪",
-      NOK: "🇳🇴",
-      DKK: "🇩🇰",
-      PLN: "🇵🇱",
-      THB: "🇹🇭",
-      IDR: "🇮🇩",
-      MYR: "🇲🇾",
-      PHP: "🇵🇭",
-      CZK: "🇨🇿",
-      ILS: "🇮🇱",
-      CLP: "🇨🇱",
-      AED: "🇦🇪",
-      SAR: "🇸🇦",
-      XRP: "✕",
-      // Global statement: show RLUSD as USD for clarity.
-      RLUSD: "🇺🇸",
-      BTC: "₿",
-      ETH: "Ξ",
-      USDT: "₮",
-      USDC: "💵",
-      BNB: "🔶",
-      ADA: "₳",
-      DOGE: "Ð",
-      XLM: "🚀",
-      LINK: "⬡",
-      DOT: "⚫",
-      UNI: "🦄",
-      MATIC: "🔷",
-      LTC: "Ł",
-      BCH: "₿",
-      AVAX: "🔺",
-      ATOM: "⚛️",
-      XMR: "ɱ",
-      TRX: "◇",
-      ETC: "Ξ",
-      AFN: "🇦🇫",
-      ALL: "🇦🇱",
-      DZD: "🇩🇿",
-      AOA: "🇦🇴",
-      ARS: "🇦🇷",
-      AMD: "🇦🇲",
-      AWG: "🇦🇼",
-      AZN: "🇦🇿",
-      BSD: "🇧🇸",
-      BHD: "🇧🇭",
-      BDT: "🇧🇩",
-      BBD: "🇧🇧",
-      BYN: "🇧🇾",
-      BZD: "🇧🇿",
-      BMD: "🇧🇲",
-      BTN: "🇧🇹",
-      BOB: "🇧🇴",
-      BAM: "🇧🇦",
-      BWP: "🇧🇼",
-      BND: "🇧🇳",
-      BGN: "🇧🇬",
-      BIF: "🇧🇮",
-      KHR: "🇰🇭",
-      CVE: "🇨🇻",
-      XAF: "🇨🇫",
-      XOF: "🇧🇫",
-      KMF: "🇰🇲",
-      CDF: "🇨🇩",
-      CRC: "🇨🇷",
-      CUP: "🇨🇺",
-      CYP: "🇨🇾",
-      DJF: "🇩🇯",
-      DOP: "🇩🇴",
-      XCD: "🇦🇬",
-      EGP: "🇪🇬",
-      ERN: "🇪🇷",
-      ETB: "🇪🇹",
-      FJD: "🇫🇯",
-      GMD: "🇬🇲",
-      GEL: "🇬🇪",
-      GHS: "🇬🇭",
-      GTQ: "🇬🇹",
-      GNF: "🇬🇳",
-      GYD: "🇬🇾",
-      HTG: "🇭🇹",
-      HNL: "🇭🇳",
-      HUF: "🇭🇺",
-      ISK: "🇮🇸",
-      IQD: "🇮🇶",
-      JMD: "🇯🇲",
-      JOD: "🇯🇴",
-      KZT: "🇰🇿",
-      KES: "🇰🇪",
-      KWD: "🇰🇼",
-      KGS: "🇰🇬",
-      LAK: "🇱🇦",
-      LBP: "🇱🇧",
-      LSL: "🇱🇸",
-      LRD: "🇱🇷",
-      LYD: "🇱🇾",
-      MOP: "🇲🇴",
-      MKD: "🇲🇰",
-      MGA: "🇲🇬",
-      MWK: "🇲🇼",
-      MVR: "🇲🇻",
-      MRU: "🇲🇷",
-      MUR: "🇲🇺",
-      MDL: "🇲🇩",
-      MNT: "🇲🇳",
-      MAD: "🇲🇦",
-      MZN: "🇲🇿",
-      MMK: "🇲🇲",
-      NAD: "🇳🇦",
-      NPR: "🇳🇵",
-      NIO: "🇳🇮",
-      NGN: "🇳🇬",
-      OMR: "🇴🇲",
-      PKR: "🇵🇰",
-      PAB: "🇵🇦",
-      PGK: "🇵🇬",
-      PYG: "🇵🇾",
-      PEN: "🇵🇪",
-      SOL: "🇵🇪",
-      QAR: "🇶🇦",
-      RON: "🇷🇴",
-      RWF: "🇷🇼",
-      WST: "🇼🇸",
-      STN: "🇸🇹",
-      RSD: "🇷🇸",
-      SCR: "🇸🇨",
-      SOS: "🇸🇴",
-      LKR: "🇱🇰",
-      SDG: "🇸🇩",
-      SRD: "🇸🇷",
-      SZL: "🇸🇿",
-      SYP: "🇸🇾",
-      TWD: "🇹🇼",
-      TJS: "🇹🇯",
-      TZS: "🇹🇿",
-      TOP: "🇹🇴",
-      TTD: "🇹🇹",
-      TND: "🇹🇳",
-      TMT: "🇹🇲",
-      UGX: "🇺🇬",
-      UAH: "🇺🇦",
-      UYU: "🇺🇾",
-      UZS: "🇺🇿",
-      VUV: "🇻🇺",
-      VES: "🇻🇪",
-      VND: "🇻🇳",
-      YER: "🇾🇪",
-      ZMW: "🇿🇲",
-      ZWL: "🇿🇼",
-    };
-    return flags[code] || "💱";
-  };
-
+  /* ── category badge ────────────────────────────────────── */
   const getCategoryBadge = (token) => {
     if (token.currency === "XRP") {
       return {
@@ -737,6 +497,7 @@ export default function GlobalStatement({
     return { label: t("ui_label_token_1c7b3a9d5e", "Token"), color: "gray" };
   };
 
+  /* ── layout (GlobalStatement uses wider max-widths) ────── */
   const STATEMENT_LAYOUTS = {
     full: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
@@ -773,7 +534,6 @@ export default function GlobalStatement({
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";
-
   const modalBgClass =
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
   const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
@@ -785,6 +545,7 @@ export default function GlobalStatement({
     isWalletActivated === true &&
     hasRlusdTrustline === false;
 
+  /* ── render ────────────────────────────────────────────── */
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
@@ -798,10 +559,7 @@ export default function GlobalStatement({
       }`}
       onClick={(e) => {
         if (inline) return;
-        // Fermer uniquement si on clique sur le backdrop (pas sur le modal)
-        if (e.target === e.currentTarget) {
-          onClose?.();
-        }
+        if (e.target === e.currentTarget) onClose?.();
       }}
     >
       <div
@@ -874,7 +632,6 @@ export default function GlobalStatement({
               <p className="text-xs text-white/50 mb-1">
                 {t("ui_statement_period_4674b18f25", "Statement Period")}
               </p>
-              {/* Month Selector - simplifié */}
               <StatementMonthSelect
                 value={selectedMonth}
                 onChange={(nextValue) => {
@@ -904,7 +661,7 @@ export default function GlobalStatement({
           </div>
         </div>
 
-        {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
+        {/* Content - Zone scrollable */}
         <div className="flex-1 overflow-hidden px-4 md:px-5 py-4 flex flex-col gap-4 min-h-0">
           {/* Controls */}
           <div className="flex items-center justify-between gap-2">
@@ -964,9 +721,7 @@ export default function GlobalStatement({
                       >
                         <td className="px-3 md:px-4 py-2.5 md:py-3">
                           <div className="flex items-center gap-2">
-                            {["XRP", "RLUSD", "RLUSD"].includes(
-                              token.currency,
-                            ) ? (
+                            {["XRP", "RLUSD"].includes(token.currency) ? (
                               <Image
                                 src={`/symbols/${token.currency.toLowerCase()}.png`}
                                 alt={token.currency}
@@ -1044,8 +799,6 @@ export default function GlobalStatement({
               </table>
             </div>
           </div>
-
-          {/* Watermark removed */}
         </div>
 
         {/* Footer Actions */}
@@ -1088,13 +841,7 @@ export default function GlobalStatement({
     </div>
   );
 
-  if (inline) {
-    return content;
-  }
-
-  if (typeof document === "undefined") {
-    return null;
-  }
-
+  if (inline) return content;
+  if (typeof document === "undefined") return null;
   return createPortal(content, document.body);
 }
