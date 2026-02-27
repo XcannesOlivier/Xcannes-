@@ -214,6 +214,7 @@ export function useWalletActivation({
     refreshBalance,
     setShowActivationModal,
     signTransaction,
+    toast,
     wallet,
   ]);
 
