@@ -132,3 +132,4 @@ function App({ Component, pageProps }) {
 }
 
 export default appWithTranslation(App, nextI18NextConfig); // ✅ conserve la trad
+/* rebuild 20260227-2324 */
