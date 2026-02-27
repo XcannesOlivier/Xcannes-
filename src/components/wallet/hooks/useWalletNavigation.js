@@ -103,6 +103,7 @@ export function useWalletNavigation({
       setSwapDefaultView,
       setSwapLockedView,
       t,
+      toast,
     ],
   );
 
@@ -136,6 +137,8 @@ export function useWalletNavigation({
       isConnected,
       flashWalletHeaderToast,
       isWalletLabelRequired,
+      setActiveAction,
+      setWalletInfoOpen,
       setSwapDefaultView,
       setSwapLockedView,
       setCashBuyPrefill,
@@ -150,7 +153,7 @@ export function useWalletNavigation({
     setSwapDefaultView("lines");
     setSwapLockedView("lines");
     setActiveAction("swap");
-  }, [closeInlineQr, setSwapDefaultView, setSwapLockedView]);
+  }, [closeInlineQr, setActiveAction, setWalletInfoOpen, setSwapDefaultView, setSwapLockedView]);
 
   // ─── Open currency statement ──────────────────────────────────────────
 
@@ -168,7 +171,18 @@ export function useWalletNavigation({
       setSelectedStatementToken(token);
       setShowCurrencyStatement(true);
     },
-    [closeInlineQr, isDesktopPanel],
+    [
+      closeInlineQr,
+      isDesktopPanel,
+      setActiveAction,
+      setSelectedStatementToken,
+      setShowActivationModal,
+      setShowActivationRequestModal,
+      setShowAdjustmentModal,
+      setShowCurrencyStatement,
+      setShowGlobalStatement,
+      setWalletInfoOpen,
+    ],
   );
 
   // ─── Open info panel ──────────────────────────────────────────────────
@@ -185,7 +199,18 @@ export function useWalletNavigation({
       setShowGlobalStatement(false);
     }
     setWalletInfoOpen(true);
-  }, [closeInlineQr, isDesktopPanel]);
+  }, [
+    closeInlineQr,
+    isDesktopPanel,
+    setActiveAction,
+    setSelectedStatementToken,
+    setShowActivationModal,
+    setShowActivationRequestModal,
+    setShowAdjustmentModal,
+    setShowCurrencyStatement,
+    setShowGlobalStatement,
+    setWalletInfoOpen,
+  ]);
 
   // ─── Open global statement ────────────────────────────────────────────
 
@@ -203,7 +228,18 @@ export function useWalletNavigation({
       return;
     }
     setShowGlobalStatement(true);
-  }, [closeInlineQr, isDesktopPanel]);
+  }, [
+    closeInlineQr,
+    isDesktopPanel,
+    setActiveAction,
+    setSelectedStatementToken,
+    setShowActivationModal,
+    setShowActivationRequestModal,
+    setShowAdjustmentModal,
+    setShowCurrencyStatement,
+    setShowGlobalStatement,
+    setWalletInfoOpen,
+  ]);
 
   // ─── Copy wallet address ──────────────────────────────────────────────
 
@@ -266,7 +302,7 @@ export function useWalletNavigation({
         setIsRefreshing(false);
       }
     }
-  }, [backendWalletAddress, isConnecting, isRefreshing, refreshBalance]);
+  }, [backendWalletAddress, isConnecting, isRefreshing, refreshBalance, setIsRefreshing]);
 
   // ─── Refresh timer cleanup ────────────────────────────────────────────
 
@@ -322,6 +358,7 @@ export function useWalletNavigation({
     setConvertQuoteCurrency,
     setSwapDefaultView,
     setSwapLockedView,
+    setWalletInfoOpen,
   ]);
 
   // ─── Event: open-adjustment ───────────────────────────────────────────
@@ -336,7 +373,7 @@ export function useWalletNavigation({
     window.addEventListener("xcannes:wallet:open-adjustment", handler);
     return () =>
       window.removeEventListener("xcannes:wallet:open-adjustment", handler);
-  }, [closeInlineQr]);
+  }, [closeInlineQr, setShowAdjustmentModal, setWalletInfoOpen]);
 
   // ─── Auto-open adjustment deficit ─────────────────────────────────────
 
@@ -358,6 +395,8 @@ export function useWalletNavigation({
     closeInlineQr,
     hasAdjustmentDeficit,
     showAdjustmentModal,
+    setShowAdjustmentModal,
+    setWalletInfoOpen,
   ]);
 
   return {
