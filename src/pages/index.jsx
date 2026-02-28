@@ -10,7 +10,6 @@ import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import WalletProductSection from "@/components/home/WalletProductSection";
 import MobileHeroCarousel from "@/components/home/MobileHeroCarousel";
-import { bankButtonClassName } from "@/components/ui/bankButtonClassName";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
 
 export default function Home() {

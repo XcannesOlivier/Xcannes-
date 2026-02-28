@@ -1,4 +1,4 @@
-export const TOKEN_ICONS = {
+const TOKEN_ICONS = {
   XRP: "✕",
   BTC: "₿",
   ETH: "Ξ",
@@ -6,7 +6,7 @@ export const TOKEN_ICONS = {
   USDC: "＄",
 };
 
-export const CURRENCY_FLAG_OVERRIDES = {
+const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
   XAF: "🌍",
   XOF: "🌍",
@@ -88,7 +88,7 @@ export function getDisplayCurrencyCode(code) {
   return upper === "RLUSD" ? "USD" : upper;
 }
 
-export function getCurrencySymbol(code, locale = "en") {
+function getCurrencySymbol(code, locale = "en") {
   const upper = String(code || "").toUpperCase();
   if (!upper) return "";
   try {
@@ -123,7 +123,7 @@ export function formatAmountWithSymbol(
   return symbol ? `${value} ${symbol}` : value;
 }
 
-export function countryCodeToFlag(countryCode) {
+function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
   const codePoints = [...countryCode.toUpperCase()].map(
     (c) => 0x1f1e6 + (c.charCodeAt(0) - 65),
@@ -149,7 +149,7 @@ export function getTokenIcon(currency) {
   return first ? first[0] : "?";
 }
 
-export const WALLET_LAYOUTS = {
+const WALLET_LAYOUTS = {
   full: {
     isFullPage: true,
     tokenListClass: "max-h-none",

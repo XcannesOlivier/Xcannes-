@@ -3,7 +3,6 @@ import HeaderLanguageStrip from "./HeaderLanguageStrip";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { lockBodyScroll } from "@/utils/bodyScrollLock";
 import { useWallet } from "@/context/WalletContext";
 
 export default function Header({ fixed = true }) {

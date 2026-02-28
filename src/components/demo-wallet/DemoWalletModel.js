@@ -595,12 +595,12 @@ export function getWalletAddress(state, walletId) {
   return wallet?.address || "";
 }
 
-export function listWalletCurrencies(wallet) {
+function listWalletCurrencies(wallet) {
   const allocations = wallet?.allocations || {};
   return Object.keys(allocations).map((c) => String(c).toUpperCase());
 }
 
-export function listStateCurrencies(state) {
+function listStateCurrencies(state) {
   const wallets = state?.wallets || {};
   const used = new Set();
   Object.values(wallets).forEach((w) => {
@@ -891,7 +891,7 @@ export function applyDemoEnableCurrency({ state, walletId, currencyCode }) {
   return { ok: true };
 }
 
-export function listWalletEvents(state, walletId) {
+function listWalletEvents(state, walletId) {
   const events = state?.events || [];
   return events.filter((evt) => {
     if (!evt) return false;
@@ -902,7 +902,7 @@ export function listWalletEvents(state, walletId) {
   });
 }
 
-export function listWalletCurrencyEvents(state, walletId, currencyCode) {
+function listWalletCurrencyEvents(state, walletId, currencyCode) {
   const currency = String(currencyCode || "").toUpperCase();
   return listWalletEvents(state, walletId).filter((evt) => {
     if (!evt) return false;

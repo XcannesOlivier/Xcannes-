@@ -25,7 +25,7 @@ export function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
-export function escapeCsvValue(value) {
+function escapeCsvValue(value) {
   if (value == null) return "";
   const raw = String(value);
   if (/[\",\n\r]/.test(raw)) {

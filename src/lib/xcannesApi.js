@@ -248,4 +248,3 @@ class XcannesAPI {
 // Export singleton
 const xcannesApi = new XcannesAPI();
 export default xcannesApi;
-export { XcannesAPI };

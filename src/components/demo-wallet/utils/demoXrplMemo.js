@@ -7,7 +7,6 @@ import {
   XCANNES_MEMO_SCHEMAS,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
-  buildCurrencyLineMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildAllocationAdjustMemo,
@@ -175,52 +174,9 @@ function isXcannesMemo(memo, { allowMissingType = true } = {}) {
   return true;
 }
 
-export function extractXcannesPayReqFromMemos(memos) {
-  const list = Array.isArray(memos) ? memos : [];
-  for (const entry of list) {
-    const memo = entry?.Memo || entry?.memo || null;
-    if (!isXcannesMemo(memo)) continue;
-    const decoded = decodeHexToUtf8Detailed(memo.MemoData);
-    if (!decoded.ok || !decoded.value) {
-      if (decoded.reason === "invalid_hex") {
-        recordMemoMetric("memo_decode_invalid_hex");
-      } else if (decoded.reason === "decode_error") {
-        recordMemoMetric("memo_decode_error");
-      } else {
-        recordMemoMetric("memo_decode_empty");
-      }
-      continue;
-    }
-    const text = decoded.value;
-    const trimmed = text.trim();
-    if (!trimmed.startsWith("{")) {
-      recordMemoMetric("memo_json_invalid");
-      continue;
-    }
-    try {
-      const parsed = JSON.parse(trimmed);
-      if (!parsed) {
-        recordMemoMetric("memo_json_invalid");
-        continue;
-      }
-      const validation = validateXcannesMemoPayload(parsed, { mode: "parse" });
-      if (!validation.ok || validation.type !== "payreq") {
-        recordMemoMetric("memo_schema_invalid");
-        continue;
-      }
-      recordMemoMetric("memo_payreq_extracted");
-      return validation.payload;
-    } catch {
-      recordMemoMetric("memo_json_invalid");
-    }
-  }
-  return null;
-}
-
 export {
   XCANNES_MEMO_SCHEMAS,
   buildWalletLabelMemo,
-  buildCurrencyLineMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildAllocationAdjustMemo,

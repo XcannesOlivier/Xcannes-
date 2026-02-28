@@ -493,4 +493,3 @@ class XcannesWebSocket {
 // Export singleton
 const wsClient = new XcannesWebSocket();
 export default wsClient;
-export { XcannesWebSocket };

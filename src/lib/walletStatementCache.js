@@ -57,7 +57,7 @@ export function listCachedStatementKeys() {
   return Object.keys(cache || {});
 }
 
-export function clearStatementCache() {
+function clearStatementCache() {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.removeItem(STATEMENT_CACHE_KEY);

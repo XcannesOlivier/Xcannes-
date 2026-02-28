@@ -8,7 +8,7 @@ export const XCANNES_SPREAD_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||
   "rGt44i8APV6KMLCCkuaJpY19RVkj2JhnHC";
 
-export const XCANNES_ACTIVATION_WALLET_ADDRESS =
+const XCANNES_ACTIVATION_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim() ||
   XCANNES_SPREAD_WALLET_ADDRESS;
 
@@ -45,14 +45,14 @@ export function computeSpreadQuote({ base, quote, amountRlusd }) {
   };
 }
 
-export function normalizeXrplIouValue(value) {
+function normalizeXrplIouValue(value) {
   const num = Number(value);
   if (!Number.isFinite(num) || num <= 0) return null;
   // Keep up to 8 decimals, trim trailing zeros.
   return num.toFixed(8).replace(/\.?0+$/, "");
 }
 
-export function buildRlusdPaymentTxjson({ account, destination, amountRlusd }) {
+function buildRlusdPaymentTxjson({ account, destination, amountRlusd }) {
   const value = normalizeXrplIouValue(amountRlusd);
   if (!value) return null;
 
