@@ -7,6 +7,7 @@ import { NativeWalletProvider } from "@/context/NativeWalletContext";
 import { PwaEmbeddedProvider } from "@/context/PwaEmbeddedContext";
 import { WalletProviderSwitch } from "@/context/WalletContext";
 import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket centralisé
+import WalletRelayQRModal from "@/components/wallet/WalletRelayQRModal";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -67,6 +68,7 @@ function App({ Component, pageProps }) {
       <PwaEmbeddedProvider>
         <WalletProviderSwitch>
           <XcannesWSProvider>
+            <WalletRelayQRModal />
             <div className="font-sans">
               <div
                 key={router.asPath}
