@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
-import Link from "next/link";
 import SEOHead from "@/components/layout/SEOHead";
 import SupportAssistantWidget from "@/components/layout/SupportAssistantWidget";
 import { useTranslation } from "next-i18next";
