@@ -82,8 +82,8 @@ export function walletFromMnemonic(mnemonic) {
 }
 
 /**
- * Restore a wallet from Xaman/XUMM "secret numbers" format.
- * For users migrating FROM Xumm to Xcannes Wallet.
+ * Restore a wallet from "secret numbers" format (8 groups of 6 digits).
+ * Useful for users migrating from other XRPL wallets.
  *
  * @param {string} secretNumbers - e.g. "123456 234567 345678 456789 567890 678901 789012 890123"
  * @returns {{ address: string, publicKey: string, wallet: object }}

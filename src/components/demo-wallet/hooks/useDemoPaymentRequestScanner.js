@@ -335,10 +335,10 @@ export function useDemoPaymentRequestScanner({
         return;
       }
 
-      // 4) Xumm/Xaman payload links: open directly
-      if (/xumm\.app|xaman|xumm:\/\//i.test(payload)) {
+      // 4) External wallet payload links: open directly
+      if (/xrpl:\/\//i.test(payload)) {
         const ok = confirm(
-          "This looks like a Xumm/Xaman request link. Open it now?",
+          "This looks like an XRPL payment request link. Open it now?",
         );
         if (ok && typeof window !== "undefined") {
           window.location.href = payload;

@@ -1,6 +1,6 @@
 "use client";
 
-import XummConnectButton from "@/components/xumm/XummConnectButton";
+import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
@@ -84,7 +84,7 @@ export default function WalletDashboardHeader({
             {t("nav_sign_out", "Se déconnecter")}
           </button>
         ) : (
-          <XummConnectButton small variant="statement-blue" />
+          <WalletConnectButton small variant="statement-blue" />
         )}
       </div>
 

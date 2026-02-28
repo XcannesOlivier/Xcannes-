@@ -684,8 +684,8 @@ export default function WalletDashboardSendModal({
               )}
               <p className="mt-2 text-[10px] text-white/45">
                 {t(
-                  "ui_xumm_signatures_one_5b2c1a7d9f",
-                  "1 Xumm signature: payment → recipient.",
+                  "ui_signatures_one_5b2c1a7d9f",
+                  "1 signature: payment → recipient.",
                 )}
               </p>
             </div>

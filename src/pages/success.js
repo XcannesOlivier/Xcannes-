@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { getPageTranslations } from "@/i18n/getPageTranslations";
 import { useWallet } from "@/context/WalletContext";
-import XummConnectButton from "@/components/xumm/XummConnectButton";
+import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
 import SEOHead from "@/components/layout/SEOHead";
@@ -100,7 +100,7 @@ export default function SuccessPage() {
                     <p className="text-white/60 text-sm leading-relaxed mb-4">
                       {t("success_wallet_required_text")}
                     </p>
-                    <XummConnectButton />
+                    <WalletConnectButton />
                   </div>
                 </div>
               }
@@ -172,10 +172,8 @@ export default function SuccessPage() {
                       </span>
                     </div>
                   </div>
-                  <a
-                    href="https://xumm.app/detect/xapp:trustset?issuer=rYourIssuerAddress&currency=RLUSD"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href="/wallet"
                     className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-xcannes-green text-black font-semibold rounded-lg hover:bg-xcannes-green/90 transition-all duration-300 shadow-lg shadow-xcannes-green/20">
 
                     <svg
@@ -192,7 +190,7 @@ export default function SuccessPage() {
 
                     </svg>
                     {t("success_trustline_button")}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

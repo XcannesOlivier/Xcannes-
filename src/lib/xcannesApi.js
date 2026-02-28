@@ -9,7 +9,7 @@ import LruCache from "../utils/lruCache";
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 
 const BACKEND_CONFIG = {
-  // Passer par l'API 3001 (qui proxifie /api/v1/* vers Market Data 3003 + XUMM)
+  // Passer par l'API 3001 (qui proxifie /api/v1/* vers Market Data 3003 + Wallet)
   API_URL: getApiBaseUrl(),
 };
 

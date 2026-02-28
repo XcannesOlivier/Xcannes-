@@ -550,20 +550,6 @@ export function useWalletModalProps({
     [handleRlusdSetupConfirm],
   );
 
-  // --- Xumm QR modal props ---
-  const xummQrProps = useMemo(
-    () => ({
-      onClose: closeQrModal,
-      uuid: qrModalData?.uuid,
-      qrUrl: qrModalData?.qrUrl,
-      deepLink: qrModalData?.deepLink,
-      type: qrModalData?.type || "connect",
-      status: qrModalData?.status,
-      enablePolling: false,
-    }),
-    [closeQrModal, qrModalData],
-  );
-
   return {
     sendModalProps,
     payreqModalProps,
@@ -576,7 +562,6 @@ export function useWalletModalProps({
     infoModalProps,
     statementSharedProps,
     rlusdSetupModalProps,
-    xummQrProps,
 
     // open / close handlers needed by both desktop & mobile
     activeAction,

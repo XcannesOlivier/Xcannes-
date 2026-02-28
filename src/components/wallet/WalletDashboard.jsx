@@ -478,7 +478,6 @@ export default function WalletDashboard({
   // ── Desktop inline flags ───────────────────────────────────
   const inlineFlags = useDesktopInlineFlags({
     isDesktopPanel,
-    qrModalData,
     qrScannerOpen: sendState.qrScannerOpen,
     activeAction,
     sendPaymentRequest: sendState.sendPaymentRequest,

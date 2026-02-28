@@ -3,7 +3,7 @@ const { i18n } = require("./next-i18next.config");
 
 const cspReportOnly = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://xumm.app",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https: wss: ws:",
@@ -41,12 +41,8 @@ const nextConfig = {
 
   // ✅ Optimisation des images
   images: {
-    // Autoriser les images distantes utilisées dans l'app (ex: QR Xumm, images de news)
+    // Autoriser les images distantes utilisées dans l'app (ex: images de news)
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'xumm.app',
-      },
       {
         protocol: 'https',
         hostname: '**.wsj.com',

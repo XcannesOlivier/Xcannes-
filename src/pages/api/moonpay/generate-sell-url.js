@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     baseCurrencyCode,
     quoteCurrencyCode,
     baseCurrencyAmount,
-    xummUuid,
+    walletAuthToken,
     options,
   } = req.body;
 
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         baseCurrencyCode,
         quoteCurrencyCode,
         baseCurrencyAmount,
-        xummUuid,
+        xummUuid: walletAuthToken, // legacy param name for moonpay-service compat
         options,
       }),
     });

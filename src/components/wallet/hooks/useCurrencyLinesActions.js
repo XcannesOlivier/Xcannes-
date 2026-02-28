@@ -12,7 +12,7 @@ export function useCurrencyLinesActions({
 }) {
   const handleUpsertCurrencyLine = useCallback(async () => {
     if (!backendWalletAddress) {
-      alert("Please connect your Xumm wallet first.");
+      alert("Please connect your wallet first.");
       return;
     }
 

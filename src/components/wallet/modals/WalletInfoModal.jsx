@@ -178,7 +178,7 @@ export function WalletInfoContent({
             <li>
               {t(
                 "ui_convert_interne_1_signature__c7b5a8e4dd",
-                "Conversion interne: 1 signature Xumm. Paiement entre 2 wallets: 2 signatures si un taux FX s’applique (sinon 1).",
+                "Conversion interne: 1 signature. Paiement entre 2 wallets: 2 signatures si un taux FX s'applique (sinon 1).",
               )}
             </li>
           </ul>

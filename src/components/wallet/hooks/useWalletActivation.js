@@ -5,7 +5,7 @@ import { buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 /**
  * Encapsulates all wallet-activation and trustline-installation logic:
  *
- * - `handleInstallRequiredTrustline`  — signs a TrustSet tx via Xumm
+ * - `handleInstallRequiredTrustline`  — signs a TrustSet tx via the wallet
  * - `handleOpenRlusdSetup`           — opens RLUSD setup modal
  * - `handleRlusdSetupConfirm`        — confirms setup + triggers trustline
  * - `handleOpenActivationModal`      — opens XRP activation modal
@@ -46,7 +46,7 @@ export function useWalletActivation({
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return;
       if (!isConnected || !wallet) {
-        toast.error("Please connect your Xumm wallet first.");
+        toast.error("Please connect your wallet first.");
         return;
       }
 
@@ -57,7 +57,7 @@ export function useWalletActivation({
       }
 
       const ok = await confirm(
-        `Install XRPL trustline for ${code}?\n\nThis will open Xumm to sign a TrustSet transaction.`,
+        `Install XRPL trustline for ${code}?\n\nThis will sign a TrustSet transaction.`,
       );
       if (!ok) return;
 
@@ -90,7 +90,7 @@ export function useWalletActivation({
       try {
         const result = await signTransaction(txjson);
         if (result && result.signed) {
-          toast.success(`✅ Trustline ${code} submitted via Xumm.`);
+          toast.success(`✅ Trustline ${code} submitted.`);
           if (refreshBalance) {
             setTimeout(() => refreshBalance(), 2500);
           }
@@ -190,7 +190,7 @@ export function useWalletActivation({
   const handleActivationSendFromWallet = useCallback(async () => {
     setShowActivationModal(false);
     if (!wallet || !signTransaction) {
-      toast.error("Please connect your Xumm wallet first.");
+      toast.error("Please connect your wallet first.");
       return;
     }
 
