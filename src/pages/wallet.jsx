@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 		import { useTranslation } from "next-i18next";
 		import { getPageTranslations } from "@/i18n/getPageTranslations";
 		import WalletDashboard from "@/components/wallet/WalletDashboard";
+		import WalletConnectScreen from "@/components/wallet/WalletConnectScreen";
 		import SEOHead from "@/components/layout/SEOHead";
 		import { useWallet } from "@/context/WalletContext";
 
@@ -37,14 +38,9 @@ export default function Wallet() {
   }, [isEmbedded]);
 
   // In embedded mode, don't redirect — wait for PWA to provide wallet via postMessage
-  useEffect(() => {
-    if (isEmbedded) return;
-    if (!isSessionReady) return;
-    if (isConnected || isConnecting) return;
-    router.replace("/");
-  }, [isConnected, isConnecting, isSessionReady, router, isEmbedded]);
+  // Non-embedded, non-connected: show WalletConnectScreen (no redirect)
 
-  if (!isSessionReady || !isConnected) {
+  if (!isSessionReady) {
     // In embedded mode, show a loading state while waiting for PWA init
     if (isEmbedded) {
       return (
@@ -54,6 +50,22 @@ export default function Wallet() {
       );
     }
     return null;
+  }
+
+  // Not connected: show wallet-app style connect screen with QR code
+  if (!isConnected && !isEmbedded) {
+    return (
+      <>
+        <SEOHead
+          title={t("wallet_page_title", "Wallet - XCANNES")}
+          description={t(
+            "wallet_page_description",
+            "Manage your XRPL wallet, trustlines, and assets on XCANNES"
+          )}
+        />
+        <WalletConnectScreen />
+      </>
+    );
   }
 
   return (

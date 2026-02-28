@@ -63,15 +63,20 @@ export async function fetchChallenge(challengeId) {
  * @returns {Promise<{ success: boolean }>}
  */
 export async function submitConnect(challengeId, proof) {
+  const body = {
+    challengeId,
+    address: proof.address,
+    publicKey: proof.publicKey,
+    signature: proof.signature,
+  };
+  // Include all wallet addresses for multi-wallet support on desktop
+  if (Array.isArray(proof.addresses) && proof.addresses.length > 0) {
+    body.addresses = proof.addresses;
+  }
   const response = await fetch(`${relayBaseUrl}/wallet-relay/connect`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      challengeId,
-      address: proof.address,
-      publicKey: proof.publicKey,
-      signature: proof.signature,
-    }),
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(15000),
   });
 

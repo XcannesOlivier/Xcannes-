@@ -95,6 +95,10 @@ export const WalletProviderSwitch = ({ children }) => {
     signTransaction: current.signTransaction,
     closeQrModal: current.closeQrModal,
 
+    // --- Multi-wallet ---
+    walletAddresses: current.walletAddresses || [],
+    switchWallet: current.switchWallet || (() => {}),
+
     // --- Provider switching ---
     activeProvider,
     switchProvider,
