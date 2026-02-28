@@ -957,8 +957,18 @@ async function handleUrlAction(action) {
 
     if (action.type === 'connect' && challenge.type === 'connect') {
       await handleConnect(challenge, statusEl);
+      // URL-based connect → redirect back to the site
+      updateStatus(statusEl, 'Redirection vers Xcannes…');
+      await delay(1500);
+      window.location.href = '/wallet';
+      return;
     } else if (action.type === 'sign' && challenge.type === 'sign') {
       await handleSign(challenge, statusEl);
+      // URL-based sign → redirect back to the site
+      updateStatus(statusEl, 'Retour vers Xcannes…');
+      await delay(1500);
+      window.location.href = '/wallet';
+      return;
     } else {
       updateStatus(statusEl, '❌ Type de demande inattendu.', true);
       setTimeout(() => goToHome(), 3000);
