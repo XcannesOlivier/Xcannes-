@@ -187,7 +187,13 @@ export default function Header({ fixed = true }) {
       return;
     }
 
-    connect();
+    // Navigate to /wallet which shows the wallet-app style connect screen
+    if (router.pathname !== "/wallet") {
+      router.push("/wallet");
+    } else {
+      // Already on /wallet page, trigger connect directly
+      connect();
+    }
   }, [connect, disconnect, isConnected, isConnecting, router]);
 
   useEffect(() => {

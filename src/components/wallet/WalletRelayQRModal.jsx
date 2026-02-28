@@ -7,6 +7,9 @@
  * Shows a QR code when the NativeWalletContext sets qrModalData.
  * On the /wallet page the WalletDashboard has its own inline handling,
  * so this modal hides itself to avoid duplicates.
+ *
+ * On mobile, when qrModalData.mobile is true, shows a "Ouvrir votre wallet"
+ * button instead of a QR code — the wallet-app handles biometric/PIN auth.
  */
 
 import { useEffect, useState, useCallback } from "react";
@@ -53,7 +56,19 @@ export default function WalletRelayQRModal() {
     return () => window.removeEventListener("keydown", handler);
   }, [qrModalData?.visible, handleClose]);
 
+  // On mobile, auto-redirect to wallet-app for signing
+  useEffect(() => {
+    if (!qrModalData?.visible || !qrModalData?.mobile || !qrModalData?.walletAppUrl) return;
+    // Short delay then redirect to wallet-app
+    const timer = setTimeout(() => {
+      window.location.href = qrModalData.walletAppUrl;
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [qrModalData?.visible, qrModalData?.mobile, qrModalData?.walletAppUrl]);
+
   if (!qrModalData?.visible || isWalletPage) return null;
+
+  const isMobile = qrModalData.mobile;
 
   const qrValue =
     typeof qrModalData.qrData === "string"
@@ -92,39 +107,61 @@ export default function WalletRelayQRModal() {
           {isConnect ? "Connecter votre wallet" : "Signer la transaction"}
         </h3>
         <p className="text-sm text-white/60 mb-6">
-          {isConnect
-            ? "Scannez ce QR code avec votre wallet Xcannes."
-            : "Confirmez la transaction dans votre wallet."}
+          {isMobile
+            ? "Confirmez dans votre wallet Xcannes avec Face ID, Touch ID ou votre code PIN."
+            : isConnect
+              ? "Scannez ce QR code avec votre wallet Xcannes."
+              : "Confirmez la transaction dans votre wallet."}
         </p>
 
-        {/* QR Code */}
+        {/* QR Code / Mobile redirect */}
         <div className="flex justify-center mb-6">
-          <div className="bg-white rounded-xl p-4">
-            {isSigned ? (
-              <div className="w-[200px] h-[200px] flex items-center justify-center">
-                <svg
-                  className="w-16 h-16 text-green-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
+          {isSigned ? (
+            <div className="w-[200px] h-[200px] flex items-center justify-center">
+              <svg
+                className="w-16 h-16 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+          ) : isMobile ? (
+            <div className="flex flex-col items-center gap-4 py-4">
+              {/* Mobile: show redirect message and manual button */}
+              <div className="w-16 h-16 rounded-full bg-xcannes-green/10 border border-xcannes-green/20 flex items-center justify-center">
+                <svg className="w-8 h-8 text-xcannes-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-            ) : (
+              <p className="text-xs text-white/50 text-center">
+                Redirection vers votre wallet…
+              </p>
+              {qrModalData.walletAppUrl && (
+                <a
+                  href={qrModalData.walletAppUrl}
+                  className="px-5 py-2.5 bg-xcannes-green/80 hover:bg-xcannes-green text-white text-sm font-medium rounded-xl transition-colors"
+                >
+                  Ouvrir Xcannes Wallet
+                </a>
+              )}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl p-4">
               <QRCodeCanvas
                 value={qrValue}
                 size={200}
                 level="M"
                 includeMargin={false}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Status */}
@@ -140,7 +177,7 @@ export default function WalletRelayQRModal() {
           ) : (
             <div className="flex items-center justify-center gap-2 text-sm text-white/50">
               <span className="inline-block w-2 h-2 bg-white/40 rounded-full animate-pulse" />
-              En attente…
+              En attente de confirmation…
             </div>
           )}
         </div>

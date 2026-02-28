@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
@@ -29,8 +30,26 @@ export default function WalletDashboardHeader({
   hideStatementCtaOnDesktop = false,
   showMobileHomeLink = false,
   hideWalletAddress = false,
+  walletAddresses = [],
+  onSwitchWallet,
 }) {
   const { t } = useTranslation("common");
+  const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+  const switcherRef = useRef(null);
+  const hasMultipleWallets = walletAddresses.length > 1;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!isSwitcherOpen) return;
+    const handleClickOutside = (e) => {
+      if (switcherRef.current && !switcherRef.current.contains(e.target)) {
+        setIsSwitcherOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isSwitcherOpen]);
+
   return (
     <div
       className={`panel-header ${layout.headerClass} flex flex-col shrink-0`}
@@ -315,6 +334,96 @@ export default function WalletDashboardHeader({
                 </svg>
               </button>
             </div>
+
+            {/* ── Multi-wallet switcher ── */}
+            {hasMultipleWallets && (
+              <div className="relative w-full max-w-[460px] mt-1" ref={switcherRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsSwitcherOpen((v) => !v)}
+                  className="w-full flex items-center justify-between gap-2 px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/15 transition-colors"
+                >
+                  <span className="text-[10px] text-white/50">
+                    {t("ui_switch_wallet_label", "Changer de wallet")}
+                    {" · "}
+                    <span className="text-white/70 font-medium">
+                      {walletAddresses.length}
+                    </span>
+                    {" "}
+                    {t("ui_wallets_count", "adresses")}
+                  </span>
+                  <svg
+                    className={`w-3 h-3 text-white/40 transition-transform ${
+                      isSwitcherOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {isSwitcherOpen && (
+                  <div className="absolute z-50 left-0 right-0 mt-1 rounded-lg bg-[#151b1e] border border-white/10 shadow-xl max-h-52 overflow-y-auto">
+                    {walletAddresses.map((w) => {
+                      const addr = typeof w === "string" ? w : w.address;
+                      const label = typeof w === "string" ? null : w.label;
+                      const isActive = addr === wallet;
+                      return (
+                        <button
+                          key={addr}
+                          type="button"
+                          onClick={() => {
+                            if (!isActive) onSwitchWallet?.(addr);
+                            setIsSwitcherOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 flex items-center gap-2 transition-colors ${
+                            isActive
+                              ? "bg-xcannes-green/10 border-l-2 border-xcannes-green"
+                              : "hover:bg-white/5 border-l-2 border-transparent"
+                          }`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                              isActive ? "bg-xcannes-green" : "bg-white/20"
+                            }`}
+                          />
+                          <div className="min-w-0">
+                            {label && (
+                              <div
+                                className={`text-[11px] font-medium truncate ${
+                                  isActive ? "text-xcannes-green" : "text-white/75"
+                                }`}
+                              >
+                                {label}
+                              </div>
+                            )}
+                            <div
+                              className={`font-mono text-[10px] truncate ${
+                                isActive ? "text-xcannes-green/70" : "text-white/40"
+                              }`}
+                            >
+                              {addr.slice(0, 10)}…{addr.slice(-8)}
+                            </div>
+                          </div>
+                          {isActive && (
+                            <span className="ml-auto text-[9px] text-xcannes-green/80 font-medium uppercase tracking-wider">
+                              {t("ui_active_wallet", "actif")}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

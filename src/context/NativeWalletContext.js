@@ -52,6 +52,7 @@ export const NativeWalletProvider = ({ children }) => {
   const [balance, setBalance] = useState(null);
   const [isWalletActivated, setIsWalletActivated] = useState(null);
   const [qrModalData, setQrModalData] = useState(null);
+  const [walletAddresses, setWalletAddresses] = useState([]); // Multi-wallet list
   const pollIntervalRef = useRef(null);
   const autoCloseTimeoutRef = useRef(null);
   const pendingSignatureResolveRef = useRef(null);
@@ -198,7 +199,7 @@ export const NativeWalletProvider = ({ children }) => {
 
   // --- Wallet state ---
   const updateWallet = useCallback(
-    (account) => {
+    (account, addresses) => {
       if (account) {
         setWallet(account);
         setIsConnected(true);
@@ -206,12 +207,24 @@ export const NativeWalletProvider = ({ children }) => {
         sessionStorage.setItem(NATIVE_WALLET_STORAGE_KEY, account);
         fetchBalance(account);
         warmFullReplay(account);
+        // Store multi-wallet list if provided
+        if (Array.isArray(addresses) && addresses.length > 0) {
+          setWalletAddresses(addresses);
+          try {
+            sessionStorage.setItem(
+              NATIVE_WALLET_STORAGE_KEY + "_addresses",
+              JSON.stringify(addresses)
+            );
+          } catch { /* ignore */ }
+        }
       } else {
         setWallet("");
         setIsConnected(false);
         setBalance(null);
         setIsWalletActivated(null);
+        setWalletAddresses([]);
         sessionStorage.removeItem(NATIVE_WALLET_STORAGE_KEY);
+        sessionStorage.removeItem(NATIVE_WALLET_STORAGE_KEY + "_addresses");
       }
     },
     [fetchBalance, warmFullReplay]
@@ -267,7 +280,13 @@ export const NativeWalletProvider = ({ children }) => {
         ? sessionStorage.getItem(NATIVE_WALLET_STORAGE_KEY)
         : null;
     if (savedWallet) {
-      updateWallet(savedWallet);
+      // Restore addresses list from session
+      let savedAddresses = [];
+      try {
+        const raw = sessionStorage.getItem(NATIVE_WALLET_STORAGE_KEY + "_addresses");
+        if (raw) savedAddresses = JSON.parse(raw);
+      } catch { /* ignore */ }
+      updateWallet(savedWallet, savedAddresses);
     }
     setIsSessionReady(true);
   }, [updateWallet]);
@@ -318,6 +337,8 @@ export const NativeWalletProvider = ({ children }) => {
       return null;
     }
 
+    const mobile = isMobileDevice();
+
     setIsConnecting(true);
     try {
       const payload = {
@@ -340,17 +361,34 @@ export const NativeWalletProvider = ({ children }) => {
       clearPolling();
       clearAutoClose();
 
-      setQrModalData({
-        uuid: challengeId,
-        qrUrl: null,
-        qrData: qrData,
-        deepLink: null,
-        type: "sign",
-        status: "waiting",
-        visible: true,
-      });
+      if (mobile) {
+        // Mobile: redirect to wallet-app for biometric/PIN sign
+        setQrModalData({
+          uuid: challengeId,
+          qrUrl: null,
+          qrData: qrData,
+          deepLink: null,
+          type: "sign",
+          status: "waiting",
+          visible: true,
+          mobile: true, // Flag for mobile-aware QR modal
+          walletAppUrl: `/wallet-app/?sign=${challengeId}`,
+        });
+      } else {
+        // Desktop: show QR code for mobile to scan
+        setQrModalData({
+          uuid: challengeId,
+          qrUrl: null,
+          qrData: qrData,
+          deepLink: null,
+          type: "sign",
+          status: "waiting",
+          visible: true,
+          mobile: false,
+        });
+      }
 
-      // Wait for signature result
+      // Wait for signature result (polling works for both desktop and mobile)
       return await new Promise((resolve) => {
         resolvePendingSignature(null);
         pendingSignatureResolveRef.current = resolve;
@@ -394,7 +432,7 @@ export const NativeWalletProvider = ({ children }) => {
             scheduleQrClose(2000);
 
             if (mode === "connect" && data.result?.address) {
-              updateWallet(data.result.address);
+              updateWallet(data.result.address, data.result.addresses);
             } else if (mode === "sign") {
               resolvePendingSignature({
                 signed: true,
@@ -426,6 +464,24 @@ export const NativeWalletProvider = ({ children }) => {
     if (wallet) fetchBalance(wallet);
   };
 
+  // --- Switch active wallet (multi-wallet) ---
+  const switchWallet = useCallback(
+    (address) => {
+      if (!address) return;
+      // Verify the address is in our walletAddresses list
+      const found = walletAddresses.find((w) => w.address === address);
+      if (!found && address !== wallet) return;
+      // Switch: update active wallet but keep the addresses list
+      setWallet(address);
+      setIsWalletActivated(null);
+      setBalance(null);
+      sessionStorage.setItem(NATIVE_WALLET_STORAGE_KEY, address);
+      fetchBalance(address);
+      warmFullReplay(address);
+    },
+    [fetchBalance, warmFullReplay, wallet, walletAddresses]
+  );
+
   const disconnect = useCallback(async () => {
     updateWallet(null);
   }, [updateWallet]);
@@ -440,11 +496,13 @@ export const NativeWalletProvider = ({ children }) => {
         balance,
         isWalletActivated,
         qrModalData,
+        walletAddresses,
         connect,
         disconnect,
         refreshBalance,
         signTransaction,
         closeQrModal,
+        switchWallet,
       }}
     >
       {children}

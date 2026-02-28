@@ -93,6 +93,8 @@ export default function WalletDashboard({
     disconnect,
     signTransaction,
     closeQrModal,
+    walletAddresses,
+    switchWallet,
   } = useWallet();
 
   const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } =
@@ -633,6 +635,8 @@ export default function WalletDashboard({
             onSaveWalletLabel={handleSaveWalletLabel}
             onCancelWalletLabel={handleCancelWalletLabel}
             showMobileHomeLink={showMobileHomeLink}
+            walletAddresses={walletAddresses}
+            onSwitchWallet={switchWallet}
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}

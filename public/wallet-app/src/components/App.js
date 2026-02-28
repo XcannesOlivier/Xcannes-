@@ -92,6 +92,19 @@ document.addEventListener('visibilitychange', async () => {
   document.addEventListener(evt, resetInactivityTimer, { passive: true });
 });
 
+// --- Notify parent iframe if running embedded (for site onboarding) ---
+function notifyParentWalletCreated(address, publicKey) {
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'WALLET_CREATED',
+        address: address || '',
+        publicKey: publicKey || '',
+      }, '*');
+    }
+  } catch { /* cross-origin safety */ }
+}
+
 // --- Config ---
 const RELAY_URL = window.__XCANNES_RELAY_URL__ || (() => {
   if (typeof window === 'undefined') return '';
@@ -529,6 +542,9 @@ function setupBackupVerifyScreen(words) {
       pendingMnemonic = null;
       pendingWalletData = null;
 
+      // Notify parent if embedded in an iframe (site onboarding flow)
+      notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
+
       showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
       await delay(2500);
       await goToHome();
@@ -712,6 +728,9 @@ async function handleImport(statusEl) {
     isUnlocked = true;
     await touchWallet(currentWallet.address);
 
+    // Notify parent if embedded in an iframe (site onboarding flow)
+    notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
+
     showSuccess('Wallet importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
     await delay(2500);
     await goToHome();
@@ -890,13 +909,65 @@ async function goToHome() {
     }
   }
 
+  // Check for URL-based auto-sign or auto-connect (mobile redirect from desktop site)
+  const pendingAction = consumePendingUrlAction();
+  if (pendingAction && currentWallet) {
+    await handleUrlAction(pendingAction);
+    return;
+  }
+
   showScreen('wallet-embedded');
   setupWalletEmbedded();
   resetInactivityTimer();
 }
 
 /**
- * Setup the embedded wallet dashboard iframe and postMessage bridge.
+ * Check for ?sign=CHALLENGE_ID or ?connect=CHALLENGE_ID in the URL.
+ * These are used when the mobile site redirects to wallet-app for signing.
+ * Returns the action and cleans the URL.
+ */
+function consumePendingUrlAction() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const signId = params.get('sign');
+    const connectId = params.get('connect');
+    if (signId || connectId) {
+      // Clean URL to prevent re-processing on refresh
+      const url = new URL(window.location.href);
+      url.searchParams.delete('sign');
+      url.searchParams.delete('connect');
+      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+      if (signId) return { type: 'sign', challengeId: signId };
+      if (connectId) return { type: 'connect', challengeId: connectId };
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+/**
+ * Handle a URL-triggered sign or connect action.
+ * Fetches the challenge from the relay, prompts biometric/PIN, then processes.
+ */
+async function handleUrlAction(action) {
+  showScreen('scanner');
+  const statusEl = document.getElementById('scanner-status');
+  try {
+    updateStatus(statusEl, 'Récupération de la demande…');
+    const challenge = await fetchChallenge(action.challengeId);
+
+    if (action.type === 'connect' && challenge.type === 'connect') {
+      await handleConnect(challenge, statusEl);
+    } else if (action.type === 'sign' && challenge.type === 'sign') {
+      await handleSign(challenge, statusEl);
+    } else {
+      updateStatus(statusEl, '❌ Type de demande inattendu.', true);
+      setTimeout(() => goToHome(), 3000);
+    }
+  } catch (err) {
+    updateStatus(statusEl, `❌ ${err.message}`, true);
+    setTimeout(() => goToHome(), 3000);
+  }
+}
  * The iframe loads the full WalletDashboard from /wallet?embedded=pwa.
  * Communication:
  *   iframe → PWA: READY, SIGN_TX, DISCONNECT, OPEN_SCANNER
@@ -1004,24 +1075,21 @@ async function handleSignFromIframe(data) {
   }
 
   try {
-    // Require biometric or PIN confirmation for every signature
-    const authConfig = await getAuthConfig();
-    if (authConfig?.credentialId) {
-      try {
-        await promptBiometric(authConfig.credentialId);
-      } catch {
-        sendToIframe({ type: 'SIGN_ERROR', error: 'auth_cancelled', requestId });
-        return;
-      }
-    } else {
-      // PIN fallback — for now, use confirm() as a minimal safeguard
-      // A proper inline PIN prompt can be added later
-      const confirmed = confirm(`Confirmer la signature : ${action || txjson?.TransactionType || 'Transaction'} ?`);
-      if (!confirmed) {
-        sendToIframe({ type: 'SIGN_ERROR', error: 'user_cancelled', requestId });
-        return;
-      }
+    // Require Face ID / Touch ID or PIN confirmation for every signature
+    const label = action || txjson?.TransactionType || 'Transaction';
+    const confirmed = await confirmWithAuth(
+      'Confirmer la signature',
+      label
+    );
+    if (!confirmed) {
+      sendToIframe({ type: 'SIGN_ERROR', error: 'auth_cancelled', requestId });
+      // Return to embedded view
+      showScreen('wallet-embedded');
+      return;
     }
+
+    // Return to embedded view immediately
+    showScreen('wallet-embedded');
 
     // Sign locally — seed is in memory, never sent to iframe
     const { tx_blob, hash } = signTransaction(currentWallet.wallet, txjson);
@@ -1034,6 +1102,7 @@ async function handleSignFromIframe(data) {
     });
   } catch (err) {
     console.error('[handleSignFromIframe] Error:', err);
+    showScreen('wallet-embedded');
     sendToIframe({ type: 'SIGN_ERROR', error: err.message, requestId });
   }
 }
@@ -1653,6 +1722,16 @@ async function handleQRScanned(rawQR, statusEl) {
 async function handleConnect(challenge, statusEl) {
   updateStatus(statusEl, 'Connexion en cours…');
 
+  // Gather all wallet addresses for multi-wallet support on desktop
+  let allAddresses = [];
+  try {
+    const wallets = await getAllWallets();
+    allAddresses = wallets.map(w => ({
+      address: w.address,
+      label: w.label || null,
+    }));
+  } catch { /* best-effort */ }
+
   const challengeHex = challenge.challenge || challenge.challengeId;
   const { signature } = signChallenge(currentWallet.wallet, challengeHex);
 
@@ -1660,6 +1739,7 @@ async function handleConnect(challenge, statusEl) {
     address: currentWallet.address,
     publicKey: currentWallet.publicKey,
     signature,
+    addresses: allAddresses,
   });
 
   showSuccess('Connecté !', `Wallet ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
@@ -1677,27 +1757,20 @@ async function handleSign(challenge, statusEl) {
   const detailsEl = document.getElementById('scanner-tx-details');
   if (detailsEl) { detailsEl.textContent = txDetails; detailsEl.classList.remove('hidden'); }
 
-  // Require confirmation
-  const authConfig = await getAuthConfig();
-  if (authConfig?.credentialId) {
-    updateStatus(statusEl, 'Confirmez avec Face ID / Touch ID…');
-    try {
-      await promptBiometric(authConfig.credentialId);
-    } catch {
-      updateStatus(statusEl, 'Signature annulée.', true);
-      if (detailsEl) detailsEl.classList.add('hidden');
-      setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 2000);
-      return;
-    }
-  } else {
-    const confirmed = confirm('Confirmer la signature de cette transaction ?');
-    if (!confirmed) {
-      updateStatus(statusEl, 'Signature annulée.', true);
-      if (detailsEl) detailsEl.classList.add('hidden');
-      setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 2000);
-      return;
-    }
+  // Require Face ID / Touch ID or PIN confirmation
+  const confirmed = await confirmWithAuth(
+    'Confirmer la signature',
+    challenge.action || challenge.txjson?.TransactionType || 'Transaction'
+  );
+  if (!confirmed) {
+    updateStatus(statusEl, 'Signature annulée.', true);
+    if (detailsEl) detailsEl.classList.add('hidden');
+    setTimeout(() => { updateStatus(statusEl, 'Scannez le QR code affiché sur votre écran'); qrScanner?.start(); }, 2000);
+    return;
   }
+
+  // Return to scanner screen to show progress
+  showScreen('scanner');
 
   updateStatus(statusEl, 'Signature en cours…');
   const { tx_blob, hash } = signTransaction(currentWallet.wallet, challenge.txjson);
