@@ -1,4 +1,4 @@
-export const TOKEN_ICONS = {
+const TOKEN_ICONS = {
   XRP: "✕",
   BTC: "₿",
   ETH: "Ξ",
@@ -6,7 +6,7 @@ export const TOKEN_ICONS = {
   USDC: "＄",
 };
 
-export const CURRENCY_FLAG_OVERRIDES = {
+const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
   XAF: "🌍",
   XOF: "🌍",
@@ -115,7 +115,7 @@ export function formatAmountWithSymbol(
   return symbol ? `${value} ${symbol}` : value;
 }
 
-export function countryCodeToFlag(countryCode) {
+function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
   const codePoints = [...countryCode.toUpperCase()].map(
     (c) => 0x1f1e6 + (c.charCodeAt(0) - 65),
@@ -123,7 +123,7 @@ export function countryCodeToFlag(countryCode) {
   return String.fromCodePoint(...codePoints);
 }
 
-export function getCurrencyFlag(code) {
+function getCurrencyFlag(code) {
   if (!code) return "🏳️";
   const upper = String(code).toUpperCase();
   if (CURRENCY_FLAG_OVERRIDES[upper]) {
@@ -133,7 +133,7 @@ export function getCurrencyFlag(code) {
   return countryCodeToFlag(countryGuess);
 }
 
-export function getTokenIcon(currency) {
+function getTokenIcon(currency) {
   const code = String(currency || "").toUpperCase();
   if (code === "RLUSD" || code === "USD") return getCurrencyFlag("USD");
   if (TOKEN_ICONS[code]) return TOKEN_ICONS[code];
@@ -141,7 +141,7 @@ export function getTokenIcon(currency) {
   return first ? first[0] : "?";
 }
 
-export const WALLET_LAYOUTS = {
+const WALLET_LAYOUTS = {
   full: {
     isFullPage: true,
     tokenListClass: "max-h-none",
@@ -189,7 +189,7 @@ export const WALLET_LAYOUTS = {
   },
 };
 
-export function resolveWalletLayout(variant, isFullPage) {
+function resolveWalletLayout(variant, isFullPage) {
   if (variant && WALLET_LAYOUTS[variant]) {
     return WALLET_LAYOUTS[variant];
   }

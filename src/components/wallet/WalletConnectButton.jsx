@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
 

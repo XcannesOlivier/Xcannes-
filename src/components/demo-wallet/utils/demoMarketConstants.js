@@ -3,7 +3,7 @@
  */
 
 // Paires populaires par défaut (les plus échangées)
-export const POPULAR_PAIRS = [
+const POPULAR_PAIRS = [
   { base: "EUR", quote: "USD" },
   { base: "GBP", quote: "USD" },
   { base: "USD", quote: "JPY" },
@@ -27,7 +27,7 @@ export const POPULAR_PAIRS = [
 ];
 
 // Drapeaux pour les devises
-export const CURRENCY_FLAGS = {
+const CURRENCY_FLAGS = {
   EUR: "🇪🇺",
   GBP: "🇬🇧",
   USD: "🇺🇸",
