@@ -9,7 +9,7 @@
  * This ensures the user always gets the latest code on next load.
  */
 
-const CACHE_NAME = 'xcannes-wallet-v12';
+const CACHE_NAME = 'xcannes-wallet-v13';
 // Paths relative to SW scope (/wallet-app/)
 const ASSETS_TO_CACHE = [
   './',

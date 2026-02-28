@@ -968,6 +968,8 @@ async function handleUrlAction(action) {
     setTimeout(() => goToHome(), 3000);
   }
 }
+
+/**
  * The iframe loads the full WalletDashboard from /wallet?embedded=pwa.
  * Communication:
  *   iframe → PWA: READY, SIGN_TX, DISCONNECT, OPEN_SCANNER
