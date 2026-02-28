@@ -46,7 +46,3 @@ archives/
 tmp/
 temp/
 .cache/
-
-# Generated docs (do not commit)
-docs/UNUSED_FILES_REPORT.md
-docs/dev/UNUSED_FILES_REPORT.md
