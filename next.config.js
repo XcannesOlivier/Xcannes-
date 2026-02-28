@@ -124,6 +124,11 @@ const nextConfig = {
   async rewrites() {
     const apiUrl = (process.env.NEXT_PUBLIC_XCANNES_API_URL || 'http://149.28.238.173:3001').replace(/\/$/, '');
     return [
+      // Wallet-app PWA: serve index.html for directory-style URLs
+      {
+        source: '/wallet-app',
+        destination: '/wallet-app/index.html',
+      },
       {
         source: '/wallet-relay/:path*',
         destination: `${apiUrl}/wallet-relay/:path*`,
