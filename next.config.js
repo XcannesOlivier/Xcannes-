@@ -41,72 +41,8 @@ const nextConfig = {
 
   // ✅ Optimisation des images
   images: {
-    // Autoriser les images distantes utilisées dans l'app (ex: images de news)
+    // Autoriser toutes les images HTTPS distantes (news, logos, etc.)
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.wsj.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.wsj.net',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.nytimes.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.ft.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.ftimg.net',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.reuters.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.bloomberg.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.cnbc.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.bbc.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.bbc.co.uk',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.theguardian.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.telegraph.co.uk',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.economist.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.lemonde.fr',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.lesechos.fr',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.lefigaro.fr',
-      },
       {
         protocol: 'https',
         hostname: '**',

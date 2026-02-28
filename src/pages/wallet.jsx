@@ -24,7 +24,7 @@ function useIsEmbedded() {
 export default function Wallet() {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const { isConnected, isConnecting, isSessionReady } = useWallet();
+  const { isConnected, isSessionReady } = useWallet();
   const isEmbedded = useIsEmbedded();
 
   useEffect(() => {

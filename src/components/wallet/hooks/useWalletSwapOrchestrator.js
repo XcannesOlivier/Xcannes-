@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useConvertForm } from "./useConvertForm";
 import { useSwapConversion } from "./useSwapConversion";
 import xcannesApi from "@/lib/xcannesApi";
 
@@ -30,21 +29,11 @@ export function useWalletSwapOrchestrator({
   const [cashModalTab, setCashModalTab] = useState("buy");
 
   // ── Convert form ───────────────────────────────────────────
-  const {
-    convertBaseCurrency,
-    setConvertBaseCurrency,
-    convertQuoteCurrency,
-    setConvertQuoteCurrency,
-    convertAmount,
-    setConvertAmount,
-    convertPreview,
-    setConvertPreview,
-    convertProcessing,
-    setConvertProcessing,
-  } = useConvertForm({
-    defaultBaseCurrency: "USD",
-    defaultQuoteCurrency: "EUR",
-  });
+  const [convertBaseCurrency, setConvertBaseCurrency] = useState("USD");
+  const [convertQuoteCurrency, setConvertQuoteCurrency] = useState("EUR");
+  const [convertAmount, setConvertAmount] = useState("");
+  const [convertPreview, setConvertPreview] = useState("");
+  const [convertProcessing, setConvertProcessing] = useState(false);
 
   // Guard: prevent XRP/RLUSD in convert selectors.
   useEffect(() => {

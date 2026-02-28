@@ -4,8 +4,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSendForm } from "./useSendForm";
 import { useSavedAddresses } from "./useSavedAddresses";
 import { usePayreqStorage } from "./usePayreqStorage";
-import { useReceiveForm } from "./useReceiveForm";
-import { usePaymentRequestForm } from "./usePaymentRequestForm";
 import { usePaymentRequestScanner } from "./usePaymentRequestScanner";
 import { useSendTransaction } from "./useSendTransaction";
 
@@ -60,17 +58,12 @@ export function useWalletSendOrchestrator({
   const [addressLabel, setAddressLabel] = useState("");
 
   // ── Receive form ───────────────────────────────────────────
-  const { receiveTab, setReceiveTab } = useReceiveForm();
+  const [receiveTab, setReceiveTab] = useState("receive");
 
   // ── Payment-request creation form ──────────────────────────
-  const {
-    requestAmount,
-    setRequestAmount,
-    requestCurrency,
-    setRequestCurrency,
-    requestMemo,
-    setRequestMemo,
-  } = usePaymentRequestForm();
+  const [requestAmount, setRequestAmount] = useState("");
+  const [requestCurrency, setRequestCurrency] = useState("RLUSD");
+  const [requestMemo, setRequestMemo] = useState("");
 
   // Guard: prevent XRP/RLUSD as payment-request currency.
   useEffect(() => {
