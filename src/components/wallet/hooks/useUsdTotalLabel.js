@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import xcannesApi from "@/lib/xcannesApi";
 
 export function useUsdTotalLabel({
   augmentedTokens,
@@ -45,7 +46,7 @@ export function useUsdTotalLabel({
       return Number.isFinite(price) && price > 0 ? price : NaN;
     };
 
-    const resolveUsdRate = async (code, pythPairsMap) => {
+    const resolveUsdRate = async (code, pythPairsMap, fawazSet) => {
       const upper = String(code || "").toUpperCase();
       if (!upper) return NaN;
       if (upper === "USD" || upper === "RLUSD") return 1;
@@ -85,6 +86,9 @@ export function useUsdTotalLabel({
         console.warn("USD rate Pyth error:", err);
       }
 
+      // Skip Fawaz si la devise n'est pas dans la liste supportée
+      if (!fawazSet || !fawazSet.has(upper)) return NaN;
+
       try {
         const fxResult = await getFxEod?.("USD", upper, 30);
         const candles = Array.isArray(fxResult?.candles)
@@ -115,7 +119,10 @@ export function useUsdTotalLabel({
       }
 
       try {
-        const markets = await getAllMarkets?.();
+        const [markets, fxCurrencies] = await Promise.all([
+          getAllMarkets?.(),
+          getFxEod ? xcannesApi.getFxCurrencies() : Promise.resolve([]),
+        ]);
         const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
         const pythPairsMap = new Map();
         pythPairs.forEach((pair) => {
@@ -125,12 +132,17 @@ export function useUsdTotalLabel({
           ).toUpperCase()}`;
           pythPairsMap.set(key, pair);
         });
+        const fawazSet = new Set(
+          (Array.isArray(fxCurrencies) ? fxCurrencies : [])
+            .map((c) => String(c?.code || c || "").toUpperCase())
+            .filter(Boolean),
+        );
 
         const codes = rateCodesKey.split("|").filter(Boolean);
         const rates = {};
         await Promise.all(
           codes.map(async (code) => {
-            rates[code] = await resolveUsdRate(code, pythPairsMap);
+            rates[code] = await resolveUsdRate(code, pythPairsMap, fawazSet);
           }),
         );
 

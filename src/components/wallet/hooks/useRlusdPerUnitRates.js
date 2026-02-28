@@ -14,7 +14,7 @@ function extractTickerPrice(ticker) {
   return Number.isFinite(price) && price > 0 ? price : Number.NaN;
 }
 
-async function resolveUsdPerUnit(code, pythPairsMap) {
+async function resolveUsdPerUnit(code, pythPairsMap, fawazSet) {
   const upper = String(code || "").toUpperCase();
   if (!upper) return { rate: Number.NaN, source: null };
   if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "PYTH" };
@@ -39,6 +39,11 @@ async function resolveUsdPerUnit(code, pythPairsMap) {
     }
   } catch (_err) {
     // fallback below
+  }
+
+  // Skip Fawaz si la devise n'est pas dans la liste supportée
+  if (!fawazSet || !fawazSet.has(upper)) {
+    return { rate: Number.NaN, source: null };
   }
 
   try {
@@ -86,7 +91,10 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
 
       setLoading(true);
       try {
-        const markets = await xcannesApi.getAllMarkets();
+        const [markets, fxCurrencies] = await Promise.all([
+          xcannesApi.getAllMarkets(),
+          xcannesApi.getFxCurrencies(),
+        ]);
         const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
         const pythPairsMap = new Map();
         pythPairs.forEach((pair) => {
@@ -95,6 +103,11 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
           if (!base || !quote) return;
           pythPairsMap.set(`${base}_${quote}`, pair);
         });
+        const fawazSet = new Set(
+          (Array.isArray(fxCurrencies) ? fxCurrencies : [])
+            .map((c) => String(c?.code || c || "").toUpperCase())
+            .filter(Boolean),
+        );
 
         const codes = codesKey.split("|").filter(Boolean);
         const next = {};
@@ -102,7 +115,7 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
 
         await Promise.all(
           codes.map(async (code) => {
-            const resolved = await resolveUsdPerUnit(code, pythPairsMap);
+            const resolved = await resolveUsdPerUnit(code, pythPairsMap, fawazSet);
             next[code] = resolved?.rate;
             nextSources[code] = resolved?.source || null;
           }),

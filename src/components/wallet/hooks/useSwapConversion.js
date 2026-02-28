@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
+import xcannesApi from "@/lib/xcannesApi";
 import { buildXrplJsonMemo, buildConversionMemo } from "@/utils/xrplMemo";
 import {
   buildRlusdPaymentTxjson,
@@ -146,6 +147,22 @@ export function useSwapConversion({
           console.warn("getRlusdPerUnit Pyth error:", error);
         }
       }
+
+      // Skip Fawaz si la devise n'est pas supportée
+      let fawazSupported = false;
+      try {
+        const fxCurrencies = await xcannesApi.getFxCurrencies();
+        const fawazSet = new Set(
+          (Array.isArray(fxCurrencies) ? fxCurrencies : [])
+            .map((c) => String(c?.code || c || "").toUpperCase())
+            .filter(Boolean),
+        );
+        fawazSupported = fawazSet.has(code);
+      } catch (_err) {
+        // ignore
+      }
+
+      if (!fawazSupported) return 1;
 
       try {
         const baseForFx = "USD";
