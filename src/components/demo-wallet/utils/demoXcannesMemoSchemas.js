@@ -607,10 +607,6 @@ function buildWalletLabelMemo(data) {
   return createXcannesMemoPayload("wallet_label", data);
 }
 
-function buildCurrencyLineMemo(data) {
-  return createXcannesMemoPayload("currency_line", data);
-}
-
 function buildConversionMemo(data) {
   return createXcannesMemoPayload("conversion", data);
 }
@@ -633,7 +629,6 @@ export {
   XCANNES_MEMO_SCHEMAS,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
-  buildCurrencyLineMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildAllocationAdjustMemo,
