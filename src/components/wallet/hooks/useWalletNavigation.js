@@ -67,7 +67,7 @@ export function useWalletNavigation({
       if (currencyCode === "RLUSD" || currencyCode === "XRP") return false;
 
       if (!backendWalletAddress) {
-        toast.error("Please connect your Xumm wallet first.");
+        toast.error("Please connect your wallet first.");
         return false;
       }
 

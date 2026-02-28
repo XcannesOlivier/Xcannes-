@@ -124,7 +124,7 @@ export function useSendTransaction({
     };
 
     if (!isConnected || !wallet) {
-      toast.error("Please connect your Xumm wallet first.");
+      toast.error("Please connect your wallet first.");
       return { ok: false };
     }
     if (!selectedSendToken) {
@@ -202,7 +202,7 @@ export function useSendTransaction({
     handleAddressSave,
   }) {
     if (!backendWalletAddress) {
-      toast.error("Please connect your Xumm wallet first.");
+      toast.error("Please connect your wallet first.");
       return { ok: false };
     }
     if (!hasOnChainRlusd) {
@@ -253,7 +253,7 @@ export function useSendTransaction({
       `Paiement en RLUSD (affiché en ${currency}).\n\n` +
         `Montant: ${amountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
         `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n\n` +
-        `1 signature Xumm sera demandée.`,
+        `1 signature sera demandée.`,
     );
     if (!ok) return { ok: false };
 
@@ -325,7 +325,7 @@ export function useSendTransaction({
       action: "wallet:send",
     });
     if (payResult?.signed) {
-      toast.success("✅ Payment submitted via Xumm.");
+      toast.success("✅ Payment submitted.");
       handleAddressSave(dest);
       setSendAmount("");
       setSendDestination("");
@@ -453,7 +453,7 @@ export function useSendTransaction({
 
     const result = await signTransaction(txjson);
     if (result && result.signed) {
-      toast.success("✅ Payment submitted via Xumm.");
+      toast.success("✅ Payment submitted.");
       handleAddressSave(dest);
 
       setSendAmount("");

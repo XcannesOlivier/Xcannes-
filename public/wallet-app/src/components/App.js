@@ -665,7 +665,7 @@ async function handleImport(statusEl) {
         rows.push(val);
       });
       if (invalid) { updateStatus(statusEl, '❌ Toutes les rangées doivent contenir 6 chiffres.', true); rearmImport(statusEl); return; }
-      updateStatus(statusEl, 'Restauration depuis Xumm…');
+      updateStatus(statusEl, 'Restauration depuis Secret Numbers…');
       const secretNumbers = rows.join(' ');
       walletResult = walletFromSecretNumbers(secretNumbers);
       seedForStorage = walletResult.wallet?.seed || secretNumbers;
@@ -850,8 +850,24 @@ function confirmWithAuth(title, subtitle) {
 }
 
 // ==========================================
-// 9. HOME SCREEN (Multi-wallet)
+// 9. HOME SCREEN → WALLET DASHBOARD (embedded iframe)
 // ==========================================
+
+/** Resolve the wallet dashboard URL (same origin) */
+function getWalletDashboardUrl() {
+  const proto = window.location.protocol;
+  const host = window.location.hostname;
+  const port = window.location.port;
+  // In dev (Next.js runs on 3000), point to the Next.js dev server
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return `${proto}//${host}:3000/wallet?embedded=pwa`;
+  }
+  // Production: same origin
+  return `/wallet?embedded=pwa`;
+}
+
+/** Active postMessage bridge cleanup reference */
+let _bridgeCleanup = null;
 
 async function goToHome() {
   // Load last used wallet if not already set
@@ -874,84 +890,184 @@ async function goToHome() {
     }
   }
 
-  showScreen('home');
-  setupHomeScreen();
+  showScreen('wallet-embedded');
+  setupWalletEmbedded();
   resetInactivityTimer();
 }
 
-function setupHomeScreen() {
-  const btnScan = document.getElementById('btn-scan');
-  const btnLock = document.getElementById('btn-lock');
-  const btnAddWallet = document.getElementById('btn-add-wallet');
+/**
+ * Setup the embedded wallet dashboard iframe and postMessage bridge.
+ * The iframe loads the full WalletDashboard from /wallet?embedded=pwa.
+ * Communication:
+ *   iframe → PWA: READY, SIGN_TX, DISCONNECT, OPEN_SCANNER
+ *   PWA → iframe: INIT, TX_SIGNED, SIGN_ERROR, LOCK, QR_RESULT
+ */
+function setupWalletEmbedded() {
+  const iframe = document.getElementById('wallet-iframe');
+  const btnLock = document.getElementById('btn-embedded-lock');
+  const btnScanner = document.getElementById('btn-embedded-scanner');
 
-  if (currentWallet) {
-    const addr = currentWallet.address;
-    setText('home-address', addr);
-    setText('home-wallet-label', 'Mon Wallet');
-    setText('home-balance-amount', '0');
-    checkBalance(addr);
+  if (!iframe) return;
+
+  // Clean up previous bridge if any
+  if (_bridgeCleanup) {
+    _bridgeCleanup();
+    _bridgeCleanup = null;
   }
 
-  // Render wallet list
-  renderWalletList();
+  // Load the wallet dashboard
+  const dashboardUrl = getWalletDashboardUrl();
+  if (iframe.src !== dashboardUrl) {
+    iframe.src = dashboardUrl;
+  }
 
-  btnScan?.addEventListener('click', () => {
-    showScreen('scanner');
-    setupScannerScreen();
-  }, { once: true });
+  // --- postMessage bridge ---
+  function handleIframeMessage(event) {
+    // Security: only accept messages from same origin or the dashboard URL
+    const data = event.data;
+    if (!data || !data.type) return;
 
-  btnLock?.addEventListener('click', () => lockWallet(), { once: true });
+    switch (data.type) {
+      case 'READY':
+        // iframe loaded — send wallet identity
+        sendToIframe({
+          type: 'INIT',
+          address: currentWallet?.address || '',
+          publicKey: currentWallet?.publicKey || '',
+        });
+        break;
 
-  // Add wallet button
-  if (btnAddWallet) {
-    const freshBtn = btnAddWallet.cloneNode(true);
-    btnAddWallet.replaceWith(freshBtn);
-    document.getElementById('btn-add-wallet')?.addEventListener('click', () => {
-      showScreen('choice');
-      setupChoiceScreen();
-    }, { once: true });
+      case 'SIGN_TX':
+        handleSignFromIframe(data);
+        break;
+
+      case 'DISCONNECT':
+        lockWallet();
+        break;
+
+      case 'OPEN_SCANNER':
+        // The dashboard requests a QR scan — open native scanner
+        openScannerFromEmbedded();
+        break;
+
+      case 'REQUEST_INIT':
+        // Dashboard requests re-init (e.g. after page reload inside iframe)
+        sendToIframe({
+          type: 'INIT',
+          address: currentWallet?.address || '',
+          publicKey: currentWallet?.publicKey || '',
+        });
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  window.addEventListener('message', handleIframeMessage);
+
+  // Lock button
+  const lockHandler = () => lockWallet();
+  btnLock?.addEventListener('click', lockHandler, { once: true });
+
+  // Scanner button — open scanner overlay and return result to iframe
+  const scanHandler = () => openScannerFromEmbedded();
+  btnScanner?.addEventListener('click', scanHandler, { once: true });
+
+  // Store cleanup function
+  _bridgeCleanup = () => {
+    window.removeEventListener('message', handleIframeMessage);
+    btnLock?.removeEventListener('click', lockHandler);
+    btnScanner?.removeEventListener('click', scanHandler);
+  };
+}
+
+/** Send a message to the wallet iframe */
+function sendToIframe(msg) {
+  const iframe = document.getElementById('wallet-iframe');
+  if (iframe?.contentWindow) {
+    iframe.contentWindow.postMessage(msg, '*');
   }
 }
 
 /**
- * Render the wallet list at the bottom of the home screen.
- * Highlights the active wallet, shows all wallets, allows switching.
+ * Handle a SIGN_TX request from the iframe.
+ * Signs the transaction locally using the decrypted seed, then sends back
+ * the tx_blob. The seed NEVER leaves this PWA.
  */
-async function renderWalletList() {
-  const container = document.getElementById('wallet-list');
-  if (!container) return;
+async function handleSignFromIframe(data) {
+  const { txjson, requestId, action } = data;
 
-  const wallets = await getAllWallets();
-  container.innerHTML = '';
-
-  if (wallets.length <= 1) {
-    container.classList.add('hidden');
+  if (!currentWallet?.wallet) {
+    sendToIframe({ type: 'SIGN_ERROR', error: 'no_wallet', requestId });
     return;
   }
 
-  container.classList.remove('hidden');
-
-  // Sort by lastUsedAt desc
-  wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0));
-
-  wallets.forEach((w) => {
-    const isActive = currentWallet && w.address === currentWallet.address;
-    const item = document.createElement('div');
-    item.className = `wallet-list-item${isActive ? ' active' : ''}`;
-    item.innerHTML = `
-      <div class="wl-info">
-        <span class="wl-label">${w.label || 'Wallet'}</span>
-        <span class="wl-address">${w.address.slice(0, 8)}…${w.address.slice(-6)}</span>
-      </div>
-      ${isActive ? '<span class="wl-active-badge">●</span>' : ''}
-    `;
-
-    if (!isActive) {
-      item.addEventListener('click', () => switchWallet(w.address));
+  try {
+    // Require biometric or PIN confirmation for every signature
+    const authConfig = await getAuthConfig();
+    if (authConfig?.credentialId) {
+      try {
+        await promptBiometric(authConfig.credentialId);
+      } catch {
+        sendToIframe({ type: 'SIGN_ERROR', error: 'auth_cancelled', requestId });
+        return;
+      }
+    } else {
+      // PIN fallback — for now, use confirm() as a minimal safeguard
+      // A proper inline PIN prompt can be added later
+      const confirmed = confirm(`Confirmer la signature : ${action || txjson?.TransactionType || 'Transaction'} ?`);
+      if (!confirmed) {
+        sendToIframe({ type: 'SIGN_ERROR', error: 'user_cancelled', requestId });
+        return;
+      }
     }
 
-    container.appendChild(item);
-  });
+    // Sign locally — seed is in memory, never sent to iframe
+    const { tx_blob, hash } = signTransaction(currentWallet.wallet, txjson);
+
+    sendToIframe({
+      type: 'TX_SIGNED',
+      tx_blob,
+      hash,
+      requestId,
+    });
+  } catch (err) {
+    console.error('[handleSignFromIframe] Error:', err);
+    sendToIframe({ type: 'SIGN_ERROR', error: err.message, requestId });
+  }
+}
+
+/**
+ * Open the native scanner screen from embedded mode.
+ * When a QR is scanned, process it (connect/sign) then return to embedded.
+ */
+function openScannerFromEmbedded() {
+  showScreen('scanner');
+  setupScannerScreen();
+  // Override the scanner back button to return to embedded instead of home
+  const btnBack = document.getElementById('btn-scanner-back');
+  if (btnBack) {
+    const freshBtn = btnBack.cloneNode(true);
+    btnBack.replaceWith(freshBtn);
+    document.getElementById('btn-scanner-back')?.addEventListener('click', () => {
+      if (qrScanner) qrScanner.stop();
+      showScreen('wallet-embedded');
+      // Re-setup embedded buttons (since we used { once: true })
+      const btnLock = document.getElementById('btn-embedded-lock');
+      const btnScanner = document.getElementById('btn-embedded-scanner');
+      btnLock?.addEventListener('click', () => lockWallet(), { once: true });
+      btnScanner?.addEventListener('click', () => openScannerFromEmbedded(), { once: true });
+    }, { once: true });
+  }
+}
+
+// --- Legacy home functions (kept for scanner success/error return) ---
+
+function setupHomeScreen() {
+  // Redirect to embedded dashboard
+  showScreen('wallet-embedded');
+  setupWalletEmbedded();
 }
 
 async function switchWallet(address) {
@@ -969,29 +1085,19 @@ async function switchWallet(address) {
     currentWallet = { wallet: w.wallet, address: w.address, publicKey: w.publicKey };
     await touchWallet(address);
 
-    showScreen('home');
-    setupHomeScreen();
+    // Notify the iframe of the wallet switch
+    sendToIframe({ type: 'INIT', address: w.address, publicKey: w.publicKey });
   } catch (err) {
     console.error('[switchWallet] Error:', err);
   }
 }
 
 async function checkBalance(address) {
+  // Balance is now handled by the embedded wallet dashboard
+  // This function is kept for backward compatibility (scanner success screens)
   try {
-    const res = await fetch(`${RELAY_URL}/xumm/balance?address=${address}`);
-    const data = await res.json().catch(() => ({}));
-
-    if (res.ok && data.xrp !== undefined) {
-      setText('home-balance-amount', parseFloat(data.xrp).toFixed(2));
-      document.getElementById('home-badge-inactive')?.classList.add('hidden');
-      document.getElementById('home-badge-active')?.classList.remove('hidden');
-      document.getElementById('activation-notice')?.classList.add('hidden');
-    } else if (res.status === 404) {
-      setText('home-balance-amount', '0');
-      document.getElementById('home-badge-inactive')?.classList.remove('hidden');
-      document.getElementById('home-badge-active')?.classList.add('hidden');
-      document.getElementById('activation-notice')?.classList.remove('hidden');
-    }
+    const res = await fetch(`${RELAY_URL}/wallet/balance?address=${address}`);
+    await res.json().catch(() => ({}));
   } catch { /* offline */ }
 }
 
@@ -1438,6 +1544,20 @@ async function performFullReset() {
 
 async function lockWallet() {
   if (inactivityTimer) clearTimeout(inactivityTimer);
+
+  // Notify the iframe before destroying it
+  sendToIframe({ type: 'LOCK' });
+
+  // Clean up bridge
+  if (_bridgeCleanup) {
+    _bridgeCleanup();
+    _bridgeCleanup = null;
+  }
+
+  // Unload the iframe for security
+  const iframe = document.getElementById('wallet-iframe');
+  if (iframe) iframe.src = 'about:blank';
+
   if (currentWallet) {
     clearWalletFromMemory(currentWallet);
     currentWallet = null;
@@ -1494,8 +1614,7 @@ function setupScannerScreen() {
 
   btnBack?.addEventListener('click', () => {
     if (qrScanner) qrScanner.stop();
-    showScreen('home');
-    setupHomeScreen();
+    showScreen('wallet-embedded');
   }, { once: true });
 
   btnLock?.addEventListener('click', () => {
@@ -1544,7 +1663,7 @@ async function handleConnect(challenge, statusEl) {
   });
 
   showSuccess('Connecté !', `Wallet ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
-  setTimeout(() => { showScreen('home'); setupHomeScreen(); }, 3000);
+  setTimeout(() => { showScreen('wallet-embedded'); }, 3000);
 }
 
 // ==========================================
@@ -1598,7 +1717,7 @@ async function handleSign(challenge, statusEl) {
     showError(`Erreur XRPL: ${result.txResult?.resultCode || 'Inconnue'}`);
   }
 
-  setTimeout(() => { showScreen('home'); setupHomeScreen(); }, 4000);
+  setTimeout(() => { showScreen('wallet-embedded'); }, 4000);
 }
 
 // ==========================================

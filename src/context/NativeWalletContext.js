@@ -1,8 +1,8 @@
 /**
  * NativeWalletContext — Connexion wallet via Xcannes Wallet Relay
  *
- * Fournit la MÊME interface que XummContext (useXumm), mais utilise
- * le protocole relay (/wallet-relay/*) au lieu du SDK Xumm.
+ * Fournit la même interface que les autres wallet providers, mais utilise
+ * le protocole relay (/wallet-relay/*) pour la signature.
  *
  * Le desktop crée un challenge → affiche QR → le mobile scanne →
  * signe localement → soumet le tx_blob signé via le relay.
@@ -39,7 +39,7 @@ function isMobileDevice() {
 /** Generate a QR code data URL using a simple inline canvas renderer */
 function generateQRDataUrl(text) {
   // We return the raw JSON/URL — the QR rendering is handled by the
-  // QR modal component (same as Xumm). The modal receives qrData as
+  // QR modal component. The modal receives qrData as
   // a plain string and renders it.
   return text;
 }
@@ -56,7 +56,7 @@ export const NativeWalletProvider = ({ children }) => {
   const autoCloseTimeoutRef = useRef(null);
   const pendingSignatureResolveRef = useRef(null);
 
-  // --- Polling helpers (identical pattern to XummContext) ---
+  // --- Polling helpers ---
   const clearPolling = useCallback(() => {
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current);
@@ -103,7 +103,7 @@ export const NativeWalletProvider = ({ children }) => {
   // --- Balance ---
   const fetchBalance = useCallback(async (address) => {
     try {
-      const res = await fetch(apiUrl(`/xumm/balance?address=${address}`));
+      const res = await fetch(apiUrl(`/wallet/balance?address=${address}`));
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setIsWalletActivated(true);

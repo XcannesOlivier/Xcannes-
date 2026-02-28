@@ -6,7 +6,6 @@
  * seuls les flags d'ouverture en mode inline sont gérés ici.
  */
 
-import XummQRModal from "@/components/xumm/XummQRModal";
 import QRScanner from "../components/QRScanner";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
@@ -22,7 +21,6 @@ import WalletDashboardStatementModals from "../modals/WalletDashboardStatementMo
 
 export default function WalletDesktopModals({
   // visibility flags (calculés par WalletDashboard)
-  showInlineXumm,
   showInlineQrScanner,
   showInlineSend,
   showInlinePayreq,
@@ -49,7 +47,6 @@ export default function WalletDesktopModals({
   infoModalProps,
   statementSharedProps,
   rlusdSetupModalProps,
-  xummQrProps,
 
   // open/close handlers
   setActiveAction,
@@ -68,8 +65,6 @@ export default function WalletDesktopModals({
 }) {
   return (
     <aside className="hidden lg:flex lg:flex-col min-h-0 relative">
-      {showInlineXumm ? <XummQRModal isOpen inline {...xummQrProps} /> : null}
-
       {showInlineQrScanner ? (
         <div className="flex-1 min-h-0">
           <QRScanner

@@ -4,7 +4,6 @@
  */
 export function useDesktopInlineFlags({
   isDesktopPanel,
-  qrModalData,
   qrScannerOpen,
   activeAction,
   sendPaymentRequest,
@@ -15,59 +14,46 @@ export function useDesktopInlineFlags({
   showCurrencyStatement,
   selectedStatementToken,
 }) {
-  const isXummInlineOpen = Boolean(
-    qrModalData && (qrModalData.visible ?? true),
-  );
-  const showInlineXumm = isDesktopPanel && isXummInlineOpen;
   const showInlineQrScanner =
-    isDesktopPanel && !showInlineXumm && qrScannerOpen;
+    isDesktopPanel && qrScannerOpen;
   const hasPayreq = Boolean(sendPaymentRequest);
   const showInlineSend =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     activeAction === "send" &&
     !hasPayreq;
   const showInlinePayreq =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     activeAction === "send" &&
     hasPayreq;
   const showInlineReceive =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     activeAction === "receive";
   const showInlineSwap =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     activeAction === "swap";
   const showInlineCash =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     activeAction === "cash";
   const showInlineAdjust =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     showAdjustmentModal;
   const showInlineActivation =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     showActivationModal;
   const showInlineActivationRequest =
     isDesktopPanel &&
-    !showInlineXumm &&
     !showInlineQrScanner &&
     showActivationRequestModal;
   const showInlineInfo =
-    isDesktopPanel && !showInlineXumm && !showInlineQrScanner && walletInfoOpen;
+    isDesktopPanel && !showInlineQrScanner && walletInfoOpen;
   const hasInlineModal =
-    showInlineXumm ||
     showInlineQrScanner ||
     showInlineSend ||
     showInlinePayreq ||
@@ -87,7 +73,6 @@ export function useDesktopInlineFlags({
     isDesktopPanel && !hasInlineModal && !showInlineCurrencyStatement;
 
   return {
-    showInlineXumm,
     showInlineQrScanner,
     showInlineSend,
     showInlinePayreq,

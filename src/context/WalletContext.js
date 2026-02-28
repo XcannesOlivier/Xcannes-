@@ -1,26 +1,27 @@
 /**
  * WalletContext — Unified wallet interface
  *
- * Wraps both XummContext and NativeWalletContext behind a single
- * `useWallet()` hook that exposes the EXACT same interface as useXumm().
+ * Wraps NativeWalletContext and PwaEmbeddedContext behind a single
+ * `useWallet()` hook that exposes the same interface everywhere.
  *
- * Components import `useWallet` instead of `useXumm` — the active
- * provider is selected by the user and stored in localStorage.
+ * Components import `useWallet` instead of provider-specific hooks — the
+ * active provider is selected automatically or by the user and stored in
+ * localStorage.
  *
  * Supported providers:
- *   - "xumm"   → XummContext (Xumm/Xaman app)
- *   - "native"  → NativeWalletContext (Xcannes Wallet relay + Face ID)
+ *   - "native" → NativeWalletContext (Xcannes Wallet relay + Face ID)
+ *   - "pwa"    → PwaEmbeddedContext (PWA iframe bridge, instant postMessage)
  */
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useXumm } from "@/context/XummContext";
 import { useNativeWallet } from "@/context/NativeWalletContext";
+import { usePwaEmbedded, isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
 const WalletContext = createContext();
 
 const PROVIDER_STORAGE_KEY = "xcannes_wallet_provider";
-const VALID_PROVIDERS = ["xumm", "native"];
-const DEFAULT_PROVIDER = "xumm";
+const VALID_PROVIDERS = ["native", "pwa"];
+const DEFAULT_PROVIDER = "native";
 
 function readProvider() {
   if (typeof window === "undefined") return DEFAULT_PROVIDER;
@@ -49,11 +50,21 @@ export const WalletProviderSwitch = ({ children }) => {
     setActiveProvider(readProvider());
   }, []);
 
-  const xumm = useXumm();
+  // Xumm provider removed — only native and pwa remain
   const native = useNativeWallet();
+  const pwa = usePwaEmbedded();
+
+  // Auto-select "pwa" provider when running inside the PWA iframe
+  useEffect(() => {
+    if (isPwaEmbedded() && activeProvider !== "pwa") {
+      setActiveProvider("pwa");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Pick the active provider's values
-  const current = activeProvider === "native" ? native : xumm;
+  const current =
+    activeProvider === "pwa" ? pwa :
+    native;
 
   const switchProvider = useCallback(
     (provider) => {
@@ -70,7 +81,7 @@ export const WalletProviderSwitch = ({ children }) => {
 
   // Enhanced context value: same interface + provider switching
   const value = {
-    // --- Same interface as useXumm() ---
+    // --- Same interface as useNativeWallet() / usePwaEmbedded() ---
     wallet: current.wallet,
     isConnected: current.isConnected,
     isConnecting: current.isConnecting,
@@ -98,7 +109,7 @@ export const WalletProviderSwitch = ({ children }) => {
 };
 
 /**
- * useWallet() — Drop-in replacement for useXumm().
+ * useWallet() — Unified wallet hook.
  * Returns the same interface + { activeProvider, switchProvider, providers }.
  */
 export const useWallet = () => useContext(WalletContext);

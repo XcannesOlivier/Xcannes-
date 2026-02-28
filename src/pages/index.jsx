@@ -849,7 +849,7 @@ export default function Home() {
                       ),
                       t(
                         "home_v2_hero_speed_modal_point_2",
-                        "Signature immédiate dans Xaman, sans délais bancaires."
+                        "Signature immédiate dans votre wallet, sans délais bancaires."
                       ),
                       t(
                         "home_v2_hero_speed_modal_point_3",
@@ -948,7 +948,7 @@ export default function Home() {
                       ),
                       t(
                         "home_v2_hero_security_modal_point_5",
-                        "XCANNES renforce la sécurité des transactions en s’appuyant sur Xaman, le wallet natif de l’écosystème XRPL."
+                        "XCANNES renforce la sécurité des transactions grâce à un wallet non-custodial intégré à l’écosystème XRPL."
                       ),
                       t(
                         "home_v2_hero_security_modal_point_4",

@@ -334,18 +334,6 @@ export function usePaymentRequestScanner({
         return;
       }
 
-      // 4) Xumm/Xaman payload links: open directly
-      if (/xumm\.app|xaman|xumm:\/\//i.test(raw)) {
-        const ok = confirm(
-          "This looks like a Xumm/Xaman request link. Open it now?",
-        );
-        if (ok && typeof window !== "undefined") {
-          window.location.href = raw;
-        }
-        setPaymentRequestScannerOpen(false);
-        return;
-      }
-
       alert("QR code scanned, but format is not supported.");
     },
     [

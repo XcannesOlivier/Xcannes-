@@ -3,57 +3,12 @@ import "@/styles/animations.css";
 import "@/styles/wallet-actions.css";
 import { appWithTranslation } from "next-i18next";
 import nextI18NextConfig from "../../next-i18next.config";
-import { XummProvider } from "@/context/XummContext";
 import { NativeWalletProvider } from "@/context/NativeWalletContext";
-import { WalletProviderSwitch, useWallet } from "@/context/WalletContext";
+import { PwaEmbeddedProvider } from "@/context/PwaEmbeddedContext";
+import { WalletProviderSwitch } from "@/context/WalletContext";
 import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket centralisé
-import XummQRModal from "@/components/xumm/XummQRModal";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
-function XummModalLayer({ children }) {
-  const { qrModalData, closeQrModal } = useWallet();
-  const router = useRouter();
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  const isOpen = Boolean(qrModalData && (qrModalData.visible ?? true));
-  const isWalletRoute = router.pathname === "/wallet";
-  const allowBackgroundScroll = !isDesktop && (qrModalData?.type || "connect") === "connect";
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 1024px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, []);
-
-  const useInlineOnWallet = isWalletRoute && isDesktop;
-
-  return (
-    <>
-      {children}
-      {!useInlineOnWallet ? (
-        <XummQRModal
-          isOpen={isOpen}
-          onClose={closeQrModal}
-          uuid={qrModalData?.uuid}
-          qrUrl={qrModalData?.qrUrl}
-          deepLink={qrModalData?.deepLink}
-          type={qrModalData?.type || "connect"}
-          status={qrModalData?.status}
-          enablePolling={false}
-          lockBodyScrollEnabled={!allowBackgroundScroll}
-        />
-      ) : null}
-    </>
-  );
-}
 
 function App({ Component, pageProps }) {
   const router = useRouter();
@@ -108,26 +63,24 @@ function App({ Component, pageProps }) {
   }, [router?.events, router.asPath, router?.locales]);
 
   return (
-    <XummProvider>
-      <NativeWalletProvider>
+    <NativeWalletProvider>
+      <PwaEmbeddedProvider>
         <WalletProviderSwitch>
           <XcannesWSProvider>
             <div className="font-sans">
-              <XummModalLayer>
-                <div
-                  key={router.asPath}
-                  className={`page-transition page-transition--${transitionDirection}${
-                    isRouteChanging ? " page-transition--exit" : ""
-                  }`}
-                >
-                  <Component {...pageProps} />
-                </div>
-              </XummModalLayer>
+              <div
+                key={router.asPath}
+                className={`page-transition page-transition--${transitionDirection}${
+                  isRouteChanging ? " page-transition--exit" : ""
+                }`}
+              >
+                <Component {...pageProps} />
+              </div>
             </div>
           </XcannesWSProvider>
         </WalletProviderSwitch>
-      </NativeWalletProvider>
-    </XummProvider>
+      </PwaEmbeddedProvider>
+    </NativeWalletProvider>
   );
 }
 

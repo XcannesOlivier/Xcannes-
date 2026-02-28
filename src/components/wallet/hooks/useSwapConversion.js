@@ -371,11 +371,11 @@ export function useSwapConversion({
     }
 
     if (!isConnected || !backendWalletAddress) {
-      alert("Please connect your Xumm wallet first.");
+      alert("Please connect your wallet first.");
       return;
     }
     if (!walletAddress || !signTransaction) {
-      alert("Please connect your Xumm wallet first.");
+      alert("Please connect your wallet first.");
       return;
     }
     if (!hasOnChainRlusd) {

@@ -162,7 +162,7 @@ export default function WalletDashboardAdjustModal({
   const handleSubmit = async () => {
     if (!canSubmit) return;
     if (!walletAddress) {
-      alert("Please connect your Xumm wallet first.");
+      alert("Please connect your wallet first.");
       return;
     }
     const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();

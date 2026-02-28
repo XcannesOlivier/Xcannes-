@@ -217,13 +217,13 @@ export default function WalletActivationModal({
                   <div className={actionTitle}>
                     {t(
                       "ui_activation_request_third_party_2a4d2f92e3",
-                      "Demander a un tiers (QR XUMM)",
+                      "Demander a un tiers",
                     )}
                   </div>
                   <div className={actionDesc}>
                     {t(
                       "ui_activation_request_desc_2a5a1c7b4d",
-                      "Generer un QR XUMM a scanner ou partager.",
+                      "Generer un lien a scanner ou partager.",
                     )}
                   </div>
                 </div>
@@ -258,13 +258,13 @@ export default function WalletActivationModal({
                   <div className={actionTitle}>
                     {t(
                       "ui_activation_send_other_wallet_4d9b7f2a1e",
-                      "Envoyer depuis un autre wallet (XUMM)",
+                      "Envoyer depuis un autre wallet",
                     )}
                   </div>
                   <div className={actionDesc}>
                     {t(
                       "ui_activation_send_other_wallet_desc_4b3a2d9c7f",
-                      "Ouvre XUMM et envoie {{amount}} XRP depuis un autre wallet.",
+                      "Envoie {{amount}} XRP depuis un autre wallet.",
                       { amount: currentActivationAmountLabel },
                     )}
                   </div>

@@ -254,19 +254,19 @@ const MoonPaySellModal = ({
     };
   }, [isOpen]);
 
-  const requestXummSignature = async () => {
+  const requestWalletSignature = async () => {
     if (!signTransaction) {
       setError(
         t(
           "moonpay_error_signature_required",
-          "XUMM signature required. Please connect your wallet.",
+          "Wallet signature required. Please connect your wallet.",
         ),
       );
       return null;
     }
 
     const result = await signTransaction({ TransactionType: "SignIn" });
-    if (!result?.signed || !result?.uuid) {
+    if (!result?.signed) {
       setError(
         t(
           "moonpay_error_signature_cancelled",
@@ -276,7 +276,7 @@ const MoonPaySellModal = ({
       return null;
     }
 
-    return result.uuid;
+    return result.uuid || result.hash || "wallet-auth";
   };
 
   // Générer l'URL MoonPay pour la vente
@@ -342,8 +342,8 @@ const MoonPaySellModal = ({
         return;
       }
 
-      const xummUuid = await requestXummSignature();
-      if (!xummUuid) return;
+      const walletAuthToken = await requestWalletSignature();
+      if (!walletAuthToken) return;
 
       setStep("loading");
 
@@ -357,7 +357,7 @@ const MoonPaySellModal = ({
           baseCurrencyCode, // Crypto à vendre
           quoteCurrencyCode: quoteCurrency, // Fiat à recevoir
           baseCurrencyAmount,
-          xummUuid,
+          walletAuthToken,
         }),
       });
 

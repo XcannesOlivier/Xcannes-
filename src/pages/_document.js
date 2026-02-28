@@ -38,10 +38,6 @@ export default function Document(props) {
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
-        <script
-          src="https://xumm.app/assets/cdn/xumm.min.js"
-          async
-        ></script>
       </Head>
       <body>
         <Main />

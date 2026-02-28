@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Xcannes Wallet">
 
-  <!-- CSP: only allow scripts from same origin, block all external/inline scripts -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.xcannes.com; media-src 'self' blob:; object-src 'none'; frame-src 'none';">
+  <!-- CSP: only allow scripts from same origin, allow iframe from same origin for wallet dashboard -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.xcannes.com; media-src 'self' blob:; object-src 'none'; frame-src 'self';">
 
   <base href="/wallet-app/">
   <title>Xcannes Wallet</title>
@@ -346,6 +346,23 @@
         <button id="btn-add-wallet" class="btn btn-outline btn-add-wallet">
           <span class="add-icon">＋</span> Ajouter un wallet
         </button>
+      </div>
+    </div>
+
+    <!-- ========== 10b. WALLET EMBEDDED SCREEN (iframe with full dashboard) ========== -->
+    <div id="screen-wallet-embedded" class="screen hidden">
+      <div class="embedded-container">
+        <div class="embedded-header">
+          <button id="btn-embedded-lock" class="btn-icon-round" title="Verrouiller">🔒</button>
+          <button id="btn-embedded-scanner" class="btn-icon-round" title="Scanner">📷</button>
+        </div>
+        <iframe
+          id="wallet-iframe"
+          class="wallet-iframe"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+          allow="clipboard-write"
+          title="Xcannes Wallet Dashboard"
+        ></iframe>
       </div>
     </div>
 
