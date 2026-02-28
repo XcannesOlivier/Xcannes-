@@ -17,7 +17,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
-import { detectWalletApp } from "@/lib/walletAppDetect";
+import { apiUrl } from "@/lib/runtimeConfig";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -25,6 +25,9 @@ const QRCodeCanvas = dynamic(
   () => import("qrcode.react").then((m) => m.QRCodeCanvas),
   { ssr: false }
 );
+
+const PENDING_CONNECT_KEY = "xcannes_pending_connect";
+const NATIVE_WALLET_KEY = "xcannes_native_wallet";
 
 // ── Helpers ────────────────────────────────────────────────────
 function useIsMobile() {
@@ -53,71 +56,110 @@ export default function WalletConnectScreen() {
 
   const isMobile = useIsMobile();
 
-  // Detection state (mobile only)
-  const [walletDetection, setWalletDetection] = useState(null); // null = loading
-  const [showOnboardingIframe, setShowOnboardingIframe] = useState(false);
-  const [iframeReady, setIframeReady] = useState(false);
-  const iframeRef = useRef(null);
-  const detectionRanRef = useRef(false);
+  // Mobile: redirect flow state
+  const [mobileStatus, setMobileStatus] = useState("init"); // init | redirecting | polling | connected | expired
+  const mobileInitRef = useRef(false);
+  const pollRef = useRef(null);
 
-  // ── Detect wallet (mobile only) ──────────────────────────────
+  // ── Mobile: redirect-based connect flow ──────────────────────
   useEffect(() => {
     if (!isMobile) return;
-    if (detectionRanRef.current) return;
-    detectionRanRef.current = true;
+    if (mobileInitRef.current) return;
+    mobileInitRef.current = true;
 
-    detectWalletApp().then((info) => {
-      setWalletDetection(info);
-    });
+    const pendingId = sessionStorage.getItem(PENDING_CONNECT_KEY);
+    if (pendingId) {
+      // Returning from wallet-app → poll for result
+      setMobileStatus("polling");
+      startPolling(pendingId);
+    } else {
+      // Create challenge and redirect to wallet-app
+      setMobileStatus("redirecting");
+      createChallengeAndRedirect();
+    }
   }, [isMobile]);
 
-  // ── Mobile + wallet exists → redirect to /wallet-app/ ───────
+  // Cleanup polling on unmount
   useEffect(() => {
-    if (!isMobile) return;
-    if (!walletDetection) return;
-    if (!walletDetection.hasWallet || !walletDetection.hasAuth) return;
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
 
-    // Wallet-app has a configured wallet → redirect to it
-    // It will do Face ID/PIN unlock → open embedded dashboard
-    window.location.href = "/wallet-app/";
-  }, [isMobile, walletDetection]);
+  async function createChallengeAndRedirect() {
+    try {
+      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "connect",
+          origin: window.location.origin,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Challenge failed");
 
-  // ── Mobile + no wallet → show onboarding iframe ─────────────
-  useEffect(() => {
-    if (!isMobile) return;
-    if (!walletDetection) return;
-    if (walletDetection.hasWallet && walletDetection.hasAuth) return;
-
-    // No wallet → show the wallet-app in an iframe for onboarding
-    setShowOnboardingIframe(true);
-  }, [isMobile, walletDetection]);
-
-  // ── Listen for postMessage from wallet-app iframe ────────────
-  useEffect(() => {
-    if (!showOnboardingIframe) return;
-
-    function handleMessage(event) {
-      const data = event.data;
-      if (!data || !data.type) return;
-
-      // The wallet-app sends INIT with address after the user creates
-      // a wallet and reaches the home/embedded screen
-      if (data.type === "WALLET_CREATED" || data.type === "INIT") {
-        if (data.address) {
-          // Wallet created in the iframe — now trigger the relay connect
-          // so the wallet address is saved in the session
-          setShowOnboardingIframe(false);
-
-          // Store address temporarily and trigger connection
-          sessionStorage.setItem("xcannes_native_wallet", data.address);
-          window.location.reload();
-        }
-      }
+      sessionStorage.setItem(PENDING_CONNECT_KEY, data.challengeId);
+      window.location.href = `/wallet-app/?connect=${data.challengeId}`;
+    } catch (err) {
+      console.error("[mobile connect] Challenge error:", err);
+      // Fallback: redirect to wallet-app without challenge
+      window.location.href = "/wallet-app/";
     }
+  }
 
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [showOnboardingIframe]);
+  function startPolling(challengeId) {
+    let attempts = 0;
+    const maxAttempts = 90; // 3 minutes at 2s
+
+    pollRef.current = setInterval(async () => {
+      attempts++;
+      if (attempts >= maxAttempts) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+        sessionStorage.removeItem(PENDING_CONNECT_KEY);
+        setMobileStatus("expired");
+        return;
+      }
+
+      try {
+        const res = await fetch(apiUrl(`/wallet-relay/status/${challengeId}`));
+        const data = await res.json();
+
+        if (data.status === "completed" || data.status === "signed") {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+          sessionStorage.removeItem(PENDING_CONNECT_KEY);
+
+          if (data.result?.address) {
+            // Store in session for NativeWalletContext to pick up
+            sessionStorage.setItem(NATIVE_WALLET_KEY, data.result.address);
+            if (Array.isArray(data.result.addresses)) {
+              sessionStorage.setItem(
+                NATIVE_WALLET_KEY + "_addresses",
+                JSON.stringify(data.result.addresses)
+              );
+            }
+            setMobileStatus("connected");
+            // Reload so NativeWalletContext restores the session
+            setTimeout(() => window.location.reload(), 800);
+          }
+        } else if (data.status === "expired" || data.status === "error") {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+          sessionStorage.removeItem(PENDING_CONNECT_KEY);
+          setMobileStatus("expired");
+        }
+      } catch { /* network error — retry */ }
+    }, 2000);
+  }
+
+  function handleMobileRetry() {
+    sessionStorage.removeItem(PENDING_CONNECT_KEY);
+    setMobileStatus("redirecting");
+    mobileInitRef.current = false;
+    createChallengeAndRedirect();
+  }
 
   // ── Desktop: auto-trigger connect ────────────────────────────
   const [showQR, setShowQR] = useState(false);
@@ -154,35 +196,68 @@ export default function WalletConnectScreen() {
         : JSON.stringify(qrModalData.qrData)
       : null;
 
-  // ── MOBILE: onboarding iframe (full wallet-app) ──────────────
-  if (isMobile && showOnboardingIframe) {
+  // ── MOBILE: redirect-based connect flow ─────────────────────
+  if (isMobile) {
     return (
-      <main className="fixed inset-0 bg-[#0a0a0a] z-50">
-        <iframe
-          ref={iframeRef}
-          src="/wallet-app/"
-          className="w-full h-full border-0"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
-          allow="camera; clipboard-write"
-          title="Xcannes Wallet — Configuration"
-          onLoad={() => setIframeReady(true)}
-        />
-        {!iframeReady && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0a]">
-            <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
+      <main className="min-h-[100svh] flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4">
+        <div className="flex flex-col items-center gap-4 max-w-xs text-center">
+          {/* Branding */}
+          <div className="w-16 h-16 rounded-full bg-[#c9a84c] flex items-center justify-center mb-2 shadow-[0_0_24px_rgba(201,168,76,0.3)]">
+            <span className="text-[#0a0a0a] text-2xl font-bold font-orbitron">X</span>
           </div>
-        )}
-      </main>
-    );
-  }
 
-  // ── MOBILE: loading detection ────────────────────────────────
-  if (isMobile && !walletDetection) {
-    return (
-      <main className="min-h-[100svh] flex items-center justify-center bg-[#0b0f10] text-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
-          <p className="text-sm text-white/40">Vérification du wallet…</p>
+          {mobileStatus === "redirecting" && (
+            <>
+              <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
+              <p className="text-sm text-white/50">
+                {t("wallet_mobile_redirecting", "Ouverture de Xcannes Wallet…")}
+              </p>
+            </>
+          )}
+
+          {mobileStatus === "polling" && (
+            <>
+              <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
+              <p className="text-sm text-white/50">
+                {t("wallet_mobile_polling", "Connexion en cours…")}
+              </p>
+              <p className="text-xs text-white/30 mt-2">
+                {t("wallet_mobile_polling_hint", "Validez la connexion dans Xcannes Wallet puis revenez ici.")}
+              </p>
+            </>
+          )}
+
+          {mobileStatus === "connected" && (
+            <>
+              <svg className="w-12 h-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <p className="text-sm text-green-400 font-medium">
+                {t("wallet_mobile_connected", "Connecté !")}
+              </p>
+            </>
+          )}
+
+          {mobileStatus === "expired" && (
+            <>
+              <p className="text-sm text-red-400 mb-2">
+                {t("wallet_mobile_expired", "La demande a expiré. Veuillez réessayer.")}
+              </p>
+              <button
+                onClick={handleMobileRetry}
+                className="px-6 py-3 bg-[#c9a84c] hover:bg-[#b89a40] text-[#0a0a0a] font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
+              >
+                {t("wallet_connect_retry", "Réessayer")}
+              </button>
+            </>
+          )}
+
+          {mobileStatus === "init" && (
+            <>
+              <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
+              <p className="text-sm text-white/40">{t("wallet_connect_loading", "Préparation de la connexion…")}</p>
+            </>
+          )}
         </div>
       </main>
     );
