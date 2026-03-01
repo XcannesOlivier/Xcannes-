@@ -62,7 +62,6 @@ export default function DemoWalletModals({
   // Swap modal
   swapDefaultView,
   swapLockedView,
-  handleActivateCurrencyLine,
   currencyLinesSummary,
   currencyLines,
   swapCurrencyOptions,
@@ -73,11 +72,6 @@ export default function DemoWalletModals({
   convertAmount,
   setConvertAmount,
   convertPreview,
-  currencyLineCode,
-  setCurrencyLineCode,
-  currencyLineAllocatedRlusd,
-  setCurrencyLineAllocatedRlusd,
-  handleUpsertCurrencyLine,
   handleDemoConvert,
   convertProcessing,
   // Cash modal
@@ -216,13 +210,6 @@ export default function DemoWalletModals({
         noticeVariant="demo"
         noticeContextLabel={demoNoticeContextLabel}
         walletId={activeWalletId}
-        isConnected={false}
-        hasOnChainRlusd={true}
-        onInstallTrustline={() => {}}
-        onActivateCurrencyLine={handleActivateCurrencyLine}
-        refreshCurrencyLines={() => {}}
-        currencyLinesLoading={false}
-        currencyLinesError={null}
         currencyLinesSummary={currencyLinesSummary}
         currencyLines={currencyLines}
         swapCurrencyOptions={swapCurrencyOptions}
@@ -237,11 +224,6 @@ export default function DemoWalletModals({
         selectLabelRightByCurrency={selectLabelRightByAssetKey}
         selectIconByCurrency={selectIconByAssetKey}
         selectLabelMobileByCurrency={selectLabelMobileByAssetKey}
-        currencyLineCode={currencyLineCode}
-        setCurrencyLineCode={setCurrencyLineCode}
-        currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}
-        setCurrencyLineAllocatedRlusd={setCurrencyLineAllocatedRlusd}
-        handleUpsertCurrencyLine={handleUpsertCurrencyLine}
         handleDemoConvert={handleDemoConvert}
         convertProcessing={convertProcessing}
         rlusdPerUnitRates={rlusdPerUnitRates}

@@ -5,7 +5,6 @@
  * - submitSend (FX spread, payreq validation, address normalization)
  * - handleSendSubmit (full UI-level send flow with address save)
  * - submitConvert / handleDemoConvert
- * - handleActivateCurrencyLine / handleUpsertCurrencyLine
  * - handleDemoBuy / handleDemoSell
  * - convert preview useEffect
  */
@@ -16,7 +15,6 @@ import { useRouter } from "next/router";
 import {
   applyDemoBuySell,
   applyDemoConvert,
-  applyDemoEnableCurrency,
   applyDemoSend,
   ensureAllocation,
   isDemoNativeCurrency,
@@ -54,9 +52,6 @@ export function useDemoActions({
   convertAmount,
   setConvertPreview,
   setConvertProcessing,
-  // currency lines
-  currencyLineCode,
-  currencyLineAllocatedRlusd,
 }) {
   const { t } = useTranslation("common");
   const router = useRouter();
@@ -441,50 +436,6 @@ export function useDemoActions({
     })();
   };
 
-  // ── Trustline activation ─────────────────────────────────────
-  const handleActivateCurrencyLine = (code) => {
-    const nextState = clone(state);
-    const res = applyDemoEnableCurrency({
-      state: nextState,
-      walletId: activeWalletId,
-      currencyCode: code,
-    });
-    if (!res.ok) return false;
-    setState(nextState);
-    return true;
-  };
-
-  // ── Upsert currency allocation ───────────────────────────────
-  const handleUpsertCurrencyLine = () => {
-    const code = String(currencyLineCode || "").toUpperCase();
-    const allocated = Number.parseFloat(currencyLineAllocatedRlusd || "0");
-    if (!code || !Number.isFinite(allocated) || allocated < 0) return;
-    const rate = Number(rlusdPerUnitRates?.[code] || 0);
-    if (!rate || code === "RLUSD") return;
-    const nextState = clone(state);
-    const wallet = nextState.wallets?.[activeWalletId];
-    if (!wallet) return;
-    const currentRlusd = Number(wallet.allocations?.RLUSD || 0);
-    const allocations = wallet.allocations || {};
-    const nextTotalAllocated = Object.entries(allocations).reduce(
-      (sum, [entryCode, entryValue]) => {
-        const upper = String(entryCode || "").toUpperCase();
-        if (upper === "RLUSD" || upper === "XRP") return sum;
-        const value = upper === code ? allocated : Number(entryValue || 0);
-        return sum + value;
-      },
-      0,
-    );
-
-    if (nextTotalAllocated > currentRlusd + 1e-9) {
-      alert(t("demo_error_insufficient", "Solde insuffisant (démo)."));
-      return;
-    }
-
-    wallet.allocations[code] = Number(allocated.toFixed(6));
-    setState(nextState);
-  };
-
   // ── Cash (buy / sell) ────────────────────────────────────────
   const handleDemoBuy = async ({ amount }) => {
     await sleep(getDemoLatencyMs());
@@ -537,8 +488,6 @@ export function useDemoActions({
   return {
     handleSendSubmit,
     handleDemoConvert,
-    handleActivateCurrencyLine,
-    handleUpsertCurrencyLine,
     handleDemoBuy,
     handleDemoSell,
   };

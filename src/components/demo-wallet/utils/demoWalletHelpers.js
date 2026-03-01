@@ -21,8 +21,6 @@ export const DEMO_SAVED_ADDRESSES_STORAGE_KEY =
   "xcannes_demo_saved_addresses_v1";
 export const DEMO_LATENCY_MS_MIN = 450;
 export const DEMO_LATENCY_MS_MAX = 1100;
-export const DEMO_RATES_REFRESH_MS = 60_000;
-export const DEMO_RATES_STALE_AFTER_MS = 30_000;
 export const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
 
 // ─── Generic helpers ────────────────────────────────────────────────────────

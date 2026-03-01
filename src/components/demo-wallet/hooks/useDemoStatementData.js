@@ -306,32 +306,6 @@ export function useDemoStatementData({
           "demo_statement_fee_spread",
           "Frais de conversion (1 %)",
         );
-      } else if (
-        evt.kind === "trustline_add" &&
-        String(evt.currency).toUpperCase() === currency &&
-        evt.wallet === activeWalletId
-      ) {
-        category = "operation";
-        type = "credit";
-        amount = 0;
-        delta = 0;
-        description = t("demo_statement_trustline_add", {
-          defaultValue: "Activation de ligne {{currency}}",
-          currency,
-        });
-      } else if (
-        evt.kind === "trustline_remove" &&
-        String(evt.currency).toUpperCase() === currency &&
-        evt.wallet === activeWalletId
-      ) {
-        category = "operation";
-        type = "debit";
-        amount = 0;
-        delta = 0;
-        description = t("demo_statement_trustline_remove", {
-          defaultValue: "Désactivation de ligne {{currency}}",
-          currency,
-        });
       } else {
         return;
       }

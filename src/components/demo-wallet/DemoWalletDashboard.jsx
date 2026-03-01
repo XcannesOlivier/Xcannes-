@@ -20,7 +20,6 @@ import { useDemoPaymentRequestForm } from "./hooks/useDemoPaymentRequestForm";
 import { useDemoPaymentRequestScanner } from "./hooks/useDemoPaymentRequestScanner";
 import { lockBodyScroll } from "@/utils/bodyScrollLock";
 import { useDemoConvertForm } from "./hooks/useDemoConvertForm";
-import { useDemoCurrencyLinesForm } from "./hooks/useDemoCurrencyLinesForm";
 import { useDemoWalletLabel } from "./hooks/useDemoWalletLabel";
 import { useDemoWalletMeta } from "./hooks/useDemoWalletMeta";
 import { useDemoSavedAddresses } from "./hooks/useDemoSavedAddresses";
@@ -194,13 +193,6 @@ export default function DemoWalletDashboard({
     defaultBaseCurrency: "RLUSD",
     defaultQuoteCurrency: "EUR",
   });
-
-  const {
-    currencyLineCode,
-    setCurrencyLineCode,
-    currencyLineAllocatedRlusd,
-    setCurrencyLineAllocatedRlusd,
-  } = useDemoCurrencyLinesForm();
 
   useEffect(() => {
     const prevAction = prevActiveActionRef.current;
@@ -419,8 +411,6 @@ export default function DemoWalletDashboard({
   const {
     handleSendSubmit,
     handleDemoConvert,
-    handleActivateCurrencyLine,
-    handleUpsertCurrencyLine,
     handleDemoBuy,
     handleDemoSell,
   } = useDemoActions({
@@ -446,8 +436,6 @@ export default function DemoWalletDashboard({
     convertAmount,
     setConvertPreview,
     setConvertProcessing,
-    currencyLineCode,
-    currencyLineAllocatedRlusd,
   });
 
   const { qrScannerOpen, setQrScannerOpen, handlePaymentRequestScan } =
@@ -577,7 +565,6 @@ export default function DemoWalletDashboard({
         handleDemoRequestGenerated={handleDemoRequestGenerated}
         swapDefaultView={swapDefaultView}
         swapLockedView={swapLockedView}
-        handleActivateCurrencyLine={handleActivateCurrencyLine}
         currencyLinesSummary={currencyLinesSummary}
         currencyLines={currencyLines}
         swapCurrencyOptions={swapCurrencyOptions}
@@ -588,11 +575,6 @@ export default function DemoWalletDashboard({
         convertAmount={convertAmount}
         setConvertAmount={setConvertAmount}
         convertPreview={convertPreview}
-        currencyLineCode={currencyLineCode}
-        setCurrencyLineCode={setCurrencyLineCode}
-        currencyLineAllocatedRlusd={currencyLineAllocatedRlusd}
-        setCurrencyLineAllocatedRlusd={setCurrencyLineAllocatedRlusd}
-        handleUpsertCurrencyLine={handleUpsertCurrencyLine}
         handleDemoConvert={handleDemoConvert}
         convertProcessing={convertProcessing}
         walletContextLabel={walletContextLabel}
