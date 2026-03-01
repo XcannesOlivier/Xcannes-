@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import DemoCurrencyStatement from "../statements/DemoCurrencyStatement";
 import DemoGlobalStatement from "../statements/DemoGlobalStatement";
@@ -51,253 +51,11 @@ export default function DemoWalletDashboardStatementModals({
     return Number.isFinite(value) ? value : 0;
   }, [augmentedTokens]);
 
-  const canFetchStatements = false;
+  // Demo wallet: statements come from local preview data (no on-chain fetch)
+  const previewMovements = previewGlobalMovements || [];
+  const previewTransactions = previewCurrencyTransactions || [];
 
-  const [globalMovements, setGlobalMovements] = useState([]);
-  const [globalCursorNext, setGlobalCursorNext] = useState(null);
-  const [globalHasMore, setGlobalHasMore] = useState(false);
-  const [globalLoading, setGlobalLoading] = useState(false);
-  const [globalLoadingMore, setGlobalLoadingMore] = useState(false);
-  const [globalError, setGlobalError] = useState(null);
-
-  const [currencyTransactions, setCurrencyTransactions] = useState([]);
-  const [currencyStatementMonths, setCurrencyStatementMonths] = useState([]);
-  const [currencyCursorNext, setCurrencyCursorNext] = useState(null);
-  const [currencyBalanceAfterNext, setCurrencyBalanceAfterNext] =
-    useState(null);
-  const [currencyHasMore, setCurrencyHasMore] = useState(false);
-  const [currencyLoadingMore, setCurrencyLoadingMore] = useState(false);
-  const [currencyLoading, setCurrencyLoading] = useState(false);
-  const [currencyError, setCurrencyError] = useState(null);
   const [closingCurrencyToken, setClosingCurrencyToken] = useState(null);
-
-  const fetchStatement = useCallback(async () => {
-    throw new Error(
-      t(
-        "demo_wallet_statements_live_disabled_8f4c2a1d9e",
-        "On-chain statements are disabled in the demo wallet.",
-      ),
-    );
-  }, [t]);
-
-  const loadGlobalFirstPage = useCallback(async () => {
-    if (!canFetchStatements) return;
-    setGlobalLoading(true);
-    setGlobalError(null);
-    try {
-      const data = await fetchStatement({
-        address: backendWalletAddress,
-        limit: 100,
-      });
-      setGlobalMovements(Array.isArray(data?.movements) ? data.movements : []);
-      setGlobalHasMore(Boolean(data?.hasMore));
-      setGlobalCursorNext(data?.cursorNext || null);
-    } catch (err) {
-      console.error("[wallet/statement] global load error:", err);
-      setGlobalError(
-        err?.message ||
-          t("ui_statement_load_failed_9b1c7a2d5e", "Failed to load statement."),
-      );
-      setGlobalMovements([]);
-      setGlobalHasMore(false);
-      setGlobalCursorNext(null);
-    } finally {
-      setGlobalLoading(false);
-    }
-  }, [backendWalletAddress, canFetchStatements, fetchStatement, t]);
-
-  const loadGlobalMore = useCallback(async () => {
-    if (!canFetchStatements || !globalHasMore || !globalCursorNext) return;
-    if (globalLoadingMore) return;
-    setGlobalLoadingMore(true);
-    setGlobalError(null);
-    try {
-      const data = await fetchStatement({
-        address: backendWalletAddress,
-        limit: 100,
-        cursor: globalCursorNext,
-      });
-      const more = Array.isArray(data?.movements) ? data.movements : [];
-      setGlobalMovements((prev) => [...(prev || []), ...more]);
-      setGlobalHasMore(Boolean(data?.hasMore));
-      setGlobalCursorNext(data?.cursorNext || null);
-    } catch (err) {
-      console.error("[wallet/statement] global load more error:", err);
-      setGlobalError(
-        err?.message ||
-          t(
-            "ui_statement_load_more_movements_failed_2a7c1b9d5e",
-            "Failed to load more movements.",
-          ),
-      );
-    } finally {
-      setGlobalLoadingMore(false);
-    }
-  }, [
-    backendWalletAddress,
-    canFetchStatements,
-    fetchStatement,
-    globalCursorNext,
-    globalHasMore,
-    globalLoadingMore,
-    t,
-  ]);
-
-  const loadCurrencyFirstPage = useCallback(
-    async (currencyCode) => {
-      if (!canFetchStatements) return;
-      const code = String(currencyCode || "")
-        .trim()
-        .toUpperCase();
-      if (!code) return;
-
-      setCurrencyLoading(true);
-      setCurrencyError(null);
-      setCurrencyTransactions([]);
-      setCurrencyStatementMonths([]);
-      setCurrencyHasMore(false);
-      setCurrencyCursorNext(null);
-      setCurrencyBalanceAfterNext(null);
-
-      try {
-        const data = await fetchStatement({
-          address: backendWalletAddress,
-          currencyCode: code,
-          limit: 100,
-        });
-        setCurrencyTransactions(
-          Array.isArray(data?.transactions) ? data.transactions : [],
-        );
-        setCurrencyStatementMonths(
-          Array.isArray(data?.statementMonths) ? data.statementMonths : [],
-        );
-        setCurrencyHasMore(Boolean(data?.hasMore));
-        setCurrencyCursorNext(data?.cursorNext || null);
-        setCurrencyBalanceAfterNext(data?.balanceAfterRlusdNext ?? null);
-      } catch (err) {
-        console.error("[wallet/statement] currency load error:", err);
-        setCurrencyError(
-          err?.message ||
-            t(
-              "ui_statement_load_failed_9b1c7a2d5e",
-              "Failed to load statement.",
-            ),
-        );
-        setCurrencyTransactions([]);
-        setCurrencyStatementMonths([]);
-        setCurrencyHasMore(false);
-        setCurrencyCursorNext(null);
-        setCurrencyBalanceAfterNext(null);
-      } finally {
-        setCurrencyLoading(false);
-      }
-    },
-    [backendWalletAddress, canFetchStatements, fetchStatement, t],
-  );
-
-  const loadCurrencyMore = useCallback(
-    async (currencyCode) => {
-      if (!canFetchStatements || currencyLoadingMore) return;
-      const code = String(currencyCode || "")
-        .trim()
-        .toUpperCase();
-      if (!code || !currencyHasMore || !currencyCursorNext) return;
-
-      setCurrencyLoadingMore(true);
-      setCurrencyError(null);
-      try {
-        const data = await fetchStatement({
-          address: backendWalletAddress,
-          currencyCode: code,
-          limit: 100,
-          cursor: currencyCursorNext,
-          balanceAfterRlusd: currencyBalanceAfterNext,
-        });
-        const more = Array.isArray(data?.transactions) ? data.transactions : [];
-        setCurrencyTransactions((prev) => [...(prev || []), ...more]);
-        if (
-          Array.isArray(data?.statementMonths) &&
-          data.statementMonths.length > 0 &&
-          (!currencyStatementMonths || currencyStatementMonths.length === 0)
-        ) {
-          setCurrencyStatementMonths(data.statementMonths);
-        }
-        setCurrencyHasMore(Boolean(data?.hasMore));
-        setCurrencyCursorNext(data?.cursorNext || null);
-        setCurrencyBalanceAfterNext(data?.balanceAfterRlusdNext ?? null);
-      } catch (err) {
-        console.error("[wallet/statement] currency load more error:", err);
-        setCurrencyError(
-          err?.message ||
-            t(
-              "ui_statement_load_more_transactions_failed_1c7b2a9d5e",
-              "Failed to load more transactions.",
-            ),
-        );
-      } finally {
-        setCurrencyLoadingMore(false);
-      }
-    },
-    [
-      backendWalletAddress,
-      canFetchStatements,
-      currencyBalanceAfterNext,
-      currencyCursorNext,
-      currencyHasMore,
-      currencyLoadingMore,
-      currencyStatementMonths,
-      fetchStatement,
-      t,
-    ],
-  );
-
-  const shouldLoadGlobal = showGlobalStatement || inlineGlobalStatement;
-  const shouldLoadCurrency = showCurrencyStatement || inlineCurrencyStatement;
-
-  useEffect(() => {
-    if (!shouldLoadGlobal) return;
-    loadGlobalFirstPage();
-  }, [loadGlobalFirstPage, shouldLoadGlobal]);
-
-  useEffect(() => {
-    if (!shouldLoadCurrency || !selectedStatementToken) return;
-    loadCurrencyFirstPage(selectedStatementToken.currency);
-  }, [loadCurrencyFirstPage, selectedStatementToken, shouldLoadCurrency]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!canFetchStatements || !backendWalletAddress) return;
-
-    const handleWalletRefresh = (event) => {
-      const address = event?.detail?.address;
-      if (!address || address !== backendWalletAddress) return;
-      if (shouldLoadGlobal) {
-        loadGlobalFirstPage();
-      }
-      if (shouldLoadCurrency && selectedStatementToken) {
-        loadCurrencyFirstPage(selectedStatementToken.currency);
-      }
-    };
-
-    window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);
-    return () =>
-      window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
-  }, [
-    backendWalletAddress,
-    canFetchStatements,
-    loadCurrencyFirstPage,
-    loadGlobalFirstPage,
-    selectedStatementToken,
-    shouldLoadCurrency,
-    shouldLoadGlobal,
-  ]);
-
-  const previewMovements = canFetchStatements
-    ? null
-    : previewGlobalMovements || [];
-  const previewTransactions = canFetchStatements
-    ? null
-    : previewCurrencyTransactions || [];
   const effectiveCurrencyToken = selectedStatementToken || closingCurrencyToken;
   const currencyModalOpen = Boolean(
     showCurrencyStatement && selectedStatementToken,
@@ -341,14 +99,12 @@ export default function DemoWalletDashboardStatementModals({
             inline
             usdRates={usdRates}
             totalBalanceOverride={statementTotalBalanceUsd}
-            movements={canFetchStatements ? globalMovements : previewMovements}
-            movementsLoading={canFetchStatements ? globalLoading : false}
-            movementsError={canFetchStatements ? globalError : null}
-            movementsHasMore={canFetchStatements ? globalHasMore : false}
-            movementsLoadingMore={
-              canFetchStatements ? globalLoadingMore : false
-            }
-            onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
+            movements={previewMovements}
+            movementsLoading={false}
+            movementsError={null}
+            movementsHasMore={false}
+            movementsLoadingMore={false}
+            onLoadMoreMovements={null}
             onClose={() => {}}
             onViewCurrency={(token) => {
               setSelectedStatementToken(token);
@@ -382,23 +138,13 @@ export default function DemoWalletDashboardStatementModals({
             inline
             usdRates={usdRates}
             rlusdBalance={rlusdBalance}
-            transactions={
-              canFetchStatements
-                ? currencyTransactions
-                : previewTransactions || []
-            }
-            statementMonths={
-              canFetchStatements ? currencyStatementMonths : null
-            }
-            hasMore={canFetchStatements ? currencyHasMore : false}
-            loadingMore={canFetchStatements ? currencyLoadingMore : false}
-            onLoadMore={
-              canFetchStatements
-                ? () => loadCurrencyMore(selectedStatementToken.currency)
-                : null
-            }
-            loading={canFetchStatements ? currencyLoading : false}
-            error={canFetchStatements ? currencyError : null}
+            transactions={previewTransactions}
+            statementMonths={null}
+            hasMore={false}
+            loadingMore={false}
+            onLoadMore={null}
+            loading={false}
+            error={null}
             highlightTransactionId={highlightTransactionId}
             onClose={() => setShowCurrencyStatement(false)}
           />
@@ -421,12 +167,12 @@ export default function DemoWalletDashboardStatementModals({
           variant={statementVariant}
           usdRates={usdRates}
           totalBalanceOverride={statementTotalBalanceUsd}
-          movements={canFetchStatements ? globalMovements : previewMovements}
-          movementsLoading={canFetchStatements ? globalLoading : false}
-          movementsError={canFetchStatements ? globalError : null}
-          movementsHasMore={canFetchStatements ? globalHasMore : false}
-          movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
-          onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
+          movements={previewMovements}
+          movementsLoading={false}
+          movementsError={null}
+          movementsHasMore={false}
+          movementsLoadingMore={false}
+          onLoadMoreMovements={null}
           isClosing={globalModalTransition.isClosing}
           onClose={() => setShowGlobalStatement(false)}
           onViewCurrency={(token) => {
@@ -461,21 +207,13 @@ export default function DemoWalletDashboardStatementModals({
           variant={statementVariant}
           usdRates={usdRates}
           rlusdBalance={rlusdBalance}
-          transactions={
-            canFetchStatements
-              ? currencyTransactions
-              : previewTransactions || []
-          }
-          statementMonths={canFetchStatements ? currencyStatementMonths : null}
-          hasMore={canFetchStatements ? currencyHasMore : false}
-          loadingMore={canFetchStatements ? currencyLoadingMore : false}
-          onLoadMore={
-            canFetchStatements
-              ? () => loadCurrencyMore(effectiveCurrencyToken.currency)
-              : null
-          }
-          loading={canFetchStatements ? currencyLoading : false}
-          error={canFetchStatements ? currencyError : null}
+          transactions={previewTransactions}
+          statementMonths={null}
+          hasMore={false}
+          loadingMore={false}
+          onLoadMore={null}
+          loading={false}
+          error={null}
           period="December 2025"
           highlightTransactionId={highlightTransactionId}
           isClosing={currencyModalTransition.isClosing}

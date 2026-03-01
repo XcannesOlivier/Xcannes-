@@ -335,16 +335,6 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
   const counterpartyForIndex = (i) =>
     DEMO_COUNTERPARTIES[i % DEMO_COUNTERPARTIES.length];
 
-  const pushTrustlineEvent = ({ walletId, currency, action }) => {
-    events.push({
-      id: newId(),
-      ts: nextTs(),
-      kind: action === "remove" ? "trustline_remove" : "trustline_add",
-      wallet: walletId,
-      currency: String(currency || "").toUpperCase(),
-    });
-  };
-
   uniqueCurrencies.forEach((currency, idx) => {
     const allocation = resolveWalletAllocation(walletA, currency);
     if (!allocation) return;
@@ -353,14 +343,6 @@ function buildDemoEvents(wallets, ratesUsdPerUnit) {
       allocation,
       ratesUsdPerUnit,
     );
-
-    // Occasional trustline operations for non-native currencies.
-    if (currency !== "XRP" && currency !== "RLUSD") {
-      if (idx % 4 === 0)
-        pushTrustlineEvent({ walletId: "A", currency, action: "add" });
-      if (idx % 11 === 0)
-        pushTrustlineEvent({ walletId: "A", currency, action: "remove" });
-    }
 
     // Outgoing payments.
     const counterparty = counterpartyForIndex(idx);
@@ -869,26 +851,6 @@ export function applyDemoBuySell({
   pushEvent(state, event);
 
   return { ok: true, event };
-}
-
-export function applyDemoEnableCurrency({ state, walletId, currencyCode }) {
-  if (!state || !state.wallets) return { ok: false, error: "invalid_state" };
-  const wallet = state.wallets[walletId];
-  if (!wallet) return { ok: false, error: "invalid_wallet" };
-
-  const currency = String(currencyCode || "").toUpperCase();
-  if (!currency) return { ok: false, error: "invalid_currency" };
-
-  if (wallet.allocations?.[currency] !== undefined) return { ok: true };
-  ensureAllocation(wallet, currency);
-  pushEvent(state, {
-    id: newId(),
-    ts: Date.now(),
-    kind: "trustline_add",
-    wallet: walletId,
-    currency,
-  });
-  return { ok: true };
 }
 
 function listWalletEvents(state, walletId) {
