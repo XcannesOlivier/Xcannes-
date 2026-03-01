@@ -209,5 +209,5 @@ export const getCurrencyDescription = (code) => {
     DCR: "Decred",
   };
 
-  return descriptions[code] || "Exchange Rate Account";
+  return descriptions[code] || undefined;
 };
