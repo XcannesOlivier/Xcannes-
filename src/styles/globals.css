@@ -27,9 +27,8 @@
   --accent-primary: #16a34a; /* proche xcannes-green, légèrement adouci */
   --accent-secondary: #38bdf8;
 
-  /* Accents spécifiques RLUSD / RLUSD (peu saturés) */
+  /* Accent spécifique RLUSD */
   --accent-rlusd: #4ade80; /* vert stable RLUSD */
-  --accent-rlusd: #fbbf24; /* or doux RLUSD */
 
   /* Status / trading */
   --success: #16a34a;
@@ -64,16 +63,8 @@
 
 /* Utilitaires sémantiques basés sur les tokens */
 
-.bg-base {
-  background-color: var(--bg-base);
-}
-
 .bg-elevated {
   background-color: var(--bg-elevated);
-}
-
-.bg-subtle {
-  background-color: var(--bg-subtle);
 }
 
 .border-subtle {
@@ -84,24 +75,12 @@
   color: var(--text-primary);
 }
 
-.text-secondary {
-  color: var(--text-secondary);
-}
-
 .text-muted {
   color: var(--text-muted);
 }
 
 .accent-rlusd {
   color: var(--accent-rlusd);
-}
-
-.accent-rlusd {
-  color: var(--accent-rlusd);
-}
-
-.bg-accent-rlusd {
-  background-color: var(--accent-rlusd);
 }
 
 .bg-accent-rlusd {
@@ -112,46 +91,9 @@
   border-color: var(--accent-rlusd);
 }
 
-.text-price-up {
-  color: var(--price-up);
-}
-
-.text-price-down {
-  color: var(--price-down);
-}
-
-.focus-ring-token:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
-.panel-surface {
-  background-color: var(--bg-elevated);
-  border-radius: var(--radius-medium);
-  border: var(--border-thin);
-}
-
-/* Panel spécifique pour le chart : bordures desktop, fondu sur mobile */
-.chart-panel {
-  background-color: var(--bg-elevated);
-  border-radius: 0;
-  border: none;
-}
-
-@media (min-width: 1024px) {
-  .chart-panel {
-    border-left: var(--border-thin);
-    border-right: var(--border-thin);
-  }
-}
-
 .panel-header {
   padding: calc(var(--panel-padding-y) * 0.75) var(--panel-padding-x);
   border-bottom: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.panel-body {
-  padding: var(--panel-padding-y) var(--panel-padding-x);
 }
 
 /* Fullscreen helpers (mobile safe) */
@@ -186,14 +128,6 @@
   }
 }
 
-.xcannes-safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.xcannes-safe-top {
-  padding-top: env(safe-area-inset-top);
-}
-
 /* Header nav hover: progressive underline + arrow drift */
 .header-nav-link {
   display: inline-flex;
@@ -209,11 +143,6 @@
 
   .header-nav-link .header-nav-label {
     font-size: 1rem; /* Réduit pour mobile de 1.5rem à 1rem pour être plus compact */
-  }
-  
-  /* Navigation mobile temporaire après animation hero */
-  nav.mobile-temp-nav {
-    font-size: 0.9rem;
   }
 }
 
@@ -477,31 +406,11 @@ body.wallet-page {
   }
 }
 
-.demo-wallet-theme-home {
-  --bg-base: rgba(255, 255, 255, 0.04);
-  --bg-elevated: rgba(255, 255, 255, 0.05);
-  --bg-subtle: rgba(255, 255, 255, 0.08);
-}
-
-.demo-wallet-theme-home .panel-header {
-  border-bottom-color: rgba(255, 255, 255, 0.12);
-}
-
-.demo-wallet-theme-dex {
-  --bg-base: #0a0f0d;
-  --bg-elevated: #071420;
-  --bg-subtle: #0b1b2a;
-}
-
 @media (hover: none) {
-  .demo-wallet-theme-home [title],
-  .demo-wallet-theme-dex [title],
   .demo-wallet-tooltip-scope [title] {
     position: relative;
   }
 
-  .demo-wallet-theme-home [title]::after,
-  .demo-wallet-theme-dex [title]::after,
   .demo-wallet-tooltip-scope [title]::after {
     content: attr(title);
     position: absolute;
@@ -531,8 +440,6 @@ body.wallet-page {
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
 
-  .demo-wallet-theme-home [title]::before,
-  .demo-wallet-theme-dex [title]::before,
   .demo-wallet-tooltip-scope [title]::before {
     content: "";
     position: absolute;
@@ -555,12 +462,6 @@ body.wallet-page {
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
 
-  .demo-wallet-theme-home [title]:active::after,
-  .demo-wallet-theme-home [title]:focus::after,
-  .demo-wallet-theme-home [title]:focus-visible::after,
-  .demo-wallet-theme-dex [title]:active::after,
-  .demo-wallet-theme-dex [title]:focus::after,
-  .demo-wallet-theme-dex [title]:focus-visible::after,
   .demo-wallet-tooltip-scope [title]:active::after,
   .demo-wallet-tooltip-scope [title]:focus::after,
   .demo-wallet-tooltip-scope [title]:focus-visible::after {
@@ -568,12 +469,6 @@ body.wallet-page {
     transform: translate(-50%, 0);
   }
 
-  .demo-wallet-theme-home [title]:active::before,
-  .demo-wallet-theme-home [title]:focus::before,
-  .demo-wallet-theme-home [title]:focus-visible::before,
-  .demo-wallet-theme-dex [title]:active::before,
-  .demo-wallet-theme-dex [title]:focus::before,
-  .demo-wallet-theme-dex [title]:focus-visible::before,
   .demo-wallet-tooltip-scope [title]:active::before,
   .demo-wallet-tooltip-scope [title]:focus::before,
   .demo-wallet-tooltip-scope [title]:focus-visible::before {
@@ -582,16 +477,12 @@ body.wallet-page {
 }
 
 @media (hover: none) and (max-width: 640px) {
-  .demo-wallet-theme-home [title]::after,
-  .demo-wallet-theme-dex [title]::after,
   .demo-wallet-tooltip-scope [title]::after {
     max-width: min(320px, 86vw);
     padding: 10px 12px;
     font-size: 13px;
   }
 
-  .demo-wallet-theme-home [title]::before,
-  .demo-wallet-theme-dex [title]::before,
   .demo-wallet-tooltip-scope [title]::before {
     width: 9px;
     height: 9px;
@@ -668,22 +559,6 @@ body {
 
 /* ========= ANIMATIONS ========= */
 
-/* Gradient animé pour hero */
-@keyframes gradient {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient 15s ease infinite;
-}
-
 /* Fade-in progressif */
 @keyframes fadeIn {
   from {
@@ -696,102 +571,8 @@ body {
   }
 }
 
-@keyframes essentialsSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes essentialsFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ====== EOD FX buttons flash (neutral + pulse) ====== */
-
-@keyframes eodFlashUp {
-  0% {
-    background-color: rgba(22, 163, 74, 0.6);
-  }
-  100% {
-    background-color: rgba(15, 23, 42, 0.7);
-  }
-}
-
-@keyframes eodFlashDown {
-  0% {
-    background-color: rgba(220, 38, 38, 0.6);
-  }
-  100% {
-    background-color: rgba(15, 23, 42, 0.7);
-  }
-}
-
-.eod-flash-up-a,
-.eod-flash-up-b {
-  animation: eodFlashUp var(--eod-flash-duration, 0.8s) ease-out;
-}
-
-.eod-flash-down-a,
-.eod-flash-down-b {
-  animation: eodFlashDown var(--eod-flash-duration, 0.8s) ease-out;
-}
-
-.animate-fade-in {
-  animation: fadeIn 1s ease-out forwards;
-}
-
 .animate-fadeIn {
   animation: fadeIn 0.6s ease-out forwards;
-}
-
-.animate-essentials-slide-in {
-  animation: essentialsSlideIn 0.9s ease-out;
-}
-
-.animate-essentials-fade {
-  animation: essentialsFadeIn 0.4s ease-out;
-}
-
-/* ====== PRICE TICKER (défilement horizontal) ====== */
-
-.price-ticker-viewport {
-  overflow: hidden;
-}
-
-.price-ticker-track {
-  animation: priceTickerScroll 60s linear infinite;
-  will-change: transform;
-}
-
-.price-ticker-track.paused {
-  animation-play-state: paused;
-}
-
-@keyframes priceTickerScroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-@media (max-width: 768px) {
-  .price-ticker-track {
-    animation: priceTickerScroll 12s linear infinite;
-  }
 }
 
 /* ====== HOME PAGE CONTENT WRAPPER (ajustement pour animation header) ====== */

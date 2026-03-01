@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         baseCurrencyCode,
         baseCurrencyAmount,
         quoteCurrencyAmount,
-        xummUuid: walletAuthToken, // legacy param name for moonpay-service compat
+        walletAuthToken,
         options,
       }),
     });

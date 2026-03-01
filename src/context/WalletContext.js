@@ -50,7 +50,7 @@ export const WalletProviderSwitch = ({ children }) => {
     setActiveProvider(readProvider());
   }, []);
 
-  // Xumm provider removed — only native and pwa remain
+  // Only native and pwa providers remain
   const native = useNativeWallet();
   const pwa = usePwaEmbedded();
 

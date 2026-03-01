@@ -260,13 +260,11 @@ export default function Contact() {
             </div>
             <div className="bg-elevated border border-white/10 rounded-2xl p-4 flex items-start justify-center md:justify-start">
               <ReCAPTCHA
-                sitekey="VOTRE_CLE_RECAPTCHA_ICI"
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
                 onChange={(token) => setCaptchaToken(token)}
                 theme="dark" />
             </div>
           </div>
-
-          {/* Back Button removed */}
         </main>
 
       </div>
