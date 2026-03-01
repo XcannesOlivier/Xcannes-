@@ -195,8 +195,6 @@ export default function DemoWalletModals({
         augmentedTokens={selectableTokens}
         requestMemo={requestMemo}
         setRequestMemo={setRequestMemo}
-        rlusdPerUnitRates={rlusdPerUnitRates}
-        rlusdPerUnitSources={rlusdPerUnitSources}
         onRequestGenerated={handleDemoRequestGenerated}
       />
 

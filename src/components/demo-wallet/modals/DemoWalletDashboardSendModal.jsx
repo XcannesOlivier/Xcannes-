@@ -77,7 +77,7 @@ export default function DemoWalletDashboardSendModal({
       : "130px";
   const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
   const fauxPayreqExample =
-    '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"FAWAZ","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+    '{"schema":"xcannes-demo-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","ccy":"USD","amt":10}';
   const showManualQrUpload = false;
   const showRealDesktopQrImage = !isDemoMode && isDesktop;
   const showManualStaticQr = isDesktop;
@@ -212,33 +212,8 @@ export default function DemoWalletDashboardSendModal({
   const looksLikeQrPayload = (value) => {
     const raw = String(value || "").trim();
     if (!raw) return false;
-    if (/^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(raw)) return true;
-    if (/^xrpl:/i.test(raw)) return true;
+    if (/^xcannes-demo:/i.test(raw)) return true;
     if (looksLikeXrplAddress(raw)) return true;
-    if (
-      raw.startsWith("{") &&
-      /"to"|"targetCurrency"|"schema"|"payreq"/i.test(raw)
-    ) {
-      return true;
-    }
-    if (/^https?:/i.test(raw)) {
-      try {
-        const url = new URL(raw);
-        const req =
-          url.searchParams.get("req") ||
-          url.searchParams.get("payreq") ||
-          url.searchParams.get("xcannes_payreq");
-        if (req) return true;
-        const candidate =
-          url.searchParams.get("to") ||
-          url.searchParams.get("destination") ||
-          (url.hostname && url.hostname !== "xrpl" ? url.hostname : "") ||
-          (url.pathname || "").replace(/^\/+/, "");
-        if (candidate && looksLikeXrplAddress(candidate)) return true;
-      } catch {
-        return false;
-      }
-    }
     return false;
   };
   const handlePastePayload = (event) => {
@@ -787,7 +762,7 @@ export default function DemoWalletDashboardSendModal({
             }`}
             placeholder={t(
               "ui_payreq_placeholder_3a9c1b7d2e",
-              "xcannes-payreq:... / JSON",
+              "xcannes-demo:... / address",
             )}
           />
         </div>

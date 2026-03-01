@@ -1,15 +1,13 @@
 "use client";
 
-import { Buffer } from "buffer";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { XRPL_KNOWN_ISSUERS } from "../utils/demoXrpl";
 import { getCurrencySymbol } from "../demoWalletDashboardConfig";
-import { XCANNES_MEMO_SCHEMAS } from "../utils/demoXrplMemo";
+import { buildDemoPayreq, encodeDemoPayreqQR } from "../utils/demoXrplMemo";
 import { useModalTransition } from "@/utils/useModalTransition";
 
 const ShareIcon = ({ className = "" }) => (
@@ -54,8 +52,6 @@ export default function DemoWalletDashboardReceiveModal({
   augmentedTokens,
   requestMemo,
   setRequestMemo,
-  rlusdPerUnitRates,
-  rlusdPerUnitSources,
   walletLabel,
   onRequestGenerated,
   inline = false,
@@ -150,16 +146,6 @@ export default function DemoWalletDashboardReceiveModal({
     setGenerateError(null);
   }, [wallet, requestAmount, requestCurrency, requestMemo]);
 
-  const isFxRequest = useMemo(() => {
-    if (!selectedRequestToken?.isTrustlineOnly) return false;
-    if (!requestCurrencyCode) return false;
-    return (
-      requestCurrencyCode !== "XRP" &&
-      requestCurrencyCode !== "RLUSD" &&
-      requestCurrencyCode !== "RLUSD"
-    );
-  }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
-
   const handleGenerateRequest = () => {
     setGenerateError(null);
 
@@ -188,59 +174,14 @@ export default function DemoWalletDashboardReceiveModal({
     const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
     const displayCurrencyUpper =
       targetCurrencyUpper === "RLUSD" ? "USD" : targetCurrencyUpper;
-    let amountRlusd = null;
-    let fxRate = null;
-    let fxSource = null;
-
-    if (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD") {
-      amountRlusd = amount;
-      fxRate = 1;
-      fxSource = "FAWAZ";
-    } else {
-      const rate = Number(rlusdPerUnitRates?.[targetCurrencyUpper]);
-      if (!Number.isFinite(rate) || rate <= 0) {
-        setGenerateError(
-          t("ui_request_error_rate_unavailable_8c2e1a7b5d", {
-            defaultValue: "Rate unavailable for {{currency}}.",
-            currency: targetCurrencyUpper,
-          }),
-        );
-        return;
-      }
-      fxRate = rate;
-      fxSource = rlusdPerUnitSources?.[targetCurrencyUpper] || null;
-      amountRlusd = amount * rate;
-    }
-
-    const issuerCandidate = String(selectedRequestToken?.issuer || "").trim();
-    const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(
-      issuerCandidate,
-    );
-    const knownIssuer =
-      targetCurrencyUpper === "RLUSD"
-        ? XRPL_KNOWN_ISSUERS.RLUSD
-        : targetCurrencyUpper === "RLUSD"
-          ? XRPL_KNOWN_ISSUERS.RLUSD
-          : null;
-    const issuer = isFxRequest
-      ? null
-      : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
     const beneficiaryLabel = String(walletLabel || "").trim() || null;
-    const req = {
-      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
+    const req = buildDemoPayreq({
       to: wallet,
-      targetCurrency: targetCurrencyUpper,
-      displayAmount: amount,
-      displayCurrency: displayCurrencyUpper,
-      amountRlusd: Number.isFinite(amountRlusd) ? amountRlusd : null,
-      fxRate,
-      fxSource,
-      issuer,
-      memo: requestMemo || "",
-      beneficiaryLabel,
-      createdAt: new Date().toISOString(),
-    };
+      currency: displayCurrencyUpper,
+      amount,
+      beneficiary: beneficiaryLabel,
+    });
 
     setGeneratedRequest(req);
     onRequestGenerated?.(req);
@@ -446,55 +387,19 @@ export default function DemoWalletDashboardReceiveModal({
     }
   };
 
-  const requestValue = useMemo(() => {
-    if (!generatedRequest) return "";
-    try {
-      const compact = {
-        s: generatedRequest.schema,
-        to: generatedRequest.to,
-        tc:
-          generatedRequest.targetCurrency ||
-          generatedRequest.targetCurrencyCode,
-        da: generatedRequest.displayAmount ?? generatedRequest.amount ?? null,
-        dc: generatedRequest.displayCurrency || null,
-        ar: generatedRequest.amountRlusd ?? null,
-        fr: generatedRequest.fxRate ?? null,
-        fs: generatedRequest.fxSource ?? null,
-        i: generatedRequest.issuer ?? null,
-        m: generatedRequest.memo ?? null,
-        b: generatedRequest.beneficiaryLabel ?? null,
-      };
-      Object.keys(compact).forEach((key) => {
-        if (compact[key] == null || compact[key] === "") delete compact[key];
-      });
-      return JSON.stringify(compact);
-    } catch {
-      return "";
-    }
-  }, [generatedRequest]);
   const requestQrValue = useMemo(() => {
-    if (!requestValue) return "";
-    try {
-      const base64 = Buffer.from(requestValue, "utf8").toString("base64");
-      const base64Url = base64
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/g, "");
-      return `xcannes-payreq:${base64Url}`;
-    } catch {
-      return "";
-    }
-  }, [requestValue]);
+    return encodeDemoPayreqQR(generatedRequest);
+  }, [generatedRequest]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
   const qrDisplaySize = inline ? 240 : 220;
   const qrPixelSize = inline ? 360 : hasGeneratedRequest ? 520 : 420;
   const requestDisplayCurrency = String(
-    generatedRequest?.displayCurrency || requestCurrencyCode || "USD",
+    generatedRequest?.ccy || requestCurrencyCode || "USD",
   )
     .trim()
     .toUpperCase();
   const requestDisplayAmount =
-    generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || "0");
+    generatedRequest?.amt ?? Number.parseFloat(requestAmount || "0");
   const requestDisplayAmountLabel = Number.isFinite(
     Number(requestDisplayAmount),
   )

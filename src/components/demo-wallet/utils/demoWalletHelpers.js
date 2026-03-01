@@ -14,7 +14,7 @@ import {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 export const DEMO_FAUX_PAYREQ_EXAMPLE =
-  '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"FAWAZ","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+  '{"schema":"xcannes-demo-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","ccy":"USD","amt":10}';
 
 export const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 export const DEMO_SAVED_ADDRESSES_STORAGE_KEY =
