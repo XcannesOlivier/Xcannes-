@@ -70,13 +70,23 @@ export default function DemoWalletDashboardSwapModal({
   }, []);
 
   const swapCurrencyOptionsSanitized = useMemo(() => {
-    return (swapCurrencyOptions || []).filter(
+    const base = (swapCurrencyOptions || []).filter(
       (code) =>
         String(code || "")
           .trim()
           .toUpperCase() !== "USD",
     );
-  }, [swapCurrencyOptions]);
+    // Include the currently-selected quote even if not yet in the wallet
+    const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
+    if (
+      quoteUpper &&
+      quoteUpper !== "USD" &&
+      !base.some((c) => String(c).toUpperCase() === quoteUpper)
+    ) {
+      base.push(quoteUpper);
+    }
+    return base;
+  }, [swapCurrencyOptions, convertQuoteCurrency]);
 
   const showDesktopWalletConvertNote =
     inline &&
