@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import xcannesApi from "@/lib/xcannesApi";
 
 export function useUsdTotalLabel({
   augmentedTokens,
@@ -11,9 +10,8 @@ export function useUsdTotalLabel({
   demoTotalUsd,
   isStablecoin,
   cryptoIcons,
-  getAllMarkets,
   getTicker,
-  getFxEod,
+  fiatRates,
   rlusdOnChain,
 } = {}) {
   const [usdRates, setUsdRates] = useState({});
@@ -46,7 +44,7 @@ export function useUsdTotalLabel({
       return Number.isFinite(price) && price > 0 ? price : NaN;
     };
 
-    const resolveUsdRate = async (code, fawazSet) => {
+    const resolveUsdRate = async (code) => {
       const upper = String(code || "").toUpperCase();
       if (!upper) return NaN;
       if (upper === "USD" || upper === "RLUSD") return 1;
@@ -67,28 +65,9 @@ export function useUsdTotalLabel({
         return NaN;
       }
 
-      // Skip Fawaz si la devise n'est pas dans la liste supportée
-      if (!fawazSet || !fawazSet.has(upper)) return NaN;
-
-      try {
-        const fxResult = await getFxEod?.("USD", upper, 30);
-        const candles = Array.isArray(fxResult?.candles)
-          ? fxResult.candles
-          : [];
-        const last = candles[candles.length - 1];
-        const close =
-          last && last.close != null
-            ? Number(last.close)
-            : last && last.price != null
-              ? Number(last.price)
-              : NaN;
-
-        if (Number.isFinite(close) && close > 0) {
-          return 1 / close;
-        }
-      } catch (err) {
-        console.warn("USD rate Fawaz error:", err);
-      }
+      // Utiliser les taux fiat pré-chargés (useRlusdPerUnitRates)
+      const rate = Number(fiatRates?.[upper]);
+      if (Number.isFinite(rate) && rate > 0) return rate;
 
       return NaN;
     };
@@ -100,18 +79,11 @@ export function useUsdTotalLabel({
       }
 
       try {
-        const fxCurrencies = getFxEod ? await xcannesApi.getFxCurrencies() : [];
-        const fawazSet = new Set(
-          (Array.isArray(fxCurrencies) ? fxCurrencies : [])
-            .map((c) => String(c?.code || c || "").toUpperCase())
-            .filter(Boolean),
-        );
-
         const codes = rateCodesKey.split("|").filter(Boolean);
         const rates = {};
         await Promise.all(
           codes.map(async (code) => {
-            rates[code] = await resolveUsdRate(code, fawazSet);
+            rates[code] = await resolveUsdRate(code);
           }),
         );
 
@@ -129,7 +101,7 @@ export function useUsdTotalLabel({
     };
   }, [
     cryptoIcons,
-    getFxEod,
+    fiatRates,
     getTicker,
     isStablecoin,
     rateCodesKey,
