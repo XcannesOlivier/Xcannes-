@@ -97,7 +97,7 @@ export default function SupportAssistantWidget({ mode = "support" }) {
   const messageBody = isTrading
     ? t(
         "ui_describe_trading_question_cc5c9669ff",
-        "Décrivez votre question de trading (pair XRPL, Pyth, EOD, carnet d'ordres...) et je vous aiderai à comprendre ce que vous voyez à l'écran."
+        "Décrivez votre question de trading (pair XRPL, EOD, carnet d'ordres...) et je vous aiderai à comprendre ce que vous voyez à l'écran."
       )
     : t(
         "home_support_msg_body",

@@ -181,12 +181,12 @@ class XcannesAPI {
   }
 
   /**
-   * Récupérer toutes les paires incluant pyth
+   * Récupérer toutes les paires de trading
    * @returns {Promise<Object>}
    */
   async getAllMarkets() {
     const result = await this.request(API_ENDPOINTS.MARKETS_ALL);
-    return result.success ? result.data : { trading: [], pyth: [] };
+    return result.success ? result.data : { trading: [] };
   }
 
   /**

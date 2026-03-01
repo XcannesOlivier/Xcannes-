@@ -8,8 +8,6 @@ export const XcannesWSProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
   const [tickers, setTickers] = useState(new Map()); // Map<pair, ticker>
   const [tickersVersion, setTickersVersion] = useState(0); // ✅ Compteur pour forcer re-render
-  const [externalPrices, setExternalPrices] = useState(new Map()); // Map<symbol, pythPrice> unifié
-  const [externalPricesVersion, setExternalPricesVersion] = useState(0); // ✅ Compteur pour forcer re-render
   const [wsErrors, setWsErrors] = useState([]); // Derniers messages d'erreur WS (optionnel)
 
   useEffect(() => {
@@ -40,25 +38,6 @@ export const XcannesWSProvider = ({ children }) => {
     };
 
     wsClient.on("ticker", handleTicker);
-
-    // Écouter les prix externes Pyth (canal unifié)
-    const handlePyth = (message) => {
-      // Log détaillé volontairement désactivé pour éviter de saturer la console
-      // quand le flux Pyth envoie beaucoup de ticks.
-      // if (DEBUG_LOGS) {
-      //   console.log("[XcannesWS] 🌐 Pyth reçu:", message.data?.symbol || message);
-      // }
-      if (message.data && message.data.symbol) {
-        setExternalPrices(prev => {
-          const next = new Map(prev);
-          next.set(message.data.symbol, message.data);
-          return next;
-        });
-        setExternalPricesVersion(v => v + 1); // ✅ Incrémenter pour forcer re-render
-      }
-    };
-
-    wsClient.on("pyth", handlePyth);
 
     // ✅ Écouter le canal "eod-summary" agrégé (toutes les paires en un message)
     const handleEodSummary = (message) => {
@@ -109,7 +88,6 @@ export const XcannesWSProvider = ({ children }) => {
     return () => {
       // Ne pas fermer la connexion (singleton partagé)
       wsClient.off("ticker", handleTicker);
-      wsClient.off("pyth", handlePyth);
       wsClient.off("eod-summary", handleEodSummary);
       wsClient.off("error", handleWsError);
     };
@@ -128,14 +106,12 @@ export const XcannesWSProvider = ({ children }) => {
   const value = useMemo(() => ({
     connected,
     tickers,
-    tickersVersion, // ✅ Exposer le compteur
-    externalPrices,
-    externalPricesVersion, // ✅ Exposer le compteur
+    tickersVersion,
     wsErrors,
     subscribe,
     unsubscribe,
     ws: wsClient,
-  }), [connected, tickers, tickersVersion, externalPrices, externalPricesVersion, wsErrors, subscribe, unsubscribe]);
+  }), [connected, tickers, tickersVersion, wsErrors, subscribe, unsubscribe]);
 
   return (
     <XcannesWSContext.Provider value={value}>

@@ -3,13 +3,12 @@
  *
  * Handles:
  * - Building the list of required currency codes from wallet allocations + form selections.
- * - Periodic fetch via xcannesApi.getAllMarkets() + resolveUsdPerUnit().
+ * - Periodic fetch via resolveUsdPerUnit() (Fawaz EOD).
  * - Staleness detection (if we haven't refreshed within DEMO_RATES_STALE_AFTER_MS, blend fallback rates).
  * - Derived rlusdPerUnitRates / rlusdPerUnitSources aliases.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import xcannesApi from "@/lib/xcannesApi";
 import { getDemoRatesUsdPerUnit } from "../DemoWalletModel";
 import {
   DEMO_RATES_REFRESH_MS,
@@ -39,8 +38,8 @@ export function useDemoRates({
     ...fallbackUsdPerUnit,
   }));
   const [usdPerUnitSources, setUsdPerUnitSources] = useState(() => ({
-    USD: "PYTH",
-    RLUSD: "PYTH",
+    USD: "FAWAZ",
+    RLUSD: "FAWAZ",
   }));
   const [ratesLastOkTs, setRatesLastOkTs] = useState(() => Date.now());
   const [ratesNowTs, setRatesNowTs] = useState(() => Date.now());
@@ -89,22 +88,12 @@ export function useDemoRates({
   // ── Fetch rates from backend ──
   const refreshRates = useCallback(async () => {
     try {
-      const markets = await xcannesApi.getAllMarkets();
-      const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
-      const pythPairsMap = new Map();
-      pythPairs.forEach((pair) => {
-        const base = String(pair?.base || "").toUpperCase();
-        const quote = String(pair?.quote || "").toUpperCase();
-        if (!base || !quote) return;
-        pythPairsMap.set(`${base}_${quote}`, pair);
-      });
-
       const nextRates = { USD: 1, RLUSD: 1 };
-      const nextSources = { USD: "PYTH", RLUSD: "PYTH" };
+      const nextSources = { USD: "FAWAZ", RLUSD: "FAWAZ" };
 
       await Promise.all(
         (requiredRateCodes || []).map(async (code) => {
-          const resolved = await resolveUsdPerUnit(code, pythPairsMap);
+          const resolved = await resolveUsdPerUnit(code);
           const num = Number(resolved?.rate);
           if (!Number.isFinite(num) || num <= 0) return;
           const upper = String(code || "").toUpperCase();

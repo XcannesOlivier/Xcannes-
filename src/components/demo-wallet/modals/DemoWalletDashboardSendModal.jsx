@@ -77,7 +77,7 @@ export default function DemoWalletDashboardSendModal({
       : "130px";
   const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
   const fauxPayreqExample =
-    '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+    '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"FAWAZ","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
   const showManualQrUpload = false;
   const showRealDesktopQrImage = !isDemoMode && isDesktop;
   const showManualStaticQr = isDesktop;

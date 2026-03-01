@@ -3,43 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import xcannesApi from "@/lib/xcannesApi";
 
-function extractTickerPrice(ticker) {
-  const priceSource =
-    ticker?.lastPrice ??
-    ticker?.price ??
-    ticker?.midPrice ??
-    ticker?.bidPrice ??
-    ticker?.askPrice;
-  const price = Number(priceSource);
-  return Number.isFinite(price) && price > 0 ? price : Number.NaN;
-}
-
-async function resolveUsdPerUnit(code, pythPairsMap, fawazSet) {
+async function resolveUsdPerUnit(code, fawazSet) {
   const upper = String(code || "").toUpperCase();
   if (!upper) return { rate: Number.NaN, source: null };
-  if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "PYTH" };
-
-  try {
-    const directKey = `${upper}_USD`;
-    const inverseKey = `USD_${upper}`;
-
-    if (pythPairsMap?.has?.(directKey)) {
-      const meta = pythPairsMap.get(directKey);
-      const ticker = await xcannesApi.getTicker(meta?.symbol || directKey);
-      const price = extractTickerPrice(ticker);
-      if (Number.isFinite(price)) return { rate: price, source: "PYTH" };
-    }
-
-    if (pythPairsMap?.has?.(inverseKey)) {
-      const meta = pythPairsMap.get(inverseKey);
-      const ticker = await xcannesApi.getTicker(meta?.symbol || inverseKey);
-      const price = extractTickerPrice(ticker);
-      if (Number.isFinite(price) && price > 0)
-        return { rate: 1 / price, source: "PYTH" };
-    }
-  } catch (_err) {
-    // fallback below
-  }
+  if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "FAWAZ" };
 
   // Skip Fawaz si la devise n'est pas dans la liste supportée
   if (!fawazSet || !fawazSet.has(upper)) {
@@ -91,18 +58,7 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
 
       setLoading(true);
       try {
-        const [markets, fxCurrencies] = await Promise.all([
-          xcannesApi.getAllMarkets(),
-          xcannesApi.getFxCurrencies(),
-        ]);
-        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
-        const pythPairsMap = new Map();
-        pythPairs.forEach((pair) => {
-          const base = String(pair?.base || "").toUpperCase();
-          const quote = String(pair?.quote || "").toUpperCase();
-          if (!base || !quote) return;
-          pythPairsMap.set(`${base}_${quote}`, pair);
-        });
+        const fxCurrencies = await xcannesApi.getFxCurrencies();
         const fawazSet = new Set(
           (Array.isArray(fxCurrencies) ? fxCurrencies : [])
             .map((c) => String(c?.code || c || "").toUpperCase())
@@ -115,7 +71,7 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
 
         await Promise.all(
           codes.map(async (code) => {
-            const resolved = await resolveUsdPerUnit(code, pythPairsMap, fawazSet);
+            const resolved = await resolveUsdPerUnit(code, fawazSet);
             next[code] = resolved?.rate;
             nextSources[code] = resolved?.source || null;
           }),

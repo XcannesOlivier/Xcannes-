@@ -206,8 +206,8 @@ class XcannesWebSocket {
     const { type, data, channel } = message;
 
     const hasListeners = this.listeners.has(type);
-    // Ne pas logger chaque tick Pyth pour éviter de saturer la console
-    const isDebug = DEBUG_LOGS && type !== 'pyth';
+    // Ne pas logger en mode production pour éviter de saturer la console
+    const isDebug = DEBUG_LOGS;
 
     if (isDebug) {
       // Log discret en mode debug uniquement
@@ -263,7 +263,7 @@ class XcannesWebSocket {
 
   /**
    * Écouter un type d'événement
-   * @param {string} eventType - 'ticker', 'pyth', 'eod-summary', 'wallet', 'connected', 'heartbeat'
+   * @param {string} eventType - 'ticker', 'eod-summary', 'wallet', 'connected', 'heartbeat'
    * @param {Function} callback
    */
   on(eventType, callback) {
@@ -323,7 +323,7 @@ class XcannesWebSocket {
 
   /**
    * S'abonner à un canal pour une paire
-   * @param {string} channel - 'ticker' ou 'pyth' (et canaux spéciaux: 'eod-summary', 'wallet')
+   * @param {string} channel - 'ticker' (et canaux spéciaux: 'eod-summary', 'wallet')
    * @param {string} pair - Format: RLUSD_XRP
    */
   subscribe(channel, pair) {
@@ -374,7 +374,7 @@ class XcannesWebSocket {
 
   /**
    * Se désabonner d'un canal pour une paire
-   * @param {string} channel - 'ticker' ou 'pyth' (et canaux spéciaux: 'eod-summary', 'wallet')
+   * @param {string} channel - 'ticker' (et canaux spéciaux: 'eod-summary', 'wallet')
    * @param {string} pair - Format: RLUSD_XRP
    */
   unsubscribe(channel, pair) {

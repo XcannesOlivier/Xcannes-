@@ -185,7 +185,7 @@ export function WalletInfoContent({
           <p className="mt-2 text-[12px] text-white/45">
             {t(
               "ui_source_de_rate_paires_live_v_6b7123ea24",
-              "Source de taux: paires “live” via Pyth quand disponible, sinon FX EOD (coté 1×/jour).",
+              "Source de taux: FX EOD (coté 1×/jour).",
             )}
           </p>
         </section>
