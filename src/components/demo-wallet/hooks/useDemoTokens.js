@@ -282,6 +282,72 @@ export function useDemoTokens({
     return icons;
   }, [augmentedTokens]);
 
+  // ── Currency-lines (for swap "Manage" panel) ──
+  const currencyLinesBase = useMemo(() => {
+    return (augmentedTokens || [])
+      .filter((token) => token.isTrustlineOnly && token.currency !== "USD")
+      .map((token) => {
+        const code = String(token.currency || "").toUpperCase();
+        const rate = Number(rlusdPerUnitRates?.[code] || 0);
+        const allocatedRlusd = rate > 0 ? Number(token.value || 0) * rate : 0;
+        return { currencyCode: code, allocatedRlusd };
+      });
+  }, [augmentedTokens, rlusdPerUnitRates]);
+
+  const currencyLinesSummary = useMemo(() => {
+    return {
+      rlusdOnChain: allocationSummary.rlusdOnChain,
+      totalAllocatedRlusd: allocationSummary.totalAllocatedUsd,
+      unallocatedRlusd: allocationSummary.unallocatedRlusd,
+    };
+  }, [allocationSummary]);
+
+  const currencyLines = useMemo(() => {
+    const lines = [
+      ...(currencyLinesBase || []),
+      {
+        currencyCode: "USD",
+        allocatedRlusd: allocationSummary.unallocatedRlusd,
+        isDerived: true,
+      },
+    ];
+    return lines.sort((a, b) => {
+      const aCode = String(a?.currencyCode || "").toUpperCase();
+      const bCode = String(b?.currencyCode || "").toUpperCase();
+      const aOrder = currencyOrderIndex.get(aCode) ?? Number.POSITIVE_INFINITY;
+      const bOrder = currencyOrderIndex.get(bCode) ?? Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return aCode.localeCompare(bCode);
+    });
+  }, [allocationSummary.unallocatedRlusd, currencyLinesBase, currencyOrderIndex]);
+
+  const swapCurrencyOptions = useMemo(() => {
+    const codes = new Set(
+      (augmentedTokens || [])
+        .map((tok) => String(tok.currency || "").toUpperCase())
+        .filter((code) => code && code !== "XRP"),
+    );
+    codes.add("RLUSD");
+    return Array.from(codes)
+      .filter(Boolean)
+      .sort((a, b) => {
+        const aPriority = Object.prototype.hasOwnProperty.call(
+          DEMO_TOKEN_PRIORITY,
+          a,
+        )
+          ? DEMO_TOKEN_PRIORITY[a]
+          : Number.POSITIVE_INFINITY;
+        const bPriority = Object.prototype.hasOwnProperty.call(
+          DEMO_TOKEN_PRIORITY,
+          b,
+        )
+          ? DEMO_TOKEN_PRIORITY[b]
+          : Number.POSITIVE_INFINITY;
+        if (aPriority !== bPriority) return aPriority - bPriority;
+        return a.localeCompare(b);
+      });
+  }, [augmentedTokens]);
+
   return {
     currencyOrderIndex,
     allocationSummary,
@@ -293,5 +359,9 @@ export function useDemoTokens({
     selectLabelRightByAssetKey,
     selectLabelMobileByAssetKey,
     selectIconByAssetKey,
+    currencyLinesBase,
+    currencyLinesSummary,
+    currencyLines,
+    swapCurrencyOptions,
   };
 }
