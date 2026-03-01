@@ -98,6 +98,33 @@ export function useDemoRates({
 
   // ── Aliases used by the rest of the wallet ──
   const rlusdPerUnitRates = usdPerUnitRates;
+
+  // ── Fetch any newly-required codes that are missing ──
+  useEffect(() => {
+    const missing = (requiredRateCodes || []).filter(
+      (code) => !usdPerUnitRates[code],
+    );
+    if (missing.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const patch = {};
+      const srcPatch = {};
+      await Promise.all(
+        missing.map(async (code) => {
+          const resolved = await resolveUsdPerUnit(code);
+          const num = Number(resolved?.rate);
+          if (!Number.isFinite(num) || num <= 0) return;
+          patch[code] = num;
+          srcPatch[code] = resolved?.source || null;
+        }),
+      );
+      if (cancelled || Object.keys(patch).length === 0) return;
+      setUsdPerUnitRates((prev) => ({ ...prev, ...patch }));
+      setUsdPerUnitSources((prev) => ({ ...prev, ...srcPatch }));
+    })();
+    return () => { cancelled = true; };
+  }, [requiredRateCodes, usdPerUnitRates]);
+
   const rlusdPerUnitSources = useMemo(
     () => ({ ...usdPerUnitSources }),
     [usdPerUnitSources],
