@@ -74,22 +74,6 @@ export function useSwapConversion({
       if (!code) return Number.NaN;
       if (code === "RLUSD" || code === "USD") return 1;
 
-      let pythPairsMap = null;
-      try {
-        const markets = await getAllMarkets?.();
-        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
-        const map = new Map();
-        pythPairs.forEach((pair) => {
-          const base = String(pair?.base || "").toUpperCase();
-          const quote = String(pair?.quote || "").toUpperCase();
-          if (!base || !quote) return;
-          map.set(`${base}_${quote}`, pair);
-        });
-        pythPairsMap = map;
-      } catch (_err) {
-        // ignore, fallback below
-      }
-
       const existing = demoLines?.[code];
       if (existing && Number(existing.units || 0) > 0) {
         const rlusd = Number(existing.rlusd || 0);
@@ -113,39 +97,6 @@ export function useSwapConversion({
           console.warn("getRlusdPerUnit XRPL error:", error);
         }
         return 1;
-      }
-
-      if (pythPairsMap) {
-        try {
-          const directKey = `${code}_USD`;
-          const inverseKey = `USD_${code}`;
-          const direct = pythPairsMap.get(directKey);
-          const inverse = pythPairsMap.get(inverseKey);
-
-          const extractTickerPrice = (ticker) => {
-            const priceSource =
-              ticker?.lastPrice ??
-              ticker?.price ??
-              ticker?.midPrice ??
-              ticker?.bidPrice ??
-              ticker?.askPrice;
-            const price = Number(priceSource);
-            return Number.isFinite(price) && price > 0 ? price : Number.NaN;
-          };
-
-          if (direct) {
-            const ticker = await getTicker?.(direct.symbol || directKey);
-            const price = extractTickerPrice(ticker);
-            if (Number.isFinite(price) && price > 0) return price;
-          }
-          if (inverse) {
-            const ticker = await getTicker?.(inverse.symbol || inverseKey);
-            const price = extractTickerPrice(ticker);
-            if (Number.isFinite(price) && price > 0) return 1 / price;
-          }
-        } catch (error) {
-          console.warn("getRlusdPerUnit Pyth error:", error);
-        }
       }
 
       // Skip Fawaz si la devise n'est pas supportée
@@ -187,34 +138,18 @@ export function useSwapConversion({
 
       return 1;
     },
-    [demoLines, getAllMarkets, getFxEod, getTicker],
+    [demoLines, getFxEod, getTicker],
   );
 
   const getFxSource = useCallback(
     async (currencyCode) => {
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return null;
-      if (code === "RLUSD" || code === "USD") return "PYTH";
+      if (code === "RLUSD" || code === "USD") return "FAWAZ";
       if (code === "XRP" || code === "RLUSD") return "XRPL";
-
-      try {
-        const markets = await getAllMarkets?.();
-        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
-        const keys = new Set(
-          pythPairs
-            .map(
-              (p) =>
-                `${String(p?.base || "").toUpperCase()}_${String(p?.quote || "").toUpperCase()}`,
-            )
-            .filter(Boolean),
-        );
-        const hasUsdPair = keys.has(`${code}_USD`) || keys.has(`USD_${code}`);
-        return hasUsdPair ? "PYTH" : "FAWAZ";
-      } catch (_err) {
-        return "FAWAZ";
-      }
+      return "FAWAZ";
     },
-    [getAllMarkets],
+    [],
   );
 
   const handleDemoConvert = useCallback(async () => {

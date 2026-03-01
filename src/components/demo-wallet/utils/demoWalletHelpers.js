@@ -14,7 +14,7 @@ import {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 export const DEMO_FAUX_PAYREQ_EXAMPLE =
-  '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"PYTH","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
+  '{"schema":"xcannes-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","targetCurrency":"RLUSD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"FAWAZ","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"DEMO","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
 
 export const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 export const DEMO_SAVED_ADDRESSES_STORAGE_KEY =
@@ -102,32 +102,11 @@ export function extractTickerPrice(ticker) {
   return Number.isFinite(price) && price > 0 ? price : Number.NaN;
 }
 
-export async function resolveUsdPerUnit(code, pythPairsMap) {
+export async function resolveUsdPerUnit(code) {
   const upper = String(code || "").toUpperCase();
   if (!upper) return { rate: Number.NaN, source: null };
-  if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "PYTH" };
+  if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "FAWAZ" };
 
-  try {
-    const directKey = `${upper}_USD`;
-    const inverseKey = `USD_${upper}`;
-
-    if (pythPairsMap?.has?.(directKey)) {
-      const meta = pythPairsMap.get(directKey);
-      const ticker = await xcannesApi.getTicker(meta?.symbol || directKey);
-      const price = extractTickerPrice(ticker);
-      if (Number.isFinite(price)) return { rate: price, source: "PYTH" };
-    }
-
-    if (pythPairsMap?.has?.(inverseKey)) {
-      const meta = pythPairsMap.get(inverseKey);
-      const ticker = await xcannesApi.getTicker(meta?.symbol || inverseKey);
-      const price = extractTickerPrice(ticker);
-      if (Number.isFinite(price) && price > 0)
-        return { rate: 1 / price, source: "PYTH" };
-    }
-  } catch (_err) {
-    // fallback below
-  }
   try {
     const fxResult = await xcannesApi.getFxEod("USD", upper, 30);
     const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];

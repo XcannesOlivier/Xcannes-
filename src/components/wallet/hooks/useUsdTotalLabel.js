@@ -46,7 +46,7 @@ export function useUsdTotalLabel({
       return Number.isFinite(price) && price > 0 ? price : NaN;
     };
 
-    const resolveUsdRate = async (code, pythPairsMap, fawazSet) => {
+    const resolveUsdRate = async (code, fawazSet) => {
       const upper = String(code || "").toUpperCase();
       if (!upper) return NaN;
       if (upper === "USD" || upper === "RLUSD") return 1;
@@ -65,25 +65,6 @@ export function useUsdTotalLabel({
           console.warn("USD rate XRPL error:", err);
         }
         return NaN;
-      }
-
-      try {
-        const directKey = `${upper}_USD`;
-        const inverseKey = `USD_${upper}`;
-        const direct = pythPairsMap.get(directKey);
-        const inverse = pythPairsMap.get(inverseKey);
-        if (direct) {
-          const ticker = await getTicker?.(direct.symbol || directKey);
-          const price = getTickerPrice(ticker);
-          if (Number.isFinite(price)) return price;
-        }
-        if (inverse) {
-          const ticker = await getTicker?.(inverse.symbol || inverseKey);
-          const price = getTickerPrice(ticker);
-          if (Number.isFinite(price) && price > 0) return 1 / price;
-        }
-      } catch (err) {
-        console.warn("USD rate Pyth error:", err);
       }
 
       // Skip Fawaz si la devise n'est pas dans la liste supportée
@@ -119,19 +100,7 @@ export function useUsdTotalLabel({
       }
 
       try {
-        const [markets, fxCurrencies] = await Promise.all([
-          getAllMarkets?.(),
-          getFxEod ? xcannesApi.getFxCurrencies() : Promise.resolve([]),
-        ]);
-        const pythPairs = Array.isArray(markets?.pyth) ? markets.pyth : [];
-        const pythPairsMap = new Map();
-        pythPairs.forEach((pair) => {
-          if (!pair?.base || !pair?.quote) return;
-          const key = `${String(pair.base).toUpperCase()}_${String(
-            pair.quote,
-          ).toUpperCase()}`;
-          pythPairsMap.set(key, pair);
-        });
+        const fxCurrencies = getFxEod ? await xcannesApi.getFxCurrencies() : [];
         const fawazSet = new Set(
           (Array.isArray(fxCurrencies) ? fxCurrencies : [])
             .map((c) => String(c?.code || c || "").toUpperCase())
@@ -142,7 +111,7 @@ export function useUsdTotalLabel({
         const rates = {};
         await Promise.all(
           codes.map(async (code) => {
-            rates[code] = await resolveUsdRate(code, pythPairsMap, fawazSet);
+            rates[code] = await resolveUsdRate(code, fawazSet);
           }),
         );
 
@@ -160,7 +129,6 @@ export function useUsdTotalLabel({
     };
   }, [
     cryptoIcons,
-    getAllMarkets,
     getFxEod,
     getTicker,
     isStablecoin,

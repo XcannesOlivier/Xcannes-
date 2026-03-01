@@ -195,7 +195,7 @@ export default function DemoWalletDashboardReceiveModal({
     if (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD") {
       amountRlusd = amount;
       fxRate = 1;
-      fxSource = "PYTH";
+      fxSource = "FAWAZ";
     } else {
       const rate = Number(rlusdPerUnitRates?.[targetCurrencyUpper]);
       if (!Number.isFinite(rate) || rate <= 0) {
