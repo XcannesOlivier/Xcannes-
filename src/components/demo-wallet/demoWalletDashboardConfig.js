@@ -115,7 +115,7 @@ export function formatAmountWithSymbol(
   return symbol ? `${value} ${symbol}` : value;
 }
 
-function countryCodeToFlag(countryCode) {
+export function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
   const codePoints = [...countryCode.toUpperCase()].map(
     (c) => 0x1f1e6 + (c.charCodeAt(0) - 65),
@@ -123,7 +123,7 @@ function countryCodeToFlag(countryCode) {
   return String.fromCodePoint(...codePoints);
 }
 
-function getCurrencyFlag(code) {
+export function getCurrencyFlag(code) {
   if (!code) return "🏳️";
   const upper = String(code).toUpperCase();
   if (CURRENCY_FLAG_OVERRIDES[upper]) {

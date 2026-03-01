@@ -56,8 +56,6 @@ export default function WalletProductSection() {
                 <div className="h-[680px] md:h-[720px] overflow-hidden">
                   <DemoWalletDashboard
                     defaultWalletId="A"
-                    theme="home"
-                    showWalletSwitcher={false}
                     allowBackgroundScrollOnMobile
                   />
                 </div>
@@ -92,8 +90,6 @@ export default function WalletProductSection() {
                 <div className="h-[720px] overflow-hidden">
                   <DemoWalletDashboard
                     defaultWalletId="A"
-                    theme="home"
-                    showWalletSwitcher={false}
                     allowBackgroundScrollOnMobile
                   />
                 </div>

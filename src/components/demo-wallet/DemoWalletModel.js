@@ -64,7 +64,7 @@ function safeNumber(value) {
   return Number.isFinite(num) ? num : null;
 }
 
-function isDemoNativeCurrency(code) {
+export function isDemoNativeCurrency(code) {
   return DEMO_NATIVE_CURRENCIES.has(String(code || "").toUpperCase());
 }
 

@@ -44,7 +44,6 @@ export default function Home() {
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   
   // États pour l'animation séquencée du hero après l'animation du header
-  const [heroAnimationStarted, setHeroAnimationStarted] = useState(false);
   const [showHeroTitle, setShowHeroTitle] = useState(false);
   const [showHeroSubtitle, setShowHeroSubtitle] = useState(false);
   const [showHeroCarousel, setShowHeroCarousel] = useState(false);
@@ -177,7 +176,6 @@ export default function Home() {
     heroAnimationRef.current = true;
     
     const timer1 = setTimeout(() => {
-      setHeroAnimationStarted(true);
       setShowHeroTitle(true);
     }, headerAnimationDuration);
     
@@ -1264,7 +1262,7 @@ export default function Home() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setValueModalOpen(false)}
+                    onClick={() => closeValueModal()}
                     className="px-6 py-2 rounded-lg border border-white/15 bg-white/[0.04] text-white text-[14px] font-medium backdrop-blur-md transition-all duration-200 hover:border-xcannes-green/40 hover:bg-white/[0.08] hover:shadow-[0_0_18px_rgba(24,169,113,0.25)]"
                   >
                     {t("home_v2_hero_value_modal_cta", "Compris")}
