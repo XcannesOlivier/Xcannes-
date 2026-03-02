@@ -92,9 +92,9 @@ export default function Wallet() {
         </>
       )}
 
-	      <main className={`min-h-[100svh] h-auto overflow-visible md:min-h-screen md:h-screen md:overflow-hidden bg-[#0b0f10] text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
-	        <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} min-h-[100svh] h-auto md:h-full md:min-h-0 mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
-	          <div className={`bg-[#0b0f10] min-h-[100svh] h-auto overflow-visible md:h-full md:min-h-0 md:overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
+	      <main className={`h-[100svh] overflow-hidden md:min-h-screen md:h-screen bg-[#0b0f10] text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
+	        <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} h-full mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
+	          <div className={`bg-[#0b0f10] h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
 	            <WalletDashboard
 	              variant={isEmbedded ? "full" : "full"}
               showDesktopStatement={!isEmbedded}

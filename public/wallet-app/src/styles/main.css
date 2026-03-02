@@ -1533,18 +1533,6 @@ textarea.error {
   background: #0b0f10;
 }
 
-.embedded-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  padding-top: max(8px, env(safe-area-inset-top));
-  background: #0b0f10;
-  flex-shrink: 0;
-  z-index: 10;
-}
-
 .wallet-iframe {
   flex: 1;
   width: 100%;

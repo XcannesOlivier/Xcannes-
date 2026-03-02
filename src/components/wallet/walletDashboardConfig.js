@@ -156,7 +156,7 @@ const WALLET_LAYOUTS = {
     statementVariant: "full",
     showBrandTitle: true,
     showOpenFullWallet: false,
-    containerClass: "",
+    containerClass: "overflow-hidden",
     headerClass: "",
     actionRowClass: "",
     tokenRowClass: "",

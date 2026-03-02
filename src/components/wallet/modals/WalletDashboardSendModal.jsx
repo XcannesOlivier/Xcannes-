@@ -259,7 +259,8 @@ export default function WalletDashboardSendModal({
     return false;
   };
   const handleScan = (data) => {
-    handlePaymentRequestScan?.(data);
+    const result = handlePaymentRequestScan?.(data);
+    if (result?.relayChallenge) return; // relay challenge forwarded to PWA — keep scanner active
     setScanActive(false);
   };
   const handleScanQrUpload = () => {
