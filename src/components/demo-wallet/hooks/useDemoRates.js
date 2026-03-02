@@ -35,20 +35,20 @@ export function useDemoRates({
     Object.values(wallets || {}).forEach((wallet) => {
       Object.keys(wallet?.allocations || {}).forEach((code) => {
         const upper = String(code || "").toUpperCase();
-        if (upper && upper !== "XRP") codes.add(upper);
+        if (upper) codes.add(upper);
       });
     });
     if (convertBaseCurrency) {
       const upper = String(convertBaseCurrency).toUpperCase();
-      if (upper && upper !== "XRP") codes.add(upper);
+      if (upper) codes.add(upper);
     }
     if (convertQuoteCurrency) {
       const upper = String(convertQuoteCurrency).toUpperCase();
-      if (upper && upper !== "XRP") codes.add(upper);
+      if (upper) codes.add(upper);
     }
     if (requestCurrency) {
       const upper = String(requestCurrency).toUpperCase();
-      if (upper && upper !== "XRP") codes.add(upper);
+      if (upper) codes.add(upper);
     }
     return Array.from(codes)
       .filter(Boolean)

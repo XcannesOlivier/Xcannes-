@@ -465,14 +465,7 @@ export default function DemoWalletDashboardReceiveModal({
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
-                {showNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t(
-                      "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                    )}
-                  </span>
-                ) : null}
+
                 {showRlusdNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
                     {t(

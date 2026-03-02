@@ -17,7 +17,6 @@ import {
   applyDemoConvert,
   applyDemoSend,
   ensureAllocation,
-  isDemoNativeCurrency,
 } from "../DemoWalletModel";
 import { computeSpreadQuote } from "../utils/demoWalletSpread";
 import {
@@ -368,7 +367,7 @@ export function useDemoActions({
     }
 
     const isFxSend =
-      selectedSendToken?.isTrustlineOnly && !isDemoNativeCurrency(currency);
+      selectedSendToken?.isTrustlineOnly && currency !== "RLUSD";
 
     setSendProcessing(true);
     try {

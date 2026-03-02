@@ -68,7 +68,7 @@ export default function DemoWalletDashboardSwapModal({
       : [];
     return base.filter((code) => {
       const upper = String(code || "").toUpperCase();
-      return upper && upper !== "USD" && upper !== "RLUSD" && upper !== "XRP";
+      return upper && upper !== "USD" && upper !== "RLUSD";
     });
   }, []);
 
@@ -130,9 +130,7 @@ export default function DemoWalletDashboardSwapModal({
     [convertAmount],
   );
 
-  // Seules les conversions impliquant XRP sont hors-scope ici (pas de swap DEX).
   // RLUSD est traité comme devise de base (peg 1:1 avec USD) pour les conversions "allocation".
-  const isXrplCore = (code) => code === "XRP";
   const sameCurrencySelected = Boolean(
     baseCode && quoteCode && baseCode === quoteCode,
   );
@@ -142,18 +140,8 @@ export default function DemoWalletDashboardSwapModal({
       return { type: "none" };
     }
 
-    if (isXrplCore(baseCode) || isXrplCore(quoteCode)) {
-      return {
-        type: "unsupported",
-        error: t(
-          "ui_xrpl_conversion_temporarily_unavailable_1f8b72d3aa",
-          "XRP/RLUSD conversion is temporarily unavailable.",
-        ),
-      };
-    }
-
     return { type: "allocation" };
-  }, [baseCode, quoteCode, t]);
+  }, [baseCode, quoteCode]);
 
   useEffect(() => {
     if (!open) return;

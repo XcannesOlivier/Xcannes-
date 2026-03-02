@@ -152,7 +152,6 @@ export const getCurrencyDescription = (code) => {
     GUSD: "Gemini Dollar Stablecoin",
 
     // Cryptomonnaies
-    XRP: "XRP Ledger Native Token",
     BTC: "Bitcoin",
     ETH: "Ethereum",
     BNB: "Binance Coin",
