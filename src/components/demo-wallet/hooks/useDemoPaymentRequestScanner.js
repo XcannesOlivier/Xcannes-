@@ -75,9 +75,10 @@ export function useDemoPaymentRequestScanner({
         return;
       }
 
-      // ── 2) Raw XRPL address ────────────────────────────────────
-      if (/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(raw)) {
-        setSendDestination?.(raw);
+      // ── 2) XRPL address (plain or with xrpl: prefix) ─────────
+      const addrMatch = raw.match(/^(?:xrpl:)?(r[1-9A-HJ-NP-Za-km-z]{24,34})$/);
+      if (addrMatch) {
+        setSendDestination?.(addrMatch[1]);
         setSendPaymentRequest?.(null);
         setSendTab?.("manual");
         setPaymentRequestScannerOpen(false);
