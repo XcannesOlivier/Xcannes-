@@ -208,7 +208,7 @@ export default function DemoWalletDashboardSendModal({
     }
   };
   const looksLikeXrplAddress = (value) =>
-    /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
+    /^(?:xrpl:)?r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
   const looksLikeQrPayload = (value) => {
     const raw = String(value || "").trim();
     if (!raw) return false;
