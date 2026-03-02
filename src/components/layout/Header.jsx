@@ -166,17 +166,26 @@ export default function Header({ fixed = true }) {
     [router, withHardNavFallback]
   );
 
-  const walletActionLabel = isConnected
-    ? t("nav_sign_out", "Se déconnecter")
-    : t("nav_sign_in", "Se connecter");
-  const showHomeWalletLink = isHome && isConnected;
-  const showHomeWalletLinkInBurger = isHome && isConnected; // Pour le menu burger
-  const walletActionToneClass = isConnected
+  // Sur la page index : toujours afficher "Se connecter" et masquer "Mes comptes"
+  const walletActionLabel = isHome
+    ? t("nav_sign_in", "Se connecter")
+    : isConnected
+      ? t("nav_sign_out", "Se déconnecter")
+      : t("nav_sign_in", "Se connecter");
+  const showHomeWalletLink = false; // Masqué sur index, pas affiché ailleurs (isHome && isConnected)
+  const showHomeWalletLinkInBurger = false; // Masqué sur index, pas affiché ailleurs
+  const walletActionToneClass = (isConnected && !isHome)
     ? "text-white hover:text-white border border-white/25 hover:border-white/40 bg-transparent hover:bg-white/10 transition-transform duration-200 hover:scale-105 active:scale-95 header-nav-link-no-arrow-anim"
     : "text-white/80 hover:text-white bg-transparent header-nav-link-no-arrow-anim";
 
   const handleWalletAction = useCallback(async () => {
     if (isConnecting) return;
+
+    // Sur la page index : toujours naviguer vers /wallet pour relancer l'identification
+    if (isHome) {
+      router.push("/wallet");
+      return;
+    }
 
     if (isConnected) {
       await disconnect();
@@ -193,7 +202,7 @@ export default function Header({ fixed = true }) {
       // Already on /wallet page, trigger connect directly
       connect();
     }
-  }, [connect, disconnect, isConnected, isConnecting, router]);
+  }, [connect, disconnect, isConnected, isConnecting, isHome, router]);
 
   useEffect(() => {
     const handleScroll = () => {
