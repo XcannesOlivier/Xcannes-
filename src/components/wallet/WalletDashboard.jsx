@@ -636,6 +636,7 @@ export default function WalletDashboard({
             showMobileHomeLink={showMobileHomeLink}
             walletAddresses={walletAddresses}
             onSwitchWallet={switchWallet}
+            onOpenInfo={handleOpenInfo}
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}
@@ -681,6 +682,15 @@ export default function WalletDashboard({
             xrplConnectionIndicator={xrplConnectionIndicator}
             isFullPageView={isFullPageView}
             onOpenInfo={handleOpenInfo}
+            isConnected={isConnected}
+            wallet={wallet}
+            onDisconnect={disconnect}
+            onCopyAddress={handleCopyAddress}
+            onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
+            onRefreshWallet={handleRefreshWallet}
+            isConnecting={isConnecting}
+            isRefreshing={isRefreshing}
+            isWalletLabelLocked={isWalletLabelLocked}
           />
           {!isDesktopPanel ? (
             <WalletMobileModals
