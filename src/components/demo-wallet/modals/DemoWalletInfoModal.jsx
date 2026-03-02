@@ -29,14 +29,7 @@ export function WalletInfoContent({
               "XCANNES Wallet — How it works",
             )}
           </h3>
-          {showNotActivatedNotice ? (
-            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-              {t(
-                "wallet_not_activated_title",
-                "Wallet not activated: a minimum reserve of 1 XRP is required.",
-              )}
-            </span>
-          ) : null}
+
           {showRlusdNotActivatedNotice ? (
             <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
               {t(
@@ -63,7 +56,7 @@ export function WalletInfoContent({
             <li>
               {t(
                 "ui_hold_assets_on_chain_xrp_rlu_6e9344f999",
-                "Hold assets on-chain (XRP / USD).",
+                 "Hold assets (USD).",
               )}
             </li>
             <li>

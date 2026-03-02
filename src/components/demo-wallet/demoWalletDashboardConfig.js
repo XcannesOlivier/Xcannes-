@@ -1,5 +1,4 @@
 const TOKEN_ICONS = {
-  XRP: "✕",
   BTC: "₿",
   ETH: "Ξ",
   USDT: "₮",

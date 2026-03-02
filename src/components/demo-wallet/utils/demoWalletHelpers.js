@@ -21,7 +21,7 @@ export const DEMO_SAVED_ADDRESSES_STORAGE_KEY =
   "xcannes_demo_saved_addresses_v1";
 export const DEMO_LATENCY_MS_MIN = 450;
 export const DEMO_LATENCY_MS_MAX = 1100;
-export const DEMO_TOKEN_PRIORITY = { XRP: 0, RLUSD: 1, USD: 2 };
+export const DEMO_TOKEN_PRIORITY = { RLUSD: 1, USD: 2 };
 
 // ─── Generic helpers ────────────────────────────────────────────────────────
 
@@ -51,8 +51,6 @@ export function getDemoLatencyMs() {
 // ─── Currency helpers ───────────────────────────────────────────────────────
 
 export function getMinUnitsForCurrency(currencyCode) {
-  const code = String(currencyCode || "").toUpperCase();
-  if (code === "XRP") return 0.000001;
   return 0.01;
 }
 

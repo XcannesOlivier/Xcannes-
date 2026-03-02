@@ -11,7 +11,6 @@ import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import {
   getWalletAddress,
-  isDemoNativeCurrency,
 } from "../DemoWalletModel";
 import {
   formatDemoAddressShort,
@@ -148,7 +147,7 @@ export function useDemoStatementData({
     const ratesSnapshot = rlusdPerUnitRatesRef.current || {};
     let running = Number(activeWallet?.allocations?.[currency]) || 0;
     const runningRate = Number(ratesSnapshot?.[currency] || 0);
-    if (!isDemoNativeCurrency(currency) && runningRate > 0) {
+    if (currency !== "RLUSD" && runningRate > 0) {
       running = running / runningRate;
     }
     const txs = [];
@@ -356,7 +355,7 @@ export function useDemoStatementData({
       const totalAllocatedUsd = Object.entries(allocations).reduce(
         (sum, [code, value]) => {
           const upper = String(code || "").toUpperCase();
-          if (upper === "RLUSD" || upper === "XRP" || upper === "USD")
+          if (upper === "RLUSD" || upper === "USD")
             return sum;
           return sum + (Number(value) || 0);
         },
@@ -365,7 +364,7 @@ export function useDemoStatementData({
       currentBalance = Math.max(0, rlusdOnChain - totalAllocatedUsd);
     } else {
       const stored = Number(activeWallet?.allocations?.[currency] || 0);
-      if (isDemoNativeCurrency(currency)) {
+      if (currency === "RLUSD") {
         currentBalance = stored;
       } else {
         const rate = Number(rlusdPerUnitRates?.[currency] || 0);

@@ -65,6 +65,5 @@ const CURRENCY_FLAGS = {
 
 // Icônes pour les cryptomonnaies (images au lieu d'emoji)
 export const CRYPTO_ICONS = {
-  XRP: "/symbols/xrp.png",
   RLUSD: "/symbols/rlusd.png",
 };

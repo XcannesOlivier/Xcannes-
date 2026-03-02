@@ -6,7 +6,6 @@ import { useTranslation } from "next-i18next";
 import {
   buildDefaultDemoState,
   getWalletAddress,
-  isDemoNativeCurrency,
   migrateDemoState,
   walletUsdTotal,
 } from "./DemoWalletModel";
@@ -333,17 +332,17 @@ export default function DemoWalletDashboard({
 
   useEffect(() => {
     const upper = String(requestCurrency || "").toUpperCase();
-    if (upper === "XRP" || upper === "USD") setRequestCurrency("RLUSD");
+    if (upper === "USD") setRequestCurrency("RLUSD");
   }, [requestCurrency, setRequestCurrency]);
 
   useEffect(() => {
     const upper = String(convertBaseCurrency || "").toUpperCase();
-    if (upper === "XRP" || upper === "USD") setConvertBaseCurrency("RLUSD");
+    if (upper === "USD") setConvertBaseCurrency("RLUSD");
   }, [convertBaseCurrency, setConvertBaseCurrency]);
 
   useEffect(() => {
     const upper = String(convertQuoteCurrency || "").toUpperCase();
-    if (upper === "XRP" || upper === "USD") setConvertQuoteCurrency("RLUSD");
+    if (upper === "USD") setConvertQuoteCurrency("RLUSD");
   }, [convertQuoteCurrency, setConvertQuoteCurrency]);
 
   const selectedSendToken = useMemo(() => {
@@ -379,7 +378,7 @@ export default function DemoWalletDashboard({
 
     const code = String(selectedSendToken.currency || "").toUpperCase();
     const isFxSend =
-      selectedSendToken?.isTrustlineOnly && !isDemoNativeCurrency(code);
+      selectedSendToken?.isTrustlineOnly && code !== "RLUSD";
     if (!isFxSend) return null;
 
     const rlusdPerUnit = Number(rlusdPerUnitRates?.[code] || 0);

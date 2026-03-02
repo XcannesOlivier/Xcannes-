@@ -224,28 +224,11 @@ export default function DemoCurrencyStatement({
     const rate = usdRates?.[code];
     if (Number.isFinite(rate)) return value * rate;
     if (USD_STABLECOINS.includes(code)) return value;
-    if (code === "XRP") return value * 0.5;
     return value;
   }, [balance, normalizedCurrency, usdRates]);
 
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
   const reservePlaceholder = "—";
-
-  const xrpReserveDetails = useMemo(() => {
-    const code = normalizedCurrency;
-    if (code !== "XRP" || !showReserveDetails) return null;
-
-    const activationXrp = 1;
-    const trustlineReserveXrp = 0.2;
-    const trustlineRlusdXrp = hasRlusdTrustline ? trustlineReserveXrp : 0;
-    const totalReserveXrp = activationXrp + trustlineRlusdXrp;
-
-    return {
-      totalReserveXrp,
-      activationXrp,
-      trustlineRlusdXrp,
-    };
-  }, [hasRlusdTrustline, normalizedCurrency, showReserveDetails]);
 
   const baseTransactions = useMemo(
     () => (Array.isArray(transactions) ? transactions : []),
@@ -536,7 +519,7 @@ export default function DemoCurrencyStatement({
 
   const ledgerStatus = useMemo(() => {
     if (isPreviewMode) return "preview";
-    if (!["XRP", "RLUSD", "RLUSD"].includes(normalizedCurrency))
+    if (!["RLUSD", "USD"].includes(normalizedCurrency))
       return "offchain";
     if (ledgerEvidenceCount > 0) return "verified";
     return "available";
@@ -1397,19 +1380,11 @@ export default function DemoCurrencyStatement({
                       {t("wallet_not_connected_title", "Wallet not connected")}
                     </span>
                   ) : null}
-                  {showNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                      {t(
-                        "wallet_not_activated_title",
-                        "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                      )}
-                    </span>
-                  ) : null}
                   {showRlusdNotActivatedNotice ? (
                     <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                       {t(
                         "wallet_rlusd_not_activated_title",
-                        "RLUSD not activated. Authorize RLUSD on your wallet.",
+                        "USD not activated. Authorize USD on your wallet.",
                       )}
                     </span>
                   ) : null}
@@ -1475,101 +1450,8 @@ export default function DemoCurrencyStatement({
                   </p>
                 </div>
               </div>
-
-              {normalizedCurrency === "XRP" && (
-                <div className="mt-2 relative">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs text-white/50 whitespace-pre-line">
-                        {t("ui_reserve_2d584ec9c7", "Reserve")}
-                      </p>
-                      <p className="text-[11px] text-white/70 font-mono">
-                        {xrpReserveDetails
-                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
-                          : reservePlaceholder}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setReserveOpen((v) => !v)}
-                      disabled={!xrpReserveDetails}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
-                      aria-expanded={reserveOpen}
-                      aria-disabled={!xrpReserveDetails}
-                      aria-label={t(
-                        "ui_reserve_breakdown_de2c3de53e",
-                        "Reserve breakdown",
-                      )}
-                    >
-                      {t("ui_details_e9615e470d", "Details")}
-                    </button>
-                  </div>
-
-                  {reserveOpen && (
-                    <div className="mt-2 rounded-lg bg-black/60 p-3 space-y-2">
-                      <div className="text-[11px] text-white/70">
-                        <div className="flex items-center justify-between gap-2">
-                          <span>
-                            {t(
-                              "ui_activation_wallet_1dcd314549",
-                              "Activation wallet",
-                            )}
-                          </span>
-                          <span className="font-mono">
-                            {xrpReserveDetails.activationXrp.toFixed(2)}
-                            {t("ui_xrp_034964b994", "XRP")}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>
-                            {t(
-                              "ui_trustline_rlusd_9c077313dc",
-                              "Trustline RLUSD",
-                            )}{" "}
-                            {hasRlusdTrustline
-                              ? t(
-                                  "ui_status_active_short_4c8b1a7d2e",
-                                  "(active)",
-                                )
-                              : t(
-                                  "ui_status_to_activate_short_7a1c4d9b2e",
-                                  "(to activate)",
-                                )}
-                          </span>
-                          <span className="font-mono">
-                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}
-                            {t("ui_xrp_034964b994", "XRP")}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>
-                            {t(
-                              "ui_trustline_rlusd_91682deeea",
-                              "Trustline RLUSD",
-                            )}{" "}
-                            {hasRlusdTrustline
-                              ? t(
-                                  "ui_status_active_short_4c8b1a7d2e",
-                                  "(active)",
-                                )
-                              : t(
-                                  "ui_status_to_activate_short_7a1c4d9b2e",
-                                  "(to activate)",
-                                )}
-                          </span>
-                          <span className="font-mono">
-                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}
-                            {t("ui_xrp_034964b994", "XRP")}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
-        </div>
 
         {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">

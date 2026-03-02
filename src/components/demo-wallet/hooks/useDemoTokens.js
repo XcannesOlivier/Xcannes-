@@ -6,7 +6,7 @@
 
 import { useMemo } from "react";
 import Image from "next/image";
-import { isDemoNativeCurrency } from "../DemoWalletModel";
+
 import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
 import { getCurrencyDescription } from "../utils/demoCurrencyDescriptions";
 import {
@@ -41,7 +41,6 @@ export function renderDemoTokenIcon(code) {
 
 export function getDemoCurrencyLabel(code) {
   const upper = String(code || "").toUpperCase();
-  if (upper === "XRP") return "XRP · Native";
   if (upper === "USD") return "US Dollar";
   if (upper === "RLUSD") return "US Dollar";
   if (USD_STABLECOINS.includes(upper)) return "XRPL Stablecoin";
@@ -76,7 +75,7 @@ export function useDemoTokens({
     const totalAllocatedUsd = Object.entries(allocations).reduce(
       (sum, [code, value]) => {
         const upper = String(code || "").toUpperCase();
-        if (upper === "RLUSD" || upper === "XRP" || upper === "USD") return sum;
+        if (upper === "RLUSD" || upper === "USD") return sum;
         return sum + (Number(value) || 0);
       },
       0,
@@ -95,13 +94,8 @@ export function useDemoTokens({
         const upper = String(code || "").toUpperCase();
         const storedNum = Number(storedValue) || 0;
         const rate = Number(effectiveUsdPerUnitRates?.[upper] ?? 0);
-        const isNative = isDemoNativeCurrency(upper);
-        const allocationUsd = isNative
-          ? upper === "XRP"
-            ? storedNum * rate
-            : storedNum
-          : storedNum;
-        const units = isNative ? storedNum : rate > 0 ? storedNum / rate : 0;
+        const allocationUsd = storedNum;
+        const units = upper === "RLUSD" ? storedNum : rate > 0 ? storedNum / rate : 0;
         const usdValue = Number.isFinite(allocationUsd) ? allocationUsd : null;
         return { code: upper, units, usdValue, allocationUsd };
       })
@@ -147,13 +141,9 @@ export function useDemoTokens({
     const entries = Object.entries(allocations).map(([code, units]) => {
       const currency = String(code || "").toUpperCase();
       const storedValue = Number(units) || 0;
-      const isTrustlineOnly = !isDemoNativeCurrency(currency);
+      const isTrustlineOnly = currency !== "RLUSD";
       const rlusdPerUnit = Number(rlusdPerUnitRates?.[currency] || 0);
-      const allocationUsd = isTrustlineOnly
-        ? storedValue
-        : currency === "XRP"
-          ? storedValue * rlusdPerUnit
-          : storedValue;
+      const allocationUsd = storedValue;
       const displayUnits = isTrustlineOnly
         ? rlusdPerUnit > 0
           ? storedValue / rlusdPerUnit
@@ -195,11 +185,11 @@ export function useDemoTokens({
     });
   }, [activeWallet?.allocations, currencyOrderIndex, rlusdPerUnitRates]);
 
-  // ── Statement-level token list (excludes XRP/USD/RLUSD, adds derived USD row) ──
+  // ── Statement-level token list (excludes USD/RLUSD, adds derived USD row) ──
   const globalStatementTokens = useMemo(() => {
     const base = (augmentedTokens || []).filter((token) => {
       const code = String(token?.currency || "").toUpperCase();
-      return code && code !== "XRP" && code !== "USD" && code !== "RLUSD";
+      return code && code !== "USD" && code !== "RLUSD";
     });
     base.push({
       currency: "USD",
@@ -211,11 +201,11 @@ export function useDemoTokens({
     return base;
   }, [allocationSummary.unallocatedRlusd, augmentedTokens]);
 
-  // ── Selectable tokens (for send/swap dropdowns — excludes XRP & USD) ──
+  // ── Selectable tokens (for send/swap dropdowns — excludes USD) ──
   const selectableTokens = useMemo(() => {
     return (augmentedTokens || []).filter((token) => {
       const code = String(token?.currency || "").toUpperCase();
-      return code !== "XRP" && code !== "USD";
+      return code !== "USD";
     });
   }, [augmentedTokens]);
 
@@ -325,7 +315,7 @@ export function useDemoTokens({
     const codes = new Set(
       (augmentedTokens || [])
         .map((tok) => String(tok.currency || "").toUpperCase())
-        .filter((code) => code && code !== "XRP"),
+        .filter(Boolean),
     );
     codes.add("RLUSD");
     return Array.from(codes)

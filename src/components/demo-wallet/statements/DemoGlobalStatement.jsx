@@ -152,7 +152,6 @@ export default function DemoGlobalStatement({
       if (!Number.isFinite(value)) return null;
       if (value === 0) return 0;
       const code = String(token.currency || "").toUpperCase();
-      if (code === "XRP") return null;
       const rate = usdRates?.[code];
       if (Number.isFinite(rate)) return value * rate;
       if (isUsdStablecoin(code)) return value;
@@ -749,19 +748,11 @@ export default function DemoGlobalStatement({
                     {t("wallet_not_connected_title", "Wallet not connected")}
                   </span>
                 ) : null}
-                {showNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t(
-                      "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                    )}
-                  </span>
-                ) : null}
                 {showRlusdNotActivatedNotice ? (
                   <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t(
                       "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet.",
+                      "USD not activated. Authorize USD on your wallet.",
                     )}
                   </span>
                 ) : null}
@@ -884,7 +875,7 @@ export default function DemoGlobalStatement({
                       >
                         <td className="px-3 md:px-4 py-2.5 md:py-3">
                           <div className="flex items-center gap-2">
-                            {["XRP", "RLUSD", "RLUSD"].includes(
+                            {["RLUSD", "USD"].includes(
                               token.currency,
                             ) ? (
                               <Image
@@ -906,9 +897,7 @@ export default function DemoGlobalStatement({
                                 {getDisplayCurrencyCode(token.currency)}
                               </p>
                               <p className="text-[9px] sm:text-xs text-white/40 truncate">
-                                {token.currency === "XRP"
-                                  ? t("ui_label_native_2d7a1c9b4e", "Native")
-                                  : token.issuer
+                                {token.issuer
                                     ? `${token.issuer.slice(0, 8)}...`
                                     : ""}
                               </p>
