@@ -35,20 +35,25 @@ export default function WalletDashboardHeader({
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const switcherRef = useRef(null);
+  const settingsRef = useRef(null);
   const hasMultipleWallets = walletAddresses.length > 1;
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
-    if (!isSwitcherOpen) return;
+    if (!isSwitcherOpen && !isSettingsOpen) return;
     const handleClickOutside = (e) => {
-      if (switcherRef.current && !switcherRef.current.contains(e.target)) {
+      if (isSwitcherOpen && switcherRef.current && !switcherRef.current.contains(e.target)) {
         setIsSwitcherOpen(false);
+      }
+      if (isSettingsOpen && settingsRef.current && !settingsRef.current.contains(e.target)) {
+        setIsSettingsOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isSwitcherOpen]);
+  }, [isSwitcherOpen, isSettingsOpen]);
 
   return (
     <div
@@ -93,15 +98,114 @@ export default function WalletDashboardHeader({
         ) : (
           <div />
         )}
-        {/* Bouton Connect ou Déconnecter */}
+        {/* Bouton Paramètres */}
         {isConnected && wallet ? (
-          <button
-            type="button"
-            onClick={() => onDisconnect?.()}
-            className="px-3 py-1.5 text-[10px] md:text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/90 rounded-md transition-colors"
-          >
-            {t("nav_sign_out", "Se déconnecter")}
-          </button>
+          <div className="relative" ref={settingsRef}>
+            <button
+              type="button"
+              onClick={() => setIsSettingsOpen((v) => !v)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] md:text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/90 rounded-lg transition-all active:scale-95"
+              aria-label={t("ui_settings_label", "Paramètres")}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={1.8}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"
+                />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <span className="hidden md:inline">{t("ui_settings_label", "Paramètres")}</span>
+            </button>
+
+            {isSettingsOpen && (
+              <div className="absolute right-0 top-full mt-1.5 z-50 w-48 rounded-xl bg-[#151b1e] border border-white/10 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="py-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onCopyAddress?.();
+                      setIsSettingsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    {t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+                  </button>
+
+                  {!isWalletLabelLocked && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onOpenWalletLabelEditor?.();
+                        setIsSettingsOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.1 2.1 0 012.97 2.97L8.9 17.39a4 4 0 01-1.69 1l-3.42 1.14 1.14-3.42a4 4 0 011-1.69L16.862 3.487z" />
+                      </svg>
+                      {t("ui_rename_86c8307e14", "Renommer")}
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onRefreshWallet?.();
+                      setIsSettingsOpen(false);
+                    }}
+                    disabled={isConnecting || isRefreshing}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <svg className={`w-4 h-4 text-white/40 ${isRefreshing ? "animate-spin" : ""}`} fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />
+                    </svg>
+                    {t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
+                  </button>
+
+                  <div className="my-1 mx-3 border-t border-white/8" />
+
+                  <a
+                    href="/wallet-app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setIsSettingsOpen(false)}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+                  </a>
+
+                  <div className="my-1 mx-3 border-t border-white/8" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      onDisconnect?.();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-red-400/80 hover:text-red-400 hover:bg-red-400/5 transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-red-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    {t("nav_sign_out", "Se déconnecter")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <WalletConnectButton small variant="statement-blue" />
         )}
