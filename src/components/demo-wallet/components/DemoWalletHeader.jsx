@@ -39,11 +39,11 @@ export default function DemoWalletHeader({
       </div>
 
       <div className="mt-4 flex flex-col items-center gap-2">
-        <div className="text-xs text-white/55 tracking-[0.18em] uppercase">
+        <div className="text-sm md:text-xs text-white/55 tracking-[0.18em] uppercase">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
-          className="text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight"
+          className="text-5xl md:text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight"
           title={t("demo_tt_balance", "Total converti en USD (démo).")}
         >
           {formatMoney(locale, displayAmount, displayCurrency)}
