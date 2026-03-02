@@ -4,23 +4,31 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { useTranslation } from "next-i18next";
+import WalletSettingsDropdown from "./WalletSettingsDropdown";
 
 export default function WalletDashboardFooter({
   layout,
   xrplConnectionIndicator,
   isFullPageView,
   onOpenInfo,
+  // Settings props for mobile settings button
+  isConnected,
+  wallet,
+  onDisconnect,
+  onCopyAddress,
+  onOpenWalletLabelEditor,
+  onRefreshWallet,
+  isConnecting,
+  isRefreshing,
+  isWalletLabelLocked,
 }) {
   const router = useRouter();
   const { t } = useTranslation("common");
   const showOpenFullWallet = !isFullPageView && layout?.showOpenFullWallet;
   const showTopBorder = layout?.statementVariant !== "dex-desktop";
   const showBottomBorder = layout?.statementVariant === "dex-mobile";
-  // Sur desktop DEX (wallet sidebar), on enlève le bouton Info & Fees
-  // car il est affiché dans le footer de la sidebar Orderbook.
-  const showInfoButton =
-    layout?.statementVariant !== "dex-mobile" &&
-    layout?.statementVariant !== "dex-desktop";
+  // Bouton Info & Fees visible uniquement sur la page wallet complète (desktop)
+  const showInfoButton = isFullPageView;
 
   // Sur mobile (DEX), on veut un fallback "hard reload" si la navigation Next échoue
   // (souvent visible comme: URL qui change mais page qui ne se met pas à jour).
@@ -135,7 +143,9 @@ export default function WalletDashboardFooter({
       ].join(" ")}
     >
       <div className="px-3 py-2 flex items-center justify-between gap-2">
+        {/* Desktop: XRPL indicator | Mobile: XCANNES title */}
         <div className="flex items-center gap-2 text-[11px] text-white/70 min-w-0">
+          {/* XRPL dot — always visible */}
           <span
             className={[
               "inline-flex h-2.5 w-2.5 rounded-full ring-4 flex-shrink-0",
@@ -145,8 +155,13 @@ export default function WalletDashboardFooter({
             ].join(" ")}
             aria-hidden="true"
           />
-          <span className="font-medium truncate">
+          {/* Desktop: XRPL label */}
+          <span className="hidden md:inline font-medium truncate">
             {xrplConnectionIndicator?.label || t("xrpl_label", "XRPL")}
+          </span>
+          {/* Mobile: XCANNES title */}
+          <span className="md:hidden font-orbitron font-semibold tracking-[0.15em] text-white/80 uppercase text-[11px]">
+            {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
         </div>
 
@@ -171,13 +186,23 @@ export default function WalletDashboardFooter({
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
                 i
               </span>
-              <span className="hidden sm:inline">
-                {t("wallet_footer_info_fees", "Info & Fees")}
-              </span>
-              <span className="sm:hidden">
-                {t("wallet_footer_info", "Info")}
-              </span>
+              <span>{t("wallet_footer_info_fees", "Info & Fees")}</span>
             </button>
+          )}
+
+          {/* Mobile: settings button (dropdown opens upward) */}
+          {isConnected && wallet && (
+            <WalletSettingsDropdown
+              position="footer"
+              onDisconnect={onDisconnect}
+              onCopyAddress={onCopyAddress}
+              onOpenWalletLabelEditor={onOpenWalletLabelEditor}
+              onRefreshWallet={onRefreshWallet}
+              onOpenInfo={onOpenInfo}
+              isConnecting={isConnecting}
+              isRefreshing={isRefreshing}
+              isWalletLabelLocked={isWalletLabelLocked}
+            />
           )}
         </div>
       </div>
