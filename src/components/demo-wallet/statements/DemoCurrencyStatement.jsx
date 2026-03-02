@@ -1452,6 +1452,7 @@ export default function DemoCurrencyStatement({
               </div>
             </div>
           </div>
+        </div>
 
         {/* Content - Zone scrollable avec flex-1 pour prendre l'espace restant */}
         <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
