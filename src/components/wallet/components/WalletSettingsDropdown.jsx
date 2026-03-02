@@ -208,7 +208,7 @@ export default function WalletSettingsDropdown({
               </svg>
             </button>
             <p className="text-sm text-white/80 font-medium mb-4">
-              {t("ui_scan_qr_to_create_wallet", "Scannez ce QR code avec votre mobile")}
+              {t("ui_scan_qr_to_open_app", "Scannez avec votre mobile pour ouvrir Xcannes App")}
             </p>
             <div className="inline-block rounded-xl bg-white p-3">
               <QRCodeSVG
@@ -220,6 +220,9 @@ export default function WalletSettingsDropdown({
             </div>
             <p className="mt-3 text-[11px] text-white/40">
               {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+            </p>
+            <p className="mt-1 text-[10px] text-white/30">
+              {t("ui_qr_hint_app_installed", "Si Xcannes App est installée, elle s'ouvrira automatiquement")}
             </p>
           </div>
         </div>

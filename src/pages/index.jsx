@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { QRCodeSVG } from "qrcode.react";
 import Header from "@/components/layout/Header";
 import FooterPro from "@/components/layout/FooterPro";
 import SEOHead from "@/components/layout/SEOHead";
@@ -421,6 +422,16 @@ export default function Home() {
                       />
                     </a>
                   </div>
+                  {/* Lien PWA install — mobile uniquement */}
+                  <a
+                    href="/wallet-app/"
+                    className="mt-3 inline-flex items-center gap-2 text-xs text-white/50 hover:text-white/80 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 3v12m0 0l-4-4m4 4l4-4" />
+                    </svg>
+                    {t("home_install_pwa_link", "Installer Xcannes App sur l'écran d'accueil")}
+                  </a>
                 </div>
 
                 {/* Texte sur desktop uniquement */}
@@ -480,6 +491,23 @@ export default function Home() {
                         unoptimized
                       />
                     </a>
+                  </div>
+                  {/* QR code pour installer Xcannes App — desktop uniquement */}
+                  <div className="mt-5 flex flex-col items-center gap-2">
+                    <p className="text-xs text-white/45">
+                      {t("home_install_pwa_qr_label", "Ou installez Xcannes App (wallet web) :")}
+                    </p>
+                    <div className="inline-block rounded-xl bg-white p-2.5">
+                      <QRCodeSVG
+                        value={typeof window !== "undefined" ? `${window.location.origin}/wallet-app/` : "/wallet-app/"}
+                        size={120}
+                        level="M"
+                        includeMargin={false}
+                      />
+                    </div>
+                    <p className="text-[10px] text-white/30">
+                      {t("home_install_pwa_qr_hint", "Scannez pour installer Xcannes App sur votre mobile")}
+                    </p>
                   </div>
                 </div>
 

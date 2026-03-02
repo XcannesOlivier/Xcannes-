@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#0a0a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Xcannes Wallet">
+  <meta name="apple-mobile-web-app-title" content="Xcannes App">
 
   <!-- CSP: only allow scripts from same origin, allow iframe from same origin for wallet dashboard -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.xcannes.com; media-src 'self' blob:; object-src 'none'; frame-src 'self';">
 
   <base href="/wallet-app/">
-  <title>Xcannes Wallet</title>
+  <title>Xcannes App</title>
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -31,11 +31,39 @@
 <body>
   <div id="app">
 
+    <!-- ========== 0. BROWSER REDIRECT SCREEN (shown when not in PWA) ========== -->
+    <div id="screen-browser-redirect" class="screen hidden">
+      <div class="screen-content center">
+        <div class="logo">X</div>
+        <h2>Ouvrir dans Xcannes App</h2>
+        <p class="subtitle">Votre wallet est dans l'application<br>installée sur votre écran d'accueil.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-icon">📱</span>
+            <span>Ouvrez <strong>Xcannes App</strong> depuis votre écran d'accueil</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">👆</span>
+            <span>Face ID déverrouillera votre wallet</span>
+          </div>
+        </div>
+
+        <p id="browser-redirect-hint" class="hint-text" style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.45);">
+          Si vous n'avez pas encore installé l'application,<br>cliquez ci-dessous pour continuer dans le navigateur.
+        </p>
+
+        <div class="button-group">
+          <button id="btn-browser-continue" class="btn btn-secondary">Continuer dans le navigateur</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ========== 1. SPLASH SCREEN ========== -->
     <div id="screen-splash" class="screen">
       <div class="screen-content center">
         <div class="splash-logo" id="splash-logo">X</div>
-        <p class="splash-label" id="splash-label">Xcannes Wallet</p>
+        <p class="splash-label" id="splash-label">Xcannes App</p>
       </div>
     </div>
 
@@ -43,7 +71,7 @@
     <div id="screen-welcome" class="screen hidden">
       <div class="screen-content center">
         <div class="logo">X</div>
-        <h1>Xcannes Wallet</h1>
+        <h1>Xcannes App</h1>
         <p class="subtitle">Votre wallet XRPL,<br>sécurisé par Face ID.</p>
 
         <div class="feature-list">
