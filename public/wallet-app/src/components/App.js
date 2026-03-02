@@ -138,10 +138,71 @@ function updateStatus(el, text, isError = false) {
 }
 
 // ==========================================
+// 0. DETECT BROWSER vs PWA STANDALONE
+// ==========================================
+
+/**
+ * Returns true if running as installed PWA (standalone / fullscreen).
+ * Returns false if running in the normal browser tab.
+ */
+function isRunningAsInstalledApp() {
+  // Standard check
+  if (window.matchMedia('(display-mode: standalone)').matches) return true;
+  if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
+  // iOS Safari standalone
+  if (window.navigator.standalone === true) return true;
+  // Running inside an iframe (embedded in Xcannes dashboard) counts as "app"
+  if (window.parent && window.parent !== window) return true;
+  return false;
+}
+
+/**
+ * Detect if this is a mobile browser (not the PWA).
+ * If so, show a redirect screen suggesting to open the installed app.
+ * User can bypass and continue in the browser.
+ */
+function checkBrowserRedirect() {
+  // Don't redirect on desktop — desktop users legitimately use the browser
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (!isMobile) return false;
+
+  // Already running as PWA — no redirect needed
+  if (isRunningAsInstalledApp()) return false;
+
+  // User previously chose "continue in browser" this session — don't nag again
+  if (sessionStorage.getItem('xcannes_browser_continue') === '1') return false;
+
+  return true;
+}
+
+function setupBrowserRedirectScreen() {
+  showScreen('browser-redirect');
+
+  const btnContinue = document.getElementById('btn-browser-continue');
+  if (btnContinue) {
+    btnContinue.addEventListener('click', () => {
+      sessionStorage.setItem('xcannes_browser_continue', '1');
+      // Continue normal init flow
+      initApp();
+    }, { once: true });
+  }
+}
+
+// ==========================================
 // 1. SPLASH → INIT
 // ==========================================
 
 export async function init() {
+  // On mobile browser (not PWA), show redirect screen first
+  if (checkBrowserRedirect()) {
+    setupBrowserRedirectScreen();
+    return;
+  }
+
+  initApp();
+}
+
+async function initApp() {
   showScreen('splash');
 
   try {

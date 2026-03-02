@@ -1,8 +1,10 @@
 {
-  "name": "Xcannes Wallet",
-  "short_name": "Xcannes",
+  "name": "Xcannes App",
+  "short_name": "Xcannes App",
   "description": "Wallet XRPL sécurisé par Face ID / Touch ID",
   "start_url": "/wallet-app/",
+  "scope": "/wallet-app/",
+  "id": "/wallet-app/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0a0a",
