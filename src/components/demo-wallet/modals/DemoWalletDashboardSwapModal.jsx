@@ -10,7 +10,10 @@ import { useTranslation } from "next-i18next";
 import {
   DEMO_CURRENCY_LINE_ORDER,
   formatAmountWithSymbol,
+  getCurrencyFlag,
+  getDisplayCurrencyCode,
 } from "../demoWalletDashboardConfig";
+import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
 import { computeSpreadQuote, isFxConversion } from "../utils/demoWalletSpread";
 import { useModalTransition } from "@/utils/useModalTransition";
 
@@ -68,6 +71,13 @@ export default function DemoWalletDashboardSwapModal({
       return upper && upper !== "USD" && upper !== "RLUSD" && upper !== "XRP";
     });
   }, []);
+
+  const getIconForCode = (code) => {
+    if (selectIconByCurrency?.[code]) return selectIconByCurrency[code];
+    const display = getDisplayCurrencyCode(code);
+    if (CRYPTO_ICONS?.[display]) return { src: CRYPTO_ICONS[display], alt: display };
+    return getCurrencyFlag(display);
+  };
 
   const swapCurrencyOptionsSanitized = useMemo(() => {
     const base = (swapCurrencyOptions || []).filter(
@@ -349,7 +359,7 @@ export default function DemoWalletDashboardSwapModal({
                               selectLabelRightByCurrency?.[code] || null;
                             return {
                               value: code,
-                              icon: selectIconByCurrency?.[code] || null,
+                              icon: getIconForCode(code),
                               label: labelLeft,
                               labelLeft,
                               labelRight,
@@ -386,7 +396,7 @@ export default function DemoWalletDashboardSwapModal({
                               selectLabelRightByCurrency?.[code] || null;
                             return {
                               value: code,
-                              icon: selectIconByCurrency?.[code] || null,
+                              icon: getIconForCode(code),
                               label: labelLeft,
                               labelLeft,
                               labelRight,
