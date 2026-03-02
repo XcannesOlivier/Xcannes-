@@ -142,7 +142,7 @@ export default function WalletDashboardFooter({
         showBottomBorder ? "border-b border-white/10" : "",
       ].join(" ")}
     >
-      <div className="px-3 py-2 flex items-center justify-between gap-2">
+      <div className="px-5 md:px-3 py-2 flex items-center justify-between gap-2">
         {/* Desktop: XRPL indicator | Mobile: XCANNES title */}
         <div className="flex items-center gap-2 text-[11px] text-white/70 min-w-0">
           {/* XRPL dot — desktop only */}

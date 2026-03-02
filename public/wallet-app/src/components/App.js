@@ -1520,6 +1520,20 @@ function setupUnlockScreenManual(error) {
 
   showRetryButton();
   setupResetButton();
+
+  // On mobile, auto-trigger Face ID after a short delay so the user
+  // doesn't have to tap the button manually.  The page was loaded from
+  // a user click (link in settings menu) so the transient user-activation
+  // is usually still valid within ~1 s.
+  if (!error || error === 'no_faceid') {
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      setTimeout(() => {
+        const btn = document.getElementById('btn-unlock');
+        if (btn && btn.style.display !== 'none') btn.click();
+      }, 400);
+    }
+  }
 }
 
 function showRetryButton() {
