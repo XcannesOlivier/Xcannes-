@@ -82,7 +82,7 @@ export default function WalletDashboardHeader({
                 </svg>
               </Link>
             )}
-            <span className="text-sm md:text-base font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase leading-none">
+            <span className="hidden md:inline text-base font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase leading-none">
               {t("ui_xcannes_3cdc66a392", "XCANNES")}
             </span>
             <span className="hidden md:inline text-[11px] font-light text-white/30">
@@ -115,10 +115,10 @@ export default function WalletDashboardHeader({
 
       {/* Solde et info wallet */}
       <div className="flex flex-col items-center gap-2">
-        <div className="text-xs text-white/55 tracking-[0.18em] uppercase">
+        <div className="text-sm md:text-xs text-white/55 tracking-[0.18em] uppercase">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
-        <p className="text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight">
+        <p className="text-5xl md:text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight">
           {totalLabel}
         </p>
 
@@ -137,7 +137,7 @@ export default function WalletDashboardHeader({
           href="https://ripple.com/solutions/stablecoin/transparency/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs md:text-[10px] text-white/40 hover:text-white/70 transition-colors"
+          className="hidden md:inline-block text-[10px] text-white/40 hover:text-white/70 transition-colors"
         >
           {t(
             "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
