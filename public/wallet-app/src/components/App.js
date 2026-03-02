@@ -987,8 +987,6 @@ async function handleUrlAction(action) {
  */
 function setupWalletEmbedded() {
   const iframe = document.getElementById('wallet-iframe');
-  const btnLock = document.getElementById('btn-embedded-lock');
-  const btnScanner = document.getElementById('btn-embedded-scanner');
 
   if (!iframe) return;
 
@@ -1033,6 +1031,11 @@ function setupWalletEmbedded() {
         openScannerFromEmbedded();
         break;
 
+      case 'PROCESS_QR_CHALLENGE':
+        // The send modal's QR scanner detected a relay challenge — process it inline
+        handleRelayChallengFromIframe(data.rawQR);
+        break;
+
       case 'REQUEST_INIT':
         // Dashboard requests re-init (e.g. after page reload inside iframe)
         sendToIframe({
@@ -1049,20 +1052,39 @@ function setupWalletEmbedded() {
 
   window.addEventListener('message', handleIframeMessage);
 
-  // Lock button
-  const lockHandler = () => lockWallet();
-  btnLock?.addEventListener('click', lockHandler, { once: true });
-
-  // Scanner button — open scanner overlay and return result to iframe
-  const scanHandler = () => openScannerFromEmbedded();
-  btnScanner?.addEventListener('click', scanHandler, { once: true });
-
   // Store cleanup function
   _bridgeCleanup = () => {
     window.removeEventListener('message', handleIframeMessage);
-    btnLock?.removeEventListener('click', lockHandler);
-    btnScanner?.removeEventListener('click', scanHandler);
   };
+}
+
+/**
+ * Handle a relay challenge forwarded from the iframe's QR scanner.
+ * Processes connect/sign without showing the full scanner screen.
+ */
+async function handleRelayChallengFromIframe(rawQR) {
+  const parsed = parseQRCode(rawQR);
+  if (!parsed) {
+    sendToIframe({ type: 'QR_CHALLENGE_RESULT', success: false, error: 'QR code non reconnu' });
+    return;
+  }
+
+  try {
+    const challenge = await fetchChallenge(parsed.challengeId);
+
+    if (challenge.type === 'connect') {
+      await handleConnect(challenge, null);
+      sendToIframe({ type: 'QR_CHALLENGE_RESULT', success: true, challengeType: 'connect' });
+    } else if (challenge.type === 'sign') {
+      await handleSign(challenge, null);
+      sendToIframe({ type: 'QR_CHALLENGE_RESULT', success: true, challengeType: 'sign' });
+    } else {
+      sendToIframe({ type: 'QR_CHALLENGE_RESULT', success: false, error: 'Type de demande inattendu' });
+    }
+  } catch (err) {
+    console.error('[handleRelayChallengFromIframe] Error:', err);
+    sendToIframe({ type: 'QR_CHALLENGE_RESULT', success: false, error: err.message });
+  }
 }
 
 /** Send a message to the wallet iframe */
@@ -1134,11 +1156,6 @@ function openScannerFromEmbedded() {
     document.getElementById('btn-scanner-back')?.addEventListener('click', () => {
       if (qrScanner) qrScanner.stop();
       showScreen('wallet-embedded');
-      // Re-setup embedded buttons (since we used { once: true })
-      const btnLock = document.getElementById('btn-embedded-lock');
-      const btnScanner = document.getElementById('btn-embedded-scanner');
-      btnLock?.addEventListener('click', () => lockWallet(), { once: true });
-      btnScanner?.addEventListener('click', () => openScannerFromEmbedded(), { once: true });
     }, { once: true });
   }
 }

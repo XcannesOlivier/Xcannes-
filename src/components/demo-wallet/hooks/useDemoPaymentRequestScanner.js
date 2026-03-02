@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from "react";
 import { DEMO_PAYREQ_SCHEMA, decodeDemoPayreqQR } from "../utils/demoXrplMemo";
+import { parseRelayChallenge, forwardRelayChallengeToPwa } from "@/utils/relayChallenge";
+import { isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
 /**
  * useDemoPaymentRequestScanner
@@ -36,6 +38,13 @@ export function useDemoPaymentRequestScanner({
     (data) => {
       const raw = String(data || "").trim();
       if (!raw) return;
+
+      // ── Relay challenge detection (wallet connect/sign via PWA) ──
+      const relayChallenge = parseRelayChallenge(raw);
+      if (relayChallenge && isPwaEmbedded()) {
+        forwardRelayChallengeToPwa(raw);
+        return { relayChallenge: true };
+      }
 
       // ── 1) Demo QR format ──────────────────────────────────────
       const payreq = decodeDemoPayreqQR(raw);

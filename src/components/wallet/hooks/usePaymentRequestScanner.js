@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import { Buffer } from "buffer";
 import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
+import { parseRelayChallenge, forwardRelayChallengeToPwa } from "@/utils/relayChallenge";
+import { isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
 export function usePaymentRequestScanner({
   augmentedTokens,
@@ -27,6 +29,14 @@ export function usePaymentRequestScanner({
   const handlePaymentRequestScan = useCallback(
     (data) => {
       const raw = String(data || "").trim();
+
+      // ── Relay challenge detection (wallet connect/sign via PWA) ──
+      const relayChallenge = parseRelayChallenge(raw);
+      if (relayChallenge && isPwaEmbedded()) {
+        forwardRelayChallengeToPwa(raw);
+        return { relayChallenge: true };
+      }
+
       const decodePrefixedPayreq = (value) => {
         const match = String(value || "").match(
           /^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i,
