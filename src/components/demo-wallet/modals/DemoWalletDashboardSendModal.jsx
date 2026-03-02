@@ -209,11 +209,14 @@ export default function DemoWalletDashboardSendModal({
   };
   const looksLikeXrplAddress = (value) =>
     /^(?:xrpl:)?r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
+  const looksLikeDemoAddress = (value) =>
+    /^[A-Za-z][A-Za-z0-9_]{10,}$/.test(value);
   const looksLikeQrPayload = (value) => {
     const raw = String(value || "").trim();
     if (!raw) return false;
     if (/^xcannes-demo:/i.test(raw)) return true;
     if (looksLikeXrplAddress(raw)) return true;
+    if (looksLikeDemoAddress(raw)) return true;
     return false;
   };
   const handlePastePayload = (event) => {

@@ -85,6 +85,16 @@ export function useDemoPaymentRequestScanner({
         return;
       }
 
+      // ── 2b) Demo wallet address (e.g. GtxxxxXcannes123xxxxxxxxxxx) ──
+      const demoAddrMatch = raw.match(/^[A-Za-z][A-Za-z0-9_]{10,}$/);
+      if (demoAddrMatch) {
+        setSendDestination?.(raw);
+        setSendPaymentRequest?.(null);
+        setSendTab?.("manual");
+        setPaymentRequestScannerOpen(false);
+        return;
+      }
+
       // ── 3) Anything else (including real-wallet QR) → rejected ─
       alert("This QR code format is not supported in demo mode.");
     },
