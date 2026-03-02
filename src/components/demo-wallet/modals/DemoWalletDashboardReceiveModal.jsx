@@ -408,7 +408,7 @@ export default function DemoWalletDashboardReceiveModal({
   const requestBeneficiaryLabel =
     String(generatedRequest?.beneficiaryLabel || walletLabel || "").trim() ||
     t("ui_beneficiary_unknown", "Bénéficiaire");
-  const receiveQrValue = wallet ? `xrpl:${wallet}` : "";
+  const receiveQrValue = wallet || "";
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
