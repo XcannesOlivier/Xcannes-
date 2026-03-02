@@ -24,24 +24,8 @@ function useIsEmbedded() {
 export default function Wallet() {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const { isConnected, isSessionReady, disconnect } = useWallet();
+  const { isConnected, isSessionReady } = useWallet();
   const isEmbedded = useIsEmbedded();
-
-  // Déconnexion automatique du wallet quand l'utilisateur quitte la page /wallet
-  useEffect(() => {
-    const handleRouteChange = (url) => {
-      // Si la nouvelle URL n'est pas /wallet, déconnecter
-      const targetPath = url.split("?")[0].replace(/\/$/, "") || "/";
-      if (targetPath !== "/wallet") {
-        disconnect();
-      }
-    };
-
-    router.events.on("routeChangeStart", handleRouteChange);
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-    };
-  }, [router.events, disconnect]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
