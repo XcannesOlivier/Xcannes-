@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "next-i18next";
+import { QRCodeSVG } from "qrcode.react";
 
 /**
  * Settings gear button + dropdown menu.
@@ -23,6 +24,7 @@ export default function WalletSettingsDropdown({
 }) {
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -49,11 +51,11 @@ export default function WalletSettingsDropdown({
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] md:text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/90 rounded-lg transition-all active:scale-95"
+        className="flex items-center gap-1.5 px-3 py-2 md:px-2.5 md:py-1.5 text-xs md:text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/90 rounded-lg transition-all active:scale-95"
         aria-label={t("ui_settings_label", "Paramètres")}
       >
         <svg
-          className="w-4 h-4"
+          className="w-5 h-5 md:w-4 md:h-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -94,11 +96,22 @@ export default function WalletSettingsDropdown({
             <div className="my-1 mx-3 border-t border-white/8" />
 
             {/* Créer ou importer */}
+            {/* Mobile: lien direct | Desktop: ouvre un QR code */}
             <a
               href="/wallet-app/"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                // Desktop (md+): empêcher la navigation et ouvrir le QR code
+                const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+                if (isDesktop) {
+                  e.preventDefault();
+                  setIsOpen(false);
+                  setShowQrModal(true);
+                } else {
+                  setIsOpen(false);
+                }
+              }}
               className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors"
             >
               <svg
@@ -170,6 +183,44 @@ export default function WalletSettingsDropdown({
               </svg>
               {t("nav_sign_out", "Se déconnecter")}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* QR Code modal (desktop) */}
+      {showQrModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowQrModal(false)}
+        >
+          <div
+            className="relative bg-[#151b1e] border border-white/10 rounded-2xl p-6 shadow-2xl max-w-xs w-full mx-4 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setShowQrModal(false)}
+              className="absolute top-3 right-3 text-white/40 hover:text-white/80 transition-colors"
+              aria-label="Fermer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <p className="text-sm text-white/80 font-medium mb-4">
+              {t("ui_scan_qr_to_create_wallet", "Scannez ce QR code avec votre mobile")}
+            </p>
+            <div className="inline-block rounded-xl bg-white p-3">
+              <QRCodeSVG
+                value={typeof window !== "undefined" ? `${window.location.origin}/wallet-app/` : "/wallet-app/"}
+                size={200}
+                level="M"
+                includeMargin={false}
+              />
+            </div>
+            <p className="mt-3 text-[11px] text-white/40">
+              {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+            </p>
           </div>
         </div>
       )}
