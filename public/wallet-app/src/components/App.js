@@ -1898,6 +1898,9 @@ async function handleConnect(challenge, statusEl) {
     addresses: allAddresses,
   });
 
+  // Stop scanner immediately so the camera preview disappears
+  if (qrScanner) { qrScanner.stop(); qrScanner = null; }
+
   showSuccess('Connecté !', `Wallet ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
   // Quick return — the desktop already transitions on its own
   setTimeout(() => { showScreen('wallet-embedded'); }, 1500);
