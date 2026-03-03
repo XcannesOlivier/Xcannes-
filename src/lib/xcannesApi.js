@@ -25,7 +25,7 @@ const API_ENDPOINTS = {
   MARKETS: '/api/v1/markets',
   MARKETS_ALL: '/api/v1/markets/all',
   TICKER: '/api/v1/ticker',
-  FX_EOD: '/api/v1/fx/eod',
+  FX_RATE: '/api/v1/fx/rate',
   FX_CURRENCIES: '/api/v1/fx/currencies',
 };
 
@@ -42,7 +42,7 @@ class XcannesAPI {
     this.getMarkets = this.getMarkets.bind(this);
     this.getAllMarkets = this.getAllMarkets.bind(this);
     this.getTicker = this.getTicker.bind(this);
-    this.getFxEod = this.getFxEod.bind(this);
+    this.getFxRate = this.getFxRate.bind(this);
     this.getFxCurrencies = this.getFxCurrencies.bind(this);
   }
 
@@ -200,22 +200,18 @@ class XcannesAPI {
   }
 
   /**
-   * Récupérer les bougies EOD pour une paire forex générique (Fawaz)
-   * @param {string} base - Devise de base (ex: 'EUR')
-   * @param {string} quote - Devise de contrepartie (ex: 'JPY')
-   * @param {number} days - Nombre de jours d'historique (max 3650)
+   * Récupérer le dernier taux de change EOD pour une paire forex (Fawaz)
+   * @param {string} base - Devise de base (ex: 'USD')
+   * @param {string} quote - Devise cible (ex: 'EUR')
+   * @returns {Promise<{ base, quote, rate, date, source }>}
    */
-  async getFxEod(base = 'USD', quote = 'EUR', days = 365) {
-    const params = new URLSearchParams({
-      base,
-      quote,
-      days: String(days),
-    });
-    const result = await this.request(`${API_ENDPOINTS.FX_EOD}?${params.toString()}`, {
+  async getFxRate(base = 'USD', quote = 'EUR') {
+    const params = new URLSearchParams({ base, quote });
+    const result = await this.request(`${API_ENDPOINTS.FX_RATE}?${params.toString()}`, {
       useCache: true,
-      cacheTTL: 60000, // 60s
+      cacheTTL: 43200000, // 12h — Fawaz met à jour ~1x/jour, on poll toutes les 12h
     });
-    return result.success ? result.data : { base, quote, symbol: `${base}/${quote}`, days, candles: [] };
+    return result.success ? result.data : null;
   }
 
   /**

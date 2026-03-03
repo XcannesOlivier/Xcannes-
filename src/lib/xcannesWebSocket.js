@@ -263,7 +263,7 @@ class XcannesWebSocket {
 
   /**
    * Écouter un type d'événement
-   * @param {string} eventType - 'ticker', 'eod-summary', 'wallet', 'connected', 'heartbeat'
+   * @param {string} eventType - 'ticker', 'wallet', 'connected', 'heartbeat'
    * @param {Function} callback
    */
   on(eventType, callback) {
@@ -323,7 +323,7 @@ class XcannesWebSocket {
 
   /**
    * S'abonner à un canal pour une paire
-   * @param {string} channel - 'ticker' (et canaux spéciaux: 'eod-summary', 'wallet')
+   * @param {string} channel - 'ticker' (et canaux spéciaux: 'wallet')
    * @param {string} pair - Format: RLUSD_XRP
    */
   subscribe(channel, pair) {
@@ -374,7 +374,7 @@ class XcannesWebSocket {
 
   /**
    * Se désabonner d'un canal pour une paire
-   * @param {string} channel - 'ticker' (et canaux spéciaux: 'eod-summary', 'wallet')
+   * @param {string} channel - 'ticker' (et canaux spéciaux: 'wallet')
    * @param {string} pair - Format: RLUSD_XRP
    */
   unsubscribe(channel, pair) {

@@ -89,16 +89,12 @@ export async function resolveUsdPerUnit(code) {
   if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "FAWAZ" };
 
   try {
-    const fxResult = await xcannesApi.getFxEod("USD", upper, 30);
-    const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];
-    const last = candles[candles.length - 1];
-    let close = Number.NaN;
-    if (last && last.close != null) close = Number(last.close);
-    else if (last && last.price != null) close = Number(last.price);
+    const fxData = await xcannesApi.getFxRate("USD", upper);
+    const rate = Number(fxData?.rate);
 
-    // API returns USD->QUOTE (QUOTE per USD), so USD per 1 QUOTE is 1/close.
-    if (Number.isFinite(close) && close > 0)
-      return { rate: 1 / close, source: "FAWAZ" };
+    // API returns USD->QUOTE (QUOTE per USD), so USD per 1 QUOTE is 1/rate.
+    if (Number.isFinite(rate) && rate > 0)
+      return { rate: 1 / rate, source: "FAWAZ" };
   } catch (_err) {
     // ignore
   }

@@ -14,19 +14,12 @@ async function resolveUsdPerUnit(code, fawazSet) {
   }
 
   try {
-    const fxResult = await xcannesApi.getFxEod("USD", upper, 30);
-    const candles = Array.isArray(fxResult?.candles) ? fxResult.candles : [];
-    const last = candles[candles.length - 1];
-    const close =
-      last && last.close != null
-        ? Number(last.close)
-        : last && last.price != null
-          ? Number(last.price)
-          : Number.NaN;
+    const fxData = await xcannesApi.getFxRate("USD", upper);
+    const rate = Number(fxData?.rate);
 
-    // API returns USD->QUOTE (QUOTE per USD), so USD per 1 QUOTE is 1/close.
-    if (Number.isFinite(close) && close > 0)
-      return { rate: 1 / close, source: "FAWAZ" };
+    // API returns USD->QUOTE (QUOTE per USD), so USD per 1 QUOTE is 1/rate.
+    if (Number.isFinite(rate) && rate > 0)
+      return { rate: 1 / rate, source: "FAWAZ" };
   } catch (_err) {
     // ignore
   }

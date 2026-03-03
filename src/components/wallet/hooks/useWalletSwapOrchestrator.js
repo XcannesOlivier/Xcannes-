@@ -104,7 +104,6 @@ export function useWalletSwapOrchestrator({
     refreshCurrencyLines,
     getAllMarkets: xcannesApi.getAllMarkets,
     getTicker: xcannesApi.getTicker,
-    getFxEod: xcannesApi.getFxEod,
   });
 
   return {

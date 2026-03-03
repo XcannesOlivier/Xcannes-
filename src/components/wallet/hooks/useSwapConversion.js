@@ -34,7 +34,6 @@ export function useSwapConversion({
   refreshCurrencyLines,
   getAllMarkets,
   getTicker,
-  getFxEod,
   onDemoConvert,
 }) {
   useEffect(() => {
@@ -99,38 +98,12 @@ export function useSwapConversion({
         return 1;
       }
 
-      // Skip Fawaz si la devise n'est pas supportée
-      let fawazSupported = false;
       try {
-        const fxCurrencies = await xcannesApi.getFxCurrencies();
-        const fawazSet = new Set(
-          (Array.isArray(fxCurrencies) ? fxCurrencies : [])
-            .map((c) => String(c?.code || c || "").toUpperCase())
-            .filter(Boolean),
-        );
-        fawazSupported = fawazSet.has(code);
-      } catch (_err) {
-        // ignore
-      }
+        const fxData = await xcannesApi.getFxRate("USD", code);
+        const rate = Number(fxData?.rate);
 
-      if (!fawazSupported) return 1;
-
-      try {
-        const baseForFx = "USD";
-        const fxResult = await getFxEod?.(baseForFx, code, 30);
-        const candles = Array.isArray(fxResult?.candles)
-          ? fxResult.candles
-          : [];
-        const last = candles[candles.length - 1];
-        const close =
-          last && last.close != null
-            ? Number(last.close)
-            : last && last.price != null
-              ? Number(last.price)
-              : Number.NaN;
-
-        if (Number.isFinite(close) && close > 0) {
-          return 1 / close;
+        if (Number.isFinite(rate) && rate > 0) {
+          return 1 / rate;
         }
       } catch (error) {
         console.warn("getRlusdPerUnit FX error:", error);
@@ -138,7 +111,7 @@ export function useSwapConversion({
 
       return 1;
     },
-    [demoLines, getFxEod, getTicker],
+    [demoLines, getTicker],
   );
 
   const getFxSource = useCallback(
