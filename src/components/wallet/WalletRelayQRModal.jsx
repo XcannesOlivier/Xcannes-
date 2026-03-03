@@ -30,6 +30,14 @@ export default function WalletRelayQRModal() {
   // Don't render on /wallet — the dashboard handles its own QR display
   const isWalletPage = router.pathname === "/wallet";
 
+  // Clean up connect-type challenges when leaving /wallet → prevents
+  // the global modal from popping up on the index page after navigating back.
+  useEffect(() => {
+    if (!isWalletPage && qrModalData?.visible && qrModalData?.type === "connect") {
+      closeQrModal();
+    }
+  }, [isWalletPage, qrModalData?.visible, qrModalData?.type, closeQrModal]);
+
   const handleClose = useCallback(() => {
     setClosing(true);
     setTimeout(() => {
