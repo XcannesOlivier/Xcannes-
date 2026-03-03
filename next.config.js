@@ -86,7 +86,7 @@ const nextConfig = {
       },
       {
         source:
-          "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+          "/((?!api|_next/static|_next/image|_next/data|favicon.ico|robots.txt|sitemap.xml).*)",
         headers: [
           {
             key: "Cache-Control",

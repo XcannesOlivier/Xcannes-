@@ -160,7 +160,10 @@ export default function FooterPro() {
     if (isConnected) {
       await disconnect();
       if (router.pathname === "/wallet") {
-        router.replace("/");
+        // Hard navigation pour garantir le changement de page sur Vercel/CDN
+        if (typeof window !== "undefined") {
+          window.location.assign("/");
+        }
       }
       return;
     }
