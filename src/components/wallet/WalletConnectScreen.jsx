@@ -17,6 +17,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -303,10 +304,13 @@ export default function WalletConnectScreen() {
             className="opacity-80 hover:opacity-100 transition-opacity"
             aria-label="App Store"
           >
-            <img
+            <Image
               src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/fr-fr?size=250x83"
               alt="App Store"
+              width={125}
+              height={42}
               className="h-10 w-auto"
+              unoptimized
             />
           </a>
           {/* Google Play badge */}
@@ -317,10 +321,13 @@ export default function WalletConnectScreen() {
             className="opacity-80 hover:opacity-100 transition-opacity"
             aria-label="Google Play"
           >
-            <img
+            <Image
               src="https://play.google.com/intl/en_us/badges/static/images/badges/fr_badge_web_generic.png"
               alt="Google Play"
+              width={170}
+              height={52}
               className="h-[52px] w-auto"
+              unoptimized
             />
           </a>
         </div>

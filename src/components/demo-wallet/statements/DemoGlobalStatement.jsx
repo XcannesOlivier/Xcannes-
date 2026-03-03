@@ -14,20 +14,12 @@ import {
 import DemoStatementMonthSelect from "./DemoStatementMonthSelect";
 import {
   formatAmountWithSymbol,
-  getCurrencySymbol,
   getDisplayCurrencyCode,
 } from "../demoWalletDashboardConfig";
 
 const USD_STABLECOINS = [
   "RLUSD",
   "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
 ];
 
 const ShareIcon = ({ className = "" }) => (
@@ -56,11 +48,7 @@ export default function DemoGlobalStatement({
   walletAddress,
   walletLabelOverride = "",
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   period = "",
   isFullPage = false,
   variant = "default",
@@ -515,28 +503,8 @@ export default function DemoGlobalStatement({
       CLP: "🇨🇱",
       AED: "🇦🇪",
       SAR: "🇸🇦",
-      XRP: "✕",
       // Demo wallet: treat RLUSD as USD for statement visuals.
       RLUSD: "🇺🇸",
-      BTC: "₿",
-      ETH: "Ξ",
-      USDT: "₮",
-      USDC: "💵",
-      BNB: "🔶",
-      ADA: "₳",
-      DOGE: "Ð",
-      XLM: "🚀",
-      LINK: "⬡",
-      DOT: "⚫",
-      UNI: "🦄",
-      MATIC: "🔷",
-      LTC: "Ł",
-      BCH: "₿",
-      AVAX: "🔺",
-      ATOM: "⚛️",
-      XMR: "ɱ",
-      TRX: "◇",
-      ETC: "Ξ",
       AFN: "🇦🇫",
       ALL: "🇦🇱",
       DZD: "🇩🇿",
@@ -693,15 +661,6 @@ export default function DemoGlobalStatement({
 
   const modalBgClass =
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
-
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
@@ -743,19 +702,7 @@ export default function DemoGlobalStatement({
                 <h2 className="text-xl font-bold text-white truncate">
                   {t("ui_global_statement_13e29aa8aa", "Global Statement")}
                 </h2>
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "USD not activated. Authorize USD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
+
               </div>
             </div>
             {!inline ? (

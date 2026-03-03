@@ -19,8 +19,8 @@ export const DEMO_FAUX_PAYREQ_EXAMPLE =
 export const DEMO_STATE_STORAGE_KEY = "xcannes_demo_wallet_state_v1";
 export const DEMO_SAVED_ADDRESSES_STORAGE_KEY =
   "xcannes_demo_saved_addresses_v1";
-export const DEMO_LATENCY_MS_MIN = 450;
-export const DEMO_LATENCY_MS_MAX = 1100;
+const DEMO_LATENCY_MS_MIN = 450;
+const DEMO_LATENCY_MS_MAX = 1100;
 export const DEMO_TOKEN_PRIORITY = { RLUSD: 1, USD: 2 };
 
 // ─── Generic helpers ────────────────────────────────────────────────────────
@@ -32,10 +32,6 @@ export function clone(value) {
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-export function newDemoEventId(prefix = "demo") {
-  return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
 export function getDemoLatencyMs() {
@@ -86,17 +82,6 @@ export function formatDemoAddressShort(address) {
 }
 
 // ─── Ticker / rate resolution ───────────────────────────────────────────────
-
-export function extractTickerPrice(ticker) {
-  const priceSource =
-    ticker?.lastPrice ??
-    ticker?.price ??
-    ticker?.midPrice ??
-    ticker?.bidPrice ??
-    ticker?.askPrice;
-  const price = Number(priceSource);
-  return Number.isFinite(price) && price > 0 ? price : Number.NaN;
-}
 
 export async function resolveUsdPerUnit(code) {
   const upper = String(code || "").toUpperCase();

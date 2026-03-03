@@ -29,13 +29,6 @@ import {
 const USD_STABLECOINS = [
   "RLUSD",
   "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
 ];
 const HIGHLIGHT_DURATION_MS = 5000;
 const STATEMENT_HISTORY_MONTHS = 13;
@@ -128,10 +121,7 @@ export default function DemoCurrencyStatement({
   walletAddress,
   walletLabelOverride = "",
   isPreviewMode = false,
-  isWalletActivated = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   transactions = [],
   hasMore = false,
   loadingMore = false,
@@ -144,7 +134,6 @@ export default function DemoCurrencyStatement({
   isClosing = false,
   inline = false,
   usdRates = {},
-  hasRlusdTrustline = false,
   rlusdBalance = null,
   statementMonths = [],
   highlightTransactionId = null,
@@ -227,7 +216,7 @@ export default function DemoCurrencyStatement({
     return value;
   }, [balance, normalizedCurrency, usdRates]);
 
-  const showReserveDetails = isPreviewMode || isWalletActivated === true;
+  const showReserveDetails = isPreviewMode;
   const reservePlaceholder = "—";
 
   const baseTransactions = useMemo(
@@ -731,78 +720,8 @@ export default function DemoCurrencyStatement({
       TOP: "🇹🇴", // Pa'anga tongien
       VUV: "🇻🇺", // Vatu vanuatais
 
-      // Stablecoins et tokens fiat
+      // Stablecoins
       RLUSD: "🇺🇸", // USD
-      BUSD: "🟡", // Binance USD
-      DAI: "🟠", // DAI Stablecoin
-      TUSD: "🔷", // TrueUSD
-      USDP: "⚪", // Pax Dollar
-      GUSD: "💚", // Gemini Dollar
-      USDD: "⚫", // USDD Stablecoin
-      FRAX: "🔲", // Frax
-      LUSD: "🟦", // Liquity USD
-      sUSD: "🔶", // Synthetix USD
-
-      // Cryptomonnaies
-      XRP: "⚡", // XRP Ledger
-      BTC: "₿", // Bitcoin
-      ETH: "Ξ", // Ethereum
-      USDT: "₮", // Tether
-      USDC: "🔵", // USD Coin
-      BNB: "🔶", // Binance Coin
-      ADA: "₳", // Cardano
-      DOGE: "Ð", // Dogecoin
-      MATIC: "🟣", // Polygon
-      DOT: "⬤", // Polkadot
-      LINK: "🔗", // Chainlink
-      AVAX: "🔺", // Avalanche
-      UNI: "🦄", // Uniswap
-      ATOM: "⚛️", // Cosmos
-      XLM: "🚀", // Stellar
-      ALGO: "◬", // Algorand
-      VET: "💎", // VeChain
-      ICP: "∞", // Internet Computer
-      FIL: "📁", // Filecoin
-      NEAR: "Ⓝ", // Near Protocol
-      APT: "🅰️", // Aptos
-      ARB: "🔷", // Arbitrum
-      OP: "🔴", // Optimism
-      SAND: "🏖️", // The Sandbox
-      MANA: "🎮", // Decentraland
-      SHIB: "🐕", // Shiba Inu
-      TRX: "🔺", // Tron
-      LTC: "Ł", // Litecoin
-      BCH: "₿", // Bitcoin Cash
-      XMR: "ɱ", // Monero
-      ETC: "Ξ", // Ethereum Classic
-      XTZ: "ꜩ", // Tezos
-      EOS: "🔷", // EOS
-      AAVE: "👻", // Aave
-      MKR: "Ⓜ️", // Maker
-      COMP: "🏦", // Compound
-      SNX: "🔷", // Synthetix
-      CRV: "🌊", // Curve
-      SUSHI: "🍣", // SushiSwap
-      YFI: "💼", // Yearn Finance
-      BAT: "🦇", // Basic Attention Token
-      ZRX: "Ⓩ", // 0x
-      ENJ: "🎮", // Enjin Coin
-      CHZ: "⚽", // Chiliz
-      THETA: "📺", // Theta
-      FTM: "👻", // Fantom
-      HBAR: "ℏ", // Hedera
-      EGLD: "🏔️", // MultiversX (Elrond)
-      FLR: "🔥", // Flare
-      XDC: "🌐", // XDC Network
-      KAVA: "🌾", // Kava
-      ZIL: "💎", // Zilliqa
-      QTUM: "⬡", // Qtum
-      WAVES: "🌊", // Waves
-      ICX: "🔷", // ICON
-      ONT: "⭕", // Ontology
-      ZEC: "🛡️", // Zcash
-      DASH: "💸", // Dash
-      DCR: "🔷", // Decred
     };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
   }, []);
@@ -1305,15 +1224,6 @@ export default function DemoCurrencyStatement({
 
   const modalBgClass =
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
-
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
@@ -1375,19 +1285,7 @@ export default function DemoCurrencyStatement({
                       {currencyDescription || displayCurrency}
                     </span>
                   </h2>
-                  {showNotConnectedNotice ? (
-                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                      {t("wallet_not_connected_title", "Wallet not connected")}
-                    </span>
-                  ) : null}
-                  {showRlusdNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                      {t(
-                        "wallet_rlusd_not_activated_title",
-                        "USD not activated. Authorize USD on your wallet.",
-                      )}
-                    </span>
-                  ) : null}
+
                 </div>
                 {/* Description merged into title */}
               </div>

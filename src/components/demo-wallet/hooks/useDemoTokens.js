@@ -158,7 +158,6 @@ export function useDemoTokens({
         allocationUsd,
         issuer: undefined,
         isTrustlineOnly,
-        isMissingTrustline: false,
         demoRlusdValue,
       };
     });
@@ -349,7 +348,6 @@ export function useDemoTokens({
     selectLabelRightByAssetKey,
     selectLabelMobileByAssetKey,
     selectIconByAssetKey,
-    currencyLinesBase,
     currencyLinesSummary,
     currencyLines,
     swapCurrencyOptions,

@@ -134,6 +134,5 @@ export function useDemoRates({
     effectiveUsdPerUnitRates: usdPerUnitRates,
     rlusdPerUnitRates,
     rlusdPerUnitSources,
-    ratesAreStale: false,
   };
 }

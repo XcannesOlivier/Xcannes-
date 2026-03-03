@@ -6,7 +6,7 @@
  */
 
 export const DEMO_PAYREQ_SCHEMA = "xcannes-demo-payreq-v1";
-export const DEMO_QR_PREFIX = "xcannes-demo:";
+const DEMO_QR_PREFIX = "xcannes-demo:";
 
 /** Build a minimal demo payment-request object. */
 export function buildDemoPayreq({ to, currency, amount, beneficiary }) {

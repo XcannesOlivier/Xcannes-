@@ -7,7 +7,6 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import DemoQRScanner from "../components/DemoQRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/utils/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
 import { normalizeQrImageFile } from "../utils/demoQrImage";
@@ -16,12 +15,7 @@ export default function DemoWalletDashboardSendModal({
   open,
   onClose,
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
-  qrSizingVariant = "default",
   renderWalletMeta,
   augmentedTokens,
   selectedSendToken,
@@ -45,12 +39,6 @@ export default function DemoWalletDashboardSendModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
@@ -61,42 +49,11 @@ export default function DemoWalletDashboardSendModal({
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const scanQrFileInputId = "send-qr-file";
-  const manualQrFileInputId = "manual-qr-file";
   const manualQrReaderIdRef = useRef(
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
   );
   const manualQrScannerRef = useRef(null);
-  const manualQrDecor =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 24 24' shape-rendering='crispEdges'%3E%3Crect width='24' height='24' fill='none'/%3E%3Crect x='0' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='17' y='0' width='7' height='7' fill='%23fff'/%3E%3Crect x='18' y='1' width='5' height='5' fill='%23000'/%3E%3Crect x='19' y='2' width='3' height='3' fill='%23fff'/%3E%3Crect x='0' y='17' width='7' height='7' fill='%23fff'/%3E%3Crect x='1' y='18' width='5' height='5' fill='%23000'/%3E%3Crect x='2' y='19' width='3' height='3' fill='%23fff'/%3E%3Crect x='9' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='3' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='4' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='6' width='1' height='1' fill='%23fff'/%3E%3Crect x='15' y='8' width='1' height='1' fill='%23fff'/%3E%3Crect x='8' y='9' width='1' height='1' fill='%23fff'/%3E%3Crect x='10' y='10' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='11' width='1' height='1' fill='%23fff'/%3E%3Crect x='14' y='12' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='13' width='1' height='1' fill='%23fff'/%3E%3Crect x='11' y='14' width='1' height='1' fill='%23fff'/%3E%3Crect x='13' y='15' width='1' height='1' fill='%23fff'/%3E%3Crect x='16' y='16' width='1' height='1' fill='%23fff'/%3E%3Crect x='18' y='17' width='1' height='1' fill='%23fff'/%3E%3Crect x='20' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='12' y='18' width='1' height='1' fill='%23fff'/%3E%3Crect x='9' y='18' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E";
   const isDemoMode = noticeVariant === "demo";
-  const useDemoQrDecor = isDemoMode && isDesktop;
-  const manualQrDecorSize = useDemoQrDecor
-    ? "170px"
-    : inline && isDesktop
-      ? "120px"
-      : "130px";
-  const manualQrDecorOpacity = useDemoQrDecor ? 1 : 0.08;
-  const fauxPayreqExample =
-    '{"schema":"xcannes-demo-payreq-v1","to":"GtxxxxXcannes123xxxxxxxxxxx","ccy":"USD","amt":10}';
-  const showManualQrUpload = false;
-  const showRealDesktopQrImage = !isDemoMode && isDesktop;
-  const showManualStaticQr = isDesktop;
-  const useDexSizing = inline || qrSizingVariant === "dex";
-  const demoQrSize = useDexSizing ? 200 : 160;
-  const showFauxPayreq = false;
-  const fauxPayreqTextClass =
-    isDemoMode && isDesktop
-      ? "text-[11px] text-white/70"
-      : isDemoMode
-        ? "text-[10px] text-white/70"
-        : "text-[10px] text-white/15";
-  const fauxPayreqOverlay = showFauxPayreq ? (
-    <div
-      className={`h-full w-full overflow-y-auto pr-2 leading-snug font-mono whitespace-pre-wrap break-words ${fauxPayreqTextClass}`}
-    >
-      {fauxPayreqExample}
-    </div>
-  ) : null;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -543,74 +500,6 @@ export default function DemoWalletDashboardSendModal({
           )}
         </div>
         <div className={inline ? "space-y-2" : ""}>
-          {showManualQrUpload ? (
-            <div className="space-y-3">
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const input = document.getElementById(manualQrFileInputId);
-                    input?.click();
-                  }}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-                >
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-                    +
-                  </span>
-                  {t(
-                    "ui_upload_recipient_qr_code_1e7c2d9a5b",
-                    "Charger le QR code de l'adresse du destinataire",
-                  )}
-                </button>
-              </div>
-              <div className="relative w-full rounded-xl border border-white/10 bg-black/30 p-3 space-y-3 overflow-hidden md:p-6 md:space-y-4 md:min-h-[180px]">
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 pointer-events-none bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: showManualStaticQr
-                      ? "none"
-                      : `url("${manualQrDecor}")`,
-                    backgroundSize: `${manualQrDecorSize} ${manualQrDecorSize}`,
-                    opacity: manualQrDecorOpacity,
-                  }}
-                />
-                {showManualStaticQr ? (
-                  <div className="relative z-10 flex items-center justify-center">
-                    <div className="rounded-lg border border-white/10 bg-black/60 p-2">
-                      <div
-                        className={showRealDesktopQrImage ? "opacity-90" : ""}
-                        style={
-                          showRealDesktopQrImage
-                            ? { filter: "brightness(0.15)" }
-                            : undefined
-                        }
-                      >
-                        <QRCodeCanvas
-                          value={fauxPayreqExample}
-                          size={demoQrSize}
-                          bgColor="#000000"
-                          fgColor="#ffffff"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-                <input
-                  id={manualQrFileInputId}
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    e.target.value = "";
-                    handleManualQrFile(file);
-                  }}
-                />
-              </div>
-            </div>
-          ) : null}
           <div>
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
@@ -749,14 +638,6 @@ export default function DemoWalletDashboardSendModal({
           </button>
         </div>
         <div className="relative">
-          {showFauxPayreq ? (
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 p-3 pointer-events-none"
-            >
-              {fauxPayreqOverlay}
-            </div>
-          ) : null}
           <textarea
             value={requestText}
             onChange={(e) => setRequestText(e.target.value)}
@@ -799,19 +680,7 @@ export default function DemoWalletDashboardSendModal({
             <div className="flex min-w-0 flex-col gap-1.5">
               <div>{renderWalletMeta?.("pr-8 wallet-meta--plus-4")}</div>
               <div className="flex flex-wrap items-center gap-2">
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "USD not activated. Authorize USD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
+
               </div>
             </div>
             <button

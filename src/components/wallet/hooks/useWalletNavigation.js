@@ -134,9 +134,6 @@ export function useWalletNavigation({
     },
     [
       closeInlineQr,
-      isConnected,
-      flashWalletHeaderToast,
-      isWalletLabelRequired,
       setActiveAction,
       setWalletInfoOpen,
       setSwapDefaultView,

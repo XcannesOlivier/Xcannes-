@@ -31,12 +31,7 @@ export default function DemoWalletDashboardReceiveModal({
   open,
   onClose,
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
-  dashboardVariant = "default",
   renderWalletMeta,
   wallet,
   handleCopyAddress,
@@ -53,19 +48,10 @@ export default function DemoWalletDashboardReceiveModal({
   requestMemo,
   setRequestMemo,
   walletLabel,
-  onRequestGenerated,
   inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
@@ -184,7 +170,6 @@ export default function DemoWalletDashboardReceiveModal({
     });
 
     setGeneratedRequest(req);
-    onRequestGenerated?.(req);
     setIsRequestOpen(false);
   };
 
@@ -460,20 +445,7 @@ export default function DemoWalletDashboardReceiveModal({
             <div className="flex min-w-0 flex-col gap-1.5">
               <div>{renderWalletMeta?.("pr-8 wallet-meta--plus-4")}</div>
               <div className="flex flex-wrap items-center gap-2">
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
 
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "USD not activated. Authorize USD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
               </div>
             </div>
             <button

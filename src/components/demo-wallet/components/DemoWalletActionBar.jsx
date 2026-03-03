@@ -9,8 +9,6 @@ import { useTranslation } from "next-i18next";
 export default function DemoWalletActionBar({
   setSendTab,
   setActiveAction,
-  setSwapDefaultView,
-  setSwapLockedView,
   setCashModalTab,
 }) {
   const { t } = useTranslation("common");
@@ -82,8 +80,6 @@ export default function DemoWalletActionBar({
         <button
           type="button"
           onClick={() => {
-            setSwapDefaultView("convert");
-            setSwapLockedView(null);
             setActiveAction("swap");
           }}
           title={t(

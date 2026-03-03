@@ -23,9 +23,6 @@ export default function DemoWalletDashboardSwapModal({
   renderWalletMeta,
   isPreviewMode,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
-  dashboardVariant = "default",
   swapCurrencyOptions,
   convertBaseCurrency,
   setConvertBaseCurrency,
@@ -98,12 +95,6 @@ export default function DemoWalletDashboardSwapModal({
     return base;
   }, [swapCurrencyOptions, convertQuoteCurrency]);
 
-  const showDesktopWalletConvertNote =
-    inline &&
-    isDesktop &&
-    noticeVariant !== "demo" &&
-    dashboardVariant === "full";
-  const useDesktopWalletConvertLayout = showDesktopWalletConvertNote;
   const [previewState, setPreviewState] = useState({
     status: "idle",
     error: null,
@@ -316,21 +307,13 @@ export default function DemoWalletDashboardSwapModal({
               >
                 <div
                   className={
-                    useDesktopWalletConvertLayout
-                      ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
-                      : inline
-                        ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(18px,2.8vh,36px)]"
-                        : "space-y-5"
+                    inline
+                      ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(18px,2.8vh,36px)]"
+                      : "space-y-5"
                   }
                 >
                   <div
-                    className={
-                      useDesktopWalletConvertLayout
-                        ? "space-y-7"
-                        : inline
-                          ? "space-y-6"
-                          : ""
-                    }
+                    className={inline ? "space-y-6" : ""}
                   >
                     <div>
                       <label className="block text-[17px] md:text-lg text-white/60 mb-1">
