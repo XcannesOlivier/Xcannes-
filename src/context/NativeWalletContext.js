@@ -15,6 +15,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -497,24 +498,41 @@ export const NativeWalletProvider = ({ children }) => {
     updateWallet(null);
   }, [updateWallet]);
 
+  const contextValue = useMemo(() => ({
+    wallet,
+    isConnected,
+    isConnecting,
+    isSessionReady,
+    balance,
+    isWalletActivated,
+    qrModalData,
+    walletAddresses,
+    connect,
+    disconnect,
+    refreshBalance,
+    signTransaction,
+    closeQrModal,
+    switchWallet,
+  }), [
+    wallet,
+    isConnected,
+    isConnecting,
+    isSessionReady,
+    balance,
+    isWalletActivated,
+    qrModalData,
+    walletAddresses,
+    connect,
+    disconnect,
+    refreshBalance,
+    signTransaction,
+    closeQrModal,
+    switchWallet,
+  ]);
+
   return (
     <NativeWalletContext.Provider
-      value={{
-        wallet,
-        isConnected,
-        isConnecting,
-        isSessionReady,
-        balance,
-        isWalletActivated,
-        qrModalData,
-        walletAddresses,
-        connect,
-        disconnect,
-        refreshBalance,
-        signTransaction,
-        closeQrModal,
-        switchWallet,
-      }}
+      value={contextValue}
     >
       {children}
     </NativeWalletContext.Provider>

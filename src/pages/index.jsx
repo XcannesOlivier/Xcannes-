@@ -45,14 +45,29 @@ export default function Home() {
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   
   // États pour l'animation séquencée du hero après l'animation du header
-  // Comme le header, les animations ne jouent qu'une seule fois par session
-  const heroAlreadyAnimated = typeof window !== "undefined" && sessionStorage.getItem("xcannes_hero_animated") === "1";
-  const [showHeroTitle, setShowHeroTitle] = useState(heroAlreadyAnimated);
-  const [showHeroSubtitle, setShowHeroSubtitle] = useState(heroAlreadyAnimated);
-  const [showHeroCarousel, setShowHeroCarousel] = useState(heroAlreadyAnimated);
-  const [showHeroBadges, setShowHeroBadges] = useState(heroAlreadyAnimated);
-  const [showHeroCards, setShowHeroCards] = useState(heroAlreadyAnimated);
-  const heroAnimationRef = useRef(heroAlreadyAnimated);
+  // Comme le header, les animations ne jouent qu'une seule fois par session.
+  // On init à false pour éviter le mismatch SSR/client (sessionStorage n'existe pas côté serveur).
+  const [showHeroTitle, setShowHeroTitle] = useState(false);
+  const [showHeroSubtitle, setShowHeroSubtitle] = useState(false);
+  const [showHeroCarousel, setShowHeroCarousel] = useState(false);
+  const [showHeroBadges, setShowHeroBadges] = useState(false);
+  const [showHeroCards, setShowHeroCards] = useState(false);
+  const heroAnimationRef = useRef(false);
+
+  // Lecture sessionStorage côté client uniquement (après hydration)
+  // Si déjà animé dans cette session, on affiche tout immédiatement
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("xcannes_hero_animated") === "1") {
+        heroAnimationRef.current = true;
+        setShowHeroTitle(true);
+        setShowHeroSubtitle(true);
+        setShowHeroCarousel(true);
+        setShowHeroBadges(true);
+        setShowHeroCards(true);
+      }
+    } catch {}
+  }, []);
 
   const getModalCloseDelay = () => {
     if (typeof window === "undefined") return 400;
