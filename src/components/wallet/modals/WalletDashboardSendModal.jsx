@@ -61,19 +61,6 @@ export default function WalletDashboardSendModal({
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
 
-  // ── Auto-close modal when PWA parent reports a successful relay challenge ──
-  useEffect(() => {
-    if (!open) return;
-    const handlePwaMessage = (event) => {
-      const data = event.data;
-      if (data?.type === 'QR_CHALLENGE_RESULT' && data.success) {
-        onClose?.();
-      }
-    };
-    window.addEventListener('message', handlePwaMessage);
-    return () => window.removeEventListener('message', handlePwaMessage);
-  }, [open, onClose]);
-
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
@@ -274,7 +261,11 @@ export default function WalletDashboardSendModal({
   };
   const handleScan = (data) => {
     const result = handlePaymentRequestScan?.(data);
-    if (result?.relayChallenge) return; // relay challenge forwarded to PWA — keep scanner active
+    if (result?.relayChallenge) {
+      // Relay challenge forwarded to PWA — close modal immediately
+      onClose?.();
+      return;
+    }
     setScanActive(false);
   };
   const handleScanQrUpload = () => {
