@@ -1797,6 +1797,17 @@ function setupScannerScreen() {
 }
 
 async function handleQRScanned(rawQR, statusEl) {
+  // If the QR contains a /wallet-app/ URL, open it in the browser
+  // This happens when scanning the desktop "Create or import" QR code
+  // from within the app's built-in scanner.
+  try {
+    const url = new URL(rawQR);
+    if (url.pathname.startsWith('/wallet-app')) {
+      window.location.href = rawQR;
+      return;
+    }
+  } catch { /* not a URL — continue to relay parsing */ }
+
   const parsed = parseQRCode(rawQR);
   if (!parsed) {
     updateStatus(statusEl, '❌ QR code non reconnu.', true);
