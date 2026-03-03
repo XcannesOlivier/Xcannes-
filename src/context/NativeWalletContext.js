@@ -429,16 +429,26 @@ export const NativeWalletProvider = ({ children }) => {
             clearPolling();
             setIsConnecting(false);
             updateQrStatus("signed");
-            scheduleQrClose(2000);
 
             if (mode === "connect" && data.result?.address) {
-              updateWallet(data.result.address, data.result.addresses);
+              // Brief delay so the user sees "Connecté !" before the
+              // dashboard swap (updateWallet flips isConnected → wallet.jsx
+              // swaps WalletConnectScreen for WalletDashboard).
+              const addr = data.result.address;
+              const addrs = data.result.addresses;
+              setTimeout(() => {
+                updateWallet(addr, addrs);
+                closeQrModal();
+              }, 1800);
             } else if (mode === "sign") {
+              scheduleQrClose(2000);
               resolvePendingSignature({
                 signed: true,
                 ...data.result,
                 uuid: challengeId,
               });
+            } else {
+              scheduleQrClose(2000);
             }
           } else if (data.status === "expired" || data.status === "error") {
             clearPolling();
@@ -453,6 +463,7 @@ export const NativeWalletProvider = ({ children }) => {
     },
     [
       clearPolling,
+      closeQrModal,
       resolvePendingSignature,
       scheduleQrClose,
       updateQrStatus,
