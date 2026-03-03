@@ -1,14 +1,14 @@
 /**
  * WalletConnectScreen — Full-page wallet connection screen
  *
- * Three modes depending on device & wallet state:
+ * Two independent modes:
  *
- * 1. DESKTOP → QR code relay challenge + "Pas encore l'app?" section
- * 2. MOBILE + wallet exists (IndexedDB) → auto-redirect to /wallet-app/
- * 3. MOBILE + no wallet → embedded iframe /wallet-app/ for full onboarding
- *    (Welcome → Terms → PIN → Create/Import → Backup → Scanner)
- *    then listens for postMessage to get the wallet address
+ * 1. DESKTOP → QR code relay challenge (scan with mobile wallet app)
+ * 2. MOBILE  → Embedded wallet-app iframe for direct onboarding
+ *    (Welcome → Terms → PIN → Create/Import → Backup)
+ *    Listens for postMessage(WALLET_CREATED) to get the address.
  *
+ * wallet-app and the site connection are independent flows.
  * After connection, isConnected flips → parent (wallet.jsx) swaps to Dashboard.
  */
 
@@ -17,7 +17,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
-import { apiUrl } from "@/lib/runtimeConfig";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -26,7 +25,6 @@ const QRCodeCanvas = dynamic(
   { ssr: false }
 );
 
-const PENDING_CONNECT_KEY = "xcannes_pending_connect";
 const NATIVE_WALLET_KEY = "xcannes_native_wallet";
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -56,112 +54,33 @@ export default function WalletConnectScreen() {
 
   const isMobile = useIsMobile();
 
-  // Mobile: redirect flow state
-  const [mobileStatus, setMobileStatus] = useState("init"); // init | redirecting | polling | connected | expired
-  const mobileInitRef = useRef(false);
-  const pollRef = useRef(null);
+  // ── Mobile: embedded wallet-app iframe ───────────────────────
+  const [mobileConnected, setMobileConnected] = useState(false);
 
-  // ── Mobile: redirect-based connect flow ──────────────────────
   useEffect(() => {
     if (!isMobile) return;
-    if (mobileInitRef.current) return;
-    mobileInitRef.current = true;
 
-    const pendingId = sessionStorage.getItem(PENDING_CONNECT_KEY);
-    if (pendingId) {
-      // Returning from wallet-app → poll for result
-      setMobileStatus("polling");
-      startPolling(pendingId);
-    } else {
-      // Create challenge and redirect to wallet-app
-      setMobileStatus("redirecting");
-      createChallengeAndRedirect();
+    function handleMessage(event) {
+      const msg = event.data;
+      if (!msg || msg.type !== "WALLET_CREATED") return;
+      if (!msg.address) return;
+
+      // Store address in session so NativeWalletContext picks it up
+      sessionStorage.setItem(NATIVE_WALLET_KEY, msg.address);
+      if (msg.publicKey) {
+        sessionStorage.setItem(NATIVE_WALLET_KEY + "_publicKey", msg.publicKey);
+      }
+      setMobileConnected(true);
+
+      // Reload so NativeWalletContext restores the session → dashboard
+      setTimeout(() => window.location.reload(), 800);
     }
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
   }, [isMobile]);
 
-  // Cleanup polling on unmount
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
-
-  async function createChallengeAndRedirect() {
-    try {
-      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "connect",
-          origin: window.location.origin,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Challenge failed");
-
-      sessionStorage.setItem(PENDING_CONNECT_KEY, data.challengeId);
-      window.location.href = `/wallet-app/?connect=${data.challengeId}`;
-    } catch (err) {
-      console.error("[mobile connect] Challenge error:", err);
-      // Fallback: redirect to wallet-app without challenge
-      window.location.href = "/wallet-app/";
-    }
-  }
-
-  function startPolling(challengeId) {
-    let attempts = 0;
-    const maxAttempts = 90; // 3 minutes at 2s
-
-    pollRef.current = setInterval(async () => {
-      attempts++;
-      if (attempts >= maxAttempts) {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-        sessionStorage.removeItem(PENDING_CONNECT_KEY);
-        setMobileStatus("expired");
-        return;
-      }
-
-      try {
-        const res = await fetch(apiUrl(`/wallet-relay/status/${challengeId}`));
-        const data = await res.json();
-
-        if (data.status === "completed" || data.status === "signed") {
-          clearInterval(pollRef.current);
-          pollRef.current = null;
-          sessionStorage.removeItem(PENDING_CONNECT_KEY);
-
-          if (data.result?.address) {
-            // Store in session for NativeWalletContext to pick up
-            sessionStorage.setItem(NATIVE_WALLET_KEY, data.result.address);
-            if (Array.isArray(data.result.addresses)) {
-              sessionStorage.setItem(
-                NATIVE_WALLET_KEY + "_addresses",
-                JSON.stringify(data.result.addresses)
-              );
-            }
-            setMobileStatus("connected");
-            // Reload so NativeWalletContext restores the session
-            setTimeout(() => window.location.reload(), 800);
-          }
-        } else if (data.status === "expired" || data.status === "error") {
-          clearInterval(pollRef.current);
-          pollRef.current = null;
-          sessionStorage.removeItem(PENDING_CONNECT_KEY);
-          setMobileStatus("expired");
-        }
-      } catch { /* network error — retry */ }
-    }, 2000);
-  }
-
-  function handleMobileRetry() {
-    sessionStorage.removeItem(PENDING_CONNECT_KEY);
-    setMobileStatus("redirecting");
-    mobileInitRef.current = false;
-    createChallengeAndRedirect();
-  }
-
-  // ── Desktop: auto-trigger connect ────────────────────────────
+  // ── Desktop: auto-trigger QR relay connect ───────────────────
   const [showQR, setShowQR] = useState(false);
   const hasAutoConnected = useRef(false);
 
@@ -196,74 +115,52 @@ export default function WalletConnectScreen() {
         : JSON.stringify(qrModalData.qrData)
       : null;
 
-  // ── MOBILE: redirect-based connect flow ─────────────────────
+  // ── MOBILE: embedded onboarding ──────────────────────────────
   if (isMobile) {
-    return (
-      <main className="min-h-[100svh] flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4">
-        <div className="flex flex-col items-center gap-4 max-w-xs text-center">
-          {/* Branding */}
-          <div className="w-16 h-16 rounded-full bg-[#c9a84c] flex items-center justify-center mb-2 shadow-[0_0_24px_rgba(201,168,76,0.3)]">
-            <span className="text-[#0a0a0a] text-2xl font-bold font-orbitron">X</span>
+    if (mobileConnected) {
+      return (
+        <main className="min-h-[100svh] flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#c9a84c] flex items-center justify-center shadow-[0_0_24px_rgba(201,168,76,0.3)]">
+              <span className="text-[#0a0a0a] text-2xl font-bold font-orbitron">X</span>
+            </div>
+            <svg className="w-12 h-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="text-sm text-green-400 font-medium">
+              {t("wallet_mobile_connected", "Connecté !")}
+            </p>
           </div>
+        </main>
+      );
+    }
 
-          {mobileStatus === "redirecting" && (
-            <>
-              <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
-              <p className="text-sm text-white/50">
-                {t("wallet_mobile_redirecting", "Ouverture de Xcannes Wallet…")}
-              </p>
-            </>
-          )}
-
-          {mobileStatus === "polling" && (
-            <>
-              <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
-              <p className="text-sm text-white/50">
-                {t("wallet_mobile_polling", "Connexion en cours…")}
-              </p>
-              <p className="text-xs text-white/30 mt-2">
-                {t("wallet_mobile_polling_hint", "Validez la connexion dans Xcannes Wallet puis revenez ici.")}
-              </p>
-            </>
-          )}
-
-          {mobileStatus === "connected" && (
-            <>
-              <svg className="w-12 h-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              <p className="text-sm text-green-400 font-medium">
-                {t("wallet_mobile_connected", "Connecté !")}
-              </p>
-            </>
-          )}
-
-          {mobileStatus === "expired" && (
-            <>
-              <p className="text-sm text-red-400 mb-2">
-                {t("wallet_mobile_expired", "La demande a expiré. Veuillez réessayer.")}
-              </p>
-              <button
-                onClick={handleMobileRetry}
-                className="px-6 py-3 bg-[#c9a84c] hover:bg-[#b89a40] text-[#0a0a0a] font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-              >
-                {t("wallet_connect_retry", "Réessayer")}
-              </button>
-            </>
-          )}
-
-          {mobileStatus === "init" && (
-            <>
-              <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
-              <p className="text-sm text-white/40">{t("wallet_connect_loading", "Préparation de la connexion…")}</p>
-            </>
-          )}
+    return (
+      <main className="h-[100svh] w-full bg-[#0b0f10] overflow-hidden relative">
+        {/* Back to home */}
+        <div className="absolute top-3 left-3 z-50">
+          <Link
+            href="/"
+            className="text-white/50 hover:text-white transition-colors text-2xl leading-none"
+            aria-label={t("nav_home", "Accueil")}
+          >
+            ‹
+          </Link>
         </div>
+
+        {/* Embedded wallet-app — full onboarding flow */}
+        <iframe
+          src="/wallet-app/"
+          title="Xcannes Wallet"
+          className="w-full h-full border-0"
+          allow="camera; publickey-credentials-get; publickey-credentials-create"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+        />
       </main>
     );
   }
 
-  // ── DESKTOP (or mobile redirecting) ──────────────────────────
+  // ── DESKTOP: QR code relay flow ──────────────────────────────
   return (
     <main className="min-h-[100svh] flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4 py-8 relative">
       {/* Back to home */}
@@ -290,7 +187,7 @@ export default function WalletConnectScreen() {
         </p>
       </div>
 
-      {/* QR Code section (desktop) */}
+      {/* QR Code section (desktop only) */}
       <div className="w-full max-w-sm">
         {showQR && qrValue && !isExpired ? (
           <div className="rounded-2xl border border-white/10 bg-[#111518] p-6 shadow-2xl">
@@ -386,7 +283,7 @@ export default function WalletConnectScreen() {
         </div>
       </div>
 
-      {/* "Pas encore l'app ?" section (desktop) */}
+      {/* "Pas encore l'app ?" section (desktop only) */}
       <div className="mt-8 max-w-sm w-full rounded-2xl border border-white/10 bg-[#111518]/60 p-5">
         <p className="text-sm font-medium text-white/70 mb-3 text-center">
           {t("wallet_connect_no_app_title", "Vous n'avez pas encore l'app ?")}
