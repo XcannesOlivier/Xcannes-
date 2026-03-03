@@ -160,7 +160,7 @@ export default function WalletDashboardFooter({
             {xrplConnectionIndicator?.label || t("xrpl_label", "XRPL")}
           </span>
           {/* Mobile: XCANNES title */}
-          <span className="md:hidden font-orbitron font-semibold tracking-[0.18em] text-white/80 uppercase text-sm">
+          <span className="md:hidden font-orbitron font-semibold tracking-[0.18em] text-white/80 uppercase text-base">
             {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
         </div>
