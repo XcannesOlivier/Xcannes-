@@ -197,6 +197,20 @@ function isRunningAsInstalledApp() {
 }
 
 /**
+ * Detect if running inside an iframe (embedded in the Xcannes site).
+ * When embedded, Face ID is disabled to avoid credential conflicts
+ * between the site's IndexedDB context and the standalone PWA context.
+ * PIN-only mode in iframe — Face ID is reserved for the installed PWA.
+ */
+function isRunningInIframe() {
+  try {
+    return window.parent && window.parent !== window;
+  } catch {
+    return true; // cross-origin iframe
+  }
+}
+
+/**
  * Detect if this is a mobile browser (not the PWA).
  * If so, show a redirect screen suggesting to open the installed app.
  * User can bypass and continue in the browser.
@@ -254,7 +268,8 @@ async function initApp() {
       const authConfig = await getAuthConfig();
 
       // Try Face ID instant unlock if configured
-      if (authConfig?.credentialId && authConfig?.wrappedMasterKey) {
+      // Skip Face ID in iframe — use PIN only to avoid credential conflicts
+      if (authConfig?.credentialId && authConfig?.wrappedMasterKey && !isRunningInIframe()) {
         const unlockResult = await attemptInstantUnlock(authConfig);
 
         if (unlockResult.success) {
@@ -371,7 +386,8 @@ function setupTermsScreen() {
         await saveAuthConfig(authConfig);
 
         // Offer Face ID / Touch ID right after PIN creation
-        const biometricOk = await isBiometricAvailable();
+        // Skip Face ID in iframe — avoid credential conflicts between site & PWA
+        const biometricOk = !isRunningInIframe() && await isBiometricAvailable();
         if (biometricOk) {
           showScreen('faceid-setup');
           setupEnableFaceIDScreen(() => {
