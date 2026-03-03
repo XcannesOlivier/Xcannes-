@@ -15,13 +15,23 @@ export default function Header({ fixed = true }) {
   const [scrolled, setScrolled] = useState(false);
   
   // Animation du header sur la page index (une seule fois par session)
-  const alreadyAnimated = typeof sessionStorage !== "undefined" && sessionStorage.getItem("xcannes_header_animated") === "1";
+  // Note : on initialise toujours à false pour éviter un hydration mismatch SSR/client
   const [showHeroHeader, setShowHeroHeader] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(alreadyAnimated);
-  const hasAnimatedRef = useRef(alreadyAnimated);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const hasAnimatedRef = useRef(false);
   
   // État pour l'affichage temporaire des boutons sur mobile après l'animation
   const [showMobileButtons, setShowMobileButtons] = useState(false);
+
+  // Lecture sessionStorage côté client uniquement (après hydration)
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("xcannes_header_animated") === "1") {
+        hasAnimatedRef.current = true;
+        setAnimationComplete(true);
+      }
+    } catch {}
+  }, []);
 
   const withHardNavFallback = useCallback(
     (href, { onBeforeFallback } = {}) =>
