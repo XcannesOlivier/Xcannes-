@@ -77,6 +77,7 @@ export default function WalletDashboardReceiveModal({
   const [isDesktop, setIsDesktop] = useState(false);
   const [copyToast, setCopyToast] = useState("");
   const copyToastTimerRef = useRef(null);
+  const autoCloseTimerRef = useRef(null);
   const qrContainerRef = useRef(null);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
 
@@ -109,6 +110,10 @@ export default function WalletDashboardReceiveModal({
       if (copyToastTimerRef.current) {
         window.clearTimeout(copyToastTimerRef.current);
         copyToastTimerRef.current = null;
+      }
+      if (autoCloseTimerRef.current) {
+        window.clearTimeout(autoCloseTimerRef.current);
+        autoCloseTimerRef.current = null;
       }
     };
   }, []);
@@ -227,17 +232,28 @@ export default function WalletDashboardReceiveModal({
     setIsRequestOpen(false);
   };
 
-  const flashCopyToast = (message) => {
+  const flashCopyToast = (message, autoClose = false) => {
     const text = String(message || "").trim();
     if (!text) return;
     setCopyToast(text);
     if (copyToastTimerRef.current) {
       window.clearTimeout(copyToastTimerRef.current);
     }
+    if (autoCloseTimerRef.current) {
+      window.clearTimeout(autoCloseTimerRef.current);
+      autoCloseTimerRef.current = null;
+    }
     copyToastTimerRef.current = window.setTimeout(() => {
       setCopyToast("");
       copyToastTimerRef.current = null;
     }, 1300);
+    // Auto-close the modal after the toast fades out
+    if (autoClose) {
+      autoCloseTimerRef.current = window.setTimeout(() => {
+        autoCloseTimerRef.current = null;
+        onClose();
+      }, 1400);
+    }
   };
 
   const dataUrlToBlob = (url) => {
@@ -338,7 +354,7 @@ export default function WalletDashboardReceiveModal({
           }
           const item = new ClipboardItem(items);
           await navigator.clipboard.write([item]);
-          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"));
+          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"), true);
           return;
         }
       } catch {
@@ -349,7 +365,7 @@ export default function WalletDashboardReceiveModal({
     if (navigator?.clipboard?.writeText && fallbackText) {
       try {
         await navigator.clipboard.writeText(fallbackText);
-        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
         return;
       } catch {
         // fall through to execCommand
@@ -369,7 +385,7 @@ export default function WalletDashboardReceiveModal({
         const ok = document.execCommand("copy");
         document.body.removeChild(el);
         if (ok) {
-          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
           return;
         }
       } catch {

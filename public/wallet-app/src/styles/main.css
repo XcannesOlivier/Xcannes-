@@ -167,42 +167,89 @@ html, body {
 
 /* ===== SPLASH ===== */
 
-.splash-logo {
-  width: 96px;
-  height: 96px;
-  border-radius: var(--radius-xl);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-light);
+.splash-title-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  transform-style: preserve-3d;
+}
+
+.splash-title {
   font-family: var(--font-orbitron);
-  font-size: 38px;
-  font-weight: 800;
+  font-size: clamp(48px, 14vw, 96px);
+  font-weight: 700;
   color: var(--text-primary);
-  text-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3);
-  animation: splash-pulse 1.5s ease-in-out infinite;
-  margin-bottom: 20px;
-  letter-spacing: 2px;
+  text-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.3), 0 0 90px rgba(59, 130, 246, 0.2);
+  letter-spacing: -0.02em;
+  text-align: center;
+  line-height: 1.1;
 }
 
-.splash-label {
+.splash-title .splash-char {
+  display: inline-block;
+}
+
+.splash-subtitle {
   font-family: var(--font-montserrat);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  opacity: 0;
-  animation: splash-fade-in 0.6s ease 0.3s forwards;
+  font-size: clamp(18px, 5vw, 32px);
+  font-weight: 200;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, filter;
 }
 
-@keyframes splash-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.3); }
-  50% { transform: scale(1.03); box-shadow: 0 0 40px 8px rgba(22, 163, 74, 0.08), 0 0 80px 16px rgba(59, 130, 246, 0.05); }
+.splash-subtitle.hidden {
+  display: none;
 }
 
-@keyframes splash-fade-in {
+.splash-subtitle.splash-anim-back {
+  animation: splashTitleBack 350ms cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+}
+
+.splash-subtitle.splash-anim-forward {
+  animation: splashTitleForward 450ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+}
+
+@keyframes splashTitleBack {
+  0% {
+    transform: scale(1) translateZ(0) rotateX(0deg);
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+  }
+  100% {
+    transform: scale(0.5) translateZ(-400px) rotateX(-5deg);
+    opacity: 0.6;
+    filter: blur(2px) brightness(0.7);
+  }
+}
+
+@keyframes splashTitleForward {
+  0% {
+    transform: scale(0.5) translateZ(-400px) rotateX(-5deg);
+    opacity: 0.6;
+    filter: blur(2px) brightness(0.7);
+  }
+  50% {
+    transform: scale(1.08) translateZ(20px) rotateX(2deg);
+    opacity: 1;
+    filter: blur(0px) brightness(1.15);
+  }
+  100% {
+    transform: scale(1) translateZ(0) rotateX(0deg);
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+  }
+}
+
+@keyframes splashFadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 		import { useTranslation } from "next-i18next";
@@ -24,7 +24,7 @@ function useIsEmbedded() {
 export default function Wallet() {
   const router = useRouter();
   const { t } = useTranslation("common");
-  const { isConnected, isSessionReady } = useWallet();
+  const { isConnected, isSessionReady, disconnect } = useWallet();
   const isEmbedded = useIsEmbedded();
 
   useEffect(() => {
@@ -36,6 +36,64 @@ export default function Wallet() {
       document.body.classList.remove("wallet-embedded");
     };
   }, [isEmbedded]);
+
+  // ── Auto-lock: disconnect wallet when leaving this page ────
+  // 1) Navigation away (cleanup runs when component unmounts)
+  // 2) Tab switch / minimize (visibilitychange → hidden)
+  // Embedded PWA mode is excluded — the PWA handles its own lock.
+  const disconnectRef = useRef(disconnect);
+  disconnectRef.current = disconnect;
+  const isConnectedRef = useRef(isConnected);
+  isConnectedRef.current = isConnected;
+
+  useEffect(() => {
+    if (isEmbedded) return;
+
+    // When the user switches tabs or minimizes the browser, disconnect
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden" && isConnectedRef.current) {
+        disconnectRef.current();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      // Component unmounting (navigating away) → disconnect
+      if (isConnectedRef.current) {
+        disconnectRef.current();
+      }
+    };
+  }, [isEmbedded]);
+
+  // ── Inactivity auto-lock: 5 min without interaction → disconnect ──
+  useEffect(() => {
+    if (isEmbedded) return;
+
+    const INACTIVITY_MS = 5 * 60 * 1000; // 5 minutes
+    let timer = null;
+
+    const resetTimer = () => {
+      if (timer) clearTimeout(timer);
+      if (!isConnectedRef.current) return;
+      timer = setTimeout(() => {
+        if (isConnectedRef.current) {
+          disconnectRef.current();
+        }
+      }, INACTIVITY_MS);
+    };
+
+    const events = ["click", "scroll", "keydown", "touchstart", "mousemove"];
+    events.forEach((ev) => window.addEventListener(ev, resetTimer, { passive: true }));
+
+    // Start the timer immediately
+    resetTimer();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+    };
+  }, [isEmbedded, isConnected]);
 
   // In embedded mode, don't redirect — wait for PWA to provide wallet via postMessage
   // Non-embedded, non-connected: show WalletConnectScreen (no redirect)

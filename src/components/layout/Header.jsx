@@ -14,10 +14,11 @@ export default function Header({ fixed = true }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
-  // Animation du header sur la page index (desktop uniquement)
+  // Animation du header sur la page index (une seule fois par session)
+  const alreadyAnimated = typeof sessionStorage !== "undefined" && sessionStorage.getItem("xcannes_header_animated") === "1";
   const [showHeroHeader, setShowHeroHeader] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
-  const hasAnimatedRef = useRef(false);
+  const [animationComplete, setAnimationComplete] = useState(alreadyAnimated);
+  const hasAnimatedRef = useRef(alreadyAnimated);
   
   // État pour l'affichage temporaire des boutons sur mobile après l'animation
   const [showMobileButtons, setShowMobileButtons] = useState(false);
@@ -227,6 +228,7 @@ export default function Header({ fixed = true }) {
     }
     
     hasAnimatedRef.current = true;
+    try { sessionStorage.setItem("xcannes_header_animated", "1"); } catch {}
     setShowHeroHeader(true);
     
     // Ajoute la classe au body pour ajuster le padding du contenu

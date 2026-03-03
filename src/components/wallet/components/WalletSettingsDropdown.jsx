@@ -157,9 +157,11 @@ export default function WalletSettingsDropdown({
               )}
             </a>
 
-            <div className="my-1 mx-3 border-t border-white/8" />
+            {/* Séparateur masqué avec le bouton déconnecter */}
+            {false && <div className="my-1 mx-3 border-t border-white/8" />}
 
-            {/* Déconnecter */}
+            {/* Déconnecter — masqué (auto-lock gère la déconnexion) */}
+            {false && (
             <button
               type="button"
               onClick={() => {
@@ -183,6 +185,7 @@ export default function WalletSettingsDropdown({
               </svg>
               {t("nav_sign_out", "Se déconnecter")}
             </button>
+            )}
           </div>
         </div>
       )}

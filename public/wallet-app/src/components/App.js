@@ -131,6 +131,46 @@ function showScreen(screenName) {
   if (el) el.classList.remove('hidden');
 }
 
+/**
+ * Animate the splash screen with a letter-by-letter "XCANNES" title
+ * followed by "Compte multi-devises" subtitle with a 3D back-forward effect.
+ * Mirrors the site header loading animation.
+ */
+function animateSplash() {
+  const titleEl = document.getElementById('splash-title');
+  const subtitleEl = document.getElementById('splash-subtitle');
+  if (!titleEl) return;
+
+  const text = 'XCANNES';
+  const charDelay = 120; // ms per character
+  let index = 0;
+  titleEl.textContent = '';
+
+  const interval = setInterval(() => {
+    if (index < text.length) {
+      const span = document.createElement('span');
+      span.className = 'splash-char';
+      span.textContent = text[index];
+      titleEl.appendChild(span);
+      index++;
+    } else {
+      clearInterval(interval);
+      // Show subtitle immediately
+      if (subtitleEl) {
+        subtitleEl.classList.remove('hidden');
+        // Back-forward 3D animation
+        setTimeout(() => {
+          subtitleEl.classList.add('splash-anim-back');
+          setTimeout(() => {
+            subtitleEl.classList.remove('splash-anim-back');
+            subtitleEl.classList.add('splash-anim-forward');
+          }, 350);
+        }, 200);
+      }
+    }
+  }, charDelay);
+}
+
 function updateStatus(el, text, isError = false) {
   if (!el) return;
   el.textContent = text;
@@ -204,6 +244,7 @@ export async function init() {
 
 async function initApp() {
   showScreen('splash');
+  animateSplash();
 
   try {
     const appSetup = await isAppSetup();
@@ -1858,7 +1899,8 @@ async function handleConnect(challenge, statusEl) {
   });
 
   showSuccess('Connecté !', `Wallet ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
-  setTimeout(() => { showScreen('wallet-embedded'); }, 3000);
+  // Quick return — the desktop already transitions on its own
+  setTimeout(() => { showScreen('wallet-embedded'); }, 1500);
 }
 
 // ==========================================
