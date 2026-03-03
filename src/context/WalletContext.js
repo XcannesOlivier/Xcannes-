@@ -13,7 +13,7 @@
  *   - "pwa"    → PwaEmbeddedContext (PWA iframe bridge, instant postMessage)
  */
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNativeWallet } from "@/context/NativeWalletContext";
 import { usePwaEmbedded, isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
@@ -79,8 +79,8 @@ export const WalletProviderSwitch = ({ children }) => {
     [current]
   );
 
-  // Enhanced context value: same interface + provider switching
-  const value = {
+  // ✅ Value memoïzé pour éviter de re-rendre les 13+ consumers à chaque render parent
+  const value = useMemo(() => ({
     // --- Same interface as useNativeWallet() / usePwaEmbedded() ---
     wallet: current.wallet,
     isConnected: current.isConnected,
@@ -103,7 +103,24 @@ export const WalletProviderSwitch = ({ children }) => {
     activeProvider,
     switchProvider,
     providers: VALID_PROVIDERS,
-  };
+  }), [
+    current.wallet,
+    current.isConnected,
+    current.isConnecting,
+    current.isSessionReady,
+    current.balance,
+    current.isWalletActivated,
+    current.qrModalData,
+    current.connect,
+    current.disconnect,
+    current.refreshBalance,
+    current.signTransaction,
+    current.closeQrModal,
+    current.walletAddresses,
+    current.switchWallet,
+    activeProvider,
+    switchProvider,
+  ]);
 
   return (
     <WalletContext.Provider value={value}>
