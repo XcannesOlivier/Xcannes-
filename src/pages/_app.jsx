@@ -9,12 +9,14 @@ import { WalletProviderSwitch } from "@/context/WalletContext";
 import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket centralisé
 import WalletRelayQRModal from "@/components/wallet/WalletRelayQRModal";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function App({ Component, pageProps }) {
   const router = useRouter();
   const [isRouteChanging, setIsRouteChanging] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState("from-right");
+  // L'animation d'entrée ne joue qu'au tout premier chargement
+  const hasNavigatedRef = useRef(false);
 
   useEffect(() => {
     if (!router?.events) return;
@@ -42,6 +44,8 @@ function App({ Component, pageProps }) {
 
     let safetyTimer;
     const handleStart = (url) => {
+      // Après la première navigation, plus d'animation de transition
+      hasNavigatedRef.current = true;
       setIsRouteChanging(true);
       const fromPath = stripLocalePrefix(router.asPath || "/");
       const toPath = stripLocalePrefix(url || "/");
@@ -72,6 +76,11 @@ function App({ Component, pageProps }) {
     };
   }, [router?.events, router.asPath, router?.locales]);
 
+  // Pas d'animation d'entrée après le premier chargement → navigation instantanée
+  const transitionClass = hasNavigatedRef.current
+    ? ""
+    : `page-transition page-transition--${transitionDirection}`;
+
   return (
     <NativeWalletProvider>
       <PwaEmbeddedProvider>
@@ -80,7 +89,7 @@ function App({ Component, pageProps }) {
             <WalletRelayQRModal />
             <div className="font-sans">
               <div
-                className={`page-transition page-transition--${transitionDirection}${
+                className={`${transitionClass}${
                   isRouteChanging ? " page-transition--exit" : ""
                 }`}
               >
