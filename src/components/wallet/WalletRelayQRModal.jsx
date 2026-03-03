@@ -76,6 +76,9 @@ export default function WalletRelayQRModal() {
 
   if (!qrModalData?.visible || isWalletPage) return null;
 
+  // Never show a stale connect QR outside /wallet (prevents flash when navigating back)
+  if (qrModalData?.type === "connect" && !isWalletPage) return null;
+
   const isMobile = qrModalData.mobile;
 
   const qrValue =
