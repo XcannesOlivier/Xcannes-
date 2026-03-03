@@ -128,19 +128,19 @@ export default function Header({ fixed = true }) {
       quickFallbackTimer = window.setTimeout(() => {
         if (didComplete) return;
         if (!didStart) doFallback();
-      }, 450);
+      }, 200);
 
       // If router started but got stuck (or errored without proper recovery), fallback later.
       stuckFallbackTimer = window.setTimeout(() => {
         if (didComplete) return;
         if (didError || didStart) doFallback();
-      }, 2200);
+      }, 1200);
     },
     [router?.events, router?.locales]
   );
 
   const withMobileNavDelay = useCallback(
-    (href, { delay = 350 } = {}) =>
+    (href, { delay = 120 } = {}) =>
     (e) => {
       if (typeof window === "undefined") return;
       if (!e || e.defaultPrevented) return;
@@ -207,13 +207,13 @@ export default function Header({ fixed = true }) {
       events?.on?.("routeChangeComplete", onComplete);
       events?.on?.("routeChangeError", onError);
 
-      // Si la navigation client n'aboutit pas en 1.5s, fallback hard-nav
+      // Si la navigation client n'aboutit pas en 800ms, fallback hard-nav
       fallbackTimer = setTimeout(() => {
         if (!didComplete && typeof window !== "undefined") {
           cleanup();
           window.location.assign(href);
         }
-      }, 1500);
+      }, 800);
 
       router.push(href);
     },
