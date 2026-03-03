@@ -388,7 +388,7 @@
 @keyframes pageEnterFromLeft {
   from {
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(-12px);
   }
   to {
     opacity: 1;
@@ -399,7 +399,7 @@
 @keyframes pageEnterFromRight {
   from {
     opacity: 0;
-    transform: translateX(24px);
+    transform: translateX(12px);
   }
   to {
     opacity: 1;
@@ -412,16 +412,15 @@
 }
 
 .page-transition > :not(header):not(.page-fixed-layer) {
-  transition: opacity 50ms ease-out, transform 50ms ease-out;
-  will-change: opacity, transform;
+  transition: opacity 150ms ease-out, transform 150ms ease-out;
 }
 
 .page-transition--from-left > :not(header):not(.page-fixed-layer) {
-  animation: pageEnterFromLeft 400ms ease-out;
+  animation: pageEnterFromLeft 200ms ease-out;
 }
 
 .page-transition--from-right > :not(header):not(.page-fixed-layer) {
-  animation: pageEnterFromRight 400ms ease-out;
+  animation: pageEnterFromRight 200ms ease-out;
 }
 
 .page-transition--exit {
@@ -429,16 +428,16 @@
 }
 
 .page-transition--exit.page-transition--from-left {
-  --page-exit-x: 24px;
+  --page-exit-x: 8px;
 }
 
 .page-transition--exit.page-transition--from-right {
-  --page-exit-x: -24px;
+  --page-exit-x: -8px;
 }
 
 .page-transition--exit > :not(header):not(.page-fixed-layer) {
   animation: none;
-  opacity: 0;
+  opacity: 0.3;
   transform: translateX(var(--page-exit-x));
 }
 

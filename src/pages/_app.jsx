@@ -53,9 +53,9 @@ function App({ Component, pageProps }) {
         setTransitionDirection("from-right");
       }
       // Sécurité : si la transition se bloque (CDN lent, fetch échoué),
-      // force la fin de l'animation après 3s pour ne pas rester à opacity:0
+      // force la fin de l'animation après 1.5s pour ne pas rester bloqué
       if (safetyTimer) clearTimeout(safetyTimer);
-      safetyTimer = setTimeout(() => setIsRouteChanging(false), 3000);
+      safetyTimer = setTimeout(() => setIsRouteChanging(false), 1500);
     };
     const handleEnd = () => {
       if (safetyTimer) clearTimeout(safetyTimer);
@@ -80,7 +80,6 @@ function App({ Component, pageProps }) {
             <WalletRelayQRModal />
             <div className="font-sans">
               <div
-                key={router.asPath}
                 className={`page-transition page-transition--${transitionDirection}${
                   isRouteChanging ? " page-transition--exit" : ""
                 }`}
