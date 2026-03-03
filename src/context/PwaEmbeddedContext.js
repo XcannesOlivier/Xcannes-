@@ -18,6 +18,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -400,22 +401,37 @@ export const PwaEmbeddedProvider = ({ children }) => {
   const qrModalData = null;
   const closeQrModal = useCallback(() => {}, []);
 
+  const contextValue = useMemo(() => ({
+    wallet,
+    isConnected,
+    isConnecting,
+    isSessionReady,
+    balance,
+    isWalletActivated,
+    qrModalData,
+    connect,
+    disconnect,
+    refreshBalance,
+    signTransaction,
+    closeQrModal,
+  }), [
+    wallet,
+    isConnected,
+    isConnecting,
+    isSessionReady,
+    balance,
+    isWalletActivated,
+    qrModalData,
+    connect,
+    disconnect,
+    refreshBalance,
+    signTransaction,
+    closeQrModal,
+  ]);
+
   return (
     <PwaEmbeddedContext.Provider
-      value={{
-        wallet,
-        isConnected,
-        isConnecting,
-        isSessionReady,
-        balance,
-        isWalletActivated,
-        qrModalData,
-        connect,
-        disconnect,
-        refreshBalance,
-        signTransaction,
-        closeQrModal,
-      }}
+      value={contextValue}
     >
       {children}
     </PwaEmbeddedContext.Provider>
