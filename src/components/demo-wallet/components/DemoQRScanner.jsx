@@ -24,11 +24,6 @@ export default function DemoQRScanner({
   staticImageAlt = "",
   staticContent = null,
   staticContentClassName = "",
-  staticFooter = null,
-  staticFooterClassName = "",
-  staticOverlay = null,
-  staticOverlayClassName = "",
-  showFileInputWhenStatic = false,
   showFauxQrBackground = false,
   fauxQrBackgroundSize = "240px",
   fauxQrBackgroundOpacity = 0.08,
@@ -474,19 +469,7 @@ export default function DemoQRScanner({
                   className="block w-full h-auto"
                 />
               )}
-              {staticOverlay ? (
-                <div
-                  className={["absolute inset-0", staticOverlayClassName]
-                    .filter(Boolean)
-                    .join(" ")}
-                >
-                  {staticOverlay}
-                </div>
-              ) : null}
             </div>
-            {staticFooter ? (
-              <div className={staticFooterClassName}>{staticFooter}</div>
-            ) : null}
           </div>
         ) : hideReader ? null : (
           <div className={edgeToEdge ? "mb-0" : "mb-4"}>
@@ -535,7 +518,7 @@ export default function DemoQRScanner({
               onChange={(e) => handleFile(e.target.files?.[0] || null)}
             />
           </div>
-        ) : !showStaticQr || showFileInputWhenStatic ? (
+        ) : !showStaticQr ? (
           <input
             id={resolvedFileInputId}
             type="file"

@@ -43,7 +43,6 @@ const DemoMoonPaySellModal = ({
   embedded = false,
   isPreviewMode = false,
   noticeVariant = "preview",
-  noticeContextLabel = "",
   demoMode = false,
   onDemoSubmit,
   availableTokens,
@@ -56,9 +55,6 @@ const DemoMoonPaySellModal = ({
   const { t } = useTranslation("common");
   const stripLeadingNoticePrefix = (value) =>
     String(value || "").replace(/^\s*[^:：]{1,60}\s*[:：]\s*/, "");
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice = false;
-  const showRlusdNotActivatedNotice = false;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [step, setStep] = useState("form"); // 'form' | 'success' | 'error'
@@ -571,20 +567,6 @@ const DemoMoonPaySellModal = ({
                     "Sell Crypto for Fiat",
                   )}
                 </h3>
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
-
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "USD not activated. Authorize USD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
               </div>
               <p className="text-xs text-white/60 mt-1">
                 {t(

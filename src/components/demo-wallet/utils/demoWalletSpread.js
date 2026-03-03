@@ -2,10 +2,6 @@
 
 const FIXED_FX_FEE_FRACTION = 0.01;
 
-export const XCANNES_SPREAD_WALLET_ADDRESS =
-  (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||
-  "rGt44i8APV6KMLCCkuaJpY19RVkj2JhnHC";
-
 export function isFxConversion(base, quote) {
   const b = String(base || "").toUpperCase();
   const q = String(quote || "").toUpperCase();

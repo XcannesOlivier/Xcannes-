@@ -8,14 +8,10 @@ import { useModalTransition } from "@/utils/useModalTransition";
 
 export default function DemoWalletDashboardStatementModals({
   augmentedTokens,
-  backendWalletAddress,
   wallet,
   walletDisplayLabel = "",
   isPreviewMode = false,
-  isWalletActivated = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   previewGlobalMovements,
   previewCurrencyTransactions,
   isFullPageView,
@@ -31,18 +27,8 @@ export default function DemoWalletDashboardStatementModals({
   statementBalance = null,
   statementTotalBalanceUsd = null,
   globalStatementTokens = null,
-  inlineGlobalStatement = false,
-  inlineGlobalStatementClassName = "",
-  inlineStatementVariant,
-  inlineCurrencyStatement = false,
-  inlineCurrencyStatementClassName = "",
 }) {
   const { t } = useTranslation("common");
-  const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
-    const code = String(t?.currency || "").toUpperCase();
-    return code === "RLUSD" && !t?.isMissingTrustline;
-  });
-
   const rlusdBalance = useMemo(() => {
     const token = (augmentedTokens || []).find(
       (entry) => String(entry?.currency || "").toUpperCase() === "RLUSD",
@@ -60,12 +46,8 @@ export default function DemoWalletDashboardStatementModals({
   const currencyModalOpen = Boolean(
     showCurrencyStatement && selectedStatementToken,
   );
-  const globalModalTransition = useModalTransition(showGlobalStatement, {
-    enabled: !inlineGlobalStatement,
-  });
-  const currencyModalTransition = useModalTransition(currencyModalOpen, {
-    enabled: !inlineCurrencyStatement,
-  });
+  const globalModalTransition = useModalTransition(showGlobalStatement);
+  const currencyModalTransition = useModalTransition(currencyModalOpen);
 
   useEffect(() => {
     if (selectedStatementToken) {
@@ -81,87 +63,13 @@ export default function DemoWalletDashboardStatementModals({
 
   return (
     <>
-      {inlineGlobalStatement ? (
-        <div className={inlineGlobalStatementClassName}>
-          <DemoGlobalStatement
-            tokens={globalStatementTokens || augmentedTokens}
-            walletAddress={wallet}
-            walletLabelOverride={walletDisplayLabel}
-            isPreviewMode={isPreviewMode}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel}
-            walletId={walletId}
-            period="December 2025"
-            isFullPage={isFullPageView}
-            variant={inlineStatementVariant || "inline-desktop"}
-            inline
-            usdRates={usdRates}
-            totalBalanceOverride={statementTotalBalanceUsd}
-            movements={previewMovements}
-            movementsLoading={false}
-            movementsError={null}
-            movementsHasMore={false}
-            movementsLoadingMore={false}
-            onLoadMoreMovements={null}
-            onClose={() => {}}
-            onViewCurrency={(token) => {
-              setSelectedStatementToken(token);
-              setShowCurrencyStatement(true);
-            }}
-          />
-        </div>
-      ) : null}
-
-      {inlineCurrencyStatement && selectedStatementToken ? (
-        <div className={inlineCurrencyStatementClassName}>
-          <DemoCurrencyStatement
-            currency={selectedStatementToken.currency}
-            balance={
-              Number.isFinite(Number(statementBalance))
-                ? Number(statementBalance)
-                : parseFloat(selectedStatementToken.value || 0)
-            }
-            issuer={selectedStatementToken.issuer}
-            walletAddress={wallet}
-            walletLabelOverride={walletDisplayLabel}
-            backendWalletAddress={backendWalletAddress}
-            isPreviewMode={isPreviewMode}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel}
-            walletId={walletId}
-            isFullPage={isFullPageView}
-            variant={inlineStatementVariant || "inline-desktop"}
-            inline
-            usdRates={usdRates}
-            rlusdBalance={rlusdBalance}
-            transactions={previewTransactions}
-            statementMonths={null}
-            hasMore={false}
-            loadingMore={false}
-            onLoadMore={null}
-            loading={false}
-            error={null}
-            highlightTransactionId={highlightTransactionId}
-            onClose={() => setShowCurrencyStatement(false)}
-          />
-        </div>
-      ) : null}
-
-      {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
+      {globalModalTransition.shouldRender ? (
         <DemoGlobalStatement
           tokens={globalStatementTokens || augmentedTokens}
           walletAddress={wallet}
           walletLabelOverride={walletDisplayLabel}
           isPreviewMode={isPreviewMode}
-          isWalletActivated={isWalletActivated}
-          hasRlusdTrustline={hasRlusdTrustline}
           noticeVariant={noticeVariant}
-          noticeContextLabel={noticeContextLabel}
-          walletId={walletId}
           period="December 2025"
           isFullPage={isFullPageView}
           variant={statementVariant}
@@ -183,9 +91,7 @@ export default function DemoWalletDashboardStatementModals({
         />
       ) : null}
 
-      {currencyModalTransition.shouldRender &&
-      effectiveCurrencyToken &&
-      !inlineCurrencyStatement ? (
+      {currencyModalTransition.shouldRender && effectiveCurrencyToken ? (
         <DemoCurrencyStatement
           currency={effectiveCurrencyToken.currency}
           balance={
@@ -196,13 +102,8 @@ export default function DemoWalletDashboardStatementModals({
           issuer={effectiveCurrencyToken.issuer}
           walletAddress={wallet}
           walletLabelOverride={walletDisplayLabel}
-          backendWalletAddress={backendWalletAddress}
           isPreviewMode={isPreviewMode}
-          isWalletActivated={isWalletActivated}
-          hasRlusdTrustline={hasRlusdTrustline}
           noticeVariant={noticeVariant}
-          noticeContextLabel={noticeContextLabel}
-          walletId={walletId}
           isFullPage={isFullPageView}
           variant={statementVariant}
           usdRates={usdRates}

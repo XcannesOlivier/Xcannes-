@@ -54,8 +54,6 @@ export default function DemoWalletDashboard({
   const setState = isExternalState ? setDemoState : setLocalState;
   const [activeWalletId, setActiveWalletId] = useState(resolvedDefaultWalletId);
   const [activeAction, setActiveAction] = useState(null); // send | receive | swap | cash | null
-  const [swapDefaultView, setSwapDefaultView] = useState("convert");
-  const [swapLockedView, setSwapLockedView] = useState(null);
   const [cashModalTab, setCashModalTab] = useState("buy"); // buy | sell
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
@@ -212,8 +210,6 @@ export default function DemoWalletDashboard({
       setConvertQuoteCurrency("EUR");
       setConvertAmount("");
       setConvertPreview("");
-      setSwapDefaultView("convert");
-      setSwapLockedView(null);
     }
     if (prevAction === "cash" && activeAction !== "cash") {
       setCashModalTab("buy");
@@ -234,8 +230,6 @@ export default function DemoWalletDashboard({
     setSendDestination,
     setSendPaymentRequest,
     setSendTab,
-    setSwapDefaultView,
-    setSwapLockedView,
   ]);
 
   // ── Business-logic hooks ──────────────────────────────────────
@@ -326,8 +320,8 @@ export default function DemoWalletDashboard({
   }, [handleReset, isRefreshing]);
 
   const usdTotal = useMemo(
-    () => walletUsdTotal(activeWallet, effectiveUsdPerUnitRates),
-    [activeWallet, effectiveUsdPerUnitRates],
+    () => walletUsdTotal(activeWallet),
+    [activeWallet],
   );
 
   useEffect(() => {
@@ -467,10 +461,6 @@ export default function DemoWalletDashboard({
     [handlePaymentRequestScan, setQrScannerOpen],
   );
 
-  const handleDemoRequestGenerated = useCallback((_request) => {
-    // With a single demo wallet, we don't simulate cross-wallet payment requests anymore.
-  }, []);
-
   useEffect(() => {
     if (!shouldLockBodyScroll) return;
     return lockBodyScroll();
@@ -506,8 +496,6 @@ export default function DemoWalletDashboard({
       <DemoWalletActionBar
         setSendTab={setSendTab}
         setActiveAction={setActiveAction}
-        setSwapDefaultView={setSwapDefaultView}
-        setSwapLockedView={setSwapLockedView}
         setCashModalTab={setCashModalTab}
       />
 
@@ -527,12 +515,10 @@ export default function DemoWalletDashboard({
       <DemoWalletModals
         walletInfoOpen={walletInfoOpen}
         setWalletInfoOpen={setWalletInfoOpen}
-        demoNoticeContextLabel=""
         activeAction={activeAction}
         setActiveAction={setActiveAction}
         hasPayreq={hasPayreq}
         setSendPaymentRequest={setSendPaymentRequest}
-        activeWalletId={activeWalletId}
         renderWalletMeta={renderWalletMeta}
         selectableTokens={selectableTokens}
         selectedSendToken={selectedSendToken}
@@ -561,9 +547,6 @@ export default function DemoWalletDashboard({
         setRequestMemo={setRequestMemo}
         rlusdPerUnitRates={rlusdPerUnitRates}
         rlusdPerUnitSources={rlusdPerUnitSources}
-        handleDemoRequestGenerated={handleDemoRequestGenerated}
-        swapDefaultView={swapDefaultView}
-        swapLockedView={swapLockedView}
         currencyLinesSummary={currencyLinesSummary}
         currencyLines={currencyLines}
         swapCurrencyOptions={swapCurrencyOptions}

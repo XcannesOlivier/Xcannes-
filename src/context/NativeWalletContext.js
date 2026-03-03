@@ -292,117 +292,6 @@ export const NativeWalletProvider = ({ children }) => {
     setIsSessionReady(true);
   }, [updateWallet]);
 
-  // --- CONNECT via relay ---
-  const connect = async () => {
-    setIsConnecting(true);
-    try {
-      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "connect",
-          origin: window.location.origin,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create challenge");
-
-      const { challengeId, qrData } = data;
-
-      clearPolling();
-      clearAutoClose();
-
-      setQrModalData({
-        uuid: challengeId,
-        qrUrl: null,
-        qrData: qrData, // Raw QR payload for the QR component to render
-        deepLink: null,
-        type: "connect",
-        status: "waiting",
-        visible: true,
-      });
-
-      // Poll for connection result
-      pollChallengeStatus(challengeId, "connect");
-    } catch (error) {
-      console.error("[NativeWallet] Connect error:", error);
-      alert(`Connection failed: ${error.message}`);
-      setIsConnecting(false);
-    }
-  };
-
-  // --- SIGN TRANSACTION via relay ---
-  const signTransaction = async (txjson, { action } = {}) => {
-    if (!isConnected) {
-      alert("Please connect your wallet first");
-      return null;
-    }
-
-    const mobile = isMobileDevice();
-
-    setIsConnecting(true);
-    try {
-      const payload = {
-        type: "sign",
-        origin: window.location.origin,
-        txjson,
-        ...(action ? { action } : {}),
-      };
-
-      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create sign challenge");
-
-      const { challengeId, qrData } = data;
-
-      clearPolling();
-      clearAutoClose();
-
-      if (mobile) {
-        // Mobile: redirect to wallet-app for biometric/PIN sign
-        setQrModalData({
-          uuid: challengeId,
-          qrUrl: null,
-          qrData: qrData,
-          deepLink: null,
-          type: "sign",
-          status: "waiting",
-          visible: true,
-          mobile: true, // Flag for mobile-aware QR modal
-          walletAppUrl: `/wallet-app/?sign=${challengeId}`,
-        });
-      } else {
-        // Desktop: show QR code for mobile to scan
-        setQrModalData({
-          uuid: challengeId,
-          qrUrl: null,
-          qrData: qrData,
-          deepLink: null,
-          type: "sign",
-          status: "waiting",
-          visible: true,
-          mobile: false,
-        });
-      }
-
-      // Wait for signature result (polling works for both desktop and mobile)
-      return await new Promise((resolve) => {
-        resolvePendingSignature(null);
-        pendingSignatureResolveRef.current = resolve;
-        pollChallengeStatus(challengeId, "sign");
-      });
-    } catch (error) {
-      console.error("[NativeWallet] Sign error:", error);
-      alert(`Signature failed: ${error.message}`);
-      setIsConnecting(false);
-      return null;
-    }
-  };
-
   // --- Poll challenge status (shared for connect and sign) ---
   const pollChallengeStatus = useCallback(
     (challengeId, mode) => {
@@ -472,9 +361,124 @@ export const NativeWalletProvider = ({ children }) => {
     ]
   );
 
-  const refreshBalance = () => {
+  // --- CONNECT via relay ---
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const connect = useCallback(async () => {
+    setIsConnecting(true);
+    try {
+      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "connect",
+          origin: window.location.origin,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create challenge");
+
+      const { challengeId, qrData } = data;
+
+      clearPolling();
+      clearAutoClose();
+
+      setQrModalData({
+        uuid: challengeId,
+        qrUrl: null,
+        qrData: qrData, // Raw QR payload for the QR component to render
+        deepLink: null,
+        type: "connect",
+        status: "waiting",
+        visible: true,
+      });
+
+      // Poll for connection result
+      pollChallengeStatus(challengeId, "connect");
+    } catch (error) {
+      console.error("[NativeWallet] Connect error:", error);
+      alert(`Connection failed: ${error.message}`);
+      setIsConnecting(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearPolling, clearAutoClose, pollChallengeStatus]);
+
+  // --- SIGN TRANSACTION via relay ---
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const signTransaction = useCallback(async (txjson, { action } = {}) => {
+    if (!isConnected) {
+      alert("Please connect your wallet first");
+      return null;
+    }
+
+    const mobile = isMobileDevice();
+
+    setIsConnecting(true);
+    try {
+      const payload = {
+        type: "sign",
+        origin: window.location.origin,
+        txjson,
+        ...(action ? { action } : {}),
+      };
+
+      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create sign challenge");
+
+      const { challengeId, qrData } = data;
+
+      clearPolling();
+      clearAutoClose();
+
+      if (mobile) {
+        // Mobile: redirect to wallet-app for biometric/PIN sign
+        setQrModalData({
+          uuid: challengeId,
+          qrUrl: null,
+          qrData: qrData,
+          deepLink: null,
+          type: "sign",
+          status: "waiting",
+          visible: true,
+          mobile: true, // Flag for mobile-aware QR modal
+          walletAppUrl: `/wallet-app/?sign=${challengeId}`,
+        });
+      } else {
+        // Desktop: show QR code for mobile to scan
+        setQrModalData({
+          uuid: challengeId,
+          qrUrl: null,
+          qrData: qrData,
+          deepLink: null,
+          type: "sign",
+          status: "waiting",
+          visible: true,
+          mobile: false,
+        });
+      }
+
+      // Wait for signature result (polling works for both desktop and mobile)
+      return await new Promise((resolve) => {
+        resolvePendingSignature(null);
+        pendingSignatureResolveRef.current = resolve;
+        pollChallengeStatus(challengeId, "sign");
+      });
+    } catch (error) {
+      console.error("[NativeWallet] Sign error:", error);
+      alert(`Signature failed: ${error.message}`);
+      setIsConnecting(false);
+      return null;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, clearPolling, clearAutoClose, pollChallengeStatus, resolvePendingSignature]);
+
+  const refreshBalance = useCallback(() => {
     if (wallet) fetchBalance(wallet);
-  };
+  }, [wallet, fetchBalance]);
 
   // --- Switch active wallet (multi-wallet) ---
   const switchWallet = useCallback(

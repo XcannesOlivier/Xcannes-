@@ -10,15 +10,10 @@ export default function DemoWalletDashboardCashModal({
   open,
   onClose,
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   demoMode = false,
   onDemoBuy,
   onDemoSell,
-  buyPrefill,
   cashModalTab,
   setCashModalTab,
   renderWalletMeta,
@@ -34,14 +29,6 @@ export default function DemoWalletDashboardCashModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   const cashNote =
     noticeVariant === "demo"
       ? t(
@@ -103,20 +90,7 @@ export default function DemoWalletDashboardCashModal({
               <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
                 <div>{renderWalletMeta?.("pr-8")}</div>
                 <div className="flex flex-wrap items-center gap-2">
-                  {showNotConnectedNotice ? (
-                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                      {t("wallet_not_connected_title", "Wallet not connected")}
-                    </span>
-                  ) : null}
 
-                  {showRlusdNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                      {t(
-                        "wallet_rlusd_not_activated_title",
-                        "USD not activated. Authorize USD on your wallet.",
-                      )}
-                    </span>
-                  ) : null}
                 </div>
               </div>
               <button
@@ -204,8 +178,6 @@ export default function DemoWalletDashboardCashModal({
                   demoMode={demoMode}
                   onDemoSubmit={onDemoBuy}
                   noticeVariant={noticeVariant}
-                  noticeContextLabel={noticeContextLabel}
-                  prefill={buyPrefill}
                 />
               ) : (
                 <DemoMoonPaySellModal
@@ -225,7 +197,6 @@ export default function DemoWalletDashboardCashModal({
                   selectIconByCurrency={selectIconByCurrency}
                   selectLabelMobileByCurrency={selectLabelMobileByCurrency}
                   noticeVariant={noticeVariant}
-                  noticeContextLabel={noticeContextLabel}
                 />
               )}
             </div>

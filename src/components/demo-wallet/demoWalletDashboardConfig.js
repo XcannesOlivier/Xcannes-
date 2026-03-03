@@ -1,10 +1,3 @@
-const TOKEN_ICONS = {
-  BTC: "₿",
-  ETH: "Ξ",
-  USDT: "₮",
-  USDC: "＄",
-};
-
 const CURRENCY_FLAG_OVERRIDES = {
   EUR: "🇪🇺",
   XAF: "🌍",
@@ -114,7 +107,7 @@ export function formatAmountWithSymbol(
   return symbol ? `${value} ${symbol}` : value;
 }
 
-export function countryCodeToFlag(countryCode) {
+function countryCodeToFlag(countryCode) {
   if (!countryCode || countryCode.length !== 2) return "🏳️";
   const codePoints = [...countryCode.toUpperCase()].map(
     (c) => 0x1f1e6 + (c.charCodeAt(0) - 65),
@@ -132,68 +125,4 @@ export function getCurrencyFlag(code) {
   return countryCodeToFlag(countryGuess);
 }
 
-function getTokenIcon(currency) {
-  const code = String(currency || "").toUpperCase();
-  if (code === "RLUSD" || code === "USD") return getCurrencyFlag("USD");
-  if (TOKEN_ICONS[code]) return TOKEN_ICONS[code];
-  const first = code.match(/[A-Z]/);
-  return first ? first[0] : "?";
-}
 
-const WALLET_LAYOUTS = {
-  full: {
-    isFullPage: true,
-    tokenListClass: "max-h-none",
-    statementVariant: "full",
-    showBrandTitle: true,
-    showOpenFullWallet: false,
-    containerClass: "",
-    headerClass: "",
-    actionRowClass: "",
-    tokenRowClass: "",
-  },
-  "dex-desktop": {
-    isFullPage: false,
-    tokenListClass: "max-h-none",
-    statementVariant: "dex-desktop",
-    showBrandTitle: false,
-    showOpenFullWallet: false,
-    containerClass: "overflow-hidden",
-    headerClass: "",
-    actionRowClass: "",
-    tokenRowClass: "rounded-lg",
-  },
-  "dex-mobile": {
-    isFullPage: false,
-    tokenListClass: "max-h-[calc(100svh-300px)] md:max-h-[420px]",
-    statementVariant: "dex-mobile",
-    showBrandTitle: true,
-    showOpenFullWallet: true,
-    containerClass:
-      "h-[100svh] rounded-none shadow-xl shadow-black/30 overflow-hidden border-t border-white/10",
-    headerClass: "",
-    actionRowClass: "",
-    tokenRowClass: "rounded-xl bg-white/5 border-white/10 hover:bg-white/10",
-  },
-  default: {
-    isFullPage: false,
-    tokenListClass: "max-h-72 md:max-h-[420px]",
-    statementVariant: "default",
-    showBrandTitle: true,
-    showOpenFullWallet: false,
-    containerClass: "",
-    headerClass: "",
-    actionRowClass: "",
-    tokenRowClass: "",
-  },
-};
-
-function resolveWalletLayout(variant, isFullPage) {
-  if (variant && WALLET_LAYOUTS[variant]) {
-    return WALLET_LAYOUTS[variant];
-  }
-  if (isFullPage) {
-    return WALLET_LAYOUTS.full;
-  }
-  return WALLET_LAYOUTS.default;
-}

@@ -120,21 +120,6 @@ function buildDemoTimestamp(nextIndex, rand) {
   return date.getTime();
 }
 
-function buildCurrentMonthTimestamp(rand) {
-  const now = new Date();
-  const date = new Date(now.getTime());
-  const maxDay = now.getDate();
-  const safeMax = Math.max(1, maxDay);
-  date.setDate(1 + Math.floor(rand() * safeMax));
-  date.setHours(
-    9 + Math.floor(rand() * 9),
-    Math.floor(rand() * 60),
-    Math.floor(rand() * 60),
-    0,
-  );
-  return date.getTime();
-}
-
 function buildSendEvent({
   fromWalletId,
   toWalletId,
@@ -456,7 +441,7 @@ export function migrateDemoState(state) {
   return base;
 }
 
-export function walletUsdTotal(wallet, ratesUsdPerUnit) {
+export function walletUsdTotal(wallet) {
   const rlusd = safeNumber(wallet?.allocations?.RLUSD);
   return rlusd && rlusd > 0 ? rlusd : 0;
 }
@@ -473,20 +458,6 @@ export function ensureAllocation(wallet, currencyCode) {
 export function getWalletAddress(state, walletId) {
   const wallet = state?.wallets?.[walletId];
   return wallet?.address || "";
-}
-
-function listWalletCurrencies(wallet) {
-  const allocations = wallet?.allocations || {};
-  return Object.keys(allocations).map((c) => String(c).toUpperCase());
-}
-
-function listStateCurrencies(state) {
-  const wallets = state?.wallets || {};
-  const used = new Set();
-  Object.values(wallets).forEach((w) => {
-    listWalletCurrencies(w).forEach((c) => used.add(c));
-  });
-  return Array.from(used).sort((a, b) => a.localeCompare(b));
 }
 
 function pushEvent(state, event) {
@@ -720,27 +691,4 @@ export function applyDemoBuySell({
   return { ok: true, event };
 }
 
-function listWalletEvents(state, walletId) {
-  const events = state?.events || [];
-  return events.filter((evt) => {
-    if (!evt) return false;
-    if (evt.wallet && evt.wallet === walletId) return true;
-    if (evt.from && evt.from === walletId) return true;
-    if (evt.to && evt.to === walletId) return true;
-    return false;
-  });
-}
 
-function listWalletCurrencyEvents(state, walletId, currencyCode) {
-  const currency = String(currencyCode || "").toUpperCase();
-  return listWalletEvents(state, walletId).filter((evt) => {
-    if (!evt) return false;
-    if (evt.currency && String(evt.currency).toUpperCase() === currency)
-      return true;
-    if (evt.fromCurrency && String(evt.fromCurrency).toUpperCase() === currency)
-      return true;
-    if (evt.toCurrency && String(evt.toCurrency).toUpperCase() === currency)
-      return true;
-    return false;
-  });
-}

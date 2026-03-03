@@ -21,13 +21,11 @@ export default function DemoWalletModals({
   // Info modal
   walletInfoOpen,
   setWalletInfoOpen,
-  demoNoticeContextLabel,
   // Send modal
   activeAction,
   setActiveAction,
   hasPayreq,
   setSendPaymentRequest,
-  activeWalletId,
   renderWalletMeta,
   selectableTokens,
   selectedSendToken,
@@ -58,10 +56,7 @@ export default function DemoWalletModals({
   setRequestMemo,
   rlusdPerUnitRates,
   rlusdPerUnitSources,
-  handleDemoRequestGenerated,
   // Swap modal
-  swapDefaultView,
-  swapLockedView,
   currencyLinesSummary,
   currencyLines,
   swapCurrencyOptions,
@@ -109,10 +104,7 @@ export default function DemoWalletModals({
         isOpen={walletInfoOpen}
         onClose={() => setWalletInfoOpen(false)}
         isPreviewMode={true}
-        isWalletActivated={true}
-        hasRlusdTrustline={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
       />
 
       <DemoWalletDashboardSendModal
@@ -123,8 +115,6 @@ export default function DemoWalletModals({
         }}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
         renderWalletMeta={renderWalletMeta}
         augmentedTokens={selectableTokens}
         selectedSendToken={selectedSendToken}
@@ -143,7 +133,6 @@ export default function DemoWalletModals({
         handleSendSubmit={handleSendSubmit}
         sendProcessing={sendProcessing}
         enableSaveAddress={true}
-        showFauxPayreqDecor={true}
       />
 
       <DemoWalletDashboardPayreqModal
@@ -154,8 +143,6 @@ export default function DemoWalletModals({
         }}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
         renderWalletMeta={renderWalletMeta}
         selectedSendToken={selectedSendToken}
         sendPaymentRequest={sendPaymentRequest}
@@ -172,8 +159,6 @@ export default function DemoWalletModals({
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
         renderWalletMeta={renderWalletMeta}
         wallet={wallet}
         handleCopyAddress={async () => {
@@ -195,19 +180,14 @@ export default function DemoWalletModals({
         augmentedTokens={selectableTokens}
         requestMemo={requestMemo}
         setRequestMemo={setRequestMemo}
-        onRequestGenerated={handleDemoRequestGenerated}
       />
 
       <DemoWalletDashboardSwapModal
         open={activeAction === "swap"}
         onClose={() => setActiveAction(null)}
-        defaultView={swapDefaultView}
-        lockedView={swapLockedView}
         renderWalletMeta={renderWalletMeta}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
         currencyLinesSummary={currencyLinesSummary}
         currencyLines={currencyLines}
         swapCurrencyOptions={swapCurrencyOptions}
@@ -232,8 +212,6 @@ export default function DemoWalletModals({
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
         walletLabel={walletContextLabel}
         hideWalletAddress={isWalletLabelLocked}
         demoMode={true}
@@ -253,13 +231,10 @@ export default function DemoWalletModals({
 
       <DemoWalletDashboardStatementModals
         augmentedTokens={selectableTokens}
-        backendWalletAddress={""}
         wallet={wallet}
         walletDisplayLabel={walletContextLabel}
         isPreviewMode={true}
         noticeVariant="demo"
-        noticeContextLabel={demoNoticeContextLabel}
-        walletId={activeWalletId}
         previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={false}
