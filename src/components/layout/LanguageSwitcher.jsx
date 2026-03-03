@@ -150,29 +150,27 @@ export default function LanguageSwitcher({
   }, [insideRefs, isInline, setOpen]);
 
   const changeLanguage = (locale) => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("NEXT_LOCALE", locale);
-      document.cookie = `NEXT_LOCALE=${encodeURIComponent(
-        locale
-      )}; path=/; max-age=31536000; samesite=lax`;
-    }
+    if (typeof window === "undefined") return;
+
+    localStorage.setItem("NEXT_LOCALE", locale);
+    document.cookie = `NEXT_LOCALE=${encodeURIComponent(
+      locale
+    )}; path=/; max-age=31536000; samesite=lax`;
 
     onSelect?.();
-    const { pathname, asPath, query } = router;
-    if (router.locale === locale) {
-      setOpen(false);
-      setOpenRegion(null);
-      return;
-    }
-    router
-      .push({ pathname, query }, asPath, { locale })
-      .then(() => {
-        if (typeof window !== "undefined") {
-          window.location.reload();
-        }
-      });
     setOpen(false);
     setOpenRegion(null);
+
+    if (router.locale === locale) return;
+
+    // Hard navigation pour garantir le changement de locale sur Vercel/CDN.
+    // router.push + reload est fragile : le push peut échouer silencieusement
+    // sur les déploiements statiques (CDN fetch /_next/data/... bloqué).
+    const { asPath } = router;
+    const defaultLocale = router.defaultLocale || "en";
+    const prefix = locale === defaultLocale ? "" : `/${locale}`;
+    const target = `${prefix}${asPath === "/" && !prefix ? "/" : asPath}`;
+    window.location.assign(target || "/");
   };
 
   const toggleRegion = (regionKey) => {

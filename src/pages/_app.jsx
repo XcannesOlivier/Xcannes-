@@ -40,6 +40,7 @@ function App({ Component, pageProps }) {
       return normalized || "/";
     };
 
+    let safetyTimer;
     const handleStart = (url) => {
       setIsRouteChanging(true);
       const fromPath = stripLocalePrefix(router.asPath || "/");
@@ -51,12 +52,20 @@ function App({ Component, pageProps }) {
       } else {
         setTransitionDirection("from-right");
       }
+      // Sécurité : si la transition se bloque (CDN lent, fetch échoué),
+      // force la fin de l'animation après 3s pour ne pas rester à opacity:0
+      if (safetyTimer) clearTimeout(safetyTimer);
+      safetyTimer = setTimeout(() => setIsRouteChanging(false), 3000);
     };
-    const handleEnd = () => setIsRouteChanging(false);
+    const handleEnd = () => {
+      if (safetyTimer) clearTimeout(safetyTimer);
+      setIsRouteChanging(false);
+    };
     router.events.on("routeChangeStart", handleStart);
     router.events.on("routeChangeComplete", handleEnd);
     router.events.on("routeChangeError", handleEnd);
     return () => {
+      if (safetyTimer) clearTimeout(safetyTimer);
       router.events.off("routeChangeStart", handleStart);
       router.events.off("routeChangeComplete", handleEnd);
       router.events.off("routeChangeError", handleEnd);

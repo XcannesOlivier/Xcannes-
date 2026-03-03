@@ -186,25 +186,59 @@ export default function Header({ fixed = true }) {
     ? "text-white hover:text-white border border-white/25 hover:border-white/40 bg-transparent hover:bg-white/10 transition-transform duration-200 hover:scale-105 active:scale-95 header-nav-link-no-arrow-anim"
     : "text-white/80 hover:text-white bg-transparent header-nav-link-no-arrow-anim";
 
+  // Navigation robuste : router.push avec fallback hard-nav si le CDN/Vercel bloque
+  const safeRouterPush = useCallback(
+    (href) => {
+      const events = router?.events;
+      let didComplete = false;
+      let fallbackTimer;
+
+      const cleanup = () => {
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        events?.off?.("routeChangeComplete", onComplete);
+        events?.off?.("routeChangeError", onError);
+      };
+      const onComplete = () => { didComplete = true; cleanup(); };
+      const onError = () => {
+        cleanup();
+        if (typeof window !== "undefined") window.location.assign(href);
+      };
+
+      events?.on?.("routeChangeComplete", onComplete);
+      events?.on?.("routeChangeError", onError);
+
+      // Si la navigation client n'aboutit pas en 1.5s, fallback hard-nav
+      fallbackTimer = setTimeout(() => {
+        if (!didComplete && typeof window !== "undefined") {
+          cleanup();
+          window.location.assign(href);
+        }
+      }, 1500);
+
+      router.push(href);
+    },
+    [router]
+  );
+
   const handleWalletAction = useCallback(async () => {
     if (isConnecting) return;
 
     if (isConnected) {
       await disconnect();
       if (router.pathname === "/wallet") {
-        router.replace("/");
+        safeRouterPush("/");
       }
       return;
     }
 
     // Navigate to /wallet which shows the wallet-app style connect screen
     if (router.pathname !== "/wallet") {
-      router.push("/wallet");
+      safeRouterPush("/wallet");
     } else {
       // Already on /wallet page, trigger connect directly
       connect();
     }
-  }, [connect, disconnect, isConnected, isConnecting, router]);
+  }, [connect, disconnect, isConnected, isConnecting, router, safeRouterPush]);
 
   useEffect(() => {
     const handleScroll = () => {
