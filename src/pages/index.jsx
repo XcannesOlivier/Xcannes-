@@ -45,12 +45,14 @@ export default function Home() {
     speedModalOpen || securityModalOpen || feesModalOpen || valueModalOpen;
   
   // États pour l'animation séquencée du hero après l'animation du header
-  const [showHeroTitle, setShowHeroTitle] = useState(false);
-  const [showHeroSubtitle, setShowHeroSubtitle] = useState(false);
-  const [showHeroCarousel, setShowHeroCarousel] = useState(false);
-  const [showHeroBadges, setShowHeroBadges] = useState(false);
-  const [showHeroCards, setShowHeroCards] = useState(false);
-  const heroAnimationRef = useRef(false);
+  // Comme le header, les animations ne jouent qu'une seule fois par session
+  const heroAlreadyAnimated = typeof window !== "undefined" && sessionStorage.getItem("xcannes_hero_animated") === "1";
+  const [showHeroTitle, setShowHeroTitle] = useState(heroAlreadyAnimated);
+  const [showHeroSubtitle, setShowHeroSubtitle] = useState(heroAlreadyAnimated);
+  const [showHeroCarousel, setShowHeroCarousel] = useState(heroAlreadyAnimated);
+  const [showHeroBadges, setShowHeroBadges] = useState(heroAlreadyAnimated);
+  const [showHeroCards, setShowHeroCards] = useState(heroAlreadyAnimated);
+  const heroAnimationRef = useRef(heroAlreadyAnimated);
 
   const getModalCloseDelay = () => {
     if (typeof window === "undefined") return 400;
@@ -167,6 +169,7 @@ export default function Home() {
   }, [valueModalOpen]);
 
   // Animation séquencée du hero après l'animation du header
+  // Ne joue qu'une seule fois par session (comme le header)
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (heroAnimationRef.current) return;
@@ -194,6 +197,8 @@ export default function Home() {
     
     const timer5 = setTimeout(() => {
       setShowHeroCards(true);
+      // Marquer comme fait dans sessionStorage (comme le header)
+      try { sessionStorage.setItem("xcannes_hero_animated", "1"); } catch {}
     }, headerAnimationDuration + 500);
     
     return () => {
