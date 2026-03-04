@@ -1188,6 +1188,16 @@ function setupWalletEmbedded() {
         });
         break;
 
+      case 'GET_WALLETS':
+        // Dashboard requests the list of all stored wallets
+        handleGetWallets();
+        break;
+
+      case 'SWITCH_WALLET':
+        // Dashboard requests switching to a different wallet
+        if (data.address) handleSwitchWalletFromIframe(data.address);
+        break;
+
       default:
         break;
     }
@@ -1235,6 +1245,43 @@ function sendToIframe(msg) {
   const iframe = document.getElementById('wallet-iframe');
   if (iframe?.contentWindow) {
     iframe.contentWindow.postMessage(msg, '*');
+  }
+}
+
+/**
+ * Respond to GET_WALLETS — send the list of all stored wallet addresses.
+ * Each entry: { address, label, lastUsedAt }
+ */
+async function handleGetWallets() {
+  try {
+    const wallets = await getAllWallets();
+    sendToIframe({
+      type: 'WALLET_LIST',
+      wallets: wallets.map(w => ({
+        address: w.address,
+        label: w.label || null,
+        lastUsedAt: w.lastUsedAt || 0,
+      })),
+      activeAddress: currentWallet?.address || '',
+    });
+  } catch (err) {
+    console.error('[handleGetWallets] Error:', err);
+    sendToIframe({ type: 'WALLET_LIST', wallets: [], activeAddress: '' });
+  }
+}
+
+/**
+ * Handle SWITCH_WALLET request from the iframe dashboard.
+ * Decrypts the target wallet, updates currentWallet, and sends INIT back.
+ */
+async function handleSwitchWalletFromIframe(address) {
+  try {
+    await switchWallet(address);
+    // Notify the iframe of the switch (switchWallet already does this,
+    // but also re-send the full wallet list)
+    handleGetWallets();
+  } catch (err) {
+    console.error('[handleSwitchWalletFromIframe] Error:', err);
   }
 }
 
