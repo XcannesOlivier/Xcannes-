@@ -22,9 +22,6 @@ const API_CONFIG = {
 };
 
 const API_ENDPOINTS = {
-  MARKETS: '/api/v1/markets',
-  MARKETS_ALL: '/api/v1/markets/all',
-  TICKER: '/api/v1/ticker',
   FX_RATE: '/api/v1/fx/rate',
   FX_CURRENCIES: '/api/v1/fx/currencies',
 };
@@ -39,9 +36,6 @@ class XcannesAPI {
     this.healthStatus = { isHealthy: true, lastCheck: 0 };
     this.request = this.request.bind(this);
     this.getHealthStatus = this.getHealthStatus.bind(this);
-    this.getMarkets = this.getMarkets.bind(this);
-    this.getAllMarkets = this.getAllMarkets.bind(this);
-    this.getTicker = this.getTicker.bind(this);
     this.getFxRate = this.getFxRate.bind(this);
     this.getFxCurrencies = this.getFxCurrencies.bind(this);
   }
@@ -193,34 +187,6 @@ class XcannesAPI {
    */
   getHealthStatus() {
     return this.healthStatus;
-  }
-
-  /**
-   * Récupérer toutes les paires (64 paires DEX)
-   * @returns {Promise<Array>}
-   */
-  async getMarkets() {
-    const result = await this.request(API_ENDPOINTS.MARKETS);
-    return result.success ? result.data : [];
-  }
-
-  /**
-   * Récupérer toutes les paires de trading
-   * @returns {Promise<Object>}
-   */
-  async getAllMarkets() {
-    const result = await this.request(API_ENDPOINTS.MARKETS_ALL);
-    return result.success ? result.data : { trading: [] };
-  }
-
-  /**
-   * Récupérer le ticker d'une paire
-   * @param {string} pair - Format: RLUSD_XRP
-   * @returns {Promise<Object>}
-   */
-  async getTicker(pair) {
-    const result = await this.request(`${API_ENDPOINTS.TICKER}?pair=${pair}`);
-    return result.success ? result.data : null;
   }
 
   /**
