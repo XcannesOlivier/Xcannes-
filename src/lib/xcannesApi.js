@@ -57,16 +57,24 @@ class XcannesAPI {
       retries = API_CONFIG.RETRY_ATTEMPTS,
       useCache = true,
       cacheTTL = API_CONFIG.CACHE_TTL,
+      negativeCacheTTL = 0,
     } = options;
 
     // Vérifier le cache (GET seulement)
     if (method === 'GET' && useCache) {
       const cached = this.getFromCache(endpoint);
-      if (cached) return cached;
+      if (cached !== null) {
+        // Negative cache hit — rethrow the stored error
+        if (cached && cached.__negativeCache) {
+          throw new Error(cached.__negativeCache);
+        }
+        return cached;
+      }
     }
 
     // Tenter la requête avec retry
     let lastError;
+    let is4xx = false;
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
         const controller = new AbortController();
@@ -84,7 +92,13 @@ class XcannesAPI {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          const status = response.status;
+          // 4xx errors are deterministic — no point retrying
+          if (status >= 400 && status < 500) {
+            is4xx = true;
+            throw new Error(`HTTP ${status}: ${response.statusText}`);
+          }
+          throw new Error(`HTTP ${status}: ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -103,6 +117,9 @@ class XcannesAPI {
             error.message
           );
         }
+
+        // Don't retry 4xx errors (404, 400…) — they won't resolve on retry
+        if (is4xx) break;
         
         // Attendre avant de réessayer
         if (attempt < retries - 1) {
@@ -111,7 +128,14 @@ class XcannesAPI {
       }
     }
 
-    console.error(`[XcannesAPI] Erreur ${endpoint} après ${retries} tentatives:`, lastError);
+    // Cache the negative result to avoid hammering the server
+    if (method === 'GET' && useCache && negativeCacheTTL > 0) {
+      this.setCache(endpoint, { __negativeCache: lastError?.message || 'Request failed' }, negativeCacheTTL);
+    }
+
+    if (DEBUG_LOGS) {
+      console.error(`[XcannesAPI] Erreur ${endpoint} après ${is4xx ? 1 : retries} tentatives:`, lastError);
+    }
     throw lastError;
   }
 
@@ -210,6 +234,7 @@ class XcannesAPI {
     const result = await this.request(`${API_ENDPOINTS.FX_RATE}?${params.toString()}`, {
       useCache: true,
       cacheTTL: 43200000, // 12h — Fawaz met à jour ~1x/jour, on poll toutes les 12h
+      negativeCacheTTL: 3600000, // 1h — évite de spammer le serveur si la paire n'existe pas
     });
     return result.success ? result.data : null;
   }

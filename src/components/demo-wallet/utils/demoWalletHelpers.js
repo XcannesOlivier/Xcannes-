@@ -83,10 +83,16 @@ export function formatDemoAddressShort(address) {
 
 // ─── Ticker / rate resolution ───────────────────────────────────────────────
 
+// Crypto/XRPL assets that should never go through the Fawaz FX endpoint.
+const CRYPTO_CODES = new Set(["XRP", "BTC", "ETH", "SOL", "DOGE", "LTC", "ADA", "DOT", "AVAX", "MATIC"]);
+
 export async function resolveUsdPerUnit(code) {
   const upper = String(code || "").toUpperCase();
   if (!upper) return { rate: Number.NaN, source: null };
   if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "FAWAZ" };
+
+  // Skip crypto assets — Fawaz only has forex/fiat pairs
+  if (CRYPTO_CODES.has(upper)) return { rate: Number.NaN, source: null };
 
   try {
     const fxData = await xcannesApi.getFxRate("USD", upper);

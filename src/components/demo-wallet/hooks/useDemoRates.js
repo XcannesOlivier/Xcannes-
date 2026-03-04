@@ -100,9 +100,17 @@ export function useDemoRates({
   const rlusdPerUnitRates = usdPerUnitRates;
 
   // ── Fetch any newly-required codes that are missing ──
+  // Use a stable string key to avoid re-triggers when the array reference changes.
+  const requiredCodesKey = useMemo(
+    () => (requiredRateCodes || []).join("|"),
+    [requiredRateCodes],
+  );
+  // Track already-attempted codes to avoid retrying failed resolutions every render.
+  const attemptedCodesRef = useRef(new Set());
+
   useEffect(() => {
     const missing = (requiredRateCodes || []).filter(
-      (code) => !usdPerUnitRates[code],
+      (code) => !usdPerUnitRates[code] && !attemptedCodesRef.current.has(code),
     );
     if (missing.length === 0) return;
     let cancelled = false;
@@ -111,6 +119,7 @@ export function useDemoRates({
       const srcPatch = {};
       await Promise.all(
         missing.map(async (code) => {
+          attemptedCodesRef.current.add(code);
           const resolved = await resolveUsdPerUnit(code);
           const num = Number(resolved?.rate);
           if (!Number.isFinite(num) || num <= 0) return;
@@ -123,7 +132,7 @@ export function useDemoRates({
       setUsdPerUnitSources((prev) => ({ ...prev, ...srcPatch }));
     })();
     return () => { cancelled = true; };
-  }, [requiredRateCodes, usdPerUnitRates]);
+  }, [requiredCodesKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const rlusdPerUnitSources = useMemo(
     () => ({ ...usdPerUnitSources }),
