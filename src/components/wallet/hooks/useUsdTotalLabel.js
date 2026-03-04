@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 
 export function useUsdTotalLabel({
@@ -9,8 +7,6 @@ export function useUsdTotalLabel({
   xrpAmount,
   demoTotalUsd,
   isStablecoin,
-  cryptoIcons,
-  getTicker,
   fiatRates,
   rlusdOnChain,
 } = {}) {
@@ -33,17 +29,6 @@ export function useUsdTotalLabel({
   useEffect(() => {
     let cancelled = false;
 
-    const getTickerPrice = (ticker) => {
-      const priceSource =
-        ticker?.lastPrice ??
-        ticker?.price ??
-        ticker?.midPrice ??
-        ticker?.bidPrice ??
-        ticker?.askPrice;
-      const price = Number(priceSource);
-      return Number.isFinite(price) && price > 0 ? price : NaN;
-    };
-
     const resolveUsdRate = async (code) => {
       const upper = String(code || "").toUpperCase();
       if (!upper) return NaN;
@@ -51,21 +36,7 @@ export function useUsdTotalLabel({
 
       if (isStablecoin?.(upper)) return 1;
 
-      if (
-        (cryptoIcons && cryptoIcons[upper]) ||
-        ["XRP", "RLUSD", "BTC", "ETH"].includes(upper)
-      ) {
-        try {
-          const ticker = await getTicker?.(`${upper}_RLUSD`);
-          const price = getTickerPrice(ticker);
-          if (Number.isFinite(price)) return price;
-        } catch (err) {
-          console.warn("USD rate XRPL error:", err);
-        }
-        return NaN;
-      }
-
-      // Utiliser les taux fiat pré-chargés (useRlusdPerUnitRates)
+      // Utiliser les taux fiat pré-chargés (useRlusdPerUnitRates / Fawaz EOD)
       const rate = Number(fiatRates?.[upper]);
       if (Number.isFinite(rate) && rate > 0) return rate;
 
@@ -100,9 +71,7 @@ export function useUsdTotalLabel({
       cancelled = true;
     };
   }, [
-    cryptoIcons,
     fiatRates,
-    getTicker,
     isStablecoin,
     rateCodesKey,
   ]);
