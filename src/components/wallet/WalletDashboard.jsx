@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
 import xcannesApi from "@/lib/xcannesApi";
-import { CRYPTO_ICONS } from "@/utils/marketConstants";
+
 
 import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
@@ -425,8 +425,6 @@ export default function WalletDashboard({
     xrpAmount,
     demoTotalUsd: 0,
     isStablecoin,
-    cryptoIcons: CRYPTO_ICONS,
-    getTicker: xcannesApi.getTicker,
     fiatRates: rlusdPerUnitRates,
     rlusdOnChain: currencyLinesSummary?.rlusdOnChain ?? null,
   });

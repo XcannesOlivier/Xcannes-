@@ -1,8 +1,5 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { useSwapConversion } from "./useSwapConversion";
-import xcannesApi from "@/lib/xcannesApi";
 
 /**
  * useWalletSwapOrchestrator — Groups all swap / convert / cash state,
@@ -102,8 +99,6 @@ export function useWalletSwapOrchestrator({
     currencyLinesSummary,
     allocatedRlusdByCurrency,
     refreshCurrencyLines,
-    getAllMarkets: xcannesApi.getAllMarkets,
-    getTicker: xcannesApi.getTicker,
   });
 
   return {

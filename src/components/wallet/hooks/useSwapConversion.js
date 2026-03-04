@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect } from "react";
 import xcannesApi from "@/lib/xcannesApi";
 import { buildXrplJsonMemo, buildConversionMemo } from "@/utils/xrplMemo";
@@ -32,8 +30,6 @@ export function useSwapConversion({
   currencyLinesSummary,
   allocatedRlusdByCurrency,
   refreshCurrencyLines,
-  getAllMarkets,
-  getTicker,
   onDemoConvert,
 }) {
   useEffect(() => {
@@ -82,22 +78,6 @@ export function useSwapConversion({
         }
       }
 
-      if (code === "RLUSD" || code === "XRP") {
-        try {
-          const pairSymbol = `${code}_RLUSD`;
-          const ticker = await getTicker?.(pairSymbol);
-          const lastPrice = ticker?.lastPrice
-            ? Number(ticker.lastPrice)
-            : Number.NaN;
-          if (Number.isFinite(lastPrice) && lastPrice > 0) {
-            return lastPrice;
-          }
-        } catch (error) {
-          console.warn("getRlusdPerUnit XRPL error:", error);
-        }
-        return 1;
-      }
-
       try {
         const fxData = await xcannesApi.getFxRate("USD", code);
         const rate = Number(fxData?.rate);
@@ -111,15 +91,13 @@ export function useSwapConversion({
 
       return 1;
     },
-    [demoLines, getTicker],
+    [demoLines],
   );
 
   const getFxSource = useCallback(
     async (currencyCode) => {
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return null;
-      if (code === "RLUSD" || code === "USD") return "FAWAZ";
-      if (code === "XRP" || code === "RLUSD") return "XRPL";
       return "FAWAZ";
     },
     [],
