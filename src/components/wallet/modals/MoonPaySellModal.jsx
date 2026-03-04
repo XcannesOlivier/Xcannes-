@@ -55,19 +55,12 @@ const MoonPaySellModal = ({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const { signTransaction, isWalletActivated, balance } = useWallet();
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
+
   const hasRlusdTrustline = useMemo(() => {
     return (balance?.tokens || []).some(
       (token) => String(token?.currency || "").toUpperCase() === "RLUSD",
     );
   }, [balance]);
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -789,27 +782,7 @@ const MoonPaySellModal = ({
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
-                {showNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-                    {t(
-                      "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                    )}
-                  </span>
-                ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "USD not activated. Authorize USD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
+
               </div>
               <p className="text-xs text-white/60 mt-1">
                 {t(

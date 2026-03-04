@@ -34,14 +34,6 @@ export default function WalletDashboardCashModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   const cashNote =
     noticeVariant === "demo"
       ? t(
@@ -108,27 +100,7 @@ export default function WalletDashboardCashModal({
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
-                  {showNotConnectedNotice ? (
-                    <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                      {t("wallet_not_connected_title", "Wallet not connected")}
-                    </span>
-                  ) : null}
-                  {showNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                      {t(
-                        "wallet_not_activated_title",
-                        "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                      )}
-                    </span>
-                  ) : null}
-                  {showRlusdNotActivatedNotice ? (
-                    <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                      {t(
-                        "wallet_rlusd_not_activated_title",
-                        "USD not activated. Authorize USD on your wallet.",
-                      )}
-                    </span>
-                  ) : null}
+
                 </div>
               </div>
               <button

@@ -19,9 +19,6 @@ export default function WalletActivationModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
-  const showNotConnectedNotice = isPreviewMode;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode && isWalletActivated === true && hasRlusdTrustline === false;
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -117,21 +114,7 @@ export default function WalletActivationModal({
                   },
                 )}
               </p>
-              <div className="flex flex-wrap items-center gap-2">
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-xs font-semibold leading-none px-2 py-1 rounded-full bg-amber-500/10 border border-amber-400/30">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "USD not activated. Authorize USD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
-              </div>
+
             </div>
           </div>
 

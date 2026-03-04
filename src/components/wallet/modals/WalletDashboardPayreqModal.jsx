@@ -38,12 +38,6 @@ export default function WalletDashboardPayreqModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
 
@@ -401,19 +395,7 @@ export default function WalletDashboardPayreqModal({
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
-            {showNotConnectedNotice ? (
-              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t("wallet_not_connected_title", "Wallet not connected")}
-              </span>
-            ) : null}
-            {showRlusdNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none w-full md:w-auto mt-1 md:mt-0">
-                {t(
-                  "wallet_rlusd_not_activated_title",
-                  "USD not activated. Authorize USD on your wallet.",
-                )}
-              </span>
-            ) : null}
+
           </div>
           {renderWalletMeta?.("mb-2")}
 
