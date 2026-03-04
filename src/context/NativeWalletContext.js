@@ -115,7 +115,13 @@ export const NativeWalletProvider = ({ children }) => {
               currency: decodeXrplCurrencyCode(token?.currency),
             }))
           : [];
-        setBalance({ xrp: data.xrp, tokens });
+        setBalance({
+          xrp: data.xrp,
+          xrpReserved: data.xrpReserved ?? 0,
+          xrpAvailable: data.xrpAvailable ?? 0,
+          xrpLowAlert: Boolean(data.xrpLowAlert),
+          tokens,
+        });
         return;
       }
       if (
@@ -125,7 +131,7 @@ export const NativeWalletProvider = ({ children }) => {
           .includes("not activated")
       ) {
         setIsWalletActivated(false);
-        setBalance({ xrp: 0, tokens: [] });
+        setBalance({ xrp: 0, xrpReserved: 0, xrpAvailable: 0, xrpLowAlert: false, tokens: [] });
       }
     } catch (error) {
       console.error("[NativeWallet] Fetch balance error:", error);
