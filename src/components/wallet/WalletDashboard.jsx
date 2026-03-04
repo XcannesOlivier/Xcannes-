@@ -106,6 +106,8 @@ export default function WalletDashboard({
     (tok) => String(tok?.currency || "").toUpperCase() === "RLUSD",
   );
   const xrpAmount = parseFloat(balance?.xrp || 0) || 0;
+  const xrpLowAlert = Boolean(balance?.xrpLowAlert);
+  const xrpAvailable = parseFloat(balance?.xrpAvailable || 0) || 0;
 
   const isStablecoin = useCallback(
     (currency) =>
@@ -300,6 +302,19 @@ export default function WalletDashboard({
   });
 
   useWalletIncomingToast({ backendWalletAddress, flashWalletHeaderToast });
+
+  // ── XRP low balance alert ──────────────────────────────────
+  useEffect(() => {
+    if (!isConnected || !xrpLowAlert) return;
+    flashWalletHeaderToast(
+      t(
+        "wallet_xrp_low_alert",
+        "⚠ XRP bas — {{available}} XRP disponible pour les frais",
+        { available: xrpAvailable.toFixed(2) },
+      ),
+      8000,
+    );
+  }, [isConnected, xrpLowAlert, xrpAvailable, flashWalletHeaderToast, t]);
 
   // ── Token display labels ───────────────────────────────────
   const {
