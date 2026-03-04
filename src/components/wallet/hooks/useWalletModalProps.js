@@ -50,7 +50,6 @@ export function useWalletModalProps({
   handlePaymentRequestScan,
   handleSendSubmit,
   sendProcessing,
-  payreqDecorProps,
   hasPayreq,
   savePayreq,
   removePayreq,
@@ -175,7 +174,6 @@ export function useWalletModalProps({
       handleSendSubmit,
       sendProcessing,
       enableSaveAddress: true,
-      ...payreqDecorProps,
     }),
     [
       isWalletActivated,
@@ -200,7 +198,6 @@ export function useWalletModalProps({
       handlePaymentRequestScan,
       handleSendSubmit,
       sendProcessing,
-      payreqDecorProps,
     ],
   );
 

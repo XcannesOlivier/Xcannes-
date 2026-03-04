@@ -12,8 +12,6 @@
  * After connection, isConnected flips → parent (wallet.jsx) swaps to Dashboard.
  */
 
-"use client";
-
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
