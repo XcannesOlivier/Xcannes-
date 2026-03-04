@@ -90,6 +90,7 @@ export const PwaEmbeddedProvider = ({ children }) => {
   const [isSessionReady, setIsSessionReady] = useState(false);
   const [balance, setBalance] = useState(null);
   const [isWalletActivated, setIsWalletActivated] = useState(null);
+  const [walletAddresses, setWalletAddresses] = useState([]);
   const walletRef = useRef("");
 
   // --- Balance ---
@@ -277,17 +278,27 @@ export const PwaEmbeddedProvider = ({ children }) => {
             updateWallet(data.address);
           }
           setIsSessionReady(true);
+          // Request the full wallet list from the PWA
+          postToPwa({ type: "GET_WALLETS" });
           break;
         }
         case "LOCK": {
           // PWA locked — clear wallet state
           updateWallet(null);
+          setWalletAddresses([]);
           break;
         }
         case "SWITCH_WALLET": {
           // PWA switched active wallet
           if (data.address) {
             updateWallet(data.address);
+          }
+          break;
+        }
+        case "WALLET_LIST": {
+          // PWA sends the full list of stored wallets
+          if (Array.isArray(data.wallets)) {
+            setWalletAddresses(data.wallets);
           }
           break;
         }
@@ -403,6 +414,13 @@ export const PwaEmbeddedProvider = ({ children }) => {
     if (walletRef.current) fetchBalance(walletRef.current);
   }, [fetchBalance]);
 
+  // --- Switch wallet (multi-wallet) ---
+  const switchWallet = useCallback((address) => {
+    if (!address || address === walletRef.current) return;
+    // Ask the PWA to switch to this wallet
+    postToPwa({ type: "SWITCH_WALLET", address });
+  }, []);
+
   // No QR modal in embedded mode
   const qrModalData = null;
   const closeQrModal = useCallback(() => {}, []);
@@ -415,11 +433,13 @@ export const PwaEmbeddedProvider = ({ children }) => {
     balance,
     isWalletActivated,
     qrModalData,
+    walletAddresses,
     connect,
     disconnect,
     refreshBalance,
     signTransaction,
     closeQrModal,
+    switchWallet,
   }), [
     wallet,
     isConnected,
@@ -428,11 +448,13 @@ export const PwaEmbeddedProvider = ({ children }) => {
     balance,
     isWalletActivated,
     qrModalData,
+    walletAddresses,
     connect,
     disconnect,
     refreshBalance,
     signTransaction,
     closeQrModal,
+    switchWallet,
   ]);
 
   return (
