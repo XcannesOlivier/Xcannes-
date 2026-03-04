@@ -3,10 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import xcannesApi from "@/lib/xcannesApi";
 
+// Crypto/XRPL assets that should never go through the Fawaz FX endpoint.
+const CRYPTO_CODES = new Set(["XRP", "BTC", "ETH", "SOL", "DOGE", "LTC", "ADA", "DOT", "AVAX", "MATIC"]);
+
 async function resolveUsdPerUnit(code, fawazSet) {
   const upper = String(code || "").toUpperCase();
   if (!upper) return { rate: Number.NaN, source: null };
   if (upper === "USD" || upper === "RLUSD") return { rate: 1, source: "FAWAZ" };
+
+  // Skip crypto assets — Fawaz only has forex/fiat pairs
+  if (CRYPTO_CODES.has(upper)) return { rate: Number.NaN, source: null };
 
   // Skip Fawaz si la devise n'est pas dans la liste supportée
   if (!fawazSet || !fawazSet.has(upper)) {
