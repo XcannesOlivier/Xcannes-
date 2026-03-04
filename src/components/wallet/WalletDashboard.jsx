@@ -646,6 +646,7 @@ export default function WalletDashboard({
             hasRlusdTrustline={hasRlusdTrustline}
             onActivateWallet={handleOpenActivationModal}
             onConfirmSetup={handleRlusdSetupConfirm}
+            activeAction={activeAction}
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}

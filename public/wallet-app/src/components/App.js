@@ -211,6 +211,31 @@ function isRunningInIframe() {
 }
 
 /**
+ * Check if URL has ?action=choice — used when the site's settings
+ * menu opens wallet-app specifically to create/import another wallet.
+ * After unlock, go directly to the choice screen instead of home.
+ */
+function hasActionChoice() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('action') === 'choice';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Post-unlock destination: choice screen if ?action=choice, else home.
+ */
+async function goToPostUnlockDestination() {
+  if (hasActionChoice()) {
+    goToChoice();
+  } else {
+    await goToHome();
+  }
+}
+
+/**
  * Detect if this is a mobile browser (not the PWA).
  * If so, show a redirect screen suggesting to open the installed app.
  * User can bypass and continue in the browser.
@@ -273,7 +298,7 @@ async function initApp() {
         const unlockResult = await attemptInstantUnlock(authConfig);
 
         if (unlockResult.success) {
-          await goToHome();
+          await goToPostUnlockDestination();
           return;
         }
         // Face ID failed — show unlock screen with retry + PIN fallback
@@ -1470,7 +1495,7 @@ function setupEnterPINScreen() {
       // Reset attempts
       await saveAuthConfig({ ...authConfig, pinAttempts: 0, pinLockedUntil: 0 });
 
-      await goToHome();
+      await goToPostUnlockDestination();
 
     } catch (err) {
       // Wrong PIN
@@ -1682,7 +1707,7 @@ async function doUnlock() {
     isUnlocked = true;
 
     updateStatus(statusEl, '');
-    await goToHome();
+    await goToPostUnlockDestination();
 
   } catch (err) {
     if (err.name === 'NotAllowedError') {
