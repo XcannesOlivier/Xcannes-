@@ -17,10 +17,6 @@ export default function WalletActivationRequestModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
-  const showNotConnectedNotice = isPreviewMode;
-  const showNotActivatedNotice = !isPreviewMode && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode && isWalletActivated === true && hasRlusdTrustline === false;
   const [copied, setCopied] = useState(false);
   const activationAmountLabel =
     Number(activationAmountXrp) === 1.4
@@ -139,27 +135,7 @@ export default function WalletActivationRequestModal({
                 },
               )}
             </h3>
-            {showNotConnectedNotice ? (
-              <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold leading-none mt-1">
-                {t("wallet_not_connected_title", "Wallet not connected")}
-              </span>
-            ) : null}
-            {showNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none mt-1">
-                {t(
-                  "wallet_not_activated_title",
-                  "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                )}
-              </span>
-            ) : null}
-            {showRlusdNotActivatedNotice ? (
-              <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none mt-1">
-                {t(
-                  "wallet_rlusd_not_activated_title",
-                  "USD not activated. Authorize USD on your wallet.",
-                )}
-              </span>
-            ) : null}
+
             <p className="mt-1 text-sm text-white/60">
               {t(
                 "ui_activation_request_subtitle_9a2d7f5c1e",

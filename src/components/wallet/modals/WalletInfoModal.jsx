@@ -12,13 +12,6 @@ export function WalletInfoContent({
   noticeVariant = "preview",
 }) {
   const { t } = useTranslation("common");
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
   return (
     <>
       <div className={withCloseGutter ? "pr-8" : ""}>
@@ -34,22 +27,7 @@ export function WalletInfoContent({
               {t("demo_notice_title", "Mode démo")}
             </span>
           ) : null}
-          {showNotActivatedNotice ? (
-            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-              {t(
-                "wallet_not_activated_title",
-                "Wallet not activated: a minimum reserve of 1 XRP is required.",
-              )}
-            </span>
-          ) : null}
-          {showRlusdNotActivatedNotice ? (
-            <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold leading-none">
-              {t(
-                "wallet_rlusd_not_activated_title",
-                "USD not activated. Authorize USD on your wallet.",
-              )}
-            </span>
-          ) : null}
+
         </div>
         <p className="mt-1 text-sm text-white/60">
           {t(
