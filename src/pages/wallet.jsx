@@ -1,14 +1,11 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-		import { useTranslation } from "next-i18next";
-		import { getPageTranslations } from "@/i18n/getPageTranslations";
-		import WalletDashboard from "@/components/wallet/WalletDashboard";
-		import WalletConnectScreen from "@/components/wallet/WalletConnectScreen";
-		import SEOHead from "@/components/layout/SEOHead";
-		import { useWallet } from "@/context/WalletContext";
+import { useTranslation } from "next-i18next";
+import { getPageTranslations } from "@/i18n/getPageTranslations";
+import WalletDashboard from "@/components/wallet/WalletDashboard";
+import WalletConnectScreen from "@/components/wallet/WalletConnectScreen";
+import SEOHead from "@/components/layout/SEOHead";
+import { useWallet } from "@/context/WalletContext";
 
 /** Detect PWA embedded mode (?embedded=pwa) */
 function useIsEmbedded() {
@@ -22,7 +19,6 @@ function useIsEmbedded() {
 }
 
 export default function Wallet() {
-  const router = useRouter();
   const { t } = useTranslation("common");
   const { isConnected, isSessionReady, disconnect } = useWallet();
   const isEmbedded = useIsEmbedded();
@@ -98,6 +94,17 @@ export default function Wallet() {
   // In embedded mode, don't redirect — wait for PWA to provide wallet via postMessage
   // Non-embedded, non-connected: show WalletConnectScreen (no redirect)
 
+  // SEO head (shared across all visible states, hidden in embedded mode)
+  const seoHead = !isEmbedded ? (
+    <SEOHead
+      title={t("wallet_page_title", "Wallet - XCANNES")}
+      description={t(
+        "wallet_page_description",
+        "Manage your XRPL wallet, trustlines, and assets on XCANNES"
+      )}
+    />
+  ) : null;
+
   if (!isSessionReady) {
     // In embedded mode, show a loading state while waiting for PWA init
     if (isEmbedded) {
@@ -114,13 +121,7 @@ export default function Wallet() {
   if (!isConnected && !isEmbedded) {
     return (
       <>
-        <SEOHead
-          title={t("wallet_page_title", "Wallet - XCANNES")}
-          description={t(
-            "wallet_page_description",
-            "Manage your XRPL wallet, trustlines, and assets on XCANNES"
-          )}
-        />
+        {seoHead}
         <WalletConnectScreen />
       </>
     );
@@ -131,13 +132,7 @@ export default function Wallet() {
       {/* Hide SEO head and nav in embedded mode */}
       {!isEmbedded && (
         <>
-          <SEOHead
-            title={t("wallet_page_title", "Wallet - XCANNES")}
-            description={t(
-              "wallet_page_description",
-              "Manage your XRPL wallet, trustlines, and assets on XCANNES"
-            )}
-          />
+          {seoHead}
 
           <div className="hidden md:flex fixed top-5 left-6 z-40">
             <Link href="/" className="header-nav-link header-nav-link-compact text-white/70 group relative">
@@ -150,11 +145,11 @@ export default function Wallet() {
         </>
       )}
 
-	      <main className={`h-[100svh] overflow-hidden md:min-h-screen md:h-screen bg-[#0b0f10] text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
-	        <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} h-full mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
-	          <div className={`bg-[#0b0f10] h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
-	            <WalletDashboard
-	              variant={isEmbedded ? "full" : "full"}
+      <main className={`h-[100svh] overflow-hidden md:min-h-screen md:h-screen bg-[#0b0f10] text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
+        <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} h-full mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
+          <div className={`bg-[#0b0f10] h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
+            <WalletDashboard
+              variant="full"
               showDesktopStatement={!isEmbedded}
               qrSizingVariant="dex"
               showMobileHomeLink={!isEmbedded}

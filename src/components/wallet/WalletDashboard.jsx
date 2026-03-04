@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
 import xcannesApi from "@/lib/xcannesApi";
@@ -60,25 +58,21 @@ function isAcceptedOnChainToken(currency) {
 }
 
 export default function WalletDashboard({
-  isFullPage = false,
   variant,
   showDesktopStatement = false,
-  showPayreqDecor = false,
   qrSizingVariant = "default",
   showMobileHomeLink = false,
   allowBackgroundScrollOnMobile = false,
-  allowPageScrollOnMobile = false,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const layout = useMemo(
-    () => resolveWalletLayout(variant, isFullPage),
-    [variant, isFullPage],
+    () => resolveWalletLayout(variant),
+    [variant],
   );
   const isFullPageView = layout.isFullPage;
   const statementVariant = layout.statementVariant;
   const showDesktopStatementPanel = Boolean(showDesktopStatement);
-  const payreqDecorProps = showPayreqDecor ? { showFauxPayreqDecor: true } : {};
 
   // ── Core wallet context ────────────────────────────────────
   const {
@@ -514,7 +508,6 @@ export default function WalletDashboard({
     selectLabelMobileByAssetKey,
     rlusdPerUnitRates,
     rlusdPerUnitSources,
-    payreqDecorProps,
     handleCopyAddress,
     handleInstallRequiredTrustline,
     handleActivateCurrencyLine,
@@ -673,7 +666,7 @@ export default function WalletDashboard({
               }
               className="touch-pan-y"
               style={{ WebkitOverflowScrolling: "touch" }}
-              disableInternalScroll={allowPageScrollOnMobile && !isDesktopPanel}
+              disableInternalScroll={false}
             />
           </div>
 
