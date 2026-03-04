@@ -182,6 +182,7 @@ export default function WalletDashboard({
     saveWalletLabel: handleSaveWalletLabel,
     cancelWalletLabel: handleCancelWalletLabel,
     loadWalletLabel,
+    defaultCurrency: walletDefaultCurrency,
   } = useWalletLabel({
     walletAddress: wallet,
     isConnected,
@@ -641,6 +642,10 @@ export default function WalletDashboard({
             walletAddresses={walletAddresses}
             onSwitchWallet={switchWallet}
             onOpenInfo={handleOpenInfo}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
+            onActivateWallet={handleOpenActivationModal}
+            onConfirmSetup={handleRlusdSetupConfirm}
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}

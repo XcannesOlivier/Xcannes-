@@ -47,7 +47,6 @@ export default function WalletDashboardTokenRow({
   isWalletActivated,
   hasRlusdTrustline,
   onActivateWallet,
-  onOpenRlusdProgram,
   onOpenRlusdSetup,
 }) {
   const { t, i18n } = useTranslation("common");
@@ -56,7 +55,6 @@ export default function WalletDashboardTokenRow({
   const displayCode = getDisplayCurrencyCode(currencyCode);
   const isDisplayOverride = displayCode !== currencyCode;
   const rawValue = Number(token?.value || 0);
-  const isMissingTrustline = !!token?.isMissingTrustline;
   const isLineCurrency = Boolean(token?.isTrustlineOnly);
   const isNativeAsset = currencyCode === "XRP";
   const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
@@ -69,10 +67,7 @@ export default function WalletDashboardTokenRow({
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
-  const displayValue =
-    currencyCode === "XRP" && Number.isFinite(rawValue)
-      ? Math.min(rawValue, 5)
-      : rawValue;
+  const displayValue = rawValue;
 
   const currencyLabel =
     currencyCode === "XRP"

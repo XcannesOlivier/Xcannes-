@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import WalletSettingsDropdown from "@/components/wallet/components/WalletSettingsDropdown";
+import WalletSetupDropdown from "@/components/wallet/components/WalletSetupDropdown";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
@@ -34,6 +35,11 @@ export default function WalletDashboardHeader({
   hideWalletAddress = false,
   walletAddresses = [],
   onSwitchWallet,
+  // Setup dropdown props
+  isWalletActivated,
+  hasRlusdTrustline,
+  onActivateWallet,
+  onConfirmSetup,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -340,6 +346,16 @@ export default function WalletDashboardHeader({
                 </svg>
               </button>
             </div>
+
+            {/* ── Wallet setup dropdown (centralised activation steps) ── */}
+            <WalletSetupDropdown
+              isWalletActivated={isWalletActivated}
+              hasRlusdTrustline={hasRlusdTrustline}
+              walletLabel={walletLabel}
+              isWalletLabelLocked={isWalletLabelLocked}
+              onActivateWallet={onActivateWallet}
+              onConfirmSetup={onConfirmSetup}
+            />
 
             {/* ── Multi-wallet switcher ── */}
             {hasMultipleWallets && (

@@ -19,6 +19,7 @@ export function useWalletLabel({
   const [isWalletLabelRequired, setIsWalletLabelRequired] = useState(false);
   const [isWalletLabelLocked, setIsWalletLabelLocked] = useState(false);
   const [isWalletLabelLoading, setIsWalletLabelLoading] = useState(false);
+  const [defaultCurrency, setDefaultCurrency] = useState(null);
   const [walletHeaderToast, setWalletHeaderToast] = useState("");
   const toastTimeoutRef = useRef(null);
   const loadTokenRef = useRef(0);
@@ -67,6 +68,7 @@ export function useWalletLabel({
       // const required = !label;
       // setIsWalletLabelRequired(required);
       setIsWalletLabelLocked(Boolean(label));
+      setDefaultCurrency(data?.defaultCurrency || null);
     } catch (err) {
       console.error("[useWalletLabel] Error fetching wallet label:", err);
       if (token === loadTokenRef.current) {
@@ -88,6 +90,7 @@ export function useWalletLabel({
       setIsWalletLabelRequired(false);
       setIsWalletLabelLocked(false);
       setIsWalletLabelLoading(false);
+      setDefaultCurrency(null);
       loadTokenRef.current += 1;
       return;
     }
@@ -220,5 +223,6 @@ export function useWalletLabel({
     saveWalletLabel,
     cancelWalletLabel,
     loadWalletLabel,
+    defaultCurrency,
   };
 }
