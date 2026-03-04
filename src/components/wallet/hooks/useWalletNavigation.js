@@ -16,7 +16,6 @@ import { useCallback, useEffect, useRef } from "react";
 export function useWalletNavigation({
   // wallet state
   wallet,
-  isConnected,
   backendWalletAddress,
   isDesktopPanel,
   isConnecting,
@@ -48,7 +47,6 @@ export function useWalletNavigation({
   setConvertAmount,
   // wallet label
   flashWalletHeaderToast,
-  isWalletLabelRequired,
   // i18n & toast
   t,
   toast,
@@ -348,7 +346,6 @@ export function useWalletNavigation({
       window.removeEventListener("xcannes:wallet:open-convert", handler);
   }, [
     closeInlineQr,
-    handleActivateCurrencyLine,
     setActiveAction,
     setConvertAmount,
     setConvertBaseCurrency,

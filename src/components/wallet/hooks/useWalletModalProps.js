@@ -144,7 +144,6 @@ export function useWalletModalProps({
 
   // --- QR ---
   qrModalData,
-  closeQrModal,
   qrScannerOpen,
   handleAddressScan,
 }) {

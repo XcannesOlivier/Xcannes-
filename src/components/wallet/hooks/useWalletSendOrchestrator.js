@@ -62,7 +62,7 @@ export function useWalletSendOrchestrator({
 
   // ── Payment-request creation form ──────────────────────────
   const [requestAmount, setRequestAmount] = useState("");
-  const [requestCurrency, setRequestCurrency] = useState("RLUSD");
+  const [requestCurrency, setRequestCurrency] = useState("USD");
   const [requestMemo, setRequestMemo] = useState("");
 
   // Guard: prevent XRP/RLUSD as payment-request currency.

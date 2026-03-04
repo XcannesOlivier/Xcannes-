@@ -387,7 +387,6 @@ export default function WalletDashboard({
     setConvertQuoteCurrency: swapState.setConvertQuoteCurrency,
     setConvertAmount: swapState.setConvertAmount,
     flashWalletHeaderToast,
-    isWalletLabelRequired,
     t,
     toast,
   });
@@ -553,7 +552,6 @@ export default function WalletDashboard({
     selectedStatementToken,
     setSelectedStatementToken,
     qrModalData,
-    closeQrModal,
     // Spread sub-orchestrator state (keys match useWalletModalProps params)
     ...sendState,
     ...swapState,
@@ -666,7 +664,6 @@ export default function WalletDashboard({
               }
               className="touch-pan-y"
               style={{ WebkitOverflowScrolling: "touch" }}
-              disableInternalScroll={false}
             />
           </div>
 
