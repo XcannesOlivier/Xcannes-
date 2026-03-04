@@ -13,7 +13,6 @@ export default function WalletDashboardHeader({
   wallet,
   onDisconnect,
   totalLabel,
-  onOpenGlobalStatement,
   xrplConnectionIndicator,
   walletLabel,
   walletHeaderToast,
@@ -30,7 +29,6 @@ export default function WalletDashboardHeader({
   onSaveWalletLabel,
   onCancelWalletLabel,
   onOpenInfo,
-  hideStatementCtaOnDesktop = false,
   showMobileHomeLink = false,
   hideWalletAddress = false,
   walletAddresses = [],
@@ -128,17 +126,6 @@ export default function WalletDashboardHeader({
           {totalLabel}
         </p>
 
-        {/* Bouton Global Statement */}
-        {onOpenGlobalStatement ? (
-          <button
-            type="button"
-            onClick={onOpenGlobalStatement}
-            className={`mt-2 px-4 py-1.5 bg-xcannes-green/50 hover:bg-xcannes-green/60 text-white rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105 ${hideStatementCtaOnDesktop ? "lg:hidden" : ""}`}
-          >
-            {t("ui_see_statement_9771dff7ec", "Voir le relevé")}
-          </button>
-        ) : null}
-
         <a
           href="https://ripple.com/solutions/stablecoin/transparency/"
           target="_blank"
@@ -150,6 +137,18 @@ export default function WalletDashboardHeader({
             "Stablecoin USD régulé (détails)",
           )}
         </a>
+
+        {/* ── Wallet setup dropdown (centralised activation steps) ── */}
+        {isConnected && wallet && (
+          <WalletSetupDropdown
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
+            walletLabel={walletLabel}
+            isWalletLabelLocked={isWalletLabelLocked}
+            onActivateWallet={onActivateWallet}
+            onConfirmSetup={onConfirmSetup}
+          />
+        )}
 
         {/* Affichage du wallet connecté à la place du menu déroulant */}
         {isConnected && wallet && (
@@ -346,16 +345,6 @@ export default function WalletDashboardHeader({
                 </svg>
               </button>
             </div>
-
-            {/* ── Wallet setup dropdown (centralised activation steps) ── */}
-            <WalletSetupDropdown
-              isWalletActivated={isWalletActivated}
-              hasRlusdTrustline={hasRlusdTrustline}
-              walletLabel={walletLabel}
-              isWalletLabelLocked={isWalletLabelLocked}
-              onActivateWallet={onActivateWallet}
-              onConfirmSetup={onConfirmSetup}
-            />
 
             {/* ── Multi-wallet switcher ── */}
             {hasMultipleWallets && (
