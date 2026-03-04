@@ -536,14 +536,6 @@ export default function GlobalStatement({
     : "fixed inset-0 z-[10200] flex";
   const modalBgClass =
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
-  const showNotConnectedNotice = isPreviewMode && noticeVariant !== "demo";
-  const showNotActivatedNotice =
-    !isPreviewMode && noticeVariant !== "demo" && isWalletActivated === false;
-  const showRlusdNotActivatedNotice =
-    !isPreviewMode &&
-    noticeVariant !== "demo" &&
-    isWalletActivated === true &&
-    hasRlusdTrustline === false;
 
   /* ── render ────────────────────────────────────────────── */
   const content = (
@@ -583,27 +575,7 @@ export default function GlobalStatement({
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
-                {showNotConnectedNotice ? (
-                  <span className="inline-flex items-center text-xcannes-yellow text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t("wallet_not_connected_title", "Wallet not connected")}
-                  </span>
-                ) : null}
-                {showNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t(
-                      "wallet_not_activated_title",
-                      "Wallet not activated: a minimum reserve of 1 XRP is required.",
-                    )}
-                  </span>
-                ) : null}
-                {showRlusdNotActivatedNotice ? (
-                  <span className="inline-flex items-center text-amber-300 text-sm md:text-sm font-semibold px-2 py-0.5 leading-none">
-                    {t(
-                      "wallet_rlusd_not_activated_title",
-                      "RLUSD not activated. Authorize RLUSD on your wallet.",
-                    )}
-                  </span>
-                ) : null}
+
               </div>
             </div>
             {!inline ? (

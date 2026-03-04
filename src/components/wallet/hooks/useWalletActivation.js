@@ -142,10 +142,12 @@ export function useWalletActivation({
   const handleOpenActivationModal = useCallback(() => {
     closeInlineQr();
     setWalletInfoOpen(false);
+    setActiveAction(null);
     setActivationBundleEnabled(false);
     setShowActivationModal(true);
   }, [
     closeInlineQr,
+    setActiveAction,
     setActivationBundleEnabled,
     setShowActivationModal,
     setWalletInfoOpen,
@@ -154,10 +156,12 @@ export function useWalletActivation({
   const handleActivationRequestFromThirdParty = useCallback(() => {
     closeInlineQr();
     setWalletInfoOpen(false);
+    setActiveAction(null);
     setShowActivationModal(false);
     setShowActivationRequestModal(true);
   }, [
     closeInlineQr,
+    setActiveAction,
     setShowActivationModal,
     setShowActivationRequestModal,
     setWalletInfoOpen,
