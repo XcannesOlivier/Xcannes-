@@ -98,7 +98,7 @@ export default function WalletSettingsDropdown({
             {/* Créer ou importer */}
             {/* Mobile: lien direct | Desktop: ouvre un QR code */}
             <a
-              href="/wallet-app/"
+              href="/wallet-app/?action=choice"
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => {
@@ -215,7 +215,7 @@ export default function WalletSettingsDropdown({
             </p>
             <div className="inline-block rounded-xl bg-white p-3">
               <QRCodeSVG
-                value={typeof window !== "undefined" ? `${window.location.origin}/wallet-app/` : "/wallet-app/"}
+                value={typeof window !== "undefined" ? `${window.location.origin}/wallet-app/?action=choice` : "/wallet-app/?action=choice"}
                 size={200}
                 level="M"
                 includeMargin={false}

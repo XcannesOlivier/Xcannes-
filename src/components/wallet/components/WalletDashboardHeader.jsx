@@ -38,6 +38,7 @@ export default function WalletDashboardHeader({
   hasRlusdTrustline,
   onActivateWallet,
   onConfirmSetup,
+  activeAction,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -147,6 +148,7 @@ export default function WalletDashboardHeader({
             isWalletLabelLocked={isWalletLabelLocked}
             onActivateWallet={onActivateWallet}
             onConfirmSetup={onConfirmSetup}
+            activeAction={activeAction}
           />
         )}
 

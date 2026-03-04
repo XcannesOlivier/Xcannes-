@@ -35,6 +35,7 @@ export default function WalletSetupDropdown({
   // Actions
   onActivateWallet,
   onConfirmSetup, // ({ label, defaultCurrency }) => void — triggers RLUSD TrustSet
+  activeAction, // when another modal/action opens, auto-close this dropdown
 }) {
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +58,12 @@ export default function WalletSetupDropdown({
 
   // Don't render anything if everything is done
   if (allDone) return null;
+
+  // ── Auto-close when another inline modal/action opens ──────
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (activeAction) setIsOpen(false);
+  }, [activeAction]);
 
   // ── Close on outside click ─────────────────────────────────
   // eslint-disable-next-line react-hooks/rules-of-hooks
