@@ -12,12 +12,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import {
-  buildCsvString,
-  downloadTextFile,
-  escapeHtml,
-  openPrintWindow,
-} from "@/utils/statementExport";
+import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
 import {
@@ -52,8 +47,6 @@ export default function CurrencyStatement({
   isPreviewMode = false,
   isWalletActivated = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   transactions = [],
   hasMore = false,
   loadingMore = false,
@@ -61,7 +54,6 @@ export default function CurrencyStatement({
   loading = false,
   error = null,
   period = "",
-  isFullPage = false,
   variant = "default",
   isClosing = false,
   inline = false,
@@ -123,7 +115,6 @@ export default function CurrencyStatement({
   const fmt = useCurrencyStatementFormatters({
     locale,
     displayCurrency,
-    normalizedCurrency,
     isMobileDate,
     isPreviewMode,
   });
@@ -138,8 +129,6 @@ export default function CurrencyStatement({
   } = data;
 
   const currentPeriod = data.currentPeriod || fallbackPeriod;
-  const currentDisplayPeriod =
-    data.currentDisplayPeriod || String(fallbackPeriod).split(" ")[0];
 
   /* ── destructure formatters hook ───────────────────────── */
   const {
@@ -439,61 +428,6 @@ export default function CurrencyStatement({
       );
     }
   }, [buildPrintHtml, docHash, normalizedCurrency, t]);
-
-  const handleExportCsv = useCallback(() => {
-    setExportFormat("csv");
-    try {
-      const suffix = docHash ? docHash.slice(0, 12) : "draft";
-      const headers = [
-        "date",
-        "type",
-        "category",
-        "description",
-        "amount",
-        "running_balance",
-        "statement_balance",
-        "counterparty",
-        "currency",
-        "ledger_status",
-        "ledger_index",
-        "doc_hash",
-      ];
-      const rows = (transactionsWithDisplayBalance || []).map((tx) => [
-        tx?.date || "",
-        tx?.type || "",
-        tx?.category || "",
-        getLocalizedDescription(tx),
-        Number.isFinite(Number(tx?.amount)) ? Number(tx.amount) : "",
-        Number.isFinite(Number(tx?.displayRunningBalance))
-          ? Number(tx.displayRunningBalance)
-          : Number.isFinite(Number(tx?.runningBalance))
-            ? Number(tx.runningBalance)
-            : "",
-        Number.isFinite(Number(balance)) ? Number(balance) : "",
-        tx?.counterparty || "",
-        normalizedCurrency || "",
-        ledgerStatus,
-        ledgerLastIndex != null ? ledgerLastIndex : "",
-        docHash || "",
-      ]);
-      const csv = buildCsvString(headers, rows);
-      downloadTextFile({
-        filename: `xcannes-statement-${String(normalizedCurrency || "currency").toLowerCase()}-${suffix}.csv`,
-        content: csv,
-        type: "text/csv;charset=utf-8",
-      });
-    } finally {
-      setExportFormat(null);
-    }
-  }, [
-    balance,
-    docHash,
-    getLocalizedDescription,
-    transactionsWithDisplayBalance,
-    ledgerLastIndex,
-    ledgerStatus,
-    normalizedCurrency,
-  ]);
 
   /* ── layout ────────────────────────────────────────────── */
   const resolvedLayout =

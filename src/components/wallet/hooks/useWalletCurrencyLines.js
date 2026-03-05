@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 
-export function useWalletCurrencyLines(address, { signTransaction } = {}) {
+export function useWalletCurrencyLines(address) {
   const [lines, setLines] = useState([]);
   const [summary, setSummary] = useState({
     rlusdOnChain: null,
@@ -112,64 +112,6 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
     [address],
   );
 
-  const convertAllocation = useCallback(
-    async ({
-      fromCurrencyCode,
-      toCurrencyCode,
-      amountRlusd,
-      fromFxRate,
-      fromFxSource,
-      toFxRate,
-      toFxSource,
-    } = {}) => {
-      if (!address || !fromCurrencyCode || !toCurrencyCode) return;
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const res = await fetch(apiUrl("/wallet/convert"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            address,
-            fromCurrencyCode,
-            toCurrencyCode,
-            amountRlusd,
-            fromFxRate,
-            fromFxSource,
-            toFxRate,
-            toFxSource,
-          }),
-        });
-
-        const data = await res.json();
-        if (!res.ok || data.error) {
-          throw new Error(data.error || "Failed to convert wallet allocations");
-        }
-
-        setLines(Array.isArray(data.lines) ? data.lines : []);
-        setSummary({
-          rlusdOnChain: data.rlusdOnChain ?? null,
-          totalAllocatedRlusd: Number(data.totalAllocatedRlusd || 0),
-          unallocatedRlusd: data.unallocatedRlusd ?? null,
-          invariantOk: data.invariantOk ?? null,
-          excessAllocatedRlusd: data.excessAllocatedRlusd ?? null,
-        });
-
-        return data;
-      } catch (err) {
-        console.error("[useWalletCurrencyLines] convertAllocation error:", err);
-        setError(err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [address],
-  );
-
   useEffect(() => {
     fetchCurrencyLines();
   }, [fetchCurrencyLines]);
@@ -181,6 +123,5 @@ export function useWalletCurrencyLines(address, { signTransaction } = {}) {
     error,
     refresh: fetchCurrencyLines,
     upsertCurrencyLine,
-    convertAllocation,
   };
 }

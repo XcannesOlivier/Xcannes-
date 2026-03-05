@@ -19,7 +19,7 @@ const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_LINE_ACTIONS = new Set(['activate']);
 const VALID_ALLOC_ACTIONS = new Set(['allocate', 'deallocate']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
-const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD', 'RLUSD']);
+const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD']);
 
 function isPlainObject(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
@@ -79,10 +79,6 @@ function parseRequiredNumber(value, { min = null, minExclusive = false } = {}) {
   const result = parseOptionalNumber(value, { min, minExclusive });
   if (!result.provided) return { ok: false, value: null, provided: false };
   return result;
-}
-
-function getXcannesMemoSchema(type) {
-  return XCANNES_MEMO_SCHEMAS[type] ? { type, ...XCANNES_MEMO_SCHEMAS[type] } : null;
 }
 
 function inferXcannesMemoType(payload) {

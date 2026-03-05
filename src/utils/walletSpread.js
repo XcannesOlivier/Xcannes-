@@ -4,7 +4,7 @@ import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 const FIXED_FX_FEE_FRACTION = 0.01;
 
-export const XCANNES_SPREAD_WALLET_ADDRESS =
+const XCANNES_SPREAD_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||
   "rGt44i8APV6KMLCCkuaJpY19RVkj2JhnHC";
 
@@ -47,7 +47,7 @@ export function computeSpreadQuote({ base, quote, amountRlusd }) {
   };
 }
 
-export function normalizeXrplIouValue(value) {
+function normalizeXrplIouValue(value) {
   const num = Number(value);
   if (!Number.isFinite(num) || num <= 0) return null;
   // Keep up to 8 decimals, trim trailing zeros.

@@ -17,7 +17,6 @@ import { getCurrencyFlag, isSvgIcon } from "./statementShared";
 export default function useCurrencyStatementFormatters({
   locale,
   displayCurrency,
-  normalizedCurrency,
   isMobileDate,
   isPreviewMode,
 }) {
