@@ -141,10 +141,10 @@ export default function WalletDashboardFooter({
         showBottomBorder ? "border-b border-white/10" : "",
       ].join(" ")}
     >
-      <div className="px-5 md:px-3 py-2 flex items-center justify-between gap-2 relative">
+      <div className="px-5 md:px-3 py-4 md:py-2 flex items-center justify-between gap-2 relative min-h-[52px] md:min-h-0">
         {/* Mobile: XCANNES centré */}
         <span className="md:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="font-orbitron font-semibold tracking-[0.18em] text-white/80 uppercase text-lg">
+          <span className="font-orbitron font-semibold tracking-[0.22em] text-white/80 uppercase text-[17px]">
             {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
         </span>
