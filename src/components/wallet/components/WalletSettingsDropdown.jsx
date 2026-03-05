@@ -36,27 +36,26 @@ export default function WalletSettingsDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, [isOpen]);
 
-  // header → visible on md+ only ; footer → visible on mobile only
+  // header → visible on md+ only ; footer → mobile only ; inline → always visible
   const visibilityClass =
-    position === "header" ? "hidden md:relative md:block" : "relative md:hidden";
-
-  // dropdown opens downward from header, upward from footer
-  const dropdownPositionClass =
     position === "header"
-      ? "absolute right-0 top-full mt-1.5"
-      : "absolute right-0 bottom-full mb-1.5";
+      ? "hidden md:relative md:block"
+      : position === "footer"
+        ? "relative md:hidden"
+        : "relative";
+
+  // dropdown opens downward from header/inline, upward from footer
+  const dropdownPositionClass =
+    position === "footer"
+      ? "absolute right-0 bottom-full mb-1.5"
+      : "absolute right-0 top-full mt-1.5";
 
   return (
     <div className={visibilityClass} ref={ref}>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className={[
-          "transition-all active:scale-95 rounded-lg",
-          position === "footer"
-            ? "shrink-0 h-9 w-9 flex items-center justify-center bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white"
-            : "flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/60 hover:text-white/90",
-        ].join(" ")}
+        className="shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
         aria-label={t("ui_settings_label", "Paramètres")}
       >
         <svg
