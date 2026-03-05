@@ -44,7 +44,7 @@ export default function WalletDashboardActionRow({ layout, onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-6 h-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -68,7 +68,7 @@ export default function WalletDashboardActionRow({ layout, onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-6 h-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -94,7 +94,7 @@ export default function WalletDashboardActionRow({ layout, onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-6 h-6"
               viewBox="0 0 24 24"
               fill="none"
             >
