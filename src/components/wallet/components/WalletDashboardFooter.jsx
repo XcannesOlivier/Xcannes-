@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { useTranslation } from "next-i18next";
-import WalletSettingsDropdown from "./WalletSettingsDropdown";
 
 export default function WalletDashboardFooter({
   layout,
@@ -142,8 +141,15 @@ export default function WalletDashboardFooter({
         showBottomBorder ? "border-b border-white/10" : "",
       ].join(" ")}
     >
-      <div className="px-5 md:px-3 py-2 flex items-center justify-between gap-2">
-        {/* Desktop: XRPL indicator | Mobile: XCANNES title */}
+      <div className="px-5 md:px-3 py-2 flex items-center justify-between gap-2 relative">
+        {/* Mobile: XCANNES centré */}
+        <span className="md:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
+          <span className="font-orbitron font-semibold tracking-[0.18em] text-white/80 uppercase text-lg">
+            {t("ui_xcannes_3cdc66a392", "XCANNES")}
+          </span>
+        </span>
+
+        {/* Desktop: XRPL indicator | Mobile: espace vide (le titre est centré en absolute) */}
         <div className="flex items-center gap-2 text-[11px] text-white/70 min-w-0">
           {/* XRPL dot — desktop only */}
           <span
@@ -158,10 +164,6 @@ export default function WalletDashboardFooter({
           {/* Desktop: XRPL label */}
           <span className="hidden md:inline font-medium truncate">
             {xrplConnectionIndicator?.label || t("xrpl_label", "XRPL")}
-          </span>
-          {/* Mobile: XCANNES title */}
-          <span className="md:hidden font-orbitron font-semibold tracking-[0.18em] text-white/80 uppercase text-base">
-            {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
         </div>
 
@@ -190,20 +192,7 @@ export default function WalletDashboardFooter({
             </button>
           )}
 
-          {/* Mobile: settings button (dropdown opens upward) */}
-          {isConnected && wallet && (
-            <WalletSettingsDropdown
-              position="footer"
-              onDisconnect={onDisconnect}
-              onCopyAddress={onCopyAddress}
-              onOpenWalletLabelEditor={onOpenWalletLabelEditor}
-              onRefreshWallet={onRefreshWallet}
-              onOpenInfo={onOpenInfo}
-              isConnecting={isConnecting}
-              isRefreshing={isRefreshing}
-              isWalletLabelLocked={isWalletLabelLocked}
-            />
-          )}
+
         </div>
       </div>
     </div>
