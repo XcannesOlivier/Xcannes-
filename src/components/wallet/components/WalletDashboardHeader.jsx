@@ -92,24 +92,12 @@ export default function WalletDashboardHeader({
 
       {/* Solde et info wallet */}
       <div className="flex flex-col items-center gap-2">
-        <div className="text-sm md:text-xs text-white/55 tracking-[0.18em] uppercase">
+        <div className="text-sm md:text-sm text-white/55 tracking-[0.18em] uppercase">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
-        <p className="text-5xl md:text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight">
+        <p className="text-5xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
           {totalLabel}
         </p>
-
-        <a
-          href="https://ripple.com/solutions/stablecoin/transparency/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden md:inline-block text-[10px] text-white/40 hover:text-white/70 transition-colors"
-        >
-          {t(
-            "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
-            "Stablecoin USD régulé (détails)",
-          )}
-        </a>
 
         {/* ── Wallet setup dropdown (centralised activation steps) ── */}
         {isConnected && wallet && (
@@ -127,7 +115,7 @@ export default function WalletDashboardHeader({
         {/* Bloc wallet — sélecteur + copier + refresh */}
         {isConnected && wallet && (
           <div className="w-full mt-6 md:mt-1.5 px-2 flex justify-center">
-            <div className="flex items-center gap-2 w-full max-w-[460px]">
+            <div className="relative flex items-center gap-2 w-full max-w-[460px]">
               <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1" ref={switcherRef}>
@@ -149,12 +137,6 @@ export default function WalletDashboardHeader({
                         <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
                           {walletLabel || "Wallet"}
                         </span>
-
-                        {hasMultipleWallets && (
-                          <span className="text-[10px] text-white/35 font-medium">
-                            · {walletAddresses.length}
-                          </span>
-                        )}
 
                         {hideWalletAddress && walletHeaderToast ? (
                           <span className="text-[10px] text-xcannes-green/90 truncate">
@@ -179,10 +161,11 @@ export default function WalletDashboardHeader({
 
                     {/* Multi-wallet dropdown */}
                     {isSwitcherOpen && hasMultipleWallets && (
-                      <div className="absolute z-50 left-0 right-0 mt-1.5 mx-2 max-w-[460px] rounded-lg bg-[#151b1e] border border-white/10 shadow-xl max-h-52 overflow-y-auto">
-                        {walletAddresses.map((w) => {
+                      <div className="absolute z-50 left-0 right-0 top-full mt-1.5 rounded-lg bg-[#151b1e] border border-white/10 shadow-xl max-h-52 overflow-y-auto">
+                        {walletAddresses.map((w, index) => {
                           const addr = typeof w === "string" ? w : w.address;
                           const label = typeof w === "string" ? null : w.label;
+                          const displayName = label || `Wallet ${index + 1}`;
                           const isActive = addr === wallet;
                           return (
                             <button
@@ -192,29 +175,27 @@ export default function WalletDashboardHeader({
                                 if (!isActive) onSwitchWallet?.(addr);
                                 setIsSwitcherOpen(false);
                               }}
-                              className={`w-full text-left px-3 py-2 flex items-center gap-2 transition-colors ${
+                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors ${
                                 isActive
                                   ? "bg-xcannes-green/10 border-l-2 border-xcannes-green"
                                   : "hover:bg-white/5 border-l-2 border-transparent"
                               }`}
                             >
                               <span
-                                className={`h-1.5 w-1.5 rounded-full shrink-0 ${
+                                className={`h-2 w-2 rounded-full shrink-0 ${
                                   isActive ? "bg-xcannes-green" : "bg-white/20"
                                 }`}
                               />
                               <div className="min-w-0">
-                                {label && (
-                                  <div
-                                    className={`text-[11px] font-medium truncate ${
-                                      isActive ? "text-xcannes-green" : "text-white/75"
-                                    }`}
-                                  >
-                                    {label}
-                                  </div>
-                                )}
                                 <div
-                                  className={`font-mono text-[10px] truncate ${
+                                  className={`text-[13px] font-medium truncate ${
+                                    isActive ? "text-xcannes-green" : "text-white/75"
+                                  }`}
+                                >
+                                  {displayName}
+                                </div>
+                                <div
+                                  className={`font-mono text-[12px] truncate ${
                                     isActive ? "text-xcannes-green/70" : "text-white/40"
                                   }`}
                                 >
@@ -222,7 +203,7 @@ export default function WalletDashboardHeader({
                                 </div>
                               </div>
                               {isActive && (
-                                <span className="ml-auto text-[9px] text-xcannes-green/80 font-medium uppercase tracking-wider">
+                                <span className="ml-auto text-[11px] text-xcannes-green/80 font-medium uppercase tracking-wider">
                                   {t("ui_active_wallet", "actif")}
                                 </span>
                               )}
