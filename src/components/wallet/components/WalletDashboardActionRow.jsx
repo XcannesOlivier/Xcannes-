@@ -19,12 +19,23 @@ export default function WalletDashboardActionRow({ layout, onAction }) {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
+              {/* Corner brackets */}
+              <path d="M2 7V3a1 1 0 0 1 1-1h4" />
+              <path d="M17 2h4a1 1 0 0 1 1 1v4" />
+              <path d="M22 17v4a1 1 0 0 1-1 1h-4" />
+              <path d="M7 22H3a1 1 0 0 1-1-1v-4" />
+              {/* Inner QR pattern */}
+              <rect x="6" y="6" width="4.5" height="4.5" rx="0.5" />
+              <rect x="13.5" y="6" width="4.5" height="4.5" rx="0.5" />
+              <rect x="6" y="13.5" width="4.5" height="4.5" rx="0.5" />
+              <rect x="14.5" y="14.5" width="1.5" height="1.5" rx="0.2" />
+              <rect x="17" y="14.5" width="1.5" height="1.5" rx="0.2" />
+              <rect x="14.5" y="17" width="1.5" height="1.5" rx="0.2" />
+              <rect x="17" y="17" width="1.5" height="1.5" rx="0.2" />
             </svg>
           </div>
           <span className="wallet-action-label !text-base !font-medium">
@@ -97,11 +108,12 @@ export default function WalletDashboardActionRow({ layout, onAction }) {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-              <line x1="1" y1="10" x2="23" y2="10"></line>
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <line x1="5" y1="21" x2="19" y2="21"></line>
             </svg>
           </div>
-          <span className="wallet-action-label !text-lg !font-bold">+/−</span>
+          <span className="wallet-action-label !text-lg !font-bold">Fonds</span>
         </button>
       </div>
     </div>
