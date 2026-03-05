@@ -141,7 +141,7 @@ export default function WalletDashboardFooter({
         showBottomBorder ? "border-b border-white/10" : "",
       ].join(" ")}
     >
-      <div className="px-5 md:px-3 py-4 md:py-2 flex items-center justify-between gap-2 relative min-h-[52px] md:min-h-0">
+      <div className="px-5 md:px-3 py-4 md:py-3 flex items-center justify-between gap-2 relative min-h-[52px] md:min-h-0">
         {/* Mobile: XCANNES centré */}
         <span className="md:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
           <span className="font-orbitron font-semibold tracking-[0.22em] text-white/80 uppercase text-[17px]">
@@ -149,22 +149,19 @@ export default function WalletDashboardFooter({
           </span>
         </span>
 
-        {/* Desktop: XRPL indicator | Mobile: espace vide (le titre est centré en absolute) */}
-        <div className="flex items-center gap-2 text-[11px] text-white/70 min-w-0">
-          {/* XRPL dot — desktop only */}
-          <span
-            className={[
-              "hidden md:inline-flex h-2.5 w-2.5 rounded-full ring-4 flex-shrink-0",
-              xrplConnectionIndicator?.dotClass || "bg-white/30",
-              xrplConnectionIndicator?.ringClass || "ring-white/10",
-              xrplConnectionIndicator?.pulse ? "animate-pulse" : "",
-            ].join(" ")}
-            aria-hidden="true"
-          />
-          {/* Desktop: XRPL label */}
-          <span className="hidden md:inline font-medium truncate">
-            {xrplConnectionIndicator?.label || t("xrpl_label", "XRPL")}
+        {/* Desktop: XCANNES | Multi-currency wallet centré */}
+        <span className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
+          <span className="font-orbitron font-semibold tracking-[0.22em] text-white/80 uppercase text-lg leading-none">
+            {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
+          <span className="mx-2.5 text-[12px] font-light text-white/30">|</span>
+          <span className="text-[15px] font-light italic text-white/40">
+            {t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
+          </span>
+        </span>
+
+        {/* Desktop: espace vide (XRPL indicator masqué) | Mobile: espace vide (le titre est centré en absolute) */}
+        <div className="flex items-center gap-2 text-[11px] text-white/70 min-w-0">
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -176,20 +173,6 @@ export default function WalletDashboardFooter({
             >
               {t("wallet_footer_open_full_wallet", "Open full wallet")}
             </Link>
-          )}
-
-          {showInfoButton && (
-            <button
-              type="button"
-              onClick={onOpenInfo}
-              className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 font-medium transition-all duration-300"
-              title={t("wallet_footer_info_title", "Wallet info & fees")}
-            >
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/5 border border-white/10 text-[12px] leading-none">
-                i
-              </span>
-              <span>{t("wallet_footer_info_fees", "Info & Fees")}</span>
-            </button>
           )}
 
 

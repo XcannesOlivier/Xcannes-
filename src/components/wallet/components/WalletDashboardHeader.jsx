@@ -80,32 +80,12 @@ export default function WalletDashboardHeader({
                 </svg>
               </Link>
             )}
-            <span className="hidden md:inline text-base font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase leading-none">
-              {t("ui_xcannes_3cdc66a392", "XCANNES")}
-            </span>
-            <span className="hidden md:inline text-[11px] font-light text-white/30">
-              |
-            </span>
-            <span className="hidden md:inline text-[14px] font-light italic text-white/40 truncate max-w-[160px] sm:max-w-none">
-              {t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
-            </span>
           </div>
         ) : (
           <div />
         )}
-        {/* Bouton Paramètres (desktop uniquement, sur mobile il est dans le footer) */}
-        {isConnected && wallet ? (
-          <WalletSettingsDropdown
-            position="header"
-            onDisconnect={onDisconnect}
-            onCopyAddress={onCopyAddress}
-            onRefreshWallet={onRefreshWallet}
-            onOpenInfo={onOpenInfo}
-            isConnecting={isConnecting}
-            isRefreshing={isRefreshing}
-            isWalletLabelLocked={isWalletLabelLocked}
-          />
-        ) : (
+        {/* Bouton Connect (quand pas connecté) */}
+        {!(isConnected && wallet) && (
           <WalletConnectButton small variant="statement-blue" />
         )}
       </div>
@@ -327,9 +307,9 @@ export default function WalletDashboardHeader({
                 </svg>
               </button>
 
-              {/* Bouton Paramètres (mobile uniquement, à côté du refresh) */}
+              {/* Bouton Paramètres (à côté du refresh, même style) */}
               <WalletSettingsDropdown
-                position="footer"
+                position="inline"
                 onDisconnect={onDisconnect}
                 onCopyAddress={onCopyAddress}
                 onRefreshWallet={onRefreshWallet}
