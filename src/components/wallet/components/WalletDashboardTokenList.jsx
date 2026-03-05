@@ -1,7 +1,6 @@
 "use client";
 
 export default function WalletDashboardTokenList({
-  layout,
   tokens,
   renderTokenRow,
   className = "",
@@ -17,7 +16,7 @@ export default function WalletDashboardTokenList({
   const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
   return (
     <div
-      className={`flex-1 min-h-0 flex flex-col ${layout.tokenListClass} ${className}`}
+      className={`flex-1 min-h-0 flex flex-col max-h-none ${className}`}
       style={style}
     >
       {(headerTitle || headerActionLabel) && (

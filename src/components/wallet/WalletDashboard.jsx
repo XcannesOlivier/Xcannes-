@@ -29,7 +29,7 @@ import { useTokenDisplayLabels } from "./hooks/useTokenDisplayLabels";
 import WalletPendingPayreqs from "./components/WalletPendingPayreqs";
 import { useTranslation } from "next-i18next";
 import {
-  resolveWalletLayout,
+  WALLET_LAYOUT,
   USD_STABLECOINS,
   WALLET_ACCEPTED_TOKENS,
 } from "./walletDashboardConfig";
@@ -58,7 +58,6 @@ function isAcceptedOnChainToken(currency) {
 }
 
 export default function WalletDashboard({
-  variant,
   showDesktopStatement = false,
   qrSizingVariant = "default",
   showMobileHomeLink = false,
@@ -66,12 +65,7 @@ export default function WalletDashboard({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const layout = useMemo(
-    () => resolveWalletLayout(variant),
-    [variant],
-  );
-  const isFullPageView = layout.isFullPage;
-  const statementVariant = layout.statementVariant;
+  const statementVariant = WALLET_LAYOUT.statementVariant;
   const showDesktopStatementPanel = Boolean(showDesktopStatement);
 
   // ── Core wallet context ────────────────────────────────────
@@ -413,7 +407,6 @@ export default function WalletDashboard({
       <WalletDashboardTokenRow
         key={token.key}
         token={token}
-        tokenRowClass={layout.tokenRowClass}
         onInstallTrustline={handleInstallRequiredTrustline}
         isWalletActivated={isWalletActivated}
         hasRlusdTrustline={hasRlusdTrustline}
@@ -429,7 +422,6 @@ export default function WalletDashboard({
       handleOpenRlusdSetup,
       hasRlusdTrustline,
       isWalletActivated,
-      layout.tokenRowClass,
     ],
   );
 
@@ -556,7 +548,7 @@ export default function WalletDashboard({
     setWalletInfoOpen,
     displayTokensWithCurrencyLines,
     backendWalletAddress,
-    isFullPageView,
+    isFullPageView: true,
     statementVariant,
     usdRates,
     showGlobalStatement,
@@ -608,7 +600,7 @@ export default function WalletDashboard({
   return (
     <>
       <div
-        className={`bg-[#0b0f10] h-full min-h-0 ${layout.containerClass} ${
+        className={`bg-[#0b0f10] h-full min-h-0 overflow-hidden ${
           showDesktopStatementPanel
             ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-0"
             : "flex flex-col"
@@ -617,7 +609,6 @@ export default function WalletDashboard({
         <div className="flex flex-col min-h-0">
           {/* Header */}
           <WalletDashboardHeader
-            layout={layout}
             isConnected={isConnected}
             wallet={wallet}
             onDisconnect={disconnect}
@@ -642,7 +633,7 @@ export default function WalletDashboard({
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}
-          <WalletDashboardActionRow layout={layout} onAction={handleAction} />
+          <WalletDashboardActionRow onAction={handleAction} />
 
           {/* Pending payment requests */}
           {sendState.pendingCount > 0 ? (
@@ -658,7 +649,6 @@ export default function WalletDashboard({
           {/* Token list */}
           <div className="flex-1 flex flex-col min-h-0">
             <WalletDashboardTokenList
-              layout={layout}
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
@@ -678,21 +668,7 @@ export default function WalletDashboard({
             />
           </div>
 
-          <WalletDashboardFooter
-            layout={layout}
-            xrplConnectionIndicator={xrplConnectionIndicator}
-            isFullPageView={isFullPageView}
-            onOpenInfo={handleOpenInfo}
-            isConnected={isConnected}
-            wallet={wallet}
-            onDisconnect={disconnect}
-            onCopyAddress={handleCopyAddress}
-            onOpenWalletLabelEditor={handleOpenWalletLabelEditor}
-            onRefreshWallet={handleRefreshWallet}
-            isConnecting={isConnecting}
-            isRefreshing={isRefreshing}
-            isWalletLabelLocked={isWalletLabelLocked}
-          />
+          <WalletDashboardFooter />
           {!isDesktopPanel ? (
             <WalletMobileModals
               {...modalProps}

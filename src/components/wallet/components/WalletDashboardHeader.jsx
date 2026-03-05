@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 
 export default function WalletDashboardHeader({
-  layout,
   isConnected,
   wallet,
   onDisconnect,
@@ -52,12 +51,11 @@ export default function WalletDashboardHeader({
 
   return (
     <div
-      className={`panel-header ${layout.headerClass} flex flex-col shrink-0`}
+      className="panel-header flex flex-col shrink-0"
     >
       {/* Titres discrets en haut */}
       <div className="flex items-center justify-between mb-4 md:mb-3">
-        {layout.showBrandTitle ? (
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-3 min-w-0">
             {showMobileHomeLink && (
               <Link
                 href="/"
@@ -81,9 +79,6 @@ export default function WalletDashboardHeader({
               </Link>
             )}
           </div>
-        ) : (
-          <div />
-        )}
         {/* Bouton Connect (quand pas connecté) */}
         {!(isConnected && wallet) && (
           <WalletConnectButton small variant="statement-blue" />
