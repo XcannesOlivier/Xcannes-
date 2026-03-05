@@ -611,7 +611,7 @@ export default function WalletDashboard({
       <div
         className={`bg-[#0b0f10] h-full min-h-0 ${layout.containerClass} ${
           showDesktopStatementPanel
-            ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-6"
+            ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-0"
             : "flex flex-col"
         }`}
       >
