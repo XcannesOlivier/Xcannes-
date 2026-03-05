@@ -214,11 +214,19 @@ function isRunningInIframe() {
  * Check if URL has ?action=choice — used when the site's settings
  * menu opens wallet-app specifically to create/import another wallet.
  * After unlock, go directly to the choice screen instead of home.
+ * Consumes the param (removes it from URL) to prevent re-triggering on reload.
  */
-function hasActionChoice() {
+function consumeActionChoice() {
   try {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action') === 'choice';
+    if (params.get('action') === 'choice') {
+      // Clean the URL so it doesn't re-trigger on next visit
+      const url = new URL(window.location.href);
+      url.searchParams.delete('action');
+      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
@@ -228,7 +236,7 @@ function hasActionChoice() {
  * Post-unlock destination: choice screen if ?action=choice, else home.
  */
 async function goToPostUnlockDestination() {
-  if (hasActionChoice()) {
+  if (consumeActionChoice()) {
     goToChoice();
   } else {
     await goToHome();
@@ -1926,9 +1934,20 @@ function setupScannerScreen() {
 }
 
 async function handleQRScanned(rawQR, statusEl) {
-  // If the QR contains a /wallet-app/ URL, open it in the browser
-  // This happens when scanning the desktop "Create or import" QR code
-  // from within the app's built-in scanner.
+  // ── 1. JSON action from desktop dashboard (e.g. "Create or import") ──
+  // QR encodes: { "type": "xcannes:navigate", "screen": "choice" }
+  try {
+    const action = JSON.parse(rawQR);
+    if (action && action.type === 'xcannes:navigate') {
+      if (qrScanner) { qrScanner.stop(); qrScanner = null; }
+      if (action.screen === 'choice') {
+        goToChoice();
+      }
+      return;
+    }
+  } catch { /* not JSON — continue */ }
+
+  // ── 2. If the QR contains a /wallet-app/ URL, open it in the browser ──
   try {
     const url = new URL(rawQR);
     if (url.pathname.startsWith('/wallet-app')) {
@@ -1937,6 +1956,7 @@ async function handleQRScanned(rawQR, statusEl) {
     }
   } catch { /* not a URL — continue to relay parsing */ }
 
+  // ── 3. Relay challenge (connect / sign) ──
   const parsed = parseQRCode(rawQR);
   if (!parsed) {
     updateStatus(statusEl, '❌ QR code non reconnu.', true);

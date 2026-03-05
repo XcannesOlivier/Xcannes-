@@ -96,13 +96,12 @@ export default function WalletSettingsDropdown({
             <div className="my-1 mx-3 border-t border-white/8" />
 
             {/* Créer ou importer */}
-            {/* Mobile: lien direct | Desktop: ouvre un QR code */}
+            {/* Mobile: lien direct | Desktop: QR code scanné par wallet-app */}
             <a
               href="/wallet-app/?action=choice"
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => {
-                // Desktop (md+): empêcher la navigation et ouvrir le QR code
                 const isDesktop = window.matchMedia("(min-width: 768px)").matches;
                 if (isDesktop) {
                   e.preventDefault();
@@ -190,7 +189,7 @@ export default function WalletSettingsDropdown({
         </div>
       )}
 
-      {/* QR Code modal (desktop) */}
+      {/* QR Code modal (desktop) — scanné par wallet-app mobile */}
       {showQrModal && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -215,7 +214,7 @@ export default function WalletSettingsDropdown({
             </p>
             <div className="inline-block rounded-xl bg-white p-3">
               <QRCodeSVG
-                value={typeof window !== "undefined" ? `${window.location.origin}/wallet-app/?action=choice` : "/wallet-app/?action=choice"}
+                value={JSON.stringify({ type: "xcannes:navigate", screen: "choice" })}
                 size={200}
                 level="M"
                 includeMargin={false}
@@ -223,9 +222,6 @@ export default function WalletSettingsDropdown({
             </div>
             <p className="mt-3 text-[11px] text-white/40">
               {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
-            </p>
-            <p className="mt-1 text-[10px] text-white/30">
-              {t("ui_qr_hint_app_installed", "Si Xcannes App est installée, elle s'ouvrira automatiquement")}
             </p>
           </div>
         </div>
