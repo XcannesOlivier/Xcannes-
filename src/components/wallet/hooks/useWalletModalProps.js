@@ -14,7 +14,6 @@ export function useWalletModalProps({
   // --- identité du wallet ---
   wallet,
   isConnected,
-  variant,
   isWalletActivated,
   hasRlusdTrustline,
   hasOnChainRlusd,
@@ -251,7 +250,7 @@ export function useWalletModalProps({
     () => ({
       isWalletActivated,
       hasRlusdTrustline,
-      dashboardVariant: variant,
+      dashboardVariant: "full",
       receiveTab,
       setReceiveTab,
       renderWalletMeta,
@@ -275,7 +274,6 @@ export function useWalletModalProps({
     [
       isWalletActivated,
       hasRlusdTrustline,
-      variant,
       receiveTab,
       setReceiveTab,
       renderWalletMeta,
@@ -304,7 +302,7 @@ export function useWalletModalProps({
       renderWalletMeta,
       defaultView: swapDefaultView,
       lockedView: swapLockedView,
-      dashboardVariant: variant,
+      dashboardVariant: "full",
       isConnected,
       isWalletActivated,
       hasRlusdTrustline,
@@ -343,7 +341,6 @@ export function useWalletModalProps({
       renderWalletMeta,
       swapDefaultView,
       swapLockedView,
-      variant,
       isConnected,
       isWalletActivated,
       hasRlusdTrustline,
