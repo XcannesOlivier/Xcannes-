@@ -493,7 +493,6 @@ export default function WalletDashboard({
   const modalProps = useWalletModalProps({
     wallet,
     isConnected,
-    variant,
     isWalletActivated,
     hasRlusdTrustline,
     hasOnChainRlusd,
