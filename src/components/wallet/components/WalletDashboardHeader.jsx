@@ -171,26 +171,9 @@ export default function WalletDashboardHeader({
                         </span>
 
                         {hasMultipleWallets && (
-                          <>
-                            <span className="text-[10px] text-white/35 font-medium">
-                              · {walletAddresses.length}
-                            </span>
-                            <svg
-                              className={`w-3 h-3 text-white/40 shrink-0 transition-transform ${
-                                isSwitcherOpen ? "rotate-180" : ""
-                              }`}
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 9l-7 7-7-7"
-                              />
-                            </svg>
-                          </>
+                          <span className="text-[10px] text-white/35 font-medium">
+                            · {walletAddresses.length}
+                          </span>
                         )}
 
                         {hideWalletAddress && walletHeaderToast ? (
@@ -270,22 +253,16 @@ export default function WalletDashboardHeader({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  {/* Chevron — ouvre le sélecteur multi-wallet */}
+                  {hasMultipleWallets && (
                     <button
                       type="button"
-                      onClick={onCopyAddress}
-                      title={t(
-                        "ui_copy_address_82d1cf6e94",
-                        "Copier l'adresse",
-                      )}
-                      className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
-                      aria-label={t(
-                        "ui_copy_xrpl_address_4f63ed10fc",
-                        "Copier l'adresse XRPL",
-                      )}
+                      onClick={() => setIsSwitcherOpen((v) => !v)}
+                      className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/50 hover:text-white rounded-md transition-all active:scale-95"
+                      aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className="w-4 h-4"
+                        className={`w-4 h-4 transition-transform ${isSwitcherOpen ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -294,14 +271,38 @@ export default function WalletDashboardHeader({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          d="M19 9l-7 7-7-7"
                         />
                       </svg>
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
 
+              {/* Bouton Copier (extérieur) */}
+              <button
+                type="button"
+                onClick={onCopyAddress}
+                title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
+                className="shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
+                aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+
+              {/* Bouton Refresh (extérieur) */}
               <button
                 type="button"
                 onClick={onRefreshWallet}
