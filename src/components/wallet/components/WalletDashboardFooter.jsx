@@ -141,7 +141,7 @@ export default function WalletDashboardFooter({
         showBottomBorder ? "border-b border-white/10" : "",
       ].join(" ")}
     >
-      <div className="px-5 md:px-3 py-4 md:py-3 flex items-center justify-between gap-2 relative min-h-[52px] md:min-h-0">
+      <div className="px-5 md:px-4 py-4 md:py-5 flex items-center justify-between gap-2 relative min-h-[52px] md:min-h-[56px]">
         {/* Mobile: XCANNES centré */}
         <span className="md:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
           <span className="font-orbitron font-semibold tracking-[0.22em] text-white/80 uppercase text-[17px]">
@@ -151,11 +151,11 @@ export default function WalletDashboardFooter({
 
         {/* Desktop: XCANNES | Multi-currency wallet centré */}
         <span className="hidden md:flex absolute inset-0 items-center justify-center pointer-events-none">
-          <span className="font-orbitron font-semibold tracking-[0.22em] text-white/80 uppercase text-lg leading-none">
+          <span className="font-orbitron font-semibold tracking-[0.24em] text-white/80 uppercase text-xl leading-none">
             {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
-          <span className="mx-2.5 text-[12px] font-light text-white/30">|</span>
-          <span className="text-[15px] font-light italic text-white/40">
+          <span className="mx-3 text-[13px] font-light text-white/30">|</span>
+          <span className="text-[16px] font-light italic text-white/45">
             {t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
           </span>
         </span>

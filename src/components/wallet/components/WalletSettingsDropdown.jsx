@@ -59,7 +59,7 @@ export default function WalletSettingsDropdown({
         aria-label={t("ui_settings_label", "Paramètres")}
       >
         <svg
-          className="w-5 h-5 md:w-4 md:h-4"
+          className="w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -72,9 +72,6 @@ export default function WalletSettingsDropdown({
           />
           <circle cx="12" cy="12" r="3" />
         </svg>
-        <span className="hidden md:inline">
-          {t("ui_settings_label", "Paramètres")}
-        </span>
       </button>
 
       {isOpen && (
