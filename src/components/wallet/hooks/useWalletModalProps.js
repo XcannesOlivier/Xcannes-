@@ -143,7 +143,6 @@ export function useWalletModalProps({
   setSelectedStatementToken,
 
   // --- QR ---
-  qrModalData,
   qrScannerOpen,
   handleAddressScan,
 }) {
@@ -578,7 +577,6 @@ export function useWalletModalProps({
     qrScannerOpen,
     setQrScannerOpen: setQrScannerOpen,
     handleAddressScan,
-    qrModalData,
 
     // Cash modal uses different availableTokens in desktop vs mobile
     selectableTokens,

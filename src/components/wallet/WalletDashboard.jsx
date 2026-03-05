@@ -565,7 +565,6 @@ export default function WalletDashboard({
     setShowCurrencyStatement,
     selectedStatementToken,
     setSelectedStatementToken,
-    qrModalData,
     // Spread sub-orchestrator state (keys match useWalletModalProps params)
     ...sendState,
     ...swapState,

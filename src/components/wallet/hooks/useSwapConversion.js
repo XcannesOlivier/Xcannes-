@@ -94,15 +94,6 @@ export function useSwapConversion({
     [demoLines],
   );
 
-  const getFxSource = useCallback(
-    async (currencyCode) => {
-      const code = String(currencyCode || "").toUpperCase();
-      if (!code) return null;
-      return "FAWAZ";
-    },
-    [],
-  );
-
   const handleDemoConvert = useCallback(async () => {
     if (isPreviewMode) {
       const base = String(convertBaseCurrency || "").toUpperCase();
@@ -362,7 +353,7 @@ export function useSwapConversion({
         }
       }
 
-      const fxSource = await getFxSource(base);
+      const fxSource = "FAWAZ";
       const destination = String(
         XCANNES_ACTIVATION_WALLET_ADDRESS || "",
       ).trim();
@@ -488,7 +479,6 @@ export function useSwapConversion({
     demoLines,
     demoRlusdTotal,
     isConnected,
-    getFxSource,
     getRlusdPerUnit,
     hasOnChainRlusd,
     isPreviewMode,

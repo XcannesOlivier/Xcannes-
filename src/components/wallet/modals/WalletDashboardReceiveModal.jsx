@@ -32,13 +32,7 @@ const ShareIcon = ({ className = "" }) => (
 export default function WalletDashboardReceiveModal({
   open,
   onClose,
-  isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
-  dashboardVariant = "default",
   renderWalletMeta,
   wallet,
   requestAmount,
@@ -60,8 +54,6 @@ export default function WalletDashboardReceiveModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const greenActionBtnMuted =
     "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
   const [generatedRequest, setGeneratedRequest] = useState(null);

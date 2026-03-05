@@ -55,9 +55,7 @@ const MoonPayBuyModal = ({
   walletLabel = "",
   hideWalletAddress = false,
   embedded = false,
-  isPreviewMode = false,
   noticeVariant = "preview",
-  noticeContextLabel = "",
   demoMode = false,
   onDemoSubmit,
   prefill = null,
@@ -69,7 +67,7 @@ const MoonPayBuyModal = ({
   const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
-  const { isWalletActivated, balance, signTransaction } = useWallet();
+  const { balance, signTransaction } = useWallet();
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
@@ -128,13 +126,6 @@ const MoonPayBuyModal = ({
       setFiatCurrency(String(prefill.fiatCurrency).toUpperCase());
     }
   }, [isOpen, prefill, prefillSignature]);
-
-  const hasRlusdTrustline = useMemo(() => {
-    const tokens = balance?.tokens || [];
-    return tokens.some(
-      (t) => String(t?.currency || "").toUpperCase() === "RLUSD",
-    );
-  }, [balance?.tokens]);
 
   const selectedFiat = useMemo(() => {
     return (fiatCurrencies || []).find((fiat) => fiat.code === fiatCurrency);

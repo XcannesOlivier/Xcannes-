@@ -15,8 +15,6 @@ export function usePaymentRequestScanner({
   setSendPaymentRequest,
 } = {}) {
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
-  const [paymentRequestScannerOpen, setPaymentRequestScannerOpen] =
-    useState(false);
 
   const handleAddressScan = useCallback(
     (address) => {
@@ -144,7 +142,6 @@ export function usePaymentRequestScanner({
         }
         setSendPaymentRequest?.(null);
         setSendTab?.("manual");
-        setPaymentRequestScannerOpen(false);
       };
 
       try {
@@ -228,7 +225,6 @@ export function usePaymentRequestScanner({
                 beneficiaryLabel != null ? String(beneficiaryLabel) : null,
             });
             setSendTab?.("manual");
-            setPaymentRequestScannerOpen(false);
             return;
           }
 
@@ -327,7 +323,6 @@ export function usePaymentRequestScanner({
               beneficiaryLabel != null ? String(beneficiaryLabel) : null,
           });
           setSendTab?.("manual");
-          setPaymentRequestScannerOpen(false);
           return;
         }
 
@@ -359,8 +354,6 @@ export function usePaymentRequestScanner({
   return {
     qrScannerOpen,
     setQrScannerOpen,
-    paymentRequestScannerOpen,
-    setPaymentRequestScannerOpen,
     handleAddressScan,
     handlePaymentRequestScan,
   };
