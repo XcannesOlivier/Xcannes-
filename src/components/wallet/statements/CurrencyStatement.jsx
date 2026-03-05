@@ -54,7 +54,7 @@ export default function CurrencyStatement({
   loading = false,
   error = null,
   period = "",
-  variant = "default",
+  variant = "full",
   isClosing = false,
   inline = false,
   usdRates = {},
@@ -83,7 +83,7 @@ export default function CurrencyStatement({
   const [filter, setFilter] = useState("all");
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0);
-  const [isMobileDate, setIsMobileDate] = useState(variant === "dex-mobile");
+  const [isMobileDate, setIsMobileDate] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
     useState(null);
@@ -431,7 +431,7 @@ export default function CurrencyStatement({
 
   /* ── layout ────────────────────────────────────────────── */
   const resolvedLayout =
-    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.full;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";

@@ -1,11 +1,11 @@
 "use client";
 import { useTranslation } from "next-i18next";
 
-export default function WalletDashboardActionRow({ layout, onAction }) {
+export default function WalletDashboardActionRow({ onAction }) {
   const { t } = useTranslation("common");
   return (
     <div
-      className={`px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3 ${layout.actionRowClass}`}
+      className="px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button

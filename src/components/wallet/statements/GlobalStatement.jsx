@@ -28,7 +28,7 @@ export default function GlobalStatement({
   isPreviewMode = false,
   noticeVariant = "preview",
   period = "",
-  variant = "default",
+  variant = "full",
   isClosing = false,
   inline = false,
   usdRates = {},
@@ -448,23 +448,6 @@ export default function GlobalStatement({
       panelClass:
         "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
     },
-    "dex-desktop": {
-      backdropClass: "bg-black/75 md:backdrop-blur-sm",
-      wrapperClass: "items-center justify-center px-3 md:px-4",
-      panelClass:
-        "max-w-4xl lg:max-w-5xl rounded-2xl border border-white/10 max-h-[90vh]",
-    },
-    "dex-mobile": {
-      backdropClass: "bg-black/90 md:backdrop-blur-sm",
-      wrapperClass: "items-stretch justify-center px-0",
-      panelClass: "w-full xcannes-fullscreen-safe rounded-none border-0",
-    },
-    default: {
-      backdropClass: "bg-black/80 md:backdrop-blur-sm",
-      wrapperClass: "items-center justify-center px-4",
-      panelClass:
-        "max-w-5xl lg:max-w-6xl rounded-2xl border border-white/10 max-h-[92vh]",
-    },
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
@@ -473,7 +456,7 @@ export default function GlobalStatement({
   };
 
   const resolvedLayout =
-    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.default;
+    STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.full;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10200] flex";

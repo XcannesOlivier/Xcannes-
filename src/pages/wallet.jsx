@@ -149,7 +149,6 @@ export default function Wallet() {
         <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} h-full mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
           <div className={`bg-[#0b0f10] h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
             <WalletDashboard
-              variant="full"
               showDesktopStatement={!isEmbedded}
               qrSizingVariant="dex"
               showMobileHomeLink={!isEmbedded}

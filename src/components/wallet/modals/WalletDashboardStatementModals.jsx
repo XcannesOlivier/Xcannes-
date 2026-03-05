@@ -23,8 +23,6 @@ export default function WalletDashboardStatementModals({
   walletId = "",
   previewGlobalMovements,
   previewCurrencyTransactions,
-  isFullPageView,
-  statementVariant,
   usdRates,
   highlightTransactionId,
   showGlobalStatement,
@@ -367,7 +365,6 @@ export default function WalletDashboardStatementModals({
             noticeContextLabel={noticeContextLabel}
             walletId={walletId}
             period="December 2025"
-            isFullPage={isFullPageView}
             variant={inlineStatementVariant || "inline-desktop"}
             inline
             usdRates={usdRates}
@@ -411,7 +408,6 @@ export default function WalletDashboardStatementModals({
             noticeVariant={noticeVariant}
             noticeContextLabel={noticeContextLabel}
             walletId={walletId}
-            isFullPage={isFullPageView}
             variant={inlineStatementVariant || "inline-desktop"}
             inline
             usdRates={usdRates}
@@ -451,8 +447,7 @@ export default function WalletDashboardStatementModals({
           noticeContextLabel={noticeContextLabel}
           walletId={walletId}
           period="December 2025"
-          isFullPage={isFullPageView}
-          variant={statementVariant}
+          variant="full"
           usdRates={usdRates}
           totalBalanceOverride={statementTotalBalanceUsd}
           movements={canFetchStatements ? globalMovements : previewMovements}
@@ -494,8 +489,7 @@ export default function WalletDashboardStatementModals({
           noticeVariant={noticeVariant}
           noticeContextLabel={noticeContextLabel}
           walletId={walletId}
-          isFullPage={isFullPageView}
-          variant={statementVariant}
+          variant="full"
           usdRates={usdRates}
           rlusdBalance={rlusdBalance}
           transactions={
