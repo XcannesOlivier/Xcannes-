@@ -114,52 +114,6 @@ export function buildXrplJsonMemo(
   return [{ Memo: memo }];
 }
 
-function decodeHexToUtf8(hex) {
-  const raw = String(hex || "").trim();
-  if (!raw) return "";
-  if (!/^[0-9A-Fa-f]+$/.test(raw) || raw.length % 2 !== 0) return "";
-  try {
-    return Buffer.from(raw, "hex").toString("utf8");
-  } catch {
-    return "";
-  }
-}
-
-function decodeHexToUtf8Detailed(hex) {
-  const raw = String(hex || "").trim();
-  if (!raw) return { ok: false, value: "", reason: "empty" };
-  if (!/^[0-9A-Fa-f]+$/.test(raw) || raw.length % 2 !== 0) {
-    return { ok: false, value: "", reason: "invalid_hex" };
-  }
-  try {
-    return { ok: true, value: Buffer.from(raw, "hex").toString("utf8"), reason: null };
-  } catch {
-    return { ok: false, value: "", reason: "decode_error" };
-  }
-}
-
-function decodeMemoFieldHex(value) {
-  const decoded = decodeHexToUtf8(value);
-  return decoded ? decoded.trim() : "";
-}
-
-function isXcannesMemo(memo, { allowMissingType = true } = {}) {
-  if (!memo?.MemoData) return false;
-  const memoType = decodeMemoFieldHex(memo.MemoType);
-  if (memoType) {
-    if (memoType.toUpperCase() !== XCANNES_MEMO_TYPE) return false;
-  } else if (!allowMissingType) {
-    return false;
-  }
-
-  const memoFormat = decodeMemoFieldHex(memo.MemoFormat);
-  if (memoFormat) {
-    if (memoFormat.toLowerCase() !== XCANNES_MEMO_FORMAT) return false;
-  }
-
-  return true;
-}
-
 export {
   XCANNES_MEMO_SCHEMAS,
   buildWalletLabelMemo,

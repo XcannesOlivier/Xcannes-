@@ -3,9 +3,6 @@
  * Centralise la résolution des URLs pour éviter les duplications et incohérences.
  */
 
-const runtimeEnv = (process.env.NEXT_PUBLIC_ENVIRONMENT || process.env.NODE_ENV || "").trim().toLowerCase();
-const isProd = runtimeEnv === "production";
-
 const RAW_API_URL = (process.env.NEXT_PUBLIC_XCANNES_API_URL || "").trim();
 const RAW_WS_URL = (process.env.NEXT_PUBLIC_XCANNES_WS_URL || "").trim();
 

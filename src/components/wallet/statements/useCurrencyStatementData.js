@@ -125,40 +125,6 @@ export default function useCurrencyStatementData({
     });
   }, [baseTransactions, selectedMonthKeys]);
 
-  /* ── statistics ─────────────────────────────────────────── */
-  const credits = periodTransactions.filter((tok) => tok.type === "credit");
-  const debits = periodTransactions.filter((tok) => tok.type === "debit");
-
-  const totalCredits = credits.reduce(
-    (sum, tok) => sum + parseFloat(tok.amount || 0),
-    0,
-  );
-  const totalDebits = debits.reduce(
-    (sum, tok) => sum + parseFloat(tok.amount || 0),
-    0,
-  );
-
-  const openingBalance = balance - totalCredits + totalDebits;
-  const closingBalance = balance;
-
-  const avgTransaction =
-    periodTransactions.length > 0
-      ? (totalCredits + totalDebits) / periodTransactions.length
-      : 0;
-
-  const largestTransaction = periodTransactions.reduce((max, tok) => {
-    const amount = parseFloat(tok.amount || 0);
-    return amount > max ? amount : max;
-  }, 0);
-
-  const transactionsByCategory = periodTransactions.reduce((acc, tx) => {
-    const cat = tx.category || "other";
-    if (!acc[cat]) acc[cat] = { count: 0, amount: 0 };
-    acc[cat].count++;
-    acc[cat].amount += parseFloat(tx.amount || 0);
-    return acc;
-  }, {});
-
   /* ── filtered transactions ─────────────────────────────── */
   const filteredTransactions = useMemo(() => {
     return periodTransactions.filter((tok) => {
@@ -290,24 +256,8 @@ export default function useCurrencyStatementData({
           ?.displayLabel || null;
 
   return {
-    baseTransactions,
-    statementMonthKeys,
     availableMonths,
-    selectedMonthKey,
-    selectedMonthKeys,
-    periodTransactions,
-    credits,
-    debits,
-    totalCredits,
-    totalDebits,
-    openingBalance,
-    closingBalance,
-    avgTransaction,
-    largestTransaction,
-    transactionsByCategory,
-    filteredTransactions,
     transactionsWithDisplayBalance,
-    transactionsByMonth,
     visibleGroups,
     showMonthHeaders,
     adjustmentInfo,

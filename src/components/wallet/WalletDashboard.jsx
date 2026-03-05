@@ -213,7 +213,7 @@ export default function WalletDashboard({
     error: currencyLinesError,
     refresh: refreshCurrencyLines,
     upsertCurrencyLine,
-  } = useWalletCurrencyLines(backendWalletAddress, { signTransaction });
+  } = useWalletCurrencyLines(backendWalletAddress);
 
   const {
     currencyLineCode,

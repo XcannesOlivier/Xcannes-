@@ -56,12 +56,3 @@ export function listCachedStatementKeys() {
   const cache = readCache();
   return Object.keys(cache || {});
 }
-
-function clearStatementCache() {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.removeItem(STATEMENT_CACHE_KEY);
-  } catch {
-    // ignore
-  }
-}

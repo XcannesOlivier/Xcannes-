@@ -126,9 +126,6 @@ export function useUsdTotalLabel({
 
   return {
     usdRates,
-    totalUsd,
-    totalUsdLabel,
-    fallbackTotalLabel,
     totalLabel,
   };
 }

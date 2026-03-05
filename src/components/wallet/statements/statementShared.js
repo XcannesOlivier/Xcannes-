@@ -43,7 +43,7 @@ export const stripCountSuffix = (label) =>
 
 /* ─── Month utilities ─────────────────────────────────────── */
 
-export const buildMonthKeyUtc = (date) => {
+const buildMonthKeyUtc = (date) => {
   if (!(date instanceof Date)) return null;
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth() + 1;

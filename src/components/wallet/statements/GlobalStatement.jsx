@@ -4,12 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
-import {
-  buildCsvString,
-  downloadTextFile,
-  escapeHtml,
-  openPrintWindow,
-} from "@/utils/statementExport";
+import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import StatementMonthSelect from "./StatementMonthSelect";
 import {
   formatAmountWithSymbol,
@@ -31,13 +26,8 @@ export default function GlobalStatement({
   walletAddress,
   walletLabelOverride = "",
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   period = "",
-  isFullPage = false,
   variant = "default",
   isClosing = false,
   inline = false,
@@ -108,12 +98,6 @@ export default function GlobalStatement({
     selectedMonth === "archives"
       ? archivesLabel
       : availableMonths[selectedMonth]?.label || fallbackPeriod;
-  const currentDisplayPeriod =
-    selectedMonth === "archives"
-      ? archivesLabel
-      : availableMonths[selectedMonth]?.displayLabel ||
-        String(fallbackPeriod).split(" ")[0];
-
   /* ── helpers ───────────────────────────────────────────── */
   const isUsdStablecoin = useCallback(
     (currency) =>
@@ -427,47 +411,6 @@ export default function GlobalStatement({
       );
     }
   }, [buildPrintHtml, docHash, t]);
-
-  const handleExportCsv = useCallback(() => {
-    setExportFormat("csv");
-    try {
-      const suffix = docHash ? docHash.slice(0, 12) : "draft";
-      const headers = [
-        "created_at",
-        "kind",
-        "from_currency",
-        "to_currency",
-        "amount_rlusd",
-        "fx_rate",
-        "fx_source",
-        "tx_hash",
-        "total_balance_usd",
-        "ledger_status",
-        "doc_hash",
-      ];
-      const rows = (movements || []).map((m) => [
-        m?.createdAt || "",
-        m?.kind || "",
-        m?.fromCurrencyCode || "",
-        m?.toCurrencyCode || "",
-        Number.isFinite(Number(m?.amountRlusd)) ? Number(m.amountRlusd) : "",
-        Number.isFinite(Number(m?.fxRate)) ? Number(m.fxRate) : "",
-        m?.fxSource || "",
-        m?.txHash || "",
-        Number.isFinite(Number(totalBalance)) ? Number(totalBalance) : "",
-        ledgerStatus,
-        docHash || "",
-      ]);
-      const csv = buildCsvString(headers, rows);
-      downloadTextFile({
-        filename: `xcannes-statement-global-${suffix}.csv`,
-        content: csv,
-        type: "text/csv;charset=utf-8",
-      });
-    } finally {
-      setExportFormat(null);
-    }
-  }, [docHash, ledgerStatus, movements, totalBalance]);
 
   /* ── category badge ────────────────────────────────────── */
   const getCategoryBadge = (token) => {

@@ -1,7 +1,5 @@
 import { Buffer } from "buffer";
 
-const pairToBackendFormat = (pair) => pair.replace("/", "_");
-
 const RLUSD_ISSUER = (process.env.NEXT_PUBLIC_RLUSD_ISSUER || "rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De").trim();
 
 export function encodeXrplCurrencyCode(currency = "") {

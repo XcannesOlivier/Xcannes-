@@ -100,5 +100,5 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
     };
   }, [codesKey]);
 
-  return { usdPerUnit, sourceByCode, loading };
+  return { usdPerUnit, sourceByCode };
 }
