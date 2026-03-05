@@ -14,13 +14,7 @@ import { normalizeQrImageFile } from "@/utils/qrImage";
 export default function WalletDashboardSendModal({
   open,
   onClose,
-  isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
-  qrSizingVariant = "default",
   renderWalletMeta,
   augmentedTokens,
   selectedSendToken,
@@ -61,26 +55,6 @@ export default function WalletDashboardSendModal({
   );
   const manualQrScannerRef = useRef(null);
   const isDemoMode = noticeVariant === "demo";
-  const fauxPayreqExample =
-    '{"schema":"xcannes-payreq-v1","to":"rDEMO_WALLET_A_xxxxxxxxxxxxxxxxxxxxxxxx","targetCurrency":"USD","displayAmount":10,"displayCurrency":"USD","amountRlusd":10,"fxRate":1,"fxSource":"FAWAZ","issuer":"rMxCKbEDwqr76QuheSUMdEGf4B9xJ8m5De","memo":"XCANNES","beneficiaryLabel":null,"createdAt":"2026-02-07T15:16:38.139Z"}';
-  const showFauxPayreq = false;
-  const fauxPayreqTextClass =
-    isDemoMode && isDesktop
-      ? "text-[11px] text-white/70"
-      : isDemoMode
-        ? "text-[10px] text-white/70"
-        : showFauxPayreq && !inline
-          ? "text-[9px] text-white/10"
-          : "text-[10px] text-white/15";
-  const fauxPayreqOverlay = showFauxPayreq ? (
-    <div
-      className={`h-full w-full overflow-y-auto pr-2 leading-snug font-mono whitespace-pre-wrap break-words ${fauxPayreqTextClass}`}
-    >
-      {fauxPayreqExample}
-    </div>
-  ) : null;
-  const fauxQrSize = inline ? (isDesktop ? "120px" : "200px") : "160px";
-  const fauxQrOpacity = inline ? 0.08 : 0.06;
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -309,14 +283,6 @@ export default function WalletDashboardSendModal({
           </button>
         </div>
         <div className="relative">
-          {showFauxPayreq ? (
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 p-3 pointer-events-none"
-            >
-              {fauxPayreqOverlay}
-            </div>
-          ) : null}
           <textarea
             value={requestText}
             onChange={(e) => setRequestText(e.target.value)}
@@ -813,9 +779,6 @@ export default function WalletDashboardSendModal({
           enableCamera={true}
           hideWhenUnavailable
           onCameraUnavailableChange={setCameraUnavailable}
-          showFauxQrBackground={showFauxPayreq}
-          fauxQrBackgroundSize={fauxQrSize}
-          fauxQrBackgroundOpacity={fauxQrOpacity}
           className="bg-black/30 border-white/10"
         />
       ) : null}

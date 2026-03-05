@@ -6,9 +6,6 @@ import { useModalTransition } from "@/utils/useModalTransition";
 
 export function WalletInfoContent({
   withCloseGutter = false,
-  isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
 }) {
   const { t } = useTranslation("common");
@@ -211,11 +208,7 @@ export function WalletInfoContent({
 export default function WalletInfoModal({
   isOpen,
   onClose,
-  isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
-  noticeContextLabel = "",
   inline = false,
 }) {
   const { t } = useTranslation("common");
@@ -277,9 +270,6 @@ export default function WalletInfoModal({
 
           <WalletInfoContent
             withCloseGutter
-            isPreviewMode={isPreviewMode}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
             noticeVariant={noticeVariant}
           />
         </div>

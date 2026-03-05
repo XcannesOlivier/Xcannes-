@@ -21,15 +21,11 @@ export default function WalletDashboardSwapModal({
   renderWalletMeta,
   isPreviewMode,
   noticeVariant = "preview",
-  noticeContextLabel = "",
-  walletId = "",
   dashboardVariant = "default",
   isConnected,
   isWalletActivated,
-  hasRlusdTrustline = null,
   onConnectWallet,
   hasOnChainRlusd,
-  onInstallTrustline,
   onActivateCurrencyLine,
   currencyLinesLoading,
   currencyLines,
@@ -41,11 +37,6 @@ export default function WalletDashboardSwapModal({
   convertAmount,
   setConvertAmount,
   convertPreview,
-  currencyLineCode,
-  setCurrencyLineCode,
-  currencyLineAllocatedRlusd,
-  setCurrencyLineAllocatedRlusd,
-  handleUpsertCurrencyLine,
   handleDemoConvert,
   convertProcessing,
   rlusdPerUnitRates,
@@ -59,8 +50,6 @@ export default function WalletDashboardSwapModal({
   const locale = i18n?.language || "en";
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
-  const greenActionBtnMuted =
-    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
 

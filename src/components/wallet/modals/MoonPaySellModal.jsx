@@ -40,9 +40,7 @@ const MoonPaySellModal = ({
   walletLabel = "",
   hideWalletAddress = false,
   embedded = false,
-  isPreviewMode = false,
   noticeVariant = "preview",
-  noticeContextLabel = "",
   demoMode = false,
   onDemoSubmit,
   availableTokens,
@@ -54,13 +52,8 @@ const MoonPaySellModal = ({
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const { signTransaction, isWalletActivated, balance } = useWallet();
+  const { signTransaction, balance } = useWallet();
 
-  const hasRlusdTrustline = useMemo(() => {
-    return (balance?.tokens || []).some(
-      (token) => String(token?.currency || "").toUpperCase() === "RLUSD",
-    );
-  }, [balance]);
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

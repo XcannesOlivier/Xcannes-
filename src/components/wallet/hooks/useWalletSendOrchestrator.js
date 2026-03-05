@@ -245,8 +245,6 @@ export function useWalletSendOrchestrator({
   return {
     // Send form
     sendTab,
-    setSendTab,
-    sendAssetKey,
     setSendAssetKey,
     sendDestination,
     setSendDestination,

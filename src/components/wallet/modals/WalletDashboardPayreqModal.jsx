@@ -11,16 +11,12 @@ import { formatAmountWithSymbol } from "../walletDashboardConfig";
 export default function WalletDashboardPayreqModal({
   open,
   onClose,
-  isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
   renderWalletMeta,
   augmentedTokens,
   selectedSendToken,
   sendFxInfo,
   setSendAssetKey,
-  setSendAmount,
   sendPaymentRequest,
   sendDestination,
   sendAmount,
@@ -33,7 +29,6 @@ export default function WalletDashboardPayreqModal({
   selectLabelMobileByAssetKey,
   enableSaveAddress = false,
   savePayreq,
-  removePayreq,
   inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
