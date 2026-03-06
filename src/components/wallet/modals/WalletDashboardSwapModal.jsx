@@ -454,20 +454,6 @@ export default function WalletDashboardSwapModal({
                     </div>
 
                     <div className="rounded-xl border border-white/10 p-3">
-                      {!canMutateLines ? (
-                        <p className="mt-1 text-[16px] text-white/45">
-                          {!isConnected
-                            ? t(
-                                "ui_connect_your_wallet_to_activ_ec68e6f427",
-                                "Connect your wallet to activate currency lines.",
-                              )
-                            : t(
-                                "ui_trustlines_required_currency_lines_f4",
-                                "USD trustline is required to create currency lines.",
-                              )}
-                        </p>
-                      ) : null}
-
                       <div className="mt-2 grid grid-cols-1 gap-2">
                         <WalletCurrencySelector
                           value={activateCurrencyCode}
