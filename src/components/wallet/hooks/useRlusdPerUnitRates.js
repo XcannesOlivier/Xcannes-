@@ -43,7 +43,6 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
 
   const [usdPerUnit, setUsdPerUnit] = useState({});
   const [sourceByCode, setSourceByCode] = useState({});
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,7 +54,6 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
         return;
       }
 
-      setLoading(true);
       try {
         const fxCurrencies = await xcannesApi.getFxCurrencies();
         const fawazSet = new Set(
@@ -89,8 +87,6 @@ export function useRlusdPerUnitRates(currencyCodes = []) {
           setUsdPerUnit({});
           setSourceByCode({});
         }
-      } finally {
-        if (!cancelled) setLoading(false);
       }
     };
 

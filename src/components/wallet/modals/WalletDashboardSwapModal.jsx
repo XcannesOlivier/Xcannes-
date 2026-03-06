@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import useIsDesktop from "../hooks/useIsDesktop";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -51,20 +52,7 @@ export default function WalletDashboardSwapModal({
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, []);
+  const isDesktop = useIsDesktop();
 
   const existingCurrencyLinesSet = useMemo(() => {
     const set = new Set();

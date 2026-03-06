@@ -4,7 +4,6 @@ export function useUsdTotalLabel({
   augmentedTokens,
   isPreviewMode,
   stableUsd,
-  xrpAmount,
   demoTotalUsd,
   isStablecoin,
   fiatRates,

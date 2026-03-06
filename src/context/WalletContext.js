@@ -13,7 +13,7 @@
  *   - "pwa"    → PwaEmbeddedContext (PWA iframe bridge, instant postMessage)
  */
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNativeWallet } from "@/context/NativeWalletContext";
 import { usePwaEmbedded, isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
@@ -66,19 +66,6 @@ export const WalletProviderSwitch = ({ children }) => {
     activeProvider === "pwa" ? pwa :
     native;
 
-  const switchProvider = useCallback(
-    (provider) => {
-      if (!VALID_PROVIDERS.includes(provider)) return;
-      // Disconnect current wallet before switching
-      if (current.isConnected) {
-        current.disconnect();
-      }
-      saveProvider(provider);
-      setActiveProvider(provider);
-    },
-    [current]
-  );
-
   // ✅ Value memoïzé pour éviter de re-rendre les 13+ consumers à chaque render parent
   const value = useMemo(() => ({
     // --- Same interface as useNativeWallet() / usePwaEmbedded() ---
@@ -98,11 +85,6 @@ export const WalletProviderSwitch = ({ children }) => {
     // --- Multi-wallet ---
     walletAddresses: current.walletAddresses || [],
     switchWallet: current.switchWallet || (() => {}),
-
-    // --- Provider switching ---
-    activeProvider,
-    switchProvider,
-    providers: VALID_PROVIDERS,
   }), [
     current.wallet,
     current.isConnected,
@@ -118,8 +100,6 @@ export const WalletProviderSwitch = ({ children }) => {
     current.closeQrModal,
     current.walletAddresses,
     current.switchWallet,
-    activeProvider,
-    switchProvider,
   ]);
 
   return (
