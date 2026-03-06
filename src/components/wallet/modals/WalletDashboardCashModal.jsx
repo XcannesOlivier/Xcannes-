@@ -10,11 +10,8 @@ export default function WalletDashboardCashModal({
   open,
   onClose,
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
   noticeContextLabel = "",
-  walletId = "",
   demoMode = false,
   onDemoBuy,
   onDemoSell,
@@ -34,16 +31,6 @@ export default function WalletDashboardCashModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
-  const cashNote =
-    noticeVariant === "demo"
-      ? t(
-          "ui_fiat_gateway_note_demo_6f1d8c2a9b",
-          "Demo mode: buy/sell are simulated, no MoonPay redirect.",
-        )
-      : t(
-          "ui_fiat_gateway_note_live_4b8c2d1e9f",
-          "Buy/sell via MoonPay (partner). Availability depends on country and payment method. Rates and fees are shown before confirmation.",
-        );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,

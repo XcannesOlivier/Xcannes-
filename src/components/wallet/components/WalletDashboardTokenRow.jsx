@@ -43,7 +43,6 @@ export default function WalletDashboardTokenRow({
   token,
   tokenRowClass = "",
   onClick,
-  onInstallTrustline,
   isWalletActivated,
   hasRlusdTrustline,
   onActivateWallet,

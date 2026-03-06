@@ -37,14 +37,6 @@ function isMobileDevice() {
     (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1);
 }
 
-/** Generate a QR code data URL using a simple inline canvas renderer */
-function generateQRDataUrl(text) {
-  // We return the raw JSON/URL — the QR rendering is handled by the
-  // QR modal component. The modal receives qrData as
-  // a plain string and renders it.
-  return text;
-}
-
 export const NativeWalletProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");
   const [isConnected, setIsConnected] = useState(false);
