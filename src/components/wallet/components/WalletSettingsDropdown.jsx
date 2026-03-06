@@ -13,14 +13,7 @@ import { QRCodeSVG } from "qrcode.react";
  */
 export default function WalletSettingsDropdown({
   position = "header",
-  onDisconnect,
-  onCopyAddress,
-  onOpenWalletLabelEditor,
-  onRefreshWallet,
   onOpenInfo,
-  isConnecting,
-  isRefreshing,
-  isWalletLabelLocked,
 }) {
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
@@ -157,35 +150,7 @@ export default function WalletSettingsDropdown({
               )}
             </a>
 
-            {/* Séparateur masqué avec le bouton déconnecter */}
-            {false && <div className="my-1 mx-3 border-t border-white/8" />}
 
-            {/* Déconnecter — masqué (auto-lock gère la déconnexion) */}
-            {false && (
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                onDisconnect?.();
-              }}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-red-400/80 hover:text-red-400 hover:bg-red-400/5 transition-colors"
-            >
-              <svg
-                className="w-4 h-4 text-red-400/50"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              {t("nav_sign_out", "Se déconnecter")}
-            </button>
-            )}
           </div>
         </div>
       )}

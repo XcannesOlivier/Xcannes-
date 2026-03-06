@@ -10,7 +10,6 @@ import { useTranslation } from "next-i18next";
 export default function WalletDashboardHeader({
   isConnected,
   wallet,
-  onDisconnect,
   totalLabel,
   xrplConnectionIndicator,
   walletLabel,
@@ -286,13 +285,7 @@ export default function WalletDashboardHeader({
               {/* Bouton Paramètres (à côté du refresh, même style) */}
               <WalletSettingsDropdown
                 position="inline"
-                onDisconnect={onDisconnect}
-                onCopyAddress={onCopyAddress}
-                onRefreshWallet={onRefreshWallet}
                 onOpenInfo={onOpenInfo}
-                isConnecting={isConnecting}
-                isRefreshing={isRefreshing}
-                isWalletLabelLocked={isWalletLabelLocked}
               />
             </div>
           </div>

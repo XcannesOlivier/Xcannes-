@@ -407,7 +407,6 @@ export default function WalletDashboard({
       <WalletDashboardTokenRow
         key={token.key}
         token={token}
-        onInstallTrustline={handleInstallRequiredTrustline}
         isWalletActivated={isWalletActivated}
         hasRlusdTrustline={hasRlusdTrustline}
         onActivateWallet={handleOpenActivationModal}
@@ -416,7 +415,6 @@ export default function WalletDashboard({
       />
     ),
     [
-      handleInstallRequiredTrustline,
       handleOpenActivationModal,
       handleOpenCurrencyStatement,
       handleOpenRlusdSetup,
@@ -610,7 +608,6 @@ export default function WalletDashboard({
           <WalletDashboardHeader
             isConnected={isConnected}
             wallet={wallet}
-            onDisconnect={disconnect}
             totalLabel={totalLabel}
             xrplConnectionIndicator={xrplConnectionIndicator}
             walletLabel={walletLabel}

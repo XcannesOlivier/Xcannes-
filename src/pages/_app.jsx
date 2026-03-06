@@ -6,7 +6,7 @@ import nextI18NextConfig from "../../next-i18next.config";
 import { NativeWalletProvider } from "@/context/NativeWalletContext";
 import { PwaEmbeddedProvider } from "@/context/PwaEmbeddedContext";
 import { WalletProviderSwitch } from "@/context/WalletContext";
-import { XcannesWSProvider } from "@/context/XcannesWSContext"; // ✅ WebSocket centralisé
+import wsClient from "@/lib/xcannesWebSocket";
 import WalletRelayQRModal from "@/components/wallet/WalletRelayQRModal";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -17,6 +17,11 @@ function App({ Component, pageProps }) {
   const [transitionDirection, setTransitionDirection] = useState("from-right");
   // L'animation d'entrée ne joue qu'au tout premier chargement
   const hasNavigatedRef = useRef(false);
+
+  // ── WebSocket: connexion précoce au boot ──
+  useEffect(() => {
+    wsClient.connect().catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!router?.events) return;
@@ -85,18 +90,16 @@ function App({ Component, pageProps }) {
     <NativeWalletProvider>
       <PwaEmbeddedProvider>
         <WalletProviderSwitch>
-          <XcannesWSProvider>
-            <WalletRelayQRModal />
-            <div className="font-sans">
-              <div
-                className={`${transitionClass}${
-                  isRouteChanging ? " page-transition--exit" : ""
-                }`}
-              >
-                <Component {...pageProps} />
-              </div>
+          <WalletRelayQRModal />
+          <div className="font-sans">
+            <div
+              className={`${transitionClass}${
+                isRouteChanging ? " page-transition--exit" : ""
+              }`}
+            >
+              <Component {...pageProps} />
             </div>
-          </XcannesWSProvider>
+          </div>
         </WalletProviderSwitch>
       </PwaEmbeddedProvider>
     </NativeWalletProvider>

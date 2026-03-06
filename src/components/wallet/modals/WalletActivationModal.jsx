@@ -13,9 +13,6 @@ export default function WalletActivationModal({
   activationBundleEnabled = false,
   onToggleActivationBundle,
   activationAmountXrp = 1,
-  isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   inline = false,
 }) {
   const { t } = useTranslation("common");
