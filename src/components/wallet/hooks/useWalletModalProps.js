@@ -471,17 +471,11 @@ export function useWalletModalProps({
   const activationRequestModalProps = useMemo(
     () => ({
       walletAddress: wallet,
-      walletLabel,
       activationAmountXrp: activationXrpAmount,
-      isWalletActivated,
-      hasRlusdTrustline,
     }),
     [
       wallet,
-      walletLabel,
       activationXrpAmount,
-      isWalletActivated,
-      hasRlusdTrustline,
     ],
   );
 
