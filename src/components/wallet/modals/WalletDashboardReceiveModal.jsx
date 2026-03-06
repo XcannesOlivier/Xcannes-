@@ -417,14 +417,21 @@ export default function WalletDashboardReceiveModal({
   const requestValue = useMemo(() => {
     if (!generatedRequest) return "";
     try {
+      const targetCurrency =
+        generatedRequest.targetCurrency ||
+        generatedRequest.targetCurrencyCode ||
+        "";
+      const displayCurrency = generatedRequest.displayCurrency || "";
+      // Omit displayCurrency (dc) if it equals targetCurrency to save space
+      const shouldIncludeDc =
+        displayCurrency && displayCurrency !== targetCurrency;
+
       const compact = {
-        s: generatedRequest.schema,
+        // Schema omitted — inferred from xcannes-payreq: prefix
         to: generatedRequest.to,
-        tc:
-          generatedRequest.targetCurrency ||
-          generatedRequest.targetCurrencyCode,
+        tc: targetCurrency || null,
         da: generatedRequest.displayAmount ?? generatedRequest.amount ?? null,
-        dc: generatedRequest.displayCurrency || null,
+        ...(shouldIncludeDc && { dc: displayCurrency }),
         ar: generatedRequest.amountRlusd ?? null,
         fr: generatedRequest.fxRate ?? null,
         fs: generatedRequest.fxSource ?? null,
