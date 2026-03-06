@@ -9,10 +9,11 @@ export function useCurrencyLinesActions({
   setCurrencyLineCode,
   setCurrencyLineAllocatedRlusd,
   upsertCurrencyLine,
+  toast,
 }) {
   const handleUpsertCurrencyLine = useCallback(async () => {
     if (!backendWalletAddress) {
-      alert("Please connect your wallet first.");
+      toast?.error("Please connect your wallet first.");
       return;
     }
 
@@ -20,17 +21,17 @@ export function useCurrencyLinesActions({
       .trim()
       .toUpperCase();
     if (!code || code.length < 2) {
-      alert("Select a valid currency.");
+      toast?.error("Select a valid currency.");
       return;
     }
     if (code === "RLUSD") {
-      alert("RLUSD is the pool (unallocated). Choose another currency.");
+      toast?.error("RLUSD is the pool (unallocated). Choose another currency.");
       return;
     }
 
     const allocated = Number.parseFloat(currencyLineAllocatedRlusd);
     if (!Number.isFinite(allocated) || allocated < 0) {
-      alert("Enter a valid allocated RLUSD amount (>= 0).");
+      toast?.error("Enter a valid allocated RLUSD amount (>= 0).");
       return;
     }
 
@@ -48,6 +49,7 @@ export function useCurrencyLinesActions({
     setCurrencyLineAllocatedRlusd,
     setCurrencyLineCode,
     upsertCurrencyLine,
+    toast,
   ]);
 
   return { handleUpsertCurrencyLine };

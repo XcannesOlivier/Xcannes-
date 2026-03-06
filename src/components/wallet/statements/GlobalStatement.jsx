@@ -41,6 +41,7 @@ export default function GlobalStatement({
   onLoadMoreMovements,
   onClose,
   onViewCurrency,
+  toast,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -384,12 +385,12 @@ export default function GlobalStatement({
         bodyHtml: buildPrintHtml(),
       });
       if (!ok && typeof window !== "undefined") {
-        window.alert(
-          t(
-            "ui_popup_blocked_1c7a9d3b5e",
-            "Popup blocked. Please allow popups to export or print.",
-          ),
+        const msg = t(
+          "ui_popup_blocked_1c7a9d3b5e",
+          "Popup blocked. Please allow popups to export or print.",
         );
+        if (toast?.warn) toast.warn(msg);
+        else window.alert(msg);
       }
     } finally {
       setExportFormat(null);
@@ -403,12 +404,12 @@ export default function GlobalStatement({
       bodyHtml: buildPrintHtml(),
     });
     if (!ok && typeof window !== "undefined") {
-      window.alert(
-        t(
-          "ui_popup_blocked_1c7a9d3b5e",
-          "Popup blocked. Please allow popups to export or print.",
-        ),
+      const msg = t(
+        "ui_popup_blocked_1c7a9d3b5e",
+        "Popup blocked. Please allow popups to export or print.",
       );
+      if (toast?.warn) toast.warn(msg);
+      else window.alert(msg);
     }
   }, [buildPrintHtml, docHash, t]);
 

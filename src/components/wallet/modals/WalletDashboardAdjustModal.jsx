@@ -32,6 +32,7 @@ export default function WalletDashboardAdjustModal({
   refreshCurrencyLines,
   adjustmentFeeRlusd = DEFAULT_ADJUSTMENT_FEE_RLUSD,
   inline = false,
+  toast,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -152,12 +153,12 @@ export default function WalletDashboardAdjustModal({
   const handleSubmit = async () => {
     if (!canSubmit) return;
     if (!walletAddress) {
-      alert("Please connect your wallet first.");
+      toast?.error("Please connect your wallet first.");
       return;
     }
     const destination = String(XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim();
     if (!destination) {
-      alert("Activation wallet not configured.");
+      toast?.error("Activation wallet not configured.");
       return;
     }
 
@@ -181,13 +182,13 @@ export default function WalletDashboardAdjustModal({
       method: "manual",
     });
     if (!memoPayload) {
-      alert("Invalid adjustment memo payload.");
+      toast?.error("Invalid adjustment memo payload.");
       return;
     }
 
     const memos = buildXrplJsonMemo(memoPayload);
     if (!memos) {
-      alert("Invalid adjustment memo.");
+      toast?.error("Invalid adjustment memo.");
       return;
     }
 
@@ -197,7 +198,7 @@ export default function WalletDashboardAdjustModal({
       amountRlusd: feeRlusd,
     });
     if (!txjson) {
-      alert("Unable to build RLUSD adjustment transaction.");
+      toast?.error("Unable to build RLUSD adjustment transaction.");
       return;
     }
     txjson.Memos = memos;
@@ -208,7 +209,7 @@ export default function WalletDashboardAdjustModal({
         action: "wallet:allocation-adjust",
       });
       if (!result?.signed) {
-        alert("Adjustment cancelled or expired.");
+        toast?.error("Adjustment cancelled or expired.");
         return;
       }
 
@@ -219,7 +220,7 @@ export default function WalletDashboardAdjustModal({
     } catch (error) {
       const message = error?.message || String(error);
       console.error("Adjustment error:", error);
-      alert("Adjustment error: " + message);
+      toast?.error("Adjustment error: " + message);
     } finally {
       setProcessing(false);
     }

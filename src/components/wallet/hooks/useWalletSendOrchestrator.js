@@ -168,6 +168,7 @@ export function useWalletSendOrchestrator({
     setSendAssetKey,
     setSendTab,
     setSendPaymentRequest,
+    toast,
   });
 
   // ── Close inline QR (desktop) ──────────────────────────────

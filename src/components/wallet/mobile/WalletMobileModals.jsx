@@ -70,6 +70,9 @@ export default function WalletMobileModals({
   setAddressLabel,
   saveAddress,
 
+  // toast
+  toast,
+
   // mobile cash uses augmentedTokens (not selectableTokens)
   augmentedTokens,
 }) {
@@ -169,7 +172,7 @@ export default function WalletMobileModals({
           setShowSaveAddressPrompt(false);
           setAddressLabel("");
           setAddressToSave("");
-          alert("✅ Address saved!");
+          toast?.success("Address saved!");
         }}
       />
 
