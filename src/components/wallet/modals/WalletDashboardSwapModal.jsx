@@ -461,15 +461,10 @@ export default function WalletDashboardSwapModal({
                                 "ui_connect_your_wallet_to_activ_ec68e6f427",
                                 "Connect your wallet to activate currency lines.",
                               )
-                            : isWalletActivated === false
-                              ? t(
-                                  "ui_wallet_activation_required_f4",
-                                  "Wallet must be activated to create currency lines.",
-                                )
-                              : t(
-                                  "ui_trustlines_required_currency_lines_f4",
-                                  "USD trustline is required to create currency lines.",
-                                )}
+                            : t(
+                                "ui_trustlines_required_currency_lines_f4",
+                                "USD trustline is required to create currency lines.",
+                              )}
                         </p>
                       ) : null}
 
