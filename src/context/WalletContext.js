@@ -85,6 +85,9 @@ export const WalletProviderSwitch = ({ children }) => {
     // --- Multi-wallet ---
     walletAddresses: current.walletAddresses || [],
     switchWallet: current.switchWallet || (() => {}),
+    
+    // --- PWA-only: navigate to create/import screen ---
+    goToChoice: current.goToChoice || null,
   }), [
     current.wallet,
     current.isConnected,
@@ -100,6 +103,7 @@ export const WalletProviderSwitch = ({ children }) => {
     current.closeQrModal,
     current.walletAddresses,
     current.switchWallet,
+    current.goToChoice,
   ]);
 
   return (

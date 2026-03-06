@@ -13,7 +13,7 @@
  * xrpl.js functions used:
  *   Wallet.fromMnemonic, Wallet.fromSeed
  *   wallet.sign, wallet.verifyTransaction, wallet.getXAddress
- *   walletFromSecretNumbers, validate, isValidSecret
+ *   validate, isValidSecret
  *   convertStringToHex
  */
 
@@ -78,22 +78,6 @@ export function walletFromMnemonic(mnemonic) {
     publicKey: wallet.publicKey,
     wallet,
     xAddress: wallet.getXAddress(),
-  };
-}
-
-/**
- * Restore a wallet from "secret numbers" format (8 groups of 6 digits).
- * Useful for users migrating from other XRPL wallets.
- *
- * @param {string} secretNumbers - e.g. "123456 234567 345678 456789 567890 678901 789012 890123"
- * @returns {{ address: string, publicKey: string, wallet: object }}
- */
-export function walletFromSecretNumbers(secretNumbers) {
-  const wallet = xrpl.walletFromSecretNumbers(secretNumbers);
-  return {
-    address: wallet.classicAddress,
-    publicKey: wallet.publicKey,
-    wallet,
   };
 }
 

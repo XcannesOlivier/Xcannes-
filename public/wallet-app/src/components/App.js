@@ -6,7 +6,7 @@
  * First launch:
  *   Splash → Welcome → Terms → PIN Creation → Optional Face ID → Choice (Create / Import)
  *   → Create: Generate → Mnemonic Backup → Verify → Home
- *   → Import: Mnemonic/Seed/SecretNumbers → Home
+ *   → Import: Mnemonic → Home
  *
  * Returning user:
  *   Splash → Face ID (instant) or PIN → Home (wallet list)
@@ -17,7 +17,7 @@
  * Vanilla JS — no framework dependency, minimal footprint.
  */
 
-import { generateWallet, walletFromSeed, walletFromMnemonic, walletFromSecretNumbers, signTransaction, signChallenge, clearWalletFromMemory, isValidSeed } from '../services/walletService.js';
+import { generateWallet, walletFromSeed, walletFromMnemonic, signTransaction, signChallenge, clearWalletFromMemory } from '../services/walletService.js';
 import { registerBiometric, promptBiometric, isBiometricAvailable } from '../services/webauthnService.js';
 import {
   saveWallet, getWallet, getAllWallets, getLastUsedWallet, hasWallets, deleteWallet, touchWallet,
@@ -709,45 +709,15 @@ function setupBackupVerifyScreen(words) {
 // 8. IMPORT
 // ==========================================
 
-let importWordCount = 12;
+// Mnemonic import is always 12 words
 
 function setupImportScreen() {
-  const tabs = document.querySelectorAll('#import-tabs .tab');
-  const panels = document.querySelectorAll('.tab-panel');
   const btnBack = document.getElementById('btn-import-back');
   const btnConfirm = document.getElementById('btn-import-confirm');
   const statusEl = document.getElementById('import-status');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(`panel-${tab.dataset.tab}`)?.classList.add('active');
-    });
-  });
-
-  // Build mnemonic grid
-  buildMnemonicImportGrid(importWordCount);
-
-  // 12/24 toggle
-  const toggleBtns = document.querySelectorAll('.word-toggle-btn');
-  toggleBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      toggleBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      importWordCount = parseInt(btn.dataset.words, 10);
-      buildMnemonicImportGrid(importWordCount);
-    });
-  });
-
-  const snInputs = document.querySelectorAll('#secret-numbers-grid input');
-  snInputs.forEach((inp, i) => {
-    inp.addEventListener('input', () => {
-      inp.value = inp.value.replace(/\D/g, '').slice(0, 6);
-      if (inp.value.length === 6 && i < snInputs.length - 1) snInputs[i + 1].focus();
-    });
-  });
+  // Build mnemonic grid (always 12 words)
+  buildMnemonicImportGrid(12);
 
   btnBack?.addEventListener('click', () => {
     showScreen('choice');
@@ -794,59 +764,26 @@ function buildMnemonicImportGrid(count) {
 }
 
 async function handleImport(statusEl) {
-  const activeTab = document.querySelector('#import-tabs .tab.active')?.dataset.tab;
-
   try {
     let walletResult, seedForStorage;
 
-    if (activeTab === 'seed') {
-      const seed = document.getElementById('import-seed-input')?.value?.trim();
-      if (!seed) { updateStatus(statusEl, '❌ Veuillez entrer un seed.', true); rearmImport(statusEl); return; }
-      if (!isValidSeed(seed)) { updateStatus(statusEl, '❌ Seed invalide. Format : sXXXX…', true); rearmImport(statusEl); return; }
-      updateStatus(statusEl, 'Restauration…');
-      walletResult = walletFromSeed(seed);
-      seedForStorage = seed;
-
-    } else if (activeTab === 'mnemonic') {
-      const inputs = document.querySelectorAll('#import-mnemonic-grid .import-word-input');
-      const words = [];
-      let emptyCount = 0;
-      inputs.forEach(inp => {
-        const w = inp.value.trim().toLowerCase();
-        if (!w) emptyCount++;
-        words.push(w);
-      });
-      if (emptyCount > 0) { updateStatus(statusEl, `❌ ${emptyCount} mot${emptyCount > 1 ? 's' : ''} manquant${emptyCount > 1 ? 's' : ''}.`, true); rearmImport(statusEl); return; }
-      const mnemonic = words.join(' ');
-      updateStatus(statusEl, 'Restauration…');
-      walletResult = walletFromMnemonic(mnemonic);
-      seedForStorage = mnemonic;
-
-    } else if (activeTab === 'secretnumbers') {
-      const inputs = document.querySelectorAll('#secret-numbers-grid input');
-      const rows = [];
-      let invalid = false;
-      inputs.forEach(inp => {
-        const val = inp.value.trim();
-        if (val.length !== 6 || !/^\d{6}$/.test(val)) invalid = true;
-        rows.push(val);
-      });
-      if (invalid) { updateStatus(statusEl, '❌ Toutes les rangées doivent contenir 6 chiffres.', true); rearmImport(statusEl); return; }
-      updateStatus(statusEl, 'Restauration depuis Secret Numbers…');
-      const secretNumbers = rows.join(' ');
-      walletResult = walletFromSecretNumbers(secretNumbers);
-      seedForStorage = walletResult.wallet?.seed || secretNumbers;
-
-    } else {
-      updateStatus(statusEl, '❌ Onglet inconnu.', true);
-      rearmImport(statusEl);
-      return;
-    }
+    // Import from mnemonic (12 words)
+    const inputs = document.querySelectorAll('#import-mnemonic-grid .import-word-input');
+    const words = [];
+    let emptyCount = 0;
+    inputs.forEach(inp => {
+      const w = inp.value.trim().toLowerCase();
+      if (!w) emptyCount++;
+      words.push(w);
+    });
+    if (emptyCount > 0) { updateStatus(statusEl, `❌ ${emptyCount} mot${emptyCount > 1 ? 's' : ''} manquant${emptyCount > 1 ? 's' : ''}.`, true); rearmImport(statusEl); return; }
+    const mnemonic = words.join(' ');
+    updateStatus(statusEl, 'Restauration…');
+    walletResult = walletFromMnemonic(mnemonic);
+    seedForStorage = mnemonic;
 
     // Clear inputs
-    document.getElementById('import-seed-input') && (document.getElementById('import-seed-input').value = '');
     document.querySelectorAll('#import-mnemonic-grid .import-word-input').forEach(inp => inp.value = '');
-    document.querySelectorAll('#secret-numbers-grid input').forEach(inp => inp.value = '');
 
     // Confirm with Face ID or PIN before saving
     const confirmed = await confirmWithAuth('Sécurisez ce wallet', `Confirmez pour chiffrer et sauvegarder le wallet ${walletResult.address.slice(0, 8)}…`);
@@ -1043,20 +980,26 @@ async function goToHome() {
   // Load last used wallet if not already set
   if (!currentWallet) {
     const wallets = await getAllWallets();
-    if (wallets.length > 0) {
-      const lastUsed = wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0))[0];
-      const masterKey = getMasterKey();
-      try {
-        const seed = await decryptWithMasterKey(lastUsed.encryptedSeed, masterKey);
-        let w;
-        if (seed.includes(' ')) { w = walletFromMnemonic(seed); } else { w = walletFromSeed(seed); }
-        currentWallet = { wallet: w.wallet, address: w.address, publicKey: w.publicKey };
-      } catch {
-        // Cannot decrypt — show choice
-        showScreen('choice');
-        setupChoiceScreen();
-        return;
-      }
+    
+    // No wallets saved yet — go back to choice screen (create or import)
+    if (wallets.length === 0) {
+      showScreen('choice');
+      setupChoiceScreen();
+      return;
+    }
+    
+    const lastUsed = wallets.sort((a, b) => (b.lastUsedAt || 0) - (a.lastUsedAt || 0))[0];
+    const masterKey = getMasterKey();
+    try {
+      const seed = await decryptWithMasterKey(lastUsed.encryptedSeed, masterKey);
+      let w;
+      if (seed.includes(' ')) { w = walletFromMnemonic(seed); } else { w = walletFromSeed(seed); }
+      currentWallet = { wallet: w.wallet, address: w.address, publicKey: w.publicKey };
+    } catch {
+      // Cannot decrypt — show choice
+      showScreen('choice');
+      setupChoiceScreen();
+      return;
     }
   }
 
@@ -1204,6 +1147,12 @@ function setupWalletEmbedded() {
       case 'SWITCH_WALLET':
         // Dashboard requests switching to a different wallet
         if (data.address) handleSwitchWalletFromIframe(data.address);
+        break;
+
+      case 'GO_TO_CHOICE':
+        // Dashboard requests navigation to create/import screen
+        // User is already authenticated in the iframe, so go directly
+        goToChoice();
         break;
 
       default:
