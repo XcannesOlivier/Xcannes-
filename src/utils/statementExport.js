@@ -25,40 +25,6 @@ export function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
-function escapeCsvValue(value) {
-  if (value == null) return "";
-  const raw = String(value);
-  if (/[\",\n\r]/.test(raw)) {
-    return `"${raw.replace(/\"/g, "\"\"")}"`;
-  }
-  return raw;
-}
-
-export function buildCsvString(headers, rows) {
-  const lines = [];
-  if (Array.isArray(headers) && headers.length > 0) {
-    lines.push(headers.map(escapeCsvValue).join(","));
-  }
-  (rows || []).forEach((row) => {
-    lines.push((row || []).map(escapeCsvValue).join(","));
-  });
-  return lines.join("\n");
-}
-
-export function downloadTextFile({ filename, content, type = "text/plain;charset=utf-8" }) {
-  if (typeof window === "undefined") return false;
-  const blob = new Blob([content], { type });
-  const url = window.URL.createObjectURL(blob);
-  const link = window.document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  window.document.body.appendChild(link);
-  link.click();
-  window.document.body.removeChild(link);
-  window.setTimeout(() => window.URL.revokeObjectURL(url), 500);
-  return true;
-}
-
 function fallbackHash(input) {
   let hash = 2166136261;
   for (let i = 0; i < input.length; i += 1) {
