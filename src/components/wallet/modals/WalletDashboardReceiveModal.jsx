@@ -2,6 +2,7 @@
 
 import { Buffer } from "buffer";
 import { useEffect, useMemo, useRef, useState } from "react";
+import useIsDesktop from "../hooks/useIsDesktop";
 import { QRCodeCanvas } from "qrcode.react";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -58,7 +59,7 @@ export default function WalletDashboardReceiveModal({
     "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isDesktop = useIsDesktop();
   const [copyToast, setCopyToast] = useState("");
   const copyToastTimerRef = useRef(null);
   const autoCloseTimerRef = useRef(null);
@@ -100,19 +101,6 @@ export default function WalletDashboardReceiveModal({
         autoCloseTimerRef.current = null;
       }
     };
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
   }, []);
 
   useEffect(() => {

@@ -170,11 +170,7 @@ export default function WalletDashboard({
   } = useWalletLabel({
     walletAddress: wallet,
     isConnected,
-    isPreviewMode: false,
-    isWalletActivated,
-    hasOnChainRlusd,
     defaultLabel: t("nav_wallet", "Wallet"),
-    signTransaction,
   });
   const defaultWalletLabel = t("nav_wallet", "Wallet");
   const walletHasCustomLabel = Boolean(
@@ -417,7 +413,6 @@ export default function WalletDashboard({
     augmentedTokens,
     isPreviewMode: false,
     stableUsd,
-    xrpAmount,
     demoTotalUsd: 0,
     isStablecoin,
     fiatRates: rlusdPerUnitRates,

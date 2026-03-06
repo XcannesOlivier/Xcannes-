@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import useIsDesktop from "../hooks/useIsDesktop";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -44,7 +45,7 @@ export default function WalletDashboardSendModal({
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [requestText, setRequestText] = useState("");
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isDesktop = useIsDesktop();
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
@@ -318,19 +319,6 @@ export default function WalletDashboardSendModal({
     setScanKey((prev) => prev + 1);
     setCameraUnavailable(false);
   }, [open]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, []);
 
   useEffect(() => {
     if (!canSaveDestination) {
