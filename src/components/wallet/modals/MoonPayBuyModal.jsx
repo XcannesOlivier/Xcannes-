@@ -67,7 +67,7 @@ const MoonPayBuyModal = ({
   const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
-  const { balance, signTransaction } = useWallet();
+  const { signTransaction } = useWallet();
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");

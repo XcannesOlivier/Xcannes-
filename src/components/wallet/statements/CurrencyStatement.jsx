@@ -41,7 +41,7 @@ import useCurrencyStatementFormatters from "./useCurrencyStatementFormatters";
 export default function CurrencyStatement({
   currency,
   balance,
-  issuer,
+  issuer: _issuer,
   walletAddress,
   walletLabelOverride = "",
   isPreviewMode = false,
@@ -59,7 +59,7 @@ export default function CurrencyStatement({
   inline = false,
   usdRates = {},
   hasRlusdTrustline = false,
-  rlusdBalance = null,
+  rlusdBalance: _rlusdBalance = null,
   statementMonths = [],
   highlightTransactionId = null,
   onClose,
@@ -283,8 +283,6 @@ export default function CurrencyStatement({
   /* ── export helpers ────────────────────────────────────── */
   const buildPrintHtml = useCallback(() => {
     const generatedAt = new Date().toLocaleString(locale);
-    const ledgerIndexLabel =
-      ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
     const docHashLabel = docHash || "-";
     const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const balanceValue = Number.isFinite(Number(balance)) ? Number(balance) : 0;

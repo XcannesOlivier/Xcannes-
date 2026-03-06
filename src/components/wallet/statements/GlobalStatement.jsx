@@ -34,11 +34,11 @@ export default function GlobalStatement({
   usdRates = {},
   totalBalanceOverride = null,
   movements = [],
-  movementsLoading = false,
-  movementsError = null,
-  movementsHasMore = false,
-  movementsLoadingMore = false,
-  onLoadMoreMovements,
+  movementsLoading: _movementsLoading = false,
+  movementsError: _movementsError = null,
+  movementsHasMore: _movementsHasMore = false,
+  movementsLoadingMore: _movementsLoadingMore = false,
+  onLoadMoreMovements: _onLoadMoreMovements,
   onClose,
   onViewCurrency,
   toast,
@@ -251,9 +251,6 @@ export default function GlobalStatement({
   /* ── export helpers ────────────────────────────────────── */
   const buildPrintHtml = useCallback(() => {
     const docHashLabel = docHash || "-";
-    const ledgerIndexLabel =
-      ledgerLastIndex != null ? String(ledgerLastIndex) : "-";
-    const walletLabelText = walletLabel || t("nav_wallet", "Wallet");
     const totalBalanceDisplay = Number.isFinite(Number(totalBalance))
       ? formatAmountWithSymbolLocal(totalBalance, "USD")
       : "-";
@@ -412,34 +409,6 @@ export default function GlobalStatement({
       else window.alert(msg);
     }
   }, [buildPrintHtml, docHash, t]);
-
-  /* ── category badge ────────────────────────────────────── */
-  const getCategoryBadge = (token) => {
-    if (token.currency === "XRP") {
-      return {
-        label: t("ui_label_native_2d7a1c9b4e", "Native"),
-        color: "blue",
-      };
-    }
-    if (token.currency === "RLUSD") {
-      return {
-        label: t("ui_label_platform_7c1a9d3b5e", "Platform"),
-        color: "green",
-      };
-    }
-    if (isUsdStablecoin(token.currency))
-      return {
-        label: t("ui_label_stablecoin_9b2c7a1d5e", "Stablecoin"),
-        color: "purple",
-      };
-    if (token.isTrustlineOnly) {
-      return {
-        label: t("ui_label_exchange_rate_5a1c7b9d3e", "Exchange Rate"),
-        color: "orange",
-      };
-    }
-    return { label: t("ui_label_token_1c7b3a9d5e", "Token"), color: "gray" };
-  };
 
   /* ── layout (GlobalStatement uses wider max-widths) ────── */
   const STATEMENT_LAYOUTS = {
@@ -610,7 +579,6 @@ export default function GlobalStatement({
                 </thead>
                 <tbody>
                   {sortedTokens.map((token, idx) => {
-                    const badge = getCategoryBadge(token);
                     const usdValue = getUsdValue(token);
 
                     return (

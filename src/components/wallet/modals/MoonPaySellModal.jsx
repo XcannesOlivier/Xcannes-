@@ -52,7 +52,7 @@ const MoonPaySellModal = ({
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const { signTransaction, balance } = useWallet();
+  const { signTransaction } = useWallet();
 
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);

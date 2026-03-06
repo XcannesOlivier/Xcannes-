@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
+import { useWallet } from "@/context/WalletContext";
 
 /**
  * Settings gear button + dropdown menu.
@@ -16,6 +17,7 @@ export default function WalletSettingsDropdown({
   onOpenInfo,
 }) {
   const { t } = useTranslation("common");
+  const { goToChoice } = useWallet();
   const [isOpen, setIsOpen] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const ref = useRef(null);
@@ -90,19 +92,26 @@ export default function WalletSettingsDropdown({
             <div className="my-1 mx-3 border-t border-white/8" />
 
             {/* Créer ou importer */}
-            {/* Mobile: lien direct | Desktop: QR code scanné par wallet-app */}
-            <a
-              href="/wallet-app/?action=choice"
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* PWA embedded: use goToChoice | Desktop: QR code */}
+            <button
+              type="button"
               onClick={(e) => {
+                e.preventDefault();
+                setIsOpen(false);
+                
+                // PWA mode: navigate directly to choice screen (already authenticated)
+                if (goToChoice) {
+                  goToChoice();
+                  return;
+                }
+                
+                // Desktop: show QR modal for wallet-app to scan
                 const isDesktop = window.matchMedia("(min-width: 768px)").matches;
                 if (isDesktop) {
-                  e.preventDefault();
-                  setIsOpen(false);
                   setShowQrModal(true);
                 } else {
-                  setIsOpen(false);
+                  // Non-PWA mobile: open wallet-app in new tab
+                  window.open("/wallet-app/?action=choice", "_blank");
                 }
               }}
               className="w-full flex items-center gap-2.5 px-3.5 py-2 text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors"
@@ -121,7 +130,7 @@ export default function WalletSettingsDropdown({
                 />
               </svg>
               {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
-            </a>
+            </button>
 
             {/* Stablecoin détails */}
             <a
