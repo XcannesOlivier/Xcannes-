@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
-import xcannesApi from "@/lib/xcannesApi";
-
 
 import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
@@ -165,18 +163,10 @@ export default function WalletDashboard({
   // ── Wallet label ───────────────────────────────────────────
   const {
     walletLabel,
-    walletLabelDraft,
-    setWalletLabelDraft,
-    isEditingWalletLabel,
-    isWalletLabelRequired,
     isWalletLabelLocked,
     walletHeaderToast,
     flashWalletHeaderToast,
-    openWalletLabelEditor: handleOpenWalletLabelEditor,
-    saveWalletLabel: handleSaveWalletLabel,
-    cancelWalletLabel: handleCancelWalletLabel,
     loadWalletLabel,
-    defaultCurrency: walletDefaultCurrency,
   } = useWalletLabel({
     walletAddress: wallet,
     isConnected,
@@ -361,7 +351,6 @@ export default function WalletDashboard({
     handleActivateCurrencyLine,
     handleUpsertCurrencyLine,
     handleAction,
-    handleOpenCurrencyLines,
     handleOpenCurrencyStatement,
     handleOpenInfo,
     handleOpenGlobalStatement,

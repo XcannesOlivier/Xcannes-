@@ -140,16 +140,6 @@ export function useWalletNavigation({
     ],
   );
 
-  // ─── Open currency lines view ─────────────────────────────────────────
-
-  const handleOpenCurrencyLines = useCallback(() => {
-    closeInlineQr();
-    setWalletInfoOpen(false);
-    setSwapDefaultView("lines");
-    setSwapLockedView("lines");
-    setActiveAction("swap");
-  }, [closeInlineQr, setActiveAction, setWalletInfoOpen, setSwapDefaultView, setSwapLockedView]);
-
   // ─── Open currency statement ──────────────────────────────────────────
 
   const handleOpenCurrencyStatement = useCallback(
@@ -397,7 +387,6 @@ export function useWalletNavigation({
     handleActivateCurrencyLine,
     handleUpsertCurrencyLine,
     handleAction,
-    handleOpenCurrencyLines,
     handleOpenCurrencyStatement,
     handleOpenInfo,
     handleOpenGlobalStatement,
