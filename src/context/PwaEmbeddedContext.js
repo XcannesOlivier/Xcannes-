@@ -421,6 +421,11 @@ export const PwaEmbeddedProvider = ({ children }) => {
     postToPwa({ type: "SWITCH_WALLET", address });
   }, []);
 
+  // Navigate to create/import wallet screen in PWA
+  const goToChoice = useCallback(() => {
+    postToPwa({ type: "GO_TO_CHOICE" });
+  }, []);
+
   // No QR modal in embedded mode
   const qrModalData = null;
   const closeQrModal = useCallback(() => {}, []);
@@ -440,6 +445,7 @@ export const PwaEmbeddedProvider = ({ children }) => {
     signTransaction,
     closeQrModal,
     switchWallet,
+    goToChoice,
   }), [
     wallet,
     isConnected,
@@ -455,6 +461,7 @@ export const PwaEmbeddedProvider = ({ children }) => {
     signTransaction,
     closeQrModal,
     switchWallet,
+    goToChoice,
   ]);
 
   return (

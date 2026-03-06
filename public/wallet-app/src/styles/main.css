@@ -763,8 +763,12 @@ textarea.error {
 .mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 10px 16px;
   margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .mnemonic-word {
@@ -772,30 +776,37 @@ textarea.error {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: border-color 0.15s;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
 .mnemonic-word:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(22, 163, 74, 0.4);
+  background: rgba(22, 163, 74, 0.08);
 }
 
 .mnemonic-num {
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--accent);
-  min-width: 18px;
-  text-align: center;
-  font-family: var(--font-manrope);
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(22, 163, 74, 0.12);
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
 .mnemonic-text {
-  font-size: 13px;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--text-primary);
-  font-family: 'SF Mono', 'Menlo', monospace;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  letter-spacing: 0.02em;
 }
 
 /* ===== VERIFY FIELDS (sequential 1–12) ===== */
@@ -986,51 +997,6 @@ textarea.error {
   color: var(--text-tertiary);
   margin-bottom: 12px;
   line-height: 1.5;
-}
-
-/* ===== SECRET NUMBERS GRID (import Xaman) ===== */
-
-.secret-numbers-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.sn-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.sn-row label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--accent);
-  width: 20px;
-  text-align: center;
-  flex-shrink: 0;
-  font-family: var(--font-manrope);
-}
-
-.sn-row input {
-  flex: 1;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text-primary);
-  font-size: 16px;
-  font-family: 'SF Mono', 'Menlo', monospace;
-  letter-spacing: 4px;
-  text-align: center;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.sn-row input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.15);
 }
 
 /* ===== HOME SCREEN ===== */
@@ -1395,60 +1361,46 @@ textarea.error {
 
 /* ===== IMPORT MNEMONIC GRID ===== */
 
-.import-word-toggle {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.word-toggle-btn {
-  padding: 6px 18px;
-  border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  background: transparent;
-  color: var(--text-tertiary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.word-toggle-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
 .import-mnemonic-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .import-word-cell {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 8px;
-  padding: 6px 8px;
-  transition: border-color 0.2s;
+  gap: 8px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: all 0.2s ease;
 }
 
 .import-word-cell:focus-within {
   border-color: var(--accent);
+  background: rgba(22, 163, 74, 0.08);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
 }
 
 .import-word-num {
-  font-size: 0.65rem;
-  color: var(--text-tertiary);
-  min-width: 16px;
-  text-align: center;
-  font-weight: 600;
-  opacity: 0.6;
+  font-size: 0.75rem;
+  color: var(--accent);
+  min-width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(22, 163, 74, 0.12);
+  border-radius: 6px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .import-word-input {
@@ -1456,20 +1408,30 @@ textarea.error {
   border: none;
   background: transparent;
   color: var(--text-primary);
-  font-size: 0.8rem;
-  font-family: inherit;
+  font-size: 0.95rem;
+  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  font-weight: 500;
   outline: none;
-  padding: 2px 0;
+  padding: 0;
+  letter-spacing: 0.02em;
 }
 
 .import-word-input::placeholder {
-  color: rgba(148, 163, 184, 0.3);
-  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.35);
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 400;
 }
 
-@media (max-width: 380px) {
+@media (max-width: 340px) {
   .import-mnemonic-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+  
+  .import-word-cell {
+    padding: 12px;
   }
 }
 
