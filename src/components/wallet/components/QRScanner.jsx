@@ -189,9 +189,10 @@ export default function QRScanner({
         await html5QrCode.start(
           cameraIdOrConfig,
           {
-            fps: 20,
+            fps: 25,
             qrbox: { width: boxSize, height: boxSize },
-            disableFlip: true,
+            aspectRatio: 1.0,
+            disableFlip: false,
             experimentalFeatures: { useBarCodeDetectorIfSupported: true },
           },
           (decodedText) => {
@@ -219,7 +220,8 @@ export default function QRScanner({
         setIsScanning(true);
         setCameraUnavailable(false);
         try {
-          const desiredZoom = 2.5;
+          // Moderate zoom to balance between close-up QR codes and larger/dense payreq QR codes
+          const desiredZoom = 1.8;
           const caps = html5QrCode.getRunningTrackCameraCapabilities?.();
           const zoomFeature = caps?.zoomFeature?.();
           if (zoomFeature && zoomFeature.isSupported()) {

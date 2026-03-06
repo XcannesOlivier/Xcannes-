@@ -6,6 +6,8 @@ import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
 import { parseRelayChallenge, forwardRelayChallengeToPwa } from "@/utils/relayChallenge";
 import { isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
+const DEBUG_PAYREQ_SCAN = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
+
 export function usePaymentRequestScanner({
   augmentedTokens,
   setSendDestination,
@@ -29,6 +31,10 @@ export function usePaymentRequestScanner({
     (data) => {
       const raw = String(data || "").trim();
 
+      if (DEBUG_PAYREQ_SCAN) {
+        console.log("[PayreqScan] Raw input:", raw?.substring(0, 100), raw?.length > 100 ? "..." : "");
+      }
+
       // ── Relay challenge detection (wallet connect/sign via PWA) ──
       const relayChallenge = parseRelayChallenge(raw);
       if (relayChallenge && isPwaEmbedded()) {
@@ -40,6 +46,9 @@ export function usePaymentRequestScanner({
         const match = String(value || "").match(
           /^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i,
         );
+        if (DEBUG_PAYREQ_SCAN) {
+          console.log("[PayreqScan] Prefix match:", match ? "yes" : "no");
+        }
         if (!match) return null;
         const payload = String(match[2] || "").trim();
         if (!payload) return null;
@@ -47,7 +56,11 @@ export function usePaymentRequestScanner({
           const padded =
             payload.replace(/-/g, "+").replace(/_/g, "/") +
             "===".slice((payload.length + 3) % 4);
-          return Buffer.from(padded, "base64").toString("utf8");
+          const decoded = Buffer.from(padded, "base64").toString("utf8");
+          if (DEBUG_PAYREQ_SCAN) {
+            console.log("[PayreqScan] Decoded JSON:", decoded?.substring(0, 80));
+          }
+          return decoded;
         } catch {
           return null;
         }
@@ -55,14 +68,19 @@ export function usePaymentRequestScanner({
       const normalizePayreqPayload = (request) => {
         if (!request || typeof request !== "object") return request;
         const normalized = { ...request };
+        // Schema may be omitted — infer from prefix (xcannes-payreq:)
         if (request.s && !normalized.schema) normalized.schema = request.s;
+        if (!normalized.schema) normalized.schema = XCANNES_MEMO_SCHEMAS.payreq.schema;
         if (request.tc && !normalized.targetCurrency)
           normalized.targetCurrency = request.tc;
         if (request.t && !normalized.to) normalized.to = request.t;
         if (request.da != null && normalized.displayAmount == null)
           normalized.displayAmount = request.da;
+        // displayCurrency defaults to targetCurrency when omitted
         if (request.dc && !normalized.displayCurrency)
           normalized.displayCurrency = request.dc;
+        if (!normalized.displayCurrency && normalized.targetCurrency)
+          normalized.displayCurrency = normalized.targetCurrency;
         if (request.ar != null && normalized.amountRlusd == null)
           normalized.amountRlusd = request.ar;
         if (request.fr != null && normalized.fxRate == null)
@@ -148,6 +166,9 @@ export function usePaymentRequestScanner({
       try {
         // 1) JSON
         const requestRaw = JSON.parse(payload);
+        if (DEBUG_PAYREQ_SCAN) {
+          console.log("[PayreqScan] Parsed request:", requestRaw?.to ? "has 'to'" : "no 'to'", requestRaw?.s || requestRaw?.schema || "no schema");
+        }
         const request = normalizePayreqPayload(requestRaw);
         if (request && request.to) {
           const schema = String(
@@ -340,6 +361,9 @@ export function usePaymentRequestScanner({
         return;
       }
 
+      if (DEBUG_PAYREQ_SCAN) {
+        console.log("[PayreqScan] Format not supported. Raw data:", raw?.substring(0, 50));
+      }
       toast?.error("QR code scanned, but format is not supported.");
     },
     [
