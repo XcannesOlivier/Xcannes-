@@ -212,17 +212,13 @@ export function useWalletLabel({
 
   return {
     walletLabel,
-    walletLabelDraft,
-    setWalletLabelDraft,
-    isEditingWalletLabel,
-    isWalletLabelRequired,
     isWalletLabelLocked,
     walletHeaderToast,
     flashWalletHeaderToast,
-    openWalletLabelEditor,
-    saveWalletLabel,
-    cancelWalletLabel,
     loadWalletLabel,
-    defaultCurrency,
+    // Dead exports removed (6 mars 2026):
+    // walletLabelDraft, setWalletLabelDraft, isEditingWalletLabel,
+    // isWalletLabelRequired, openWalletLabelEditor, saveWalletLabel,
+    // cancelWalletLabel, defaultCurrency
   };
 }

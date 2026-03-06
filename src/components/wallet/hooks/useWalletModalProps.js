@@ -15,7 +15,6 @@ export function useWalletModalProps({
   wallet,
   isConnected,
   isWalletActivated,
-  hasRlusdTrustline,
   hasOnChainRlusd,
   walletLabel,
   walletHasCustomLabel,
@@ -146,8 +145,6 @@ export function useWalletModalProps({
   // --- Send modal props ---
   const sendModalProps = useMemo(
     () => ({
-      isWalletActivated,
-      hasRlusdTrustline,
       qrSizingVariant,
       renderWalletMeta,
       augmentedTokens: selectableTokens,
@@ -171,8 +168,6 @@ export function useWalletModalProps({
       enableSaveAddress: true,
     }),
     [
-      isWalletActivated,
-      hasRlusdTrustline,
       qrSizingVariant,
       renderWalletMeta,
       selectableTokens,
@@ -199,8 +194,6 @@ export function useWalletModalProps({
   // --- Payreq modal props ---
   const payreqModalProps = useMemo(
     () => ({
-      isWalletActivated,
-      hasRlusdTrustline,
       renderWalletMeta,
       augmentedTokens: selectableTokens,
       selectedSendToken,
@@ -222,8 +215,6 @@ export function useWalletModalProps({
       removePayreq,
     }),
     [
-      isWalletActivated,
-      hasRlusdTrustline,
       renderWalletMeta,
       selectableTokens,
       selectedSendToken,
@@ -248,8 +239,6 @@ export function useWalletModalProps({
   // --- Receive modal props ---
   const receiveModalProps = useMemo(
     () => ({
-      isWalletActivated,
-      hasRlusdTrustline,
       dashboardVariant: "full",
       receiveTab,
       setReceiveTab,
@@ -272,8 +261,6 @@ export function useWalletModalProps({
       walletLabel,
     }),
     [
-      isWalletActivated,
-      hasRlusdTrustline,
       receiveTab,
       setReceiveTab,
       renderWalletMeta,
@@ -305,7 +292,6 @@ export function useWalletModalProps({
       dashboardVariant: "full",
       isConnected,
       isWalletActivated,
-      hasRlusdTrustline,
       walletAddress: wallet,
       onConnectWallet: connect,
       hasOnChainRlusd,
@@ -343,7 +329,6 @@ export function useWalletModalProps({
       swapLockedView,
       isConnected,
       isWalletActivated,
-      hasRlusdTrustline,
       wallet,
       connect,
       hasOnChainRlusd,
@@ -380,8 +365,6 @@ export function useWalletModalProps({
   // --- Cash modal props ---
   const cashModalProps = useMemo(
     () => ({
-      isWalletActivated,
-      hasRlusdTrustline,
       cashModalTab,
       setCashModalTab,
       renderWalletMeta,
@@ -396,8 +379,6 @@ export function useWalletModalProps({
       buyPrefill: cashBuyPrefill,
     }),
     [
-      isWalletActivated,
-      hasRlusdTrustline,
       cashModalTab,
       setCashModalTab,
       renderWalletMeta,
@@ -416,8 +397,6 @@ export function useWalletModalProps({
   // --- Adjust modal props ---
   const adjustModalProps = useMemo(
     () => ({
-      isWalletActivated,
-      hasRlusdTrustline,
       renderWalletMeta,
       walletAddress: wallet,
       signTransaction,
@@ -429,8 +408,6 @@ export function useWalletModalProps({
       adjustmentFeeRlusd,
     }),
     [
-      isWalletActivated,
-      hasRlusdTrustline,
       renderWalletMeta,
       wallet,
       signTransaction,
@@ -452,8 +429,6 @@ export function useWalletModalProps({
       activationBundleEnabled,
       onToggleActivationBundle: setActivationBundleEnabled,
       activationAmountXrp: activationXrpAmount,
-      isWalletActivated,
-      hasRlusdTrustline,
     }),
     [
       handleActivationSendFromWallet,
@@ -462,8 +437,6 @@ export function useWalletModalProps({
       activationBundleEnabled,
       setActivationBundleEnabled,
       activationXrpAmount,
-      isWalletActivated,
-      hasRlusdTrustline,
     ],
   );
 
@@ -481,11 +454,8 @@ export function useWalletModalProps({
 
   // --- Info modal props ---
   const infoModalProps = useMemo(
-    () => ({
-      isWalletActivated,
-      hasRlusdTrustline,
-    }),
-    [isWalletActivated, hasRlusdTrustline],
+    () => ({}),
+    [],
   );
 
   // --- Statement shared props ---

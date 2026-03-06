@@ -15,7 +15,6 @@ import { useState, useCallback, useEffect } from "react";
  *   pendingPayreqs: Array<object>,
  *   savePayreq: (payreq: object) => string | null,
  *   removePayreq: (id: string) => void,
- *   clearAllPayreqs: () => void,
  *   pendingCount: number,
  * }}
  */
@@ -121,20 +120,10 @@ export function usePayreqStorage({ walletAddress } = {}) {
     [storageKey, writeToStorage],
   );
 
-  // ----------------------------------------------------------------
-  // Clear all
-  // ----------------------------------------------------------------
-  const clearAllPayreqs = useCallback(() => {
-    if (!storageKey) return;
-    setPendingPayreqs([]);
-    writeToStorage([]);
-  }, [storageKey, writeToStorage]);
-
   return {
     pendingPayreqs,
     savePayreq,
     removePayreq,
-    clearAllPayreqs,
     pendingCount: pendingPayreqs.length,
   };
 }

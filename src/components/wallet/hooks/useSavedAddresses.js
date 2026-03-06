@@ -56,16 +56,5 @@ export function useSavedAddresses(storageKey = DEFAULT_STORAGE_KEY) {
     [persist],
   );
 
-  const deleteAddress = useCallback(
-    (address) => {
-      setSavedAddresses((prev) => {
-        const next = (prev || []).filter((a) => a.address !== address);
-        persist(next);
-        return next;
-      });
-    },
-    [persist],
-  );
-
-  return { savedAddresses, saveAddress, deleteAddress };
+  return { savedAddresses, saveAddress };
 }
