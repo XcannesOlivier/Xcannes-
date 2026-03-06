@@ -14,6 +14,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import { useWallet } from "@/context/WalletContext";
 import dynamic from "next/dynamic";
 
@@ -24,6 +25,7 @@ const QRCodeCanvas = dynamic(
 
 export default function WalletRelayQRModal() {
   const router = useRouter();
+  const { t } = useTranslation("common");
   const { qrModalData, closeQrModal, isConnected } = useWallet();
   const [closing, setClosing] = useState(false);
 
@@ -108,21 +110,21 @@ export default function WalletRelayQRModal() {
           type="button"
           onClick={handleClose}
           className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white flex items-center justify-center transition-colors"
-          aria-label="Fermer"
+          aria-label={t("close")}
         >
           ✕
         </button>
 
         {/* Title */}
         <h3 className="text-lg font-semibold text-white mb-1">
-          {isConnect ? "Connecter votre wallet" : "Signer la transaction"}
+          {isConnect ? t("wallet_relay_title_connect") : t("wallet_relay_title_sign")}
         </h3>
         <p className="text-sm text-white/60 mb-6">
           {isMobile
-            ? "Confirmez dans votre wallet Xcannes avec Face ID, Touch ID ou votre code PIN."
+            ? t("wallet_relay_desc_mobile")
             : isConnect
-              ? "Scannez ce QR code avec votre wallet Xcannes."
-              : "Confirmez la transaction dans votre wallet."}
+              ? t("wallet_relay_desc_desktop_connect")
+              : t("wallet_relay_desc_desktop_sign")}
         </p>
 
         {/* QR Code / Mobile redirect */}

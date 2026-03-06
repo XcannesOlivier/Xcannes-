@@ -16,6 +16,7 @@ export function useWalletSwapOrchestrator({
   currencyLinesSummary,
   allocatedRlusdByCurrency,
   refreshCurrencyLines,
+  toast,
 }) {
   // ── View state ─────────────────────────────────────────────
   const [swapDefaultView, setSwapDefaultView] = useState("convert");
@@ -99,6 +100,7 @@ export function useWalletSwapOrchestrator({
     currencyLinesSummary,
     allocatedRlusdByCurrency,
     refreshCurrencyLines,
+    toast,
   });
 
   return {

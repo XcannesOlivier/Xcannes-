@@ -13,6 +13,7 @@ export function usePaymentRequestScanner({
   setSendAssetKey,
   setSendTab,
   setSendPaymentRequest,
+  toast,
 } = {}) {
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
 
@@ -339,7 +340,7 @@ export function usePaymentRequestScanner({
         return;
       }
 
-      alert("QR code scanned, but format is not supported.");
+      toast?.error("QR code scanned, but format is not supported.");
     },
     [
       augmentedTokens,
@@ -348,6 +349,7 @@ export function usePaymentRequestScanner({
       setSendDestination,
       setSendPaymentRequest,
       setSendTab,
+      toast,
     ],
   );
 

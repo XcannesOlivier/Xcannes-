@@ -1306,5 +1306,10 @@
   "ui_rlusd_benefit_title_2d3c7a1f8e": "Avantage RLUSD",
   "ui_rlusd_applied_rate_label_8e2f1c9a4b": "Taux de conversion\nappliqué",
   "ui_rlusd_program_cta_4fd1b09c3a": "Programme RLUSD",
-  "ui_rlusd_benefit_body_71b8f6c2a4": "Les conversions sont soumises à un taux standard de 1 %.\n\nLa détention de RLUSD permet d’accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l’opération.\n\nLe niveau d’optimisation évolue en fonction du volume de RLUSD détenu.\n\nIllustration :\n\n6 RLUSD → frais ajustés à 0,94 %\n\n100 RLUSD → 0 % de frais\n\nLes RLUSD ne sont ni débités ni immobilisés lors de la conversion.\nIls demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement."
+  "ui_rlusd_benefit_body_71b8f6c2a4": "Les conversions sont soumises à un taux standard de 1 %.\n\nLa détention de RLUSD permet d’accéder à des conditions de conversion optimisées, appliquées automatiquement au moment de l’opération.\n\nLe niveau d’optimisation évolue en fonction du volume de RLUSD détenu.\n\nIllustration :\n\n6 RLUSD → frais ajustés à 0,94 %\n\n100 RLUSD → 0 % de frais\n\nLes RLUSD ne sont ni débités ni immobilisés lors de la conversion.\nIls demeurent entièrement disponibles et peuvent être conservés, cédés ou renforcés librement.",
+  "wallet_relay_title_connect": "Connecter votre wallet",
+  "wallet_relay_title_sign": "Signer la transaction",
+  "wallet_relay_desc_mobile": "Confirmez dans votre wallet Xcannes avec Face ID, Touch ID ou votre code PIN.",
+  "wallet_relay_desc_desktop_connect": "Scannez ce QR code avec votre wallet Xcannes.",
+  "wallet_relay_desc_desktop_sign": "Confirmez la transaction dans votre wallet."
 }

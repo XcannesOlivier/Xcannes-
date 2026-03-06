@@ -31,6 +31,7 @@ export function useSwapConversion({
   allocatedRlusdByCurrency,
   refreshCurrencyLines,
   onDemoConvert,
+  toast,
 }) {
   useEffect(() => {
     if (!swapCurrencyOptions?.length) return;
@@ -101,12 +102,12 @@ export function useSwapConversion({
       const amountBase = Number(convertAmount || "0");
 
       if (!base || !quote || base === quote) {
-        alert("Choisissez deux devises différentes.");
+        toast?.error("Please select two different currencies.");
         return;
       }
 
       if (!Number.isFinite(amountBase) || amountBase <= 0) {
-        alert("Entrez un montant valide dans la devise de base.");
+        toast?.error("Please enter a valid amount.");
         return;
       }
 
@@ -114,19 +115,14 @@ export function useSwapConversion({
         demoLines?.[base] || (base === "RLUSD" ? demoLines?.RLUSD : null);
 
       if (!baseLine || !Number.isFinite(Number(baseLine.units || 0))) {
-        alert(
-          "Aucun solde démo disponible dans la devise de base sélectionnée.",
-        );
+        toast?.error("No demo balance available for the selected currency.");
         return;
       }
 
       const availableBaseUnits = Number(baseLine.units || 0);
       if (amountBase > availableBaseUnits + 1e-8) {
-        alert(
-          `Montant trop élevé. Solde disponible en ${base}: ${availableBaseUnits.toLocaleString(
-            "en-US",
-            { maximumFractionDigits: 4 },
-          )}.`,
+        toast?.error(
+          `Amount too high. Available ${base}: ${availableBaseUnits.toLocaleString("en-US", { maximumFractionDigits: 4 })}.`,
         );
         return;
       }
@@ -142,9 +138,7 @@ export function useSwapConversion({
           !Number.isFinite(rlusdPerQuote) ||
           rlusdPerQuote <= 0
         ) {
-          alert(
-            "Impossible de récupérer les taux de conversion pour cette paire.",
-          );
+          toast?.error("Unable to fetch conversion rates for this pair.");
           return;
         }
 
@@ -253,10 +247,7 @@ export function useSwapConversion({
         setConvertAmount("");
       } catch (error) {
         console.error("Demo convert error:", error);
-        alert(
-          "Erreur lors de la conversion démo: " +
-            (error?.message || String(error)),
-        );
+        toast?.error("Demo conversion error: " + (error?.message || String(error)));
       } finally {
         setConvertProcessing(false);
       }
@@ -265,15 +256,15 @@ export function useSwapConversion({
     }
 
     if (!isConnected || !backendWalletAddress) {
-      alert("Please connect your wallet first.");
+      toast?.error("Please connect your wallet first.");
       return;
     }
     if (!walletAddress || !signTransaction) {
-      alert("Please connect your wallet first.");
+      toast?.error("Please connect your wallet first.");
       return;
     }
     if (!hasOnChainRlusd) {
-      alert("RLUSD trustline is not installed yet.");
+      toast?.error("RLUSD trustline is not installed yet.");
       return;
     }
 
@@ -282,12 +273,12 @@ export function useSwapConversion({
     const amountBase = Number(convertAmount || "0");
 
     if (!base || !quote || base === quote) {
-      alert("Choisissez deux devises différentes.");
+      toast?.error("Please select two different currencies.");
       return;
     }
 
     if (!Number.isFinite(amountBase) || amountBase <= 0) {
-      alert("Entrez un montant valide dans la devise de base.");
+      toast?.error("Please enter a valid amount.");
       return;
     }
 
@@ -303,9 +294,7 @@ export function useSwapConversion({
         !Number.isFinite(rlusdPerQuote) ||
         rlusdPerQuote <= 0
       ) {
-        alert(
-          "Impossible de récupérer les taux de conversion pour cette paire.",
-        );
+        toast?.error("Unable to fetch conversion rates for this pair.");
         return;
       }
 
@@ -326,11 +315,8 @@ export function useSwapConversion({
           Number.isFinite(unallocated) &&
           unallocated + epsilon < grossRlusd
         ) {
-          alert(
-            `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString(
-              "en-US",
-              { maximumFractionDigits: 6 },
-            )} RLUSD.`,
+          toast?.error(
+            `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD.`,
           );
           return;
         }
@@ -341,13 +327,8 @@ export function useSwapConversion({
         if (availableAllocated + epsilon < grossRlusd) {
           const maxUnits =
             availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
-          alert(
-            `Montant trop élevé. Allocation disponible en ${base}: ${maxUnits.toLocaleString(
-              "en-US",
-              { maximumFractionDigits: 6 },
-            )} ${base} (≈ ${availableAllocated.toLocaleString("en-US", {
-              maximumFractionDigits: 6,
-            })} RLUSD).`,
+          toast?.error(
+            `Amount too high. Available ${base}: ${maxUnits.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${base} (≈ ${availableAllocated.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD).`,
           );
           return;
         }
@@ -362,11 +343,11 @@ export function useSwapConversion({
       }
 
       if (!Number.isFinite(netRlusd) || netRlusd <= 0) {
-        alert("Montant trop faible après frais.");
+        toast?.error("Amount too small after fees.");
         return;
       }
       if (!Number.isFinite(spreadFee) || spreadFee <= 0) {
-        alert("Frais de conversion invalides.");
+        toast?.error("Invalid conversion fees.");
         return;
       }
 
@@ -438,7 +419,7 @@ export function useSwapConversion({
         action: "wallet:convert",
       });
       if (!result?.signed) {
-        alert("Conversion cancelled or expired.");
+        toast?.error("Conversion cancelled or expired.");
         return;
       }
 
@@ -465,7 +446,7 @@ export function useSwapConversion({
     } catch (error) {
       console.error("Convert error:", error);
       const message = error?.message || String(error);
-      alert("Conversion error: " + message);
+      toast?.error("Conversion error: " + message);
     } finally {
       setConvertProcessing(false);
     }
@@ -490,6 +471,7 @@ export function useSwapConversion({
     setConvertProcessing,
     setDemoLines,
     signTransaction,
+    toast,
     walletAddress,
   ]);
 

@@ -37,6 +37,7 @@ export default function WalletDashboardSendModal({
   sendProcessing,
   enableSaveAddress = false,
   inline = false,
+  toast,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -160,7 +161,7 @@ export default function WalletDashboardSendModal({
       }
     } catch (err) {
       console.error("QR scanFile error:", err);
-      alert(
+      toast?.error(
         t(
           "ui_qr_decode_failed_3b5d7f9a2c",
           "Unable to decode this image. Try a clearer screenshot.",

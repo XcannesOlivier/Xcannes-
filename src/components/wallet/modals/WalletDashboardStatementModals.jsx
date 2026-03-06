@@ -39,6 +39,7 @@ export default function WalletDashboardStatementModals({
   inlineStatementVariant,
   inlineCurrencyStatement = false,
   inlineCurrencyStatementClassName = "",
+  toast,
 }) {
   const { t } = useTranslation("common");
   const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
@@ -382,6 +383,7 @@ export default function WalletDashboardStatementModals({
               setSelectedStatementToken(token);
               setShowCurrencyStatement(true);
             }}
+            toast={toast}
           />
         </div>
       ) : null}
@@ -431,6 +433,7 @@ export default function WalletDashboardStatementModals({
             error={canFetchStatements ? currencyError : null}
             highlightTransactionId={highlightTransactionId}
             onClose={() => setShowCurrencyStatement(false)}
+            toast={toast}
           />
         </div>
       ) : null}
@@ -463,6 +466,7 @@ export default function WalletDashboardStatementModals({
             setShowGlobalStatement(false);
             setShowCurrencyStatement(true);
           }}
+          toast={toast}
         />
       ) : null}
 
@@ -514,6 +518,7 @@ export default function WalletDashboardStatementModals({
             setShowCurrencyStatement(false);
             setSelectedStatementToken(null);
           }}
+          toast={toast}
         />
       ) : null}
     </>

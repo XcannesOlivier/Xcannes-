@@ -141,6 +141,9 @@ export function useWalletModalProps({
   // --- QR ---
   qrScannerOpen,
   handleAddressScan,
+
+  // --- Toast ---
+  toast,
 }) {
   // --- Send modal props ---
   const sendModalProps = useMemo(
@@ -166,6 +169,7 @@ export function useWalletModalProps({
       handleSendSubmit,
       sendProcessing,
       enableSaveAddress: true,
+      toast,
     }),
     [
       qrSizingVariant,
@@ -188,6 +192,7 @@ export function useWalletModalProps({
       handlePaymentRequestScan,
       handleSendSubmit,
       sendProcessing,
+      toast,
     ],
   );
 
@@ -406,6 +411,7 @@ export function useWalletModalProps({
       refreshBalance,
       refreshCurrencyLines: effectiveRefreshCurrencyLines,
       adjustmentFeeRlusd,
+      toast,
     }),
     [
       renderWalletMeta,
@@ -417,6 +423,7 @@ export function useWalletModalProps({
       refreshBalance,
       effectiveRefreshCurrencyLines,
       adjustmentFeeRlusd,
+      toast,
     ],
   );
 
@@ -475,6 +482,7 @@ export function useWalletModalProps({
       setShowCurrencyStatement,
       selectedStatementToken,
       setSelectedStatementToken,
+      toast,
     }),
     [
       displayTokensWithCurrencyLines,
@@ -491,6 +499,7 @@ export function useWalletModalProps({
       setShowCurrencyStatement,
       selectedStatementToken,
       setSelectedStatementToken,
+      toast,
     ],
   );
 

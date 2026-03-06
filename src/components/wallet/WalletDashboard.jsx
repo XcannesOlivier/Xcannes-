@@ -210,6 +210,7 @@ export default function WalletDashboard({
       setCurrencyLineCode,
       setCurrencyLineAllocatedRlusd,
       upsertCurrencyLine,
+      toast,
     });
 
   // ── Augmented currency lines (defaults + sorting + deficit) ─
@@ -260,6 +261,7 @@ export default function WalletDashboard({
     currencyLinesSummary,
     allocatedRlusdByCurrency,
     refreshCurrencyLines,
+    toast,
   });
 
   const sendState = useWalletSendOrchestrator({
@@ -537,6 +539,7 @@ export default function WalletDashboard({
     setShowCurrencyStatement,
     selectedStatementToken,
     setSelectedStatementToken,
+    toast,
     // Spread sub-orchestrator state (keys match useWalletModalProps params)
     ...sendState,
     ...swapState,
