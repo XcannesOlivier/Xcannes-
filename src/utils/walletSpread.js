@@ -17,8 +17,8 @@ export function isFxConversion(base, quote) {
   const q = String(quote || "").toUpperCase();
   if (!b || !q || b === q) return false;
   if (b === "XRP" || b === "RLUSD" || q === "XRP" || q === "RLUSD") return false;
-  // FX conversions: RLUSD<->fiat or fiat<->fiat.
-  return b !== "RLUSD" || q !== "RLUSD";
+  // FX conversions: fiat<->fiat only (XRP and RLUSD are excluded above).
+  return true;
 }
 
 export function computeSpreadQuote({ base, quote, amountRlusd }) {

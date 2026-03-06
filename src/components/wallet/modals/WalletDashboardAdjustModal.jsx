@@ -20,8 +20,6 @@ export default function WalletDashboardAdjustModal({
   open,
   onClose,
   isPreviewMode = false,
-  isWalletActivated = null,
-  hasRlusdTrustline = null,
   noticeVariant = "preview",
   walletId = "",
   renderWalletMeta,

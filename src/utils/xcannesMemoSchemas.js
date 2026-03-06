@@ -534,6 +534,10 @@ function buildAllocationAdjustMemo(data) {
   return createXcannesMemoPayload('allocation_adjust', data);
 }
 
+function buildCurrencyLineMemo(data) {
+  return createXcannesMemoPayload('currency_line', data);
+}
+
 function buildMoonpayMemo(data) {
   return createXcannesMemoPayload('moonpay', data);
 }
@@ -542,8 +546,10 @@ export {
   XCANNES_MEMO_TYPE,
   XCANNES_MEMO_FORMAT,
   XCANNES_MEMO_SCHEMAS,
+  inferXcannesMemoType,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
+  buildCurrencyLineMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildAllocationAdjustMemo,

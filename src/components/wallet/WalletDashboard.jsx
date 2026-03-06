@@ -481,7 +481,6 @@ export default function WalletDashboard({
     wallet,
     isConnected,
     isWalletActivated,
-    hasRlusdTrustline,
     hasOnChainRlusd,
     walletLabel,
     walletHasCustomLabel,
