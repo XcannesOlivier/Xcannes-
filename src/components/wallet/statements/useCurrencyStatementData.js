@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "next-i18next";
 import {
   STATEMENT_HISTORY_MONTHS,

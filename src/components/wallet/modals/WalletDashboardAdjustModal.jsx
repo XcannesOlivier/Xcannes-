@@ -21,7 +21,7 @@ export default function WalletDashboardAdjustModal({
   onClose,
   isPreviewMode = false,
   noticeVariant = "preview",
-  walletId = "",
+  walletId: _walletId = "",
   renderWalletMeta,
   walletAddress,
   signTransaction,

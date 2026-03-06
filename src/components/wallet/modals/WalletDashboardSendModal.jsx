@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import useIsDesktop from "../hooks/useIsDesktop";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
@@ -46,7 +45,6 @@ export default function WalletDashboardSendModal({
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [requestText, setRequestText] = useState("");
-  const isDesktop = useIsDesktop();
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
@@ -56,7 +54,6 @@ export default function WalletDashboardSendModal({
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
   );
   const manualQrScannerRef = useRef(null);
-  const isDemoMode = noticeVariant === "demo";
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
