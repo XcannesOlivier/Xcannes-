@@ -26,16 +26,10 @@ import {
   setCachedStatement,
 } from "@/lib/walletStatementCache";
 import { decodeXrplCurrencyCode } from "@/utils/xrpl";
+import { isMobileDevice } from "@/utils/deviceDetect";
 
 const NativeWalletContext = createContext();
 const NATIVE_WALLET_STORAGE_KEY = "xcannes_native_wallet";
-
-function isMobileDevice() {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent || "";
-  return /android|iphone|ipad|ipod|mobile/i.test(ua) ||
-    (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1);
-}
 
 export const NativeWalletProvider = ({ children }) => {
   const [wallet, setWallet] = useState("");

@@ -18,6 +18,7 @@ import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { isMobileDevice } from "@/utils/deviceDetect";
 
 const QRCodeCanvas = dynamic(
   () => import("qrcode.react").then((m) => m.QRCodeCanvas),
@@ -29,14 +30,7 @@ const NATIVE_WALLET_KEY = "xcannes_native_wallet";
 // ── Helpers ────────────────────────────────────────────────────
 function useIsMobile() {
   const [mobile, setMobile] = useState(false);
-  useEffect(() => {
-    if (typeof navigator === "undefined") return;
-    const ua = navigator.userAgent || "";
-    const isMob =
-      /android|iphone|ipad|ipod|mobile/i.test(ua) ||
-      (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1);
-    setMobile(isMob);
-  }, []);
+  useEffect(() => setMobile(isMobileDevice()), []);
   return mobile;
 }
 
