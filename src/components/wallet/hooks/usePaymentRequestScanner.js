@@ -42,6 +42,24 @@ export function usePaymentRequestScanner({
         return { relayChallenge: true };
       }
 
+      // ── Navigation command from desktop (e.g. "Create or import wallet") ──
+      try {
+        const navAction = JSON.parse(raw);
+        if (navAction && navAction.type === "xcannes:navigate") {
+          if (DEBUG_PAYREQ_SCAN) {
+            console.log("[PayreqScan] Navigate action detected:", navAction.screen);
+          }
+          if (navAction.screen === "choice" && isPwaEmbedded()) {
+            // Send GO_TO_CHOICE to PWA parent
+            window.parent?.postMessage({ type: "GO_TO_CHOICE" }, "*");
+            setQrScannerOpen(false);
+            return { navigate: true };
+          }
+        }
+      } catch {
+        // Not JSON or not navigate action — continue
+      }
+
       const decodePrefixedPayreq = (value) => {
         const match = String(value || "").match(
           /^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i,
