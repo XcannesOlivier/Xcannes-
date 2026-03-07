@@ -716,6 +716,9 @@ function setupImportScreen() {
   const btnConfirm = document.getElementById('btn-import-confirm');
   const statusEl = document.getElementById('import-status');
 
+  // Clear any previous status message
+  if (statusEl) statusEl.textContent = '';
+
   // Build mnemonic grid (always 12 words)
   buildMnemonicImportGrid(12);
 
