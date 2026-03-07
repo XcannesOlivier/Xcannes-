@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { useWallet } from "@/context/WalletContext";
-import { useNativeWallet } from "@/context/NativeWalletContext";
-import { apiUrl } from "@/lib/runtimeConfig";
 
 /**
  * Settings gear button + dropdown menu.
@@ -20,124 +18,9 @@ export default function WalletSettingsDropdown({
 }) {
   const { t } = useTranslation("common");
   const { goToChoice } = useWallet();
-  const { updateWallet } = useNativeWallet();
   const [isOpen, setIsOpen] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
-  const [qrChallenge, setQrChallenge] = useState(null); // { challengeId, qrData, relay }
-  const [qrStatus, setQrStatus] = useState("loading"); // loading | waiting | connected | error
-  const pollIntervalRef = useRef(null);
   const ref = useRef(null);
-
-  // Create relay challenge when QR modal opens
-  const createNavigateChallenge = useCallback(async () => {
-    try {
-      setQrStatus("loading");
-      setQrChallenge(null);
-      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "connect",
-          origin: window.location.origin,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create challenge");
-      
-      const { challengeId } = data;
-      // Build QR data with navigate-connect type
-      const relay = window.location.origin;
-      const qrData = JSON.stringify({
-        type: "xcannes:navigate-connect",
-        screen: "choice",
-        challengeId,
-        relay,
-      });
-      setQrChallenge({ challengeId, qrData, relay });
-      setQrStatus("waiting");
-    } catch (error) {
-      console.error("[WalletSettingsDropdown] Challenge creation error:", error);
-      setQrStatus("error");
-    }
-  }, []);
-
-  // Poll challenge status
-  const pollChallengeStatus = useCallback((challengeId) => {
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
-    const maxAttempts = 150; // 5 minutes at 2s interval
-    let attempts = 0;
-    
-    pollIntervalRef.current = setInterval(async () => {
-      attempts++;
-      if (attempts >= maxAttempts) {
-        clearInterval(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-        setQrStatus("error");
-        return;
-      }
-      
-      try {
-        const res = await fetch(apiUrl(`/wallet-relay/status/${challengeId}`));
-        const data = await res.json();
-        
-        if (data.status === "completed" || data.status === "signed") {
-          clearInterval(pollIntervalRef.current);
-          pollIntervalRef.current = null;
-          setQrStatus("connected");
-          
-          // Update wallet in NativeWalletContext
-          if (data.result?.address) {
-            const addr = data.result.address;
-            const addrs = data.result.addresses;
-            setTimeout(() => {
-              updateWallet?.(addr, addrs);
-              setShowQrModal(false);
-              setQrChallenge(null);
-            }, 1500);
-          }
-        } else if (data.status === "expired" || data.status === "error") {
-          clearInterval(pollIntervalRef.current);
-          pollIntervalRef.current = null;
-          setQrStatus("error");
-        }
-      } catch (error) {
-        console.error("[WalletSettingsDropdown] Polling error:", error);
-      }
-    }, 2000);
-  }, [updateWallet]);
-
-  // When QR modal opens, create challenge and start polling
-  useEffect(() => {
-    if (showQrModal) {
-      createNavigateChallenge().then(() => {
-        // Start polling after challenge is created - poll from the effect callback
-      });
-    } else {
-      // Cleanup when modal closes
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-        pollIntervalRef.current = null;
-      }
-      setQrChallenge(null);
-      setQrStatus("loading");
-    }
-  }, [showQrModal, createNavigateChallenge]);
-
-  // Start polling when challenge is ready
-  useEffect(() => {
-    if (qrChallenge?.challengeId && qrStatus === "waiting") {
-      pollChallengeStatus(qrChallenge.challengeId);
-    }
-  }, [qrChallenge, qrStatus, pollChallengeStatus]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -281,7 +164,7 @@ export default function WalletSettingsDropdown({
         </div>
       )}
 
-      {/* QR Code modal (desktop) — scanné par wallet-app mobile + auto-connect */}
+      {/* QR Code modal (desktop) — scanné par wallet-app mobile */}
       {showQrModal && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
@@ -301,65 +184,20 @@ export default function WalletSettingsDropdown({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            
-            {qrStatus === "connected" ? (
-              <>
-                <div className="flex justify-center mb-4">
-                  <svg className="w-16 h-16 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <p className="text-sm text-green-400 font-medium">
-                  {t("wallet_connect_success", "Connecté !")}
-                </p>
-              </>
-            ) : qrStatus === "error" ? (
-              <>
-                <p className="text-sm text-red-400 mb-4">
-                  {t("wallet_connect_expired", "Le QR code a expiré. Veuillez réessayer.")}
-                </p>
-                <button
-                  onClick={() => {
-                    createNavigateChallenge();
-                  }}
-                  className="px-6 py-3 bg-[#c9a84c] hover:bg-[#b89a40] text-[#0a0a0a] font-semibold rounded-xl transition-all duration-200 hover:scale-105 active:scale-95"
-                >
-                  {t("wallet_connect_retry", "Réessayer")}
-                </button>
-              </>
-            ) : qrStatus === "loading" || !qrChallenge?.qrData ? (
-              <>
-                <p className="text-sm text-white/80 font-medium mb-4">
-                  {t("wallet_connect_loading", "Préparation de la connexion…")}
-                </p>
-                <div className="flex justify-center">
-                  <div className="w-[200px] h-[200px] bg-white/5 rounded-xl flex items-center justify-center">
-                    <div className="w-10 h-10 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-sm text-white/80 font-medium mb-4">
-                  {t("ui_scan_qr_to_open_app", "Scannez avec votre mobile pour ouvrir Xcannes App")}
-                </p>
-                <div className="inline-block rounded-xl bg-white p-3">
-                  <QRCodeSVG
-                    value={qrChallenge.qrData}
-                    size={200}
-                    level="M"
-                    includeMargin={false}
-                  />
-                </div>
-                <div className="mt-3 flex items-center justify-center gap-2 text-[11px] text-white/40">
-                  <span className="inline-block w-2 h-2 bg-white/40 rounded-full animate-pulse" />
-                  {t("wallet_connect_waiting", "En attente du scan…")}
-                </div>
-                <p className="mt-2 text-[10px] text-white/30">
-                  {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
-                </p>
-              </>
-            )}
+            <p className="text-sm text-white/80 font-medium mb-4">
+              {t("ui_scan_qr_to_open_app", "Scannez avec votre mobile pour ouvrir Xcannes App")}
+            </p>
+            <div className="inline-block rounded-xl bg-white p-3">
+              <QRCodeSVG
+                value={JSON.stringify({ type: "xcannes:navigate", screen: "choice" })}
+                size={200}
+                level="M"
+                includeMargin={false}
+              />
+            </div>
+            <p className="mt-3 text-[11px] text-white/40">
+              {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+            </p>
           </div>
         </div>
       )}
