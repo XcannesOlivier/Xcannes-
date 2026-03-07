@@ -130,9 +130,6 @@ export function createQRScanner(videoElement, onResult, onError) {
  *   - JSON: { "type": "xcannes:connect"|"xcannes:sign", "challengeId": "...", "relay": "..." }
  *   - Plain: CHALLENGE_ID (UUID)
  *
- * NOTE: Navigation types (xcannes:navigate, xcannes:navigate-connect) are NOT relay challenges
- *       and should be handled separately in handleQRScanned before calling parseQRCode.
- *
  * @param {string} rawQR - The raw QR code content
  * @returns {{ type: string, challengeId: string, relay?: string } | null}
  */
@@ -142,10 +139,7 @@ export function parseQRCode(rawQR) {
   // Try JSON format
   try {
     const parsed = JSON.parse(rawQR);
-    // Only treat as relay challenge if it's xcannes:connect or xcannes:sign
-    // Navigation types (xcannes:navigate, xcannes:navigate-connect) are handled elsewhere
-    if (parsed.challengeId && parsed.type && 
-        (parsed.type === 'xcannes:connect' || parsed.type === 'xcannes:sign')) {
+    if (parsed.challengeId && parsed.type) {
       return {
         type: parsed.type,
         challengeId: parsed.challengeId,
