@@ -66,7 +66,7 @@ export function useWalletLabel({
       setIsWalletLabelLocked(Boolean(label));
     } catch (err) {
       console.error("[useWalletLabel] Error fetching wallet label:", err);
-      flashWalletHeaderToast("Impossible de charger le nom du wallet.", 2200);
+      // Silently fail — use default label (not critical)
     }
   }, [defaultLabel, flashWalletHeaderToast, isConnected, walletAddress]);
 
