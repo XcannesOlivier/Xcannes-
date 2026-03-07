@@ -46,15 +46,15 @@ export const NativeWalletProvider = ({ children }) => {
   const [isWalletActivated, setIsWalletActivated] = useState(null);
   const [qrModalData, setQrModalData] = useState(null);
   const [walletAddresses, setWalletAddresses] = useState([]); // Multi-wallet list
-  const pollIntervalRef = useRef(null);
+  const relayCleanupRef = useRef(null);
   const autoCloseTimeoutRef = useRef(null);
   const pendingSignatureResolveRef = useRef(null);
 
-  // --- Polling helpers ---
-  const clearPolling = useCallback(() => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
+  // --- WebSocket relay cleanup ---
+  const cleanupRelaySubscription = useCallback(() => {
+    if (relayCleanupRef.current) {
+      relayCleanupRef.current();
+      relayCleanupRef.current = null;
     }
   }, []);
 
@@ -77,12 +77,12 @@ export const NativeWalletProvider = ({ children }) => {
   }, []);
 
   const closeQrModal = useCallback(() => {
-    clearPolling();
+    cleanupRelaySubscription();
     clearAutoClose();
     resolvePendingSignature(null);
     setQrModalData(null);
     setIsConnecting(false);
-  }, [clearAutoClose, clearPolling, resolvePendingSignature]);
+  }, [clearAutoClose, cleanupRelaySubscription, resolvePendingSignature]);
 
   const scheduleQrClose = useCallback(
     (delayMs = 2000) => {
@@ -290,67 +290,77 @@ export const NativeWalletProvider = ({ children }) => {
     setIsSessionReady(true);
   }, [updateWallet]);
 
-  // --- Poll challenge status (shared for connect and sign) ---
-  const pollChallengeStatus = useCallback(
-    (challengeId, mode) => {
-      const maxAttempts = 150; // 5 minutes at 2s interval
-      let attempts = 0;
+  // --- Subscribe to challenge status via WebSocket (replaces polling) ---
+  const subscribeToChallengeStatus = useCallback(
+    async (challengeId, mode) => {
+      // Cleanup any previous subscription
+      cleanupRelaySubscription();
 
-      clearPolling();
-      pollIntervalRef.current = setInterval(async () => {
-        attempts++;
-        if (attempts >= maxAttempts) {
-          clearPolling();
+      // Timeout after 5 minutes
+      const timeoutId = setTimeout(() => {
+        cleanupRelaySubscription();
+        setIsConnecting(false);
+        updateQrStatus("error");
+        if (mode === "sign") resolvePendingSignature(null);
+      }, 5 * 60 * 1000);
+
+      // Handler for WebSocket relay events
+      const handleRelayEvent = (message) => {
+        if (message?.challengeId !== challengeId) return;
+        const eventType = message?.event;
+
+        if (eventType === "connected" || eventType === "signed") {
+          cleanupRelaySubscription();
+          setIsConnecting(false);
+          updateQrStatus("signed");
+
+          if (mode === "connect" && message?.address) {
+            // Brief delay so user sees "Connecté !" before dashboard swap
+            const addr = message.address;
+            const addrs = message.addresses;
+            setTimeout(() => {
+              updateWallet(addr, addrs);
+              closeQrModal();
+            }, 1800);
+          } else if (mode === "sign") {
+            scheduleQrClose(2000);
+            resolvePendingSignature({
+              signed: true,
+              address: message.address,
+              hash: message.hash,
+              txResult: message.txResult,
+              uuid: challengeId,
+            });
+          } else {
+            scheduleQrClose(2000);
+          }
+        } else if (eventType === "expired" || eventType === "error") {
+          cleanupRelaySubscription();
           setIsConnecting(false);
           updateQrStatus("error");
           if (mode === "sign") resolvePendingSignature(null);
-          return;
         }
+      };
 
-        try {
-          const res = await fetch(
-            apiUrl(`/wallet-relay/status/${challengeId}`)
-          );
-          const data = await res.json();
+      // Subscribe via WebSocket
+      try {
+        await wsClient.connect();
+        wsClient.subscribe("wallet-relay", challengeId);
+        wsClient.on("wallet-relay", handleRelayEvent);
 
-          if (data.status === "completed" || data.status === "signed") {
-            clearPolling();
-            setIsConnecting(false);
-            updateQrStatus("signed");
-
-            if (mode === "connect" && data.result?.address) {
-              // Brief delay so the user sees "Connecté !" before the
-              // dashboard swap (updateWallet flips isConnected → wallet.jsx
-              // swaps WalletConnectScreen for WalletDashboard).
-              const addr = data.result.address;
-              const addrs = data.result.addresses;
-              setTimeout(() => {
-                updateWallet(addr, addrs);
-                closeQrModal();
-              }, 1800);
-            } else if (mode === "sign") {
-              scheduleQrClose(2000);
-              resolvePendingSignature({
-                signed: true,
-                ...data.result,
-                uuid: challengeId,
-              });
-            } else {
-              scheduleQrClose(2000);
-            }
-          } else if (data.status === "expired" || data.status === "error") {
-            clearPolling();
-            setIsConnecting(false);
-            updateQrStatus("error");
-            if (mode === "sign") resolvePendingSignature(null);
-          }
-        } catch (error) {
-          console.error("[NativeWallet] Polling error:", error);
-        }
-      }, 2000);
+        // Store cleanup function
+        relayCleanupRef.current = () => {
+          clearTimeout(timeoutId);
+          wsClient.off("wallet-relay", handleRelayEvent);
+          wsClient.unsubscribe("wallet-relay", challengeId);
+        };
+      } catch (error) {
+        console.error("[NativeWallet] WebSocket subscription error:", error);
+        clearTimeout(timeoutId);
+      }
     },
     [
-      clearPolling,
+      cleanupRelaySubscription,
       closeQrModal,
       resolvePendingSignature,
       scheduleQrClose,
@@ -377,7 +387,7 @@ export const NativeWalletProvider = ({ children }) => {
 
       const { challengeId, qrData } = data;
 
-      clearPolling();
+      cleanupRelaySubscription();
       clearAutoClose();
 
       setQrModalData({
@@ -390,15 +400,15 @@ export const NativeWalletProvider = ({ children }) => {
         visible: true,
       });
 
-      // Poll for connection result
-      pollChallengeStatus(challengeId, "connect");
+      // Subscribe to challenge status via WebSocket
+      subscribeToChallengeStatus(challengeId, "connect");
     } catch (error) {
       console.error("[NativeWallet] Connect error:", error);
       alert(`Connection failed: ${error.message}`);
       setIsConnecting(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clearPolling, clearAutoClose, pollChallengeStatus]);
+  }, [cleanupRelaySubscription, clearAutoClose, subscribeToChallengeStatus]);
 
   // --- SIGN TRANSACTION via relay ---
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -429,7 +439,7 @@ export const NativeWalletProvider = ({ children }) => {
 
       const { challengeId, qrData } = data;
 
-      clearPolling();
+      cleanupRelaySubscription();
       clearAutoClose();
 
       if (mobile) {
@@ -459,11 +469,11 @@ export const NativeWalletProvider = ({ children }) => {
         });
       }
 
-      // Wait for signature result (polling works for both desktop and mobile)
+      // Wait for signature result via WebSocket
       return await new Promise((resolve) => {
         resolvePendingSignature(null);
         pendingSignatureResolveRef.current = resolve;
-        pollChallengeStatus(challengeId, "sign");
+        subscribeToChallengeStatus(challengeId, "sign");
       });
     } catch (error) {
       console.error("[NativeWallet] Sign error:", error);
@@ -472,7 +482,7 @@ export const NativeWalletProvider = ({ children }) => {
       return null;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, clearPolling, clearAutoClose, pollChallengeStatus, resolvePendingSignature]);
+  }, [isConnected, cleanupRelaySubscription, clearAutoClose, subscribeToChallengeStatus, resolvePendingSignature]);
 
   const refreshBalance = useCallback(() => {
     if (wallet) fetchBalance(wallet);

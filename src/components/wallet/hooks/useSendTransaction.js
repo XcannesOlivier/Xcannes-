@@ -64,7 +64,6 @@ export function useSendTransaction({
   isConnected,
   wallet,
   signTransaction,
-  refreshBalance,
   // Computed booleans / values
   hasOnChainRlusd,
   backendWalletAddress,
@@ -89,8 +88,6 @@ export function useSendTransaction({
   rlusdPerUnitSources,
   // useWalletTokens()
   allocatedRlusdByCurrency,
-  // useWalletCurrencyLines()
-  refreshCurrencyLines,
   // useWalletToast()
   toast,
   confirm,
@@ -355,8 +352,7 @@ export function useSendTransaction({
         if (match) removePayreq(match.id);
       }
       setSendPaymentRequest(null);
-      if (refreshBalance) setTimeout(() => refreshBalance(), 3000);
-      if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 3000);
+      // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
       toast.warn("Transaction cancelled or expired.");
@@ -484,9 +480,7 @@ export function useSendTransaction({
         if (match) removePayreq(match.id);
       }
       setSendPaymentRequest(null);
-      if (refreshBalance) {
-        setTimeout(() => refreshBalance(), 3000);
-      }
+      // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
       toast.warn("Transaction cancelled or expired.");
