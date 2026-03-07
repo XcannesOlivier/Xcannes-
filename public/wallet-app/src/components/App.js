@@ -47,6 +47,7 @@ let currentWallet = null;  // { address, wallet (xrpl instance), publicKey }
 let isUnlocked = false;
 let pendingMnemonic = null;
 let pendingWalletData = null; // { address, seed, publicKey, mnemonic, wallet }
+let pendingRelayChallengeId = null; // Challenge ID from navigate-connect QR for auto-connect after wallet creation
 
 // --- Auto-lock ---
 const AUTO_LOCK_MS = 5 * 60 * 1000;
@@ -103,6 +104,45 @@ function notifyParentWalletCreated(address, publicKey) {
       }, '*');
     }
   } catch { /* cross-origin safety */ }
+}
+
+// --- Auto-submit connect to relay after wallet creation (for navigate-connect QR flow) ---
+async function autoSubmitConnectIfPending() {
+  if (!pendingRelayChallengeId || !currentWallet) {
+    pendingRelayChallengeId = null;
+    return;
+  }
+
+  const challengeId = pendingRelayChallengeId;
+  pendingRelayChallengeId = null; // Clear immediately to avoid double submission
+
+  try {
+    console.log('[PWA] Auto-submitting connect for challenge:', challengeId);
+
+    // Gather all wallet addresses for multi-wallet support on desktop
+    let allAddresses = [];
+    try {
+      const wallets = await getAllWallets();
+      allAddresses = wallets.map(w => ({
+        address: w.address,
+        label: w.label || null,
+      }));
+    } catch { /* best-effort */ }
+
+    const { signature } = signChallenge(currentWallet.wallet, challengeId);
+
+    await submitConnect(challengeId, {
+      address: currentWallet.address,
+      publicKey: currentWallet.publicKey,
+      signature,
+      addresses: allAddresses,
+    });
+
+    console.log('[PWA] Auto-connect submitted successfully');
+  } catch (err) {
+    console.error('[PWA] Auto-connect failed:', err.message);
+    // Don't block wallet creation flow — just log the error
+  }
 }
 
 // --- Config ---
@@ -696,6 +736,9 @@ function setupBackupVerifyScreen(words) {
       // Notify parent if embedded in an iframe (site onboarding flow)
       notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
 
+      // Auto-submit connect to relay if navigated from desktop QR
+      await autoSubmitConnectIfPending();
+
       showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
       await delay(2500);
       await goToHome();
@@ -821,6 +864,9 @@ async function handleImport(statusEl) {
 
     // Notify parent if embedded in an iframe (site onboarding flow)
     notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
+
+    // Auto-submit connect to relay if navigated from desktop QR
+    await autoSubmitConnectIfPending();
 
     showSuccess('Wallet importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
     await delay(2500);
@@ -1888,10 +1934,28 @@ function setupScannerScreen() {
 async function handleQRScanned(rawQR, statusEl) {
   // ── 1. JSON action from desktop dashboard (e.g. "Create or import") ──
   // QR encodes: { "type": "xcannes:navigate", "screen": "choice" }
+  // Or navigate-connect: { "type": "xcannes:navigate-connect", "screen": "choice", "challengeId": "...", "relay": "..." }
   try {
     const action = JSON.parse(rawQR);
     if (action && action.type === 'xcannes:navigate') {
       if (qrScanner) { qrScanner.stop(); qrScanner = null; }
+      if (action.screen === 'choice') {
+        goToChoice();
+      }
+      return;
+    }
+    // Handle navigate-connect: store challenge for auto-submit after wallet creation
+    if (action && action.type === 'xcannes:navigate-connect') {
+      if (qrScanner) { qrScanner.stop(); qrScanner = null; }
+      // Store the challengeId for auto-connect after wallet creation/import
+      if (action.challengeId) {
+        pendingRelayChallengeId = action.challengeId;
+        console.log('[PWA] Stored pending relay challenge:', action.challengeId);
+      }
+      // Update relay URL if provided
+      if (action.relay) {
+        setRelayUrl(action.relay);
+      }
       if (action.screen === 'choice') {
         goToChoice();
       }
