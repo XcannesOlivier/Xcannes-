@@ -20,7 +20,6 @@ export default function WalletDashboardCashModal({
   setCashModalTab,
   renderWalletMeta,
   walletLabel = "",
-  hideWalletAddress = false,
   availableTokens,
   rlusdPerUnitRates,
   selectLabelByCurrency,
@@ -169,7 +168,6 @@ export default function WalletDashboardCashModal({
                   onClose={onClose}
                   walletAddress={walletAddress || ""}
                   walletLabel={walletLabel}
-                  hideWalletAddress={hideWalletAddress}
                   embedded={true}
                   isPreviewMode={isPreviewMode}
                   demoMode={demoMode}
@@ -184,7 +182,6 @@ export default function WalletDashboardCashModal({
                   onClose={onClose}
                   walletAddress={walletAddress || ""}
                   walletLabel={walletLabel}
-                  hideWalletAddress={hideWalletAddress}
                   embedded={true}
                   isPreviewMode={isPreviewMode}
                   demoMode={demoMode}

@@ -15,7 +15,6 @@ import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
 import WalletDashboardAdjustModal from "../modals/WalletDashboardAdjustModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
-import WalletRlusdSetupModal from "../modals/WalletRlusdSetupModal";
 import WalletInfoModal from "../modals/WalletInfoModal";
 import WalletDashboardStatementModals from "../modals/WalletDashboardStatementModals";
 
@@ -33,7 +32,6 @@ export default function WalletDesktopModals({
   showInlineInfo,
   showInlineCurrencyStatement,
   showInlineGlobalStatement,
-  showRlusdSetupModal,
 
   // shared modal prop bundles (from useWalletModalProps)
   sendModalProps,
@@ -46,14 +44,12 @@ export default function WalletDesktopModals({
   activationRequestModalProps,
   infoModalProps,
   statementSharedProps,
-  rlusdSetupModalProps,
 
   // open/close handlers
   setActiveAction,
   setShowAdjustmentModal,
   setShowActivationModal,
   setShowActivationRequestModal,
-  setShowRlusdSetupModal,
   setWalletInfoOpen,
   setSendPaymentRequest,
   setCashBuyPrefill,
@@ -155,14 +151,6 @@ export default function WalletDesktopModals({
           inline
           onClose={() => setShowActivationRequestModal(false)}
           {...activationRequestModalProps}
-        />
-      ) : null}
-
-      {showRlusdSetupModal ? (
-        <WalletRlusdSetupModal
-          open
-          onClose={() => setShowRlusdSetupModal(false)}
-          {...rlusdSetupModalProps}
         />
       ) : null}
 

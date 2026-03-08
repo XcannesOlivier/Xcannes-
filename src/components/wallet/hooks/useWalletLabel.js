@@ -21,6 +21,7 @@ export function useWalletLabel({
 } = {}) {
   const [walletLabel, setWalletLabel] = useState(defaultLabel);
   const [isWalletLabelLocked, setIsWalletLabelLocked] = useState(false);
+  const [defaultCurrency, setDefaultCurrency] = useState(null);
   const [walletHeaderToast, setWalletHeaderToast] = useState("");
   const toastTimeoutRef = useRef(null);
   const loadTokenRef = useRef(0);
@@ -64,6 +65,7 @@ export function useWalletLabel({
       const label = String(data?.label || "").trim();
       setWalletLabel(label || defaultLabel);
       setIsWalletLabelLocked(Boolean(label));
+      setDefaultCurrency(data?.defaultCurrency || null);
     } catch (err) {
       console.error("[useWalletLabel] Error fetching wallet label:", err);
       // Silently fail — use default label (not critical)
@@ -74,6 +76,7 @@ export function useWalletLabel({
     if (!isConnected || !walletAddress) {
       setWalletLabel(defaultLabel);
       setIsWalletLabelLocked(false);
+      setDefaultCurrency(null);
       loadTokenRef.current += 1;
       return;
     }
@@ -83,6 +86,7 @@ export function useWalletLabel({
   return {
     walletLabel,
     isWalletLabelLocked,
+    defaultCurrency,
     walletHeaderToast,
     flashWalletHeaderToast,
     loadWalletLabel,

@@ -9,15 +9,12 @@ export default function WalletActivationRequestModal({
   open,
   onClose,
   walletAddress,
-  activationAmountXrp = 1,
   inline = false,
 }) {
   const { t } = useTranslation("common");
   const [copied, setCopied] = useState(false);
-  const activationAmountLabel =
-    Number(activationAmountXrp) === 1.4
-      ? "1.40"
-      : String(activationAmountXrp || "1");
+  const activationAmountLabel = "1";
+  const activationAmountXrp = 1;
 
   // Build a simple XRPL payment request URI
   const paymentUri = useMemo(() => {

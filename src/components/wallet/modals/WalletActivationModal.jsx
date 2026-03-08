@@ -10,9 +10,6 @@ export default function WalletActivationModal({
   onSendFromWallet,
   onRequestFromThirdParty,
   onBuyViaMoonpay,
-  activationBundleEnabled = false,
-  onToggleActivationBundle,
-  activationAmountXrp = 1,
   inline = false,
 }) {
   const { t } = useTranslation("common");
@@ -31,14 +28,7 @@ export default function WalletActivationModal({
     "flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-all duration-200 group-hover:border-white/25 group-hover:bg-white/10";
   const actionArrowBase =
     "text-white/30 transition-colors duration-200 group-hover:text-white/60";
-  const currentActivationAmountLabel =
-    Number(activationAmountXrp) === 1.4
-      ? "1.40"
-      : String(activationAmountXrp || "1");
-  const bundleAmountLabel = "1.40";
-  const bundleCardClass = activationBundleEnabled
-    ? "border-emerald-400/40 bg-emerald-500/10"
-    : "border-white/10 bg-black/30";
+  const activationAmountLabel = "1";
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -64,10 +54,7 @@ export default function WalletActivationModal({
           className={`fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm ${
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
-          onClick={() => {
-            onToggleActivationBundle?.(false);
-            onClose?.();
-          }}
+          onClick={() => onClose?.()}
         />
       ) : null}
 
@@ -80,10 +67,7 @@ export default function WalletActivationModal({
         >
           <button
             type="button"
-            onClick={() => {
-              onToggleActivationBundle?.(false);
-              onClose?.();
-            }}
+            onClick={() => onClose?.()}
             className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl"
             aria-label={t("ui_close_08378568ba", "Close")}
           >
@@ -99,7 +83,7 @@ export default function WalletActivationModal({
               </div>
               <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
                 {t("ui_get_1_xrp_title_9d07f2455a", "Obtenir {{amount}} XRP", {
-                  amount: currentActivationAmountLabel,
+                  amount: activationAmountLabel,
                 })}
               </h3>
               <p className="text-sm text-white/70">
@@ -107,52 +91,13 @@ export default function WalletActivationModal({
                   "ui_need_1_xrp_to_activate_8b6c7f2c5f",
                   "Il faut {{amount}} XRP pour activer.",
                   {
-                    amount: currentActivationAmountLabel,
+                    amount: activationAmountLabel,
                   },
                 )}
               </p>
 
             </div>
           </div>
-
-          <div className={`rounded-xl border px-4 py-3 ${bundleCardClass}`}>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 accent-xcannes-green"
-                checked={activationBundleEnabled}
-                onChange={(e) => onToggleActivationBundle?.(e.target.checked)}
-              />
-              <div className="space-y-1">
-                <div className="text-sm font-semibold text-white">
-                  {t(
-                    "ui_activation_bundle_title_8c1d7f2b9e",
-                    "Option {{amount}} XRP",
-                    {
-                      amount: bundleAmountLabel,
-                    },
-                  )}
-                </div>
-                <div className="text-[11px] text-white/60">
-                  {t(
-                    "ui_activation_bundle_desc_4b7a1c9e2d",
-                    "Activer le wallet et avoir de quoi activer USD.",
-                  )}
-                </div>
-              </div>
-            </label>
-          </div>
-          {activationBundleEnabled ? (
-            <div className="text-[11px] text-emerald-200/90">
-              {t(
-                "ui_activation_amount_summary_7a2c9d1e5b",
-                "Montant choisi : {{amount}} XRP",
-                {
-                  amount: bundleAmountLabel,
-                },
-              )}
-            </div>
-          ) : null}
 
           <div className="grid gap-2">
             <button
@@ -245,7 +190,7 @@ export default function WalletActivationModal({
                     {t(
                       "ui_activation_send_other_wallet_desc_4b3a2d9c7f",
                       "Envoie {{amount}} XRP depuis un autre wallet.",
-                      { amount: currentActivationAmountLabel },
+                      { amount: activationAmountLabel },
                     )}
                   </div>
                 </div>

@@ -153,3 +153,26 @@ export const WALLET_LAYOUT = Object.freeze({
   statementVariant: "full",
   containerClass: "overflow-hidden",
 });
+
+// ── Wallet setup shared constants ────────────────────────────
+
+export const AVAILABLE_DEFAULT_CURRENCIES = [
+  "EUR",
+  "USD",
+  "GBP",
+  "CHF",
+  "CAD",
+  "JPY",
+  "AUD",
+];
+
+/**
+ * Validate a wallet label: 1 or 2 words, max 7 ASCII letters each, A-Z only.
+ */
+export function validateWalletLabel(value) {
+  const trimmed = String(value || "").trim();
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  const wordPattern = /^[A-Za-z]+$/;
+  if (words.length < 1 || words.length > 2) return false;
+  return words.every((w) => w.length <= 7 && wordPattern.test(w));
+}

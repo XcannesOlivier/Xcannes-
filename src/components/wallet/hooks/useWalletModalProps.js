@@ -110,18 +110,10 @@ export function useWalletModalProps({
   handleActivationSendFromWallet,
   handleActivationRequestFromThirdParty,
   handleActivationBuyViaMoonpay,
-  activationBundleEnabled,
-  setActivationBundleEnabled,
-  activationXrpAmount,
 
   // --- Activation Request ---
   showActivationRequestModal,
   setShowActivationRequestModal,
-
-  // --- RLUSD Setup ---
-  showRlusdSetupModal,
-  setShowRlusdSetupModal,
-  handleRlusdSetupConfirm,
 
   // --- Info ---
   walletInfoOpen,
@@ -374,7 +366,6 @@ export function useWalletModalProps({
       setCashModalTab,
       renderWalletMeta,
       walletLabel,
-      hideWalletAddress: walletHasCustomLabel,
       rlusdPerUnitRates,
       selectLabelByCurrency: selectLabelByAssetKey,
       selectLabelRightByCurrency: selectLabelRightByAssetKey,
@@ -388,7 +379,6 @@ export function useWalletModalProps({
       setCashModalTab,
       renderWalletMeta,
       walletLabel,
-      walletHasCustomLabel,
       rlusdPerUnitRates,
       selectLabelByAssetKey,
       selectLabelRightByAssetKey,
@@ -433,17 +423,11 @@ export function useWalletModalProps({
       onSendFromWallet: handleActivationSendFromWallet,
       onRequestFromThirdParty: handleActivationRequestFromThirdParty,
       onBuyViaMoonpay: handleActivationBuyViaMoonpay,
-      activationBundleEnabled,
-      onToggleActivationBundle: setActivationBundleEnabled,
-      activationAmountXrp: activationXrpAmount,
     }),
     [
       handleActivationSendFromWallet,
       handleActivationRequestFromThirdParty,
       handleActivationBuyViaMoonpay,
-      activationBundleEnabled,
-      setActivationBundleEnabled,
-      activationXrpAmount,
     ],
   );
 
@@ -451,11 +435,9 @@ export function useWalletModalProps({
   const activationRequestModalProps = useMemo(
     () => ({
       walletAddress: wallet,
-      activationAmountXrp: activationXrpAmount,
     }),
     [
       wallet,
-      activationXrpAmount,
     ],
   );
 
@@ -503,13 +485,7 @@ export function useWalletModalProps({
     ],
   );
 
-  // --- RLUSD Setup modal props ---
-  const rlusdSetupModalProps = useMemo(
-    () => ({
-      onConfirm: handleRlusdSetupConfirm,
-    }),
-    [handleRlusdSetupConfirm],
-  );
+  // --- RLUSD Setup modal props --- (removed: setup handled by WalletSetupDropdown)
 
   return {
     sendModalProps,
@@ -522,7 +498,6 @@ export function useWalletModalProps({
     activationRequestModalProps,
     infoModalProps,
     statementSharedProps,
-    rlusdSetupModalProps,
 
     // open / close handlers needed by both desktop & mobile
     activeAction,
@@ -534,8 +509,6 @@ export function useWalletModalProps({
     setShowActivationModal,
     showActivationRequestModal,
     setShowActivationRequestModal,
-    showRlusdSetupModal,
-    setShowRlusdSetupModal,
     walletInfoOpen,
     setWalletInfoOpen,
     setSendPaymentRequest,

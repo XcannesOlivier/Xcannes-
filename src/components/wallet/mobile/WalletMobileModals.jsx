@@ -20,7 +20,6 @@ import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
 import WalletDashboardAdjustModal from "../modals/WalletDashboardAdjustModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
-import WalletRlusdSetupModal from "../modals/WalletRlusdSetupModal";
 import WalletInfoModal from "../modals/WalletInfoModal";
 import WalletDashboardStatementModals from "../modals/WalletDashboardStatementModals";
 import WalletDashboardSaveAddressPrompt from "../components/WalletDashboardSaveAddressPrompt";
@@ -37,7 +36,6 @@ export default function WalletMobileModals({
   activationRequestModalProps,
   infoModalProps,
   statementSharedProps,
-  rlusdSetupModalProps,
 
   // open/close handlers
   activeAction,
@@ -49,8 +47,6 @@ export default function WalletMobileModals({
   setShowActivationModal,
   showActivationRequestModal,
   setShowActivationRequestModal,
-  showRlusdSetupModal,
-  setShowRlusdSetupModal,
   walletInfoOpen,
   setWalletInfoOpen,
   setSendPaymentRequest,
@@ -93,11 +89,6 @@ export default function WalletMobileModals({
         open={showActivationRequestModal}
         onClose={() => setShowActivationRequestModal(false)}
         {...activationRequestModalProps}
-      />
-      <WalletRlusdSetupModal
-        open={showRlusdSetupModal}
-        onClose={() => setShowRlusdSetupModal(false)}
-        {...rlusdSetupModalProps}
       />
 
       {/* Modales via Portal pour éviter les problèmes de z-index et overflow */}

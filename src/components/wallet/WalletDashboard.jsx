@@ -47,9 +47,6 @@ const ADJUSTMENT_FEE_RLUSD = (() => {
   return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ADJUSTMENT_FEE_RLUSD;
 })();
 
-const DEFAULT_ACTIVATION_XRP_AMOUNT = 1;
-const ACTIVATION_BUNDLE_XRP_AMOUNT = 1.4;
-
 function isAcceptedOnChainToken(currency) {
   const code = String(currency || "").toUpperCase();
   return WALLET_ACCEPTED_TOKENS.has(code);
@@ -127,7 +124,6 @@ export default function WalletDashboard({
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showActivationRequestModal, setShowActivationRequestModal] =
     useState(false);
-  const [showRlusdSetupModal, setShowRlusdSetupModal] = useState(false);
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
@@ -135,11 +131,7 @@ export default function WalletDashboard({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
-  const [activationBundleEnabled, setActivationBundleEnabled] = useState(false);
-  const activationXrpAmount = activationBundleEnabled
-    ? ACTIVATION_BUNDLE_XRP_AMOUNT
-    : DEFAULT_ACTIVATION_XRP_AMOUNT;
-  const activationXrpAmountLabel = activationBundleEnabled ? "1.40" : "1";
+
 
   // ── Desktop panel media query ──────────────────────────────
   useEffect(() => {
@@ -315,7 +307,6 @@ export default function WalletDashboard({
   // ── Activation ─────────────────────────────────────────────
   const {
     handleInstallRequiredTrustline,
-    handleOpenRlusdSetup,
     handleRlusdSetupConfirm,
     handleOpenActivationModal,
     handleActivationRequestFromThirdParty,
@@ -333,13 +324,9 @@ export default function WalletDashboard({
     setWalletInfoOpen,
     setShowActivationModal,
     setShowActivationRequestModal,
-    setShowRlusdSetupModal,
-    setActivationBundleEnabled,
     setCashBuyPrefill: swapState.setCashBuyPrefill,
     setCashModalTab: swapState.setCashModalTab,
     setActiveAction,
-    activationXrpAmount,
-    activationXrpAmountLabel,
   });
 
   // ── Navigation ─────────────────────────────────────────────
@@ -392,19 +379,11 @@ export default function WalletDashboard({
       <WalletDashboardTokenRow
         key={token.key}
         token={token}
-        isWalletActivated={isWalletActivated}
-        hasRlusdTrustline={hasRlusdTrustline}
-        onActivateWallet={handleOpenActivationModal}
-        onOpenRlusdSetup={handleOpenRlusdSetup}
         onClick={() => handleOpenCurrencyStatement(token)}
       />
     ),
     [
-      handleOpenActivationModal,
       handleOpenCurrencyStatement,
-      handleOpenRlusdSetup,
-      hasRlusdTrustline,
-      isWalletActivated,
     ],
   );
 
@@ -516,13 +495,8 @@ export default function WalletDashboard({
     handleActivationSendFromWallet,
     handleActivationRequestFromThirdParty,
     handleActivationBuyViaMoonpay,
-    activationBundleEnabled,
-    setActivationBundleEnabled,
-    activationXrpAmount,
     showActivationRequestModal,
     setShowActivationRequestModal,
-    showRlusdSetupModal,
-    setShowRlusdSetupModal,
     handleRlusdSetupConfirm,
     walletInfoOpen,
     setWalletInfoOpen,

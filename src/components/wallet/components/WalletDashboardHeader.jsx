@@ -21,7 +21,6 @@ export default function WalletDashboardHeader({
   isWalletLabelLocked,
   onOpenInfo,
   showMobileHomeLink = false,
-  hideWalletAddress = false,
   walletAddresses = [],
   onSwitchWallet,
   // Setup dropdown props
@@ -131,26 +130,18 @@ export default function WalletDashboardHeader({
                         <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
                           {walletLabel || "Wallet"}
                         </span>
+                      </div>
 
-                        {hideWalletAddress && walletHeaderToast ? (
-                          <span className="text-[10px] text-xcannes-green/90 truncate">
+                      <div className="mt-0.5 flex items-center gap-2 min-w-0">
+                        <span className="font-mono text-[10px] text-white/55 truncate">
+                          {wallet.slice(0, 10)}…{wallet.slice(-8)}
+                        </span>
+                        {walletHeaderToast ? (
+                          <span className="text-[10px] text-xcannes-green/90">
                             {walletHeaderToast}
                           </span>
                         ) : null}
                       </div>
-
-                      {!hideWalletAddress ? (
-                        <div className="mt-0.5 flex items-center gap-2 min-w-0">
-                          <span className="font-mono text-[10px] text-white/55 truncate">
-                            {wallet.slice(0, 10)}…{wallet.slice(-8)}
-                          </span>
-                          {walletHeaderToast ? (
-                            <span className="text-[10px] text-xcannes-green/90">
-                              {walletHeaderToast}
-                            </span>
-                          ) : null}
-                        </div>
-                      ) : null}
                     </button>
 
                     {/* Multi-wallet dropdown */}

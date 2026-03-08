@@ -6,7 +6,7 @@ import { buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
  * Encapsulates all wallet-activation and trustline-installation logic:
  *
  * - `handleInstallRequiredTrustline`  — signs a TrustSet tx via the wallet
- * - `handleOpenRlusdSetup`           — opens RLUSD setup modal
+
  * - `handleRlusdSetupConfirm`        — confirms setup + triggers trustline
  * - `handleOpenActivationModal`      — opens XRP activation modal
  * - `handleActivationRequestFromThirdParty` — switches to 3rd-party request
@@ -26,14 +26,9 @@ export function useWalletActivation({
   setWalletInfoOpen,
   setShowActivationModal,
   setShowActivationRequestModal,
-  setShowRlusdSetupModal,
-  setActivationBundleEnabled,
   setCashBuyPrefill,
   setCashModalTab,
   setActiveAction,
-  // Activation XRP
-  activationXrpAmount,
-  activationXrpAmountLabel,
   // useWalletToast()
   toast,
   confirm,
@@ -120,20 +115,15 @@ export function useWalletActivation({
   );
 
   // ------------------------------------------------------------------
-  // RLUSD setup (opens form → triggers trustline with wallet_label memo)
+  // RLUSD setup (triggers trustline with wallet_label memo)
   // ------------------------------------------------------------------
-  const handleOpenRlusdSetup = useCallback(() => {
-    setShowRlusdSetupModal(true);
-  }, [setShowRlusdSetupModal]);
-
   const handleRlusdSetupConfirm = useCallback(
     ({ label, defaultCurrency } = {}) => {
-      setShowRlusdSetupModal(false);
       handleInstallRequiredTrustline("RLUSD", {
         walletSetup: { label, defaultCurrency },
       });
     },
-    [handleInstallRequiredTrustline, setShowRlusdSetupModal],
+    [handleInstallRequiredTrustline],
   );
 
   // ------------------------------------------------------------------
@@ -143,12 +133,10 @@ export function useWalletActivation({
     closeInlineQr();
     setWalletInfoOpen(false);
     setActiveAction(null);
-    setActivationBundleEnabled(false);
     setShowActivationModal(true);
   }, [
     closeInlineQr,
     setActiveAction,
-    setActivationBundleEnabled,
     setShowActivationModal,
     setWalletInfoOpen,
   ]);
@@ -173,13 +161,12 @@ export function useWalletActivation({
     setShowActivationModal(false);
     setCashBuyPrefill({
       currency: "XRP",
-      amount: activationXrpAmountLabel,
+      amount: "1",
       amountType: "crypto",
     });
     setCashModalTab("buy");
     setActiveAction("cash");
   }, [
-    activationXrpAmountLabel,
     closeInlineQr,
     setActiveAction,
     setCashBuyPrefill,
@@ -199,7 +186,7 @@ export function useWalletActivation({
     }
 
     const amountDrops = String(
-      Math.round(Number(activationXrpAmount) * 1_000_000),
+      Math.round(1 * 1_000_000),
     );
     const txjson = {
       TransactionType: "Payment",
@@ -214,7 +201,6 @@ export function useWalletActivation({
       setTimeout(() => refreshBalance(), 3000);
     }
   }, [
-    activationXrpAmount,
     refreshBalance,
     setShowActivationModal,
     signTransaction,
@@ -224,7 +210,6 @@ export function useWalletActivation({
 
   return {
     handleInstallRequiredTrustline,
-    handleOpenRlusdSetup,
     handleRlusdSetupConfirm,
     handleOpenActivationModal,
     handleActivationRequestFromThirdParty,

@@ -2,16 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "next-i18next";
-
-const AVAILABLE_DEFAULT_CURRENCIES = [
-  "EUR",
-  "USD",
-  "GBP",
-  "CHF",
-  "CAD",
-  "JPY",
-  "AUD",
-];
+import {
+  AVAILABLE_DEFAULT_CURRENCIES,
+  validateWalletLabel,
+} from "../walletDashboardConfig";
 
 /**
  * WalletSetupDropdown — centralised 2-step activation panel.
@@ -19,7 +13,7 @@ const AVAILABLE_DEFAULT_CURRENCIES = [
  * Displayed below the total balance / wallet name block when the wallet
  * setup is not yet complete. Two steps only:
  *
- *   Step 1 — Fund wallet with ≥ 2 XRP (covers base reserve + trustline).
+ *   Step 1 — Fund wallet with ≥ 1 XRP (covers base reserve).
  *   Step 2 — Choose wallet name + preferred currency, then validate.
  *            The validation triggers the RLUSD TrustSet with a
  *            wallet_label memo containing both the name and the currency.
@@ -78,15 +72,7 @@ export default function WalletSetupDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // ── Label validation (same rules as WalletRlusdSetupModal) ─
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const validateLabel = useCallback((value) => {
-    const trimmed = String(value || "").trim();
-    const words = trimmed.split(/\s+/).filter(Boolean);
-    const wordPattern = /^[A-Za-z]+$/;
-    if (words.length < 1 || words.length > 2) return false;
-    return words.every((w) => w.length <= 7 && wordPattern.test(w));
-  }, []);
+  const validateLabel = validateWalletLabel;
 
   // ── Form submit ────────────────────────────────────────────
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -107,7 +93,7 @@ export default function WalletSetupDropdown({
       label: trimmed,
       defaultCurrency: currencyDraft || null,
     });
-  }, [currencyDraft, labelDraft, onConfirmSetup, t, validateLabel]);
+  }, [currencyDraft, labelDraft, onConfirmSetup, t]);
 
   // ── Keyboard shortcut for step 2 input ─────────────────────
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -189,7 +175,7 @@ export default function WalletSetupDropdown({
 
           <div className="p-3 space-y-2">
             {/* ────────────────────────────────────────────────
-                STEP 1 — Fund wallet with 2 XRP
+                STEP 1 — Fund wallet with 1 XRP
                ──────────────────────────────────────────────── */}
             <button
               type="button"
@@ -216,7 +202,7 @@ export default function WalletSetupDropdown({
                     ? t("ui_setup_step_done", "Effectué")
                     : t(
                         "ui_setup_step_xrp_desc",
-                        "2 XRP requis pour activer le compte",
+                        "1 XRP requis pour activer le compte",
                       )}
                 </div>
               </div>
@@ -258,7 +244,7 @@ export default function WalletSetupDropdown({
                       : !isStep1Done
                         ? t(
                             "ui_setup_step_requires_xrp",
-                            "Nécessite 2 XRP d'abord",
+                            "Nécessite 1 XRP d'abord",
                           )
                         : t(
                             "ui_setup_step_name_currency_desc",
