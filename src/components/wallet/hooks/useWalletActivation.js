@@ -37,7 +37,7 @@ export function useWalletActivation({
   // handleInstallRequiredTrustline
   // ------------------------------------------------------------------
   const handleInstallRequiredTrustline = useCallback(
-    async (currencyCode, { walletSetup } = {}) => {
+    async (currencyCode, { walletSetup, skipConfirm = false } = {}) => {
       const code = String(currencyCode || "").toUpperCase();
       if (!code) return;
       if (!isConnected || !wallet) {
@@ -51,10 +51,14 @@ export function useWalletActivation({
         return;
       }
 
-      const ok = await confirm(
-        `Install XRPL trustline for ${code}?\n\nThis will sign a TrustSet transaction.`,
-      );
-      if (!ok) return;
+      // When called from setup dropdown, the user already clicked "Valider"
+      // — skip the redundant confirmation dialog.
+      if (!skipConfirm) {
+        const ok = await confirm(
+          `Install XRPL trustline for ${code}?\n\nThis will sign a TrustSet transaction.`,
+        );
+        if (!ok) return;
+      }
 
       const currency = encodeXrplCurrencyCode(code);
       const txjson = {
@@ -85,7 +89,25 @@ export function useWalletActivation({
       try {
         const result = await signTransaction(txjson);
         if (result && result.signed) {
-          toast.success(`✅ Trustline ${code} submitted.`);
+          // Check XRPL result code — the tx may have been signed but rejected by the ledger
+          const engineResult =
+            result.txResult?.result?.engine_result ||
+            result.txResult?.engine_result ||
+            "";
+          if (engineResult && engineResult !== "tesSUCCESS" && engineResult !== "terQUEUED") {
+            // Map common error codes to user-friendly messages
+            if (engineResult === "tecINSUF_RESERVE_LINE" || engineResult === "tecNO_LINE_INSUF_RESERVE") {
+              toast.error(
+                "❌ Réserve XRP insuffisante pour créer la trustline. " +
+                "Vous avez besoin d'au moins 1.2 XRP (1 réserve + 0.2 par trustline).",
+              );
+            } else {
+              toast.error(`❌ Trustline rejetée par le ledger : ${engineResult}`);
+            }
+            return;
+          }
+
+          toast.success(`✅ Trustline ${code} activée.`);
           if (refreshBalance) {
             setTimeout(() => refreshBalance(), 2500);
           }
@@ -94,12 +116,12 @@ export function useWalletActivation({
             setTimeout(() => loadWalletLabel(), 3000);
           }
         } else {
-          toast.warn("Transaction cancelled or expired.");
+          toast.warn("Transaction annulée ou expirée.");
         }
       } catch (err) {
         console.error("Install trustline error:", err);
         toast.error(
-          "Error while preparing trustline: " + (err?.message || String(err)),
+          "Erreur lors de la préparation de la trustline : " + (err?.message || String(err)),
         );
       }
     },
@@ -121,6 +143,7 @@ export function useWalletActivation({
     ({ label, defaultCurrency } = {}) => {
       handleInstallRequiredTrustline("RLUSD", {
         walletSetup: { label, defaultCurrency },
+        skipConfirm: true, // User already clicked "Valider" in the setup dropdown
       });
     },
     [handleInstallRequiredTrustline],
