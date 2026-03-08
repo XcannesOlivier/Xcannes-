@@ -1,9 +1,5 @@
 const TOKEN_ICONS = {
   XRP: "✕",
-  BTC: "₿",
-  ETH: "Ξ",
-  USDT: "₮",
-  USDC: "＄",
 };
 
 const CURRENCY_FLAG_OVERRIDES = {
@@ -44,17 +40,7 @@ const CURRENCY_SYMBOL_OVERRIDES = {
   SAR: "﷼",
 };
 
-export const USD_STABLECOINS = [
-  "RLUSD",
-  "USD",
-  "USDC",
-  "USDT",
-  "BUSD",
-  "DAI",
-  "TUSD",
-  "USDP",
-  "GUSD",
-];
+export const USD_STABLECOINS = ["RLUSD", "USD"];
 
 /**
  * Actifs XRPL acceptés dans le wallet XCANNES (hors XRP natif qui est
