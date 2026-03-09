@@ -13,7 +13,6 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
-  WALLET_CURRENCY_LINE_ORDER,
 } from "../walletDashboardConfig";
 
 export default function WalletDashboardSwapModal({
@@ -51,27 +50,7 @@ export default function WalletDashboardSwapModal({
   const locale = i18n?.language || "en";
   const greenActionBtnBase =
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
-  const [activateCurrencyCode, setActivateCurrencyCode] = useState("");
   const isDesktop = useIsDesktop();
-
-  const existingCurrencyLinesSet = useMemo(() => {
-    const set = new Set();
-    (currencyLines || []).forEach((line) => {
-      const code = String(line?.currencyCode || "").toUpperCase();
-      if (code) set.add(code);
-    });
-    return set;
-  }, [currencyLines]);
-
-  const suggestedCurrencies = useMemo(() => {
-    const base = Array.isArray(WALLET_CURRENCY_LINE_ORDER)
-      ? WALLET_CURRENCY_LINE_ORDER
-      : [];
-    return base.filter((code) => {
-      const upper = String(code || "").toUpperCase();
-      return upper && upper !== "USD" && upper !== "RLUSD" && upper !== "XRP";
-    });
-  }, []);
 
   // USD est une devise convertible comme les autres — ne pas le filtrer.
   // Seul RLUSD est masqué (infrastructure invisible).
@@ -87,6 +66,15 @@ export default function WalletDashboardSwapModal({
   const canMutateLines =
     isPreviewMode ||
     (isConnected && isWalletActivated === true && hasOnChainRlusd);
+
+  const existingCurrencyLinesSet = useMemo(() => {
+    const set = new Set();
+    (currencyLines || []).forEach((line) => {
+      const code = String(line?.currencyCode || "").toUpperCase();
+      if (code) set.add(code);
+    });
+    return set;
+  }, [currencyLines]);
   const showDesktopWalletConvertNote =
     inline &&
     isDesktop &&
@@ -248,32 +236,6 @@ export default function WalletDashboardSwapModal({
       : t("ui_convert_allocation_6b2c1a9d5e", "Convert allocation");
   const handleConvertAction = () => {
     handleDemoConvert();
-  };
-  const activeCurrencyUpper = String(activateCurrencyCode || "").toUpperCase();
-  const isLineAlreadyActive =
-    Boolean(activeCurrencyUpper) &&
-    existingCurrencyLinesSet.has(activeCurrencyUpper);
-  const activateLineDisabled =
-    !canMutateLines ||
-    currencyLinesLoading ||
-    !activateCurrencyCode ||
-    existingCurrencyLinesSet.has(
-      String(activateCurrencyCode || "").toUpperCase(),
-    );
-  const handleActivateLine = async () => {
-    const upper = String(activateCurrencyCode || "").toUpperCase();
-    let didActivate = false;
-    try {
-      const result = await onActivateCurrencyLine?.(upper);
-      didActivate = Boolean(result);
-    } catch (error) {
-      console.error("[wallet/swap] activate currency line failed:", error);
-    } finally {
-      setActivateCurrencyCode("");
-    }
-    if (didActivate) {
-      onClose?.();
-    }
   };
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -453,58 +415,31 @@ export default function WalletDashboardSwapModal({
                       />
                     </div>
 
-                    <div className="rounded-xl border border-white/10 p-3">
-                      <div className="mt-2 grid grid-cols-1 gap-2">
-                        <WalletCurrencySelector
-                          value={activateCurrencyCode}
-                          onChange={setActivateCurrencyCode}
-                          placeholder={t(
-                            "ui_select_a_currency_to_activat_776d6af637",
-                            "Select another currency",
-                          )}
-                          quickOptions={suggestedCurrencies}
-                          excludeCodes={["USD"]}
-                          showQuickAdd={false}
-                        />
-
-                        {isLineAlreadyActive ? (
-                          <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
-                            {t(
-                              "ui_currency_line_already_active_5df2d3b1a8",
-                              "Ligne de compte déjà active",
-                            )}
-                          </div>
-                        ) : null}
-
-                        {activateCurrencyCode ? (
-                          <>
-                            <SwipeConfirmButton
-                              label={t(
-                                "ui_activate_currency_line_32843c5eeb",
-                                "Activate currency line",
-                              )}
-                              onConfirm={handleActivateLine}
-                              disabled={activateLineDisabled}
-                              variant="green"
-                              className="md:hidden"
-                            />
-                            <button
-                              type="button"
-                              disabled={activateLineDisabled}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleActivateLine();
-                              }}
-                              className={`hidden md:block w-full px-3 py-2 text-lg ${greenActionBtnBase}`}
-                            >
-                              {t(
-                                "ui_activate_currency_line_32843c5eeb",
-                                "Activate currency line",
-                              )}
-                            </button>
-                          </>
-                        ) : null}
+                    {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
+                      <div className="rounded-md border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-[15px] text-emerald-200/80">
+                        {t(
+                          "ui_new_currency_line_auto_activate_a1b2c3",
+                          "New currency — the {{currency}} line will be created automatically.",
+                        ).replace("{{currency}}", quoteCode)}
                       </div>
+                    ) : null}
+
+                    <div>
+                      <label className="block text-[15px] text-white/40 mb-1">
+                        {t("ui_other_currency_d8e1f2a3b4", "Other currency")}
+                      </label>
+                      <WalletCurrencySelector
+                        value=""
+                        onChange={(code) => {
+                          if (code) setConvertQuoteCurrency(code);
+                        }}
+                        placeholder={t(
+                          "ui_search_all_currencies_c5d6e7f8",
+                          "Search all currencies...",
+                        )}
+                        excludeCodes={["USD", "RLUSD", "XRP"]}
+                        showQuickAdd={true}
+                      />
                     </div>
 
                     <div>
