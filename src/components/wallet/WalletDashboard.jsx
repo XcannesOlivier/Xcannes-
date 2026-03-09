@@ -237,10 +237,10 @@ export default function WalletDashboard({
   );
   const hasRlusdTrustline = hasOnChainRlusd;
 
-  const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
-    useRlusdPerUnitRates(currencyLineCodes);
-
   // ===== SUB-ORCHESTRATORS ===================================
+  // swapState MUST be created before useRlusdPerUnitRates so that
+  // the currently selected swap currencies (which may not yet exist
+  // as wallet lines) are included in the rate-fetching codes.
 
   const swapState = useWalletSwapOrchestrator({
     isConnected,
@@ -255,6 +255,21 @@ export default function WalletDashboard({
     refreshCurrencyLines,
     toast,
   });
+
+  // Augment currency line codes with whatever the user has currently
+  // selected in the swap modal — this ensures we fetch rates for new
+  // currencies that are not yet in the wallet.
+  const rateCodes = useMemo(() => {
+    const codes = new Set(currencyLineCodes || []);
+    const base = String(swapState.convertBaseCurrency || "").trim().toUpperCase();
+    const quote = String(swapState.convertQuoteCurrency || "").trim().toUpperCase();
+    if (base && base !== "USD" && base !== "RLUSD" && base !== "XRP") codes.add(base);
+    if (quote && quote !== "USD" && quote !== "RLUSD" && quote !== "XRP") codes.add(quote);
+    return Array.from(codes);
+  }, [currencyLineCodes, swapState.convertBaseCurrency, swapState.convertQuoteCurrency]);
+
+  const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
+    useRlusdPerUnitRates(rateCodes);
 
   const sendState = useWalletSendOrchestrator({
     wallet,

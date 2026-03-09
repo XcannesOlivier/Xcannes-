@@ -80,6 +80,36 @@ export default function CurrencyStatement({
     [normalizedCurrency],
   );
 
+  /* ── RLUSD → local-currency converter ───────────────────
+   * All internal amounts (balance, tx.amount, tx.runningBalance) are
+   * stored in RLUSD.  For non-USD/RLUSD currencies we must divide by
+   * the usdRates entry (RLUSD-per-1-unit) so the statement shows the
+   * actual local-currency value that fluctuates with the FX rate.
+   */
+  const rlusdToLocal = useMemo(() => {
+    const code = normalizedCurrency;
+    // USD and RLUSD are 1:1 — no conversion needed.
+    if (!code || USD_STABLECOINS.includes(code)) {
+      return (rlusdAmount) => {
+        const v = Number(rlusdAmount);
+        return Number.isFinite(v) ? v : 0;
+      };
+    }
+    const rate = Number(usdRates?.[code]);
+    if (!Number.isFinite(rate) || rate <= 0) {
+      // No rate available — fall back to raw RLUSD value.
+      return (rlusdAmount) => {
+        const v = Number(rlusdAmount);
+        return Number.isFinite(v) ? v : 0;
+      };
+    }
+    return (rlusdAmount) => {
+      const v = Number(rlusdAmount);
+      if (!Number.isFinite(v)) return 0;
+      return v / rate;
+    };
+  }, [normalizedCurrency, usdRates]);
+
   /* ── local state ───────────────────────────────────────── */
   const [filter, setFilter] = useState("all");
   const [exportFormat, setExportFormat] = useState(null);
@@ -142,6 +172,15 @@ export default function CurrencyStatement({
     formatUsd: formatUsdWithSymbol,
     getTransactionIcon,
   } = fmt;
+
+  // Format a RLUSD amount as local-currency units.
+  // Transaction amounts from the backend are in RLUSD; divide by rate
+  // to get the local value (EUR, GBP…) that fluctuates with the FX rate.
+  // balance (header) is already in local units so use formatAmountWithSymbolLocal directly.
+  const formatAmountRlusdAsLocal = useCallback(
+    (rlusdAmount) => formatAmountWithSymbolLocal(rlusdToLocal(rlusdAmount)),
+    [formatAmountWithSymbolLocal, rlusdToLocal],
+  );
 
   /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {
@@ -320,7 +359,7 @@ export default function CurrencyStatement({
           <td class="right">${escapeHtml(
             `${isDebit ? "-" : "+"}${formatAmountWithSymbol(
               locale,
-              tx?.amount,
+              rlusdToLocal(tx?.amount),
               displayCurrency,
               { minimumFractionDigits: 2, maximumFractionDigits: 2 },
             )}`,
@@ -328,9 +367,11 @@ export default function CurrencyStatement({
           <td class="right">${escapeHtml(
             formatAmountWithSymbol(
               locale,
-              tx?.displayRunningBalance != null
-                ? tx.displayRunningBalance
-                : tx?.runningBalance,
+              rlusdToLocal(
+                tx?.displayRunningBalance != null
+                  ? tx.displayRunningBalance
+                  : tx?.runningBalance,
+              ),
               displayCurrency,
               { minimumFractionDigits: 2, maximumFractionDigits: 2 },
             ),
@@ -380,6 +421,7 @@ export default function CurrencyStatement({
     displayCurrency,
     fallbackPeriod,
     getLocalizedDescription,
+    rlusdToLocal,
     transactionsWithDisplayBalance,
     formatDate,
     ledgerLastIndex,
@@ -910,10 +952,10 @@ export default function CurrencyStatement({
                                   }`}
                                 >
                                   {tx.type === "debit" ? "−" : "+"}
-                                  {formatAmountWithSymbolLocal(tx.amount)}
+                                  {formatAmountRlusdAsLocal(tx.amount)}
                                 </td>
                                 <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                                  {formatAmountWithSymbolLocal(
+                                  {formatAmountRlusdAsLocal(
                                     tx?.displayRunningBalance != null
                                       ? tx.displayRunningBalance
                                       : tx.runningBalance,
