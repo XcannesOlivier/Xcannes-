@@ -8,7 +8,7 @@ import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { useWallet } from "@/context/WalletContext";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";

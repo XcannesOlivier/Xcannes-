@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 export default function WalletDashboardSaveAddressPrompt({
   open,

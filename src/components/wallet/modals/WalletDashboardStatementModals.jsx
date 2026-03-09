@@ -9,7 +9,7 @@ import {
 } from "@/lib/walletStatementCache";
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 export default function WalletDashboardStatementModals({
   augmentedTokens,

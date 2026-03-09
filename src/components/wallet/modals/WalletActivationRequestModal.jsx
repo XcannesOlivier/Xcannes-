@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import { useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 export default function WalletActivationRequestModal({
   open,

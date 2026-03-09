@@ -8,7 +8,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { getCurrencySymbol } from "../demoWalletDashboardConfig";
 import { buildDemoPayreq, encodeDemoPayreqQR } from "../utils/demoXrplMemo";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 const ShareIcon = ({ className = "" }) => (
   <svg

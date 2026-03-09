@@ -15,7 +15,7 @@ import {
 } from "../demoWalletDashboardConfig";
 import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
 import { computeSpreadQuote, isFxConversion } from "../utils/demoWalletSpread";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 export default function DemoWalletDashboardSwapModal({
   open,

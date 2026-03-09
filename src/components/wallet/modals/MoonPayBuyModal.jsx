@@ -5,7 +5,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";

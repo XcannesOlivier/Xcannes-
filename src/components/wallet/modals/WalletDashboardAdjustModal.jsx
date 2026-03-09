@@ -8,7 +8,7 @@ import {
   buildRlusdPaymentTxjson,
   XCANNES_ACTIVATION_WALLET_ADDRESS,
 } from "@/utils/walletSpread";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,

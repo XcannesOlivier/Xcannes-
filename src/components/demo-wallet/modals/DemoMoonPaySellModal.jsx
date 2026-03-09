@@ -7,7 +7,7 @@ import {
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 // Static fiat currencies for the demo wallet (no MoonPay API call needed)
 const DEMO_FIAT_CURRENCIES = [

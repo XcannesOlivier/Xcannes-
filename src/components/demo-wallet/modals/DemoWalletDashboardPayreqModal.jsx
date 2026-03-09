@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
 
 export default function DemoWalletDashboardPayreqModal({

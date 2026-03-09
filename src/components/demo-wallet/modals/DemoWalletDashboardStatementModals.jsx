@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 import DemoCurrencyStatement from "../statements/DemoCurrencyStatement";
 import DemoGlobalStatement from "../statements/DemoGlobalStatement";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 
 export default function DemoWalletDashboardStatementModals({
   augmentedTokens,

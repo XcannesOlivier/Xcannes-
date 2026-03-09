@@ -7,7 +7,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import QRScanner from "../components/QRScanner";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { normalizeQrImageFile } from "@/utils/qrImage";
 

@@ -10,7 +10,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 const ShareIcon = ({ className = "" }) => (

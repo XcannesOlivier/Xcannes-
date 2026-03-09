@@ -9,7 +9,7 @@ import WalletCurrencySelector from "@/components/ui/WalletCurrencySelector";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
-import { useModalTransition } from "@/utils/useModalTransition";
+import { useModalTransition } from "@/hooks/useModalTransition";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
