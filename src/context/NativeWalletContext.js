@@ -416,10 +416,28 @@ export const NativeWalletProvider = ({ children }) => {
 
     setIsConnecting(true);
     try {
+      // Autofill Fee, Sequence, LastLedgerSequence via backend before signing
+      let filledTx = txjson;
+      try {
+        const afRes = await fetch(apiUrl("/wallet-relay/autofill"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ txjson, address: wallet }),
+        });
+        if (afRes.ok) {
+          const afData = await afRes.json();
+          if (afData.txjson) filledTx = afData.txjson;
+        } else {
+          console.warn("[NativeWallet] Autofill failed, signing without:", await afRes.text());
+        }
+      } catch (afErr) {
+        console.warn("[NativeWallet] Autofill error, signing without:", afErr);
+      }
+
       const payload = {
         type: "sign",
         origin: window.location.origin,
-        txjson,
+        txjson: filledTx,
         ...(action ? { action } : {}),
       };
 

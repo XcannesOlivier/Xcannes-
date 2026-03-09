@@ -342,10 +342,28 @@ export const PwaEmbeddedProvider = ({ children }) => {
       setIsConnecting(true);
 
       try {
+        // Autofill Fee, Sequence, LastLedgerSequence via backend before signing
+        let filledTx = txjson;
+        try {
+          const afRes = await fetch(apiUrl("/wallet-relay/autofill"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ txjson, address: walletRef.current }),
+          });
+          if (afRes.ok) {
+            const afData = await afRes.json();
+            if (afData.txjson) filledTx = afData.txjson;
+          } else {
+            console.warn("[PwaEmbedded] Autofill failed, signing without:", await afRes.text());
+          }
+        } catch (afErr) {
+          console.warn("[PwaEmbedded] Autofill error, signing without:", afErr);
+        }
+
         // Ask the PWA to sign the transaction
         postToPwa({
           type: "SIGN_TX",
-          txjson,
+          txjson: filledTx,
           action: action || null,
           requestId,
           address: walletRef.current,
