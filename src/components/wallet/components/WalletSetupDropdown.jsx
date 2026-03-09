@@ -50,17 +50,12 @@ export default function WalletSetupDropdown({
   const totalSteps = 2;
   const allDone = isStep1Done && isStep2Done;
 
-  // Don't render anything if everything is done
-  if (allDone) return null;
-
   // ── Auto-close when another inline modal/action opens ──────
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (activeAction) setIsOpen(false);
   }, [activeAction]);
 
   // ── Close on outside click ─────────────────────────────────
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!isOpen) return;
     const handleClickOutside = (e) => {
@@ -75,7 +70,6 @@ export default function WalletSetupDropdown({
   const validateLabel = validateWalletLabel;
 
   // ── Form submit ────────────────────────────────────────────
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleValidate = useCallback(() => {
     const trimmed = labelDraft.trim();
     if (!validateLabel(trimmed)) {
@@ -96,7 +90,6 @@ export default function WalletSetupDropdown({
   }, [currencyDraft, labelDraft, onConfirmSetup, t]);
 
   // ── Keyboard shortcut for step 2 input ─────────────────────
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === "Enter") {
@@ -106,6 +99,10 @@ export default function WalletSetupDropdown({
     },
     [handleValidate],
   );
+
+  // Don't render anything if everything is done
+  // (MUST be after all hooks to respect React rules of hooks)
+  if (allDone) return null;
 
   // ── Progress bar width ─────────────────────────────────────
   const progressPct = Math.round((completedCount / totalSteps) * 100);
