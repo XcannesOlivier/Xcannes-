@@ -7,7 +7,6 @@ export function useDesktopInlineFlags({
   qrScannerOpen,
   activeAction,
   sendPaymentRequest,
-  showAdjustmentModal,
   showActivationModal,
   showActivationRequestModal,
   walletInfoOpen,
@@ -39,10 +38,6 @@ export function useDesktopInlineFlags({
     isDesktopPanel &&
     !showInlineQrScanner &&
     activeAction === "cash";
-  const showInlineAdjust =
-    isDesktopPanel &&
-    !showInlineQrScanner &&
-    showAdjustmentModal;
   const showInlineActivation =
     isDesktopPanel &&
     !showInlineQrScanner &&
@@ -60,7 +55,6 @@ export function useDesktopInlineFlags({
     showInlineReceive ||
     showInlineSwap ||
     showInlineCash ||
-    showInlineAdjust ||
     showInlineActivation ||
     showInlineActivationRequest ||
     showInlineInfo;
@@ -79,7 +73,6 @@ export function useDesktopInlineFlags({
     showInlineReceive,
     showInlineSwap,
     showInlineCash,
-    showInlineAdjust,
     showInlineActivation,
     showInlineActivationRequest,
     showInlineInfo,

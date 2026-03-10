@@ -26,8 +26,6 @@ export function useWalletNavigation({
   currencyLines,
   handleUpsertCurrencyLineReal,
   activeAction,
-  hasAdjustmentDeficit,
-  showAdjustmentModal,
   // navigation
   closeInlineQr,
   setActiveAction,
@@ -35,7 +33,6 @@ export function useWalletNavigation({
   setSwapDefaultView,
   setSwapLockedView,
   setCashBuyPrefill,
-  setShowAdjustmentModal,
   setShowActivationModal,
   setShowActivationRequestModal,
   setShowGlobalStatement,
@@ -52,7 +49,6 @@ export function useWalletNavigation({
   toast,
 }) {
   const refreshTimerRef = useRef(null);
-  const adjustmentAutoOpenedRef = useRef(false);
 
   // ─── Currency line activation (open converter) ────────────────────────
 
@@ -342,44 +338,6 @@ export function useWalletNavigation({
     setConvertQuoteCurrency,
     setSwapDefaultView,
     setSwapLockedView,
-    setWalletInfoOpen,
-  ]);
-
-  // ─── Event: open-adjustment ───────────────────────────────────────────
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const handler = () => {
-      closeInlineQr();
-      setWalletInfoOpen(false);
-      setShowAdjustmentModal(true);
-    };
-    window.addEventListener("xcannes:wallet:open-adjustment", handler);
-    return () =>
-      window.removeEventListener("xcannes:wallet:open-adjustment", handler);
-  }, [closeInlineQr, setShowAdjustmentModal, setWalletInfoOpen]);
-
-  // ─── Auto-open adjustment deficit ─────────────────────────────────────
-
-  useEffect(() => {
-    if (!backendWalletAddress) return;
-    if (!hasAdjustmentDeficit) {
-      adjustmentAutoOpenedRef.current = false;
-      return;
-    }
-    if (adjustmentAutoOpenedRef.current) return;
-    if (activeAction || showAdjustmentModal) return;
-    closeInlineQr();
-    setWalletInfoOpen(false);
-    setShowAdjustmentModal(true);
-    adjustmentAutoOpenedRef.current = true;
-  }, [
-    activeAction,
-    backendWalletAddress,
-    closeInlineQr,
-    hasAdjustmentDeficit,
-    showAdjustmentModal,
-    setShowAdjustmentModal,
     setWalletInfoOpen,
   ]);
 

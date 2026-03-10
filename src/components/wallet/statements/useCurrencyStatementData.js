@@ -228,21 +228,6 @@ export default function useCurrencyStatementData({
 
   const showMonthHeaders = selectedMonth === "archives";
 
-  /* ── adjustment info ────────────────────────────────────── */
-  const adjustmentInfo = useMemo(() => {
-    let required = false;
-    let deficit = null;
-    for (const tx of transactions || []) {
-      if (!tx?.adjustmentRequired) continue;
-      required = true;
-      const value = Number(tx?.adjustmentDeficitRlusd);
-      if (Number.isFinite(value)) {
-        deficit = Math.max(deficit ?? 0, value);
-      }
-    }
-    return { required, deficit };
-  }, [transactions]);
-
   /* ── current period label ───────────────────────────────── */
   const currentPeriod =
     selectedMonth === "archives"
@@ -260,7 +245,6 @@ export default function useCurrencyStatementData({
     transactionsWithDisplayBalance,
     visibleGroups,
     showMonthHeaders,
-    adjustmentInfo,
     currentPeriod,
     currentDisplayPeriod,
   };

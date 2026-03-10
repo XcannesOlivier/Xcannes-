@@ -85,6 +85,10 @@ export default function CurrencyStatement({
    * stored in RLUSD.  For non-USD/RLUSD currencies we must divide by
    * the usdRates entry (RLUSD-per-1-unit) so the statement shows the
    * actual local-currency value that fluctuates with the FX rate.
+   *
+   * NOTE: The `balance` prop (header) is already in local-currency units
+   * (converted in useTokenDisplayLabels).  Only transaction amounts
+   * (tx.amount, tx.runningBalance) need rlusdToLocal conversion.
    */
   const rlusdToLocal = useMemo(() => {
     const code = normalizedCurrency;
@@ -155,7 +159,6 @@ export default function CurrencyStatement({
     availableMonths,
     visibleGroups,
     showMonthHeaders,
-    adjustmentInfo,
     transactionsWithDisplayBalance,
   } = data;
 
@@ -253,12 +256,13 @@ export default function CurrencyStatement({
   const estimatedUsd = useMemo(() => {
     const value = Number.parseFloat(balance || 0) || 0;
     const code = normalizedCurrency;
-    if (!code) return value;
+    if (!code) return null;
     const rate = usdRates?.[code];
-    if (Number.isFinite(rate)) return value * rate;
+    if (Number.isFinite(rate) && rate > 0) return value * rate;
     if (USD_STABLECOINS.includes(code)) return value;
-    if (code === "XRP") return value * 0.5;
-    return value;
+    // For XRP and currencies without a rate, return null to hide the
+    // USD estimate rather than displaying a misleading value.
+    return null;
   }, [balance, normalizedCurrency, usdRates]);
 
   /* ── XRP reserve ───────────────────────────────────────── */
@@ -351,10 +355,19 @@ export default function CurrencyStatement({
         const fullDescription = [txDescription, counterparty]
           .filter(Boolean)
           .join(" ");
+        const feeLabel =
+          tx?.category === "exchange" && tx?.spreadRlusd > 0
+            ? ` (${t("statement_conversion_fee_label", "Frais")} : ${formatAmountWithSymbol(
+                locale,
+                rlusdToLocal(tx.spreadRlusd),
+                displayCurrency,
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+              )})`
+            : "";
         return `
         <tr>
           <td>${escapeHtml(formatDate(tx?.date))}</td>
-          <td>${escapeHtml(fullDescription)}</td>
+          <td>${escapeHtml(fullDescription)}${feeLabel ? `<br/><small style="color:#888">${escapeHtml(feeLabel)}</small>` : ""}</td>
           <td>${escapeHtml(txType)}</td>
           <td class="right">${escapeHtml(
             `${isDebit ? "-" : "+"}${formatAmountWithSymbol(
@@ -592,9 +605,11 @@ export default function CurrencyStatement({
               <p className="text-sm text-white font-semibold">
                 {formatAmountWithSymbolLocal(balance)}
               </p>
-              <p className="text-[11px] text-white/50">
-                ≈ {formatUsdWithSymbol(estimatedUsd)}
-              </p>
+              {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+                <p className="text-[11px] text-white/50">
+                  ≈ {formatUsdWithSymbol(estimatedUsd)}
+                </p>
+              ) : null}
 
               {normalizedCurrency === "XRP" && (
                 <div className="mt-2 relative">
@@ -636,7 +651,7 @@ export default function CurrencyStatement({
                             )}
                           </span>
                           <span className="font-mono">
-                            {xrpReserveDetails.activationXrp.toFixed(2)}
+                            {xrpReserveDetails.activationXrp.toFixed(2)}{" "}
                             {t("ui_xrp_034964b994", "XRP")}
                           </span>
                         </div>
@@ -657,28 +672,7 @@ export default function CurrencyStatement({
                                 )}
                           </span>
                           <span className="font-mono">
-                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}
-                            {t("ui_xrp_034964b994", "XRP")}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>
-                            {t(
-                              "ui_trustline_rlusd_91682deeea",
-                              "Trustline RLUSD",
-                            )}{" "}
-                            {hasRlusdTrustline
-                              ? t(
-                                  "ui_status_active_short_4c8b1a7d2e",
-                                  "(active)",
-                                )
-                              : t(
-                                  "ui_status_to_activate_short_7a1c4d9b2e",
-                                  "(to activate)",
-                                )}
-                          </span>
-                          <span className="font-mono">
-                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}
+                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{" "}
                             {t("ui_xrp_034964b994", "XRP")}
                           </span>
                         </div>
@@ -706,46 +700,6 @@ export default function CurrencyStatement({
                   )}
                 </span>
               </p>
-            </div>
-          )}
-
-          {adjustmentInfo.required && (
-            <div className="bg-amber-500/10 rounded-lg p-3 md:p-4">
-              <p className="text-sm text-amber-200 flex items-center gap-2">
-                <span className="text-xl">⚠️</span>
-                <span>
-                  <strong>
-                    {t(
-                      "ui_adjustment_required_94b2c1d5aa",
-                      "Ajustement requis:",
-                    )}
-                  </strong>{" "}
-                  {t(
-                    "ui_adjustment_required_desc_4f7a2c1b9e",
-                    "Le pool RLUSD ne couvre plus toutes les allocations.",
-                  )}
-                  {Number.isFinite(adjustmentInfo.deficit)
-                    ? ` (${adjustmentInfo.deficit.toLocaleString(locale, { maximumFractionDigits: 6 })} RLUSD)`
-                    : ""}
-                </span>
-              </p>
-              <div className="mt-2 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (typeof window === "undefined") return;
-                    window.dispatchEvent(
-                      new CustomEvent("xcannes:wallet:open-adjustment"),
-                    );
-                  }}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-amber-300/20 text-amber-100 hover:bg-amber-300/30 transition-colors"
-                >
-                  {t(
-                    "ui_adjustment_open_modal_3c2b1a9d5e",
-                    "Ajuster maintenant",
-                  )}
-                </button>
-              </div>
             </div>
           )}
 
@@ -941,6 +895,20 @@ export default function CurrencyStatement({
                                           {tx.counterparty.slice(-6)}
                                         </p>
                                       )}
+                                      {/* Conversion fees — shown in quote currency */}
+                                      {tx.category === "exchange" &&
+                                        tx.spreadRlusd > 0 && (
+                                          <p className="text-[10px] md:text-xs text-white/35 mt-0.5">
+                                            {t(
+                                              "statement_conversion_fee_label",
+                                              "Frais",
+                                            )}
+                                            {" : "}
+                                            {formatAmountRlusdAsLocal(
+                                              tx.spreadRlusd,
+                                            )}
+                                          </p>
+                                        )}
                                     </div>
                                   </div>
                                 </td>

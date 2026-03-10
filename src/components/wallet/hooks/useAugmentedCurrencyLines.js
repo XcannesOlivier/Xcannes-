@@ -100,12 +100,6 @@ export function useAugmentedCurrencyLines({
       window.removeEventListener("xcannes:wallet:refresh", handleWalletRefresh);
   }, [backendWalletAddress, refreshCurrencyLines]);
 
-  const adjustmentDeficitRlusd = Number(
-    currencyLinesSummary?.excessAllocatedRlusd ?? 0,
-  );
-  const hasAdjustmentDeficit =
-    Number.isFinite(adjustmentDeficitRlusd) && adjustmentDeficitRlusd > 1e-9;
-
   const currencyLineCodes = useMemo(() => {
     const codes = new Set();
     // Utiliser augmentedCurrencyLines (inclut les lignes par défaut
@@ -124,8 +118,6 @@ export function useAugmentedCurrencyLines({
 
   return {
     augmentedCurrencyLines,
-    adjustmentDeficitRlusd,
-    hasAdjustmentDeficit,
     currencyLineCodes,
   };
 }

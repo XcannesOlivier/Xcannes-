@@ -12,7 +12,6 @@ import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
-import WalletDashboardAdjustModal from "../modals/WalletDashboardAdjustModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
 import WalletInfoModal from "../modals/WalletInfoModal";
@@ -26,7 +25,6 @@ export default function WalletDesktopModals({
   showInlineReceive,
   showInlineSwap,
   showInlineCash,
-  showInlineAdjust,
   showInlineActivation,
   showInlineActivationRequest,
   showInlineInfo,
@@ -39,7 +37,6 @@ export default function WalletDesktopModals({
   receiveModalProps,
   swapModalProps,
   cashModalProps,
-  adjustModalProps,
   activationModalProps,
   activationRequestModalProps,
   infoModalProps,
@@ -47,7 +44,6 @@ export default function WalletDesktopModals({
 
   // open/close handlers
   setActiveAction,
-  setShowAdjustmentModal,
   setShowActivationModal,
   setShowActivationRequestModal,
   setWalletInfoOpen,
@@ -124,15 +120,6 @@ export default function WalletDesktopModals({
           }}
           {...cashModalProps}
           availableTokens={selectableTokens}
-        />
-      ) : null}
-
-      {showInlineAdjust ? (
-        <WalletDashboardAdjustModal
-          open
-          inline
-          onClose={() => setShowAdjustmentModal(false)}
-          {...adjustModalProps}
         />
       ) : null}
 

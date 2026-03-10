@@ -470,20 +470,6 @@ export default function DemoCurrencyStatement({
 
   const showMonthHeaders = selectedMonth === "archives";
 
-  const adjustmentInfo = useMemo(() => {
-    let required = false;
-    let deficit = null;
-    for (const tx of transactions || []) {
-      if (!tx?.adjustmentRequired) continue;
-      required = true;
-      const value = Number(tx?.adjustmentDeficitRlusd);
-      if (Number.isFinite(value)) {
-        deficit = Math.max(deficit ?? 0, value);
-      }
-    }
-    return { required, deficit };
-  }, [transactions]);
-
   useEffect(() => {
     if (!highlightedTransactionId) return;
     const node = highlightRowRef.current;
@@ -1367,46 +1353,6 @@ export default function DemoCurrencyStatement({
                   )}
                 </span>
               </p>
-            </div>
-          )}
-
-          {adjustmentInfo.required && (
-            <div className="bg-amber-500/10 rounded-lg p-3 md:p-4">
-              <p className="text-sm text-amber-200 flex items-center gap-2">
-                <span className="text-xl">⚠️</span>
-                <span>
-                  <strong>
-                    {t(
-                      "ui_adjustment_required_94b2c1d5aa",
-                      "Ajustement requis:",
-                    )}
-                  </strong>{" "}
-                  {t(
-                    "ui_adjustment_required_desc_4f7a2c1b9e",
-                    "Le pool RLUSD ne couvre plus toutes les allocations.",
-                  )}
-                  {Number.isFinite(adjustmentInfo.deficit)
-                    ? ` (${adjustmentInfo.deficit.toLocaleString(locale, { maximumFractionDigits: 6 })} RLUSD)`
-                    : ""}
-                </span>
-              </p>
-              <div className="mt-2 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (typeof window === "undefined") return;
-                    window.dispatchEvent(
-                      new CustomEvent("xcannes:wallet:open-adjustment"),
-                    );
-                  }}
-                  className="px-3 py-1.5 text-xs rounded-lg bg-amber-300/20 text-amber-100 hover:bg-amber-300/30 transition-colors"
-                >
-                  {t(
-                    "ui_adjustment_open_modal_3c2b1a9d5e",
-                    "Ajuster maintenant",
-                  )}
-                </button>
-              </div>
             </div>
           )}
 

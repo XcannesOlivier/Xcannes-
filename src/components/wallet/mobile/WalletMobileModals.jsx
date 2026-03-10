@@ -17,7 +17,6 @@ import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
-import WalletDashboardAdjustModal from "../modals/WalletDashboardAdjustModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
 import WalletInfoModal from "../modals/WalletInfoModal";
@@ -31,7 +30,6 @@ export default function WalletMobileModals({
   receiveModalProps,
   swapModalProps,
   cashModalProps,
-  adjustModalProps,
   activationModalProps,
   activationRequestModalProps,
   infoModalProps,
@@ -41,8 +39,6 @@ export default function WalletMobileModals({
   activeAction,
   hasPayreq,
   setActiveAction,
-  showAdjustmentModal,
-  setShowAdjustmentModal,
   showActivationModal,
   setShowActivationModal,
   showActivationRequestModal,
@@ -119,12 +115,6 @@ export default function WalletMobileModals({
               open={activeAction === "swap"}
               onClose={() => setActiveAction(null)}
               {...swapModalProps}
-            />
-
-            <WalletDashboardAdjustModal
-              open={showAdjustmentModal}
-              onClose={() => setShowAdjustmentModal(false)}
-              {...adjustModalProps}
             />
 
             <WalletDashboardCashModal

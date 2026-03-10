@@ -39,14 +39,6 @@ import { useWalletIncomingToast } from "./hooks/useWalletIncomingToast";
 import { useDesktopInlineFlags } from "./hooks/useDesktopInlineFlags";
 import { useAugmentedCurrencyLines } from "./hooks/useAugmentedCurrencyLines";
 
-const DEFAULT_ADJUSTMENT_FEE_RLUSD = 1;
-const ADJUSTMENT_FEE_RLUSD = (() => {
-  const raw = Number.parseFloat(
-    process.env.NEXT_PUBLIC_WALLET_ADJUSTMENT_FEE_RLUSD || "",
-  );
-  return Number.isFinite(raw) && raw > 0 ? raw : DEFAULT_ADJUSTMENT_FEE_RLUSD;
-})();
-
 function isAcceptedOnChainToken(currency) {
   const code = String(currency || "").toUpperCase();
   return WALLET_ACCEPTED_TOKENS.has(code);
@@ -120,7 +112,6 @@ export default function WalletDashboard({
 
   // ── UI state ───────────────────────────────────────────────
   const [activeAction, setActiveAction] = useState(null);
-  const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showActivationRequestModal, setShowActivationRequestModal] =
     useState(false);
@@ -208,8 +199,6 @@ export default function WalletDashboard({
   // ── Augmented currency lines (defaults + sorting + deficit) ─
   const {
     augmentedCurrencyLines,
-    adjustmentDeficitRlusd,
-    hasAdjustmentDeficit,
     currencyLineCodes,
   } = useAugmentedCurrencyLines({
     currencyLines,
@@ -366,15 +355,12 @@ export default function WalletDashboard({
     currencyLines,
     handleUpsertCurrencyLineReal,
     activeAction,
-    hasAdjustmentDeficit,
-    showAdjustmentModal,
     closeInlineQr: sendState.closeInlineQr,
     setActiveAction,
     setWalletInfoOpen,
     setSwapDefaultView: swapState.setSwapDefaultView,
     setSwapLockedView: swapState.setSwapLockedView,
     setCashBuyPrefill: swapState.setCashBuyPrefill,
-    setShowAdjustmentModal,
     setShowActivationModal,
     setShowActivationRequestModal,
     setShowGlobalStatement,
@@ -428,7 +414,6 @@ export default function WalletDashboard({
     if (desktopDefaultActionSetRef.current) return;
     if (
       activeAction ||
-      showAdjustmentModal ||
       showActivationModal ||
       showActivationRequestModal ||
       walletInfoOpen ||
@@ -445,7 +430,6 @@ export default function WalletDashboard({
     isDesktopPanel,
     showActivationModal,
     showActivationRequestModal,
-    showAdjustmentModal,
     showCurrencyStatement,
     walletInfoOpen,
     swapState,
@@ -457,7 +441,6 @@ export default function WalletDashboard({
     qrScannerOpen: sendState.qrScannerOpen,
     activeAction,
     sendPaymentRequest: sendState.sendPaymentRequest,
-    showAdjustmentModal,
     showActivationModal,
     showActivationRequestModal,
     walletInfoOpen,
@@ -500,11 +483,6 @@ export default function WalletDashboard({
     currencyLineAllocatedRlusd,
     setCurrencyLineAllocatedRlusd,
     handleUpsertCurrencyLine,
-    showAdjustmentModal,
-    setShowAdjustmentModal,
-    adjustmentDeficitRlusd,
-    refreshBalance,
-    adjustmentFeeRlusd: ADJUSTMENT_FEE_RLUSD,
     showActivationModal,
     setShowActivationModal,
     handleActivationSendFromWallet,
@@ -552,7 +530,6 @@ export default function WalletDashboard({
     !allowBackgroundScrollOnMobile &&
     Boolean(
       lockForActiveAction ||
-      showAdjustmentModal ||
       showActivationModal ||
       showActivationRequestModal ||
       walletInfoOpen ||

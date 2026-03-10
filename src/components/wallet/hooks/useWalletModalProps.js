@@ -97,13 +97,6 @@ export function useWalletModalProps({
   cashBuyPrefill,
   setCashBuyPrefill,
 
-  // --- Adjust ---
-  showAdjustmentModal,
-  setShowAdjustmentModal,
-  adjustmentDeficitRlusd,
-  refreshBalance,
-  adjustmentFeeRlusd,
-
   // --- Activation ---
   showActivationModal,
   setShowActivationModal,
@@ -389,34 +382,6 @@ export function useWalletModalProps({
     ],
   );
 
-  // --- Adjust modal props ---
-  const adjustModalProps = useMemo(
-    () => ({
-      renderWalletMeta,
-      walletAddress: wallet,
-      signTransaction,
-      deficitRlusd: adjustmentDeficitRlusd,
-      currencyLines: effectiveCurrencyLines,
-      rlusdPerUnitRates,
-      refreshBalance,
-      refreshCurrencyLines: effectiveRefreshCurrencyLines,
-      adjustmentFeeRlusd,
-      toast,
-    }),
-    [
-      renderWalletMeta,
-      wallet,
-      signTransaction,
-      adjustmentDeficitRlusd,
-      effectiveCurrencyLines,
-      rlusdPerUnitRates,
-      refreshBalance,
-      effectiveRefreshCurrencyLines,
-      adjustmentFeeRlusd,
-      toast,
-    ],
-  );
-
   // --- Activation modal props ---
   const activationModalProps = useMemo(
     () => ({
@@ -493,7 +458,6 @@ export function useWalletModalProps({
     receiveModalProps,
     swapModalProps,
     cashModalProps,
-    adjustModalProps,
     activationModalProps,
     activationRequestModalProps,
     infoModalProps,
@@ -503,8 +467,6 @@ export function useWalletModalProps({
     activeAction,
     setActiveAction,
     hasPayreq,
-    showAdjustmentModal,
-    setShowAdjustmentModal,
     showActivationModal,
     setShowActivationModal,
     showActivationRequestModal,

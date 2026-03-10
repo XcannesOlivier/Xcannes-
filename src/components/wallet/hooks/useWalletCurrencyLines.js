@@ -7,8 +7,6 @@ export function useWalletCurrencyLines(address) {
     rlusdOnChain: null,
     totalAllocatedRlusd: 0,
     unallocatedRlusd: null,
-    invariantOk: null,
-    excessAllocatedRlusd: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -20,8 +18,6 @@ export function useWalletCurrencyLines(address) {
         rlusdOnChain: null,
         totalAllocatedRlusd: 0,
         unallocatedRlusd: null,
-        invariantOk: null,
-        excessAllocatedRlusd: null,
       });
       setLoading(false);
       setError(null);
@@ -46,8 +42,6 @@ export function useWalletCurrencyLines(address) {
         rlusdOnChain: data.rlusdOnChain ?? null,
         totalAllocatedRlusd: Number(data.totalAllocatedRlusd || 0),
         unallocatedRlusd: data.unallocatedRlusd ?? null,
-        invariantOk: data.invariantOk ?? null,
-        excessAllocatedRlusd: data.excessAllocatedRlusd ?? null,
       });
     } catch (err) {
       console.error("[useWalletCurrencyLines] Error:", err);
@@ -94,8 +88,6 @@ export function useWalletCurrencyLines(address) {
           rlusdOnChain: data.rlusdOnChain ?? null,
           totalAllocatedRlusd: Number(data.totalAllocatedRlusd || 0),
           unallocatedRlusd: data.unallocatedRlusd ?? null,
-          invariantOk: data.invariantOk ?? null,
-          excessAllocatedRlusd: data.excessAllocatedRlusd ?? null,
         });
 
         return data;
