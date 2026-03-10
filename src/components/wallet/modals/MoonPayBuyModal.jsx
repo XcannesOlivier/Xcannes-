@@ -513,11 +513,11 @@ const MoonPayBuyModal = ({
               {t("moonpay_destination_wallet", "Destination wallet")}
             </p>
             {String(walletLabel || "").trim() ? (
-              <p className="text-sm text-white/90 font-semibold truncate mb-1">
+              <p className="text-[12px] md:text-[13px] text-white/80 font-semibold truncate mb-1">
                 {walletLabel}
               </p>
             ) : null}
-            <p className="text-lg text-white/90 font-mono break-all">
+            <p className="text-[8px] md:text-[10px] text-white/50 font-mono break-all">
               {walletAddress}
             </p>
           </div>

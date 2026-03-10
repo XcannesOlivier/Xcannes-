@@ -21,7 +21,7 @@ export function useWalletMeta({
             {resolvedLabel || "Wallet"}
           </div>
           {!hideAddress && resolvedAddress ? (
-            <div className="font-mono flex flex-wrap items-center gap-2">
+            <div className="font-mono text-[8px] md:text-[10px] flex flex-wrap items-center gap-2">
               <span className="break-all" title={addressTitle || undefined}>
                 {resolvedAddress}
               </span>
