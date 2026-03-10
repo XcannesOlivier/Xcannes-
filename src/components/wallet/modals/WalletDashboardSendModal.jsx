@@ -525,6 +525,7 @@ export default function WalletDashboardSendModal({
               </div>
 
               {saveAddressBlock}
+              {scanRequestFooter}
             </div>
           </div>
           <div>
@@ -810,7 +811,6 @@ export default function WalletDashboardSendModal({
               ) : (
                 <>
                   {manualForm}
-                  {scanRequestFooter}
                   {sendActions}
                   {scannerModal}
                 </>
