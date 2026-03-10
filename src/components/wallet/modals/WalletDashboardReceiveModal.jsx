@@ -88,9 +88,8 @@ export default function WalletDashboardReceiveModal({
       setGeneratedRequest(null);
       setGenerateError(null);
       setIsRequestOpen(false);
-      resetReceiveForm?.();
     }
-  }, [open, resetReceiveForm]);
+  }, [open]);
 
   useEffect(() => {
     return () => {

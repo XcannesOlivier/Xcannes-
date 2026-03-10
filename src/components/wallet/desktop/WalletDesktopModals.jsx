@@ -49,6 +49,10 @@ export default function WalletDesktopModals({
   setWalletInfoOpen,
   setSendPaymentRequest,
   setCashBuyPrefill,
+  resetSendForm,
+  resetReceiveForm,
+  resetSwapForm,
+  resetCashForm,
   setQrScannerOpen,
   handleAddressScan,
 
@@ -76,6 +80,7 @@ export default function WalletDesktopModals({
           open
           inline
           onClose={() => {
+            resetSendForm?.();
             setActiveAction(null);
           }}
           {...sendModalProps}
@@ -98,7 +103,10 @@ export default function WalletDesktopModals({
         <WalletDashboardReceiveModal
           open
           inline
-          onClose={() => setActiveAction(null)}
+          onClose={() => {
+            resetReceiveForm?.();
+            setActiveAction(null);
+          }}
           {...receiveModalProps}
         />
       ) : null}
@@ -107,7 +115,10 @@ export default function WalletDesktopModals({
         <WalletDashboardSwapModal
           open
           inline
-          onClose={() => setActiveAction(null)}
+          onClose={() => {
+            resetSwapForm?.();
+            setActiveAction(null);
+          }}
           {...swapModalProps}
         />
       ) : null}
@@ -117,6 +128,7 @@ export default function WalletDesktopModals({
           open
           inline
           onClose={() => {
+            resetCashForm?.();
             setActiveAction(null);
             setCashBuyPrefill(null);
           }}

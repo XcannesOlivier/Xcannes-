@@ -266,9 +266,8 @@ export default function WalletDashboardSendModal({
       setSaveNewAddressLabel("");
       setShowConfirmation(false);
       setScanActive(false);
-      resetSendForm?.();
     }
-  }, [open, resetSendForm]);
+  }, [open]);
 
   useEffect(() => {
     if (!canSaveDestination) {

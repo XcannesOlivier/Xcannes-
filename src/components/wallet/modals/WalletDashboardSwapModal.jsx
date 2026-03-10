@@ -164,12 +164,6 @@ export default function WalletDashboardSwapModal({
   };
 
   useEffect(() => {
-    if (!open) {
-      resetSwapForm?.();
-    }
-  }, [open, resetSwapForm]);
-
-  useEffect(() => {
     if (!open) return;
     setPreviewState({ status: "idle", error: null });
     setPreviewAmount(null);

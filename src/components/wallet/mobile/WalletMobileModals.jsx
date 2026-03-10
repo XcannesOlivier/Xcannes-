@@ -47,6 +47,10 @@ export default function WalletMobileModals({
   setWalletInfoOpen,
   setSendPaymentRequest,
   setCashBuyPrefill,
+  resetSendForm,
+  resetReceiveForm,
+  resetSwapForm,
+  resetCashForm,
 
   // QR scanner
   qrScannerOpen,
@@ -94,6 +98,7 @@ export default function WalletMobileModals({
             <WalletDashboardSendModal
               open={activeAction === "send" && !hasPayreq}
               onClose={() => {
+                resetSendForm?.();
                 setActiveAction(null);
               }}
               {...sendModalProps}
@@ -109,19 +114,26 @@ export default function WalletMobileModals({
 
             <WalletDashboardReceiveModal
               open={activeAction === "receive"}
-              onClose={() => setActiveAction(null)}
+              onClose={() => {
+                resetReceiveForm?.();
+                setActiveAction(null);
+              }}
               {...receiveModalProps}
             />
 
             <WalletDashboardSwapModal
               open={activeAction === "swap"}
-              onClose={() => setActiveAction(null)}
+              onClose={() => {
+                resetSwapForm?.();
+                setActiveAction(null);
+              }}
               {...swapModalProps}
             />
 
             <WalletDashboardCashModal
               open={activeAction === "cash"}
               onClose={() => {
+                resetCashForm?.();
                 setActiveAction(null);
                 setCashBuyPrefill(null);
               }}
