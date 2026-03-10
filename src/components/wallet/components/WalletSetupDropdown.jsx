@@ -161,7 +161,20 @@ export default function WalletSetupDropdown({
 
       {/* ── Dropdown panel ── */}
       {isOpen && (
-        <div className="absolute z-50 left-0 right-0 mt-1.5 rounded-xl bg-[#111418] border border-white/10 shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 bg-[#111418] overflow-y-auto md:absolute md:inset-auto md:left-0 md:right-0 md:mt-1.5 md:rounded-xl md:border md:border-white/10 md:shadow-2xl md:overflow-hidden">
+          {/* Close button (mobile fullscreen) */}
+          <div className="flex items-center justify-between px-4 pt-4 pb-2 md:hidden">
+            <span className="text-sm font-semibold text-white/80">
+              {t("ui_setup_steps_remaining", "Configuration requise")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="text-white/60 hover:text-white transition-colors text-xl"
+            >
+              ✕
+            </button>
+          </div>
           {/* Progress bar */}
           <div className="h-1 w-full bg-white/5">
             <div
