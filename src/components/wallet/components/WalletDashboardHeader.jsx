@@ -107,7 +107,7 @@ export default function WalletDashboardHeader({
 
         {/* Bloc wallet — sélecteur + copier + refresh */}
         {isConnected && wallet && (
-          <div className="w-full mt-6 md:mt-1.5 px-2 flex justify-center">
+          <div className="w-full mt-14 md:mt-1.5 px-2 flex justify-center">
             <div className="relative flex items-center gap-2 w-full max-w-[460px]">
               <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
                 <div className="flex items-start justify-between gap-3">
