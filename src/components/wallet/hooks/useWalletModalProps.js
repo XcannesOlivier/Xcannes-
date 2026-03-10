@@ -129,6 +129,8 @@ export function useWalletModalProps({
 
   // --- Toast ---
   toast,
+  // --- Reset ---
+  resetSendForm,
 }) {
   // --- Send modal props ---
   const sendModalProps = useMemo(
@@ -154,6 +156,7 @@ export function useWalletModalProps({
       handleSendSubmit,
       sendProcessing,
       enableSaveAddress: true,
+      resetSendForm,
       toast,
     }),
     [
@@ -177,6 +180,7 @@ export function useWalletModalProps({
       handlePaymentRequestScan,
       handleSendSubmit,
       sendProcessing,
+      resetSendForm,
       toast,
     ],
   );

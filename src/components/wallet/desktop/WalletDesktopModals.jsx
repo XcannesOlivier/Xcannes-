@@ -75,7 +75,9 @@ export default function WalletDesktopModals({
         <WalletDashboardSendModal
           open
           inline
-          onClose={() => setActiveAction(null)}
+          onClose={() => {
+            setActiveAction(null);
+          }}
           {...sendModalProps}
         />
       ) : null}

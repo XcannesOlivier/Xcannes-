@@ -93,7 +93,9 @@ export default function WalletMobileModals({
           <>
             <WalletDashboardSendModal
               open={activeAction === "send" && !hasPayreq}
-              onClose={() => setActiveAction(null)}
+              onClose={() => {
+                setActiveAction(null);
+              }}
               {...sendModalProps}
             />
             <WalletDashboardPayreqModal

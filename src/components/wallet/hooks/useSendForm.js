@@ -17,6 +17,15 @@ export function useSendForm({
   const [sendProcessing, setSendProcessing] = useState(false);
   const [sendPaymentRequest, setSendPaymentRequest] = useState(null);
 
+  const resetSendForm = () => {
+    setSendTab(defaultSendTab);
+    setSendAssetKey(defaultSendAssetKey);
+    setSendDestination(defaultSendDestination);
+    setSendAmount(defaultSendAmount);
+    setSendProcessing(false);
+    setSendPaymentRequest(null);
+  };
+
   return {
     sendTab,
     setSendTab,
@@ -30,5 +39,6 @@ export function useSendForm({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest,
+    resetSendForm,
   };
 }

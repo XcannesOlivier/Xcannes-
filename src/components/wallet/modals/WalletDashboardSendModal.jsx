@@ -35,6 +35,7 @@ export default function WalletDashboardSendModal({
   sendProcessing,
   enableSaveAddress = false,
   inline = false,
+  resetSendForm,
   toast,
 }) {
   const { t, i18n } = useTranslation("common");
@@ -264,16 +265,10 @@ export default function WalletDashboardSendModal({
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
       setShowConfirmation(false);
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) {
       setScanActive(false);
-      return;
+      resetSendForm?.();
     }
-    setScanActive(false);
-  }, [open]);
+  }, [open, resetSendForm]);
 
   useEffect(() => {
     if (!canSaveDestination) {

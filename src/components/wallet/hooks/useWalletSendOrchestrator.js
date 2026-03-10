@@ -42,6 +42,7 @@ export function useWalletSendOrchestrator({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest,
+    resetSendForm,
   } = useSendForm();
 
   // ── Saved addresses ────────────────────────────────────────
@@ -287,5 +288,6 @@ export function useWalletSendOrchestrator({
     closeInlineQr,
     handleResumePayreq,
     handleSendSubmit,
+    resetSendForm,
   };
 }
