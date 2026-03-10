@@ -45,6 +45,7 @@ export default function WalletDashboardSendModal({
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -262,6 +263,7 @@ export default function WalletDashboardSendModal({
     if (!open) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
+      setShowConfirmation(false);
     }
   }, [open]);
 
@@ -681,16 +683,135 @@ export default function WalletDashboardSendModal({
     </div>
   ) : null;
 
+  /* ── Label helpers for confirmation ── */
+  const confirmDestinationLabel =
+    normalizedDestination.length > 14
+      ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+      : normalizedDestination;
+  const confirmCurrencyCode = String(
+    selectedSendToken?.currency || "",
+  ).trim().toUpperCase();
+  const confirmAmountLabel =
+    Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0 && confirmCurrencyCode
+      ? formatAmountWithSymbol(locale, normalizedSendAmount, confirmCurrencyCode, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 6,
+        })
+      : null;
+
+  const confirmationView = showConfirmation ? (
+    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
+      {/* Summary card */}
+      <div className="rounded-xl border border-[#22C55E]/25 bg-[#22C55E]/5 p-4 space-y-3">
+        <div className="text-[11px] uppercase tracking-wide text-[#22C55E]/80 font-semibold">
+          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
+        </div>
+        <div className="space-y-2 text-xs text-white/80">
+          {/* Destination */}
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_destination_xrpl_address_9c2b94554c", "Destination")}
+            </span>
+            <span className="font-mono text-white/80">
+              {confirmDestinationLabel}
+            </span>
+          </div>
+          {/* Asset */}
+          {confirmCurrencyCode ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-white/60">
+                {t("ui_asset_e5170a7a06", "Asset")}
+              </span>
+              <span className="font-semibold text-white/90">
+                {selectLabelByAssetKey?.[selectedSendToken?.key] ||
+                  selectLabelByAssetKey?.[selectedSendToken?.currency] ||
+                  confirmCurrencyCode}
+              </span>
+            </div>
+          ) : null}
+          {/* Amount */}
+          {confirmAmountLabel ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-white/60">
+                {t("ui_amount_52cea2dd3d", "Amount")}
+              </span>
+              <span className="font-mono text-white/90">
+                {confirmAmountLabel}
+              </span>
+            </div>
+          ) : null}
+          {/* FX info */}
+          {sendFxInfo ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-white/60">
+                {t("ui_fx_settlement", "Règlement XRPL")}
+              </span>
+              <span className="font-mono text-white/80">
+                ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
+              </span>
+            </div>
+          ) : null}
+          {/* Balance */}
+          {selectedSendToken ? (
+            <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
+              <span className="text-white/50 text-[10px]">
+                {t("ui_balance_340cdcff7a", "Balance:")}
+              </span>
+              <span className="font-mono text-white/50 text-[10px]">
+                {formatAmountWithSymbol(locale, selectedSendToken.value, selectedSendToken.currency, { minimumFractionDigits: 0, maximumFractionDigits: 6 })}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="space-y-2">
+        <SwipeConfirmButton
+          label={
+            sendProcessing
+              ? t("ui_sending_3b8c1a7d5e", "Sending...")
+              : t("ui_confirm_send", "Confirmer l'envoi")
+          }
+          onConfirm={handleManualSend}
+          disabled={sendProcessing || !canManualSend}
+          variant="green"
+          className="md:hidden"
+        />
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleManualSend();
+          }}
+          disabled={sendProcessing || !canManualSend}
+          className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnBase}`}
+        >
+          {sendProcessing
+            ? t("ui_sending_3b8c1a7d5e", "Sending...")
+            : t("ui_confirm_send", "Confirmer l'envoi")}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowConfirmation(false);
+          }}
+          disabled={sendProcessing}
+          className="w-full text-sm py-2 rounded-lg border border-white/15 bg-transparent text-white/70 hover:bg-white/5 hover:text-white transition-all duration-200"
+        >
+          {t("ui_back_modify", "← Modifier")}
+        </button>
+      </div>
+    </div>
+  ) : null;
+
   const sendActions = (
     <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
       <SwipeConfirmButton
-        label={
-          sendProcessing
-            ? t("ui_sending_3b8c1a7d5e", "Sending...")
-            : t("ui_send_504b64a87b", "Send")
-        }
-        onConfirm={handleManualSend}
-        disabled={sendProcessing || !canManualSend}
+        label={t("ui_send_504b64a87b", "Send")}
+        onConfirm={() => setShowConfirmation(true)}
+        disabled={!canManualSend}
         variant="green"
         className="mt-2 md:hidden"
       />
@@ -698,14 +819,12 @@ export default function WalletDashboardSendModal({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          handleManualSend();
+          setShowConfirmation(true);
         }}
-        disabled={sendProcessing || !canManualSend}
+        disabled={!canManualSend}
         className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}
       >
-        {sendProcessing
-          ? t("ui_sending_3b8c1a7d5e", "Sending...")
-          : t("ui_send_504b64a87b", "Send")}
+        {t("ui_send_504b64a87b", "Send")}
       </button>
     </div>
   );
@@ -810,6 +929,10 @@ export default function WalletDashboardSendModal({
                   {payreqCurrencySelectorBlock}
                   {saveAddressBlock}
                   {sendActions}
+                </>
+              ) : showConfirmation ? (
+                <>
+                  {confirmationView}
                 </>
               ) : (
                 <>
