@@ -455,6 +455,82 @@ export default function WalletDashboardSendModal({
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
               title={t(
+                "ui_send_destination_tip",
+                "Adresse XRPL du destinataire.",
+              )}
+            >
+              {t(
+                "ui_destination_xrpl_address_9c2b94554c",
+                "Destination (XRPL address)",
+              )}
+            </label>
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    list="saved-addresses"
+                    value={sendDestination}
+                    onChange={(e) => setSendDestination(e.target.value)}
+                    onPaste={handlePastePayload}
+                    placeholder={
+                      (savedAddresses || []).length > 0
+                        ? t(
+                            "ui_select_saved_address_60c28f89c1",
+                            "Select saved address...",
+                          )
+                        : t(
+                            "ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a",
+                            "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                          )
+                    }
+                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+                  />
+                  <datalist id="saved-addresses">
+                    {(savedAddresses || []).map((addr, idx) => (
+                      <option
+                        key={idx}
+                        value={addr.address}
+                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
+                      />
+                    ))}
+                  </datalist>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setScanActive(true);
+                    setScanKey((prev) => prev + 1);
+                  }}
+                  className="px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
+                  title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+                >
+                  <svg
+                    className="w-5 h-5 text-white/80"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {saveAddressBlock}
+            </div>
+          </div>
+          <div>
+            <label
+              className="block text-[11px] md:text-xs text-white/60 mb-1"
+              title={t(
                 "ui_send_asset_tip",
                 "Sélectionnez la devise à envoyer.",
               )}
@@ -596,84 +672,6 @@ export default function WalletDashboardSendModal({
               </p>
             </div>
           )}
-        </div>
-        <div className={inline ? "space-y-2" : ""}>
-          <div>
-            <label
-              className="block text-[11px] md:text-xs text-white/60 mb-1"
-              title={t(
-                "ui_send_destination_tip",
-                "Adresse XRPL du destinataire.",
-              )}
-            >
-              {t(
-                "ui_destination_xrpl_address_9c2b94554c",
-                "Destination (XRPL address)",
-              )}
-            </label>
-
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    list="saved-addresses"
-                    value={sendDestination}
-                    onChange={(e) => setSendDestination(e.target.value)}
-                    onPaste={handlePastePayload}
-                    placeholder={
-                      (savedAddresses || []).length > 0
-                        ? t(
-                            "ui_select_saved_address_60c28f89c1",
-                            "Select saved address...",
-                          )
-                        : t(
-                            "ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a",
-                            "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                          )
-                    }
-                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
-                  />
-                  <datalist id="saved-addresses">
-                    {(savedAddresses || []).map((addr, idx) => (
-                      <option
-                        key={idx}
-                        value={addr.address}
-                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
-                      />
-                    ))}
-                  </datalist>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setScanActive(true);
-                    setScanKey((prev) => prev + 1);
-                  }}
-                  className="px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
-                  title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-                >
-                  <svg
-                    className="w-5 h-5 text-white/80"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {saveAddressBlock}
-            </div>
-          </div>
         </div>
       </div>
     </div>
