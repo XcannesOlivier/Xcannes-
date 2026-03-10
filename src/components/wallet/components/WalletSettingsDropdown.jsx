@@ -40,10 +40,11 @@ export default function WalletSettingsDropdown({
         : "relative";
 
   // dropdown opens downward from header/inline, upward from footer
+  // md: prefixed so it doesn't override mobile fullscreen (fixed inset-0)
   const dropdownPositionClass =
     position === "footer"
-      ? "absolute right-0 bottom-full mb-1.5"
-      : "absolute right-0 top-full mt-1.5";
+      ? "md:absolute md:right-0 md:bottom-full md:mb-1.5"
+      : "md:absolute md:right-0 md:top-full md:mt-1.5";
 
   return (
     <div className={visibilityClass} ref={ref}>
@@ -71,7 +72,7 @@ export default function WalletSettingsDropdown({
 
       {isOpen && (
         <div
-          className={`fixed inset-0 z-50 bg-[#151b1e] overflow-y-auto md:fixed md:inset-auto ${dropdownPositionClass} md:w-48 md:rounded-xl md:bg-[#151b1e] md:border md:border-white/10 md:shadow-2xl md:overflow-hidden md:animate-in md:fade-in md:slide-in-from-top-1 md:duration-150`}
+          className={`fixed inset-0 z-50 bg-[#151b1e] overflow-y-auto ${dropdownPositionClass} md:inset-auto md:w-48 md:rounded-xl md:bg-[#151b1e] md:border md:border-white/10 md:shadow-2xl md:overflow-hidden md:animate-in md:fade-in md:slide-in-from-top-1 md:duration-150`}
         >
           {/* Mobile fullscreen header with close button */}
           <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
