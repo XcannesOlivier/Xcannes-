@@ -12,8 +12,10 @@ import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import {
   formatAmountWithSymbol,
+  getCurrencyFlag,
   getDisplayCurrencyCode,
 } from "../walletDashboardConfig";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 export default function WalletDashboardSwapModal({
   open,
@@ -52,16 +54,35 @@ export default function WalletDashboardSwapModal({
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const isDesktop = useIsDesktop();
 
+  // Résout l'icône (drapeau) pour un code devise, y compris les devises
+  // pas encore présentes dans le wallet (absentes de selectIconByCurrency).
+  const getIconForCode = (code) => {
+    if (selectIconByCurrency?.[code]) return selectIconByCurrency[code];
+    const display = getDisplayCurrencyCode(code);
+    if (CRYPTO_ICONS?.[display]) return { src: CRYPTO_ICONS[display], alt: display };
+    return getCurrencyFlag(display);
+  };
+
   // USD est une devise convertible comme les autres — ne pas le filtrer.
   // Seul RLUSD est masqué (infrastructure invisible).
   const swapCurrencyOptionsSanitized = useMemo(() => {
-    return (swapCurrencyOptions || []).filter(
+    const base = (swapCurrencyOptions || []).filter(
       (code) =>
         String(code || "")
           .trim()
           .toUpperCase() !== "RLUSD",
     );
-  }, [swapCurrencyOptions]);
+    // Inclure la quote sélectionnée même si elle n'est pas encore dans le wallet
+    const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
+    if (
+      quoteUpper &&
+      quoteUpper !== "RLUSD" &&
+      !base.some((c) => String(c).toUpperCase() === quoteUpper)
+    ) {
+      base.push(quoteUpper);
+    }
+    return base;
+  }, [swapCurrencyOptions, convertQuoteCurrency]);
 
   const canMutateLines =
     isPreviewMode ||
@@ -389,7 +410,7 @@ export default function WalletDashboardSwapModal({
                               selectLabelRightByCurrency?.[code] || null;
                             return {
                               value: code,
-                              icon: selectIconByCurrency?.[code] || null,
+                              icon: getIconForCode(code),
                               label: labelLeft,
                               labelLeft,
                               labelRight,
