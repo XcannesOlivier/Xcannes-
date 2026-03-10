@@ -43,7 +43,6 @@ export default function WalletDashboardSendModal({
     "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
-  const [requestText, setRequestText] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
 
@@ -238,60 +237,23 @@ export default function WalletDashboardSendModal({
     input?.click();
   };
   const scanRequestFooter = (
-    <div
-      className={
-        inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"
-      }
-    >
-      <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
-        <span className="h-px flex-1 bg-white/10" />
-        <span className="text-base md:text-lg font-semibold text-white/60">
-          {t("ui_or_8a4c1f83bd", "ou")}
-        </span>
-        <span className="h-px flex-1 bg-white/10" />
-      </div>
-
-      <div
-        className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${
-          inline ? "flex-1 min-h-0 flex flex-col" : ""
-        }`}
+    <div className="flex justify-end">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleScanQrUpload();
+        }}
+        className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
       >
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
-          <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
-            {t("demo_payreq_token", "Enter your QR code")}
-          </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleScanQrUpload();
-            }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-          >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
-              +
-            </span>
-            {t(
-              "ui_or_upload_a_qr_image_works_e_df6baa8039",
-              "Charger une image qrcode",
-            )}
-          </button>
-        </div>
-        <div className="relative">
-          <textarea
-            value={requestText}
-            onChange={(e) => setRequestText(e.target.value)}
-            onPaste={handlePastePayload}
-            className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
-              inline ? "flex-1 min-h-[160px]" : ""
-            }`}
-            placeholder={t(
-              "ui_payreq_placeholder_3a9c1b7d2e",
-              "xcannes-payreq:... / JSON",
-            )}
-          />
-        </div>
-      </div>
+        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+          +
+        </span>
+        {t(
+          "ui_or_upload_a_qr_image_works_e_df6baa8039",
+          "Charger une image qrcode",
+        )}
+      </button>
     </div>
   );
 
@@ -299,7 +261,6 @@ export default function WalletDashboardSendModal({
     if (!open) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
-      setRequestText("");
     }
   }, [open]);
 
@@ -824,9 +785,9 @@ export default function WalletDashboardSendModal({
               ) : (
                 <>
                   {manualForm}
-                  {sendActions}
                   {scanActive ? scannerPanel : null}
                   {scanRequestFooter}
+                  {sendActions}
                 </>
               )}
             </div>
