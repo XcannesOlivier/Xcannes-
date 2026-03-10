@@ -505,6 +505,15 @@ export default function QRScanner({
                   <span className="absolute -top-1 -right-1 h-6 w-6 border-t-[3px] border-r-[3px] border-[#22C55E]/90 rounded-tr-md" />
                   <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-[3px] border-l-[3px] border-[#22C55E]/90 rounded-bl-md" />
                   <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-[3px] border-r-[3px] border-[#22C55E]/90 rounded-br-md" />
+                  {/* Animated scan line */}
+                  <span
+                    className="absolute left-1 right-1 h-[2px] rounded-full"
+                    style={{
+                      background: "linear-gradient(90deg, transparent 0%, #22C55E 30%, #22C55E 70%, transparent 100%)",
+                      boxShadow: "0 0 8px 2px rgba(34,197,94,0.4)",
+                      animation: "qr-scanline 2.2s ease-in-out infinite",
+                    }}
+                  />
                 </div>
               ) : null}
             </div>

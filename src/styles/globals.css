@@ -670,3 +670,19 @@ body.header-hero-mode .home-content-wrapper {
   justify-content: center;
   background: linear-gradient(135deg, #0f1a1a 0%, #1a2e2e 50%, #0f1a1a 100%);
 }
+
+/* ── Hide html5-qrcode native scan region border/corners (keep only custom green corners) ── */
+#qr-shaded-region {
+  border: none !important;
+}
+[id^="qr-reader"] > div > div {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Animated scan line for QR scanner ── */
+@keyframes qr-scanline {
+  0% { top: 0; opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { top: calc(100% - 2px); opacity: 0.3; }
+}

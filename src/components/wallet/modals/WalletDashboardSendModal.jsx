@@ -717,7 +717,7 @@ export default function WalletDashboardSendModal({
             onClick={() => setScanActive(false)}
           />
           {/* Scanner container */}
-          <div className="relative flex-1 flex flex-col">
+          <div className="relative flex-1 flex flex-col items-center justify-center">
             {/* Close button */}
             <button
               type="button"
