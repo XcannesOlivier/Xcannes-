@@ -95,6 +95,11 @@
   padding: calc(var(--panel-padding-y) * 0.75) var(--panel-padding-x);
   border-bottom: 1px solid rgba(148, 163, 184, 0.25);
 }
+@media (max-width: 767px) {
+  .panel-header {
+    padding-top: 0.25rem;
+  }
+}
 
 /* Fullscreen helpers (mobile safe) */
 .xcannes-fullscreen {
