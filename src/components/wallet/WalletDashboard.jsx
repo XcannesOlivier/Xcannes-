@@ -278,6 +278,19 @@ export default function WalletDashboard({
 
   useWalletIncomingToast({ backendWalletAddress, flashWalletHeaderToast });
 
+  // ── Reset previous action state on desktop inline switch ──
+  const prevActionRef = useRef(null);
+  useEffect(() => {
+    const prev = prevActionRef.current;
+    prevActionRef.current = activeAction;
+    if (prev && prev !== activeAction) {
+      if (prev === "send") sendState.resetSendForm?.();
+      if (prev === "receive") sendState.resetReceiveForm?.();
+      if (prev === "swap") swapState.resetSwapForm?.();
+      if (prev === "cash") swapState.resetCashForm?.();
+    }
+  }, [activeAction, sendState.resetSendForm, sendState.resetReceiveForm, swapState.resetSwapForm, swapState.resetCashForm]);
+
   // ── Token display labels ───────────────────────────────────
   const {
     displayTokensWithCurrencyLines,
