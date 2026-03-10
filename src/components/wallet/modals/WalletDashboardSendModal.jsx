@@ -30,7 +30,6 @@ export default function WalletDashboardSendModal({
   savedAddresses,
   sendDestination,
   setSendDestination,
-  setQrScannerOpen,
   handlePaymentRequestScan,
   handleSendSubmit,
   sendProcessing,
@@ -47,7 +46,6 @@ export default function WalletDashboardSendModal({
   const [requestText, setRequestText] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
-  const [cameraUnavailable, setCameraUnavailable] = useState(false);
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -245,15 +243,13 @@ export default function WalletDashboardSendModal({
         inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"
       }
     >
-      {!cameraUnavailable ? (
-        <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
-          <span className="h-px flex-1 bg-white/10" />
-          <span className="text-base md:text-lg font-semibold text-white/60">
-            {t("ui_or_8a4c1f83bd", "ou")}
-          </span>
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
-      ) : null}
+      <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
+        <span className="h-px flex-1 bg-white/10" />
+        <span className="text-base md:text-lg font-semibold text-white/60">
+          {t("ui_or_8a4c1f83bd", "ou")}
+        </span>
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
 
       <div
         className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${
@@ -304,7 +300,6 @@ export default function WalletDashboardSendModal({
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
       setRequestText("");
-      setCameraUnavailable(false);
     }
   }, [open]);
 
@@ -313,9 +308,7 @@ export default function WalletDashboardSendModal({
       setScanActive(false);
       return;
     }
-    setScanActive(true);
-    setScanKey((prev) => prev + 1);
-    setCameraUnavailable(false);
+    setScanActive(false);
   }, [open]);
 
   useEffect(() => {
@@ -695,9 +688,10 @@ export default function WalletDashboardSendModal({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setQrScannerOpen(true);
+                    setScanActive((prev) => !prev);
+                    setScanKey((prev) => prev + 1);
                   }}
-                  className="md:hidden px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
+                  className="px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
                   title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
                 >
                   <svg
@@ -764,7 +758,6 @@ export default function WalletDashboardSendModal({
           showClose={false}
           enableCamera={true}
           hideWhenUnavailable
-          onCameraUnavailableChange={setCameraUnavailable}
           className="bg-black/30 border-white/10"
         />
       ) : null}
@@ -830,14 +823,10 @@ export default function WalletDashboardSendModal({
                 </>
               ) : (
                 <>
-                  {scannerPanel}
-                  {scanActive ? scanRequestFooter : null}
-                  {!scanActive ? (
-                    <>
-                      {manualForm}
-                      {sendActions}
-                    </>
-                  ) : null}
+                  {manualForm}
+                  {sendActions}
+                  {scanActive ? scannerPanel : null}
+                  {scanRequestFooter}
                 </>
               )}
             </div>
