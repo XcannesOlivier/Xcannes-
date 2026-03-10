@@ -649,7 +649,7 @@ export default function WalletDashboardSendModal({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setScanActive((prev) => !prev);
+                    setScanActive(true);
                     setScanKey((prev) => prev + 1);
                   }}
                   className="px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
@@ -708,22 +708,52 @@ export default function WalletDashboardSendModal({
     </div>
   );
 
-  const scannerPanel = (
-    <div className={`space-y-2 ${inline ? "" : "-mx-4 md:-mx-5"}`}>
-      {scanActive ? (
-        <QRScanner
-          key={scanKey}
-          isOpen={true}
-          onScan={handleScan}
-          embedded={true}
-          showClose={false}
-          enableCamera={true}
-          hideWhenUnavailable
-          className="bg-black/30 border-white/10"
-        />
-      ) : null}
-    </div>
-  );
+  const scannerModal = scanActive
+    ? createPortal(
+        <div className="fixed inset-0 z-[10002] flex flex-col">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+            onClick={() => setScanActive(false)}
+          />
+          {/* Scanner container */}
+          <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8">
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setScanActive(false)}
+              className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            {/* Title */}
+            <div className="mb-4 text-sm font-semibold text-white/70">
+              {t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            </div>
+            {/* Scanner */}
+            <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+              <QRScanner
+                key={scanKey}
+                isOpen={true}
+                onScan={handleScan}
+                embedded={true}
+                showClose={false}
+                enableCamera={true}
+                hideWhenUnavailable
+                className="bg-black/30 border-white/10"
+              />
+            </div>
+            {/* Hint */}
+            <p className="mt-3 text-xs text-white/40 text-center">
+              {t("ui_scan_hint_auto_close", "Le scanner se ferme automatiquement après la lecture.")}
+            </p>
+          </div>
+        </div>,
+        document.body,
+      )
+    : null;
 
   const content = (
     <>
@@ -785,9 +815,9 @@ export default function WalletDashboardSendModal({
               ) : (
                 <>
                   {manualForm}
-                  {scanActive ? scannerPanel : null}
                   {scanRequestFooter}
                   {sendActions}
+                  {scannerModal}
                 </>
               )}
             </div>
