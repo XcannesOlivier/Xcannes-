@@ -17,7 +17,14 @@ export function useUsdTotalLabel({
         const code = String(token.currency || "").toUpperCase();
         if (code === "XRP") return false;
         const value = Number(token.value || 0);
-        return Number.isFinite(value) && value > 0;
+        // Include tokens with a positive value OR with an RLUSD allocation
+        // (currency-line tokens like EUR/GBP have value=0 but allocatedRlusd>0;
+        // their rate is needed by CurrencyStatement to convert transaction amounts).
+        const allocated = Number(token.allocatedRlusd || 0);
+        return (
+          (Number.isFinite(value) && value > 0) ||
+          (Number.isFinite(allocated) && allocated > 0)
+        );
       })
       .map((t) => String(t.currency || "").toUpperCase())
       .filter(Boolean);

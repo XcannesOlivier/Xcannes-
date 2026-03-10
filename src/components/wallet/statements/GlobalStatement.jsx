@@ -114,8 +114,12 @@ export default function GlobalStatement({
       const code = String(token.currency || "").toUpperCase();
       if (code === "XRP") return null;
       const rate = usdRates?.[code];
-      if (Number.isFinite(rate)) return value * rate;
+      if (Number.isFinite(rate) && rate > 0) return value * rate;
       if (isUsdStablecoin(code)) return value;
+      // Fallback: for currency-line tokens, allocatedRlusd IS the USD value
+      // (RLUSD ≈ USD 1:1). Use it when the FX rate is unavailable.
+      const allocated = Number(token.allocatedRlusd);
+      if (Number.isFinite(allocated) && allocated > 0) return allocated;
       return null;
     },
     [isUsdStablecoin, usdRates],

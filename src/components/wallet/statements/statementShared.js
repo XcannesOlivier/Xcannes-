@@ -351,12 +351,31 @@ const CURRENCY_FLAGS = {
 };
 
 /**
+ * Convert a 2-letter country code to a regional indicator flag emoji.
+ * Same approach used by the swap modal's WalletCurrencySelector.
+ */
+function countryCodeToFlag(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return null;
+  const upper = countryCode.toUpperCase();
+  // Only A-Z letters produce valid regional indicator symbols.
+  if (!/^[A-Z]{2}$/.test(upper)) return null;
+  const codePoints = [...upper].map((c) => 0x1f1e6 + (c.charCodeAt(0) - 65));
+  return String.fromCodePoint(...codePoints);
+}
+
+/**
  * Return an emoji flag / symbol for a given currency code.
- * Falls back to 💱 if unknown.
+ * 1. Check explicit CURRENCY_FLAGS map (crypto symbols, stablecoins, special cases).
+ * 2. Dynamically generate a flag from the first 2 letters (same logic as swap modal).
+ * 3. Fall back to 💱 if nothing works.
  */
 export function getCurrencyFlag(code) {
   const upper = String(code || "")
     .trim()
     .toUpperCase();
-  return CURRENCY_FLAGS[upper] || "💱";
+  if (CURRENCY_FLAGS[upper]) return CURRENCY_FLAGS[upper];
+  // Dynamic generation from first 2 chars — works for any fiat currency code.
+  const dynamicFlag = countryCodeToFlag(upper.slice(0, 2));
+  if (dynamicFlag) return dynamicFlag;
+  return "💱";
 }

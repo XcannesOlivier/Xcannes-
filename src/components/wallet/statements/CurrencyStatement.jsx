@@ -854,11 +854,24 @@ export default function CurrencyStatement({
                                         {(() => {
                                           const localizedDescription =
                                             getLocalizedDescription(tx);
+                                          const feeSuffix =
+                                            tx.category === "exchange" &&
+                                            tx.spreadRlusd > 0 ? (
+                                              <span className="text-[8px] md:text-xs text-white/35 ml-0.5 md:ml-1 whitespace-nowrap">
+                                                ({t(
+                                                  "statement_conversion_fee_label",
+                                                  "Frais",
+                                                )}{" : "}{formatAmountRlusdAsLocal(
+                                                  tx.spreadRlusd,
+                                                )})
+                                              </span>
+                                            ) : null;
                                           return tx.category === "exchange"
                                             ? renderConversionDescription(
                                                 localizedDescription,
                                                 {
                                                   withLabel: !isMobileDate,
+                                                  feeSuffix,
                                                 },
                                               ) ||
                                                 (isMobileDate
@@ -889,24 +902,11 @@ export default function CurrencyStatement({
                                                 );
                                         })()}
                                       </p>
-                                      {tx.counterparty && (
-                                        <p className="text-xs text-white/40 font-mono truncate hidden md:block">
-                                          {tx.counterparty.slice(0, 10)}...
-                                          {tx.counterparty.slice(-6)}
-                                        </p>
-                                      )}
-                                      {/* Conversion fees — shown in quote currency */}
-                                      {tx.category === "exchange" &&
-                                        tx.spreadRlusd > 0 && (
-                                          <p className="text-[10px] md:text-xs text-white/35 mt-0.5">
-                                            {t(
-                                              "statement_conversion_fee_label",
-                                              "Frais",
-                                            )}
-                                            {" : "}
-                                            {formatAmountRlusdAsLocal(
-                                              tx.spreadRlusd,
-                                            )}
+                                      {tx.counterparty &&
+                                        String(tx.counterparty).toUpperCase() !== "XCANNES" && (
+                                          <p className="text-xs text-white/40 font-mono truncate hidden md:block">
+                                            {tx.counterparty.slice(0, 10)}...
+                                            {tx.counterparty.slice(-6)}
                                           </p>
                                         )}
                                     </div>

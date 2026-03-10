@@ -198,23 +198,24 @@ export default function useCurrencyStatementFormatters({
 
   /* ─── renderConversionDescription ───────────────────────── */
   const renderConversionDescription = useCallback(
-    (description, { withLabel = false } = {}) => {
+    (description, { withLabel = false, feeSuffix = null } = {}) => {
       const pair = parseConversionPair(description);
       if (!pair) return null;
       const badges = (
-        <span className="inline-flex items-center gap-2">
+        <span className="inline-flex items-center gap-1">
           {renderCurrencyBadge(pair.from)}
-          <span className="text-white/50 text-xs md:text-sm">→</span>
+          <span className="text-white/50 text-xs">→</span>
           {renderCurrencyBadge(pair.to)}
         </span>
       );
       if (!withLabel) return badges;
       return (
-        <span className="inline-flex items-center gap-2">
-          <span className="text-white/70 text-xs md:text-sm">
+        <span className="inline-flex items-center gap-1.5 flex-wrap">
+          <span className="text-white/70 text-xs">
             {t("statement_conversion_label", "Conversion")}
           </span>
           {badges}
+          {feeSuffix}
         </span>
       );
     },

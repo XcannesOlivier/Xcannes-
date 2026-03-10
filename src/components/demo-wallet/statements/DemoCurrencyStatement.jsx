@@ -1551,12 +1551,13 @@ export default function DemoCurrencyStatement({
                                               );
                                         })()}
                                       </p>
-                                      {tx.counterparty && (
-                                        <p className="text-xs text-white/40 font-mono truncate hidden md:block">
-                                          {tx.counterparty.slice(0, 10)}...
-                                          {tx.counterparty.slice(-6)}
-                                        </p>
-                                      )}
+                                      {tx.counterparty &&
+                                        String(tx.counterparty).toUpperCase() !== "XCANNES" && (
+                                          <p className="text-xs text-white/40 font-mono truncate hidden md:block">
+                                            {tx.counterparty.slice(0, 10)}...
+                                            {tx.counterparty.slice(-6)}
+                                          </p>
+                                        )}
                                     </div>
                                   </div>
                                 </td>
