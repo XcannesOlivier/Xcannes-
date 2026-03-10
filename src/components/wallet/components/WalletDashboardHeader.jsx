@@ -84,8 +84,8 @@ export default function WalletDashboardHeader({
       </div>
 
       {/* Solde et info wallet */}
-      <div className="flex flex-col items-center gap-5 md:gap-2">
-        <div className="text-base md:text-sm text-white/55 tracking-[0.18em] uppercase">
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-lg md:text-sm text-white/55 tracking-[0.18em] uppercase mb-4 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
@@ -107,11 +107,11 @@ export default function WalletDashboardHeader({
 
         {/* Bloc wallet — sélecteur + copier + refresh */}
         {isConnected && wallet && (
-          <div className="w-full mt-18 md:mt-1.5 px-2 flex justify-center">
+          <div className="w-full mt-6 md:mt-1.5 px-2 flex justify-center">
             <div className="relative flex items-center gap-2 w-full max-w-[460px]">
               <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1" ref={switcherRef}>
+                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
+                  <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
                     <button
                       type="button"
@@ -150,8 +150,10 @@ export default function WalletDashboardHeader({
                         {walletAddresses.map((w, index) => {
                           const addr = typeof w === "string" ? w : w.address;
                           const label = typeof w === "string" ? null : w.label;
-                          const displayName = label || `Wallet ${index + 1}`;
                           const isActive = addr === wallet;
+                          const displayName = isActive
+                            ? (walletLabel || label || `Wallet ${index + 1}`)
+                            : (label || `Wallet ${index + 1}`);
                           return (
                             <button
                               key={addr}
