@@ -144,7 +144,6 @@ export function useWalletNavigation({
       setWalletInfoOpen(false);
       if (isDesktopPanel) {
         setActiveAction(null);
-        setShowAdjustmentModal(false);
         setShowActivationModal(false);
         setShowActivationRequestModal(false);
         setShowGlobalStatement(false);
@@ -159,7 +158,6 @@ export function useWalletNavigation({
       setSelectedStatementToken,
       setShowActivationModal,
       setShowActivationRequestModal,
-      setShowAdjustmentModal,
       setShowCurrencyStatement,
       setShowGlobalStatement,
       setWalletInfoOpen,
@@ -172,7 +170,6 @@ export function useWalletNavigation({
     closeInlineQr();
     if (isDesktopPanel) {
       setActiveAction(null);
-      setShowAdjustmentModal(false);
       setShowActivationModal(false);
       setShowActivationRequestModal(false);
       setShowCurrencyStatement(false);
@@ -187,7 +184,6 @@ export function useWalletNavigation({
     setSelectedStatementToken,
     setShowActivationModal,
     setShowActivationRequestModal,
-    setShowAdjustmentModal,
     setShowCurrencyStatement,
     setShowGlobalStatement,
     setWalletInfoOpen,
@@ -200,7 +196,6 @@ export function useWalletNavigation({
     setWalletInfoOpen(false);
     if (isDesktopPanel) {
       setActiveAction(null);
-      setShowAdjustmentModal(false);
       setShowActivationModal(false);
       setShowActivationRequestModal(false);
       setShowCurrencyStatement(false);
@@ -216,7 +211,6 @@ export function useWalletNavigation({
     setSelectedStatementToken,
     setShowActivationModal,
     setShowActivationRequestModal,
-    setShowAdjustmentModal,
     setShowCurrencyStatement,
     setShowGlobalStatement,
     setWalletInfoOpen,
