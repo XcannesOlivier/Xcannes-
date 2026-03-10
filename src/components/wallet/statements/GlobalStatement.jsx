@@ -416,7 +416,7 @@ export default function GlobalStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
+        "w-full xcannes-fullscreen-safe md:h-auto rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
     },
     "inline-desktop": {
       backdropClass: "",
