@@ -39,12 +39,12 @@ export default function WalletDashboardCashModal({
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-cash-modal border border-white/10 overflow-hidden flex flex-col pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "max-w-2xl max-h-[92vh] rounded-2xl",
+      : "h-full md:h-auto md:max-w-2xl md:max-h-[92vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
