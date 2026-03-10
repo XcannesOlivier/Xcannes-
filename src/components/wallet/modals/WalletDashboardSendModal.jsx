@@ -717,7 +717,7 @@ export default function WalletDashboardSendModal({
             onClick={() => setScanActive(false)}
           />
           {/* Scanner container */}
-          <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8">
+          <div className="relative flex-1 flex flex-col">
             {/* Close button */}
             <button
               type="button"
@@ -728,25 +728,22 @@ export default function WalletDashboardSendModal({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            {/* Title */}
-            <div className="mb-4 text-sm font-semibold text-white/70">
-              {t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-            </div>
             {/* Scanner */}
-            <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+            <div className="flex-1 w-full">
               <QRScanner
                 key={scanKey}
                 isOpen={true}
                 onScan={handleScan}
                 embedded={true}
                 showClose={false}
+                hideTitle={true}
                 enableCamera={true}
                 hideWhenUnavailable
-                className="bg-black/30 border-white/10"
+                className="bg-black w-full h-full [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
               />
             </div>
             {/* Hint */}
-            <p className="mt-3 text-xs text-white/40 text-center">
+            <p className="absolute bottom-6 left-0 right-0 text-xs text-white/40 text-center">
               {t("ui_scan_hint_auto_close", "Le scanner se ferme automatiquement après la lecture.")}
             </p>
           </div>
