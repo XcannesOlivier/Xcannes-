@@ -314,14 +314,10 @@ export default function WalletDashboardSwapModal({
               </button>
             </div>
             <div
-              className={
-                inline
-                  ? "wallet-tab-unfold-in flex-1 min-h-0 flex flex-col"
-                  : "wallet-tab-unfold-in"
-              }
+              className="wallet-tab-unfold-in flex-1 min-h-0 flex flex-col"
             >
               <div
-                className={`space-y-5 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}
+                className="flex-1 min-h-0 flex flex-col justify-between gap-5"
               >
                 <div
                   className={
@@ -329,7 +325,7 @@ export default function WalletDashboardSwapModal({
                       ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
                       : inline
                         ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(18px,2.8vh,36px)]"
-                        : "space-y-5"
+                        : "space-y-[clamp(16px,2.5vh,28px)]"
                   }
                 >
                   <div
@@ -338,7 +334,7 @@ export default function WalletDashboardSwapModal({
                         ? "space-y-7"
                         : inline
                           ? "space-y-6"
-                          : ""
+                          : "space-y-[clamp(14px,2.2vh,24px)]"
                     }
                   >
                     <div>
@@ -533,7 +529,7 @@ export default function WalletDashboardSwapModal({
                   className={
                     inline
                       ? "mt-auto space-y-2 pt-2 border-t border-white/10"
-                      : ""
+                      : "mt-auto pt-4"
                   }
                 >
                   {!isConnected && !isPreviewMode ? (
