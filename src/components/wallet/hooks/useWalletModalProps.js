@@ -131,6 +131,9 @@ export function useWalletModalProps({
   toast,
   // --- Reset ---
   resetSendForm,
+  resetReceiveForm,
+  resetSwapForm,
+  resetCashForm,
 }) {
   // --- Send modal props ---
   const sendModalProps = useMemo(
@@ -253,6 +256,7 @@ export function useWalletModalProps({
       rlusdPerUnitRates,
       rlusdPerUnitSources,
       walletLabel,
+      resetReceiveForm,
     }),
     [
       receiveTab,
@@ -274,6 +278,7 @@ export function useWalletModalProps({
       rlusdPerUnitRates,
       rlusdPerUnitSources,
       walletLabel,
+      resetReceiveForm,
     ],
   );
 
@@ -316,6 +321,7 @@ export function useWalletModalProps({
       handleDemoConvert,
       convertProcessing,
       rlusdPerUnitRates,
+      resetSwapForm,
     }),
     [
       renderWalletMeta,
@@ -353,6 +359,7 @@ export function useWalletModalProps({
       handleDemoConvert,
       convertProcessing,
       rlusdPerUnitRates,
+      resetSwapForm,
     ],
   );
 
@@ -370,6 +377,7 @@ export function useWalletModalProps({
       selectLabelMobileByCurrency: selectLabelMobileByAssetKey,
       walletAddress: wallet || "",
       buyPrefill: cashBuyPrefill,
+      resetCashForm,
     }),
     [
       cashModalTab,
@@ -383,6 +391,7 @@ export function useWalletModalProps({
       selectLabelMobileByAssetKey,
       wallet,
       cashBuyPrefill,
+      resetCashForm,
     ],
   );
 

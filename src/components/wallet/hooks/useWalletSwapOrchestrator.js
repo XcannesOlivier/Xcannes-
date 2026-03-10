@@ -33,6 +33,21 @@ export function useWalletSwapOrchestrator({
   const [convertPreview, setConvertPreview] = useState("");
   const [convertProcessing, setConvertProcessing] = useState(false);
 
+  const resetSwapForm = () => {
+    setSwapDefaultView("convert");
+    setSwapLockedView(null);
+    setConvertBaseCurrency("USD");
+    setConvertQuoteCurrency("EUR");
+    setConvertAmount("");
+    setConvertPreview("");
+    setConvertProcessing(false);
+  };
+
+  const resetCashForm = () => {
+    setCashBuyPrefill(null);
+    setCashModalTab("buy");
+  };
+
   // Guard: prevent XRP/RLUSD in convert selectors.
   useEffect(() => {
     const baseUpper = String(convertBaseCurrency || "")
@@ -126,5 +141,8 @@ export function useWalletSwapOrchestrator({
     handleDemoConvert,
     // Options
     swapCurrencyOptionsForModal,
+    // Reset
+    resetSwapForm,
+    resetCashForm,
   };
 }

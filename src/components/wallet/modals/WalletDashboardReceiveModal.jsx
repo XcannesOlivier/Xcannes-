@@ -51,6 +51,7 @@ export default function WalletDashboardReceiveModal({
   rlusdPerUnitSources,
   walletLabel,
   onRequestGenerated,
+  resetReceiveForm,
   inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
@@ -87,8 +88,9 @@ export default function WalletDashboardReceiveModal({
       setGeneratedRequest(null);
       setGenerateError(null);
       setIsRequestOpen(false);
+      resetReceiveForm?.();
     }
-  }, [open]);
+  }, [open, resetReceiveForm]);
 
   useEffect(() => {
     return () => {

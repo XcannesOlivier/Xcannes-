@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
 import { createPortal } from "react-dom";
@@ -27,6 +28,7 @@ export default function WalletDashboardCashModal({
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   walletAddress,
+  resetCashForm,
   inline = false,
 }) {
   const { t } = useTranslation("common");
@@ -34,6 +36,15 @@ export default function WalletDashboardCashModal({
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
   });
+
+  // Reset on close
+  const prevOpenRef = useRef(open);
+  useEffect(() => {
+    if (prevOpenRef.current && !open) {
+      resetCashForm?.();
+    }
+    prevOpenRef.current = open;
+  }, [open, resetCashForm]);
 
   if (!shouldRender) return null;
 

@@ -64,6 +64,13 @@ export function useWalletSendOrchestrator({
   const [requestCurrency, setRequestCurrency] = useState("USD");
   const [requestMemo, setRequestMemo] = useState("");
 
+  const resetReceiveForm = () => {
+    setReceiveTab("receive");
+    setRequestAmount("");
+    setRequestCurrency("USD");
+    setRequestMemo("");
+  };
+
   // Guard: prevent XRP/RLUSD as payment-request currency.
   useEffect(() => {
     const upper = String(requestCurrency || "")
@@ -289,5 +296,6 @@ export function useWalletSendOrchestrator({
     handleResumePayreq,
     handleSendSubmit,
     resetSendForm,
+    resetReceiveForm,
   };
 }

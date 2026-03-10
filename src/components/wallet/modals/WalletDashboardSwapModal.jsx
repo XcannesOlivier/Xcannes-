@@ -46,6 +46,7 @@ export default function WalletDashboardSwapModal({
   selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
+  resetSwapForm,
   inline = false,
 }) {
   const { t, i18n } = useTranslation("common");
@@ -161,6 +162,12 @@ export default function WalletDashboardSwapModal({
       ...options,
     });
   };
+
+  useEffect(() => {
+    if (!open) {
+      resetSwapForm?.();
+    }
+  }, [open, resetSwapForm]);
 
   useEffect(() => {
     if (!open) return;
