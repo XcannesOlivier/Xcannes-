@@ -56,6 +56,7 @@ export default function WalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination],
   );
+  const hasDestination = Boolean(normalizedDestination) && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(normalizedDestination);
   const showCalculatedAmountLabel = useMemo(() => {
     if (!sendPaymentRequest || !selectedSendToken) return false;
     const target = String(sendPaymentRequest?.targetCurrencyCode || "")
@@ -528,6 +529,7 @@ export default function WalletDashboardSendModal({
               {scanRequestFooter}
             </div>
           </div>
+          <div className={`transition-opacity duration-300 space-y-3 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <div>
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
@@ -673,6 +675,7 @@ export default function WalletDashboardSendModal({
               </p>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>
