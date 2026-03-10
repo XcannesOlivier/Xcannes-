@@ -203,13 +203,17 @@ export default function WalletDashboardSendModal({
   const handlePastePayload = (event) => {
     const clipboard = event.clipboardData;
     if (!clipboard) return false;
-    const text = clipboard.getData("text") || "";
+
+    // 1) Try synchronous text from clipboardData (works on desktop)
+    const text = (clipboard.getData("text") || clipboard.getData("text/plain") || "").trim();
     if (looksLikeQrPayload(text)) {
       event.preventDefault();
       handlePaymentRequestScan?.(text);
       setScanActive(false);
       return true;
     }
+
+    // 2) Check for image in clipboard items (QR image paste)
     const items = clipboard.items || [];
     for (const item of items) {
       if (
@@ -224,6 +228,27 @@ export default function WalletDashboardSendModal({
         }
       }
     }
+
+    // 3) Async fallback for mobile: clipboardData.getData("text") is often
+    //    empty on mobile when the clipboard was written via ClipboardItem API.
+    //    Use navigator.clipboard.readText() as async fallback.
+    if (!text && navigator?.clipboard?.readText) {
+      event.preventDefault();
+      navigator.clipboard.readText().then((asyncText) => {
+        const trimmed = (asyncText || "").trim();
+        if (looksLikeQrPayload(trimmed)) {
+          handlePaymentRequestScan?.(trimmed);
+          setScanActive(false);
+        } else if (trimmed) {
+          // Not a QR payload — put it in the destination field
+          setSendDestination(trimmed);
+        }
+      }).catch(() => {
+        // Permission denied or unavailable — ignore
+      });
+      return true;
+    }
+
     return false;
   };
   const handleScan = (data) => {
