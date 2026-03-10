@@ -94,7 +94,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-6 h-6"
+              className="w-7 h-7"
               viewBox="0 0 24 24"
               fill="none"
             >

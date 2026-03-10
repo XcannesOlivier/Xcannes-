@@ -84,7 +84,7 @@ export default function WalletDashboardHeader({
       </div>
 
       {/* Solde et info wallet */}
-      <div className="flex flex-col items-center gap-4 md:gap-2">
+      <div className="flex flex-col items-center gap-5 md:gap-2">
         <div className="text-base md:text-sm text-white/55 tracking-[0.18em] uppercase">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
