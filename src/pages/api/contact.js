@@ -37,20 +37,21 @@ export default async function handler(req, res) {
   }
 
   // Configurer Nodemailer (OVH)
+  const contactEmail = process.env.CONTACT_EMAIL || "contact@xcannes.com";
   const transporter = nodemailer.createTransport({
-    host: "ssl0.ovh.net",
-    port: 587,
+    host: process.env.SMTP_HOST || "ssl0.ovh.net",
+    port: Number(process.env.SMTP_PORT || 587),
     secure: false,
     auth: {
-      user: "contact@xcannes.com",
+      user: contactEmail,
       pass: process.env.OVH_EMAIL_PASSWORD,
     },
   });
 
   try {
     await transporter.sendMail({
-      from: `"XCannes Contact" <contact@xcannes.com>`,
-      to: "contact@xcannes.com", // ou autre destinataire
+      from: `"XCannes Contact" <${contactEmail}>`,
+      to: contactEmail,
       subject: i18n.subject(name),
       text: `
 ${i18n.labelName} : ${name}

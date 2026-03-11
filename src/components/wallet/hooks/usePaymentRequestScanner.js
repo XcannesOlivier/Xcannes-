@@ -51,7 +51,8 @@ export function usePaymentRequestScanner({
           }
           if (navAction.screen === "choice" && isPwaEmbedded()) {
             // Send GO_TO_CHOICE to PWA parent
-            window.parent?.postMessage({ type: "GO_TO_CHOICE" }, "*");
+            const appOrigin = process.env.NEXT_PUBLIC_SITE_URL || "https://xcannes.com";
+            window.parent?.postMessage({ type: "GO_TO_CHOICE" }, appOrigin);
             setQrScannerOpen(false);
             return { navigate: true };
           }

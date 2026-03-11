@@ -47,11 +47,13 @@ export function isPwaEmbedded() {
   }
 }
 
+const APP_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL || "https://xcannes.com";
+
 /** Send a message to the PWA parent */
 function postToPwa(msg) {
   try {
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage(msg, "*");
+      window.parent.postMessage(msg, APP_ORIGIN);
     }
   } catch {
     // cross-origin safety

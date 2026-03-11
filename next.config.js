@@ -58,7 +58,7 @@ const nextConfig = {
 
   // ✅ Proxy wallet-relay vers le VPS API (permet au PWA sur Vercel d'atteindre le backend)
   async rewrites() {
-    const apiUrl = (process.env.NEXT_PUBLIC_XCANNES_API_URL || 'http://149.28.238.173:3001').replace(/\/$/, '');
+    const apiUrl = (process.env.NEXT_PUBLIC_XCANNES_API_URL || 'http://localhost:3001').replace(/\/$/, '');
     return [
       // Wallet-app PWA: serve index.html for directory-style URLs
       {

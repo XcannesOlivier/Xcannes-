@@ -22,7 +22,8 @@ export default function WalletActivationRequestModal({
     const amountDrops = Math.round(Number(activationAmountXrp) * 1_000_000);
     const drops = Number.isFinite(amountDrops) && amountDrops > 0 ? amountDrops : 1_000_000;
     // Standard XRPL PayString / payment URI format
-    return `https://xcannes.com/wallet?pay=${walletAddress}&amount=${drops}`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://xcannes.com";
+    return `${siteUrl}/wallet?pay=${walletAddress}&amount=${drops}`;
   }, [walletAddress, activationAmountXrp]);
 
   const shareText = useMemo(() => {
