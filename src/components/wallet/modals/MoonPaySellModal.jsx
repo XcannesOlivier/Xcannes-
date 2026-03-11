@@ -7,7 +7,6 @@ import {
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
-import { useWallet } from "@/context/WalletContext";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
@@ -51,7 +50,6 @@ const MoonPaySellModal = ({
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const { signTransaction } = useWallet();
 
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -239,31 +237,6 @@ const MoonPaySellModal = ({
     };
   }, [isOpen]);
 
-  const requestWalletSignature = async () => {
-    if (!signTransaction) {
-      setError(
-        t(
-          "moonpay_error_signature_required",
-          "Wallet signature required. Please connect your wallet.",
-        ),
-      );
-      return null;
-    }
-
-    const result = await signTransaction({ TransactionType: "SignIn" });
-    if (!result?.signed) {
-      setError(
-        t(
-          "moonpay_error_signature_cancelled",
-          "Signature cancelled or expired.",
-        ),
-      );
-      return null;
-    }
-
-    return result.uuid || result.hash || "wallet-auth";
-  };
-
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
     if (!walletAddress) {
@@ -327,9 +300,6 @@ const MoonPaySellModal = ({
         return;
       }
 
-      const walletAuthToken = await requestWalletSignature();
-      if (!walletAuthToken) return;
-
       setStep("loading");
 
       const response = await fetch("/api/moonpay/generate-sell-url", {
@@ -342,7 +312,6 @@ const MoonPaySellModal = ({
           baseCurrencyCode, // Crypto à vendre
           quoteCurrencyCode: quoteCurrency, // Fiat à recevoir
           baseCurrencyAmount,
-          walletAuthToken,
         }),
       });
 

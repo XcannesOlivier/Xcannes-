@@ -2,7 +2,6 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { XCircleIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
-import { useWallet } from "@/context/WalletContext";
 import { useTranslation } from "next-i18next";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { useModalTransition } from "@/hooks/useModalTransition";
@@ -66,7 +65,6 @@ const MoonPayBuyModal = ({
   const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
-  const { signTransaction } = useWallet();
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
@@ -191,31 +189,6 @@ const MoonPayBuyModal = ({
     };
   }, [isOpen]);
 
-  const requestWalletSignature = async () => {
-    if (!signTransaction) {
-      setError(
-        t(
-          "moonpay_error_signature_required",
-          "Wallet signature required. Please connect your wallet.",
-        ),
-      );
-      return null;
-    }
-
-    const result = await signTransaction({ TransactionType: "SignIn" });
-    if (!result?.signed) {
-      setError(
-        t(
-          "moonpay_error_signature_cancelled",
-          "Signature cancelled or expired.",
-        ),
-      );
-      return null;
-    }
-
-    return result.uuid || result.hash || "wallet-auth";
-  };
-
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
     if (!walletAddress) {
@@ -277,9 +250,6 @@ const MoonPayBuyModal = ({
         return;
       }
 
-      const walletAuthToken = await requestWalletSignature();
-      if (!walletAuthToken) return;
-
       setStep("loading");
 
       const walletAddressTag = resolveMoonpayTag(currency);
@@ -296,7 +266,6 @@ const MoonPayBuyModal = ({
             amountType === "fiat" ? parseFloat(amount) : undefined,
           quoteCurrencyAmount:
             amountType === "crypto" ? parseFloat(amount) : undefined,
-          walletAuthToken,
           options: walletAddressTag != null ? { walletAddressTag } : undefined,
         }),
       });

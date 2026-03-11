@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     baseCurrencyCode,
     baseCurrencyAmount,
     quoteCurrencyAmount,
-    walletAuthToken,
     options,
   } = req.body;
 
@@ -35,7 +34,6 @@ export default async function handler(req, res) {
         baseCurrencyCode,
         baseCurrencyAmount,
         quoteCurrencyAmount,
-        walletAuthToken,
         options,
       }),
     });
