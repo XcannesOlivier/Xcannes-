@@ -366,7 +366,6 @@ export default function GlobalStatement({
     fallbackPeriod,
     formatAmountWithSymbolLocal,
     getUsdValue,
-    ledgerLastIndex,
     ledgerStatusLabel,
     locale,
     movements,
@@ -374,7 +373,6 @@ export default function GlobalStatement({
     t,
     totalBalance,
     walletAddress,
-    walletLabel,
   ]);
 
   const handleExportPdf = useCallback(() => {
@@ -396,7 +394,7 @@ export default function GlobalStatement({
     } finally {
       setExportFormat(null);
     }
-  }, [buildPrintHtml, docHash, t]);
+  }, [buildPrintHtml, docHash, t, toast]);
 
   const handlePrint = useCallback(() => {
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
@@ -412,7 +410,7 @@ export default function GlobalStatement({
       if (toast?.warn) toast.warn(msg);
       else window.alert(msg);
     }
-  }, [buildPrintHtml, docHash, t]);
+  }, [buildPrintHtml, docHash, t, toast]);
 
   /* ── layout (GlobalStatement uses wider max-widths) ────── */
   const STATEMENT_LAYOUTS = {

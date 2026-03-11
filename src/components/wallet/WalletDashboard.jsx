@@ -280,16 +280,18 @@ export default function WalletDashboard({
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
+  const { resetSendForm, resetReceiveForm } = sendState;
+  const { resetSwapForm, resetCashForm } = swapState;
   useEffect(() => {
     const prev = prevActionRef.current;
     prevActionRef.current = activeAction;
     if (prev && prev !== activeAction) {
-      if (prev === "send") sendState.resetSendForm?.();
-      if (prev === "receive") sendState.resetReceiveForm?.();
-      if (prev === "swap") swapState.resetSwapForm?.();
-      if (prev === "cash") swapState.resetCashForm?.();
+      if (prev === "send") resetSendForm?.();
+      if (prev === "receive") resetReceiveForm?.();
+      if (prev === "swap") resetSwapForm?.();
+      if (prev === "cash") resetCashForm?.();
     }
-  }, [activeAction, sendState.resetSendForm, sendState.resetReceiveForm, swapState.resetSwapForm, swapState.resetCashForm]);
+  }, [activeAction, resetSendForm, resetReceiveForm, resetSwapForm, resetCashForm]);
 
   // ── Token display labels ───────────────────────────────────
   const {

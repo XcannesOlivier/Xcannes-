@@ -67,12 +67,10 @@ export default function WalletSetupDropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const validateLabel = validateWalletLabel;
-
   // ── Form submit ────────────────────────────────────────────
   const handleValidate = useCallback(() => {
     const trimmed = labelDraft.trim();
-    if (!validateLabel(trimmed)) {
+    if (!validateWalletLabel(trimmed)) {
       setLabelError(
         t(
           "ui_wallet_label_validation_error_f4",

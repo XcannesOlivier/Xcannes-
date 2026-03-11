@@ -70,7 +70,7 @@ export function useWalletLabel({
       console.error("[useWalletLabel] Error fetching wallet label:", err);
       // Silently fail — use default label (not critical)
     }
-  }, [defaultLabel, flashWalletHeaderToast, isConnected, walletAddress]);
+  }, [defaultLabel, isConnected, walletAddress]);
 
   useEffect(() => {
     if (!isConnected || !walletAddress) {

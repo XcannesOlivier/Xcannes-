@@ -437,7 +437,6 @@ export default function CurrencyStatement({
     rlusdToLocal,
     transactionsWithDisplayBalance,
     formatDate,
-    ledgerLastIndex,
     ledgerStatusLabel,
     locale,
     normalizedCurrency,
@@ -465,7 +464,7 @@ export default function CurrencyStatement({
     } finally {
       setExportFormat(null);
     }
-  }, [buildPrintHtml, docHash, normalizedCurrency, t]);
+  }, [buildPrintHtml, docHash, normalizedCurrency, t, toast]);
 
   const handlePrint = useCallback(() => {
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
@@ -481,7 +480,7 @@ export default function CurrencyStatement({
       if (toast?.warn) toast.warn(msg);
       else window.alert(msg);
     }
-  }, [buildPrintHtml, docHash, normalizedCurrency, t]);
+  }, [buildPrintHtml, docHash, normalizedCurrency, t, toast]);
 
   /* ── layout ────────────────────────────────────────────── */
   const resolvedLayout =
