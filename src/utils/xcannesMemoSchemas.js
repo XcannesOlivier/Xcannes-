@@ -19,6 +19,8 @@ const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_LINE_ACTIONS = new Set(['activate']);
 const VALID_ALLOC_ACTIONS = new Set(['allocate', 'deallocate']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
+// ⚠️  SYNC : cette liste doit rester identique à XRPL_ASSET_CODES
+//    définie dans utils/currency.js (source unique côté backend).
 const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD']);
 
 function isPlainObject(value) {
