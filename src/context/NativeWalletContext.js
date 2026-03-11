@@ -1,13 +1,12 @@
 /**
  * NativeWalletContext — Connexion wallet via Xcannes Wallet Relay
  *
- * Fournit la même interface que les autres wallet providers, mais utilise
- * le protocole relay (/wallet-relay/*) pour la signature.
+ * Uses the relay (/wallet-relay/*) for signature:
+ * Desktop creates challenge → shows QR → mobile scans → signs locally →
+ * submits tx_blob via relay.
  *
- * Le desktop crée un challenge → affiche QR → le mobile scanne →
- * signe localement → soumet le tx_blob signé via le relay.
- *
- * Aucun seed ni clé privée ne transite par ce contexte ou le serveur.
+ * Shared wallet logic (balance, statement cache, WebSocket updates) lives
+ * in useWalletCore. This file only handles relay-specific transport.
  */
 
 import {
@@ -21,25 +20,35 @@ import {
 } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 import wsClient from "@/lib/xcannesWebSocket";
-import {
-  listCachedStatementKeys,
-  setCachedStatement,
-} from "@/lib/walletStatementCache";
-import { decodeXrplCurrencyCode } from "@/utils/xrpl";
 import { isMobileDevice } from "@/utils/deviceDetect";
+import { useWalletCore } from "@/hooks/useWalletCore";
 
 const NativeWalletContext = createContext();
 const NATIVE_WALLET_STORAGE_KEY = "xcannes_native_wallet";
 
 export const NativeWalletProvider = ({ children }) => {
-  const [wallet, setWallet] = useState("");
-  const [isConnected, setIsConnected] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isSessionReady, setIsSessionReady] = useState(false);
-  const [balance, setBalance] = useState(null);
-  const [isWalletActivated, setIsWalletActivated] = useState(null);
+  // ─── Shared wallet state & actions ────────────────────────────────
+  const {
+    wallet,
+    isConnected,
+    isConnecting,
+    isSessionReady,
+    balance,
+    isWalletActivated,
+    walletAddresses,
+    walletRef,
+    setIsConnecting,
+    setIsSessionReady,
+    setWalletAddresses,
+    activateWallet,
+    deactivateWallet,
+    switchToWallet,
+    refreshBalance,
+    autofillTransaction,
+  } = useWalletCore({ logPrefix: "NativeWallet" });
+
+  // ─── Relay-specific state ─────────────────────────────────────────
   const [qrModalData, setQrModalData] = useState(null);
-  const [walletAddresses, setWalletAddresses] = useState([]); // Multi-wallet list
   const relayCleanupRef = useRef(null);
   const autoCloseTimeoutRef = useRef(null);
   const pendingSignatureResolveRef = useRef(null);
@@ -76,7 +85,7 @@ export const NativeWalletProvider = ({ children }) => {
     resolvePendingSignature(null);
     setQrModalData(null);
     setIsConnecting(false);
-  }, [clearAutoClose, cleanupRelaySubscription, resolvePendingSignature]);
+  }, [clearAutoClose, cleanupRelaySubscription, resolvePendingSignature, setIsConnecting]);
 
   const scheduleQrClose = useCallback(
     (delayMs = 2000) => {
@@ -88,118 +97,12 @@ export const NativeWalletProvider = ({ children }) => {
     [clearAutoClose, closeQrModal]
   );
 
-  // --- Balance ---
-  const fetchBalance = useCallback(async (address) => {
-    try {
-      const res = await fetch(apiUrl(`/wallet/balance?address=${address}`));
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setIsWalletActivated(true);
-        const tokens = Array.isArray(data?.tokens)
-          ? data.tokens.map((token) => ({
-              ...token,
-              currency: decodeXrplCurrencyCode(token?.currency),
-            }))
-          : [];
-        setBalance({
-          xrp: data.xrp,
-          xrpReserved: data.xrpReserved ?? 0,
-          xrpAvailable: data.xrpAvailable ?? 0,
-          xrpLowAlert: Boolean(data.xrpLowAlert),
-          tokens,
-        });
-        return;
-      }
-      if (
-        res.status === 404 &&
-        String(data?.message || "")
-          .toLowerCase()
-          .includes("not activated")
-      ) {
-        setIsWalletActivated(false);
-        setBalance({ xrp: 0, xrpReserved: 0, xrpAvailable: 0, xrpLowAlert: false, tokens: [] });
-      }
-    } catch (error) {
-      console.error("[NativeWallet] Fetch balance error:", error);
-    }
-  }, []);
-
-  const warmFullReplay = useCallback(async (address) => {
-    if (!address) return;
-    try {
-      const params = new URLSearchParams();
-      params.set("address", address);
-      params.set("limit", "100");
-      params.set("forceFullReplay", "true");
-      params.set("includeRaw", "true");
-      params.set("source", "onchain");
-      const url = apiUrl(`/wallet/statement?${params.toString()}`);
-      const res = await fetch(url);
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setCachedStatement(url, data);
-        const rawlessParams = new URLSearchParams(params);
-        rawlessParams.delete("includeRaw");
-        setCachedStatement(
-          apiUrl(`/wallet/statement?${rawlessParams.toString()}`),
-          data
-        );
-      }
-    } catch (error) {
-      // best-effort
-    }
-  }, []);
-
-  const refreshCachedStatementsForAddress = useCallback(async (address) => {
-    if (!address) return;
-    const cacheKeys = listCachedStatementKeys();
-    const targetKeys = cacheKeys.filter((key) => {
-      if (!key.includes("/wallet/statement")) return false;
-      if (!key.includes(`address=${encodeURIComponent(address)}`)) return false;
-      if (key.includes("cursor=")) return false;
-      return true;
-    });
-    const urls =
-      targetKeys.length > 0
-        ? targetKeys
-        : (() => {
-            const p = new URLSearchParams();
-            p.set("address", address);
-            p.set("limit", "100");
-            p.set("source", "onchain");
-            return [apiUrl(`/wallet/statement?${p.toString()}`)];
-          })();
-    for (const url of urls) {
-      const fetchUrl = (() => {
-        try {
-          const parsed = new URL(url);
-          if (!parsed.searchParams.has("includeRaw"))
-            parsed.searchParams.set("includeRaw", "true");
-          return parsed.toString();
-        } catch {
-          return url;
-        }
-      })();
-      try {
-        const res = await fetch(fetchUrl);
-        const data = await res.json().catch(() => ({}));
-        if (res.ok) setCachedStatement(url, data);
-      } catch (_) {
-        /* best-effort */
-      }
-    }
-  }, []);
-
-  // --- Wallet state ---
+  // ─── Session-storage–backed wallet activation ─────────────────────
   const updateWallet = useCallback(
     (account, addresses) => {
       if (account) {
-        setWallet(account);
-        setIsConnected(true);
-        setIsWalletActivated(null);
+        activateWallet(account);
         sessionStorage.setItem(NATIVE_WALLET_STORAGE_KEY, account);
-        fetchBalance(account);
-        warmFullReplay(account);
         // Store multi-wallet list if provided
         if (Array.isArray(addresses) && addresses.length > 0) {
           setWalletAddresses(addresses);
@@ -211,60 +114,14 @@ export const NativeWalletProvider = ({ children }) => {
           } catch { /* ignore */ }
         }
       } else {
-        setWallet("");
-        setIsConnected(false);
-        setBalance(null);
-        setIsWalletActivated(null);
+        deactivateWallet();
         setWalletAddresses([]);
         sessionStorage.removeItem(NATIVE_WALLET_STORAGE_KEY);
         sessionStorage.removeItem(NATIVE_WALLET_STORAGE_KEY + "_addresses");
       }
     },
-    [fetchBalance, warmFullReplay]
+    [activateWallet, deactivateWallet, setWalletAddresses]
   );
-
-  // --- WebSocket real-time updates (reuses same wallet:address channel) ---
-  const walletWsRefreshRef = useRef(0);
-
-  useEffect(() => {
-    if (!wallet) return;
-    let cancelled = false;
-    const address = wallet;
-    const channelKey = `wallet:${address}`;
-
-    wsClient
-      .connect()
-      .then(() => {
-        if (cancelled) return;
-        wsClient.subscribe("wallet", address);
-      })
-      .catch(() => {});
-
-    const handleWalletUpdate = (message) => {
-      if (cancelled) return;
-      const channel = message?.channel;
-      const data = message?.data || {};
-      if (channel && channel !== channelKey) return;
-      if (data?.address && data.address !== address) return;
-      const now = Date.now();
-      if (now - walletWsRefreshRef.current < 5000) return;
-      walletWsRefreshRef.current = now;
-      refreshCachedStatementsForAddress(address);
-      fetchBalance(address);
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("xcannes:wallet:refresh", { detail: { address } })
-        );
-      }
-    };
-
-    wsClient.on("wallet", handleWalletUpdate);
-    return () => {
-      cancelled = true;
-      wsClient.off("wallet", handleWalletUpdate);
-      wsClient.unsubscribe("wallet", address);
-    };
-  }, [fetchBalance, refreshCachedStatementsForAddress, wallet]);
 
   // --- Restore saved session ---
   useEffect(() => {
@@ -273,7 +130,6 @@ export const NativeWalletProvider = ({ children }) => {
         ? sessionStorage.getItem(NATIVE_WALLET_STORAGE_KEY)
         : null;
     if (savedWallet) {
-      // Restore addresses list from session
       let savedAddresses = [];
       try {
         const raw = sessionStorage.getItem(NATIVE_WALLET_STORAGE_KEY + "_addresses");
@@ -282,15 +138,13 @@ export const NativeWalletProvider = ({ children }) => {
       updateWallet(savedWallet, savedAddresses);
     }
     setIsSessionReady(true);
-  }, [updateWallet]);
+  }, [updateWallet, setIsSessionReady]);
 
-  // --- Subscribe to challenge status via WebSocket (replaces polling) ---
+  // ─── Relay challenge subscription ─────────────────────────────────
   const subscribeToChallengeStatus = useCallback(
     async (challengeId, mode) => {
-      // Cleanup any previous subscription
       cleanupRelaySubscription();
 
-      // Timeout after 5 minutes
       const timeoutId = setTimeout(() => {
         cleanupRelaySubscription();
         setIsConnecting(false);
@@ -298,7 +152,6 @@ export const NativeWalletProvider = ({ children }) => {
         if (mode === "sign") resolvePendingSignature(null);
       }, 5 * 60 * 1000);
 
-      // Handler for WebSocket relay events
       const handleRelayEvent = (message) => {
         if (message?.challengeId !== challengeId) return;
         const eventType = message?.event;
@@ -309,7 +162,6 @@ export const NativeWalletProvider = ({ children }) => {
           updateQrStatus("signed");
 
           if (mode === "connect" && message?.address) {
-            // Brief delay so user sees "Connecté !" before dashboard swap
             const addr = message.address;
             const addrs = message.addresses;
             setTimeout(() => {
@@ -336,13 +188,11 @@ export const NativeWalletProvider = ({ children }) => {
         }
       };
 
-      // Subscribe via WebSocket
       try {
         await wsClient.connect();
         wsClient.subscribe("wallet-relay", challengeId);
         wsClient.on("wallet-relay", handleRelayEvent);
 
-        // Store cleanup function
         relayCleanupRef.current = () => {
           clearTimeout(timeoutId);
           wsClient.off("wallet-relay", handleRelayEvent);
@@ -358,13 +208,13 @@ export const NativeWalletProvider = ({ children }) => {
       closeQrModal,
       resolvePendingSignature,
       scheduleQrClose,
+      setIsConnecting,
       updateQrStatus,
       updateWallet,
     ]
   );
 
-  // --- CONNECT via relay ---
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // ─── CONNECT via relay ────────────────────────────────────────────
   const connect = useCallback(async () => {
     setIsConnecting(true);
     try {
@@ -387,25 +237,22 @@ export const NativeWalletProvider = ({ children }) => {
       setQrModalData({
         uuid: challengeId,
         qrUrl: null,
-        qrData: qrData, // Raw QR payload for the QR component to render
+        qrData: qrData,
         deepLink: null,
         type: "connect",
         status: "waiting",
         visible: true,
       });
 
-      // Subscribe to challenge status via WebSocket
       subscribeToChallengeStatus(challengeId, "connect");
     } catch (error) {
       console.error("[NativeWallet] Connect error:", error);
       alert(`Connection failed: ${error.message}`);
       setIsConnecting(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cleanupRelaySubscription, clearAutoClose, subscribeToChallengeStatus]);
+  }, [cleanupRelaySubscription, clearAutoClose, setIsConnecting, subscribeToChallengeStatus]);
 
-  // --- SIGN TRANSACTION via relay ---
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // ─── SIGN TRANSACTION via relay ───────────────────────────────────
   const signTransaction = useCallback(async (txjson, { action } = {}) => {
     if (!isConnected) {
       alert("Please connect your wallet first");
@@ -416,23 +263,7 @@ export const NativeWalletProvider = ({ children }) => {
 
     setIsConnecting(true);
     try {
-      // Autofill Fee, Sequence, LastLedgerSequence via backend before signing
-      let filledTx = txjson;
-      try {
-        const afRes = await fetch(apiUrl("/wallet-relay/autofill"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ txjson, address: wallet }),
-        });
-        if (afRes.ok) {
-          const afData = await afRes.json();
-          if (afData.txjson) filledTx = afData.txjson;
-        } else {
-          console.warn("[NativeWallet] Autofill failed, signing without:", await afRes.text());
-        }
-      } catch (afErr) {
-        console.warn("[NativeWallet] Autofill error, signing without:", afErr);
-      }
+      const filledTx = await autofillTransaction(txjson, walletRef.current);
 
       const payload = {
         type: "sign",
@@ -455,7 +286,6 @@ export const NativeWalletProvider = ({ children }) => {
       clearAutoClose();
 
       if (mobile) {
-        // Mobile: redirect to wallet-app for biometric/PIN sign
         setQrModalData({
           uuid: challengeId,
           qrUrl: null,
@@ -464,11 +294,10 @@ export const NativeWalletProvider = ({ children }) => {
           type: "sign",
           status: "waiting",
           visible: true,
-          mobile: true, // Flag for mobile-aware QR modal
+          mobile: true,
           walletAppUrl: `/wallet-app/?sign=${challengeId}`,
         });
       } else {
-        // Desktop: show QR code for mobile to scan
         setQrModalData({
           uuid: challengeId,
           qrUrl: null,
@@ -481,7 +310,6 @@ export const NativeWalletProvider = ({ children }) => {
         });
       }
 
-      // Wait for signature result via WebSocket
       return await new Promise((resolve) => {
         resolvePendingSignature(null);
         pendingSignatureResolveRef.current = resolve;
@@ -493,35 +321,25 @@ export const NativeWalletProvider = ({ children }) => {
       setIsConnecting(false);
       return null;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, cleanupRelaySubscription, clearAutoClose, subscribeToChallengeStatus, resolvePendingSignature]);
+  }, [isConnected, walletRef, autofillTransaction, cleanupRelaySubscription, clearAutoClose, setIsConnecting, resolvePendingSignature, subscribeToChallengeStatus]);
 
-  const refreshBalance = useCallback(() => {
-    if (wallet) fetchBalance(wallet);
-  }, [wallet, fetchBalance]);
-
-  // --- Switch active wallet (multi-wallet) ---
+  // ─── Switch active wallet (multi-wallet) ──────────────────────────
   const switchWallet = useCallback(
     (address) => {
       if (!address) return;
-      // Verify the address is in our walletAddresses list
       const found = walletAddresses.find((w) => w.address === address);
       if (!found && address !== wallet) return;
-      // Switch: update active wallet but keep the addresses list
-      setWallet(address);
-      setIsWalletActivated(null);
-      setBalance(null);
+      switchToWallet(address);
       sessionStorage.setItem(NATIVE_WALLET_STORAGE_KEY, address);
-      fetchBalance(address);
-      warmFullReplay(address);
     },
-    [fetchBalance, warmFullReplay, wallet, walletAddresses]
+    [switchToWallet, wallet, walletAddresses]
   );
 
   const disconnect = useCallback(async () => {
     updateWallet(null);
   }, [updateWallet]);
 
+  // ─── Context value ────────────────────────────────────────────────
   const contextValue = useMemo(() => ({
     wallet,
     isConnected,

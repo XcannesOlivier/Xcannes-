@@ -15,6 +15,7 @@ const SCHEMA_TO_TYPE = Object.entries(XCANNES_MEMO_SCHEMAS).reduce((acc, [type, 
   return acc;
 }, {});
 
+// "spread" origin = conversion fee transaction (legacy naming).
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_LINE_ACTIONS = new Set(['activate']);
 const VALID_ALLOC_ACTIONS = new Set(['allocate', 'deallocate']);
@@ -38,10 +39,43 @@ function normalizeUpper(value) {
   return text ? text.toUpperCase() : null;
 }
 
+/**
+ * Decode an XRPL hex-encoded currency code (40-char hex → human-readable).
+ * Browser-compatible version (no Buffer dependency).
+ * Mirrors utils/currency.js decodeXrplCurrencyHex (backend).
+ *
+ * @param {string} currency — Raw currency field from the XRPL ledger
+ * @returns {string} Decoded and uppercased currency code
+ */
+function decodeXrplCurrencyHex(currency) {
+  const raw = String(currency || '').trim();
+  if (!raw) return '';
+  if (!/^[0-9A-Fa-f]{40}$/.test(raw)) return raw.toUpperCase();
+  try {
+    let decoded = '';
+    for (let i = 0; i < raw.length; i += 2) {
+      const byte = parseInt(raw.substring(i, i + 2), 16);
+      if (byte === 0) break;
+      decoded += String.fromCharCode(byte);
+    }
+    if (!decoded) return raw.toUpperCase();
+    // Only accept printable ASCII (0x20–0x7E); reject control chars / multi-byte artefacts
+    if (!/^[\x20-\x7E]+$/.test(decoded)) return raw.toUpperCase();
+    return decoded.trim().toUpperCase();
+  } catch {
+    return raw.toUpperCase();
+  }
+}
+
 function normalizeCurrencyCode(value) {
-  const code = normalizeUpper(value);
-  if (!code) return null;
-  if (code.length < 2 || code.length > 12) return null;
+  if (!value || typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  // If hex-encoded (40-char hex from XRPL), decode it
+  const code = /^[A-Fa-f0-9]{40}$/.test(trimmed)
+    ? decodeXrplCurrencyHex(trimmed)
+    : trimmed.toUpperCase();
+  if (!code || code.length < 2 || code.length > 12) return null;
   return code;
 }
 
@@ -62,8 +96,7 @@ function isValidWalletLabel(label) {
   if (!label) return false;
   const parts = String(label).trim().split(/\s+/).filter(Boolean);
   if (parts.length < 1 || parts.length > 2) return false;
-  const wordPattern = /^[A-Za-z]+$/;
-  return parts.every((part) => part.length <= 7 && wordPattern.test(part));
+  return parts.every((part) => /^[A-Za-z]+$/.test(part) && part.length <= 7);
 }
 
 function parseOptionalNumber(value, { min = null, minExclusive = false } = {}) {
@@ -156,6 +189,7 @@ function normalizeConversionPayload(payload, errors) {
   });
   if (!fxRateRes.ok) errors.push('conversion.fxRate');
 
+  // "spreadRlusd" is the legacy field name for the conversion fee amount (now fixed 1%).
   const spreadRlusdRes = parseOptionalNumber(payload?.spreadRlusd, { min: 0 });
   if (!spreadRlusdRes.ok) errors.push('conversion.spreadRlusd');
 
@@ -548,7 +582,6 @@ export {
   XCANNES_MEMO_TYPE,
   XCANNES_MEMO_FORMAT,
   XCANNES_MEMO_SCHEMAS,
-  inferXcannesMemoType,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
   buildCurrencyLineMemo,
