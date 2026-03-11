@@ -6,6 +6,10 @@ import { getPageTranslations } from "@/i18n/getPageTranslations";
 import ReCAPTCHA from "react-google-recaptcha";
 import SEOHead from "@/components/layout/SEOHead";
 
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY !== "your_recaptcha_site_key_here"
+  ? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+  : null;
+
 export default function Contact() {
   const router = useRouter();
   const { t } = useTranslation("common");
@@ -158,7 +162,7 @@ export default function Contact() {
 
                 <button
                   type="submit"
-                  disabled={!captchaToken || status === "loading"}
+                  disabled={(!captchaToken && !!RECAPTCHA_SITE_KEY) || status === "loading"}
                   className="w-full inline-flex items-center justify-center gap-2 px-8 py-3 bg-xcannes-green text-black font-semibold rounded-lg hover:bg-xcannes-green/90 transition-all duration-300 shadow-lg shadow-xcannes-green/20 disabled:opacity-50 disabled:cursor-not-allowed">
 
                   {status === "loading" ?
@@ -259,10 +263,14 @@ export default function Contact() {
               }
             </div>
             <div className="bg-elevated border border-white/10 rounded-2xl p-4 flex items-start justify-center md:justify-start">
-              <ReCAPTCHA
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-                onChange={(token) => setCaptchaToken(token)}
-                theme="dark" />
+              {RECAPTCHA_SITE_KEY ? (
+                <ReCAPTCHA
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                  theme="dark" />
+              ) : (
+                <p className="text-white/40 text-sm">{t("ui_recaptcha_not_configured", "Protection anti-spam temporairement indisponible.")}</p>
+              )}
             </div>
           </div>
         </main>

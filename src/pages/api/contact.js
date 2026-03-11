@@ -27,13 +27,15 @@ export default async function handler(req, res) {
         };
 
 
-  // Vérifier le token reCAPTCHA
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${captchaToken}`;
- const captchaRes = await fetch(verifyUrl, { method: "POST" });
-  const captchaData = await captchaRes.json();
+  // Vérifier le token reCAPTCHA (optionnel si RECAPTCHA_SECRET n'est pas configuré)
+  if (process.env.RECAPTCHA_SECRET && process.env.RECAPTCHA_SECRET !== "XXXXXXXXXXXXXXXXXXXXXXXXXX") {
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${captchaToken}`;
+    const captchaRes = await fetch(verifyUrl, { method: "POST" });
+    const captchaData = await captchaRes.json();
 
-  if (!captchaData.success) {
-    return res.status(400).json({ message: i18n.captchaError });
+    if (!captchaData.success) {
+      return res.status(400).json({ message: i18n.captchaError });
+    }
   }
 
   // Configurer Nodemailer (OVH)
