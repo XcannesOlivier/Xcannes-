@@ -7,6 +7,8 @@
     "build": "node -r ./scripts/exdev-rename-fallback.cjs ./node_modules/next/dist/bin/next build",
     "start": "next start -p 2500",
     "lint": "next lint",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/",
     "i18n:sync": "node scripts/sync-locales.cjs",
     "i18n:audit": "node scripts/i18n-audit.cjs",
     "i18n:sample": "node scripts/i18n-sample.cjs",
@@ -40,7 +42,9 @@
     "autoprefixer": "^10.4.22",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",
-    "postcss": "^8.5.6"
+    "eslint-config-prettier": "^10.1.8",
+    "postcss": "^8.5.6",
+    "prettier": "^3.8.1"
   },
   "overrides": {
     "glob": "^10.5.0",
