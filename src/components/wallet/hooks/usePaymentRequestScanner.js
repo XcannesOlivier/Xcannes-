@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { Buffer } from "buffer";
-import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
+const PAYREQ_SCHEMA = 'xcannes-payreq';
 import { parseRelayChallenge, forwardRelayChallengeToPwa } from "@/utils/relayChallenge";
 import { isPwaEmbedded } from "@/context/PwaEmbeddedContext";
 
@@ -89,7 +89,7 @@ export function usePaymentRequestScanner({
         const normalized = { ...request };
         // Schema may be omitted — infer from prefix (xcannes-payreq:)
         if (request.s && !normalized.schema) normalized.schema = request.s;
-        if (!normalized.schema) normalized.schema = XCANNES_MEMO_SCHEMAS.payreq.schema;
+        if (!normalized.schema) normalized.schema = PAYREQ_SCHEMA;
         if (request.tc && !normalized.targetCurrency)
           normalized.targetCurrency = request.tc;
         if (request.t && !normalized.to) normalized.to = request.t;
@@ -252,7 +252,7 @@ export function usePaymentRequestScanner({
 
             setSendDestination?.(request.to);
             setSendPaymentRequest?.({
-              schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
+              schema: PAYREQ_SCHEMA,
               to: request.to,
               targetCurrencyCode: targetCurrency || null,
               displayAmount:
@@ -351,7 +351,7 @@ export function usePaymentRequestScanner({
 
           setSendDestination?.(request.to);
           setSendPaymentRequest?.({
-            schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
+            schema: PAYREQ_SCHEMA,
             to: request.to,
             targetCurrencyCode: targetCurrency || null,
             displayAmount: displayAmount != null ? Number(displayAmount) : null,

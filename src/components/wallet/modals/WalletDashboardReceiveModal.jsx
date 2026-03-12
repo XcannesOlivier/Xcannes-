@@ -9,7 +9,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
-import { XCANNES_MEMO_SCHEMAS } from "@/utils/xrplMemo";
+
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
@@ -186,7 +186,7 @@ export default function WalletDashboardReceiveModal({
 
     const beneficiaryLabel = String(walletLabel || "").trim() || null;
     const req = {
-      schema: XCANNES_MEMO_SCHEMAS.payreq.schema,
+      schema: 'xcannes-payreq',
       to: wallet,
       targetCurrency: targetCurrencyUpper,
       displayAmount: amount,

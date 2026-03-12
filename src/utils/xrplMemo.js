@@ -4,7 +4,6 @@ import { Buffer } from "buffer";
 import {
   XCANNES_MEMO_TYPE,
   XCANNES_MEMO_FORMAT,
-  XCANNES_MEMO_SCHEMAS,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
   buildConversionMemo,
@@ -114,7 +113,6 @@ export function buildXrplJsonMemo(
 }
 
 export {
-  XCANNES_MEMO_SCHEMAS,
   buildWalletLabelMemo,
   buildConversionMemo,
   buildPayreqMemo,
