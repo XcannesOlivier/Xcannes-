@@ -9,6 +9,7 @@
 
 const XCANNES_MEMO_TYPE = 'XCANNES';
 const XCANNES_MEMO_FORMAT = 'application/json';
+const XCANNES_MEMO_FORMAT_ZLIB = 'application/x-xcannes-zlib';
 const MEMO_FORMAT_VERSION = 2;
 
 // Valid memo types
@@ -29,6 +30,8 @@ const V2_SIDE_LONG_TO_SHORT = { buy: 'b', sell: 's' };
 // "spread" origin = conversion fee transaction.
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
+// Maximum JSON byte length for memo payload (XRPL practical limit ~1 KB).
+const MEMO_MAX_JSON_BYTES = 900;
 // ⚠️  SYNC : cette liste doit rester identique à XRPL_ASSET_CODES
 //    définie dans utils/currency.js (source unique côté backend).
 const XRPL_ASSET_CODES = new Set(['XRP', 'RLUSD']);
@@ -471,6 +474,17 @@ function buildXcannesMemoPayload(type, data = {}, options = {}) {
   if (!result.ok) return result;
 
   result.compactPayload = toV2Compact(type, result.payload);
+
+  // Size guard — reject memo payloads that exceed XRPL practical limit
+  try {
+    const json = JSON.stringify(result.compactPayload ?? result.payload);
+    if (json.length > MEMO_MAX_JSON_BYTES) {
+      return { ok: false, errors: ['memo_too_large'], type };
+    }
+  } catch {
+    return { ok: false, errors: ['memo_serialize_error'], type };
+  }
+
   return result;
 }
 
@@ -499,6 +513,8 @@ function buildMoonpayMemo(data) {
 export {
   XCANNES_MEMO_TYPE,
   XCANNES_MEMO_FORMAT,
+  XCANNES_MEMO_FORMAT_ZLIB,
+  MEMO_MAX_JSON_BYTES,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
   buildConversionMemo,

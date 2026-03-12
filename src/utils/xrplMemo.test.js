@@ -43,20 +43,19 @@ describe("buildXrplJsonMemo", () => {
 // ── buildWalletLabelMemo ────────────────────────────────────
 
 describe("buildWalletLabelMemo", () => {
-  it("builds a valid wallet_label payload", () => {
+  it("builds a valid wallet_label v2 compact payload", () => {
     const payload = buildWalletLabelMemo({ label: "Alice" });
     expect(payload).toBeTruthy();
-    expect(payload.xcannes).toBe("wallet_label");
-    expect(payload.label).toBe("Alice");
-    expect(payload.schema).toBeTruthy();
-    expect(payload.v).toBe(1);
+    expect(payload.xc).toBe("wl");
+    expect(payload.l).toBe("Alice");
+    expect(payload.v).toBe(2);
   });
 });
 
 // ── buildConversionMemo ─────────────────────────────────────
 
 describe("buildConversionMemo", () => {
-  it("builds a valid conversion payload", () => {
+  it("builds a valid conversion v2 compact payload", () => {
     const payload = buildConversionMemo({
       base: "EUR",
       quote: "USD",
@@ -67,24 +66,29 @@ describe("buildConversionMemo", () => {
       fxRate: 1.0909,
     });
     expect(payload).toBeTruthy();
-    expect(payload.xcannes).toBe("conversion");
-    expect(payload.base).toBe("EUR");
-    expect(payload.quote).toBe("USD");
+    expect(payload.xc).toBe("cv");
+    expect(payload.b).toBe("EUR");
+    expect(payload.q).toBe("USD");
+    expect(payload.r).toBe(108);
+    expect(payload.v).toBe(2);
   });
 });
 
 // ── buildPayreqMemo ─────────────────────────────────────────
 
 describe("buildPayreqMemo", () => {
-  it("builds a valid payreq payload", () => {
+  it("builds a valid payreq v2 compact payload", () => {
     const payload = buildPayreqMemo({
       origin: "payreq",
       targetCurrencyCode: "EUR",
       amountRlusd: 50,
     });
     expect(payload).toBeTruthy();
-    expect(payload.xcannes).toBe("payreq");
-    expect(payload.origin).toBe("payreq");
+    expect(payload.xc).toBe("pr");
+    expect(payload.tc).toBe("EUR");
+    expect(payload.o).toBe("p"); // short origin: payreq → p
+    expect(payload.r).toBe(50);
+    expect(payload.v).toBe(2);
   });
 
   it("rejects invalid origin", () => {

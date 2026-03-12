@@ -1,9 +1,11 @@
 "use client";
 
 import { Buffer } from "buffer";
+import pako from "pako";
 import {
   XCANNES_MEMO_TYPE,
-  XCANNES_MEMO_FORMAT,
+  XCANNES_MEMO_FORMAT_ZLIB,
+  MEMO_MAX_JSON_BYTES,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
   buildConversionMemo,
@@ -55,11 +57,17 @@ function encodeUtf8ToHex(value) {
   return Buffer.from(raw, "utf8").toString("hex").toUpperCase();
 }
 
+function encodeBytesToHex(uint8arr) {
+  return Buffer.from(uint8arr).toString("hex").toUpperCase();
+}
+
 export function buildXrplJsonMemo(
   payload,
   { memoType = XCANNES_MEMO_TYPE, validate = true } = {}
 ) {
-  let memoPayload = payload;
+  // Validate the payload but keep the original (compact v2) for on-chain encoding.
+  // The builders already validate in mode "create" and return compact v2;
+  // this second validation acts as a safety net for raw/external payloads.
   if (validate && payload && typeof payload === "object") {
     const validation = validateXcannesMemoPayload(payload, { mode: "create" });
     if (!validation.ok) {
@@ -67,24 +75,33 @@ export function buildXrplJsonMemo(
       console.error("[xrplMemo] Invalid memo payload:", validation.errors);
       return null;
     }
-    memoPayload = validation.payload;
   }
 
   let json = "";
   try {
-    json = JSON.stringify(memoPayload ?? {});
+    json = JSON.stringify(payload ?? {});
   } catch (error) {
     recordMemoMetric("memo_encode_json_error");
     console.error("[xrplMemo] Memo JSON stringify failed:", error?.message || error);
     return null;
   }
 
+  // Size guard on raw JSON (before compression)
+  if (json.length > MEMO_MAX_JSON_BYTES) {
+    recordMemoMetric("memo_encode_too_large");
+    console.error(`[xrplMemo] Memo payload too large: ${json.length} bytes (max ${MEMO_MAX_JSON_BYTES})`);
+    return null;
+  }
+
+  // Compress JSON with deflate (zlib) → binary on-chain, not human-readable
   let memoData = "";
+  let memoFormat = XCANNES_MEMO_FORMAT_ZLIB;
   try {
-    memoData = encodeUtf8ToHex(json);
+    const compressed = pako.deflate(json);
+    memoData = encodeBytesToHex(compressed);
   } catch (error) {
-    recordMemoMetric("memo_encode_hex_error");
-    console.error("[xrplMemo] Memo hex encode failed:", error?.message || error);
+    recordMemoMetric("memo_encode_deflate_error");
+    console.error("[xrplMemo] Memo deflate failed:", error?.message || error);
     return null;
   }
   if (!memoData) {
@@ -96,7 +113,7 @@ export function buildXrplJsonMemo(
   let formatHex = "";
   try {
     typeHex = memoType ? encodeUtf8ToHex(memoType) : "";
-    formatHex = encodeUtf8ToHex(XCANNES_MEMO_FORMAT);
+    formatHex = encodeUtf8ToHex(memoFormat);
   } catch (error) {
     recordMemoMetric("memo_encode_hex_error");
     console.error("[xrplMemo] Memo type/format hex encode failed:", error?.message || error);
