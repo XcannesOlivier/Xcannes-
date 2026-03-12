@@ -1,6 +1,9 @@
 import { useState, useCallback, useMemo } from "react";
 import { buildXrplJsonMemo, buildReconcileMemo } from "@/utils/xrplMemo";
-import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
+import {
+  buildRlusdPaymentTxjson,
+  XCANNES_RECONCILE_DESTINATION,
+} from "@/utils/walletSpread";
 
 /**
  * useReconciliation — manages external-spend reconciliation workflow.
@@ -8,8 +11,12 @@ import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
  * When the user spends RLUSD via external wallets (Xumm, Sologenic, etc.),
  * the Xcannes replay allocations total MORE than the actual on-chain balance.
  * This hook detects the deficit and lets the user confirm the adjustment
- * via a "J'ai compris" button, which sends a tiny self-payment with a
- * reconcile memo to permanently record the correction on-chain.
+ * via a "J'ai compris" button, which sends a tiny RLUSD payment to the
+ * Xcannes spread wallet with a reconcile memo to permanently record
+ * the correction on-chain.
+ *
+ * NOTE: XRPL rejects self-payments (Account === Destination) with
+ * temREDUNDANT, so the payment is sent to the spread wallet instead.
  *
  * @param {object} options
  * @param {object|null} options.reconciliation - Reconciliation data from backend API.
@@ -70,8 +77,12 @@ export function useReconciliation({
   }, [needed, deficit, operations, lineStates]);
 
   /**
-   * Build the full XRPL transaction JSON for the reconcile self-payment.
-   * Uses a minimal 0.000001 RLUSD payment to self with reconcile memo.
+   * Build the full XRPL transaction JSON for the reconcile payment.
+   * Sends a minimal 0.000001 RLUSD to the Xcannes spread wallet
+   * with the reconcile memo attached.
+   *
+   * NOTE: XRPL rejects self-payments (Account === Destination) with
+   * temREDUNDANT, so we MUST use a different destination address.
    */
   const buildReconcileTx = useCallback(() => {
     if (!address || !needed) return null;
@@ -82,10 +93,10 @@ export function useReconciliation({
     const memos = buildXrplJsonMemo(memoPayload);
     if (!memos) return null;
 
-    // Minimal self-payment of 0.000001 RLUSD
+    // Minimal payment to Xcannes spread wallet (not self — XRPL rejects self-payments)
     const txJson = buildRlusdPaymentTxjson({
       account: address,
-      destination: address,
+      destination: XCANNES_RECONCILE_DESTINATION,
       amountRlusd: 0.000001,
     });
     if (!txJson) return null;
@@ -122,6 +133,19 @@ export function useReconciliation({
       });
 
       if (result?.signed) {
+        // Verify the XRPL submission actually succeeded (engine_result)
+        const engineResult = result?.txResult?.result?.engine_result
+          || result?.txResult?.engine_result
+          || "";
+        if (engineResult && engineResult !== "tesSUCCESS" && engineResult !== "terQUEUED") {
+          const msg = result?.txResult?.result?.engine_result_message
+            || result?.txResult?.engine_result_message
+            || engineResult;
+          console.error("[useReconciliation] XRPL rejected:", engineResult, msg);
+          setError(`Transaction rejected: ${msg}`);
+          return;
+        }
+
         setTxHash(result.hash || "confirmed");
         if (typeof onComplete === "function") {
           onComplete();

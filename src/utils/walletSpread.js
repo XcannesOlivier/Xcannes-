@@ -12,6 +12,13 @@ export const XCANNES_ACTIVATION_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_ACTIVATION_WALLET_ADDRESS || "").trim() ||
   XCANNES_SPREAD_WALLET_ADDRESS;
 
+/**
+ * Destination for reconcile payments.
+ * XRPL rejects self-payments (temREDUNDANT), so reconcile memos are sent
+ * as a minimal 0.000001 RLUSD payment to the spread wallet.
+ */
+export const XCANNES_RECONCILE_DESTINATION = XCANNES_SPREAD_WALLET_ADDRESS;
+
 export function isFxConversion(base, quote) {
   const b = String(base || "").toUpperCase();
   const q = String(quote || "").toUpperCase();
