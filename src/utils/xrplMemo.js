@@ -9,7 +9,6 @@ import {
   buildWalletLabelMemo,
   buildConversionMemo,
   buildPayreqMemo,
-  buildAllocationAdjustMemo,
   buildMoonpayMemo,
 } from "./xcannesMemoSchemas";
 
@@ -119,6 +118,5 @@ export {
   buildWalletLabelMemo,
   buildConversionMemo,
   buildPayreqMemo,
-  buildAllocationAdjustMemo,
   buildMoonpayMemo,
 };

@@ -6,7 +6,6 @@ const XCANNES_MEMO_SCHEMAS = {
   currency_line: { schema: 'xcannes-currency-line-v1', version: 1 },
   conversion: { schema: 'xcannes-convert-v1', version: 1 },
   payreq: { schema: 'xcannes-payreq-v1', version: 1 },
-  allocation_adjust: { schema: 'xcannes-allocation-v1', version: 1 },
   moonpay: { schema: 'xcannes-moonpay-v1', version: 1 },
 };
 
@@ -18,7 +17,6 @@ const SCHEMA_TO_TYPE = Object.entries(XCANNES_MEMO_SCHEMAS).reduce((acc, [type, 
 // "spread" origin = conversion fee transaction (legacy naming).
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_LINE_ACTIONS = new Set(['activate']);
-const VALID_ALLOC_ACTIONS = new Set(['allocate', 'deallocate']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
 // ⚠️  SYNC : cette liste doit rester identique à XRPL_ASSET_CODES
 //    définie dans utils/currency.js (source unique côté backend).
@@ -86,7 +84,6 @@ function normalizeMemoTypeMarker(value) {
   if (lower === 'wallet_label' || lower.includes('wallet-label')) return 'wallet_label';
   if (lower === 'currency_line' || lower.includes('currency-line')) return 'currency_line';
   if (lower === 'conversion' || lower === 'convert' || lower.includes('convert')) return 'conversion';
-  if (lower === 'allocation_adjust' || lower.includes('allocation')) return 'allocation_adjust';
   if (lower === 'moonpay' || lower.includes('moonpay')) return 'moonpay';
   if (lower === 'payreq' || lower.includes('payreq')) return 'payreq';
   return null;
@@ -312,93 +309,6 @@ function normalizePayreqPayload(payload, errors, { requireOrigin = false } = {})
   return normalized;
 }
 
-function normalizeAllocationAdjustPayload(payload, errors) {
-  const defaultActionRaw = normalizeString(payload?.action);
-  const defaultAction = defaultActionRaw ? defaultActionRaw.toLowerCase() : null;
-  const reason = normalizeString(payload?.reason);
-  const method = normalizeString(payload?.method);
-
-  const adjustments = Array.isArray(payload?.adjustments) ? payload.adjustments : null;
-  if (adjustments && adjustments.length > 0) {
-    const normalizedAdjustments = [];
-    adjustments.forEach((entry) => {
-      const entryActionRaw = normalizeString(entry?.action);
-      const entryAction = entryActionRaw ? entryActionRaw.toLowerCase() : defaultAction;
-      if (!entryAction || !VALID_ALLOC_ACTIONS.has(entryAction)) {
-        errors.push('allocation_adjust.adjustments.action');
-        return;
-      }
-
-      const currencyCode = normalizeCurrencyCode(entry?.currencyCode ?? entry?.currency);
-      if (!currencyCode) {
-        errors.push('allocation_adjust.adjustments.currencyCode');
-        return;
-      }
-
-      const amountRes = parseRequiredNumber(entry?.amountRlusd ?? entry?.amount, {
-        min: 0,
-        minExclusive: true,
-      });
-      if (!amountRes.ok) {
-        errors.push('allocation_adjust.adjustments.amountRlusd');
-        return;
-      }
-
-      const allocatedAfterRes = parseOptionalNumber(entry?.allocatedRlusdAfter, { min: 0 });
-      if (!allocatedAfterRes.ok) {
-        errors.push('allocation_adjust.adjustments.allocatedRlusdAfter');
-        return;
-      }
-
-      const normalizedEntry = {
-        currencyCode,
-        amountRlusd: amountRes.value,
-      };
-      if (entryAction && entryAction !== defaultAction) normalizedEntry.action = entryAction;
-      if (allocatedAfterRes.value != null) normalizedEntry.allocatedRlusdAfter = allocatedAfterRes.value;
-      normalizedAdjustments.push(normalizedEntry);
-    });
-
-    if (normalizedAdjustments.length === 0) {
-      errors.push('allocation_adjust.adjustments');
-    }
-
-    const normalized = {
-      adjustments: normalizedAdjustments,
-    };
-    if (defaultAction) normalized.action = defaultAction;
-    if (reason) normalized.reason = reason;
-    if (method) normalized.method = method;
-    return normalized;
-  }
-
-  if (!defaultAction || !VALID_ALLOC_ACTIONS.has(defaultAction)) {
-    errors.push('allocation_adjust.action');
-  }
-
-  const currencyCode = normalizeCurrencyCode(payload?.currencyCode ?? payload?.currency);
-  if (!currencyCode) errors.push('allocation_adjust.currencyCode');
-
-  const amountRes = parseRequiredNumber(payload?.amountRlusd ?? payload?.amount, {
-    min: 0,
-    minExclusive: true,
-  });
-  if (!amountRes.ok) errors.push('allocation_adjust.amountRlusd');
-
-  const allocatedAfterRes = parseOptionalNumber(payload?.allocatedRlusdAfter, { min: 0 });
-  if (!allocatedAfterRes.ok) errors.push('allocation_adjust.allocatedRlusdAfter');
-
-  const normalized = {
-    action: defaultAction,
-    currencyCode,
-    amountRlusd: amountRes.value,
-  };
-  if (reason) normalized.reason = reason;
-  if (method) normalized.method = method;
-  if (allocatedAfterRes.value != null) normalized.allocatedRlusdAfter = allocatedAfterRes.value;
-  return normalized;
-}
-
 function normalizeMoonpayPayload(payload, errors) {
   const sideRaw = normalizeString(payload?.side);
   const side = sideRaw ? sideRaw.toLowerCase() : null;
@@ -495,8 +405,6 @@ function validateXcannesMemoPayload(payload, options = {}) {
     normalizedBody = normalizePayreqPayload(payload, errors, {
       requireOrigin: mode === 'create',
     });
-  } else if (inferredType === 'allocation_adjust') {
-    normalizedBody = normalizeAllocationAdjustPayload(payload, errors);
   } else if (inferredType === 'moonpay') {
     normalizedBody = normalizeMoonpayPayload(payload, errors);
   }
@@ -566,10 +474,6 @@ function buildPayreqMemo(data) {
   return createXcannesMemoPayload('payreq', data);
 }
 
-function buildAllocationAdjustMemo(data) {
-  return createXcannesMemoPayload('allocation_adjust', data);
-}
-
 function buildCurrencyLineMemo(data) {
   return createXcannesMemoPayload('currency_line', data);
 }
@@ -587,6 +491,5 @@ export {
   buildCurrencyLineMemo,
   buildConversionMemo,
   buildPayreqMemo,
-  buildAllocationAdjustMemo,
   buildMoonpayMemo,
 };

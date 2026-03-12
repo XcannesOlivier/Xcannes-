@@ -10,8 +10,7 @@ import { useCallback, useEffect, useRef } from "react";
  *   handleRefreshWallet, handleActivateCurrencyLine, handleUpsertCurrencyLine
  *
  * Extracted effects:
- *   xcannes:wallet:open-convert, xcannes:wallet:open-adjustment,
- *   auto-open adjustment deficit, refresh timer cleanup
+ *   xcannes:wallet:open-convert, refresh timer cleanup
  */
 export function useWalletNavigation({
   // wallet state

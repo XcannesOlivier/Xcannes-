@@ -4,7 +4,7 @@ import { WALLET_CURRENCY_LINE_ORDER } from "../walletDashboardConfig";
 /**
  * useAugmentedCurrencyLines — Augments raw currency lines from the backend
  * with default lines (USD, EUR, CHF…), sorts them by configured priority,
- * and computes adjustment deficit and currency-line codes for FX rates.
+ * and computes currency-line codes for FX rates.
  */
 export function useAugmentedCurrencyLines({
   currencyLines,
