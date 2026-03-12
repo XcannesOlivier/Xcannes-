@@ -48,9 +48,10 @@ export function middleware(request) {
   return response;
 }
 
-// Ne pas exécuter le middleware sur les assets statiques
+// Ne pas exécuter le middleware sur les assets statiques ni sur le PWA wallet-app
+// (wallet-app a son propre CSP via <meta>, le nonce middleware le casserait)
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\.png$|.*\\.jpg$|.*\\.svg$|.*\\.webp$).*)',
+    '/((?!_next/static|_next/image|wallet-app|favicon\\.ico|robots\\.txt|sitemap\\.xml|.*\\.png$|.*\\.jpg$|.*\\.svg$|.*\\.webp$).*)',
   ],
 };
