@@ -3,7 +3,6 @@ const XCANNES_MEMO_FORMAT = 'application/json';
 
 const XCANNES_MEMO_SCHEMAS = {
   wallet_label: { schema: 'xcannes-wallet-label-v1', version: 1 },
-  currency_line: { schema: 'xcannes-currency-line-v1', version: 1 },
   conversion: { schema: 'xcannes-convert-v1', version: 1 },
   payreq: { schema: 'xcannes-payreq-v1', version: 1 },
   moonpay: { schema: 'xcannes-moonpay-v1', version: 1 },
@@ -16,7 +15,6 @@ const SCHEMA_TO_TYPE = Object.entries(XCANNES_MEMO_SCHEMAS).reduce((acc, [type, 
 
 // "spread" origin = conversion fee transaction (legacy naming).
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
-const VALID_LINE_ACTIONS = new Set(['activate']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
 // ⚠️  SYNC : cette liste doit rester identique à XRPL_ASSET_CODES
 //    définie dans utils/currency.js (source unique côté backend).
@@ -82,7 +80,6 @@ function normalizeMemoTypeMarker(value) {
   if (!marker) return null;
   const lower = marker.toLowerCase();
   if (lower === 'wallet_label' || lower.includes('wallet-label')) return 'wallet_label';
-  if (lower === 'currency_line' || lower.includes('currency-line')) return 'currency_line';
   if (lower === 'conversion' || lower === 'convert' || lower.includes('convert')) return 'conversion';
   if (lower === 'moonpay' || lower.includes('moonpay')) return 'moonpay';
   if (lower === 'payreq' || lower.includes('payreq')) return 'payreq';
@@ -139,21 +136,6 @@ function normalizeWalletLabelPayload(payload, errors) {
   const defaultCurrency = normalizeCurrencyCode(payload?.defaultCurrency);
   const normalized = { label };
   if (defaultCurrency) normalized.defaultCurrency = defaultCurrency;
-  return normalized;
-}
-
-function normalizeCurrencyLinePayload(payload, errors) {
-  const action = normalizeString(payload?.action);
-  const normalizedAction = action ? action.toLowerCase() : null;
-  if (!normalizedAction || !VALID_LINE_ACTIONS.has(normalizedAction)) {
-    errors.push('currency_line.action');
-  }
-  const currencyCode = normalizeCurrencyCode(payload?.currencyCode ?? payload?.currency);
-  if (!currencyCode) errors.push('currency_line.currencyCode');
-  const allocatedAfterRes = parseOptionalNumber(payload?.allocatedRlusdAfter, { min: 0 });
-  if (!allocatedAfterRes.ok) errors.push('currency_line.allocatedRlusdAfter');
-  const normalized = { action: normalizedAction, currencyCode };
-  if (allocatedAfterRes.value != null) normalized.allocatedRlusdAfter = allocatedAfterRes.value;
   return normalized;
 }
 
@@ -397,8 +379,6 @@ function validateXcannesMemoPayload(payload, options = {}) {
   let normalizedBody = null;
   if (inferredType === 'wallet_label') {
     normalizedBody = normalizeWalletLabelPayload(payload, errors);
-  } else if (inferredType === 'currency_line') {
-    normalizedBody = normalizeCurrencyLinePayload(payload, errors);
   } else if (inferredType === 'conversion') {
     normalizedBody = normalizeConversionPayload(payload, errors);
   } else if (inferredType === 'payreq') {
@@ -474,10 +454,6 @@ function buildPayreqMemo(data) {
   return createXcannesMemoPayload('payreq', data);
 }
 
-function buildCurrencyLineMemo(data) {
-  return createXcannesMemoPayload('currency_line', data);
-}
-
 function buildMoonpayMemo(data) {
   return createXcannesMemoPayload('moonpay', data);
 }
@@ -488,7 +464,6 @@ export {
   XCANNES_MEMO_SCHEMAS,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
-  buildCurrencyLineMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
