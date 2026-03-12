@@ -8,6 +8,7 @@ export function useWalletCurrencyLines(address) {
     totalAllocatedRlusd: 0,
     unallocatedRlusd: null,
   });
+  const [reconciliation, setReconciliation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,6 +20,7 @@ export function useWalletCurrencyLines(address) {
         totalAllocatedRlusd: 0,
         unallocatedRlusd: null,
       });
+      setReconciliation(null);
       setLoading(false);
       setError(null);
       return;
@@ -43,6 +45,7 @@ export function useWalletCurrencyLines(address) {
         totalAllocatedRlusd: Number(data.totalAllocatedRlusd || 0),
         unallocatedRlusd: data.unallocatedRlusd ?? null,
       });
+      setReconciliation(data.reconciliation || null);
     } catch (err) {
       console.error("[useWalletCurrencyLines] Error:", err);
       setError(err.message || "Unknown error");
@@ -89,6 +92,7 @@ export function useWalletCurrencyLines(address) {
           totalAllocatedRlusd: Number(data.totalAllocatedRlusd || 0),
           unallocatedRlusd: data.unallocatedRlusd ?? null,
         });
+        setReconciliation(data.reconciliation || null);
 
         return data;
       } catch (err) {
@@ -111,6 +115,7 @@ export function useWalletCurrencyLines(address) {
   return {
     lines,
     summary,
+    reconciliation,
     loading,
     error,
     refresh: fetchCurrencyLines,

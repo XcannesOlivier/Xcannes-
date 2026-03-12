@@ -1311,5 +1311,12 @@
   "wallet_relay_title_sign": "Signer la transaction",
   "wallet_relay_desc_mobile": "Confirmez dans votre wallet Xcannes avec Face ID, Touch ID ou votre code PIN.",
   "wallet_relay_desc_desktop_connect": "Scannez ce QR code avec votre wallet Xcannes.",
-  "wallet_relay_desc_desktop_sign": "Confirmez la transaction dans votre wallet."
+  "wallet_relay_desc_desktop_sign": "Confirmez la transaction dans votre wallet.",
+  "wallet.reconciliation.title": "Dépense externe détectée",
+  "wallet.reconciliation.description": "Des fonds RLUSD ont été dépensés en dehors de Xcannes (Xumm, Sologenic…). Une correction de {{amount}} USD est nécessaire pour resynchroniser vos soldes.",
+  "wallet.reconciliation.total": "Total",
+  "wallet.reconciliation.confirm": "J'ai compris",
+  "wallet.reconciliation.later": "Plus tard",
+  "wallet.reconciliation.submitting": "Correction en cours…",
+  "wallet.reconciliation.success": "Correction enregistrée avec succès."
 }

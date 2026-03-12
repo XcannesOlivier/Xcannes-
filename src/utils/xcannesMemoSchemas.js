@@ -13,11 +13,11 @@ const XCANNES_MEMO_FORMAT_ZLIB = 'application/x-xcannes-zlib';
 const MEMO_FORMAT_VERSION = 2;
 
 // Valid memo types
-const VALID_MEMO_TYPES = new Set(['wallet_label', 'conversion', 'payreq', 'moonpay']);
+const VALID_MEMO_TYPES = new Set(['wallet_label', 'conversion', 'payreq', 'moonpay', 'reconcile']);
 
 // Short marker ↔ long type
-const V2_TYPE_SHORT_TO_LONG = { wl: 'wallet_label', cv: 'conversion', pr: 'payreq', mp: 'moonpay' };
-const V2_TYPE_LONG_TO_SHORT = { wallet_label: 'wl', conversion: 'cv', payreq: 'pr', moonpay: 'mp' };
+const V2_TYPE_SHORT_TO_LONG = { wl: 'wallet_label', cv: 'conversion', pr: 'payreq', mp: 'moonpay', rc: 'reconcile' };
+const V2_TYPE_LONG_TO_SHORT = { wallet_label: 'wl', conversion: 'cv', payreq: 'pr', moonpay: 'mp', reconcile: 'rc' };
 
 // Short origin ↔ long origin (payreq)
 const V2_ORIGIN_SHORT_TO_LONG = { p: 'payreq', m: 'manual', s: 'spread' };
@@ -200,12 +200,43 @@ function expandV2Moonpay(p) {
   };
 }
 
+function expandV2Reconcile(p) {
+  let operations = p.operations ?? null;
+  const ops = p.ops;
+  if (Array.isArray(ops) && ops.length > 0 && !operations) {
+    operations = ops.map((entry) => {
+      if (Array.isArray(entry) && entry.length >= 2) {
+        return { currencyCode: entry[0], deductedRlusd: entry[1] };
+      }
+      return entry;
+    });
+  }
+
+  let lineStates = p.lineStates ?? null;
+  const ls = p.ls;
+  if (Array.isArray(ls) && ls.length > 0 && !lineStates) {
+    lineStates = ls.map((entry) => {
+      if (Array.isArray(entry) && entry.length >= 2) {
+        return { currencyCode: entry[0], allocatedRlusdAfter: entry[1] };
+      }
+      return entry;
+    });
+  }
+
+  return {
+    deficit: p.d ?? p.deficit,
+    operations,
+    lineStates,
+  };
+}
+
 function expandV2Payload(payload, type) {
   const expanders = {
     wallet_label: expandV2WalletLabel,
     conversion: expandV2Conversion,
     payreq: expandV2Payreq,
     moonpay: expandV2Moonpay,
+    reconcile: expandV2Reconcile,
   };
 
   const expander = expanders[type];
@@ -356,6 +387,52 @@ function normalizeMoonpayPayload(payload, errors) {
   return normalized;
 }
 
+function normalizeReconcilePayload(payload, errors) {
+  const deficitRes = parseRequiredNumber(payload?.deficit, { min: 0, minExclusive: true });
+  if (!deficitRes.ok) errors.push('reconcile.deficit');
+
+  const operationsRaw = Array.isArray(payload?.operations) ? payload.operations : null;
+  let operations = null;
+  if (operationsRaw && operationsRaw.length > 0) {
+    const normalizedOps = [];
+    operationsRaw.forEach((entry) => {
+      const currencyCode = normalizeCurrencyCode(entry?.currencyCode ?? entry?.currency);
+      if (!currencyCode) { errors.push('reconcile.operations.currencyCode'); return; }
+      const amountRes = parseRequiredNumber(entry?.deductedRlusd ?? entry?.amount, { min: 0, minExclusive: true });
+      if (!amountRes.ok) { errors.push('reconcile.operations.deductedRlusd'); return; }
+      normalizedOps.push({ currencyCode, deductedRlusd: amountRes.value });
+    });
+    if (normalizedOps.length === 0) {
+      errors.push('reconcile.operations');
+    } else {
+      operations = normalizedOps;
+    }
+  } else {
+    errors.push('reconcile.operations');
+  }
+
+  const lineStatesRaw = Array.isArray(payload?.lineStates) ? payload.lineStates : null;
+  let lineStates = null;
+  if (lineStatesRaw && lineStatesRaw.length > 0) {
+    const normalizedStates = [];
+    lineStatesRaw.forEach((entry) => {
+      const currencyCode = normalizeCurrencyCode(entry?.currencyCode ?? entry?.currency);
+      if (!currencyCode) { errors.push('reconcile.lineStates.currencyCode'); return; }
+      const amountRes = parseRequiredNumber(entry?.allocatedRlusdAfter ?? entry?.allocated_after, { min: 0 });
+      if (!amountRes.ok) { errors.push('reconcile.lineStates.allocatedRlusdAfter'); return; }
+      normalizedStates.push({ currencyCode, allocatedRlusdAfter: amountRes.value });
+    });
+    if (normalizedStates.length > 0) {
+      lineStates = normalizedStates;
+    }
+  }
+
+  const normalized = { deficit: deficitRes.value };
+  if (operations) normalized.operations = operations;
+  if (lineStates) normalized.lineStates = lineStates;
+  return normalized;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // VALIDATE — parse v2 compact → normalized long-key payload
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -391,6 +468,8 @@ function validateXcannesMemoPayload(payload, options = {}) {
     normalizedBody = normalizePayreqPayload(expanded, errors, { requireOrigin: mode === 'create' });
   } else if (inferredType === 'moonpay') {
     normalizedBody = normalizeMoonpayPayload(expanded, errors);
+  } else if (inferredType === 'reconcile') {
+    normalizedBody = normalizeReconcilePayload(expanded, errors);
   }
 
   if (errors.length > 0) {
@@ -454,6 +533,14 @@ function toV2Compact(type, body) {
     if (body.currencyCode) compact.c = body.currencyCode;
     if (body.amount != null) compact.a = body.amount;
     if (body.amountRlusd != null) compact.r = body.amountRlusd;
+  } else if (type === 'reconcile') {
+    compact.d = body.deficit;
+    if (body.operations && body.operations.length > 0) {
+      compact.ops = body.operations.map((op) => [op.currencyCode, op.deductedRlusd]);
+    }
+    if (body.lineStates && body.lineStates.length > 0) {
+      compact.ls = body.lineStates.map((s) => [s.currencyCode, s.allocatedRlusdAfter]);
+    }
   }
 
   return compact;
@@ -510,6 +597,10 @@ function buildMoonpayMemo(data) {
   return createXcannesMemoPayload('moonpay', data);
 }
 
+function buildReconcileMemo(data) {
+  return createXcannesMemoPayload('reconcile', data);
+}
+
 export {
   XCANNES_MEMO_TYPE,
   XCANNES_MEMO_FORMAT,
@@ -520,4 +611,5 @@ export {
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
+  buildReconcileMemo,
 };

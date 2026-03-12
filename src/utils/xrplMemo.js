@@ -11,6 +11,7 @@ import {
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
+  buildReconcileMemo,
 } from "./xcannesMemoSchemas";
 
 const MEMO_METRICS_LOG_INTERVAL_MS = Number(
@@ -134,4 +135,5 @@ export {
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
+  buildReconcileMemo,
 };

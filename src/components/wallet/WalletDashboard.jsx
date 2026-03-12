@@ -25,6 +25,7 @@ import WalletToastOverlay from "./components/WalletToastOverlay";
 import { useWalletNavigation } from "./hooks/useWalletNavigation";
 import { useTokenDisplayLabels } from "./hooks/useTokenDisplayLabels";
 import WalletPendingPayreqs from "./components/WalletPendingPayreqs";
+import ReconciliationBanner from "./components/ReconciliationBanner";
 import { useTranslation } from "next-i18next";
 import {
   WALLET_LAYOUT,
@@ -38,6 +39,7 @@ import { useWalletSwapOrchestrator } from "./hooks/useWalletSwapOrchestrator";
 import { useWalletIncomingToast } from "./hooks/useWalletIncomingToast";
 import { useDesktopInlineFlags } from "./hooks/useDesktopInlineFlags";
 import { useAugmentedCurrencyLines } from "./hooks/useAugmentedCurrencyLines";
+import { useReconciliation } from "./hooks/useReconciliation";
 
 function isAcceptedOnChainToken(currency) {
   const code = String(currency || "").toUpperCase();
@@ -170,6 +172,7 @@ export default function WalletDashboard({
   const {
     lines: currencyLines,
     summary: currencyLinesSummary,
+    reconciliation: reconciliationData,
     loading: currencyLinesLoading,
     error: currencyLinesError,
     refresh: refreshCurrencyLines,
@@ -193,6 +196,17 @@ export default function WalletDashboard({
       upsertCurrencyLine,
       toast,
     });
+
+  // ── Reconciliation (external spend detection) ──────────────
+  const reconciliation = useReconciliation({
+    reconciliation: reconciliationData,
+    address: wallet,
+    signTransaction,
+    onComplete: () => {
+      refreshBalance();
+      refreshCurrencyLines();
+    },
+  });
 
   // ── Augmented currency lines (defaults + sorting + deficit) ─
   const {
@@ -580,6 +594,18 @@ export default function WalletDashboard({
 
           {/* Action row: Send / Receive / Exchange / Buy */}
           <WalletDashboardActionRow onAction={handleAction} />
+
+          {/* Reconciliation banner (external RLUSD spend detected) */}
+          <ReconciliationBanner
+            visible={reconciliation.visible}
+            deficit={reconciliation.deficit}
+            operationsSummary={reconciliation.operationsSummary}
+            submitting={reconciliation.submitting}
+            error={reconciliation.error}
+            txHash={reconciliation.txHash}
+            onConfirm={reconciliation.confirm}
+            onDismiss={reconciliation.dismiss}
+          />
 
           {/* Pending payment requests */}
           {sendState.pendingCount > 0 ? (
