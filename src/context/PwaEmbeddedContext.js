@@ -63,6 +63,7 @@ function waitForPwaReply(requestId, timeoutMs = 120000) {
     }, timeoutMs);
 
     function handler(event) {
+      if (event.origin !== APP_ORIGIN) return;
       const data = event.data;
       if (!data || data.requestId !== requestId) return;
       window.removeEventListener("message", handler);
@@ -121,6 +122,7 @@ export const PwaEmbeddedProvider = ({ children }) => {
     }
 
     function handleMessage(event) {
+      if (event.origin !== APP_ORIGIN) return;
       const data = event.data;
       if (!data || !data.type) return;
 

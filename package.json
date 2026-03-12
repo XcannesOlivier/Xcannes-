@@ -15,7 +15,9 @@
     "i18n:realign": "node scripts/i18n-realign-keys.cjs",
     "i18n:codemod": "node scripts/i18n-codemod.cjs",
     "translations:status": "node scripts/status.js",
-    "translations:report": "node scripts/generate-html-report.js"
+    "translations:report": "node scripts/generate-html-report.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -44,7 +46,8 @@
     "eslint-config-next": "^14.2.35",
     "eslint-config-prettier": "^10.1.8",
     "postcss": "^8.5.6",
-    "prettier": "^3.8.1"
+    "prettier": "^3.8.1",
+    "vitest": "^4.0.18"
   },
   "overrides": {
     "glob": "^10.5.0",

@@ -1,7 +1,13 @@
-import { Html, Head, Main, NextScript } from "next/document";
+import Document, { Html, Head, Main, NextScript } from "next/document";
 
-export default function Document(props) {
-  // Détection des langues RTL (Right-To-Left)
+/**
+ * _document.js — Injecte le nonce CSP dans tous les scripts Next.js.
+ *
+ * Le nonce est généré par src/middleware.js et transmis via le header `x-nonce`.
+ * <Head nonce> et <NextScript nonce> l'appliquent à tous les <script> générés.
+ */
+export default function XcannesDocument(props) {
+  const nonce = props.nonce || "";
   const locale = props.__NEXT_DATA__.locale || "en";
 
   // Liste des locales RTL : 19 arabes + ourdou
@@ -33,7 +39,7 @@ export default function Document(props) {
 
   return (
     <Html lang={locale} dir={direction}>
-      <Head>
+      <Head nonce={nonce}>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover"
@@ -41,8 +47,14 @@ export default function Document(props) {
       </Head>
       <body>
         <Main />
-        <NextScript />
+        <NextScript nonce={nonce} />
       </body>
     </Html>
   );
 }
+
+XcannesDocument.getInitialProps = async (ctx) => {
+  const initialProps = await Document.getInitialProps(ctx);
+  const nonce = ctx.req?.headers?.["x-nonce"] || "";
+  return { ...initialProps, nonce };
+};

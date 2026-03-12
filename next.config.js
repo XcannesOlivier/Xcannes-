@@ -1,18 +1,8 @@
 /** @type {import('next').NextConfig} */
 const { i18n } = require("./next-i18next.config");
 
-const cspReportOnly = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "connect-src 'self' https: wss: ws:",
-  "font-src 'self' data:",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "frame-ancestors 'self'",
-].join("; ");
-
+// CSP gérée dynamiquement par src/middleware.js (nonce par requête).
+// Seuls les headers non-CSP restent ici (statiques).
 const securityHeaders = [
   {
     key: "X-DNS-Prefetch-Control",
@@ -25,10 +15,6 @@ const securityHeaders = [
   {
     key: "X-Content-Type-Options",
     value: "nosniff",
-  },
-  {
-    key: "Content-Security-Policy-Report-Only",
-    value: cspReportOnly,
   },
 ];
 
