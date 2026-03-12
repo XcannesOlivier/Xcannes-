@@ -1327,7 +1327,7 @@ export default function Home() {
 
 }
 
-export async function getStaticProps({ locale }) {
+export async function getServerSideProps({ locale }) {
   return {
     props: {
       ...(await getPageTranslations(locale, ["common"]))
