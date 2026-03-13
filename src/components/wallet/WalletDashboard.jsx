@@ -85,6 +85,7 @@ export default function WalletDashboard({
     visible: false,
     status: "pending",
     actionLabel: "",
+    actionKey: "",
     errorMessage: "",
   });
 
@@ -97,7 +98,13 @@ export default function WalletDashboard({
   }), [t]);
 
   const handleTxProgressClose = useCallback(() => {
-    setTxProgress((prev) => ({ ...prev, visible: false }));
+    setTxProgress((prev) => {
+      // Auto-close the swap panel after a successful conversion
+      if (prev.status === "success" && prev.actionKey === "wallet:convert") {
+        setActiveAction(null);
+      }
+      return { ...prev, visible: false };
+    });
   }, []);
 
   /**
@@ -147,6 +154,7 @@ export default function WalletDashboard({
             visible: true,
             status: "pending",
             actionLabel: label,
+            actionKey: actionKey,
             errorMessage: "",
           });
 
@@ -166,6 +174,7 @@ export default function WalletDashboard({
             visible: true,
             status: "error",
             actionLabel: label,
+            actionKey: actionKey,
             errorMessage: result.engineMessage || result.engineResult || t("ui_tx_rejected", "Transaction rejetée"),
           });
         }
@@ -177,6 +186,7 @@ export default function WalletDashboard({
           visible: true,
           status: "error",
           actionLabel: label,
+          actionKey: actionKey,
           errorMessage: err?.message || String(err),
         });
         throw err;
