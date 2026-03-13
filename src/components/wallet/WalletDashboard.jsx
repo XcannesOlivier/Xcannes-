@@ -144,7 +144,22 @@ export default function WalletDashboard({
     return () => media.removeListener(handleChange);
   }, [showDesktopStatementPanel]);
 
-  // ── Wallet label ───────────────────────────────────────────
+  // ── Currency lines (backend) ───────────────────────────────
+  const backendWalletAddress = wallet || null;
+
+  const {
+    lines: currencyLines,
+    summary: currencyLinesSummary,
+    reconciliation: reconciliationData,
+    walletLabel: clWalletLabel,
+    defaultCurrency: clDefaultCurrency,
+    loading: currencyLinesLoading,
+    error: currencyLinesError,
+    refresh: refreshCurrencyLines,
+    upsertCurrencyLine,
+  } = useWalletCurrencyLines(backendWalletAddress);
+
+  // ── Wallet label (fed by currency-lines, no extra XRPL call) ──
   const {
     walletLabel,
     isWalletLabelLocked,
@@ -156,6 +171,9 @@ export default function WalletDashboard({
     walletAddress: wallet,
     isConnected,
     defaultLabel: t("nav_wallet", "Wallet"),
+    externalLabel: clWalletLabel,
+    externalDefaultCurrency: clDefaultCurrency,
+    onRefresh: refreshCurrencyLines,
   });
   const defaultWalletLabel = t("nav_wallet", "Wallet");
   const walletHasCustomLabel = Boolean(
@@ -179,19 +197,6 @@ export default function WalletDashboard({
   } = usePreferredCurrency({
     defaultCurrency,
   });
-
-  // ── Currency lines (backend) ───────────────────────────────
-  const backendWalletAddress = wallet || null;
-
-  const {
-    lines: currencyLines,
-    summary: currencyLinesSummary,
-    reconciliation: reconciliationData,
-    loading: currencyLinesLoading,
-    error: currencyLinesError,
-    refresh: refreshCurrencyLines,
-    upsertCurrencyLine,
-  } = useWalletCurrencyLines(backendWalletAddress);
 
   const {
     currencyLineCode,
