@@ -180,6 +180,21 @@ export const NativeWalletProvider = ({ children }) => {
           } else {
             scheduleQrClose(2000);
           }
+        } else if (eventType === "rejected") {
+          // XRPL rejected the transaction (tem*, tef*, tel*)
+          cleanupRelaySubscription();
+          setIsConnecting(false);
+          updateQrStatus("error");
+          if (mode === "sign") {
+            scheduleQrClose(1500);
+            resolvePendingSignature({
+              signed: false,
+              rejected: true,
+              engineResult: message?.engineResult || "",
+              engineMessage: message?.engineMessage || "Transaction rejetée par le XRPL",
+              hash: message?.hash || "",
+            });
+          }
         } else if (eventType === "expired" || eventType === "error") {
           cleanupRelaySubscription();
           setIsConnecting(false);

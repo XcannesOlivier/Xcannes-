@@ -160,8 +160,16 @@ export default function WalletDashboard({
               prev.visible ? { ...prev, status: "success" } : prev,
             );
           })();
+        } else if (result?.rejected) {
+          // XRPL rejected the transaction (tem*, tef*, tel*)
+          setTxProgress({
+            visible: true,
+            status: "error",
+            actionLabel: label,
+            errorMessage: result.engineMessage || result.engineResult || t("ui_tx_rejected", "Transaction rejetée"),
+          });
         }
-        // If not signed (cancelled/expired), don't show anything
+        // If result is null (cancelled/expired), don't show anything
 
         return result;
       } catch (err) {
