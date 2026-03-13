@@ -115,11 +115,11 @@ export function useWalletActivation({
 
           toast.success(`✅ Trustline ${code} activée.`);
           if (refreshBalance) {
-            setTimeout(() => refreshBalance(), 4000);
+            setTimeout(() => refreshBalance(), 10000);
           }
           // If label was set via TrustSet memo, refresh wallet label
           if (walletSetup?.label && loadWalletLabel) {
-            setTimeout(() => loadWalletLabel(), 4000);
+            setTimeout(() => loadWalletLabel(), 10000);
           }
         } else {
           toast.warn("Transaction annulée ou expirée.");
@@ -212,8 +212,8 @@ export function useWalletActivation({
             return;
           }
           toast.success("✅ Wallet configuré avec succès.");
-          if (refreshBalance) setTimeout(() => refreshBalance(), 4000);
-          if (loadWalletLabel) setTimeout(() => loadWalletLabel(), 4000);
+          if (refreshBalance) setTimeout(() => refreshBalance(), 10000);
+          if (loadWalletLabel) setTimeout(() => loadWalletLabel(), 10000);
         } else {
           toast.warn("Transaction annulée ou expirée.");
         }
@@ -309,7 +309,7 @@ export function useWalletActivation({
       action: "wallet:activate_xrp",
     });
     if (result?.signed && refreshBalance) {
-      setTimeout(() => refreshBalance(), 4000);
+      setTimeout(() => refreshBalance(), 10000);
     }
   }, [
     refreshBalance,

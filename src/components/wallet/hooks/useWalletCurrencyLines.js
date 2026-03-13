@@ -63,7 +63,7 @@ export function useWalletCurrencyLines(address) {
     setDefaultCurrency(data.defaultCurrency || null);
   }, []);
 
-  const fetchCurrencyLines = useCallback(async ({ silent = false } = {}) => {
+  const fetchCurrencyLines = useCallback(async ({ silent = false, bustCache = false } = {}) => {
     if (!address) {
       setLines([]);
       setSummary({
@@ -84,8 +84,11 @@ export function useWalletCurrencyLines(address) {
       if (!silent) setLoading(true);
       setError(null);
 
+      const params = new URLSearchParams({ address });
+      if (bustCache) params.set("bustCache", "true");
+
       const res = await fetch(
-        apiUrl(`/wallet/currency-lines?address=${encodeURIComponent(address)}`),
+        apiUrl(`/wallet/currency-lines?${params.toString()}`),
       );
       const data = await res.json();
 

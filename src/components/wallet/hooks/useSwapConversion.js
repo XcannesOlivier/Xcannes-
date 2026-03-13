@@ -441,8 +441,8 @@ export function useSwapConversion({
       );
 
       setConvertAmount("");
-      if (refreshBalance) setTimeout(() => refreshBalance(), 4000);
-      if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines(), 4000);
+      if (refreshBalance) setTimeout(() => refreshBalance(), 10000);
+      if (refreshCurrencyLines) setTimeout(() => refreshCurrencyLines({ bustCache: true }), 10000);
     } catch (error) {
       console.error("Convert error:", error);
       const message = error?.message || String(error);
