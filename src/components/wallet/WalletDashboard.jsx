@@ -144,7 +144,23 @@ export default function WalletDashboard({
     return () => media.removeListener(handleChange);
   }, [showDesktopStatementPanel]);
 
-  // ── Wallet label ───────────────────────────────────────────
+  // ── Currency lines (backend) — called first so label can feed useWalletLabel
+  const backendWalletAddress = wallet || null;
+
+  const {
+    lines: currencyLines,
+    summary: currencyLinesSummary,
+    reconciliation: reconciliationData,
+    walletLabel: clWalletLabel,
+    defaultCurrency: clDefaultCurrency,
+    loading: currencyLinesLoading,
+    error: currencyLinesError,
+    initialReady: currencyLinesReady,
+    refresh: refreshCurrencyLines,
+    upsertCurrencyLine,
+  } = useWalletCurrencyLines(backendWalletAddress);
+
+  // ── Wallet label (fed by currency-lines, no extra XRPL call) ──
   const {
     walletLabel,
     isWalletLabelLocked,
@@ -156,6 +172,9 @@ export default function WalletDashboard({
     walletAddress: wallet,
     isConnected,
     defaultLabel: t("nav_wallet", "Wallet"),
+    externalLabel: clWalletLabel,
+    externalDefaultCurrency: clDefaultCurrency,
+    onRefresh: refreshCurrencyLines,
   });
   const defaultWalletLabel = t("nav_wallet", "Wallet");
   const walletHasCustomLabel = Boolean(
@@ -179,19 +198,6 @@ export default function WalletDashboard({
   } = usePreferredCurrency({
     defaultCurrency,
   });
-
-  // ── Currency lines (backend) ───────────────────────────────
-  const backendWalletAddress = wallet || null;
-
-  const {
-    lines: currencyLines,
-    summary: currencyLinesSummary,
-    reconciliation: reconciliationData,
-    loading: currencyLinesLoading,
-    error: currencyLinesError,
-    refresh: refreshCurrencyLines,
-    upsertCurrencyLine,
-  } = useWalletCurrencyLines(backendWalletAddress);
 
   const {
     currencyLineCode,
@@ -576,6 +582,17 @@ export default function WalletDashboard({
   }, [shouldLockBodyScroll]);
 
   // ── Render ─────────────────────────────────────────────────
+
+  // Gate: wait until currency-lines data is available (from cache or API)
+  // to avoid a flash of empty wallet state on page load.
+  if (backendWalletAddress && !currencyLinesReady) {
+    return (
+      <div className="bg-[#0b0f10] h-full min-h-0 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <>
       <div
