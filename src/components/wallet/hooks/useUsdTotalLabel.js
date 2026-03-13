@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 export function useUsdTotalLabel({
   augmentedTokens,
@@ -8,8 +9,11 @@ export function useUsdTotalLabel({
   isStablecoin,
   fiatRates,
   rlusdOnChain,
+  preferredCurrency = "USD",
+  locale = "en",
 } = {}) {
   const [usdRates, setUsdRates] = useState({});
+  const prefCode = String(preferredCurrency || "USD").toUpperCase();
 
   const rateCodesKey = useMemo(() => {
     const codes = (augmentedTokens || [])
@@ -94,44 +98,63 @@ export function useUsdTotalLabel({
     return Number.isFinite(total) ? total : 0;
   }, [augmentedTokens, usdRates]);
 
-  const totalUsdLabel =
-    Number.isFinite(totalUsd) && totalUsd > 0
-      ? `${totalUsd.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} USD`
-      : null;
-
-  // En mode réel, le total exact = rlusdOnChain (source de vérité on-chain).
-  // En mode preview, utilise demoTotalUsd ; fallback sur stableUsd si FX non chargés.
+  // ── Compute the RLUSD/USD total (source of truth) ──────────
   const rlusdOnChainTotal = Number(rlusdOnChain);
-  const rlusdOnChainLabel =
-    !isPreviewMode &&
-    Number.isFinite(rlusdOnChainTotal) &&
-    rlusdOnChainTotal >= 0
-      ? `${rlusdOnChainTotal.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} USD`
-      : null;
+  const totalInUsd =
+    !isPreviewMode && Number.isFinite(rlusdOnChainTotal) && rlusdOnChainTotal >= 0
+      ? rlusdOnChainTotal
+      : totalUsd > 0
+        ? totalUsd
+        : isPreviewMode
+          ? Number(demoTotalUsd || 0)
+          : Number(stableUsd || 0);
 
-  const fallbackTotalLabel = isPreviewMode
-    ? `${Number(demoTotalUsd || 0).toLocaleString("en-US", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      })} USD`
-    : stableUsd > 0
-      ? `${Number(stableUsd || 0).toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} USD`
-      : `0.00 USD`;
+  // ── Convert total to preferred currency ────────────────────
+  // rlusdPerUnitRate = how many RLUSD (≈ USD) per 1 unit of preferred currency.
+  // So: totalInPreferredCurrency = totalInUsd / rlusdPerUnitRate
+  const rlusdPerUnitRate = useMemo(() => {
+    if (prefCode === "USD" || prefCode === "RLUSD") return 1;
+    const rate = Number(fiatRates?.[prefCode]);
+    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  }, [prefCode, fiatRates]);
 
-  // Priorité : rlusdOnChain (exact) > FX-based total > fallback
-  const totalLabel = rlusdOnChainLabel || totalUsdLabel || fallbackTotalLabel;
+  const totalInPreferred = useMemo(() => {
+    if (!Number.isFinite(totalInUsd) || totalInUsd <= 0) return 0;
+    if (prefCode === "USD" || prefCode === "RLUSD") return totalInUsd;
+    if (rlusdPerUnitRate === null) return null; // rate not available
+    return totalInUsd / rlusdPerUnitRate;
+  }, [totalInUsd, prefCode, rlusdPerUnitRate]);
+
+  // ── Build the label ────────────────────────────────────────
+  const totalLabel = useMemo(() => {
+    // If preferred currency rate is available, show in that currency
+    if (totalInPreferred !== null && Number.isFinite(totalInPreferred)) {
+      const displayCode = prefCode === "RLUSD" ? "USD" : prefCode;
+      return formatAmountWithSymbol(locale, totalInPreferred, displayCode, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    // Fallback to USD if preferred rate unavailable
+    if (Number.isFinite(totalInUsd) && totalInUsd > 0) {
+      return formatAmountWithSymbol(locale, totalInUsd, "USD", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    return formatAmountWithSymbol(locale, 0, prefCode === "RLUSD" ? "USD" : prefCode, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, [totalInPreferred, totalInUsd, prefCode, locale]);
 
   return {
     usdRates,
     totalLabel,
+    totalInUsd,
+    totalInPreferred,
+    preferredCurrencyCode: prefCode,
   };
 }

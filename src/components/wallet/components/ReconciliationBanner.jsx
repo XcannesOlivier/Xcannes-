@@ -19,7 +19,6 @@ export default function ReconciliationBanner({
   error = null,
   txHash = null,
   onConfirm,
-  onDismiss,
 }) {
   const { t } = useTranslation("common");
 
@@ -112,19 +111,6 @@ export default function ReconciliationBanner({
             : t("wallet.reconciliation.confirm", "J'ai compris")}
         </button>
 
-        {onDismiss && !submitting && (
-          <button
-            type="button"
-            onClick={onDismiss}
-            className="
-              px-3 py-1.5 rounded-lg text-xs
-              text-white/50 hover:text-white/80
-              transition-colors
-            "
-          >
-            {t("wallet.reconciliation.later", "Plus tard")}
-          </button>
-        )}
       </div>
     </div>
   );

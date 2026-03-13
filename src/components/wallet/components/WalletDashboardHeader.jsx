@@ -11,6 +11,7 @@ export default function WalletDashboardHeader({
   isConnected,
   wallet,
   totalLabel,
+  totalInUsd,
   xrplConnectionIndicator,
   walletLabel,
   walletHeaderToast,
@@ -29,6 +30,13 @@ export default function WalletDashboardHeader({
   onActivateWallet,
   onConfirmSetup,
   activeAction,
+  // Preferred currency props
+  preferredCurrency,
+  topCurrencies,
+  fawazCurrencies,
+  fawazLoading,
+  onLoadFawazCurrencies,
+  onPreferredCurrencyChange,
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -91,6 +99,11 @@ export default function WalletDashboardHeader({
         <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
           {totalLabel}
         </p>
+        {Number.isFinite(totalInUsd) && totalInUsd > 0 && preferredCurrency && preferredCurrency !== "USD" && preferredCurrency !== "RLUSD" && (
+          <p className="text-[11px] text-white/35 font-mono tabular-nums mt-0.5">
+            {totalInUsd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RLUSD
+          </p>
+        )}
 
         {/* ── Wallet setup dropdown (centralised activation steps) ── */}
         {isConnected && wallet && (
@@ -279,6 +292,12 @@ export default function WalletDashboardHeader({
               <WalletSettingsDropdown
                 position="inline"
                 onOpenInfo={onOpenInfo}
+                preferredCurrency={preferredCurrency}
+                topCurrencies={topCurrencies}
+                fawazCurrencies={fawazCurrencies}
+                fawazLoading={fawazLoading}
+                onLoadFawazCurrencies={onLoadFawazCurrencies}
+                onPreferredCurrencyChange={onPreferredCurrencyChange}
               />
             </div>
           </div>

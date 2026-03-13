@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { useWallet } from "@/context/WalletContext";
+import PreferredCurrencySelector from "./PreferredCurrencySelector";
 
 /**
  * Settings gear button + dropdown menu.
@@ -15,6 +16,13 @@ import { useWallet } from "@/context/WalletContext";
 export default function WalletSettingsDropdown({
   position = "header",
   onOpenInfo,
+  // Preferred currency props
+  preferredCurrency,
+  topCurrencies,
+  fawazCurrencies,
+  fawazLoading,
+  onLoadFawazCurrencies,
+  onPreferredCurrencyChange,
 }) {
   const { t } = useTranslation("common");
   const { goToChoice } = useWallet();
@@ -173,6 +181,24 @@ export default function WalletSettingsDropdown({
               )}
             </a>
 
+            {/* Preferred currency selector */}
+            {preferredCurrency && (
+              <>
+                <div className="my-1 mx-3 border-t border-white/8" />
+                <div className="px-2 md:px-1.5 py-2">
+                  <PreferredCurrencySelector
+                    currentCurrency={preferredCurrency}
+                    topCurrencies={topCurrencies}
+                    allCurrencies={fawazCurrencies}
+                    isLoading={fawazLoading}
+                    onSelect={(code) => {
+                      onPreferredCurrencyChange?.(code);
+                    }}
+                    onOpen={onLoadFawazCurrencies}
+                  />
+                </div>
+              </>
+            )}
 
           </div>
         </div>

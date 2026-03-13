@@ -1,6 +1,10 @@
 import { useCallback } from "react";
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 import { buildWalletLabelMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
+import {
+  buildRlusdPaymentTxjson,
+  XCANNES_RECONCILE_DESTINATION,
+} from "@/utils/walletSpread";
 
 /**
  * Encapsulates all wallet-activation and trustline-installation logic:
@@ -21,6 +25,8 @@ export function useWalletActivation({
   refreshBalance,
   // Wallet label
   loadWalletLabel,
+  // Trustline state
+  hasRlusdTrustline,
   // UI state setters
   closeInlineQr,
   setWalletInfoOpen,
@@ -137,16 +143,98 @@ export function useWalletActivation({
   );
 
   // ------------------------------------------------------------------
-  // RLUSD setup (triggers trustline with wallet_label memo)
+  // RLUSD setup
+  //
+  // Two modes:
+  //   A) Trustline NOT yet installed → TrustSet with wallet_label memo
+  //   B) Trustline already installed (activated on Xumm, Sologenic…)
+  //      → Mini RLUSD payment (0.000001) to the Xcannes spread wallet
+  //        carrying the wallet_label memo.  Self-payments are rejected
+  //        by XRPL (temREDUNDANT) so the destination MUST be the
+  //        spread wallet.
   // ------------------------------------------------------------------
   const handleRlusdSetupConfirm = useCallback(
-    ({ label, defaultCurrency } = {}) => {
-      handleInstallRequiredTrustline("RLUSD", {
-        walletSetup: { label, defaultCurrency },
-        skipConfirm: true, // User already clicked "Valider" in the setup dropdown
+    async ({ label, defaultCurrency } = {}) => {
+      // ── Mode A: trustline does not exist yet ─────────────────────
+      if (!hasRlusdTrustline) {
+        handleInstallRequiredTrustline("RLUSD", {
+          walletSetup: { label, defaultCurrency },
+          skipConfirm: true,
+        });
+        return;
+      }
+
+      // ── Mode B: trustline already exists → mini Payment with memo ─
+      if (!isConnected || !wallet) {
+        toast.error("Please connect your wallet first.");
+        return;
+      }
+
+      // Build wallet_label memo
+      const memoData = { label };
+      if (defaultCurrency) memoData.defaultCurrency = defaultCurrency;
+      const memoPayload = buildWalletLabelMemo(memoData);
+      if (!memoPayload) {
+        toast.error("Unable to build wallet label memo.");
+        return;
+      }
+      const memos = buildXrplJsonMemo(memoPayload);
+      if (!memos) {
+        toast.error("Unable to encode wallet label memo.");
+        return;
+      }
+
+      // Build minimal RLUSD payment (0.000001) → spread wallet
+      const txjson = buildRlusdPaymentTxjson({
+        account: wallet,
+        destination: XCANNES_RECONCILE_DESTINATION,
+        amountRlusd: 0.000001,
       });
+      if (!txjson) {
+        toast.error("Unable to build naming transaction.");
+        return;
+      }
+      txjson.Memos = memos;
+
+      try {
+        const result = await signTransaction(txjson);
+        if (result?.signed) {
+          const engineResult =
+            result.txResult?.result?.engine_result ||
+            result.txResult?.engine_result ||
+            "";
+          if (
+            engineResult &&
+            engineResult !== "tesSUCCESS" &&
+            engineResult !== "terQUEUED"
+          ) {
+            toast.error(`❌ Transaction rejetée : ${engineResult}`);
+            return;
+          }
+          toast.success("✅ Wallet configuré avec succès.");
+          if (refreshBalance) setTimeout(() => refreshBalance(), 2500);
+          if (loadWalletLabel) setTimeout(() => loadWalletLabel(), 3000);
+        } else {
+          toast.warn("Transaction annulée ou expirée.");
+        }
+      } catch (err) {
+        console.error("[useWalletActivation] Mini-payment naming error:", err);
+        toast.error(
+          "Erreur lors de la transaction de nommage : " +
+            (err?.message || String(err)),
+        );
+      }
     },
-    [handleInstallRequiredTrustline],
+    [
+      hasRlusdTrustline,
+      handleInstallRequiredTrustline,
+      isConnected,
+      loadWalletLabel,
+      refreshBalance,
+      signTransaction,
+      toast,
+      wallet,
+    ],
   );
 
   // ------------------------------------------------------------------

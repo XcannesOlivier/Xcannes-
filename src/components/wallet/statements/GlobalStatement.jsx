@@ -32,6 +32,8 @@ export default function GlobalStatement({
   isClosing = false,
   inline = false,
   usdRates = {},
+  preferredCurrency = "USD",
+  rlusdPerUnitRates = {},
   totalBalanceOverride = null,
   movements = [],
   movementsLoading: _movementsLoading = false,
@@ -138,6 +140,21 @@ export default function GlobalStatement({
     Number.isFinite(totalBalanceOverrideValue)
       ? totalBalanceOverrideValue
       : computedTotalBalance;
+
+  /* ── preferred currency conversion ─────────────────────── */
+  const prefCode = String(preferredCurrency || "USD").toUpperCase();
+  const prefRlusdPerUnit = useMemo(() => {
+    if (prefCode === "USD" || prefCode === "RLUSD") return 1;
+    const rate = Number(rlusdPerUnitRates?.[prefCode]);
+    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  }, [prefCode, rlusdPerUnitRates]);
+  const totalInPreferred = useMemo(() => {
+    if (!Number.isFinite(totalBalance) || totalBalance <= 0) return 0;
+    if (prefCode === "USD" || prefCode === "RLUSD") return totalBalance;
+    if (prefRlusdPerUnit === null) return null;
+    return totalBalance / prefRlusdPerUnit;
+  }, [totalBalance, prefCode, prefRlusdPerUnit]);
+  const displayCurrencyCode = prefCode === "RLUSD" ? "USD" : prefCode;
 
   /* ── sorted tokens ─────────────────────────────────────── */
   const sortedTokens = [...tokens]
@@ -256,7 +273,12 @@ export default function GlobalStatement({
   const buildPrintHtml = useCallback(() => {
     const docHashLabel = docHash || "-";
     const totalBalanceDisplay = Number.isFinite(Number(totalBalance))
-      ? formatAmountWithSymbolLocal(totalBalance, "USD")
+      ? formatAmountWithSymbolLocal(
+          totalInPreferred !== null && Number.isFinite(totalInPreferred)
+            ? totalInPreferred
+            : totalBalance,
+          displayCurrencyCode,
+        )
       : "-";
     const balancesRows = (sortedTokens || [])
       .map((token) => {
@@ -326,7 +348,7 @@ export default function GlobalStatement({
       <div class="meta">
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
-        <div><strong>${escapeHtml(t("ui_total_balance_label_2c7a1d9b5e", "Total balance (USD)"))}:</strong> ${escapeHtml(totalBalanceDisplay)}</div>
+        <div><strong>${escapeHtml(t("ui_total_balance_label_2c7a1d9b5e", "Total balance (USD)").replace("USD", displayCurrencyCode))}:</strong> ${escapeHtml(totalBalanceDisplay)}</div>
         <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
         <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
       </div>
@@ -521,7 +543,12 @@ export default function GlobalStatement({
                 {t("ui_total_assets_918e935125", "Total Assets")}
               </p>
               <p className="text-sm text-white">
-                ≈ {formatAmountWithSymbolLocal(totalBalance, "USD")}
+                ≈ {formatAmountWithSymbolLocal(
+                    totalInPreferred !== null && Number.isFinite(totalInPreferred)
+                      ? totalInPreferred
+                      : totalBalance,
+                    displayCurrencyCode,
+                  )}
               </p>
               <p className="text-[11px] text-white/50">
                 {tokens.length}

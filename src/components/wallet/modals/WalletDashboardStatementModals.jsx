@@ -24,6 +24,8 @@ export default function WalletDashboardStatementModals({
   previewGlobalMovements,
   previewCurrencyTransactions,
   usdRates,
+  preferredCurrency,
+  rlusdPerUnitRates,
   highlightTransactionId,
   showGlobalStatement,
   setShowGlobalStatement,
@@ -369,6 +371,8 @@ export default function WalletDashboardStatementModals({
             variant={inlineStatementVariant || "inline-desktop"}
             inline
             usdRates={usdRates}
+            preferredCurrency={preferredCurrency}
+            rlusdPerUnitRates={rlusdPerUnitRates}
             totalBalanceOverride={statementTotalBalanceUsd}
             movements={canFetchStatements ? globalMovements : previewMovements}
             movementsLoading={canFetchStatements ? globalLoading : false}
@@ -452,6 +456,8 @@ export default function WalletDashboardStatementModals({
           period="December 2025"
           variant="full"
           usdRates={usdRates}
+          preferredCurrency={preferredCurrency}
+          rlusdPerUnitRates={rlusdPerUnitRates}
           totalBalanceOverride={statementTotalBalanceUsd}
           movements={canFetchStatements ? globalMovements : previewMovements}
           movementsLoading={canFetchStatements ? globalLoading : false}

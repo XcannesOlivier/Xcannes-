@@ -40,6 +40,7 @@ import { useWalletIncomingToast } from "./hooks/useWalletIncomingToast";
 import { useDesktopInlineFlags } from "./hooks/useDesktopInlineFlags";
 import { useAugmentedCurrencyLines } from "./hooks/useAugmentedCurrencyLines";
 import { useReconciliation } from "./hooks/useReconciliation";
+import { usePreferredCurrency } from "./hooks/usePreferredCurrency";
 
 function isAcceptedOnChainToken(currency) {
   const code = String(currency || "").toUpperCase();
@@ -147,6 +148,7 @@ export default function WalletDashboard({
   const {
     walletLabel,
     isWalletLabelLocked,
+    defaultCurrency,
     walletHeaderToast,
     flashWalletHeaderToast,
     loadWalletLabel,
@@ -164,6 +166,18 @@ export default function WalletDashboard({
     walletAddress: wallet,
     walletLabel,
     hideAddress: false,
+  });
+
+  // ── Preferred currency ─────────────────────────────────────
+  const {
+    preferredCurrency,
+    setPreferredCurrency,
+    topCurrencies: prefTopCurrencies,
+    fawazCurrencies: prefFawazCurrencies,
+    fawazLoading: prefFawazLoading,
+    loadFawazCurrencies: prefLoadFawazCurrencies,
+  } = usePreferredCurrency({
+    defaultCurrency,
   });
 
   // ── Currency lines (backend) ───────────────────────────────
@@ -336,6 +350,7 @@ export default function WalletDashboard({
     signTransaction,
     refreshBalance,
     loadWalletLabel,
+    hasRlusdTrustline,
     toast,
     confirm,
     closeInlineQr: sendState.closeInlineQr,
@@ -403,7 +418,7 @@ export default function WalletDashboard({
   );
 
   // ── Total label ────────────────────────────────────────────
-  const { usdRates, totalLabel } = useUsdTotalLabel({
+  const { usdRates, totalLabel, totalInUsd } = useUsdTotalLabel({
     augmentedTokens,
     isPreviewMode: false,
     stableUsd,
@@ -411,6 +426,8 @@ export default function WalletDashboard({
     isStablecoin,
     fiatRates: rlusdPerUnitRates,
     rlusdOnChain: currencyLinesSummary?.rlusdOnChain ?? null,
+    preferredCurrency,
+    locale,
   });
 
   const xrplConnectionIndicator = useXrplConnectionIndicator({
@@ -512,6 +529,7 @@ export default function WalletDashboard({
     isFullPageView: true,
     statementVariant,
     usdRates,
+    preferredCurrency,
     showGlobalStatement,
     setShowGlobalStatement,
     showCurrencyStatement,
@@ -573,6 +591,7 @@ export default function WalletDashboard({
             isConnected={isConnected}
             wallet={wallet}
             totalLabel={totalLabel}
+            totalInUsd={totalInUsd}
             xrplConnectionIndicator={xrplConnectionIndicator}
             walletLabel={walletLabel}
             walletHeaderToast={walletHeaderToast}
@@ -590,6 +609,12 @@ export default function WalletDashboard({
             onActivateWallet={handleOpenActivationModal}
             onConfirmSetup={handleRlusdSetupConfirm}
             activeAction={activeAction}
+            preferredCurrency={preferredCurrency}
+            topCurrencies={prefTopCurrencies}
+            fawazCurrencies={prefFawazCurrencies}
+            fawazLoading={prefFawazLoading}
+            onLoadFawazCurrencies={prefLoadFawazCurrencies}
+            onPreferredCurrencyChange={setPreferredCurrency}
           />
 
           {/* Action row: Send / Receive / Exchange / Buy */}
