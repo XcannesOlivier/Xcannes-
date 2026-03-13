@@ -40,7 +40,7 @@ export default function WalletSetupDropdown({
   //    "Configuration requise" on wallets that are already set up. ──
   const [graceElapsed, setGraceElapsed] = useState(false);
   useEffect(() => {
-    const id = setTimeout(() => setGraceElapsed(true), 150);
+    const id = setTimeout(() => setGraceElapsed(true), 400);
     return () => clearTimeout(id);
   }, []);
 
