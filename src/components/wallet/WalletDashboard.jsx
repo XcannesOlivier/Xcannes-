@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
+import TransactionProgressModal from "./modals/TransactionProgressModal";
 
 import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
 import { useCurrencyLinesForm } from "./hooks/useCurrencyLinesForm";
@@ -77,6 +78,69 @@ export default function WalletDashboard({
 
   const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } =
     useWalletToast();
+
+  // ── Transaction progress modal state ────────────────────────
+  const [txProgress, setTxProgress] = useState({
+    visible: false,
+    status: "pending",
+    actionLabel: "",
+    errorMessage: "",
+  });
+
+  const TX_ACTION_LABELS = useMemo(() => ({
+    "wallet:convert": t("ui_tx_label_conversion", "Conversion"),
+    "wallet:send": t("ui_tx_label_payment", "Paiement"),
+    "wallet:reconcile": t("ui_tx_label_reconciliation", "Réconciliation"),
+    "wallet:activate_xrp": t("ui_tx_label_activation", "Activation"),
+    "wallet:setup": t("ui_tx_label_setup", "Configuration"),
+  }), [t]);
+
+  const handleTxProgressClose = useCallback(() => {
+    setTxProgress((prev) => ({ ...prev, visible: false }));
+  }, []);
+
+  /**
+   * Wrapper around signTransaction that shows a progress modal
+   * while the XRPL transaction is being signed and confirmed.
+   */
+  const signTransactionWithProgress = useCallback(
+    async (txjson, options) => {
+      const actionKey = options?.action || "";
+      const label = TX_ACTION_LABELS[actionKey] || t("ui_tx_label_default", "Transaction");
+
+      setTxProgress({
+        visible: true,
+        status: "pending",
+        actionLabel: label,
+        errorMessage: "",
+      });
+
+      try {
+        const result = await signTransaction(txjson, options);
+
+        if (result?.signed) {
+          setTxProgress((prev) => ({ ...prev, status: "success" }));
+          // Auto-refresh wallet after a short delay
+          setTimeout(() => {
+            refreshBalance();
+          }, 1200);
+        } else {
+          // User cancelled or expired — just close silently
+          setTxProgress((prev) => ({ ...prev, visible: false }));
+        }
+
+        return result;
+      } catch (err) {
+        setTxProgress((prev) => ({
+          ...prev,
+          status: "error",
+          errorMessage: err?.message || String(err),
+        }));
+        throw err;
+      }
+    },
+    [signTransaction, refreshBalance, TX_ACTION_LABELS, t],
+  );
 
   // ── Token computation ──────────────────────────────────────
   const baseTokens = useMemo(
@@ -221,7 +285,7 @@ export default function WalletDashboard({
   const reconciliation = useReconciliation({
     reconciliation: reconciliationData,
     address: wallet,
-    signTransaction,
+    signTransaction: signTransactionWithProgress,
     onComplete: () => {
       refreshBalance();
       refreshCurrencyLines();
@@ -267,7 +331,7 @@ export default function WalletDashboard({
     isConnected,
     backendWalletAddress,
     wallet,
-    signTransaction,
+    signTransaction: signTransactionWithProgress,
     refreshBalance,
     hasOnChainRlusd,
     swapCurrencyOptions,
@@ -297,7 +361,7 @@ export default function WalletDashboard({
     isConnected,
     isDesktopPanel,
     backendWalletAddress,
-    signTransaction,
+    signTransaction: signTransactionWithProgress,
     hasOnChainRlusd,
     augmentedTokens,
     selectableTokens,
@@ -353,7 +417,7 @@ export default function WalletDashboard({
   } = useWalletActivation({
     isConnected,
     wallet,
-    signTransaction,
+    signTransaction: signTransactionWithProgress,
     refreshBalance,
     loadWalletLabel,
     hasRlusdTrustline,
@@ -494,7 +558,7 @@ export default function WalletDashboard({
     walletLabel,
     walletHasCustomLabel,
     renderWalletMeta,
-    signTransaction,
+    signTransaction: signTransactionWithProgress,
     connect,
     activeAction,
     setActiveAction,
@@ -701,6 +765,13 @@ export default function WalletDashboard({
           <WalletDesktopModals {...inlineFlags} {...modalProps} />
         ) : null}
       </div>
+      <TransactionProgressModal
+        visible={txProgress.visible}
+        status={txProgress.status}
+        actionLabel={txProgress.actionLabel}
+        errorMessage={txProgress.errorMessage}
+        onClose={handleTxProgressClose}
+      />
       <WalletToastOverlay
         toasts={toasts}
         confirmState={confirmState}
