@@ -60,6 +60,7 @@ export function useWalletCurrencyLines(address) {
   const [defaultCurrency, setDefaultCurrency] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [initialReady, setInitialReady] = useState(false);
   const hydratedRef = useRef(false);
 
   const setters = { setLines, setSummary, setReconciliation, setWalletLabel, setDefaultCurrency };
@@ -100,6 +101,7 @@ export function useWalletCurrencyLines(address) {
       setError(err.message || "Unknown error");
     } finally {
       if (!silent) setLoading(false);
+      setInitialReady(true);
     }
   }, [address]);
 
@@ -162,6 +164,7 @@ export function useWalletCurrencyLines(address) {
       if (cached) {
         applyData(cached, setters);
         hydratedRef.current = true;
+        setInitialReady(true);
         // 2. Revalidate silently (no loading spinner)
         fetchCurrencyLines({ silent: true });
         return;
@@ -178,6 +181,7 @@ export function useWalletCurrencyLines(address) {
     reconciliation,
     walletLabel,
     defaultCurrency,
+    initialReady,
     loading,
     error,
     refresh: fetchCurrencyLines,

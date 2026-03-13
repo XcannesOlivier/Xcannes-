@@ -153,6 +153,7 @@ export default function WalletDashboard({
     reconciliation: reconciliationData,
     walletLabel: clWalletLabel,
     defaultCurrency: clDefaultCurrency,
+    initialReady: currencyLinesReady,
     loading: currencyLinesLoading,
     error: currencyLinesError,
     refresh: refreshCurrencyLines,
@@ -581,6 +582,10 @@ export default function WalletDashboard({
   }, [shouldLockBodyScroll]);
 
   // ── Render ─────────────────────────────────────────────────
+
+  // Wait for initial currency-lines data before showing the dashboard
+  if (!currencyLinesReady && backendWalletAddress) return null;
+
   return (
     <>
       <div
