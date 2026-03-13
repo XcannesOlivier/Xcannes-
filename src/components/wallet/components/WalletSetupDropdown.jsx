@@ -35,6 +35,15 @@ export default function WalletSetupDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  // ── Grace period: delay initial render by 150 ms so walletLabel
+  //    has time to arrive from the server, avoiding a flash of
+  //    "Configuration requise" on wallets that are already set up. ──
+  const [graceElapsed, setGraceElapsed] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setGraceElapsed(true), 150);
+    return () => clearTimeout(id);
+  }, []);
+
   // ── Step 2 local form state ─────────────────────────────────
   const [labelDraft, setLabelDraft] = useState("");
   const [currencyDraft, setCurrencyDraft] = useState("");
@@ -101,6 +110,10 @@ export default function WalletSetupDropdown({
   // Don't render anything if everything is done
   // (MUST be after all hooks to respect React rules of hooks)
   if (allDone) return null;
+
+  // Hide during the initial grace period to avoid flashing "Configuration
+  // requise" while the walletLabel fetch is still in-flight (~100-200 ms).
+  if (!graceElapsed) return null;
 
   // ── Progress bar width ─────────────────────────────────────
   const progressPct = Math.round((completedCount / totalSteps) * 100);
