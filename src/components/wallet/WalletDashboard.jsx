@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
+import { apiUrl } from "@/lib/runtimeConfig";
 import TransactionProgressModal from "./modals/TransactionProgressModal";
 
 import { useWalletCurrencyLines } from "./hooks/useWalletCurrencyLines";
@@ -100,9 +101,37 @@ export default function WalletDashboard({
   }, []);
 
   /**
-   * Wrapper around signTransaction that shows a success/error modal
-   * AFTER the XRPL transaction is signed and confirmed (post-Face ID).
-   * Does NOT trigger refreshBalance — each hook manages its own refresh timing.
+   * Poll XRPL tx-status endpoint until the transaction is validated
+   * on-ledger, or give up after ~12 s.
+   */
+  const waitForTxValidation = useCallback(async (hash) => {
+    const MAX_POLLS = 12;
+    const INTERVAL = 1000; // 1 s
+    for (let i = 0; i < MAX_POLLS; i++) {
+      try {
+        const res = await fetch(apiUrl(`/wallet/tx-status?hash=${encodeURIComponent(hash)}`));
+        if (res.ok) {
+          const data = await res.json();
+          if (data.validated) return true;
+        }
+      } catch {
+        /* network hiccup — keep polling */
+      }
+      await new Promise((r) => setTimeout(r, INTERVAL));
+    }
+    return false; // timeout — show success anyway (tesSUCCESS was received)
+  }, []);
+
+  /**
+   * Wrapper around signTransaction — Xumm-style progress overlay
+   * AFTER Face ID validation (post-sign). Flow:
+   *   1. signTransaction() → QR → Face ID → XRPL submit (no modal yet)
+   *   2. signed:true → show "pending" with 3 blinking dots
+   *   3. poll XRPL for validated:true on the tx hash (non-blocking)
+   *   4. validated → "Validé" + confetti
+   *
+   * IMPORTANT: polling runs in background — does NOT block the return.
+   * Each hook's post-sign logic (toast, form reset, refreshBalance) runs immediately.
    */
   const signTransactionWithProgress = useCallback(
     async (txjson, options) => {
@@ -113,13 +142,24 @@ export default function WalletDashboard({
         const result = await signTransaction(txjson, options);
 
         if (result?.signed) {
-          // Show success modal only AFTER Face ID + XRPL confirmation
+          // Show "en cours" with 3 blinking dots
           setTxProgress({
             visible: true,
-            status: "success",
+            status: "pending",
             actionLabel: label,
             errorMessage: "",
           });
+
+          // Fire-and-forget: poll XRPL then switch to success
+          const txHash = result.hash || "";
+          (async () => {
+            if (txHash) {
+              await waitForTxValidation(txHash);
+            }
+            setTxProgress((prev) =>
+              prev.visible ? { ...prev, status: "success" } : prev,
+            );
+          })();
         }
         // If not signed (cancelled/expired), don't show anything
 
@@ -134,7 +174,7 @@ export default function WalletDashboard({
         throw err;
       }
     },
-    [signTransaction, TX_ACTION_LABELS, t],
+    [signTransaction, TX_ACTION_LABELS, t, waitForTxValidation],
   );
 
   // ── Token computation ──────────────────────────────────────
