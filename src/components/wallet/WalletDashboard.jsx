@@ -100,46 +100,41 @@ export default function WalletDashboard({
   }, []);
 
   /**
-   * Wrapper around signTransaction that shows a progress modal
-   * while the XRPL transaction is being signed and confirmed.
+   * Wrapper around signTransaction that shows a success/error modal
+   * AFTER the XRPL transaction is signed and confirmed (post-Face ID).
+   * Does NOT trigger refreshBalance — each hook manages its own refresh timing.
    */
   const signTransactionWithProgress = useCallback(
     async (txjson, options) => {
       const actionKey = options?.action || "";
       const label = TX_ACTION_LABELS[actionKey] || t("ui_tx_label_default", "Transaction");
 
-      setTxProgress({
-        visible: true,
-        status: "pending",
-        actionLabel: label,
-        errorMessage: "",
-      });
-
       try {
         const result = await signTransaction(txjson, options);
 
         if (result?.signed) {
-          setTxProgress((prev) => ({ ...prev, status: "success" }));
-          // Auto-refresh wallet after a short delay
-          setTimeout(() => {
-            refreshBalance();
-          }, 1200);
-        } else {
-          // User cancelled or expired — just close silently
-          setTxProgress((prev) => ({ ...prev, visible: false }));
+          // Show success modal only AFTER Face ID + XRPL confirmation
+          setTxProgress({
+            visible: true,
+            status: "success",
+            actionLabel: label,
+            errorMessage: "",
+          });
         }
+        // If not signed (cancelled/expired), don't show anything
 
         return result;
       } catch (err) {
-        setTxProgress((prev) => ({
-          ...prev,
+        setTxProgress({
+          visible: true,
           status: "error",
+          actionLabel: label,
           errorMessage: err?.message || String(err),
-        }));
+        });
         throw err;
       }
     },
-    [signTransaction, refreshBalance, TX_ACTION_LABELS, t],
+    [signTransaction, TX_ACTION_LABELS, t],
   );
 
   // ── Token computation ──────────────────────────────────────
