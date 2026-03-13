@@ -18,10 +18,39 @@ function useIsEmbedded() {
   return embedded;
 }
 
+/**
+ * Small grace period after isConnected flips to true.
+ * Lets SWR / hooks hydrate before the dashboard is revealed,
+ * so the user never sees a blank skeleton.
+ */
+const REVEAL_DELAY_MS = 350;
+
+function useRevealDelay(isConnected) {
+  const [ready, setReady] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isConnected) {
+      // Reset when disconnecting so the delay fires again next time
+      setReady(false);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      return;
+    }
+    // Already revealed (e.g. fast reconnect) — keep it
+    if (ready) return;
+
+    timerRef.current = setTimeout(() => setReady(true), REVEAL_DELAY_MS);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [isConnected]); // intentionally omit 'ready' to avoid re-triggering
+
+  return ready;
+}
+
 export default function Wallet() {
   const { t } = useTranslation("common");
   const { isConnected, isSessionReady, disconnect } = useWallet();
   const isEmbedded = useIsEmbedded();
+  const dashboardReady = useRevealDelay(isConnected);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -124,6 +153,18 @@ export default function Wallet() {
         {seoHead}
         <WalletConnectScreen />
       </>
+    );
+  }
+
+  // Grace period — let hooks hydrate before revealing the dashboard
+  if (!dashboardReady) {
+    return (
+      <main className="min-h-[100svh] flex items-center justify-center bg-[#0b0f10] text-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-white/20 border-t-[#c9a84c] rounded-full animate-spin" />
+          <span className="text-white/40 text-sm tracking-wide">Chargement du wallet…</span>
+        </div>
+      </main>
     );
   }
 
