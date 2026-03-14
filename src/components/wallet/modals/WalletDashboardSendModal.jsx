@@ -546,7 +546,6 @@ export default function WalletDashboardSendModal({
                 </button>
               </div>
 
-              {saveAddressBlock}
               {scanRequestFooter}
             </div>
           </div>
@@ -658,15 +657,28 @@ export default function WalletDashboardSendModal({
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
         <div className="space-y-2 text-sm text-white/80">
-          {/* Destination – full XRPL address */}
-          <div className="flex items-start justify-between gap-3">
+          {/* Beneficiary name */}
+          <div className="flex items-center justify-between gap-3">
             <span className="text-white/60 shrink-0">
-              {t("ui_destination_xrpl_address_9c2b94554c", "Destination")}
+              {t("ui_beneficiary_label", "Destinataire")}
             </span>
-            <span className="font-mono text-white/80 text-right break-all text-xs leading-relaxed">
-              {normalizedDestination}
+            <span className="font-semibold text-white/90">
+              {/* TODO: beneficiary lookup logic */}
             </span>
           </div>
+          {/* Destination – truncated XRPL address, full on hover */}
+          <div className="flex items-center justify-between gap-3" title={normalizedDestination}>
+            <span className="text-white/60 shrink-0">
+              {t("ui_account_number_label", "N° de compte")}
+            </span>
+            <span className="font-mono text-white/80 text-right text-xs cursor-default">
+              {normalizedDestination.length > 14
+                ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+                : normalizedDestination}
+            </span>
+          </div>
+          {/* Save address option */}
+          {saveAddressBlock}
           {/* Asset */}
           {confirmCurrencyCode ? (
             <div className="flex items-center justify-between gap-3">
@@ -689,17 +701,6 @@ export default function WalletDashboardSendModal({
               {confirmAmountLabel || '0'}
             </span>
           </div>
-          {/* FX info */}
-          {sendFxInfo ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-white/60">
-                {t("ui_fx_settlement", "Règlement XRPL")}
-              </span>
-              <span className="font-mono text-white/80">
-                ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
-              </span>
-            </div>
-          ) : null}
         </div>
       </div>
     </div>
