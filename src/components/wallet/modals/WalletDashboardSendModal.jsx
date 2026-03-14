@@ -82,7 +82,15 @@ export default function WalletDashboardSendModal({
     Number.isFinite(normalizedSendAmount) &&
     normalizedSendAmount > 0;
   const hasPaymentRequest = Boolean(sendPaymentRequest);
-  const showManualForm = !hasPaymentRequest;
+
+  // ── Insufficient balance detection (payreq mode) ──
+  const insufficientBalance = useMemo(() => {
+    if (!sendPaymentRequest || !selectedSendToken) return false;
+    const requiredAmount = Number(sendAmount || 0);
+    const available = Number(selectedSendToken.value || 0);
+    return requiredAmount > 0 && available < requiredAmount;
+  }, [sendPaymentRequest, selectedSendToken, sendAmount]);
+
   const requestCurrencyCode = String(
     sendPaymentRequest?.displayCurrency ||
       sendPaymentRequest?.targetCurrencyCode ||
@@ -471,7 +479,7 @@ export default function WalletDashboardSendModal({
       })
     : null;
 
-  const manualForm = showManualForm ? (
+  const manualForm = (
     <div className="space-y-3">
         {/* ── Destination ── */}
         <div>
@@ -486,38 +494,43 @@ export default function WalletDashboardSendModal({
                 type="text"
                 list="saved-addresses"
                 value={sendDestination}
-                onChange={(e) => setSendDestination(e.target.value)}
-                onPaste={handlePastePayload}
+                onChange={hasPaymentRequest ? undefined : (e) => setSendDestination(e.target.value)}
+                onPaste={hasPaymentRequest ? undefined : handlePastePayload}
+                readOnly={hasPaymentRequest}
                 placeholder={t("ui_select_saved_address_60c28f89c1", "Import or select saved address...")}
-                className="w-full bg-black/40 border border-white/15 rounded-xl pl-4 pr-20 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+                className={`w-full bg-black/40 border border-white/15 rounded-xl pl-4 ${hasPaymentRequest ? 'pr-4' : 'pr-20'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] ${hasPaymentRequest ? 'cursor-default text-white/60' : ''}`}
               />
-              {/* ── + upload QR image ── */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleScanQrUpload();
-                }}
-                className="absolute right-10 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                title={t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Charger une image qrcode")}
-              >
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-white/20 text-white/60 text-lg font-bold leading-none">+</span>
-              </button>
-              {/* ── Scan QR camera ── */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setScanActive(true);
-                  setScanKey((prev) => prev + 1);
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-              >
-                <svg className="w-7 h-7 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                </svg>
-              </button>
+              {!hasPaymentRequest && (
+                <>
+                  {/* ── + upload QR image ── */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleScanQrUpload();
+                    }}
+                    className="absolute right-10 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    title={t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Charger une image qrcode")}
+                  >
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-white/20 text-white/60 text-lg font-bold leading-none">+</span>
+                  </button>
+                  {/* ── Scan QR camera ── */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScanActive(true);
+                      setScanKey((prev) => prev + 1);
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+                  >
+                    <svg className="w-7 h-7 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
+                  </button>
+                </>
+              )}
               <datalist id="saved-addresses">
                 {(savedAddresses || []).map((addr, idx) => (
                   <option
@@ -530,7 +543,8 @@ export default function WalletDashboardSendModal({
             </div>
         </div>
 
-        {/* ── Devise + Montant (séparés) ── */}
+        {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
+        {!hasPaymentRequest && (
         <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <div>
             <label
@@ -622,8 +636,9 @@ export default function WalletDashboardSendModal({
             />
           </div>
         </div>
+        )}
     </div>
-  ) : null;
+  );
 
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
   const inlineSummary = hasDestination ? (
@@ -679,6 +694,76 @@ export default function WalletDashboardSendModal({
           </div>
         </div>
       </div>
+    </div>
+  ) : null;
+
+  /* ── Payreq inline summary – shown when a payment request was scanned ── */
+  const payreqInlineSummary = hasPaymentRequest ? (
+    <div className="space-y-3 transition-all duration-200">
+      <div className="rounded-xl border border-amber-300/25 bg-amber-300/5 p-4 space-y-3">
+        <div className="text-xs uppercase tracking-wide text-amber-200/80 font-semibold">
+          {t("ui_payment_request_details", "Demande de paiement")}
+        </div>
+        <div className="space-y-2 text-sm text-white/80">
+          {/* Beneficiary */}
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60 shrink-0">
+              {t("ui_beneficiary_label", "Destinataire")}
+            </span>
+            <span className="font-semibold text-white/90">
+              {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+            </span>
+          </div>
+          {/* N° de compte */}
+          <div className="flex items-center justify-between gap-3" title={requestDestination}>
+            <span className="text-white/60 shrink-0">
+              {t("ui_account_number_label", "N° de compte")}
+            </span>
+            <span className="font-mono text-white/80 text-right text-xs cursor-default">
+              {requestDestinationLabel || requestDestination}
+            </span>
+          </div>
+          {/* Save address option */}
+          {saveAddressBlock}
+          {/* Asset */}
+          {requestCurrencyCode ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-white/60">
+                {t("ui_asset_e5170a7a06", "Asset")}
+              </span>
+              <span className="font-semibold text-white/90">
+                {requestCurrencyCode}
+              </span>
+            </div>
+          ) : null}
+          {/* Amount */}
+          {requestAmountLabel ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-white/60">
+                {t("ui_amount_52cea2dd3d", "Amount")}
+              </span>
+              <span className="font-mono text-white/90">
+                {requestAmountLabel}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      </div>
+      {/* Insufficient balance warning */}
+      {insufficientBalance ? (
+        <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 space-y-1">
+          <div className="font-semibold">
+            {t("ui_insufficient_balance_title", "Solde insuffisant")}
+          </div>
+          <div>
+            {t(
+              "ui_insufficient_balance_detail",
+              "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
+              { currency: String(selectedSendToken?.currency || "").toUpperCase() },
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   ) : null;
 
@@ -804,19 +889,9 @@ export default function WalletDashboardSendModal({
           </div>
           <div className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5">
             <div className="flex flex-col gap-3">
-              {hasPaymentRequest ? (
-                <>
-                  {requestDetailsPanel}
-                  {payreqCurrencySelectorBlock}
-                  {saveAddressBlock}
-                </>
-              ) : (
-                <>
-                  {manualForm}
-                  {inlineSummary}
-                  {scannerModal}
-                </>
-              )}
+              {manualForm}
+              {hasPaymentRequest ? payreqInlineSummary : inlineSummary}
+              {scannerModal}
             </div>
           </div>
           {sendActions}

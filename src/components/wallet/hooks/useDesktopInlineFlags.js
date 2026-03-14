@@ -19,13 +19,8 @@ export function useDesktopInlineFlags({
   const showInlineSend =
     isDesktopPanel &&
     !showInlineQrScanner &&
-    activeAction === "send" &&
-    !hasPayreq;
-  const showInlinePayreq =
-    isDesktopPanel &&
-    !showInlineQrScanner &&
-    activeAction === "send" &&
-    hasPayreq;
+    activeAction === "send";
+  const showInlinePayreq = false;
   const showInlineReceive =
     isDesktopPanel &&
     !showInlineQrScanner &&

@@ -87,18 +87,6 @@ export default function WalletDesktopModals({
         />
       ) : null}
 
-      {showInlinePayreq ? (
-        <WalletDashboardPayreqModal
-          open
-          inline
-          onClose={() => {
-            setSendPaymentRequest(null);
-            setActiveAction(null);
-          }}
-          {...payreqModalProps}
-        />
-      ) : null}
-
       {showInlineReceive ? (
         <WalletDashboardReceiveModal
           open

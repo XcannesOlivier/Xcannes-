@@ -96,20 +96,12 @@ export default function WalletMobileModals({
         createPortal(
           <>
             <WalletDashboardSendModal
-              open={activeAction === "send" && !hasPayreq}
+              open={activeAction === "send"}
               onClose={() => {
                 resetSendForm?.();
                 setActiveAction(null);
               }}
               {...sendModalProps}
-            />
-            <WalletDashboardPayreqModal
-              open={activeAction === "send" && hasPayreq}
-              onClose={() => {
-                setSendPaymentRequest(null);
-                setActiveAction(null);
-              }}
-              {...payreqModalProps}
             />
 
             <WalletDashboardReceiveModal
