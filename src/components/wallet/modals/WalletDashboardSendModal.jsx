@@ -521,7 +521,7 @@ export default function WalletDashboardSendModal({
                   title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
                 >
                   <svg
-                    className="w-[68px] h-[68px] text-white/80"
+                    className="w-[52px] h-[52px] text-white/80"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
