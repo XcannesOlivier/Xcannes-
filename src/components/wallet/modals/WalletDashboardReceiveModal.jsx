@@ -787,7 +787,7 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnMuted}`}
+                        className={`hidden md:block w-full text-lg py-3 ${greenActionBtnMuted}`}
                       >
                         {t(
                           "ui_generate_request_58584f23a2",

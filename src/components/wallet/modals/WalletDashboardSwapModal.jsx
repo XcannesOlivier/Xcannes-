@@ -614,7 +614,7 @@ export default function WalletDashboardSwapModal({
                           e.stopPropagation();
                           handleConvertAction();
                         }}
-                        className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnBase}`}
+                        className={`hidden md:block w-full text-lg py-3 ${greenActionBtnBase}`}
                         disabled={convertButtonDisabled}
                       >
                         {convertButtonLabel}

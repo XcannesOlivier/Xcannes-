@@ -346,7 +346,7 @@ export default function WalletDashboardPayreqModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full mt-2 text-lg py-3 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")

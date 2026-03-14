@@ -792,7 +792,7 @@ export default function WalletDashboardSendModal({
             handleManualSend();
           }}
           disabled={sendProcessing || !canManualSend}
-          className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnBase}`}
+          className={`hidden md:block w-full text-lg py-3 ${greenActionBtnBase}`}
         >
           {sendProcessing
             ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -829,7 +829,7 @@ export default function WalletDashboardSendModal({
           setShowConfirmation(true);
         }}
         disabled={!canManualSend}
-        className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full text-lg py-3 ${greenActionBtnBase}`}
       >
         {t("ui_send_504b64a87b", "Send")}
       </button>
