@@ -463,13 +463,13 @@ export default function WalletDashboardSendModal({
   const confirmCurrencyCode = String(
     selectedSendToken?.currency || "",
   ).trim().toUpperCase();
-  const confirmAmountLabel =
-    Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0 && confirmCurrencyCode
-      ? formatAmountWithSymbol(locale, normalizedSendAmount, confirmCurrencyCode, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 6,
-        })
-      : null;
+  const summaryAmount = Number.isFinite(normalizedSendAmount) ? normalizedSendAmount : 0;
+  const confirmAmountLabel = confirmCurrencyCode
+    ? formatAmountWithSymbol(locale, summaryAmount, confirmCurrencyCode, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 6,
+      })
+    : null;
 
   const manualForm = showManualForm ? (
     <div className="space-y-4">
@@ -597,20 +597,6 @@ export default function WalletDashboardSendModal({
               }
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
-            {selectedSendToken && (
-              <p className="mt-1 text-xs text-white/40">
-                {t("ui_balance_340cdcff7a", "Balance:")}
-
-                <span className="text-white/80">
-                  {formatAmountWithSymbol(
-                    locale,
-                    selectedSendToken.value,
-                    selectedSendToken.currency,
-                    { minimumFractionDigits: 0, maximumFractionDigits: 6 },
-                  )}
-                </span>
-              </p>
-            )}
           </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
             <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
@@ -660,49 +646,12 @@ export default function WalletDashboardSendModal({
               containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
             />
           </div>
-
-          {sendFxInfo && (
-            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <div className="text-xs font-semibold text-white/80">
-                {t(
-                  "ui_payment_fx_base_usd_r_gleme_4818b8a6c3",
-                  "Paiement FX (base USD · règlement XRPL via USD)",
-                )}
-              </div>
-              <p className="mt-1 text-xs text-white/60">
-                ≈{" "}
-                <span className="font-mono">
-                  {formatAmountWithSymbol(
-                    locale,
-                    Number(sendFxInfo.paymentRlusd || 0),
-                    "USD",
-                    { minimumFractionDigits: 0, maximumFractionDigits: 6 },
-                  )}
-                </span>{" "}
-                {t("ui_au_recipient_67dcc85cec", "au destinataire")}
-              </p>
-              {sendFxInfo.fxSource && (
-                <p className="mt-1 text-xs text-white/60">
-                  {t("ui_source_507c065942", "source")}{" "}
-                  <span className="font-mono">
-                    {String(sendFxInfo.fxSource).toUpperCase()}
-                  </span>
-                </p>
-              )}
-              <p className="mt-2 text-[11px] text-white/40">
-                {t(
-                  "ui_signatures_one_5b2c1a7d9f",
-                  "1 signature: payment → recipient.",
-                )}
-              </p>
-            </div>
-          )}
         </div>
     </div>
   ) : null;
 
-  /* ── Dynamic summary – always visible when destination + asset + amount are set ── */
-  const inlineSummary = hasDestination && selectedSendToken && Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0 ? (
+  /* ── Dynamic summary – visible as soon as a destination address is set ── */
+  const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
       <div className="rounded-xl border border-xcannes-accent-green/25 bg-xcannes-accent-green/5 p-4 space-y-3">
         <div className="text-xs uppercase tracking-wide text-xcannes-accent-green/80 font-semibold">
@@ -732,16 +681,14 @@ export default function WalletDashboardSendModal({
             </div>
           ) : null}
           {/* Amount */}
-          {confirmAmountLabel ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-white/60">
-                {t("ui_amount_52cea2dd3d", "Amount")}
-              </span>
-              <span className="font-mono text-white/90">
-                {confirmAmountLabel}
-              </span>
-            </div>
-          ) : null}
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_amount_52cea2dd3d", "Amount")}
+            </span>
+            <span className={`font-mono ${summaryAmount > 0 ? 'text-white/90' : 'text-white/40'}`}>
+              {confirmAmountLabel || '0'}
+            </span>
+          </div>
           {/* FX info */}
           {sendFxInfo ? (
             <div className="flex items-center justify-between gap-3">
@@ -750,17 +697,6 @@ export default function WalletDashboardSendModal({
               </span>
               <span className="font-mono text-white/80">
                 ≈ {formatAmountWithSymbol(locale, Number(sendFxInfo.paymentRlusd || 0), "USD", { maximumFractionDigits: 6 })}
-              </span>
-            </div>
-          ) : null}
-          {/* Balance after send */}
-          {selectedSendToken ? (
-            <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
-              <span className="text-white/60 text-xs">
-                {t("ui_balance_340cdcff7a", "Balance:")}
-              </span>
-              <span className="font-mono text-white/60 text-xs">
-                {formatAmountWithSymbol(locale, selectedSendToken.value, selectedSendToken.currency, { minimumFractionDigits: 0, maximumFractionDigits: 6 })}
               </span>
             </div>
           ) : null}
