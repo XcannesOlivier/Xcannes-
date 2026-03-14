@@ -312,7 +312,7 @@ export default function WalletDashboardSendModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto pb-[env(safe-area-inset-bottom)]",
+    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
@@ -462,12 +462,10 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const manualForm = showManualForm ? (
-    <div className="space-y-3">
-      <div className="space-y-3">
+    <div className="space-y-4">
         <div>
-          <div>
             <label
-              className="block text-[11px] md:text-xs text-white/60 mb-1"
+              className="block text-[11px] md:text-xs text-white/60 mb-1.5"
               title={t(
                 "ui_send_destination_tip",
                 "Adresse XRPL du destinataire.",
@@ -542,10 +540,10 @@ export default function WalletDashboardSendModal({
               {scanRequestFooter}
             </div>
           </div>
-          <div className={`transition-opacity duration-300 space-y-3 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
+          <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <div>
             <label
-              className="block text-[11px] md:text-xs text-white/60 mb-1"
+              className="block text-[11px] md:text-xs text-white/60 mb-1.5"
               title={t(
                 "ui_send_asset_tip",
                 "Sélectionnez la devise à envoyer.",
@@ -616,7 +614,7 @@ export default function WalletDashboardSendModal({
           <div>
             <div className="flex items-center justify-between">
               <label
-                className="block text-[11px] md:text-xs text-white/60 mb-1"
+                className="block text-[11px] md:text-xs text-white/60 mb-1.5"
                 title={t(
                   "ui_send_amount_tip",
                   "Saisissez le montant à envoyer.",
@@ -689,8 +687,6 @@ export default function WalletDashboardSendModal({
             </div>
           )}
         </div>
-        </div>
-      </div>
     </div>
   ) : null;
 
@@ -818,13 +814,13 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className="pt-2 border-t border-white/10">
+    <div className="pt-3 border-t border-white/10">
       <SwipeConfirmButton
         label={t("ui_send_504b64a87b", "Send")}
         onConfirm={() => setShowConfirmation(true)}
         disabled={!canManualSend}
         variant="green"
-        className="mt-2 md:hidden"
+        className="md:hidden"
       />
       <button
         type="button"
@@ -833,7 +829,7 @@ export default function WalletDashboardSendModal({
           setShowConfirmation(true);
         }}
         disabled={!canManualSend}
-        className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnBase}`}
       >
         {t("ui_send_504b64a87b", "Send")}
       </button>
@@ -900,7 +896,6 @@ export default function WalletDashboardSendModal({
       <div className={wrapperClass}>
         <div
           className={panelClass}
-          style={{ WebkitOverflowScrolling: "touch" }}
           onClick={(e) => {
             if (!inline) e.stopPropagation();
           }}
@@ -933,7 +928,7 @@ export default function WalletDashboardSendModal({
             </button>
           </div>
           <div>
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4">
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}
