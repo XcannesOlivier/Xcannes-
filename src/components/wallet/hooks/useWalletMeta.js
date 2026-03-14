@@ -17,11 +17,11 @@ export function useWalletMeta({
       if (!resolvedAddress && !resolvedLabel) return null;
       return (
         <div className={`text-xs text-white/50 ${className}`}>
-          <div className="text-base md:text-lg font-semibold text-white/80 leading-tight">
+          <div className="text-lg md:text-lg font-semibold text-white/80 leading-tight">
             {resolvedLabel || "Wallet"}
           </div>
           {!hideAddress && resolvedAddress ? (
-            <div className="font-mono text-sm md:text-base flex flex-wrap items-center gap-2">
+            <div className="font-mono text-xs md:text-base flex flex-wrap items-center gap-2">
               <span className="break-all" title={addressTitle || undefined}>
                 {resolvedAddress}
               </span>
