@@ -103,27 +103,13 @@
 
 /* Fullscreen helpers (mobile safe) */
 .xcannes-fullscreen {
-  height: 100svh;
-  max-height: 100svh;
-}
-
-@supports (height: 100dvh) {
-  .xcannes-fullscreen {
-    height: 100dvh;
-    max-height: 100dvh;
-  }
+  height: 100vh;
+  max-height: 100vh;
 }
 
 .xcannes-fullscreen-safe {
-  height: 100svh;
-  max-height: 100svh;
-}
-
-@supports (height: 100dvh) {
-  .xcannes-fullscreen-safe {
-    height: 100dvh;
-    max-height: 100dvh;
-  }
+  height: 100vh;
+  max-height: 100vh;
 }
 
 @media (max-width: 767px) {
