@@ -666,7 +666,7 @@ export default function WalletDashboardReceiveModal({
                       e.stopPropagation();
                       setIsRequestOpen((prev) => !prev);
                     }}
-                    className={`px-4 py-2 text-xs md:text-sm ${greenActionBtnMuted}`}
+                    className={`px-6 py-3 text-base md:text-lg ${greenActionBtnMuted}`}
                   >
                     {isRequestOpen
                       ? t("ui_hide_request_payment", "Masquer la demande")
