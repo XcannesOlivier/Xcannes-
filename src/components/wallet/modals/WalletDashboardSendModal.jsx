@@ -517,11 +517,11 @@ export default function WalletDashboardSendModal({
                     setScanActive(true);
                     setScanKey((prev) => prev + 1);
                   }}
-                  className="px-4 py-4 rounded-xl border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
+                  className="px-5 py-4 rounded-xl border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
                   title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
                 >
                   <svg
-                    className="w-5 h-5 text-white/80"
+                    className="w-7 h-7 text-white/80"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
