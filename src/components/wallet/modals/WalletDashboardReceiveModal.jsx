@@ -498,7 +498,7 @@ export default function WalletDashboardReceiveModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-3 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
+    "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
@@ -693,7 +693,7 @@ export default function WalletDashboardReceiveModal({
                       {/* Amount & Currency */}
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[11px] md:text-xs text-white/60 mb-1">
+                          <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
                             {t("ui_amount_7668986206", "Amount")}
                           </label>
                           <input
@@ -705,7 +705,7 @@ export default function WalletDashboardReceiveModal({
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] md:text-xs text-white/60 mb-1">
+                          <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
                             {t("ui_currency_1ed55673be", "Currency")}
                           </label>
                           <ModalSelect
@@ -756,7 +756,7 @@ export default function WalletDashboardReceiveModal({
 
                       {/* Memo (optional) */}
                       <div>
-                        <label className="block text-[11px] md:text-xs text-white/60 mb-1">
+                        <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
                           {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
                         </label>
                         <input
@@ -779,7 +779,7 @@ export default function WalletDashboardReceiveModal({
                         )}
                         onConfirm={handleGenerateRequest}
                         variant="green"
-                        className="mt-2 md:hidden"
+                        className="md:hidden"
                       />
                       <button
                         type="button"
@@ -787,7 +787,7 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnMuted}`}
+                        className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnMuted}`}
                       >
                         {t(
                           "ui_generate_request_58584f23a2",

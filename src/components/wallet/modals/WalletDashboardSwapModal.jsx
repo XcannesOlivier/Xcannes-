@@ -346,8 +346,7 @@ export default function WalletDashboardSwapModal({
           }}
         >
           <div
-            className="flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-5 overflow-y-auto"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className="flex-1 min-h-0 flex flex-col p-4 md:p-5 space-y-4"
           >
             <div className="flex items-start justify-between gap-3 mb-1 pr-6">
               <div className="flex min-w-0 flex-col gap-1.5">
@@ -358,7 +357,7 @@ export default function WalletDashboardSwapModal({
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/70 text-lg md:text-xl font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
@@ -377,18 +376,10 @@ export default function WalletDashboardSwapModal({
               </button>
             </div>
             <div className="wallet-tab-unfold-in">
-              <div className="flex flex-col gap-5">
-                <div
-                  className={
-                    useDesktopWalletConvertLayout
-                      ? "space-y-7"
-                      : inline
-                        ? "space-y-6"
-                        : "space-y-[clamp(14px,2.2vh,24px)]"
-                  }
-                >
+              <div className="flex flex-col gap-4">
+                <div className="space-y-4">
                     <div>
-                      <label className="block text-[17px] md:text-lg text-white/60 mb-1">
+                      <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
                         {t("ui_base_6d4184e1ef", "Base")}
                       </label>
                       <ModalSelect
@@ -414,18 +405,18 @@ export default function WalletDashboardSwapModal({
                         )}
                         useNativeSelect={false}
                         showMobileOptionRight={true}
-                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
                             ? "bg-[#0b0f10]"
                             : "bg-elevated"
                         }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[17px] md:text-lg text-white/60 mb-1">
+                      <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
                         {t("ui_quote_e3761255be", "Quote")}
                       </label>
                       <ModalSelect
@@ -451,18 +442,18 @@ export default function WalletDashboardSwapModal({
                         )}
                         useNativeSelect={false}
                         showMobileOptionRight={true}
-                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
                             ? "bg-[#0b0f10]"
                             : "bg-elevated"
                         }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                       />
                     </div>
 
                     {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
-                      <div className="rounded-md border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-[15px] text-emerald-200/80">
+                      <div className="rounded-md border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-200/80">
                         {t(
                           "ui_new_currency_line_auto_activate_a1b2c3",
                           "New currency — the {{currency}} line will be created automatically.",
@@ -471,7 +462,7 @@ export default function WalletDashboardSwapModal({
                     ) : null}
 
                     <div>
-                      <label className="block text-[15px] text-white/40 mb-1">
+                      <label className="block text-[11px] md:text-xs text-white/40 mb-1.5">
                         {t("ui_other_currency_d8e1f2a3b4", "Other currency")}
                       </label>
                       <WalletCurrencySelector
@@ -489,7 +480,7 @@ export default function WalletDashboardSwapModal({
                     </div>
 
                     <div>
-                      <label className="block text-[17px] md:text-lg text-white/60 mb-1">
+                      <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
                         {t("ui_amount_52a20b2992", "Amount")}
                       </label>
                       <TokenAmountInput
@@ -507,9 +498,9 @@ export default function WalletDashboardSwapModal({
                     </div>
                   </div>
 
-                  <div className={inline ? "space-y-2" : "space-y-2"}>
+                  <div className="space-y-2">
                     {sameCurrencySelected ? (
-                      <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
+                      <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
                         {t(
                           "ui_convert_same_asset_warning_6f13d5c9c2",
                           "Veuillez choisir 2 actifs différents.",
@@ -517,7 +508,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {insufficientBalance && !sameCurrencySelected ? (
-                      <div className="rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-[17px] text-red-200/90">
+                      <div className="rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200/90">
                         {t(
                           "ui_insufficient_balance_convert_a3b4c5d6",
                           "Solde insuffisant. Disponible : {{amount}} {{currency}}",
@@ -530,7 +521,7 @@ export default function WalletDashboardSwapModal({
                       {/* Conversion summary */}
                       {Number.isFinite(previewAmount) && previewAmount > 0 && Number.isFinite(amountValue) && amountValue > 0 && baseCode && quoteCode ? (
                         <>
-                          <div className="text-[17px] md:text-lg text-white/80 leading-snug">
+                          <div className="text-sm text-white/80 leading-snug">
                             {t(
                               "ui_convert_summary_label_a1b2c3d4e5",
                               "Pour {{amountBase}} {{base}} vous recevrez",
@@ -551,7 +542,7 @@ export default function WalletDashboardSwapModal({
                           {previewMeta?.route === "allocation" &&
                           previewMeta?.isFx &&
                           previewMeta?.spreadFeeRlusd > 0 ? (
-                            <div className="text-[15px] text-white/45 pt-0.5 border-t border-white/5">
+                            <div className="text-[11px] text-white/45 pt-0.5 border-t border-white/5">
                               {t("ui_conversion_fee_label_e2f3a4b5c6", "Frais de conversion")}
                               {" : "}
                               {formatAmountWithSymbol(
@@ -567,12 +558,12 @@ export default function WalletDashboardSwapModal({
                           ) : null}
                         </>
                       ) : (
-                        <div className="text-[17px] text-white/40">—</div>
+                        <div className="text-sm text-white/40">—</div>
                       )}
                     </div>
 
                     {previewState.status === "loading" ? (
-                      <div className="text-[17px] text-white/50">
+                      <div className="text-xs text-white/50">
                         {t(
                           "ui_loading_market_data_1d5d6ed3c4",
                           "Refreshing market data...",
@@ -581,25 +572,19 @@ export default function WalletDashboardSwapModal({
                     ) : null}
 
                     {previewState.status === "error" ? (
-                      <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[17px] text-red-200">
+                      <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
                         {previewState.error}
                       </div>
                     ) : null}
 
                     {convertPreview ? (
-                      <p className="text-[17px] text-white/60">
+                      <p className="text-xs text-white/60">
                         {convertPreview}
                       </p>
                     ) : null}
                   </div>
 
-                <div
-                  className={
-                    inline
-                      ? "space-y-2 pt-2 border-t border-white/10"
-                      : "pt-3"
-                  }
-                >
+                <div className="pt-3 border-t border-white/10">
                   {!isConnected && !isPreviewMode ? (
                     <button
                       type="button"
@@ -607,7 +592,7 @@ export default function WalletDashboardSwapModal({
                         e.stopPropagation();
                         onConnectWallet?.();
                       }}
-                      className={`w-full mt-1 text-xl py-2.5 ${greenActionBtnBase}`}
+                      className={`w-full text-sm py-2.5 ${greenActionBtnBase}`}
                     >
                       {t("wallet_connect_cta", "Connect wallet")}
                     </button>
@@ -618,7 +603,7 @@ export default function WalletDashboardSwapModal({
                         onConfirm={handleConvertAction}
                         disabled={convertButtonDisabled}
                         variant="green"
-                        className="mt-1 md:hidden"
+                        className="md:hidden"
                       />
                       <button
                         type="button"
@@ -626,7 +611,7 @@ export default function WalletDashboardSwapModal({
                           e.stopPropagation();
                           handleConvertAction();
                         }}
-                        className={`hidden md:block w-full mt-1 text-xl py-2.5 ${greenActionBtnBase}`}
+                        className={`hidden md:block w-full text-sm py-2.5 ${greenActionBtnBase}`}
                         disabled={convertButtonDisabled}
                       >
                         {convertButtonLabel}
