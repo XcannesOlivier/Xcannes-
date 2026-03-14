@@ -42,6 +42,7 @@ export default function WalletDashboardSwapModal({
   handleDemoConvert,
   convertProcessing,
   rlusdPerUnitRates,
+  currencyLinesSummary,
   selectLabelByCurrency,
   selectLabelRightByCurrency,
   selectIconByCurrency,
@@ -136,6 +137,38 @@ export default function WalletDashboardSwapModal({
     baseCode && quoteCode && baseCode === quoteCode,
   );
 
+  // ── Insufficient balance detection ──────────────────────────
+  const insufficientBalance = useMemo(() => {
+    if (!baseCode || !Number.isFinite(amountValue) || amountValue <= 0) return null;
+
+    const isPeggedToUsd = (code) => code === "RLUSD" || code === "USD";
+    const rlusdPerBase = isPeggedToUsd(baseCode)
+      ? 1
+      : Number(rlusdPerUnitRates?.[baseCode]);
+    if (!Number.isFinite(rlusdPerBase) || rlusdPerBase <= 0) return null;
+
+    const grossRlusd = amountValue * rlusdPerBase;
+    const epsilon = 1e-9;
+
+    if (baseCode === "RLUSD") {
+      const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
+      if (Number.isFinite(unallocated) && unallocated + epsilon < grossRlusd) {
+        return { availableRlusd: unallocated, availableUnits: unallocated, currency: baseCode };
+      }
+      return null;
+    }
+
+    const baseLine = (currencyLines || []).find(
+      (l) => String(l?.currencyCode || "").toUpperCase() === baseCode,
+    );
+    const availableRlusd = Number(baseLine?.allocatedRlusd ?? 0);
+    if (Number.isFinite(availableRlusd) && availableRlusd + epsilon < grossRlusd) {
+      const availableUnits = rlusdPerBase > 0 ? availableRlusd / rlusdPerBase : 0;
+      return { availableRlusd, availableUnits, currency: baseCode };
+    }
+    return null;
+  }, [amountValue, baseCode, currencyLines, currencyLinesSummary, rlusdPerUnitRates]);
+
   const conversionRoute = useMemo(() => {
     if (!baseCode || !quoteCode || baseCode === quoteCode) {
       return { type: "none" };
@@ -223,6 +256,12 @@ export default function WalletDashboardSwapModal({
       const quoteUnits =
         quoteCode === "RLUSD" ? netRlusd : netRlusd / rlusdPerQuote;
 
+      // Unit rate: how many quote units per 1 base unit (after spread)
+      const unitRateGross = rlusdPerBase / rlusdPerQuote;
+      const unitRateNet = isFxConversion(baseCode, quoteCode)
+        ? unitRateGross * (1 - Number(spread?.spreadFraction || 0))
+        : unitRateGross;
+
       setPreviewState({ status: "done", error: null });
       setPreviewAmount(quoteUnits);
       setPreviewMeta({
@@ -230,6 +269,7 @@ export default function WalletDashboardSwapModal({
         spreadFeeRlusd: spreadFee,
         spreadPercent: Number(spread?.spreadFraction || 0) * 100,
         isFx: isFxConversion(baseCode, quoteCode),
+        unitRate: unitRateNet,
       });
       return undefined;
     }
@@ -250,7 +290,8 @@ export default function WalletDashboardSwapModal({
     !convertQuoteCurrency ||
     !convertAmount ||
     sameCurrencySelected ||
-    conversionRoute.type !== "allocation";
+    conversionRoute.type !== "allocation" ||
+    !!insufficientBalance;
   const convertButtonLabel = convertProcessing
     ? t("ui_converting_71c2b9a4e5", "Converting...")
     : isPreviewMode
@@ -339,15 +380,15 @@ export default function WalletDashboardSwapModal({
               className="wallet-tab-unfold-in flex-1 min-h-0 flex flex-col"
             >
               <div
-                className="flex-1 min-h-0 flex flex-col justify-between gap-5"
+                className="flex-1 min-h-0 flex flex-col justify-evenly gap-4"
               >
                 <div
                   className={
                     useDesktopWalletConvertLayout
                       ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
                       : inline
-                        ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(18px,2.8vh,36px)]"
-                        : "space-y-[clamp(16px,2.5vh,28px)]"
+                        ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-[clamp(18px,2.8vh,36px)]"
+                        : "space-y-[clamp(14px,2vh,22px)]"
                   }
                 >
                   <div
@@ -488,29 +529,67 @@ export default function WalletDashboardSwapModal({
                         )}
                       </div>
                     ) : null}
-                    <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
-                      <div className="uppercase tracking-[0.16em] text-[15px] text-white/50">
+                    {insufficientBalance && !sameCurrencySelected ? (
+                      <div className="rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-[17px] text-red-200/90">
                         {t(
-                          "ui_estimated_receive_0c5a3b7e9a",
-                          "Estimated receive",
-                        )}
+                          "ui_insufficient_balance_convert_a3b4c5d6",
+                          "Solde insuffisant. Disponible : {{amount}} {{currency}}",
+                        )
+                          .replace("{{amount}}", insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 6 }))
+                          .replace("{{currency}}", getDisplayCurrencyCode(insufficientBalance.currency))}
                       </div>
-                      <div className="text-xl text-white/90">
-                        {formatAmountWithSymbolLocal(
-                          previewAmount,
-                          convertQuoteCurrency || "",
-                          {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 6,
-                          },
-                        )}
-                      </div>
+                    ) : null}
+                    <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2.5 space-y-2">
+                      {/* Unit rate line */}
+                      {previewMeta?.unitRate > 0 && baseCode && quoteCode ? (
+                        <div className="text-[17px] md:text-lg text-white/80 leading-snug">
+                          {t(
+                            "ui_unit_rate_label_f7a8b9c0d1",
+                            "Pour 1 {{base}} vous recevrez",
+                          ).replace("{{base}}", getDisplayCurrencyCode(baseCode))}
+                          {" "}
+                          <span className="text-white font-semibold">
+                            {previewMeta.unitRate.toLocaleString(locale, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 6,
+                            })}
+                            {" "}
+                            {getDisplayCurrencyCode(quoteCode)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="uppercase tracking-[0.16em] text-[15px] text-white/50">
+                          {t(
+                            "ui_estimated_receive_0c5a3b7e9a",
+                            "Estimated receive",
+                          )}
+                        </div>
+                      )}
+
+                      {/* Total received */}
+                      {Number.isFinite(previewAmount) && previewAmount > 0 ? (
+                        <div className="text-xl text-white/90 font-medium">
+                          ≈{" "}
+                          {formatAmountWithSymbolLocal(
+                            previewAmount,
+                            convertQuoteCurrency || "",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 6,
+                            },
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-xl text-white/40">—</div>
+                      )}
+
+                      {/* Conversion fee */}
                       {previewMeta?.route === "allocation" &&
                       previewMeta?.isFx &&
                       previewMeta?.spreadFeeRlusd > 0 ? (
-                        <div className="text-[16px] text-white/45">
-                          {t("ui_spread_fee_6c2a8d5e1b", "Conversion fee (1%)")}
-                          :{" "}
+                        <div className="text-[15px] text-white/45 pt-0.5 border-t border-white/5">
+                          {t("ui_conversion_fee_label_e2f3a4b5c6", "Frais de conversion")}
+                          {" : "}
                           {formatAmountWithSymbol(
                             locale,
                             previewMeta.spreadFeeRlusd,
@@ -550,8 +629,8 @@ export default function WalletDashboardSwapModal({
                 <div
                   className={
                     inline
-                      ? "mt-auto space-y-2 pt-2 border-t border-white/10"
-                      : "mt-auto pt-4"
+                      ? "space-y-2 pt-2 border-t border-white/10"
+                      : "pt-3"
                   }
                 >
                   {!isConnected && !isPreviewMode ? (
