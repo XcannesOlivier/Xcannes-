@@ -493,8 +493,21 @@ export default function WalletDashboardSendModal({
                     ? t("ui_select_saved_address_60c28f89c1", "Select saved address...")
                     : t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
                 }
-                className="w-full bg-black/40 border border-white/15 rounded-xl pl-4 pr-12 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+                className="w-full bg-black/40 border border-white/15 rounded-xl pl-4 pr-20 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
               />
+              {/* ── + upload QR image ── */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleScanQrUpload();
+                }}
+                className="absolute right-10 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                title={t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Charger une image qrcode")}
+              >
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded border border-white/20 text-white/60 text-sm font-bold">+</span>
+              </button>
+              {/* ── Scan QR camera ── */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -519,13 +532,56 @@ export default function WalletDashboardSendModal({
                 ))}
               </datalist>
             </div>
-            <div className="mt-1.5">{scanRequestFooter}</div>
         </div>
 
-        {/* ── Devise + Montant (fusionnés) ── */}
-        <div className={`transition-opacity duration-300 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
+        {/* ── Devise + Montant (séparés) ── */}
+        <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
+          <div>
+            <label
+              className="block text-base md:text-lg text-white/60 mb-1.5"
+              title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
+            >
+              {t("ui_asset_e5170a7a06", "Asset")}
+            </label>
+            <ModalSelect
+              value={selectedSendToken ? selectedSendToken.key : ""}
+              onChange={setSendAssetKey}
+              options={(augmentedTokens || []).map((token) => {
+                const labelLeft =
+                  selectLabelByAssetKey?.[token.key] ||
+                  selectLabelByAssetKey?.[token.currency] ||
+                  token.currency;
+                const labelRight =
+                  selectLabelRightByAssetKey?.[token.key] ||
+                  selectLabelRightByAssetKey?.[token.currency] ||
+                  null;
+                return {
+                  value: token.key,
+                  icon:
+                    selectIconByAssetKey?.[token.key] ||
+                    selectIconByAssetKey?.[token.currency] ||
+                    null,
+                  label: labelLeft,
+                  labelLeft,
+                  labelRight,
+                  labelMobile:
+                    selectLabelMobileByAssetKey?.[token.key] ||
+                    selectLabelMobileByAssetKey?.[token.currency] ||
+                    labelLeft,
+                };
+              })}
+              useNativeSelect={false}
+              showMobileOptionRight={true}
+              iconClassName="text-3xl leading-none"
+              buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              menuClassName={
+                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+              }
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+            />
+          </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
-            <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90 mb-2">
+            <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
               <span className="text-white/80">
                 {t("ui_beneficiary_label", "Bénéficiaire")}:
               </span>{" "}
@@ -534,79 +590,40 @@ export default function WalletDashboardSendModal({
               </span>
             </div>
           ) : null}
-          <div className="flex items-center justify-between mb-1">
-            <label className="block text-sm text-white/50">
-              {t("ui_amount_and_currency_label", "Montant & Devise")}
-            </label>
-            {showCalculatedAmountLabel ? (
-              <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
-                {t("ui_calculated_amount_label", "Montant calculé")}
-              </span>
-            ) : null}
-          </div>
-          <div className="flex gap-2 items-stretch">
-            {/* Currency selector – compact */}
-            <div className="shrink-0 w-[130px] md:w-[150px]">
-              <ModalSelect
-                value={selectedSendToken ? selectedSendToken.key : ""}
-                onChange={setSendAssetKey}
-                options={(augmentedTokens || []).map((token) => {
-                  const labelLeft =
-                    selectLabelByAssetKey?.[token.key] ||
-                    selectLabelByAssetKey?.[token.currency] ||
-                    token.currency;
-                  const labelRight =
-                    selectLabelRightByAssetKey?.[token.key] ||
-                    selectLabelRightByAssetKey?.[token.currency] ||
-                    null;
-                  return {
-                    value: token.key,
-                    icon:
-                      selectIconByAssetKey?.[token.key] ||
-                      selectIconByAssetKey?.[token.currency] ||
-                      null,
-                    label: labelLeft,
-                    labelLeft,
-                    labelRight,
-                    labelMobile:
-                      selectLabelMobileByAssetKey?.[token.key] ||
-                      selectLabelMobileByAssetKey?.[token.currency] ||
-                      labelLeft,
-                  };
-                })}
-                useNativeSelect={false}
-                showMobileOptionRight={true}
-                iconClassName="text-xl leading-none"
-                buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer h-full"
-                menuClassName={
-                  noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-                }
-                selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-              />
+          <div>
+            <div className="flex items-center justify-between">
+              <label
+                className="block text-base md:text-lg text-white/60 mb-1.5"
+                title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
+              >
+                {t("ui_amount_52cea2dd3d", "Amount")}
+              </label>
+              {showCalculatedAmountLabel ? (
+                <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
+                  {t("ui_calculated_amount_label", "Montant calculé")}
+                </span>
+              ) : null}
             </div>
-            {/* Amount input – fills remaining space */}
-            <div className="flex-1">
-              <TokenAmountInput
-                value={sendAmount}
-                onChange={setSendAmount}
-                max={
-                  sendFxInfo
-                    ? undefined
-                    : selectedSendToken
-                      ? selectedSendToken.value
-                      : undefined
-                }
-                placeholder="0.00"
-                token={
-                  selectedSendToken
-                    ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
-                      selectedSendToken.currency
-                    : "USD"
-                }
-                tokenClassName="text-white text-base"
-                containerClassName="focus-within:!border-xcannes-green/80 py-3 rounded-xl h-full"
-              />
-            </div>
+            <TokenAmountInput
+              value={sendAmount}
+              onChange={setSendAmount}
+              max={
+                sendFxInfo
+                  ? undefined
+                  : selectedSendToken
+                    ? selectedSendToken.value
+                    : undefined
+              }
+              placeholder="0.0000"
+              token={
+                selectedSendToken
+                  ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
+                    selectedSendToken.currency
+                  : "USD"
+              }
+              tokenClassName="text-white text-xl"
+              containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
+            />
           </div>
         </div>
     </div>
