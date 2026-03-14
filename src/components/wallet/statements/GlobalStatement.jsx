@@ -384,6 +384,7 @@ export default function GlobalStatement({
     `;
   }, [
     currentPeriod,
+    displayCurrencyCode,
     docHash,
     fallbackPeriod,
     formatAmountWithSymbolLocal,
@@ -394,6 +395,7 @@ export default function GlobalStatement({
     sortedTokens,
     t,
     totalBalance,
+    totalInPreferred,
     walletAddress,
   ]);
 

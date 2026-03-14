@@ -380,7 +380,7 @@ export default function WalletDashboardSwapModal({
               className="wallet-tab-unfold-in flex-1 min-h-0 flex flex-col"
             >
               <div
-                className="flex-1 min-h-0 flex flex-col justify-evenly gap-4"
+                className="flex-1 min-h-0 flex flex-col gap-5"
               >
                 <div
                   className={
@@ -388,7 +388,7 @@ export default function WalletDashboardSwapModal({
                       ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
                       : inline
                         ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-[clamp(18px,2.8vh,36px)]"
-                        : "space-y-[clamp(14px,2vh,22px)]"
+                        : ""
                   }
                 >
                   <div
@@ -540,67 +540,48 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2.5 space-y-2">
-                      {/* Unit rate line */}
-                      {previewMeta?.unitRate > 0 && baseCode && quoteCode ? (
-                        <div className="text-[17px] md:text-lg text-white/80 leading-snug">
-                          {t(
-                            "ui_unit_rate_label_f7a8b9c0d1",
-                            "Pour 1 {{base}} vous recevrez",
-                          ).replace("{{base}}", getDisplayCurrencyCode(baseCode))}
-                          {" "}
-                          <span className="text-white font-semibold">
-                            {previewMeta.unitRate.toLocaleString(locale, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 6,
-                            })}
+                      {/* Conversion summary */}
+                      {Number.isFinite(previewAmount) && previewAmount > 0 && Number.isFinite(amountValue) && amountValue > 0 && baseCode && quoteCode ? (
+                        <>
+                          <div className="text-[17px] md:text-lg text-white/80 leading-snug">
+                            {t(
+                              "ui_convert_summary_label_a1b2c3d4e5",
+                              "Pour {{amountBase}} {{base}} vous recevrez",
+                            )
+                              .replace("{{amountBase}}", amountValue.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 6 }))
+                              .replace("{{base}}", getDisplayCurrencyCode(baseCode))}
                             {" "}
-                            {getDisplayCurrencyCode(quoteCode)}
-                          </span>
-                        </div>
+                            <span className="text-white font-semibold">
+                              {previewAmount.toLocaleString(locale, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 6,
+                              })}
+                              {" "}
+                              {getDisplayCurrencyCode(quoteCode)}
+                            </span>
+                          </div>
+                          {/* Conversion fee */}
+                          {previewMeta?.route === "allocation" &&
+                          previewMeta?.isFx &&
+                          previewMeta?.spreadFeeRlusd > 0 ? (
+                            <div className="text-[15px] text-white/45 pt-0.5 border-t border-white/5">
+                              {t("ui_conversion_fee_label_e2f3a4b5c6", "Frais de conversion")}
+                              {" : "}
+                              {formatAmountWithSymbol(
+                                locale,
+                                previewMeta.spreadFeeRlusd,
+                                "USD",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                },
+                              )}
+                            </div>
+                          ) : null}
+                        </>
                       ) : (
-                        <div className="uppercase tracking-[0.16em] text-[15px] text-white/50">
-                          {t(
-                            "ui_estimated_receive_0c5a3b7e9a",
-                            "Estimated receive",
-                          )}
-                        </div>
+                        <div className="text-[17px] text-white/40">—</div>
                       )}
-
-                      {/* Total received */}
-                      {Number.isFinite(previewAmount) && previewAmount > 0 ? (
-                        <div className="text-xl text-white/90 font-medium">
-                          ≈{" "}
-                          {formatAmountWithSymbolLocal(
-                            previewAmount,
-                            convertQuoteCurrency || "",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 6,
-                            },
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-xl text-white/40">—</div>
-                      )}
-
-                      {/* Conversion fee */}
-                      {previewMeta?.route === "allocation" &&
-                      previewMeta?.isFx &&
-                      previewMeta?.spreadFeeRlusd > 0 ? (
-                        <div className="text-[15px] text-white/45 pt-0.5 border-t border-white/5">
-                          {t("ui_conversion_fee_label_e2f3a4b5c6", "Frais de conversion")}
-                          {" : "}
-                          {formatAmountWithSymbol(
-                            locale,
-                            previewMeta.spreadFeeRlusd,
-                            "USD",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            },
-                          )}
-                        </div>
-                      ) : null}
                     </div>
 
                     {previewState.status === "loading" ? (

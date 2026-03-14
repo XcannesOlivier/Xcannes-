@@ -45,8 +45,8 @@ export function useReconciliation({
   const visible = needed && !dismissed && !txHash;
 
   const deficit = needed ? reconciliation.deficit : 0;
-  const operations = needed ? reconciliation.operations : [];
-  const lineStates = needed ? reconciliation.lineStates || [] : [];
+  const operations = useMemo(() => (needed ? reconciliation.operations : []), [needed, reconciliation?.operations]);
+  const lineStates = useMemo(() => (needed ? reconciliation.lineStates || [] : []), [needed, reconciliation?.lineStates]);
 
   /** Format a human-readable summary of operations. */
   const operationsSummary = useMemo(() => {
