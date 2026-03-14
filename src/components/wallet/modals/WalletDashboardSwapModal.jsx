@@ -385,21 +385,12 @@ export default function WalletDashboardSwapModal({
                 <div
                   className={
                     useDesktopWalletConvertLayout
-                      ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-6"
+                      ? "space-y-7"
                       : inline
-                        ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col gap-[clamp(18px,2.8vh,36px)]"
-                        : ""
+                        ? "space-y-6"
+                        : "space-y-[clamp(14px,2.2vh,24px)]"
                   }
                 >
-                  <div
-                    className={
-                      useDesktopWalletConvertLayout
-                        ? "space-y-7"
-                        : inline
-                          ? "space-y-6"
-                          : "space-y-[clamp(14px,2.2vh,24px)]"
-                    }
-                  >
                     <div>
                       <label className="block text-[17px] md:text-lg text-white/60 mb-1">
                         {t("ui_base_6d4184e1ef", "Base")}
@@ -605,7 +596,6 @@ export default function WalletDashboardSwapModal({
                       </p>
                     ) : null}
                   </div>
-                </div>
 
                 <div
                   className={

@@ -826,7 +826,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
+    <div className="mt-auto pt-2 border-t border-white/10">
       <SwipeConfirmButton
         label={t("ui_send_504b64a87b", "Send")}
         onConfirm={() => setShowConfirmation(true)}
@@ -940,8 +940,8 @@ export default function WalletDashboardSendModal({
               ✕
             </button>
           </div>
-          <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div className="space-y-4">
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-1 flex flex-col gap-5">
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}
