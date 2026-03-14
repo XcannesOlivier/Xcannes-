@@ -368,9 +368,9 @@ export default function Home() {
       <div className="pt-16 home-content-wrapper">
 
         {/* LAYER 1 : Hero – sticky, reste derrière (desktop) */}
-        <div className="sticky-layer sticky-layer--hero z-[1] bg-[#0b0f10]">
+        <div className="sticky-layer sticky-layer--hero z-[1] bg-xcannes-surface-demo">
         <main className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-[#0b0f10] bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
+          <div className="absolute inset-0 bg-xcannes-surface-demo bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0b0f10] md:h-36" />
 
             <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-24 md:py-32">
@@ -537,7 +537,7 @@ export default function Home() {
         </div>
 
         {/* LAYER 2 : Pillar cards – sticky, recouvrent le Hero */}
-        <div className="sticky-layer sticky-layer--cover z-[2] bg-[#0b0f10]">
+        <div className="sticky-layer sticky-layer--cover z-[2] bg-xcannes-surface-demo">
           <div className="relative z-10 max-w-[1600px] mx-auto px-6 pt-4 pb-10 md:pt-10 md:pb-24 overflow-visible">
             <div className="mx-auto max-w-6xl overflow-visible">
 
@@ -829,7 +829,7 @@ export default function Home() {
         </div>
 
         {/* LAYER 3 : Reste de la page – recouvre les cartes (desktop) */}
-        <div className="sticky-layer--cover relative z-[3] bg-[#0b0f10]">
+        <div className="sticky-layer--cover relative z-[3] bg-xcannes-surface-demo">
           <WalletProductSection />
           <section className="relative py-14 sm:py-16 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">

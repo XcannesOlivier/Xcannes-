@@ -2,24 +2,24 @@
 
 const VARIANTS = {
   blue: {
-    btn: "border-transparent bg-[#15803d] text-white hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
-    disabledBtn: "border-transparent bg-[#15803d]/40 text-white/50",
+    btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",
   },
   green: {
-    btn: "border-transparent bg-[#15803d] text-white hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
-    disabledBtn: "border-transparent bg-[#15803d]/40 text-white/50",
+    btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",
   },
   cyan: {
-    btn: "border-transparent bg-[#15803d] text-white hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
-    disabledBtn: "border-transparent bg-[#15803d]/40 text-white/50",
+    btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",
   },
   xcannesGreen: {
-    btn: "border-transparent bg-[#15803d] text-white hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
-    disabledBtn: "border-transparent bg-[#15803d]/40 text-white/50",
+    btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",
   },
   orange: {
-    btn: "border-transparent bg-[#15803d] text-white hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
-    disabledBtn: "border-transparent bg-[#15803d]/40 text-white/50",
+    btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",
   },
 };
 

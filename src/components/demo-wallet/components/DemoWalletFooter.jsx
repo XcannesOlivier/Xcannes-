@@ -13,7 +13,7 @@ export default function DemoWalletFooter({ setWalletInfoOpen }) {
     <div
       className={[
         "shrink-0 border-t border-white/10 px-3 py-2",
-        "bg-[#0b0f10]",
+        "bg-xcannes-surface-demo",
       ].join(" ")}
     >
       <div className="flex items-center justify-between gap-3">

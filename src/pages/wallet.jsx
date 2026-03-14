@@ -109,7 +109,7 @@ export default function Wallet() {
     // In embedded mode, show a loading state while waiting for PWA init
     if (isEmbedded) {
       return (
-        <main className="min-h-[100svh] flex items-center justify-center bg-[#0b0f10] text-white">
+        <main className="min-h-[100svh] flex items-center justify-center bg-xcannes-surface-demo text-white">
           <div className="animate-pulse text-white/40 text-sm">Chargement du wallet…</div>
         </main>
       );
@@ -145,9 +145,9 @@ export default function Wallet() {
         </>
       )}
 
-      <main className={`h-[100svh] overflow-hidden md:min-h-screen md:h-screen bg-[#0b0f10] text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
+      <main className={`h-[100svh] overflow-hidden md:min-h-screen md:h-screen bg-xcannes-surface-demo text-white font-montserrat${isEmbedded ? " pwa-embedded-main" : ""}`}>
         <div className={`w-full ${isEmbedded ? "" : "md:max-w-5xl lg:max-w-[1600px]"} h-full mx-0 md:mx-auto px-0 md:px-6 py-0 md:py-6`}>
-          <div className={`bg-[#0b0f10] h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
+          <div className={`bg-xcannes-surface-demo h-full overflow-hidden ${isEmbedded ? "" : "border-0 rounded-none md:border md:border-white/10 md:rounded-xl lg:shadow-[0_0_28px_rgba(0,0,0,0.35)]"}`}>
             <WalletDashboard
               showDesktopStatement={!isEmbedded}
               qrSizingVariant="dex"

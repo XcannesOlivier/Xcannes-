@@ -704,7 +704,7 @@ export default function WalletDashboard({
   // to avoid a flash of empty wallet state on page load.
   if (backendWalletAddress && !currencyLinesReady) {
     return (
-      <div className="bg-[#0b0f10] h-full min-h-0 flex items-center justify-center">
+      <div className="bg-xcannes-surface-demo h-full min-h-0 flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
       </div>
     );
@@ -713,7 +713,7 @@ export default function WalletDashboard({
   return (
     <>
       <div
-        className={`bg-[#0b0f10] h-full min-h-0 overflow-hidden ${
+        className={`bg-xcannes-surface-demo h-full min-h-0 overflow-hidden ${
           showDesktopStatementPanel
             ? "flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(480px,600px)] lg:gap-0"
             : "flex flex-col"

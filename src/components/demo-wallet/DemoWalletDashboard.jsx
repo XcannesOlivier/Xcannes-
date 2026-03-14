@@ -469,7 +469,7 @@ export default function DemoWalletDashboard({
   return (
     <div
       className={[
-        "h-full flex flex-col min-h-0 ring-1 rounded-md overflow-hidden bg-[#0b0f10] border border-white/10",
+        "h-full flex flex-col min-h-0 ring-1 rounded-md overflow-hidden bg-xcannes-surface-demo border border-white/10",
         "demo-wallet-tooltip-scope",
         "ring-white/10",
       ].join(" ")}

@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
+import { greenActionBtnBase } from "./demoWalletModalTokens";
 import { normalizeQrImageFile } from "../utils/demoQrImage";
 
 export default function DemoWalletDashboardSendModal({
@@ -39,8 +40,6 @@ export default function DemoWalletDashboardSendModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [requestText, setRequestText] = useState("");
@@ -266,7 +265,7 @@ export default function DemoWalletDashboardSendModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline
@@ -409,7 +408,7 @@ export default function DemoWalletDashboardSendModal({
               showMobileOptionRight={true}
               buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
               menuClassName={
-                noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
               }
               selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />

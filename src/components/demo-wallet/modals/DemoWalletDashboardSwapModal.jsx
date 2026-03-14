@@ -16,6 +16,7 @@ import {
 import { CRYPTO_ICONS } from "../utils/demoMarketConstants";
 import { computeSpreadQuote, isFxConversion } from "../utils/demoWalletSpread";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { greenActionBtnBase } from "./demoWalletModalTokens";
 
 export default function DemoWalletDashboardSwapModal({
   open,
@@ -42,8 +43,6 @@ export default function DemoWalletDashboardSwapModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -245,7 +244,7 @@ export default function DemoWalletDashboardSwapModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "max-w-md md:max-w-lg max-h-[96vh] rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline
@@ -345,7 +344,7 @@ export default function DemoWalletDashboardSwapModal({
                         buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
-                            ? "bg-[#0b0f10]"
+                            ? "bg-xcannes-surface-demo"
                             : "bg-elevated"
                         }
                         selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
@@ -382,7 +381,7 @@ export default function DemoWalletDashboardSwapModal({
                         buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
-                            ? "bg-[#0b0f10]"
+                            ? "bg-xcannes-surface-demo"
                             : "bg-elevated"
                         }
                         selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"

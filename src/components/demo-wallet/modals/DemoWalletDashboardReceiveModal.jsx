@@ -9,6 +9,7 @@ import { useTranslation } from "next-i18next";
 import { getCurrencySymbol } from "../demoWalletDashboardConfig";
 import { buildDemoPayreq, encodeDemoPayreqQR } from "../utils/demoXrplMemo";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { greenActionBtnBase, greenActionBtnMuted } from "./demoWalletModalTokens";
 
 const ShareIcon = ({ className = "" }) => (
   <svg
@@ -52,10 +53,6 @@ export default function DemoWalletDashboardReceiveModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
-  const greenActionBtnMuted =
-    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
@@ -410,7 +407,7 @@ export default function DemoWalletDashboardReceiveModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline
@@ -649,7 +646,7 @@ export default function DemoWalletDashboardReceiveModal({
                             buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                             menuClassName={
                               noticeVariant === "demo"
-                                ? "bg-[#0b0f10]"
+                                ? "bg-xcannes-surface-demo"
                                 : "bg-elevated"
                             }
                             selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"

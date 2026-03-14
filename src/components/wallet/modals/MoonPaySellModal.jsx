@@ -464,7 +464,7 @@ const MoonPaySellModal = ({
               showMobileOptionRight={true}
               buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
               menuClassName={
-                noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
               }
               selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
             />
@@ -534,7 +534,7 @@ const MoonPaySellModal = ({
               disabled={fiatLoading || fiatCurrencies.length === 0}
               buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
               menuClassName={
-                noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
+                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
               }
               selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
             />
@@ -722,7 +722,7 @@ const MoonPaySellModal = ({
         <div
           className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
             noticeVariant === "demo"
-              ? "bg-[#0b0f10] border-white/10"
+              ? "bg-xcannes-surface-demo border-white/10"
               : "bg-elevated border-subtle"
           } ${isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
           onClick={(e) => e.stopPropagation()}

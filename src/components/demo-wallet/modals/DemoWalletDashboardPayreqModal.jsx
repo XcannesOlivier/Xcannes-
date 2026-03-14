@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
+import { greenActionBtnBase } from "./demoWalletModalTokens";
 
 export default function DemoWalletDashboardPayreqModal({
   open,
@@ -25,8 +26,6 @@ export default function DemoWalletDashboardPayreqModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
 
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
@@ -127,7 +126,7 @@ export default function DemoWalletDashboardPayreqModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline

@@ -112,7 +112,7 @@ export default function WalletConnectScreen() {
   if (isMobile) {
     if (mobileConnected) {
       return (
-        <main className="min-h-[100svh] flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4">
+        <main className="min-h-[100svh] flex flex-col items-center justify-center bg-xcannes-surface-demo text-white font-montserrat px-4">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="w-16 h-16 rounded-full bg-[#c9a84c] flex items-center justify-center shadow-[0_0_24px_rgba(201,168,76,0.3)]">
               <span className="text-[#0a0a0a] text-2xl font-bold font-orbitron">X</span>
@@ -129,7 +129,7 @@ export default function WalletConnectScreen() {
     }
 
     return (
-      <main className="h-[100svh] w-full bg-[#0b0f10] overflow-hidden relative">
+      <main className="h-[100svh] w-full bg-xcannes-surface-demo overflow-hidden relative">
         {/* Back to home */}
         <div className="absolute top-3 left-3 z-50">
           <Link
@@ -155,7 +155,7 @@ export default function WalletConnectScreen() {
 
   // ── DESKTOP: QR code relay flow ──────────────────────────────
   return (
-    <main className="min-h-[100svh] flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4 py-8 relative">
+    <main className="min-h-[100svh] flex flex-col items-center justify-center bg-xcannes-surface-demo text-white font-montserrat px-4 py-8 relative">
       {/* Back to home */}
       <div className="absolute top-5 left-6 z-40">
         <Link

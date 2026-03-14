@@ -54,7 +54,7 @@ export default function DemoWalletDashboardCashModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "max-w-2xl max-h-[92vh] rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline

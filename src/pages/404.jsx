@@ -9,7 +9,7 @@ export default function Custom404() {
   return (
     <>
       <SEOHead title="404 - XCANNES" description="Page not found" />
-      <main className="min-h-screen flex flex-col items-center justify-center bg-[#0b0f10] text-white font-montserrat px-4">
+      <main className="min-h-screen flex flex-col items-center justify-center bg-xcannes-surface-demo text-white font-montserrat px-4">
         <h1 className="text-6xl font-bold text-[#c9a84c] mb-4">404</h1>
         <p className="text-white/60 text-lg mb-8">
           {t("error_page_not_found", "Cette page n'existe pas.")}

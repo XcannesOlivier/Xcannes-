@@ -373,7 +373,7 @@ export default function DemoQRScanner({
           ? edgeToEdge
             ? "relative border-y border-white/10 bg-black/20 p-0 rounded-none"
             : "relative rounded-xl border border-white/10 bg-black/20 p-4"
-          : "relative w-full max-w-md bg-[#0b0f10] border border-white/10 rounded-2xl p-6 shadow-2xl",
+          : "relative w-full max-w-md bg-xcannes-surface-demo border border-white/10 rounded-2xl p-6 shadow-2xl",
         showEmbeddedFauxQr ? "overflow-hidden" : "",
         embedded ? "wallet-inline-zoom-in" : "",
         !embedded

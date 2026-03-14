@@ -49,7 +49,7 @@ export default function WalletProductSection() {
       {/* ===== MOBILE : stacked sticky layout ===== */}
       <div className="lg:hidden">
         {/* Wallet demo – sticky, reste derrière */}
-        <div className="sticky top-0 z-[1] bg-[#0b0f10]">
+        <div className="sticky top-0 z-[1] bg-xcannes-surface-demo">
           <div className="px-4 sm:px-6 pt-8 pb-4">
             <div className="relative max-w-7xl mx-auto">
               <div className="bg-black/15 overflow-hidden rounded-md">
@@ -65,7 +65,7 @@ export default function WalletProductSection() {
         </div>
 
         {/* Cartes explicatives – scrollent par-dessus le wallet demo */}
-        <div className="sticky-layer--cover relative z-[2] bg-[#0b0f10] overflow-x-hidden">
+        <div className="sticky-layer--cover relative z-[2] bg-xcannes-surface-demo overflow-x-hidden">
           <div
             ref={mobileCardsRef}
             className={`px-4 sm:px-6 pt-6 pb-16 mobile-cards-slide-in${mobileCardsVisible ? ' is-visible' : ''}`}

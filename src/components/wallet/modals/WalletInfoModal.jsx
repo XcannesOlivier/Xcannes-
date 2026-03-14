@@ -223,7 +223,7 @@ export default function WalletInfoModal({
     : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
   const panelVariantClass =
     noticeVariant === "demo"
-      ? "bg-[#0b0f10] border-white/10"
+      ? "bg-xcannes-surface-demo border-white/10"
       : "bg-elevated border-subtle";
   const panelClass = [
     inline

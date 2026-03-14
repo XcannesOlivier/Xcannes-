@@ -314,7 +314,7 @@ export default function WalletDashboardSwapModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline
@@ -408,7 +408,7 @@ export default function WalletDashboardSwapModal({
                         buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
-                            ? "bg-[#0b0f10]"
+                            ? "bg-xcannes-surface-demo"
                             : "bg-elevated"
                         }
                         selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
@@ -446,7 +446,7 @@ export default function WalletDashboardSwapModal({
                         buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
-                            ? "bg-[#0b0f10]"
+                            ? "bg-xcannes-surface-demo"
                             : "bg-elevated"
                         }
                         selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"

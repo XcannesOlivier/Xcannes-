@@ -144,7 +144,7 @@ export default function WalletDashboardPayreqModal({
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-full md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
     !inline

@@ -1209,7 +1209,7 @@ export default function DemoCurrencyStatement({
     : "fixed inset-0 z-[10200] flex";
 
   const modalBgClass =
-    noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated";
+    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
