@@ -86,6 +86,9 @@ export default function WalletDashboardSendModal({
   // ── Insufficient balance detection (payreq mode) ──
   const insufficientBalance = useMemo(() => {
     if (!sendPaymentRequest || !selectedSendToken) return false;
+    // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation —
+    // the real balance isn't in `value`, so skip this check for them.
+    if (selectedSendToken.isTrustlineOnly) return false;
     const requiredAmount = Number(sendAmount || 0);
     const available = Number(selectedSendToken.value || 0);
     return requiredAmount > 0 && available < requiredAmount;
