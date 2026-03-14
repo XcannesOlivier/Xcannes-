@@ -29,4 +29,4 @@ export const greenActionBtnMuted = [
 ].join(" ");
 
 /** Standard modal max-height on desktop. */
-export const MODAL_MAX_H = "md:max-h-[96vh]";
+export const MODAL_MAX_H = "md:max-h-[100vh]";
