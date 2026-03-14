@@ -315,7 +315,7 @@ export default function WalletDashboardSendModal({
     "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-screen md:h-auto md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[96vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -410,11 +410,12 @@ export default function WalletDashboardSendModal({
           })}
           useNativeSelect={false}
           showMobileOptionRight={true}
-          buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+          iconClassName="text-3xl leading-none"
+          buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
           menuClassName={
             noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
           }
-          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
         />
         {sendFxInfo ? (
           <div className="text-xs text-white/50">
@@ -465,7 +466,7 @@ export default function WalletDashboardSendModal({
     <div className="space-y-4">
         <div>
             <label
-              className="block text-sm md:text-sm text-white/60 mb-1.5"
+              className="block text-base md:text-lg text-white/60 mb-1.5"
               title={t(
                 "ui_send_destination_tip",
                 "Adresse XRPL du destinataire.",
@@ -497,7 +498,7 @@ export default function WalletDashboardSendModal({
                             "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
                           )
                     }
-                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+                    className="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
                   />
                   <datalist id="saved-addresses">
                     {(savedAddresses || []).map((addr, idx) => (
@@ -517,7 +518,7 @@ export default function WalletDashboardSendModal({
                     setScanActive(true);
                     setScanKey((prev) => prev + 1);
                   }}
-                  className="px-3 py-2.5 rounded-lg border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
+                  className="px-4 py-4 rounded-xl border border-white/20 bg-transparent text-white/80 transition-all duration-200 hover:border-white/35 hover:bg-white/5 active:scale-95"
                   title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
                 >
                   <svg
@@ -543,7 +544,7 @@ export default function WalletDashboardSendModal({
           <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           <div>
             <label
-              className="block text-sm md:text-sm text-white/60 mb-1.5"
+              className="block text-base md:text-lg text-white/60 mb-1.5"
               title={t(
                 "ui_send_asset_tip",
                 "Sélectionnez la devise à envoyer.",
@@ -580,11 +581,12 @@ export default function WalletDashboardSendModal({
               })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              iconClassName="text-3xl leading-none"
+              buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
               menuClassName={
                 noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated"
               }
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
             {selectedSendToken && (
               <p className="mt-1 text-xs text-white/40">
@@ -614,7 +616,7 @@ export default function WalletDashboardSendModal({
           <div>
             <div className="flex items-center justify-between">
               <label
-                className="block text-sm md:text-sm text-white/60 mb-1.5"
+                className="block text-base md:text-lg text-white/60 mb-1.5"
                 title={t(
                   "ui_send_amount_tip",
                   "Saisissez le montant à envoyer.",
@@ -645,8 +647,8 @@ export default function WalletDashboardSendModal({
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white"
-              containerClassName="focus-within:!border-xcannes-green/80"
+              tokenClassName="text-white text-xl"
+              containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
             />
           </div>
 
