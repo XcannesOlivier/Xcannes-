@@ -273,7 +273,7 @@ export default function WalletDashboardSendModal({
         }}
         className="inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
       >
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
           +
         </span>
         {t(
@@ -377,7 +377,7 @@ export default function WalletDashboardSendModal({
   const payreqCurrencySelectorBlock =
     hasPaymentRequest && augmentedTokens && setSendAssetKey ? (
       <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
-        <div className="text-xs uppercase tracking-wide text-white/50 font-semibold">
+        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_pay_with_currency", "Payer avec")}
         </div>
         <ModalSelect
@@ -417,7 +417,7 @@ export default function WalletDashboardSendModal({
           selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
         />
         {sendFxInfo ? (
-          <div className="text-xs text-white/50">
+          <div className="text-xs text-white/60">
             ≈{" "}
             {formatAmountWithSymbol(
               locale,
@@ -591,7 +591,7 @@ export default function WalletDashboardSendModal({
               <p className="mt-1 text-xs text-white/40">
                 {t("ui_balance_340cdcff7a", "Balance:")}
 
-                <span className="text-white/70">
+                <span className="text-white/80">
                   {formatAmountWithSymbol(
                     locale,
                     selectedSendToken.value,
@@ -604,7 +604,7 @@ export default function WalletDashboardSendModal({
           </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
             <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
-              <span className="text-white/70">
+              <span className="text-white/80">
                 {t("ui_beneficiary_label", "Bénéficiaire")}:
               </span>{" "}
               <span className="font-semibold">
@@ -679,7 +679,7 @@ export default function WalletDashboardSendModal({
                   </span>
                 </p>
               )}
-              <p className="mt-2 text-[11px] text-white/45">
+              <p className="mt-2 text-[11px] text-white/40">
                 {t(
                   "ui_signatures_one_5b2c1a7d9f",
                   "1 signature: payment → recipient.",
@@ -710,8 +710,8 @@ export default function WalletDashboardSendModal({
   const confirmationView = showConfirmation ? (
     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
       {/* Summary card */}
-      <div className="rounded-xl border border-[#22C55E]/25 bg-[#22C55E]/5 p-4 space-y-3">
-        <div className="text-xs uppercase tracking-wide text-[#22C55E]/80 font-semibold">
+      <div className="rounded-xl border border-xcannes-accent-green/25 bg-xcannes-accent-green/5 p-4 space-y-3">
+        <div className="text-xs uppercase tracking-wide text-xcannes-accent-green/80 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
         <div className="space-y-2 text-sm text-white/80">
@@ -762,10 +762,10 @@ export default function WalletDashboardSendModal({
           {/* Balance */}
           {selectedSendToken ? (
             <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
-              <span className="text-white/50 text-xs">
+              <span className="text-white/60 text-xs">
                 {t("ui_balance_340cdcff7a", "Balance:")}
               </span>
-              <span className="font-mono text-white/50 text-xs">
+              <span className="font-mono text-white/60 text-xs">
                 {formatAmountWithSymbol(locale, selectedSendToken.value, selectedSendToken.currency, { minimumFractionDigits: 0, maximumFractionDigits: 6 })}
               </span>
             </div>
@@ -806,7 +806,7 @@ export default function WalletDashboardSendModal({
             setShowConfirmation(false);
           }}
           disabled={sendProcessing}
-          className="w-full text-sm py-2 rounded-lg border border-white/15 bg-transparent text-white/70 hover:bg-white/5 hover:text-white transition-all duration-200"
+          className="w-full text-sm py-2 rounded-lg border border-white/15 bg-transparent text-white/80 hover:bg-white/5 hover:text-white transition-all duration-200"
         >
           {t("ui_back_modify", "← Modifier")}
         </button>
@@ -910,7 +910,7 @@ export default function WalletDashboardSendModal({
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}

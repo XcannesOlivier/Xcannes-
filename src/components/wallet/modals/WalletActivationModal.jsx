@@ -77,7 +77,7 @@ export default function WalletActivationModal({
           <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0c1b2e]/80 via-[#0b1017]/90 to-black/80 p-4 shadow-lg">
             <div className="absolute right-4 top-4 hidden h-12 w-12 rounded-full bg-white/5 blur-xl md:block" />
             <div className="relative pr-8 space-y-2">
-              <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/50">
+              <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-white/60">
                 <span className="h-1.5 w-1.5 rounded-full bg-xcannes-green/80" />
                 {t("ui_activation_label_2a9d7f1b5c", "Activation")}
               </div>
@@ -86,7 +86,7 @@ export default function WalletActivationModal({
                   amount: activationAmountLabel,
                 })}
               </h3>
-              <p className="text-sm text-white/70">
+              <p className="text-sm text-white/80">
                 {t(
                   "ui_need_1_xrp_to_activate_8b6c7f2c5f",
                   "Il faut {{amount}} XRP pour activer.",

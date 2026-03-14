@@ -898,14 +898,14 @@ export default function DemoCurrencyStatement({
       const badges = (
         <span className="inline-flex items-center gap-2">
           {renderCurrencyBadge(pair.from)}
-          <span className="text-white/50 text-xs md:text-sm">→</span>
+          <span className="text-white/60 text-xs md:text-sm">→</span>
           {renderCurrencyBadge(pair.to)}
         </span>
       );
       if (!withLabel) return badges;
       return (
         <span className="inline-flex items-center gap-2">
-          <span className="text-white/70 text-xs md:text-sm">
+          <span className="text-white/80 text-xs md:text-sm">
             {t("statement_conversion_label", "Conversion")}
           </span>
           {badges}
@@ -1291,13 +1291,13 @@ export default function DemoCurrencyStatement({
                 {walletLabel || t("nav_wallet", "Wallet")}
               </p>
               {walletAddress ? (
-                <p className="text-[11px] text-white/50 font-mono break-all">
+                <p className="text-[11px] text-white/60 font-mono break-all">
                   {walletAddress}
                 </p>
               ) : null}
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
               {/* Month Selector - Version simplifiée */}
@@ -1318,7 +1318,7 @@ export default function DemoCurrencyStatement({
             <div>
               <div className="flex items-start justify-between gap-3">
                 <div className="pl-1">
-                  <p className="text-xs text-white/50 mb-1">
+                  <p className="text-xs text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
                   <p className="text-sm text-white font-semibold">
@@ -1326,10 +1326,10 @@ export default function DemoCurrencyStatement({
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-white/50 mb-1">
+                  <p className="text-xs text-white/60 mb-1">
                     {t("demo_indexed_stability_label_f4", "Stabilité Indexée")}
                   </p>
-                  <p className="text-[11px] text-white/50">
+                  <p className="text-[11px] text-white/60">
                     ≈ {formatUsdWithSymbol(estimatedUsd)}
                   </p>
                 </div>
@@ -1458,7 +1458,7 @@ export default function DemoCurrencyStatement({
                           <tr className="bg-white/5">
                             <td
                               colSpan="4"
-                              className="px-2 md:px-4 py-2 text-xs font-semibold text-white/70 uppercase tracking-wide"
+                              className="px-2 md:px-4 py-2 text-xs font-semibold text-white/80 uppercase tracking-wide"
                             >
                               {group.label || group.key}
                             </td>
@@ -1492,7 +1492,7 @@ export default function DemoCurrencyStatement({
                                 ref={isHighlighted ? highlightRowRef : null}
                                 className={rowClassName}
                               >
-                                <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
+                                <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/80 font-mono text-xs">
                                   {formatDate(tx.date)}
                                 </td>
                                 <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
@@ -1595,7 +1595,7 @@ export default function DemoCurrencyStatement({
               type="button"
               onClick={() => onLoadMore && onLoadMore()}
               disabled={loadingMore}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70"
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
             >
               {loadingMore
                 ? t("ui_loading_1386baebe9", "Loading…")
@@ -1607,7 +1607,7 @@ export default function DemoCurrencyStatement({
           <div className="hidden sm:block text-center py-3 md:py-4">
             <div className="space-y-1">
               {ledgerLastIndex != null ? (
-                <p className="text-xs text-white/20 font-mono">
+                <p className="text-xs text-white/30 font-mono">
                   {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
                   {ledgerLastIndex}
                 </p>
@@ -1622,7 +1622,7 @@ export default function DemoCurrencyStatement({
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
             >
               {exportFormat === "pdf" ? (
                 <>
@@ -1646,7 +1646,7 @@ export default function DemoCurrencyStatement({
             </button>
             <button
               onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70"
+              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
             >
               {t("ui_print_1313eff37c", "🖨️ Print")}
             </button>

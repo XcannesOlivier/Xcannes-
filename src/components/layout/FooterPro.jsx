@@ -146,7 +146,7 @@ export default function FooterPro() {
     [router?.events, router?.locales]
   );
 
-  const gradientFromClass = "from-[#0b0f10]";
+  const gradientFromClass = "from-xcannes-surface-demo";
   const walletActionLabel = isConnected
     ? t("nav_sign_out", "Se déconnecter")
     : t("nav_sign_in", "Se connecter");

@@ -35,7 +35,7 @@ export function WalletInfoContent({
           <h4 className="text-sm font-semibold text-white/80">
             {t("ui_core_features_fe8d86dd76", "Core features")}
           </h4>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
+          <ul className="mt-2 space-y-1 text-[13px] text-white/80 list-disc pl-5">
             <li>
               {t(
                 "ui_hold_assets_on_chain_xrp_rlu_6e9344f999",
@@ -61,7 +61,7 @@ export function WalletInfoContent({
               )}
             </li>
           </ul>
-          <p className="mt-3 text-[12px] text-white/45">
+          <p className="mt-3 text-[12px] text-white/40">
             {t(
               "ui_in_the_wallet_list_you_will__7a5642d046",
               "In the wallet list, you will see 2 types of “lines”:",
@@ -94,13 +94,13 @@ export function WalletInfoContent({
               "Currency line activation",
             )}
           </h4>
-          <p className="mt-2 text-[13px] text-white/70">
+          <p className="mt-2 text-[13px] text-white/80">
             {t(
               "ui_currency_line_activation_body_f4",
               "Creating or deleting a currency line is now free.",
             )}
           </p>
-          <p className="mt-2 text-[12px] text-white/45">
+          <p className="mt-2 text-[12px] text-white/40">
             {t(
               "ui_currency_line_activation_note_f4",
               "Only standard XRPL network fees apply to the transaction.",
@@ -112,7 +112,7 @@ export function WalletInfoContent({
           <h4 className="text-sm font-semibold text-white/80">
             {t("ui_fees_580613eea6", "Fees")}
           </h4>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
+          <ul className="mt-2 space-y-1 text-[13px] text-white/80 list-disc pl-5">
             <li>
               {t(
                 "ui_xrpl_network_fee_on_chain_pa_975e8f666a",
@@ -153,7 +153,7 @@ export function WalletInfoContent({
               )}
             </li>
           </ul>
-          <p className="mt-2 text-[12px] text-white/45">
+          <p className="mt-2 text-[12px] text-white/40">
             {t(
               "ui_source_de_rate_paires_live_v_6b7123ea24",
               "Source de taux: FX EOD (coté 1×/jour)."
@@ -165,7 +165,7 @@ export function WalletInfoContent({
           <h4 className="text-sm font-semibold text-white/80">
             {t("ui_important_af28edf1c1", "Important")}
           </h4>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/70 list-disc pl-5">
+          <ul className="mt-2 space-y-1 text-[13px] text-white/80 list-disc pl-5">
             <li>
               {t(
                 "ui_xrpl_est_la_source_de_v_rit__bf1084eac7",

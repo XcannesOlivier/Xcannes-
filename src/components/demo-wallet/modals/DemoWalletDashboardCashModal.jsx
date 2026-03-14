@@ -109,7 +109,7 @@ export default function DemoWalletDashboardCashModal({
                 className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
                   cashModalTab === "buy"
                     ? "bg-xcannes-green/20 text-white/90 border-xcannes-green/40 hover:bg-xcannes-green/30 hover:text-white hover:scale-[1.02]"
-                    : "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"
+                    : "bg-black/20 text-white/60 border-white/10 hover:bg-black/40 hover:text-white/80"
                 }`}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -136,7 +136,7 @@ export default function DemoWalletDashboardCashModal({
                 className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
                   cashModalTab === "sell"
                     ? "bg-xcannes-green/20 text-white/90 border-xcannes-green/40 hover:bg-xcannes-green/30 hover:text-white hover:scale-[1.02]"
-                    : "bg-black/20 text-white/50 border-white/10 hover:bg-black/40 hover:text-white/80"
+                    : "bg-black/20 text-white/60 border-white/10 hover:bg-black/40 hover:text-white/80"
                 }`}
               >
                 <div className="flex items-center justify-center gap-2">

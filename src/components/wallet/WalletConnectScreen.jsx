@@ -134,7 +134,7 @@ export default function WalletConnectScreen() {
         <div className="absolute top-3 left-3 z-50">
           <Link
             href="/"
-            className="text-white/50 hover:text-white transition-colors text-2xl leading-none"
+            className="text-white/60 hover:text-white transition-colors text-2xl leading-none"
             aria-label={t("nav_home", "Accueil")}
           >
             ‹
@@ -160,7 +160,7 @@ export default function WalletConnectScreen() {
       <div className="absolute top-5 left-6 z-40">
         <Link
           href="/"
-          className="text-white/50 hover:text-white transition-colors text-2xl leading-none"
+          className="text-white/60 hover:text-white transition-colors text-2xl leading-none"
           aria-label={t("nav_home", "Accueil")}
         >
           ‹
@@ -175,7 +175,7 @@ export default function WalletConnectScreen() {
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
           Xcannes Wallet
         </h1>
-        <p className="text-white/50 text-sm text-center max-w-xs">
+        <p className="text-white/60 text-sm text-center max-w-xs">
           {t("wallet_connect_subtitle", "Connectez votre wallet pour accéder à vos comptes.")}
         </p>
       </div>
@@ -187,7 +187,7 @@ export default function WalletConnectScreen() {
             <h3 className="text-lg font-semibold text-white mb-1 text-center">
               {t("wallet_connect_qr_title", "Connecter votre wallet")}
             </h3>
-            <p className="text-sm text-white/50 mb-6 text-center">
+            <p className="text-sm text-white/60 mb-6 text-center">
               {t("wallet_connect_qr_desc", "Scannez ce QR code avec votre wallet Xcannes.")}
             </p>
 
@@ -262,15 +262,15 @@ export default function WalletConnectScreen() {
 
       {/* Feature list */}
       <div className="mt-8 max-w-sm w-full space-y-3">
-        <div className="flex items-center gap-3 text-sm text-white/50">
+        <div className="flex items-center gap-3 text-sm text-white/60">
           <span className="text-base">🔐</span>
           <span>{t("wallet_connect_feature_1", "Clés chiffrées sur votre appareil")}</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-white/50">
+        <div className="flex items-center gap-3 text-sm text-white/60">
           <span className="text-base">👆</span>
           <span>{t("wallet_connect_feature_2", "Déverrouillage biométrique")}</span>
         </div>
-        <div className="flex items-center gap-3 text-sm text-white/50">
+        <div className="flex items-center gap-3 text-sm text-white/60">
           <span className="text-base">🌐</span>
           <span>{t("wallet_connect_feature_3", "Connexion à Xcannes en un scan")}</span>
         </div>
@@ -278,7 +278,7 @@ export default function WalletConnectScreen() {
 
       {/* "Pas encore l'app ?" section (desktop only) */}
       <div className="mt-8 max-w-sm w-full rounded-2xl border border-white/10 bg-[#111518]/60 p-5">
-        <p className="text-sm font-medium text-white/70 mb-3 text-center">
+        <p className="text-sm font-medium text-white/80 mb-3 text-center">
           {t("wallet_connect_no_app_title", "Vous n'avez pas encore l'app ?")}
         </p>
         <p className="text-xs text-white/40 mb-4 text-center">

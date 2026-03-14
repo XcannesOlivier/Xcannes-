@@ -41,6 +41,7 @@ module.exports = {
         "xcannes-btn-green": "#15803d",
         "xcannes-btn-green-hover": "#166534",
         "xcannes-surface-demo": "#0b0f10",
+        "xcannes-accent-green": "#22C55E",
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",

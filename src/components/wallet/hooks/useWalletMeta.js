@@ -16,7 +16,7 @@ export function useWalletMeta({
       const resolvedAddress = String(walletAddress || "").trim();
       if (!resolvedAddress && !resolvedLabel) return null;
       return (
-        <div className={`text-xs text-white/50 ${className}`}>
+        <div className={`text-xs text-white/60 ${className}`}>
           <div className="text-lg md:text-lg font-semibold text-white/80 leading-tight">
             {resolvedLabel || "Wallet"}
           </div>

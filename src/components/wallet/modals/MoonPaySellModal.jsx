@@ -493,7 +493,7 @@ const MoonPaySellModal = ({
             {isCurrencyLine && hasValidAmount && (
               <p
                 className={`mt-1 text-xs ${
-                  conversionMissing ? "text-red-400" : "text-white/50"
+                  conversionMissing ? "text-red-400" : "text-white/60"
                 }`}
               >
                 {conversionMissing
@@ -542,7 +542,7 @@ const MoonPaySellModal = ({
               <p className="text-xs text-red-400 mt-1">{fiatError}</p>
             )}
             {!fiatLoading && !fiatError && fiatUnavailable && (
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-white/60 mt-1">
                 {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
               </p>
             )}
@@ -558,7 +558,7 @@ const MoonPaySellModal = ({
                 {walletLabel}
               </p>
             ) : null}
-            <p className="text-[8px] md:text-[10px] text-white/50 font-mono break-all">
+            <p className="text-[8px] md:text-[10px] text-white/60 font-mono break-all">
               {walletAddress}
             </p>
           </div>
@@ -602,7 +602,7 @@ const MoonPaySellModal = ({
             type="button"
             onClick={generateSellUrl}
             disabled={continueDisabled}
-            className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-[#10B981]/10 disabled:text-[#10B981]/60 disabled:border-[#10B981]/25 disabled:hover:scale-100"
+            className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-xcannes-green/10 disabled:text-xcannes-green/60 disabled:border-xcannes-green/25 disabled:hover:scale-100"
           >
             {continueLabel}
           </button>
@@ -738,7 +738,7 @@ const MoonPaySellModal = ({
                   )}
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}

@@ -28,7 +28,7 @@ export default function DemoWalletTokenList({
           <button
             type="button"
             onClick={() => setShowGlobalStatement(true)}
-            className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
+            className="text-sm md:text-xs text-white/80 hover:text-white transition-colors"
             title={t("demo_tt_statement", "Voir le relevé global.")}
           >
             {t(
@@ -106,7 +106,7 @@ export default function DemoWalletTokenList({
           })}
 
           {tokens.length === 0 ? (
-            <div className="text-sm text-white/50">
+            <div className="text-sm text-white/60">
               {t("demo_no_lines", "Aucune ligne pour le moment.")}
             </div>
           ) : null}

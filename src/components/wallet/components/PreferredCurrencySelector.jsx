@@ -66,7 +66,7 @@ export default function PreferredCurrencySelector({
   return (
     <div className="space-y-2">
       {/* Label */}
-      <div className="text-[10px] font-semibold text-white/50 uppercase tracking-wider px-1">
+      <div className="text-[10px] font-semibold text-white/60 uppercase tracking-wider px-1">
         {t("ui_preferred_currency_label", "Votre devise préférée")}
       </div>
 
@@ -159,7 +159,7 @@ export default function PreferredCurrencySelector({
                     <span className="text-[13px] shrink-0">{flag}</span>
                     <span className="font-mono font-semibold">{c.code}</span>
                     {c.name && (
-                      <span className="text-[10px] text-white/35 truncate">
+                      <span className="text-[10px] text-white/40 truncate">
                         {c.name}
                       </span>
                     )}
@@ -181,7 +181,7 @@ export default function PreferredCurrencySelector({
               setIsExpanded(false);
               setSearch("");
             }}
-            className="w-full text-center py-1 text-[10px] text-white/30 hover:text-white/50 transition-colors"
+            className="w-full text-center py-1 text-[10px] text-white/30 hover:text-white/60 transition-colors"
           >
             {t("ui_collapse", "Réduire")}
           </button>

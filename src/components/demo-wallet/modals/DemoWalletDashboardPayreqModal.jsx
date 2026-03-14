@@ -276,7 +276,7 @@ export default function DemoWalletDashboardPayreqModal({
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}

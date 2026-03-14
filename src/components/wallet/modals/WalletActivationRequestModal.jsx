@@ -152,7 +152,7 @@ export default function WalletActivationRequestModal({
                 </div>
               </div>
               {paymentUri ? (
-                <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/70 break-all">
+                <div className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white/80 break-all">
                   <span className="text-white/40">
                     {t("ui_transaction_code_2a6c9b1d5e", "Lien de paiement")}
                     :
@@ -182,7 +182,7 @@ export default function WalletActivationRequestModal({
               type="button"
               onClick={handleShare}
               disabled={!paymentUri}
-              className="w-full rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
+              className="w-full rounded-lg border border-xcannes-accent-green/40 bg-xcannes-accent-green/80 text-black font-semibold transition-all duration-200 hover:bg-xcannes-accent-green hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
             >
               {t("ui_share_request_4b9a2d7f1c", "Partager")}
             </button>
@@ -190,7 +190,7 @@ export default function WalletActivationRequestModal({
               type="button"
               onClick={handleCopy}
               disabled={!walletAddress}
-              className="w-full rounded-lg border border-white/20 bg-transparent text-white/70 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/90 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-lg border border-white/20 bg-transparent text-white/80 font-semibold transition-all duration-200 hover:border-white/35 hover:text-white/90 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {copied
                 ? t("ui_copied_9a2d7f5c1e", "Copie")

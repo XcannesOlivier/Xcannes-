@@ -371,7 +371,7 @@ export default function Home() {
         <div className="sticky-layer sticky-layer--hero z-[1] bg-xcannes-surface-demo">
         <main className="relative overflow-hidden">
           <div className="absolute inset-0 bg-xcannes-surface-demo bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.05),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.025),transparent_55%)]" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-[#0b0f10] md:h-36" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-xcannes-surface-demo md:h-36" />
 
             <div className="relative z-10 max-w-[1600px] mx-auto px-6 py-24 md:py-32">
             <div className="mx-auto max-w-6xl text-center">

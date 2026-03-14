@@ -39,7 +39,7 @@ export default function DemoWalletHeader({
       </div>
 
       <div className="mt-4 flex flex-col items-center gap-2">
-        <div className="text-sm md:text-xs text-white/55 tracking-[0.18em] uppercase">
+        <div className="text-sm md:text-xs text-white/60 tracking-[0.18em] uppercase">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
@@ -52,7 +52,7 @@ export default function DemoWalletHeader({
           href="https://ripple.com/solutions/stablecoin/transparency/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs md:text-[10px] text-white/40 hover:text-white/70 transition-colors"
+          className="text-xs md:text-[10px] text-white/40 hover:text-white/80 transition-colors"
         >
           {t(
             "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
@@ -79,7 +79,7 @@ export default function DemoWalletHeader({
                   {!isWalletLabelLocked ? (
                     <div className="mt-0.5 flex items-center gap-2 min-w-0">
                       <span
-                        className="font-mono text-[10px] text-white/55 truncate"
+                        className="font-mono text-[10px] text-white/60 truncate"
                         title={t(
                           "demo_tt_wallet_address",
                           "Adresse XRPL du wallet.",
@@ -165,7 +165,7 @@ export default function DemoWalletHeader({
                       "ui_wallet_name_b4c2f054b9",
                       "Nom du wallet",
                     )}
-                    className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/85 outline-none placeholder:text-white/35"
+                    className="min-w-0 w-full bg-transparent text-[16px] md:text-[12px] text-white/80 outline-none placeholder:text-white/40"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleSaveWalletLabel();

@@ -722,13 +722,13 @@ export default function DemoGlobalStatement({
                 {walletLabel || t("nav_wallet", "Wallet")}
               </p>
               {walletAddress ? (
-                <p className="text-[11px] text-white/50 font-mono break-all">
+                <p className="text-[11px] text-white/60 font-mono break-all">
                   {walletAddress}
                 </p>
               ) : null}
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("ui_statement_period_4674b18f25", "Statement Period")}
               </p>
               {/* Month Selector - simplifié */}
@@ -747,7 +747,7 @@ export default function DemoGlobalStatement({
               />
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("demo_total_balance_label_f4", "Solde total")}
               </p>
               <div className="flex items-baseline justify-between gap-2">
@@ -863,9 +863,9 @@ export default function DemoGlobalStatement({
                               },
                             )}
                           </div>
-                          <div className="text-[9px] sm:text-xs text-white/50"></div>
+                          <div className="text-[9px] sm:text-xs text-white/60"></div>
                         </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/80 text-[10px] sm:text-sm hidden sm:table-cell">
                           {Number.isFinite(usdValue)
                             ? formatAmountWithSymbol(locale, usdValue, "USD")
                             : "--"}
@@ -897,7 +897,7 @@ export default function DemoGlobalStatement({
           <div className="hidden sm:block text-center py-3 sm:py-4">
             <div className="space-y-1">
               {ledgerLastIndex != null ? (
-                <p className="text-[9px] sm:text-xs text-white/20 font-mono px-2">
+                <p className="text-[9px] sm:text-xs text-white/30 font-mono px-2">
                   {t("ui_ledger_index_label_0c2a1d9b5e", "Ledger index:")}{" "}
                   {ledgerLastIndex}
                 </p>
@@ -912,7 +912,7 @@ export default function DemoGlobalStatement({
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
             >
               {exportFormat === "pdf" ? (
                 <>
@@ -936,7 +936,7 @@ export default function DemoGlobalStatement({
             </button>
             <button
               onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70"
+              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
             >
               {t("ui_print_eb5de3a228", "🖨️ Print")}
             </button>

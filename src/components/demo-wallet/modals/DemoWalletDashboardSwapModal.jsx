@@ -389,7 +389,7 @@ export default function DemoWalletDashboardSwapModal({
                     </div>
 
                     <div className="rounded-xl border border-white/10 p-3">
-                      <p className="text-[15px] text-white/50 mb-2">
+                      <p className="text-[15px] text-white/60 mb-2">
                         {t(
                           "ui_other_currencies_label_demo",
                           "Other currencies",
@@ -439,7 +439,7 @@ export default function DemoWalletDashboardSwapModal({
                       </div>
                     ) : null}
                     <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
-                      <div className="uppercase tracking-[0.16em] text-[15px] text-white/50">
+                      <div className="uppercase tracking-[0.16em] text-[15px] text-white/60">
                         {t(
                           "ui_estimated_receive_0c5a3b7e9a",
                           "Estimated receive",
@@ -459,7 +459,7 @@ export default function DemoWalletDashboardSwapModal({
                       {previewMeta?.route === "allocation" &&
                       previewMeta?.isFx &&
                       previewMeta?.spreadFeeRlusd > 0 ? (
-                        <div className="text-[16px] text-white/45">
+                        <div className="text-[16px] text-white/40">
                           {t(
                             "ui_conversion_fee_simple_6c2a8d5e1b",
                             "Frais de conversion",
@@ -479,7 +479,7 @@ export default function DemoWalletDashboardSwapModal({
                     </div>
 
                     {previewState.status === "loading" ? (
-                      <div className="text-[17px] text-white/50">
+                      <div className="text-[17px] text-white/60">
                         {t(
                           "ui_loading_market_data_1d5d6ed3c4",
                           "Refreshing market data...",

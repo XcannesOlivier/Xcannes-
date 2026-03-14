@@ -15,7 +15,7 @@ export const greenActionBtnBase = [
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-btn-green-hover hover:-translate-y-px",
   "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-btn-green/40 disabled:text-white/50 disabled:cursor-not-allowed",
+  "disabled:bg-xcannes-btn-green/40 disabled:text-white/60 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 

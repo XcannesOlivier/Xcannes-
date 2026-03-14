@@ -458,7 +458,7 @@ export default function DemoWalletDashboardReceiveModal({
           </div>
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="wallet-tab-unfold-in">
-              <p className="text-xs md:text-sm text-white/50 mb-3">
+              <p className="text-xs md:text-sm text-white/60 mb-3">
                 {t(
                   "ui_receive_and_request_desc_2f1a7c9d5e",
                   "Share this XRPL address to receive funds, or create a payment request to send to another wallet.",

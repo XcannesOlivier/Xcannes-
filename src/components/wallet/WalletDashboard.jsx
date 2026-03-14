@@ -786,7 +786,7 @@ export default function WalletDashboard({
                 <button
                   type="button"
                   onClick={handleOpenGlobalStatement}
-                  className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
+                  className="text-sm md:text-xs text-white/80 hover:text-white transition-colors"
                 >
                   {t(
                     "ui_consult_global_statement_3b89f4a7a2",

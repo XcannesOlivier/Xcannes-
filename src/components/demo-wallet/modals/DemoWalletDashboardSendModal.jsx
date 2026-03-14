@@ -487,7 +487,7 @@ export default function DemoWalletDashboardSendModal({
                   </span>
                 </p>
               )}
-              <p className="mt-2 text-[10px] text-white/45">
+              <p className="mt-2 text-[10px] text-white/40">
                 {Number(sendFxInfo.spreadFeeRlusd || 0) > 0
                   ? t(
                       "demo_send_flow_with_fee_f4",
@@ -601,7 +601,7 @@ export default function DemoWalletDashboardSendModal({
       }
     >
       {!cameraUnavailable ? (
-        <div className="flex items-center gap-3 text-xs md:text-sm text-white/35">
+        <div className="flex items-center gap-3 text-xs md:text-sm text-white/40">
           <span className="h-px flex-1 bg-white/10" />
           <span className="text-base md:text-lg font-semibold text-white/60">
             {t("ui_or_8a4c1f83bd", "ou")}
@@ -616,7 +616,7 @@ export default function DemoWalletDashboardSendModal({
         }`}
       >
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
-          <div className="text-[11px] text-white/45 md:text-xs md:text-white/60">
+          <div className="text-[11px] text-white/40 md:text-xs md:text-white/60">
             {t("demo_payreq_token", "Enter your QR code")}
           </div>
           <button
@@ -627,7 +627,7 @@ export default function DemoWalletDashboardSendModal({
             }}
             className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
           >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/50">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
               +
             </span>
             {t(
@@ -641,7 +641,7 @@ export default function DemoWalletDashboardSendModal({
             value={requestText}
             onChange={(e) => setRequestText(e.target.value)}
             onPaste={handlePastePayload}
-            className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
+            className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
               inline ? "flex-1 min-h-[160px]" : ""
             }`}
             placeholder={t(

@@ -551,7 +551,7 @@ export default function CurrencyStatement({
                     </span>
                   </h2>
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
@@ -574,13 +574,13 @@ export default function CurrencyStatement({
                 {walletLabel || t("nav_wallet", "Wallet")}
               </p>
               {walletAddress ? (
-                <p className="text-[11px] text-white/50 font-mono break-all">
+                <p className="text-[11px] text-white/60 font-mono break-all">
                   {walletAddress}
                 </p>
               ) : null}
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("ui_statement_period_6dedec11d9", "Statement Period")}
               </p>
               <StatementMonthSelect
@@ -598,14 +598,14 @@ export default function CurrencyStatement({
               />
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("ui_balance_445d830d72", "Balance")}
               </p>
               <p className="text-sm text-white font-semibold">
                 {formatAmountWithSymbolLocal(balance)}
               </p>
               {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                <p className="text-[11px] text-white/50">
+                <p className="text-[11px] text-white/60">
                   ≈ {formatUsdWithSymbol(estimatedUsd)}
                 </p>
               ) : null}
@@ -614,10 +614,10 @@ export default function CurrencyStatement({
                 <div className="mt-2 relative">
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <p className="text-xs text-white/50 whitespace-pre-line">
+                      <p className="text-xs text-white/60 whitespace-pre-line">
                         {t("ui_reserve_2d584ec9c7", "Reserve")}
                       </p>
-                      <p className="text-[11px] text-white/70 font-mono">
+                      <p className="text-[11px] text-white/80 font-mono">
                         {xrpReserveDetails
                           ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
                           : reservePlaceholder}
@@ -627,7 +627,7 @@ export default function CurrencyStatement({
                       type="button"
                       onClick={() => setReserveOpen((v) => !v)}
                       disabled={!xrpReserveDetails}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/70 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
+                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/80 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
                       aria-expanded={reserveOpen}
                       aria-disabled={!xrpReserveDetails}
                       aria-label={t(
@@ -641,7 +641,7 @@ export default function CurrencyStatement({
 
                   {reserveOpen && (
                     <div className="mt-2 rounded-lg bg-black/60 p-3 space-y-2">
-                      <div className="text-[11px] text-white/70">
+                      <div className="text-[11px] text-white/80">
                         <div className="flex items-center justify-between gap-2">
                           <span>
                             {t(
@@ -804,7 +804,7 @@ export default function CurrencyStatement({
                           <tr className="bg-white/5">
                             <td
                               colSpan="4"
-                              className="px-2 md:px-4 py-2 text-xs font-semibold text-white/70 uppercase tracking-wide"
+                              className="px-2 md:px-4 py-2 text-xs font-semibold text-white/80 uppercase tracking-wide"
                             >
                               {group.label || group.key}
                             </td>
@@ -838,7 +838,7 @@ export default function CurrencyStatement({
                                 ref={isHighlighted ? highlightRowRef : null}
                                 className={rowClassName}
                               >
-                                <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/70 font-mono text-xs">
+                                <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/80 font-mono text-xs">
                                   {formatDate(tx.date)}
                                 </td>
                                 <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
@@ -856,7 +856,7 @@ export default function CurrencyStatement({
                                           const feeSuffix =
                                             tx.category === "exchange" &&
                                             tx.spreadRlusd > 0 ? (
-                                              <span className="text-[8px] md:text-xs text-white/35 ml-0.5 md:ml-1 whitespace-nowrap">
+                                              <span className="text-[8px] md:text-xs text-white/40 ml-0.5 md:ml-1 whitespace-nowrap">
                                                 ({t(
                                                   "statement_conversion_fee_label",
                                                   "Frais",
@@ -945,7 +945,7 @@ export default function CurrencyStatement({
               type="button"
               onClick={() => onLoadMore && onLoadMore()}
               disabled={loadingMore}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/70"
+              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
             >
               {loadingMore
                 ? t("ui_loading_1386baebe9", "Loading…")
@@ -960,7 +960,7 @@ export default function CurrencyStatement({
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
             >
               {exportFormat === "pdf" ? (
                 <>
@@ -984,7 +984,7 @@ export default function CurrencyStatement({
             </button>
             <button
               onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70"
+              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
             >
               {t("ui_print_1313eff37c", "🖨️ Print")}
             </button>

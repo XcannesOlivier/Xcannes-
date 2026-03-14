@@ -153,7 +153,7 @@ export default function WalletRelayQRModal() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-xs text-white/50 text-center">
+              <p className="text-xs text-white/60 text-center">
                 Redirection vers votre wallet…
               </p>
               {qrModalData.walletAppUrl && (
@@ -188,7 +188,7 @@ export default function WalletRelayQRModal() {
               Ce QR code a expiré. Veuillez réessayer.
             </p>
           ) : (
-            <div className="flex items-center justify-center gap-2 text-sm text-white/50">
+            <div className="flex items-center justify-center gap-2 text-sm text-white/60">
               <span className="inline-block w-2 h-2 bg-white/40 rounded-full animate-pulse" />
               En attente de confirmation…
             </div>

@@ -72,7 +72,7 @@ export default function WalletPendingPayreqs({
                 <div className="text-xs text-white/80 font-medium truncate">
                   {beneficiary}
                 </div>
-                <div className="flex items-center gap-2 text-[10px] text-white/50">
+                <div className="flex items-center gap-2 text-[10px] text-white/60">
                   {amountLabel ? (
                     <span className="font-mono">{amountLabel}</span>
                   ) : null}

@@ -65,7 +65,7 @@ export default function WalletDashboardHeader({
             {showMobileHomeLink && (
               <Link
                 href="/"
-                className="md:hidden inline-flex items-center justify-center h-8 w-8 text-white/70 hover:text-xcannes-green transition-colors"
+                className="md:hidden inline-flex items-center justify-center h-8 w-8 text-white/80 hover:text-xcannes-green transition-colors"
                 aria-label={t("nav_home", "Page d'accueil")}
               >
                 <svg
@@ -93,14 +93,14 @@ export default function WalletDashboardHeader({
 
       {/* Solde et info wallet */}
       <div className="flex flex-col items-center gap-2">
-        <div className="text-lg md:text-sm text-white/55 tracking-[0.18em] uppercase mb-4 md:mb-0">
+        <div className="text-lg md:text-sm text-white/60 tracking-[0.18em] uppercase mb-4 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
           {totalLabel}
         </p>
         {Number.isFinite(totalInUsd) && totalInUsd > 0 && preferredCurrency && preferredCurrency !== "USD" && preferredCurrency !== "RLUSD" && (
-          <p className="text-[11px] text-white/35 font-mono tabular-nums mt-0.5">
+          <p className="text-[11px] text-white/40 font-mono tabular-nums mt-0.5">
             {totalInUsd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RLUSD
           </p>
         )}
@@ -146,7 +146,7 @@ export default function WalletDashboardHeader({
                       </div>
 
                       <div className="mt-0.5 flex items-center gap-2 min-w-0">
-                        <span className="font-mono text-[10px] text-white/55 truncate">
+                        <span className="font-mono text-[10px] text-white/60 truncate">
                           {wallet.slice(0, 10)}…{wallet.slice(-8)}
                         </span>
                         {walletHeaderToast ? (
@@ -189,7 +189,7 @@ export default function WalletDashboardHeader({
                               <div className="min-w-0">
                                 <div
                                   className={`text-[13px] font-medium truncate ${
-                                    isActive ? "text-xcannes-green" : "text-white/75"
+                                    isActive ? "text-xcannes-green" : "text-white/80"
                                   }`}
                                 >
                                   {displayName}
@@ -219,7 +219,7 @@ export default function WalletDashboardHeader({
                     <button
                       type="button"
                       onClick={() => setIsSwitcherOpen((v) => !v)}
-                      className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/50 hover:text-white rounded-md transition-all active:scale-95"
+                      className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg

@@ -125,7 +125,7 @@ export default function TransactionProgressModal({
                   style={{ animation: "dotBlink 1.4s ease-in-out infinite 0.4s" }}
                 />
               </div>
-              <p className="text-[11px] text-white/35 mt-1">
+              <p className="text-[11px] text-white/40 mt-1">
                 {t("ui_tx_progress_pending_hint", "Confirmation XRPL…")}
               </p>
             </>

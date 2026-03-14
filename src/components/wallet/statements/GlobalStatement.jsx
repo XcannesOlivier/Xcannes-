@@ -493,7 +493,7 @@ export default function GlobalStatement({
                   {t("ui_global_statement_13e29aa8aa", "Global Statement")}
                 </h2>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
@@ -517,13 +517,13 @@ export default function GlobalStatement({
                 {walletLabel || t("nav_wallet", "Wallet")}
               </p>
               {walletAddress ? (
-                <p className="text-[11px] text-white/50 font-mono break-all">
+                <p className="text-[11px] text-white/60 font-mono break-all">
                   {walletAddress}
                 </p>
               ) : null}
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("ui_statement_period_4674b18f25", "Statement Period")}
               </p>
               <StatementMonthSelect
@@ -541,7 +541,7 @@ export default function GlobalStatement({
               />
             </div>
             <div>
-              <p className="text-xs text-white/50 mb-1">
+              <p className="text-xs text-white/60 mb-1">
                 {t("ui_total_assets_918e935125", "Total Assets")}
               </p>
               <p className="text-sm text-white">
@@ -552,7 +552,7 @@ export default function GlobalStatement({
                     displayCurrencyCode,
                   )}
               </p>
-              <p className="text-[11px] text-white/50">
+              <p className="text-[11px] text-white/60">
                 {tokens.length}
                 {t("ui_currencies_5e5bf1a8a1", "Currencies")}
               </p>
@@ -670,7 +670,7 @@ export default function GlobalStatement({
                             )}
                           </div>
                         </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/70 text-[10px] sm:text-sm hidden sm:table-cell">
+                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/80 text-[10px] sm:text-sm hidden sm:table-cell">
                           {Number.isFinite(usdValue)
                             ? formatAmountWithSymbolLocal(usdValue, "USD")
                             : "--"}
@@ -705,7 +705,7 @@ export default function GlobalStatement({
             <button
               onClick={handleExportPdf}
               disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/70"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
             >
               {exportFormat === "pdf" ? (
                 <>
@@ -729,7 +729,7 @@ export default function GlobalStatement({
             </button>
             <button
               onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/70"
+              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
             >
               {t("ui_print_eb5de3a228", "🖨️ Print")}
             </button>

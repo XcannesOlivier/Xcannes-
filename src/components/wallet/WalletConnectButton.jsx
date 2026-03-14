@@ -69,7 +69,7 @@ export default function WalletConnectButton({
           onClick={disconnect}
           className={`${
             small ? "px-3 py-2 text-xs" : "px-4 py-3 text-sm"
-          } bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-red-400 border border-white/10 hover:border-red-500/40 rounded-lg font-medium transition-all duration-300`}
+          } bg-white/5 hover:bg-red-500/20 text-white/80 hover:text-red-400 border border-white/10 hover:border-red-500/40 rounded-lg font-medium transition-all duration-300`}
           aria-label={t(
             "ui_logout_wallet_558f860cac",
             "Se déconnecter du wallet",

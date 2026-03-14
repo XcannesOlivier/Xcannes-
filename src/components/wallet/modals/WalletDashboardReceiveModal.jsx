@@ -540,7 +540,7 @@ export default function WalletDashboardReceiveModal({
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
@@ -560,7 +560,7 @@ export default function WalletDashboardReceiveModal({
           </div>
           <div className="flex-1 min-h-0 flex flex-col">
             <div className="wallet-tab-unfold-in flex-1 flex flex-col gap-4">
-              <p className="text-xs md:text-sm text-white/50">
+              <p className="text-xs md:text-sm text-white/60">
                 {t(
                   "ui_receive_and_request_desc_2f1a7c9d5e",
                   "Share this XRPL address to receive funds, or create a payment request to send to another wallet.",

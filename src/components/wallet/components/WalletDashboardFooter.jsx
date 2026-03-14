@@ -21,7 +21,7 @@ export default function WalletDashboardFooter() {
             {t("ui_xcannes_3cdc66a392", "XCANNES")}
           </span>
           <span className="mx-3 text-[13px] font-light text-white/30">|</span>
-          <span className="text-[16px] font-light italic text-white/45">
+          <span className="text-[16px] font-light italic text-white/40">
             {t("ui_global_usd_wallet_202f7e48be", "Multi-currency wallet")}
           </span>
         </span>

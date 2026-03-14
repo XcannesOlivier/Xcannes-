@@ -103,7 +103,7 @@ export default function WalletSettingsDropdown({
                 onOpenInfo?.();
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
+              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/80 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
             >
               <span className="inline-flex h-5 w-5 md:h-4 md:w-4 items-center justify-center rounded-full bg-white/8 border border-white/10 text-xs md:text-[10px] text-white/40 leading-none font-semibold">
                 i
@@ -136,7 +136,7 @@ export default function WalletSettingsDropdown({
                   window.open("/wallet-app/?action=choice", "_blank");
                 }
               }}
-              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
+              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/80 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
             >
               <svg
                 className="w-5 h-5 md:w-4 md:h-4 text-white/40"
@@ -160,7 +160,7 @@ export default function WalletSettingsDropdown({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/75 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
+              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/80 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
             >
               <svg
                 className="w-5 h-5 md:w-4 md:h-4 text-white/40"

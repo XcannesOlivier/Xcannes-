@@ -356,7 +356,7 @@ export default function WalletDashboardSwapModal({
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
@@ -477,7 +477,7 @@ export default function WalletDashboardSwapModal({
                         )}
                         excludeCodes={["USD", "RLUSD", "XRP"]}
                         showQuickAdd={true}
-                        buttonClassName="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-xl text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98"
+                        buttonClassName="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-xl text-white/80 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/80 transition-colors active:scale-98"
                       />
                     </div>
 
@@ -520,7 +520,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     <div className="rounded-xl border border-subtle bg-black/30 px-4 py-3.5 space-y-2.5">
-                      <h4 className="text-sm font-medium text-white/50 uppercase tracking-wide">{t("ui_summary_title_d4e5f6a7b8", "Résumé")}</h4>
+                      <h4 className="text-sm font-medium text-white/60 uppercase tracking-wide">{t("ui_summary_title_d4e5f6a7b8", "Résumé")}</h4>
                       {/* Conversion summary */}
                       {Number.isFinite(previewAmount) && previewAmount > 0 && Number.isFinite(amountValue) && amountValue > 0 && baseCode && quoteCode ? (
                         <>
@@ -545,7 +545,7 @@ export default function WalletDashboardSwapModal({
                           {previewMeta?.route === "allocation" &&
                           previewMeta?.isFx &&
                           previewMeta?.spreadFeeRlusd > 0 ? (
-                            <div className="text-sm text-white/50 pt-1 border-t border-white/5">
+                            <div className="text-sm text-white/60 pt-1 border-t border-white/5">
                               {t("ui_conversion_fee_label_e2f3a4b5c6", "Frais de conversion")}
                               {" : "}
                               {formatAmountWithSymbol(
@@ -566,7 +566,7 @@ export default function WalletDashboardSwapModal({
                     </div>
 
                     {previewState.status === "loading" ? (
-                      <div className="text-xs text-white/50">
+                      <div className="text-xs text-white/60">
                         {t(
                           "ui_loading_market_data_1d5d6ed3c4",
                           "Refreshing market data...",

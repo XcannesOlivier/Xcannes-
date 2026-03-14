@@ -87,7 +87,7 @@ export default function DemoStatementMonthSelect({
                 className={`w-full px-3 py-2 text-sm text-left transition-colors ${
                   isSelected
                     ? "bg-white/10 text-white"
-                    : "text-white/70 hover:bg-white/5"
+                    : "text-white/80 hover:bg-white/5"
                 }`}
               >
                 {option.label}

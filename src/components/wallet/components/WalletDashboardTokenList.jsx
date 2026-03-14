@@ -27,7 +27,7 @@ export default function WalletDashboardTokenList({
         >
           {typeof headerTitle === "string" ? (
             <div
-              className={`text-xs text-white/45 ${showHeaderAction ? "" : "ml-auto"}`}
+              className={`text-xs text-white/40 ${showHeaderAction ? "" : "ml-auto"}`}
             >
               {headerTitle}
             </div>
@@ -40,7 +40,7 @@ export default function WalletDashboardTokenList({
             <button
               type="button"
               onClick={onHeaderAction}
-              className="text-sm md:text-xs text-white/70 hover:text-white transition-colors"
+              className="text-sm md:text-xs text-white/80 hover:text-white transition-colors"
             >
               {headerActionLabel} →
             </button>

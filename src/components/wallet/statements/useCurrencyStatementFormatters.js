@@ -204,14 +204,14 @@ export default function useCurrencyStatementFormatters({
       const badges = (
         <span className="inline-flex items-center gap-1">
           {renderCurrencyBadge(pair.from)}
-          <span className="text-white/50 text-xs">→</span>
+          <span className="text-white/60 text-xs">→</span>
           {renderCurrencyBadge(pair.to)}
         </span>
       );
       if (!withLabel) return badges;
       return (
         <span className="inline-flex items-center gap-1.5 flex-wrap">
-          <span className="text-white/70 text-xs">
+          <span className="text-white/80 text-xs">
             {t("statement_conversion_label", "Conversion")}
           </span>
           {badges}

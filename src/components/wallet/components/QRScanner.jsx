@@ -501,10 +501,10 @@ export default function QRScanner({
                     transform: "translate(-50%, -50%)",
                   }}
                 >
-                  <span className="absolute -top-1 -left-1 h-6 w-6 border-t-[3px] border-l-[3px] border-[#22C55E]/90 rounded-tl-md" />
-                  <span className="absolute -top-1 -right-1 h-6 w-6 border-t-[3px] border-r-[3px] border-[#22C55E]/90 rounded-tr-md" />
-                  <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-[3px] border-l-[3px] border-[#22C55E]/90 rounded-bl-md" />
-                  <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-[3px] border-r-[3px] border-[#22C55E]/90 rounded-br-md" />
+                  <span className="absolute -top-1 -left-1 h-6 w-6 border-t-[3px] border-l-[3px] border-xcannes-accent-green/90 rounded-tl-md" />
+                  <span className="absolute -top-1 -right-1 h-6 w-6 border-t-[3px] border-r-[3px] border-xcannes-accent-green/90 rounded-tr-md" />
+                  <span className="absolute -bottom-1 -left-1 h-6 w-6 border-b-[3px] border-l-[3px] border-xcannes-accent-green/90 rounded-bl-md" />
+                  <span className="absolute -bottom-1 -right-1 h-6 w-6 border-b-[3px] border-r-[3px] border-xcannes-accent-green/90 rounded-br-md" />
                   {/* Animated scan line */}
                   <span
                     className="absolute left-1 right-1 h-[2px] rounded-full"
@@ -533,7 +533,7 @@ export default function QRScanner({
               id={resolvedFileInputId}
               type="file"
               accept="image/*"
-              className="w-full text-xs text-white/70 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:text-white/80 hover:file:bg-white/20"
+              className="w-full text-xs text-white/80 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:text-white/80 hover:file:bg-white/20"
               onChange={(e) => handleFile(e.target.files?.[0] || null)}
             />
           </div>
@@ -591,7 +591,7 @@ export default function QRScanner({
         {/* Instructions */}
         {(isScanning || isStarting) && !error && !showStaticQr && (
           <div className="bg-xcannes-green/10 border border-xcannes-green/30 rounded-lg p-3">
-            <p className="text-sm text-white/70 text-center">
+            <p className="text-sm text-white/80 text-center">
               {isStarting
                 ? "Starting camera..."
                 : "Point your camera at a QR code"}

@@ -125,7 +125,7 @@ export default function WalletSetupDropdown({
         ✓
       </span>
     ) : (
-      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/50 text-[10px] font-semibold">
+      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/60 text-[10px] font-semibold">
         {num}
       </span>
     );
@@ -214,7 +214,7 @@ export default function WalletSetupDropdown({
               {stepIcon(isStep1Done, 1)}
               <div className="flex-1 min-w-0">
                 <div
-                  className={`text-[12px] font-semibold ${isStep1Done ? "text-white/50 line-through" : "text-white/90"}`}
+                  className={`text-[12px] font-semibold ${isStep1Done ? "text-white/60 line-through" : "text-white/90"}`}
                 >
                   {t("ui_setup_step_xrp", "Activer le wallet")}
                 </div>
@@ -251,7 +251,7 @@ export default function WalletSetupDropdown({
                   <div
                     className={`text-[12px] font-semibold ${
                       isStep2Done
-                        ? "text-white/50 line-through"
+                        ? "text-white/60 line-through"
                         : !isStep1Done
                           ? "text-white/30"
                           : "text-white/90"
@@ -302,7 +302,7 @@ export default function WalletSetupDropdown({
                     {labelError && (
                       <p className="text-[10px] text-red-400">{labelError}</p>
                     )}
-                    <p className="text-[9px] text-white/35">
+                    <p className="text-[9px] text-white/40">
                       {t(
                         "ui_setup_label_hint",
                         "1 ou 2 mots, 7 lettres max par mot, A-Z uniquement",

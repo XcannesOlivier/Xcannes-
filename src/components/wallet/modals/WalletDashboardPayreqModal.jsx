@@ -206,7 +206,7 @@ export default function WalletDashboardPayreqModal({
   const currencySelectorBlock =
     sendPaymentRequest && augmentedTokens && setSendAssetKey ? (
       <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
-        <div className="text-[11px] uppercase tracking-wide text-white/50 font-semibold">
+        <div className="text-[11px] uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_pay_with_currency", "Payer avec")}
         </div>
         <ModalSelect
@@ -243,7 +243,7 @@ export default function WalletDashboardPayreqModal({
           selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
         />
         {sendFxInfo ? (
-          <div className="text-[11px] text-white/50">
+          <div className="text-[11px] text-white/60">
             ≈{" "}
             {formatAmountWithSymbol(
               locale,
@@ -385,7 +385,7 @@ export default function WalletDashboardPayreqModal({
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-white/70 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}

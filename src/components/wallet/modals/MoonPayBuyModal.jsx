@@ -431,7 +431,7 @@ const MoonPayBuyModal = ({
               selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
             />
             {fiatLoading && (
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-white/60 mt-1">
                 {t("moonpay_fiat_loading", "Loading fiat currencies...")}
               </p>
             )}
@@ -439,7 +439,7 @@ const MoonPayBuyModal = ({
               <p className="text-xs text-red-400 mt-1">{fiatError}</p>
             )}
             {!fiatLoading && !fiatError && fiatUnavailable && (
-              <p className="text-xs text-white/50 mt-1">
+              <p className="text-xs text-white/60 mt-1">
                 {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
               </p>
             )}
@@ -486,7 +486,7 @@ const MoonPayBuyModal = ({
                 {walletLabel}
               </p>
             ) : null}
-            <p className="text-[8px] md:text-[10px] text-white/50 font-mono break-all">
+            <p className="text-[8px] md:text-[10px] text-white/60 font-mono break-all">
               {walletAddress}
             </p>
           </div>
@@ -530,7 +530,7 @@ const MoonPayBuyModal = ({
             type="button"
             onClick={generateBuyUrl}
             disabled={continueDisabled}
-            className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-[#10B981]/10 disabled:text-[#10B981]/60 disabled:border-[#10B981]/25 disabled:hover:scale-100"
+            className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-xcannes-green/10 disabled:text-xcannes-green/60 disabled:border-xcannes-green/25 disabled:hover:scale-100"
           >
             {continueLabel}
           </button>
@@ -666,7 +666,7 @@ const MoonPayBuyModal = ({
                   )}
                 </h3>
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/70 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-0.5 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
