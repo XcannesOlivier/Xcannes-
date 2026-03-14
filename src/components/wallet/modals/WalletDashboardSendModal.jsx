@@ -462,17 +462,9 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const manualForm = showManualForm ? (
-    <div
-      className={`space-y-3 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}
-    >
-      <div
-        className={
-          inline
-            ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]"
-            : "space-y-3"
-        }
-      >
-        <div className={inline ? "space-y-3" : ""}>
+    <div className="space-y-3">
+      <div className="space-y-3">
+        <div>
           <div>
             <label
               className="block text-[11px] md:text-xs text-white/60 mb-1"
@@ -826,7 +818,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className="mt-auto pt-2 border-t border-white/10">
+    <div className="pt-2 border-t border-white/10">
       <SwipeConfirmButton
         label={t("ui_send_504b64a87b", "Send")}
         onConfirm={() => setShowConfirmation(true)}
@@ -940,8 +932,8 @@ export default function WalletDashboardSendModal({
               ✕
             </button>
           </div>
-          <div className="flex-1 min-h-0 flex flex-col">
-            <div className="flex-1 flex flex-col gap-5">
+          <div>
+            <div className="flex flex-col gap-5">
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}

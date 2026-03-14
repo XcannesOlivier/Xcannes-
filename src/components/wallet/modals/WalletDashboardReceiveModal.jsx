@@ -560,9 +560,9 @@ export default function WalletDashboardReceiveModal({
               ✕
             </button>
           </div>
-          <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div className="wallet-tab-unfold-in">
-              <p className="text-xs md:text-sm text-white/50 mb-3">
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="wallet-tab-unfold-in flex-1 flex flex-col gap-4">
+              <p className="text-xs md:text-sm text-white/50">
                 {t(
                   "ui_receive_and_request_desc_2f1a7c9d5e",
                   "Share this XRPL address to receive funds, or create a payment request to send to another wallet.",
@@ -661,7 +661,7 @@ export default function WalletDashboardReceiveModal({
               ) : null}
 
               {wallet ? (
-                <div className="mt-2 flex justify-center">
+                <div className="flex justify-center">
                   <button
                     type="button"
                     onClick={(e) => {

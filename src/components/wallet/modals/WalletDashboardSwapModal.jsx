@@ -376,12 +376,8 @@ export default function WalletDashboardSwapModal({
                 ✕
               </button>
             </div>
-            <div
-              className="wallet-tab-unfold-in flex-1 min-h-0 flex flex-col"
-            >
-              <div
-                className="flex-1 min-h-0 flex flex-col gap-5"
-              >
+            <div className="wallet-tab-unfold-in">
+              <div className="flex flex-col gap-5">
                 <div
                   className={
                     useDesktopWalletConvertLayout
