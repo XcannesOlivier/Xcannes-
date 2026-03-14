@@ -45,7 +45,6 @@ export default function WalletDashboardSendModal({
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
-  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -288,7 +287,6 @@ export default function WalletDashboardSendModal({
     if (!open) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
-      setShowConfirmation(false);
       setScanActive(false);
     }
   }, [open]);
@@ -460,6 +458,18 @@ export default function WalletDashboardSendModal({
       ) : null}
     </div>
   ) : null;
+
+  /* ── Label helpers for summary ── */
+  const confirmCurrencyCode = String(
+    selectedSendToken?.currency || "",
+  ).trim().toUpperCase();
+  const confirmAmountLabel =
+    Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0 && confirmCurrencyCode
+      ? formatAmountWithSymbol(locale, normalizedSendAmount, confirmCurrencyCode, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 6,
+        })
+      : null;
 
   const manualForm = showManualForm ? (
     <div className="space-y-4">
@@ -691,37 +701,21 @@ export default function WalletDashboardSendModal({
     </div>
   ) : null;
 
-  /* ── Label helpers for confirmation ── */
-  const confirmDestinationLabel =
-    normalizedDestination.length > 14
-      ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
-      : normalizedDestination;
-  const confirmCurrencyCode = String(
-    selectedSendToken?.currency || "",
-  ).trim().toUpperCase();
-  const confirmAmountLabel =
-    Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0 && confirmCurrencyCode
-      ? formatAmountWithSymbol(locale, normalizedSendAmount, confirmCurrencyCode, {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 6,
-        })
-      : null;
-
-  const confirmationView = showConfirmation ? (
-    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-200">
-      {/* Summary card */}
+  /* ── Dynamic summary – always visible when destination + asset + amount are set ── */
+  const inlineSummary = hasDestination && selectedSendToken && Number.isFinite(normalizedSendAmount) && normalizedSendAmount > 0 ? (
+    <div className="space-y-3 transition-all duration-200">
       <div className="rounded-xl border border-xcannes-accent-green/25 bg-xcannes-accent-green/5 p-4 space-y-3">
         <div className="text-xs uppercase tracking-wide text-xcannes-accent-green/80 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
         <div className="space-y-2 text-sm text-white/80">
-          {/* Destination */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
+          {/* Destination – full XRPL address */}
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-white/60 shrink-0">
               {t("ui_destination_xrpl_address_9c2b94554c", "Destination")}
             </span>
-            <span className="font-mono text-white/80">
-              {confirmDestinationLabel}
+            <span className="font-mono text-white/80 text-right break-all text-xs leading-relaxed">
+              {normalizedDestination}
             </span>
           </div>
           {/* Asset */}
@@ -759,7 +753,7 @@ export default function WalletDashboardSendModal({
               </span>
             </div>
           ) : null}
-          {/* Balance */}
+          {/* Balance after send */}
           {selectedSendToken ? (
             <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
               <span className="text-white/60 text-xs">
@@ -772,54 +766,19 @@ export default function WalletDashboardSendModal({
           ) : null}
         </div>
       </div>
-
-      {/* Action buttons */}
-      <div className="space-y-2">
-        <SwipeConfirmButton
-          label={
-            sendProcessing
-              ? t("ui_sending_3b8c1a7d5e", "Sending...")
-              : t("ui_confirm_send", "Confirmer l'envoi")
-          }
-          onConfirm={handleManualSend}
-          disabled={sendProcessing || !canManualSend}
-          variant="green"
-          className="md:hidden"
-        />
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleManualSend();
-          }}
-          disabled={sendProcessing || !canManualSend}
-          className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
-        >
-          {sendProcessing
-            ? t("ui_sending_3b8c1a7d5e", "Sending...")
-            : t("ui_confirm_send", "Confirmer l'envoi")}
-        </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowConfirmation(false);
-          }}
-          disabled={sendProcessing}
-          className="w-full text-sm py-2 rounded-lg border border-white/15 bg-transparent text-white/80 hover:bg-white/5 hover:text-white transition-all duration-200"
-        >
-          {t("ui_back_modify", "← Modifier")}
-        </button>
-      </div>
     </div>
   ) : null;
 
   const sendActions = (
-    <div className="pt-3 border-t border-white/10">
+    <div className="pt-3 border-t border-white/10 space-y-2">
       <SwipeConfirmButton
-        label={t("ui_send_504b64a87b", "Send")}
-        onConfirm={() => setShowConfirmation(true)}
-        disabled={!canManualSend}
+        label={
+          sendProcessing
+            ? t("ui_sending_3b8c1a7d5e", "Sending...")
+            : t("ui_send_504b64a87b", "Send")
+        }
+        onConfirm={handleManualSend}
+        disabled={sendProcessing || !canManualSend}
         variant="green"
         className="md:hidden"
       />
@@ -827,12 +786,14 @@ export default function WalletDashboardSendModal({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setShowConfirmation(true);
+          handleManualSend();
         }}
-        disabled={!canManualSend}
+        disabled={sendProcessing || !canManualSend}
         className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
-        {t("ui_send_504b64a87b", "Send")}
+        {sendProcessing
+          ? t("ui_sending_3b8c1a7d5e", "Sending...")
+          : t("ui_send_504b64a87b", "Send")}
       </button>
     </div>
   );
@@ -937,13 +898,10 @@ export default function WalletDashboardSendModal({
                   {saveAddressBlock}
                   {sendActions}
                 </>
-              ) : showConfirmation ? (
-                <>
-                  {confirmationView}
-                </>
               ) : (
                 <>
                   {manualForm}
+                  {inlineSummary}
                   {sendActions}
                   {scannerModal}
                 </>
