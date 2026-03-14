@@ -169,7 +169,7 @@ export default function WalletActivationRequestModal({
               ) : null}
             </div>
           ) : (
-            <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
+            <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
               {t(
                 "ui_activation_request_error_6c1f7a2b9d",
                 "Adresse wallet manquante.",

@@ -406,11 +406,11 @@ export default function DemoWalletDashboardSendModal({
               })}
               useNativeSelect={false}
               showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
               menuClassName={
                 noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
               }
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
             />
             {selectedSendToken ? null : null}
           </div>
@@ -523,7 +523,7 @@ export default function DemoWalletDashboardSendModal({
                       "ui_enter_or_import_address",
                       "Compte Bénéficiaire",
                     )}
-                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
                   />
                   <datalist id="saved-addresses">
                     {(savedAddresses || []).map((addr, idx) => (
@@ -565,7 +565,7 @@ export default function DemoWalletDashboardSendModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full mt-2 text-sm py-2.5 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full mt-2 text-sm py-3 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -625,7 +625,7 @@ export default function DemoWalletDashboardSendModal({
               e.stopPropagation();
               handleScanQrUpload();
             }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-[11px] rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+            className="inline-flex items-center gap-2 px-3 py-2 text-[11px] rounded-lg border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
           >
             <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
               +
@@ -641,7 +641,7 @@ export default function DemoWalletDashboardSendModal({
             value={requestText}
             onChange={(e) => setRequestText(e.target.value)}
             onPaste={handlePastePayload}
-            className={`relative w-full min-h-[110px] overflow-y-auto rounded-md bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
+            className={`relative w-full min-h-[110px] overflow-y-auto rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
               inline ? "flex-1 min-h-[160px]" : ""
             }`}
             placeholder={t(

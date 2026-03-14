@@ -83,7 +83,7 @@ export default function WalletDashboardCashModal({
                 <div>{renderWalletMeta?.("pr-8")}</div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}

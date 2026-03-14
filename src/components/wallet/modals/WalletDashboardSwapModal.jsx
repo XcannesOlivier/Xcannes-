@@ -356,7 +356,7 @@ export default function WalletDashboardSwapModal({
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
@@ -454,7 +454,7 @@ export default function WalletDashboardSwapModal({
                     </div>
 
                     {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
-                      <div className="rounded-md border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-200/80">
+                      <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-200/80">
                         {t(
                           "ui_new_currency_line_auto_activate_a1b2c3",
                           "New currency — the {{currency}} line will be created automatically.",
@@ -502,7 +502,7 @@ export default function WalletDashboardSwapModal({
 
                   <div className="space-y-2">
                     {sameCurrencySelected ? (
-                      <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
+                      <div className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
                         {t(
                           "ui_convert_same_asset_warning_6f13d5c9c2",
                           "Veuillez choisir 2 actifs différents.",
@@ -510,7 +510,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {insufficientBalance && !sameCurrencySelected ? (
-                      <div className="rounded-md border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200/90">
+                      <div className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200/90">
                         {t(
                           "ui_insufficient_balance_convert_a3b4c5d6",
                           "Solde insuffisant. Disponible : {{amount}} {{currency}}",
@@ -519,7 +519,7 @@ export default function WalletDashboardSwapModal({
                           .replace("{{currency}}", getDisplayCurrencyCode(insufficientBalance.currency))}
                       </div>
                     ) : null}
-                    <div className="rounded-xl border border-subtle bg-black/30 px-4 py-3.5 space-y-2.5">
+                    <div className="rounded-xl border border-subtle bg-black/30 px-4 py-4 space-y-2.5">
                       <h4 className="text-sm font-medium text-white/60 uppercase tracking-wide">{t("ui_summary_title_d4e5f6a7b8", "Résumé")}</h4>
                       {/* Conversion summary */}
                       {Number.isFinite(previewAmount) && previewAmount > 0 && Number.isFinite(amountValue) && amountValue > 0 && baseCode && quoteCode ? (
@@ -575,7 +575,7 @@ export default function WalletDashboardSwapModal({
                     ) : null}
 
                     {previewState.status === "error" ? (
-                      <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                      <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
                         {previewState.error}
                       </div>
                     ) : null}
@@ -595,7 +595,7 @@ export default function WalletDashboardSwapModal({
                         e.stopPropagation();
                         onConnectWallet?.();
                       }}
-                      className={`w-full text-sm py-2.5 ${greenActionBtnBase}`}
+                      className={`w-full text-sm py-3 ${greenActionBtnBase}`}
                     >
                       {t("wallet_connect_cta", "Connect wallet")}
                     </button>
@@ -614,7 +614,7 @@ export default function WalletDashboardSwapModal({
                           e.stopPropagation();
                           handleConvertAction();
                         }}
-                        className={`hidden md:block w-full text-xl py-3.5 ${greenActionBtnBase}`}
+                        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
                         disabled={convertButtonDisabled}
                       >
                         {convertButtonLabel}

@@ -271,7 +271,7 @@ export default function WalletDashboardSendModal({
           e.stopPropagation();
           handleScanQrUpload();
         }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded-md border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+        className="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-lg border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
       >
         <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
           +
@@ -624,7 +624,7 @@ export default function WalletDashboardSendModal({
                 {t("ui_amount_52cea2dd3d", "Amount")}
               </label>
               {showCalculatedAmountLabel ? (
-                <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
+                <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
                   {t("ui_calculated_amount_label", "Montant calculé")}
                 </span>
               ) : null}
@@ -793,7 +793,7 @@ export default function WalletDashboardSendModal({
             handleManualSend();
           }}
           disabled={sendProcessing || !canManualSend}
-          className={`hidden md:block w-full text-xl py-3.5 ${greenActionBtnBase}`}
+          className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
         >
           {sendProcessing
             ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -830,7 +830,7 @@ export default function WalletDashboardSendModal({
           setShowConfirmation(true);
         }}
         disabled={!canManualSend}
-        className={`hidden md:block w-full text-xl py-3.5 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
         {t("ui_send_504b64a87b", "Send")}
       </button>
@@ -910,7 +910,7 @@ export default function WalletDashboardSendModal({
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}

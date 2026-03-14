@@ -341,13 +341,13 @@ export default function DemoWalletDashboardSwapModal({
                         )}
                         useNativeSelect={false}
                         showMobileOptionRight={true}
-                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
                             ? "bg-xcannes-surface-demo"
                             : "bg-elevated"
                         }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                       />
                     </div>
 
@@ -378,13 +378,13 @@ export default function DemoWalletDashboardSwapModal({
                         )}
                         useNativeSelect={false}
                         showMobileOptionRight={true}
-                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                         menuClassName={
                           noticeVariant === "demo"
                             ? "bg-xcannes-surface-demo"
                             : "bg-elevated"
                         }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
+                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
                       />
                     </div>
 
@@ -431,7 +431,7 @@ export default function DemoWalletDashboardSwapModal({
 
                   <div className={inline ? "space-y-2" : "space-y-2"}>
                     {sameCurrencySelected ? (
-                      <div className="rounded-md border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
+                      <div className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
                         {t(
                           "ui_convert_same_asset_warning_6f13d5c9c2",
                           "Veuillez choisir 2 actifs différents.",
@@ -488,7 +488,7 @@ export default function DemoWalletDashboardSwapModal({
                     ) : null}
 
                     {previewState.status === "error" ? (
-                      <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-[17px] text-red-200">
+                      <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-[17px] text-red-200">
                         {previewState.error}
                       </div>
                     ) : null}
@@ -515,7 +515,7 @@ export default function DemoWalletDashboardSwapModal({
                       e.stopPropagation();
                       handleConvertAction();
                     }}
-                    className={`hidden md:block w-full mt-1 text-xl py-2.5 ${greenActionBtnBase}`}
+                    className={`hidden md:block w-full mt-1 text-xl py-3 ${greenActionBtnBase}`}
                     disabled={convertButtonDisabled}
                   >
                     {convertButtonLabel}

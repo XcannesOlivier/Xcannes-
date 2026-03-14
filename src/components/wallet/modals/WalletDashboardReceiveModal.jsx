@@ -540,7 +540,7 @@ export default function WalletDashboardReceiveModal({
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
                     {t("demo_notice_title", "Mode démo")}
                   </span>
                 ) : null}
@@ -700,7 +700,7 @@ export default function WalletDashboardReceiveModal({
                             value={requestAmount}
                             onChange={(e) => setRequestAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-base text-white outline-none focus:border-xcannes-green/80"
+                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-base text-white outline-none focus:border-xcannes-green/80"
                           />
                         </div>
                         <div>
@@ -742,13 +742,13 @@ export default function WalletDashboardReceiveModal({
                               };
                             })}
                             useNativeSelect={false}
-                            buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
+                            buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
                             menuClassName={
                               noticeVariant === "demo"
                                 ? "bg-xcannes-surface-demo"
                                 : "bg-elevated"
                             }
-                            selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
+                            selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80"
                           />
                         </div>
                       </div>
@@ -766,7 +766,7 @@ export default function WalletDashboardReceiveModal({
                             "ui_payment_for_82ec86ac25",
                             "Payment for...",
                           )}
-                          className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80"
+                          className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80"
                         />
                       </div>
 
@@ -786,7 +786,7 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className={`hidden md:block w-full text-xl py-3.5 ${greenActionBtnMuted}`}
+                        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnMuted}`}
                       >
                         {t(
                           "ui_generate_request_58584f23a2",
@@ -795,7 +795,7 @@ export default function WalletDashboardReceiveModal({
                       </button>
 
                       {generateError ? (
-                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-md px-3 py-2">
+                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                           {generateError}
                         </div>
                       ) : null}

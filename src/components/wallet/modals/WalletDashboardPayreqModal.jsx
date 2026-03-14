@@ -238,9 +238,9 @@ export default function WalletDashboardPayreqModal({
           })}
           useNativeSelect={false}
           showMobileOptionRight={true}
-          buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+          buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
           menuClassName="bg-elevated"
-          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
         />
         {sendFxInfo ? (
           <div className="text-[11px] text-white/60">
@@ -308,7 +308,7 @@ export default function WalletDashboardPayreqModal({
               setSavedForLater(true);
             }
           }}
-          className="w-full rounded-md border border-amber-400/40 bg-amber-400/20 px-3 py-1.5 text-[11px] font-semibold text-amber-100 hover:bg-amber-400/30 transition-colors"
+          className="w-full rounded-lg border border-amber-400/40 bg-amber-400/20 px-3 py-2 text-[11px] font-semibold text-amber-100 hover:bg-amber-400/30 transition-colors"
         >
           {t("ui_save_payreq_for_later", "Sauvegarder la demande")}
         </button>
@@ -345,7 +345,7 @@ export default function WalletDashboardPayreqModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full mt-2 text-xl py-3.5 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full mt-2 text-xl py-4 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -385,7 +385,7 @@ export default function WalletDashboardPayreqModal({
           </button>
           <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
+              <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
