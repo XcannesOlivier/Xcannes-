@@ -12,6 +12,7 @@ import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { greenActionBtnMuted } from "./walletModalTokens";
 
 const ShareIcon = ({ className = "" }) => (
   <svg
@@ -56,8 +57,6 @@ export default function WalletDashboardReceiveModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnMuted =
-    "rounded-lg border border-transparent bg-[#15803d] text-white font-semibold transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const isDesktop = useIsDesktop();
@@ -501,7 +500,7 @@ export default function WalletDashboardReceiveModal({
     "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-screen md:h-auto md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[96vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",

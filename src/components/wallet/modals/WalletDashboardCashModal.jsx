@@ -45,7 +45,7 @@ export default function WalletDashboardCashModal({
     "relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-full md:h-auto md:max-w-2xl md:max-h-[92vh] rounded-none md:rounded-2xl",
+      : "h-full md:h-auto md:max-w-2xl md:max-h-[96vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",

@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { greenActionBtnBase } from "./walletModalTokens";
 
 export default function WalletDashboardPayreqModal({
   open,
@@ -33,8 +34,6 @@ export default function WalletDashboardPayreqModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-transparent bg-[#15803d] text-white font-semibold transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:bg-[#15803d]/40 disabled:text-white/50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100";
 
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
@@ -144,7 +143,7 @@ export default function WalletDashboardPayreqModal({
     "relative w-full wallet-modal-panel wallet-send-modal wallet-payreq-modal border-white/10 md:border p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-full md:h-auto md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
+      : "h-full md:h-auto md:max-w-lg md:max-h-[96vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-[#0b0f10]" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",

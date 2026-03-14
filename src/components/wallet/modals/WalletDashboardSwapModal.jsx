@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { computeSpreadQuote, isFxConversion } from "@/utils/walletSpread";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { greenActionBtnBase } from "./walletModalTokens";
 import {
   formatAmountWithSymbol,
   getCurrencyFlag,
@@ -52,8 +53,6 @@ export default function WalletDashboardSwapModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const greenActionBtnBase =
-    "rounded-lg border border-transparent bg-[#15803d] text-white font-semibold transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:bg-[#15803d]/40 disabled:text-white/50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100";
   const isDesktop = useIsDesktop();
 
   // Résout l'icône (drapeau) pour un code devise, y compris les devises

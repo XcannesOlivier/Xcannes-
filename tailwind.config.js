@@ -38,6 +38,9 @@ module.exports = {
         "xcannes-violet-weight": "#5b21b6",
         "xcannes-pink": "#ec4899",
         "xcannes-pink-weight": "#be185d",
+        "xcannes-btn-green": "#15803d",
+        "xcannes-btn-green-hover": "#166534",
+        "xcannes-surface-demo": "#0b0f10",
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",
