@@ -106,9 +106,9 @@ export default function DemoWalletDashboardCashModal({
               <button
                 type="button"
                 onClick={() => setCashModalTab("buy")}
-                className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
+                className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] border ${
                   cashModalTab === "buy"
-                    ? "bg-xcannes-green/20 text-white/90 border-xcannes-green/40 hover:bg-xcannes-green/30 hover:text-white hover:scale-[1.02]"
+                    ? "bg-xcannes-btn-green text-white border-xcannes-btn-green hover:bg-xcannes-btn-green-hover hover:translate-y-[-1px]"
                     : "bg-black/20 text-white/60 border-white/10 hover:bg-black/40 hover:text-white/80"
                 }`}
               >
@@ -133,9 +133,9 @@ export default function DemoWalletDashboardCashModal({
               <button
                 type="button"
                 onClick={() => setCashModalTab("sell")}
-                className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-200 border ${
+                className={`flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] border ${
                   cashModalTab === "sell"
-                    ? "bg-xcannes-green/20 text-white/90 border-xcannes-green/40 hover:bg-xcannes-green/30 hover:text-white hover:scale-[1.02]"
+                    ? "bg-xcannes-btn-green text-white border-xcannes-btn-green hover:bg-xcannes-btn-green-hover hover:translate-y-[-1px]"
                     : "bg-black/20 text-white/60 border-white/10 hover:bg-black/40 hover:text-white/80"
                 }`}
               >
