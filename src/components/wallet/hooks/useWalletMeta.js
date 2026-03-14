@@ -17,7 +17,7 @@ export function useWalletMeta({
       if (!resolvedAddress && !resolvedLabel) return null;
       return (
         <div className={`text-xs text-white/60 ${className}`}>
-          <div className="text-lg md:text-lg font-semibold text-white/80 leading-tight">
+          <div className="text-xl md:text-2xl font-semibold text-white/80 leading-tight">
             {resolvedLabel || "Wallet"}
           </div>
           {!hideAddress && resolvedAddress ? (

@@ -488,11 +488,7 @@ export default function WalletDashboardSendModal({
                 value={sendDestination}
                 onChange={(e) => setSendDestination(e.target.value)}
                 onPaste={handlePastePayload}
-                placeholder={
-                  (savedAddresses || []).length > 0
-                    ? t("ui_select_saved_address_60c28f89c1", "Import or select saved address...")
-                    : t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                }
+                placeholder={t("ui_select_saved_address_60c28f89c1", "Import or select saved address...")}
                 className="w-full bg-black/40 border border-white/15 rounded-xl pl-4 pr-20 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
               />
               {/* ── + upload QR image ── */}

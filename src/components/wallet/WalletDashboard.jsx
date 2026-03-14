@@ -301,7 +301,7 @@ export default function WalletDashboard({
   const { renderWalletMeta } = useWalletMeta({
     walletAddress: wallet,
     walletLabel,
-    hideAddress: false,
+    hideAddress: true,
   });
 
   // ── Preferred currency ─────────────────────────────────────
