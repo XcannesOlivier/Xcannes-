@@ -34,7 +34,7 @@ export default function WalletDashboardPayreqModal({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:border-[#22C55E]/30 disabled:bg-[#22C55E]/25 disabled:text-white/70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:bg-[#22C55E]/25";
+    "rounded-lg border border-transparent bg-[#15803d] text-white font-semibold transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:bg-[#15803d]/40 disabled:text-white/50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100";
 
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
@@ -346,7 +346,7 @@ export default function WalletDashboardPayreqModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full mt-2 text-lg py-3 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full mt-2 text-xl py-3.5 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")

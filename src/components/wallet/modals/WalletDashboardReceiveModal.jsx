@@ -57,7 +57,7 @@ export default function WalletDashboardReceiveModal({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const greenActionBtnMuted =
-    "rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 text-white/85 font-semibold transition-all duration-200 hover:bg-[#22C55E]/20 hover:text-white/95 hover:scale-105 active:scale-95";
+    "rounded-lg border border-transparent bg-[#15803d] text-white font-semibold transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const isDesktop = useIsDesktop();
@@ -787,7 +787,7 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className={`hidden md:block w-full text-lg py-3 ${greenActionBtnMuted}`}
+                        className={`hidden md:block w-full text-xl py-3.5 ${greenActionBtnMuted}`}
                       >
                         {t(
                           "ui_generate_request_58584f23a2",

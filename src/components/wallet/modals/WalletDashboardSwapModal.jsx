@@ -53,7 +53,7 @@ export default function WalletDashboardSwapModal({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const greenActionBtnBase =
-    "rounded-lg border border-[#22C55E]/40 bg-[#22C55E]/80 text-black font-semibold transition-all duration-200 hover:bg-[#22C55E] hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
+    "rounded-lg border border-transparent bg-[#15803d] text-white font-semibold transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-[#166534] hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:bg-[#15803d]/40 disabled:text-white/50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:scale-100";
   const isDesktop = useIsDesktop();
 
   // Résout l'icône (drapeau) pour un code devise, y compris les devises
@@ -296,7 +296,7 @@ export default function WalletDashboardSwapModal({
     ? t("ui_converting_71c2b9a4e5", "Converting...")
     : isPreviewMode
       ? t("ui_convert_8408e969ec", "Convert")
-      : t("ui_convert_allocation_6b2c1a9d5e", "Convert allocation");
+      : t("ui_convert_8408e969ec", "Convert");
   const handleConvertAction = () => {
     handleDemoConvert();
   };
@@ -521,6 +521,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     <div className="rounded-xl border border-subtle bg-black/30 px-4 py-3.5 space-y-2.5">
+                      <h4 className="text-sm font-medium text-white/50 uppercase tracking-wide">{t("ui_summary_title_d4e5f6a7b8", "Résumé")}</h4>
                       {/* Conversion summary */}
                       {Number.isFinite(previewAmount) && previewAmount > 0 && Number.isFinite(amountValue) && amountValue > 0 && baseCode && quoteCode ? (
                         <>
@@ -614,7 +615,7 @@ export default function WalletDashboardSwapModal({
                           e.stopPropagation();
                           handleConvertAction();
                         }}
-                        className={`hidden md:block w-full text-lg py-3 ${greenActionBtnBase}`}
+                        className={`hidden md:block w-full text-xl py-3.5 ${greenActionBtnBase}`}
                         disabled={convertButtonDisabled}
                       >
                         {convertButtonLabel}
