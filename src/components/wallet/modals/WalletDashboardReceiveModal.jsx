@@ -693,7 +693,7 @@ export default function WalletDashboardReceiveModal({
                       {/* Amount & Currency */}
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
+                          <label className="block text-sm md:text-sm text-white/60 mb-1.5">
                             {t("ui_amount_7668986206", "Amount")}
                           </label>
                           <input
@@ -701,11 +701,11 @@ export default function WalletDashboardReceiveModal({
                             value={requestAmount}
                             onChange={(e) => setRequestAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-base md:text-sm text-white outline-none focus:border-xcannes-green/80"
+                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2.5 text-base text-white outline-none focus:border-xcannes-green/80"
                           />
                         </div>
                         <div>
-                          <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
+                          <label className="block text-sm md:text-sm text-white/60 mb-1.5">
                             {t("ui_currency_1ed55673be", "Currency")}
                           </label>
                           <ModalSelect
@@ -756,7 +756,7 @@ export default function WalletDashboardReceiveModal({
 
                       {/* Memo (optional) */}
                       <div>
-                        <label className="block text-[11px] md:text-xs text-white/60 mb-1.5">
+                        <label className="block text-sm md:text-sm text-white/60 mb-1.5">
                           {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
                         </label>
                         <input
