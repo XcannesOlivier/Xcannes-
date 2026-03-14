@@ -472,133 +472,60 @@ export default function WalletDashboardSendModal({
     : null;
 
   const manualForm = showManualForm ? (
-    <div className="space-y-4">
+    <div className="space-y-3">
+        {/* ── Destination ── */}
         <div>
             <label
-              className="block text-base md:text-lg text-white/60 mb-1.5"
-              title={t(
-                "ui_send_destination_tip",
-                "Adresse XRPL du destinataire.",
-              )}
+              className="block text-sm text-white/50 mb-1"
+              title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
             >
-              {t(
-                "ui_destination_xrpl_address_9c2b94554c",
-                "Destination (XRPL address)",
-              )}
+              {t("ui_send_to_label", "Envoyer à")}
             </label>
-
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    list="saved-addresses"
-                    value={sendDestination}
-                    onChange={(e) => setSendDestination(e.target.value)}
-                    onPaste={handlePastePayload}
-                    placeholder={
-                      (savedAddresses || []).length > 0
-                        ? t(
-                            "ui_select_saved_address_60c28f89c1",
-                            "Select saved address...",
-                          )
-                        : t(
-                            "ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a",
-                            "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-                          )
-                    }
-                    className="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+            <div className="relative">
+              <input
+                type="text"
+                list="saved-addresses"
+                value={sendDestination}
+                onChange={(e) => setSendDestination(e.target.value)}
+                onPaste={handlePastePayload}
+                placeholder={
+                  (savedAddresses || []).length > 0
+                    ? t("ui_select_saved_address_60c28f89c1", "Select saved address...")
+                    : t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                }
+                className="w-full bg-black/40 border border-white/15 rounded-xl pl-4 pr-12 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setScanActive(true);
+                  setScanKey((prev) => prev + 1);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+              >
+                <svg className="w-7 h-7 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+              </button>
+              <datalist id="saved-addresses">
+                {(savedAddresses || []).map((addr, idx) => (
+                  <option
+                    key={idx}
+                    value={addr.address}
+                    label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
                   />
-                  <datalist id="saved-addresses">
-                    {(savedAddresses || []).map((addr, idx) => (
-                      <option
-                        key={idx}
-                        value={addr.address}
-                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
-                      />
-                    ))}
-                  </datalist>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setScanActive(true);
-                    setScanKey((prev) => prev + 1);
-                  }}
-                  className="p-0 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                  title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-                >
-                  <svg
-                    className="w-[52px] h-[52px] text-white/80"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              {scanRequestFooter}
+                ))}
+              </datalist>
             </div>
-          </div>
-          <div className={`transition-opacity duration-300 space-y-4 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
-          <div>
-            <label
-              className="block text-base md:text-lg text-white/60 mb-1.5"
-              title={t(
-                "ui_send_asset_tip",
-                "Sélectionnez la devise à envoyer.",
-              )}
-            >
-              {t("ui_asset_e5170a7a06", "Asset")}
-            </label>
-            <ModalSelect
-              value={selectedSendToken ? selectedSendToken.key : ""}
-              onChange={setSendAssetKey}
-              options={(augmentedTokens || []).map((token) => {
-                const labelLeft =
-                  selectLabelByAssetKey?.[token.key] ||
-                  selectLabelByAssetKey?.[token.currency] ||
-                  token.currency;
-                const labelRight =
-                  selectLabelRightByAssetKey?.[token.key] ||
-                  selectLabelRightByAssetKey?.[token.currency] ||
-                  null;
-                return {
-                  value: token.key,
-                  icon:
-                    selectIconByAssetKey?.[token.key] ||
-                    selectIconByAssetKey?.[token.currency] ||
-                    null,
-                  label: labelLeft,
-                  labelLeft,
-                  labelRight,
-                  labelMobile:
-                    selectLabelMobileByAssetKey?.[token.key] ||
-                    selectLabelMobileByAssetKey?.[token.currency] ||
-                    labelLeft,
-                };
-              })}
-              useNativeSelect={false}
-              showMobileOptionRight={true}
-              iconClassName="text-3xl leading-none"
-              buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-            />
-          </div>
+            <div className="mt-1.5">{scanRequestFooter}</div>
+        </div>
+
+        {/* ── Devise + Montant (fusionnés) ── */}
+        <div className={`transition-opacity duration-300 ${hasDestination ? 'opacity-100' : 'opacity-30 pointer-events-none select-none'}`}>
           {sendPaymentRequest?.beneficiaryLabel ? (
-            <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
+            <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90 mb-2">
               <span className="text-white/80">
                 {t("ui_beneficiary_label", "Bénéficiaire")}:
               </span>{" "}
@@ -607,43 +534,79 @@ export default function WalletDashboardSendModal({
               </span>
             </div>
           ) : null}
-          <div>
-            <div className="flex items-center justify-between">
-              <label
-                className="block text-base md:text-lg text-white/60 mb-1.5"
-                title={t(
-                  "ui_send_amount_tip",
-                  "Saisissez le montant à envoyer.",
-                )}
-              >
-                {t("ui_amount_52cea2dd3d", "Amount")}
-              </label>
-              {showCalculatedAmountLabel ? (
-                <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
-                  {t("ui_calculated_amount_label", "Montant calculé")}
-                </span>
-              ) : null}
+          <div className="flex items-center justify-between mb-1">
+            <label className="block text-sm text-white/50">
+              {t("ui_amount_and_currency_label", "Montant & Devise")}
+            </label>
+            {showCalculatedAmountLabel ? (
+              <span className="inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 text-[10px] text-amber-200/90">
+                {t("ui_calculated_amount_label", "Montant calculé")}
+              </span>
+            ) : null}
+          </div>
+          <div className="flex gap-2 items-stretch">
+            {/* Currency selector – compact */}
+            <div className="shrink-0 w-[130px] md:w-[150px]">
+              <ModalSelect
+                value={selectedSendToken ? selectedSendToken.key : ""}
+                onChange={setSendAssetKey}
+                options={(augmentedTokens || []).map((token) => {
+                  const labelLeft =
+                    selectLabelByAssetKey?.[token.key] ||
+                    selectLabelByAssetKey?.[token.currency] ||
+                    token.currency;
+                  const labelRight =
+                    selectLabelRightByAssetKey?.[token.key] ||
+                    selectLabelRightByAssetKey?.[token.currency] ||
+                    null;
+                  return {
+                    value: token.key,
+                    icon:
+                      selectIconByAssetKey?.[token.key] ||
+                      selectIconByAssetKey?.[token.currency] ||
+                      null,
+                    label: labelLeft,
+                    labelLeft,
+                    labelRight,
+                    labelMobile:
+                      selectLabelMobileByAssetKey?.[token.key] ||
+                      selectLabelMobileByAssetKey?.[token.currency] ||
+                      labelLeft,
+                  };
+                })}
+                useNativeSelect={false}
+                showMobileOptionRight={true}
+                iconClassName="text-xl leading-none"
+                buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer h-full"
+                menuClassName={
+                  noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+                }
+                selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              />
             </div>
-            <TokenAmountInput
-              value={sendAmount}
-              onChange={setSendAmount}
-              max={
-                sendFxInfo
-                  ? undefined
-                  : selectedSendToken
-                    ? selectedSendToken.value
-                    : undefined
-              }
-              placeholder="0.0000"
-              token={
-                selectedSendToken
-                  ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
-                    selectedSendToken.currency
-                  : "USD"
-              }
-              tokenClassName="text-white text-xl"
-              containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
-            />
+            {/* Amount input – fills remaining space */}
+            <div className="flex-1">
+              <TokenAmountInput
+                value={sendAmount}
+                onChange={setSendAmount}
+                max={
+                  sendFxInfo
+                    ? undefined
+                    : selectedSendToken
+                      ? selectedSendToken.value
+                      : undefined
+                }
+                placeholder="0.00"
+                token={
+                  selectedSendToken
+                    ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
+                      selectedSendToken.currency
+                    : "USD"
+                }
+                tokenClassName="text-white text-base"
+                containerClassName="focus-within:!border-xcannes-green/80 py-3 rounded-xl h-full"
+              />
+            </div>
           </div>
         </div>
     </div>
@@ -707,7 +670,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className="pt-3 border-t border-white/10 space-y-2">
+    <div className="sticky bottom-0 pt-3 pb-1 border-t border-white/10 space-y-2 bg-inherit z-10">
       <SwipeConfirmButton
         label={
           sendProcessing
@@ -826,25 +789,24 @@ export default function WalletDashboardSendModal({
               ✕
             </button>
           </div>
-          <div>
-            <div className="flex flex-col gap-4">
+          <div className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5">
+            <div className="flex flex-col gap-3">
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}
                   {payreqCurrencySelectorBlock}
                   {saveAddressBlock}
-                  {sendActions}
                 </>
               ) : (
                 <>
                   {manualForm}
                   {inlineSummary}
-                  {sendActions}
                   {scannerModal}
                 </>
               )}
             </div>
           </div>
+          {sendActions}
           <input
             id={payreqFileInputId}
             type="file"
