@@ -12,6 +12,7 @@ export default function ModalSelect({
   menuClassName = "",
   optionClassName = "",
   selectClassName = "",
+  iconClassName = "",
   useNativeSelect = true,
   hideMobileSelectedRight = false,
   useMobileSelectedLabel = false,
@@ -44,12 +45,13 @@ export default function ModalSelect({
 
   const renderIcon = (icon) => {
     if (!icon) return null;
+    const cls = iconClassName || "text-base leading-none";
     if (isValidElement(icon)) {
-      return <span className="text-base leading-none">{icon}</span>;
+      return <span className={cls}>{icon}</span>;
     }
     if (typeof icon === "string" || typeof icon === "number") {
       return (
-        <span className="text-base leading-none" aria-hidden="true">
+        <span className={cls} aria-hidden="true">
           {icon}
         </span>
       );
