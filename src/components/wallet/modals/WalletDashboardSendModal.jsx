@@ -490,7 +490,7 @@ export default function WalletDashboardSendModal({
                 onPaste={handlePastePayload}
                 placeholder={
                   (savedAddresses || []).length > 0
-                    ? t("ui_select_saved_address_60c28f89c1", "Select saved address...")
+                    ? t("ui_select_saved_address_60c28f89c1", "Import or select saved address...")
                     : t("ui_rxxxxxxxxxxxxxxxxxxxxxxxxxxx_26c99db80a", "rXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
                 }
                 className="w-full bg-black/40 border border-white/15 rounded-xl pl-4 pr-20 py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
@@ -505,7 +505,7 @@ export default function WalletDashboardSendModal({
                 className="absolute right-10 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
                 title={t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Charger une image qrcode")}
               >
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded border border-white/20 text-white/60 text-sm font-bold">+</span>
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded border border-white/20 text-white/60 text-base font-bold leading-none">+</span>
               </button>
               {/* ── Scan QR camera ── */}
               <button
@@ -687,7 +687,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className="sticky bottom-0 pt-3 pb-1 border-t border-white/10 space-y-2 bg-inherit z-10">
+    <div className="sticky bottom-0 pt-2 pb-1 -mt-2 border-t border-white/10 space-y-2 bg-inherit z-10">
       <SwipeConfirmButton
         label={
           sendProcessing
