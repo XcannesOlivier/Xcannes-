@@ -482,12 +482,7 @@ export default function WalletDashboardReceiveModal({
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       });
-  const receiveQrValue = useMemo(() => {
-    if (!wallet) return "";
-    const label = String(walletLabel || "").trim();
-    if (label) return `xrpl:${wallet}?name=${encodeURIComponent(label)}`;
-    return `xrpl:${wallet}`;
-  }, [wallet, walletLabel]);
+  const receiveQrValue = wallet ? `xrpl:${wallet}` : "";
   const qrDisplaySize = inline ? 240 : 220;
   const qrPixelSize = inline ? 360 : hasGeneratedRequest ? 520 : 420;
 

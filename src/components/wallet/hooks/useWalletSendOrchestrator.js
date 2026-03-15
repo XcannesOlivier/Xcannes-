@@ -42,8 +42,6 @@ export function useWalletSendOrchestrator({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest,
-    sendDestinationLabel,
-    setSendDestinationLabel,
     resetSendForm,
   } = useSendForm();
 
@@ -176,7 +174,6 @@ export function useWalletSendOrchestrator({
     setSendAssetKey,
     setSendTab,
     setSendPaymentRequest,
-    setSendDestinationLabel,
     toast,
   });
 
@@ -261,7 +258,6 @@ export function useWalletSendOrchestrator({
     sendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest,
-    sendDestinationLabel,
     // Addresses
     savedAddresses,
     saveAddress,

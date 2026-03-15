@@ -15,7 +15,6 @@ export function usePaymentRequestScanner({
   setSendAssetKey,
   setSendTab,
   setSendPaymentRequest,
-  setSendDestinationLabel,
   toast,
 } = {}) {
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
@@ -161,14 +160,13 @@ export function usePaymentRequestScanner({
           const to = candidateFromUrl || candidateFromHost || candidateFromPath;
           const amount = params.get("amount") || params.get("value") || null;
           const currency = params.get("currency") || params.get("ccy") || null;
-          const name = params.get("name") || params.get("label") || null;
-          return { to, amount, currency, name };
+          return { to, amount, currency };
         } catch (_) {
           return null;
         }
       };
 
-      const applyPrefill = ({ to, amount, currency, name } = {}) => {
+      const applyPrefill = ({ to, amount, currency } = {}) => {
         if (to) setSendDestination?.(to);
         if (amount) setSendAmount?.(String(amount));
         if (currency) {
@@ -181,8 +179,6 @@ export function usePaymentRequestScanner({
           }
         }
         setSendPaymentRequest?.(null);
-        // Propagate the scanned wallet label (from ?name= in xrpl: URI)
-        setSendDestinationLabel?.(name ? String(name) : "");
         setSendTab?.("manual");
       };
 
@@ -394,7 +390,6 @@ export function usePaymentRequestScanner({
       setSendAmount,
       setSendAssetKey,
       setSendDestination,
-      setSendDestinationLabel,
       setSendPaymentRequest,
       setSendTab,
       toast,
