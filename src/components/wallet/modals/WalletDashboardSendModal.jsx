@@ -551,26 +551,24 @@ export default function WalletDashboardSendModal({
                 }}
                 onPaste={handlePastePayload}
                 placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
-                className={`w-full bg-black/40 border border-white/15 rounded-xl ${(!hasPaymentRequest && (savedAddresses || []).length > 0) ? 'pl-11' : 'pl-4'} ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
+                className={`w-full bg-black/40 border border-white/15 rounded-xl ${!hasPaymentRequest ? 'pl-9' : 'pl-4'} ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
               />
               {!hasPaymentRequest && (
                 <>
-                  {(savedAddresses || []).length > 0 && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSavedPicker((prev) => !prev);
-                      }}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                      title={t("ui_saved_addresses_label", "Adresses enregistrées")}
-                      aria-expanded={showSavedPicker}
-                    >
-                      <svg className="w-7 h-7 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSavedPicker((prev) => !prev);
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+                    aria-expanded={showSavedPicker}
+                  >
+                    <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
                   {/* ── + upload QR image ── */}
                   <button
                     type="button"
@@ -600,35 +598,41 @@ export default function WalletDashboardSendModal({
                   </button>
                 </>
               )}
-              {!hasPaymentRequest && showSavedPicker && (savedAddresses || []).length > 0 ? (
+              {!hasPaymentRequest && showSavedPicker ? (
                 <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-lg border border-white/15 bg-black/90 backdrop-blur-sm overflow-hidden shadow-lg">
                   <div className="max-h-48 overflow-y-auto">
-                    {(savedAddresses || []).map((addr, idx) => (
-                      <button
-                        key={`${addr.address}-${idx}`}
-                        type="button"
-                        onClick={() => {
-                          const value = String(addr?.address || "").trim();
-                          if (!value) return;
-                          const label = String(
-                            addr?.onChainLabel || addr?.label || "",
-                          ).trim();
-                          setSendDestination(value);
-                          setSendDestinationLabel?.(label);
-                          setShowSavedPicker(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
-                      >
-                        <span className="block font-semibold">
-                          {String(
-                            addr?.onChainLabel || addr?.label || "",
-                          ).trim() || t("ui_wallet_unknown", "Unknown wallet")}
-                        </span>
-                        <span className="block font-mono text-[11px] text-white/60">
-                          {addr.address}
-                        </span>
-                      </button>
-                    ))}
+                    {(savedAddresses || []).length > 0 ? (
+                      (savedAddresses || []).map((addr, idx) => (
+                        <button
+                          key={`${addr.address}-${idx}`}
+                          type="button"
+                          onClick={() => {
+                            const value = String(addr?.address || "").trim();
+                            if (!value) return;
+                            const label = String(
+                              addr?.onChainLabel || addr?.label || "",
+                            ).trim();
+                            setSendDestination(value);
+                            setSendDestinationLabel?.(label);
+                            setShowSavedPicker(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
+                        >
+                          <span className="block font-semibold">
+                            {String(
+                              addr?.onChainLabel || addr?.label || "",
+                            ).trim() || t("ui_wallet_unknown", "Unknown wallet")}
+                          </span>
+                          <span className="block font-mono text-[11px] text-white/60">
+                            {addr.address}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-xs text-white/60">
+                        {t("ui_no_saved_addresses", "No saved addresses yet")}
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : null}
