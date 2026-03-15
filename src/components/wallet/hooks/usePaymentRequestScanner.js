@@ -160,13 +160,14 @@ export function usePaymentRequestScanner({
           const to = candidateFromUrl || candidateFromHost || candidateFromPath;
           const amount = params.get("amount") || params.get("value") || null;
           const currency = params.get("currency") || params.get("ccy") || null;
-          return { to, amount, currency };
+          const name = params.get("name") || params.get("label") || null;
+          return { to, amount, currency, name };
         } catch (_) {
           return null;
         }
       };
 
-      const applyPrefill = ({ to, amount, currency } = {}) => {
+      const applyPrefill = ({ to, amount, currency, name } = {}) => {
         if (to) setSendDestination?.(to);
         if (amount) setSendAmount?.(String(amount));
         if (currency) {
@@ -178,7 +179,16 @@ export function usePaymentRequestScanner({
             setSendAssetKey?.(matchingToken.key);
           }
         }
-        setSendPaymentRequest?.(null);
+        // When the scanned QR includes a wallet label (name), preserve it
+        // as a minimal payment request so the send UI can display it.
+        if (name) {
+          setSendPaymentRequest?.({
+            to: to || null,
+            beneficiaryLabel: String(name),
+          });
+        } else {
+          setSendPaymentRequest?.(null);
+        }
         setSendTab?.("manual");
       };
 
