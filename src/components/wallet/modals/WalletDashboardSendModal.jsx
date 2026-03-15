@@ -228,6 +228,63 @@ export default function WalletDashboardSendModal({
     }
   }, [canSaveDestination]);
 
+  /* ── Label helpers for summary ── */
+  const confirmCurrencyCode = String(
+    selectedSendToken?.currency || "",
+  ).trim().toUpperCase();
+  const summaryAmount = Number.isFinite(normalizedSendAmount) ? normalizedSendAmount : 0;
+  const confirmAmountLabel = confirmCurrencyCode
+    ? formatAmountWithSymbol(locale, summaryAmount, confirmCurrencyCode, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 6,
+      })
+    : null;
+  const savedDestinationLabel = useMemo(() => {
+    if (!normalizedDestination) return "";
+    const entry = (savedAddresses || []).find(
+      (addr) => String(addr?.address || "").trim() === normalizedDestination,
+    );
+    return entry?.label ? String(entry.label).trim() : "";
+  }, [savedAddresses, normalizedDestination]);
+  const resolvedDestinationLabel =
+    savedDestinationLabel || sendDestinationLabel || remoteDestinationLabel;
+
+  useEffect(() => {
+    if (!hasDestination || hasPaymentRequest || savedDestinationLabel || sendDestinationLabel) {
+      setRemoteDestinationLabel("");
+      return;
+    }
+
+    let cancelled = false;
+    const address = normalizedDestination;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          apiUrl(`/wallet/label?address=${encodeURIComponent(address)}`),
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to load wallet label");
+        }
+        const label = String(data?.label || "").trim();
+        if (!cancelled) setRemoteDestinationLabel(label);
+      } catch {
+        if (!cancelled) setRemoteDestinationLabel("");
+      }
+    }, 450);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [
+    hasDestination,
+    hasPaymentRequest,
+    normalizedDestination,
+    savedDestinationLabel,
+    sendDestinationLabel,
+  ]);
+
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -388,63 +445,6 @@ export default function WalletDashboardSendModal({
       ) : null}
     </div>
   ) : null;
-
-  /* ── Label helpers for summary ── */
-  const confirmCurrencyCode = String(
-    selectedSendToken?.currency || "",
-  ).trim().toUpperCase();
-  const summaryAmount = Number.isFinite(normalizedSendAmount) ? normalizedSendAmount : 0;
-  const confirmAmountLabel = confirmCurrencyCode
-    ? formatAmountWithSymbol(locale, summaryAmount, confirmCurrencyCode, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 6,
-      })
-    : null;
-  const savedDestinationLabel = useMemo(() => {
-    if (!normalizedDestination) return "";
-    const entry = (savedAddresses || []).find(
-      (addr) => String(addr?.address || "").trim() === normalizedDestination,
-    );
-    return entry?.label ? String(entry.label).trim() : "";
-  }, [savedAddresses, normalizedDestination]);
-  const resolvedDestinationLabel =
-    savedDestinationLabel || sendDestinationLabel || remoteDestinationLabel;
-
-  useEffect(() => {
-    if (!hasDestination || hasPaymentRequest || savedDestinationLabel || sendDestinationLabel) {
-      setRemoteDestinationLabel("");
-      return;
-    }
-
-    let cancelled = false;
-    const address = normalizedDestination;
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          apiUrl(`/wallet/label?address=${encodeURIComponent(address)}`),
-        );
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          throw new Error(data?.error || "Failed to load wallet label");
-        }
-        const label = String(data?.label || "").trim();
-        if (!cancelled) setRemoteDestinationLabel(label);
-      } catch {
-        if (!cancelled) setRemoteDestinationLabel("");
-      }
-    }, 450);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [
-    hasDestination,
-    hasPaymentRequest,
-    normalizedDestination,
-    savedDestinationLabel,
-    sendDestinationLabel,
-  ]);
 
   const manualForm = (
     <div className="space-y-3">
