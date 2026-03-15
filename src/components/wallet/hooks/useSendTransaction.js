@@ -2,6 +2,7 @@ import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
 import {
   buildMoonpayMemo,
   buildPayreqMemo,
+  buildAddressBookMemo,
   buildXrplJsonMemo,
 } from "@/utils/xrplMemo";
 
@@ -43,6 +44,17 @@ const appendMemos = (txjson, extraMemos) => {
   if (!txjson || !Array.isArray(extraMemos) || extraMemos.length === 0) return;
   const existing = Array.isArray(txjson.Memos) ? txjson.Memos : [];
   txjson.Memos = [...existing, ...extraMemos];
+};
+
+const buildAddressBookMemos = (address, label) => {
+  const normalized = String(address || "").trim();
+  if (!normalized) return null;
+  const payload = buildAddressBookMemo({
+    address: normalized,
+    label: String(label || "").trim() || null,
+  });
+  if (!payload) return null;
+  return buildXrplJsonMemo(payload);
 };
 
 // ---------------------------------------------------------------------------
@@ -317,6 +329,10 @@ export function useSendTransaction({
         amountRlusd: paymentRlusd,
       }),
     );
+    appendMemos(
+      payTx,
+      buildAddressBookMemos(normalizedSaveDestination, saveLabel),
+    );
 
     const payResult = await signTransaction(payTx, {
       action: "wallet:send",
@@ -445,6 +461,10 @@ export function useSendTransaction({
         amount: amountNum,
         amountRlusd: currency === "RLUSD" ? amountNum : null,
       }),
+    );
+    appendMemos(
+      txjson,
+      buildAddressBookMemos(normalizedSaveDestination, saveLabel),
     );
 
     const result = await signTransaction(txjson);

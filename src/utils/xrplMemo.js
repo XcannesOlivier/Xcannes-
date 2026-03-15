@@ -8,6 +8,7 @@ import {
   MEMO_MAX_JSON_BYTES,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
+  buildAddressBookMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
@@ -132,6 +133,7 @@ export function buildXrplJsonMemo(
 
 export {
   buildWalletLabelMemo,
+  buildAddressBookMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,

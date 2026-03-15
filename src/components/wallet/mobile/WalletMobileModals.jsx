@@ -62,8 +62,6 @@ export default function WalletMobileModals({
   setShowSaveAddressPrompt,
   addressToSave,
   setAddressToSave,
-  addressLabel,
-  setAddressLabel,
   saveAddress,
 
   // toast
@@ -147,17 +145,13 @@ export default function WalletMobileModals({
       <WalletDashboardSaveAddressPrompt
         open={showSaveAddressPrompt}
         addressToSave={addressToSave}
-        addressLabel={addressLabel}
-        setAddressLabel={setAddressLabel}
         onClose={() => {
           setShowSaveAddressPrompt(false);
-          setAddressLabel("");
           setAddressToSave("");
         }}
         onSave={() => {
-          saveAddress(addressToSave, addressLabel);
+          saveAddress(addressToSave, "");
           setShowSaveAddressPrompt(false);
-          setAddressLabel("");
           setAddressToSave("");
           toast?.success("Address saved!");
         }}

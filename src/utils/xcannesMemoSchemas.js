@@ -13,11 +13,11 @@ const XCANNES_MEMO_FORMAT_ZLIB = 'application/x-xcannes-zlib';
 const MEMO_FORMAT_VERSION = 2;
 
 // Valid memo types
-const VALID_MEMO_TYPES = new Set(['wallet_label', 'conversion', 'payreq', 'moonpay', 'reconcile']);
+const VALID_MEMO_TYPES = new Set(['wallet_label', 'conversion', 'payreq', 'moonpay', 'reconcile', 'address_book']);
 
 // Short marker ↔ long type
-const V2_TYPE_SHORT_TO_LONG = { wl: 'wallet_label', cv: 'conversion', pr: 'payreq', mp: 'moonpay', rc: 'reconcile' };
-const V2_TYPE_LONG_TO_SHORT = { wallet_label: 'wl', conversion: 'cv', payreq: 'pr', moonpay: 'mp', reconcile: 'rc' };
+const V2_TYPE_SHORT_TO_LONG = { wl: 'wallet_label', cv: 'conversion', pr: 'payreq', mp: 'moonpay', rc: 'reconcile', ab: 'address_book' };
+const V2_TYPE_LONG_TO_SHORT = { wallet_label: 'wl', conversion: 'cv', payreq: 'pr', moonpay: 'mp', reconcile: 'rc', address_book: 'ab' };
 
 // Short origin ↔ long origin (payreq)
 const V2_ORIGIN_SHORT_TO_LONG = { p: 'payreq', m: 'manual', s: 'spread' };
@@ -30,6 +30,7 @@ const V2_SIDE_LONG_TO_SHORT = { buy: 'b', sell: 's' };
 // "spread" origin = conversion fee transaction.
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
+const ADDRESS_LABEL_MAX_LENGTH = 40;
 // Maximum JSON byte length for memo payload (XRPL practical limit ~1 KB).
 const MEMO_MAX_JSON_BYTES = 900;
 // ⚠️  SYNC : cette liste doit rester identique à XRPL_ASSET_CODES
@@ -94,6 +95,11 @@ function isValidWalletLabel(label) {
   const parts = String(label).trim().split(/\s+/).filter(Boolean);
   if (parts.length < 1 || parts.length > 2) return false;
   return parts.every((part) => /^[A-Za-z]+$/.test(part) && part.length <= 7);
+}
+
+function isValidXrplAddress(address) {
+  const trimmed = String(address || '').trim();
+  return /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(trimmed);
 }
 
 function parseOptionalNumber(value, { min = null, minExclusive = false } = {}) {
@@ -230,6 +236,13 @@ function expandV2Reconcile(p) {
   };
 }
 
+function expandV2AddressBook(p) {
+  return {
+    address: p.a ?? p.address,
+    label: p.l ?? p.label,
+  };
+}
+
 function expandV2Payload(payload, type) {
   const expanders = {
     wallet_label: expandV2WalletLabel,
@@ -237,6 +250,7 @@ function expandV2Payload(payload, type) {
     payreq: expandV2Payreq,
     moonpay: expandV2Moonpay,
     reconcile: expandV2Reconcile,
+    address_book: expandV2AddressBook,
   };
 
   const expander = expanders[type];
@@ -258,6 +272,20 @@ function normalizeWalletLabelPayload(payload, errors) {
   const defaultCurrency = normalizeCurrencyCode(payload?.defaultCurrency);
   const normalized = { label };
   if (defaultCurrency) normalized.defaultCurrency = defaultCurrency;
+  return normalized;
+}
+
+function normalizeAddressBookPayload(payload, errors) {
+  const address = normalizeString(payload?.address);
+  if (!address || !isValidXrplAddress(address)) {
+    errors.push('address_book.address');
+  }
+  let label = normalizeString(payload?.label);
+  if (label && label.length > ADDRESS_LABEL_MAX_LENGTH) {
+    errors.push('address_book.label');
+  }
+  const normalized = { address };
+  if (label) normalized.label = label;
   return normalized;
 }
 
@@ -462,6 +490,8 @@ function validateXcannesMemoPayload(payload, options = {}) {
   let normalizedBody = null;
   if (inferredType === 'wallet_label') {
     normalizedBody = normalizeWalletLabelPayload(expanded, errors);
+  } else if (inferredType === 'address_book') {
+    normalizedBody = normalizeAddressBookPayload(expanded, errors);
   } else if (inferredType === 'conversion') {
     normalizedBody = normalizeConversionPayload(expanded, errors);
   } else if (inferredType === 'payreq') {
@@ -502,6 +532,9 @@ function toV2Compact(type, body) {
   if (type === 'wallet_label') {
     compact.l = body.label;
     if (body.defaultCurrency) compact.dc = body.defaultCurrency;
+  } else if (type === 'address_book') {
+    compact.a = body.address;
+    if (body.label) compact.l = body.label;
   } else if (type === 'conversion') {
     compact.b = body.base;
     compact.q = body.quote;
@@ -585,6 +618,10 @@ function buildWalletLabelMemo(data) {
   return createXcannesMemoPayload('wallet_label', data);
 }
 
+function buildAddressBookMemo(data) {
+  return createXcannesMemoPayload('address_book', data);
+}
+
 function buildConversionMemo(data) {
   return createXcannesMemoPayload('conversion', data);
 }
@@ -608,6 +645,7 @@ export {
   MEMO_MAX_JSON_BYTES,
   validateXcannesMemoPayload,
   buildWalletLabelMemo,
+  buildAddressBookMemo,
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,

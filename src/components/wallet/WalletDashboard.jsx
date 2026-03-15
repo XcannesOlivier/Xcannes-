@@ -797,8 +797,6 @@ export default function WalletDashboard({
               setShowSaveAddressPrompt={sendState.setShowSaveAddressPrompt}
               addressToSave={sendState.addressToSave}
               setAddressToSave={sendState.setAddressToSave}
-              addressLabel={sendState.addressLabel}
-              setAddressLabel={sendState.setAddressLabel}
               saveAddress={sendState.saveAddress}
             />
           ) : null}

@@ -45,10 +45,11 @@ export default function WalletDashboardSendModal({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
-  const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [remoteDestinationLabel, setRemoteDestinationLabel] = useState("");
+  const [showSavedPicker, setShowSavedPicker] = useState(false);
+  const savedPickerRef = useRef(null);
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -138,11 +139,10 @@ export default function WalletDashboardSendModal({
     const result = await handleSendSubmit?.({
       saveDestination:
         saveNewAddress && canSaveDestination ? normalizedDestination : "",
-      saveLabel: saveNewAddressLabel,
+      saveLabel: resolvedDestinationLabel,
     });
     if (result?.ok) {
       setSaveNewAddress(false);
-      setSaveNewAddressLabel("");
     }
   };
   const handleManualQrFile = async (file) => {
@@ -178,6 +178,87 @@ export default function WalletDashboardSendModal({
         ),
       );
     }
+  };
+  const looksLikeXrplAddress = (value) =>
+    /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
+  const looksLikeQrPayload = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw) return false;
+    if (/^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(raw)) return true;
+    if (/^xrpl:/i.test(raw)) return true;
+    if (looksLikeXrplAddress(raw)) return true;
+    if (
+      raw.startsWith("{") &&
+      /"to"|"targetCurrency"|"schema"|"payreq"/i.test(raw)
+    ) {
+      return true;
+    }
+    if (/^https?:/i.test(raw)) {
+      try {
+        const url = new URL(raw);
+        const req =
+          url.searchParams.get("req") ||
+          url.searchParams.get("payreq") ||
+          url.searchParams.get("xcannes_payreq");
+        if (req) return true;
+        const candidate =
+          url.searchParams.get("to") ||
+          url.searchParams.get("destination") ||
+          (url.hostname && url.hostname !== "xrpl" ? url.hostname : "") ||
+          (url.pathname || "").replace(/^\/+/, "");
+        if (candidate && looksLikeXrplAddress(candidate)) return true;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+  const handlePastePayload = (event) => {
+    const clipboard = event.clipboardData;
+    if (!clipboard) return false;
+    const text = (
+      clipboard.getData("text") ||
+      clipboard.getData("text/plain") ||
+      ""
+    ).trim();
+    if (text) {
+      event.preventDefault();
+      if (looksLikeQrPayload(text)) {
+        handlePaymentRequestScan?.(text);
+        setScanActive(false);
+        setShowSavedPicker(false);
+        return true;
+      }
+      setSendDestination(text);
+      setSendDestinationLabel?.("");
+      setShowSavedPicker(false);
+      return true;
+    }
+
+    const imageFromFiles = Array.from(clipboard.files || []).find(
+      (file) => file?.type && file.type.startsWith("image/"),
+    );
+    if (imageFromFiles) {
+      event.preventDefault();
+      handleManualQrFile(imageFromFiles);
+      setScanActive(false);
+      setShowSavedPicker(false);
+      return true;
+    }
+
+    const imageItem = Array.from(clipboard.items || []).find(
+      (item) => item?.kind === "file" && item.type?.startsWith("image/"),
+    );
+    const imageFromItems = imageItem?.getAsFile();
+    if (imageFromItems) {
+      event.preventDefault();
+      handleManualQrFile(imageFromItems);
+      setScanActive(false);
+      setShowSavedPicker(false);
+      return true;
+    }
+
+    return false;
   };
   const handleScan = (data) => {
     const result = handlePaymentRequestScan?.(data);
@@ -216,15 +297,32 @@ export default function WalletDashboardSendModal({
   useEffect(() => {
     if (!open) {
       setSaveNewAddress(false);
-      setSaveNewAddressLabel("");
       setScanActive(false);
+      setShowSavedPicker(false);
     }
   }, [open]);
 
   useEffect(() => {
+    if (!showSavedPicker) return;
+    const handleOutside = (event) => {
+      const target = event?.target;
+      const container = savedPickerRef.current;
+      if (!container || !target) return;
+      if (!container.contains(target)) {
+        setShowSavedPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [showSavedPicker]);
+
+  useEffect(() => {
     if (!canSaveDestination) {
       setSaveNewAddress(false);
-      setSaveNewAddressLabel("");
     }
   }, [canSaveDestination]);
 
@@ -426,23 +524,6 @@ export default function WalletDashboardSendModal({
         />
         {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
       </label>
-      {saveNewAddress ? (
-        <div className="space-y-1">
-          <div className="text-xs text-white/60">
-            {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
-          </div>
-          <input
-            type="text"
-            value={saveNewAddressLabel}
-            onChange={(e) => setSaveNewAddressLabel(e.target.value)}
-            placeholder={t(
-              "ui_e_g_exchange_friend_11008b5e9e",
-              "e.g., Exchange, Friend, ...",
-            )}
-            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
-          />
-        </div>
-      ) : null}
     </div>
   ) : null;
 
@@ -456,18 +537,37 @@ export default function WalletDashboardSendModal({
             >
               {t("ui_send_to_label", "Envoyer à")}
             </label>
-            <div className="relative">
+            <div className="relative" ref={savedPickerRef}>
               <input
                 type="text"
-                list="saved-addresses"
                 value={sendDestination}
-                readOnly
-                inputMode="none"
-                placeholder={t("ui_select_saved_address_60c28f89c1", "Scan QR code to fill address...")}
-                className={`w-full bg-black/40 border border-white/15 rounded-xl pl-4 ${hasPaymentRequest ? 'pr-4' : 'pr-20'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] cursor-default text-white/80`}
+                onChange={(e) => {
+                  setSendDestination(e.target.value);
+                  setSendDestinationLabel?.("");
+                  setShowSavedPicker(false);
+                }}
+                onPaste={handlePastePayload}
+                placeholder={t("ui_import_or_choose_recipient", "Import or choose your destinataire")}
+                className={`w-full bg-black/40 border border-white/15 rounded-xl pl-4 ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
               />
               {!hasPaymentRequest && (
                 <>
+                  {(savedAddresses || []).length > 0 && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSavedPicker((prev) => !prev);
+                      }}
+                      className="absolute right-20 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                      title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+                      aria-expanded={showSavedPicker}
+                    >
+                      <svg className="w-7 h-7 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                    </button>
+                  )}
                   {/* ── + upload QR image ── */}
                   <button
                     type="button"
@@ -475,7 +575,7 @@ export default function WalletDashboardSendModal({
                       e.stopPropagation();
                       handleScanQrUpload();
                     }}
-                    className="absolute right-10 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    className="absolute right-11 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
                     title={t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Charger une image qrcode")}
                   >
                     <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-white/20 text-white/60 text-lg font-bold leading-none">+</span>
@@ -497,16 +597,40 @@ export default function WalletDashboardSendModal({
                   </button>
                 </>
               )}
-              <datalist id="saved-addresses">
-                {(savedAddresses || []).map((addr, idx) => (
-                  <option
-                    key={idx}
-                    value={addr.address}
-                    label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
-                  />
-                ))}
-              </datalist>
+              {!hasPaymentRequest && showSavedPicker && (savedAddresses || []).length > 0 ? (
+                <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-lg border border-white/15 bg-black/90 backdrop-blur-sm overflow-hidden shadow-lg">
+                  <div className="max-h-48 overflow-y-auto">
+                    {(savedAddresses || []).map((addr, idx) => (
+                      <button
+                        key={`${addr.address}-${idx}`}
+                        type="button"
+                        onClick={() => {
+                          const value = String(addr?.address || "").trim();
+                          if (!value) return;
+                          setSendDestination(value);
+                          setSendDestinationLabel?.(String(addr?.label || "").trim());
+                          setShowSavedPicker(false);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
+                      >
+                        <span className="block font-semibold">
+                          {addr.label || t("ui_wallet_unknown", "Unknown wallet")}
+                        </span>
+                        <span className="block font-mono text-[11px] text-white/60">
+                          {addr.address}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
+            {resolvedDestinationLabel ? (
+              <div className="mt-1 text-xs text-white/60">
+                {t("ui_selected_wallet_label", "Sélectionné")}:{' '}
+                <span className="text-white/80">{resolvedDestinationLabel}</span>
+              </div>
+            ) : null}
         </div>
 
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}

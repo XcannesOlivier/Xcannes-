@@ -48,7 +48,9 @@ export function useWalletSendOrchestrator({
   } = useSendForm();
 
   // ── Saved addresses ────────────────────────────────────────
-  const { savedAddresses, saveAddress } = useSavedAddresses();
+  const { savedAddresses, saveAddress } = useSavedAddresses({
+    walletAddress: wallet?.address || "",
+  });
 
   // ── Pending payment requests (local storage) ───────────────
   const { pendingPayreqs, savePayreq, removePayreq, pendingCount } =
@@ -56,7 +58,6 @@ export function useWalletSendOrchestrator({
 
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
-  const [addressLabel, setAddressLabel] = useState("");
 
   // ── Receive form ───────────────────────────────────────────
   const [receiveTab, setReceiveTab] = useState("receive");
@@ -277,8 +278,6 @@ export function useWalletSendOrchestrator({
     setShowSaveAddressPrompt,
     addressToSave,
     setAddressToSave,
-    addressLabel,
-    setAddressLabel,
     // Receive
     receiveTab,
     setReceiveTab,

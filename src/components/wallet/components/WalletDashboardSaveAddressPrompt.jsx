@@ -7,8 +7,6 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 export default function WalletDashboardSaveAddressPrompt({
   open,
   addressToSave,
-  addressLabel,
-  setAddressLabel,
   onClose,
   onSave,
 }) {
@@ -51,21 +49,6 @@ export default function WalletDashboardSaveAddressPrompt({
               <div className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 font-mono break-all">
                 {addressToSave}
               </div>
-            </div>
-            <div className="mb-6">
-              <label className="block text-xs text-white/60 mb-2">
-                {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
-              </label>
-              <input
-                type="text"
-                value={addressLabel}
-                onChange={(e) => setAddressLabel(e.target.value)}
-                placeholder={t(
-                  "ui_e_g_exchange_friend_11008b5e9e",
-                  "e.g., Exchange, Friend, ...",
-                )}
-                className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-xcannes-green/80"
-              />
             </div>
             <div className="flex gap-3">
               <button
