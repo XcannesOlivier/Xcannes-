@@ -16,6 +16,7 @@ export function useSendForm({
   const [sendAmount, setSendAmount] = useState(defaultSendAmount);
   const [sendProcessing, setSendProcessing] = useState(false);
   const [sendPaymentRequest, setSendPaymentRequest] = useState(null);
+  const [sendDestinationLabel, setSendDestinationLabel] = useState("");
 
   const resetSendForm = () => {
     setSendTab(defaultSendTab);
@@ -24,6 +25,7 @@ export function useSendForm({
     setSendAmount(defaultSendAmount);
     setSendProcessing(false);
     setSendPaymentRequest(null);
+    setSendDestinationLabel("");
   };
 
   return {
@@ -39,6 +41,8 @@ export function useSendForm({
     setSendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest,
+    sendDestinationLabel,
+    setSendDestinationLabel,
     resetSendForm,
   };
 }

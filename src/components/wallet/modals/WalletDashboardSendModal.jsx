@@ -31,6 +31,7 @@ export default function WalletDashboardSendModal({
   savedAddresses,
   sendDestination,
   setSendDestination,
+  sendDestinationLabel,
   handlePaymentRequestScan,
   handleSendSubmit,
   sendProcessing,
@@ -657,7 +658,7 @@ export default function WalletDashboardSendModal({
               {t("ui_beneficiary_label", "Destinataire")}
             </span>
             <span className="font-semibold text-white/90">
-              {/* TODO: beneficiary lookup logic */}
+              {sendDestinationLabel || "—"}
             </span>
           </div>
           {/* Destination – truncated XRPL address, full on hover */}

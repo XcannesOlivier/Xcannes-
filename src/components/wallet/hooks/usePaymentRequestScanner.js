@@ -15,6 +15,7 @@ export function usePaymentRequestScanner({
   setSendAssetKey,
   setSendTab,
   setSendPaymentRequest,
+  setSendDestinationLabel,
   toast,
 } = {}) {
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
@@ -179,16 +180,9 @@ export function usePaymentRequestScanner({
             setSendAssetKey?.(matchingToken.key);
           }
         }
-        // When the scanned QR includes a wallet label (name), preserve it
-        // as a minimal payment request so the send UI can display it.
-        if (name) {
-          setSendPaymentRequest?.({
-            to: to || null,
-            beneficiaryLabel: String(name),
-          });
-        } else {
-          setSendPaymentRequest?.(null);
-        }
+        setSendPaymentRequest?.(null);
+        // Propagate the scanned wallet label (from ?name= in xrpl: URI)
+        setSendDestinationLabel?.(name ? String(name) : "");
         setSendTab?.("manual");
       };
 
@@ -400,6 +394,7 @@ export function usePaymentRequestScanner({
       setSendAmount,
       setSendAssetKey,
       setSendDestination,
+      setSendDestinationLabel,
       setSendPaymentRequest,
       setSendTab,
       toast,
