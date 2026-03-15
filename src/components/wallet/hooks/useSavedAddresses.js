@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { apiUrl } from "@/lib/runtimeConfig";
 
 const DEFAULT_STORAGE_KEY = "xcannes_saved_addresses";
+const normalizeLabel = (value) => String(value || "").trim();
 
 export function useSavedAddresses({
   storageKey = DEFAULT_STORAGE_KEY,
@@ -22,7 +23,24 @@ export function useSavedAddresses({
         return;
       }
       const parsed = JSON.parse(raw);
-      setSavedAddresses(Array.isArray(parsed) ? parsed : []);
+      const normalized = Array.isArray(parsed)
+        ? parsed
+            .map((entry) => {
+              const address = String(entry?.address || "").trim();
+              if (!address) return null;
+              const label = normalizeLabel(entry?.label);
+              const onChainLabel = normalizeLabel(entry?.onChainLabel);
+              const savedAt = entry?.savedAt || entry?.createdAt || null;
+              return {
+                address,
+                label: label || null,
+                onChainLabel: onChainLabel || null,
+                savedAt,
+              };
+            })
+            .filter(Boolean)
+        : [];
+      setSavedAddresses(normalized);
     } catch (err) {
       console.error("[useSavedAddresses] Error loading saved addresses:", err);
       setSavedAddresses([]);
@@ -71,9 +89,11 @@ export function useSavedAddresses({
           (remote || []).forEach((entry) => {
             const addr = String(entry?.address || "").trim();
             if (!addr) return;
+            const remoteLabel = normalizeLabel(entry?.label);
             map.set(addr, {
               address: addr,
-              label: String(entry?.label || "").trim() || null,
+              label: remoteLabel || null,
+              onChainLabel: remoteLabel || null,
               savedAt: entry?.savedAt || entry?.createdAt || null,
             });
           });
@@ -81,12 +101,15 @@ export function useSavedAddresses({
             const addr = String(entry?.address || "").trim();
             if (!addr) return;
             const existing = map.get(addr) || {};
-            const localLabel = String(entry?.label || "").trim();
-            const remoteLabel = String(existing.label || "").trim();
-            const label = remoteLabel || localLabel || "";
+            const localLabel = normalizeLabel(entry?.label);
+            const onChainLabel = normalizeLabel(
+              existing.onChainLabel || existing.label,
+            );
+            const label = onChainLabel || localLabel || "";
             map.set(addr, {
               address: addr,
               label: label || null,
+              onChainLabel: onChainLabel || null,
               savedAt: entry?.savedAt || existing.savedAt || null,
             });
           });
@@ -95,6 +118,7 @@ export function useSavedAddresses({
             label:
               entry.label ||
               String(entry.address || "").slice(0, 10) + "...",
+            onChainLabel: entry.onChainLabel || null,
             savedAt: entry.savedAt || new Date().toISOString(),
           }));
           persist(merged);
@@ -116,6 +140,7 @@ export function useSavedAddresses({
       const newAddress = {
         address,
         label: label || String(address || "").slice(0, 10) + "...",
+        onChainLabel: null,
         savedAt: new Date().toISOString(),
       };
 
