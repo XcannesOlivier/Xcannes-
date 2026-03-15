@@ -13,6 +13,7 @@ export function useSendForm({
   const [sendDestination, setSendDestination] = useState(
     defaultSendDestination,
   );
+  const [sendDestinationLabel, setSendDestinationLabel] = useState("");
   const [sendAmount, setSendAmount] = useState(defaultSendAmount);
   const [sendProcessing, setSendProcessing] = useState(false);
   const [sendPaymentRequest, setSendPaymentRequest] = useState(null);
@@ -21,6 +22,7 @@ export function useSendForm({
     setSendTab(defaultSendTab);
     setSendAssetKey(defaultSendAssetKey);
     setSendDestination(defaultSendDestination);
+    setSendDestinationLabel("");
     setSendAmount(defaultSendAmount);
     setSendProcessing(false);
     setSendPaymentRequest(null);
@@ -33,6 +35,8 @@ export function useSendForm({
     setSendAssetKey,
     sendDestination,
     setSendDestination,
+    sendDestinationLabel,
+    setSendDestinationLabel,
     sendAmount,
     setSendAmount,
     sendProcessing,

@@ -36,6 +36,8 @@ export function useWalletSendOrchestrator({
     setSendAssetKey,
     sendDestination,
     setSendDestination,
+    sendDestinationLabel,
+    setSendDestinationLabel,
     sendAmount,
     setSendAmount,
     sendProcessing,
@@ -170,6 +172,7 @@ export function useWalletSendOrchestrator({
   } = usePaymentRequestScanner({
     augmentedTokens,
     setSendDestination,
+    setSendDestinationLabel,
     setSendAmount,
     setSendAssetKey,
     setSendTab,
@@ -190,6 +193,7 @@ export function useWalletSendOrchestrator({
       if (!entry?.payreq) return;
       const pr = entry.payreq;
       if (pr.to) setSendDestination(pr.to);
+      setSendDestinationLabel("");
       const targetCurrency = String(pr.targetCurrencyCode || "").toUpperCase();
       const matchingToken = (augmentedTokens || []).find(
         (tok) => String(tok.currency || "").toUpperCase() === targetCurrency,
@@ -210,6 +214,7 @@ export function useWalletSendOrchestrator({
     [
       augmentedTokens,
       setSendDestination,
+      setSendDestinationLabel,
       setSendAssetKey,
       setSendAmount,
       setSendPaymentRequest,
@@ -253,6 +258,8 @@ export function useWalletSendOrchestrator({
     setSendAssetKey,
     sendDestination,
     setSendDestination,
+    sendDestinationLabel,
+    setSendDestinationLabel,
     sendAmount,
     setSendAmount,
     sendProcessing,

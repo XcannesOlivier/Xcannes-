@@ -11,6 +11,7 @@ const DEBUG_PAYREQ_SCAN = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 export function usePaymentRequestScanner({
   augmentedTokens,
   setSendDestination,
+  setSendDestinationLabel,
   setSendAmount,
   setSendAssetKey,
   setSendTab,
@@ -22,9 +23,10 @@ export function usePaymentRequestScanner({
   const handleAddressScan = useCallback(
     (address) => {
       setSendDestination?.(address);
+      setSendDestinationLabel?.("");
       setQrScannerOpen(false);
     },
-    [setSendDestination],
+    [setSendDestination, setSendDestinationLabel],
   );
 
   const handlePaymentRequestScan = useCallback(
@@ -160,13 +162,18 @@ export function usePaymentRequestScanner({
           const to = candidateFromUrl || candidateFromHost || candidateFromPath;
           const amount = params.get("amount") || params.get("value") || null;
           const currency = params.get("currency") || params.get("ccy") || null;
-          return { to, amount, currency };
+          const label =
+            params.get("label") ||
+            params.get("name") ||
+            params.get("beneficiary") ||
+            null;
+          return { to, amount, currency, label };
         } catch (_) {
           return null;
         }
       };
 
-      const applyPrefill = ({ to, amount, currency } = {}) => {
+      const applyPrefill = ({ to, amount, currency, label } = {}) => {
         if (to) setSendDestination?.(to);
         if (amount) setSendAmount?.(String(amount));
         if (currency) {
@@ -177,6 +184,10 @@ export function usePaymentRequestScanner({
           if (matchingToken) {
             setSendAssetKey?.(matchingToken.key);
           }
+        }
+        if (setSendDestinationLabel) {
+          const nextLabel = String(label || "").trim();
+          setSendDestinationLabel(nextLabel);
         }
         setSendPaymentRequest?.(null);
         setSendTab?.("manual");
@@ -223,9 +234,11 @@ export function usePaymentRequestScanner({
             request.beneficiaryName ??
             request.beneficiary ??
             request.walletLabel ??
+            request.label ??
             null;
 
           if (isXcannesPayReq && targetCurrency) {
+            setSendDestinationLabel?.("");
             const matchingToken = (augmentedTokens || []).find(
               (t) => String(t.currency || "").toUpperCase() === targetCurrency,
             );
@@ -274,6 +287,7 @@ export function usePaymentRequestScanner({
             to: request.to,
             amount: request.amount,
             currency: request.currency,
+            label: beneficiaryLabel,
           });
           return;
         }
@@ -283,7 +297,7 @@ export function usePaymentRequestScanner({
 
       // 2) XRPL address only
       if (looksLikeXrplAddress) {
-        applyPrefill({ to: payload });
+        applyPrefill({ to: payload, label: null });
         return;
       }
 
@@ -324,9 +338,11 @@ export function usePaymentRequestScanner({
           request.beneficiaryName ??
           request.beneficiary ??
           request.walletLabel ??
+          request.label ??
           null;
 
         if (isXcannesPayReq && targetCurrency) {
+          setSendDestinationLabel?.("");
           const matchingToken = (augmentedTokens || []).find(
             (t) => String(t.currency || "").toUpperCase() === targetCurrency,
           );
@@ -371,6 +387,7 @@ export function usePaymentRequestScanner({
           to: request.to,
           amount: request.amount,
           currency: request.currency,
+          label: beneficiaryLabel,
         });
         return;
       }
@@ -390,6 +407,7 @@ export function usePaymentRequestScanner({
       setSendAmount,
       setSendAssetKey,
       setSendDestination,
+      setSendDestinationLabel,
       setSendPaymentRequest,
       setSendTab,
       toast,

@@ -11,6 +11,7 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { greenActionBtnBase } from "./walletModalTokens";
 import { normalizeQrImageFile } from "@/utils/qrImage";
+import { apiUrl } from "@/lib/runtimeConfig";
 
 export default function WalletDashboardSendModal({
   open,
@@ -31,6 +32,8 @@ export default function WalletDashboardSendModal({
   savedAddresses,
   sendDestination,
   setSendDestination,
+  sendDestinationLabel,
+  setSendDestinationLabel,
   handlePaymentRequestScan,
   handleSendSubmit,
   sendProcessing,
@@ -45,6 +48,7 @@ export default function WalletDashboardSendModal({
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
+  const [remoteDestinationLabel, setRemoteDestinationLabel] = useState("");
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -174,91 +178,6 @@ export default function WalletDashboardSendModal({
         ),
       );
     }
-  };
-  const looksLikeXrplAddress = (value) =>
-    /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value);
-  const looksLikeQrPayload = (value) => {
-    const raw = String(value || "").trim();
-    if (!raw) return false;
-    if (/^(xcannes-payreq|xcannes-request)(?::\/\/|:)/i.test(raw)) return true;
-    if (/^xrpl:/i.test(raw)) return true;
-    if (looksLikeXrplAddress(raw)) return true;
-    if (
-      raw.startsWith("{") &&
-      /"to"|"targetCurrency"|"schema"|"payreq"/i.test(raw)
-    ) {
-      return true;
-    }
-    if (/^https?:/i.test(raw)) {
-      try {
-        const url = new URL(raw);
-        const req =
-          url.searchParams.get("req") ||
-          url.searchParams.get("payreq") ||
-          url.searchParams.get("xcannes_payreq");
-        if (req) return true;
-        const candidate =
-          url.searchParams.get("to") ||
-          url.searchParams.get("destination") ||
-          (url.hostname && url.hostname !== "xrpl" ? url.hostname : "") ||
-          (url.pathname || "").replace(/^\/+/, "");
-        if (candidate && looksLikeXrplAddress(candidate)) return true;
-      } catch {
-        return false;
-      }
-    }
-    return false;
-  };
-  const handlePastePayload = (event) => {
-    const clipboard = event.clipboardData;
-    if (!clipboard) return false;
-
-    // 1) Try synchronous text from clipboardData (works on desktop)
-    const text = (clipboard.getData("text") || clipboard.getData("text/plain") || "").trim();
-    if (looksLikeQrPayload(text)) {
-      event.preventDefault();
-      handlePaymentRequestScan?.(text);
-      setScanActive(false);
-      return true;
-    }
-
-    // 2) Check for image in clipboard items (QR image paste)
-    const items = clipboard.items || [];
-    for (const item of items) {
-      if (
-        item.kind === "file" &&
-        String(item.type || "").startsWith("image/")
-      ) {
-        const file = item.getAsFile();
-        if (file) {
-          event.preventDefault();
-          void handleManualQrFile(file);
-          return true;
-        }
-      }
-    }
-
-    // 3) Async fallback for mobile: clipboardData.getData("text") is often
-    //    empty on mobile when the clipboard was written via ClipboardItem API.
-    //    Use navigator.clipboard.readText() as async fallback.
-    if (!text && navigator?.clipboard?.readText) {
-      event.preventDefault();
-      navigator.clipboard.readText().then((asyncText) => {
-        const trimmed = (asyncText || "").trim();
-        if (looksLikeQrPayload(trimmed)) {
-          handlePaymentRequestScan?.(trimmed);
-          setScanActive(false);
-        } else if (trimmed) {
-          // Not a QR payload — put it in the destination field
-          setSendDestination(trimmed);
-        }
-      }).catch(() => {
-        // Permission denied or unavailable — ignore
-      });
-      return true;
-    }
-
-    return false;
   };
   const handleScan = (data) => {
     const result = handlePaymentRequestScan?.(data);
@@ -481,6 +400,51 @@ export default function WalletDashboardSendModal({
         maximumFractionDigits: 6,
       })
     : null;
+  const savedDestinationLabel = useMemo(() => {
+    if (!normalizedDestination) return "";
+    const entry = (savedAddresses || []).find(
+      (addr) => String(addr?.address || "").trim() === normalizedDestination,
+    );
+    return entry?.label ? String(entry.label).trim() : "";
+  }, [savedAddresses, normalizedDestination]);
+  const resolvedDestinationLabel =
+    savedDestinationLabel || sendDestinationLabel || remoteDestinationLabel;
+
+  useEffect(() => {
+    if (!hasDestination || hasPaymentRequest || savedDestinationLabel || sendDestinationLabel) {
+      setRemoteDestinationLabel("");
+      return;
+    }
+
+    let cancelled = false;
+    const address = normalizedDestination;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          apiUrl(`/wallet/label?address=${encodeURIComponent(address)}`),
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to load wallet label");
+        }
+        const label = String(data?.label || "").trim();
+        if (!cancelled) setRemoteDestinationLabel(label);
+      } catch {
+        if (!cancelled) setRemoteDestinationLabel("");
+      }
+    }, 450);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [
+    hasDestination,
+    hasPaymentRequest,
+    normalizedDestination,
+    savedDestinationLabel,
+    sendDestinationLabel,
+  ]);
 
   const manualForm = (
     <div className="space-y-3">
@@ -497,11 +461,10 @@ export default function WalletDashboardSendModal({
                 type="text"
                 list="saved-addresses"
                 value={sendDestination}
-                onChange={hasPaymentRequest ? undefined : (e) => setSendDestination(e.target.value)}
-                onPaste={hasPaymentRequest ? undefined : handlePastePayload}
-                readOnly={hasPaymentRequest}
-                placeholder={t("ui_select_saved_address_60c28f89c1", "Import or select saved address...")}
-                className={`w-full bg-black/40 border border-white/15 rounded-xl pl-4 ${hasPaymentRequest ? 'pr-4' : 'pr-20'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] ${hasPaymentRequest ? 'cursor-default text-white/60' : ''}`}
+                readOnly
+                inputMode="none"
+                placeholder={t("ui_select_saved_address_60c28f89c1", "Scan QR code to fill address...")}
+                className={`w-full bg-black/40 border border-white/15 rounded-xl pl-4 ${hasPaymentRequest ? 'pr-4' : 'pr-20'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] cursor-default text-white/80`}
               />
               {!hasPaymentRequest && (
                 <>
@@ -657,7 +620,7 @@ export default function WalletDashboardSendModal({
               {t("ui_beneficiary_label", "Destinataire")}
             </span>
             <span className="font-semibold text-white/90">
-              {/* TODO: beneficiary lookup logic */}
+              {resolvedDestinationLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </span>
           </div>
           {/* Destination – truncated XRPL address, full on hover */}
