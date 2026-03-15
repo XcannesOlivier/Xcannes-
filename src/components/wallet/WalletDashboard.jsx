@@ -700,16 +700,6 @@ export default function WalletDashboard({
 
   // ── Render ─────────────────────────────────────────────────
 
-  // Gate: wait until currency-lines data is available (from cache or API)
-  // to avoid a flash of empty wallet state on page load.
-  if (backendWalletAddress && !currencyLinesReady) {
-    return (
-      <div className="bg-xcannes-surface-demo h-full min-h-0 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <>
       <div

@@ -102,6 +102,7 @@ export function useWalletCurrencyLines(address) {
     } catch (err) {
       console.error("[useWalletCurrencyLines] Error:", err);
       setError(err.message || "Unknown error");
+      setInitialReady(true);
     } finally {
       if (!silent) setLoading(false);
     }
