@@ -682,7 +682,7 @@ export default function WalletDashboardReceiveModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
+    "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col min-h-0 overflow-y-auto overscroll-contain pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
@@ -748,7 +748,7 @@ export default function WalletDashboardReceiveModal({
               <p className="text-xs md:text-sm text-white/60">
                 {t(
                   "ui_receive_and_request_desc_2f1a7c9d5e",
-                  "Share this XRPL address to receive funds, or create a payment request to send to another wallet.",
+                  "Share your address to get paid, or create a payment request to send to someone.",
                 )}
               </p>
 
@@ -758,6 +758,17 @@ export default function WalletDashboardReceiveModal({
                     inline ? "flex-1 min-h-0 justify-center" : ""
                   }`}
                 >
+                  <div className="text-xs md:text-sm text-white/70 text-center">
+                    {showRequestPreview
+                      ? t(
+                          "ui_receive_qr_request_title",
+                          "QR de demande de paiement — à scanner pour vous payer.",
+                        )
+                      : t(
+                          "ui_receive_qr_address_title",
+                          "QR d’adresse — à scanner pour vous envoyer des fonds.",
+                        )}
+                  </div>
                   <div
                     ref={qrContainerRef}
                     className="bg-black/60 border border-white/10 rounded-xl p-3 text-[0px]"
