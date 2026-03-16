@@ -45,11 +45,13 @@ export default function DemoWalletDashboardSendModal({
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
+  const [pageHeaderOffset, setPageHeaderOffset] = useState(0);
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [selectedSavedLabel, setSelectedSavedLabel] = useState("");
+  const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
   const savedPickerRef = useRef(null);
   const scanQrFileInputId = "send-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -120,6 +122,23 @@ export default function DemoWalletDashboardSendModal({
     requestDestination.length > 14
       ? `${requestDestination.slice(0, 6)}...${requestDestination.slice(-4)}`
       : requestDestination;
+
+  const resolvedDestinationLabel = selectedSavedLabel || requestBeneficiaryLabel;
+  const confirmCurrencyCode = String(
+    selectedSendToken?.currency || requestCurrencyCode || "",
+  )
+    .trim()
+    .toUpperCase();
+  const summaryAmount = Number.isFinite(normalizedSendAmount) ? normalizedSendAmount : 0;
+  const confirmAmountLabel =
+    confirmCurrencyCode
+      ? formatAmountWithSymbol(
+          locale,
+          Number.isFinite(summaryAmount) ? summaryAmount : 0,
+          confirmCurrencyCode,
+          { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+        )
+      : null;
   const handleManualSend = async () => {
     const result = await handleSendSubmit?.({
       saveDestination:
@@ -244,6 +263,7 @@ export default function DemoWalletDashboardSendModal({
       setCameraUnavailable(false);
       setShowSavedPicker(false);
       setSelectedSavedLabel("");
+      setShowFullSummaryAddress(false);
     }
   }, [open]);
 
@@ -280,16 +300,40 @@ export default function DemoWalletDashboardSendModal({
     enabled: shouldAnimate,
   });
 
+  const resolveFixedHeaderOffset = () => {
+    if (typeof window === "undefined") return 0;
+    const header = document.querySelector("header");
+    if (!header) return 0;
+    const styles = window.getComputedStyle(header);
+    if (styles.position !== "fixed") return 0;
+    const rect = header.getBoundingClientRect?.();
+    if (!rect) return 0;
+    // Header fixed at top; reserve its height so modals in the home demo
+    // don't get pushed under/around the global header.
+    if (Math.abs(rect.top) > 1) return 0;
+    return Math.max(0, Math.round(rect.height || 0));
+  };
+
+  // When embedded on the homepage (fixed site header), keep the modal below the header.
+  // This is a no-op on pages without a fixed header.
+  useEffect(() => {
+    if (!open || inline) return;
+    const apply = () => setPageHeaderOffset(resolveFixedHeaderOffset());
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, [open, inline]);
+
   if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+    : "fixed inset-x-0 bottom-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
+      : "h-full md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -377,6 +421,75 @@ export default function DemoWalletDashboardSendModal({
           />
         </div>
       ) : null}
+    </div>
+  ) : null;
+
+  const inlineSummary = hasDestination ? (
+    <div className="space-y-3 transition-all duration-200">
+      <div className="rounded-xl border border-xcannes-accent-green/25 bg-xcannes-accent-green/5 p-4 space-y-3">
+        <div className="text-xs uppercase tracking-wide text-xcannes-accent-green/80 font-semibold">
+          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
+        </div>
+        <div className="space-y-2 text-sm text-white/80">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60 shrink-0">
+              {t("ui_beneficiary_label", "Destinataire")}
+            </span>
+            <span className="font-semibold text-white/90">
+              {resolvedDestinationLabel ||
+                t("ui_wallet_unknown", "Unknown wallet")}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60 shrink-0">
+              {t("ui_account_number_label", "N° de compte")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowFullSummaryAddress((prev) => !prev)}
+              title={normalizedDestination}
+              className={`font-mono text-white/80 text-right text-xs ${
+                showFullSummaryAddress ? "break-all" : ""
+              } cursor-pointer`}
+            >
+              {showFullSummaryAddress
+                ? normalizedDestination
+                : normalizedDestination.length > 14
+                  ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+                  : normalizedDestination}
+            </button>
+          </div>
+
+          {saveAddressBlock}
+
+          {confirmCurrencyCode ? (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-white/60">
+                {t("ui_asset_e5170a7a06", "Asset")}
+              </span>
+              <span className="font-semibold text-white/90">
+                {selectLabelByAssetKey?.[selectedSendToken?.key] ||
+                  selectLabelByAssetKey?.[selectedSendToken?.currency] ||
+                  confirmCurrencyCode}
+              </span>
+            </div>
+          ) : null}
+
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_amount_52cea2dd3d", "Amount")}
+            </span>
+            <span
+              className={`font-mono ${
+                summaryAmount > 0 ? "text-white/90" : "text-white/40"
+              }`}
+            >
+              {confirmAmountLabel || "0"}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   ) : null;
 
@@ -696,7 +809,6 @@ export default function DemoWalletDashboardSendModal({
             )}
           </div>
 
-          {saveAddressBlock ? <div className="pt-1">{saveAddressBlock}</div> : null}
         </div>
       </div>
     </div>
@@ -723,7 +835,10 @@ export default function DemoWalletDashboardSendModal({
   const scannerModal =
     scanActive && typeof document !== "undefined"
       ? createPortal(
-          <div className="fixed inset-0 z-[10002] flex flex-col">
+          <div
+            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col"
+            style={{ top: pageHeaderOffset ? `${pageHeaderOffset}px` : 0 }}
+          >
             {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black/90 backdrop-blur-sm"
@@ -796,15 +911,19 @@ export default function DemoWalletDashboardSendModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+          className={`fixed inset-x-0 bottom-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}
+          style={{ top: pageHeaderOffset ? `${pageHeaderOffset}px` : 0 }}
         />
       ) : null}
 
       {/* Modale */}
-      <div className={wrapperClass}>
+      <div
+        className={wrapperClass}
+        style={{ top: pageHeaderOffset ? `${pageHeaderOffset}px` : 0 }}
+      >
         <div
           className={panelClass}
           style={{ WebkitOverflowScrolling: "touch" }}
@@ -838,11 +957,11 @@ export default function DemoWalletDashboardSendModal({
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}
-                  {saveAddressBlock}
                 </>
               ) : (
                 <>
                   {manualForm}
+                  {inlineSummary}
                 </>
               )}
               {scannerModal}
