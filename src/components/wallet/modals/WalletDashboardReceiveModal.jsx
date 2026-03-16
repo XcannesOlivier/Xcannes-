@@ -442,6 +442,16 @@ export default function WalletDashboardReceiveModal({
     const fallbackText = useRequest ? requestQrValue : receiveQrValue;
     const blob = buildQrBlob(useRequest);
 
+    if (!isDesktop && navigator?.clipboard?.writeText && fallbackText) {
+      try {
+        await navigator.clipboard.writeText(fallbackText);
+        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+        return;
+      } catch {
+        // fall through to image copy / execCommand
+      }
+    }
+
     if (typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write) {
       try {
         if (blob) {
@@ -520,8 +530,12 @@ export default function WalletDashboardReceiveModal({
     }
 
     const shareData = {};
-    if (fallbackText) shareData.text = fallbackText;
     shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
+
+    const payreqShareText = t(
+      "ui_share_payreq_short",
+      "XCANNES payment request",
+    );
 
     if (blob && typeof File !== "undefined") {
       const file = new File([blob], "xcannes-qr.png", {
@@ -530,6 +544,12 @@ export default function WalletDashboardReceiveModal({
       if (!navigator.canShare || navigator.canShare({ files: [file] })) {
         shareData.files = [file];
       }
+    }
+
+    if (shareData.files) {
+      shareData.text = useRequest ? payreqShareText : fallbackText;
+    } else if (fallbackText) {
+      shareData.text = fallbackText;
     }
 
     try {
