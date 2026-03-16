@@ -1,0 +1,168 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "next-i18next";
+
+/**
+ * DemoWalletSettingsDropdown — settings gear + dropdown shell for the demo wallet.
+ * Mobile-only for now, with no links/actions wired yet (UI scaffold).
+ */
+export default function DemoWalletSettingsDropdown() {
+  const { t } = useTranslation("common");
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isOpen]);
+
+  return (
+    <div className="relative md:hidden" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className={[
+          "shrink-0 h-9 w-9 flex items-center justify-center rounded-lg border transition-all active:scale-95",
+          isOpen
+            ? "bg-white/5 border-white/12 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)]"
+            : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5",
+        ].join(" ")}
+        aria-label={t("ui_settings_label", "Paramètres")}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={1.8}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          {/* Backdrop (tap to close) */}
+          <button
+            type="button"
+            aria-label={t("close", "Fermer")}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px]"
+            onClick={() => setIsOpen(false)}
+          />
+
+          <div
+            role="menu"
+            className="fixed inset-0 z-50 overflow-y-auto bg-[#0b0f10]"
+          >
+            {/* Top stripe */}
+            <div className="h-1 w-full bg-gradient-to-r from-xcannes-green/70 via-xcannes-green/15 to-transparent" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-3">
+              <div className="min-w-0">
+                <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+                  {t("ui_settings_label", "Paramètres")}
+                </div>
+                <div className="text-[12px] text-white/80 mt-1 truncate">
+                  {t("ui_demo_wallet_settings_subtitle", "Démo — mise en place")}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                aria-label={t("close", "Fermer")}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="px-3 pb-4">
+              {/* Section: Actions (disabled scaffold) */}
+              <div className="pt-2">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                  {t("ui_settings_section_actions", "Actions")}
+                </div>
+                <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/3 text-left opacity-60">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/60 shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_settings_demo_placeholder_desc", "Aucun lien activé pour le moment")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="my-3 border-t border-white/10" />
+
+              {/* Section: Display (disabled scaffold) */}
+              <div className="pt-0.5">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                  {t("ui_settings_section_display", "Affichage")}
+                </div>
+                <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl border border-white/10 bg-black/20 text-left opacity-60">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v18m9-9H3" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("ui_preferred_currency_label", "Devise principale")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_coming_soon", "Bientôt disponible")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="my-3 border-t border-white/10" />
+
+              {/* Section: Help (disabled scaffold) */}
+              <div className="pt-0.5">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                  {t("ui_settings_section_help", "Aide")}
+                </div>
+                <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl border border-white/10 bg-white/3 text-left opacity-60">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0 font-semibold">
+                    i
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("wallet_footer_info_fees", "Info & Fees")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_settings_demo_info_hint", "À configurer")}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+

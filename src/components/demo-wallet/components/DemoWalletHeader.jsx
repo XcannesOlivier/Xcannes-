@@ -6,6 +6,7 @@
 
 import { useTranslation } from "next-i18next";
 import { formatMoney, formatDemoAddressShort } from "../utils/demoWalletHelpers";
+import DemoWalletSettingsDropdown from "./demoWalletSettingsDropdown";
 
 export default function DemoWalletHeader({
   locale,
@@ -224,9 +225,9 @@ export default function DemoWalletHeader({
               ) : null}
             </div>
 
-            <button
-              type="button"
-              onClick={handleRefreshWallet}
+	            <button
+	              type="button"
+	              onClick={handleRefreshWallet}
               disabled={isRefreshing}
               title={t("demo_tt_reset", "Réinitialiser la démo.")}
               aria-label={t("demo_reset", "Réinitialiser")}
@@ -243,10 +244,13 @@ export default function DemoWalletHeader({
               >
                 <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />
               </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+	            </button>
+
+	            {/* Settings dropdown (mobile only) — scaffold only, no links yet */}
+	            <DemoWalletSettingsDropdown />
+	          </div>
+	        </div>
+	      </div>
+	    </div>
   );
 }
