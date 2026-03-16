@@ -42,6 +42,22 @@ const DEFAULT_DEMO_WALLETS = {
       XAF: 60,
     },
   },
+  B: {
+    id: "B",
+    label: "Compte secondaire",
+    labelLocked: false,
+    address: "GtxxxxXcannes456xxxxxxxxxxx",
+    allocations: {
+      RLUSD: 2500,
+      EUR: 120,
+      GBP: 80,
+      CHF: 60,
+      JPY: 90,
+      MXN: 110,
+      INR: 320,
+      XAF: 140,
+    },
+  },
 };
 
 const DEMO_EVENT_SPREAD_BPS = 100;
@@ -690,5 +706,4 @@ export function applyDemoBuySell({
 
   return { ok: true, event };
 }
-
 

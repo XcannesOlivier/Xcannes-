@@ -80,18 +80,7 @@ export default function DemoWalletDashboard({
   const refreshTimerRef = useRef(null);
   const prevActiveActionRef = useRef(activeAction);
 
-  const {
-    isEditingWalletLabel,
-    setIsEditingWalletLabel,
-    walletLabelDraft,
-    setWalletLabelDraft,
-    walletHeaderToast,
-    setWalletHeaderToast,
-    handleOpenWalletLabelEditor,
-    handleCancelWalletLabel,
-    handleSaveWalletLabel,
-    handleCopyWalletAddress,
-  } = useDemoWalletLabel({
+  const { walletHeaderToast, handleCopyWalletAddress } = useDemoWalletLabel({
     activeWalletId,
     walletContextLabel,
     walletAddress: wallet,
@@ -112,7 +101,7 @@ export default function DemoWalletDashboard({
   const { renderWalletMeta } = useDemoWalletMeta({
     walletAddress: wallet,
     walletLabel: walletContextLabel,
-    hideAddress: isWalletLabelLocked,
+    hideAddress: false,
     addressTitle: t("demo_tt_wallet_address", "Adresse XRPL du wallet."),
   });
   const { savedAddresses: demoSavedAddresses, saveAddress: saveDemoAddress } =
@@ -298,8 +287,6 @@ export default function DemoWalletDashboard({
     setSelectedStatementToken(null);
     resetStatementHighlights();
     setSendPaymentRequest(null);
-    setIsEditingWalletLabel(false);
-    setWalletHeaderToast("");
   }, [
     resetStatementHighlights,
     resolvedDefaultWalletId,
@@ -311,8 +298,6 @@ export default function DemoWalletDashboard({
     setShowCurrencyStatement,
     setShowGlobalStatement,
     setState,
-    setIsEditingWalletLabel,
-    setWalletHeaderToast,
   ]);
 
   const handleRefreshWallet = useCallback(() => {
@@ -343,6 +328,14 @@ export default function DemoWalletDashboard({
 
   const displayCurrency = String(preferredCurrency || "USD").toUpperCase();
   const displayTotal = usdTotal / preferredUsdPerUnit;
+
+  const walletAddresses = useMemo(() => {
+    return Object.values(state?.wallets || {}).map((w) => ({
+      id: w?.id,
+      label: w?.label,
+      address: w?.address,
+    }));
+  }, [state?.wallets]);
 
   useEffect(() => {
     const upper = String(requestCurrency || "").toUpperCase();
@@ -509,14 +502,10 @@ export default function DemoWalletDashboard({
         onLoadFawazCurrencies={loadFawazCurrencies}
         onPreferredCurrencyChange={setPreferredCurrency}
         walletHeaderToast={walletHeaderToast}
-        isWalletLabelLocked={isWalletLabelLocked}
-        isEditingWalletLabel={isEditingWalletLabel}
-        walletLabelDraft={walletLabelDraft}
-        setWalletLabelDraft={setWalletLabelDraft}
-        handleOpenWalletLabelEditor={handleOpenWalletLabelEditor}
-        handleSaveWalletLabel={handleSaveWalletLabel}
-        handleCancelWalletLabel={handleCancelWalletLabel}
         handleCopyWalletAddress={handleCopyWalletAddress}
+        walletAddresses={walletAddresses}
+        activeWalletId={activeWalletId}
+        onSwitchWallet={setActiveWalletId}
         handleRefreshWallet={handleRefreshWallet}
         isRefreshing={isRefreshing}
       />
