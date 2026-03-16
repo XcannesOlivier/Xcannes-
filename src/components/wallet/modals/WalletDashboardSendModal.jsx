@@ -980,16 +980,20 @@ export default function WalletDashboardSendModal({
                 className="bg-black w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
               />
             </div>
-            {/* Hint */}
-            <p className="absolute bottom-6 left-0 right-0 text-xs text-white/40 text-center">
-              {t("ui_scan_hint_auto_close", "Le scanner se ferme automatiquement après la lecture.")}
-            </p>
             {inline && scanUnavailable ? (
-              <div className="absolute bottom-16 left-4 right-4 rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 text-center">
-                {t(
-                  "ui_camera_unavailable_device_4f2a90f1c3",
-                  "Camera is not available on this device. You can upload a QR image below.",
-                )}
+              <div className="absolute bottom-6 left-4 right-4 rounded-xl border border-orange-400/30 bg-black/70 px-4 py-3 text-xs text-white/80 shadow-lg backdrop-blur-sm">
+                <div className="text-sm font-semibold text-white">
+                  {t(
+                    "ui_scanner_unavailable_title",
+                    "Scanner indisponible",
+                  )}
+                </div>
+                <div className="mt-1 text-white/70">
+                  {t(
+                    "ui_scanner_unavailable_detail",
+                    "La caméra n’est pas accessible sur ce poste. Importez un QR via le bouton + ou collez un code.",
+                  )}
+                </div>
               </div>
             ) : null}
           </div>
