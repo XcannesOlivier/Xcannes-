@@ -247,11 +247,17 @@ export default function WalletDashboardReceiveModal({
     if (!canvas) return null;
     const srcWidth = canvas.width;
     const srcHeight = canvas.height;
-    const scale = useRequest ? 4 : 3;
+    const baseScale = useRequest ? 4 : 3;
     const marginRatio = useRequest ? 0.12 : 0.1;
     const margin = Math.max(24, Math.round(srcWidth * marginRatio));
+    const maxExportWidth = 1600;
+    const safeScale = Math.min(
+      baseScale,
+      maxExportWidth / (srcWidth + margin * 2),
+    );
+    const scale = Math.max(1.8, safeScale);
     const exportCanvas = document.createElement("canvas");
-    const exportWidth = (srcWidth + margin * 2) * scale;
+    const exportWidth = Math.round((srcWidth + margin * 2) * scale);
     const baseHeight = (srcHeight + margin * 2) * scale;
     exportCanvas.width = exportWidth;
     const ctx = exportCanvas.getContext("2d");
@@ -442,13 +448,33 @@ export default function WalletDashboardReceiveModal({
     const fallbackText = useRequest ? requestQrValue : receiveQrValue;
     const blob = buildQrBlob(useRequest);
 
-    if (!isDesktop && navigator?.clipboard?.writeText && fallbackText) {
+    if (!isDesktop && fallbackText) {
+      if (navigator?.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(fallbackText);
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          return;
+        } catch {
+          // fall through to execCommand
+        }
+      }
       try {
-        await navigator.clipboard.writeText(fallbackText);
-        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
-        return;
+        const el = document.createElement("textarea");
+        el.value = fallbackText;
+        el.setAttribute("readonly", "");
+        el.style.position = "fixed";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.focus();
+        el.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(el);
+        if (ok) {
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          return;
+        }
       } catch {
-        // fall through to image copy / execCommand
+        // fall through
       }
     }
 
