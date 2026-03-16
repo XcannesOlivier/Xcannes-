@@ -163,7 +163,16 @@ export default function WalletDashboardSendModal({
       const instance = manualQrScannerRef.current || new Html5Qrcode(readerId);
       manualQrScannerRef.current = instance;
 
-      const decodedText = await instance.scanFile(scanFile, true);
+      let decodedText;
+      try {
+        decodedText = await instance.scanFile(scanFile, true);
+      } catch (err) {
+        if (scanFile !== file) {
+          decodedText = await instance.scanFile(file, true);
+        } else {
+          throw err;
+        }
+      }
       try {
         await instance.clear();
       } catch (err) {

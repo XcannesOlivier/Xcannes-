@@ -65,13 +65,15 @@ export function usePaymentRequestScanner({
 
       const decodePrefixedPayreq = (value) => {
         const match = String(value || "").match(
-          /^(xcannes-payreq|xcannes-request)(?::\/\/|:)(.+)$/i,
+          /^(xcannes-payreq|xcannes-request)(?::\/\/|:)([\s\S]+)$/i,
         );
         if (DEBUG_PAYREQ_SCAN) {
           console.log("[PayreqScan] Prefix match:", match ? "yes" : "no");
         }
         if (!match) return null;
-        const payload = String(match[2] || "").trim();
+        const payload = String(match[2] || "")
+          .replace(/\s+/g, "")
+          .trim();
         if (!payload) return null;
         try {
           const padded =

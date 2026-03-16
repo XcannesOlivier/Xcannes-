@@ -347,7 +347,16 @@ export default function QRScanner({
       } catch {
         scanFile = file;
       }
-      const decodedText = await html5QrCode.scanFile(scanFile, true);
+      let decodedText;
+      try {
+        decodedText = await html5QrCode.scanFile(scanFile, true);
+      } catch (err) {
+        if (scanFile !== file) {
+          decodedText = await html5QrCode.scanFile(file, true);
+        } else {
+          throw err;
+        }
+      }
       await stopScanner();
       onScan(decodedText);
     } catch (err) {
