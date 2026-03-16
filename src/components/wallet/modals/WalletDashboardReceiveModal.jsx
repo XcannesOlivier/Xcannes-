@@ -745,12 +745,14 @@ export default function WalletDashboardReceiveModal({
           </div>
           <div className="flex-1 min-h-0 flex flex-col">
             <div className="wallet-tab-unfold-in flex-1 flex flex-col gap-4">
-              <p className="text-xs md:text-sm text-white/60">
-                {t(
-                  "ui_receive_and_request_desc_2f1a7c9d5e",
-                  "Share your address to get paid, or create a payment request to send to someone.",
-                )}
-              </p>
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                <p className="text-xs md:text-sm text-white/80 text-center font-medium">
+                  {t(
+                    "ui_receive_and_request_desc_2f1a7c9d5e",
+                    "Share your address to get paid, or create a payment request to send to someone.",
+                  )}
+                </p>
+              </div>
 
               {wallet ? (
                 <div
@@ -758,7 +760,13 @@ export default function WalletDashboardReceiveModal({
                     inline ? "flex-1 min-h-0 justify-center" : ""
                   }`}
                 >
-                  <div className="text-xs md:text-sm text-white/70 text-center">
+                  <div
+                    className={`inline-flex items-center justify-center rounded-full border px-3 py-1.5 text-xs md:text-sm font-semibold shadow-sm ${
+                      showRequestPreview
+                        ? "border-amber-400/40 bg-amber-400/10 text-amber-100"
+                        : "border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90"
+                    }`}
+                  >
                     {showRequestPreview
                       ? t(
                           "ui_receive_qr_request_title",
