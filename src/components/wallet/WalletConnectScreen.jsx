@@ -144,7 +144,7 @@ export default function WalletConnectScreen() {
         {/* Embedded wallet-app — full onboarding flow */}
         <iframe
           src="/wallet-app/"
-          title="Xcannes Wallet"
+          title="XCANNES Wallet"
           className="w-full h-full border-0"
           allow="camera; publickey-credentials-get; publickey-credentials-create"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
@@ -167,19 +167,6 @@ export default function WalletConnectScreen() {
         </Link>
       </div>
 
-      {/* Branding */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 rounded-full bg-[#c9a84c] flex items-center justify-center mb-4 shadow-[0_0_24px_rgba(201,168,76,0.3)]">
-          <span className="text-[#0a0a0a] text-2xl font-bold font-orbitron">X</span>
-        </div>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
-          Xcannes Wallet
-        </h1>
-        <p className="text-white/60 text-sm text-center max-w-xs">
-          {t("wallet_connect_subtitle", "Connectez votre wallet pour accéder à vos comptes.")}
-        </p>
-      </div>
-
       {/* QR Code section (desktop only) */}
       <div className="w-full max-w-sm">
         {showQR && qrValue && !isExpired ? (
@@ -188,7 +175,7 @@ export default function WalletConnectScreen() {
               {t("wallet_connect_qr_title", "Connecter votre wallet")}
             </h3>
             <p className="text-sm text-white/60 mb-6 text-center">
-              {t("wallet_connect_qr_desc", "Scannez ce QR code avec votre wallet Xcannes.")}
+              {t("wallet_connect_qr_desc", "Scannez ce QR code avec votre wallet XCANNES.")}
             </p>
 
             {/* QR */}
@@ -272,7 +259,7 @@ export default function WalletConnectScreen() {
         </div>
         <div className="flex items-center gap-3 text-sm text-white/60">
           <span className="text-base">🌐</span>
-          <span>{t("wallet_connect_feature_3", "Connexion à Xcannes en un scan")}</span>
+          <span>{t("wallet_connect_feature_3", "Connexion à XCANNES en un scan")}</span>
         </div>
       </div>
 
@@ -284,7 +271,7 @@ export default function WalletConnectScreen() {
         <p className="text-xs text-white/40 mb-4 text-center">
           {t(
             "wallet_connect_no_app_desc",
-            "Téléchargez Xcannes Wallet sur votre téléphone pour créer un wallet sécurisé et scanner le QR code."
+            "Téléchargez XCANNES Wallet sur votre téléphone pour créer un wallet sécurisé et scanner le QR code."
           )}
         </p>
         <div className="flex items-center justify-center gap-3">
@@ -336,7 +323,7 @@ export default function WalletConnectScreen() {
 
       {/* Help text */}
       <p className="mt-6 text-xs text-white/30 text-center max-w-xs">
-        {t("wallet_connect_help", "Ouvrez l'app Xcannes Wallet sur votre téléphone, puis scannez le QR code ci-dessus.")}
+        {t("wallet_connect_help", "Ouvrez l'app XCANNES Wallet sur votre téléphone, puis scannez le QR code ci-dessus.")}
       </p>
     </main>
   );

@@ -45,13 +45,13 @@ export default function ReconciliationBanner({
           <h3 className="text-sm font-semibold text-amber-300 mb-1">
             {t("wallet.reconciliation.title", "Dépense externe détectée")}
           </h3>
-          <p className="text-xs text-white/80 leading-relaxed">
-            {t(
-              "wallet.reconciliation.description",
-              "Des fonds RLUSD ont été dépensés en dehors de Xcannes (Xumm, Sologenic…). Une correction de {{amount}} USD est nécessaire pour resynchroniser vos soldes.",
-              { amount: deficitFormatted }
-            )}
-          </p>
+	          <p className="text-xs text-white/80 leading-relaxed">
+	            {t(
+	              "wallet.reconciliation.description",
+	              "Des fonds RLUSD ont été dépensés en dehors de XCANNES (Xumm, Sologenic…). Une correction de {{amount}} USD est nécessaire pour resynchroniser vos soldes.",
+	              { amount: deficitFormatted }
+	            )}
+	          </p>
         </div>
       </div>
 

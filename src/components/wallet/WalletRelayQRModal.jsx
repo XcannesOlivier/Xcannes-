@@ -159,12 +159,12 @@ export default function WalletRelayQRModal() {
               </p>
               {qrModalData.walletAppUrl && (
                 <a
-                  href={qrModalData.walletAppUrl}
-                  className="px-5 py-2.5 bg-xcannes-green/80 hover:bg-xcannes-green text-white text-sm font-medium rounded-xl transition-colors"
-                >
-                  Ouvrir Xcannes Wallet
-                </a>
-              )}
+	                  href={qrModalData.walletAppUrl}
+	                  className="px-5 py-2.5 bg-xcannes-green/80 hover:bg-xcannes-green text-white text-sm font-medium rounded-xl transition-colors"
+	                >
+	                  Ouvrir XCANNES Wallet
+	                </a>
+	              )}
             </div>
           ) : (
             <div className="bg-white rounded-xl p-4">

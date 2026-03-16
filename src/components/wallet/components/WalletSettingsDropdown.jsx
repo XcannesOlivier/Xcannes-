@@ -332,10 +332,10 @@ export default function WalletSettingsDropdown({
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
-            <p className="text-sm text-white/80 font-medium mb-4">
-              {t("ui_scan_qr_to_open_app", "Scannez avec votre mobile pour ouvrir Xcannes App")}
-            </p>
+	            </button>
+	            <p className="text-sm text-white/80 font-medium mb-4">
+	              {t("ui_scan_qr_to_open_app", "Scannez avec votre mobile pour ouvrir XCANNES App")}
+	            </p>
             <div className="inline-block rounded-xl bg-white p-3">
               <QRCodeSVG
                 value={JSON.stringify({ type: "xcannes:navigate", screen: "choice" })}
