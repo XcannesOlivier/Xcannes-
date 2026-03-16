@@ -7,7 +7,7 @@ import { useTranslation } from "next-i18next";
  * DemoWalletSettingsDropdown — settings gear + dropdown shell for the demo wallet.
  * No links/actions wired yet (UI scaffold).
  */
-export default function DemoWalletSettingsDropdown() {
+export default function DemoWalletSettingsDropdown({ onOpenInfo }) {
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
@@ -75,7 +75,7 @@ export default function DemoWalletSettingsDropdown() {
 
           <div
             role="menu"
-            className="fixed inset-0 z-50 overflow-y-auto bg-[#0b0f10]"
+            className="fixed inset-0 z-50 bg-[#0b0f10] flex flex-col"
           >
             {/* Top stripe */}
             <div className="h-1 w-full bg-gradient-to-r from-xcannes-green/70 via-xcannes-green/15 to-transparent" />
@@ -100,7 +100,7 @@ export default function DemoWalletSettingsDropdown() {
               </button>
             </div>
 
-            <div className="px-3 pb-4">
+            <div className="flex-1 overflow-y-auto px-3 pb-4">
               {/* Section: Actions (disabled scaffold) */}
               <div className="pt-2">
                 <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
@@ -149,25 +149,31 @@ export default function DemoWalletSettingsDropdown() {
 
               <div className="my-3 border-t border-white/10" />
 
-              {/* Section: Help (disabled scaffold) */}
-              <div className="pt-0.5">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
-                  {t("ui_settings_section_help", "Aide")}
-                </div>
-                <div className="w-full flex items-center gap-3 px-3 py-2 rounded-xl border border-white/10 bg-white/3 text-left opacity-60">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0 font-semibold">
-                    i
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("wallet_footer_info_fees", "Info & Fees")}
-                    </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_settings_demo_info_hint", "À configurer")}
-                    </div>
+            </div>
+
+            {/* Bottom link: Info & Fees (same action as demo footer) */}
+            <div className="shrink-0 border-t border-white/10 bg-black/20 px-3 py-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  onOpenInfo?.();
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-left transition-colors"
+                title={t("wallet_footer_info_title", "Wallet info & fees")}
+              >
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/70 shrink-0 font-semibold">
+                  i
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13px] font-medium text-white/90">
+                    {t("wallet_footer_info_fees", "Info & Fees")}
+                  </div>
+                  <div className="text-[11px] text-white/45 mt-0.5">
+                    {t("ui_settings_open_info_hint", "Infos du wallet et frais")}
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </>

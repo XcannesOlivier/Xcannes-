@@ -480,6 +480,7 @@ export default function DemoWalletDashboard({
         displayCurrency="USD"
         walletContextLabel={walletContextLabel}
         wallet={wallet}
+        onOpenInfo={() => setWalletInfoOpen(true)}
         walletHeaderToast={walletHeaderToast}
         isWalletLabelLocked={isWalletLabelLocked}
         isEditingWalletLabel={isEditingWalletLabel}

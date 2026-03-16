@@ -14,6 +14,7 @@ export default function DemoWalletHeader({
   displayCurrency,
   walletContextLabel,
   wallet,
+  onOpenInfo,
   walletHeaderToast,
   isWalletLabelLocked,
   isEditingWalletLabel,
@@ -246,8 +247,7 @@ export default function DemoWalletHeader({
               </svg>
 	            </button>
 
-	            {/* Settings dropdown (mobile only) — scaffold only, no links yet */}
-	            <DemoWalletSettingsDropdown />
+	            <DemoWalletSettingsDropdown onOpenInfo={onOpenInfo} />
 	          </div>
 	        </div>
 	      </div>
