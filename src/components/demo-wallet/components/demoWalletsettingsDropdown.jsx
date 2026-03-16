@@ -5,12 +5,22 @@ import { useTranslation } from "next-i18next";
 
 /**
  * DemoWalletSettingsDropdown — settings gear + dropdown shell for the demo wallet.
- * Mobile-only for now, with no links/actions wired yet (UI scaffold).
+ * No links/actions wired yet (UI scaffold).
  */
 export default function DemoWalletSettingsDropdown() {
   const { t } = useTranslation("common");
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
+
+  // Close when clicking outside the dropdown (desktop popover)
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isOpen]);
 
   // Close on Escape
   useEffect(() => {
@@ -23,7 +33,7 @@ export default function DemoWalletSettingsDropdown() {
   }, [isOpen]);
 
   return (
-    <div className="relative md:hidden" ref={ref}>
+    <div className="relative shrink-0" ref={ref}>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
@@ -165,4 +175,3 @@ export default function DemoWalletSettingsDropdown() {
     </div>
   );
 }
-

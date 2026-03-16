@@ -6,7 +6,7 @@
 
 import { useTranslation } from "next-i18next";
 import { formatMoney, formatDemoAddressShort } from "../utils/demoWalletHelpers";
-import DemoWalletSettingsDropdown from "./demoWalletSettingsDropdown";
+import DemoWalletSettingsDropdown from "./demoWalletsettingsDropdown";
 
 export default function DemoWalletHeader({
   locale,
@@ -62,7 +62,7 @@ export default function DemoWalletHeader({
         </a>
 
         <div className="w-full mt-1.5 flex justify-center">
-          <div className="flex items-center gap-2 w-full max-w-[460px]">
+          <div className="flex items-center gap-2 w-full max-w-[460px] md:max-w-[520px]">
             <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
