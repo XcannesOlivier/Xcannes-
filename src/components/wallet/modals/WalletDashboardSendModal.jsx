@@ -52,6 +52,7 @@ export default function WalletDashboardSendModal({
   const [useLabelDisplay, setUseLabelDisplay] = useState(false);
   const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
+  const [scanUnavailable, setScanUnavailable] = useState(false);
   const savedPickerRef = useRef(null);
 
   const payreqFileInputId = "payreq-qr-file";
@@ -310,8 +311,15 @@ export default function WalletDashboardSendModal({
       setUseLabelDisplay(false);
       setShowFullSummaryAddress(false);
       setShowFullPayreqAddress(false);
+      setScanUnavailable(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!scanActive) {
+      setScanUnavailable(false);
+    }
+  }, [scanActive]);
 
   useEffect(() => {
     setShowFullSummaryAddress(false);
@@ -968,13 +976,22 @@ export default function WalletDashboardSendModal({
                 hideTitle={true}
                 enableCamera={true}
                 hideWhenUnavailable
-                className="bg-black w-full h-full [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+                onCameraUnavailableChange={setScanUnavailable}
+                className="bg-black w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
               />
             </div>
             {/* Hint */}
             <p className="absolute bottom-6 left-0 right-0 text-xs text-white/40 text-center">
               {t("ui_scan_hint_auto_close", "Le scanner se ferme automatiquement après la lecture.")}
             </p>
+            {inline && scanUnavailable ? (
+              <div className="absolute bottom-16 left-4 right-4 rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 text-center">
+                {t(
+                  "ui_camera_unavailable_device_4f2a90f1c3",
+                  "Camera is not available on this device. You can upload a QR image below.",
+                )}
+              </div>
+            ) : null}
           </div>
         </div>,
         document.body,
