@@ -47,6 +47,7 @@ export default function GlobalStatement({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+  const globalTitle = t("ui_global_statement_13e29aa8aa", "Global");
 
   /* ── local state ───────────────────────────────────────── */
   const [sortBy, setSortBy] = useState("balance");
@@ -344,7 +345,7 @@ export default function GlobalStatement({
     `;
 
     return `
-      <h1>${escapeHtml(t("ui_global_statement_13e29aa8aa", "Global Statement"))}</h1>
+      <h1>${escapeHtml(globalTitle)}</h1>
       <div class="meta">
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
@@ -388,6 +389,7 @@ export default function GlobalStatement({
     docHash,
     fallbackPeriod,
     formatAmountWithSymbolLocal,
+    globalTitle,
     getUsdValue,
     ledgerStatusLabel,
     locale,
@@ -404,7 +406,7 @@ export default function GlobalStatement({
     try {
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const ok = openPrintWindow({
-        title: `XCANNES Global Statement ${suffix}`,
+        title: `XCANNES ${globalTitle} ${suffix}`,
         bodyHtml: buildPrintHtml(),
       });
       if (!ok && typeof window !== "undefined") {
@@ -418,12 +420,12 @@ export default function GlobalStatement({
     } finally {
       setExportFormat(null);
     }
-  }, [buildPrintHtml, docHash, t, toast]);
+  }, [buildPrintHtml, docHash, globalTitle, t, toast]);
 
   const handlePrint = useCallback(() => {
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
     const ok = openPrintWindow({
-      title: `XCANNES Global Statement ${suffix}`,
+      title: `XCANNES ${globalTitle} ${suffix}`,
       bodyHtml: buildPrintHtml(),
     });
     if (!ok && typeof window !== "undefined") {
@@ -434,7 +436,7 @@ export default function GlobalStatement({
       if (toast?.warn) toast.warn(msg);
       else window.alert(msg);
     }
-  }, [buildPrintHtml, docHash, t, toast]);
+  }, [buildPrintHtml, docHash, globalTitle, t, toast]);
 
   /* ── layout (GlobalStatement uses wider max-widths) ────── */
   const STATEMENT_LAYOUTS = {
@@ -487,10 +489,16 @@ export default function GlobalStatement({
         >
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex items-center gap-3 min-w-0">
-              <span className="text-3xl flex-shrink-0">🌍</span>
+              <Image
+                src="/assets/statement.svg"
+                alt={t("ui_statement_a87c93acb8", "Statement")}
+                width={40}
+                height={40}
+                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10"
+              />
               <div className="flex items-center gap-2 min-w-0">
                 <h2 className="text-xl font-bold text-white truncate">
-                  {t("ui_global_statement_13e29aa8aa", "Global Statement")}
+                  {globalTitle}
                 </h2>
                 {noticeVariant === "demo" ? (
                   <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
