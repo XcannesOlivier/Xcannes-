@@ -181,6 +181,8 @@ export function useSendTransaction({
           dest,
           currency,
           handleAddressSave,
+          normalizedSaveDestination,
+          saveLabel,
         });
       }
 
@@ -189,6 +191,8 @@ export function useSendTransaction({
         dest,
         currency,
         handleAddressSave,
+        normalizedSaveDestination,
+        saveLabel,
       });
     } catch (err) {
       console.error("Send payment error:", err);
@@ -209,6 +213,8 @@ export function useSendTransaction({
     dest,
     currency,
     handleAddressSave,
+    normalizedSaveDestination,
+    saveLabel,
   }) {
     if (!backendWalletAddress) {
       toast.error("Please connect your wallet first.");
@@ -384,6 +390,8 @@ export function useSendTransaction({
     dest,
     currency,
     handleAddressSave,
+    normalizedSaveDestination,
+    saveLabel,
   }) {
     let Amount;
     if (
