@@ -459,6 +459,39 @@ export default function WalletDashboard({
     locale,
   });
 
+  // ── Statement balance override (USD = unallocated RLUSD) ─────────
+  const statementBalance = useMemo(() => {
+    const token = selectedStatementToken;
+    if (!token) return null;
+    const code = String(token.currency || "").trim().toUpperCase();
+    if (!code) return null;
+
+    // USD statement shows the unallocated RLUSD pool (1:1).
+    if (code === "USD") {
+      const unallocated = Number(currencyLinesSummary?.unallocatedRlusd);
+      return Number.isFinite(unallocated) ? unallocated : null;
+    }
+
+    // For other currency lines (trustline-only), convert allocated RLUSD → units.
+    if (token.isTrustlineOnly) {
+      const allocated = allocatedRlusdByCurrency?.get?.(code);
+      if (!Number.isFinite(allocated)) return null;
+      const rawRate =
+        code === "USD" || code === "RLUSD"
+          ? 1
+          : Number(rlusdPerUnitRates?.[code]);
+      if (!Number.isFinite(rawRate) || rawRate <= 0) return allocated;
+      return allocated / rawRate;
+    }
+
+    return null;
+  }, [
+    selectedStatementToken,
+    currencyLinesSummary,
+    allocatedRlusdByCurrency,
+    rlusdPerUnitRates,
+  ]);
+
   // ── Activation ─────────────────────────────────────────────
   const {
     handleInstallRequiredTrustline,
@@ -659,6 +692,7 @@ export default function WalletDashboard({
     setShowCurrencyStatement,
     selectedStatementToken,
     setSelectedStatementToken,
+    statementBalance,
     toast,
     // Spread sub-orchestrator state (keys match useWalletModalProps params)
     ...sendState,
