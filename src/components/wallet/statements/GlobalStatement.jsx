@@ -520,68 +520,105 @@ export default function GlobalStatement({
           </div>
 
           {/* Account Info dans le header */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
-              {isInlineDesktop ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-sm text-white font-semibold whitespace-nowrap">
-                    {walletLabel || t("nav_wallet", "Wallet")}
-                  </span>
-                  {walletAddress ? (
-                    <div className="text-[11px] text-white/60 font-mono whitespace-nowrap overflow-x-auto">
-                      {walletAddress}
-                    </div>
-                  ) : null}
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-white font-semibold truncate">
-                    {walletLabel || t("nav_wallet", "Wallet")}
+          {isInlineDesktop ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-sm text-white font-semibold whitespace-nowrap">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </span>
+                {walletAddress ? (
+                  <div className="text-[11px] text-white/60 font-mono whitespace-nowrap overflow-x-auto">
+                    {walletAddress}
+                  </div>
+                ) : null}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-white/60 mb-1">
+                    {t("ui_statement_period_4674b18f25", "Statement Period")}
                   </p>
-                  {walletAddress ? (
-                    <p className="text-[11px] text-white/60 font-mono break-all">
-                      {walletAddress}
-                    </p>
-                  ) : null}
-                </>
-              )}
+                  <StatementMonthSelect
+                    value={selectedMonth}
+                    onChange={(nextValue) => {
+                      if (nextValue === "archives") {
+                        setSelectedMonth("archives");
+                        return;
+                      }
+                      const parsed = Number.parseInt(nextValue, 10);
+                      setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                    }}
+                    options={availableMonths}
+                    menuClassName={modalBgClass}
+                  />
+                </div>
+                <div>
+                  <p className="text-xs text-white/60 mb-1">
+                    {t("ui_total_assets_918e935125", "Total Assets")}
+                  </p>
+                  <p className="text-sm text-white">
+                    ≈ {formatAmountWithSymbolLocal(
+                        totalInPreferred !== null && Number.isFinite(totalInPreferred)
+                          ? totalInPreferred
+                          : totalBalance,
+                        displayCurrencyCode,
+                      )}
+                  </p>
+                  <p className="text-[11px] text-white/60">
+                    {tokens.length}
+                    {t("ui_currencies_5e5bf1a8a1", "Currencies")}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-white/60 mb-1">
-                {t("ui_statement_period_4674b18f25", "Statement Period")}
-              </p>
-              <StatementMonthSelect
-                value={selectedMonth}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-              />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <p className="text-sm text-white font-semibold truncate">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </p>
+                {walletAddress ? (
+                  <p className="text-[11px] text-white/60 font-mono break-all">
+                    {walletAddress}
+                  </p>
+                ) : null}
+              </div>
+              <div>
+                <p className="text-xs text-white/60 mb-1">
+                  {t("ui_statement_period_4674b18f25", "Statement Period")}
+                </p>
+                <StatementMonthSelect
+                  value={selectedMonth}
+                  onChange={(nextValue) => {
+                    if (nextValue === "archives") {
+                      setSelectedMonth("archives");
+                      return;
+                    }
+                    const parsed = Number.parseInt(nextValue, 10);
+                    setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                  }}
+                  options={availableMonths}
+                  menuClassName={modalBgClass}
+                />
+              </div>
+              <div>
+                <p className="text-xs text-white/60 mb-1">
+                  {t("ui_total_assets_918e935125", "Total Assets")}
+                </p>
+                <p className="text-sm text-white">
+                  ≈ {formatAmountWithSymbolLocal(
+                      totalInPreferred !== null && Number.isFinite(totalInPreferred)
+                        ? totalInPreferred
+                        : totalBalance,
+                      displayCurrencyCode,
+                    )}
+                </p>
+                <p className="text-[11px] text-white/60">
+                  {tokens.length}
+                  {t("ui_currencies_5e5bf1a8a1", "Currencies")}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-white/60 mb-1">
-                {t("ui_total_assets_918e935125", "Total Assets")}
-              </p>
-              <p className="text-sm text-white">
-                ≈ {formatAmountWithSymbolLocal(
-                    totalInPreferred !== null && Number.isFinite(totalInPreferred)
-                      ? totalInPreferred
-                      : totalBalance,
-                    displayCurrencyCode,
-                  )}
-              </p>
-              <p className="text-[11px] text-white/60">
-                {tokens.length}
-                {t("ui_currencies_5e5bf1a8a1", "Currencies")}
-              </p>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Content - Zone scrollable */}

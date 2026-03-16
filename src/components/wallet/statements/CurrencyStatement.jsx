@@ -570,7 +570,7 @@ export default function CurrencyStatement({
 
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div>
+            <div className={isInlineDesktop ? "md:col-span-3" : ""}>
               {isInlineDesktop ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-sm text-white font-semibold whitespace-nowrap">
