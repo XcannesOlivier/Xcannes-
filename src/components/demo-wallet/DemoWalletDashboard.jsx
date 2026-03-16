@@ -27,6 +27,7 @@ import { useDemoActions } from "./hooks/useDemoActions";
 import { useDemoTokens, renderDemoTokenIcon, getDemoCurrencyLabel } from "./hooks/useDemoTokens";
 import { useDemoStatementData } from "./hooks/useDemoStatementData";
 import { computeSpreadQuote } from "./utils/demoWalletSpread";
+import { usePreferredCurrency } from "@/components/wallet/hooks/usePreferredCurrency";
 import {
   DEMO_SAVED_ADDRESSES_STORAGE_KEY,
   DEMO_STATE_STORAGE_KEY,
@@ -58,6 +59,15 @@ export default function DemoWalletDashboard({
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
+
+  const {
+    preferredCurrency,
+    setPreferredCurrency,
+    topCurrencies,
+    fawazCurrencies,
+    fawazLoading,
+    loadFawazCurrencies,
+  } = usePreferredCurrency();
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -238,6 +248,7 @@ export default function DemoWalletDashboard({
       wallets: state.wallets,
       convertBaseCurrency,
       convertQuoteCurrency,
+      preferredCurrency,
       requestCurrency,
     });
 
@@ -323,6 +334,15 @@ export default function DemoWalletDashboard({
     () => walletUsdTotal(activeWallet),
     [activeWallet],
   );
+
+  const preferredUsdPerUnit = useMemo(() => {
+    const code = String(preferredCurrency || "USD").toUpperCase();
+    const rate = Number(effectiveUsdPerUnitRates?.[code]);
+    return Number.isFinite(rate) && rate > 0 ? rate : 1;
+  }, [effectiveUsdPerUnitRates, preferredCurrency]);
+
+  const displayCurrency = String(preferredCurrency || "USD").toUpperCase();
+  const displayTotal = usdTotal / preferredUsdPerUnit;
 
   useEffect(() => {
     const upper = String(requestCurrency || "").toUpperCase();
@@ -476,11 +496,18 @@ export default function DemoWalletDashboard({
     >
       <DemoWalletHeader
         locale={locale}
-        displayAmount={usdTotal}
-        displayCurrency="USD"
+        displayAmount={displayTotal}
+        displayCurrency={displayCurrency}
+        totalInRlusd={usdTotal}
         walletContextLabel={walletContextLabel}
         wallet={wallet}
         onOpenInfo={() => setWalletInfoOpen(true)}
+        preferredCurrency={preferredCurrency}
+        topCurrencies={topCurrencies}
+        fawazCurrencies={fawazCurrencies}
+        fawazLoading={fawazLoading}
+        onLoadFawazCurrencies={loadFawazCurrencies}
+        onPreferredCurrencyChange={setPreferredCurrency}
         walletHeaderToast={walletHeaderToast}
         isWalletLabelLocked={isWalletLabelLocked}
         isEditingWalletLabel={isEditingWalletLabel}

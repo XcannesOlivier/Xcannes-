@@ -14,6 +14,7 @@ export function useDemoRates({
   convertBaseCurrency,
   convertQuoteCurrency,
   requestCurrency,
+  preferredCurrency,
 }) {
   const fallbackUsdPerUnit = useMemo(() => getDemoRatesUsdPerUnit(), []);
 
@@ -50,10 +51,20 @@ export function useDemoRates({
       const upper = String(requestCurrency).toUpperCase();
       if (upper) codes.add(upper);
     }
+    if (preferredCurrency) {
+      const upper = String(preferredCurrency).toUpperCase();
+      if (upper) codes.add(upper);
+    }
     return Array.from(codes)
       .filter(Boolean)
       .sort((a, b) => a.localeCompare(b));
-  }, [convertBaseCurrency, convertQuoteCurrency, requestCurrency, wallets]);
+  }, [
+    convertBaseCurrency,
+    convertQuoteCurrency,
+    preferredCurrency,
+    requestCurrency,
+    wallets,
+  ]);
 
   // ── Single fetch at mount — no polling ──
   useEffect(() => {

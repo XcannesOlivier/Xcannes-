@@ -12,9 +12,16 @@ export default function DemoWalletHeader({
   locale,
   displayAmount,
   displayCurrency,
+  totalInRlusd,
   walletContextLabel,
   wallet,
   onOpenInfo,
+  preferredCurrency,
+  topCurrencies,
+  fawazCurrencies,
+  fawazLoading,
+  onLoadFawazCurrencies,
+  onPreferredCurrencyChange,
   walletHeaderToast,
   isWalletLabelLocked,
   isEditingWalletLabel,
@@ -41,6 +48,19 @@ export default function DemoWalletHeader({
         >
           {formatMoney(locale, displayAmount, displayCurrency)}
         </p>
+        {Number.isFinite(totalInRlusd) &&
+        totalInRlusd > 0 &&
+        displayCurrency &&
+        displayCurrency !== "USD" &&
+        displayCurrency !== "RLUSD" ? (
+          <p className="text-[11px] text-white/40 font-mono tabular-nums mt-0.5">
+            {totalInRlusd.toLocaleString("en", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}{" "}
+            RLUSD
+          </p>
+        ) : null}
 
         <div className="w-full mt-1.5 flex justify-center">
           <div className="flex items-center gap-2 w-full max-w-[460px] md:max-w-[520px]">
@@ -227,7 +247,15 @@ export default function DemoWalletHeader({
               </svg>
 	            </button>
 
-	            <DemoWalletSettingsDropdown onOpenInfo={onOpenInfo} />
+	            <DemoWalletSettingsDropdown
+	              onOpenInfo={onOpenInfo}
+	              preferredCurrency={preferredCurrency}
+	              topCurrencies={topCurrencies}
+	              fawazCurrencies={fawazCurrencies}
+	              fawazLoading={fawazLoading}
+	              onLoadFawazCurrencies={onLoadFawazCurrencies}
+	              onPreferredCurrencyChange={onPreferredCurrencyChange}
+	            />
 	          </div>
 	        </div>
 	      </div>
