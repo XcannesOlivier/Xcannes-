@@ -375,7 +375,7 @@ export default function WalletDashboardReceiveModal({
     if (isDesktop || !navigator?.share) {
       if (blob) {
         downloadBlob(blob, "xcannes-qr.png");
-        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"));
+        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"), true);
         return;
       }
       if (fallbackText) {
@@ -383,7 +383,7 @@ export default function WalletDashboardReceiveModal({
           new Blob([fallbackText], { type: "text/plain" }),
           "xcannes-qr.txt",
         );
-        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"));
+        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"), true);
         return;
       }
       flashCopyToast(
@@ -407,7 +407,7 @@ export default function WalletDashboardReceiveModal({
 
     try {
       await navigator.share(shareData);
-      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"));
+      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"), true);
     } catch (err) {
       if (err?.name === "AbortError") return;
       flashCopyToast(t("ui_share_failed_1a2b3c", "Partage impossible"));
