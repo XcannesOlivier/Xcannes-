@@ -226,11 +226,53 @@ export default function WalletDashboardSendModal({
       clipboard.getData("text/plain") ||
       ""
     ).trim();
+    const imageFromFiles = Array.from(clipboard.files || []).find(
+      (file) => file?.type && file.type.startsWith("image/"),
+    );
+    const imageItem = Array.from(clipboard.items || []).find(
+      (item) => item?.kind === "file" && item.type?.startsWith("image/"),
+    );
+    const imageFromItems = imageItem?.getAsFile();
+    const imageFromClipboard = imageFromFiles || imageFromItems || null;
+
+    const dataUrlToFile = (dataUrl) => {
+      const match = String(dataUrl || "").match(
+        /^data:image\/([a-z0-9+.-]+);base64,(.+)$/i,
+      );
+      if (!match) return null;
+      try {
+        const mime = `image/${match[1].toLowerCase()}`;
+        const binary = atob(match[2]);
+        const len = binary.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i += 1) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: mime });
+        return new File([blob], "pasted-qr", { type: mime });
+      } catch {
+        return null;
+      }
+    };
+
     if (text) {
       event.preventDefault();
       setUseLabelDisplay(false);
       if (looksLikeQrPayload(text)) {
         handlePaymentRequestScan?.(text);
+        setScanActive(false);
+        setShowSavedPicker(false);
+        return true;
+      }
+      const dataUrlFile = dataUrlToFile(text);
+      if (dataUrlFile) {
+        handleManualQrFile(dataUrlFile);
+        setScanActive(false);
+        setShowSavedPicker(false);
+        return true;
+      }
+      if (imageFromClipboard) {
+        handleManualQrFile(imageFromClipboard);
         setScanActive(false);
         setShowSavedPicker(false);
         return true;
@@ -241,26 +283,10 @@ export default function WalletDashboardSendModal({
       return true;
     }
 
-    const imageFromFiles = Array.from(clipboard.files || []).find(
-      (file) => file?.type && file.type.startsWith("image/"),
-    );
-    if (imageFromFiles) {
+    if (imageFromClipboard) {
       event.preventDefault();
       setUseLabelDisplay(false);
-      handleManualQrFile(imageFromFiles);
-      setScanActive(false);
-      setShowSavedPicker(false);
-      return true;
-    }
-
-    const imageItem = Array.from(clipboard.items || []).find(
-      (item) => item?.kind === "file" && item.type?.startsWith("image/"),
-    );
-    const imageFromItems = imageItem?.getAsFile();
-    if (imageFromItems) {
-      event.preventDefault();
-      setUseLabelDisplay(false);
-      handleManualQrFile(imageFromItems);
+      handleManualQrFile(imageFromClipboard);
       setScanActive(false);
       setShowSavedPicker(false);
       return true;
