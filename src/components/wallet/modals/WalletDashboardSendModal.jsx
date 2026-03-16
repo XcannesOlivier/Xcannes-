@@ -49,6 +49,9 @@ export default function WalletDashboardSendModal({
   const [scanKey, setScanKey] = useState(0);
   const [remoteDestinationLabel, setRemoteDestinationLabel] = useState("");
   const [showSavedPicker, setShowSavedPicker] = useState(false);
+  const [useLabelDisplay, setUseLabelDisplay] = useState(false);
+  const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
+  const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const savedPickerRef = useRef(null);
 
   const payreqFileInputId = "payreq-qr-file";
@@ -166,6 +169,7 @@ export default function WalletDashboardSendModal({
         // ignore cleanup errors
       }
       if (decodedText) {
+        setUseLabelDisplay(false);
         handlePaymentRequestScan?.(decodedText);
         setScanActive(false);
       }
@@ -223,6 +227,7 @@ export default function WalletDashboardSendModal({
     ).trim();
     if (text) {
       event.preventDefault();
+      setUseLabelDisplay(false);
       if (looksLikeQrPayload(text)) {
         handlePaymentRequestScan?.(text);
         setScanActive(false);
@@ -240,6 +245,7 @@ export default function WalletDashboardSendModal({
     );
     if (imageFromFiles) {
       event.preventDefault();
+      setUseLabelDisplay(false);
       handleManualQrFile(imageFromFiles);
       setScanActive(false);
       setShowSavedPicker(false);
@@ -252,6 +258,7 @@ export default function WalletDashboardSendModal({
     const imageFromItems = imageItem?.getAsFile();
     if (imageFromItems) {
       event.preventDefault();
+      setUseLabelDisplay(false);
       handleManualQrFile(imageFromItems);
       setScanActive(false);
       setShowSavedPicker(false);
@@ -261,6 +268,7 @@ export default function WalletDashboardSendModal({
     return false;
   };
   const handleScan = (data) => {
+    setUseLabelDisplay(false);
     const result = handlePaymentRequestScan?.(data);
     if (result?.relayChallenge) {
       // Relay challenge forwarded to PWA — close modal immediately
@@ -299,8 +307,19 @@ export default function WalletDashboardSendModal({
       setSaveNewAddress(false);
       setScanActive(false);
       setShowSavedPicker(false);
+      setUseLabelDisplay(false);
+      setShowFullSummaryAddress(false);
+      setShowFullPayreqAddress(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    setShowFullSummaryAddress(false);
+  }, [normalizedDestination]);
+
+  useEffect(() => {
+    setShowFullPayreqAddress(false);
+  }, [requestDestination]);
 
   useEffect(() => {
     if (!showSavedPicker) return;
@@ -349,6 +368,10 @@ export default function WalletDashboardSendModal({
   }, [savedAddresses, normalizedDestination]);
   const resolvedDestinationLabel =
     savedDestinationLabel || sendDestinationLabel || remoteDestinationLabel;
+  const destinationDisplayValue =
+    useLabelDisplay && sendDestinationLabel
+      ? sendDestinationLabel
+      : sendDestination;
 
   useEffect(() => {
     if (!hasDestination || hasPaymentRequest || savedDestinationLabel || sendDestinationLabel) {
@@ -543,15 +566,16 @@ export default function WalletDashboardSendModal({
             <div className="relative" ref={savedPickerRef}>
               <input
                 type="text"
-                value={sendDestination}
+                value={destinationDisplayValue}
                 onChange={(e) => {
+                  setUseLabelDisplay(false);
                   setSendDestination(e.target.value);
                   setSendDestinationLabel?.("");
                   setShowSavedPicker(false);
                 }}
                 onPaste={handlePastePayload}
                 placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
-                className={`w-full bg-black/40 border border-white/15 rounded-xl ${!hasPaymentRequest ? 'pl-9' : 'pl-4'} ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
+                className={`w-full bg-black/40 border border-white/15 rounded-xl ${!hasPaymentRequest ? 'pl-8' : 'pl-4'} ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
               />
               {!hasPaymentRequest && (
                 <>
@@ -565,7 +589,7 @@ export default function WalletDashboardSendModal({
                     title={t("ui_saved_addresses_label", "Adresses enregistrées")}
                     aria-expanded={showSavedPicker}
                   >
-                    <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
@@ -606,16 +630,17 @@ export default function WalletDashboardSendModal({
                         <button
                           key={`${addr.address}-${idx}`}
                           type="button"
-                          onClick={() => {
-                            const value = String(addr?.address || "").trim();
-                            if (!value) return;
-                            const label = String(
-                              addr?.onChainLabel || addr?.label || "",
-                            ).trim();
-                            setSendDestination(value);
-                            setSendDestinationLabel?.(label);
-                            setShowSavedPicker(false);
-                          }}
+                        onClick={() => {
+                          const value = String(addr?.address || "").trim();
+                          if (!value) return;
+                          const label = String(
+                            addr?.onChainLabel || addr?.label || "",
+                          ).trim();
+                          setSendDestination(value);
+                          setSendDestinationLabel?.(label);
+                          setUseLabelDisplay(Boolean(label));
+                          setShowSavedPicker(false);
+                        }}
                           className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
                         >
                           <span className="block font-semibold">
@@ -760,15 +785,22 @@ export default function WalletDashboardSendModal({
             </span>
           </div>
           {/* Destination – truncated XRPL address, full on hover */}
-          <div className="flex items-center justify-between gap-3" title={normalizedDestination}>
+          <div className="flex items-center justify-between gap-3">
             <span className="text-white/60 shrink-0">
               {t("ui_account_number_label", "N° de compte")}
             </span>
-            <span className="font-mono text-white/80 text-right text-xs cursor-default">
-              {normalizedDestination.length > 14
-                ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
-                : normalizedDestination}
-            </span>
+            <button
+              type="button"
+              onClick={() => setShowFullSummaryAddress((prev) => !prev)}
+              title={normalizedDestination}
+              className={`font-mono text-white/80 text-right text-xs ${showFullSummaryAddress ? "break-all" : ""} cursor-pointer`}
+            >
+              {showFullSummaryAddress
+                ? normalizedDestination
+                : normalizedDestination.length > 14
+                  ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+                  : normalizedDestination}
+            </button>
           </div>
           {/* Save address option */}
           {saveAddressBlock}
@@ -817,13 +849,20 @@ export default function WalletDashboardSendModal({
             </span>
           </div>
           {/* N° de compte */}
-          <div className="flex items-center justify-between gap-3" title={requestDestination}>
+          <div className="flex items-center justify-between gap-3">
             <span className="text-white/60 shrink-0">
               {t("ui_account_number_label", "N° de compte")}
             </span>
-            <span className="font-mono text-white/80 text-right text-xs cursor-default">
-              {requestDestinationLabel || requestDestination}
-            </span>
+            <button
+              type="button"
+              onClick={() => setShowFullPayreqAddress((prev) => !prev)}
+              title={requestDestination}
+              className={`font-mono text-white/80 text-right text-xs ${showFullPayreqAddress ? "break-all" : ""} cursor-pointer`}
+            >
+              {showFullPayreqAddress
+                ? requestDestination
+                : requestDestinationLabel || requestDestination}
+            </button>
           </div>
           {/* Save address option */}
           {saveAddressBlock}
