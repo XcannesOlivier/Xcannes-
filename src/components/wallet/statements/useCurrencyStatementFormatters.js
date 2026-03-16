@@ -165,7 +165,7 @@ export default function useCurrencyStatementFormatters({
 
       return tx?.description || "";
     },
-    [parseConversionPair, t],
+    [compactLabels, parseConversionPair, t],
   );
 
   /* ─── renderCurrencyBadge ───────────────────────────────── */
