@@ -68,6 +68,8 @@ export default function CurrencyStatement({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const isInlineDesktop = variant === "inline-desktop";
+  const showRunningBalanceColumn = !isInlineDesktop;
+  const tableColSpan = showRunningBalanceColumn ? 4 : 3;
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),
     [currency],
@@ -153,6 +155,7 @@ export default function CurrencyStatement({
     displayCurrency,
     isMobileDate,
     isPreviewMode,
+    compactLabels: isInlineDesktop,
   });
 
   /* ── destructure data hook ─────────────────────────────── */
@@ -786,16 +789,18 @@ export default function CurrencyStatement({
                     <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
                       {t("ui_amount_1843418f56", "Amount")}
                     </th>
-                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">
-                      {t("ui_balance_445d830d72", "Balance")}
-                    </th>
+                    {showRunningBalanceColumn ? (
+                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">
+                        {t("ui_balance_445d830d72", "Balance")}
+                      </th>
+                    ) : null}
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
                       <td
-                        colSpan="4"
+                        colSpan={tableColSpan}
                         className="text-center py-12 text-white/40 text-sm"
                       >
                         {t("ui_loading_948e39804b", "Loading…")}
@@ -804,7 +809,7 @@ export default function CurrencyStatement({
                   ) : !visibleGroups || visibleGroups.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="4"
+                        colSpan={tableColSpan}
                         className="text-center py-12 text-white/40 text-sm"
                       >
                         {t(
@@ -819,7 +824,7 @@ export default function CurrencyStatement({
                         {showMonthHeaders ? (
                           <tr className="bg-white/5">
                             <td
-                              colSpan="4"
+                              colSpan={tableColSpan}
                               className="px-2 md:px-4 py-2 text-xs font-semibold text-white/80 uppercase tracking-wide"
                             >
                               {group.label || group.key}
@@ -829,7 +834,7 @@ export default function CurrencyStatement({
                         {group.transactions.length === 0 ? (
                           <tr>
                             <td
-                              colSpan="4"
+                              colSpan={tableColSpan}
                               className="text-center py-6 text-white/40 text-sm"
                             >
                               {t(
@@ -885,7 +890,7 @@ export default function CurrencyStatement({
                                             ? renderConversionDescription(
                                                 localizedDescription,
                                                 {
-                                                  withLabel: !isMobileDate,
+                                                  withLabel: false,
                                                   feeSuffix,
                                                 },
                                               ) ||
@@ -937,13 +942,15 @@ export default function CurrencyStatement({
                                   {tx.type === "debit" ? "−" : "+"}
                                   {formatAmountRlusdAsLocal(tx.amount)}
                                 </td>
-                                <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                                  {formatAmountRlusdAsLocal(
-                                    tx?.displayRunningBalance != null
-                                      ? tx.displayRunningBalance
-                                      : tx.runningBalance,
-                                  )}
-                                </td>
+                                {showRunningBalanceColumn ? (
+                                  <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
+                                    {formatAmountRlusdAsLocal(
+                                      tx?.displayRunningBalance != null
+                                        ? tx.displayRunningBalance
+                                        : tx.runningBalance,
+                                    )}
+                                  </td>
+                                ) : null}
                               </tr>
                             );
                           })

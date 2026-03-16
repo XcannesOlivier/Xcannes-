@@ -19,6 +19,7 @@ export default function useCurrencyStatementFormatters({
   displayCurrency,
   isMobileDate,
   isPreviewMode,
+  compactLabels = false,
 }) {
   const { t } = useTranslation("common");
 
@@ -120,6 +121,9 @@ export default function useCurrencyStatementFormatters({
         .toLowerCase();
 
       if (kind === "PAYMENT_OUT") {
+        if (compactLabels) {
+          return t("statement_xrpl_mobile_out", "Sent");
+        }
         return counterparty
           ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", {
               counterparty,
@@ -127,6 +131,9 @@ export default function useCurrencyStatementFormatters({
           : t("statement_payment_out_generic", "Paiement envoyé");
       }
       if (kind === "PAYMENT_IN") {
+        if (compactLabels) {
+          return t("statement_xrpl_mobile_in", "Received");
+        }
         return counterparty
           ? t("statement_payment_in_from", "Reçu de {{counterparty}}", {
               counterparty,
@@ -134,10 +141,14 @@ export default function useCurrencyStatementFormatters({
           : t("statement_payment_in_generic", "Paiement reçu");
       }
       if (kind === "XRPL_PAYMENT_OUT") {
-        return t("statement_xrpl_payment_out", "Paiement envoyé");
+        return compactLabels
+          ? t("statement_xrpl_mobile_out", "Sent")
+          : t("statement_xrpl_payment_out", "Paiement envoyé");
       }
       if (kind === "XRPL_PAYMENT_IN") {
-        return t("statement_xrpl_payment_in", "Paiement reçu");
+        return compactLabels
+          ? t("statement_xrpl_mobile_in", "Received")
+          : t("statement_xrpl_payment_in", "Paiement reçu");
       }
       if (kind === "MOONPAY_BUY") {
         return t("statement_buy_bank", "Purchase by bank payment");

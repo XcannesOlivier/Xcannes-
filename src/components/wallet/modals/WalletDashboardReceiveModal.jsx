@@ -757,7 +757,9 @@ export default function WalletDashboardReceiveModal({
               {wallet ? (
                 <div
                   className={`flex flex-col items-center gap-3 ${
-                    inline ? "flex-1 min-h-0 justify-center" : ""
+                    inline && !isRequestOpen
+                      ? "flex-1 min-h-0 justify-center"
+                      : ""
                   }`}
                 >
                   <div
