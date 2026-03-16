@@ -31,36 +31,16 @@ export default function DemoWalletHeader({
 
   return (
     <div className="panel-header">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-1 min-w-0"></div>
-        <div className="flex items-center gap-1">
-          <span className="text-xs md:text-sm font-orbitron font-semibold tracking-[0.2em] text-white/80 uppercase">
-            {t("ui_xcannes_30015bef4b", "XCANNES")}
-          </span>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-col items-center gap-2">
-        <div className="text-sm md:text-xs text-white/60 tracking-[0.18em] uppercase">
+      <div className="mt-2 flex flex-col items-center gap-2">
+        <div className="text-lg md:text-sm text-white/60 tracking-[0.18em] uppercase mb-4 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p
-          className="text-5xl md:text-4xl lg:text-5xl font-sans font-bold text-white tabular-nums tracking-tight"
+          className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight"
           title={t("demo_tt_balance", "Total converti en USD (démo).")}
         >
           {formatMoney(locale, displayAmount, displayCurrency)}
         </p>
-        <a
-          href="https://ripple.com/solutions/stablecoin/transparency/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs md:text-[10px] text-white/40 hover:text-white/80 transition-colors"
-        >
-          {t(
-            "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
-            "Stablecoin USD régulé (détails)",
-          )}
-        </a>
 
         <div className="w-full mt-1.5 flex justify-center">
           <div className="flex items-center gap-2 w-full max-w-[460px] md:max-w-[520px]">

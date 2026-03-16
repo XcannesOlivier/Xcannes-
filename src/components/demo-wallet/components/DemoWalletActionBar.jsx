@@ -38,8 +38,13 @@ export default function DemoWalletActionBar({
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
+              {/* Viewfinder corners */}
+              <path d="M2 7V3a1 1 0 0 1 1-1h4" />
+              <path d="M17 2h4a1 1 0 0 1 1 1v4" />
+              <path d="M22 17v4a1 1 0 0 1-1 1h-4" />
+              <path d="M7 22H3a1 1 0 0 1-1-1v-4" />
+              {/* Scan line */}
+              <line x1="4" y1="12" x2="20" y2="12" />
             </svg>
           </div>
           <span className="wallet-action-label !text-base !font-medium">
@@ -60,7 +65,7 @@ export default function DemoWalletActionBar({
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-6 h-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -90,7 +95,7 @@ export default function DemoWalletActionBar({
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-6 h-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -120,19 +125,26 @@ export default function DemoWalletActionBar({
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-4 h-4"
+              className="w-7 h-7"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
             >
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-              <line x1="1" y1="10" x2="23" y2="10"></line>
+              <text
+                x="12"
+                y="17"
+                textAnchor="middle"
+                fill="currentColor"
+                fontSize="18"
+                fontWeight="700"
+                fontFamily="system-ui, sans-serif"
+              >
+                +/−
+              </text>
             </svg>
           </div>
-          <span className="wallet-action-label !text-lg !font-bold">+/−</span>
+          <span className="wallet-action-label !text-sm !font-normal">
+            Funds
+          </span>
         </button>
       </div>
     </div>

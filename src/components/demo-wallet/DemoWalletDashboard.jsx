@@ -511,7 +511,7 @@ export default function DemoWalletDashboard({
         setShowCurrencyStatement={setShowCurrencyStatement}
       />
 
-      <DemoWalletFooter setWalletInfoOpen={setWalletInfoOpen} />
+      <DemoWalletFooter />
 
       <DemoWalletModals
         walletInfoOpen={walletInfoOpen}
