@@ -238,8 +238,6 @@ export default function DemoWalletDashboardSendModal({
       setScanActive(false);
       return;
     }
-    setScanActive(true);
-    setScanKey((prev) => prev + 1);
     setCameraUnavailable(false);
   }, [open]);
 
@@ -259,12 +257,12 @@ export default function DemoWalletDashboardSendModal({
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -556,7 +554,7 @@ export default function DemoWalletDashboardSendModal({
         onConfirm={handleManualSend}
         disabled={sendProcessing || !canManualSend}
         variant="green"
-        className="mt-2 md:hidden"
+        className="md:hidden"
       />
       <button
         type="button"
@@ -565,7 +563,7 @@ export default function DemoWalletDashboardSendModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full mt-2 text-sm py-3 ${greenActionBtnBase}`}
+        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -574,25 +572,76 @@ export default function DemoWalletDashboardSendModal({
     </div>
   );
 
-  const scannerPanel = (
-    <div className={`space-y-2 ${inline ? "" : "-mx-4 md:-mx-5"}`}>
-      {scanActive ? (
-        <DemoQRScanner
-          key={scanKey}
-          isOpen={true}
-          onScan={handleScan}
-          embedded={true}
-          edgeToEdge={!inline}
-          showClose={false}
-          enableCamera={true}
-          hideWhenUnavailable
-          onCameraUnavailableChange={setCameraUnavailable}
-          showFauxQrBackground={false}
-          className="bg-black/30 border-white/10"
-        />
-      ) : null}
-    </div>
-  );
+  const scannerModal =
+    scanActive && typeof document !== "undefined"
+      ? createPortal(
+          <div className="fixed inset-0 z-[10002] flex flex-col">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+              onClick={() => {
+                setScanActive(false);
+                setCameraUnavailable(false);
+              }}
+            />
+            {/* Scanner container */}
+            <div className="relative flex-1 flex flex-col items-center justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setScanActive(false);
+                  setCameraUnavailable(false);
+                }}
+                className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
+                aria-label={t("close", "Fermer")}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <div className="flex-1 w-full">
+                <DemoQRScanner
+                  key={scanKey}
+                  isOpen={true}
+                  onScan={handleScan}
+                  embedded={true}
+                  edgeToEdge={true}
+                  showClose={false}
+                  enableCamera={true}
+                  hideWhenUnavailable
+                  onCameraUnavailableChange={setCameraUnavailable}
+                  showFauxQrBackground={false}
+                  className="bg-black w-full h-full flex flex-col justify-center [&_video]:w-full [&_video]:h-full [&_video]:object-cover"
+                />
+              </div>
+              {inline && cameraUnavailable ? (
+                <div className="absolute bottom-6 left-4 right-4 rounded-xl border border-orange-400/30 bg-black/70 px-4 py-3 text-xs text-white/80 shadow-lg backdrop-blur-sm">
+                  <div className="text-sm font-semibold text-white">
+                    {t("ui_scanner_unavailable_title", "Scanner indisponible")}
+                  </div>
+                  <div className="mt-1 text-white/70">
+                    {t(
+                      "ui_scanner_unavailable_detail",
+                      "La caméra n’est pas accessible sur ce poste. Importez un QR via le bouton + ou collez un code.",
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   const scanRequestFooter = (
     <div
@@ -619,6 +668,48 @@ export default function DemoWalletDashboardSendModal({
           <div className="text-[11px] text-white/40 md:text-xs md:text-white/60">
             {t("demo_payreq_token", "Enter your QR code")}
           </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setScanActive(true);
+              setScanKey((prev) => prev + 1);
+              setCameraUnavailable(false);
+            }}
+            className="inline-flex items-center gap-2 px-3 py-2 text-[11px] rounded-lg border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+          >
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2 7V3a1 1 0 0 1 1-1h4"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 2h4a1 1 0 0 1 1 1v4"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M22 17v4a1 1 0 0 1-1 1h-4"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 22H3a1 1 0 0 1-1-1v-4"
+                />
+              </svg>
+            </span>
+            {t("ui_scan_qr", "Scanner un QR")}
+          </button>
           <button
             type="button"
             onClick={(e) => {
@@ -677,9 +768,17 @@ export default function DemoWalletDashboardSendModal({
         >
           <div className="flex items-start justify-between gap-3 mb-1 pr-6">
             <div className="flex min-w-0 flex-col gap-1.5">
-              <div>{renderWalletMeta?.("pr-8 wallet-meta--plus-4")}</div>
+              <div>
+                {renderWalletMeta?.(
+                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                )}
+              </div>
               <div className="flex flex-wrap items-center gap-2">
-
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
               </div>
             </div>
             <button
@@ -693,29 +792,23 @@ export default function DemoWalletDashboardSendModal({
               ✕
             </button>
           </div>
-          {/* Send layout */}
-          <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5">
+            <div className="flex flex-col gap-3">
               {hasPaymentRequest ? (
                 <>
                   {requestDetailsPanel}
                   {saveAddressBlock}
-                  {sendActions}
                 </>
               ) : (
                 <>
-                  {scannerPanel}
-                  {scanActive ? scanRequestFooter : null}
-                  {!scanActive ? (
-                    <>
-                      {manualForm}
-                      {sendActions}
-                    </>
-                  ) : null}
+                  {scanRequestFooter}
+                  {manualForm}
                 </>
               )}
+              {scannerModal}
             </div>
           </div>
+          {sendActions}
           <input
             id={scanQrFileInputId}
             type="file"
