@@ -57,6 +57,7 @@ export default function WalletDashboardReceiveModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+  const fallbackWalletLabel = t("nav_wallet", "Wallet");
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const isDesktop = useIsDesktop();
@@ -250,10 +251,123 @@ export default function WalletDashboardReceiveModal({
     const marginRatio = useRequest ? 0.12 : 0.1;
     const margin = Math.max(24, Math.round(srcWidth * marginRatio));
     const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = (srcWidth + margin * 2) * scale;
-    exportCanvas.height = (srcHeight + margin * 2) * scale;
+    const exportWidth = (srcWidth + margin * 2) * scale;
+    const baseHeight = (srcHeight + margin * 2) * scale;
+    exportCanvas.width = exportWidth;
     const ctx = exportCanvas.getContext("2d");
     if (!ctx) return null;
+
+    const maxTextWidth = exportWidth - margin * scale * 2;
+    const labelFontSize = Math.max(16, Math.round(exportWidth * 0.032));
+    const addressFontSize = Math.max(13, Math.round(exportWidth * 0.026));
+    const metaFontSize = Math.max(12, Math.round(exportWidth * 0.024));
+    const labelFont = `600 ${labelFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+    const addressFont = `${addressFontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+    const metaFont = `${metaFontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif`;
+
+    const wrapText = (text, font) => {
+      if (!text) return [];
+      ctx.font = font;
+      const words = String(text).split(" ");
+      const lines = [];
+      let current = "";
+      const pushCurrent = () => {
+        if (current) {
+          lines.push(current);
+          current = "";
+        }
+      };
+      words.forEach((word) => {
+        const test = current ? `${current} ${word}` : word;
+        if (ctx.measureText(test).width <= maxTextWidth) {
+          current = test;
+          return;
+        }
+        pushCurrent();
+        if (ctx.measureText(word).width <= maxTextWidth) {
+          current = word;
+          return;
+        }
+        let chunk = "";
+        for (const ch of word) {
+          const next = `${chunk}${ch}`;
+          if (ctx.measureText(next).width > maxTextWidth && chunk) {
+            lines.push(chunk);
+            chunk = ch;
+          } else {
+            chunk = next;
+          }
+        }
+        if (chunk) {
+          current = chunk;
+        }
+      });
+      pushCurrent();
+      return lines;
+    };
+
+    const textLines = [];
+    const addLines = (text, font, color, lineHeight) => {
+      wrapText(text, font).forEach((line) => {
+        textLines.push({ text: line, font, color, lineHeight });
+      });
+    };
+
+    const labelText = String(
+      useRequest
+        ? generatedRequest?.beneficiaryLabel ||
+            walletLabel ||
+            fallbackWalletLabel
+        : walletLabel || fallbackWalletLabel,
+    ).trim();
+    const addressText = String(
+      useRequest ? generatedRequest?.to || wallet || "" : wallet || "",
+    ).trim();
+    const amountLine = useRequest
+      ? `${requestDisplayAmountLabel} ${requestDisplayCurrency}`.trim()
+      : "";
+    const dateLine = useRequest ? requestDateLabel : "";
+
+    if (labelText) {
+      addLines(
+        labelText,
+        labelFont,
+        "#111111",
+        Math.round(labelFontSize * 1.35),
+      );
+    }
+    if (addressText) {
+      addLines(
+        addressText,
+        addressFont,
+        "#333333",
+        Math.round(addressFontSize * 1.35),
+      );
+    }
+    if (amountLine) {
+      addLines(
+        amountLine,
+        metaFont,
+        "#444444",
+        Math.round(metaFontSize * 1.35),
+      );
+    }
+    if (dateLine) {
+      addLines(
+        dateLine,
+        metaFont,
+        "#555555",
+        Math.round(metaFontSize * 1.35),
+      );
+    }
+
+    const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
+    const textBlockHeight = textLines.reduce(
+      (sum, line) => sum + line.lineHeight,
+      0,
+    );
+    exportCanvas.height = baseHeight + textGap + textBlockHeight;
+
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
@@ -291,6 +405,19 @@ export default function WalletDashboardReceiveModal({
         srcHeight * scale,
       );
     }
+
+    if (textLines.length > 0) {
+      let y = offset + srcHeight * scale + textGap;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      textLines.forEach((line) => {
+        ctx.font = line.font;
+        ctx.fillStyle = line.color;
+        ctx.fillText(line.text, exportWidth / 2, y);
+        y += line.lineHeight;
+      });
+    }
+
     const dataUrl = exportCanvas.toDataURL("image/png");
     return dataUrlToBlob(dataUrl);
   };
@@ -489,12 +616,6 @@ export default function WalletDashboardReceiveModal({
     if (!Number.isFinite(parsed.getTime())) return "";
     return parsed.toLocaleString(locale);
   }, [generatedRequest?.createdAt, locale]);
-  const addressLabelText = String(
-    (generatedRequest?.beneficiaryLabel || walletLabel || "").trim(),
-  );
-  const addressValueText = String(
-    (generatedRequest?.to || wallet || "").trim(),
-  );
   const receiveQrValue = useMemo(() => {
     if (!wallet) return "";
     const label = String(walletLabel || "").trim();
@@ -607,50 +728,26 @@ export default function WalletDashboardReceiveModal({
                       level="M"
                     />
                   </div>
-                  <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t("ui_beneficiary_label", "Bénéficiaire")}
-                      </span>
-                      <span className="font-semibold text-white/90">
-                        {addressLabelText ||
-                          t("ui_wallet_unknown", "Unknown wallet")}
-                      </span>
+                  {showRequestPreview ? (
+                    <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-white/60">
+                          {t("ui_amount_7668986206", "Amount")}
+                        </span>
+                        <span className="font-mono text-white/90">
+                          {requestDisplayAmountLabel}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-white/60">
+                          {t("ui_currency_1ed55673be", "Currency")}
+                        </span>
+                        <span className="font-semibold text-white/90">
+                          {requestDisplayCurrency}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t(
-                          "ui_wallet_address_label_2f7a1c9b5e",
-                          "Wallet address",
-                        )}
-                      </span>
-                      <span className="font-mono text-[11px] text-white/90 text-right break-all">
-                        {addressValueText}
-                      </span>
-                    </div>
-                    {showRequestPreview ? (
-                      <>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-white/60">
-                            {t("ui_amount_7668986206", "Amount")}
-                          </span>
-                          <span className="font-mono text-white/90">
-                            {requestDisplayAmountLabel}
-                          </span>
-                        </div>
-                        {requestDateLabel ? (
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-white/60">
-                              {t("ui_date_label_7a2c1b9d5e", "Date")}
-                            </span>
-                            <span className="font-mono text-white/90">
-                              {requestDateLabel}
-                            </span>
-                          </div>
-                        ) : null}
-                      </>
-                    ) : null}
-                  </div>
+                  ) : null}
                   <div className="flex flex-wrap justify-center gap-2">
                     <button
                       type="button"
