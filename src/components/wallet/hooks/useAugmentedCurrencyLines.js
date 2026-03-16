@@ -92,7 +92,8 @@ export function useAugmentedCurrencyLines({
     const handleWalletRefresh = (event) => {
       const address = event?.detail?.address;
       if (!address || address !== backendWalletAddress) return;
-      refreshCurrencyLines();
+      // Bust backend cache so unallocated RLUSD reflects on-chain changes immediately.
+      refreshCurrencyLines({ silent: true, bustCache: true });
     };
 
     window.addEventListener("xcannes:wallet:refresh", handleWalletRefresh);

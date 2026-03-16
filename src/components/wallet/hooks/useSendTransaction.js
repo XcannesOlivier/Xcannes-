@@ -95,6 +95,8 @@ export function useSendTransaction({
   setActiveAction,
   setAddressToSave,
   setShowSaveAddressPrompt,
+  // Layout
+  isDesktopPanel,
   // useRlusdPerUnitRates()
   rlusdPerUnitRates,
   rlusdPerUnitSources,
@@ -172,7 +174,9 @@ export function useSendTransaction({
       currency !== "USD";
 
     setSendProcessing(true);
-    setActiveAction(null);
+    if (!isDesktopPanel) {
+      setActiveAction(null);
+    }
 
     try {
       if (isFxSend) {

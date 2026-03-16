@@ -244,6 +244,7 @@ export function useWalletSendOrchestrator({
     setActiveAction,
     setAddressToSave,
     setShowSaveAddressPrompt,
+    isDesktopPanel,
     rlusdPerUnitRates,
     rlusdPerUnitSources,
     allocatedRlusdByCurrency,

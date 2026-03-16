@@ -94,7 +94,7 @@ export default function WalletRelayQRModal() {
 
   return (
     <div
-      className={`fixed inset-0 z-[10100] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 transition-opacity duration-250 ${
+      className={`fixed inset-0 z-[20000] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 transition-opacity duration-250 ${
         closing ? "opacity-0" : "opacity-100"
       }`}
       onClick={(e) => {
