@@ -250,15 +250,96 @@ export default function WalletConnectScreen() {
       {/* Feature list */}
       <div className="mt-8 max-w-sm w-full space-y-3">
         <div className="flex items-center gap-3 text-sm text-white/60">
-          <span className="text-base">🔐</span>
+          <span
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70"
+            aria-hidden
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7 11V8a5 5 0 0110 0v3"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 11h12a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2z"
+              />
+            </svg>
+          </span>
           <span>{t("wallet_connect_feature_1", "Clés chiffrées sur votre appareil")}</span>
         </div>
         <div className="flex items-center gap-3 text-sm text-white/60">
-          <span className="text-base">👆</span>
+          <span
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70"
+            aria-hidden
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 11c.552 0 1 .448 1 1v4.2c0 1.91-1.612 3.8-3.6 3.8H9c-1.2 0-2.4-.6-3.1-1.7l-1.3-2.1a1.2 1.2 0 012.05-1.25l1.05 1.7V8.8a1 1 0 112 0V12"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.7 12V6.8a1 1 0 112 0V12"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M11.7 12V7.6a1 1 0 112 0V12"
+              />
+            </svg>
+          </span>
           <span>{t("wallet_connect_feature_2", "Déverrouillage biométrique")}</span>
         </div>
         <div className="flex items-center gap-3 text-sm text-white/60">
-          <span className="text-base">🌐</span>
+          <span
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70"
+            aria-hidden
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              strokeWidth={1.8}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7 3H5a2 2 0 00-2 2v2M17 3h2a2 2 0 012 2v2M7 21H5a2 2 0 01-2-2v-2M17 21h2a2 2 0 002-2v-2"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.5 12a3.5 3.5 0 017 0"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 12v4"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 16.5h3"
+              />
+            </svg>
+          </span>
           <span>{t("wallet_connect_feature_3", "Connexion à XCANNES en un scan")}</span>
         </div>
       </div>
