@@ -147,7 +147,7 @@ export function WalletInfoContent({
             <li>
               {t(
                 "ui_fx_fee_fixed_1pct",
-                "Conversion fee: 1% regardless of currency, applied on the USD amount and sent on-chain to an XCANNES company wallet.",
+                "Conversion fee: 1% regardless of currency (minimum $0.01), applied on the USD amount and sent on-chain to an XCANNES company wallet.",
               )}
             </li>
             <li>

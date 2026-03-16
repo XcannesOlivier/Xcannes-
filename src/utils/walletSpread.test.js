@@ -48,6 +48,17 @@ describe("computeSpreadQuote", () => {
     expect(result.spreadFeeRlusd).toBe(10); // 1% of 1000
   });
 
+  it("applies a minimum fee of $0.01 on small amounts", () => {
+    const result = computeSpreadQuote({
+      base: "EUR",
+      quote: "USD",
+      amountRlusd: 0.5,
+    });
+    expect(result.isFx).toBe(true);
+    expect(result.spreadFraction).toBe(0.01);
+    expect(result.spreadFeeRlusd).toBe(0.01);
+  });
+
   it("returns zero spread for non-FX pairs", () => {
     const result = computeSpreadQuote({
       base: "XRP",

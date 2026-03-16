@@ -3,6 +3,7 @@
 import { encodeXrplCurrencyCode, XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 const FIXED_FX_FEE_FRACTION = 0.01;
+const MIN_FX_FEE_RLUSD = 0.01;
 
 const XCANNES_SPREAD_WALLET_ADDRESS =
   (process.env.NEXT_PUBLIC_XCANNES_SPREAD_WALLET_ADDRESS || "").trim() ||
@@ -43,7 +44,7 @@ export function computeSpreadQuote({ base, quote, amountRlusd }) {
   }
 
   const spreadFraction = FIXED_FX_FEE_FRACTION;
-  const spreadFeeRlusd = amount * spreadFraction;
+  const spreadFeeRlusd = Math.max(amount * spreadFraction, MIN_FX_FEE_RLUSD);
 
   return {
     isFx: true,
