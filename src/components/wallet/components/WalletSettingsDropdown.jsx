@@ -39,6 +39,16 @@ export default function WalletSettingsDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, [isOpen]);
 
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setIsOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isOpen]);
+
   // header → visible on md+ only ; footer → mobile only ; inline → always visible
   const visibilityClass =
     position === "header"
@@ -54,13 +64,29 @@ export default function WalletSettingsDropdown({
       ? "md:absolute md:right-0 md:bottom-full md:mb-1.5"
       : "md:absolute md:right-0 md:top-full md:mt-1.5";
 
+  const arrowPositionClass =
+    position === "footer"
+      ? "md:bottom-[-7px] md:right-3 md:rotate-45"
+      : "md:top-[-7px] md:right-3 md:rotate-45";
+
+  const isDesktop = typeof window !== "undefined"
+    ? window.matchMedia?.("(min-width: 768px)")?.matches
+    : false;
+
   return (
     <div className={visibilityClass} ref={ref}>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
+        className={[
+          "shrink-0 h-9 w-9 flex items-center justify-center rounded-lg border transition-all active:scale-95",
+          isOpen
+            ? "bg-white/5 border-white/12 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)]"
+            : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5",
+        ].join(" ")}
         aria-label={t("ui_settings_label", "Paramètres")}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
       >
         <svg
           className="w-5 h-5"
@@ -79,129 +105,212 @@ export default function WalletSettingsDropdown({
       </button>
 
       {isOpen && (
-        <div
-          className={`fixed inset-0 z-50 bg-[#151b1e] overflow-y-auto ${dropdownPositionClass} md:inset-auto md:w-48 md:rounded-xl md:bg-[#151b1e] md:border md:border-white/10 md:shadow-2xl md:overflow-hidden md:animate-in md:fade-in md:slide-in-from-top-1 md:duration-150`}
-        >
-          {/* Mobile fullscreen header with close button */}
-          <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
-            <span className="text-sm font-semibold text-white/80">
-              {t("ui_settings_label", "Paramètres")}
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="text-white/60 hover:text-white transition-colors text-xl"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="py-1 px-2 md:px-0">
-            {/* Info & Fees */}
-            <button
-              type="button"
-              onClick={() => {
-                onOpenInfo?.();
-                setIsOpen(false);
-              }}
-              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/80 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
-            >
-              <span className="inline-flex h-5 w-5 md:h-4 md:w-4 items-center justify-center rounded-full bg-white/8 border border-white/10 text-xs md:text-[10px] text-white/40 leading-none font-semibold">
-                i
-              </span>
-              {t("wallet_footer_info_fees", "Info & Fees")}
-            </button>
+        <>
+          {/* Backdrop on mobile (tap to close) */}
+          <button
+            type="button"
+            aria-label={t("close", "Fermer")}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
+            onClick={() => setIsOpen(false)}
+          />
 
-            <div className="my-1 mx-3 border-t border-white/8" />
+          <div
+            role="menu"
+            className={[
+              "fixed inset-0 z-50 overflow-y-auto bg-[#0b0f10]",
+              "md:inset-auto md:w-[320px] md:rounded-2xl md:border md:border-white/10 md:bg-[#111518]/95 md:backdrop-blur-xl md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-fadeScale",
+              dropdownPositionClass,
+            ].join(" ")}
+          >
+            {/* Pointer (desktop) */}
+            <div
+              className={[
+                "hidden md:block absolute h-3.5 w-3.5 bg-[#111518]/95 border border-white/10",
+                arrowPositionClass,
+              ].join(" ")}
+              aria-hidden
+            />
 
-            {/* Créer ou importer */}
-            {/* PWA embedded: use goToChoice | Desktop: QR code */}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsOpen(false);
-                
-                // PWA mode: navigate directly to choice screen (already authenticated)
-                if (goToChoice) {
-                  goToChoice();
-                  return;
-                }
-                
-                // Desktop: show QR modal for wallet-app to scan
-                const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-                if (isDesktop) {
-                  setShowQrModal(true);
-                } else {
-                  // Non-PWA mobile: open wallet-app in new tab
-                  window.open("/wallet-app/?action=choice", "_blank");
-                }
-              }}
-              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/80 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
-            >
-              <svg
-                className="w-5 h-5 md:w-4 md:h-4 text-white/40"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
-            </button>
+            {/* Top stripe */}
+            <div className="h-1 w-full bg-gradient-to-r from-xcannes-green/70 via-xcannes-green/15 to-transparent" />
 
-            {/* Stablecoin détails */}
-            <a
-              href="https://rlusd.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
-              className="w-full flex items-center gap-3 md:gap-2.5 px-4 md:px-3.5 py-3.5 md:py-2 text-sm md:text-[12px] text-white/80 hover:text-white hover:bg-white/5 transition-colors rounded-xl md:rounded-none"
-            >
-              <svg
-                className="w-5 h-5 md:w-4 md:h-4 text-white/40"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 6v4m0 4h.01"
-                />
-              </svg>
-              {t(
-                "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
-                "Stablecoin USD réglementé (détails)",
-              )}
-            </a>
-
-            {/* Preferred currency selector */}
-            {preferredCurrency && (
-              <>
-                <div className="my-1 mx-3 border-t border-white/8" />
-                <div className="px-2 md:px-1.5 py-2">
-                  <PreferredCurrencySelector
-                    currentCurrency={preferredCurrency}
-                    topCurrencies={topCurrencies}
-                    allCurrencies={fawazCurrencies}
-                    isLoading={fawazLoading}
-                    onSelect={(code) => {
-                      onPreferredCurrencyChange?.(code);
-                    }}
-                    onOpen={onLoadFawazCurrencies}
-                  />
+            {/* Mobile header */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
+              <div className="min-w-0">
+                <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+                  {t("ui_settings_label", "Paramètres")}
                 </div>
-              </>
-            )}
+                <div className="text-[12px] text-white/80 mt-1 truncate">
+                  {t("ui_wallet_settings_subtitle", "Wallet — options rapides")}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                aria-label={t("close", "Fermer")}
+              >
+                ✕
+              </button>
+            </div>
 
+            {/* Desktop header */}
+            <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-white/8">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/60">
+                    {t("ui_settings_label", "Paramètres")}
+                  </div>
+                  <div className="text-[12px] text-white/80 truncate">
+                    {t("ui_wallet_settings_subtitle", "Wallet — options rapides")}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
+                aria-label={t("close", "Fermer")}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="px-3 pb-4 md:px-3 md:pb-3">
+              {/* Section: Actions */}
+              <div className="pt-2 md:pt-3">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                  {t("ui_settings_section_actions", "Actions")}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsOpen(false);
+
+                    // PWA embedded: navigate directly to choice screen (already authenticated)
+                    if (goToChoice) {
+                      goToChoice();
+                      return;
+                    }
+
+                    // Desktop: show QR modal for wallet-app to scan
+                    if (isDesktop) {
+                      setShowQrModal(true);
+                    } else {
+                      // Non-PWA mobile: open wallet-app in new tab
+                      window.open("/wallet-app/?action=choice", "_blank");
+                    }
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors text-left"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/60 shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/90">
+                      {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+                    </div>
+                    <div className="text-[11px] text-white/45 mt-0.5">
+                      {t("ui_manage_wallets_hint", "Ajouter un wallet, ou en importer un existant")}
+                    </div>
+                  </div>
+                  <span className="text-white/25 text-lg">›</span>
+                </button>
+              </div>
+
+              {/* Section: Display */}
+              {preferredCurrency && (
+                <>
+                  <div className="my-3 border-t border-white/10" />
+                  <div className="pt-0.5">
+                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                      {t("ui_settings_section_display", "Affichage")}
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-black/20 p-2.5">
+                      <PreferredCurrencySelector
+                        currentCurrency={preferredCurrency}
+                        topCurrencies={topCurrencies}
+                        allCurrencies={fawazCurrencies}
+                        isLoading={fawazLoading}
+                        onSelect={(code) => {
+                          onPreferredCurrencyChange?.(code);
+                        }}
+                        onOpen={onLoadFawazCurrencies}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="my-3 border-t border-white/10" />
+
+              {/* Section: Help */}
+              <div className="pt-0.5">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                  {t("ui_settings_section_help", "Aide")}
+                </div>
+
+                <a
+                  href="https://rlusd.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 6v4m0 4h.01" />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+	                      {t(
+	                        "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
+	                        "Stablecoin RLUSD (détails)",
+	                      )}
+	                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_external_link_hint", "Ouvre rlusd.com")}
+                    </div>
+                  </div>
+                  <span className="text-white/20 text-lg">↗</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenInfo?.();
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0 font-semibold">
+                    i
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("wallet_footer_info_fees", "Info & Fees")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_settings_info_hint", "Comprendre les frais et le fonctionnement")}
+                    </div>
+                  </div>
+                  <span className="text-white/20 text-lg">›</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* QR Code modal (desktop) — scanné par wallet-app mobile */}

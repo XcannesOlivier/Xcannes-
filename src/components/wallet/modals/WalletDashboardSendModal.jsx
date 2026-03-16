@@ -600,12 +600,12 @@ export default function WalletDashboardSendModal({
     <div className="space-y-3">
         {/* ── Destination ── */}
         <div>
-            <label
-              className="block text-sm text-white/50 mb-1"
-              title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
-            >
-              {t("ui_send_to_label", "Envoyer à")}
-            </label>
+	            <label
+	              className="block text-base md:text-lg text-white/60 mb-1.5"
+	              title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
+	            >
+	              {t("ui_send_to_label", "Envoyer à")}
+	            </label>
             <div className="relative" ref={savedPickerRef}>
               <input
                 type="text"

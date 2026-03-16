@@ -1026,7 +1026,7 @@
   "ui_spread_8f9f9fc2e9": "fixed FX rate",
   "ui_spread_fx_tiers_88afacafd8": "Conversion fee (1%)",
   "ui_spread_xcannes_tier_7ad17576d3": "Conversion fee (1%)",
-  "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32": "Stablecoin USD regulated (details)",
+  "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32": "Stablecoin RLUSD (details)",
   "ui_state_of_incorporation_ca40f96cb4": "State of Incorporation",
   "ui_statement_a87c93acb8": "Statement",
   "ui_statement_period_4674b18f25": "Statement Period",
