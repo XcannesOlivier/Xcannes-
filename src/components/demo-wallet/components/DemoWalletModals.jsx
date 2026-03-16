@@ -132,7 +132,7 @@ export default function DemoWalletModals({
         handlePaymentRequestScan={handlePaymentRequestScan}
         handleSendSubmit={handleSendSubmit}
         sendProcessing={sendProcessing}
-        enableSaveAddress={true}
+        enableSaveAddress={false}
       />
 
       <DemoWalletDashboardPayreqModal
@@ -151,7 +151,7 @@ export default function DemoWalletModals({
         sendProcessing={sendProcessing}
         handleSendSubmit={handleSendSubmit}
         savedAddresses={demoSavedAddresses}
-        enableSaveAddress={true}
+        enableSaveAddress={false}
       />
 
       <DemoWalletDashboardReceiveModal

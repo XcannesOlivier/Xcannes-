@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import TokenAmountInput from "@/components/ui/TokenAmountInput";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import DemoQRScanner from "../components/DemoQRScanner";
 import { createPortal } from "react-dom";
@@ -11,6 +10,9 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../demoWalletDashboardConfig";
 import { greenActionBtnBase } from "./demoWalletModalTokens";
 import { normalizeQrImageFile } from "../utils/demoQrImage";
+
+const XRPL_ADDRESS_RE = /^(?:xrpl:)?r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+const DEMO_ADDRESS_RE = /^[A-Za-z][A-Za-z0-9_]{10,}$/;
 
 export default function DemoWalletDashboardSendModal({
   open,
@@ -42,11 +44,13 @@ export default function DemoWalletDashboardSendModal({
   const locale = i18n?.language || "en";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
-  const [requestText, setRequestText] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
+  const [showSavedPicker, setShowSavedPicker] = useState(false);
+  const [selectedSavedLabel, setSelectedSavedLabel] = useState("");
+  const savedPickerRef = useRef(null);
   const scanQrFileInputId = "send-qr-file";
   const manualQrReaderIdRef = useRef(
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
@@ -58,6 +62,13 @@ export default function DemoWalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination],
   );
+  const hasDestination = useMemo(() => {
+    if (!normalizedDestination) return false;
+    return (
+      XRPL_ADDRESS_RE.test(normalizedDestination) ||
+      DEMO_ADDRESS_RE.test(normalizedDestination)
+    );
+  }, [normalizedDestination]);
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
       (addr) => addr.address === normalizedDestination,
@@ -211,12 +222,28 @@ export default function DemoWalletDashboardSendModal({
     input?.click();
   };
 
+  // Close saved picker when clicking outside.
+  useEffect(() => {
+    if (!showSavedPicker) return;
+    const handler = (e) => {
+      if (
+        savedPickerRef.current &&
+        !savedPickerRef.current.contains(e.target)
+      ) {
+        setShowSavedPicker(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showSavedPicker]);
+
   useEffect(() => {
     if (!open) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
-      setRequestText("");
       setCameraUnavailable(false);
+      setShowSavedPicker(false);
+      setSelectedSavedLabel("");
     }
   }, [open]);
 
@@ -365,179 +392,311 @@ export default function DemoWalletDashboardSendModal({
         }
       >
         <div className={inline ? "space-y-3" : ""}>
+          {/* ── Destination (same UX as real wallet) ── */}
           <div>
             <label
-              className="block text-[11px] md:text-xs text-white/60 mb-1"
-              title={t(
-                "ui_send_asset_tip",
-                "Sélectionnez la devise à envoyer.",
-              )}
-            >
-              {t("ui_asset_e5170a7a06", "Asset")}
-            </label>
-            <ModalSelect
-              value={selectedSendToken ? selectedSendToken.key : ""}
-              onChange={setSendAssetKey}
-              options={(augmentedTokens || []).map((token) => {
-                const labelLeft =
-                  selectLabelByAssetKey?.[token.key] ||
-                  selectLabelByAssetKey?.[token.currency] ||
-                  token.currency;
-                const labelRight =
-                  selectLabelRightByAssetKey?.[token.key] ||
-                  selectLabelRightByAssetKey?.[token.currency] ||
-                  null;
-                return {
-                  value: token.key,
-                  icon:
-                    selectIconByAssetKey?.[token.key] ||
-                    selectIconByAssetKey?.[token.currency] ||
-                    null,
-                  label: labelLeft,
-                  labelLeft,
-                  labelRight,
-                  labelMobile:
-                    selectLabelMobileByAssetKey?.[token.key] ||
-                    selectLabelMobileByAssetKey?.[token.currency] ||
-                    labelLeft,
-                };
-              })}
-              useNativeSelect={false}
-              showMobileOptionRight={true}
-              buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-            />
-            {selectedSendToken ? null : null}
-          </div>
-          <div>
-            <label
-              className="block text-[11px] md:text-xs text-white/60 mb-1"
-              title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
-            >
-              {t("ui_amount_52cea2dd3d", "Amount")}
-            </label>
-            <TokenAmountInput
-              value={sendAmount}
-              onChange={setSendAmount}
-              placeholder="0.0000"
-              token={
-                selectedSendToken
-                  ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
-                    selectedSendToken.currency
-                  : "RLUSD"
-              }
-              tokenClassName="text-white"
-              containerClassName="focus-within:!border-xcannes-green/80"
-            />
-          </div>
-
-          {sendFxInfo && (
-            <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-              <div className="text-[11px] font-semibold text-white/80">
-                {t(
-                  "ui_payment_fx_base_usd_r_gleme_4818b8a6c3",
-                  "Paiement FX (base USD · règlement XRPL via USD)",
-                )}
-              </div>
-              <p className="mt-1 text-[11px] text-white/60">
-                ≈{" "}
-                <span className="font-mono">
-                  {formatAmountWithSymbol(
-                    locale,
-                    Number(sendFxInfo.paymentRlusd || 0),
-                    "USD",
-                    { minimumFractionDigits: 0, maximumFractionDigits: 6 },
-                  )}
-                </span>{" "}
-                {t("ui_au_recipient_67dcc85cec", "au destinataire")}
-              </p>
-              {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 && (
-                <p className="mt-1 text-[11px] text-white/60">
-                  {t(
-                    "ui_spread_xcannes_tier_7ad17576d3",
-                    "Conversion fee (1%)",
-                  )}
-                  {sendFxInfo.fxSource ? (
-                    <>
-                      {" "}
-                      · {t("ui_source_507c065942", "source")}{" "}
-                      <span className="font-mono">
-                        {String(sendFxInfo.fxSource).toUpperCase()}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {" "}
-                      · {t("ui_source_unknown_4c1a7d9b2e", "unknown source")}
-                    </>
-                  )}
-                  :{" "}
-                  <span className="font-mono">
-                    {formatAmountWithSymbol(
-                      locale,
-                      Number(sendFxInfo.spreadFeeRlusd || 0),
-                      "USD",
-                      { minimumFractionDigits: 0, maximumFractionDigits: 6 },
-                    )}
-                  </span>
-                </p>
-              )}
-              <p className="mt-2 text-[10px] text-white/40">
-                {Number(sendFxInfo.spreadFeeRlusd || 0) > 0
-                  ? t(
-                      "demo_send_flow_with_fee_f4",
-                      "Demo: service fee (1%) applied, then payment → recipient.",
-                    )
-                  : t("demo_send_flow_simple_f4", "Demo: payment → recipient.")}
-              </p>
-            </div>
-          )}
-        </div>
-        <div className={inline ? "space-y-2" : ""}>
-          <div>
-            <label
-              className="block text-[11px] md:text-xs text-white/60 mb-1"
+              className="block text-base md:text-lg text-white/60 mb-1.5"
               title={t(
                 "ui_send_destination_tip",
                 "Adresse XRPL du destinataire.",
               )}
             >
-              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
+              {t("ui_send_to_label", "Envoyer à")}
             </label>
+            <div className="relative" ref={savedPickerRef}>
+              <input
+                type="text"
+                value={sendDestination}
+                onChange={(e) => {
+                  setSendDestination(e.target.value);
+                  setSelectedSavedLabel("");
+                  setShowSavedPicker(false);
+                }}
+                onPaste={handlePastePayload}
+                placeholder={t(
+                  "ui_import_or_choose_recipient",
+                  "Import or choose address",
+                )}
+                className={`w-full bg-black/40 border border-white/15 rounded-xl ${
+                  !hasPaymentRequest ? "pl-8" : "pl-4"
+                } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
+              />
 
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    list="saved-addresses"
-                    value={sendDestination}
-                    onChange={(e) => setSendDestination(e.target.value)}
-                    onPaste={handlePastePayload}
-                    placeholder={t(
-                      "ui_enter_or_import_address",
-                      "Compte Bénéficiaire",
-                    )}
-                    className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
-                  />
-                  <datalist id="saved-addresses">
-                    {(savedAddresses || []).map((addr, idx) => (
-                      <option
-                        key={idx}
-                        value={addr.address}
-                        label={`${addr.label} (${addr.address.slice(0, 8)}...${addr.address.slice(-6)})`}
+              {!hasPaymentRequest ? (
+                <>
+                  {/* Saved addresses picker */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSavedPicker((prev) => !prev);
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+                    aria-expanded={showSavedPicker}
+                  >
+                    <svg
+                      className="w-4 h-4 text-white/60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
                       />
-                    ))}
-                  </datalist>
-                </div>
-              </div>
+                    </svg>
+                  </button>
 
-              {saveAddressBlock}
+                  {/* Upload QR image */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleScanQrUpload();
+                    }}
+                    className="absolute right-11 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    title={t(
+                      "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                      "Charger une image qrcode",
+                    )}
+                  >
+                    <span className="inline-flex h-9 w-9 items-center justify-center text-white/60 text-2xl leading-none">
+                      +
+                    </span>
+                  </button>
+
+                  {/* Scan QR camera */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScanActive(true);
+                      setScanKey((prev) => prev + 1);
+                      setCameraUnavailable(false);
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                    title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+                  >
+                    <svg
+                      className="w-7 h-7 text-white/60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 3h6v6H3V3zm12 0h6v6h-6V3zM3 15h6v6H3v-6zm6-8H5m14 0h-2m2 10h-2m-8-2v2m10-2v2M15 15h6v6h-6v-6z"
+                      />
+                    </svg>
+                  </button>
+                </>
+              ) : null}
+
+              {!hasPaymentRequest && showSavedPicker ? (
+                <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-lg border border-white/15 bg-black/90 backdrop-blur-sm overflow-hidden shadow-lg">
+                  <div className="max-h-48 overflow-y-auto">
+                    {(savedAddresses || []).length > 0 ? (
+                      (savedAddresses || []).map((addr, idx) => (
+                        <button
+                          key={`${addr.address}-${idx}`}
+                          type="button"
+                          onClick={() => {
+                            const value = String(addr?.address || "").trim();
+                            if (!value) return;
+                            const label = String(addr?.label || "").trim();
+                            setSendDestination(value);
+                            setSelectedSavedLabel(label);
+                            setShowSavedPicker(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
+                        >
+                          <span className="block font-semibold">
+                            {String(addr?.label || "").trim() ||
+                              t("ui_wallet_unknown", "Unknown wallet")}
+                          </span>
+                          <span className="block font-mono text-[11px] text-white/60">
+                            {addr.address}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-xs text-white/60">
+                        {t("ui_no_saved_addresses", "No saved addresses yet")}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
             </div>
+
+            {selectedSavedLabel ? (
+              <div className="mt-1 text-xs text-white/60">
+                {t("ui_selected_wallet_label", "Sélectionné")}:{" "}
+                <span className="text-white/80">{selectedSavedLabel}</span>
+              </div>
+            ) : null}
           </div>
+
+          {/* ── Devise + Montant (same sizing as real wallet) ── */}
+          <div
+            className={[
+              "transition-opacity duration-300 space-y-4",
+              hasDestination
+                ? "opacity-100"
+                : "opacity-30 pointer-events-none select-none",
+            ].join(" ")}
+          >
+            <div>
+              <label
+                className="block text-base md:text-lg text-white/60 mb-1.5"
+                title={t(
+                  "ui_send_asset_tip",
+                  "Sélectionnez la devise à envoyer.",
+                )}
+              >
+                {t("ui_asset_e5170a7a06", "Asset")}
+              </label>
+              <ModalSelect
+                value={selectedSendToken ? selectedSendToken.key : ""}
+                onChange={setSendAssetKey}
+                options={(augmentedTokens || []).map((token) => {
+                  const labelLeft =
+                    selectLabelByAssetKey?.[token.key] ||
+                    selectLabelByAssetKey?.[token.currency] ||
+                    token.currency;
+                  const labelRight =
+                    selectLabelRightByAssetKey?.[token.key] ||
+                    selectLabelRightByAssetKey?.[token.currency] ||
+                    null;
+                  return {
+                    value: token.key,
+                    icon:
+                      selectIconByAssetKey?.[token.key] ||
+                      selectIconByAssetKey?.[token.currency] ||
+                      null,
+                    label: labelLeft,
+                    labelLeft,
+                    labelRight,
+                    labelMobile:
+                      selectLabelMobileByAssetKey?.[token.key] ||
+                      selectLabelMobileByAssetKey?.[token.currency] ||
+                      labelLeft,
+                  };
+                })}
+                useNativeSelect={false}
+                showMobileOptionRight={true}
+                iconClassName="text-3xl leading-none"
+                buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer [&_.tabular-nums]:text-lg [&_.tabular-nums]:text-white/35"
+                menuClassName={
+                  noticeVariant === "demo"
+                    ? "bg-xcannes-surface-demo"
+                    : "bg-elevated"
+                }
+                selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-base md:text-lg text-white/60 mb-1.5"
+                title={t(
+                  "ui_send_amount_tip",
+                  "Saisissez le montant à envoyer.",
+                )}
+              >
+                {t("ui_amount_52cea2dd3d", "Amount")}
+              </label>
+              <TokenAmountInput
+                value={sendAmount}
+                onChange={setSendAmount}
+                placeholder="0.0000"
+                token={
+                  selectedSendToken
+                    ? selectLabelByAssetKey?.[selectedSendToken.currency] ||
+                      selectedSendToken.currency
+                    : "RLUSD"
+                }
+                tokenClassName="text-white/45 text-xl font-semibold"
+                containerClassName="focus-within:!border-xcannes-green/80 !rounded-xl !bg-black/40 !border-white/15 py-4"
+              />
+            </div>
+
+            {sendFxInfo && (
+              <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                <div className="text-[11px] font-semibold text-white/80">
+                  {t(
+                    "ui_payment_fx_base_usd_r_gleme_4818b8a6c3",
+                    "Paiement FX (base USD · règlement XRPL via USD)",
+                  )}
+                </div>
+                <p className="mt-1 text-[11px] text-white/60">
+                  ≈{" "}
+                  <span className="font-mono">
+                    {formatAmountWithSymbol(
+                      locale,
+                      Number(sendFxInfo.paymentRlusd || 0),
+                      "USD",
+                      { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                    )}
+                  </span>{" "}
+                  {t("ui_au_recipient_67dcc85cec", "au destinataire")}
+                </p>
+                {Number(sendFxInfo.spreadFeeRlusd || 0) > 0 && (
+                  <p className="mt-1 text-[11px] text-white/60">
+                    {t(
+                      "ui_spread_xcannes_tier_7ad17576d3",
+                      "Conversion fee (1%)",
+                    )}
+                    {sendFxInfo.fxSource ? (
+                      <>
+                        {" "}
+                        · {t("ui_source_507c065942", "source")}{" "}
+                        <span className="font-mono">
+                          {String(sendFxInfo.fxSource).toUpperCase()}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        {" "}
+                        ·{" "}
+                        {t(
+                          "ui_source_unknown_4c1a7d9b2e",
+                          "unknown source",
+                        )}
+                      </>
+                    )}
+                    :{" "}
+                    <span className="font-mono">
+                      {formatAmountWithSymbol(
+                        locale,
+                        Number(sendFxInfo.spreadFeeRlusd || 0),
+                        "USD",
+                        { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                      )}
+                    </span>
+                  </p>
+                )}
+                <p className="mt-2 text-[10px] text-white/40">
+                  {Number(sendFxInfo.spreadFeeRlusd || 0) > 0
+                    ? t(
+                        "demo_send_flow_with_fee_f4",
+                        "Demo: service fee (1%) applied, then payment → recipient.",
+                      )
+                    : t(
+                        "demo_send_flow_simple_f4",
+                        "Demo: payment → recipient.",
+                      )}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {saveAddressBlock ? <div className="pt-1">{saveAddressBlock}</div> : null}
         </div>
       </div>
     </div>
@@ -545,17 +704,6 @@ export default function DemoWalletDashboardSendModal({
 
   const sendActions = (
     <div className={inline ? "mt-auto pt-2 border-t border-white/10" : ""}>
-      <SwipeConfirmButton
-        label={
-          sendProcessing
-            ? t("ui_sending_3b8c1a7d5e", "Sending...")
-            : t("ui_send_504b64a87b", "Send")
-        }
-        onConfirm={handleManualSend}
-        disabled={sendProcessing || !canManualSend}
-        variant="green"
-        className="md:hidden"
-      />
       <button
         type="button"
         onClick={(e) => {
@@ -563,7 +711,7 @@ export default function DemoWalletDashboardSendModal({
           handleManualSend();
         }}
         disabled={sendProcessing || !canManualSend}
-        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
+        className={`w-full text-xl py-4 ${greenActionBtnBase}`}
       >
         {sendProcessing
           ? t("ui_sending_3b8c1a7d5e", "Sending...")
@@ -643,108 +791,6 @@ export default function DemoWalletDashboardSendModal({
         )
       : null;
 
-  const scanRequestFooter = (
-    <div
-      className={
-        inline ? "space-y-6 mt-auto pt-2 border-t border-white/10" : "space-y-6"
-      }
-    >
-      {!cameraUnavailable ? (
-        <div className="flex items-center gap-3 text-xs md:text-sm text-white/40">
-          <span className="h-px flex-1 bg-white/10" />
-          <span className="text-base md:text-lg font-semibold text-white/60">
-            {t("ui_or_8a4c1f83bd", "ou")}
-          </span>
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
-      ) : null}
-
-      <div
-        className={`rounded-lg border border-white/5 bg-white/5 p-3 space-y-2 md:rounded-xl md:border-white/10 md:bg-black/30 md:p-4 md:space-y-3 ${
-          inline ? "flex-1 min-h-0 flex flex-col" : ""
-        }`}
-      >
-        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-3">
-          <div className="text-[11px] text-white/40 md:text-xs md:text-white/60">
-            {t("demo_payreq_token", "Enter your QR code")}
-          </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setScanActive(true);
-              setScanKey((prev) => prev + 1);
-              setCameraUnavailable(false);
-            }}
-            className="inline-flex items-center gap-2 px-3 py-2 text-[11px] rounded-lg border border-white/20 bg-white/10 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-          >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2 7V3a1 1 0 0 1 1-1h4"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 2h4a1 1 0 0 1 1 1v4"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M22 17v4a1 1 0 0 1-1 1h-4"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7 22H3a1 1 0 0 1-1-1v-4"
-                />
-              </svg>
-            </span>
-            {t("ui_scan_qr", "Scanner un QR")}
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleScanQrUpload();
-            }}
-            className="inline-flex items-center gap-2 px-3 py-2 text-[11px] rounded-lg border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-          >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
-              +
-            </span>
-            {t(
-              "ui_or_upload_a_qr_image_works_e_df6baa8039",
-              "Charger une image qrcode",
-            )}
-          </button>
-        </div>
-        <div className="relative">
-          <textarea
-            value={requestText}
-            onChange={(e) => setRequestText(e.target.value)}
-            onPaste={handlePastePayload}
-            className={`relative w-full min-h-[110px] overflow-y-auto rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-xs text-white/80 placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-xcannes-green/30 font-mono md:min-h-[140px] md:border-white/15 md:bg-black/50 ${
-              inline ? "flex-1 min-h-[160px]" : ""
-            }`}
-            placeholder={t(
-              "ui_payreq_placeholder_3a9c1b7d2e",
-              "xcannes-demo:... / address",
-            )}
-          />
-        </div>
-      </div>
-    </div>
-  );
-
   const content = (
     <>
       {/* Backdrop */}
@@ -770,15 +816,10 @@ export default function DemoWalletDashboardSendModal({
             <div className="flex min-w-0 flex-col gap-1.5">
               <div>
                 {renderWalletMeta?.(
-                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap [&_.font-mono]:hidden",
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
               </div>
             </div>
             <button
@@ -801,7 +842,6 @@ export default function DemoWalletDashboardSendModal({
                 </>
               ) : (
                 <>
-                  {scanRequestFooter}
                   {manualForm}
                 </>
               )}
