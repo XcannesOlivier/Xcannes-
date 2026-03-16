@@ -479,9 +479,22 @@ export default function WalletDashboardReceiveModal({
         { minimumFractionDigits: 0, maximumFractionDigits: 2 },
       )
     : formatAmountWithSymbol(locale, 0, requestDisplayCurrency, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      });
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  const requestDateLabel = useMemo(() => {
+    const raw = generatedRequest?.createdAt;
+    if (!raw) return "";
+    const parsed = new Date(raw);
+    if (!Number.isFinite(parsed.getTime())) return "";
+    return parsed.toLocaleString(locale);
+  }, [generatedRequest?.createdAt, locale]);
+  const addressLabelText = String(
+    (generatedRequest?.beneficiaryLabel || walletLabel || "").trim(),
+  );
+  const addressValueText = String(
+    (generatedRequest?.to || wallet || "").trim(),
+  );
   const receiveQrValue = useMemo(() => {
     if (!wallet) return "";
     const label = String(walletLabel || "").trim();
@@ -594,26 +607,50 @@ export default function WalletDashboardReceiveModal({
                       level="M"
                     />
                   </div>
-                  {showRequestPreview ? (
-                    <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-white/60">
-                          {t("ui_amount_7668986206", "Amount")}
-                        </span>
-                        <span className="font-mono text-white/90">
-                          {requestDisplayAmountLabel}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-white/60">
-                          {t("ui_currency_1ed55673be", "Currency")}
-                        </span>
-                        <span className="font-semibold text-white/90">
-                          {requestDisplayCurrency}
-                        </span>
-                      </div>
+                  <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
+                        {t("ui_beneficiary_label", "Bénéficiaire")}
+                      </span>
+                      <span className="font-semibold text-white/90">
+                        {addressLabelText ||
+                          t("ui_wallet_unknown", "Unknown wallet")}
+                      </span>
                     </div>
-                  ) : null}
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
+                        {t(
+                          "ui_wallet_address_label_2f7a1c9b5e",
+                          "Wallet address",
+                        )}
+                      </span>
+                      <span className="font-mono text-[11px] text-white/90 text-right break-all">
+                        {addressValueText}
+                      </span>
+                    </div>
+                    {showRequestPreview ? (
+                      <>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-white/60">
+                            {t("ui_amount_7668986206", "Amount")}
+                          </span>
+                          <span className="font-mono text-white/90">
+                            {requestDisplayAmountLabel}
+                          </span>
+                        </div>
+                        {requestDateLabel ? (
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-white/60">
+                              {t("ui_date_label_7a2c1b9d5e", "Date")}
+                            </span>
+                            <span className="font-mono text-white/90">
+                              {requestDateLabel}
+                            </span>
+                          </div>
+                        ) : null}
+                      </>
+                    ) : null}
+                  </div>
                   <div className="flex flex-wrap justify-center gap-2">
                     <button
                       type="button"
