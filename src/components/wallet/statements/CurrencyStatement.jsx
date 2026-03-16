@@ -67,6 +67,7 @@ export default function CurrencyStatement({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+  const isInlineDesktop = variant === "inline-desktop";
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),
     [currency],
@@ -570,14 +571,29 @@ export default function CurrencyStatement({
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <p className="text-sm text-white font-semibold truncate">
-                {walletLabel || t("nav_wallet", "Wallet")}
-              </p>
-              {walletAddress ? (
-                <p className="text-[11px] text-white/60 font-mono break-all">
-                  {walletAddress}
-                </p>
-              ) : null}
+              {isInlineDesktop ? (
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-sm text-white font-semibold whitespace-nowrap">
+                    {walletLabel || t("nav_wallet", "Wallet")}
+                  </span>
+                  {walletAddress ? (
+                    <div className="text-[11px] text-white/60 font-mono whitespace-nowrap overflow-x-auto">
+                      {walletAddress}
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-white font-semibold truncate">
+                    {walletLabel || t("nav_wallet", "Wallet")}
+                  </p>
+                  {walletAddress ? (
+                    <p className="text-[11px] text-white/60 font-mono break-all">
+                      {walletAddress}
+                    </p>
+                  ) : null}
+                </>
+              )}
             </div>
             <div>
               <p className="text-xs text-white/60 mb-1">
