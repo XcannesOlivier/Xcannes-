@@ -45,7 +45,6 @@ export default function DemoWalletDashboardSendModal({
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
   const [isDesktop, setIsDesktop] = useState(false);
-  const [pageHeaderOffset, setPageHeaderOffset] = useState(0);
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
@@ -300,40 +299,16 @@ export default function DemoWalletDashboardSendModal({
     enabled: shouldAnimate,
   });
 
-  const resolveFixedHeaderOffset = () => {
-    if (typeof window === "undefined") return 0;
-    const header = document.querySelector("header");
-    if (!header) return 0;
-    const styles = window.getComputedStyle(header);
-    if (styles.position !== "fixed") return 0;
-    const rect = header.getBoundingClientRect?.();
-    if (!rect) return 0;
-    // Header fixed at top; reserve its height so modals in the home demo
-    // don't get pushed under/around the global header.
-    if (Math.abs(rect.top) > 1) return 0;
-    return Math.max(0, Math.round(rect.height || 0));
-  };
-
-  // When embedded on the homepage (fixed site header), keep the modal below the header.
-  // This is a no-op on pages without a fixed header.
-  useEffect(() => {
-    if (!open || inline) return;
-    const apply = () => setPageHeaderOffset(resolveFixedHeaderOffset());
-    apply();
-    window.addEventListener("resize", apply);
-    return () => window.removeEventListener("resize", apply);
-  }, [open, inline]);
-
   if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-x-0 bottom-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-full md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -836,8 +811,7 @@ export default function DemoWalletDashboardSendModal({
     scanActive && typeof document !== "undefined"
       ? createPortal(
           <div
-            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col"
-            style={{ top: pageHeaderOffset ? `${pageHeaderOffset}px` : 0 }}
+            className="fixed inset-0 z-[10002] flex flex-col"
           >
             {/* Backdrop */}
             <div
@@ -911,19 +885,15 @@ export default function DemoWalletDashboardSendModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-x-0 bottom-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}
-          style={{ top: pageHeaderOffset ? `${pageHeaderOffset}px` : 0 }}
         />
       ) : null}
 
       {/* Modale */}
-      <div
-        className={wrapperClass}
-        style={{ top: pageHeaderOffset ? `${pageHeaderOffset}px` : 0 }}
-      >
+      <div className={wrapperClass}>
         <div
           className={panelClass}
           style={{ WebkitOverflowScrolling: "touch" }}
