@@ -237,7 +237,7 @@ export default function DemoWalletModals({
         noticeVariant="demo"
         previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
-        isFullPageView={false}
+        isFullPageView={!isDesktop}
         statementVariant={"default"}
         usdRates={effectiveUsdPerUnitRates}
         highlightTransactionId={highlightTransactionId}

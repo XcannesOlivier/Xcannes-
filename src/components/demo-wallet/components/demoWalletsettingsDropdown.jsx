@@ -75,13 +75,13 @@ export default function DemoWalletSettingsDropdown({
             onClick={close}
           />
 
-          <div className="fixed inset-0 z-[10001] flex items-end md:items-center justify-center px-4 pb-4 md:pb-0 pointer-events-none">
+          <div className="fixed inset-0 z-[10001] flex items-end md:items-center justify-center px-0 pb-0 md:px-4 md:pb-0 pointer-events-none">
             <div
               role="dialog"
               aria-modal="true"
               aria-label={t("ui_settings_label", "Paramètres")}
               className={[
-                "relative w-full max-h-[92vh] max-w-md md:max-w-lg rounded-2xl overflow-hidden flex flex-col pointer-events-auto",
+                "relative w-full h-screen md:h-auto md:max-h-[92vh] md:max-w-lg rounded-none md:rounded-2xl overflow-hidden flex flex-col pointer-events-auto",
                 "wallet-modal-panel border border-white/10",
                 "bg-xcannes-surface-demo demo-wallet-tooltip-scope",
                 isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in",
