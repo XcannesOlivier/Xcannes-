@@ -29,7 +29,7 @@ export default function WalletRelayQRModal() {
   const { qrModalData, closeQrModal, isConnected } = useWallet();
   const [closing, setClosing] = useState(false);
 
-  // Don't render on /wallet — the dashboard handles its own QR display
+  // Don't render on /wallet unless it's a sign flow (connect handled elsewhere)
   const isWalletPage = router.pathname === "/wallet";
 
   // Clean up connect-type challenges when leaving /wallet → prevents
@@ -76,7 +76,8 @@ export default function WalletRelayQRModal() {
     return () => clearTimeout(timer);
   }, [qrModalData?.visible, qrModalData?.mobile, qrModalData?.walletAppUrl]);
 
-  if (!qrModalData?.visible || isWalletPage) return null;
+  if (!qrModalData?.visible) return null;
+  if (isWalletPage && qrModalData?.type !== "sign") return null;
 
   // Never show a stale connect QR outside /wallet (prevents flash when navigating back)
   if (qrModalData?.type === "connect" && !isWalletPage) return null;
