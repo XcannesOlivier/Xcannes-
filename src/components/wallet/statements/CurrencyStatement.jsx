@@ -15,6 +15,7 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
+import { apiUrl } from "@/lib/runtimeConfig";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
@@ -125,6 +126,11 @@ export default function CurrencyStatement({
   const [reserveOpen, setReserveOpen] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
     useState(null);
+  const [detailTx, setDetailTx] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailLabel, setDetailLabel] = useState("");
+  const [detailLabelLoading, setDetailLabelLoading] = useState(false);
+  const labelCacheRef = useRef(new Map());
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
   const defaultPeriod = t(
@@ -172,7 +178,9 @@ export default function CurrencyStatement({
   const {
     enrichDescription,
     simplifyMobileDescription,
+    parseConversionPair,
     getLocalizedDescription,
+    renderCurrencyBadge,
     renderConversionDescription,
     formatDate,
     formatAmountLocal: formatAmountWithSymbolLocal,
@@ -188,6 +196,67 @@ export default function CurrencyStatement({
     (rlusdAmount) => formatAmountWithSymbolLocal(rlusdToLocal(rlusdAmount)),
     [formatAmountWithSymbolLocal, rlusdToLocal],
   );
+
+  const openTxDetails = useCallback((tx) => {
+    if (!tx) return;
+    setDetailTx(tx);
+    setDetailOpen(true);
+  }, []);
+
+  const closeTxDetails = useCallback(() => {
+    setDetailOpen(false);
+    setDetailTx(null);
+    setDetailLabel("");
+    setDetailLabelLoading(false);
+  }, []);
+
+  const formatDateTime = useCallback(
+    (tx) => {
+      const raw = tx?.createdAt || tx?.date || "";
+      const parsed = new Date(raw);
+      if (!Number.isFinite(parsed.getTime())) return String(raw || "");
+      return parsed.toLocaleString(locale);
+    },
+    [locale],
+  );
+
+  useEffect(() => {
+    if (!detailOpen || !detailTx) return;
+    const counterparty = String(detailTx?.counterparty || "").trim();
+    const isXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(counterparty);
+    if (!counterparty || !isXrplAddress) {
+      setDetailLabel("");
+      setDetailLabelLoading(false);
+      return;
+    }
+    const cached = labelCacheRef.current.get(counterparty);
+    if (cached != null) {
+      setDetailLabel(cached);
+      setDetailLabelLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setDetailLabelLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          apiUrl(`/wallet/label?address=${encodeURIComponent(counterparty)}`),
+        );
+        const data = await res.json().catch(() => ({}));
+        const label = String(data?.label || "").trim();
+        labelCacheRef.current.set(counterparty, label);
+        if (!cancelled) setDetailLabel(label);
+      } catch {
+        if (!cancelled) setDetailLabel("");
+      } finally {
+        if (!cancelled) setDetailLabelLoading(false);
+      }
+    }, 200);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [detailOpen, detailTx]);
 
   /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {
@@ -494,6 +563,153 @@ export default function CurrencyStatement({
     : "fixed inset-0 z-[10200] flex";
   const modalBgClass =
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
+
+  const transactionDetailModal =
+    detailOpen && detailTx && typeof document !== "undefined"
+      ? createPortal(
+          <div className="fixed inset-0 z-[10300] flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={closeTxDetails}
+            />
+            <div
+              className={`relative w-full max-w-md rounded-2xl border border-white/10 ${modalBgClass} p-4 md:p-5 shadow-2xl`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-xs text-white/50 uppercase tracking-wide">
+                    {t("ui_transaction_details", "Transaction details")}
+                  </div>
+                  <div className="text-base md:text-lg text-white font-semibold truncate">
+                    {getLocalizedDescription(detailTx) ||
+                      t("ui_not_available_9c2a1f7b3d", "N/A")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeTxDetails}
+                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-white/60">
+                    {t("ui_date_label_7a2c1b9d5e", "Date & time")}
+                  </span>
+                  <span className="text-white/90 text-right">
+                    {formatDateTime(detailTx)}
+                  </span>
+                </div>
+
+                {detailTx?.category === "exchange" ? (() => {
+                  const pair = parseConversionPair(
+                    detailTx?.description || "",
+                  );
+                  if (!pair) return null;
+                  return (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
+                        {t("ui_conversion_label", "Conversion")}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        {renderCurrencyBadge(pair.from)}
+                        <span className="text-white/40 text-xs">→</span>
+                        {renderCurrencyBadge(pair.to)}
+                      </span>
+                    </div>
+                  );
+                })() : null}
+
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-white/60">
+                    {t("ui_amount_52cea2dd3d", "Amount")}
+                  </span>
+                  <span
+                    className={`font-mono ${
+                      detailTx?.type === "debit"
+                        ? "text-red-400"
+                        : "text-green-400"
+                    }`}
+                  >
+                    {detailTx?.type === "debit" ? "−" : "+"}
+                    {formatAmountRlusdAsLocal(detailTx?.amount ?? 0)}
+                  </span>
+                </div>
+
+                {detailTx?.spreadRlusd ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-white/60">
+                      {t("statement_conversion_fee_label", "Frais")}
+                    </span>
+                    <span className="font-mono text-white/80">
+                      {formatAmountRlusdAsLocal(detailTx.spreadRlusd)}
+                    </span>
+                  </div>
+                ) : null}
+
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-white/60">
+                    {t("ui_balance_after_label", "Balance après")}
+                  </span>
+                  <span className="font-mono text-white/90">
+                    {formatAmountRlusdAsLocal(
+                      detailTx?.displayRunningBalance != null
+                        ? detailTx.displayRunningBalance
+                        : detailTx?.runningBalance ?? 0,
+                    )}
+                  </span>
+                </div>
+
+                {(() => {
+                  const counterparty = String(
+                    detailTx?.counterparty || "",
+                  ).trim();
+                  if (!counterparty || counterparty.toUpperCase() === "XCANNES")
+                    return null;
+                  const isOutgoing =
+                    detailTx?.type === "debit" ||
+                    String(detailTx?.kind || "")
+                      .toUpperCase()
+                      .includes("OUT");
+                  const label = detailLabel || counterparty;
+                  return (
+                    <div className="space-y-1">
+                      <div className="text-white/60 text-xs">
+                        {isOutgoing
+                          ? t("ui_to_label_7b2c1a9d5e", "To")
+                          : t("ui_from_label_2c7a1d9b5e", "From")}
+                      </div>
+                      <div className="text-white/90 font-semibold">
+                        {detailLabelLoading ? "…" : label}
+                      </div>
+                      {detailLabel && counterparty ? (
+                        <div className="text-[11px] text-white/50 font-mono break-all">
+                          {counterparty}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })()}
+
+                {detailTx?.txHash ? (
+                  <div className="space-y-1">
+                    <div className="text-white/60 text-xs">
+                      {t("ui_tx_hash_label_2b7c1a9d5e", "Tx hash")}
+                    </div>
+                    <div className="text-[11px] text-white/70 font-mono break-all">
+                      {detailTx.txHash}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   /* ── render ────────────────────────────────────────────── */
   const content = (
@@ -857,7 +1073,16 @@ export default function CurrencyStatement({
                               <tr
                                 key={`${group.key || groupIdx}-${idx}`}
                                 ref={isHighlighted ? highlightRowRef : null}
-                                className={rowClassName}
+                                className={`${rowClassName} cursor-pointer`}
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => openTxDetails(tx)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    openTxDetails(tx);
+                                  }
+                                }}
                               >
                                 <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/80 font-mono text-xs">
                                   {formatDate(tx.date)}
@@ -1017,7 +1242,18 @@ export default function CurrencyStatement({
     </div>
   );
 
-  if (inline) return content;
+  if (inline)
+    return (
+      <>
+        {content}
+        {transactionDetailModal}
+      </>
+    );
   if (typeof document === "undefined") return null;
-  return createPortal(content, document.body);
+  return (
+    <>
+      {createPortal(content, document.body)}
+      {transactionDetailModal}
+    </>
+  );
 }
