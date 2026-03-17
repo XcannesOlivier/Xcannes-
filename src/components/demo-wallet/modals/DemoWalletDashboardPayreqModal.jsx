@@ -292,23 +292,20 @@ export default function DemoWalletDashboardPayreqModal({
                 </div>
               ) : null}
               {sendPaymentRequest && requestDestination ? (
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/60 shrink-0 text-sm">
-                    {t("ui_account_number_label", "N° de compte")}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowFullAccountNumber((prev) => !prev)}
-                    title={requestDestination}
-                    className={`font-mono text-white/80 text-right text-xs ${
-                      showFullAccountNumber ? "break-all" : ""
-                    } cursor-pointer`}
+                <button
+                  type="button"
+                  onClick={() => setShowFullAccountNumber((prev) => !prev)}
+                  title={requestDestination}
+                  className="w-full bg-black/40 border border-white/15 rounded-xl px-4 py-3 text-base text-white outline-none focus-visible:border-xcannes-green/80 focus-visible:border-[0.5px] text-left"
+                >
+                  <span
+                    className={showFullAccountNumber ? "break-all" : "truncate"}
                   >
                     {showFullAccountNumber
                       ? requestDestination
                       : requestDestinationLabel || requestDestination}
-                  </button>
-                </div>
+                  </span>
+                </button>
               ) : null}
               {requestDetailsPanel}
               {sendActions}
