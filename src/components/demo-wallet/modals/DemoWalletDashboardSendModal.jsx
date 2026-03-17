@@ -538,50 +538,53 @@ export default function DemoWalletDashboardSendModal({
                     </svg>
                   </button>
 
-                  {/* Upload QR image */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleScanQrUpload();
-                    }}
-                    className="absolute right-11 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                    title={t(
-                      "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                      "Charger une image qrcode",
-                    )}
-                  >
-                    <span className="inline-flex h-9 w-9 items-center justify-center text-white/60 text-2xl leading-none">
-                      +
-                    </span>
-                  </button>
-
-                  {/* Scan QR camera */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setScanActive(true);
-                      setScanKey((prev) => prev + 1);
-                      setCameraUnavailable(false);
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                    title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-                  >
-                    <svg
-                      className="w-7 h-7 text-white/60"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {/* Actions droite (responsive): + upload + scan */}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {/* Upload QR image */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleScanQrUpload();
+                      }}
+                      className="p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                      title={t(
+                        "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                        "Charger une image qrcode",
+                      )}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 3h6v6H3V3zm12 0h6v6h-6V3zM3 15h6v6H3v-6zm6-8H5m14 0h-2m2 10h-2m-8-2v2m10-2v2M15 15h6v6h-6v-6z"
-                      />
-                    </svg>
-                  </button>
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-white/20 text-white/60 text-lg font-bold leading-none">
+                        +
+                      </span>
+                    </button>
+
+                    {/* Scan QR camera (same icon as real wallet) */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setScanActive(true);
+                        setScanKey((prev) => prev + 1);
+                        setCameraUnavailable(false);
+                      }}
+                      className="p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                      title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+                    >
+                      <svg
+                        className="w-7 h-7 text-white/60"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </>
               ) : null}
 

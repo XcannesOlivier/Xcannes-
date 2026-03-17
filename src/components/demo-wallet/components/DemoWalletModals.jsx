@@ -27,6 +27,7 @@ export default function DemoWalletModals({
   hasPayreq,
   setSendPaymentRequest,
   renderWalletMeta,
+  renderWalletMetaNoAddress,
   selectableTokens,
   selectedSendToken,
   sendFxInfo,
@@ -98,6 +99,8 @@ export default function DemoWalletModals({
   isDesktop,
   demoScannerQrSize,
 }) {
+  const modalWalletMeta = renderWalletMetaNoAddress || renderWalletMeta;
+
   return (
     <>
       <DemoWalletInfoModal
@@ -159,7 +162,7 @@ export default function DemoWalletModals({
         onClose={() => setActiveAction(null)}
         isPreviewMode={true}
         noticeVariant="demo"
-        renderWalletMeta={renderWalletMeta}
+        renderWalletMeta={modalWalletMeta}
         wallet={wallet}
         handleCopyAddress={async () => {
           try {
@@ -185,7 +188,7 @@ export default function DemoWalletModals({
       <DemoWalletDashboardSwapModal
         open={activeAction === "swap"}
         onClose={() => setActiveAction(null)}
-        renderWalletMeta={renderWalletMeta}
+        renderWalletMeta={modalWalletMeta}
         isPreviewMode={true}
         noticeVariant="demo"
         currencyLinesSummary={currencyLinesSummary}
@@ -219,7 +222,7 @@ export default function DemoWalletModals({
         onDemoSell={handleDemoSell}
         cashModalTab={cashModalTab}
         setCashModalTab={setCashModalTab}
-        renderWalletMeta={renderWalletMeta}
+        renderWalletMeta={modalWalletMeta}
         availableTokens={selectableTokens}
         rlusdPerUnitRates={rlusdPerUnitRates}
         selectLabelByCurrency={selectLabelByAssetKey}
@@ -238,7 +241,7 @@ export default function DemoWalletModals({
         previewGlobalMovements={previewGlobalMovements}
         previewCurrencyTransactions={previewCurrencyTransactions}
         isFullPageView={!isDesktop}
-        statementVariant={"default"}
+        statementVariant={isDesktop ? "default" : "full"}
         usdRates={effectiveUsdPerUnitRates}
         highlightTransactionId={highlightTransactionId}
         showGlobalStatement={showGlobalStatement}

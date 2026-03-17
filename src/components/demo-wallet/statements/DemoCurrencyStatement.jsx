@@ -1177,7 +1177,7 @@ export default function DemoCurrencyStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full xcannes-fullscreen-safe rounded-none border border-white/10 md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:h-auto md:max-w-4xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-5xl",
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
@@ -1188,7 +1188,7 @@ export default function DemoCurrencyStatement({
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-        "w-full xcannes-fullscreen-safe rounded-none border border-white/10",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:border md:border-white/10",
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",

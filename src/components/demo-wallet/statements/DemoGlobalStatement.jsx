@@ -627,7 +627,7 @@ export default function DemoGlobalStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full xcannes-fullscreen-safe rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:h-auto md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
@@ -638,7 +638,7 @@ export default function DemoGlobalStatement({
     "dex-mobile": {
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
-      panelClass: "w-full xcannes-fullscreen-safe rounded-none border-0",
+      panelClass: "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",

@@ -104,6 +104,12 @@ export default function DemoWalletDashboard({
     hideAddress: false,
     addressTitle: t("demo_tt_wallet_address", "Adresse XRPL du wallet."),
   });
+  const { renderWalletMeta: renderWalletMetaNoAddress } = useDemoWalletMeta({
+    walletAddress: wallet,
+    walletLabel: walletContextLabel,
+    hideAddress: true,
+    addressTitle: t("demo_tt_wallet_address", "Adresse XRPL du wallet."),
+  });
   const { savedAddresses: demoSavedAddresses, saveAddress: saveDemoAddress } =
     useDemoSavedAddresses(DEMO_SAVED_ADDRESSES_STORAGE_KEY);
 
@@ -537,6 +543,7 @@ export default function DemoWalletDashboard({
         hasPayreq={hasPayreq}
         setSendPaymentRequest={setSendPaymentRequest}
         renderWalletMeta={renderWalletMeta}
+        renderWalletMetaNoAddress={renderWalletMetaNoAddress}
         selectableTokens={selectableTokens}
         selectedSendToken={selectedSendToken}
         sendFxInfo={sendFxInfo}
