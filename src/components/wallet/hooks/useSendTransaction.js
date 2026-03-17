@@ -128,10 +128,7 @@ export function useSendTransaction({
         saveAddress(normalizedDest, saveLabel);
         return;
       }
-      if (!isAlreadySaved) {
-        setAddressToSave(normalizedDest);
-        setShowSaveAddressPrompt(true);
-      }
+      // No automatic "save this address?" prompt after sending.
     };
 
     if (!isConnected || !wallet) {
