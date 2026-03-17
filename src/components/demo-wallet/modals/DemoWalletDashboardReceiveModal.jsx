@@ -1,41 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import useIsDesktop from "@/components/wallet/hooks/useIsDesktop";
 import { QRCodeCanvas } from "qrcode.react";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { getCurrencySymbol } from "../demoWalletDashboardConfig";
 import { buildDemoPayreq, encodeDemoPayreqQR } from "../utils/demoXrplMemo";
 import { useModalTransition } from "@/hooks/useModalTransition";
-import { greenActionBtnBase, greenActionBtnMuted } from "./demoWalletModalTokens";
-
-const ShareIcon = ({ className = "" }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-    <polyline points="17 8 12 3 7 8" />
-    <line x1="12" y1="3" x2="12" y2="15" />
-  </svg>
-);
 
 export default function DemoWalletDashboardReceiveModal({
   open,
   onClose,
-  isPreviewMode = false,
   noticeVariant = "preview",
   renderWalletMeta,
   wallet,
-  handleCopyAddress,
   requestAmount,
   setRequestAmount,
   requestCurrency,
@@ -55,11 +35,13 @@ export default function DemoWalletDashboardReceiveModal({
   const locale = i18n?.language || "en";
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
-  const [isRequestOpen, setIsRequestOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
+  const isDesktop = useIsDesktop();
   const [copyToast, setCopyToast] = useState("");
   const copyToastTimerRef = useRef(null);
-  const qrContainerRef = useRef(null);
+  const autoCloseTimerRef = useRef(null);
+  const receiveQrContainerRef = useRef(null);
+  const requestQrContainerRef = useRef(null);
+  const requestPreviewRef = useRef(null);
   const formatUnits = (value, currencyCode = "USD") => {
     const num = Number(value);
     if (!Number.isFinite(num)) return "0";
@@ -86,19 +68,10 @@ export default function DemoWalletDashboardReceiveModal({
     [requestCurrency],
   );
 
-  const selectedRequestToken = useMemo(() => {
-    return (
-      (augmentedTokens || []).find(
-        (t) => String(t?.currency || "").toUpperCase() === requestCurrencyCode,
-      ) || null
-    );
-  }, [augmentedTokens, requestCurrencyCode]);
-
   useEffect(() => {
     if (!open) {
       setGeneratedRequest(null);
       setGenerateError(null);
-      setIsRequestOpen(false);
     }
   }, [open]);
 
@@ -108,20 +81,11 @@ export default function DemoWalletDashboardReceiveModal({
         window.clearTimeout(copyToastTimerRef.current);
         copyToastTimerRef.current = null;
       }
+      if (autoCloseTimerRef.current) {
+        window.clearTimeout(autoCloseTimerRef.current);
+        autoCloseTimerRef.current = null;
+      }
     };
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
   }, []);
 
   useEffect(() => {
@@ -167,20 +131,29 @@ export default function DemoWalletDashboardReceiveModal({
     });
 
     setGeneratedRequest(req);
-    setIsRequestOpen(false);
   };
 
-  const flashCopyToast = (message) => {
+  const flashCopyToast = (message, autoClose = false) => {
     const text = String(message || "").trim();
     if (!text) return;
     setCopyToast(text);
     if (copyToastTimerRef.current) {
       window.clearTimeout(copyToastTimerRef.current);
     }
+    if (autoCloseTimerRef.current) {
+      window.clearTimeout(autoCloseTimerRef.current);
+      autoCloseTimerRef.current = null;
+    }
     copyToastTimerRef.current = window.setTimeout(() => {
       setCopyToast("");
       copyToastTimerRef.current = null;
     }, 1300);
+    if (autoClose) {
+      autoCloseTimerRef.current = window.setTimeout(() => {
+        autoCloseTimerRef.current = null;
+        onClose?.();
+      }, 1400);
+    }
   };
 
   const dataUrlToBlob = (url) => {
@@ -196,14 +169,23 @@ export default function DemoWalletDashboardReceiveModal({
     return new Blob([bytes], { type: mime });
   };
 
-  const buildQrBlob = () => {
-    const canvas = qrContainerRef.current?.querySelector?.("canvas");
+  const buildQrBlob = (useRequest = hasGeneratedRequest) => {
+    const container = useRequest
+      ? requestQrContainerRef.current
+      : receiveQrContainerRef.current;
+    const canvas = container?.querySelector?.("canvas");
     if (!canvas) return null;
     const srcWidth = canvas.width;
     const srcHeight = canvas.height;
-    const scale = hasGeneratedRequest ? 4 : 3;
-    const marginRatio = hasGeneratedRequest ? 0.12 : 0.1;
+    const baseScale = useRequest ? 4 : 3;
+    const marginRatio = useRequest ? 0.12 : 0.1;
     const margin = Math.max(24, Math.round(srcWidth * marginRatio));
+    const maxExportWidth = 1600;
+    const safeScale = Math.min(
+      baseScale,
+      maxExportWidth / (srcWidth + margin * 2),
+    );
+    const scale = Math.max(1.8, safeScale);
     const exportCanvas = document.createElement("canvas");
     exportCanvas.width = (srcWidth + margin * 2) * scale;
     exportCanvas.height = (srcHeight + margin * 2) * scale;
@@ -214,38 +196,6 @@ export default function DemoWalletDashboardReceiveModal({
     ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
     const offset = margin * scale;
     ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
-    try {
-      const srcCtx = canvas.getContext("2d");
-      const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
-      const isDarkBg =
-        srcPixel && srcPixel.length >= 3
-          ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3
-          : false;
-      if (isDarkBg) {
-        const imageData = ctx.getImageData(
-          offset,
-          offset,
-          srcWidth * scale,
-          srcHeight * scale,
-        );
-        const data = imageData.data;
-        for (let i = 0; i < data.length; i += 4) {
-          data[i] = 255 - data[i];
-          data[i + 1] = 255 - data[i + 1];
-          data[i + 2] = 255 - data[i + 2];
-        }
-        ctx.putImageData(imageData, offset, offset);
-      }
-    } catch {
-      // fallback to raw canvas if pixel access fails
-      ctx.drawImage(
-        canvas,
-        offset,
-        offset,
-        srcWidth * scale,
-        srcHeight * scale,
-      );
-    }
     const dataUrl = exportCanvas.toDataURL("image/png");
     return dataUrlToBlob(dataUrl);
   };
@@ -266,9 +216,39 @@ export default function DemoWalletDashboardReceiveModal({
     }
   };
 
-  const handleCopyQr = async () => {
-    const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
-    const blob = buildQrBlob();
+  const handleCopyQr = async (useRequest = hasGeneratedRequest) => {
+    const fallbackText = useRequest ? requestQrValue : receiveQrValue;
+    const blob = buildQrBlob(useRequest);
+
+    if (!isDesktop && fallbackText) {
+      if (navigator?.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(fallbackText);
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          return;
+        } catch {
+          // fall through to execCommand
+        }
+      }
+      try {
+        const el = document.createElement("textarea");
+        el.value = fallbackText;
+        el.setAttribute("readonly", "");
+        el.style.position = "fixed";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        el.focus();
+        el.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(el);
+        if (ok) {
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          return;
+        }
+      } catch {
+        // fall through
+      }
+    }
 
     if (typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write) {
       try {
@@ -281,7 +261,7 @@ export default function DemoWalletDashboardReceiveModal({
           }
           const item = new ClipboardItem(items);
           await navigator.clipboard.write([item]);
-          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"));
+          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"), true);
           return;
         }
       } catch {
@@ -292,7 +272,7 @@ export default function DemoWalletDashboardReceiveModal({
     if (navigator?.clipboard?.writeText && fallbackText) {
       try {
         await navigator.clipboard.writeText(fallbackText);
-        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
         return;
       } catch {
         // fall through to execCommand
@@ -312,7 +292,7 @@ export default function DemoWalletDashboardReceiveModal({
         const ok = document.execCommand("copy");
         document.body.removeChild(el);
         if (ok) {
-          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"));
+          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
           return;
         }
       } catch {
@@ -320,17 +300,19 @@ export default function DemoWalletDashboardReceiveModal({
       }
     }
 
-    flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
+    flashCopyToast(
+      t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"),
+    );
   };
 
-  const handleShareQr = async () => {
-    const fallbackText = hasGeneratedRequest ? requestQrValue : receiveQrValue;
-    const blob = buildQrBlob();
+  const handleShareQr = async (useRequest = hasGeneratedRequest) => {
+    const fallbackText = useRequest ? requestQrValue : receiveQrValue;
+    const blob = buildQrBlob(useRequest);
 
     if (isDesktop || !navigator?.share) {
       if (blob) {
         downloadBlob(blob, "xcannes-qr.png");
-        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"));
+        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"), true);
         return;
       }
       if (fallbackText) {
@@ -338,7 +320,7 @@ export default function DemoWalletDashboardReceiveModal({
           new Blob([fallbackText], { type: "text/plain" }),
           "xcannes-qr.txt",
         );
-        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"));
+        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"), true);
         return;
       }
       flashCopyToast(
@@ -348,7 +330,6 @@ export default function DemoWalletDashboardReceiveModal({
     }
 
     const shareData = {};
-    if (fallbackText) shareData.text = fallbackText;
     shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
 
     if (blob && typeof File !== "undefined") {
@@ -360,9 +341,11 @@ export default function DemoWalletDashboardReceiveModal({
       }
     }
 
+    if (!shareData.files && fallbackText) shareData.text = fallbackText;
+
     try {
       await navigator.share(shareData);
-      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"));
+      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"), true);
     } catch (err) {
       if (err?.name === "AbortError") return;
       flashCopyToast(t("ui_share_failed_1a2b3c", "Partage impossible"));
@@ -373,8 +356,10 @@ export default function DemoWalletDashboardReceiveModal({
     return encodeDemoPayreqQR(generatedRequest);
   }, [generatedRequest]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
-  const qrDisplaySize = inline ? 240 : 220;
-  const qrPixelSize = inline ? 360 : hasGeneratedRequest ? 520 : 420;
+  // Public address QR should be visually smaller than the request QR preview.
+  const qrDisplaySize = inline ? 240 : 190;
+  const qrPixelSize = inline ? 360 : 380;
+  const requestQrPixelSize = inline ? 360 : 520;
   const requestDisplayCurrency = String(
     generatedRequest?.ccy || requestCurrencyCode || "USD",
   )
@@ -387,26 +372,48 @@ export default function DemoWalletDashboardReceiveModal({
   )
     ? formatUnits(requestDisplayAmount, requestDisplayCurrency)
     : formatUnits(0, requestDisplayCurrency);
-  const requestBeneficiaryLabel =
-    String(generatedRequest?.beneficiaryLabel || walletLabel || "").trim() ||
-    t("ui_beneficiary_unknown", "Bénéficiaire");
-  const receiveQrValue = wallet || "";
+  const receiveQrValue = useMemo(() => {
+    if (!wallet) return "";
+    const label = String(walletLabel || "").trim();
+    if (!label) return `xrpl:${wallet}`;
+    return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
+  }, [wallet, walletLabel]);
+
+  const shortWalletAddress = useMemo(() => {
+    const addr = String(wallet || "").trim();
+    if (!addr) return "";
+    if (addr.length <= 10) return addr;
+    return `${addr.slice(0, 4)}...${addr.slice(-3)}`;
+  }, [wallet]);
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
   });
 
+  // After generating a request, scroll the modal to the generated QR block.
+  useEffect(() => {
+    if (!shouldRender) return;
+    if (!hasGeneratedRequest) return;
+    const el = requestPreviewRef.current;
+    if (!el) return;
+    try {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch {
+      // ignore
+    }
+  }, [hasGeneratedRequest, shouldRender]);
+
   if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-stretch md:items-center justify-center md:px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-receive-modal border-0 md:border md:border-white/10 p-4 md:p-5 space-y-3 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col min-h-0 overflow-y-auto overscroll-contain pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-[100dvh] md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -440,9 +447,17 @@ export default function DemoWalletDashboardReceiveModal({
         >
           <div className="flex items-start justify-between gap-3 mb-1 pr-6">
             <div className="flex min-w-0 flex-col gap-1.5">
-              <div>{renderWalletMeta?.("pr-8 wallet-meta--plus-4")}</div>
+              <div>
+                {renderWalletMeta?.(
+                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                )}
+              </div>
               <div className="flex flex-wrap items-center gap-2">
-
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
               </div>
             </div>
             <button
@@ -456,258 +471,224 @@ export default function DemoWalletDashboardReceiveModal({
               ✕
             </button>
           </div>
-          <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
-            <div className="wallet-tab-unfold-in">
-              <p className="text-xs md:text-sm text-white/60 mb-3">
-                {t(
-                  "ui_receive_and_request_desc_2f1a7c9d5e",
-                  "Share this XRPL address to receive funds, or create a payment request to send to another wallet.",
-                )}
-              </p>
+          <div className="flex-1 min-h-0 flex flex-col">
+            <div className="flex-1 min-h-0 flex flex-col gap-5">
+              {/* SECTION 1 — RECEIVE FUNDS */}
+              <div className="space-y-2">
+                <h2 className="text-base md:text-lg font-semibold text-white/90">
+                  {t("ui_receive_funds_title", "Recevoir des fonds")}
+                </h2>
+                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                  <div className="flex flex-col items-center">
+                    <div
+                      ref={receiveQrContainerRef}
+                      className="rounded-xl border border-white/10 bg-white p-3"
+                    >
+                      <QRCodeCanvas
+                        value={receiveQrValue || ""}
+                        size={qrPixelSize}
+                        style={{ width: qrDisplaySize, height: qrDisplaySize }}
+                        bgColor="#ffffff"
+                        fgColor="#000000"
+                        includeMargin={true}
+                        level="M"
+                      />
+                    </div>
 
-              {/* Tab Content: Receive */}
-              {wallet && (
-                <div
-                  className={`flex flex-col items-center gap-3 ${inline ? "flex-1 min-h-0 justify-center" : ""}`}
-                >
-                  <div
-                    ref={qrContainerRef}
-                    className="bg-black/60 border border-white/10 rounded-xl p-3 text-[0px]"
-                  >
-                    <QRCodeCanvas
-                      value={
-                        hasGeneratedRequest ? requestQrValue : receiveQrValue
-                      }
-                      size={qrPixelSize}
-                      style={{ width: qrDisplaySize, height: qrDisplaySize }}
-                      bgColor="#ffffff"
-                      fgColor="#000000"
-                      includeMargin={true}
-                      level="M"
+                    <div className="mt-3 text-[11px] tracking-[0.22em] uppercase text-white/45">
+                      {t("ui_public_address_label", "Adresse publique")}
+                    </div>
+                    <div className="mt-1 text-sm font-mono text-white/80">
+                      {shortWalletAddress || "—"}
+                    </div>
+
+                    <div className="mt-4 w-full grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await handleCopyQr(false);
+                        }}
+                        className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                      >
+                        {t("ui_copy", "Copier")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await handleShareQr(false);
+                        }}
+                        className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                      >
+                        {t("ui_download", "Télécharger")}
+                      </button>
+                    </div>
+
+                    {copyToast ? (
+                      <div className="mt-3 text-[11px] text-xcannes-green/90">
+                        {copyToast}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2 — CREATE REQUEST */}
+              <div className="space-y-2">
+                <h2 className="text-base md:text-lg font-semibold text-white/90">
+                  {t("ui_create_request_title", "Créer une demande")}
+                </h2>
+                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4 space-y-4">
+                  {/* Amount */}
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_amount_7668986206", "Amount")}
+                    </label>
+                    <input
+                      type="number"
+                      value={requestAmount}
+                      onChange={(e) => setRequestAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
                     />
                   </div>
-                  {hasGeneratedRequest ? (
-                    <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-white/60">
-                          {t("ui_amount_7668986206", "Amount")}
-                        </span>
-                        <span className="font-mono text-white/90">
-                          {requestDisplayAmountLabel}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-white/60">
-                          {t("ui_currency_1ed55673be", "Currency")}
-                        </span>
-                        <span className="font-semibold text-white/90">
-                          {requestDisplayCurrency}
-                        </span>
-                      </div>
-                    </div>
-                  ) : null}
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await handleCopyQr();
-                        } catch {
-                          // ignore
-                        } finally {
-                          onClose?.();
-                        }
-                      }}
-                      className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
-                    >
-                      {hasGeneratedRequest
-                        ? t("ui_copy_request_32a3f4409b", "Copy request")
-                        : t("ui_copy_address_779691d570", "Copy address")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await handleShareQr();
-                        } catch {
-                          // ignore
-                        } finally {
-                          onClose?.();
-                        }
-                      }}
-                      className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors inline-flex items-center justify-center"
-                    >
-                      {isDesktop ? (
-                        t("ui_download_qr_5c1d2e7f9a", "Télécharger")
-                      ) : (
-                        <>
-                          <ShareIcon className="w-5 h-5" />
-                          <span className="sr-only">
-                            {t("ui_share_qr_9b5c1a2d7e", "Partager")}
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  {copyToast ? (
-                    <div className="text-[10px] text-xcannes-green/90">
-                      {copyToast}
-                    </div>
-                  ) : null}
-                </div>
-              )}
 
-              {wallet ? (
-                <div className="mt-2 flex justify-center">
+                  {/* Currency */}
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_currency_1ed55673be", "Currency")}
+                    </label>
+                    <ModalSelect
+                      value={requestCurrency}
+                      onChange={setRequestCurrency}
+                      options={(augmentedTokens || []).map((token) => {
+                        const currencyUpper = String(
+                          token.currency || "",
+                        ).toUpperCase();
+                        const labelLeft =
+                          selectLabelByCurrency?.[token.currency] ||
+                          selectLabelByCurrency?.[currencyUpper] ||
+                          token.currency;
+                        const baseLabelRight =
+                          selectLabelRightByCurrency?.[token.currency] ||
+                          selectLabelRightByCurrency?.[currencyUpper] ||
+                          null;
+                        const labelRight =
+                          currencyUpper === "RLUSD" &&
+                          unallocatedUsdValue !== null
+                            ? formatUnits(unallocatedUsdValue, "USD")
+                            : baseLabelRight;
+                        return {
+                          value: token.currency,
+                          icon:
+                            selectIconByCurrency?.[token.currency] ||
+                            selectIconByCurrency?.[currencyUpper] ||
+                            null,
+                          label: labelLeft,
+                          labelLeft,
+                          labelRight,
+                          labelMobile:
+                            selectLabelMobileByCurrency?.[token.currency] ||
+                            selectLabelMobileByCurrency?.[currencyUpper] ||
+                            labelLeft,
+                        };
+                      })}
+                      useNativeSelect={false}
+                      buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+                      menuClassName={
+                        noticeVariant === "demo"
+                          ? "bg-xcannes-surface-demo"
+                          : "bg-elevated"
+                      }
+                      selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                    />
+                  </div>
+
+                  {/* Memo (optional) */}
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
+                    </label>
+                    <input
+                      type="text"
+                      value={requestMemo}
+                      onChange={(e) => setRequestMemo(e.target.value)}
+                      placeholder={t(
+                        "ui_payment_memo_placeholder",
+                        "Objet du paiement (optionnel)",
+                      )}
+                      className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                    />
+                  </div>
+
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsRequestOpen((prev) => !prev);
+                      handleGenerateRequest();
                     }}
-                    className={`px-6 py-3 text-base md:text-lg ${greenActionBtnMuted}`}
+                    className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors duration-150"
                   >
-                    {isRequestOpen
-                      ? t("ui_hide_request_payment", "Masquer la demande")
-                      : t("ui_request_payment_c62b99fb16", "Créer une demande")}
+                    {t("ui_generate_request_fr", "Générer la demande")}
                   </button>
-                </div>
-              ) : null}
 
-              {/* Request Payment */}
-              {wallet && isRequestOpen && (
-                <div
-                  className={`space-y-4 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}
-                >
-                  <div
-                    className={
-                      inline
-                        ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]"
-                        : "space-y-4"
-                    }
-                  >
-                    <div className="space-y-4">
-                      {/* Amount & Currency */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-[11px] md:text-xs text-white/60 mb-1">
-                            {t("ui_amount_7668986206", "Amount")}
-                          </label>
-                          <input
-                            type="number"
-                            value={requestAmount}
-                            onChange={(e) => setRequestAmount(e.target.value)}
-                            placeholder="0.00"
-                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-base md:text-sm text-white outline-none focus:border-xcannes-green/80"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] md:text-xs text-white/60 mb-1">
-                            {t("ui_currency_1ed55673be", "Currency")}
-                          </label>
-                          <ModalSelect
-                            value={requestCurrency}
-                            onChange={setRequestCurrency}
-                            options={(augmentedTokens || []).map((token) => {
-                              const currencyUpper = String(
-                                token.currency || "",
-                              ).toUpperCase();
-                              const labelLeft =
-                                selectLabelByCurrency?.[token.currency] ||
-                                selectLabelByCurrency?.[currencyUpper] ||
-                                token.currency;
-                              const baseLabelRight =
-                                selectLabelRightByCurrency?.[token.currency] ||
-                                selectLabelRightByCurrency?.[currencyUpper] ||
-                                null;
-                              const labelRight =
-                                currencyUpper === "RLUSD" &&
-                                unallocatedUsdValue !== null
-                                  ? formatUnits(unallocatedUsdValue, "USD")
-                                  : baseLabelRight;
-                              return {
-                                value: token.currency,
-                                icon:
-                                  selectIconByCurrency?.[token.currency] ||
-                                  selectIconByCurrency?.[currencyUpper] ||
-                                  null,
-                                label: labelLeft,
-                                labelLeft,
-                                labelRight,
-                                labelMobile:
-                                  selectLabelMobileByCurrency?.[
-                                    token.currency
-                                  ] ||
-                                  selectLabelMobileByCurrency?.[
-                                    currencyUpper
-                                  ] ||
-                                  labelLeft,
-                              };
-                            })}
-                            useNativeSelect={false}
-                            buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
-                            menuClassName={
-                              noticeVariant === "demo"
-                                ? "bg-xcannes-surface-demo"
-                                : "bg-elevated"
-                            }
-                            selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Memo (optional) */}
-                      <div>
-                        <label className="block text-[11px] md:text-xs text-white/60 mb-1">
-                          {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
-                        </label>
-                        <input
-                          type="text"
-                          value={requestMemo}
-                          onChange={(e) => setRequestMemo(e.target.value)}
-                          placeholder={t(
-                            "ui_payment_for_82ec86ac25",
-                            "Payment for...",
-                          )}
-                          className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80"
-                        />
-                      </div>
-
-                      {/* Generate Button */}
-                      <SwipeConfirmButton
-                        label={t(
-                          "ui_generate_request_58584f23a2",
-                          "Generate Request",
-                        )}
-                        onConfirm={handleGenerateRequest}
-                        variant="green"
-                        className="mt-2 md:hidden"
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleGenerateRequest();
-                        }}
-                        className={`hidden md:block w-full mt-2 text-sm py-3 ${greenActionBtnMuted}`}
-                      >
-                        {t(
-                          "ui_generate_request_58584f23a2",
-                          "Generate Request",
-                        )}
-                      </button>
-
-                      {generateError && (
-                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                          {generateError}
-                        </div>
-                      )}
+                  {generateError ? (
+                    <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {generateError}
                     </div>
-                  </div>
+                  ) : null}
+
+                  {hasGeneratedRequest ? (
+                    <div ref={requestPreviewRef} className="pt-2 space-y-3">
+                      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                        {t("ui_request_generated_label", "Demande générée")}
+                      </div>
+                      <div className="flex items-center justify-center">
+                        <div
+                          ref={requestQrContainerRef}
+                          className="rounded-xl border border-white/10 bg-white p-3"
+                        >
+                          <QRCodeCanvas
+                            value={requestQrValue}
+                            size={requestQrPixelSize}
+                            style={{ width: 200, height: 200 }}
+                            bgColor="#ffffff"
+                            fgColor="#000000"
+                            includeMargin={true}
+                            level="M"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleCopyQr(true);
+                          }}
+                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                        >
+                          {t("ui_copy", "Copier")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleShareQr(true);
+                          }}
+                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                        >
+                          {t("ui_download", "Télécharger")}
+                        </button>
+                      </div>
+                      <div className="text-[11px] text-white/50 text-center">
+                        {requestDisplayAmountLabel}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>

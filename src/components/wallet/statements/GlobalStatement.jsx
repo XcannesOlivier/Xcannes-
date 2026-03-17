@@ -158,6 +158,13 @@ export default function GlobalStatement({
   }, [totalBalance, prefCode, prefRlusdPerUnit]);
   const displayCurrencyCode = prefCode === "RLUSD" ? "USD" : prefCode;
 
+  const shortWalletAddress = useMemo(() => {
+    const addr = String(walletAddress || "").trim();
+    if (!addr) return "";
+    if (addr.length <= 10) return addr;
+    return `${addr.slice(0, 4)}...${addr.slice(-3)}`;
+  }, [walletAddress]);
+
   /* ── sorted tokens ─────────────────────────────────────── */
   const sortedTokens = [...tokens]
     .filter((tok) => String(tok.currency || "").toUpperCase() !== "RLUSD")
@@ -484,33 +491,43 @@ export default function GlobalStatement({
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
       >
-        {/* Header avec Account Info intégré */}
+        {/* Header */}
         <div
           className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4`}
         >
-          <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <Image
                 src="/assets/statement.svg"
                 alt={t("ui_statement_a87c93acb8", "Statement")}
-                width={40}
-                height={40}
-                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10"
+                width={36}
+                height={36}
+                className="flex-shrink-0 w-9 h-9"
               />
-              <div className="flex items-center gap-2 min-w-0">
-                <h2 className="text-xl font-bold text-white truncate">
-                  {globalTitle}
-                </h2>
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                    {t("ui_global_statement_13e29aa8aa", "Global")}
+                  </div>
+                  {noticeVariant === "demo" ? (
+                    <span className="inline-flex items-center text-white/80 text-[11px] font-semibold px-2 py-0.5 leading-none">
+                      {t("demo_notice_title", "Mode démo")}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mt-1 text-base md:text-lg font-semibold text-white/90 truncate">
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </div>
+                {shortWalletAddress ? (
+                  <div className="mt-0.5 text-xs text-white/50 font-mono truncate">
+                    {shortWalletAddress}
+                  </div>
                 ) : null}
-
               </div>
             </div>
             {!inline ? (
               <button
+                type="button"
                 onClick={onClose}
                 className="wallet-modal-close text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0"
               >
@@ -519,244 +536,181 @@ export default function GlobalStatement({
             ) : null}
           </div>
 
-          {/* Account Info dans le header */}
-          {isInlineDesktop ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-sm text-white font-semibold whitespace-nowrap">
-                  {walletLabel || t("nav_wallet", "Wallet")}
-                </span>
-                {walletAddress ? (
-                  <div className="text-[11px] text-white/60 font-mono whitespace-nowrap overflow-x-auto">
-                    {walletAddress}
-                  </div>
-                ) : null}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <p className="text-xs text-white/60 mb-1">
-                    {t("ui_statement_period_4674b18f25", "Statement Period")}
-                  </p>
-                  <StatementMonthSelect
-                    value={selectedMonth}
-                    onChange={(nextValue) => {
-                      if (nextValue === "archives") {
-                        setSelectedMonth("archives");
-                        return;
-                      }
-                      const parsed = Number.parseInt(nextValue, 10);
-                      setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                    }}
-                    options={availableMonths}
-                    menuClassName={modalBgClass}
-                  />
-                </div>
-                <div>
-                  <p className="text-xs text-white/60 mb-1">
-                    {t("ui_total_assets_918e935125", "Total Assets")}
-                  </p>
-                  <p className="text-sm text-white">
-                    ≈ {formatAmountWithSymbolLocal(
-                        totalInPreferred !== null && Number.isFinite(totalInPreferred)
-                          ? totalInPreferred
-                          : totalBalance,
-                        displayCurrencyCode,
-                      )}
-                  </p>
-                  <p className="text-[11px] text-white/60">
-                    {tokens.length}
-                    {t("ui_currencies_5e5bf1a8a1", "Currencies")}
-                  </p>
-                </div>
-              </div>
+          <div className="mt-4 rounded-[14px] border border-white/10 bg-white/5 p-4">
+            <div className="text-xs text-white/60">
+              {t("ui_total_assets_label_fr", "Total des actifs")}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <p className="text-sm text-white font-semibold truncate">
-                  {walletLabel || t("nav_wallet", "Wallet")}
-                </p>
-                {walletAddress ? (
-                  <p className="text-xs md:text-sm text-white/60 font-mono break-all">
-                    {walletAddress}
-                  </p>
-                ) : null}
-              </div>
-              <div>
-                <p className="text-xs text-white/60 mb-1">
-                  {t("ui_statement_period_4674b18f25", "Statement Period")}
-                </p>
-                <StatementMonthSelect
-                  value={selectedMonth}
-                  onChange={(nextValue) => {
-                    if (nextValue === "archives") {
-                      setSelectedMonth("archives");
-                      return;
-                    }
-                    const parsed = Number.parseInt(nextValue, 10);
-                    setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                  }}
-                  options={availableMonths}
-                  menuClassName={modalBgClass}
-                />
-              </div>
-              <div>
-                <p className="text-xs text-white/60 mb-1">
-                  {t("ui_total_assets_918e935125", "Total Assets")}
-                </p>
-                <p className="text-sm text-white">
-                  ≈ {formatAmountWithSymbolLocal(
-                      totalInPreferred !== null && Number.isFinite(totalInPreferred)
-                        ? totalInPreferred
-                        : totalBalance,
-                      displayCurrencyCode,
-                    )}
-                </p>
-                <p className="text-[11px] text-white/60">
-                  {tokens.length}
-                  {t("ui_currencies_5e5bf1a8a1", "Currencies")}
-                </p>
-              </div>
+            <div className="mt-1 text-3xl md:text-[32px] font-semibold text-white/95">
+              ≈{" "}
+              {formatAmountWithSymbolLocal(
+                totalInPreferred !== null && Number.isFinite(totalInPreferred)
+                  ? totalInPreferred
+                  : totalBalance,
+                displayCurrencyCode,
+                { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+              )}
             </div>
-          )}
+            <div className="mt-1 text-xs text-white/50">
+              {sortedTokens.filter(
+                (tok) => String(tok?.currency || "").toUpperCase() !== "XRP",
+              ).length}{" "}
+              {t("ui_currencies_fr", "devises")}
+            </div>
+          </div>
         </div>
 
         {/* Content - Zone scrollable */}
-        <div className="flex-1 overflow-hidden px-4 md:px-5 py-4 flex flex-col gap-4 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-4 flex flex-col gap-4">
           {/* Controls */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={() => setSortBy("balance")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  sortBy === "balance"
-                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                {t("ui_sort_by_balance_17aed9021c", "Sort by Balance")}
-              </button>
-              <button
-                onClick={() => setSortBy("name")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  sortBy === "name"
-                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                {t("ui_sort_by_name_2590e44f12", "Sort by Name")}
-              </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+            <div>
+              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                {t("ui_statement_period_4674b18f25", "Période")}
+              </div>
+              <StatementMonthSelect
+                value={selectedMonth}
+                onChange={(nextValue) => {
+                  if (nextValue === "archives") {
+                    setSelectedMonth("archives");
+                    return;
+                  }
+                  const parsed = Number.parseInt(nextValue, 10);
+                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                }}
+                options={availableMonths}
+                menuClassName={modalBgClass}
+              />
+            </div>
+
+            <div className="md:justify-self-end">
+              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                {t("ui_sort_label", "Tri")}
+              </div>
+              <div className="inline-flex rounded-[10px] border border-white/10 bg-white/5 p-1">
+                <button
+                  type="button"
+                  onClick={() => setSortBy("balance")}
+                  className={[
+                    "px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors duration-150",
+                    sortBy === "balance"
+                      ? "bg-white/10 text-white"
+                      : "text-white/60 hover:text-white/80 hover:bg-white/5",
+                  ].join(" ")}
+                >
+                  {t("ui_sort_balance_short", "Balance")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortBy("name")}
+                  className={[
+                    "px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors duration-150",
+                    sortBy === "name"
+                      ? "bg-white/10 text-white"
+                      : "text-white/60 hover:text-white/80 hover:bg-white/5",
+                  ].join(" ")}
+                >
+                  {t("ui_sort_name_short", "Nom")}
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Assets Table */}
-          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
-            <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-black z-10">
-                  <tr>
-                    <th className="text-left px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
-                      {t("ui_asset_e3ae76ddf7", "Asset")}
-                    </th>
-                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
-                      {t("ui_balance_0ad2d5b8eb", "Balance")}
-                    </th>
-                    <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">
-                      {t("ui_usd_value_6925fe3f7e", "≈ USD Value")}
-                    </th>
-                    <th className="text-center px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
-                      {t("ui_action_96db311a48", "Action")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedTokens.map((token, idx) => {
-                    const usdValue = getUsdValue(token);
+          {/* Asset list */}
+          <div className="space-y-2">
+            {sortedTokens.map((token, idx) => {
+              const usdValue = getUsdValue(token);
+              const tokenCode = getDisplayCurrencyCode(token.currency);
+              const convertedValue =
+                Number.isFinite(usdValue) && usdValue !== null
+                  ? prefCode === "USD" || prefCode === "RLUSD"
+                    ? usdValue
+                    : prefRlusdPerUnit
+                      ? usdValue / prefRlusdPerUnit
+                      : null
+                  : null;
+              const showConverted =
+                Number.isFinite(convertedValue) &&
+                String(tokenCode || "").toUpperCase() !==
+                  String(displayCurrencyCode || "").toUpperCase();
 
-                    return (
-                      <tr
-                        key={idx}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                      >
-                        <td className="px-3 md:px-4 py-2.5 md:py-3">
-                          <div className="flex items-center gap-2">
-                            {["XRP", "RLUSD"].includes(token.currency) ? (
-                              <Image
-                                src={`/symbols/${token.currency.toLowerCase()}.png`}
-                                alt={token.currency}
-                                width={24}
-                                height={24}
-                                className="flex-shrink-0 w-6 h-6 rounded-md"
-                              />
-                            ) : (
-                              <span className="text-lg sm:text-2xl flex-shrink-0">
-                                {getCurrencyFlag(
-                                  getDisplayCurrencyCode(token.currency),
-                                )}
-                              </span>
-                            )}
-                            <div className="min-w-0">
-                              <p className="text-white font-medium text-xs sm:text-sm truncate">
-                                {isPreviewMode ? (
-                                  <>
-                                    <span className="md:hidden">
-                                      {getDisplayCurrencyCode(token.currency)}
-                                    </span>
-                                    <span className="hidden md:inline">
-                                      {getCurrencyDescription(
-                                        getDisplayCurrencyCode(token.currency),
-                                      ) ||
-                                        getDisplayCurrencyCode(token.currency)}
-                                    </span>
-                                  </>
-                                ) : (
-                                  getDisplayCurrencyCode(token.currency)
-                                )}
-                              </p>
-                              {isPreviewMode && (
-                                <p className="text-[9px] sm:text-xs text-white/40 truncate">
-                                  {token.currency === "XRP"
-                                    ? t("ui_label_native_2d7a1c9b4e", "Native")
-                                    : token.issuer?.slice(0, 8) + "..."}
-                                </p>
-                              )}
-                            </div>
+              const description = getCurrencyDescription(tokenCode);
+
+              return (
+                <button
+                  key={`${token.currency}-${idx}`}
+                  type="button"
+                  onClick={() => onViewCurrency?.(token)}
+                  disabled={!onViewCurrency}
+                  className="w-full text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.07] transition-colors duration-150 px-3 py-3 disabled:opacity-70 disabled:cursor-default"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {["XRP", "RLUSD"].includes(String(token.currency || "").toUpperCase()) ? (
+                        <Image
+                          src={`/symbols/${String(token.currency || "").toLowerCase()}.png`}
+                          alt={tokenCode}
+                          width={28}
+                          height={28}
+                          className="flex-shrink-0 w-7 h-7 rounded-md"
+                        />
+                      ) : (
+                        <span className="text-2xl flex-shrink-0">
+                          {getCurrencyFlag(tokenCode)}
+                        </span>
+                      )}
+
+                      <div className="min-w-0">
+                        <div className="text-[13px] font-medium text-white/90 truncate">
+                          {tokenCode}
+                        </div>
+                        {description ? (
+                          <div className="text-[11px] text-white/45 truncate mt-0.5">
+                            {description}
                           </div>
-                        </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white font-medium text-[10px] sm:text-sm">
-                          <div className="truncate">
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <div className="text-right">
+                        <div className="text-[15px] font-semibold text-white/90 font-mono">
+                          {formatAmountWithSymbolLocal(
+                            token.value,
+                            token.currency,
+                            { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                          )}
+                        </div>
+                        {showConverted ? (
+                          <div className="text-[11px] text-white/45 font-mono mt-0.5">
+                            ≈{" "}
                             {formatAmountWithSymbolLocal(
-                              token.value,
-                              token.currency,
+                              convertedValue,
+                              displayCurrencyCode,
+                              { minimumFractionDigits: 0, maximumFractionDigits: 6 },
                             )}
                           </div>
-                        </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono text-white/80 text-[10px] sm:text-sm hidden sm:table-cell">
-                          {Number.isFinite(usdValue)
-                            ? formatAmountWithSymbolLocal(usdValue, "USD")
-                            : "--"}
-                        </td>
-                        <td className="px-2 sm:px-4 py-2 sm:py-3 text-center">
-                          <button
-                            onClick={() =>
-                              onViewCurrency && onViewCurrency(token)
-                            }
-                            className="px-2 sm:px-3 py-1 bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green rounded text-[9px] sm:text-xs font-medium transition-colors border border-transparent whitespace-nowrap"
-                          >
-                            <span className="hidden sm:inline">
-                              {t("view_statement", "View Statement")}
-                            </span>
-                            <span className="sm:hidden">
-                              {t("view", "View")}
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                        ) : null}
+                      </div>
+
+                      <svg
+                        className="w-5 h-5 text-white/35"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 

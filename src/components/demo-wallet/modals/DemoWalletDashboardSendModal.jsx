@@ -240,6 +240,16 @@ export default function DemoWalletDashboardSendModal({
     const input = document.getElementById(scanQrFileInputId);
     input?.click();
   };
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return;
+      handlePaymentRequestScan?.(text);
+      setScanActive(false);
+    } catch {
+      // Clipboard permissions can be denied; ignore silently.
+    }
+  };
 
   // Close saved picker when clicking outside.
   useEffect(() => {
@@ -334,49 +344,179 @@ export default function DemoWalletDashboardSendModal({
       : "",
   ].join(" ");
 
-  const requestDetailsPanel = hasPaymentRequest ? (
-    <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 space-y-2">
-      <div className="text-[11px] uppercase tracking-wide text-amber-200/70 font-semibold">
-        {t("ui_payment_request_details", "Payment request")}
-      </div>
-      <div className="space-y-1 text-xs text-white/80">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-white/60">
-            {t("ui_beneficiary_label", "Bénéficiaire")}
-          </span>
-          <span className="font-semibold text-white/90">
-            {requestBeneficiaryLabel ||
-              t("ui_wallet_unknown", "Unknown wallet")}
-          </span>
+  const payreqFinalStep = hasPaymentRequest ? (
+    <div className="space-y-4">
+      {/* 1) Recipient input */}
+      <div className="space-y-2">
+        <label className="block text-base md:text-lg text-white/60">
+          {t("ui_send_to_label", "Destinataire")}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            value={requestDestination}
+            readOnly
+            className="w-full bg-[#0F141A] border border-white/10 rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:border-xcannes-green/80"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <button
+              type="button"
+              onClick={handlePasteFromClipboard}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t("ui_paste", "Coller")}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 3h6v2H9V3z"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={handleScanQrUpload}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode",
+              )}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setScanActive(true);
+                setScanKey((prev) => prev + 1);
+                setCameraUnavailable(false);
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-        {requestAmountLabel ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Amount")}
+        <div className="text-xs text-white/45 space-y-0.5">
+          <div className="text-white/70 font-semibold">
+            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+          </div>
+          <div className="font-mono">{requestDestinationLabel}</div>
+          <div className="text-white/50">{t("ui_valid_address", "Adresse valide")}</div>
+        </div>
+      </div>
+
+      {/* 2) Divider */}
+      <div className="h-px bg-white/5 my-2" />
+
+      {/* 3) Summary */}
+      <div className="space-y-2">
+        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
+          {t("ui_summary", "Résumé")}
+        </div>
+        <div className="text-[11px] text-white/45">
+          {t(
+            "ui_verify_before_sending",
+            "Vérifiez les informations avant d’envoyer",
+          )}
+        </div>
+        <div className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-3">
+          <div className="space-y-0.5">
+            <div className="text-[11px] text-white/45">
+              {t("ui_beneficiary_label", "Destinataire")}
+            </div>
+            <div className="text-sm font-semibold text-white/90">
+              {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            <div className="text-[11px] text-white/45">
+              {t("ui_address", "Adresse")}
+            </div>
+            <div className="font-mono text-xs text-white/80">
+              {requestDestinationLabel}
+            </div>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-0.5">
+              <div className="text-[11px] text-white/45">
+                {t("ui_currency_label", "Devise")}
+              </div>
+              <div className="text-sm text-white/90">
+                {requestCurrencyCode || "—"}
+              </div>
+            </div>
+            <div className="text-right space-y-0.5">
+              <div className="text-[11px] text-white/45">
+                {t("ui_amount_52cea2dd3d", "Montant")}
+              </div>
+              <div className="text-lg font-semibold text-white/95">
+                {requestAmountLabel || "—"}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/10">
+            <span className="text-[11px] text-white/45">
+              {t("ui_fees", "Frais")}
             </span>
-            <span className="font-mono text-white/90">
-              {requestAmountLabel}
+            <span className="font-mono text-xs text-white/70">
+              {formatAmountWithSymbol(locale, 0, "USD", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 6,
+              })}
             </span>
           </div>
-        ) : null}
-        {requestCurrencyCode ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_currency_label", "Currency")}
-            </span>
-            <span className="font-semibold text-white/90">
-              {requestCurrencyCode}
-            </span>
-          </div>
-        ) : null}
-        {requestDestination ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
-            </span>
-            <span className="font-mono text-white/80">
-              {requestDestinationLabel || requestDestination}
-            </span>
+        </div>
+        {canSaveDestination ? (
+          <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+            <label className="flex items-center gap-2 text-xs text-white/60">
+              <input
+                type="checkbox"
+                checked={saveNewAddress}
+                onChange={(e) => setSaveNewAddress(e.target.checked)}
+                className="accent-xcannes-green"
+              />
+              {t(
+                "ui_save_this_address_fr",
+                "Enregistrer cette adresse",
+              )}
+            </label>
           </div>
         ) : null}
       </div>
@@ -1052,9 +1192,7 @@ export default function DemoWalletDashboardSendModal({
           <div className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5">
             <div className="flex flex-col gap-3">
               {hasPaymentRequest ? (
-                <>
-                  {requestDetailsPanel}
-                </>
+                payreqFinalStep
               ) : (
                 <>
                   {manualForm}

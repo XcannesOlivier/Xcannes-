@@ -48,7 +48,7 @@ export default function DemoStatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="statement-select w-full bg-black/40 border border-transparent rounded-md px-3 py-1.5 text-sm text-white cursor-pointer transition-colors flex items-center justify-between gap-2"
+        className="statement-select w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
@@ -72,7 +72,7 @@ export default function DemoStatementMonthSelect({
         <div
           ref={menuRef}
           role="listbox"
-          className={`absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-md border border-transparent shadow-2xl ${menuClassName}`}
+          className={`absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl ${menuClassName}`}
           onClick={(e) => e.stopPropagation()}
         >
           {options.map((option) => {

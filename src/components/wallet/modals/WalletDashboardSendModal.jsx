@@ -52,10 +52,12 @@ export default function WalletDashboardSendModal({
   const [useLabelDisplay, setUseLabelDisplay] = useState(false);
   const [destinationFocused, setDestinationFocused] = useState(false);
   const [autoShowLabelOnce, setAutoShowLabelOnce] = useState(false);
-  const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
+  const [editingRecipient, setEditingRecipient] = useState(true);
   const savedPickerRef = useRef(null);
+  const destinationInputRef = useRef(null);
+  const recipientAutoCollapsedRef = useRef(false);
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -325,6 +327,15 @@ export default function WalletDashboardSendModal({
     const input = document.getElementById(payreqFileInputId);
     input?.click();
   };
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return;
+      handlePaymentRequestScan?.(text);
+    } catch {
+      // Clipboard permissions can be denied; ignore silently.
+    }
+  };
   const scanRequestFooter = (
     <div className="flex justify-end">
       <button
@@ -352,7 +363,6 @@ export default function WalletDashboardSendModal({
       setScanActive(false);
       setShowSavedPicker(false);
       setUseLabelDisplay(false);
-      setShowFullSummaryAddress(false);
       setShowFullPayreqAddress(false);
       setScanUnavailable(false);
     }
@@ -363,10 +373,6 @@ export default function WalletDashboardSendModal({
       setScanUnavailable(false);
     }
   }, [scanActive]);
-
-  useEffect(() => {
-    setShowFullSummaryAddress(false);
-  }, [normalizedDestination]);
 
   useEffect(() => {
     setShowFullPayreqAddress(false);
@@ -395,6 +401,27 @@ export default function WalletDashboardSendModal({
       setSaveNewAddress(false);
     }
   }, [canSaveDestination]);
+
+  useEffect(() => {
+    if (!open) {
+      setEditingRecipient(true);
+      recipientAutoCollapsedRef.current = false;
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (hasPaymentRequest) return;
+    if (!hasDestination) {
+      setEditingRecipient(true);
+      recipientAutoCollapsedRef.current = false;
+      return;
+    }
+    if (!recipientAutoCollapsedRef.current) {
+      setEditingRecipient(false);
+      recipientAutoCollapsedRef.current = true;
+    }
+  }, [open, hasDestination, hasPaymentRequest]);
 
   /* ── Label helpers for summary ── */
   const confirmCurrencyCode = String(
@@ -426,6 +453,12 @@ export default function WalletDashboardSendModal({
   const destinationDisplayValue = shouldShowLabelInInput
     ? resolvedDestinationLabel
     : sendDestination;
+
+  const compactDestinationLabel = normalizedDestination
+    ? normalizedDestination.length > 14
+      ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+      : normalizedDestination
+    : "";
 
   // If we resolved a label (saved/on-chain) and the user isn't typing, show it in the input.
   useEffect(() => {
@@ -522,111 +555,6 @@ export default function WalletDashboardSendModal({
       : "",
   ].join(" ");
 
-  const requestDetailsPanel = hasPaymentRequest ? (
-    <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 space-y-2">
-      <div className="text-xs uppercase tracking-wide text-amber-200/70 font-semibold">
-        {t("ui_payment_request_details", "Payment request")}
-      </div>
-      <div className="space-y-1 text-xs text-white/80">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-white/60">
-            {t("ui_beneficiary_label", "Bénéficiaire")}
-          </span>
-          <span className="font-semibold text-white/90">
-            {requestBeneficiaryLabel ||
-              t("ui_wallet_unknown", "Unknown wallet")}
-          </span>
-        </div>
-        {requestAmountLabel ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Amount")}
-            </span>
-            <span className="font-mono text-white/90">
-              {requestAmountLabel}
-            </span>
-          </div>
-        ) : null}
-        {requestCurrencyCode ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_currency_label", "Currency")}
-            </span>
-            <span className="font-semibold text-white/90">
-              {requestCurrencyCode}
-            </span>
-          </div>
-        ) : null}
-        {requestDestination ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
-            </span>
-            <span className="font-mono text-white/80">
-              {requestDestinationLabel || requestDestination}
-            </span>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  ) : null;
-
-  const payreqCurrencySelectorBlock =
-    hasPaymentRequest && augmentedTokens && setSendAssetKey ? (
-      <div className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
-        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
-          {t("ui_pay_with_currency", "Payer avec")}
-        </div>
-        <ModalSelect
-          value={selectedSendToken ? selectedSendToken.key : ""}
-          onChange={setSendAssetKey}
-          options={(augmentedTokens || []).map((token) => {
-            const labelLeft =
-              selectLabelByAssetKey?.[token.key] ||
-              selectLabelByAssetKey?.[token.currency] ||
-              token.currency;
-            const labelRight =
-              selectLabelRightByAssetKey?.[token.key] ||
-              selectLabelRightByAssetKey?.[token.currency] ||
-              null;
-            return {
-              value: token.key,
-              icon:
-                selectIconByAssetKey?.[token.key] ||
-                selectIconByAssetKey?.[token.currency] ||
-                null,
-              label: labelLeft,
-              labelLeft,
-              labelRight,
-              labelMobile:
-                selectLabelMobileByAssetKey?.[token.key] ||
-                selectLabelMobileByAssetKey?.[token.currency] ||
-                labelLeft,
-            };
-          })}
-          useNativeSelect={false}
-          showMobileOptionRight={true}
-          iconClassName="text-3xl leading-none"
-          buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-          menuClassName={
-            noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-          }
-          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
-        />
-        {sendFxInfo ? (
-          <div className="text-xs text-white/60">
-            ≈{" "}
-            {formatAmountWithSymbol(
-              locale,
-              Number(sendFxInfo.paymentRlusd || 0),
-              "USD",
-              { maximumFractionDigits: 6 },
-            )}
-          </div>
-        ) : null}
-      </div>
-    ) : null;
-
   const saveAddressBlock = canSaveDestination ? (
     <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
       <label className="flex items-center gap-2 text-xs text-white/60">
@@ -641,97 +569,137 @@ export default function WalletDashboardSendModal({
     </div>
   ) : null;
 
-  const manualForm = (
-    <div className="space-y-3">
-        {/* ── Destination ── */}
-        <div>
-	            <label
-	              className="block text-base md:text-lg text-white/60 mb-1.5"
-	              title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
-	            >
-	              {t("ui_send_to_label", "Envoyer à")}
-	            </label>
-            <div className="relative" ref={savedPickerRef}>
-              <input
-                type="text"
-                value={destinationDisplayValue}
-                onChange={(e) => {
-                  setAutoShowLabelOnce(false);
-                  setUseLabelDisplay(false);
-                  setSendDestination(e.target.value);
-                  setSendDestinationLabel?.("");
-                  setShowSavedPicker(false);
-                }}
-                onFocus={() => {
-                  setDestinationFocused(true);
-                  // When focusing, reveal the address so the user can edit/copy it.
-                  setUseLabelDisplay(false);
-                }}
-                onBlur={() => {
-                  setDestinationFocused(false);
-                }}
-                onClick={() => {
-                  // If we're showing a label (readOnly), allow a click to reveal the address immediately.
-                  if (shouldShowLabelInInput) setUseLabelDisplay(false);
-                }}
-                onPaste={handlePastePayload}
-                placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
-                readOnly={shouldShowLabelInInput}
-                className={`w-full bg-black/40 border border-white/15 rounded-xl ${!hasPaymentRequest ? 'pl-8' : 'pl-4'} ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
-              />
-              {!hasPaymentRequest && (
-                <>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSavedPicker((prev) => !prev);
-                    }}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                    title={t("ui_saved_addresses_label", "Adresses enregistrées")}
-                    aria-expanded={showSavedPicker}
-                  >
-                    <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {/* ── + upload QR image ── */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleScanQrUpload();
-                    }}
-                    className="absolute right-11 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                    title={t("ui_or_upload_a_qr_image_works_e_df6baa8039", "Charger une image qrcode")}
-                  >
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-white/20 text-white/60 text-lg font-bold leading-none">+</span>
-                  </button>
-                  {/* ── Scan QR camera ── */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setScanActive(true);
-                      setScanKey((prev) => prev + 1);
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                    title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-                  >
-                    <svg className="w-7 h-7 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                    </svg>
-                  </button>
-                </>
+  const recipientCard = !hasPaymentRequest ? (
+    <div>
+      <label
+        className="block text-base md:text-lg text-white/60 mb-1.5"
+        title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
+      >
+        {t("ui_send_to_label", "Destinataire")}
+      </label>
+
+      {editingRecipient || !hasDestination ? (
+        <>
+          <div className="relative" ref={savedPickerRef}>
+            <input
+              ref={destinationInputRef}
+              type="text"
+              value={destinationDisplayValue}
+              onChange={(e) => {
+                setAutoShowLabelOnce(false);
+                setUseLabelDisplay(false);
+                setSendDestination(e.target.value);
+                setSendDestinationLabel?.("");
+                setShowSavedPicker(false);
+              }}
+              onFocus={() => {
+                setDestinationFocused(true);
+                // When focusing, reveal the address so the user can edit/copy it.
+                setUseLabelDisplay(false);
+              }}
+              onBlur={() => {
+                setDestinationFocused(false);
+              }}
+              onClick={() => {
+                // If we're showing a label (readOnly), allow a click to reveal the address immediately.
+                if (shouldShowLabelInInput) setUseLabelDisplay(false);
+              }}
+              onPaste={handlePastePayload}
+              placeholder={t(
+                "ui_import_or_choose_recipient",
+                "Import or choose address",
               )}
-              {!hasPaymentRequest && showSavedPicker ? (
-                <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-lg border border-white/15 bg-black/90 backdrop-blur-sm overflow-hidden shadow-lg">
-                  <div className="max-h-48 overflow-y-auto">
-                    {(savedAddresses || []).length > 0 ? (
-                      (savedAddresses || []).map((addr, idx) => (
-                        <button
-                          key={`${addr.address}-${idx}`}
-                          type="button"
+              readOnly={shouldShowLabelInInput}
+              className={`w-full bg-black/40 border border-white/15 rounded-xl ${
+                !hasPaymentRequest ? "pl-8" : "pl-4"
+              } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
+            />
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSavedPicker((prev) => !prev);
+              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+              aria-expanded={showSavedPicker}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleScanQrUpload();
+              }}
+              className="absolute right-11 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode",
+              )}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setScanActive(true);
+                setScanKey((prev) => prev + 1);
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
+            </button>
+
+            {showSavedPicker ? (
+              <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl border border-white/10 bg-elevated overflow-hidden shadow-lg">
+                <div className="max-h-56 overflow-y-auto">
+                  {(savedAddresses || []).length > 0 ? (
+                    (savedAddresses || []).map((addr, idx) => (
+                      <button
+                        key={`${addr.address}-${idx}`}
+                        type="button"
                         onClick={() => {
                           const value = String(addr?.address || "").trim();
                           if (!value) return;
@@ -742,35 +710,153 @@ export default function WalletDashboardSendModal({
                           setSendDestinationLabel?.(label);
                           setUseLabelDisplay(Boolean(label));
                           setShowSavedPicker(false);
+                          setEditingRecipient(false);
                         }}
-                          className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
-                        >
-                          <span className="block font-semibold">
-                            {String(
-                              addr?.onChainLabel || addr?.label || "",
-                            ).trim() || t("ui_wallet_unknown", "Unknown wallet")}
-                          </span>
-                          <span className="block font-mono text-[11px] text-white/60">
-                            {addr.address}
-                          </span>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-3 py-2 text-xs text-white/60">
-                        {t("ui_no_saved_addresses", "No saved addresses yet")}
-                      </div>
-                    )}
-                  </div>
+                        className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
+                      >
+                        <span className="block font-semibold">
+                          {String(
+                            addr?.onChainLabel || addr?.label || "",
+                          ).trim() ||
+                            t("ui_wallet_unknown", "Unknown wallet")}
+                        </span>
+                        <span className="block font-mono text-[11px] text-white/60 truncate">
+                          {addr.address}
+                        </span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-3 py-2 text-xs text-white/60">
+                      {t("ui_no_saved_addresses", "No saved addresses yet")}
+                    </div>
+                  )}
                 </div>
-              ) : null}
-            </div>
-            {resolvedDestinationLabel ? (
-              <div className="mt-1 text-xs text-white/60">
-                {t("ui_selected_wallet_label", "Sélectionné")}:{' '}
-                <span className="text-white/80">{resolvedDestinationLabel}</span>
               </div>
             ) : null}
+          </div>
+
+          {hasDestination && resolvedDestinationLabel ? (
+            <div className="mt-1 text-[11px] text-white/40">
+              {t("ui_selected_wallet_label", "Sélectionné")} :{" "}
+              <span className="text-white/60">{resolvedDestinationLabel}</span>
+            </div>
+          ) : null}
+
+          {hasDestination ? saveAddressBlock : null}
+        </>
+      ) : (
+        <div className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setEditingRecipient(true);
+              setShowSavedPicker(false);
+              setUseLabelDisplay(false);
+              requestAnimationFrame(() => {
+                destinationInputRef.current?.focus?.();
+              });
+            }}
+            className="min-w-0 text-left flex-1"
+          >
+            <div className="text-sm font-semibold text-white/90 truncate">
+              {resolvedDestinationLabel ||
+                t("ui_wallet_unknown", "Unknown wallet")}
+            </div>
+            <div className="mt-0.5 text-[12px] font-mono text-white/50 truncate">
+              {compactDestinationLabel}
+            </div>
+          </button>
+
+          <div className="flex items-center gap-1 text-white/60 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setEditingRecipient(true);
+                setShowSavedPicker(false);
+                setUseLabelDisplay(false);
+                requestAnimationFrame(() => {
+                  destinationInputRef.current?.focus?.();
+                });
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title={t("ui_change_recipient", "Changer le destinataire")}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 5l4 4M4 20h4l10.5-10.5a2 2 0 000-2.8l-1.2-1.2a2 2 0 00-2.8 0L4 16v4z"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleScanQrUpload();
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode",
+              )}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setScanActive(true);
+                setScanKey((prev) => prev + 1);
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+      )}
+    </div>
+  ) : null;
+
+  const manualForm = (
+    <div className="space-y-3">
+        {/* ── Destination ── */}
+        {recipientCard}
 
         {/* ── Devise + Montant (séparés) – masqués en mode payreq ── */}
         {!hasPaymentRequest && (
@@ -780,7 +866,7 @@ export default function WalletDashboardSendModal({
               className="block text-base md:text-lg text-white/60 mb-1.5"
               title={t("ui_send_asset_tip", "Sélectionnez la devise à envoyer.")}
             >
-              {t("ui_asset_e5170a7a06", "Asset")}
+              {t("ui_asset_e5170a7a06", "Devise")}
             </label>
             <ModalSelect
               value={selectedSendToken ? selectedSendToken.key : ""}
@@ -835,7 +921,7 @@ export default function WalletDashboardSendModal({
                 className="block text-base md:text-lg text-white/60 mb-1.5"
                 title={t("ui_send_amount_tip", "Saisissez le montant à envoyer.")}
               >
-                {t("ui_amount_52cea2dd3d", "Amount")}
+                {t("ui_amount_52cea2dd3d", "Montant")}
               </label>
               {showCalculatedAmountLabel ? (
                 <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
@@ -872,12 +958,17 @@ export default function WalletDashboardSendModal({
   /* ── Dynamic summary – visible as soon as a destination address is set ── */
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
-      <div className="rounded-xl border border-xcannes-accent-green/25 bg-xcannes-accent-green/5 p-4 space-y-3">
-        <div className="text-xs uppercase tracking-wide text-xcannes-accent-green/80 font-semibold">
+      <div className="text-[11px] text-white/45">
+        {t(
+          "ui_verify_before_sending",
+          "Vérifiez les informations avant d’envoyer",
+        )}
+      </div>
+      <div className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-4">
+        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
-        <div className="space-y-2 text-sm text-white/80">
-          {/* Beneficiary name */}
+        <div className="space-y-3 text-sm text-white/80">
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60 shrink-0">
               {t("ui_beneficiary_label", "Destinataire")}
@@ -886,46 +977,29 @@ export default function WalletDashboardSendModal({
               {resolvedDestinationLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </span>
           </div>
-          {/* Destination – truncated XRPL address, full on hover */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60 shrink-0">
-              {t("ui_account_number_label", "N° de compte")}
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowFullSummaryAddress((prev) => !prev)}
-              title={normalizedDestination}
-              className={`font-mono text-white/80 text-right text-xs ${showFullSummaryAddress ? "break-all" : ""} cursor-pointer`}
-            >
-              {showFullSummaryAddress
-                ? normalizedDestination
-                : normalizedDestination.length > 14
-                  ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
-                  : normalizedDestination}
-            </button>
-          </div>
-          {/* Save address option */}
-          {saveAddressBlock}
-          {/* Asset */}
-          {confirmCurrencyCode ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-white/60">
-                {t("ui_asset_e5170a7a06", "Asset")}
-              </span>
-              <span className="font-semibold text-white/90">
-                {selectLabelByAssetKey?.[selectedSendToken?.key] ||
-                  selectLabelByAssetKey?.[selectedSendToken?.currency] ||
-                  confirmCurrencyCode}
-              </span>
-            </div>
-          ) : null}
-          {/* Amount */}
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Amount")}
+              {t("ui_amount_52cea2dd3d", "Montant")}
             </span>
             <span className={`font-mono ${summaryAmount > 0 ? 'text-white/90' : 'text-white/40'}`}>
               {confirmAmountLabel || '0'}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">{t("ui_fees", "Frais")}</span>
+            <span className="font-mono text-white/70">
+              {formatAmountWithSymbol(locale, 0, "USD", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 6,
+              })}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
+            <span className="text-white/70 font-semibold">
+              {t("ui_total", "Total")}
+            </span>
+            <span className="font-mono text-white/90 font-semibold">
+              {confirmAmountLabel || "0"}
             </span>
           </div>
         </div>
@@ -933,65 +1007,186 @@ export default function WalletDashboardSendModal({
     </div>
   ) : null;
 
-  /* ── Payreq inline summary – shown when a payment request was scanned ── */
-  const payreqInlineSummary = hasPaymentRequest ? (
-    <div className="space-y-3 transition-all duration-200">
-      <div className="rounded-xl border border-amber-300/25 bg-amber-300/5 p-4 space-y-3">
-        <div className="text-xs uppercase tracking-wide text-amber-200/80 font-semibold">
-          {t("ui_payment_request_details", "Demande de paiement")}
-        </div>
-        <div className="space-y-2 text-sm text-white/80">
-          {/* Beneficiary */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60 shrink-0">
-              {t("ui_beneficiary_label", "Destinataire")}
-            </span>
-            <span className="font-semibold text-white/90">
-              {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
-            </span>
-          </div>
-          {/* N° de compte */}
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60 shrink-0">
-              {t("ui_account_number_label", "N° de compte")}
-            </span>
+  /* ── Payreq final step – shown when a payment request was scanned ── */
+  const payreqFinalStep = hasPaymentRequest ? (
+    <div className="space-y-4">
+      {/* 1) Recipient input */}
+      <div className="space-y-2">
+        <label className="block text-base md:text-lg text-white/60">
+          {t("ui_send_to_label", "Destinataire")}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            value={requestDestination}
+            readOnly
+            className="w-full bg-[#0F141A] border border-white/10 rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:border-xcannes-green/80"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
             <button
               type="button"
-              onClick={() => setShowFullPayreqAddress((prev) => !prev)}
-              title={requestDestination}
-              className={`font-mono text-white/80 text-right text-xs ${showFullPayreqAddress ? "break-all" : ""} cursor-pointer`}
+              onClick={handlePasteFromClipboard}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t("ui_paste", "Coller")}
             >
-              {showFullPayreqAddress
-                ? requestDestination
-                : requestDestinationLabel || requestDestination}
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 5h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 3h6v2H9V3z"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={handleScanQrUpload}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode",
+              )}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setScanActive(true);
+                setScanKey((prev) => prev + 1);
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
             </button>
           </div>
-          {/* Save address option */}
-          {saveAddressBlock}
-          {/* Asset */}
-          {requestCurrencyCode ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-white/60">
-                {t("ui_asset_e5170a7a06", "Asset")}
-              </span>
-              <span className="font-semibold text-white/90">
-                {requestCurrencyCode}
-              </span>
-            </div>
-          ) : null}
-          {/* Amount */}
-          {requestAmountLabel ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-white/60">
-                {t("ui_amount_52cea2dd3d", "Amount")}
-              </span>
-              <span className="font-mono text-white/90">
-                {requestAmountLabel}
-              </span>
-            </div>
-          ) : null}
+        </div>
+        <div className="text-xs text-white/45 space-y-0.5">
+          <div className="text-white/70 font-semibold">
+            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+          </div>
+          <div className="font-mono">{requestDestinationLabel}</div>
+          <div className="text-white/50">{t("ui_valid_address", "Adresse valide")}</div>
         </div>
       </div>
+
+      {/* 2) Divider */}
+      <div className="h-px bg-white/5 my-2" />
+
+      {/* 3) Summary */}
+      <div className="space-y-2">
+        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
+          {t("ui_summary", "Résumé")}
+        </div>
+        <div className="text-[11px] text-white/45">
+          {t(
+            "ui_verify_before_sending",
+            "Vérifiez les informations avant d’envoyer",
+          )}
+        </div>
+        <div className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-3">
+          <div className="space-y-0.5">
+            <div className="text-[11px] text-white/45">
+              {t("ui_beneficiary_label", "Destinataire")}
+            </div>
+            <div className="text-sm font-semibold text-white/90">
+              {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            <div className="text-[11px] text-white/45">
+              {t("ui_address", "Adresse")}
+            </div>
+            <div className="font-mono text-xs text-white/80">
+              {requestDestinationLabel}
+            </div>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-0.5">
+              <div className="text-[11px] text-white/45">
+                {t("ui_currency_label", "Devise")}
+              </div>
+              <div className="text-sm text-white/90">
+                {requestCurrencyCode || confirmCurrencyCode || "—"}
+              </div>
+            </div>
+            <div className="text-right space-y-0.5">
+              <div className="text-[11px] text-white/45">
+                {t("ui_amount_52cea2dd3d", "Montant")}
+              </div>
+              <div className="text-lg font-semibold text-white/95">
+                {requestAmountLabel || "—"}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/10">
+            <span className="text-[11px] text-white/45">
+              {t("ui_fees", "Frais")}
+            </span>
+            <span className="font-mono text-xs text-white/70">
+              {formatAmountWithSymbol(
+                locale,
+                Number(sendFxInfo?.spreadFeeRlusd || 0),
+                "USD",
+                { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+              )}
+            </span>
+          </div>
+        </div>
+
+        {canSaveDestination ? (
+          <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+            <label className="flex items-center gap-2 text-xs text-white/60">
+              <input
+                type="checkbox"
+                checked={saveNewAddress}
+                onChange={(e) => setSaveNewAddress(e.target.checked)}
+                className="accent-xcannes-green"
+              />
+              {t(
+                "ui_save_this_address_fr",
+                "Enregistrer cette adresse",
+              )}
+            </label>
+          </div>
+        ) : null}
+      </div>
+
       {/* Insufficient balance warning */}
       {insufficientBalance ? (
         <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 space-y-1">
@@ -1002,7 +1197,9 @@ export default function WalletDashboardSendModal({
             {t(
               "ui_insufficient_balance_detail",
               "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
-              { currency: String(selectedSendToken?.currency || "").toUpperCase() },
+              {
+                currency: String(selectedSendToken?.currency || "").toUpperCase(),
+              },
             )}
           </div>
         </div>
@@ -1145,8 +1342,8 @@ export default function WalletDashboardSendModal({
           </div>
           <div className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5">
             <div className="flex flex-col gap-3">
-              {manualForm}
-              {hasPaymentRequest ? payreqInlineSummary : inlineSummary}
+              {hasPaymentRequest ? payreqFinalStep : manualForm}
+              {!hasPaymentRequest ? inlineSummary : null}
               {scannerModal}
             </div>
           </div>

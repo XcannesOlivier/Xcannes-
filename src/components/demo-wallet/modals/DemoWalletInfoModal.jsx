@@ -5,199 +5,174 @@ import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 
 export function WalletInfoContent({
-  withCloseGutter = false,
   isPreviewMode = false,
   noticeVariant = "preview",
+  onBack,
 }) {
   const { t } = useTranslation("common");
   return (
-    <>
-      <div className={withCloseGutter ? "pr-8" : ""}>
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-            {t(
-              "ui_xcannes_wallet_how_it_works_0397d0e570",
-              "XCANNES Wallet — How it works",
-            )}
-          </h3>
-
+    <div className="flex flex-col min-h-full">
+      {/* Header (sticky) */}
+      <div className="sticky top-0 z-10 bg-[#0B0F14] border-b border-white/[0.06]">
+        <div className="h-14 px-4 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="w-10 h-10 -ml-2 rounded-lg inline-flex items-center justify-center text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+            aria-label={t("ui_back", "Back")}
+            title={t("ui_back", "Back")}
+          >
+            ←
+          </button>
+          <div className="min-w-0">
+            <div className="text-base font-semibold text-[#E6EDF3] truncate">
+              {t("ui_how_it_works", "How it works")}
+            </div>
+            <div className="text-xs text-[#8B98A5] truncate">
+              {t("ui_xcannes_wallet", "XCANNES Wallet")}
+            </div>
+          </div>
         </div>
-        <p className="mt-1 text-sm text-white/60">
+      </div>
+
+      {/* Intro */}
+      <div className="px-4 pt-4">
+        <p className="text-sm leading-snug text-[#8B98A5]">
           {t(
-            "ui_wallet_no_custodial_on_xrp_4e8c91bea3",
-            "Wallet non-custodial sur XRPL + un “ledger UX” pour répartir USD en lignes de comptes.",
+            "ui_wallet_intro_short_fees",
+            "Non-custodial wallet on XRPL. Funds are organized into internal currency lines.",
           )}
         </p>
       </div>
 
-      <div className="mt-5 grid gap-4">
-        <section className="rounded-xl border border-white/10 bg-black/30 p-4">
-          <h4 className="text-sm font-semibold text-white/80">
+      {/* Sections */}
+      <div className="px-4 py-5 space-y-4">
+        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
+          <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
             {t("ui_core_features_fe8d86dd76", "Core features")}
-          </h4>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/80 list-disc pl-5">
+          </div>
+          <ul className="mt-3 space-y-1.5 text-sm text-[#E6EDF3] list-disc pl-5">
             <li>
-              {t(
-                "ui_hold_assets_on_chain_xrp_rlu_6e9344f999",
-                 "Hold assets (USD).",
-              )}
+              {t("ui_hold_assets_demo", "Hold assets on-chain (USD)")}
             </li>
             <li>
               {t(
                 "ui_create_currency_lines_eur_gb_3cb882c93c",
-                "Create currency lines (EUR/GBP/…) to allocate USD internally.",
+                "Create currency lines (EUR, GBP…)",
               )}
             </li>
             <li>
               {t(
                 "ui_convert_between_lines_alloca_8439f5b49f",
-                "Convert between lines (allocation-only MVP, no on-chain FX).",
+                "Convert between lines (internal allocation)",
               )}
             </li>
             <li>
               {t(
                 "ui_statements_show_a_unified_vi_6ef7ea3ce7",
-                "Statements show a unified view of your wallet activity.",
+                "Unified transaction view",
               )}
             </li>
           </ul>
-          <p className="mt-3 text-[12px] text-white/40">
-            {t(
-              "ui_in_the_wallet_list_you_will__7a5642d046",
-              "In the wallet list, you will see 2 types of “lines”:",
-            )}{" "}
-            <span className="font-mono">
-              {t("ui_xrpl_assets_c7b3e7185a", "XRPL assets")}
-            </span>
-            {t("ui_on_chain_and_0836c903ca", "(on-chain) and")}{" "}
-            <span className="font-mono">
-              {t("ui_local_currency_lines_2b186f452e", "local currency lines")}
-            </span>
-            {t(
-              "ui_off_chain_allocations_for_lo_07b1acc670",
-              "(off-chain allocations). For local currency lines, the small",
-            )}{" "}
-            <span className="font-mono">
-              {t("ui_rlusd_6a0d57ec4d", "≈ … USD")}
-            </span>
-            {t(
-              "ui_value_represents_the_underly_94a3198fdf",
-              "value represents the underlying allocation.",
-            )}
-          </p>
         </section>
 
-        <section className="rounded-xl border border-white/10 bg-black/30 p-4">
-          <h4 className="text-sm font-semibold text-white/80">
-            {t(
-              "ui_currency_line_activation_title_f4",
-              "Currency line activation",
-            )}
-          </h4>
-          <p className="mt-2 text-[13px] text-white/80">
-            {t(
-              "ui_currency_line_activation_body_f4",
-              "Creating or deleting a currency line is now free.",
-            )}
-          </p>
-          <p className="mt-2 text-[12px] text-white/40">
-            {t(
-              "ui_currency_line_activation_note_f4",
-              "Only standard XRPL network fees apply to the transaction.",
-            )}
-          </p>
+        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
+          <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
+            {t("ui_currency_lines_title", "Currency lines")}
+          </div>
+          <div className="mt-3 space-y-3 text-sm text-[#E6EDF3]">
+            <div className="space-y-1">
+              <div className="text-[#8B98A5] text-xs uppercase tracking-[0.08em]">
+                {t("ui_two_types", "Two types")}
+              </div>
+              <ul className="space-y-1.5 list-disc pl-5">
+                <li>{t("ui_onchain_assets", "On-chain assets (XRPL)")}</li>
+                <li>
+                  {t(
+                    "ui_internal_currency_lines",
+                    "Internal currency lines (off-chain allocation)",
+                  )}
+                </li>
+              </ul>
+            </div>
+            <div className="text-[#8B98A5]">
+              {t(
+                "ui_currency_lines_note_short",
+                "Displayed values (EUR, GBP…) are based on USD allocation.",
+              )}
+            </div>
+          </div>
         </section>
 
-        <section className="rounded-xl border border-white/10 bg-black/30 p-4">
-          <h4 className="text-sm font-semibold text-white/80">
+        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
+          <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
             {t("ui_fees_580613eea6", "Fees")}
-          </h4>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/80 list-disc pl-5">
-            <li>
-              {t(
-                "ui_xrpl_network_fee_on_chain_pa_975e8f666a",
-                "XRPL network fee (on-chain): payable sur chaque transaction XRPL (ex: Payment, TrustSet).",
-              )}
-            </li>
-            <li>
-              {t(
-                "demo_fee_model_intro_f4",
-                "Aucun frais séparé n’est prélevé. Le modèle est un",
-              )}{" "}
-              <span className="font-semibold">
-                {t("ui_spread_8f9f9fc2e9", "taux FX fixe")}
-              </span>
-              {t(
-                "ui_appliqu_uniquement_quand_il__d0c9824222",
-                "appliqué uniquement quand il y a une conversion (ex:",
-              )}{" "}
-              <span className="font-mono">
-                {t("ui_eur_gbp_1865864628", "EUR↔GBP")}
-              </span>
-              ,{" "}
-              <span className="font-mono">
-                {t("ui_rlusd_eur_23dc8f699b", "USD↔EUR")}
-              </span>
-              ).
-            </li>
-            <li>
-              {t(
-                "demo_fx_fee_fixed_1pct_f4",
-                "Frais de conversion : 1 % quelle que soit la devise, appliqué sur le montant en USD.",
-              )}
-            </li>
-            <li>
-              {t(
-                "demo_signatures_none_f4",
-                "Aucune signature n’est requise (données fictives).",
-              )}
-            </li>
-          </ul>
-          <p className="mt-2 text-[12px] text-white/40">
-            {t(
-              "ui_source_de_rate_paires_live_v_6b7123ea24",
-              "Source de taux: FX EOD (coté 1×/jour)."
-            )}
-          </p>
+          </div>
+          <div className="mt-3 space-y-3 text-sm text-[#E6EDF3]">
+            <div>
+              <div className="text-[#E6EDF3] font-semibold">
+                {t("ui_xrpl_network", "XRPL network")}
+              </div>
+              <div className="text-[#8B98A5]">
+                {t(
+                  "ui_xrpl_network_fee_on_chain_pa_975e8f666a",
+                  "Applies to on-chain transactions",
+                )}
+              </div>
+            </div>
+            <div>
+              <div className="text-[#E6EDF3] font-semibold">
+                {t("ui_conversion_fee", "Conversion")}
+              </div>
+              <div className="text-[#8B98A5]">
+                {t(
+                  "ui_conversion_fee_value",
+                  "1% fee (minimum $0.01)",
+                )}
+              </div>
+            </div>
+            <div>
+              <div className="text-[#E6EDF3] font-semibold">
+                {t("ui_signatures", "Signatures")}
+              </div>
+              <ul className="mt-1 space-y-1.5 text-[#8B98A5] list-disc pl-5">
+                <li>{t("ui_sig_demo", "No signature required (demo)")}</li>
+              </ul>
+            </div>
+          </div>
         </section>
 
-        <section className="rounded-xl border border-white/10 bg-black/30 p-4">
-          <h4 className="text-sm font-semibold text-white/80">
-            {t("ui_important_af28edf1c1", "Important")}
-          </h4>
-          <ul className="mt-2 space-y-1 text-[13px] text-white/80 list-disc pl-5">
+        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[#8B98A5]">⚠️</span>
+            <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
+              {t("ui_important_af28edf1c1", "Important")}
+            </div>
+          </div>
+          <ul className="mt-3 space-y-1.5 text-sm text-[#E6EDF3] list-disc pl-5">
             <li>
               {t(
                 "ui_xrpl_est_la_source_de_v_rit__bf1084eac7",
-                "XRPL est la source de vérité pour les soldes on-chain.",
+                "XRPL is the source of truth for balances",
               )}
             </li>
             <li>
               {t(
                 "ui_currency_lines_represent_rlusd_155e16f839",
-                "Les lignes de comptes représentent une répartition interne de USD.",
+                "Currency lines represent internal USD allocation",
               )}
             </li>
             <li>
               {t(
                 "ui_l_allocation_totale_ne_doit__dcf11e3d6c",
-                "L’allocation totale ne doit jamais dépasser USD on-chain.",
+                "Total allocation must not exceed on-chain USD",
               )}
             </li>
-            <li>
-              {t(
-                "ui_amounts_in_currency_indicative_73d7ff4e8d",
-                "Les montants en devise (EUR, USD, …) sont des valeurs indicatives basées sur des taux marché; la valeur de référence reste",
-              )}{" "}
-              <span className="font-mono">
-                {t("ui_rlusd_5933874327", "USD")}
-              </span>
-              .
-            </li>
+            <li>{t("ui_usd_reference", "USD is the reference value")}</li>
           </ul>
         </section>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -215,64 +190,21 @@ export default function DemoWalletInfoModal({
   });
 
   if (!shouldRender) return null;
-  const wrapperClass = inline
-    ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[11001] flex items-center justify-center px-4 pointer-events-none";
-  const panelVariantClass =
-    noticeVariant === "demo"
-      ? "bg-xcannes-surface-demo border-white/10"
-      : "bg-elevated border-subtle";
-  const panelClass = [
-    inline
-      ? "relative w-full wallet-modal-panel h-full border rounded-xl p-4 md:p-6 overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl"
-      : "relative w-full wallet-modal-panel max-w-2xl border rounded-2xl p-4 md:p-6 max-h-[92vh] overflow-y-auto flex flex-col overscroll-contain pointer-events-auto shadow-2xl",
-    panelVariantClass,
-    inline ? "wallet-inline-zoom-in" : "",
-    !inline
-      ? isClosing
-        ? "wallet-modal-lift-out"
-        : "wallet-modal-lift-in"
-      : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
 
   const content = (
-    <>
-      {!inline ? (
-        <div
-          className={`fixed inset-0 z-[11000] bg-black/80 md:backdrop-blur-sm ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`}
-          onClick={() => onClose && onClose()}
+    <div
+      className={`fixed inset-0 z-[11001] bg-[#0B0F14] ${
+        isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
+      }`}
+    >
+      <div className="h-full overflow-y-auto overscroll-contain">
+        <WalletInfoContent
+          isPreviewMode={isPreviewMode}
+          noticeVariant={noticeVariant}
+          onBack={() => onClose && onClose()}
         />
-      ) : null}
-
-      <div className={wrapperClass}>
-        <div
-          className={panelClass}
-          style={{ WebkitOverflowScrolling: "touch" }}
-          onClick={(e) => {
-            if (!inline) e.stopPropagation();
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => onClose && onClose()}
-            className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl"
-            aria-label={t("ui_close_08378568ba", "Close")}
-          >
-            ✕
-          </button>
-
-          <WalletInfoContent
-            withCloseGutter
-            isPreviewMode={isPreviewMode}
-            noticeVariant={noticeVariant}
-          />
-        </div>
       </div>
-    </>
+    </div>
   );
 
   if (inline) return content;

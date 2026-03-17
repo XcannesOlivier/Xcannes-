@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Fragment,
   useCallback,
   useEffect,
   useMemo,
@@ -69,8 +68,6 @@ export default function CurrencyStatement({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const isInlineDesktop = variant === "inline-desktop";
-  const showRunningBalanceColumn = !isInlineDesktop;
-  const tableColSpan = showRunningBalanceColumn ? 4 : 3;
   const normalizedCurrency = useMemo(
     () => String(currency || "").toUpperCase(),
     [currency],
@@ -167,8 +164,6 @@ export default function CurrencyStatement({
   /* ── destructure data hook ─────────────────────────────── */
   const {
     availableMonths,
-    visibleGroups,
-    showMonthHeaders,
     transactionsWithDisplayBalance,
   } = data;
 
@@ -176,16 +171,11 @@ export default function CurrencyStatement({
 
   /* ── destructure formatters hook ───────────────────────── */
   const {
-    enrichDescription,
-    simplifyMobileDescription,
     parseConversionPair,
     getLocalizedDescription,
-    renderCurrencyBadge,
-    renderConversionDescription,
     formatDate,
     formatAmountLocal: formatAmountWithSymbolLocal,
     formatUsd: formatUsdWithSymbol,
-    getTransactionIcon,
   } = fmt;
 
   // Format a RLUSD amount as local-currency units.
@@ -337,6 +327,95 @@ export default function CurrencyStatement({
     // USD estimate rather than displaying a misleading value.
     return null;
   }, [balance, normalizedCurrency, usdRates]);
+
+  /* ── timeline groups (Today / Yesterday / date) ────────── */
+  const timelineGroups = useMemo(() => {
+    const list = Array.isArray(transactionsWithDisplayBalance)
+      ? [...transactionsWithDisplayBalance]
+      : [];
+
+    const getTxTime = (tx) => {
+      const raw = tx?.createdAt || tx?.date || "";
+      const d = new Date(raw);
+      const tms = d.getTime();
+      return Number.isFinite(tms) ? tms : 0;
+    };
+    list.sort((a, b) => getTxTime(b) - getTxTime(a));
+
+    const startOfDay = (d) =>
+      new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const today = startOfDay(new Date());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const labelFor = (date) => {
+      const day = startOfDay(date);
+      if (day.getTime() === today.getTime()) {
+        return t("ui_today_8b1a4d2c7e", "Today");
+      }
+      if (day.getTime() === yesterday.getTime()) {
+        return t("ui_yesterday_1c7a9d3b5e", "Yesterday");
+      }
+      return date.toLocaleDateString(locale, {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    };
+
+    const keyFor = (date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+    const groups = [];
+    const map = new Map();
+    for (const tx of list) {
+      const raw = tx?.createdAt || tx?.date || "";
+      const d = new Date(raw);
+      const tms = d.getTime();
+      const date = Number.isFinite(tms) ? d : new Date(0);
+      const key = keyFor(date);
+      if (!map.has(key)) {
+        const group = { key, label: labelFor(date), date, transactions: [] };
+        map.set(key, group);
+        groups.push(group);
+      }
+      map.get(key).transactions.push(tx);
+    }
+
+    return groups;
+  }, [transactionsWithDisplayBalance, locale, t]);
+
+  const formatCounterpartyCompact = useCallback((counterparty) => {
+    const raw = String(counterparty || "").trim();
+    if (!raw || raw.toUpperCase() === "XCANNES") return "";
+    if (raw.length <= 16) return raw;
+    return `${raw.slice(0, 9)}…${raw.slice(-5)}`;
+  }, []);
+
+  const getTimelineIcon = useCallback((tx) => {
+    if (tx?.category === "exchange") return "⇄";
+    if (tx?.type === "credit") return "↓";
+    return "↑";
+  }, []);
+
+  const getTimelineLabel = useCallback(
+    (tx) => {
+      if (!tx) return "";
+      if (tx?.category === "exchange") {
+        const pair = parseConversionPair(tx?.description || "");
+        if (pair?.from && pair?.to) return `${pair.from} → ${pair.to}`;
+        const localized = String(getLocalizedDescription(tx) || "").trim();
+        return localized.replace(/^Conversion\\s*/i, "").trim() || localized;
+      }
+      const base =
+        tx?.type === "credit"
+          ? t("statement_xrpl_mobile_in", "Reçu")
+          : t("statement_xrpl_mobile_out", "Envoyé");
+      const name = formatCounterpartyCompact(tx?.counterparty);
+      return name ? `${base} · ${name}` : base;
+    },
+    [formatCounterpartyCompact, getLocalizedDescription, parseConversionPair, t],
+  );
 
   /* ── XRP reserve ───────────────────────────────────────── */
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
@@ -564,147 +643,299 @@ export default function CurrencyStatement({
   const modalBgClass =
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
 
+  const truncateMiddle = useCallback((text, start = 6, end = 4) => {
+    const raw = String(text || "").trim();
+    if (!raw) return "";
+    if (raw.length <= start + end + 1) return raw;
+    return `${raw.slice(0, start)}…${raw.slice(-end)}`;
+  }, []);
+
+  const copyToClipboard = useCallback(
+    async (text, successMessage) => {
+      const value = String(text || "").trim();
+      if (!value) return;
+      try {
+        if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(value);
+        } else if (typeof document !== "undefined") {
+          const el = document.createElement("textarea");
+          el.value = value;
+          el.setAttribute("readonly", "");
+          el.style.position = "absolute";
+          el.style.left = "-9999px";
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+        }
+        if (successMessage) toast?.success?.(successMessage);
+      } catch {
+        // ignore
+      }
+    },
+    [toast],
+  );
+
+  const detailIsOutgoing = useMemo(() => {
+    if (!detailTx) return false;
+    return (
+      detailTx?.type === "debit" ||
+      String(detailTx?.kind || "").toUpperCase().includes("OUT")
+    );
+  }, [detailTx]);
+
+  const detailTypeLabel = useMemo(() => {
+    if (!detailTx) return "";
+    if (detailTx?.category === "exchange") {
+      return t("statement_conversion_label", "Conversion");
+    }
+    if (detailIsOutgoing) return t("statement_xrpl_payment_out", "Paiement envoyé");
+    return t("statement_xrpl_mobile_in", "Reçu");
+  }, [detailIsOutgoing, detailTx, t]);
+
+  const detailStatusLabel = useMemo(() => {
+    if (!detailTx) return "";
+    if (isPreviewMode) return t("ui_status_preview", "Aperçu");
+    if (detailTx?.txHash) return t("ui_status_confirmed", "Confirmé");
+    if (!["XRP", "RLUSD"].includes(normalizedCurrency)) {
+      return t("ui_status_offchain", "Hors chaîne");
+    }
+    return t("ui_status_recorded", "Enregistré");
+  }, [detailTx, isPreviewMode, normalizedCurrency, t]);
+
+  const counterpartyAddress = useMemo(() => {
+    const raw = String(detailTx?.counterparty || "").trim();
+    if (!raw || raw.toUpperCase() === "XCANNES") return "";
+    return raw;
+  }, [detailTx]);
+
+  const counterpartyTitle = useMemo(() => {
+    return detailIsOutgoing
+      ? t("ui_recipient_label", "Destinataire")
+      : t("ui_sender_label", "Expéditeur");
+  }, [detailIsOutgoing, t]);
+
+  const counterpartyName = useMemo(() => {
+    if (!counterpartyAddress) return "";
+    if (detailLabelLoading) return "…";
+    const label = String(detailLabel || "").trim();
+    return label || t("ui_no_name_found", "Aucun nom trouvé");
+  }, [counterpartyAddress, detailLabel, detailLabelLoading, t]);
+
+  const detailExplorerUrl = useMemo(() => {
+    const hash = String(detailTx?.txHash || "").trim();
+    if (!hash) return "";
+    return `https://xrpscan.com/tx/${encodeURIComponent(hash)}`;
+  }, [detailTx]);
+
   const transactionDetailModal =
     detailOpen && detailTx && typeof document !== "undefined"
       ? createPortal(
           <div className="fixed inset-0 z-[10300] flex items-center justify-center p-4">
             <div
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm wallet-modal-backdrop-in"
               onClick={closeTxDetails}
             />
             <div
-              className={`relative w-full max-w-md rounded-2xl border border-white/10 ${modalBgClass} p-4 md:p-5 shadow-2xl`}
+              className={`relative w-full max-w-md rounded-[14px] border border-white/[0.06] ${modalBgClass} p-4 md:p-5 shadow-2xl wallet-modal-lift-in`}
             >
+              {/* Header */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="text-xs text-white/50 uppercase tracking-wide">
-                    {t("ui_transaction_details", "Transaction details")}
+                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    {detailTypeLabel || t("ui_transaction", "Transaction")}
                   </div>
-                  <div className="text-base md:text-lg text-white font-semibold truncate">
-                    {getLocalizedDescription(detailTx) ||
-                      t("ui_not_available_9c2a1f7b3d", "N/A")}
+                  <div
+                    className={`mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap ${
+                      detailTx?.type === "debit"
+                        ? "text-red-400"
+                        : "text-xcannes-green"
+                    }`}
+                  >
+                    {detailTx?.type === "debit" ? "−" : "+"}
+                    {formatAmountRlusdAsLocal(detailTx?.amount ?? 0)}
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={closeTxDetails}
-                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl w-10 h-10 -mr-2 flex items-center justify-center rounded-lg hover:bg-white/5"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="mt-4 space-y-3 text-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/60">
-                    {t("ui_date_label_7a2c1b9d5e", "Date & time")}
-                  </span>
-                  <span className="text-white/90 text-right">
-                    {formatDateTime(detailTx)}
-                  </span>
-                </div>
+              <div className="h-px bg-white/[0.04] my-3" />
 
-                {detailTx?.category === "exchange" ? (() => {
-                  const pair = parseConversionPair(
-                    detailTx?.description || "",
-                  );
-                  if (!pair) return null;
-                  return (
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t("ui_conversion_label", "Conversion")}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        {renderCurrencyBadge(pair.from)}
-                        <span className="text-white/40 text-xs">→</span>
-                        {renderCurrencyBadge(pair.to)}
-                      </span>
+              {/* Status & Date */}
+              <div className="space-y-3">
+                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  {t("ui_status_and_date", "Statut & date")}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                    <div className="text-xs text-white/60">
+                      {t("ui_status_label", "Statut")}
                     </div>
-                  );
-                })() : null}
-
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/60">
-                    {t("ui_amount_52cea2dd3d", "Amount")}
-                  </span>
-                  <span
-                    className={`font-mono ${
-                      detailTx?.type === "debit"
-                        ? "text-red-400"
-                        : "text-green-400"
-                    }`}
-                  >
-                    {detailTx?.type === "debit" ? "−" : "+"}
-                    {formatAmountRlusdAsLocal(detailTx?.amount ?? 0)}
-                  </span>
+                    <div className="mt-0.5 text-sm text-white/90 font-semibold">
+                      {detailStatusLabel}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                    <div className="text-xs text-white/60">
+                      {t("ui_date_label_7a2c1b9d5e", "Date")}
+                    </div>
+                    <div className="mt-0.5 text-sm text-white/90 font-semibold truncate">
+                      {formatDateTime(detailTx)}
+                    </div>
+                  </div>
                 </div>
+              </div>
 
-                {detailTx?.spreadRlusd ? (
+              <div className="h-px bg-white/[0.04] my-3" />
+
+              {/* Counterparty */}
+              {counterpartyAddress ? (
+                <div className="space-y-2">
+                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    {counterpartyTitle}
+                  </div>
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm text-white/90 font-semibold truncate">
+                          {counterpartyName}
+                        </div>
+                        <div className="mt-0.5 text-xs text-white/60 font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+                          {truncateMiddle(counterpartyAddress, 8, 6)}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          copyToClipboard(
+                            counterpartyAddress,
+                            t("ui_copied_address", "Adresse copiée"),
+                          )
+                        }
+                        className="flex-none inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        aria-label={t("ui_copy_address", "Copy address")}
+                        title={t("ui_copy_address", "Copy address")}
+                      >
+                        ⧉
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="h-px bg-white/[0.04] my-3" />
+
+              {/* Financial details */}
+              <div className="space-y-2">
+                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  {t("ui_details_label", "Détails")}
+                </div>
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3 space-y-2">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-white/60">
+                    <span className="text-xs text-white/60">
+                      {t("ui_amount_52cea2dd3d", "Montant")}
+                    </span>
+                    <span
+                      className={`text-sm font-semibold font-mono ${
+                        detailTx?.type === "debit"
+                          ? "text-red-400"
+                          : "text-xcannes-green"
+                      }`}
+                    >
+                      {detailTx?.type === "debit" ? "−" : "+"}
+                      {formatAmountRlusdAsLocal(detailTx?.amount ?? 0)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-white/60">
                       {t("statement_conversion_fee_label", "Frais")}
                     </span>
-                    <span className="font-mono text-white/80">
-                      {formatAmountRlusdAsLocal(detailTx.spreadRlusd)}
+                    <span className="text-sm font-semibold font-mono text-white/90">
+                      {detailTx?.spreadRlusd
+                        ? formatAmountRlusdAsLocal(detailTx.spreadRlusd)
+                        : formatAmountRlusdAsLocal(0)}
                     </span>
                   </div>
-                ) : null}
-
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-white/60">
-                    {t("ui_balance_after_label", "Balance après")}
-                  </span>
-                  <span className="font-mono text-white/90">
-                    {formatAmountRlusdAsLocal(
-                      detailTx?.displayRunningBalance != null
-                        ? detailTx.displayRunningBalance
-                        : detailTx?.runningBalance ?? 0,
-                    )}
-                  </span>
+                  {detailTx?.runningBalance != null ||
+                  detailTx?.displayRunningBalance != null ? (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs text-white/60">
+                        {t("ui_balance_after_label", "Solde après")}
+                      </span>
+                      <span className="text-sm font-semibold font-mono text-white/90">
+                        {formatAmountRlusdAsLocal(
+                          detailTx?.displayRunningBalance != null
+                            ? detailTx.displayRunningBalance
+                            : detailTx?.runningBalance ?? 0,
+                        )}
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
+              </div>
 
-                {(() => {
-                  const counterparty = String(
-                    detailTx?.counterparty || "",
-                  ).trim();
-                  if (!counterparty || counterparty.toUpperCase() === "XCANNES")
-                    return null;
-                  const isOutgoing =
-                    detailTx?.type === "debit" ||
-                    String(detailTx?.kind || "")
-                      .toUpperCase()
-                      .includes("OUT");
-                  const label = detailLabel || counterparty;
-                  return (
-                    <div className="space-y-1">
-                      <div className="text-white/60 text-xs">
-                        {isOutgoing
-                          ? t("ui_to_label_7b2c1a9d5e", "To")
-                          : t("ui_from_label_2c7a1d9b5e", "From")}
-                      </div>
-                      <div className="text-white/90 font-semibold text-base md:text-lg">
-                        {detailLabelLoading ? "…" : label}
-                      </div>
-                      {detailLabel && counterparty ? (
-                        <div className="text-xs md:text-sm text-white/55 font-mono break-all">
-                          {counterparty}
+              <div className="h-px bg-white/[0.04] my-3" />
+
+              {/* Technical */}
+              {detailTx?.txHash ? (
+                <div className="space-y-2">
+                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    {t("ui_transaction", "Transaction")}
+                  </div>
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-xs text-white/60">
+                          {t("ui_tx_hash_label_2b7c1a9d5e", "Hash")}
                         </div>
-                      ) : null}
-                    </div>
-                  );
-                })()}
-
-                {detailTx?.txHash ? (
-                  <div className="space-y-1">
-                    <div className="text-white/60 text-xs">
-                      {t("ui_tx_hash_label_2b7c1a9d5e", "Tx hash")}
-                    </div>
-                    <div className="text-[11px] text-white/70 font-mono break-all">
-                      {detailTx.txHash}
+                        <div className="mt-0.5 text-sm text-white/90 font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+                          {truncateMiddle(detailTx.txHash, 10, 8)}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-none">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            copyToClipboard(
+                              detailTx.txHash,
+                              t("ui_copied_hash", "Hash copié"),
+                            )
+                          }
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          aria-label={t("ui_copy_hash", "Copy hash")}
+                          title={t("ui_copy_hash", "Copy hash")}
+                        >
+                          ⧉
+                        </button>
+                        {detailExplorerUrl ? (
+                          <a
+                            href={detailExplorerUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                            aria-label={t(
+                              "ui_view_on_explorer",
+                              "View on explorer",
+                            )}
+                            title={t(
+                              "ui_view_on_explorer",
+                              "View on explorer",
+                            )}
+                          >
+                            ↗
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
             </div>
           </div>,
           document.body,
@@ -939,252 +1170,118 @@ export default function CurrencyStatement({
 
           {/* Filters */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex gap-1.5 flex-wrap">
-              <button
-                onClick={() => setFilter("all")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "all"
-                    ? "bg-xcannes-green/20 hover:bg-xcannes-green/30 text-xcannes-green"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                {stripCountSuffix(t("ui_all_0c90d41d71", "All"))}
-              </button>
-              <button
-                onClick={() => setFilter("credit")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "credit"
-                    ? "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                {stripCountSuffix(t("ui_credits_b8166276a0", "Credits"))}
-              </button>
-              <button
-                onClick={() => setFilter("debit")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "debit"
-                    ? "bg-red-500/20 hover:bg-red-500/30 text-red-300"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                {stripCountSuffix(t("ui_debits_38c870b18f", "Debits"))}
-              </button>
-              <button
-                onClick={() => setFilter("conversion")}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-                  filter === "conversion"
-                    ? "bg-blue-500/20 hover:bg-blue-500/30 text-blue-300"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-                }`}
-              >
-                {stripCountSuffix(
-                  t("ui_conversions_b604b5ef8b", "Conversions"),
-                )}
-              </button>
+            <div className="inline-flex items-center rounded-xl border border-white/5 bg-[#11161C] p-1">
+              {[
+                {
+                  key: "all",
+                  label: stripCountSuffix(t("ui_all_0c90d41d71", "All")),
+                },
+                {
+                  key: "credit",
+                  label: stripCountSuffix(
+                    t("ui_credits_b8166276a0", "Credits"),
+                  ),
+                },
+                {
+                  key: "debit",
+                  label: stripCountSuffix(t("ui_debits_38c870b18f", "Debits")),
+                },
+                {
+                  key: "conversion",
+                  label: stripCountSuffix(
+                    t("ui_conversions_b604b5ef8b", "Conversions"),
+                  ),
+                },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setFilter(item.key)}
+                  className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                    filter === item.key
+                      ? "bg-white/5 text-white"
+                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Transactions Table */}
-          <div className="bg-black/40 rounded-lg overflow-hidden flex flex-col min-h-0">
+          {/* Transactions Timeline */}
+          <div className="rounded-xl border border-white/5 bg-[#11161C] overflow-hidden flex flex-col min-h-0">
             {error && (
               <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
                 {error}
               </div>
             )}
-            <div className="overflow-x-auto flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
-              <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-black/85 backdrop-blur-md z-10">
-                  <tr>
-                    <th className="text-left px-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
-                      {t("ui_date_bb69dc2fa3", "Date")}
-                    </th>
-                    <th className="text-left pl-2 pr-1 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
-                      {t("ui_description_d37d7cf577", "Description")}
-                    </th>
-                    <th className="text-right pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60">
-                      {t("ui_amount_1843418f56", "Amount")}
-                    </th>
-                    {showRunningBalanceColumn ? (
-                      <th className="text-right px-3 md:px-4 py-2.5 md:py-3 text-xs font-medium text-white/60 hidden md:table-cell">
-                        {t("ui_balance_445d830d72", "Balance")}
-                      </th>
-                    ) : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td
-                        colSpan={tableColSpan}
-                        className="text-center py-12 text-white/40 text-sm"
-                      >
-                        {t("ui_loading_948e39804b", "Loading…")}
-                      </td>
-                    </tr>
-                  ) : !visibleGroups || visibleGroups.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={tableColSpan}
-                        className="text-center py-12 text-white/40 text-sm"
-                      >
-                        {t(
-                          "ui_no_transactions_found_af217af8de",
-                          "No transactions found",
-                        )}
-                      </td>
-                    </tr>
-                  ) : (
-                    (visibleGroups || []).map((group, groupIdx) => (
-                      <Fragment key={group.key || groupIdx}>
-                        {showMonthHeaders ? (
-                          <tr className="bg-white/5">
-                            <td
-                              colSpan={tableColSpan}
-                              className="px-2 md:px-4 py-2 text-xs font-semibold text-white/80 uppercase tracking-wide"
-                            >
-                              {group.label || group.key}
-                            </td>
-                          </tr>
-                        ) : null}
-                        {group.transactions.length === 0 ? (
-                          <tr>
-                            <td
-                              colSpan={tableColSpan}
-                              className="text-center py-6 text-white/40 text-sm"
-                            >
-                              {t(
-                                "ui_no_transactions_found_af217af8de",
-                                "No transactions found",
-                              )}
-                            </td>
-                          </tr>
-                        ) : (
-                          group.transactions.map((tx, idx) => {
-                            const icon = getTransactionIcon(tx.category);
-                            const transactionId = tx?.id || null;
-                            const isHighlighted =
-                              highlightedTransactionId &&
-                              transactionId === highlightedTransactionId;
-                            const rowClassName = isHighlighted
-                              ? "border-b border-white/5 bg-xcannes-green/10 transition-colors"
-                              : "border-b border-white/5 hover:bg-white/5 transition-colors";
-                            return (
-                              <tr
-                                key={`${group.key || groupIdx}-${idx}`}
-                                ref={isHighlighted ? highlightRowRef : null}
-                                className={`${rowClassName} cursor-pointer`}
-                                role="button"
-                                tabIndex={0}
-                                onClick={() => openTxDetails(tx)}
-                                onKeyDown={(event) => {
-                                  if (event.key === "Enter" || event.key === " ") {
-                                    event.preventDefault();
-                                    openTxDetails(tx);
-                                  }
-                                }}
-                              >
-                                <td className="px-2 md:px-4 py-2.5 md:py-3 text-white/80 font-mono text-xs">
-                                  {formatDate(tx.date)}
-                                </td>
-                                <td className="pl-2 pr-1 md:px-4 py-2.5 md:py-3">
-                                  <div className="flex items-center gap-2">
-                                    {icon ? (
-                                      <span className="transaction-icon text-lg flex-shrink-0">
-                                        {icon}
-                                      </span>
-                                    ) : null}
-                                    <div className="min-w-0">
-                                      <p className="text-sm text-white/90 truncate">
-                                        {(() => {
-                                          const localizedDescription =
-                                            getLocalizedDescription(tx);
-                                          const feeSuffix =
-                                            tx.category === "exchange" &&
-                                            tx.spreadRlusd > 0 ? (
-                                              <span className="text-[8px] md:text-xs text-white/40 ml-0.5 md:ml-1 whitespace-nowrap">
-                                                ({t(
-                                                  "statement_conversion_fee_label",
-                                                  "Frais",
-                                                )}{" : "}{formatAmountRlusdAsLocal(
-                                                  tx.spreadRlusd,
-                                                )})
-                                              </span>
-                                            ) : null;
-                                          return tx.category === "exchange"
-                                            ? renderConversionDescription(
-                                                localizedDescription,
-                                                {
-                                                  withLabel: false,
-                                                  feeSuffix,
-                                                },
-                                              ) ||
-                                                (isMobileDate
-                                                  ? simplifyMobileDescription(
-                                                      localizedDescription,
-                                                      tx.category,
-                                                    )
-                                                  : enrichDescription(
-                                                      localizedDescription,
-                                                    ))
-                                            : isMobileDate
-                                              ? tx.kind === "XRPL_PAYMENT_IN"
-                                                ? t(
-                                                    "statement_xrpl_mobile_in",
-                                                    "Reçu",
-                                                  )
-                                                : tx.kind === "XRPL_PAYMENT_OUT"
-                                                  ? t(
-                                                      "statement_xrpl_mobile_out",
-                                                      "Envoyé",
-                                                    )
-                                                  : simplifyMobileDescription(
-                                                      localizedDescription,
-                                                      tx.category,
-                                                    )
-                                              : enrichDescription(
-                                                  localizedDescription,
-                                                );
-                                        })()}
-                                      </p>
-                                      {tx.counterparty &&
-                                        String(tx.counterparty).toUpperCase() !== "XCANNES" && (
-                                          <p className="text-xs text-white/40 font-mono truncate hidden md:block">
-                                            {tx.counterparty.slice(0, 10)}...
-                                            {tx.counterparty.slice(-6)}
-                                          </p>
-                                        )}
-                                    </div>
-                                  </div>
-                                </td>
-                                <td
-                                  className={`pl-1 pr-2 md:px-4 py-2.5 md:py-3 text-right font-mono text-sm font-medium ${
-                                    tx.type === "debit"
-                                      ? "text-red-400"
-                                      : "text-green-400"
-                                  }`}
-                                >
-                                  {tx.type === "debit" ? "−" : "+"}
-                                  {formatAmountRlusdAsLocal(tx.amount)}
-                                </td>
-                                {showRunningBalanceColumn ? (
-                                  <td className="px-3 md:px-4 py-2.5 md:py-3 text-right font-mono text-white/90 text-sm hidden md:table-cell">
-                                    {formatAmountRlusdAsLocal(
-                                      tx?.displayRunningBalance != null
-                                        ? tx.displayRunningBalance
-                                        : tx.runningBalance,
-                                    )}
-                                  </td>
-                                ) : null}
-                              </tr>
-                            );
-                          })
-                        )}
-                      </Fragment>
-                    ))
+            <div className="flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
+              {loading ? (
+                <div className="py-14 text-center text-white/40 text-sm">
+                  {t("ui_loading_948e39804b", "Loading…")}
+                </div>
+              ) : !timelineGroups || timelineGroups.length === 0 ? (
+                <div className="py-14 text-center text-white/40 text-sm">
+                  {t(
+                    "ui_no_transactions_found_af217af8de",
+                    "No transactions found",
                   )}
-                </tbody>
-              </table>
+                </div>
+              ) : (
+                <div className="divide-y divide-white/5">
+                  {timelineGroups.map((group) => (
+                    <div key={group.key}>
+                      <div className="px-4 pt-4 pb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
+                        {group.label}
+                      </div>
+                      <div className="pb-2">
+                        {group.transactions.map((tx, idx) => {
+                          const transactionId =
+                            tx?.id || tx?.txHash || `${group.key}-${idx}`;
+                          const isHighlighted =
+                            highlightedTransactionId &&
+                            transactionId === highlightedTransactionId;
+                          return (
+                            <button
+                              key={transactionId}
+                              type="button"
+                              ref={isHighlighted ? highlightRowRef : null}
+                              onClick={() => openTxDetails(tx)}
+                              className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
+                                isHighlighted
+                                  ? "bg-xcannes-green/10"
+                                  : "hover:bg-white/[0.03]"
+                              }`}
+                            >
+                              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/60 flex-none">
+                                <span className="text-sm leading-none">
+                                  {getTimelineIcon(tx)}
+                                </span>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm text-white/90 truncate whitespace-nowrap overflow-hidden text-ellipsis">
+                                  {getTimelineLabel(tx)}
+                                </div>
+                              </div>
+                              <div
+                                className={`flex-none font-mono font-semibold whitespace-nowrap ${
+                                  tx?.type === "debit"
+                                    ? "text-red-400"
+                                    : "text-xcannes-green"
+                                }`}
+                              >
+                                {tx?.type === "debit" ? "−" : "+"}
+                                {formatAmountRlusdAsLocal(tx?.amount)}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

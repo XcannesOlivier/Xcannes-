@@ -43,20 +43,6 @@ export default function DemoWalletDashboardSwapModal({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
-    }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, []);
 
   const suggestedCurrencies = useMemo(() => {
     const base = Array.isArray(DEMO_CURRENCY_LINE_ORDER)
@@ -80,13 +66,13 @@ export default function DemoWalletDashboardSwapModal({
       (code) =>
         String(code || "")
           .trim()
-          .toUpperCase() !== "USD",
+          .toUpperCase() !== "RLUSD",
     );
     // Include the currently-selected quote even if not yet in the wallet
     const quoteUpper = String(convertQuoteCurrency || "").trim().toUpperCase();
     if (
       quoteUpper &&
-      quoteUpper !== "USD" &&
+      quoteUpper !== "RLUSD" &&
       !base.some((c) => String(c).toUpperCase() === quoteUpper)
     ) {
       base.push(quoteUpper);
@@ -132,6 +118,15 @@ export default function DemoWalletDashboardSwapModal({
 
     return { type: "allocation" };
   }, [baseCode, quoteCode]);
+
+  const formatAmountWithSymbolLocal = (value, currency, options = {}) => {
+    const display = getDisplayCurrencyCode(currency);
+    return formatAmountWithSymbol(locale, value, display, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 6,
+      ...options,
+    });
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -214,6 +209,21 @@ export default function DemoWalletDashboardSwapModal({
     t,
   ]);
 
+  const unitRate = useMemo(() => {
+    if (!baseCode || !quoteCode) return null;
+    if (baseCode === quoteCode) return null;
+    const isPeggedToUsd = (code) => code === "RLUSD" || code === "USD";
+    const rlusdPerBase = isPeggedToUsd(baseCode)
+      ? 1
+      : Number(rlusdPerUnitRates?.[baseCode]);
+    const rlusdPerQuote = isPeggedToUsd(quoteCode)
+      ? 1
+      : Number(rlusdPerUnitRates?.[quoteCode]);
+    if (!Number.isFinite(rlusdPerBase) || rlusdPerBase <= 0) return null;
+    if (!Number.isFinite(rlusdPerQuote) || rlusdPerQuote <= 0) return null;
+    return rlusdPerBase / rlusdPerQuote;
+  }, [baseCode, quoteCode, rlusdPerUnitRates]);
+
   const convertButtonDisabled =
     convertProcessing ||
     !convertBaseCurrency ||
@@ -238,12 +248,12 @@ export default function DemoWalletDashboardSwapModal({
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-stretch md:items-center justify-center md:px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-convert-modal border-0 md:border md:border-white/10 overflow-hidden flex flex-col min-h-0 pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-convert-modal border-white/10 md:border overflow-hidden flex flex-col min-h-0 pointer-events-auto pb-[env(safe-area-inset-bottom)]",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "h-[100dvh] md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
+      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -275,13 +285,22 @@ export default function DemoWalletDashboardSwapModal({
           }}
         >
           <div
-            className="flex-1 min-h-0 flex flex-col overscroll-contain p-4 md:p-5 space-y-5 overflow-y-auto"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className="flex-1 min-h-0 flex flex-col p-4 md:p-5 space-y-4"
           >
             <div className="flex items-start justify-between gap-3 mb-1 pr-6">
               <div className="flex min-w-0 flex-col gap-1.5">
-                <div>{renderWalletMeta?.("pr-8 wallet-meta--plus-4")}</div>
-
+                <div>
+                  {renderWalletMeta?.(
+                    "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                  )}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {noticeVariant === "demo" ? (
+                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                      {t("demo_notice_title", "Mode démo")}
+                    </span>
+                  ) : null}
+                </div>
               </div>
               <button
                 type="button"
@@ -301,213 +320,237 @@ export default function DemoWalletDashboardSwapModal({
                   : "wallet-tab-unfold-in"
               }
             >
-              <div
-                className={`space-y-5 ${inline ? "flex-1 min-h-0 flex flex-col" : ""}`}
-              >
-                <div
-                  className={
-                    inline
-                      ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(18px,2.8vh,36px)]"
-                      : "space-y-5"
-                  }
-                >
-                  <div
-                    className={inline ? "space-y-6" : ""}
-                  >
-                    <div>
-                      <label className="block text-[17px] md:text-lg text-white/60 mb-1">
-                        {t("ui_base_6d4184e1ef", "Base")}
-                      </label>
-                      <ModalSelect
-                        value={convertBaseCurrency}
-                        onChange={setConvertBaseCurrency}
-                        options={(swapCurrencyOptionsSanitized || []).map(
-                          (code) => {
-                            const labelLeft =
-                              selectLabelByCurrency?.[code] || code;
-                            const labelRight =
-                              selectLabelRightByCurrency?.[code] || null;
-                            return {
-                              value: code,
-                              icon: getIconForCode(code),
-                              label: labelLeft,
-                              labelLeft,
-                              labelRight,
-                              labelMobile:
-                                selectLabelMobileByCurrency?.[code] ||
-                                labelLeft,
-                            };
-                          },
-                        )}
-                        useNativeSelect={false}
-                        showMobileOptionRight={true}
-                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                        menuClassName={
-                          noticeVariant === "demo"
-                            ? "bg-xcannes-surface-demo"
-                            : "bg-elevated"
-                        }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                      />
+              <div className="flex flex-col gap-4">
+                {/* ── SECTION 1: Currency selection ───────────────────────── */}
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_from_label_short", "De")}
                     </div>
-
-                    <div>
-                      <label className="block text-[17px] md:text-lg text-white/60 mb-1">
-                        {t("ui_quote_e3761255be", "Quote")}
-                      </label>
-                      <ModalSelect
-                        value={convertQuoteCurrency}
-                        onChange={setConvertQuoteCurrency}
-                        options={(swapCurrencyOptionsSanitized || []).map(
-                          (code) => {
-                            const labelLeft =
-                              selectLabelByCurrency?.[code] || code;
-                            const labelRight =
-                              selectLabelRightByCurrency?.[code] || null;
-                            return {
-                              value: code,
-                              icon: getIconForCode(code),
-                              label: labelLeft,
-                              labelLeft,
-                              labelRight,
-                              labelMobile:
-                                selectLabelMobileByCurrency?.[code] ||
-                                labelLeft,
-                            };
-                          },
-                        )}
-                        useNativeSelect={false}
-                        showMobileOptionRight={true}
-                        buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                        menuClassName={
-                          noticeVariant === "demo"
-                            ? "bg-xcannes-surface-demo"
-                            : "bg-elevated"
-                        }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                      />
-                    </div>
-
-                    <div className="rounded-xl border border-white/10 p-3">
-                      <p className="text-[15px] text-white/60 mb-2">
-                        {t(
-                          "ui_other_currencies_label_demo",
-                          "Other currencies",
-                        )}
-                      </p>
-                      <WalletCurrencySelector
-                        value=""
-                        onChange={(code) => {
-                          if (code) setConvertQuoteCurrency(code);
-                        }}
-                        placeholder={t(
-                          "ui_select_a_currency_to_activat_776d6af637",
-                          "Select another currency",
-                        )}
-                        quickOptions={suggestedCurrencies}
-                        excludeCodes={["USD"]}
-                        showQuickAdd={false}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[17px] md:text-lg text-white/60 mb-1">
-                        {t("ui_amount_52a20b2992", "Amount")}
-                      </label>
-                      <TokenAmountInput
-                        value={convertAmount}
-                        onChange={setConvertAmount}
-                        placeholder="0.0000"
-                        token={
-                          selectLabelByCurrency?.[convertBaseCurrency] ||
-                          convertBaseCurrency ||
-                          "RLUSD"
-                        }
-                        tokenClassName="text-white"
-                        containerClassName="focus-within:!border-xcannes-green/80"
-                      />
-                    </div>
+                    <ModalSelect
+                      value={convertBaseCurrency}
+                      onChange={setConvertBaseCurrency}
+                      options={(swapCurrencyOptionsSanitized || []).map((code) => {
+                        const labelLeft = selectLabelByCurrency?.[code] || code;
+                        const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        return {
+                          value: code,
+                          icon: getIconForCode(code),
+                          label: labelLeft,
+                          labelLeft,
+                          labelRight,
+                          labelMobile:
+                            selectLabelMobileByCurrency?.[code] || labelLeft,
+                        };
+                      })}
+                      useNativeSelect={false}
+                      showMobileOptionRight={true}
+                      iconClassName="text-3xl leading-none"
+                      buttonClassName="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      menuClassName={
+                        noticeVariant === "demo"
+                          ? "bg-xcannes-surface-demo"
+                          : "bg-elevated"
+                      }
+                      selectClassName="xcannes-select w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                    />
                   </div>
 
-                  <div className={inline ? "space-y-2" : "space-y-2"}>
-                    {sameCurrencySelected ? (
-                      <div className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-[17px] text-amber-100/90">
-                        {t(
-                          "ui_convert_same_asset_warning_6f13d5c9c2",
-                          "Veuillez choisir 2 actifs différents.",
-                        )}
-                      </div>
-                    ) : null}
-                    <div className="rounded-lg border border-subtle bg-black/30 px-3 py-2 space-y-1">
-                      <div className="uppercase tracking-[0.16em] text-[15px] text-white/60">
-                        {t(
-                          "ui_estimated_receive_0c5a3b7e9a",
-                          "Estimated receive",
-                        )}
-                      </div>
-                      <div className="text-xl text-white/90">
-                        {formatAmountWithSymbol(
-                          locale,
-                          previewAmount,
-                          convertQuoteCurrency || "",
-                          {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 6,
-                          },
-                        )}
-                      </div>
-                      {previewMeta?.route === "allocation" &&
-                      previewMeta?.isFx &&
-                      previewMeta?.spreadFeeRlusd > 0 ? (
-                        <div className="text-[16px] text-white/40">
-                          {t(
-                            "ui_conversion_fee_simple_6c2a8d5e1b",
-                            "Frais de conversion",
-                          )}{" "}
-                          :{" "}
-                          {formatAmountWithSymbol(
-                            locale,
-                            previewMeta.spreadFeeRlusd,
-                            "USD",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            },
-                          )}
-                        </div>
-                      ) : null}
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const prevBase = convertBaseCurrency;
+                        const prevQuote = convertQuoteCurrency;
+                        if (!prevBase || !prevQuote) return;
+                        setConvertBaseCurrency(prevQuote);
+                        setConvertQuoteCurrency(prevBase);
+                      }}
+                      className="h-10 w-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors duration-150 flex items-center justify-center text-white/70"
+                      aria-label={t("ui_swap_currencies", "Inverser")}
+                      title={t("ui_swap_currencies", "Inverser")}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M7 10h10M7 10l3-3M7 10l3 3M17 14H7m10 0l-3-3m3 3l-3 3"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_to_label_short", "Vers")}
                     </div>
+                    <ModalSelect
+                      value={convertQuoteCurrency}
+                      onChange={setConvertQuoteCurrency}
+                      options={(swapCurrencyOptionsSanitized || []).map((code) => {
+                        const labelLeft = selectLabelByCurrency?.[code] || code;
+                        const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        return {
+                          value: code,
+                          icon: getIconForCode(code),
+                          label: labelLeft,
+                          labelLeft,
+                          labelRight,
+                          labelMobile:
+                            selectLabelMobileByCurrency?.[code] || labelLeft,
+                        };
+                      })}
+                      useNativeSelect={false}
+                      showMobileOptionRight={true}
+                      iconClassName="text-3xl leading-none"
+                      buttonClassName="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      menuClassName={
+                        noticeVariant === "demo"
+                          ? "bg-xcannes-surface-demo"
+                          : "bg-elevated"
+                      }
+                      selectClassName="xcannes-select w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                    />
+                  </div>
 
-                    {previewState.status === "loading" ? (
-                      <div className="text-[17px] text-white/60">
-                        {t(
-                          "ui_loading_market_data_1d5d6ed3c4",
-                          "Refreshing market data...",
-                        )}
-                      </div>
-                    ) : null}
-
-                    {previewState.status === "error" ? (
-                      <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-[17px] text-red-200">
-                        {previewState.error}
-                      </div>
-                    ) : null}
+                  <div className="pt-1">
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/35 mb-2">
+                      {t("ui_other_currency_d8e1f2a3b4", "Autre devise")}
+                    </div>
+                    <WalletCurrencySelector
+                      value=""
+                      onChange={(code) => {
+                        if (code) setConvertQuoteCurrency(code);
+                      }}
+                      placeholder={t(
+                        "ui_search_all_currencies_c5d6e7f8",
+                        "Search all currencies...",
+                      )}
+                      quickOptions={suggestedCurrencies}
+                      excludeCodes={["USD", "RLUSD", "XRP"]}
+                      showQuickAdd={true}
+                      buttonClassName="w-full bg-white/3 border border-white/10 rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:border-white/20 transition-colors duration-150"
+                    />
                   </div>
                 </div>
 
-                <div
-                  className={
-                    inline
-                      ? "mt-auto space-y-2 pt-2 border-t border-white/10"
-                      : ""
-                  }
-                >
+                {/* ── SECTION 2: Amount input ─────────────────────────────── */}
+                <div className="space-y-2">
+                  <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                    {t("ui_amount_52a20b2992", "Montant")}
+                  </div>
+                  <TokenAmountInput
+                    value={convertAmount}
+                    onChange={setConvertAmount}
+                    placeholder="0.0000"
+                    token={
+                      selectLabelByCurrency?.[convertBaseCurrency] ||
+                      convertBaseCurrency ||
+                      "USD"
+                    }
+                    tokenClassName="text-white text-base"
+                    containerClassName="rounded-xl px-4 py-4 border-white/15 bg-black/30 focus-within:!border-xcannes-green/60 transition-colors duration-150"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  {sameCurrencySelected ? (
+                    <div className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
+                      {t(
+                        "ui_convert_same_asset_warning_6f13d5c9c2",
+                        "Veuillez choisir 2 actifs différents.",
+                      )}
+                    </div>
+                  ) : null}
+
+                  {/* ── SECTION 3: Summary ─────────────────────────────── */}
+                  <div className="rounded-[14px] border border-white/10 bg-white/5 px-4 py-4 space-y-3">
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                      {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
+                    </div>
+                    <div className="text-sm text-white/70">
+                      {t("ui_you_receive", "Vous recevez")}
+                    </div>
+                    {Number.isFinite(previewAmount) &&
+                    previewAmount > 0 &&
+                    Number.isFinite(amountValue) &&
+                    amountValue > 0 &&
+                    baseCode &&
+                    quoteCode ? (
+                      <>
+                        <div className="text-2xl font-semibold text-white">
+                          {formatAmountWithSymbolLocal(previewAmount, quoteCode, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 6,
+                          })}
+                        </div>
+                        {previewMeta?.route === "allocation" &&
+                        previewMeta?.isFx &&
+                        previewMeta?.spreadFeeRlusd > 0 ? (
+                          <div className="text-sm text-white/60 pt-2 border-t border-white/10">
+                            {t("statement_conversion_fee_label", "Frais")}
+                            {" : "}
+                            {formatAmountWithSymbol(
+                              locale,
+                              previewMeta.spreadFeeRlusd,
+                              "USD",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              },
+                            )}
+                          </div>
+                        ) : null}
+                        {Number.isFinite(Number(unitRate)) && unitRate > 0 ? (
+                          <div className="text-xs text-white/50">
+                            {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
+                              unitRate,
+                            ).toLocaleString(locale, {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 6,
+                            })} ${getDisplayCurrencyCode(quoteCode)}`}
+                          </div>
+                        ) : null}
+                      </>
+                    ) : (
+                      <div className="text-base text-white/40">—</div>
+                    )}
+                  </div>
+
+                  {previewState.status === "loading" ? (
+                    <div className="text-xs text-white/60">
+                      {t(
+                        "ui_loading_market_data_1d5d6ed3c4",
+                        "Refreshing market data...",
+                      )}
+                    </div>
+                  ) : null}
+
+                  {previewState.status === "error" ? (
+                    <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                      {previewState.error}
+                    </div>
+                  ) : null}
+
+                  {convertPreview ? (
+                    <p className="text-xs text-white/60">{convertPreview}</p>
+                  ) : null}
+                </div>
+
+                <div className="pt-3 border-t border-white/10">
                   <SwipeConfirmButton
                     label={convertButtonLabel}
                     onConfirm={handleConvertAction}
                     disabled={convertButtonDisabled}
                     variant="green"
-                    className="mt-1 md:hidden"
+                    className="md:hidden"
                   />
                   <button
                     type="button"
@@ -515,7 +558,7 @@ export default function DemoWalletDashboardSwapModal({
                       e.stopPropagation();
                       handleConvertAction();
                     }}
-                    className={`hidden md:block w-full mt-1 text-xl py-3 ${greenActionBtnBase}`}
+                    className={`hidden md:block w-full text-xl py-3 ${greenActionBtnBase}`}
                     disabled={convertButtonDisabled}
                   >
                     {convertButtonLabel}
