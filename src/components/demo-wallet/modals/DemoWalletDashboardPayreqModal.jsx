@@ -140,28 +140,6 @@ export default function DemoWalletDashboardPayreqModal({
 
   const requestDetailsPanel = sendPaymentRequest ? (
     <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 space-y-2">
-      <div className="text-[17px] md:text-lg text-white/60">
-        {t("ui_send_to_label", "Envoyé à")}
-      </div>
-      {requestDestination ? (
-        <div className="flex items-center justify-between gap-3 text-xs text-white/80">
-          <span className="text-white/60 shrink-0">
-            {t("ui_account_number_label", "N° de compte")}
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowFullAccountNumber((prev) => !prev)}
-            title={requestDestination}
-            className={`font-mono text-white/80 text-right text-xs ${
-              showFullAccountNumber ? "break-all" : ""
-            } cursor-pointer`}
-          >
-            {showFullAccountNumber
-              ? requestDestination
-              : requestDestinationLabel || requestDestination}
-          </button>
-        </div>
-      ) : null}
       <div className="text-[11px] uppercase tracking-wide text-amber-200/70 font-semibold">
         {t("ui_payment_request_details", "Payment request")}
       </div>
@@ -215,16 +193,6 @@ export default function DemoWalletDashboardPayreqModal({
             ) : null}
           </div>
         ) : null}
-        {requestAmountLabel ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Amount")}
-            </span>
-            <span className="font-mono text-white/90">
-              {requestAmountLabel}
-            </span>
-          </div>
-        ) : null}
         {requestCurrencyCode ? (
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
@@ -232,6 +200,16 @@ export default function DemoWalletDashboardPayreqModal({
             </span>
             <span className="font-semibold text-white/90">
               {requestCurrencyCode}
+            </span>
+          </div>
+        ) : null}
+        {requestAmountLabel ? (
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_amount_52cea2dd3d", "Amount")}
+            </span>
+            <span className="font-mono text-white/90">
+              {requestAmountLabel}
             </span>
           </div>
         ) : null}
@@ -301,6 +279,30 @@ export default function DemoWalletDashboardPayreqModal({
 
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="space-y-4">
+              {sendPaymentRequest ? (
+                <div className="text-[17px] md:text-lg text-white/60">
+                  {t("ui_send_to_label", "Envoyé à")}
+                </div>
+              ) : null}
+              {sendPaymentRequest && requestDestination ? (
+                <div className="flex items-center justify-between gap-3 text-xs text-white/80">
+                  <span className="text-white/60 shrink-0">
+                    {t("ui_account_number_label", "N° de compte")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowFullAccountNumber((prev) => !prev)}
+                    title={requestDestination}
+                    className={`font-mono text-white/80 text-right text-xs ${
+                      showFullAccountNumber ? "break-all" : ""
+                    } cursor-pointer`}
+                  >
+                    {showFullAccountNumber
+                      ? requestDestination
+                      : requestDestinationLabel || requestDestination}
+                  </button>
+                </div>
+              ) : null}
               {requestDetailsPanel}
               {sendActions}
             </div>
