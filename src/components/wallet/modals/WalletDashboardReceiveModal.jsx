@@ -64,6 +64,7 @@ export default function WalletDashboardReceiveModal({
   const autoCloseTimerRef = useRef(null);
   const receiveQrContainerRef = useRef(null);
   const requestQrContainerRef = useRef(null);
+  const requestPreviewRef = useRef(null);
 
   const requestCurrencyCode = useMemo(
     () =>
@@ -667,8 +668,9 @@ export default function WalletDashboardReceiveModal({
     if (!label) return `xrpl:${wallet}`;
     return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
   }, [wallet, walletLabel]);
-  const qrDisplaySize = inline ? 240 : 220;
-  const qrPixelSize = inline ? 360 : 420;
+  // Public address QR should be visually smaller than the request QR preview.
+  const qrDisplaySize = inline ? 240 : 190;
+  const qrPixelSize = inline ? 360 : 380;
   const requestQrPixelSize = inline ? 360 : 520;
 
   const shortWalletAddress = useMemo(() => {
@@ -682,6 +684,21 @@ export default function WalletDashboardReceiveModal({
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
   });
+
+  // After generating a request, scroll the modal to the generated QR block.
+  // This keeps the interaction single-flow without making the user hunt for the new QR.
+  // (Note: must run after we know the modal is rendered.)
+  useEffect(() => {
+    if (!shouldRender) return;
+    if (!hasGeneratedRequest) return;
+    const el = requestPreviewRef.current;
+    if (!el) return;
+    try {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch {
+      // ignore
+    }
+  }, [hasGeneratedRequest, shouldRender]);
 
   if (!shouldRender) return null;
 
@@ -914,7 +931,7 @@ export default function WalletDashboardReceiveModal({
                   ) : null}
 
                   {hasGeneratedRequest ? (
-                    <div className="pt-2 space-y-3">
+                    <div ref={requestPreviewRef} className="pt-2 space-y-3">
                       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                         {t("ui_request_generated_label", "Demande générée")}
                       </div>
