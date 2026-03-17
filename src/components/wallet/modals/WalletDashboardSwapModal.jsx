@@ -292,10 +292,8 @@ export default function WalletDashboardSwapModal({
     conversionRoute.type !== "allocation" ||
     !!insufficientBalance;
   const convertButtonLabel = convertProcessing
-    ? t("ui_converting_71c2b9a4e5", "Converting...")
-    : isPreviewMode
-      ? t("ui_convert_8408e969ec", "Convert")
-      : t("ui_convert_8408e969ec", "Convert");
+    ? t("ui_converting_71c2b9a4e5", "Conversion…")
+    : t("ui_convert_cta_fr", "Convertir");
   const handleConvertAction = () => {
     handleDemoConvert();
   };
@@ -376,129 +374,138 @@ export default function WalletDashboardSwapModal({
             </div>
             <div className="wallet-tab-unfold-in">
               <div className="flex flex-col gap-4">
-                <div className="space-y-4">
-                    <div>
-                      <label className="block text-base md:text-lg text-white/60 mb-1.5">
-                        {t("ui_base_6d4184e1ef", "Base")}
-                      </label>
-                      <ModalSelect
-                        value={convertBaseCurrency}
-                        onChange={setConvertBaseCurrency}
-                        options={(swapCurrencyOptionsSanitized || []).map(
-                          (code) => {
-                            const labelLeft =
-                              selectLabelByCurrency?.[code] || code;
-                            const labelRight =
-                              selectLabelRightByCurrency?.[code] || null;
-                            return {
-                              value: code,
-                              icon: selectIconByCurrency?.[code] || null,
-                              label: labelLeft,
-                              labelLeft,
-                              labelRight,
-                              labelMobile:
-                                selectLabelMobileByCurrency?.[code] ||
-                                labelLeft,
-                            };
-                          },
-                        )}
-                        useNativeSelect={false}
-                        showMobileOptionRight={true}
-                        iconClassName="text-3xl leading-none"
-                        buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                        menuClassName={
-                          noticeVariant === "demo"
-                            ? "bg-xcannes-surface-demo"
-                            : "bg-elevated"
-                        }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                      />
+                {/* ── SECTION 1: Currency selection ───────────────────────── */}
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_from_label_short", "De")}
                     </div>
-
-                    <div>
-                      <label className="block text-base md:text-lg text-white/60 mb-1.5">
-                        {t("ui_quote_e3761255be", "Quote")}
-                      </label>
-                      <ModalSelect
-                        value={convertQuoteCurrency}
-                        onChange={setConvertQuoteCurrency}
-                        options={(swapCurrencyOptionsSanitized || []).map(
-                          (code) => {
-                            const labelLeft =
-                              selectLabelByCurrency?.[code] || code;
-                            const labelRight =
-                              selectLabelRightByCurrency?.[code] || null;
-                            return {
-                              value: code,
-                              icon: getIconForCode(code),
-                              label: labelLeft,
-                              labelLeft,
-                              labelRight,
-                              labelMobile:
-                                selectLabelMobileByCurrency?.[code] ||
-                                labelLeft,
-                            };
-                          },
-                        )}
-                        useNativeSelect={false}
-                        showMobileOptionRight={true}
-                        iconClassName="text-3xl leading-none"
-                        buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                        menuClassName={
-                          noticeVariant === "demo"
-                            ? "bg-xcannes-surface-demo"
-                            : "bg-elevated"
-                        }
-                        selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 appearance-none cursor-pointer"
-                      />
-                    </div>
-
-                    {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
-                      <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/5 px-3 py-2 text-xs text-emerald-200/80">
-                        {t(
-                          "ui_new_currency_line_auto_activate_a1b2c3",
-                          "New currency — the {{currency}} line will be created automatically.",
-                        ).replace("{{currency}}", quoteCode)}
-                      </div>
-                    ) : null}
-
-                    <div>
-                      <label className="block text-base md:text-lg text-white/40 mb-1.5">
-                        {t("ui_other_currency_d8e1f2a3b4", "Other currency")}
-                      </label>
-                      <WalletCurrencySelector
-                        value=""
-                        onChange={(code) => {
-                          if (code) setConvertQuoteCurrency(code);
-                        }}
-                        placeholder={t(
-                          "ui_search_all_currencies_c5d6e7f8",
-                          "Search all currencies...",
-                        )}
-                        excludeCodes={["USD", "RLUSD", "XRP"]}
-                        showQuickAdd={true}
-                        buttonClassName="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-xl text-white/80 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/80 transition-colors active:scale-98"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-base md:text-lg text-white/60 mb-1.5">
-                        {t("ui_amount_52a20b2992", "Amount")}
-                      </label>
-                      <TokenAmountInput
-                        value={convertAmount}
-                        onChange={setConvertAmount}
-                        placeholder="0.0000"
-                        token={
-                          selectLabelByCurrency?.[convertBaseCurrency] ||
-                          convertBaseCurrency ||
-                          "USD"
-                        }
-                        tokenClassName="text-white text-xl"
-                        containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
-                      />
-                    </div>
+                    <ModalSelect
+                      value={convertBaseCurrency}
+                      onChange={setConvertBaseCurrency}
+                      options={(swapCurrencyOptionsSanitized || []).map((code) => {
+                        const labelLeft = selectLabelByCurrency?.[code] || code;
+                        const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        return {
+                          value: code,
+                          icon: getIconForCode(code),
+                          label: labelLeft,
+                          labelLeft,
+                          labelRight,
+                          labelMobile:
+                            selectLabelMobileByCurrency?.[code] || labelLeft,
+                        };
+                      })}
+                      useNativeSelect={false}
+                      showMobileOptionRight={true}
+                      iconClassName="text-3xl leading-none"
+                      buttonClassName="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      menuClassName={
+                        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+                      }
+                      selectClassName="xcannes-select w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                    />
                   </div>
+
+                  <div className="flex justify-center">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const prevBase = convertBaseCurrency;
+                        const prevQuote = convertQuoteCurrency;
+                        if (!prevBase || !prevQuote) return;
+                        setConvertBaseCurrency(prevQuote);
+                        setConvertQuoteCurrency(prevBase);
+                      }}
+                      className="h-10 w-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors duration-150 flex items-center justify-center text-white/70"
+                      aria-label={t("ui_swap_currencies", "Inverser")}
+                      title={t("ui_swap_currencies", "Inverser")}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h10M7 10l3-3M7 10l3 3M17 14H7m10 0l-3-3m3 3l-3 3" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_to_label_short", "Vers")}
+                    </div>
+                    <ModalSelect
+                      value={convertQuoteCurrency}
+                      onChange={setConvertQuoteCurrency}
+                      options={(swapCurrencyOptionsSanitized || []).map((code) => {
+                        const labelLeft = selectLabelByCurrency?.[code] || code;
+                        const labelRight = selectLabelRightByCurrency?.[code] || null;
+                        return {
+                          value: code,
+                          icon: getIconForCode(code),
+                          label: labelLeft,
+                          labelLeft,
+                          labelRight,
+                          labelMobile:
+                            selectLabelMobileByCurrency?.[code] || labelLeft,
+                        };
+                      })}
+                      useNativeSelect={false}
+                      showMobileOptionRight={true}
+                      iconClassName="text-3xl leading-none"
+                      buttonClassName="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      menuClassName={
+                        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+                      }
+                      selectClassName="xcannes-select w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                    />
+                  </div>
+
+                  {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
+                    <div className="rounded-lg border border-xcannes-green/25 bg-xcannes-green/10 px-3 py-2 text-xs text-xcannes-green/90">
+                      {t(
+                        "ui_new_currency_line_auto_activate_a1b2c3",
+                        "New currency — the {{currency}} line will be created automatically.",
+                      ).replace("{{currency}}", quoteCode)}
+                    </div>
+                  ) : null}
+
+                  <div className="pt-1">
+                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/35 mb-2">
+                      {t("ui_other_currency_d8e1f2a3b4", "Autre devise")}
+                    </div>
+                    <WalletCurrencySelector
+                      value=""
+                      onChange={(code) => {
+                        if (code) setConvertQuoteCurrency(code);
+                      }}
+                      placeholder={t(
+                        "ui_search_all_currencies_c5d6e7f8",
+                        "Search all currencies...",
+                      )}
+                      excludeCodes={["USD", "RLUSD", "XRP"]}
+                      showQuickAdd={true}
+                      buttonClassName="w-full bg-white/3 border border-white/10 rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:border-white/20 transition-colors duration-150"
+                    />
+                  </div>
+                </div>
+
+                {/* ── SECTION 2: Amount input ─────────────────────────────── */}
+                <div className="space-y-2">
+                  <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                    {t("ui_amount_52a20b2992", "Montant")}
+                  </div>
+                  <TokenAmountInput
+                    value={convertAmount}
+                    onChange={setConvertAmount}
+                    placeholder="0.0000"
+                    token={
+                      selectLabelByCurrency?.[convertBaseCurrency] ||
+                      convertBaseCurrency ||
+                      "USD"
+                    }
+                    tokenClassName="text-white text-base"
+                    containerClassName="rounded-xl px-4 py-4 border-white/15 bg-black/30 focus-within:!border-xcannes-green/60 transition-colors duration-150"
+                  />
+                </div>
 
                   <div className="space-y-2">
                     {sameCurrencySelected ? (
@@ -519,44 +526,48 @@ export default function WalletDashboardSwapModal({
                           .replace("{{currency}}", getDisplayCurrencyCode(insufficientBalance.currency))}
                       </div>
                     ) : null}
-                    <div className="rounded-xl border border-subtle bg-black/30 px-4 py-4 space-y-2.5">
-                      <h4 className="text-sm font-medium text-white/60 uppercase tracking-wide">{t("ui_summary_title_d4e5f6a7b8", "Résumé")}</h4>
-                      {/* Conversion summary */}
-                      {Number.isFinite(previewAmount) && previewAmount > 0 && Number.isFinite(amountValue) && amountValue > 0 && baseCode && quoteCode ? (
+                    {/* ── SECTION 3: Summary ─────────────────────────────── */}
+                    <div className="rounded-[14px] border border-white/10 bg-white/5 px-4 py-4 space-y-3">
+                      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                        {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
+                      </div>
+                      <div className="text-sm text-white/70">
+                        {t("ui_you_receive", "Vous recevez")}
+                      </div>
+                      {Number.isFinite(previewAmount) &&
+                      previewAmount > 0 &&
+                      Number.isFinite(amountValue) &&
+                      amountValue > 0 &&
+                      baseCode &&
+                      quoteCode ? (
                         <>
-                          <div className="text-base text-white/80 leading-snug">
-                            {t(
-                              "ui_convert_summary_label_a1b2c3d4e5",
-                              "Pour {{amountBase}} {{base}} vous recevrez",
-                            )
-                              .replace("{{amountBase}}", amountValue.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 6 }))
-                              .replace("{{base}}", getDisplayCurrencyCode(baseCode))}
-                            {" "}
-                            <span className="text-white font-semibold text-lg">
-                              {previewAmount.toLocaleString(locale, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 6,
-                              })}
-                              {" "}
-                              {getDisplayCurrencyCode(quoteCode)}
-                            </span>
+                          <div className="text-2xl font-semibold text-white">
+                            {formatAmountWithSymbolLocal(previewAmount, quoteCode, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 6,
+                            })}
                           </div>
-                          {/* Conversion fee */}
                           {previewMeta?.route === "allocation" &&
                           previewMeta?.isFx &&
                           previewMeta?.spreadFeeRlusd > 0 ? (
-                            <div className="text-sm text-white/60 pt-1 border-t border-white/5">
-                              {t("ui_conversion_fee_label_e2f3a4b5c6", "Frais de conversion")}
+                            <div className="text-sm text-white/60 pt-2 border-t border-white/10">
+                              {t("statement_conversion_fee_label", "Frais")}
                               {" : "}
-                              {formatAmountWithSymbol(
-                                locale,
-                                previewMeta.spreadFeeRlusd,
-                                "USD",
-                                {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                },
-                              )}
+                              {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </div>
+                          ) : null}
+                          {Number.isFinite(Number(previewMeta?.unitRate)) &&
+                          previewMeta?.unitRate > 0 ? (
+                            <div className="text-xs text-white/50">
+                              {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
+                                previewMeta.unitRate,
+                              ).toLocaleString(locale, {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 6,
+                              })} ${getDisplayCurrencyCode(quoteCode)}`}
                             </div>
                           ) : null}
                         </>
