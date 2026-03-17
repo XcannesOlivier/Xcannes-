@@ -4,7 +4,6 @@ import { Buffer } from "buffer";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useIsDesktop from "../hooks/useIsDesktop";
 import { QRCodeCanvas } from "qrcode.react";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
@@ -12,7 +11,6 @@ import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
-import { greenActionBtnMuted } from "./walletModalTokens";
 
 const ShareIcon = ({ className = "" }) => (
   <svg
@@ -64,8 +62,8 @@ export default function WalletDashboardReceiveModal({
   const [copyToast, setCopyToast] = useState("");
   const copyToastTimerRef = useRef(null);
   const autoCloseTimerRef = useRef(null);
-  const qrContainerRef = useRef(null);
-  const [isRequestOpen, setIsRequestOpen] = useState(false);
+  const receiveQrContainerRef = useRef(null);
+  const requestQrContainerRef = useRef(null);
 
   const requestCurrencyCode = useMemo(
     () =>
@@ -87,7 +85,6 @@ export default function WalletDashboardReceiveModal({
     if (!open) {
       setGeneratedRequest(null);
       setGenerateError(null);
-      setIsRequestOpen(false);
     }
   }, [open]);
 
@@ -243,7 +240,10 @@ export default function WalletDashboardReceiveModal({
   };
 
   const buildQrBlob = (useRequest = hasGeneratedRequest) => {
-    const canvas = qrContainerRef.current?.querySelector?.("canvas");
+    const container = useRequest
+      ? requestQrContainerRef.current
+      : receiveQrContainerRef.current;
+    const canvas = container?.querySelector?.("canvas");
     if (!canvas) return null;
     const srcWidth = canvas.width;
     const srcHeight = canvas.height;
@@ -634,7 +634,6 @@ export default function WalletDashboardReceiveModal({
     }
   }, [requestValue]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
-  const showRequestPreview = hasGeneratedRequest;
   const requestDisplayCurrency = String(
     generatedRequest?.displayCurrency || requestCurrencyCode || "USD",
   )
@@ -669,7 +668,15 @@ export default function WalletDashboardReceiveModal({
     return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
   }, [wallet, walletLabel]);
   const qrDisplaySize = inline ? 240 : 220;
-  const qrPixelSize = inline ? 360 : hasGeneratedRequest ? 520 : 420;
+  const qrPixelSize = inline ? 360 : 420;
+  const requestQrPixelSize = inline ? 360 : 520;
+
+  const shortWalletAddress = useMemo(() => {
+    const addr = String(wallet || "").trim();
+    if (!addr) return "";
+    if (addr.length <= 10) return addr;
+    return `${addr.slice(0, 4)}...${addr.slice(-3)}`;
+  }, [wallet]);
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -744,271 +751,218 @@ export default function WalletDashboardReceiveModal({
             </button>
           </div>
           <div className="flex-1 min-h-0 flex flex-col">
-            <div className="wallet-tab-unfold-in flex-1 flex flex-col gap-4">
-              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                <p className="text-xs md:text-sm text-white/80 text-center font-medium">
-                  {t(
-                    "ui_receive_and_request_desc_2f1a7c9d5e",
-                    "Share your address to get paid, or create a payment request to send to someone.",
-                  )}
-                </p>
+            <div className="flex-1 min-h-0 flex flex-col gap-5">
+              {/* SECTION 1 — RECEIVE FUNDS */}
+              <div className="space-y-2">
+                <h2 className="text-base md:text-lg font-semibold text-white/90">
+                  {t("ui_receive_funds_title", "Recevoir des fonds")}
+                </h2>
+                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                  <div className="flex flex-col items-center">
+                    <div
+                      ref={receiveQrContainerRef}
+                      className="rounded-xl border border-white/10 bg-white p-3"
+                    >
+                      <QRCodeCanvas
+                        value={receiveQrValue}
+                        size={qrPixelSize}
+                        style={{ width: qrDisplaySize, height: qrDisplaySize }}
+                        bgColor="#ffffff"
+                        fgColor="#000000"
+                        includeMargin={true}
+                        level="M"
+                      />
+                    </div>
+
+                    <div className="mt-3 text-[11px] tracking-[0.22em] uppercase text-white/45">
+                      {t("ui_public_address_label", "Adresse publique")}
+                    </div>
+                    <div className="mt-1 text-sm font-mono text-white/80">
+                      {shortWalletAddress || "—"}
+                    </div>
+
+                    <div className="mt-4 w-full grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await handleCopyQr(false);
+                        }}
+                        className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                      >
+                        {t("ui_copy", "Copier")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await handleShareQr(false);
+                        }}
+                        className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                      >
+                        {t("ui_download", "Télécharger")}
+                      </button>
+                    </div>
+
+                    {copyToast ? (
+                      <div className="mt-3 text-[11px] text-xcannes-green/90">
+                        {copyToast}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
               </div>
 
-              {wallet ? (
-                <div
-                  className={`flex flex-col items-center gap-3 ${
-                    inline && !isRequestOpen
-                      ? "flex-1 min-h-0 justify-center"
-                      : ""
-                  }`}
-                >
-                  <div
-                    className={`inline-flex items-center justify-center rounded-full border px-3 py-1.5 text-xs md:text-sm font-semibold shadow-sm ${
-                      showRequestPreview
-                        ? "border-amber-400/40 bg-amber-400/10 text-amber-100"
-                        : "border-xcannes-green/40 bg-xcannes-green/10 text-xcannes-green/90"
-                    }`}
-                  >
-                    {showRequestPreview
-                      ? t(
-                          "ui_receive_qr_request_title",
-                          "QR de demande de paiement — à scanner pour vous payer.",
-                        )
-                      : t(
-                          "ui_receive_qr_address_title",
-                          "QR d’adresse — à scanner pour vous envoyer des fonds.",
-                        )}
-                  </div>
-                  <div
-                    ref={qrContainerRef}
-                    className="bg-black/60 border border-white/10 rounded-xl p-3 text-[0px]"
-                  >
-                    <QRCodeCanvas
-                      value={
-                        showRequestPreview ? requestQrValue : receiveQrValue
-                      }
-                      size={qrPixelSize}
-                      style={{ width: qrDisplaySize, height: qrDisplaySize }}
-                      bgColor="#ffffff"
-                      fgColor="#000000"
-                      includeMargin={true}
-                      level="M"
+              {/* SECTION 2 — CREATE REQUEST */}
+              <div className="space-y-2">
+                <h2 className="text-base md:text-lg font-semibold text-white/90">
+                  {t("ui_create_request_title", "Créer une demande")}
+                </h2>
+                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4 space-y-4">
+                  {/* Amount */}
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_amount_7668986206", "Amount")}
+                    </label>
+                    <input
+                      type="number"
+                      value={requestAmount}
+                      onChange={(e) => setRequestAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
                     />
                   </div>
-                  {showRequestPreview ? (
-                    <div className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/80 space-y-1">
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-white/60">
-                          {t("ui_amount_7668986206", "Amount")}
-                        </span>
-                        <span className="font-mono text-white/90">
-                          {requestDisplayAmountLabel}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-white/60">
-                          {t("ui_currency_1ed55673be", "Currency")}
-                        </span>
-                        <span className="font-semibold text-white/90">
-                          {requestDisplayCurrency}
-                        </span>
-                      </div>
-                    </div>
-                  ) : null}
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await handleCopyQr(showRequestPreview);
-                        } catch {
-                          // ignore
-                        }
-                      }}
-                      className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors"
-                    >
-                      {showRequestPreview
-                        ? t("ui_copy_request_32a3f4409b", "Copy request")
-                        : t("ui_copy_address_779691d570", "Copy address")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        try {
-                          await handleShareQr(showRequestPreview);
-                        } catch {
-                          // ignore
-                        }
-                      }}
-                      className="px-4 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/15 text-white/90 font-semibold transition-colors inline-flex items-center justify-center"
-                    >
-                      {isDesktop ? (
-                        t("ui_download_qr_5c1d2e7f9a", "Télécharger")
-                      ) : (
-                        <>
-                          <ShareIcon className="w-5 h-5" />
-                          <span className="sr-only">
-                            {t("ui_share_qr_9b5c1a2d7e", "Partager")}
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  {copyToast ? (
-                    <div className="text-[10px] text-xcannes-green/90">
-                      {copyToast}
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
 
-              {wallet ? (
-                <div className="flex justify-center">
+                  {/* Currency */}
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_currency_1ed55673be", "Currency")}
+                    </label>
+                    <ModalSelect
+                      value={requestCurrency}
+                      onChange={setRequestCurrency}
+                      options={(augmentedTokens || []).map((token) => {
+                        const currencyUpper = String(
+                          token.currency || "",
+                        ).toUpperCase();
+                        const labelLeft =
+                          selectLabelByCurrency?.[token.currency] ||
+                          selectLabelByCurrency?.[currencyUpper] ||
+                          token.currency;
+                        const labelRight =
+                          selectLabelRightByCurrency?.[token.currency] ||
+                          selectLabelRightByCurrency?.[currencyUpper] ||
+                          null;
+                        return {
+                          value: token.currency,
+                          icon:
+                            selectIconByCurrency?.[token.currency] ||
+                            selectIconByCurrency?.[currencyUpper] ||
+                            null,
+                          label: labelLeft,
+                          labelLeft,
+                          labelRight,
+                          labelMobile:
+                            selectLabelMobileByCurrency?.[token.currency] ||
+                            selectLabelMobileByCurrency?.[currencyUpper] ||
+                            labelLeft,
+                        };
+                      })}
+                      useNativeSelect={false}
+                      buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+                      menuClassName={
+                        noticeVariant === "demo"
+                          ? "bg-xcannes-surface-demo"
+                          : "bg-elevated"
+                      }
+                      selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                    />
+                  </div>
+
+                  {/* Memo (optional) */}
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
+                    </label>
+                    <input
+                      type="text"
+                      value={requestMemo}
+                      onChange={(e) => setRequestMemo(e.target.value)}
+                      placeholder={t(
+                        "ui_payment_memo_placeholder",
+                        "Objet du paiement (optionnel)",
+                      )}
+                      className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                    />
+                  </div>
+
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setIsRequestOpen((prev) => !prev);
+                      handleGenerateRequest();
                     }}
-                    className={`px-6 py-3 text-base md:text-lg ${greenActionBtnMuted}`}
+                    className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors duration-150"
                   >
-                    {isRequestOpen
-                      ? t("ui_hide_request_payment", "Masquer la demande")
-                      : t("ui_request_payment_c62b99fb16", "Créer une demande")}
+                    {t("ui_generate_request_fr", "Générer la demande")}
                   </button>
-                </div>
-              ) : null}
 
-              {wallet && isRequestOpen ? (
-                <div
-                  className={`space-y-4 ${
-                    inline ? "flex-1 min-h-0 flex flex-col" : ""
-                  }`}
-                >
-                  <div
-                    className={
-                      inline
-                        ? "flex-1 min-h-0 overflow-y-auto pr-1 flex flex-col justify-between gap-[clamp(12px,2.2vh,26px)]"
-                        : "space-y-4"
-                    }
-                  >
-                    <div className="space-y-4">
-                      {/* Amount & Currency */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm md:text-sm text-white/60 mb-1.5">
-                            {t("ui_amount_7668986206", "Amount")}
-                          </label>
-                          <input
-                            type="number"
-                            value={requestAmount}
-                            onChange={(e) => setRequestAmount(e.target.value)}
-                            placeholder="0.00"
-                            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-base text-white outline-none focus:border-xcannes-green/80"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm md:text-sm text-white/60 mb-1.5">
-                            {t("ui_currency_1ed55673be", "Currency")}
-                          </label>
-                          <ModalSelect
-                            value={requestCurrency}
-                            onChange={setRequestCurrency}
-                            options={(augmentedTokens || []).map((token) => {
-                              const currencyUpper = String(
-                                token.currency || "",
-                              ).toUpperCase();
-                              const labelLeft =
-                                selectLabelByCurrency?.[token.currency] ||
-                                selectLabelByCurrency?.[currencyUpper] ||
-                                token.currency;
-                              const labelRight =
-                                selectLabelRightByCurrency?.[token.currency] ||
-                                selectLabelRightByCurrency?.[currencyUpper] ||
-                                null;
-                              return {
-                                value: token.currency,
-                                icon:
-                                  selectIconByCurrency?.[token.currency] ||
-                                  selectIconByCurrency?.[currencyUpper] ||
-                                  null,
-                                label: labelLeft,
-                                labelLeft,
-                                labelRight,
-                                labelMobile:
-                                  selectLabelMobileByCurrency?.[
-                                    token.currency
-                                  ] ||
-                                  selectLabelMobileByCurrency?.[
-                                    currencyUpper
-                                  ] ||
-                                  labelLeft,
-                              };
-                            })}
-                            useNativeSelect={false}
-                            buttonClassName="bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80 cursor-pointer"
-                            menuClassName={
-                              noticeVariant === "demo"
-                                ? "bg-xcannes-surface-demo"
-                                : "bg-elevated"
-                            }
-                            selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Memo (optional) */}
-                      <div>
-                        <label className="block text-sm md:text-sm text-white/60 mb-1.5">
-                          {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
-                        </label>
-                        <input
-                          type="text"
-                          value={requestMemo}
-                          onChange={(e) => setRequestMemo(e.target.value)}
-                          placeholder={t(
-                            "ui_payment_for_82ec86ac25",
-                            "Payment for...",
-                          )}
-                          className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-3 text-sm text-white outline-none focus:border-xcannes-green/80"
-                        />
-                      </div>
-
-                      {/* Generate Button */}
-                      <SwipeConfirmButton
-                        label={t(
-                          "ui_generate_request_58584f23a2",
-                          "Generate Request",
-                        )}
-                        onConfirm={handleGenerateRequest}
-                        variant="green"
-                        className="md:hidden"
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleGenerateRequest();
-                        }}
-                        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnMuted}`}
-                      >
-                        {t(
-                          "ui_generate_request_58584f23a2",
-                          "Generate Request",
-                        )}
-                      </button>
-
-                      {generateError ? (
-                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                          {generateError}
-                        </div>
-                      ) : null}
+                  {generateError ? (
+                    <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {generateError}
                     </div>
-                  </div>
+                  ) : null}
+
+                  {hasGeneratedRequest ? (
+                    <div className="pt-2 space-y-3">
+                      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                        {t("ui_request_generated_label", "Demande générée")}
+                      </div>
+                      <div className="flex items-center justify-center">
+                        <div
+                          ref={requestQrContainerRef}
+                          className="rounded-xl border border-white/10 bg-white p-3"
+                        >
+                          <QRCodeCanvas
+                            value={requestQrValue}
+                            size={requestQrPixelSize}
+                            style={{ width: 200, height: 200 }}
+                            bgColor="#ffffff"
+                            fgColor="#000000"
+                            includeMargin={true}
+                            level="M"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleCopyQr(true);
+                          }}
+                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                        >
+                          {t("ui_copy", "Copier")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            await handleShareQr(true);
+                          }}
+                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                        >
+                          {t("ui_download", "Télécharger")}
+                        </button>
+                      </div>
+                      <div className="text-[11px] text-white/50 text-center">
+                        {requestDisplayAmountLabel}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
+              </div>
             </div>
           </div>
         </div>
