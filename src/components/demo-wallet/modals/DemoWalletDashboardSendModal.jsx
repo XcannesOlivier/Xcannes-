@@ -44,14 +44,15 @@ export default function DemoWalletDashboardSendModal({
   const locale = i18n?.language || "en";
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
-  const [isDesktop, setIsDesktop] = useState(false);
   const [scanActive, setScanActive] = useState(false);
   const [scanKey, setScanKey] = useState(0);
   const [cameraUnavailable, setCameraUnavailable] = useState(false);
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [selectedSavedLabel, setSelectedSavedLabel] = useState("");
-  const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
+  const [editingRecipient, setEditingRecipient] = useState(true);
   const savedPickerRef = useRef(null);
+  const destinationInputRef = useRef(null);
+  const recipientAutoCollapsedRef = useRef(false);
   const scanQrFileInputId = "send-qr-file";
   const manualQrReaderIdRef = useRef(
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
@@ -262,22 +263,36 @@ export default function DemoWalletDashboardSendModal({
       setCameraUnavailable(false);
       setShowSavedPicker(false);
       setSelectedSavedLabel("");
-      setShowFullSummaryAddress(false);
+      setEditingRecipient(true);
+      recipientAutoCollapsedRef.current = false;
     }
   }, [open]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const media = window.matchMedia("(min-width: 768px)");
-    const handleChange = () => setIsDesktop(media.matches);
-    handleChange();
-    if (media.addEventListener) {
-      media.addEventListener("change", handleChange);
-      return () => media.removeEventListener("change", handleChange);
+    if (!open) return;
+    if (hasPaymentRequest) return;
+    if (!hasDestination) {
+      setEditingRecipient(true);
+      recipientAutoCollapsedRef.current = false;
+      return;
     }
-    media.addListener(handleChange);
-    return () => media.removeListener(handleChange);
-  }, []);
+    if (!recipientAutoCollapsedRef.current) {
+      setEditingRecipient(false);
+      recipientAutoCollapsedRef.current = true;
+    }
+  }, [open, hasDestination, hasPaymentRequest]);
+
+  useEffect(() => {
+    if (!normalizedDestination) {
+      setSelectedSavedLabel("");
+      return;
+    }
+    const matched = (savedAddresses || []).find(
+      (addr) => String(addr?.address || "").trim() === normalizedDestination,
+    );
+    const label = String(matched?.label || "").trim();
+    setSelectedSavedLabel(label);
+  }, [normalizedDestination, savedAddresses]);
 
   useEffect(() => {
     if (!open) {
@@ -399,13 +414,287 @@ export default function DemoWalletDashboardSendModal({
     </div>
   ) : null;
 
+  const compactDestinationLabel =
+    normalizedDestination.length > 14
+      ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
+      : normalizedDestination;
+
+  const recipientCard = !hasPaymentRequest ? (
+    <div className="space-y-2">
+      <label
+        className="block text-base md:text-lg text-white/60 mb-1.5"
+        title={t("ui_send_destination_tip", "Adresse XRPL du destinataire.")}
+      >
+        {t("ui_send_to_label", "Destinataire")}
+      </label>
+
+      {editingRecipient || !hasDestination ? (
+        <div className="relative" ref={savedPickerRef}>
+          <input
+            ref={destinationInputRef}
+            type="text"
+            value={sendDestination}
+            onChange={(e) => {
+              setSendDestination(e.target.value);
+              setShowSavedPicker(false);
+            }}
+            onPaste={handlePastePayload}
+            placeholder={t(
+              "ui_import_or_choose_recipient",
+              "Import or choose address",
+            )}
+            className="w-full bg-black/40 border border-white/15 rounded-xl pl-8 pr-28 h-12 md:h-auto py-0 md:py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]"
+          />
+
+          {/* Saved addresses picker (vertically centered) */}
+          <div className="absolute left-2 inset-y-0 flex items-center">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSavedPicker((prev) => !prev);
+              }}
+              className="p-2 rounded-lg bg-transparent border-none outline-none cursor-pointer hover:bg-white/5 transition-colors"
+              title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+              aria-expanded={showSavedPicker}
+            >
+              <svg
+                className="w-4 h-4 text-white/60"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Actions droite (import + scan) */}
+          <div className="absolute right-2 inset-y-0 flex items-center gap-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleScanQrUpload();
+              }}
+              className="p-2 rounded-lg bg-transparent border-none outline-none cursor-pointer hover:bg-white/5 transition-colors"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode",
+              )}
+            >
+              <svg
+                className="w-5 h-5 text-white/60"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setScanActive(true);
+                setScanKey((prev) => prev + 1);
+                setCameraUnavailable(false);
+              }}
+              className="p-2 rounded-lg bg-transparent border-none outline-none cursor-pointer hover:bg-white/5 transition-colors"
+              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            >
+              <svg
+                className="w-6 h-6 text-white/60"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {showSavedPicker ? (
+            <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl border border-white/10 bg-elevated overflow-hidden shadow-lg">
+              <div className="max-h-56 overflow-y-auto">
+                {(savedAddresses || []).length > 0 ? (
+                  (savedAddresses || []).map((addr, idx) => (
+                    <button
+                      key={`${addr.address}-${idx}`}
+                      type="button"
+                      onClick={() => {
+                        const value = String(addr?.address || "").trim();
+                        if (!value) return;
+                        setSendDestination(value);
+                        setShowSavedPicker(false);
+                        setEditingRecipient(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
+                    >
+                      <span className="block font-semibold">
+                        {String(addr?.label || "").trim() ||
+                          t("ui_wallet_unknown", "Unknown wallet")}
+                      </span>
+                      <span className="block font-mono text-[11px] text-white/60 truncate">
+                        {addr.address}
+                      </span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-xs text-white/60">
+                    {t("ui_no_saved_addresses", "No saved addresses yet")}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setEditingRecipient(true);
+              setShowSavedPicker(false);
+              requestAnimationFrame(() => {
+                destinationInputRef.current?.focus?.();
+              });
+            }}
+            className="min-w-0 text-left flex-1"
+          >
+            <div className="text-sm font-semibold text-white/90 truncate">
+              {resolvedDestinationLabel ||
+                t("ui_wallet_unknown", "Unknown wallet")}
+            </div>
+            <div className="mt-0.5 text-[12px] font-mono text-white/50 truncate">
+              {compactDestinationLabel}
+            </div>
+          </button>
+
+          <div className="flex items-center gap-1 text-white/60 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setEditingRecipient(true);
+                setShowSavedPicker(false);
+                requestAnimationFrame(() => {
+                  destinationInputRef.current?.focus?.();
+                });
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title={t("ui_change_recipient", "Changer le destinataire")}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 5l4 4M4 20h4l10.5-10.5a2 2 0 000-2.8l-1.2-1.2a2 2 0 00-2.8 0L4 16v4z"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleScanQrUpload();
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title={t(
+                "ui_or_upload_a_qr_image_works_e_df6baa8039",
+                "Charger une image qrcode",
+              )}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+                />
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setScanActive(true);
+                setScanKey((prev) => prev + 1);
+                setCameraUnavailable(false);
+              }}
+              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {hasDestination && resolvedDestinationLabel ? (
+        <div className="text-[11px] text-white/40">
+          {t("ui_selected_recipient", "Sélectionné")} :{" "}
+          <span className="text-white/60">{resolvedDestinationLabel}</span>
+        </div>
+      ) : null}
+
+      {hasDestination && editingRecipient ? saveAddressBlock : null}
+    </div>
+  ) : null;
+
   const inlineSummary = hasDestination ? (
     <div className="space-y-3 transition-all duration-200">
-      <div className="rounded-xl border border-xcannes-accent-green/25 bg-xcannes-accent-green/5 p-4 space-y-3">
-        <div className="text-xs uppercase tracking-wide text-xcannes-accent-green/80 font-semibold">
+      <div className="text-[11px] text-white/45">
+        {t(
+          "ui_verify_before_sending",
+          "Vérifiez les informations avant d’envoyer",
+        )}
+      </div>
+      <div className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-4">
+        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
-        <div className="space-y-2 text-sm text-white/80">
+        <div className="space-y-3 text-sm text-white/80">
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60 shrink-0">
               {t("ui_beneficiary_label", "Destinataire")}
@@ -417,49 +706,35 @@ export default function DemoWalletDashboardSendModal({
           </div>
 
           <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60 shrink-0">
-              {t("ui_account_number_label", "N° de compte")}
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowFullSummaryAddress((prev) => !prev)}
-              title={normalizedDestination}
-              className={`font-mono text-white/80 text-right text-xs ${
-                showFullSummaryAddress ? "break-all" : ""
-              } cursor-pointer`}
-            >
-              {showFullSummaryAddress
-                ? normalizedDestination
-                : normalizedDestination.length > 14
-                  ? `${normalizedDestination.slice(0, 6)}…${normalizedDestination.slice(-4)}`
-                  : normalizedDestination}
-            </button>
-          </div>
-
-          {saveAddressBlock}
-
-          {confirmCurrencyCode ? (
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-white/60">
-                {t("ui_asset_e5170a7a06", "Asset")}
-              </span>
-              <span className="font-semibold text-white/90">
-                {selectLabelByAssetKey?.[selectedSendToken?.key] ||
-                  selectLabelByAssetKey?.[selectedSendToken?.currency] ||
-                  confirmCurrencyCode}
-              </span>
-            </div>
-          ) : null}
-
-          <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
-              {t("ui_amount_52cea2dd3d", "Amount")}
+              {t("ui_amount_52cea2dd3d", "Montant")}
             </span>
             <span
               className={`font-mono ${
                 summaryAmount > 0 ? "text-white/90" : "text-white/40"
               }`}
             >
+              {confirmAmountLabel || "0"}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_fees", "Frais")}
+            </span>
+            <span className="font-mono text-white/70">
+              {formatAmountWithSymbol(locale, 0, "USD", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 6,
+              })}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
+            <span className="text-white/70 font-semibold">
+              {t("ui_total", "Total")}
+            </span>
+            <span className="font-mono text-white/90 font-semibold">
               {confirmAmountLabel || "0"}
             </span>
           </div>
@@ -480,157 +755,7 @@ export default function DemoWalletDashboardSendModal({
         }
       >
         <div className={inline ? "space-y-3" : ""}>
-          {/* ── Destination (same UX as real wallet) ── */}
-          <div>
-            <label
-              className="block text-base md:text-lg text-white/60 mb-1.5"
-              title={t(
-                "ui_send_destination_tip",
-                "Adresse XRPL du destinataire.",
-              )}
-            >
-              {t("ui_send_to_label", "Envoyer à")}
-            </label>
-            <div className="relative" ref={savedPickerRef}>
-              <input
-                type="text"
-                value={sendDestination}
-                onChange={(e) => {
-                  setSendDestination(e.target.value);
-                  setSelectedSavedLabel("");
-                  setShowSavedPicker(false);
-                }}
-                onPaste={handlePastePayload}
-                placeholder={t(
-                  "ui_import_or_choose_recipient",
-                  "Import or choose address",
-                )}
-                className={`w-full bg-black/40 border border-white/15 rounded-xl ${
-                  !hasPaymentRequest ? "pl-8" : "pl-4"
-                } ${hasPaymentRequest ? "pr-4" : "pr-28"} h-12 md:h-auto py-0 md:py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
-              />
-
-              {!hasPaymentRequest ? (
-                <>
-                  {/* Saved addresses picker (vertically centered) */}
-                  <div className="absolute left-2 inset-y-0 flex items-center">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSavedPicker((prev) => !prev);
-                      }}
-                      className="p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                      title={t(
-                        "ui_saved_addresses_label",
-                        "Adresses enregistrées",
-                      )}
-                      aria-expanded={showSavedPicker}
-                    >
-                      <svg
-                        className="w-4 h-4 text-white/60"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Actions droite (responsive): + upload + scan */}
-                  <div className="absolute right-2 inset-y-0 flex items-center gap-1">
-                    {/* Upload QR image */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleScanQrUpload();
-                      }}
-                      className="p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                      title={t(
-                        "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                        "Charger une image qrcode",
-                      )}
-                    >
-                      <span className="inline-flex h-9 w-9 items-center justify-center rounded border border-white/20 text-white/60 text-lg font-bold leading-none">
-                        +
-                      </span>
-                    </button>
-
-                    {/* Scan QR camera (same icon as real wallet) */}
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setScanActive(true);
-                        setScanKey((prev) => prev + 1);
-                        setCameraUnavailable(false);
-                      }}
-                      className="p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                      title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-                    >
-                      <svg
-                        className="w-7 h-7 text-white/60"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </>
-              ) : null}
-
-              {!hasPaymentRequest && showSavedPicker ? (
-                <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-lg border border-white/15 bg-black/90 backdrop-blur-sm overflow-hidden shadow-lg">
-                  <div className="max-h-48 overflow-y-auto">
-                    {(savedAddresses || []).length > 0 ? (
-                      (savedAddresses || []).map((addr, idx) => (
-                        <button
-                          key={`${addr.address}-${idx}`}
-                          type="button"
-                          onClick={() => {
-                            const value = String(addr?.address || "").trim();
-                            if (!value) return;
-                            const label = String(addr?.label || "").trim();
-                            setSendDestination(value);
-                            setSelectedSavedLabel(label);
-                            setShowSavedPicker(false);
-                          }}
-                          className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/10 transition-colors"
-                        >
-                          <span className="block font-semibold">
-                            {String(addr?.label || "").trim() ||
-                              t("ui_wallet_unknown", "Unknown wallet")}
-                          </span>
-                          <span className="block font-mono text-[11px] text-white/60">
-                            {addr.address}
-                          </span>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-3 py-2 text-xs text-white/60">
-                        {t("ui_no_saved_addresses", "No saved addresses yet")}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-          </div>
+          {recipientCard}
 
           {/* ── Devise + Montant (same sizing as real wallet) ── */}
           <div
@@ -649,7 +774,7 @@ export default function DemoWalletDashboardSendModal({
                   "Sélectionnez la devise à envoyer.",
                 )}
               >
-                {t("ui_asset_e5170a7a06", "Asset")}
+                {t("ui_asset_e5170a7a06", "Devise")}
               </label>
               <ModalSelect
                 value={selectedSendToken ? selectedSendToken.key : ""}
@@ -699,7 +824,7 @@ export default function DemoWalletDashboardSendModal({
                   "Saisissez le montant à envoyer.",
                 )}
               >
-                {t("ui_amount_52cea2dd3d", "Amount")}
+                {t("ui_amount_52cea2dd3d", "Montant")}
               </label>
               <TokenAmountInput
                 value={sendAmount}
