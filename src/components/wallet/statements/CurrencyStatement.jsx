@@ -127,6 +127,7 @@ export default function CurrencyStatement({
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailLabel, setDetailLabel] = useState("");
   const [detailLabelLoading, setDetailLabelLoading] = useState(false);
+  const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
@@ -235,6 +236,13 @@ export default function CurrencyStatement({
         const data = await res.json().catch(() => ({}));
         const label = String(data?.label || "").trim();
         labelCacheRef.current.set(counterparty, label);
+        if (!cancelled) {
+          setCounterpartyLabels((prev) =>
+            prev?.[counterparty] === label
+              ? prev
+              : { ...(prev || {}), [counterparty]: label },
+          );
+        }
         if (!cancelled) setDetailLabel(label);
       } catch {
         if (!cancelled) setDetailLabel("");
@@ -247,6 +255,63 @@ export default function CurrencyStatement({
       clearTimeout(timer);
     };
   }, [detailOpen, detailTx]);
+
+  /* ── prefetch counterparty labels for the list ─────────── */
+  useEffect(() => {
+    if (typeof window === "undefined") return () => {};
+    const list = Array.isArray(transactionsWithDisplayBalance)
+      ? transactionsWithDisplayBalance
+      : [];
+    if (!list.length) return () => {};
+
+    const isXrplAddress = (value) =>
+      /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim());
+
+    // Only prefetch for a limited number of recent rows (avoids spamming the API).
+    const candidates = [];
+    for (const tx of list) {
+      const addr = String(tx?.counterparty || "").trim();
+      if (!addr || addr.toUpperCase() === "XCANNES") continue;
+      if (!isXrplAddress(addr)) continue;
+      candidates.push(addr);
+      if (candidates.length >= 40) break;
+    }
+
+    const unique = Array.from(new Set(candidates));
+    const toFetch = unique.filter((addr) => {
+      if (labelCacheRef.current.has(addr)) return false;
+      if (counterpartyLabels?.[addr] != null) return false;
+      return true;
+    });
+    if (!toFetch.length) return () => {};
+
+    let cancelled = false;
+    (async () => {
+      for (const addr of toFetch) {
+        if (cancelled) return;
+        try {
+          const res = await fetch(
+            apiUrl(`/wallet/label?address=${encodeURIComponent(addr)}`),
+          );
+          const data = await res.json().catch(() => ({}));
+          const label = String(data?.label || "").trim();
+          labelCacheRef.current.set(addr, label);
+          if (cancelled) return;
+          setCounterpartyLabels((prev) =>
+            prev?.[addr] === label
+              ? prev
+              : { ...(prev || {}), [addr]: label },
+          );
+        } catch {
+          // ignore
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [transactionsWithDisplayBalance, counterpartyLabels]);
 
   /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {
@@ -411,10 +476,20 @@ export default function CurrencyStatement({
         tx?.type === "credit"
           ? t("statement_xrpl_mobile_in", "Reçu")
           : t("statement_xrpl_mobile_out", "Envoyé");
-      const name = formatCounterpartyCompact(tx?.counterparty);
+      const addr = String(tx?.counterparty || "").trim();
+      const cachedLabel =
+        (addr && (counterpartyLabels?.[addr] ?? labelCacheRef.current.get(addr))) ||
+        "";
+      const name = cachedLabel ? cachedLabel : formatCounterpartyCompact(addr);
       return name ? `${base} · ${name}` : base;
     },
-    [formatCounterpartyCompact, getLocalizedDescription, parseConversionPair, t],
+    [
+      counterpartyLabels,
+      formatCounterpartyCompact,
+      getLocalizedDescription,
+      parseConversionPair,
+      t,
+    ],
   );
 
   /* ── XRP reserve ───────────────────────────────────────── */

@@ -20,6 +20,7 @@ import {
 } from "../utils/demoStatementExport";
 import { useTranslation } from "next-i18next";
 import DemoStatementMonthSelect from "./DemoStatementMonthSelect";
+import { apiUrl } from "@/lib/runtimeConfig";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
@@ -164,8 +165,10 @@ export default function DemoCurrencyStatement({
     useState(null);
   const [detailTx, setDetailTx] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const highlightRowRef = useRef(null);
   const highlightTimerRef = useRef(null);
+  const labelCacheRef = useRef(new Map());
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -509,11 +512,77 @@ export default function DemoCurrencyStatement({
         tx?.type === "credit"
           ? t("statement_xrpl_mobile_in", "Reçu")
           : t("statement_xrpl_mobile_out", "Envoyé");
-      const name = formatCounterpartyCompact(tx?.counterparty);
+      const addr = String(tx?.counterparty || "").trim();
+      const cachedLabel =
+        (addr && (counterpartyLabels?.[addr] ?? labelCacheRef.current.get(addr))) ||
+        "";
+      const name = cachedLabel ? cachedLabel : formatCounterpartyCompact(addr);
       return name ? `${base} · ${name}` : base;
     },
-    [formatCounterpartyCompact, getLocalizedDescription, parseConversionPair, t],
+    [
+      counterpartyLabels,
+      formatCounterpartyCompact,
+      getLocalizedDescription,
+      parseConversionPair,
+      t,
+    ],
   );
+
+  /* ── prefetch counterparty labels for the list ─────────── */
+  useEffect(() => {
+    if (typeof window === "undefined") return () => {};
+    const list = Array.isArray(transactionsWithDisplayBalance)
+      ? transactionsWithDisplayBalance
+      : [];
+    if (!list.length) return () => {};
+
+    const isXrplAddress = (value) =>
+      /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim());
+
+    const candidates = [];
+    for (const tx of list) {
+      const addr = String(tx?.counterparty || "").trim();
+      if (!addr || addr.toUpperCase() === "XCANNES") continue;
+      if (!isXrplAddress(addr)) continue;
+      candidates.push(addr);
+      if (candidates.length >= 40) break;
+    }
+
+    const unique = Array.from(new Set(candidates));
+    const toFetch = unique.filter((addr) => {
+      if (labelCacheRef.current.has(addr)) return false;
+      if (counterpartyLabels?.[addr] != null) return false;
+      return true;
+    });
+    if (!toFetch.length) return () => {};
+
+    let cancelled = false;
+    (async () => {
+      for (const addr of toFetch) {
+        if (cancelled) return;
+        try {
+          const res = await fetch(
+            apiUrl(`/wallet/label?address=${encodeURIComponent(addr)}`),
+          );
+          const data = await res.json().catch(() => ({}));
+          const label = String(data?.label || "").trim();
+          labelCacheRef.current.set(addr, label);
+          if (cancelled) return;
+          setCounterpartyLabels((prev) =>
+            prev?.[addr] === label
+              ? prev
+              : { ...(prev || {}), [addr]: label },
+          );
+        } catch {
+          // ignore
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [transactionsWithDisplayBalance, counterpartyLabels]);
 
   const openTxDetails = useCallback((tx) => {
     if (!tx) return;
@@ -1177,8 +1246,12 @@ export default function DemoCurrencyStatement({
 
   const counterpartyName = useMemo(() => {
     if (!counterpartyAddress) return "";
-    return t("ui_no_name_found", "Aucun nom trouvé");
-  }, [counterpartyAddress, t]);
+    const cached =
+      counterpartyLabels?.[counterpartyAddress] ??
+      labelCacheRef.current.get(counterpartyAddress) ??
+      "";
+    return cached || t("ui_no_name_found", "Aucun nom trouvé");
+  }, [counterpartyAddress, counterpartyLabels, t]);
 
   const detailExplorerUrl = useMemo(() => {
     const hash = String(detailTx?.txHash || "").trim();
