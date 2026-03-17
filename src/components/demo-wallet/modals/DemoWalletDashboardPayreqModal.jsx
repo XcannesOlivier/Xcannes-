@@ -120,12 +120,12 @@ export default function DemoWalletDashboardPayreqModal({
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none";
+    : "fixed inset-0 z-[10001] flex items-stretch md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal wallet-payreq-modal border border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
+    "relative w-full wallet-modal-panel wallet-send-modal wallet-payreq-modal border-0 md:border md:border-white/10 p-4 md:p-5 space-y-3 md:space-y-4 overflow-y-auto flex flex-col min-h-0 overscroll-contain pointer-events-auto",
     inline
       ? "h-full max-h-none rounded-xl"
-      : "max-w-md md:max-w-lg max-h-[92vh] rounded-2xl",
+      : "h-[100dvh] md:h-auto max-w-none md:max-w-lg md:max-h-[92vh] rounded-none md:rounded-2xl",
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
@@ -274,15 +274,7 @@ export default function DemoWalletDashboardPayreqModal({
           >
             ✕
           </button>
-          <div className="flex flex-wrap items-center gap-2 mb-1 pr-6">
-            {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-                {t("demo_notice_title", "Mode démo")}
-              </span>
-            ) : null}
-
-          </div>
-          {renderWalletMeta?.("mb-2")}
+          {renderWalletMeta?.("mb-2 [&_.font-mono]:hidden")}
 
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="space-y-4">
