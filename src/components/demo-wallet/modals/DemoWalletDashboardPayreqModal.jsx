@@ -29,6 +29,7 @@ export default function DemoWalletDashboardPayreqModal({
 
   const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [saveNewAddressLabel, setSaveNewAddressLabel] = useState("");
+  const [showFullAccountNumber, setShowFullAccountNumber] = useState(false);
 
   const normalizedDestination = useMemo(
     () => String(sendDestination || "").trim(),
@@ -101,6 +102,7 @@ export default function DemoWalletDashboardPayreqModal({
     if (!open) {
       setSaveNewAddress(false);
       setSaveNewAddressLabel("");
+      setShowFullAccountNumber(false);
     }
   }, [open]);
 
@@ -138,6 +140,28 @@ export default function DemoWalletDashboardPayreqModal({
 
   const requestDetailsPanel = sendPaymentRequest ? (
     <div className="rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 space-y-2">
+      <div className="text-[17px] md:text-lg text-white/60">
+        {t("ui_send_to_label", "Envoyé à")}
+      </div>
+      {requestDestination ? (
+        <div className="flex items-center justify-between gap-3 text-xs text-white/80">
+          <span className="text-white/60 shrink-0">
+            {t("ui_account_number_label", "N° de compte")}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowFullAccountNumber((prev) => !prev)}
+            title={requestDestination}
+            className={`font-mono text-white/80 text-right text-xs ${
+              showFullAccountNumber ? "break-all" : ""
+            } cursor-pointer`}
+          >
+            {showFullAccountNumber
+              ? requestDestination
+              : requestDestinationLabel || requestDestination}
+          </button>
+        </div>
+      ) : null}
       <div className="text-[11px] uppercase tracking-wide text-amber-200/70 font-semibold">
         {t("ui_payment_request_details", "Payment request")}
       </div>
@@ -151,6 +175,46 @@ export default function DemoWalletDashboardPayreqModal({
               t("ui_wallet_unknown", "Unknown wallet")}
           </span>
         </div>
+        {requestDestination ? (
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-white/60">
+              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
+            </span>
+            <span className="font-mono text-white/80">
+              {requestDestinationLabel || requestDestination}
+            </span>
+          </div>
+        ) : null}
+        {canSaveDestination ? (
+          <div className="mt-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2 space-y-2">
+            <label className="flex items-center gap-2 text-[11px] text-white/70">
+              <input
+                type="checkbox"
+                checked={saveNewAddress}
+                onChange={(e) => setSaveNewAddress(e.target.checked)}
+                className="accent-xcannes-green"
+              />
+              {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
+            </label>
+            {saveNewAddress ? (
+              <div className="space-y-1">
+                <div className="text-[11px] text-white/60">
+                  {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
+                </div>
+                <input
+                  type="text"
+                  value={saveNewAddressLabel}
+                  onChange={(e) => setSaveNewAddressLabel(e.target.value)}
+                  placeholder={t(
+                    "ui_e_g_exchange_friend_11008b5e9e",
+                    "e.g., Exchange, Friend, ...",
+                  )}
+                  className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {requestAmountLabel ? (
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
@@ -171,48 +235,7 @@ export default function DemoWalletDashboardPayreqModal({
             </span>
           </div>
         ) : null}
-        {requestDestination ? (
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
-            </span>
-            <span className="font-mono text-white/80">
-              {requestDestinationLabel || requestDestination}
-            </span>
-          </div>
-        ) : null}
       </div>
-    </div>
-  ) : null;
-
-  const saveAddressBlock = canSaveDestination ? (
-    <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
-      <label className="flex items-center gap-2 text-[11px] text-white/60">
-        <input
-          type="checkbox"
-          checked={saveNewAddress}
-          onChange={(e) => setSaveNewAddress(e.target.checked)}
-          className="accent-xcannes-green"
-        />
-        {t("ui_save_this_address_7ef65aa11c", "Save this address?")}
-      </label>
-      {saveNewAddress ? (
-        <div className="space-y-1">
-          <div className="text-[11px] text-white/60">
-            {t("ui_label_optional_3b6a3c454c", "Label (optional)")}
-          </div>
-          <input
-            type="text"
-            value={saveNewAddressLabel}
-            onChange={(e) => setSaveNewAddressLabel(e.target.value)}
-            placeholder={t(
-              "ui_e_g_exchange_friend_11008b5e9e",
-              "e.g., Exchange, Friend, ...",
-            )}
-            className="w-full bg-black/40 border border-white/15 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-xcannes-green/80"
-          />
-        </div>
-      ) : null}
     </div>
   ) : null;
 
@@ -279,7 +302,6 @@ export default function DemoWalletDashboardPayreqModal({
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="space-y-4">
               {requestDetailsPanel}
-              {saveAddressBlock}
               {sendActions}
             </div>
           </div>
