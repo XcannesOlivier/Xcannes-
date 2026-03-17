@@ -51,6 +51,7 @@ export default function WalletDashboardSendModal({
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [useLabelDisplay, setUseLabelDisplay] = useState(false);
   const [destinationFocused, setDestinationFocused] = useState(false);
+  const [autoShowLabelOnce, setAutoShowLabelOnce] = useState(false);
   const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
@@ -84,7 +85,10 @@ export default function WalletDashboardSendModal({
     );
   }, [savedAddresses, normalizedDestination]);
   const canSaveDestination =
-    enableSaveAddress && normalizedDestination && !isSavedDestination;
+    enableSaveAddress &&
+    normalizedDestination &&
+    !isSavedDestination &&
+    !String(sendDestinationLabel || remoteDestinationLabel || "").trim();
   const normalizedSendAmount = Number(String(sendAmount || "").trim());
   const canManualSend =
     Boolean(selectedSendToken) &&
@@ -290,6 +294,9 @@ export default function WalletDashboardSendModal({
       setSendDestination(text);
       setSendDestinationLabel?.("");
       setShowSavedPicker(false);
+      // If the user pasted a raw XRPL address, show its label ASAP once resolved
+      // (saved address label or on-chain label lookup).
+      if (looksLikeXrplAddress(text)) setAutoShowLabelOnce(true);
       return true;
     }
 
@@ -431,6 +438,21 @@ export default function WalletDashboardSendModal({
     destinationFocused,
     hasDestination,
     hasPaymentRequest,
+    resolvedDestinationLabel,
+  ]);
+
+  // Special case: after paste, flip to label as soon as it's available (even if still focused).
+  useEffect(() => {
+    if (!autoShowLabelOnce) return;
+    if (hasPaymentRequest) return;
+    if (!hasDestination) return;
+    if (!String(resolvedDestinationLabel || "").trim()) return;
+    setUseLabelDisplay(true);
+    setAutoShowLabelOnce(false);
+  }, [
+    autoShowLabelOnce,
+    hasPaymentRequest,
+    hasDestination,
     resolvedDestinationLabel,
   ]);
 
@@ -629,6 +651,7 @@ export default function WalletDashboardSendModal({
                 type="text"
                 value={destinationDisplayValue}
                 onChange={(e) => {
+                  setAutoShowLabelOnce(false);
                   setUseLabelDisplay(false);
                   setSendDestination(e.target.value);
                   setSendDestinationLabel?.("");
@@ -641,6 +664,10 @@ export default function WalletDashboardSendModal({
                 }}
                 onBlur={() => {
                   setDestinationFocused(false);
+                }}
+                onClick={() => {
+                  // If we're showing a label (readOnly), allow a click to reveal the address immediately.
+                  if (shouldShowLabelInInput) setUseLabelDisplay(false);
                 }}
                 onPaste={handlePastePayload}
                 placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}

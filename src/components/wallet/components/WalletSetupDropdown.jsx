@@ -40,7 +40,9 @@ export default function WalletSetupDropdown({
   //    "Configuration requise" on wallets that are already set up. ──
   const [graceElapsed, setGraceElapsed] = useState(false);
   useEffect(() => {
-    const id = setTimeout(() => setGraceElapsed(true), 400);
+    // Note: this component is keyed by wallet address upstream, so it remounts
+    // (and re-applies the grace) on wallet switch.
+    const id = setTimeout(() => setGraceElapsed(true), 900);
     return () => clearTimeout(id);
   }, []);
 

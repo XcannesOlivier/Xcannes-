@@ -8,6 +8,46 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { apiUrl } from "@/lib/runtimeConfig";
 
+// ── Local label cache (best-effort) ──────────────────────────────────────────
+const LABEL_CACHE_KEY = "xcannes_wallet_labels_v1";
+const LABEL_CACHE_TTL_MS = 10 * 60_000; // 10 minutes
+
+function readLabelCache() {
+  try {
+    const raw = localStorage.getItem(LABEL_CACHE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    const now = Date.now();
+    const out = {};
+    for (const [addr, entry] of Object.entries(parsed)) {
+      const label = String(entry?.label || "").trim();
+      const ts = Number(entry?.ts || 0);
+      if (!addr || !label) continue;
+      if (!Number.isFinite(ts) || now - ts > LABEL_CACHE_TTL_MS) continue;
+      out[addr] = label;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function writeLabelCache(labelsByAddress) {
+  try {
+    const now = Date.now();
+    const payload = {};
+    for (const [addr, label] of Object.entries(labelsByAddress || {})) {
+      const t = String(label || "").trim();
+      if (!addr || !t) continue;
+      payload[addr] = { label: t, ts: now };
+    }
+    localStorage.setItem(LABEL_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function WalletDashboardHeader({
   isConnected,
   wallet,
@@ -56,16 +96,23 @@ export default function WalletDashboardHeader({
     return set;
   }, [walletAddresses]);
 
-  // Best-effort: resolve wallet labels for the dropdown list.
-  // In native relay mode, the multi-wallet list may not have labels.
+  // Hydrate cached labels once (client-side).
+  useEffect(() => {
+    try {
+      const cached = readLabelCache();
+      if (cached && Object.keys(cached).length > 0) {
+        setLabelsByAddress((prev) => ({ ...cached, ...prev }));
+      }
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Seed/clean label map from walletAddresses and active walletLabel,
+  // so the UI updates immediately on wallet switch.
   useEffect(() => {
     if (!hasMultipleWallets) return;
-    if (!isSwitcherOpen) return;
-
-    let cancelled = false;
-    const controller = new AbortController();
-
-    // Seed from provided walletAddresses labels first.
     setLabelsByAddress((prev) => {
       const next = { ...prev };
       for (const w of walletAddresses) {
@@ -73,12 +120,23 @@ export default function WalletDashboardHeader({
         const label = typeof w === "string" ? "" : trimmed(w?.label);
         if (addr && label) next[addr] = label;
       }
-      // Drop labels for wallets that are no longer in the list
+      const active = trimmed(walletLabel);
+      if (wallet && active) next[wallet] = active;
       for (const addr of Object.keys(next)) {
         if (!walletAddressSet.has(addr)) delete next[addr];
       }
+      writeLabelCache(next);
       return next;
     });
+  }, [hasMultipleWallets, walletAddresses, walletAddressSet, wallet, walletLabel]);
+
+  // Best-effort: resolve missing wallet labels in the background (prefetch).
+  // In native relay mode, the multi-wallet list may not have labels.
+  useEffect(() => {
+    if (!hasMultipleWallets) return;
+
+    let cancelled = false;
+    const controller = new AbortController();
 
     const addrsToFetch = walletAddresses
       .map((w) => (typeof w === "string" ? w : w?.address))
@@ -94,25 +152,32 @@ export default function WalletDashboardHeader({
       });
 
     (async () => {
-      for (const addr of addrsToFetch) {
-        if (cancelled) return;
-        try {
-          const res = await fetch(
-            apiUrl(
-              `/wallet/label?address=${encodeURIComponent(addr)}&allowFullReplay=false`,
-            ),
-            { signal: controller.signal },
-          );
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) continue;
-          const label = trimmed(data?.label);
-          if (!label) continue;
+      // Fetch in parallel (small list) to reduce "late labels" feeling.
+      await Promise.all(
+        addrsToFetch.map(async (addr) => {
           if (cancelled) return;
-          setLabelsByAddress((prev) => ({ ...prev, [addr]: label }));
-        } catch (err) {
-          // ignore (offline/cancelled)
-        }
-      }
+          try {
+            const res = await fetch(
+              apiUrl(
+                `/wallet/label?address=${encodeURIComponent(addr)}&allowFullReplay=false`,
+              ),
+              { signal: controller.signal },
+            );
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) return;
+            const label = trimmed(data?.label);
+            if (!label) return;
+            if (cancelled) return;
+            setLabelsByAddress((prev) => {
+              const next = { ...prev, [addr]: label };
+              writeLabelCache(next);
+              return next;
+            });
+          } catch {
+            // ignore (offline/cancelled)
+          }
+        }),
+      );
     })();
 
     return () => {
@@ -120,7 +185,7 @@ export default function WalletDashboardHeader({
       controller.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasMultipleWallets, isSwitcherOpen, walletAddresses, walletAddressSet]);
+  }, [hasMultipleWallets, walletAddresses, walletAddressSet, labelsByAddress]);
 
   const activeWalletLabel = useMemo(() => {
     const direct = trimmed(walletLabel);
@@ -200,6 +265,7 @@ export default function WalletDashboardHeader({
         {/* ── Wallet setup dropdown (centralised activation steps) ── */}
         {isConnected && wallet && (
           <WalletSetupDropdown
+            key={wallet}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
             walletLabel={walletLabel}
