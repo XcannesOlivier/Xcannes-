@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 /**
- * TransactionProgressModal — Xumm-style overlay for XRPL transactions.
+ * TransactionProgressModal — full-screen XRPL transaction progress overlay.
  *
  * Visual states:
- *   1. "pending"  – action label + 3 dots blinking sequentially
- *   2. "success"  – big "Validé ✓" with confetti / sparkle burst
+ *   1. "pending"  – full screen "verification" page
+ *   2. "success"  – full screen success page + optional details card
  *   3. "error"    – red message
  */
 export default function TransactionProgressModal({
@@ -16,63 +16,14 @@ export default function TransactionProgressModal({
   status = "pending",
   actionLabel = "",
   errorMessage = "",
+  details = null,
+  autoCloseMs = null,
   onClose,
 }) {
   const { t } = useTranslation("common");
   const [closing, setClosing] = useState(false);
 
   const label = actionLabel || t("ui_tx_progress_label", "Transaction");
-
-  // ── Confetti particles (generated once per mount) ────────────
-  const confettiPieces = useMemo(
-    () =>
-      Array.from({ length: 40 }, (_, i) => ({
-        id: i,
-        // Random angle in radians around a circle
-        angle: (Math.PI * 2 * i) / 40 + (Math.random() - 0.5) * 0.4,
-        // Distance from center
-        distance: 60 + Math.random() * 100,
-        // Random rotation
-        rotation: Math.random() * 360,
-        // Size
-        size: 4 + Math.random() * 5,
-        // Delay
-        delay: Math.random() * 0.3,
-        // Color
-        color: [
-          "#34d399",
-          "#6ee7b7",
-          "#a7f3d0",
-          "#fbbf24",
-          "#f59e0b",
-          "#60a5fa",
-          "#a78bfa",
-          "#f472b6",
-          "#fb923c",
-          "#ffffff",
-        ][i % 10],
-      })),
-    [],
-  );
-
-  // ── Auto-close ───────────────────────────────────────────────
-  useEffect(() => {
-    if (!visible) return;
-    if (status === "success") {
-      const timer = setTimeout(() => {
-        setClosing(true);
-        setTimeout(() => onClose?.(), 350);
-      }, 2400);
-      return () => clearTimeout(timer);
-    }
-    if (status === "error") {
-      const timer = setTimeout(() => {
-        setClosing(true);
-        setTimeout(() => onClose?.(), 350);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [visible, status, onClose]);
 
   useEffect(() => {
     if (visible) setClosing(false);
@@ -84,211 +35,259 @@ export default function TransactionProgressModal({
   const isSuccess = status === "success";
   const isError = status === "error";
 
+  const trimmed = (v) => String(v || "").trim();
+  const amountLabel = trimmed(details?.amountLabel);
+  const beneficiaryLabel = trimmed(details?.beneficiaryLabel);
+  const beneficiaryAddress = trimmed(details?.beneficiaryAddress);
+  const showDetailsCard =
+    Boolean(amountLabel) || Boolean(beneficiaryAddress) || Boolean(beneficiaryLabel);
+
+  const handleClose = () => {
+    setClosing(true);
+    setTimeout(() => onClose?.(), 220);
+  };
+
+  // Optional auto-close (used for some actions like conversion).
+  useEffect(() => {
+    if (!visible) return;
+    if (!Number.isFinite(Number(autoCloseMs)) || Number(autoCloseMs) <= 0) return;
+    if (status !== "success") return;
+    const id = setTimeout(() => handleClose(), Number(autoCloseMs));
+    return () => clearTimeout(id);
+  }, [autoCloseMs, status, visible]);
+
+  const statusPill = useMemo(() => {
+    if (isSuccess) return { label: t("ui_sent", "Envoyé"), tone: "success" };
+    if (isError) return { label: t("ui_error", "Erreur"), tone: "error" };
+    return { label: t("ui_sent", "Envoyé"), tone: "pending" };
+  }, [isError, isSuccess, t]);
+
   return (
     <div
-      className={`fixed inset-0 z-[10200] flex items-center justify-center bg-black/65 backdrop-blur-sm px-4 transition-opacity duration-350 ${
+      className={`fixed inset-0 z-[10200] bg-black transition-opacity duration-200 ${
         closing ? "opacity-0" : "opacity-100"
       }`}
     >
-      <div
-        className={`relative w-full max-w-[280px] rounded-2xl border bg-[#0d1117] p-8 shadow-2xl transition-all duration-350 ${
-          closing ? "scale-90 opacity-0" : "scale-100 opacity-100"
-        } ${
-          isSuccess
-            ? "border-emerald-500/30"
-            : isError
-              ? "border-red-500/30"
-              : "border-white/10"
-        }`}
-      >
-        <div className="flex flex-col items-center gap-4">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-24 left-1/2 h-72 w-[520px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute -bottom-24 left-1/2 h-72 w-[520px] -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
+      </div>
 
-          {/* ── PENDING: Label + 3 sequential dots ────────── */}
-          {isPending && (
+      <div className="relative h-full w-full flex flex-col items-center px-6 pt-14 pb-8">
+        {/* status pill */}
+        <div
+          className={[
+            "inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 border",
+            statusPill.tone === "success"
+              ? "border-emerald-400/25 bg-emerald-400/10 text-emerald-300"
+              : statusPill.tone === "error"
+                ? "border-red-400/25 bg-red-400/10 text-red-200"
+                : "border-emerald-400/25 bg-emerald-400/10 text-emerald-300",
+          ].join(" ")}
+        >
+          <svg
+            className="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
+            {statusPill.tone === "error" ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            )}
+          </svg>
+          <span className="text-[18px] font-semibold">{statusPill.label}</span>
+          {isPending ? (
+            <span className="text-[18px] font-semibold opacity-90">✓</span>
+          ) : null}
+        </div>
+
+        {/* main */}
+        <div className="mt-7 w-full max-w-[440px] flex-1 flex flex-col items-center">
+          {isPending ? (
             <>
-              <p className="text-[17px] font-semibold text-white/90 text-center">
+              <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-white">
+                {t("ui_tx_verifying", "En cours de vérification")}
+              </h1>
+              <div className="mt-6 text-white/70">{label}</div>
+
+              {showDetailsCard ? (
+                <div className="mt-6 w-full rounded-2xl bg-white/7 border border-white/10 px-5 py-4">
+                  {amountLabel ? (
+                    <div className="mb-3">
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_amount", "Montant")}:
+                      </div>
+                      <div className="mt-1 text-[20px] font-semibold text-white">
+                        {amountLabel}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {beneficiaryAddress ? (
+                    <div>
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_beneficiary", "Bénéficiaire")}:
+                      </div>
+                      <div className="mt-1 text-[14px] text-sky-300">
+                        {beneficiaryLabel || t("ui_no_name_found", "Aucun nom trouvé")}
+                      </div>
+                      <div className="mt-1 font-mono text-[12px] text-white/55 break-all">
+                        {beneficiaryAddress}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="mt-6">
+                <svg
+                  className="h-9 w-9 text-white/70 animate-spin"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                    opacity="0.25"
+                  />
+                  <path
+                    d="M22 12a10 10 0 0 1-10 10"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+              <p className="mt-6 text-center text-[13px] text-white/55 leading-relaxed">
+                {t(
+                  "ui_tx_verifying_hint",
+                  "Envoi de votre transaction au registre XRP Ledger.\nCela va prendre quelques secondes…",
+                )}
+              </p>
+            </>
+          ) : null}
+
+          {isSuccess ? (
+            <>
+              <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-emerald-400">
+                {t("ui_tx_sent_success", "Envoyé avec succès!")}
+              </h1>
+              <p className="mt-2 text-center text-[13px] text-emerald-200/70">
+                {t(
+                  "ui_tx_sent_success_hint",
+                  "Votre transaction a été enregistrée avec succès sur le XRP Ledger.",
+                )}
+              </p>
+
+              <div className="mt-8 relative w-full flex items-center justify-center">
+                {/* Big check illustration */}
+                <svg
+                  className="h-40 w-40 text-emerald-400 drop-shadow-[0_0_22px_rgba(52,211,153,0.22)]"
+                  viewBox="0 0 120 120"
+                  fill="none"
+                >
+                  <path
+                    d="M20 64 L50 88 L100 34"
+                    stroke="currentColor"
+                    strokeWidth="10"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M60 10a50 50 0 1 0 0 100a50 50 0 1 0 0-100Z"
+                    stroke="currentColor"
+                    strokeOpacity="0.12"
+                    strokeWidth="8"
+                  />
+                </svg>
+              </div>
+
+              {showDetailsCard ? (
+                <div className="mt-6 w-full rounded-2xl bg-white/7 border border-white/10 px-5 py-4">
+                  {amountLabel ? (
+                    <div className="mb-3">
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_amount", "Montant")}:
+                      </div>
+                      <div className="mt-1 text-[20px] font-semibold text-white">
+                        {amountLabel}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {beneficiaryAddress ? (
+                    <div>
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_beneficiary", "Bénéficiaire")}:
+                      </div>
+                      <div className="mt-1 text-[14px] text-sky-300">
+                        {beneficiaryLabel || t("ui_no_name_found", "Aucun nom trouvé")}
+                      </div>
+                      <div className="mt-1 font-mono text-[12px] text-white/55 break-all">
+                        {beneficiaryAddress}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="mt-8 w-full">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="w-full h-12 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-semibold transition-colors"
+                >
+                  {t("ui_close", "Fermer")}
+                </button>
+              </div>
+            </>
+          ) : null}
+
+          {isError ? (
+            <>
+              <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-red-300">
+                {t("ui_tx_failed", "Transaction échouée")}
+              </h1>
+              <p className="mt-2 text-center text-[13px] text-red-200/70">
                 {label}
-                {" "}
-                {t("ui_tx_progress_pending_suffix", "en cours")}
               </p>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className="inline-block w-3 h-3 rounded-full bg-white/80"
-                  style={{ animation: "dotBlink 1.4s ease-in-out infinite 0s" }}
-                />
-                <span
-                  className="inline-block w-3 h-3 rounded-full bg-white/80"
-                  style={{ animation: "dotBlink 1.4s ease-in-out infinite 0.2s" }}
-                />
-                <span
-                  className="inline-block w-3 h-3 rounded-full bg-white/80"
-                  style={{ animation: "dotBlink 1.4s ease-in-out infinite 0.4s" }}
-                />
-              </div>
-              <p className="text-[11px] text-white/40 mt-1">
-                {t("ui_tx_progress_pending_hint", "Confirmation XRPL…")}
-              </p>
-            </>
-          )}
-
-          {/* ── SUCCESS: Big "Validé" + confetti burst ────── */}
-          {isSuccess && (
-            <div className="relative flex flex-col items-center">
-              {/* Confetti burst */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  width: 280,
-                  height: 280,
-                  left: "50%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)",
-                }}
-              >
-                {confettiPieces.map((p) => (
-                  <span
-                    key={p.id}
-                    className="absolute rounded-sm"
-                    style={{
-                      width: p.size,
-                      height: p.size,
-                      backgroundColor: p.color,
-                      left: "50%",
-                      top: "50%",
-                      opacity: 0,
-                      animation: `confettiBurst 0.9s ease-out ${p.delay}s forwards`,
-                      "--conf-x": `${Math.cos(p.angle) * p.distance}px`,
-                      "--conf-y": `${Math.sin(p.angle) * p.distance}px`,
-                      "--conf-rot": `${p.rotation}deg`,
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Checkmark circle */}
-              <div
-                className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 mb-3"
-                style={{ animation: "scaleIn 0.4s ease-out" }}
-              >
-                <svg
-                  className="w-9 h-9 text-emerald-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.8}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                    style={{
-                      strokeDasharray: 24,
-                      strokeDashoffset: 24,
-                      animation: "drawCheck 0.45s ease-out 0.25s forwards",
-                    }}
-                  />
-                </svg>
-              </div>
-
-              {/* Big "Validé" */}
-              <p
-                className="text-[28px] font-bold text-emerald-400 tracking-wide"
-                style={{ animation: "scaleIn 0.35s ease-out 0.15s both" }}
-              >
-                {t("ui_tx_progress_validated", "Validé")}
-              </p>
-
-              <p
-                className="text-[12px] text-emerald-400/50 mt-1"
-                style={{ animation: "fadeIn 0.4s ease-out 0.5s both" }}
-              >
-                {label} {t("ui_tx_progress_confirmed", "confirmée")}
-              </p>
-            </div>
-          )}
-
-          {/* ── ERROR ──────────────────────────────────────── */}
-          {isError && (
-            <>
-              <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-500/15">
-                <svg
-                  className="w-8 h-8 text-red-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <p className="text-[15px] font-semibold text-red-300 text-center">
-                {label} {t("ui_tx_progress_error_suffix", "échouée")}
-              </p>
-              {errorMessage && (
-                <p className="text-[11px] text-red-400/70 max-w-[220px] text-center break-words">
+              {errorMessage ? (
+                <div className="mt-6 w-full rounded-2xl bg-red-500/10 border border-red-400/20 px-4 py-3 text-[12px] text-red-100/80 break-words">
                   {errorMessage}
-                </p>
-              )}
+                </div>
+              ) : null}
+              <div className="mt-8 w-full">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="w-full h-12 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold transition-colors"
+                >
+                  {t("ui_close", "Fermer")}
+                </button>
+              </div>
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
       {/* ── Keyframes ──────────────────────────────────────────── */}
       <style jsx global>{`
-        @keyframes dotBlink {
-          0%, 80%, 100% {
-            opacity: 0.15;
-            transform: scale(0.7);
-          }
-          40% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes confettiBurst {
-          0% {
-            opacity: 1;
-            transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(1);
-          }
-          70% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-50%, -50%)
-              translate(var(--conf-x), var(--conf-y))
-              rotate(var(--conf-rot))
-              scale(0.3);
-          }
-        }
-
-        @keyframes drawCheck {
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-
-        @keyframes scaleIn {
-          from {
-            transform: scale(0.3);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
+        /* keep file local: no keyframes needed beyond tailwind's spin */
       `}</style>
     </div>
   );

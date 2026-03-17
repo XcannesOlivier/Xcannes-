@@ -474,7 +474,11 @@ export default function WalletDashboardSendModal({
           throw new Error(data?.error || "Failed to load wallet label");
         }
         const label = String(data?.label || "").trim();
-        if (!cancelled) setRemoteDestinationLabel(label);
+        if (!cancelled) {
+          setRemoteDestinationLabel(label);
+          // Propagate so the send flow can reuse it (progress screen, etc.)
+          if (label) setSendDestinationLabel?.(label);
+        }
       } catch {
         if (!cancelled) setRemoteDestinationLabel("");
       }

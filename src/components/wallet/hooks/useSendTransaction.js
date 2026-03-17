@@ -83,6 +83,7 @@ export function useSendTransaction({
   // useSendForm()
   sendAmount,
   sendDestination,
+  sendDestinationLabel,
   sendPaymentRequest,
   setSendProcessing,
   setSendAmount,
@@ -332,8 +333,23 @@ export function useSendTransaction({
       buildAddressBookMemos(normalizedSaveDestination, saveLabel),
     );
 
+    const savedEntry = (savedAddresses || []).find(
+      (a) => String(a?.address || "").trim() === String(dest || "").trim(),
+    );
+    const beneficiaryLabel =
+      String(sendDestinationLabel || "").trim() ||
+      String(savedEntry?.onChainLabel || savedEntry?.label || "").trim() ||
+      "";
+
     const payResult = await signTransaction(payTx, {
       action: "wallet:send",
+      progressDetails: {
+        amountLabel: `${amountNum.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} ${currency}`,
+        beneficiaryLabel: beneficiaryLabel || null,
+        beneficiaryAddress: dest,
+      },
     });
     if (payResult?.signed) {
       toast.success("✅ Payment submitted.");
@@ -467,7 +483,39 @@ export function useSendTransaction({
       buildAddressBookMemos(normalizedSaveDestination, saveLabel),
     );
 
-    const result = await signTransaction(txjson);
+    const savedEntry = (savedAddresses || []).find(
+      (a) => String(a?.address || "").trim() === String(dest || "").trim(),
+    );
+    const beneficiaryLabel =
+      String(sendDestinationLabel || "").trim() ||
+      String(savedEntry?.onChainLabel || savedEntry?.label || "").trim() ||
+      "";
+
+    const amountLabel = (() => {
+      if (currency === "XRP") {
+        return `${amountNum.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} XRP`;
+      }
+      if (currency === "USD" || currency === "RLUSD") {
+        // UI "USD" is a RLUSD payment on-chain.
+        return `${amountNum.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} RLUSD`;
+      }
+      return `${amountNum.toLocaleString("en-US", {
+        maximumFractionDigits: 6,
+      })} ${currency}`;
+    })();
+
+    const result = await signTransaction(txjson, {
+      action: "wallet:send",
+      progressDetails: {
+        amountLabel,
+        beneficiaryLabel: beneficiaryLabel || null,
+        beneficiaryAddress: dest,
+      },
+    });
     if (result && result.signed) {
       toast.success("✅ Payment submitted.");
       handleAddressSave(dest);

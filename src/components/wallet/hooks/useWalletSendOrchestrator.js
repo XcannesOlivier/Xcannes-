@@ -234,6 +234,7 @@ export function useWalletSendOrchestrator({
     selectedSendToken,
     sendAmount,
     sendDestination,
+    sendDestinationLabel,
     sendPaymentRequest,
     setSendProcessing,
     setSendAmount,

@@ -87,6 +87,7 @@ export default function WalletDashboard({
     actionLabel: "",
     actionKey: "",
     errorMessage: "",
+    details: null,
   });
 
   const TX_ACTION_LABELS = useMemo(() => ({
@@ -156,6 +157,7 @@ export default function WalletDashboard({
             actionLabel: label,
             actionKey: actionKey,
             errorMessage: "",
+            details: options?.progressDetails || null,
           });
 
           // Fire-and-forget: poll XRPL then switch to success
@@ -176,6 +178,7 @@ export default function WalletDashboard({
             actionLabel: label,
             actionKey: actionKey,
             errorMessage: result.engineMessage || result.engineResult || t("ui_tx_rejected", "Transaction rejetée"),
+            details: options?.progressDetails || null,
           });
         }
         // If result is null (cancelled/expired), don't show anything
@@ -188,6 +191,7 @@ export default function WalletDashboard({
           actionLabel: label,
           actionKey: actionKey,
           errorMessage: err?.message || String(err),
+          details: options?.progressDetails || null,
         });
         throw err;
       }
@@ -845,6 +849,8 @@ export default function WalletDashboard({
         status={txProgress.status}
         actionLabel={txProgress.actionLabel}
         errorMessage={txProgress.errorMessage}
+        details={txProgress.details}
+        autoCloseMs={txProgress.actionKey === "wallet:convert" ? 1600 : null}
         onClose={handleTxProgressClose}
       />
       <WalletToastOverlay
