@@ -156,7 +156,7 @@ export default function DemoWalletDashboardPayreqModal({
         {requestDestination ? (
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
-              {t("ui_destination_xrpl_address_9c2b94554c", "Vers le compte")}
+              {t("ui_account_number_label", "N° de compte")}
             </span>
             <span className="font-mono text-white/80">
               {requestDestinationLabel || requestDestination}
@@ -265,17 +265,24 @@ export default function DemoWalletDashboardPayreqModal({
             if (!inline) e.stopPropagation();
           }}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="wallet-modal-close absolute top-3 right-3 md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
-          >
-            ✕
-          </button>
-          {renderWalletMeta?.("mb-2 [&_.font-mono]:hidden")}
+          <div className="flex items-start justify-between gap-3 mb-5 pr-6">
+            <div className="min-w-0">
+              {renderWalletMeta?.(
+                "wallet-meta--plus-4 [&_.font-mono]:hidden",
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl z-10"
+              aria-label={t("close", "Fermer")}
+            >
+              ✕
+            </button>
+          </div>
 
           <div className={inline ? "flex-1 min-h-0 flex flex-col" : ""}>
             <div className="space-y-4">
@@ -285,8 +292,8 @@ export default function DemoWalletDashboardPayreqModal({
                 </div>
               ) : null}
               {sendPaymentRequest && requestDestination ? (
-                <div className="flex items-center justify-between gap-3 text-xs text-white/80">
-                  <span className="text-white/60 shrink-0">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-white/60 shrink-0 text-sm">
                     {t("ui_account_number_label", "N° de compte")}
                   </span>
                   <button

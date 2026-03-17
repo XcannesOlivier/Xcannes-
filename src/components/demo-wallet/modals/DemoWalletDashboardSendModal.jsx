@@ -630,12 +630,6 @@ export default function DemoWalletDashboardSendModal({
               ) : null}
             </div>
 
-            {selectedSavedLabel ? (
-              <div className="mt-1 text-xs text-white/60">
-                {t("ui_selected_wallet_label", "Sélectionné")}:{" "}
-                <span className="text-white/80">{selectedSavedLabel}</span>
-              </div>
-            ) : null}
           </div>
 
           {/* ── Devise + Montant (same sizing as real wallet) ── */}

@@ -16,21 +16,18 @@ export function useDemoWalletMeta({
       const resolvedAddress = String(walletAddress || "").trim();
       if (!resolvedAddress && !resolvedLabel) return null;
       return (
-        <div className={`text-[10px] text-white/60 ${className}`}>
-          <div className="text-[12px] md:text-[13px] font-semibold text-white/80 leading-tight">
+        <div className={`text-xs text-white/60 ${className}`}>
+          <div className="text-xl md:text-2xl font-semibold text-white/80 leading-tight">
             {resolvedLabel || "Wallet"}
           </div>
           {!hideAddress && resolvedAddress ? (
-            <div className="font-mono flex flex-wrap items-center gap-2">
+            <div className="font-mono text-xs md:text-base flex flex-wrap items-center gap-2">
               <span className="break-all" title={addressTitle || undefined}>
                 {resolvedAddress}
               </span>
               {addressBadge ? (
                 <span
-                  className={[
-                    "text-[10px] font-semibold",
-                    addressBadgeClassName,
-                  ]
+                  className={["text-xs font-semibold", addressBadgeClassName]
                     .filter(Boolean)
                     .join(" ")}
                 >
@@ -41,7 +38,7 @@ export function useDemoWalletMeta({
           ) : addressBadge ? (
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={["text-[10px] font-semibold", addressBadgeClassName]
+                className={["text-xs font-semibold", addressBadgeClassName]
                   .filter(Boolean)
                   .join(" ")}
               >

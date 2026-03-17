@@ -801,7 +801,7 @@ export default function WalletDashboardSendModal({
                     selectedSendToken.currency
                   : "USD"
               }
-              tokenClassName="text-white text-xl"
+              tokenClassName="text-white drop-shadow-sm text-xl"
               containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
             />
           </div>
