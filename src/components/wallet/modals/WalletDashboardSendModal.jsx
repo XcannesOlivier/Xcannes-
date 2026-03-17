@@ -494,6 +494,7 @@ export default function WalletDashboardSendModal({
     normalizedDestination,
     savedDestinationLabel,
     sendDestinationLabel,
+    setSendDestinationLabel,
   ]);
 
   const shouldAnimate = !inline;

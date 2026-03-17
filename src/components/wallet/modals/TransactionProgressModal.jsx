@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 /**
@@ -25,12 +25,6 @@ export default function TransactionProgressModal({
 
   const label = actionLabel || t("ui_tx_progress_label", "Transaction");
 
-  useEffect(() => {
-    if (visible) setClosing(false);
-  }, [visible]);
-
-  if (!visible) return null;
-
   const isPending = status === "pending";
   const isSuccess = status === "success";
   const isError = status === "error";
@@ -40,12 +34,18 @@ export default function TransactionProgressModal({
   const beneficiaryLabel = trimmed(details?.beneficiaryLabel);
   const beneficiaryAddress = trimmed(details?.beneficiaryAddress);
   const showDetailsCard =
-    Boolean(amountLabel) || Boolean(beneficiaryAddress) || Boolean(beneficiaryLabel);
+    Boolean(amountLabel) ||
+    Boolean(beneficiaryAddress) ||
+    Boolean(beneficiaryLabel);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setClosing(true);
     setTimeout(() => onClose?.(), 220);
-  };
+  }, [onClose]);
+
+  useEffect(() => {
+    if (visible) setClosing(false);
+  }, [visible]);
 
   // Optional auto-close (used for some actions like conversion).
   useEffect(() => {
@@ -54,13 +54,15 @@ export default function TransactionProgressModal({
     if (status !== "success") return;
     const id = setTimeout(() => handleClose(), Number(autoCloseMs));
     return () => clearTimeout(id);
-  }, [autoCloseMs, status, visible]);
+  }, [autoCloseMs, handleClose, status, visible]);
 
   const statusPill = useMemo(() => {
     if (isSuccess) return { label: t("ui_sent", "Envoyé"), tone: "success" };
     if (isError) return { label: t("ui_error", "Erreur"), tone: "error" };
     return { label: t("ui_sent", "Envoyé"), tone: "pending" };
   }, [isError, isSuccess, t]);
+
+  if (!visible) return null;
 
   return (
     <div
