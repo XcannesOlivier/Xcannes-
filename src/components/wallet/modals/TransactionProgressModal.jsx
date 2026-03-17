@@ -71,7 +71,7 @@ export default function TransactionProgressModal({
       }`}
     >
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-24 left-1/2 h-72 w-[520px] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute -top-24 left-1/2 h-72 w-[520px] -translate-x-1/2 rounded-full bg-xcannes-green/10 blur-3xl" />
         <div className="absolute -bottom-24 left-1/2 h-72 w-[520px] -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
       </div>
 
@@ -81,10 +81,10 @@ export default function TransactionProgressModal({
           className={[
             "inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 border",
             statusPill.tone === "success"
-              ? "border-emerald-400/25 bg-emerald-400/10 text-emerald-300"
+              ? "border-xcannes-green/30 bg-xcannes-green/10 text-xcannes-green"
               : statusPill.tone === "error"
                 ? "border-red-400/25 bg-red-400/10 text-red-200"
-                : "border-emerald-400/25 bg-emerald-400/10 text-emerald-300",
+                : "border-xcannes-green/30 bg-xcannes-green/10 text-xcannes-green",
           ].join(" ")}
         >
           <svg
@@ -186,10 +186,10 @@ export default function TransactionProgressModal({
 
           {isSuccess ? (
             <>
-              <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-emerald-400">
+              <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-xcannes-green">
                 {t("ui_tx_sent_success", "Envoyé avec succès!")}
               </h1>
-              <p className="mt-2 text-center text-[13px] text-emerald-200/70">
+              <p className="mt-2 text-center text-[13px] text-xcannes-green/70">
                 {t(
                   "ui_tx_sent_success_hint",
                   "Votre transaction a été enregistrée avec succès sur le XRP Ledger.",
@@ -199,7 +199,7 @@ export default function TransactionProgressModal({
               <div className="mt-8 relative w-full flex items-center justify-center">
                 {/* Big check illustration */}
                 <svg
-                  className="h-40 w-40 text-emerald-400 drop-shadow-[0_0_22px_rgba(52,211,153,0.22)]"
+                  className="h-40 w-40 text-xcannes-green drop-shadow-[0_0_22px_rgba(0,255,166,0.22)]"
                   viewBox="0 0 120 120"
                   fill="none"
                 >
@@ -252,7 +252,7 @@ export default function TransactionProgressModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="w-full h-12 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-semibold transition-colors"
+                  className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors"
                 >
                   {t("ui_close", "Fermer")}
                 </button>
