@@ -267,15 +267,6 @@ export function useSendTransaction({
       return { ok: false };
     }
 
-    // --- Confirmation ---
-    const ok = await confirm(
-      `Paiement en RLUSD (affiché en ${currency}).\n\n` +
-        `Montant: ${amountNum.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}\n` +
-        `≈ ${paymentRlusd.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD au destinataire\n\n` +
-        `1 signature sera demandée.`,
-    );
-    if (!ok) return { ok: false };
-
     // --- Build & sign single RLUSD payment ---
     const fxSource =
       (sendPaymentRequest?.fxSource

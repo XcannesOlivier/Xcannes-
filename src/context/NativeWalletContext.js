@@ -342,7 +342,9 @@ export const NativeWalletProvider = ({ children }) => {
   const switchWallet = useCallback(
     (address) => {
       if (!address) return;
-      const found = walletAddresses.find((w) => w.address === address);
+      const found = walletAddresses.find((w) =>
+        typeof w === "string" ? w === address : w?.address === address
+      );
       if (!found && address !== wallet) return;
       switchToWallet(address);
       sessionStorage.setItem(NATIVE_WALLET_STORAGE_KEY, address);

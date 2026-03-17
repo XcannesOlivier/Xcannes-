@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import WalletConnectButton from "@/components/wallet/WalletConnectButton";
 import WalletSettingsDropdown from "@/components/wallet/components/WalletSettingsDropdown";
 import WalletSetupDropdown from "@/components/wallet/components/WalletSetupDropdown";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
+import { apiUrl } from "@/lib/runtimeConfig";
 
 export default function WalletDashboardHeader({
   isConnected,
@@ -42,6 +43,97 @@ export default function WalletDashboardHeader({
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const switcherRef = useRef(null);
   const hasMultipleWallets = walletAddresses.length > 1;
+  const [labelsByAddress, setLabelsByAddress] = useState({});
+
+  const trimmed = (v) => String(v || "").trim();
+
+  const walletAddressSet = useMemo(() => {
+    const set = new Set();
+    for (const w of walletAddresses) {
+      const addr = typeof w === "string" ? w : w?.address;
+      if (addr) set.add(addr);
+    }
+    return set;
+  }, [walletAddresses]);
+
+  // Best-effort: resolve wallet labels for the dropdown list.
+  // In native relay mode, the multi-wallet list may not have labels.
+  useEffect(() => {
+    if (!hasMultipleWallets) return;
+    if (!isSwitcherOpen) return;
+
+    let cancelled = false;
+    const controller = new AbortController();
+
+    // Seed from provided walletAddresses labels first.
+    setLabelsByAddress((prev) => {
+      const next = { ...prev };
+      for (const w of walletAddresses) {
+        const addr = typeof w === "string" ? w : w?.address;
+        const label = typeof w === "string" ? "" : trimmed(w?.label);
+        if (addr && label) next[addr] = label;
+      }
+      // Drop labels for wallets that are no longer in the list
+      for (const addr of Object.keys(next)) {
+        if (!walletAddressSet.has(addr)) delete next[addr];
+      }
+      return next;
+    });
+
+    const addrsToFetch = walletAddresses
+      .map((w) => (typeof w === "string" ? w : w?.address))
+      .filter(Boolean)
+      .filter((addr) => {
+        const entry = walletAddresses.find((w) =>
+          typeof w === "string" ? w === addr : w?.address === addr,
+        );
+        const fromList = typeof entry === "string" ? "" : trimmed(entry?.label);
+        if (fromList) return false;
+        if (trimmed(labelsByAddress?.[addr])) return false;
+        return true;
+      });
+
+    (async () => {
+      for (const addr of addrsToFetch) {
+        if (cancelled) return;
+        try {
+          const res = await fetch(
+            apiUrl(
+              `/wallet/label?address=${encodeURIComponent(addr)}&allowFullReplay=false`,
+            ),
+            { signal: controller.signal },
+          );
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) continue;
+          const label = trimmed(data?.label);
+          if (!label) continue;
+          if (cancelled) return;
+          setLabelsByAddress((prev) => ({ ...prev, [addr]: label }));
+        } catch (err) {
+          // ignore (offline/cancelled)
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMultipleWallets, isSwitcherOpen, walletAddresses, walletAddressSet]);
+
+  const activeWalletLabel = useMemo(() => {
+    const direct = trimmed(walletLabel);
+    if (direct) return direct;
+    const entry = walletAddresses.find((w) =>
+      typeof w === "string" ? w === wallet : w?.address === wallet,
+    );
+    const fromList = typeof entry === "string" ? "" : trimmed(entry?.label);
+    if (fromList) return fromList;
+    const fromMap = trimmed(labelsByAddress?.[wallet]);
+    if (fromMap) return fromMap;
+    return "Wallet";
+  }, [labelsByAddress, wallet, walletAddresses, walletLabel]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -141,7 +233,7 @@ export default function WalletDashboardHeader({
                         />
 
                         <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
-                          {walletLabel || "Wallet"}
+                          {activeWalletLabel}
                         </span>
                       </div>
 
@@ -162,10 +254,13 @@ export default function WalletDashboardHeader({
                       <div className="absolute z-50 left-0 right-0 top-full mt-1.5 rounded-lg bg-[#151b1e] border border-white/10 shadow-xl max-h-52 overflow-y-auto">
                         {walletAddresses.map((w, index) => {
                           const addr = typeof w === "string" ? w : w.address;
-                          const label = typeof w === "string" ? null : w.label;
+                          const label =
+                            typeof w === "string"
+                              ? ""
+                              : trimmed(w?.label) || trimmed(labelsByAddress?.[addr]);
                           const isActive = addr === wallet;
                           const displayName = isActive
-                            ? (walletLabel || label || `Wallet ${index + 1}`)
+                            ? (activeWalletLabel || label || `Wallet ${index + 1}`)
                             : (label || `Wallet ${index + 1}`);
                           return (
                             <button
