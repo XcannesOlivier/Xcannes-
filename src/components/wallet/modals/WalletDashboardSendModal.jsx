@@ -50,6 +50,7 @@ export default function WalletDashboardSendModal({
   const [remoteDestinationLabel, setRemoteDestinationLabel] = useState("");
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [useLabelDisplay, setUseLabelDisplay] = useState(false);
+  const [destinationFocused, setDestinationFocused] = useState(false);
   const [showFullSummaryAddress, setShowFullSummaryAddress] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
@@ -411,10 +412,27 @@ export default function WalletDashboardSendModal({
   }, [savedAddresses, normalizedDestination]);
   const resolvedDestinationLabel =
     savedDestinationLabel || sendDestinationLabel || remoteDestinationLabel;
-  const destinationDisplayValue =
-    useLabelDisplay && sendDestinationLabel
-      ? sendDestinationLabel
-      : sendDestination;
+  const shouldShowLabelInInput =
+    Boolean(resolvedDestinationLabel) &&
+    Boolean(useLabelDisplay) &&
+    !hasPaymentRequest;
+  const destinationDisplayValue = shouldShowLabelInInput
+    ? resolvedDestinationLabel
+    : sendDestination;
+
+  // If we resolved a label (saved/on-chain) and the user isn't typing, show it in the input.
+  useEffect(() => {
+    if (destinationFocused) return;
+    if (!hasDestination) return;
+    if (hasPaymentRequest) return;
+    if (!String(resolvedDestinationLabel || "").trim()) return;
+    setUseLabelDisplay(true);
+  }, [
+    destinationFocused,
+    hasDestination,
+    hasPaymentRequest,
+    resolvedDestinationLabel,
+  ]);
 
   useEffect(() => {
     if (!hasDestination || hasPaymentRequest || savedDestinationLabel || sendDestinationLabel) {
@@ -616,8 +634,17 @@ export default function WalletDashboardSendModal({
                   setSendDestinationLabel?.("");
                   setShowSavedPicker(false);
                 }}
+                onFocus={() => {
+                  setDestinationFocused(true);
+                  // When focusing, reveal the address so the user can edit/copy it.
+                  setUseLabelDisplay(false);
+                }}
+                onBlur={() => {
+                  setDestinationFocused(false);
+                }}
                 onPaste={handlePastePayload}
                 placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
+                readOnly={shouldShowLabelInInput}
                 className={`w-full bg-black/40 border border-white/15 rounded-xl ${!hasPaymentRequest ? 'pl-8' : 'pl-4'} ${hasPaymentRequest ? 'pr-4' : 'pr-28'} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
               />
               {!hasPaymentRequest && (
