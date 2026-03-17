@@ -682,11 +682,11 @@ export default function CurrencyStatement({
                           ? t("ui_to_label_7b2c1a9d5e", "To")
                           : t("ui_from_label_2c7a1d9b5e", "From")}
                       </div>
-                      <div className="text-white/90 font-semibold">
+                      <div className="text-white/90 font-semibold text-base md:text-lg">
                         {detailLabelLoading ? "…" : label}
                       </div>
                       {detailLabel && counterparty ? (
-                        <div className="text-[11px] text-white/50 font-mono break-all">
+                        <div className="text-xs md:text-sm text-white/55 font-mono break-all">
                           {counterparty}
                         </div>
                       ) : null}
@@ -796,7 +796,7 @@ export default function CurrencyStatement({
                     {walletLabel || t("nav_wallet", "Wallet")}
                   </span>
                   {walletAddress ? (
-                    <div className="text-[11px] text-white/60 font-mono whitespace-nowrap overflow-x-auto">
+                    <div className="text-xs md:text-sm text-white/60 font-mono whitespace-nowrap overflow-x-auto">
                       {walletAddress}
                     </div>
                   ) : null}
@@ -807,7 +807,7 @@ export default function CurrencyStatement({
                     {walletLabel || t("nav_wallet", "Wallet")}
                   </p>
                   {walletAddress ? (
-                    <p className="text-[11px] text-white/60 font-mono break-all">
+                    <p className="text-xs md:text-sm text-white/60 font-mono break-all">
                       {walletAddress}
                     </p>
                   ) : null}

@@ -577,7 +577,7 @@ export default function GlobalStatement({
                   {walletLabel || t("nav_wallet", "Wallet")}
                 </p>
                 {walletAddress ? (
-                  <p className="text-[11px] text-white/60 font-mono break-all">
+                  <p className="text-xs md:text-sm text-white/60 font-mono break-all">
                     {walletAddress}
                   </p>
                 ) : null}
