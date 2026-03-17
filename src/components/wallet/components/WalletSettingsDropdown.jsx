@@ -117,22 +117,19 @@ export default function WalletSettingsDropdown({
           <div
             role="menu"
             className={[
-              "fixed inset-0 z-50 overflow-y-auto bg-[#0b0f10]",
-              "md:inset-auto md:w-[320px] md:rounded-2xl md:border md:border-white/10 md:bg-[#111518]/95 md:backdrop-blur-xl md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-fadeScale",
+              "fixed inset-0 z-50 overflow-y-auto bg-[#0B0F14]",
+              "md:inset-auto md:w-[320px] md:rounded-xl md:border md:border-white/5 md:bg-[#11161C] md:shadow-[0_16px_60px_rgba(0,0,0,0.55)] md:overflow-visible md:animate-walletSettingsIn",
               dropdownPositionClass,
             ].join(" ")}
           >
             {/* Pointer (desktop) */}
             <div
               className={[
-                "hidden md:block absolute h-3.5 w-3.5 bg-[#111518]/95 border border-white/10",
+                "hidden md:block absolute h-3.5 w-3.5 bg-[#11161C] border border-white/5",
                 arrowPositionClass,
               ].join(" ")}
               aria-hidden
             />
-
-            {/* Top stripe */}
-            <div className="h-1 w-full bg-gradient-to-r from-xcannes-green/70 via-xcannes-green/15 to-transparent" />
 
             {/* Mobile header */}
             <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
@@ -155,9 +152,9 @@ export default function WalletSettingsDropdown({
             </div>
 
             {/* Desktop header */}
-            <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-white/8">
+            <div className="hidden md:flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/4 border border-white/5 text-[#8B98A5]">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z" />
                     <circle cx="12" cy="12" r="3" />
@@ -167,7 +164,7 @@ export default function WalletSettingsDropdown({
                   <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/60">
                     {t("ui_settings_label", "Paramètres")}
                   </div>
-                  <div className="text-[12px] text-white/80 truncate">
+                  <div className="text-[12px] text-[#8B98A5] truncate">
                     {t("ui_wallet_settings_subtitle", "Wallet — options rapides")}
                   </div>
                 </div>
@@ -175,7 +172,7 @@ export default function WalletSettingsDropdown({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
+                className="h-8 w-8 rounded-lg bg-white/4 hover:bg-white/7 border border-white/5 text-white/45 hover:text-white/80 flex items-center justify-center transition-colors duration-150"
                 aria-label={t("close", "Fermer")}
               >
                 ✕
@@ -183,10 +180,10 @@ export default function WalletSettingsDropdown({
             </div>
 
             <div className="px-3 pb-4 md:px-3 md:pb-3">
-              {/* Section: Actions */}
-              <div className="pt-2 md:pt-3">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
-                  {t("ui_settings_section_actions", "Actions")}
+              {/* Section: Comptes */}
+              <div className="pt-2 md:pt-2.5">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#8B98A5]/80">
+                  {t("ui_settings_section_accounts", "Comptes")}
                 </div>
 
                 <button
@@ -209,34 +206,36 @@ export default function WalletSettingsDropdown({
                       window.open("/wallet-app/?action=choice", "_blank");
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border border-white/10 bg-white/3 hover:bg-white/5 hover:border-white/15 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-white/5 bg-white/3 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-[rgba(34,197,94,0.6)] focus-visible:ring-2 focus-visible:ring-[rgba(34,197,94,0.18)]"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/60 shrink-0">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0F141A] border border-white/5 text-[#8B98A5] shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/90">
-                      {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
+                    <div className="text-[13px] font-medium text-[#E6EDF3]">
+                      {t("ui_add_wallet", "Ajouter un wallet")}
                     </div>
-                    <div className="text-[11px] text-white/45 mt-0.5">
-                      {t("ui_manage_wallets_hint", "Ajouter un wallet, ou en importer un existant")}
+                    <div className="text-[11px] text-[#8B98A5] mt-0.5">
+                      {t("ui_add_wallet_hint", "Créer ou importer un wallet existant")}
                     </div>
                   </div>
                   <span className="text-white/25 text-lg">›</span>
                 </button>
               </div>
 
-              {/* Section: Display */}
+              {/* Section: Préférences */}
               {preferredCurrency && (
                 <>
-                  <div className="my-3 border-t border-white/10" />
-                  <div className="pt-0.5">
-                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
-                      {t("ui_settings_section_display", "Affichage")}
+                  <div className="mt-4">
+                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#8B98A5]/80">
+                      {t("ui_settings_section_preferences", "Préférences")}
                     </div>
-                    <div className="rounded-xl border border-white/10 bg-black/20 p-2.5">
+                    <div className="rounded-[10px] border border-white/5 bg-[#0F141A] p-2.5 focus-within:border-[rgba(34,197,94,0.6)] focus-within:ring-2 focus-within:ring-[rgba(34,197,94,0.18)] transition-colors duration-150">
+                      <div className="px-1 pb-2 text-[11px] text-[#8B98A5]">
+                        {t("ui_primary_currency_label", "Devise principale")}
+                      </div>
                       <PreferredCurrencySelector
                         currentCurrency={preferredCurrency}
                         topCurrencies={topCurrencies}
@@ -252,12 +251,10 @@ export default function WalletSettingsDropdown({
                 </>
               )}
 
-              <div className="my-3 border-t border-white/10" />
-
-              {/* Section: Help */}
-              <div className="pt-0.5">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
-                  {t("ui_settings_section_help", "Aide")}
+              {/* Section: Support */}
+              <div className="mt-4">
+                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-[#8B98A5]/80">
+                  {t("ui_settings_section_support", "Support")}
                 </div>
 
                 <a
@@ -265,22 +262,19 @@ export default function WalletSettingsDropdown({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/5 hover:bg-white/4 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-[rgba(34,197,94,0.6)] focus-visible:ring-2 focus-visible:ring-[rgba(34,197,94,0.18)]"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0F141A] border border-white/5 text-[#8B98A5] shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 6v4m0 4h.01" />
                     </svg>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-	                      {t(
-	                        "ui_stablecoin_usd_r_gul_d_details_80d8d1ba32",
-	                        "Stablecoin RLUSD (détails)",
-	                      )}
-	                    </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_external_link_hint", "Ouvre rlusd.com")}
+                    <div className="text-[13px] font-medium text-[#E6EDF3]">
+                      {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
+                    </div>
+                    <div className="text-[11px] text-[#8B98A5] mt-0.5">
+                      {t("ui_stablecoin_rlusd_hint", "Ouvrir rlusd.com")}
                     </div>
                   </div>
                   <span className="text-white/20 text-lg">↗</span>
@@ -292,16 +286,18 @@ export default function WalletSettingsDropdown({
                     onOpenInfo?.();
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-left"
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/5 hover:bg-white/4 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-[rgba(34,197,94,0.6)] focus-visible:ring-2 focus-visible:ring-[rgba(34,197,94,0.18)]"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/4 border border-white/10 text-white/55 shrink-0 font-semibold">
-                    i
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#0F141A] border border-white/5 text-[#8B98A5] shrink-0">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                    </svg>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/85">
-                      {t("wallet_footer_info_fees", "Info & Fees")}
+                    <div className="text-[13px] font-medium text-[#E6EDF3]">
+                      {t("ui_fees_and_how_it_works", "Frais et fonctionnement")}
                     </div>
-                    <div className="text-[11px] text-white/40 mt-0.5">
+                    <div className="text-[11px] text-[#8B98A5] mt-0.5">
                       {t("ui_settings_info_hint", "Comprendre les frais et le fonctionnement")}
                     </div>
                   </div>
@@ -310,6 +306,22 @@ export default function WalletSettingsDropdown({
               </div>
             </div>
           </div>
+
+          <style jsx global>{`
+            @keyframes walletSettingsIn {
+              from {
+                opacity: 0;
+                transform: translateY(4px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            .animate-walletSettingsIn {
+              animation: walletSettingsIn 150ms ease-out both;
+            }
+          `}</style>
         </>
       )}
 
