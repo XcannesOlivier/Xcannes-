@@ -82,22 +82,23 @@ export default function DemoWalletHeader({
               className="relative flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none"
               ref={switcherRef}
             >
-              <button
-                type="button"
-                onClick={
-                  hasMultipleWallets
-                    ? () => setIsSwitcherOpen((v) => !v)
-                    : undefined
-                }
-                className={[
-                  "w-full text-left",
-                  hasMultipleWallets ? "cursor-pointer" : "cursor-default",
-                ].join(" ")}
-                aria-haspopup={hasMultipleWallets ? "menu" : undefined}
-                aria-expanded={hasMultipleWallets ? isSwitcherOpen : undefined}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-3">
+                {/* Wallet label + address */}
+                <button
+                  type="button"
+                  onClick={
+                    hasMultipleWallets
+                      ? () => setIsSwitcherOpen((v) => !v)
+                      : undefined
+                  }
+                  className={[
+                    "w-full text-left min-w-0 flex-1",
+                    hasMultipleWallets ? "cursor-pointer" : "cursor-default",
+                  ].join(" ")}
+                  aria-haspopup={hasMultipleWallets ? "menu" : undefined}
+                  aria-expanded={hasMultipleWallets ? isSwitcherOpen : undefined}
+                >
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
                         {walletContextLabel || t("nav_wallet", "Wallet")}
@@ -120,51 +121,88 @@ export default function DemoWalletHeader({
                       </span>
                     </div>
                   </div>
+                </button>
 
-                  {hasMultipleWallets ? (
-                    <span className="text-white/30 text-lg leading-none">
-                      {isSwitcherOpen ? "▴" : "▾"}
-                    </span>
-                  ) : null}
-                </div>
-              </button>
+                {/* Chevron — same as real wallet */}
+                {hasMultipleWallets ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsSwitcherOpen((v) => !v)}
+                    className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
+                    aria-label={t("ui_switch_wallet", "Changer de wallet")}
+                  >
+                    <svg
+                      className={`w-4 h-4 transition-transform ${
+                        isSwitcherOpen ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                ) : null}
+              </div>
 
               {hasMultipleWallets && isSwitcherOpen ? (
-                <div className="absolute left-0 right-0 top-full mt-1.5 z-20 rounded-xl border border-white/10 bg-[#111518]/95 backdrop-blur-xl shadow-[0_28px_90px_rgba(0,0,0,0.6)] overflow-hidden">
+                <div className="absolute z-50 left-0 right-0 top-full mt-1.5 rounded-lg bg-[#151b1e] border border-white/10 shadow-xl max-h-52 overflow-y-auto">
                   {(walletAddresses || []).map((w) => {
                     const id = String(w?.id || "").toUpperCase();
-                    const isActive = id === String(activeWalletId || "").toUpperCase();
+                    const isActive =
+                      id === String(activeWalletId || "").toUpperCase();
+                    const displayName =
+                      String(w?.label || "").trim() ||
+                      `${t("demo_wallet_label", "Wallet")} ${id}`;
                     return (
                       <button
                         key={id}
                         type="button"
                         onClick={() => {
                           setIsSwitcherOpen(false);
-                          onSwitchWallet?.(id);
+                          if (!isActive) onSwitchWallet?.(id);
                         }}
                         className={[
-                          "w-full flex items-center justify-between gap-3 px-3 py-2 text-left transition-colors",
+                          "w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors border-l-2",
                           isActive
-                            ? "bg-emerald-400/10 text-emerald-200"
-                            : "hover:bg-white/5 text-white/80",
+                            ? "bg-xcannes-green/10 border-xcannes-green"
+                            : "hover:bg-white/5 border-transparent",
                         ].join(" ")}
                       >
+                        <span
+                          className={`h-2 w-2 rounded-full shrink-0 ${
+                            isActive ? "bg-xcannes-green" : "bg-white/20"
+                          }`}
+                        />
                         <div className="min-w-0">
-                          <div className="text-[13px] font-medium truncate">
-                            {String(w?.label || "").trim() ||
-                              `${t("demo_wallet_label", "Wallet")} ${id}`}
+                          <div
+                            className={`text-[13px] font-medium truncate ${
+                              isActive ? "text-xcannes-green" : "text-white/80"
+                            }`}
+                          >
+                            {displayName}
                           </div>
-                          <div className="text-[10px] font-mono text-white/45 truncate">
-                            {formatDemoAddressShort(w?.address || "")}
+                          <div
+                            className={`font-mono text-[12px] truncate ${
+                              isActive
+                                ? "text-xcannes-green/70"
+                                : "text-white/40"
+                            }`}
+                          >
+                            {(w?.address || "").slice(0, 10)}…
+                            {(w?.address || "").slice(-8)}
                           </div>
                         </div>
                         {isActive ? (
-                          <span className="text-emerald-300 text-[12px]">
-                            ✓
+                          <span className="ml-auto text-[11px] text-xcannes-green/80 font-medium uppercase tracking-wider">
+                            {t("ui_active_wallet", "actif")}
                           </span>
-                        ) : (
-                          <span className="text-white/20 text-lg">›</span>
-                        )}
+                        ) : null}
                       </button>
                     );
                   })}
