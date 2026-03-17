@@ -507,39 +507,44 @@ export default function DemoWalletDashboardSendModal({
                 )}
                 className={`w-full bg-black/40 border border-white/15 rounded-xl ${
                   !hasPaymentRequest ? "pl-8" : "pl-4"
-                } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
+                } ${hasPaymentRequest ? "pr-4" : "pr-28"} h-12 md:h-auto py-0 md:py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
               />
 
               {!hasPaymentRequest ? (
                 <>
-                  {/* Saved addresses picker */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowSavedPicker((prev) => !prev);
-                    }}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
-                    title={t("ui_saved_addresses_label", "Adresses enregistrées")}
-                    aria-expanded={showSavedPicker}
-                  >
-                    <svg
-                      className="w-4 h-4 text-white/60"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  {/* Saved addresses picker (vertically centered) */}
+                  <div className="absolute left-2 inset-y-0 flex items-center">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSavedPicker((prev) => !prev);
+                      }}
+                      className="p-1 bg-transparent border-none outline-none cursor-pointer transition-transform duration-200 hover:scale-110 active:scale-95"
+                      title={t(
+                        "ui_saved_addresses_label",
+                        "Adresses enregistrées",
+                      )}
+                      aria-expanded={showSavedPicker}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
+                      <svg
+                        className="w-4 h-4 text-white/60"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
 
                   {/* Actions droite (responsive): + upload + scan */}
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <div className="absolute right-2 inset-y-0 flex items-center gap-1">
                     {/* Upload QR image */}
                     <button
                       type="button"
