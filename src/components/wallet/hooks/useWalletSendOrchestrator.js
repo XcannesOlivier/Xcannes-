@@ -28,6 +28,9 @@ export function useWalletSendOrchestrator({
   confirm,
   setActiveAction,
 }) {
+  const resolvedWalletAddress =
+    typeof wallet === "string" ? wallet : wallet?.address || "";
+
   // ── Send form ──────────────────────────────────────────────
   const {
     sendTab,
@@ -49,12 +52,12 @@ export function useWalletSendOrchestrator({
 
   // ── Saved addresses ────────────────────────────────────────
   const { savedAddresses, saveAddress } = useSavedAddresses({
-    walletAddress: wallet?.address || "",
+    walletAddress: resolvedWalletAddress,
   });
 
   // ── Pending payment requests (local storage) ───────────────
   const { pendingPayreqs, savePayreq, removePayreq, pendingCount } =
-    usePayreqStorage({ walletAddress: wallet?.address || null });
+    usePayreqStorage({ walletAddress: resolvedWalletAddress || null });
 
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
