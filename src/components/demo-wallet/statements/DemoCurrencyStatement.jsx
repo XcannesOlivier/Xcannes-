@@ -1140,7 +1140,7 @@ export default function DemoCurrencyStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:h-auto md:max-w-4xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-5xl",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:h-auto md:max-w-4xl md:rounded-2xl md:max-h-[92vh] lg:max-w-5xl",
     },
     "dex-desktop": {
       backdropClass: "bg-black/75 md:backdrop-blur-sm",
@@ -1151,7 +1151,7 @@ export default function DemoCurrencyStatement({
       backdropClass: "bg-black/90 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0",
       panelClass:
-        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0 md:border md:border-white/10",
+        "w-full h-[100dvh] max-h-[100dvh] rounded-none border-0",
     },
     default: {
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
@@ -1268,7 +1268,7 @@ export default function DemoCurrencyStatement({
               onClick={closeTxDetails}
             />
             <div
-              className={`relative w-full max-w-md rounded-[14px] border border-white/[0.06] ${modalBgClass} p-4 md:p-5 shadow-2xl wallet-modal-lift-in`}
+              className={`relative w-full max-w-md rounded-[14px] ${modalBgClass} p-4 md:p-5 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
             >
               {/* Header */}
               <div className="flex items-start justify-between gap-3">
@@ -1482,13 +1482,13 @@ export default function DemoCurrencyStatement({
       }}
     >
       <div
-        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
+        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
       >
         {/* Header avec Account Info intégré */}
         <div
-          className={`flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4`}
+          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
         >
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
@@ -1610,7 +1610,7 @@ export default function DemoCurrencyStatement({
 
           {/* Filters */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="inline-flex items-center rounded-xl border border-white/5 bg-[#11161C] p-1">
+            <div className="inline-flex items-center rounded-xl p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               {[
                 {
                   key: "all",
@@ -1650,7 +1650,7 @@ export default function DemoCurrencyStatement({
           </div>
 
           {/* Transactions Timeline */}
-          <div className="rounded-xl border border-white/5 bg-[#11161C] overflow-hidden flex flex-col min-h-0">
+          <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col min-h-0">
             {error && (
               <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
                 {error}
@@ -1752,7 +1752,7 @@ export default function DemoCurrencyStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30">
+        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleExportPdf}
