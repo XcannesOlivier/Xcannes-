@@ -72,7 +72,12 @@ export default function WalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination],
   );
-  const hasDestination = Boolean(normalizedDestination) && /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(normalizedDestination);
+  const effectiveDestination = String(
+    sendPaymentRequest?.to || normalizedDestination || "",
+  ).trim();
+  const hasDestination =
+    Boolean(effectiveDestination) &&
+    /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(effectiveDestination);
   const showCalculatedAmountLabel = useMemo(() => {
     if (!sendPaymentRequest || !selectedSendToken) return false;
     const target = String(sendPaymentRequest?.targetCurrencyCode || "")
@@ -86,12 +91,12 @@ export default function WalletDashboardSendModal({
   }, [sendPaymentRequest, selectedSendToken]);
   const isSavedDestination = useMemo(() => {
     return (savedAddresses || []).some(
-      (addr) => addr.address === normalizedDestination,
+      (addr) => String(addr?.address || "").trim() === effectiveDestination,
     );
-  }, [savedAddresses, normalizedDestination]);
+  }, [savedAddresses, effectiveDestination]);
   const canSaveDestination =
     enableSaveAddress &&
-    normalizedDestination &&
+    effectiveDestination &&
     !isSavedDestination;
   const normalizedSendAmount = Number(String(sendAmount || "").trim());
   const canManualSend =
@@ -151,7 +156,7 @@ export default function WalletDashboardSendModal({
   const handleManualSend = async () => {
     const result = await handleSendSubmit?.({
       saveDestination:
-        saveNewAddress && canSaveDestination ? normalizedDestination : "",
+        saveNewAddress && shouldShowSaveAddressBlock ? effectiveDestination : "",
       saveLabel: resolvedDestinationLabel,
     });
     if (result?.ok) {
@@ -449,15 +454,15 @@ export default function WalletDashboardSendModal({
       })
     : null;
   const savedDestinationLabel = useMemo(() => {
-    if (!normalizedDestination) return "";
+    if (!effectiveDestination) return "";
     const entry = (savedAddresses || []).find(
-      (addr) => String(addr?.address || "").trim() === normalizedDestination,
+      (addr) => String(addr?.address || "").trim() === effectiveDestination,
     );
     const label = String(
       entry?.onChainLabel || entry?.label || "",
     ).trim();
     return label;
-  }, [savedAddresses, normalizedDestination]);
+  }, [savedAddresses, effectiveDestination]);
   const resolvedDestinationLabel =
     savedDestinationLabel || sendDestinationLabel || remoteDestinationLabel;
   const shouldShowLabelInInput =
@@ -467,6 +472,20 @@ export default function WalletDashboardSendModal({
   const destinationDisplayValue = shouldShowLabelInInput
     ? resolvedDestinationLabel
     : sendDestination;
+
+  const payreqSelectorLabel = String(
+    requestBeneficiaryLabel || resolvedDestinationLabel || "",
+  ).trim();
+  const payreqSelectorValue = payreqSelectorLabel || requestDestination;
+  const recipientLabelDetected = hasPaymentRequest
+    ? Boolean(payreqSelectorLabel)
+    : Boolean(String(resolvedDestinationLabel || "").trim());
+  const shouldShowSaveAddressBlock =
+    canSaveDestination && hasDestination && !recipientLabelDetected;
+
+  useEffect(() => {
+    if (!shouldShowSaveAddressBlock) setSaveNewAddress(false);
+  }, [shouldShowSaveAddressBlock]);
 
   const compactDestinationLabel = normalizedDestination
     ? normalizedDestination.length > 14
@@ -552,13 +571,18 @@ export default function WalletDashboardSendModal({
   ]);
 
   useEffect(() => {
-    if (!hasDestination || hasPaymentRequest || savedDestinationLabel || sendDestinationLabel) {
+    if (
+      !hasDestination ||
+      savedDestinationLabel ||
+      sendDestinationLabel ||
+      (hasPaymentRequest && String(requestBeneficiaryLabel || "").trim())
+    ) {
       setRemoteDestinationLabel("");
       return;
     }
 
     let cancelled = false;
-    const address = normalizedDestination;
+    const address = effectiveDestination;
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(
@@ -586,7 +610,8 @@ export default function WalletDashboardSendModal({
   }, [
     hasDestination,
     hasPaymentRequest,
-    normalizedDestination,
+    effectiveDestination,
+    requestBeneficiaryLabel,
     savedDestinationLabel,
     sendDestinationLabel,
     setSendDestinationLabel,
@@ -617,7 +642,7 @@ export default function WalletDashboardSendModal({
       : "",
   ].join(" ");
 
-  const saveAddressBlock = canSaveDestination ? (
+  const saveAddressBlock = shouldShowSaveAddressBlock ? (
     <div className="rounded-lg bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 space-y-2 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
       <label className="flex items-center gap-2 text-xs text-white/60">
         <input
@@ -752,7 +777,7 @@ export default function WalletDashboardSendModal({
         ) : null}
       </div>
 
-      {hasDestination ? saveAddressBlock : null}
+      {saveAddressBlock}
     </div>
   ) : null;
 
@@ -944,7 +969,7 @@ export default function WalletDashboardSendModal({
         <div className="relative">
           <input
             type="text"
-            value={requestDestination}
+            value={payreqSelectorValue}
             readOnly
             className="w-full bg-[#0F141A] ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
           />
@@ -1024,11 +1049,13 @@ export default function WalletDashboardSendModal({
         </div>
         <div className="text-xs text-white/45 space-y-0.5">
           <div className="text-white/70 font-semibold">
-            {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+            {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
           </div>
           <div className="font-mono">{requestDestinationLabel}</div>
           <div className="text-white/50">{t("ui_valid_address", "Adresse valide")}</div>
         </div>
+
+        {saveAddressBlock}
       </div>
 
       {/* 2) Divider */}
@@ -1051,7 +1078,7 @@ export default function WalletDashboardSendModal({
               {t("ui_beneficiary_label", "Destinataire")}
             </div>
             <div className="text-sm font-semibold text-white/90">
-              {requestBeneficiaryLabel || t("ui_wallet_unknown", "Unknown wallet")}
+              {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </div>
           </div>
           <div className="space-y-0.5">
@@ -1082,22 +1109,6 @@ export default function WalletDashboardSendModal({
           </div>
         </div>
 
-        {canSaveDestination ? (
-          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <label className="flex items-center gap-2 text-xs text-white/60">
-              <input
-                type="checkbox"
-                checked={saveNewAddress}
-                onChange={(e) => setSaveNewAddress(e.target.checked)}
-                className="accent-xcannes-green"
-              />
-              {t(
-                "ui_save_this_address_fr",
-                "Enregistrer cette adresse",
-              )}
-            </label>
-          </div>
-        ) : null}
       </div>
 
       {/* Insufficient balance warning */}
