@@ -54,6 +54,8 @@ export default function WalletDashboardSendModal({
   const [autoShowLabelOnce, setAutoShowLabelOnce] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
+  const [showFullRecipientAccount, setShowFullRecipientAccount] =
+    useState(false);
   const savedPickerRef = useRef(null);
   const savedMenuRef = useRef(null);
   const destinationInputRef = useRef(null);
@@ -473,6 +475,10 @@ export default function WalletDashboardSendModal({
       : normalizedDestination
     : "";
 
+  useEffect(() => {
+    setShowFullRecipientAccount(false);
+  }, [normalizedDestination]);
+
   const savedPickerMenu = showSavedPicker ? (
     <div
       ref={savedMenuRef}
@@ -747,13 +753,6 @@ export default function WalletDashboardSendModal({
         ) : null}
       </div>
 
-      {hasDestination && resolvedDestinationLabel ? (
-        <div className="mt-1 text-[11px] text-white/40">
-          {t("ui_selected_wallet_label", "Sélectionné")} :{" "}
-          <span className="text-white/60">{resolvedDestinationLabel}</span>
-        </div>
-      ) : null}
-
       {hasDestination ? saveAddressBlock : null}
     </div>
   ) : null;
@@ -876,13 +875,34 @@ export default function WalletDashboardSendModal({
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
         <div className="space-y-3 text-sm text-white/80">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-start justify-between gap-3">
             <span className="text-white/60 shrink-0">
               {t("ui_beneficiary_label", "Destinataire")}
             </span>
-            <span className="font-semibold text-white/90">
-              {resolvedDestinationLabel || t("ui_wallet_unknown", "Unknown wallet")}
-            </span>
+            <div className="min-w-0 text-right">
+              <div className="font-semibold text-white/90 truncate">
+                {resolvedDestinationLabel ||
+                  t("ui_wallet_unknown", "Unknown wallet")}
+              </div>
+              {normalizedDestination ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowFullRecipientAccount((prev) => !prev)
+                  }
+                  className="mt-1 text-[12px] text-white/60 hover:text-white/80 transition-colors font-mono"
+                  title={t(
+                    "ui_toggle_full_account_number",
+                    "Afficher/masquer l’adresse complète",
+                  )}
+                >
+                  {t("ui_account_number_label", "N° Compte")} :{" "}
+                  {showFullRecipientAccount
+                    ? normalizedDestination
+                    : compactDestinationLabel}
+                </button>
+              ) : null}
+            </div>
           </div>
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
