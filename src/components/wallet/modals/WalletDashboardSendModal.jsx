@@ -54,10 +54,8 @@ export default function WalletDashboardSendModal({
   const [autoShowLabelOnce, setAutoShowLabelOnce] = useState(false);
   const [showFullPayreqAddress, setShowFullPayreqAddress] = useState(false);
   const [scanUnavailable, setScanUnavailable] = useState(false);
-  const [editingRecipient, setEditingRecipient] = useState(true);
   const savedPickerRef = useRef(null);
   const destinationInputRef = useRef(null);
-  const recipientAutoCollapsedRef = useRef(false);
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -402,27 +400,6 @@ export default function WalletDashboardSendModal({
     }
   }, [canSaveDestination]);
 
-  useEffect(() => {
-    if (!open) {
-      setEditingRecipient(true);
-      recipientAutoCollapsedRef.current = false;
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    if (hasPaymentRequest) return;
-    if (!hasDestination) {
-      setEditingRecipient(true);
-      recipientAutoCollapsedRef.current = false;
-      return;
-    }
-    if (!recipientAutoCollapsedRef.current) {
-      setEditingRecipient(false);
-      recipientAutoCollapsedRef.current = true;
-    }
-  }, [open, hasDestination, hasPaymentRequest]);
-
   /* ── Label helpers for summary ── */
   const confirmCurrencyCode = String(
     selectedSendToken?.currency || "",
@@ -578,278 +555,159 @@ export default function WalletDashboardSendModal({
         {t("ui_send_to_label", "Destinataire")}
       </label>
 
-      {editingRecipient || !hasDestination ? (
-        <>
-          <div className="relative" ref={savedPickerRef}>
-            <input
-              ref={destinationInputRef}
-              type="text"
-              value={destinationDisplayValue}
-              onChange={(e) => {
-                setAutoShowLabelOnce(false);
-                setUseLabelDisplay(false);
-                setSendDestination(e.target.value);
-                setSendDestinationLabel?.("");
-                setShowSavedPicker(false);
-              }}
-              onFocus={() => {
-                setDestinationFocused(true);
-                // When focusing, reveal the address so the user can edit/copy it.
-                setUseLabelDisplay(false);
-              }}
-              onBlur={() => {
-                setDestinationFocused(false);
-              }}
-              onClick={() => {
-                // If we're showing a label (readOnly), allow a click to reveal the address immediately.
-                if (shouldShowLabelInInput) setUseLabelDisplay(false);
-              }}
-              onPaste={handlePastePayload}
-              placeholder={t(
-                "ui_import_or_choose_recipient",
-                "Import or choose address",
-              )}
-              readOnly={shouldShowLabelInInput}
-              className={`w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl ${
-                !hasPaymentRequest ? "pl-8" : "pl-4"
-              } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
-            />
+      <div className="relative" ref={savedPickerRef}>
+        <input
+          ref={destinationInputRef}
+          type="text"
+          value={destinationDisplayValue}
+          onChange={(e) => {
+            setAutoShowLabelOnce(false);
+            setUseLabelDisplay(false);
+            setSendDestination(e.target.value);
+            setSendDestinationLabel?.("");
+            setShowSavedPicker(false);
+          }}
+          onFocus={() => {
+            setDestinationFocused(true);
+            // When focusing, reveal the address so the user can edit/copy it.
+            setUseLabelDisplay(false);
+          }}
+          onBlur={() => {
+            setDestinationFocused(false);
+          }}
+          onClick={() => {
+            // If we're showing a label (readOnly), allow a click to reveal the address immediately.
+            if (shouldShowLabelInInput) setUseLabelDisplay(false);
+          }}
+          onPaste={handlePastePayload}
+          placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
+          readOnly={shouldShowLabelInInput}
+          className={`w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl ${
+            !hasPaymentRequest ? "pl-8" : "pl-4"
+          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
+        />
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowSavedPicker((prev) => !prev);
-              }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t("ui_saved_addresses_label", "Adresses enregistrées")}
-              aria-expanded={showSavedPicker}
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleScanQrUpload();
-              }}
-              className="absolute right-11 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t(
-                "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                "Charger une image qrcode",
-              )}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
-                />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setScanActive(true);
-                setScanKey((prev) => prev + 1);
-              }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                />
-              </svg>
-            </button>
-
-            {showSavedPicker ? (
-              <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl ring-1 ring-white/10 ring-inset bg-elevated overflow-hidden shadow-lg">
-                <div className="max-h-56 overflow-y-auto">
-                  {(savedAddresses || []).length > 0 ? (
-                    (savedAddresses || []).map((addr, idx) => (
-                      <button
-                        key={`${addr.address}-${idx}`}
-                        type="button"
-                        onClick={() => {
-                          const value = String(addr?.address || "").trim();
-                          if (!value) return;
-                          const label = String(
-                            addr?.onChainLabel || addr?.label || "",
-                          ).trim();
-                          setSendDestination(value);
-                          setSendDestinationLabel?.(label);
-                          setUseLabelDisplay(Boolean(label));
-                          setShowSavedPicker(false);
-                          setEditingRecipient(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
-                      >
-                        <span className="block font-semibold">
-                          {String(
-                            addr?.onChainLabel || addr?.label || "",
-                          ).trim() ||
-                            t("ui_wallet_unknown", "Unknown wallet")}
-                        </span>
-                        <span className="block font-mono text-[11px] text-white/60 truncate">
-                          {addr.address}
-                        </span>
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-xs text-white/60">
-                      {t("ui_no_saved_addresses", "No saved addresses yet")}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : null}
-          </div>
-
-          {hasDestination && resolvedDestinationLabel ? (
-            <div className="mt-1 text-[11px] text-white/40">
-              {t("ui_selected_wallet_label", "Sélectionné")} :{" "}
-              <span className="text-white/60">{resolvedDestinationLabel}</span>
-            </div>
-          ) : null}
-
-          {hasDestination ? saveAddressBlock : null}
-        </>
-      ) : (
-        <div className="w-full rounded-xl ring-1 ring-white/10 ring-inset bg-black/20 px-3 py-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setEditingRecipient(true);
-              setShowSavedPicker(false);
-              setUseLabelDisplay(false);
-              requestAnimationFrame(() => {
-                destinationInputRef.current?.focus?.();
-              });
-            }}
-            className="min-w-0 text-left flex-1"
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowSavedPicker((prev) => !prev);
+          }}
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+          title={t("ui_saved_addresses_label", "Adresses enregistrées")}
+          aria-expanded={showSavedPicker}
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
           >
-            <div className="text-sm font-semibold text-white/90 truncate">
-              {resolvedDestinationLabel ||
-                t("ui_wallet_unknown", "Unknown wallet")}
-            </div>
-            <div className="mt-0.5 text-[12px] font-mono text-white/50 truncate">
-              {compactDestinationLabel}
-            </div>
-          </button>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
 
-          <div className="flex items-center gap-1 text-white/60 shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                setEditingRecipient(true);
-                setShowSavedPicker(false);
-                setUseLabelDisplay(false);
-                requestAnimationFrame(() => {
-                  destinationInputRef.current?.focus?.();
-                });
-              }}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
-              title={t("ui_change_recipient", "Changer le destinataire")}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 5l4 4M4 20h4l10.5-10.5a2 2 0 000-2.8l-1.2-1.2a2 2 0 00-2.8 0L4 16v4z"
-                />
-              </svg>
-            </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleScanQrUpload();
+          }}
+          className="absolute right-11 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+          title={t(
+            "ui_or_upload_a_qr_image_works_e_df6baa8039",
+            "Charger une image qrcode",
+          )}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
+            />
+          </svg>
+        </button>
 
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleScanQrUpload();
-              }}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
-              title={t(
-                "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                "Charger une image qrcode",
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setScanActive(true);
+            setScanKey((prev) => prev + 1);
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
+          title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+            />
+          </svg>
+        </button>
+
+        {showSavedPicker ? (
+          <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl ring-1 ring-white/10 ring-inset bg-elevated overflow-hidden shadow-lg">
+            <div className="max-h-56 overflow-y-auto">
+              {(savedAddresses || []).length > 0 ? (
+                (savedAddresses || []).map((addr, idx) => (
+                  <button
+                    key={`${addr.address}-${idx}`}
+                    type="button"
+                    onClick={() => {
+                      const value = String(addr?.address || "").trim();
+                      if (!value) return;
+                      const label = String(
+                        addr?.onChainLabel || addr?.label || "",
+                      ).trim();
+                      setSendDestination(value);
+                      setSendDestinationLabel?.(label);
+                      setUseLabelDisplay(Boolean(label));
+                      setShowSavedPicker(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
+                  >
+                    <span className="block font-semibold">
+                      {String(addr?.onChainLabel || addr?.label || "").trim() ||
+                        t("ui_wallet_unknown", "Unknown wallet")}
+                    </span>
+                    <span className="block font-mono text-[11px] text-white/60 truncate">
+                      {addr.address}
+                    </span>
+                  </button>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-xs text-white/60">
+                  {t("ui_no_saved_addresses", "No saved addresses yet")}
+                </div>
               )}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
-                />
-              </svg>
-            </button>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setScanActive(true);
-                setScanKey((prev) => prev + 1);
-              }}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
-              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                />
-              </svg>
-            </button>
+            </div>
           </div>
+        ) : null}
+      </div>
+
+      {hasDestination && resolvedDestinationLabel ? (
+        <div className="mt-1 text-[11px] text-white/40">
+          {t("ui_selected_wallet_label", "Sélectionné")} :{" "}
+          <span className="text-white/60">{resolvedDestinationLabel}</span>
         </div>
-      )}
+      ) : null}
+
+      {hasDestination ? saveAddressBlock : null}
     </div>
   ) : null;
 
