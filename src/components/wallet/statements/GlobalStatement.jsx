@@ -480,7 +480,7 @@ export default function GlobalStatement({
       }}
     >
       <div
-        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
+        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
       >
@@ -493,29 +493,33 @@ export default function GlobalStatement({
               <Image
                 src="/assets/statement.svg"
                 alt={t("ui_statement_a87c93acb8", "Statement")}
-                width={36}
-                height={36}
-                className="flex-shrink-0 w-9 h-9"
+                width={32}
+                height={32}
+                className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8"
               />
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                    {t("ui_global_statement_13e29aa8aa", "Global")}
-                  </div>
+                <div className="flex items-center gap-2 min-w-0">
+                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+                    <span className="break-words">
+                      {t("ui_global_statement_13e29aa8aa", "Global")}
+                    </span>
+                  </h2>
                   {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-[11px] font-semibold px-2 py-0.5 leading-none">
+                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-0.5 leading-none">
                       {t("demo_notice_title", "Mode démo")}
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-1 text-base md:text-lg font-semibold text-white/90 break-words">
-                  {walletLabel || t("nav_wallet", "Wallet")}
+                <div className="mt-1 flex flex-wrap items-center gap-2 min-w-0">
+                  <span className="text-sm text-white font-semibold whitespace-nowrap">
+                    {walletLabel || t("nav_wallet", "Wallet")}
+                  </span>
+                  {walletAddress ? (
+                    <span className="text-xs md:text-sm text-white/60 font-mono break-all">
+                      {walletAddress}
+                    </span>
+                  ) : null}
                 </div>
-                {walletAddress ? (
-                  <div className="mt-1 text-xs text-white/50 font-mono break-all">
-                    {walletAddress}
-                  </div>
-                ) : null}
               </div>
             </div>
             {!inline ? (
