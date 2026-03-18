@@ -308,7 +308,7 @@ export default function WalletDashboardSwapModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-convert-modal border-white/10 md:border overflow-hidden flex flex-col min-h-0 pointer-events-auto pb-[env(safe-area-inset-bottom)]",
+    "relative w-full wallet-modal-panel wallet-convert-modal border-white/10 md:border overflow-hidden flex flex-col min-h-0 pointer-events-auto pb-[env(safe-area-inset-bottom)] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
@@ -399,11 +399,11 @@ export default function WalletDashboardSwapModal({
                       useNativeSelect={false}
                       showMobileOptionRight={true}
                       iconClassName="text-3xl leading-none"
-                      buttonClassName="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
                       menuClassName={
                         noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
                       }
-                      selectClassName="xcannes-select w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
                     />
                   </div>
 
@@ -418,7 +418,7 @@ export default function WalletDashboardSwapModal({
                         setConvertBaseCurrency(prevQuote);
                         setConvertQuoteCurrency(prevBase);
                       }}
-                      className="h-10 w-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors duration-150 flex items-center justify-center text-white/70"
+                      className="h-10 w-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset hover:bg-white/10 hover:ring-white/20 transition-colors duration-150 flex items-center justify-center text-white/70"
                       aria-label={t("ui_swap_currencies", "Inverser")}
                       title={t("ui_swap_currencies", "Inverser")}
                     >
@@ -451,16 +451,16 @@ export default function WalletDashboardSwapModal({
                       useNativeSelect={false}
                       showMobileOptionRight={true}
                       iconClassName="text-3xl leading-none"
-                      buttonClassName="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
                       menuClassName={
                         noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
                       }
-                      selectClassName="xcannes-select w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:border-xcannes-green/60 cursor-pointer transition-colors duration-150"
+                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
                     />
                   </div>
 
                   {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
-                    <div className="rounded-lg border border-xcannes-green/25 bg-xcannes-green/10 px-3 py-2 text-xs text-xcannes-green/90">
+                    <div className="rounded-lg ring-1 ring-xcannes-green/25 ring-inset bg-xcannes-green/10 px-3 py-2 text-xs text-xcannes-green/90">
                       {t(
                         "ui_new_currency_line_auto_activate_a1b2c3",
                         "New currency — the {{currency}} line will be created automatically.",
@@ -483,7 +483,7 @@ export default function WalletDashboardSwapModal({
                       )}
                       excludeCodes={["USD", "RLUSD", "XRP"]}
                       showQuickAdd={true}
-                      buttonClassName="w-full bg-white/3 border border-white/10 rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:border-white/20 transition-colors duration-150"
+                      buttonClassName="w-full bg-white/3 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:ring-white/20 transition-colors duration-150"
                     />
                   </div>
                 </div>
@@ -503,13 +503,13 @@ export default function WalletDashboardSwapModal({
                       "USD"
                     }
                     tokenClassName="text-white text-base"
-                    containerClassName="rounded-xl px-4 py-4 border-white/15 bg-black/30 focus-within:!border-xcannes-green/60 transition-colors duration-150"
+                    containerClassName="rounded-xl px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/60 transition-colors duration-150"
                   />
                 </div>
 
                   <div className="space-y-2">
                     {sameCurrencySelected ? (
-                      <div className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
+                      <div className="rounded-lg ring-1 ring-amber-300/30 ring-inset bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
                         {t(
                           "ui_convert_same_asset_warning_6f13d5c9c2",
                           "Veuillez choisir 2 actifs différents.",
@@ -517,7 +517,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {insufficientBalance && !sameCurrencySelected ? (
-                      <div className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-xs text-red-200/90">
+                      <div className="rounded-lg ring-1 ring-red-400/30 ring-inset bg-red-400/10 px-3 py-2 text-xs text-red-200/90">
                         {t(
                           "ui_insufficient_balance_convert_a3b4c5d6",
                           "Solde insuffisant. Disponible : {{amount}} {{currency}}",
@@ -527,7 +527,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-                    <div className="rounded-[14px] border border-white/10 bg-white/5 px-4 py-4 space-y-3">
+                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
                       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                         {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
                       </div>
@@ -550,7 +550,7 @@ export default function WalletDashboardSwapModal({
                           {previewMeta?.route === "allocation" &&
                           previewMeta?.isFx &&
                           previewMeta?.spreadFeeRlusd > 0 ? (
-                            <div className="text-sm text-white/60 pt-2 border-t border-white/10">
+                            <div className="text-sm text-white/60 pt-2 mt-2 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
                               {t("statement_conversion_fee_label", "Frais")}
                               {" : "}
                               {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", {
@@ -586,7 +586,7 @@ export default function WalletDashboardSwapModal({
                     ) : null}
 
                     {previewState.status === "error" ? (
-                      <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
+                      <div className="rounded-lg ring-1 ring-red-500/30 ring-inset bg-red-500/10 px-3 py-2 text-xs text-red-200">
                         {previewState.error}
                       </div>
                     ) : null}
@@ -598,7 +598,7 @@ export default function WalletDashboardSwapModal({
                     ) : null}
                   </div>
 
-                <div className="pt-3 border-t border-white/10">
+                <div className="pt-3 mt-1 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
                   {!isConnected && !isPreviewMode ? (
                     <button
                       type="button"
