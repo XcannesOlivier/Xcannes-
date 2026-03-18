@@ -478,7 +478,7 @@ export default function DemoWalletDashboardReceiveModal({
                 <h2 className="text-base md:text-lg font-semibold text-white/90">
                   {t("ui_receive_funds_title", "Recevoir des fonds")}
                 </h2>
-                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
                   <div className="flex flex-col items-center">
                     <div
                       ref={receiveQrContainerRef}
@@ -640,7 +640,10 @@ export default function DemoWalletDashboardReceiveModal({
                   ) : null}
 
                   {hasGeneratedRequest ? (
-                    <div ref={requestPreviewRef} className="pt-2 space-y-3">
+                    <div
+                      ref={requestPreviewRef}
+                      className="pt-2 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3"
+                    >
                       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                         {t("ui_request_generated_label", "Demande générée")}
                       </div>
