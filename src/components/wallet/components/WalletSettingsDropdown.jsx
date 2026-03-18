@@ -137,10 +137,10 @@ export default function WalletSettingsDropdown({
                 <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
                   {t("ui_settings_label", "Paramètres")}
                 </div>
-                <div className="text-[12px] text-white/80 mt-1 truncate">
-                  {t("ui_wallet_settings_subtitle", "Wallet — options rapides")}
-                </div>
-              </div>
+	                <div className="text-[12px] text-white/80 mt-1 truncate">
+	                  {t("ui_wallet_settings_subtitle", "Gestion du compte")}
+	                </div>
+	              </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -163,12 +163,12 @@ export default function WalletSettingsDropdown({
                 <div className="min-w-0">
                   <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/60">
                     {t("ui_settings_label", "Paramètres")}
-                  </div>
-                  <div className="text-[12px] text-white/80 truncate">
-                    {t("ui_wallet_settings_subtitle", "Wallet — options rapides")}
-                  </div>
-                </div>
-              </div>
+	                  </div>
+	                  <div className="text-[12px] text-white/80 truncate">
+	                    {t("ui_wallet_settings_subtitle", "Gestion du compte")}
+	                  </div>
+	                </div>
+	              </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -214,13 +214,16 @@ export default function WalletSettingsDropdown({
                     </svg>
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-white/90">
-                      {t("ui_add_wallet", "Ajouter un wallet")}
-                    </div>
-                    <div className="text-[11px] text-white/45 mt-0.5">
-                      {t("ui_add_wallet_hint", "Créer ou importer un wallet existant")}
-                    </div>
-                  </div>
+	                    <div className="text-[13px] font-medium text-white/90">
+	                      {t("ui_add_wallet", "Ajouter un compte")}
+	                    </div>
+	                    <div className="text-[11px] text-white/45 mt-0.5">
+	                      {t(
+	                        "ui_add_wallet_hint",
+	                        "Créer ou importer un compte existant",
+	                      )}
+	                    </div>
+	                  </div>
                   <span className="text-white/25 text-lg">›</span>
                 </button>
               </div>
@@ -229,18 +232,15 @@ export default function WalletSettingsDropdown({
               {preferredCurrency && (
                 <>
                   <div className="mt-4">
-                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
-                      {t("ui_settings_section_preferences", "Préférences")}
-                    </div>
-                    <div className="rounded-[10px] border border-white/10 bg-black/20 p-2.5 focus-within:border-xcannes-green/60 focus-within:ring-2 focus-within:ring-xcannes-green/20 transition-colors duration-150">
-                      <div className="px-1 pb-2 text-[11px] text-white/60">
-                        {t("ui_primary_currency_label", "Devise principale")}
-                      </div>
-                      <PreferredCurrencySelector
-                        currentCurrency={preferredCurrency}
-                        topCurrencies={topCurrencies}
-                        allCurrencies={fawazCurrencies}
-                        isLoading={fawazLoading}
+	                    <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+	                      {t("ui_settings_section_preferences", "Préférences")}
+	                    </div>
+	                    <div className="rounded-[10px] border border-white/10 bg-black/20 p-2.5 focus-within:border-xcannes-green/60 focus-within:ring-2 focus-within:ring-xcannes-green/20 transition-colors duration-150">
+	                      <PreferredCurrencySelector
+	                        currentCurrency={preferredCurrency}
+	                        topCurrencies={topCurrencies}
+	                        allCurrencies={fawazCurrencies}
+	                        isLoading={fawazLoading}
                         onSelect={(code) => {
                           onPreferredCurrencyChange?.(code);
                         }}

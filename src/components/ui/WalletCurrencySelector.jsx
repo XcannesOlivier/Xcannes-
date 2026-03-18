@@ -208,11 +208,11 @@ export default function WalletCurrencySelector({
       {open &&
       <div
         ref={popupRef}
-        className="absolute z-50 mt-1 w-full max-h-72 bg-[#0a0f0d] border border-white/10 rounded-lg shadow-2xl overscroll-contain flex flex-col"
+        className="absolute z-50 mt-1 w-full max-h-72 overflow-hidden rounded-xl bg-black/40 ring-1 ring-white/10 ring-inset shadow-[0_28px_90px_rgba(0,0,0,0.6)] overscroll-contain flex flex-col"
         style={{ WebkitOverflowScrolling: 'touch' }}
         onClick={(e) => e.stopPropagation()}>
 
-          <div className="px-3 pt-2 pb-1 border-b border-white/10 space-y-2">
+          <div className="px-3 pt-2 pb-2 border-b border-white/10 space-y-2 bg-black/20">
             {showQuickAdd ?
             <>
                 {normalizedQuickOptions.length > 0 ?
@@ -245,7 +245,7 @@ export default function WalletCurrencySelector({
             onClick={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
             placeholder={t("ui_search_currency_045b7c357f", "Search currency...")}
-            className="w-full bg-black/30 border border-white/10 rounded px-2 py-1.5 text-base text-white/80 placeholder:text-white/40 focus:outline-none focus:border-accent-rlusd" />
+            className="w-full rounded-lg bg-white/5 ring-1 ring-white/10 ring-inset px-2.5 py-2 text-[15px] text-white/85 placeholder:text-white/35 outline-none focus:ring-2 focus:ring-xcannes-green/40" />
 
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto">
@@ -259,7 +259,7 @@ export default function WalletCurrencySelector({
                 {t("ui_no_currencies_found_b70888825e", "No currencies found.")}
               </div>
             ) : (
-              <ul className="py-1">
+              <ul className="divide-y divide-white/10">
                 {filtered.map((c) =>
                   <li key={c.code}>
                     <button
@@ -268,7 +268,7 @@ export default function WalletCurrencySelector({
                         e.stopPropagation();
                         handleSelect(c.code);
                       }}
-                      className="w-full px-3 py-1.5 text-base text-white/80 hover:bg-white/5 flex items-center gap-2 text-left active:scale-98">
+                      className="w-full px-3 py-2 text-base text-white/80 hover:bg-white/[0.06] flex items-center gap-2 text-left active:scale-98">
                       <span className="text-lg">{getFlag(c.code)}</span>
                       <span className="font-mono text-[15px]">{c.code}</span>
                       <span className="text-[15px] text-white/45 truncate">

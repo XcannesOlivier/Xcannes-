@@ -143,14 +143,12 @@ export default function WalletDesktopModals({
         />
       ) : null}
 
-      {showInlineInfo ? (
-        <WalletInfoModal
-          isOpen
-          inline
-          onClose={() => setWalletInfoOpen(false)}
-          {...infoModalProps}
-        />
-      ) : null}
+      {/* Desktop: open "Infos & frais" as a real modal (portal to body). */}
+      <WalletInfoModal
+        isOpen={showInlineInfo}
+        onClose={() => setWalletInfoOpen(false)}
+        {...infoModalProps}
+      />
 
       {showInlineCurrencyStatement ? (
         <WalletDashboardStatementModals
