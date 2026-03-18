@@ -478,11 +478,7 @@ export default function DemoWalletDashboardReceiveModal({
                 <h2 className="text-base md:text-lg font-semibold text-white/90">
                   {t("ui_receive_funds_title", "Recevoir des fonds")}
                 </h2>
-                <div className="relative rounded-[14px] border border-white/15 bg-white/5 p-4 shadow-[0_10px_16px_rgba(0,0,0,0.35)]">
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 rounded-[14px] shadow-[inset_0_0_0_1px_rgba(11,16,23,0.35),inset_0_0_24px_rgba(0,0,0,0.28)]"
-                  />
+                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
                   <div className="flex flex-col items-center">
                     <div
                       ref={receiveQrContainerRef}
