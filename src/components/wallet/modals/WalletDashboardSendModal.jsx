@@ -344,9 +344,9 @@ export default function WalletDashboardSendModal({
           e.stopPropagation();
           handleScanQrUpload();
         }}
-        className="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-lg border border-white/20 bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+        className="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-lg ring-1 ring-white/20 ring-inset bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
       >
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/60">
+        <span className="inline-flex h-5 w-5 items-center justify-center rounded ring-1 ring-white/10 ring-inset text-white/60">
           +
         </span>
         {t(
@@ -541,7 +541,7 @@ export default function WalletDashboardSendModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)]",
+    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
@@ -556,7 +556,7 @@ export default function WalletDashboardSendModal({
   ].join(" ");
 
   const saveAddressBlock = canSaveDestination ? (
-    <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 space-y-2">
+    <div className="rounded-lg bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 space-y-2 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
       <label className="flex items-center gap-2 text-xs text-white/60">
         <input
           type="checkbox"
@@ -610,9 +610,9 @@ export default function WalletDashboardSendModal({
                 "Import or choose address",
               )}
               readOnly={shouldShowLabelInInput}
-              className={`w-full bg-black/40 border border-white/15 rounded-xl ${
+              className={`w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl ${
                 !hasPaymentRequest ? "pl-8" : "pl-4"
-              } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px]`}
+              } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
             />
 
             <button
@@ -693,7 +693,7 @@ export default function WalletDashboardSendModal({
             </button>
 
             {showSavedPicker ? (
-              <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl border border-white/10 bg-elevated overflow-hidden shadow-lg">
+              <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl ring-1 ring-white/10 ring-inset bg-elevated overflow-hidden shadow-lg">
                 <div className="max-h-56 overflow-y-auto">
                   {(savedAddresses || []).length > 0 ? (
                     (savedAddresses || []).map((addr, idx) => (
@@ -745,7 +745,7 @@ export default function WalletDashboardSendModal({
           {hasDestination ? saveAddressBlock : null}
         </>
       ) : (
-        <div className="w-full rounded-xl border border-white/10 bg-black/20 px-3 py-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-3">
+        <div className="w-full rounded-xl ring-1 ring-white/10 ring-inset bg-black/20 px-3 py-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => {
@@ -898,15 +898,15 @@ export default function WalletDashboardSendModal({
               useNativeSelect={false}
               showMobileOptionRight={true}
               iconClassName="text-3xl leading-none"
-              buttonClassName="bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
               menuClassName={
                 noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
               }
-              selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-4 py-4 text-2xl text-white outline-none focus:border-xcannes-green/80 focus:border-[0.5px] appearance-none cursor-pointer"
+              selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
             />
           </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
-            <div className="rounded-lg border border-amber-300/20 bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
+            <div className="rounded-lg ring-1 ring-amber-300/20 ring-inset bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
               <span className="text-white/80">
                 {t("ui_beneficiary_label", "Bénéficiaire")}:
               </span>{" "}
@@ -924,7 +924,7 @@ export default function WalletDashboardSendModal({
                 {t("ui_amount_52cea2dd3d", "Montant")}
               </label>
               {showCalculatedAmountLabel ? (
-                <span className="mb-1 inline-flex items-center rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
+                <span className="mb-1 inline-flex items-center rounded-full ring-1 ring-amber-300/30 ring-inset bg-amber-300/10 px-2 py-1 text-[10px] text-amber-200/90">
                   {t("ui_calculated_amount_label", "Montant calculé")}
                 </span>
               ) : null}
@@ -947,7 +947,7 @@ export default function WalletDashboardSendModal({
                   : "USD"
               }
               tokenClassName="text-white drop-shadow-sm text-xl"
-              containerClassName="focus-within:!border-xcannes-green/80 py-4 rounded-xl"
+              containerClassName="py-4 rounded-xl bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/80 transition-colors duration-150"
             />
           </div>
         </div>
@@ -964,7 +964,7 @@ export default function WalletDashboardSendModal({
           "Vérifiez les informations avant d’envoyer",
         )}
       </div>
-      <div className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-4">
+      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
         <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
         </div>
@@ -994,7 +994,7 @@ export default function WalletDashboardSendModal({
               })}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/10">
+          <div className="flex items-center justify-between gap-3 pt-2 mt-1 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
             <span className="text-white/70 font-semibold">
               {t("ui_total", "Total")}
             </span>
@@ -1020,7 +1020,7 @@ export default function WalletDashboardSendModal({
             type="text"
             value={requestDestination}
             readOnly
-            className="w-full bg-[#0F141A] border border-white/10 rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:border-xcannes-green/80"
+            className="w-full bg-[#0F141A] ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
             <button
@@ -1119,7 +1119,7 @@ export default function WalletDashboardSendModal({
             "Vérifiez les informations avant d’envoyer",
           )}
         </div>
-        <div className="rounded-xl border border-white/10 bg-black/20 p-4 space-y-3">
+        <div className="rounded-[14px] p-4 space-y-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
           <div className="space-y-0.5">
             <div className="text-[11px] text-white/45">
               {t("ui_beneficiary_label", "Destinataire")}
@@ -1154,7 +1154,7 @@ export default function WalletDashboardSendModal({
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/10">
+          <div className="flex items-center justify-between gap-3 pt-3 mt-1 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
             <span className="text-[11px] text-white/45">
               {t("ui_fees", "Frais")}
             </span>
@@ -1170,7 +1170,7 @@ export default function WalletDashboardSendModal({
         </div>
 
         {canSaveDestination ? (
-          <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <label className="flex items-center gap-2 text-xs text-white/60">
               <input
                 type="checkbox"
@@ -1189,7 +1189,7 @@ export default function WalletDashboardSendModal({
 
       {/* Insufficient balance warning */}
       {insufficientBalance ? (
-        <div className="rounded-lg border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 space-y-1">
+        <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90 space-y-1">
           <div className="font-semibold">
             {t("ui_insufficient_balance_title", "Solde insuffisant")}
           </div>
@@ -1208,7 +1208,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const sendActions = (
-    <div className="sticky bottom-0 pt-0 pb-1 -mt-0 border-t border-white/10 space-y-2 bg-inherit z-10">
+    <div className="sticky bottom-0 pt-0 pb-1 -mt-0 space-y-2 bg-inherit z-10 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
       <SwipeConfirmButton
         label={
           sendProcessing
@@ -1250,7 +1250,7 @@ export default function WalletDashboardSendModal({
             <button
               type="button"
               onClick={() => setScanActive(false)}
-              className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
+              className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 ring-1 ring-white/20 ring-inset text-white/80 hover:bg-white/20 hover:text-white transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1272,7 +1272,7 @@ export default function WalletDashboardSendModal({
               />
             </div>
             {inline && scanUnavailable ? (
-              <div className="absolute bottom-6 left-4 right-4 rounded-xl border border-orange-400/30 bg-black/70 px-4 py-3 text-xs text-white/80 shadow-lg backdrop-blur-sm">
+              <div className="absolute bottom-6 left-4 right-4 rounded-xl ring-1 ring-orange-400/30 ring-inset bg-black/70 px-4 py-3 text-xs text-white/80 shadow-lg backdrop-blur-sm">
                 <div className="text-sm font-semibold text-white">
                   {t(
                     "ui_scanner_unavailable_title",
