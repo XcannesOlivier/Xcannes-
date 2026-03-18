@@ -92,8 +92,7 @@ export default function WalletDashboardSendModal({
   const canSaveDestination =
     enableSaveAddress &&
     normalizedDestination &&
-    !isSavedDestination &&
-    !String(sendDestinationLabel || remoteDestinationLabel || "").trim();
+    !isSavedDestination;
   const normalizedSendAmount = Number(String(sendAmount || "").trim());
   const canManualSend =
     Boolean(selectedSendToken) &&
@@ -885,22 +884,31 @@ export default function WalletDashboardSendModal({
                   t("ui_wallet_unknown", "Unknown wallet")}
               </div>
               {normalizedDestination ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowFullRecipientAccount((prev) => !prev)
-                  }
-                  className="mt-1 text-[12px] text-white/60 hover:text-white/80 transition-colors font-mono"
-                  title={t(
-                    "ui_toggle_full_account_number",
-                    "Afficher/masquer l’adresse complète",
-                  )}
-                >
-                  {t("ui_account_number_label", "N° Compte")} :{" "}
-                  {showFullRecipientAccount
-                    ? normalizedDestination
-                    : compactDestinationLabel}
-                </button>
+                <div className="mt-1 flex items-start justify-end gap-2 text-[12px]">
+                  <span className="text-white/50 shrink-0">
+                    {t("ui_account_number_label", "N° de Compte")}:
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowFullRecipientAccount((prev) => !prev)
+                    }
+                    className={[
+                      "font-mono text-white/65 hover:text-white/85 transition-colors",
+                      showFullRecipientAccount
+                        ? "break-all"
+                        : "truncate max-w-[240px]",
+                    ].join(" ")}
+                    title={t(
+                      "ui_toggle_full_account_number",
+                      "Afficher/masquer l’adresse complète",
+                    )}
+                  >
+                    {showFullRecipientAccount
+                      ? normalizedDestination
+                      : compactDestinationLabel}
+                  </button>
+                </div>
               ) : null}
             </div>
           </div>

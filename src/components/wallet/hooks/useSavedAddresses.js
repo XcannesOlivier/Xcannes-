@@ -6,45 +6,47 @@ import { apiUrl } from "@/lib/runtimeConfig";
 const DEFAULT_STORAGE_KEY = "xcannes_saved_addresses";
 const normalizeLabel = (value) => String(value || "").trim();
 
+function loadSavedAddressesFromLocalStorage(storageKey) {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    const normalized = Array.isArray(parsed)
+      ? parsed
+          .map((entry) => {
+            const address = String(entry?.address || "").trim();
+            if (!address) return null;
+            const label = normalizeLabel(entry?.label);
+            const onChainLabel = normalizeLabel(entry?.onChainLabel);
+            const savedAt = entry?.savedAt || entry?.createdAt || null;
+            return {
+              address,
+              label: label || null,
+              onChainLabel: onChainLabel || null,
+              savedAt,
+            };
+          })
+          .filter(Boolean)
+      : [];
+    return normalized;
+  } catch (err) {
+    console.error("[useSavedAddresses] Error loading saved addresses:", err);
+    return [];
+  }
+}
+
 export function useSavedAddresses({
   storageKey = DEFAULT_STORAGE_KEY,
   walletAddress = "",
 } = {}) {
-  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [savedAddresses, setSavedAddresses] = useState(() =>
+    loadSavedAddressesFromLocalStorage(storageKey),
+  );
   const fetchedRef = useRef(new Set());
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (!raw) {
-        setSavedAddresses([]);
-        return;
-      }
-      const parsed = JSON.parse(raw);
-      const normalized = Array.isArray(parsed)
-        ? parsed
-            .map((entry) => {
-              const address = String(entry?.address || "").trim();
-              if (!address) return null;
-              const label = normalizeLabel(entry?.label);
-              const onChainLabel = normalizeLabel(entry?.onChainLabel);
-              const savedAt = entry?.savedAt || entry?.createdAt || null;
-              return {
-                address,
-                label: label || null,
-                onChainLabel: onChainLabel || null,
-                savedAt,
-              };
-            })
-            .filter(Boolean)
-        : [];
-      setSavedAddresses(normalized);
-    } catch (err) {
-      console.error("[useSavedAddresses] Error loading saved addresses:", err);
-      setSavedAddresses([]);
-    }
+    setSavedAddresses(loadSavedAddressesFromLocalStorage(storageKey));
   }, [storageKey]);
 
   const persist = useCallback(
