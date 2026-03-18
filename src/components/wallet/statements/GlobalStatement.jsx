@@ -158,13 +158,6 @@ export default function GlobalStatement({
   }, [totalBalance, prefCode, prefRlusdPerUnit]);
   const displayCurrencyCode = prefCode === "RLUSD" ? "USD" : prefCode;
 
-  const shortWalletAddress = useMemo(() => {
-    const addr = String(walletAddress || "").trim();
-    if (!addr) return "";
-    if (addr.length <= 10) return addr;
-    return `${addr.slice(0, 4)}...${addr.slice(-3)}`;
-  }, [walletAddress]);
-
   /* ── sorted tokens ─────────────────────────────────────── */
   const sortedTokens = [...tokens]
     .filter((tok) => String(tok.currency || "").toUpperCase() !== "RLUSD")
@@ -515,12 +508,12 @@ export default function GlobalStatement({
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-1 text-base md:text-lg font-semibold text-white/90 truncate">
+                <div className="mt-1 text-base md:text-lg font-semibold text-white/90 break-words">
                   {walletLabel || t("nav_wallet", "Wallet")}
                 </div>
-                {shortWalletAddress ? (
-                  <div className="mt-0.5 text-xs text-white/50 font-mono truncate">
-                    {shortWalletAddress}
+                {walletAddress ? (
+                  <div className="mt-1 text-xs text-white/50 font-mono break-all">
+                    {walletAddress}
                   </div>
                 ) : null}
               </div>

@@ -491,17 +491,6 @@ export default function DemoWalletDashboardSendModal({
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-3 pt-3 mt-1 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
-            <span className="text-[11px] text-white/45">
-              {t("ui_fees", "Frais")}
-            </span>
-            <span className="font-mono text-xs text-white/70">
-              {formatAmountWithSymbol(locale, 0, "USD", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 6,
-              })}
-            </span>
-          </div>
         </div>
         {canSaveDestination ? (
           <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
@@ -855,18 +844,6 @@ export default function DemoWalletDashboardSendModal({
               }`}
             >
               {confirmAmountLabel || "0"}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-white/60">
-              {t("ui_fees", "Frais")}
-            </span>
-            <span className="font-mono text-white/70">
-              {formatAmountWithSymbol(locale, 0, "USD", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 6,
-              })}
             </span>
           </div>
 

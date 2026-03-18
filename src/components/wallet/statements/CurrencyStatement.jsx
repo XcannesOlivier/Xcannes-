@@ -768,6 +768,13 @@ export default function CurrencyStatement({
     return t("statement_xrpl_mobile_in", "Reçu");
   }, [detailIsOutgoing, detailTx, t]);
 
+  const showConversionFee = useMemo(() => {
+    if (!detailTx) return false;
+    if (detailTx?.category === "exchange") return true;
+    const spread = Number(detailTx?.spreadRlusd);
+    return Number.isFinite(spread) && spread > 0;
+  }, [detailTx]);
+
   const detailStatusLabel = useMemo(() => {
     if (!detailTx) return "";
     if (isPreviewMode) return t("ui_status_preview", "Aperçu");
@@ -927,16 +934,18 @@ export default function CurrencyStatement({
                       {formatAmountRlusdAsLocal(detailTx?.amount ?? 0)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-white/60">
-                      {t("statement_conversion_fee_label", "Frais")}
-                    </span>
-                    <span className="text-sm font-semibold font-mono text-white/90">
-                      {detailTx?.spreadRlusd
-                        ? formatAmountRlusdAsLocal(detailTx.spreadRlusd)
-                        : formatAmountRlusdAsLocal(0)}
-                    </span>
-                  </div>
+                  {showConversionFee ? (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs text-white/60">
+                        {t("statement_conversion_fee_label", "Frais")}
+                      </span>
+                      <span className="text-sm font-semibold font-mono text-white/90">
+                        {detailTx?.spreadRlusd
+                          ? formatAmountRlusdAsLocal(detailTx.spreadRlusd)
+                          : formatAmountRlusdAsLocal(0)}
+                      </span>
+                    </div>
+                  ) : null}
                   {detailTx?.runningBalance != null ||
                   detailTx?.displayRunningBalance != null ? (
                     <div className="flex items-center justify-between gap-3">
@@ -1304,7 +1313,7 @@ export default function CurrencyStatement({
                   )}
                 </div>
               ) : (
-                <div className="divide-y divide-white/5">
+                <div className="space-y-4 py-2">
                   {timelineGroups.map((group) => (
                     <div key={group.key}>
                       <div className="px-4 pt-4 pb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
@@ -1323,13 +1332,17 @@ export default function CurrencyStatement({
                               type="button"
                               ref={isHighlighted ? highlightRowRef : null}
                               onClick={() => openTxDetails(tx)}
-                              className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
+                              className={[
+                                "w-full flex items-center gap-3 text-left mx-3 px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset",
+                                "bg-gradient-to-b from-white/[0.06] to-white/[0.02]",
+                                "shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-12px_18px_rgba(0,0,0,0.45)]",
+                                "transition-colors duration-150",
                                 isHighlighted
-                                  ? "bg-xcannes-green/10"
-                                  : "hover:bg-white/[0.03]"
-                              }`}
+                                  ? "ring-xcannes-green/25 from-xcannes-green/20 to-xcannes-green/5"
+                                  : "hover:from-white/[0.08] hover:to-white/[0.03]",
+                              ].join(" ")}
                             >
-                              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/60 flex-none">
+                              <div className="w-8 h-8 rounded-full bg-black/20 ring-1 ring-white/10 ring-inset flex items-center justify-center text-white/60 flex-none shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                                 <span className="text-sm leading-none">
                                   {getTimelineIcon(tx)}
                                 </span>
