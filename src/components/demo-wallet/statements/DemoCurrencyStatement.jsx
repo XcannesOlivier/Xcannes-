@@ -486,6 +486,68 @@ export default function DemoCurrencyStatement({
     return groups;
   }, [transactionsWithDisplayBalance, locale, t]);
 
+  const parseConversionPair = useCallback((description) => {
+    if (!description) return null;
+    const text = String(description).trim();
+    let match = text.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
+    if (!match) {
+      match = text.match(/([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/);
+    }
+    if (!match) return null;
+    return { from: match[1], to: match[2] };
+  }, []);
+
+  const getLocalizedDescription = useCallback(
+    (tx) => {
+      const kind = String(tx?.kind || "")
+        .trim()
+        .toUpperCase();
+      const rawCounterparty = tx?.counterparty
+        ? String(tx.counterparty).trim()
+        : "";
+      const counterparty = rawCounterparty;
+      const category = String(tx?.category || "")
+        .trim()
+        .toLowerCase();
+
+      if (kind === "PAYMENT_OUT") {
+        return counterparty
+          ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", {
+              counterparty,
+            })
+          : t("statement_payment_out_generic", "Paiement envoyé");
+      }
+      if (kind === "PAYMENT_IN") {
+        return counterparty
+          ? t("statement_payment_in_from", "Reçu de {{counterparty}}", {
+              counterparty,
+            })
+          : t("statement_payment_in_generic", "Paiement reçu");
+      }
+      if (kind === "XRPL_PAYMENT_OUT") {
+        return t("statement_xrpl_payment_out", "Paiement envoyé");
+      }
+      if (kind === "XRPL_PAYMENT_IN") {
+        return t("statement_xrpl_payment_in", "Paiement reçu");
+      }
+      if (kind === "MOONPAY_BUY") {
+        return t("statement_buy_bank", "Purchase by bank payment");
+      }
+      if (kind === "MOONPAY_SELL") {
+        return t("statement_sell_bank", "Sale to bank account");
+      }
+      if (category === "exchange") {
+        const pair = parseConversionPair(tx?.description || "");
+        if (pair) {
+          return `${t("statement_conversion_label", "Conversion")} ${pair.from} → ${pair.to}`;
+        }
+      }
+
+      return tx?.description || "";
+    },
+    [parseConversionPair, t],
+  );
+
   const formatCounterpartyCompact = useCallback((counterparty) => {
     const raw = String(counterparty || "").trim();
     if (!raw || raw.toUpperCase() === "XCANNES") return "";
@@ -835,68 +897,6 @@ export default function DemoCurrencyStatement({
     };
     return flags[curr] || "💱"; // Fallback sur l'emoji exchange
   }, []);
-
-  const parseConversionPair = useCallback((description) => {
-    if (!description) return null;
-    const text = String(description).trim();
-    let match = text.match(/([A-Z]{3,6})\s*(?:→|->)\s*([A-Z]{3,6})/);
-    if (!match) {
-      match = text.match(/([A-Z]{3,6})\s*\/\s*([A-Z]{3,6})/);
-    }
-    if (!match) return null;
-    return { from: match[1], to: match[2] };
-  }, []);
-
-  const getLocalizedDescription = useCallback(
-    (tx) => {
-      const kind = String(tx?.kind || "")
-        .trim()
-        .toUpperCase();
-      const rawCounterparty = tx?.counterparty
-        ? String(tx.counterparty).trim()
-        : "";
-      const counterparty = rawCounterparty;
-      const category = String(tx?.category || "")
-        .trim()
-        .toLowerCase();
-
-      if (kind === "PAYMENT_OUT") {
-        return counterparty
-          ? t("statement_payment_out_to", "Envoyé à {{counterparty}}", {
-              counterparty,
-            })
-          : t("statement_payment_out_generic", "Paiement envoyé");
-      }
-      if (kind === "PAYMENT_IN") {
-        return counterparty
-          ? t("statement_payment_in_from", "Reçu de {{counterparty}}", {
-              counterparty,
-            })
-          : t("statement_payment_in_generic", "Paiement reçu");
-      }
-      if (kind === "XRPL_PAYMENT_OUT") {
-        return t("statement_xrpl_payment_out", "Paiement envoyé");
-      }
-      if (kind === "XRPL_PAYMENT_IN") {
-        return t("statement_xrpl_payment_in", "Paiement reçu");
-      }
-      if (kind === "MOONPAY_BUY") {
-        return t("statement_buy_bank", "Purchase by bank payment");
-      }
-      if (kind === "MOONPAY_SELL") {
-        return t("statement_sell_bank", "Sale to bank account");
-      }
-      if (category === "exchange") {
-        const pair = parseConversionPair(tx?.description || "");
-        if (pair) {
-          return `${t("statement_conversion_label", "Conversion")} ${pair.from} → ${pair.to}`;
-        }
-      }
-
-      return tx?.description || "";
-    },
-    [parseConversionPair, t],
-  );
 
   const formatDate = useCallback(
     (dateStr) => {
