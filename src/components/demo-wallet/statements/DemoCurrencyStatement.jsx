@@ -1665,7 +1665,7 @@ export default function DemoCurrencyStatement({
                 {error}
               </div>
             )}
-            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden md:max-h-[420px]">
+            <div className="flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
               {loading ? (
                 <div className="py-14 text-center text-white/40 text-sm">
                   {t("ui_loading_948e39804b", "Loading…")}
@@ -1718,7 +1718,7 @@ export default function DemoCurrencyStatement({
                                 </div>
                               </div>
                               <div
-                                className={`flex-none font-mono font-semibold whitespace-nowrap ${
+                                className={`flex-none max-w-[42%] text-right font-mono font-semibold whitespace-nowrap overflow-hidden text-ellipsis ${
                                   tx?.type === "debit"
                                     ? "text-red-400"
                                     : "text-xcannes-green"
