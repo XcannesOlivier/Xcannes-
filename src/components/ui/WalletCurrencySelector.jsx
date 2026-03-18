@@ -205,14 +205,14 @@ export default function WalletCurrencySelector({
         </svg>
       </button>
 
-      {open &&
-      <div
-        ref={popupRef}
-        className="absolute z-50 mt-1 w-full max-h-72 overflow-hidden rounded-xl bg-black/40 ring-1 ring-white/10 ring-inset shadow-[0_28px_90px_rgba(0,0,0,0.6)] overscroll-contain flex flex-col"
-        style={{ WebkitOverflowScrolling: 'touch' }}
-        onClick={(e) => e.stopPropagation()}>
+	      {open &&
+	      <div
+	        ref={popupRef}
+	        className="absolute z-50 mt-1 w-full max-h-72 overflow-hidden rounded-xl bg-[#0B0F14] ring-1 ring-white/10 ring-inset shadow-[0_28px_90px_rgba(0,0,0,0.7)] overscroll-contain flex flex-col"
+	        style={{ WebkitOverflowScrolling: 'touch' }}
+	        onClick={(e) => e.stopPropagation()}>
 
-          <div className="px-3 pt-2 pb-2 border-b border-white/10 space-y-2 bg-black/20">
+	          <div className="px-3 pt-2 pb-2 border-b border-white/10 space-y-2 bg-[#0B0F14]">
             {showQuickAdd ?
             <>
                 {normalizedQuickOptions.length > 0 ?

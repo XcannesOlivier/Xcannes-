@@ -327,9 +327,9 @@ export default function DemoWalletDashboardSwapModal({
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                       {t("ui_from_label_short", "De")}
                     </div>
-                    <ModalSelect
-                      value={convertBaseCurrency}
-                      onChange={setConvertBaseCurrency}
+	                    <ModalSelect
+	                      value={convertBaseCurrency}
+	                      onChange={setConvertBaseCurrency}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -343,18 +343,18 @@ export default function DemoWalletDashboardSwapModal({
                             selectLabelMobileByCurrency?.[code] || labelLeft,
                         };
                       })}
-                      useNativeSelect={false}
-                      showMobileOptionRight={true}
-                      iconClassName="text-3xl leading-none"
-                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
-                      menuClassName={
-                        noticeVariant === "demo"
-                          ? "bg-xcannes-surface-demo"
-                          : "bg-elevated"
-                      }
-                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
-                    />
-                  </div>
+	                      useNativeSelect={false}
+	                      showMobileOptionRight={true}
+	                      iconClassName="text-3xl leading-none"
+	                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+	                      menuClassName={
+	                        noticeVariant === "demo"
+	                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
+	                          : "bg-elevated border-white/15 ring-1 ring-white/10"
+	                      }
+	                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+	                    />
+	                  </div>
 
                   <div className="flex justify-center">
                     <button
@@ -391,9 +391,9 @@ export default function DemoWalletDashboardSwapModal({
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                       {t("ui_to_label_short", "Vers")}
                     </div>
-                    <ModalSelect
-                      value={convertQuoteCurrency}
-                      onChange={setConvertQuoteCurrency}
+	                    <ModalSelect
+	                      value={convertQuoteCurrency}
+	                      onChange={setConvertQuoteCurrency}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -407,18 +407,18 @@ export default function DemoWalletDashboardSwapModal({
                             selectLabelMobileByCurrency?.[code] || labelLeft,
                         };
                       })}
-                      useNativeSelect={false}
-                      showMobileOptionRight={true}
-                      iconClassName="text-3xl leading-none"
-                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
-                      menuClassName={
-                        noticeVariant === "demo"
-                          ? "bg-xcannes-surface-demo"
-                          : "bg-elevated"
-                      }
-                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
-                    />
-                  </div>
+	                      useNativeSelect={false}
+	                      showMobileOptionRight={true}
+	                      iconClassName="text-3xl leading-none"
+	                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+	                      menuClassName={
+	                        noticeVariant === "demo"
+	                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
+	                          : "bg-elevated border-white/15 ring-1 ring-white/10"
+	                      }
+	                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+	                    />
+	                  </div>
 
                   <div className="pt-1">
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/35 mb-2">
