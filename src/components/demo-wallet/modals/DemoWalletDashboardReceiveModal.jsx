@@ -598,8 +598,8 @@ export default function DemoWalletDashboardReceiveModal({
 	                      buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
 	                      menuClassName={
 	                        noticeVariant === "demo"
-	                          ? "bg-xcannes-surface-demo max-h-40 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10"
-	                          : "bg-elevated max-h-40 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10"
+	                          ? "bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10"
+	                          : "bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10"
 	                      }
 	                      selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
 	                    />
