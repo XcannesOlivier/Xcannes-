@@ -898,12 +898,14 @@ export default function WalletDashboardSendModal({
               useNativeSelect={false}
               showMobileOptionRight={true}
               iconClassName="text-3xl leading-none"
-              buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
-            />
+	              buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
+	              menuClassName={
+	                noticeVariant === "demo"
+	                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
+	                  : "bg-elevated border-white/15 ring-1 ring-white/10"
+	              }
+	              selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
+	            />
           </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
             <div className="rounded-lg ring-1 ring-amber-300/20 ring-inset bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">

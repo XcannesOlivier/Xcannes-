@@ -923,14 +923,14 @@ export default function DemoWalletDashboardSendModal({
                 useNativeSelect={false}
                 showMobileOptionRight={true}
                 iconClassName="text-3xl leading-none"
-                buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer [&_.tabular-nums]:text-lg [&_.tabular-nums]:text-white/35"
-                menuClassName={
-                  noticeVariant === "demo"
-                    ? "bg-xcannes-surface-demo"
-                    : "bg-elevated"
-                }
-                selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
-              />
+	                buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer [&_.tabular-nums]:text-lg [&_.tabular-nums]:text-white/35"
+	                menuClassName={
+	                  noticeVariant === "demo"
+	                    ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
+	                    : "bg-elevated border-white/15 ring-1 ring-white/10"
+	                }
+	                selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
+	              />
             </div>
 
             <div>
