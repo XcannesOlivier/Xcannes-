@@ -1111,7 +1111,7 @@ export default function CurrencyStatement({
                     {walletLabel || t("nav_wallet", "Wallet")}
                   </span>
                   {walletAddress ? (
-                    <div className="text-xs md:text-sm text-white/60 font-mono whitespace-nowrap overflow-x-auto">
+                    <div className="text-xs md:text-sm text-white/60 font-mono break-all">
                       {walletAddress}
                     </div>
                   ) : null}
@@ -1300,7 +1300,7 @@ export default function CurrencyStatement({
                 {error}
               </div>
             )}
-            <div className="flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden md:max-h-[420px]">
               {loading ? (
                 <div className="py-14 text-center text-white/40 text-sm">
                   {t("ui_loading_948e39804b", "Loading…")}
@@ -1333,7 +1333,7 @@ export default function CurrencyStatement({
                               ref={isHighlighted ? highlightRowRef : null}
                               onClick={() => openTxDetails(tx)}
                               className={[
-                                "w-full flex items-center gap-3 text-left mx-3 px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset",
+                                "w-full flex items-center gap-3 text-left mx-3 px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset overflow-hidden",
                                 "bg-gradient-to-b from-white/[0.06] to-white/[0.02]",
                                 "shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-12px_18px_rgba(0,0,0,0.45)]",
                                 "transition-colors duration-150",

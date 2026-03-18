@@ -450,7 +450,7 @@ export default function GlobalStatement({
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass: "w-full h-full rounded-xl",
+      panelClass: "w-full h-full rounded-xl border-l border-white/10",
     },
   };
 
@@ -489,13 +489,13 @@ export default function GlobalStatement({
           className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
         >
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-start gap-3 min-w-0">
               <Image
                 src="/assets/statement.svg"
                 alt={t("ui_statement_a87c93acb8", "Statement")}
                 width={32}
                 height={32}
-                className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8"
+                className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 mt-0.5"
               />
               <div className="min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
