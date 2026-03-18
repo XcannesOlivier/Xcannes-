@@ -452,12 +452,12 @@ export default function GlobalStatement({
       backdropClass: "bg-black/80 md:backdrop-blur-sm",
       wrapperClass: "items-stretch justify-center px-0 md:items-center md:px-4",
       panelClass:
-        "w-full xcannes-fullscreen-safe md:h-auto rounded-none border-0 md:max-w-5xl md:rounded-2xl md:border md:border-white/10 md:max-h-[92vh] lg:max-w-6xl",
+        "w-full xcannes-fullscreen-safe md:h-auto rounded-none border-0 md:max-w-5xl md:rounded-2xl md:max-h-[92vh] lg:max-w-6xl",
     },
     "inline-desktop": {
       backdropClass: "",
       wrapperClass: "items-stretch justify-stretch p-0",
-      panelClass: "w-full h-full rounded-xl border border-white/10",
+      panelClass: "w-full h-full rounded-xl",
     },
   };
 
@@ -487,13 +487,13 @@ export default function GlobalStatement({
       }}
     >
       <div
-        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ${
+        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
       >
         {/* Header */}
         <div
-          className={`border-b border-white/10 flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4`}
+          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
@@ -536,7 +536,7 @@ export default function GlobalStatement({
             ) : null}
           </div>
 
-          <div className="mt-4 rounded-[14px] border border-white/10 bg-white/5 p-4">
+          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <div className="text-xs text-white/60">
               {t("ui_total_assets_label_fr", "Total des actifs")}
             </div>
@@ -586,7 +586,7 @@ export default function GlobalStatement({
               <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                 {t("ui_sort_label", "Tri")}
               </div>
-              <div className="inline-flex rounded-[10px] border border-white/10 bg-white/5 p-1">
+              <div className="inline-flex rounded-[10px] ring-1 ring-white/10 ring-inset bg-white/5 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                 <button
                   type="button"
                   onClick={() => setSortBy("balance")}
@@ -641,7 +641,7 @@ export default function GlobalStatement({
                   type="button"
                   onClick={() => onViewCurrency?.(token)}
                   disabled={!onViewCurrency}
-                  className="w-full text-left rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.07] transition-colors duration-150 px-3 py-3 disabled:opacity-70 disabled:cursor-default"
+                  className="w-full text-left rounded-xl px-3 py-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150 disabled:opacity-70 disabled:cursor-default"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
@@ -715,7 +715,7 @@ export default function GlobalStatement({
         </div>
 
         {/* Footer Actions */}
-        <div className="px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30">
+        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleExportPdf}
