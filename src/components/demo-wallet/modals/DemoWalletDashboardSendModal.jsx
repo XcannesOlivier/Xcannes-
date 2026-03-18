@@ -50,7 +50,10 @@ export default function DemoWalletDashboardSendModal({
   const [showSavedPicker, setShowSavedPicker] = useState(false);
   const [selectedSavedLabel, setSelectedSavedLabel] = useState("");
   const savedPickerRef = useRef(null);
+  const savedMenuRef = useRef(null);
   const destinationInputRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const [savedMenuStyle, setSavedMenuStyle] = useState(null);
   const scanQrFileInputId = "send-qr-file";
   const manualQrReaderIdRef = useRef(
     `manual-qr-reader-${Math.random().toString(36).slice(2, 10)}`,
@@ -253,16 +256,50 @@ export default function DemoWalletDashboardSendModal({
   useEffect(() => {
     if (!showSavedPicker) return;
     const handler = (e) => {
-      if (
-        savedPickerRef.current &&
-        !savedPickerRef.current.contains(e.target)
-      ) {
-        setShowSavedPicker(false);
-      }
+      const target = e?.target;
+      const container = savedPickerRef.current;
+      const menu = savedMenuRef.current;
+      if (!target) return;
+      if (container && container.contains(target)) return;
+      if (menu && menu.contains(target)) return;
+      setShowSavedPicker(false);
     };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
   }, [showSavedPicker]);
+
+  useEffect(() => {
+    if (!inline || !showSavedPicker) {
+      setSavedMenuStyle(null);
+      return;
+    }
+
+    const update = () => {
+      const input = destinationInputRef.current;
+      if (!input) return;
+      const rect = input.getBoundingClientRect();
+      setSavedMenuStyle({
+        left: rect.left,
+        top: rect.bottom + 8,
+        width: rect.width,
+      });
+    };
+
+    update();
+    const scrollContainer = scrollContainerRef.current;
+    scrollContainer?.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      scrollContainer?.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [inline, showSavedPicker]);
 
   useEffect(() => {
     if (!open) {
@@ -525,6 +562,47 @@ export default function DemoWalletDashboardSendModal({
     </div>
   ) : null;
 
+  const savedPickerMenu = showSavedPicker ? (
+    <div
+      ref={savedMenuRef}
+      className={[
+        "rounded-xl ring-1 ring-white/10 ring-inset overflow-hidden shadow-lg",
+        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
+      ].join(" ")}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="max-h-56 overflow-y-auto">
+        {(savedAddresses || []).length > 0 ? (
+          (savedAddresses || []).map((addr, idx) => (
+            <button
+              key={`${addr.address}-${idx}`}
+              type="button"
+              onClick={() => {
+                const value = String(addr?.address || "").trim();
+                if (!value) return;
+                setSendDestination(value);
+                setShowSavedPicker(false);
+              }}
+              className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
+            >
+              <span className="block font-semibold">
+                {String(addr?.label || "").trim() ||
+                  t("ui_wallet_unknown", "Unknown wallet")}
+              </span>
+              <span className="block font-mono text-[11px] text-white/60 truncate">
+                {addr.address}
+              </span>
+            </button>
+          ))
+        ) : (
+          <div className="px-3 py-2 text-xs text-white/60">
+            {t("ui_no_saved_addresses", "No saved addresses yet")}
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
+
   const recipientCard = !hasPaymentRequest ? (
     <div className="space-y-2">
       <label
@@ -635,37 +713,9 @@ export default function DemoWalletDashboardSendModal({
           </button>
         </div>
 
-        {showSavedPicker ? (
-          <div className="absolute left-0 right-0 top-full mt-2 z-20 rounded-xl ring-1 ring-white/10 ring-inset bg-elevated overflow-hidden shadow-lg">
-            <div className="max-h-56 overflow-y-auto">
-              {(savedAddresses || []).length > 0 ? (
-                (savedAddresses || []).map((addr, idx) => (
-                  <button
-                    key={`${addr.address}-${idx}`}
-                    type="button"
-                    onClick={() => {
-                      const value = String(addr?.address || "").trim();
-                      if (!value) return;
-                      setSendDestination(value);
-                      setShowSavedPicker(false);
-                    }}
-                    className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
-                  >
-                    <span className="block font-semibold">
-                      {String(addr?.label || "").trim() ||
-                        t("ui_wallet_unknown", "Unknown wallet")}
-                    </span>
-                    <span className="block font-mono text-[11px] text-white/60 truncate">
-                      {addr.address}
-                    </span>
-                  </button>
-                ))
-              ) : (
-                <div className="px-3 py-2 text-xs text-white/60">
-                  {t("ui_no_saved_addresses", "No saved addresses yet")}
-                </div>
-              )}
-            </div>
+        {!inline && savedPickerMenu ? (
+          <div className="absolute left-0 right-0 top-full mt-2 z-20">
+            {savedPickerMenu}
           </div>
         ) : null}
       </div>
@@ -1036,7 +1086,10 @@ export default function DemoWalletDashboardSendModal({
               ✕
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto -mx-4 px-4 md:-mx-5 md:px-5"
+          >
             <div className="flex flex-col gap-3">
               {hasPaymentRequest ? (
                 payreqFinalStep
@@ -1049,6 +1102,25 @@ export default function DemoWalletDashboardSendModal({
               {scannerModal}
             </div>
           </div>
+          {inline &&
+          savedPickerMenu &&
+          savedMenuStyle &&
+          typeof document !== "undefined"
+            ? createPortal(
+                <div
+                  style={{
+                    position: "fixed",
+                    left: savedMenuStyle.left,
+                    top: savedMenuStyle.top,
+                    width: savedMenuStyle.width,
+                    zIndex: 12050,
+                  }}
+                >
+                  {savedPickerMenu}
+                </div>,
+                document.body,
+              )
+            : null}
           {sendActions}
           <input
             id={scanQrFileInputId}
