@@ -1333,7 +1333,7 @@ export default function CurrencyStatement({
                               ref={isHighlighted ? highlightRowRef : null}
                               onClick={() => openTxDetails(tx)}
                               className={[
-                                "w-full flex items-center gap-3 text-left mx-3 px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset overflow-hidden",
+                                "w-full flex items-center gap-2 text-left mx-3 px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset",
                                 "bg-gradient-to-b from-white/[0.06] to-white/[0.02]",
                                 "shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-12px_18px_rgba(0,0,0,0.45)]",
                                 "transition-colors duration-150",
@@ -1348,7 +1348,7 @@ export default function CurrencyStatement({
                                 </span>
                               </div>
                               <div className="min-w-0 flex-1">
-                                <div className="text-sm text-white/90 truncate whitespace-nowrap overflow-hidden text-ellipsis">
+                                <div className="text-sm text-white/90 break-words overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
                                   {getTimelineLabel(tx)}
                                 </div>
                               </div>
