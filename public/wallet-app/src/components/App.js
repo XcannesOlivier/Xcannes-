@@ -1659,7 +1659,7 @@ function setupUnlockScreenManual(error) {
 
   if (error && error !== 'no_faceid') {
     if (error.name === 'NotAllowedError') {
-      updateStatus(statusEl, 'Authentification annulée. Réessayez.', true);
+      updateStatus(statusEl, '');
     } else if (error.message) {
       updateStatus(statusEl, `Erreur : ${error.message}`, true);
     }
@@ -1718,7 +1718,7 @@ async function doUnlock() {
 
   } catch (err) {
     if (err.name === 'NotAllowedError') {
-      updateStatus(statusEl, 'Authentification annulée. Réessayez.', true);
+      updateStatus(statusEl, '');
     } else {
       updateStatus(statusEl, `Erreur : ${err.message}`, true);
     }
