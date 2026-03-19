@@ -126,10 +126,19 @@ const SETTING_TERMS_ACCEPTED = 'terms_accepted';
 // ==========================================
 
 let keyboardAvoidanceInitialized = false;
+let keyboardTransitionTimer = null;
+let lastKeyboardPx = 0;
 
 function clearKeyboardAvoidanceUI() {
   document.documentElement.style.setProperty('--keyboard-offset', '0px');
   document.body?.classList.remove('keyboard-open');
+  document.body?.classList.remove('keyboard-opening');
+  document.body?.classList.remove('keyboard-closing');
+  if (keyboardTransitionTimer) {
+    clearTimeout(keyboardTransitionTimer);
+    keyboardTransitionTimer = null;
+  }
+  lastKeyboardPx = 0;
 }
 
 function getPinDotsElForInput(inputEl) {
@@ -149,8 +158,40 @@ function setupKeyboardAvoidance() {
   const update = () => {
     if (!viewport) return;
     const keyboardPx = Math.max(0, window.innerHeight - viewport.height - (viewport.offsetTop || 0));
+    const wasOpen = lastKeyboardPx > 0;
+    const isOpen = keyboardPx > 0;
+    lastKeyboardPx = keyboardPx;
+
+    if (keyboardTransitionTimer) {
+      clearTimeout(keyboardTransitionTimer);
+      keyboardTransitionTimer = null;
+    }
+
+    if (!wasOpen && isOpen) {
+      document.body?.classList.remove('keyboard-closing');
+      document.body?.classList.add('keyboard-opening');
+      requestAnimationFrame(() => {
+        document.documentElement.style.setProperty('--keyboard-offset', `${Math.round(keyboardPx)}px`);
+        document.body?.classList.add('keyboard-open');
+      });
+      keyboardTransitionTimer = setTimeout(() => document.body?.classList.remove('keyboard-opening'), 520);
+      return;
+    }
+
+    if (wasOpen && !isOpen) {
+      document.body?.classList.remove('keyboard-opening');
+      document.body?.classList.add('keyboard-closing');
+      requestAnimationFrame(() => {
+        document.documentElement.style.setProperty('--keyboard-offset', '0px');
+        document.body?.classList.remove('keyboard-open');
+      });
+      keyboardTransitionTimer = setTimeout(() => document.body?.classList.remove('keyboard-closing'), 260);
+      return;
+    }
+
+    // Same state — just keep offset in sync (e.g. keyboard bar changes height)
     document.documentElement.style.setProperty('--keyboard-offset', `${Math.round(keyboardPx)}px`);
-    if (keyboardPx > 0) document.body?.classList.add('keyboard-open');
+    if (isOpen) document.body?.classList.add('keyboard-open');
     else document.body?.classList.remove('keyboard-open');
   };
 

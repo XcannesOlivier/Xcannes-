@@ -109,7 +109,18 @@ html, body {
 }
 
 .screen-content.keyboard-avoid {
-  transition: padding-bottom 360ms cubic-bezier(0.22, 1, 0.36, 1), padding-top 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Default = closing (faster) */
+  transition: padding-bottom 220ms cubic-bezier(0.4, 0, 1, 1), padding-top 220ms cubic-bezier(0.4, 0, 1, 1);
+}
+
+body.keyboard-opening .screen-content.keyboard-avoid {
+  transition-duration: 420ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body.keyboard-closing .screen-content.keyboard-avoid {
+  transition-duration: 220ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
 
 body.keyboard-open .screen-content.keyboard-avoid {
