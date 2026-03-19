@@ -109,13 +109,25 @@ export default function WalletDashboardSendModal({
   // ── Insufficient balance detection (payreq mode) ──
   const insufficientBalance = useMemo(() => {
     if (!sendPaymentRequest || !selectedSendToken) return false;
-    // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation —
-    // the real balance isn't in `value`, so skip this check for them.
-    if (selectedSendToken.isTrustlineOnly) return false;
+
     const requiredAmount = Number(sendAmount || 0);
+    if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return false;
+
+    // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
+    // In payreq mode, we can estimate required RLUSD via sendFxInfo.paymentRlusd.
+    if (selectedSendToken.isTrustlineOnly) {
+      const requiredRlusd = Number(sendFxInfo?.paymentRlusd);
+      const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
+      if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
+      if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0)
+        return false;
+      return availableAllocatedRlusd < requiredRlusd;
+    }
+
     const available = Number(selectedSendToken.value || 0);
-    return requiredAmount > 0 && available < requiredAmount;
-  }, [sendPaymentRequest, selectedSendToken, sendAmount]);
+    if (!Number.isFinite(available)) return false;
+    return available < requiredAmount;
+  }, [sendPaymentRequest, selectedSendToken, sendAmount, sendFxInfo]);
 
   const requestCurrencyCode = String(
     sendPaymentRequest?.displayCurrency ||
@@ -334,35 +346,6 @@ export default function WalletDashboardSendModal({
     const input = document.getElementById(payreqFileInputId);
     input?.click();
   };
-  const handlePasteFromClipboard = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (!text) return;
-      handlePaymentRequestScan?.(text);
-    } catch {
-      // Clipboard permissions can be denied; ignore silently.
-    }
-  };
-  const scanRequestFooter = (
-    <div className="flex justify-end">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleScanQrUpload();
-        }}
-        className="inline-flex items-center gap-2 px-3 py-2 text-xs rounded-lg ring-1 ring-white/20 ring-inset bg-white/15 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
-      >
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded ring-1 ring-white/10 ring-inset text-white/60">
-          +
-        </span>
-        {t(
-          "ui_or_upload_a_qr_image_works_e_df6baa8039",
-          "Charger une image qrcode",
-        )}
-      </button>
-    </div>
-  );
 
   useEffect(() => {
     if (!open) {
@@ -971,90 +954,9 @@ export default function WalletDashboardSendModal({
             type="text"
             value={payreqSelectorValue}
             readOnly
-            className="w-full bg-[#0F141A] ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-24 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
+            className="w-full bg-black/40 backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
           />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <button
-              type="button"
-              onClick={handlePasteFromClipboard}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t("ui_paste", "Coller")}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V7a2 2 0 012-2z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 3h6v2H9V3z"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={handleScanQrUpload}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t(
-                "ui_or_upload_a_qr_image_works_e_df6baa8039",
-                "Charger une image qrcode",
-              )}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l-3-3m3 3l3-3"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setScanActive(true);
-                setScanKey((prev) => prev + 1);
-              }}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors text-white/60"
-              title={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                />
-              </svg>
-            </button>
-          </div>
         </div>
-        <div className="text-xs text-white/45 space-y-0.5">
-          <div className="text-white/70 font-semibold">
-            {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
-          </div>
-          <div className="font-mono">{requestDestinationLabel}</div>
-          <div className="text-white/50">{t("ui_valid_address", "Adresse valide")}</div>
-        </div>
-
         {saveAddressBlock}
       </div>
 
@@ -1085,9 +987,21 @@ export default function WalletDashboardSendModal({
             <div className="text-[11px] text-white/45">
               {t("ui_address", "Adresse")}
             </div>
-            <div className="font-mono text-xs text-white/80">
-              {requestDestinationLabel}
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowFullPayreqAddress((prev) => !prev)}
+              className={[
+                "font-mono text-xs text-white/80 text-left transition-colors",
+                "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
+                showFullPayreqAddress ? "break-all" : "",
+              ].join(" ")}
+              title={t(
+                "ui_toggle_full_account_number",
+                "Afficher/masquer l’adresse complète",
+              )}
+            >
+              {showFullPayreqAddress ? requestDestination : requestDestinationLabel}
+            </button>
           </div>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-0.5">
@@ -1122,7 +1036,7 @@ export default function WalletDashboardSendModal({
               "ui_insufficient_balance_detail",
               "Vous n'avez pas assez de {{currency}} pour payer cette demande. Convertissez vos fonds via le bouton Convertir, puis revenez payer.",
               {
-                currency: String(selectedSendToken?.currency || "").toUpperCase(),
+                currency: String(requestCurrencyCode || selectedSendToken?.currency || "").toUpperCase(),
               },
             )}
           </div>
@@ -1140,7 +1054,7 @@ export default function WalletDashboardSendModal({
             : t("ui_send_504b64a87b", "Send")
         }
         onConfirm={handleManualSend}
-        disabled={sendProcessing || !canManualSend}
+        disabled={sendProcessing || !canManualSend || (hasPaymentRequest && insufficientBalance)}
         variant="green"
         className="md:hidden"
       />
@@ -1150,7 +1064,7 @@ export default function WalletDashboardSendModal({
           e.stopPropagation();
           handleManualSend();
         }}
-        disabled={sendProcessing || !canManualSend}
+        disabled={sendProcessing || !canManualSend || (hasPaymentRequest && insufficientBalance)}
         className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
         {sendProcessing
