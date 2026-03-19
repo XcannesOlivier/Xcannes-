@@ -439,48 +439,51 @@
     </div>
 
     <!-- ========== 11. UNLOCK SCREEN (Face ID + PIN fallback) ========== -->
-	    <div id="screen-unlock" class="screen hidden">
-	      <div class="screen-content center">
-	        <div class="logo">X</div>
-	        <p class="unlock-welcome">Bienvenue sur XCANNES !</p>
-	        <h2 class="unlock-title">Déverrouiller</h2>
+		    <div id="screen-unlock" class="screen hidden">
+		      <div class="screen-content center">
+		        <div class="logo">X</div>
+		        <p class="unlock-welcome">Bienvenue sur XCANNES !</p>
+		        <h2 class="unlock-title">Déverrouiller</h2>
 
-	        <button id="btn-unlock" class="btn btn-primary btn-biometric btn-biometric--hero">
-	          Face ID / Touch ID
-	        </button>
+		        <button id="btn-unlock" class="btn btn-primary btn-biometric btn-biometric--hero">
+		          <span class="unlock-btn-icon" aria-hidden="true">☝️</span>
+		          Face ID / Touch ID
+		        </button>
 
-        <p id="unlock-status" class="status"></p>
+	        <p id="unlock-status" class="status"></p>
 
-        <button id="btn-unlock-use-pin" class="btn-link hidden">Utiliser mon code PIN</button>
-        <button id="btn-reset-wallet" class="btn-link btn-danger-link">Réinitialiser le wallet</button>
-      </div>
-    </div>
+	        <button id="btn-unlock-use-pin" class="btn-link hidden">Utiliser mon code PIN</button>
+	        <button id="btn-reset-wallet" class="btn-link btn-danger-link">Réinitialiser le compte</button>
+	      </div>
+	    </div>
 
-    <!-- ========== 11b. PIN UNLOCK SCREEN ========== -->
-		    <div id="screen-pin-unlock" class="screen hidden">
-		      <div class="screen-content center keyboard-avoid">
-		        <div class="logo logo-sm">X</div>
-		        <h2>Entrez votre code PIN</h2>
+	    <!-- ========== 11b. PIN UNLOCK SCREEN ========== -->
+			    <div id="screen-pin-unlock" class="screen hidden">
+			      <div class="screen-content center keyboard-avoid">
+			        <div class="logo logo-sm">X</div>
+			        <h2>Entrez votre code PIN</h2>
 
-	        <div class="pin-dots" id="pin-unlock-dots">
-	          <span class="pin-dot"></span>
-	          <span class="pin-dot"></span>
-          <span class="pin-dot"></span>
-          <span class="pin-dot"></span>
-          <span class="pin-dot"></span>
-          <span class="pin-dot"></span>
-        </div>
+		        <div class="pin-unlock-box" aria-hidden="true">
+		          <div class="pin-dots" id="pin-unlock-dots">
+		            <span class="pin-dot"></span>
+		            <span class="pin-dot"></span>
+		            <span class="pin-dot"></span>
+		            <span class="pin-dot"></span>
+		            <span class="pin-dot"></span>
+		            <span class="pin-dot"></span>
+		          </div>
+		        </div>
 
-        <input type="text" id="pin-unlock-input" class="pin-hidden-input"
-               maxlength="6" inputmode="numeric" pattern="[0-9]*"
-               autocomplete="off" autocorrect="off" autocapitalize="off">
+	        <input type="text" id="pin-unlock-input" class="pin-hidden-input"
+	               maxlength="6" inputmode="numeric" pattern="[0-9]*"
+	               autocomplete="off" autocorrect="off" autocapitalize="off">
 
-        <p id="pin-unlock-status" class="status"></p>
+	        <p id="pin-unlock-status" class="status"></p>
 
-        <button id="btn-pin-unlock-faceid" class="btn-link hidden">Utiliser Face ID</button>
-        <button id="btn-reset-wallet-pin" class="btn-link btn-danger-link">Réinitialiser le wallet</button>
-      </div>
-    </div>
+	        <button id="btn-pin-unlock-faceid" class="btn-link hidden">Utiliser Face ID</button>
+	        <button id="btn-reset-wallet-pin" class="btn-link btn-danger-link">Réinitialiser le compte</button>
+	      </div>
+	    </div>
 
     <!-- ========== 12. SCANNER SCREEN ========== -->
     <div id="screen-scanner" class="screen hidden">

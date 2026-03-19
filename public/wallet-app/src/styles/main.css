@@ -716,6 +716,25 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 
 /* ===== UNLOCK SCREEN ===== */
 
+#screen-unlock {
+  background:
+    radial-gradient(900px 520px at 50% 0%, rgba(0, 200, 83, 0.14), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.10), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-unlock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 7px);
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
 .unlock-welcome {
   font-family: var(--font-montserrat);
   font-size: 14px;
@@ -731,17 +750,175 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 .unlock-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-tertiary);
-  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 22px;
 }
 
 .btn-biometric--hero {
-  max-width: 320px;
+  max-width: 360px;
   font-size: 16px;
-  padding: 18px 32px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  background: rgba(0, 200, 83, 0.10);
+  border: 1px solid rgba(0, 200, 83, 0.18);
   box-shadow:
-    0 0 26px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 26px rgba(0, 200, 83, 0.12),
+    0 26px 70px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+  position: relative;
+}
+
+.btn-biometric--hero::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: -10px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
+  opacity: 0.9;
+}
+
+.unlock-btn-icon {
+  font-size: 18px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+#screen-pin-unlock {
+  background:
+    radial-gradient(900px 520px at 50% 0%, rgba(0, 200, 83, 0.14), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.10), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-pin-unlock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%),
+    repeating-linear-gradient(115deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 7px);
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+#screen-pin-unlock .logo {
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  border-color: rgba(0, 200, 83, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
+    0 0 28px rgba(0, 200, 83, 0.14),
+    0 26px 70px rgba(0, 0, 0, 0.60);
+  margin-bottom: 22px;
+}
+
+#screen-pin-unlock h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.35px;
+  margin-bottom: 14px;
+}
+
+.pin-unlock-box {
+  width: 100%;
+  max-width: 360px;
+  padding: 18px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 18px 46px rgba(0, 0, 0, 0.55);
+  position: relative;
+  margin: 6px auto 10px;
+}
+
+.pin-unlock-box::before,
+.pin-unlock-box::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
+  opacity: 0.9;
+}
+
+.pin-unlock-box::before { top: -10px; }
+.pin-unlock-box::after { bottom: -10px; }
+
+#screen-pin-unlock .pin-dots {
+  margin: 0;
+  gap: 16px;
+}
+
+#screen-pin-unlock .pin-dot {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+#screen-pin-unlock .pin-dot.filled {
+  background: rgba(0, 200, 83, 0.95);
+  border-color: rgba(0, 200, 83, 0.95);
+  transform: scale(1.12);
+}
+
+#screen-pin-unlock #pin-unlock-status.status {
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12.5px;
+  min-height: 18px;
+}
+
+#screen-pin-unlock #btn-pin-unlock-faceid.btn-link {
+  margin-top: 14px;
+  color: rgba(0, 200, 83, 0.70);
+  text-decoration-color: rgba(0, 200, 83, 0.40);
+}
+
+#screen-pin-unlock #btn-reset-wallet-pin.btn-link {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration-color: rgba(255, 255, 255, 0.22);
+}
+
+#screen-unlock .logo {
+  width: 86px;
+  height: 86px;
+  border-radius: 22px;
+  border-color: rgba(0, 200, 83, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
+    0 0 28px rgba(0, 200, 83, 0.14),
+    0 26px 70px rgba(0, 0, 0, 0.60);
+  margin-bottom: 22px;
+}
+
+#screen-unlock #unlock-status.status {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12.5px;
+  min-height: 18px;
+}
+
+#screen-unlock #btn-unlock-use-pin.btn-link {
+  margin-top: 16px;
+  color: rgba(0, 200, 83, 0.70);
+  text-decoration-color: rgba(0, 200, 83, 0.40);
+}
+
+#screen-unlock #btn-reset-wallet.btn-link {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration-color: rgba(255, 255, 255, 0.22);
 }
 
 /* ===== TYPOGRAPHY ===== */
