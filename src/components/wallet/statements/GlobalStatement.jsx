@@ -510,14 +510,17 @@ export default function GlobalStatement({
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 min-w-0">
-                  <span className="text-sm text-white font-semibold whitespace-nowrap">
+                <div className="mt-1 min-w-0 space-y-0.5">
+                  <p className="text-sm text-white font-semibold truncate">
+                    <span className="text-white/55 font-medium">
+                      {t("ui_current_account_prefix", "Compte actuel :")}
+                    </span>{" "}
                     {walletLabel || t("nav_wallet", "Wallet")}
-                  </span>
+                  </p>
                   {walletAddress ? (
-                    <span className="text-xs md:text-sm text-white/60 font-mono break-all">
+                    <p className="text-xs md:text-sm text-white/60 font-mono break-all">
                       {walletAddress}
-                    </span>
+                    </p>
                   ) : null}
                 </div>
               </div>
@@ -543,7 +546,7 @@ export default function GlobalStatement({
                 totalInPreferred !== null && Number.isFinite(totalInPreferred)
                   ? totalInPreferred
                   : totalBalance,
-                displayCurrencyCode,
+                displayCurrencyCode === "USD" ? "RLUSD" : displayCurrencyCode,
                 { minimumFractionDigits: 0, maximumFractionDigits: 6 },
               )}
             </div>
@@ -682,7 +685,9 @@ export default function GlobalStatement({
                             ≈{" "}
                             {formatAmountWithSymbolLocal(
                               convertedValue,
-                              displayCurrencyCode,
+                              displayCurrencyCode === "USD"
+                                ? "RLUSD"
+                                : displayCurrencyCode,
                               { minimumFractionDigits: 0, maximumFractionDigits: 6 },
                             )}
                           </div>

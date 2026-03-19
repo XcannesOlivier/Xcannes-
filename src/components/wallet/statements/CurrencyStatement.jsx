@@ -492,6 +492,16 @@ export default function CurrencyStatement({
     ],
   );
 
+  const isQuoteSideConversion = useCallback(
+    (tx) => {
+      if (!tx || tx?.category !== "exchange") return false;
+      const pair = parseConversionPair(tx?.description || "");
+      if (!pair?.to) return false;
+      return String(pair.to || "").trim().toUpperCase() === normalizedCurrency;
+    },
+    [normalizedCurrency, parseConversionPair],
+  );
+
   /* ── XRP reserve ───────────────────────────────────────── */
   const showReserveDetails = isPreviewMode || isWalletActivated === true;
   const reservePlaceholder = "\u2014";
@@ -583,7 +593,9 @@ export default function CurrencyStatement({
           .filter(Boolean)
           .join(" ");
         const feeLabel =
-          tx?.category === "exchange" && tx?.spreadRlusd > 0
+          tx?.category === "exchange" &&
+          isQuoteSideConversion(tx) &&
+          tx?.spreadRlusd > 0
             ? ` (${t("statement_conversion_fee_label", "Frais")} : ${formatAmountWithSymbol(
                 locale,
                 rlusdToLocal(tx.spreadRlusd),
@@ -770,10 +782,10 @@ export default function CurrencyStatement({
 
   const showConversionFee = useMemo(() => {
     if (!detailTx) return false;
-    if (detailTx?.category === "exchange") return true;
+    if (detailTx?.category === "exchange") return isQuoteSideConversion(detailTx);
     const spread = Number(detailTx?.spreadRlusd);
     return Number.isFinite(spread) && spread > 0;
-  }, [detailTx]);
+  }, [detailTx, isQuoteSideConversion]);
 
   const detailStatusLabel = useMemo(() => {
     if (!detailTx) return "";
@@ -1105,29 +1117,19 @@ export default function CurrencyStatement({
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className={isInlineDesktop ? "md:col-span-3" : ""}>
-              {isInlineDesktop ? (
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-sm text-white font-semibold whitespace-nowrap">
-                    {walletLabel || t("nav_wallet", "Wallet")}
-                  </span>
-                  {walletAddress ? (
-                    <div className="text-xs md:text-sm text-white/60 font-mono break-all">
-                      {walletAddress}
-                    </div>
-                  ) : null}
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm text-white font-semibold truncate">
-                    {walletLabel || t("nav_wallet", "Wallet")}
+              <div className="min-w-0 space-y-0.5">
+                <p className="text-sm text-white font-semibold truncate">
+                  <span className="text-white/55 font-medium">
+                    {t("ui_current_account_prefix", "Compte actuel :")}
+                  </span>{" "}
+                  {walletLabel || t("nav_wallet", "Wallet")}
+                </p>
+                {walletAddress ? (
+                  <p className="text-xs md:text-sm text-white/60 font-mono break-all">
+                    {walletAddress}
                   </p>
-                  {walletAddress ? (
-                    <p className="text-xs md:text-sm text-white/60 font-mono break-all">
-                      {walletAddress}
-                    </p>
-                  ) : null}
-                </>
-              )}
+                ) : null}
+              </div>
             </div>
             <div>
               <p className="text-xs text-white/60 mb-1">
@@ -1156,7 +1158,11 @@ export default function CurrencyStatement({
               </p>
               {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                 <p className="text-[11px] text-white/60">
-                  ≈ {formatUsdWithSymbol(estimatedUsd)}
+                  ≈{" "}
+                  {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               ) : null}
 
@@ -1300,7 +1306,7 @@ export default function CurrencyStatement({
                 {error}
               </div>
             )}
-            <div className="flex-1 min-h-0 overflow-y-auto md:max-h-[420px]">
+            <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden md:max-h-[420px]">
               {loading ? (
                 <div className="py-14 text-center text-white/40 text-sm">
                   {t("ui_loading_948e39804b", "Loading…")}
@@ -1319,7 +1325,7 @@ export default function CurrencyStatement({
                       <div className="px-4 pt-4 pb-2 text-[11px] font-semibold text-white/50 uppercase tracking-wide">
                         {group.label}
                       </div>
-                      <div className="pb-2">
+                      <div className="px-3 pb-2">
                         {group.transactions.map((tx, idx) => {
                           const transactionId =
                             tx?.id || tx?.txHash || `${group.key}-${idx}`;
@@ -1333,7 +1339,7 @@ export default function CurrencyStatement({
                               ref={isHighlighted ? highlightRowRef : null}
                               onClick={() => openTxDetails(tx)}
                               className={[
-                                "w-full flex items-center gap-2 text-left mx-3 px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset",
+                                "w-full flex items-center gap-2 text-left px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset",
                                 "bg-gradient-to-b from-white/[0.06] to-white/[0.02]",
                                 "shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-12px_18px_rgba(0,0,0,0.45)]",
                                 "transition-colors duration-150",
