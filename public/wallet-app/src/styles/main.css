@@ -160,6 +160,20 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   color: var(--text-primary);
 }
 
+/* ===== CHOICE (create/import) ===== */
+
+.choice-title {
+  margin-top: 14px;
+  margin-bottom: 18px;
+  font-family: var(--font-montserrat);
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  color: var(--text-primary);
+  text-align: center;
+}
+
 .btn-back {
   width: 36px;
   height: 36px;
