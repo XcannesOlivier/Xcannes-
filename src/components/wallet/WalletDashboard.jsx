@@ -306,6 +306,7 @@ export default function WalletDashboard({
     walletAddress: wallet,
     walletLabel,
     hideAddress: true,
+    labelPrefix: t("ui_current_account_prefix", "Compte actuel:"),
   });
 
   // ── Preferred currency ─────────────────────────────────────

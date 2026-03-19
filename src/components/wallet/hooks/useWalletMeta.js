@@ -5,6 +5,7 @@ import { useCallback } from "react";
 export function useWalletMeta({
   walletAddress,
   walletLabel,
+  labelPrefix = "",
   hideAddress = false,
   addressBadge,
   addressBadgeClassName = "",
@@ -14,10 +15,16 @@ export function useWalletMeta({
     (className = "") => {
       const resolvedLabel = String(walletLabel || "").trim();
       const resolvedAddress = String(walletAddress || "").trim();
+      const resolvedPrefix = String(labelPrefix || "").trim();
       if (!resolvedAddress && !resolvedLabel) return null;
       return (
         <div className={`text-xs text-white/60 ${className}`}>
           <div className="text-xl md:text-2xl font-semibold text-white/80 leading-tight">
+            {resolvedPrefix ? (
+              <span className="font-medium text-white/55 mr-2">
+                {resolvedPrefix}
+              </span>
+            ) : null}
             {resolvedLabel || "Wallet"}
           </div>
           {!hideAddress && resolvedAddress ? (
@@ -57,6 +64,7 @@ export function useWalletMeta({
       addressBadgeClassName,
       addressTitle,
       hideAddress,
+      labelPrefix,
       walletAddress,
       walletLabel,
     ],

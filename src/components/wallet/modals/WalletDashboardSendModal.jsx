@@ -116,7 +116,11 @@ export default function WalletDashboardSendModal({
     // Trustline-only tokens (EUR, GBP, etc.) are backed by RLUSD allocation.
     // In payreq mode, we can estimate required RLUSD via sendFxInfo.paymentRlusd.
     if (selectedSendToken.isTrustlineOnly) {
-      const requiredRlusd = Number(sendFxInfo?.paymentRlusd);
+      const code = String(selectedSendToken?.currency || "")
+        .trim()
+        .toUpperCase();
+      const requiredRlusd =
+        code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
       const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
       if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
       if (!Number.isFinite(availableAllocatedRlusd) || availableAllocatedRlusd < 0)
@@ -128,6 +132,38 @@ export default function WalletDashboardSendModal({
     if (!Number.isFinite(available)) return false;
     return available < requiredAmount;
   }, [sendPaymentRequest, selectedSendToken, sendAmount, sendFxInfo]);
+
+  // ── Insufficient balance detection (manual send) ──
+  const manualInsufficientBalance = useMemo(() => {
+    if (sendPaymentRequest || !selectedSendToken) return false;
+
+    const requiredAmount = Number(sendAmount || 0);
+    if (!Number.isFinite(requiredAmount) || requiredAmount <= 0) return false;
+
+    const code = String(selectedSendToken?.currency || "")
+      .trim()
+      .toUpperCase();
+
+    if (selectedSendToken.isTrustlineOnly) {
+      const availableAllocatedRlusd = Number(selectedSendToken.allocatedRlusd);
+      if (
+        !Number.isFinite(availableAllocatedRlusd) ||
+        availableAllocatedRlusd < 0
+      ) {
+        return false;
+      }
+
+      // USD "pool non alloué" is a 1:1 RLUSD amount.
+      const requiredRlusd =
+        code === "USD" ? requiredAmount : Number(sendFxInfo?.paymentRlusd);
+      if (!Number.isFinite(requiredRlusd) || requiredRlusd <= 0) return false;
+      return availableAllocatedRlusd < requiredRlusd;
+    }
+
+    const available = Number(selectedSendToken.value || 0);
+    if (!Number.isFinite(available)) return false;
+    return available < requiredAmount;
+  }, [sendAmount, sendFxInfo, sendPaymentRequest, selectedSendToken]);
 
   const requestCurrencyCode = String(
     sendPaymentRequest?.displayCurrency ||
@@ -504,13 +540,13 @@ export default function WalletDashboardSendModal({
                 setUseLabelDisplay(Boolean(label));
                 setShowSavedPicker(false);
               }}
-              className="w-full text-left px-3 py-2 text-xs text-white/90 hover:bg-white/5 transition-colors"
+              className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/5 transition-colors"
             >
               <span className="block font-semibold">
                 {String(addr?.onChainLabel || addr?.label || "").trim() ||
                   t("ui_wallet_unknown", "Unknown wallet")}
               </span>
-              <span className="block font-mono text-[11px] text-white/60 truncate">
+              <span className="block font-mono text-xs text-white/60 truncate">
                 {addr.address}
               </span>
             </button>
@@ -862,6 +898,24 @@ export default function WalletDashboardSendModal({
               tokenClassName="text-white drop-shadow-sm text-xl"
               containerClassName="py-4 rounded-xl bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/80 transition-colors duration-150"
             />
+            {manualInsufficientBalance ? (
+              <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
+                <div className="font-semibold">
+                  {t("ui_insufficient_balance_title", "Solde insuffisant")}
+                </div>
+                <div>
+                  {t(
+                    "ui_insufficient_balance_manual_detail",
+                    "Vous n'avez pas assez de {{currency}} pour ce montant.",
+                    {
+                      currency: String(
+                        selectedSendToken?.currency || "",
+                      ).toUpperCase(),
+                    },
+                  )}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
         )}
@@ -880,46 +934,49 @@ export default function WalletDashboardSendModal({
       <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
         <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
-        </div>
-        <div className="space-y-3 text-sm text-white/80">
-          <div className="flex items-start justify-between gap-3">
-            <span className="text-white/60 shrink-0">
-              {t("ui_beneficiary_label", "Destinataire")}
-            </span>
-            <div className="min-w-0 text-right">
-              <div className="font-semibold text-white/90 truncate">
-                {resolvedDestinationLabel ||
-                  t("ui_wallet_unknown", "Unknown wallet")}
-              </div>
-              {normalizedDestination ? (
-                <div className="mt-1 flex items-start justify-end gap-2 text-[12px]">
-                  <span className="text-white/50 shrink-0">
-                    {t("ui_account_number_label", "N° de Compte")}:
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setShowFullRecipientAccount((prev) => !prev)
-                    }
-                    className={[
-                      "font-mono text-white/65 hover:text-white/85 transition-colors",
-                      showFullRecipientAccount
-                        ? "break-all"
-                        : "truncate max-w-[240px]",
-                    ].join(" ")}
-                    title={t(
-                      "ui_toggle_full_account_number",
-                      "Afficher/masquer l’adresse complète",
-                    )}
-                  >
-                    {showFullRecipientAccount
-                      ? normalizedDestination
-                      : compactDestinationLabel}
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          </div>
+	        </div>
+	        <div className="space-y-3 text-sm text-white/80">
+	          <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">
+	            <div className="text-white/60 shrink-0">
+	              {t("ui_beneficiary_label", "Destinataire")}
+	            </div>
+	            <div className="min-w-0 text-right">
+	              <div className="font-semibold text-white/90 truncate">
+	                {resolvedDestinationLabel ||
+	                  t("ui_wallet_unknown", "Unknown wallet")}
+	              </div>
+	            </div>
+	            {normalizedDestination ? (
+	              <>
+	                <div className="text-white/50 shrink-0 text-[12px]">
+	                  {t("ui_account_number_label", "N° de Compte")}:
+	                </div>
+	                <div className="min-w-0 text-right">
+	                  <button
+	                    type="button"
+	                    onClick={() =>
+	                      setShowFullRecipientAccount((prev) => !prev)
+	                    }
+	                    className={[
+	                      "font-mono text-[12px] text-white/65 hover:text-white/85 transition-colors",
+	                      "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
+	                      showFullRecipientAccount
+	                        ? "break-all"
+	                        : "inline-block truncate max-w-[240px]",
+	                    ].join(" ")}
+	                    title={t(
+	                      "ui_toggle_full_account_number",
+	                      "Afficher/masquer l’adresse complète",
+	                    )}
+	                  >
+	                    {showFullRecipientAccount
+	                      ? normalizedDestination
+	                      : compactDestinationLabel}
+	                  </button>
+	                </div>
+	              </>
+	            ) : null}
+	          </div>
           <div className="flex items-center justify-between gap-3">
             <span className="text-white/60">
               {t("ui_amount_52cea2dd3d", "Montant")}
@@ -1054,7 +1111,12 @@ export default function WalletDashboardSendModal({
             : t("ui_send_504b64a87b", "Send")
         }
         onConfirm={handleManualSend}
-        disabled={sendProcessing || !canManualSend || (hasPaymentRequest && insufficientBalance)}
+        disabled={
+          sendProcessing ||
+          !canManualSend ||
+          (hasPaymentRequest && insufficientBalance) ||
+          (!hasPaymentRequest && manualInsufficientBalance)
+        }
         variant="green"
         className="md:hidden"
       />
@@ -1064,7 +1126,12 @@ export default function WalletDashboardSendModal({
           e.stopPropagation();
           handleManualSend();
         }}
-        disabled={sendProcessing || !canManualSend || (hasPaymentRequest && insufficientBalance)}
+        disabled={
+          sendProcessing ||
+          !canManualSend ||
+          (hasPaymentRequest && insufficientBalance) ||
+          (!hasPaymentRequest && manualInsufficientBalance)
+        }
         className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
         {sendProcessing
