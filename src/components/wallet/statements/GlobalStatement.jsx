@@ -493,9 +493,9 @@ export default function GlobalStatement({
               <Image
                 src="/assets/statement.svg"
                 alt={t("ui_statement_a87c93acb8", "Statement")}
-                width={32}
-                height={32}
-                className="flex-shrink-0 w-7 h-7 md:w-8 md:h-8 mt-0.5"
+                width={40}
+                height={40}
+                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 mt-0.5"
               />
               <div className="min-w-0">
                 <div className="flex items-center gap-2 min-w-0">

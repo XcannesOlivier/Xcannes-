@@ -408,8 +408,15 @@ export default function WalletDashboard({
     const quote = String(swapState.convertQuoteCurrency || "").trim().toUpperCase();
     if (base && base !== "USD" && base !== "RLUSD" && base !== "XRP") codes.add(base);
     if (quote && quote !== "USD" && quote !== "RLUSD" && quote !== "XRP") codes.add(quote);
+    const pref = String(preferredCurrency || "").trim().toUpperCase();
+    if (pref && pref !== "USD" && pref !== "RLUSD" && pref !== "XRP") codes.add(pref);
     return Array.from(codes);
-  }, [currencyLineCodes, swapState.convertBaseCurrency, swapState.convertQuoteCurrency]);
+  }, [
+    currencyLineCodes,
+    swapState.convertBaseCurrency,
+    swapState.convertQuoteCurrency,
+    preferredCurrency,
+  ]);
 
   const { usdPerUnit: rlusdPerUnitRates, sourceByCode: rlusdPerUnitSources } =
     useRlusdPerUnitRates(rateCodes);
