@@ -1923,44 +1923,69 @@ textarea.error {
 
 /* ===== IMPORT MNEMONIC GRID ===== */
 
+#screen-import {
+  background:
+    radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.08), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-import::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%);
+  pointer-events: none;
+}
+
+#screen-import .tab-desc {
+  max-width: 360px;
+  margin: 6px auto 14px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: left;
+}
+
 .import-mnemonic-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px 16px;
   margin-bottom: 20px;
-  padding: 14px;
+  padding: 18px 16px;
   background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 18px 46px rgba(0, 0, 0, 0.55);
 }
 
 .import-word-cell {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 10px 10px;
   transition: all 0.2s ease;
 }
 
 .import-word-cell:focus-within {
-  border-color: var(--accent);
-  background: rgba(22, 163, 74, 0.06);
-  box-shadow: none;
+  border-color: rgba(0, 200, 83, 0.45);
+  background: rgba(0, 200, 83, 0.05);
 }
 
 .import-word-num {
   font-size: 0.75rem;
-  color: var(--accent);
+  color: rgba(0, 200, 83, 0.95);
   min-width: 22px;
   height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(22, 163, 74, 0.12);
+  background: rgba(0, 200, 83, 0.12);
   border-radius: 6px;
   font-weight: 700;
   flex-shrink: 0;
@@ -1968,19 +1993,20 @@ textarea.error {
 
 .import-word-input {
   width: 100%;
-  border: none;
-  background: transparent;
-  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 0.95rem;
-  font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
-  font-weight: 500;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
+  font-weight: 600;
   outline: none;
-  padding: 0;
-  letter-spacing: 0.02em;
+  padding: 10px 12px;
+  border-radius: 12px;
+  letter-spacing: 0.01em;
   appearance: none;
   -webkit-appearance: none;
   box-shadow: none;
-  caret-color: var(--accent);
+  caret-color: rgba(0, 200, 83, 0.95);
 }
 
 .import-word-input::placeholder {
@@ -1988,6 +2014,29 @@ textarea.error {
   font-size: 0.85rem;
   font-family: inherit;
   font-weight: 400;
+}
+
+.import-word-cell:focus-within .import-word-input {
+  border-color: rgba(0, 200, 83, 0.38);
+  background: rgba(0, 200, 83, 0.06);
+}
+
+#screen-import .button-group {
+  max-width: 360px;
+}
+
+#screen-import .btn-primary {
+  border-radius: 14px;
+  padding: 18px 26px;
+  font-size: 15px;
+  background: linear-gradient(180deg, rgba(0, 200, 83, 0.85), rgba(0, 168, 70, 0.78));
+  box-shadow:
+    0 0 26px rgba(0, 200, 83, 0.14),
+    0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+#screen-import .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(0, 200, 83, 0.92), rgba(0, 200, 83, 0.72));
 }
 
 @media (max-width: 340px) {
