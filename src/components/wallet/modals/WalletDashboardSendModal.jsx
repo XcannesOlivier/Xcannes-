@@ -17,6 +17,7 @@ export default function WalletDashboardSendModal({
   open,
   onClose,
   noticeVariant = "preview",
+  currentWalletAddress = "",
   renderWalletMeta,
   augmentedTokens,
   selectedSendToken,
@@ -61,6 +62,15 @@ export default function WalletDashboardSendModal({
   const destinationInputRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const [savedMenuStyle, setSavedMenuStyle] = useState(null);
+  const normalizedCurrentWalletAddress = useMemo(
+    () => String(currentWalletAddress || "").trim(),
+    [currentWalletAddress],
+  );
+  const selfSendBlocked = Boolean(
+    normalizedCurrentWalletAddress &&
+      effectiveDestination &&
+      effectiveDestination === normalizedCurrentWalletAddress,
+  );
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -517,6 +527,19 @@ export default function WalletDashboardSendModal({
   }, [normalizedDestination]);
 
   const savedPickerMenu = showSavedPicker ? (
+    (() => {
+      const filteredSavedAddresses = (savedAddresses || []).filter((entry) => {
+        const address = String(entry?.address || "").trim();
+        if (!address) return false;
+        if (
+          normalizedCurrentWalletAddress &&
+          address === normalizedCurrentWalletAddress
+        ) {
+          return false;
+        }
+        return true;
+      });
+      return (
     <div
       ref={savedMenuRef}
       className={[
@@ -526,8 +549,8 @@ export default function WalletDashboardSendModal({
       onClick={(e) => e.stopPropagation()}
     >
       <div className="max-h-56 overflow-y-auto">
-        {(savedAddresses || []).length > 0 ? (
-          (savedAddresses || []).map((addr, idx) => (
+        {filteredSavedAddresses.length > 0 ? (
+          filteredSavedAddresses.map((addr, idx) => (
             <button
               key={`${addr.address}-${idx}`}
               type="button"
@@ -558,6 +581,8 @@ export default function WalletDashboardSendModal({
         )}
       </div>
     </div>
+      );
+    })()
   ) : null;
 
   // If we resolved a label (saved/on-chain) and the user isn't typing, show it in the input.
@@ -796,6 +821,20 @@ export default function WalletDashboardSendModal({
         ) : null}
       </div>
 
+      {selfSendBlocked ? (
+        <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
+          <div className="font-semibold">
+            {t("ui_invalid_recipient_title", "Destinataire invalide")}
+          </div>
+          <div>
+            {t(
+              "ui_cannot_send_to_self",
+              "Vous ne pouvez pas envoyer à votre propre compte.",
+            )}
+          </div>
+        </div>
+      ) : null}
+
       {saveAddressBlock}
     </div>
   ) : null;
@@ -1014,6 +1053,19 @@ export default function WalletDashboardSendModal({
             className="w-full bg-black/40 backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
           />
         </div>
+        {selfSendBlocked ? (
+          <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
+            <div className="font-semibold">
+              {t("ui_invalid_recipient_title", "Destinataire invalide")}
+            </div>
+            <div>
+              {t(
+                "ui_cannot_send_to_self",
+                "Vous ne pouvez pas envoyer à votre propre compte.",
+              )}
+            </div>
+          </div>
+        ) : null}
         {saveAddressBlock}
       </div>
 
@@ -1115,7 +1167,8 @@ export default function WalletDashboardSendModal({
           sendProcessing ||
           !canManualSend ||
           (hasPaymentRequest && insufficientBalance) ||
-          (!hasPaymentRequest && manualInsufficientBalance)
+          (!hasPaymentRequest && manualInsufficientBalance) ||
+          selfSendBlocked
         }
         variant="green"
         className="md:hidden"
@@ -1130,7 +1183,8 @@ export default function WalletDashboardSendModal({
           sendProcessing ||
           !canManualSend ||
           (hasPaymentRequest && insufficientBalance) ||
-          (!hasPaymentRequest && manualInsufficientBalance)
+          (!hasPaymentRequest && manualInsufficientBalance) ||
+          selfSendBlocked
         }
         className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >

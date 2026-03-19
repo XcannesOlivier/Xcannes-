@@ -142,6 +142,8 @@ export function useWalletModalProps({
   // --- Send modal props ---
   const sendModalProps = useMemo(
     () => ({
+      currentWalletAddress:
+        typeof wallet === "string" ? wallet : wallet?.address || "",
       qrSizingVariant,
       renderWalletMeta,
       augmentedTokens: selectableTokens,
@@ -169,6 +171,7 @@ export function useWalletModalProps({
       toast,
     }),
     [
+      wallet,
       qrSizingVariant,
       renderWalletMeta,
       selectableTokens,

@@ -162,6 +162,12 @@ export function useSendTransaction({
       toast.error("Please enter a valid XRPL destination address.");
       return { ok: false };
     }
+    const walletAddress =
+      typeof wallet === "string" ? String(wallet).trim() : String(wallet?.address || "").trim();
+    if (walletAddress && dest === walletAddress) {
+      toast.error("You can't send to your own wallet.");
+      return { ok: false };
+    }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
     // USD (pool non alloué) est envoyé comme RLUSD natif, pas comme une conversion FX.
@@ -497,8 +503,13 @@ export function useSendTransaction({
           maximumFractionDigits: 6,
         })} XRP`;
       }
-      if (currency === "USD" || currency === "RLUSD") {
-        // UI "USD" is a RLUSD payment on-chain.
+      if (currency === "USD") {
+        // USD is paid on-chain as RLUSD, but keep the user's selected currency for UI.
+        return `${amountNum.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} USD`;
+      }
+      if (currency === "RLUSD") {
         return `${amountNum.toLocaleString("en-US", {
           maximumFractionDigits: 6,
         })} RLUSD`;
