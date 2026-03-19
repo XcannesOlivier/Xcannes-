@@ -808,7 +808,7 @@ function setupBackupVerifyScreen(words) {
       // Notify parent if embedded in an iframe (site onboarding flow)
       notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
 
-      showSuccess('Wallet créé !', 'Votre wallet est prêt. Conservez votre phrase de récupération en lieu sûr.');
+      showSuccess('Compte créé !', "Votre compte est prêt. Conservez votre phrase de récupération en lieu sûr.");
       await delay(2500);
       await goToHome();
     } catch (err) {
@@ -934,7 +934,7 @@ async function handleImport(statusEl) {
     // Notify parent if embedded in an iframe (site onboarding flow)
     notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
 
-    showSuccess('Wallet importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
+    showSuccess('Compte importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
     await delay(2500);
     await goToHome();
 
@@ -2068,7 +2068,7 @@ async function handleConnect(challenge, statusEl) {
   // Stop scanner immediately so the camera preview disappears
   if (qrScanner) { qrScanner.stop(); qrScanner = null; }
 
-  showSuccess('Connecté !', `Wallet ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
+  showSuccess('Connecté !', `Compte ${currentWallet.address.slice(0, 8)}… lié à Xcannes.`);
   // Quick return — the desktop already transitions on its own
   setTimeout(() => { showScreen('wallet-embedded'); }, 1500);
 }

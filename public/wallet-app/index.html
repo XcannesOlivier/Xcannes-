@@ -504,8 +504,8 @@
 		    <div id="screen-confirm-secure" class="screen hidden">
 		      <div class="screen-content center keyboard-avoid">
 		        <div class="logo logo-sm">X</div>
-		        <h2 id="confirm-secure-title">Sécurisez ce wallet</h2>
-		        <p id="confirm-secure-subtitle" class="subtitle">Confirmez votre identité pour chiffrer et sauvegarder ce wallet.</p>
+		        <h2 id="confirm-secure-title">Sécurisez ce compte</h2>
+		        <p id="confirm-secure-subtitle" class="subtitle">Confirmez votre identité pour chiffrer et sauvegarder ce compte.</p>
 
 	        <button id="btn-confirm-biometric" class="btn btn-primary btn-confirm-hero">
 	          <span class="confirm-hero-icon" aria-hidden="true">
@@ -542,14 +542,18 @@
 	      </div>
 	    </div>
 
-    <!-- ========== 14. SUCCESS SCREEN ========== -->
-    <div id="screen-success" class="screen hidden">
-      <div class="screen-content center">
-        <div class="icon-large success-icon">✅</div>
-        <h2 id="success-title">Succès</h2>
-        <p id="success-message" class="subtitle"></p>
-      </div>
-    </div>
+	    <!-- ========== 14. SUCCESS SCREEN ========== -->
+	    <div id="screen-success" class="screen hidden">
+	      <div class="screen-content center">
+	        <div class="success-check" aria-hidden="true">
+	          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+	            <path d="M20 6L9 17l-5-5" />
+	          </svg>
+	        </div>
+	        <h2 id="success-title">Succès</h2>
+	        <p id="success-message" class="subtitle"></p>
+	      </div>
+	    </div>
 
     <!-- ========== 14. ERROR SCREEN ========== -->
     <div id="screen-error" class="screen hidden">

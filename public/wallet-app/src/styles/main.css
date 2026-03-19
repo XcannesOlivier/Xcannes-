@@ -373,6 +373,59 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   min-height: 18px;
 }
 
+/* ===== SUCCESS SCREEN ===== */
+
+#screen-success {
+  background:
+    radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.08), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-success::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%),
+    radial-gradient(ellipse at 50% 45%, rgba(0, 200, 83, 0.08), transparent 58%);
+  pointer-events: none;
+}
+
+.success-check {
+  width: 86px;
+  height: 86px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: rgba(0, 200, 83, 0.95);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(0, 200, 83, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
+    0 0 30px rgba(0, 200, 83, 0.22),
+    0 24px 70px rgba(0, 0, 0, 0.60);
+  margin-bottom: 18px;
+}
+
+.success-check svg {
+  width: 34px;
+  height: 34px;
+}
+
+#screen-success h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.35px;
+  margin-bottom: 10px;
+}
+
+#screen-success .subtitle {
+  margin-bottom: 0;
+  max-width: 340px;
+  opacity: 0.85;
+}
+
 .screen-content.center {
   display: flex;
   flex-direction: column;
