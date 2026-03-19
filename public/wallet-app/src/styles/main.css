@@ -201,6 +201,96 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   transform: scale(1.12);
 }
 
+/* ===== FACE ID SETUP ===== */
+
+#screen-faceid-setup {
+  background:
+    radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.14), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.10), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-faceid-setup::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%);
+  pointer-events: none;
+}
+
+.faceid-setup-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: rgba(0, 200, 83, 0.95);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(0, 200, 83, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.12) inset,
+    0 0 26px rgba(0, 200, 83, 0.18),
+    0 24px 60px rgba(0, 0, 0, 0.60);
+  margin-bottom: 18px;
+}
+
+.faceid-setup-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+#screen-faceid-setup h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-bottom: 10px;
+}
+
+#screen-faceid-setup .faceid-setup-subtitle {
+  margin-bottom: 18px;
+  max-width: 320px;
+  opacity: 0.92;
+}
+
+#screen-faceid-setup .hint-text {
+  margin-bottom: 26px;
+  max-width: 320px;
+}
+
+#screen-faceid-setup .button-group {
+  max-width: 360px;
+  gap: 12px;
+}
+
+#screen-faceid-setup .btn-primary {
+  border-radius: 14px;
+  padding: 18px 26px;
+  font-size: 15px;
+  background: linear-gradient(180deg, rgba(0, 200, 83, 0.85), rgba(0, 168, 70, 0.78));
+  box-shadow:
+    0 0 26px rgba(0, 200, 83, 0.14),
+    0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+#screen-faceid-setup .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(0, 200, 83, 0.92), rgba(0, 200, 83, 0.72));
+}
+
+#screen-faceid-setup .btn-secondary {
+  border-radius: 14px;
+  padding: 18px 26px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#screen-faceid-setup .btn-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 .screen-content.center {
   display: flex;
   flex-direction: column;

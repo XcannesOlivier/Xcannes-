@@ -250,26 +250,34 @@
       </div>
     </div>
 
-    <!-- ========== 5c. FACE ID SETUP (optional) ========== -->
-    <div id="screen-faceid-setup" class="screen hidden">
-      <div class="screen-content center">
-        <div class="icon-large">👆</div>
-        <h2>Activer Face ID ?</h2>
-        <p class="subtitle">Déverrouillez votre wallet encore plus vite<br>avec Face ID ou Touch ID.</p>
+	    <!-- ========== 5c. FACE ID SETUP (optional) ========== -->
+	    <div id="screen-faceid-setup" class="screen hidden">
+	      <div class="screen-content center">
+	        <div class="faceid-setup-icon" aria-hidden="true">
+	          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	            <path d="M8 3H7a4 4 0 0 0-4 4v1" />
+	            <path d="M16 3h1a4 4 0 0 1 4 4v1" />
+	            <path d="M8 21H7a4 4 0 0 1-4-4v-1" />
+	            <path d="M16 21h1a4 4 0 0 0 4-4v-1" />
+	            <path d="M9 10a3 3 0 0 0 6 0" opacity="0.9" />
+	            <path d="M10 14h4" opacity="0.7" />
+	          </svg>
+	        </div>
+	        <h2>Activer Face ID ?</h2>
+	        <p class="subtitle faceid-setup-subtitle">Déverrouillez en un instant avec Face ID<br>ou Touch ID.</p>
 
-        <p class="hint-text">Face ID est optionnel.<br>Votre code PIN reste toujours disponible.</p>
+	        <p class="hint-text">Face ID est optionnel.<br>Votre code PIN reste toujours disponible.</p>
 
-        <p id="faceid-setup-status" class="status"></p>
+	        <p id="faceid-setup-status" class="status"></p>
 
-        <div class="button-group">
-          <button id="btn-faceid-activate" class="btn btn-primary">
-            <span class="biometric-icon">👆</span>
-            Activer Face ID
-          </button>
-          <button id="btn-faceid-skip" class="btn btn-secondary">Plus tard</button>
-        </div>
-      </div>
-    </div>
+	        <div class="button-group">
+	          <button id="btn-faceid-activate" class="btn btn-primary">
+	            Activer Face ID
+	          </button>
+	          <button id="btn-faceid-skip" class="btn btn-secondary">Plus tard</button>
+	        </div>
+	      </div>
+	    </div>
 
     <!-- ========== 6. CREATE — GENERATING ========== -->
     <div id="screen-creating" class="screen hidden">
