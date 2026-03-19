@@ -37,6 +37,9 @@ export default function TransactionProgressModal({
     Boolean(amountLabel) ||
     Boolean(beneficiaryAddress) ||
     Boolean(beneficiaryLabel);
+  const pendingTitle = beneficiaryAddress
+    ? t("ui_tx_sending_eta", "Envoi en cours (≈3 secondes)")
+    : t("ui_tx_verifying", "En cours de vérification");
 
   const handleClose = useCallback(() => {
     setClosing(true);
@@ -119,7 +122,7 @@ export default function TransactionProgressModal({
           {isPending ? (
             <>
               <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-white">
-                {t("ui_tx_verifying", "En cours de vérification")}
+                {pendingTitle}
               </h1>
               <div className="mt-6 text-white/70">{label}</div>
 
