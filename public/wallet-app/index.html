@@ -281,46 +281,49 @@
 	      </div>
 	    </div>
 
-    <!-- ========== 6. CREATE — GENERATING ========== -->
-    <div id="screen-creating" class="screen hidden">
-      <div class="screen-content center">
-        <div class="icon-large">🔐</div>
-        <h2>Création du wallet</h2>
-        <p id="creating-status" class="status">Génération des clés…</p>
-        <div class="spinner"></div>
-      </div>
-    </div>
+	    <!-- ========== 6. CREATE — GENERATING ========== -->
+	    <div id="screen-creating" class="screen hidden">
+	      <div class="screen-content center">
+	        <div class="creating-icon" aria-hidden="true">🔐</div>
+	        <h2>Création du compte</h2>
+	        <p id="creating-status" class="status">Génération des clés…</p>
+	        <div class="spinner"></div>
+	      </div>
+	    </div>
 
-    <!-- ========== 7. BACKUP — SHOW MNEMONIC ========== -->
-    <div id="screen-backup" class="screen hidden">
-      <div class="screen-content">
-        <div class="screen-header">
-          <span></span>
-          <h2>Sauvegardez votre phrase</h2>
-          <span></span>
-        </div>
+	    <!-- ========== 7. BACKUP — SHOW MNEMONIC ========== -->
+	    <div id="screen-backup" class="screen hidden">
+	      <div class="screen-content">
+	        <div class="screen-header">
+	          <span></span>
+	          <h2>Sauvegardez votre phrase</h2>
+	          <span></span>
+	        </div>
 
-        <div class="warning">
-          ⚠️ Notez ces <strong>12 mots</strong> dans l'ordre, dans un endroit sûr.<br>
-          C'est le <strong>seul moyen</strong> de récupérer votre wallet.<br>
-          Ils ne seront <strong>plus jamais affichés</strong>.
-        </div>
+	        <div class="backup-warning">
+	          <div class="backup-warning-icon" aria-hidden="true">!</div>
+	          <div class="backup-warning-text">
+	            <p>Notez ces <strong>12 mots</strong> dans l'ordre, dans un endroit sûr.</p>
+	            <p>C'est le <strong>seul moyen</strong> de récupérer votre compte.</p>
+	            <p>Ils ne seront <strong>plus affichés</strong>.</p>
+	          </div>
+	        </div>
 
-        <div class="mnemonic-grid" id="mnemonic-grid">
-          <!-- 12 word slots filled by JS -->
-        </div>
+	        <div class="mnemonic-grid" id="mnemonic-grid">
+	          <!-- 12 word slots filled by JS -->
+	        </div>
 
-        <div class="info-box">
-          <p class="info-label">Adresse XRPL</p>
-          <code id="backup-address">…</code>
-        </div>
+	        <div class="info-box">
+	          <p class="info-label">ADRESSE XRPL</p>
+	          <code id="backup-address">…</code>
+	        </div>
 
-        <div class="button-group">
-          <button id="btn-backup-regenerate" class="btn btn-secondary btn-sm">🔄 Nouvelle liste</button>
-          <button id="btn-backup-continue" class="btn btn-primary">J'ai noté mes 12 mots</button>
-        </div>
-      </div>
-    </div>
+	        <div class="button-group">
+	          <button id="btn-backup-continue" class="btn btn-primary">J'ai noté mes 12 mots</button>
+	        </div>
+	        <button id="btn-backup-regenerate" class="btn-link">Nouvelle liste</button>
+	      </div>
+	    </div>
 
     <!-- ========== 8. BACKUP — VERIFY ALL 12 WORDS ========== -->
     <div id="screen-backup-verify" class="screen hidden">

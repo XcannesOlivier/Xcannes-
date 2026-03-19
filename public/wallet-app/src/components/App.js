@@ -774,7 +774,7 @@ function setupBackupVerifyScreen(words) {
   btnConfirm?.addEventListener('click', async () => {
     try {
       // Ask for Face ID or PIN confirmation before saving
-      const confirmed = await confirmWithAuth('Sécurisez ce wallet', 'Confirmez votre identité pour chiffrer et sauvegarder ce wallet.');
+      const confirmed = await confirmWithAuth('Sécurisez ce compte', 'Confirmez votre identité pour chiffrer et sauvegarder ce compte.');
       if (!confirmed) {
         // User cancelled — stay on verify screen
         showScreen('backup-verify');
@@ -901,7 +901,7 @@ async function handleImport(statusEl) {
     document.querySelectorAll('#import-mnemonic-grid .import-word-input').forEach(inp => inp.value = '');
 
     // Confirm with Face ID or PIN before saving
-    const confirmed = await confirmWithAuth('Sécurisez ce wallet', `Confirmez pour chiffrer et sauvegarder le wallet ${walletResult.address.slice(0, 8)}…`);
+    const confirmed = await confirmWithAuth('Sécurisez ce compte', `Confirmez pour chiffrer et sauvegarder le compte ${walletResult.address.slice(0, 8)}…`);
     if (!confirmed) {
       showScreen('import');
       setupImportScreen();
@@ -970,7 +970,7 @@ function confirmWithAuth(title, subtitle) {
     const pinDots = document.getElementById('confirm-pin-dots');
     const pinInput = document.getElementById('confirm-pin-input');
 
-    if (titleEl) titleEl.textContent = title || 'Sécurisez ce wallet';
+    if (titleEl) titleEl.textContent = title || 'Sécurisez ce compte';
     if (subtitleEl) subtitleEl.textContent = subtitle || '';
     updateStatus(statusEl, '');
     pinSection.classList.add('hidden');
