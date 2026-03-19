@@ -69,33 +69,53 @@
       </div>
     </div>
 
-    <!-- ========== 2. WELCOME SCREEN ========== -->
+	    <!-- ========== 2. WELCOME SCREEN ========== -->
 	    <div id="screen-welcome" class="screen hidden">
 	      <div class="screen-content center">
 	        <div class="logo">X</div>
-	        <h1>Bienvenu sur l'application XCANNES !</h1>
-	        <p class="subtitle">Votre compte multi-devises sécurisé</p>
+	        <h1 class="welcome-hero-title">
+	          <span>Votre argent,</span>
+	          <span class="welcome-accent">sans frontières.</span>
+	        </h1>
+	        <p class="subtitle welcome-hero-subtitle">Envoyez, recevez et convertissez<br>votre argent instantanément.</p>
 
 	        <div class="feature-list">
 	          <div class="feature-item">
-	            <span class="feature-icon">🔒︎</span>
+	            <span class="feature-icon-box" aria-hidden="true">
+	              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M7 11V8a5 5 0 0 1 10 0v3" />
+	                <path d="M6 11h12v9H6z" />
+	              </svg>
+	            </span>
 	            <span class="feature-text">
-	              <span class="feature-title">Votre argent est sécurisé</span>
+	              <span class="feature-title">Vos fonds restent sécurisés</span>
 	              <span class="feature-sub">Clés stockées uniquement sur votre appareil</span>
 	            </span>
 	          </div>
 	          <div class="feature-item">
-	            <span class="feature-icon">⌁</span>
+	            <span class="feature-icon-box" aria-hidden="true">
+	              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M12 11c1.66 0 3-1.34 3-3S13.66 5 12 5 9 6.34 9 8s1.34 3 3 3z" />
+	                <path d="M12 11v4" />
+	                <path d="M8 15h8" />
+	                <path d="M7 8v1a5 5 0 0 0 10 0V8" opacity="0.6" />
+	                <path d="M6 12v2a6 6 0 0 0 12 0v-2" opacity="0.6" />
+	              </svg>
+	            </span>
 	            <span class="feature-text">
-	              <span class="feature-title">Accès rapide et sécurisé</span>
-	              <span class="feature-sub">Déverrouillage avec Face/Touch ID</span>
+	              <span class="feature-title">Accès rapide avec Face ID</span>
+	              <span class="feature-sub">Déverrouillage en un geste</span>
 	            </span>
 	          </div>
 	          <div class="feature-item">
-	            <span class="feature-icon">▣</span>
+	            <span class="feature-icon-box" aria-hidden="true">
+	              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M13 2L3 14h7l-1 8 12-14h-7l-1-6z" />
+	              </svg>
+	            </span>
 	            <span class="feature-text">
-	              <span class="feature-title">Connexion instantanée</span>
-	              <span class="feature-sub">Accédez à votre compte en un scan</span>
+	              <span class="feature-title">Paiements instantanés</span>
+	              <span class="feature-sub">Envoyez et recevez en quelques secondes</span>
 	            </span>
 	          </div>
 	        </div>
@@ -103,8 +123,13 @@
 	        <div class="button-group">
 	          <button id="btn-welcome-continue" class="btn btn-primary">Commencer</button>
 	        </div>
-      </div>
-    </div>
+
+	        <div class="welcome-footer" aria-hidden="true">
+	          <span class="welcome-footer-icon">🛡︎</span>
+	          <span>Prêt en quelques secondes</span>
+	        </div>
+	      </div>
+	    </div>
 
     <!-- ========== 3. TERMS SCREEN ========== -->
     <div id="screen-terms" class="screen hidden">
