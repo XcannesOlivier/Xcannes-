@@ -125,7 +125,77 @@ const SETTING_TERMS_ACCEPTED = 'terms_accepted';
 // SCREEN MANAGEMENT
 // ==========================================
 
+let keyboardAvoidanceInitialized = false;
+
+function clearKeyboardAvoidanceUI() {
+  document.documentElement.style.setProperty('--keyboard-offset', '0px');
+  document.body?.classList.remove('keyboard-open');
+}
+
+function getPinDotsElForInput(inputEl) {
+  const id = inputEl?.id || '';
+  if (id === 'pin-create-input') return document.getElementById('pin-create-dots');
+  if (id === 'pin-unlock-input') return document.getElementById('pin-unlock-dots');
+  if (id === 'confirm-pin-input') return document.getElementById('confirm-pin-dots');
+  return null;
+}
+
+function setupKeyboardAvoidance() {
+  if (keyboardAvoidanceInitialized) return;
+  keyboardAvoidanceInitialized = true;
+
+  const viewport = window.visualViewport;
+
+  const update = () => {
+    if (!viewport) return;
+    const keyboardPx = Math.max(0, window.innerHeight - viewport.height - (viewport.offsetTop || 0));
+    document.documentElement.style.setProperty('--keyboard-offset', `${Math.round(keyboardPx)}px`);
+    if (keyboardPx > 0) document.body?.classList.add('keyboard-open');
+    else document.body?.classList.remove('keyboard-open');
+  };
+
+  document.addEventListener('focusin', (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (!target.classList.contains('pin-hidden-input')) return;
+
+    update();
+    const dotsEl = getPinDotsElForInput(target);
+    setTimeout(() => {
+      (dotsEl || target).scrollIntoView({ block: 'center', inline: 'nearest' });
+    }, 60);
+  });
+
+  document.addEventListener('focusout', (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (!target.classList.contains('pin-hidden-input')) return;
+
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (active instanceof HTMLInputElement && active.classList.contains('pin-hidden-input')) return;
+      clearKeyboardAvoidanceUI();
+    }, 120);
+  });
+
+  if (viewport) {
+    viewport.addEventListener('resize', update);
+    viewport.addEventListener('scroll', update);
+  } else {
+    // Fallback — some browsers don’t implement visualViewport well in PWA mode.
+    window.addEventListener('resize', clearKeyboardAvoidanceUI);
+  }
+
+  window.addEventListener('orientationchange', () => setTimeout(update, 250));
+}
+
 function showScreen(screenName) {
+  const active = document.activeElement;
+  if (active instanceof HTMLInputElement && active.classList.contains('pin-hidden-input')) {
+    active.blur();
+    clearKeyboardAvoidanceUI();
+  }
+
   document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   const el = document.getElementById(`screen-${screenName}`);
   if (el) el.classList.remove('hidden');
@@ -292,6 +362,7 @@ export async function init() {
 async function initApp() {
   showScreen('splash');
   animateSplash();
+  setupKeyboardAvoidance();
 
   try {
     const appSetup = await isAppSetup();

@@ -52,6 +52,9 @@
   --font-orbitron: 'Orbitron', system-ui, sans-serif;
   --font-montserrat: 'Montserrat', system-ui, sans-serif;
   --font-manrope: 'Manrope', system-ui, sans-serif;
+
+  /* Dynamic — adjusted when mobile keyboard opens (JS) */
+  --keyboard-offset: 0px;
 }
 
 * {
@@ -103,6 +106,19 @@ html, body {
   padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 12px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.screen-content.keyboard-avoid {
+  transition: padding-bottom 180ms ease, padding-top 180ms ease;
+}
+
+body.keyboard-open .screen-content.keyboard-avoid {
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 12px + var(--keyboard-offset));
+  scroll-padding-bottom: calc(var(--keyboard-offset) + 24px);
+}
+
+body.keyboard-open .screen-content.center.keyboard-avoid {
+  justify-content: flex-start;
 }
 
 .screen-content.center {
