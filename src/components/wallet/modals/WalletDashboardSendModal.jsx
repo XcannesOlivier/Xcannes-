@@ -66,11 +66,6 @@ export default function WalletDashboardSendModal({
     () => String(currentWalletAddress || "").trim(),
     [currentWalletAddress],
   );
-  const selfSendBlocked = Boolean(
-    normalizedCurrentWalletAddress &&
-      effectiveDestination &&
-      effectiveDestination === normalizedCurrentWalletAddress,
-  );
 
   const payreqFileInputId = "payreq-qr-file";
   const manualQrReaderIdRef = useRef(
@@ -85,6 +80,11 @@ export default function WalletDashboardSendModal({
   const effectiveDestination = String(
     sendPaymentRequest?.to || normalizedDestination || "",
   ).trim();
+  const selfSendBlocked = Boolean(
+    normalizedCurrentWalletAddress &&
+      effectiveDestination &&
+      effectiveDestination === normalizedCurrentWalletAddress,
+  );
   const hasDestination =
     Boolean(effectiveDestination) &&
     /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(effectiveDestination);
