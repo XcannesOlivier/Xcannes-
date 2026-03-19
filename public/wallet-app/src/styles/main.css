@@ -1618,6 +1618,153 @@ textarea.error {
 
 /* ===== VERIFY FIELDS (sequential 1–12) ===== */
 
+#screen-backup-verify {
+  background:
+    radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.08), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-backup-verify::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%);
+  pointer-events: none;
+}
+
+#screen-backup-verify .screen-header h2 {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+#screen-backup-verify .verify-intro {
+  max-width: 360px;
+  margin: 0 auto 14px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+#screen-backup-verify .verify-progress {
+  max-width: 360px;
+  margin: 0 auto 10px;
+}
+
+#screen-backup-verify #verify-progress-text {
+  color: rgba(0, 200, 83, 0.85);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+#screen-backup-verify .verify-progress-bar {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+#screen-backup-verify .verify-progress-fill {
+  background: rgba(0, 200, 83, 0.85);
+  box-shadow: 0 0 14px rgba(0, 200, 83, 0.25);
+}
+
+#screen-backup-verify .verify-sequential {
+  max-width: 360px;
+  margin: 10px auto 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#screen-backup-verify .verify-row {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#screen-backup-verify .verify-row:last-child {
+  border-bottom: none;
+}
+
+#screen-backup-verify .verify-row .row-num {
+  min-width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+}
+
+#screen-backup-verify .verify-row.active .row-num {
+  background: rgba(0, 200, 83, 0.12);
+  border-color: rgba(0, 200, 83, 0.22);
+  color: rgba(0, 200, 83, 0.92);
+}
+
+#screen-backup-verify .verify-row.done .row-num {
+  background: rgba(0, 200, 83, 0.10);
+  border-color: rgba(0, 200, 83, 0.18);
+  color: rgba(0, 200, 83, 0.85);
+}
+
+#screen-backup-verify .verify-row .row-input {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 12px 12px;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+#screen-backup-verify .verify-row.active .row-input {
+  border-color: rgba(0, 200, 83, 0.35);
+  background: rgba(0, 200, 83, 0.06);
+}
+
+#screen-backup-verify .verify-row.locked {
+  opacity: 0.32;
+}
+
+#screen-backup-verify .verify-row.locked .row-input {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+#screen-backup-verify .verify-row .row-status,
+#screen-backup-verify .verify-row .row-error-msg {
+  display: none;
+}
+
+#screen-backup-verify .button-group {
+  max-width: 360px;
+  margin: 0 auto;
+  position: relative;
+}
+
+#screen-backup-verify .button-group::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: -14px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 83, 0.55), transparent);
+  opacity: 0.9;
+}
+
+#screen-backup-verify .btn-primary {
+  border-radius: 14px;
+  padding: 18px 26px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.90);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 26px 70px rgba(0, 0, 0, 0.55);
+}
+
+#screen-backup-verify .btn-primary:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+}
+
 .verify-intro {
   color: var(--text-tertiary);
   font-size: 13px;
