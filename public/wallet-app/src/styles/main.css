@@ -132,6 +132,75 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   justify-content: flex-start;
 }
 
+/* ===== PIN SETUP (Create/Confirm PIN) ===== */
+
+#screen-pin-create {
+  background:
+    radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.14), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.10), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-pin-create::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%);
+  pointer-events: none;
+}
+
+.pin-setup-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: rgba(0, 200, 83, 0.95);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(0, 200, 83, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.12) inset,
+    0 0 26px rgba(0, 200, 83, 0.18),
+    0 24px 60px rgba(0, 0, 0, 0.60);
+  margin-bottom: 18px;
+}
+
+.pin-setup-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+#screen-pin-create h2 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-bottom: 10px;
+}
+
+#screen-pin-create .subtitle {
+  margin-bottom: 30px;
+  max-width: 320px;
+  opacity: 0.92;
+}
+
+#screen-pin-create .pin-dots {
+  margin: 10px 0 24px;
+  gap: 16px;
+}
+
+#screen-pin-create .pin-dot {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+#screen-pin-create .pin-dot.filled {
+  background: rgba(0, 200, 83, 0.95);
+  border-color: rgba(0, 200, 83, 0.95);
+  transform: scale(1.12);
+}
+
 .screen-content.center {
   display: flex;
   flex-direction: column;

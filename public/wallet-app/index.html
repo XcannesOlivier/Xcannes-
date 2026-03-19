@@ -217,16 +217,25 @@
       </div>
     </div>
 
-    <!-- ========== 5b. PIN CREATE SCREEN ========== -->
+	    <!-- ========== 5b. PIN CREATE SCREEN ========== -->
 	    <div id="screen-pin-create" class="screen hidden">
 	      <div class="screen-content center keyboard-avoid">
-	        <div class="icon-large">🔢</div>
+	        <div class="pin-setup-icon" aria-hidden="true">
+	          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	            <path d="M8 3H7a4 4 0 0 0-4 4v1" />
+	            <path d="M16 3h1a4 4 0 0 1 4 4v1" />
+	            <path d="M8 21H7a4 4 0 0 1-4-4v-1" />
+	            <path d="M16 21h1a4 4 0 0 0 4-4v-1" />
+	            <path d="M9 10a3 3 0 0 0 6 0" opacity="0.9" />
+	            <path d="M10 14h4" opacity="0.7" />
+	          </svg>
+	        </div>
 	        <h2 id="pin-create-title">Créez votre code PIN</h2>
-	        <p id="pin-create-subtitle" class="subtitle">Ce code à 6 chiffres protège votre wallet.</p>
+	        <p id="pin-create-subtitle" class="subtitle">Choisissez un code PIN sécurisé à 6 chiffres</p>
 
-        <div class="pin-dots" id="pin-create-dots">
-          <span class="pin-dot"></span>
-          <span class="pin-dot"></span>
+	        <div class="pin-dots" id="pin-create-dots">
+	          <span class="pin-dot"></span>
+	          <span class="pin-dot"></span>
           <span class="pin-dot"></span>
           <span class="pin-dot"></span>
           <span class="pin-dot"></span>
