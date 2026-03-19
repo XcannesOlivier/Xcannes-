@@ -291,6 +291,88 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
+/* ===== CONFIRM SECURE (biometric / PIN confirmation) ===== */
+
+#screen-confirm-secure {
+  background:
+    radial-gradient(850px 520px at 50% 0%, rgba(0, 200, 83, 0.12), transparent 62%),
+    radial-gradient(700px 520px at 50% 100%, rgba(0, 200, 83, 0.08), transparent 62%),
+    linear-gradient(180deg, #050707 0%, #050b08 55%, #050707 100%);
+}
+
+#screen-confirm-secure::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top, rgba(255,255,255,0.03), transparent 64%);
+  pointer-events: none;
+}
+
+#screen-confirm-secure .logo {
+  border-color: rgba(0, 200, 83, 0.16);
+  box-shadow:
+    0 0 0 1px rgba(0, 200, 83, 0.10) inset,
+    0 0 22px rgba(0, 200, 83, 0.14),
+    0 24px 60px rgba(0, 0, 0, 0.60);
+  margin-bottom: 18px;
+}
+
+#screen-confirm-secure h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.35px;
+  margin-bottom: 10px;
+}
+
+#screen-confirm-secure .subtitle {
+  margin-bottom: 26px;
+  max-width: 340px;
+  opacity: 0.92;
+}
+
+.btn-confirm-hero {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 14px;
+  padding: 18px 22px;
+  font-size: 15px;
+  background: linear-gradient(180deg, rgba(0, 200, 83, 0.20), rgba(0, 200, 83, 0.10));
+  border: 1px solid rgba(0, 200, 83, 0.20);
+  box-shadow:
+    0 0 22px rgba(0, 200, 83, 0.10),
+    0 26px 70px rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.95);
+  gap: 12px;
+}
+
+.btn-confirm-hero:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(0, 200, 83, 0.26), rgba(0, 200, 83, 0.12));
+}
+
+.confirm-hero-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+  flex-shrink: 0;
+}
+
+.confirm-hero-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+#screen-confirm-secure .status {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12.5px;
+  min-height: 18px;
+}
+
 .screen-content.center {
   display: flex;
   flex-direction: column;
