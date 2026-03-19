@@ -586,6 +586,8 @@ h3 {
   gap: 10px;
   width: 100%;
   max-width: 320px;
+  margin: 0 auto;
+  align-self: center;
 }
 
 .btn {
@@ -1437,27 +1439,28 @@ textarea.error {
   grid-template-columns: 1fr 1fr;
   gap: 10px 16px;
   margin-bottom: 20px;
-  padding: 16px;
-  background: rgba(15, 23, 42, 0.6);
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
 }
 
 .import-word-cell {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 10px 12px;
   transition: all 0.2s ease;
 }
 
 .import-word-cell:focus-within {
   border-color: var(--accent);
-  background: rgba(22, 163, 74, 0.08);
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
+  background: rgba(22, 163, 74, 0.06);
+  box-shadow: none;
 }
 
 .import-word-num {
@@ -1485,10 +1488,14 @@ textarea.error {
   outline: none;
   padding: 0;
   letter-spacing: 0.02em;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  caret-color: var(--accent);
 }
 
 .import-word-input::placeholder {
-  color: rgba(148, 163, 184, 0.35);
+  color: rgba(148, 163, 184, 0.4);
   font-size: 0.85rem;
   font-family: inherit;
   font-weight: 400;
