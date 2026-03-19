@@ -134,40 +134,69 @@
 	    </div>
 
     <!-- ========== 3. TERMS SCREEN ========== -->
-    <div id="screen-terms" class="screen hidden">
-      <div class="screen-content">
-        <div class="screen-header">
-          <button class="btn-back" id="btn-terms-back">‹</button>
-          <h2>Conditions d'utilisation</h2>
-          <span></span>
-        </div>
+	    <div id="screen-terms" class="screen hidden">
+	      <div class="screen-content">
+	        <div class="screen-header">
+	          <button class="btn-back" id="btn-terms-back">‹</button>
+	          <h2>Conditions d'utilisation</h2>
+	          <span></span>
+	        </div>
 
-        <div class="terms-box">
-          <div class="terms-scroll" id="terms-text">
-            <h3>Xcannes Wallet — Conditions</h3>
-            <p>En utilisant Xcannes Wallet, vous acceptez les conditions suivantes :</p>
-            <ul>
-              <li><strong>Non-custodial</strong> — Vos clés privées sont générées et stockées exclusivement sur votre appareil. Xcannes n'a jamais accès à vos fonds.</li>
-              <li><strong>Responsabilité</strong> — Vous êtes seul responsable de la sauvegarde de votre phrase de récupération (mnemonic). En cas de perte, vos fonds sont irrécupérables.</li>
-              <li><strong>Pas de garantie</strong> — Le logiciel est fourni "tel quel". Xcannes ne peut être tenu responsable de toute perte liée à l'utilisation du wallet.</li>
-              <li><strong>Sécurité</strong> — Le chiffrement repose sur la biométrie de votre appareil (Face ID / Touch ID). Protégez l'accès à votre téléphone.</li>
-              <li><strong>Réseau XRPL</strong> — Les transactions sont irréversibles une fois soumises au XRP Ledger.</li>
-              <li><strong>Activation</strong> — Un compte XRPL nécessite un dépôt minimum de 10 XRP pour être activé sur le ledger.</li>
-            </ul>
-            <p>En continuant, vous confirmez avoir lu et accepté l'ensemble de ces conditions.</p>
-          </div>
-        </div>
+	        <div class="terms-cards" id="terms-text">
+	          <div class="terms-card">
+	            <div class="terms-icon-box" aria-hidden="true">
+	              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M7 11V8a5 5 0 0 1 10 0v3" />
+	                <path d="M6 11h12v9H6z" />
+	              </svg>
+	            </div>
+	            <div class="terms-card-text">
+	              <div class="terms-card-title">Non-custodial</div>
+	              <div class="terms-card-sub">Vos clés privées sont stockées uniquement sur votre appareil. Xcannes n'a jamais accès à vos fonds.</div>
+	            </div>
+	          </div>
 
-        <div class="terms-footer">
-          <label class="checkbox-label" for="terms-agree">
-            <input type="checkbox" id="terms-agree">
-            <span class="checkbox-custom"></span>
-            <span>J'ai lu et j'accepte les conditions</span>
-          </label>
-          <button id="btn-terms-accept" class="btn btn-primary" disabled>Accepter et continuer</button>
-        </div>
-      </div>
-    </div>
+	          <div class="terms-card">
+	            <div class="terms-icon-box" aria-hidden="true">
+	              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M12 2l10 18H2L12 2z" />
+	                <path d="M12 9v4" />
+	                <path d="M12 17h.01" />
+	              </svg>
+	            </div>
+	            <div class="terms-card-text">
+	              <div class="terms-card-title">Responsabilité</div>
+	              <div class="terms-card-sub">Vous êtes seul responsable de votre phrase de récupération. En cas de perte, vos fonds sont irrécupérables.</div>
+	            </div>
+	          </div>
+
+	          <div class="terms-card">
+	            <div class="terms-icon-box" aria-hidden="true">
+	              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+	                <path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0" />
+	                <path d="M12 3v3" />
+	                <path d="M12 18v3" />
+	                <path d="M3 12h3" />
+	                <path d="M18 12h3" />
+	              </svg>
+	            </div>
+	            <div class="terms-card-text">
+	              <div class="terms-card-title">Pas de garantie</div>
+	              <div class="terms-card-sub">Xcannes ne peut être tenu responsable en cas de perte.</div>
+	            </div>
+	          </div>
+	        </div>
+
+	        <div class="terms-footer">
+	          <label class="checkbox-label" for="terms-agree">
+	            <input type="checkbox" id="terms-agree">
+	            <span class="checkbox-custom"></span>
+	            <span>J'accepte les conditions d'utilisation</span>
+	          </label>
+	          <button id="btn-terms-accept" class="btn btn-primary" disabled>Accepter et continuer</button>
+	        </div>
+	      </div>
+	    </div>
 
     <!-- ========== 5. CHOICE SCREEN ========== -->
     <div id="screen-choice" class="screen hidden">
