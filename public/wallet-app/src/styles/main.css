@@ -547,7 +547,7 @@ h3 {
 .feature-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 32px;
   width: 100%;
   max-width: 300px;
@@ -560,11 +560,29 @@ h3 {
   font-size: 13px;
   color: var(--text-secondary);
   text-align: left;
-  padding: 10px 14px;
+  padding: 14px 16px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: border-color 0.2s;
+}
+
+.feature-item .feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.25;
+}
+
+.feature-item .feature-title {
+  font-weight: 650;
+  color: var(--text-secondary);
+}
+
+.feature-item .feature-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-tertiary);
 }
 
 .feature-item:hover {
@@ -576,6 +594,38 @@ h3 {
   width: 28px;
   text-align: center;
   flex-shrink: 0;
+}
+
+/* Welcome screen — match wallet modal surfaces (inset ring + subtle gradient) */
+#screen-welcome .feature-item {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -18px 28px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+#screen-welcome .feature-item:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+#screen-welcome .feature-icon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#screen-welcome h1 {
+  max-width: 340px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+#screen-welcome .subtitle {
+  margin-bottom: 22px;
+}
+
+#screen-welcome .button-group {
+  margin-top: 6px;
 }
 
 /* ===== BUTTONS ===== */
