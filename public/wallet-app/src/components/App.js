@@ -1424,16 +1424,11 @@ function setupEnterPINScreen() {
   const dotsContainer = document.getElementById('pin-unlock-dots');
   const input = document.getElementById('pin-unlock-input');
   const statusEl = document.getElementById('pin-unlock-status');
-  const addressEl = document.getElementById('pin-unlock-address');
   const btnFaceID = document.getElementById('btn-pin-unlock-faceid');
   const btnReset = document.getElementById('btn-reset-wallet-pin');
 
-  // Show most recent wallet address
-  getLastUsedWallet().then(wallet => {
-    if (wallet && addressEl) {
-      addressEl.textContent = `${wallet.address.slice(0, 8)}…${wallet.address.slice(-6)}`;
-    }
-  });
+  // Address preview removed from UI.
+  getLastUsedWallet().then(() => {});
 
   // Show Face ID link if available
   getAuthConfig().then(authConfig => {

@@ -288,6 +288,36 @@ html, body {
   margin-bottom: 0;
 }
 
+/* ===== UNLOCK SCREEN ===== */
+
+.unlock-welcome {
+  font-family: var(--font-montserrat);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-top: -6px;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.unlock-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: 18px;
+}
+
+.btn-biometric--hero {
+  max-width: 320px;
+  font-size: 16px;
+  padding: 18px 32px;
+  box-shadow:
+    0 0 26px var(--accent-glow),
+    0 18px 46px rgba(0, 0, 0, 0.55);
+}
+
 /* ===== TYPOGRAPHY ===== */
 
 h1 {
