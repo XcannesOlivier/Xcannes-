@@ -79,6 +79,33 @@ export default function GlobalStatement({
     [],
   );
 
+  const rlusdToLocal = useCallback(
+    (rlusdAmount, currencyCode) => {
+      const amount = Number(rlusdAmount);
+      if (!Number.isFinite(amount)) return 0;
+      const code = String(currencyCode || "").toUpperCase();
+      if (!code || isUsdStablecoin(code)) return amount;
+      const rate = Number(usdRates?.[code]);
+      if (!Number.isFinite(rate) || rate <= 0) return amount;
+      return amount / rate;
+    },
+    [isUsdStablecoin, usdRates],
+  );
+
+  const formatConversionUnits = useCallback(
+    (value, code) => {
+      const v = Number(value);
+      const c = String(code || "").toUpperCase() || "—";
+      if (!Number.isFinite(v)) return `— ${c}`;
+      const formatted = v.toLocaleString(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return `${formatted} ${c}`;
+    },
+    [locale],
+  );
+
   const normalizeKind = useCallback(
     (value) => String(value || "").trim().toUpperCase(),
     [],
@@ -198,10 +225,18 @@ export default function GlobalStatement({
       const from = String(m?.fromCurrencyCode || "").toUpperCase();
       const to = String(m?.toCurrencyCode || "").toUpperCase();
       if (kind === "CONVERSION") {
-        return t("ui_global_tx_conversion_7b1c2a9d5e", {
-          defaultValue: "Conversion {{from}} → {{to}}",
-          from: from || "—",
-          to: to || "—",
+        const grossRlusd = Number(m?.amountRlusdGross);
+        const netRlusd = Number(m?.amountRlusd);
+        const baseRlusd = Number.isFinite(grossRlusd) ? grossRlusd : netRlusd;
+        const quoteRlusd = Number.isFinite(netRlusd) ? netRlusd : grossRlusd;
+
+        const baseAmount = rlusdToLocal(baseRlusd, from);
+        const quoteAmount = rlusdToLocal(quoteRlusd, to);
+
+        return t("ui_global_tx_conversion_amounts_7b1c2a9d5e", {
+          defaultValue: "Conversion {{base}} → {{quote}}",
+          base: formatConversionUnits(baseAmount, from),
+          quote: formatConversionUnits(quoteAmount, to),
         });
       }
       if (kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN") {
@@ -230,7 +265,7 @@ export default function GlobalStatement({
       }
       return String(m?.kind || "").trim() || t("ui_transaction", "Transaction");
     },
-    [normalizeKind, t],
+    [formatConversionUnits, normalizeKind, rlusdToLocal, t],
   );
 
   const formatMovementDateTime = useCallback(
@@ -1066,8 +1101,8 @@ export default function GlobalStatement({
             ) : (
               <div className="space-y-2">
                 {recentMovements.map((m, idx) => {
+                  const isConversion = normalizeKind(m?.kind) === "CONVERSION";
                   const uiType = getMovementUiType(m);
-                  const { amount, currency } = getMovementDisplayAmount(m);
                   const sign =
                     uiType === "debit"
                       ? "−"
@@ -1095,37 +1130,55 @@ export default function GlobalStatement({
                             {getMovementTitle(m)}
                           </div>
                           <div className="mt-0.5 text-[11px] text-white/45 truncate">
-                            {from && to
-                              ? `${from} → ${to}`
-                              : from || to || "—"}
-                            {m?.note ? ` · ${String(m.note)}` : ""}
+                            {isConversion
+                              ? when || ""
+                              : from && to
+                                ? `${from} → ${to}`
+                                : from || to || "—"}
+                            {!isConversion && m?.note
+                              ? ` · ${String(m.note)}`
+                              : ""}
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3 shrink-0">
-                          <div className="text-right">
-                            <div
-                              className={[
-                                "text-[15px] font-semibold font-mono whitespace-nowrap",
-                                uiType === "debit"
-                                  ? "text-red-300"
-                                  : uiType === "credit"
-                                    ? "text-xcannes-green"
-                                    : "text-white/90",
-                              ].join(" ")}
-                            >
-                              {sign}
-                              {formatAmountWithSymbolLocal(amount, currency, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}
+                          {!isConversion ? (
+                            <div className="text-right">
+                              {(() => {
+                                const { amount, currency } =
+                                  getMovementDisplayAmount(m);
+                                return (
+                                  <>
+                                    <div
+                                      className={[
+                                        "text-[15px] font-semibold font-mono whitespace-nowrap",
+                                        uiType === "debit"
+                                          ? "text-red-300"
+                                          : uiType === "credit"
+                                            ? "text-xcannes-green"
+                                            : "text-white/90",
+                                      ].join(" ")}
+                                    >
+                                      {sign}
+                                      {formatAmountWithSymbolLocal(
+                                        amount,
+                                        currency,
+                                        {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                        },
+                                      )}
+                                    </div>
+                                    {when ? (
+                                      <div className="text-[11px] text-white/45 mt-0.5 whitespace-nowrap">
+                                        {when}
+                                      </div>
+                                    ) : null}
+                                  </>
+                                );
+                              })()}
                             </div>
-                            {when ? (
-                              <div className="text-[11px] text-white/45 mt-0.5 whitespace-nowrap">
-                                {when}
-                              </div>
-                            ) : null}
-                          </div>
+                          ) : null}
 
                           <svg
                             className="w-5 h-5 text-white/35"
