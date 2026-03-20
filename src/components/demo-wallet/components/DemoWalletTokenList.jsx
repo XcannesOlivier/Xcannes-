@@ -33,7 +33,7 @@ export default function DemoWalletTokenList({
           >
             {t(
               "ui_consult_global_statement_3b89f4a7a2",
-              "Consulter votre Relevé global",
+              "Consulter vos dernières transactions",
             )}
           </button>
         </div>

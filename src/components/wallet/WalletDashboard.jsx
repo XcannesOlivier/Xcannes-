@@ -585,6 +585,18 @@ export default function WalletDashboard({
     ],
   );
 
+  const handleOpenXrplActivity = useCallback(() => {
+    const xrpToken =
+      (augmentedTokens || []).find(
+        (tok) => String(tok?.currency || "").toUpperCase() === "XRP",
+      ) || {
+        currency: "XRP",
+        issuer: null,
+        value: 0,
+      };
+    handleOpenCurrencyStatement(xrpToken);
+  }, [augmentedTokens, handleOpenCurrencyStatement]);
+
   // ── Total label ────────────────────────────────────────────
   const { usdRates, totalLabel, totalInUsd } = useUsdTotalLabel({
     augmentedTokens,
@@ -774,6 +786,7 @@ export default function WalletDashboard({
             walletAddresses={walletAddresses}
             onSwitchWallet={switchWallet}
             onOpenInfo={handleOpenInfo}
+            onOpenXrplActivity={handleOpenXrplActivity}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
             onActivateWallet={handleOpenActivationModal}
@@ -826,7 +839,7 @@ export default function WalletDashboard({
                 >
                   {t(
                     "ui_consult_global_statement_3b89f4a7a2",
-                    "Consulter votre Relevé global",
+                    "Consulter vos dernières transactions",
                   )}
                 </button>
               }

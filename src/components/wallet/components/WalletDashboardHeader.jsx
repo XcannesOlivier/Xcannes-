@@ -62,6 +62,7 @@ export default function WalletDashboardHeader({
   isRefreshing,
   isWalletLabelLocked,
   onOpenInfo,
+  onOpenXrplActivity,
   showMobileHomeLink = false,
   walletAddresses = [],
   onSwitchWallet,
@@ -453,6 +454,7 @@ export default function WalletDashboardHeader({
               <WalletSettingsDropdown
                 position="inline"
                 onOpenInfo={onOpenInfo}
+                onOpenXrplActivity={onOpenXrplActivity}
                 preferredCurrency={preferredCurrency}
                 topCurrencies={topCurrencies}
                 fawazCurrencies={fawazCurrencies}

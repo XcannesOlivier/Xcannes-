@@ -2,16 +2,13 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import {
   formatAmountWithSymbol,
-  getDisplayCurrencyCode,
   USD_STABLECOINS,
 } from "../walletDashboardConfig";
-import { getCurrencyDescription } from "@/utils/currencyDescriptions";
-import { getCurrencyFlag, ShareIcon } from "./statementShared";
+import { ShareIcon } from "./statementShared";
 import useStatementWalletLabel from "./useStatementWalletLabel";
 import useStatementDocHash from "./useStatementDocHash";
 
@@ -46,12 +43,14 @@ export default function GlobalStatement({
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
-  const globalTitle = t("ui_global_statement_13e29aa8aa", "Global");
+  const globalTitle = t(
+    "ui_global_statement_13e29aa8aa",
+    "Historique de vos dernières transactions",
+  );
   const isInlineDesktop = variant === "inline-desktop";
   const MAX_RECENT_TRANSACTIONS = 20;
 
   /* ── local state ───────────────────────────────────────── */
-  const [sortBy, setSortBy] = useState("balance");
   const [exportFormat, setExportFormat] = useState(null);
   const [showFullAddress, setShowFullAddress] = useState(false);
   const [detailMovement, setDetailMovement] = useState(null);
@@ -307,20 +306,11 @@ export default function GlobalStatement({
 
   /* ── sorted tokens ─────────────────────────────────────── */
   const sortedTokens = [...tokens]
-    .filter((tok) => String(tok.currency || "").toUpperCase() !== "RLUSD")
-    .sort((a, b) => {
-      const aIsXrp = String(a.currency || "").toUpperCase() === "XRP";
-      const bIsXrp = String(b.currency || "").toUpperCase() === "XRP";
-      if (aIsXrp && !bIsXrp) return 1;
-      if (!aIsXrp && bIsXrp) return -1;
-      if (sortBy === "balance") {
-        return parseFloat(b.value || 0) - parseFloat(a.value || 0);
-      }
-      if (sortBy === "name") {
-        return a.currency.localeCompare(b.currency);
-      }
-      return 0;
-    });
+    .filter((tok) => {
+      const code = String(tok.currency || "").toUpperCase();
+      return code !== "RLUSD" && code !== "XRP";
+    })
+    .sort((a, b) => parseFloat(b.value || 0) - parseFloat(a.value || 0));
 
   const formatAmountWithSymbolLocal = useCallback(
     (amount, currency, options = {}) =>
@@ -453,12 +443,6 @@ export default function GlobalStatement({
     const safeTotal = Number.isFinite(Number(totalBalance))
       ? Number(totalBalance)
       : 0;
-    const tokenPayload = (tokens || []).map((token) => ({
-      currency: token?.currency || "",
-      value: Number.isFinite(Number(token?.value)) ? Number(token.value) : 0,
-      issuer: token?.issuer || "",
-      isTrustlineOnly: Boolean(token?.isTrustlineOnly),
-    }));
     const movementPayload = (recentMovements || []).map((m) => ({
       kind: m?.kind || "",
       fromCurrencyCode: m?.fromCurrencyCode || "",
@@ -484,14 +468,12 @@ export default function GlobalStatement({
       walletAddress: walletAddress || "",
       period: currentPeriod || fallbackPeriod,
       totalBalance: safeTotal,
-      tokens: tokenPayload,
       movements: movementPayload,
     });
   }, [
     currentPeriod,
     fallbackPeriod,
     recentMovements,
-    tokens,
     totalBalance,
     walletAddress,
   ]);
@@ -509,35 +491,6 @@ export default function GlobalStatement({
           displayCurrencyCode,
         )
       : "-";
-    const balancesRows = (sortedTokens || [])
-      .map((token) => {
-        const usdValue = getUsdValue(token);
-        const displayCode = getDisplayCurrencyCode(token?.currency);
-        return `
-        <tr>
-          <td>${escapeHtml(displayCode || "-")}</td>
-          <td class="right">${escapeHtml(
-            formatAmountWithSymbol(locale, token?.value, token?.currency, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }),
-          )}</td>
-          <td class="right">${
-            Number.isFinite(usdValue)
-              ? escapeHtml(formatAmountWithSymbolLocal(usdValue, "USD"))
-              : "-"
-          }</td>
-        </tr>
-      `;
-      })
-      .join("");
-    const balancesEmpty = `
-      <tr>
-        <td colspan="3" class="muted">${escapeHtml(
-          t("ui_no_balances_found_2c7a1d9b5e", "No balances available"),
-        )}</td>
-      </tr>
-    `;
     const movementRows = (recentMovements || [])
       .map((m) => {
         const from = String(m?.fromCurrencyCode || "").toUpperCase();
@@ -587,19 +540,6 @@ export default function GlobalStatement({
         <div><strong>${escapeHtml(t("ui_ledger_status_label_0f7c1a9b5e", "Ledger status"))}:</strong> ${escapeHtml(ledgerStatusLabel)}</div>
         <div><strong>${escapeHtml(t("ui_document_hash_label_9b5c1a2d7e", "Document hash"))}:</strong> <span class="small">${escapeHtml(docHashLabel)}</span></div>
       </div>
-      <h2>${escapeHtml(t("ui_balances_label_1c7a2d9b5e", "Balances"))}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>${escapeHtml(t("ui_currency_label_2f7a1c9b5e", "Currency"))}</th>
-            <th class="right">${escapeHtml(t("ui_balance_label_7f2a1b9c5e", "Balance"))}</th>
-            <th class="right">${escapeHtml(t("ui_usd_value_label_1a7c9d3b5e", "USD value"))}</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${balancesRows || balancesEmpty}
-        </tbody>
-      </table>
       <h2>${escapeHtml(t("ui_recent_activity_de80b9813c", "Recent activity"))}</h2>
       <table>
         <thead>
@@ -624,11 +564,9 @@ export default function GlobalStatement({
     fallbackPeriod,
     formatAmountWithSymbolLocal,
     globalTitle,
-    getUsdValue,
     ledgerStatusLabel,
     locale,
     recentMovements,
-    sortedTokens,
     t,
     totalBalance,
     totalInPreferred,
@@ -999,7 +937,7 @@ export default function GlobalStatement({
               <span
                 className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 mt-0.5 inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/85"
                 aria-hidden="true"
-                title={t("ui_global_statement_13e29aa8aa", "Global")}
+                title={globalTitle}
               >
                 <svg
                   className="w-5 h-5 md:w-6 md:h-6"
@@ -1029,7 +967,7 @@ export default function GlobalStatement({
                 <div className="flex items-center gap-2 min-w-0">
                   <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
                     <span className="break-words">
-                      {t("ui_global_statement_13e29aa8aa", "Global")}
+                      {globalTitle}
                     </span>
                   </h2>
                   {noticeVariant === "demo" ? (
@@ -1220,159 +1158,6 @@ export default function GlobalStatement({
                 })}
               </div>
             )}
-          </div>
-
-          {/* Balances header + sort */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
-            <div>
-              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                {t("ui_balances_label_1c7a2d9b5e", "Balances")}
-              </div>
-              <div className="text-xs text-white/50">
-                {ledgerStatusLabel}
-                {ledgerLastIndex ? (
-                  <>
-                    {" "}
-                    ·{" "}
-                    {t("ui_last_ledger_index", {
-                      defaultValue: "Dernier ledger : {{index}}",
-                      index: Number(ledgerLastIndex).toLocaleString(locale),
-                    })}
-                  </>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="md:justify-self-end">
-              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                {t("ui_sort_label", "Tri")}
-              </div>
-              <div className="inline-flex rounded-[10px] ring-1 ring-white/10 ring-inset bg-white/5 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <button
-                  type="button"
-                  onClick={() => setSortBy("balance")}
-                  className={[
-                    "px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors duration-150",
-                    sortBy === "balance"
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5",
-                  ].join(" ")}
-                >
-                  {t("ui_sort_balance_short", "Balance")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSortBy("name")}
-                  className={[
-                    "px-3 py-1.5 rounded-[8px] text-xs font-semibold transition-colors duration-150",
-                    sortBy === "name"
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:text-white/80 hover:bg-white/5",
-                  ].join(" ")}
-                >
-                  {t("ui_sort_name_short", "Nom")}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Asset list */}
-          <div className="space-y-2">
-            {sortedTokens.map((token, idx) => {
-              const usdValue = getUsdValue(token);
-              const tokenCode = getDisplayCurrencyCode(token.currency);
-              const convertedValue =
-                Number.isFinite(usdValue) && usdValue !== null
-                  ? prefCode === "USD" || prefCode === "RLUSD"
-                    ? usdValue
-                    : prefRlusdPerUnit
-                      ? usdValue / prefRlusdPerUnit
-                      : null
-                  : null;
-              const showConverted =
-                Number.isFinite(convertedValue) &&
-                String(tokenCode || "").toUpperCase() !==
-                  String(displayCurrencyCode || "").toUpperCase();
-
-              const description = getCurrencyDescription(tokenCode);
-
-              return (
-                <button
-                  key={`${token.currency}-${idx}`}
-                  type="button"
-                  onClick={() => onViewCurrency?.(token)}
-                  disabled={!onViewCurrency}
-                  className="w-full text-left rounded-xl px-3 py-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150 disabled:opacity-70 disabled:cursor-default"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      {["XRP", "RLUSD"].includes(String(token.currency || "").toUpperCase()) ? (
-                        <Image
-                          src={`/symbols/${String(token.currency || "").toLowerCase()}.png`}
-                          alt={tokenCode}
-                          width={28}
-                          height={28}
-                          className="flex-shrink-0 w-7 h-7 rounded-md"
-                        />
-                      ) : (
-                        <span className="text-2xl flex-shrink-0">
-                          {getCurrencyFlag(tokenCode)}
-                        </span>
-                      )}
-
-                      <div className="min-w-0">
-                        <div className="text-[13px] font-medium text-white/90 truncate">
-                          {tokenCode}
-                        </div>
-                        {description ? (
-                          <div className="text-[11px] text-white/45 truncate mt-0.5">
-                            {description}
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <div className="text-[15px] font-semibold text-white/90 font-mono">
-                          {formatAmountWithSymbolLocal(
-                            token.value,
-                            token.currency,
-                            { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-                          )}
-                        </div>
-                        {showConverted ? (
-                          <div className="text-[11px] text-white/45 font-mono mt-0.5">
-                            {formatAmountWithSymbolLocal(
-                              convertedValue,
-                              displayCurrencyCode === "USD"
-                                ? "RLUSD"
-                                : displayCurrencyCode,
-                              { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-                            )}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <svg
-                        className="w-5 h-5 text-white/35"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
           </div>
         </div>
 

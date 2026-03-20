@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
 import { useWallet } from "@/context/WalletContext";
@@ -16,6 +17,7 @@ import PreferredCurrencySelector from "./PreferredCurrencySelector";
 export default function WalletSettingsDropdown({
   position = "header",
   onOpenInfo,
+  onOpenXrplActivity,
   // Preferred currency props
   preferredCurrency,
   topCurrencies,
@@ -299,6 +301,49 @@ export default function WalletSettingsDropdown({
                   <span className="text-white/25 text-lg">›</span>
                 </button>
               </div>
+
+              {/* Section: Réseau */}
+              {onOpenXrplActivity ? (
+                <div className="mt-4">
+                  <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+                    {t("ui_settings_section_network", "Réseau")}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      onOpenXrplActivity?.();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                  >
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 shrink-0">
+                      <Image
+                        src="/symbols/xrp.png"
+                        alt="XRP"
+                        width={22}
+                        height={22}
+                        className="rounded-md"
+                      />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-white/90">
+                        {t(
+                          "ui_xrpl_network_activity_6c7a1d9b5e",
+                          "Activité réseau XRPL",
+                        )}
+                      </div>
+                      <div className="text-[11px] text-white/45 mt-0.5">
+                        {t(
+                          "ui_xrpl_network_activity_hint_2c7a1d9b5e",
+                          "Voir les frais et opérations réseau",
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-white/25 text-lg">›</span>
+                  </button>
+                </div>
+              ) : null}
 
               {/* Section: Préférences */}
               {preferredCurrency && (

@@ -336,7 +336,7 @@ export default function DemoGlobalStatement({
     `;
 
     return `
-      <h1>${escapeHtml(t("ui_global_statement_13e29aa8aa", "Global Statement"))}</h1>
+      <h1>${escapeHtml(t("ui_global_statement_13e29aa8aa", "Historique de vos dernières transactions"))}</h1>
       <div class="meta">
         <div><strong>${escapeHtml(t("ui_wallet_address_label_2f7a1c9b5e", "Wallet address"))}:</strong> <span class="small">${escapeHtml(walletAddress || "-")}</span></div>
         <div><strong>${escapeHtml(t("ui_statement_period_label_3f6c1a9b5e", "Period"))}:</strong> ${escapeHtml(currentPeriod || fallbackPeriod)}</div>
@@ -394,7 +394,7 @@ export default function DemoGlobalStatement({
     try {
       const suffix = docHash ? docHash.slice(0, 12) : "draft";
       const ok = openPrintWindow({
-        title: `XCANNES Global Statement ${suffix}`,
+        title: `XCANNES Historique ${suffix}`,
         bodyHtml: buildPrintHtml(),
       });
       if (!ok && typeof window !== "undefined") {
@@ -413,7 +413,7 @@ export default function DemoGlobalStatement({
   const handlePrint = useCallback(() => {
     const suffix = docHash ? docHash.slice(0, 12) : "draft";
     const ok = openPrintWindow({
-      title: `XCANNES Global Statement ${suffix}`,
+      title: `XCANNES Historique ${suffix}`,
       bodyHtml: buildPrintHtml(),
     });
     if (!ok && typeof window !== "undefined") {
@@ -702,7 +702,10 @@ export default function DemoGlobalStatement({
                 <div className="flex items-center gap-2 min-w-0">
                   <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
                     <span className="break-words">
-                      {t("ui_global_statement_13e29aa8aa", "Global")}
+                      {t(
+                        "ui_global_statement_13e29aa8aa",
+                        "Historique de vos dernières transactions",
+                      )}
                     </span>
                   </h2>
                   {noticeVariant === "demo" ? (
