@@ -54,6 +54,7 @@ export default function GlobalStatement({
   const [sortBy, setSortBy] = useState("balance");
   const [selectedMonth, setSelectedMonth] = useState(0);
   const [exportFormat, setExportFormat] = useState(null);
+  const [showFullAddress, setShowFullAddress] = useState(false);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -184,6 +185,13 @@ export default function GlobalStatement({
       }),
     [locale],
   );
+
+  const truncatedWalletAddress = useMemo(() => {
+    const addr = String(walletAddress || "").trim();
+    if (!addr) return "";
+    if (addr.length <= 22) return addr;
+    return `${addr.slice(0, 10)}…${addr.slice(-8)}`;
+  }, [walletAddress]);
 
   /* ── ledger status ─────────────────────────────────────── */
   const ledgerEvidenceCount = useMemo(
@@ -540,9 +548,24 @@ export default function GlobalStatement({
                     {walletLabel || t("nav_wallet", "Wallet")}
                   </p>
                   {walletAddress ? (
-                    <p className="text-xs md:text-sm text-white/60 font-mono break-all">
-                      {walletAddress}
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowFullAddress((v) => !v)}
+                      className={[
+                        "text-xs md:text-sm text-white/60 font-mono text-left",
+                        showFullAddress ? "break-all whitespace-normal" : "truncate",
+                      ].join(" ")}
+                      title={t(
+                        "ui_toggle_full_address",
+                        "Cliquer pour afficher/masquer l'adresse complète",
+                      )}
+                      aria-label={t(
+                        "ui_toggle_full_address",
+                        "Cliquer pour afficher/masquer l'adresse complète",
+                      )}
+                    >
+                      {showFullAddress ? walletAddress : truncatedWalletAddress}
+                    </button>
                   ) : null}
                 </div>
               </div>

@@ -119,6 +119,7 @@ export default function CurrencyStatement({
   const [filter, setFilter] = useState("all");
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0);
+  const [showFullAddress, setShowFullAddress] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
@@ -127,6 +128,10 @@ export default function CurrencyStatement({
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailLabel, setDetailLabel] = useState("");
   const [detailLabelLoading, setDetailLabelLoading] = useState(false);
+  const [copiedHash, setCopiedHash] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState(false);
+  const copiedHashTimerRef = useRef(null);
+  const copiedAddressTimerRef = useRef(null);
   const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
   const highlightRowRef = useRef(null);
@@ -142,6 +147,13 @@ export default function CurrencyStatement({
     walletAddress,
     walletLabelOverride,
   );
+
+  const truncatedWalletAddress = useMemo(() => {
+    const addr = String(walletAddress || "").trim();
+    if (!addr) return "";
+    if (addr.length <= 22) return addr;
+    return `${addr.slice(0, 10)}…${addr.slice(-8)}`;
+  }, [walletAddress]);
 
   const data = useCurrencyStatementData({
     transactions,
@@ -199,6 +211,16 @@ export default function CurrencyStatement({
     setDetailTx(null);
     setDetailLabel("");
     setDetailLabelLoading(false);
+    setCopiedHash(false);
+    setCopiedAddress(false);
+    if (copiedHashTimerRef.current) {
+      window.clearTimeout(copiedHashTimerRef.current);
+      copiedHashTimerRef.current = null;
+    }
+    if (copiedAddressTimerRef.current) {
+      window.clearTimeout(copiedAddressTimerRef.current);
+      copiedAddressTimerRef.current = null;
+    }
   }, []);
 
   const formatDateTime = useCallback(
@@ -206,9 +228,19 @@ export default function CurrencyStatement({
       const raw = tx?.createdAt || tx?.date || "";
       const parsed = new Date(raw);
       if (!Number.isFinite(parsed.getTime())) return String(raw || "");
+      // Mobile: no seconds in the transaction detail cards
+      if (isMobileDate) {
+        return parsed.toLocaleString(locale, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
       return parsed.toLocaleString(locale);
     },
-    [locale],
+    [isMobileDate, locale],
   );
 
   useEffect(() => {
@@ -822,6 +854,24 @@ export default function CurrencyStatement({
     return `https://xrpscan.com/tx/${encodeURIComponent(hash)}`;
   }, [detailTx]);
 
+  const handleShareTransaction = useCallback(async () => {
+    const url = String(detailExplorerUrl || "").trim();
+    if (!url) return;
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        await navigator.share({
+          title: t("ui_transaction", "Transaction"),
+          text: t("ui_share_transaction", "Partager la transaction"),
+          url,
+        });
+        return;
+      }
+    } catch {
+      // fall back to clipboard
+    }
+    await copyToClipboard(url, t("ui_link_copied", "Lien copié"));
+  }, [copyToClipboard, detailExplorerUrl, t]);
+
   const transactionDetailModal =
     detailOpen && detailTx && typeof document !== "undefined"
       ? createPortal(
@@ -906,18 +956,31 @@ export default function CurrencyStatement({
                       </div>
                       <button
                         type="button"
-                        onClick={() =>
-                          copyToClipboard(
+                        onClick={async () => {
+                          await copyToClipboard(
                             counterpartyAddress,
                             t("ui_copied_address", "Adresse copiée"),
-                          )
-                        }
+                          );
+                          setCopiedAddress(true);
+                          if (copiedAddressTimerRef.current) {
+                            window.clearTimeout(copiedAddressTimerRef.current);
+                          }
+                          copiedAddressTimerRef.current = window.setTimeout(() => {
+                            setCopiedAddress(false);
+                            copiedAddressTimerRef.current = null;
+                          }, 1200);
+                        }}
                         className="flex-none inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
                         aria-label={t("ui_copy_address", "Copy address")}
                         title={t("ui_copy_address", "Copy address")}
                       >
                         ⧉
                       </button>
+                      {copiedAddress ? (
+                        <span className="text-[10px] text-xcannes-green/90 font-medium">
+                          {t("ui_copied", "Copié")}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -997,35 +1060,47 @@ export default function CurrencyStatement({
                       <div className="flex items-center gap-2 flex-none">
                         <button
                           type="button"
-                          onClick={() =>
-                            copyToClipboard(
+                          onClick={async () => {
+                            await copyToClipboard(
                               detailTx.txHash,
                               t("ui_copied_hash", "Hash copié"),
-                            )
-                          }
+                            );
+                            setCopiedHash(true);
+                            if (copiedHashTimerRef.current) {
+                              window.clearTimeout(copiedHashTimerRef.current);
+                            }
+                            copiedHashTimerRef.current = window.setTimeout(() => {
+                              setCopiedHash(false);
+                              copiedHashTimerRef.current = null;
+                            }, 1200);
+                          }}
                           className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
                           aria-label={t("ui_copy_hash", "Copy hash")}
                           title={t("ui_copy_hash", "Copy hash")}
                         >
                           ⧉
                         </button>
+                        {copiedHash ? (
+                          <span className="text-[10px] text-xcannes-green/90 font-medium">
+                            {t("ui_copied", "Copié")}
+                          </span>
+                        ) : null}
                         {detailExplorerUrl ? (
-                          <a
-                            href={detailExplorerUrl}
-                            target="_blank"
-                            rel="noreferrer"
+                          <button
+                            type="button"
+                            onClick={handleShareTransaction}
                             className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
                             aria-label={t(
-                              "ui_view_on_explorer",
-                              "View on explorer",
+                              "ui_share",
+                              "Partager",
                             )}
                             title={t(
-                              "ui_view_on_explorer",
-                              "View on explorer",
+                              "ui_share",
+                              "Partager",
                             )}
                           >
                             ↗
-                          </a>
+                          </button>
                         ) : null}
                       </div>
                     </div>
@@ -1125,9 +1200,24 @@ export default function CurrencyStatement({
                   {walletLabel || t("nav_wallet", "Wallet")}
                 </p>
                 {walletAddress ? (
-                  <p className="text-xs md:text-sm text-white/60 font-mono break-all">
-                    {walletAddress}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowFullAddress((v) => !v)}
+                    className={[
+                      "text-xs md:text-sm text-white/60 font-mono text-left",
+                      showFullAddress ? "break-all whitespace-normal" : "truncate",
+                    ].join(" ")}
+                    title={t(
+                      "ui_toggle_full_address",
+                      "Cliquer pour afficher/masquer l'adresse complète",
+                    )}
+                    aria-label={t(
+                      "ui_toggle_full_address",
+                      "Cliquer pour afficher/masquer l'adresse complète",
+                    )}
+                  >
+                    {showFullAddress ? walletAddress : truncatedWalletAddress}
+                  </button>
                 ) : null}
               </div>
             </div>
