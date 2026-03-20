@@ -230,24 +230,90 @@ export default function CurrencyStatement({
       if (!Number.isFinite(parsed.getTime())) return String(raw || "");
       // Mobile: no seconds in the transaction detail cards
       if (isMobileDate) {
-        return parsed.toLocaleString(locale, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
+        // Fixed compact format requested: "MM/DD HH:mm"
+        const md = new Intl.DateTimeFormat("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+        }).format(parsed);
+        const hm = new Intl.DateTimeFormat("en-US", {
           hour: "2-digit",
           minute: "2-digit",
-        });
+          hour12: false,
+        }).format(parsed);
+        return `${md} ${hm}`;
       }
       return parsed.toLocaleString(locale);
     },
     [isMobileDate, locale],
   );
 
+  const isXrplAddress = useCallback(
+    (value) => /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim()),
+    [],
+  );
+
+  const getCounterpartyAddressFromTx = useCallback(
+    (tx) => {
+      const trimmed = (v) => String(v || "").trim();
+      const normalized = (v) => {
+        const s = trimmed(v);
+        if (!s || s.toUpperCase() === "XCANNES") return "";
+        return s;
+      };
+      const isOutgoing =
+        tx?.type === "debit" ||
+        String(tx?.kind || "").toUpperCase().includes("OUT");
+
+      const candidates = [];
+      const push = (v) => {
+        const s = normalized(v);
+        if (s) candidates.push(s);
+      };
+
+      // Common fields (schemas vary between on-chain/off-chain currency lines)
+      push(tx?.counterparty);
+      push(tx?.counterpartyAddress);
+      push(tx?.counterpartyXrplAddress);
+
+      if (isOutgoing) {
+        push(tx?.to);
+        push(tx?.destination);
+        push(tx?.destinationAddress);
+        push(tx?.recipient);
+        push(tx?.recipientAddress);
+        push(tx?.beneficiary);
+        push(tx?.beneficiaryAddress);
+
+        push(tx?.from);
+        push(tx?.source);
+        push(tx?.sourceAddress);
+        push(tx?.sender);
+        push(tx?.senderAddress);
+      } else {
+        push(tx?.from);
+        push(tx?.source);
+        push(tx?.sourceAddress);
+        push(tx?.sender);
+        push(tx?.senderAddress);
+
+        push(tx?.to);
+        push(tx?.destination);
+        push(tx?.destinationAddress);
+        push(tx?.recipient);
+        push(tx?.recipientAddress);
+        push(tx?.beneficiary);
+        push(tx?.beneficiaryAddress);
+      }
+
+      return candidates.find((addr) => isXrplAddress(addr)) || "";
+    },
+    [isXrplAddress],
+  );
+
   useEffect(() => {
     if (!detailOpen || !detailTx) return;
-    const counterparty = String(detailTx?.counterparty || "").trim();
-    const isXrplAddress = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(counterparty);
-    if (!counterparty || !isXrplAddress) {
+    const counterparty = getCounterpartyAddressFromTx(detailTx);
+    if (!counterparty || !isXrplAddress(counterparty)) {
       setDetailLabel("");
       setDetailLabelLoading(false);
       return;
@@ -286,7 +352,7 @@ export default function CurrencyStatement({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [detailOpen, detailTx]);
+  }, [detailOpen, detailTx, getCounterpartyAddressFromTx, isXrplAddress]);
 
   /* ── prefetch counterparty labels for the list ─────────── */
   useEffect(() => {
@@ -296,13 +362,10 @@ export default function CurrencyStatement({
       : [];
     if (!list.length) return () => {};
 
-    const isXrplAddress = (value) =>
-      /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim());
-
     // Only prefetch for a limited number of recent rows (avoids spamming the API).
     const candidates = [];
     for (const tx of list) {
-      const addr = String(tx?.counterparty || "").trim();
+      const addr = getCounterpartyAddressFromTx(tx);
       if (!addr || addr.toUpperCase() === "XCANNES") continue;
       if (!isXrplAddress(addr)) continue;
       candidates.push(addr);
@@ -343,7 +406,7 @@ export default function CurrencyStatement({
     return () => {
       cancelled = true;
     };
-  }, [transactionsWithDisplayBalance, counterpartyLabels]);
+  }, [transactionsWithDisplayBalance, counterpartyLabels, getCounterpartyAddressFromTx, isXrplAddress]);
 
   /* ── doc hash ──────────────────────────────────────────── */
   const statementHashInput = useMemo(() => {
@@ -508,7 +571,7 @@ export default function CurrencyStatement({
         tx?.type === "credit"
           ? t("statement_xrpl_mobile_in", "Reçu")
           : t("statement_xrpl_mobile_out", "Envoyé");
-      const addr = String(tx?.counterparty || "").trim();
+      const addr = getCounterpartyAddressFromTx(tx);
       const cachedLabel =
         (addr && (counterpartyLabels?.[addr] ?? labelCacheRef.current.get(addr))) ||
         "";
@@ -518,6 +581,7 @@ export default function CurrencyStatement({
     [
       counterpartyLabels,
       formatCounterpartyCompact,
+      getCounterpartyAddressFromTx,
       getLocalizedDescription,
       parseConversionPair,
       t,
@@ -830,10 +894,9 @@ export default function CurrencyStatement({
   }, [detailTx, isPreviewMode, normalizedCurrency, t]);
 
   const counterpartyAddress = useMemo(() => {
-    const raw = String(detailTx?.counterparty || "").trim();
-    if (!raw || raw.toUpperCase() === "XCANNES") return "";
-    return raw;
-  }, [detailTx]);
+    if (!detailTx) return "";
+    return getCounterpartyAddressFromTx(detailTx);
+  }, [detailTx, getCounterpartyAddressFromTx]);
 
   const counterpartyTitle = useMemo(() => {
     return detailIsOutgoing
@@ -848,29 +911,164 @@ export default function CurrencyStatement({
     return label || t("ui_no_name_found", "Aucun nom trouvé");
   }, [counterpartyAddress, detailLabel, detailLabelLoading, t]);
 
-  const detailExplorerUrl = useMemo(() => {
-    const hash = String(detailTx?.txHash || "").trim();
-    if (!hash) return "";
-    return `https://xrpscan.com/tx/${encodeURIComponent(hash)}`;
-  }, [detailTx]);
-
   const handleShareTransaction = useCallback(async () => {
-    const url = String(detailExplorerUrl || "").trim();
-    if (!url) return;
+    if (!detailTx) return;
+    if (typeof document === "undefined") return;
+
+    const typeLabel = detailTypeLabel || t("ui_transaction", "Transaction");
+    const amountLabel = `${detailTx?.type === "debit" ? "−" : "+"}${formatAmountRlusdAsLocal(
+      detailTx?.amount ?? 0,
+    )}`;
+    const dateLabel = formatDateTime(detailTx);
+    const statusLabel = detailStatusLabel || "";
+    const nameLabel = counterpartyName || "";
+    const addressLabel = counterpartyAddress || "";
+
+    const buildCardBlob = async () => {
+      const w = 1080;
+      const h = 720;
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+
+      const roundedRect = (x, y, width, height, r) => {
+        const radius = Math.max(0, Math.min(r, width / 2, height / 2));
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
+      };
+
+      // Background
+      ctx.fillStyle = "#0b0f10";
+      ctx.fillRect(0, 0, w, h);
+      const glow = ctx.createRadialGradient(w * 0.5, h * 0.25, 0, w * 0.5, h * 0.25, h * 0.9);
+      glow.addColorStop(0, "rgba(34,197,94,0.22)");
+      glow.addColorStop(0.55, "rgba(34,197,94,0.08)");
+      glow.addColorStop(1, "rgba(34,197,94,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+
+      // Card
+      const pad = 56;
+      const cardX = pad;
+      const cardY = pad;
+      const cardW = w - pad * 2;
+      const cardH = h - pad * 2;
+      roundedRect(cardX, cardY, cardW, cardH, 42);
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.10)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Header
+      ctx.fillStyle = "rgba(255,255,255,0.70)";
+      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText("XCANNES", cardX + 44, cardY + 62);
+
+      ctx.fillStyle = "rgba(255,255,255,0.90)";
+      ctx.font = "700 44px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(typeLabel, cardX + 44, cardY + 120);
+
+      // Amount
+      ctx.font = "800 86px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+      ctx.fillStyle = detailTx?.type === "debit" ? "#f87171" : "#22c55e";
+      ctx.fillText(amountLabel, cardX + 44, cardY + 220);
+
+      // Meta
+      const metaY = cardY + 270;
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), cardX + 44, metaY);
+      ctx.fillText(t("ui_status_label", "Statut"), cardX + 44, metaY + 64);
+
+      ctx.fillStyle = "rgba(255,255,255,0.86)";
+      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(dateLabel, cardX + 44, metaY + 34);
+      ctx.fillText(statusLabel || "—", cardX + 44, metaY + 98);
+
+      // Counterparty
+      const cpTitle = counterpartyTitle || t("ui_counterparty", "Contrepartie");
+      const cpY = metaY + 150;
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(cpTitle, cardX + 44, cpY);
+
+      ctx.fillStyle = "rgba(255,255,255,0.90)";
+      ctx.font = "650 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(nameLabel || t("ui_no_name_found", "Aucun nom trouvé"), cardX + 44, cpY + 38);
+
+      if (addressLabel) {
+        const addr = addressLabel.length > 26
+          ? `${addressLabel.slice(0, 10)}…${addressLabel.slice(-8)}`
+          : addressLabel;
+        ctx.fillStyle = "rgba(255,255,255,0.60)";
+        ctx.font = "600 22px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(addr, cardX + 44, cpY + 78);
+      }
+
+      return await new Promise((resolve) =>
+        canvas.toBlob((b) => resolve(b || null), "image/png", 0.92),
+      );
+    };
+
+    const blob = await buildCardBlob();
+    if (!blob) return;
+
+    const fileBase =
+      String(detailTx?.txHash || "").trim().slice(0, 10) || String(Date.now());
+    const file = new File([blob], `xcannes-transaction-${fileBase}.png`, {
+      type: "image/png",
+    });
+
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        await navigator.share({
+        const payload = {
           title: t("ui_transaction", "Transaction"),
-          text: t("ui_share_transaction", "Partager la transaction"),
-          url,
-        });
+          text: t("ui_share_transaction_card", "Partager la carte de transaction"),
+          files: [file],
+        };
+        if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
+          throw new Error("canShare:false");
+        }
+        await navigator.share(payload);
         return;
       }
     } catch {
-      // fall back to clipboard
+      // fall back below
     }
-    await copyToClipboard(url, t("ui_link_copied", "Lien copié"));
-  }, [copyToClipboard, detailExplorerUrl, t]);
+    // Fallback: download the image
+    try {
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+      toast?.success?.(t("ui_downloaded", "Téléchargé"));
+    } catch {
+      // ignore
+    }
+  }, [
+    counterpartyAddress,
+    counterpartyName,
+    counterpartyTitle,
+    detailStatusLabel,
+    detailTx,
+    detailTypeLabel,
+    formatAmountRlusdAsLocal,
+    formatDateTime,
+    t,
+    toast,
+  ]);
 
   const transactionDetailModal =
     detailOpen && detailTx && typeof document !== "undefined"
@@ -1085,23 +1283,15 @@ export default function CurrencyStatement({
                             {t("ui_copied", "Copié")}
                           </span>
                         ) : null}
-                        {detailExplorerUrl ? (
-                          <button
-                            type="button"
-                            onClick={handleShareTransaction}
-                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
-                            aria-label={t(
-                              "ui_share",
-                              "Partager",
-                            )}
-                            title={t(
-                              "ui_share",
-                              "Partager",
-                            )}
-                          >
-                            ↗
-                          </button>
-                        ) : null}
+                        <button
+                          type="button"
+                          onClick={handleShareTransaction}
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          aria-label={t("ui_share", "Partager")}
+                          title={t("ui_share", "Partager")}
+                        >
+                          ↗
+                        </button>
                       </div>
                     </div>
                   </div>
