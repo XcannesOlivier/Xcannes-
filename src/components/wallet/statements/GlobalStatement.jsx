@@ -748,6 +748,43 @@ export default function GlobalStatement({
     return normalizeKind(detailMovement?.kind) === "CONVERSION";
   }, [detailMovement, normalizeKind]);
 
+  const detailIsPaymentSent = useMemo(() => {
+    const kind = normalizeKind(detailMovement?.kind);
+    return kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT";
+  }, [detailMovement, normalizeKind]);
+
+  const detailIsPaymentReceive = useMemo(() => {
+    const kind = normalizeKind(detailMovement?.kind);
+    return kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN";
+  }, [detailMovement, normalizeKind]);
+
+  const detailRecipientLabel = useMemo(() => {
+    if (!detailMovement) return "—";
+    const raw =
+      detailMovement?.counterpartyLabel ||
+      detailMovement?.counterparty ||
+      detailMovement?.note ||
+      "";
+    const label = String(raw || "").trim();
+    if (!label) return "—";
+    // Avoid showing "XCANNES" as a recipient.
+    if (label.toUpperCase() === "XCANNES") return "—";
+    return label;
+  }, [detailMovement]);
+
+  const detailSenderLabel = useMemo(() => {
+    if (!detailMovement) return "—";
+    const raw =
+      detailMovement?.counterpartyLabel ||
+      detailMovement?.counterparty ||
+      detailMovement?.note ||
+      "";
+    const label = String(raw || "").trim();
+    if (!label) return "—";
+    if (label.toUpperCase() === "XCANNES") return "—";
+    return label;
+  }, [detailMovement]);
+
   const detailConversionHeader = useMemo(() => {
     if (!detailMovement) return "";
     const from = String(detailMovement?.fromCurrencyCode || "")
@@ -890,51 +927,106 @@ export default function GlobalStatement({
                       {String(detailMovement?.kind || "").trim() || "—"}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-white/60">
-                      {t("ui_from_label_2c7a1d9b5e", "From")}
-                    </span>
-                    <span className="text-sm font-semibold text-white/90 font-mono">
-                      {detailIsConversion
-                        ? detailConversionFrom
-                        : String(detailMovement?.fromCurrencyCode || "")
+                  {detailIsPaymentSent ? (
+                    <>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          {t("ui_currency_label_2f7a1c9b5e", "Devise")}
+                        </span>
+                        <span className="text-sm font-semibold text-white/90 font-mono">
+                          {String(detailMovement?.fromCurrencyCode || "")
                             .toUpperCase()
                             .trim() || "—"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-white/60">
-                      {t("ui_to_label_7b2c1a9d5e", "To")}
-                    </span>
-                    <span className="text-sm font-semibold text-white/90 font-mono">
-                      {detailIsConversion
-                        ? detailConversionTo
-                        : String(detailMovement?.toCurrencyCode || "")
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          {t(
+                            "ui_recipient_label_2c7a1d9b5e",
+                            "Destinataire",
+                          )}
+                        </span>
+                        <span className="text-sm font-semibold text-white/90 truncate">
+                          {detailRecipientLabel}
+                        </span>
+                      </div>
+                    </>
+                  ) : detailIsPaymentReceive ? (
+                    <>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          {t("ui_currency_label_2f7a1c9b5e", "Devise")}
+                        </span>
+                        <span className="text-sm font-semibold text-white/90 font-mono">
+                          {String(detailMovement?.toCurrencyCode || "")
                             .toUpperCase()
                             .trim() || "—"}
-                    </span>
-                  </div>
-                  {detailIsConversion ? (
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-white/60">
-                        {t("ui_fx_rate", "Taux")}
-                      </span>
-                      <span className="text-sm font-semibold text-white/90 font-mono">
-                        {detailConversionFee}
-                      </span>
-                    </div>
-                  ) : detailMovement?.fxRate ? (
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-white/60">
-                        {t("ui_fx_rate", "Taux")}
-                      </span>
-                      <span className="text-sm font-semibold text-white/90 font-mono">
-                        {Number(detailMovement.fxRate).toLocaleString(locale, {
-                          maximumFractionDigits: 8,
-                        })}
-                      </span>
-                    </div>
-                  ) : null}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          {t(
+                            "ui_sender_label_2c7a1d9b5e",
+                            "Expéditeur",
+                          )}
+                        </span>
+                        <span className="text-sm font-semibold text-white/90 truncate">
+                          {detailSenderLabel}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          {t("ui_from_label_2c7a1d9b5e", "From")}
+                        </span>
+                        <span className="text-sm font-semibold text-white/90 font-mono">
+                          {detailIsConversion
+                            ? detailConversionFrom
+                            : String(detailMovement?.fromCurrencyCode || "")
+                                .toUpperCase()
+                                .trim() || "—"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-xs text-white/60">
+                          {t("ui_to_label_7b2c1a9d5e", "To")}
+                        </span>
+                        <span className="text-sm font-semibold text-white/90 font-mono">
+                          {detailIsConversion
+                            ? detailConversionTo
+                            : String(detailMovement?.toCurrencyCode || "")
+                                .toUpperCase()
+                                .trim() || "—"}
+                        </span>
+                      </div>
+                      {detailIsConversion ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs text-white/60">
+                            {t("ui_fx_rate", "Taux")}
+                          </span>
+                          <span className="text-sm font-semibold text-white/90 font-mono">
+                            {detailConversionFee}
+                          </span>
+                        </div>
+                      ) : detailMovement?.fxRate ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs text-white/60">
+                            {t("ui_fx_rate", "Taux")}
+                          </span>
+                          <span className="text-sm font-semibold text-white/90 font-mono">
+                            {Number(detailMovement.fxRate).toLocaleString(
+                              locale,
+                              {
+                                maximumFractionDigits: 8,
+                              },
+                            )}
+                          </span>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
                   {detailMovement?.note ? (
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-xs text-white/60">
@@ -945,7 +1037,9 @@ export default function GlobalStatement({
                       </span>
                     </div>
                   ) : null}
-                  {detailMovement?.counterparty ? (
+                  {detailMovement?.counterparty &&
+                  !detailIsPaymentSent &&
+                  !detailIsPaymentReceive ? (
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-xs text-white/60">
                         {t("ui_counterparty", "Contrepartie")}
@@ -962,7 +1056,8 @@ export default function GlobalStatement({
 
               {/* Counterparty copy */}
               {detailMovement?.counterparty &&
-              isXrplAddress(detailMovement.counterparty) ? (
+              isXrplAddress(detailMovement.counterparty) &&
+              !detailIsPaymentSent ? (
                 <div className="mt-3 flex items-center justify-end gap-2">
                   <button
                     type="button"
