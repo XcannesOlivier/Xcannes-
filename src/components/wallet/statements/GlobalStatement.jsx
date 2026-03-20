@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
@@ -57,6 +57,7 @@ export default function GlobalStatement({
   const [detailOpen, setDetailOpen] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedCounterparty, setCopiedCounterparty] = useState(false);
+  const [isMobileDate, setIsMobileDate] = useState(false);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -66,6 +67,16 @@ export default function GlobalStatement({
     "ui_last_20_transactions_period_0b6d4c2a1e",
     "Last 20 transactions",
   );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia?.("(max-width: 767px)");
+    const update = () => setIsMobileDate(Boolean(mq?.matches));
+    update();
+    if (!mq?.addEventListener) return;
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   /* ── extracted hooks ───────────────────────────────────── */
   const walletLabel = useStatementWalletLabel(
@@ -273,9 +284,18 @@ export default function GlobalStatement({
       const raw = m?.createdAt || "";
       const parsed = raw ? new Date(raw) : null;
       if (!parsed || !Number.isFinite(parsed.getTime())) return "";
+      if (isMobileDate) {
+        return parsed.toLocaleString(locale, {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
       return parsed.toLocaleString(locale);
     },
-    [locale],
+    [isMobileDate, locale],
   );
 
   const openMovementDetails = useCallback((m) => {
@@ -680,6 +700,54 @@ export default function GlobalStatement({
     return t("ui_transaction", "Transaction");
   }, [detailMovement, normalizeKind, t]);
 
+  const detailIsConversion = useMemo(() => {
+    return normalizeKind(detailMovement?.kind) === "CONVERSION";
+  }, [detailMovement, normalizeKind]);
+
+  const detailConversionHeader = useMemo(() => {
+    if (!detailMovement) return "";
+    const from = String(detailMovement?.fromCurrencyCode || "")
+      .toUpperCase()
+      .trim();
+    const to = String(detailMovement?.toCurrencyCode || "")
+      .toUpperCase()
+      .trim();
+    return `Convertion ${from || "—"} → ${to || "—"}`;
+  }, [detailMovement]);
+
+  const detailConversionFrom = useMemo(() => {
+    if (!detailMovement) return "—";
+    const from = String(detailMovement?.fromCurrencyCode || "")
+      .toUpperCase()
+      .trim();
+    const grossRlusd = Number(detailMovement?.amountRlusdGross);
+    const netRlusd = Number(detailMovement?.amountRlusd);
+    const baseRlusd = Number.isFinite(grossRlusd) ? grossRlusd : netRlusd;
+    const baseUnits = rlusdToLocal(baseRlusd, from);
+    return formatConversionUnits(baseUnits, from);
+  }, [detailMovement, formatConversionUnits, rlusdToLocal]);
+
+  const detailConversionTo = useMemo(() => {
+    if (!detailMovement) return "—";
+    const to = String(detailMovement?.toCurrencyCode || "")
+      .toUpperCase()
+      .trim();
+    const netRlusd = Number(detailMovement?.amountRlusd);
+    const quoteUnits = rlusdToLocal(netRlusd, to);
+    return formatConversionUnits(quoteUnits, to);
+  }, [detailMovement, formatConversionUnits, rlusdToLocal]);
+
+  const detailConversionFee = useMemo(() => {
+    if (!detailMovement) return "—";
+    const to = String(detailMovement?.toCurrencyCode || "")
+      .toUpperCase()
+      .trim();
+    const spread = Number(detailMovement?.spreadRlusd);
+    if (!Number.isFinite(spread) || spread <= 0) return "—";
+    const feeUnits = rlusdToLocal(spread, to);
+    return formatConversionUnits(feeUnits, to);
+  }, [detailMovement, formatConversionUnits, rlusdToLocal]);
+
   const transactionDetailModal =
     detailOpen && detailMovement && typeof document !== "undefined"
       ? createPortal(
@@ -695,34 +763,36 @@ export default function GlobalStatement({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
-                    {detailTypeLabel}
+                    {detailIsConversion ? detailConversionHeader : detailTypeLabel}
                   </div>
-                  <div
-                    className={[
-                      "mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap",
-                      getMovementUiType(detailMovement) === "debit"
-                        ? "text-red-400"
-                        : getMovementUiType(detailMovement) === "credit"
-                          ? "text-xcannes-green"
-                          : "text-white/90",
-                    ].join(" ")}
-                  >
-                    {(() => {
-                      const uiType = getMovementUiType(detailMovement);
-                      const { amount, currency } =
-                        getMovementDisplayAmount(detailMovement);
-                      const sign =
-                        uiType === "debit"
-                          ? "−"
-                          : uiType === "credit"
-                            ? "+"
-                            : "";
-                      return `${sign}${formatAmountWithSymbolLocal(
-                        amount,
-                        currency,
-                      )}`;
-                    })()}
-                  </div>
+                  {!detailIsConversion ? (
+                    <div
+                      className={[
+                        "mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap",
+                        getMovementUiType(detailMovement) === "debit"
+                          ? "text-red-400"
+                          : getMovementUiType(detailMovement) === "credit"
+                            ? "text-xcannes-green"
+                            : "text-white/90",
+                      ].join(" ")}
+                    >
+                      {(() => {
+                        const uiType = getMovementUiType(detailMovement);
+                        const { amount, currency } =
+                          getMovementDisplayAmount(detailMovement);
+                        const sign =
+                          uiType === "debit"
+                            ? "−"
+                            : uiType === "credit"
+                              ? "+"
+                              : "";
+                        return `${sign}${formatAmountWithSymbolLocal(
+                          amount,
+                          currency,
+                        )}`;
+                      })()}
+                    </div>
+                  ) : null}
                 </div>
                 <button
                   type="button"
@@ -781,9 +851,11 @@ export default function GlobalStatement({
                       {t("ui_from_label_2c7a1d9b5e", "From")}
                     </span>
                     <span className="text-sm font-semibold text-white/90 font-mono">
-                      {String(detailMovement?.fromCurrencyCode || "")
-                        .toUpperCase()
-                        .trim() || "—"}
+                      {detailIsConversion
+                        ? detailConversionFrom
+                        : String(detailMovement?.fromCurrencyCode || "")
+                            .toUpperCase()
+                            .trim() || "—"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
@@ -791,12 +863,23 @@ export default function GlobalStatement({
                       {t("ui_to_label_7b2c1a9d5e", "To")}
                     </span>
                     <span className="text-sm font-semibold text-white/90 font-mono">
-                      {String(detailMovement?.toCurrencyCode || "")
-                        .toUpperCase()
-                        .trim() || "—"}
+                      {detailIsConversion
+                        ? detailConversionTo
+                        : String(detailMovement?.toCurrencyCode || "")
+                            .toUpperCase()
+                            .trim() || "—"}
                     </span>
                   </div>
-                  {detailMovement?.fxRate ? (
+                  {detailIsConversion ? (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs text-white/60">
+                        {t("ui_fx_rate", "Taux")}
+                      </span>
+                      <span className="text-sm font-semibold text-white/90 font-mono">
+                        {detailConversionFee}
+                      </span>
+                    </div>
+                  ) : detailMovement?.fxRate ? (
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-xs text-white/60">
                         {t("ui_fx_rate", "Taux")}
@@ -879,8 +962,8 @@ export default function GlobalStatement({
                         <div className="mt-0.5 text-sm text-white/90 font-mono whitespace-nowrap overflow-hidden text-ellipsis">
                           {truncateMiddle(detailMovement.txHash, 10, 8)}
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-none">
+                    </div>
+                    <div className="flex items-center gap-2 flex-none">
                         <button
                           type="button"
                           onClick={async () => {
@@ -916,14 +999,6 @@ export default function GlobalStatement({
                         </button>
                       </div>
                     </div>
-                    {detailMovement?.ledgerIndex ? (
-                      <div className="mt-2 text-xs text-white/55 font-mono">
-                        {t("ui_ledger_index", "Ledger")}:{" "}
-                        {Number(detailMovement.ledgerIndex).toLocaleString(
-                          locale,
-                        )}
-                      </div>
-                    ) : null}
                   </div>
                 </div>
               ) : null}
