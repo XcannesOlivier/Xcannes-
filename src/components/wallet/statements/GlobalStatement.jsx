@@ -304,14 +304,6 @@ export default function GlobalStatement({
   }, [totalBalance, prefCode, prefRlusdPerUnit]);
   const displayCurrencyCode = prefCode === "RLUSD" ? "USD" : prefCode;
 
-  /* ── sorted tokens ─────────────────────────────────────── */
-  const sortedTokens = [...tokens]
-    .filter((tok) => {
-      const code = String(tok.currency || "").toUpperCase();
-      return code !== "RLUSD" && code !== "XRP";
-    })
-    .sort((a, b) => parseFloat(b.value || 0) - parseFloat(a.value || 0));
-
   const formatAmountWithSymbolLocal = useCallback(
     (amount, currency, options = {}) =>
       formatAmountWithSymbol(locale, amount, currency, {
@@ -949,17 +941,32 @@ export default function GlobalStatement({
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M12 2a10 10 0 100 20 10 10 0 000-20z"
+                    d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
                   />
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M2 12h20"
+                    d="M8 8h8"
                   />
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M12 2c2.9 2.7 4.5 6.2 4.5 10S14.9 19.3 12 22c-2.9-2.7-4.5-6.2-4.5-10S9.1 4.7 12 2z"
+                    d="M8 12h5"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.5 14.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 14.5V12.8"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 14.5l1.4 1.1"
                   />
                 </svg>
               </span>
@@ -976,34 +983,7 @@ export default function GlobalStatement({
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-1 min-w-0 space-y-0.5">
-                  <p className="text-sm text-white font-semibold truncate">
-                    <span className="text-white/55 font-medium">
-                      {t("ui_current_account_prefix", "Compte actuel :")}
-                    </span>{" "}
-                    {walletLabel || t("nav_wallet", "Wallet")}
-                  </p>
-                  {walletAddress ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowFullAddress((v) => !v)}
-                      className={[
-                        "text-xs md:text-sm text-white/60 font-mono text-left",
-                        showFullAddress ? "break-all whitespace-normal" : "truncate",
-                      ].join(" ")}
-                      title={t(
-                        "ui_toggle_full_address",
-                        "Cliquer pour afficher/masquer l'adresse complète",
-                      )}
-                      aria-label={t(
-                        "ui_toggle_full_address",
-                        "Cliquer pour afficher/masquer l'adresse complète",
-                      )}
-                    >
-                      {showFullAddress ? walletAddress : truncatedWalletAddress}
-                    </button>
-                  ) : null}
-                </div>
+                <div className="mt-1 min-w-0" />
               </div>
             </div>
             {!inline ? (
@@ -1019,23 +999,33 @@ export default function GlobalStatement({
 
           <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <div className="text-xs text-white/60">
-              {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
+              {t("ui_current_account_prefix", "Compte actuel :")}
             </div>
-            <div className="mt-1 text-3xl md:text-[32px] font-semibold text-white/95">
-              {formatAmountWithSymbolLocal(
-                totalInPreferred !== null && Number.isFinite(totalInPreferred)
-                  ? totalInPreferred
-                  : totalBalance,
-                displayCurrencyCode === "USD" ? "RLUSD" : displayCurrencyCode,
-                { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-              )}
+            <div className="mt-1 text-lg md:text-xl font-semibold text-white/95 truncate">
+              {walletLabel || t("nav_wallet", "Wallet")}
             </div>
-            <div className="mt-1 text-xs text-white/50">
-              {sortedTokens.filter(
-                (tok) => String(tok?.currency || "").toUpperCase() !== "XRP",
-              ).length}{" "}
-              {t("ui_currencies_fr", "devises")}
-            </div>
+            {walletAddress ? (
+              <button
+                type="button"
+                onClick={() => setShowFullAddress((v) => !v)}
+                className={[
+                  "mt-2 text-xs md:text-sm text-white/60 font-mono text-left w-full",
+                  showFullAddress
+                    ? "break-all whitespace-normal"
+                    : "truncate",
+                ].join(" ")}
+                title={t(
+                  "ui_toggle_full_address",
+                  "Cliquer pour afficher/masquer l'adresse complète",
+                )}
+                aria-label={t(
+                  "ui_toggle_full_address",
+                  "Cliquer pour afficher/masquer l'adresse complète",
+                )}
+              >
+                {showFullAddress ? walletAddress : truncatedWalletAddress}
+              </button>
+            ) : null}
           </div>
         </div>
 
