@@ -250,6 +250,25 @@ export default function GlobalStatement({
         }
       }
 
+      // Payment received: show the amount in the received currency (toCurrencyCode)
+      // instead of RLUSD.
+      if (kind === "PAYMENT_IN") {
+        const to = String(m?.toCurrencyCode || "").toUpperCase().trim();
+        if (to) {
+          const rate = Number(usdRates?.[to]);
+          const fallbackRate = Number(m?.fxRate);
+          const effectiveRate =
+            Number.isFinite(rate) && rate > 0
+              ? rate
+              : Number.isFinite(fallbackRate) && fallbackRate > 0
+                ? fallbackRate
+                : null;
+          const units =
+            effectiveRate != null ? amountRlusd / effectiveRate : amountRlusd;
+          return { amount: units, currency: to };
+        }
+      }
+
       return { amount: amountRlusd, currency: "RLUSD" };
     },
     [normalizeKind, usdRates],
@@ -1203,6 +1222,7 @@ export default function GlobalStatement({
                 {recentMovements.map((m, idx) => {
                   const isConversion = normalizeKind(m?.kind) === "CONVERSION";
                   const isPaymentOut = normalizeKind(m?.kind) === "PAYMENT_OUT";
+                  const isPaymentIn = normalizeKind(m?.kind) === "PAYMENT_IN";
                   const uiType = getMovementUiType(m);
                   const sign =
                     uiType === "debit"
@@ -1231,12 +1251,15 @@ export default function GlobalStatement({
                             {getMovementTitle(m)}
                           </div>
                           <div className="mt-0.5 text-[11px] text-white/45 truncate">
-                            {isConversion || isPaymentOut
+                            {isConversion || isPaymentOut || isPaymentIn
                               ? when || ""
                               : from && to
                                 ? `${from} → ${to}`
                                 : from || to || "—"}
-                            {!isConversion && !isPaymentOut && m?.note
+                            {!isConversion &&
+                            !isPaymentOut &&
+                            !isPaymentIn &&
+                            m?.note
                               ? ` · ${String(m.note)}`
                               : ""}
                           </div>
@@ -1270,7 +1293,9 @@ export default function GlobalStatement({
                                         },
                                       )}
                                     </div>
-                                    {when ? (
+                                    {when &&
+                                    !isPaymentOut &&
+                                    !isPaymentIn ? (
                                       <div className="text-[11px] text-white/45 mt-0.5 whitespace-nowrap">
                                         {when}
                                       </div>
