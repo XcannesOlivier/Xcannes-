@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
-import StatementMonthSelect from "./StatementMonthSelect";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
@@ -36,8 +35,8 @@ export default function GlobalStatement({
   rlusdPerUnitRates = {},
   totalBalanceOverride = null,
   movements = [],
-  movementsLoading: _movementsLoading = false,
-  movementsError: _movementsError = null,
+  movementsLoading = false,
+  movementsError = null,
   movementsHasMore: _movementsHasMore = false,
   movementsLoadingMore: _movementsLoadingMore = false,
   onLoadMoreMovements: _onLoadMoreMovements,
@@ -49,67 +48,214 @@ export default function GlobalStatement({
   const locale = i18n?.language || "en";
   const globalTitle = t("ui_global_statement_13e29aa8aa", "Global");
   const isInlineDesktop = variant === "inline-desktop";
+  const MAX_RECENT_TRANSACTIONS = 20;
 
   /* ── local state ───────────────────────────────────────── */
   const [sortBy, setSortBy] = useState("balance");
-  const [selectedMonth, setSelectedMonth] = useState(0);
   const [exportFormat, setExportFormat] = useState(null);
   const [showFullAddress, setShowFullAddress] = useState(false);
+  const [detailMovement, setDetailMovement] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [copiedHash, setCopiedHash] = useState(false);
+  const [copiedCounterparty, setCopiedCounterparty] = useState(false);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
   );
-  const archivesLabel = t("ui_archives_label_3c1f8a7b2e", "Archives");
-  const archivesLongLabel = t(
-    "ui_archives_12plus_7b3c9a1d5e",
-    "Archives (12+ months)",
-  );
   const fallbackPeriod = period || defaultPeriod;
+  const currentPeriod = t(
+    "ui_last_20_transactions_period_0b6d4c2a1e",
+    "Last 20 transactions",
+  );
 
   /* ── extracted hooks ───────────────────────────────────── */
   const walletLabel = useStatementWalletLabel(
     walletAddress,
     walletLabelOverride,
   );
-
-  /* ── month selector ────────────────────────────────────── */
-  const generateMonths = () => {
-    const months = [];
-    const currentDate = new Date();
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() - i,
-        1,
-      );
-      months.push({
-        value: i,
-        label: date.toLocaleDateString(locale, {
-          month: "long",
-          year: "numeric",
-        }),
-        displayLabel: date.toLocaleDateString(locale, { month: "long" }),
-      });
-    }
-    months.push({
-      value: "archives",
-      label: archivesLongLabel,
-      displayLabel: archivesLabel,
-    });
-    return months;
-  };
-
-  const availableMonths = generateMonths();
-  const currentPeriod =
-    selectedMonth === "archives"
-      ? archivesLabel
-      : availableMonths[selectedMonth]?.label || fallbackPeriod;
   /* ── helpers ───────────────────────────────────────────── */
   const isUsdStablecoin = useCallback(
     (currency) =>
       USD_STABLECOINS.includes(String(currency || "").toUpperCase()),
     [],
   );
+
+  const normalizeKind = useCallback(
+    (value) => String(value || "").trim().toUpperCase(),
+    [],
+  );
+
+  const isVisibleMovement = useCallback(
+    (m) => {
+      const kind = normalizeKind(m?.kind);
+      if (!kind) return false;
+      if (
+        kind === "ALLOCATE" ||
+        kind.startsWith("ALLOCATE_") ||
+        kind === "DEALLOCATE" ||
+        kind.startsWith("DEALLOCATE_")
+      ) {
+        return false;
+      }
+      if (kind === "XRPL_TRUSTLINE_ADD" || kind === "XRPL_TRUSTLINE_REMOVE") {
+        return false;
+      }
+      if (kind === "WALLET_LABEL") return false;
+      return true;
+    },
+    [normalizeKind],
+  );
+
+  const sortMovementsDesc = useCallback((list) => {
+    const sorted = Array.isArray(list) ? list.slice() : [];
+    sorted.sort((a, b) => {
+      const left = Number.isFinite(Number(a?.ledgerIndex))
+        ? Number(a.ledgerIndex)
+        : -Infinity;
+      const right = Number.isFinite(Number(b?.ledgerIndex))
+        ? Number(b.ledgerIndex)
+        : -Infinity;
+      if (left !== right) return right - left;
+      const leftDate = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const rightDate = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (leftDate !== rightDate) return rightDate - leftDate;
+      return String(b?.txHash || "").localeCompare(String(a?.txHash || ""));
+    });
+    return sorted;
+  }, []);
+
+  const recentMovements = useMemo(() => {
+    const visible = (movements || []).filter(isVisibleMovement);
+    const sorted = sortMovementsDesc(visible);
+    return sorted.slice(0, MAX_RECENT_TRANSACTIONS);
+  }, [
+    MAX_RECENT_TRANSACTIONS,
+    isVisibleMovement,
+    movements,
+    sortMovementsDesc,
+  ]);
+
+  const isXrplAddress = useCallback(
+    (value) =>
+      /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim()),
+    [],
+  );
+
+  const truncateMiddle = useCallback((value, left = 10, right = 8) => {
+    const s = String(value || "");
+    if (!s) return "";
+    if (s.length <= left + right + 1) return s;
+    return `${s.slice(0, left)}…${s.slice(-right)}`;
+  }, []);
+
+  const getMovementUiType = useCallback(
+    (m) => {
+      const kind = normalizeKind(m?.kind);
+      const direction = String(m?.direction || "").trim().toLowerCase();
+      if (kind === "CONVERSION") return "neutral";
+      if (direction === "send") return "debit";
+      if (direction === "receive") return "credit";
+      if (
+        kind === "PAYMENT_OUT" ||
+        kind === "XRPL_PAYMENT_OUT" ||
+        kind === "MOONPAY_SELL" ||
+        kind === "XRPL_FEES_TOTAL" ||
+        kind === "RECONCILE"
+      ) {
+        return "debit";
+      }
+      if (
+        kind === "PAYMENT_IN" ||
+        kind === "XRPL_PAYMENT_IN" ||
+        kind === "MOONPAY_BUY"
+      ) {
+        return "credit";
+      }
+      return "neutral";
+    },
+    [normalizeKind],
+  );
+
+  const getMovementDisplayAmount = useCallback((m) => {
+    const displayAmount = Number(m?.displayAmount);
+    const displayCurrency = String(m?.displayCurrencyCode || "").trim();
+    if (
+      Number.isFinite(displayAmount) &&
+      displayAmount !== 0 &&
+      displayCurrency
+    ) {
+      return { amount: displayAmount, currency: displayCurrency };
+    }
+    const amountRlusd = Number(m?.amountRlusd);
+    if (Number.isFinite(amountRlusd)) {
+      return { amount: amountRlusd, currency: "RLUSD" };
+    }
+    return { amount: 0, currency: "RLUSD" };
+  }, []);
+
+  const getMovementTitle = useCallback(
+    (m) => {
+      const kind = normalizeKind(m?.kind);
+      const from = String(m?.fromCurrencyCode || "").toUpperCase();
+      const to = String(m?.toCurrencyCode || "").toUpperCase();
+      if (kind === "CONVERSION") {
+        return t("ui_global_tx_conversion_7b1c2a9d5e", {
+          defaultValue: "Conversion {{from}} → {{to}}",
+          from: from || "—",
+          to: to || "—",
+        });
+      }
+      if (kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN") {
+        return t("ui_global_tx_received_1c7b2a9d5e", "Payment received");
+      }
+      if (kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT") {
+        return t("ui_global_tx_sent_2c7a1d9b5e", "Payment sent");
+      }
+      if (kind === "MOONPAY_BUY") {
+        return t("ui_global_tx_moonpay_buy_3c7a1d9b5e", "Purchase");
+      }
+      if (kind === "MOONPAY_SELL") {
+        return t("ui_global_tx_moonpay_sell_4c7a1d9b5e", "Sale");
+      }
+      if (kind === "XRPL_FEES_TOTAL") {
+        return t(
+          "ui_global_tx_network_fees_5c7a1d9b5e",
+          "XRPL network fees",
+        );
+      }
+      if (kind === "RECONCILE") {
+        return t(
+          "ui_global_tx_adjustment_6c7a1d9b5e",
+          "External adjustment",
+        );
+      }
+      return String(m?.kind || "").trim() || t("ui_transaction", "Transaction");
+    },
+    [normalizeKind, t],
+  );
+
+  const formatMovementDateTime = useCallback(
+    (m) => {
+      const raw = m?.createdAt || "";
+      const parsed = raw ? new Date(raw) : null;
+      if (!parsed || !Number.isFinite(parsed.getTime())) return "";
+      return parsed.toLocaleString(locale);
+    },
+    [locale],
+  );
+
+  const openMovementDetails = useCallback((m) => {
+    if (!m) return;
+    setDetailMovement(m);
+    setDetailOpen(true);
+  }, []);
+
+  const closeMovementDetails = useCallback(() => {
+    setDetailOpen(false);
+    setDetailMovement(null);
+    setCopiedHash(false);
+    setCopiedCounterparty(false);
+  }, []);
 
   const getUsdValue = useCallback(
     (token) => {
@@ -193,25 +339,92 @@ export default function GlobalStatement({
     return `${addr.slice(0, 10)}…${addr.slice(-8)}`;
   }, [walletAddress]);
 
+  const copyToClipboard = useCallback(
+    async (text, successMessage) => {
+      const value = String(text || "");
+      if (!value) return false;
+      try {
+        if (navigator?.clipboard?.writeText) {
+          await navigator.clipboard.writeText(value);
+        } else {
+          const el = document.createElement("textarea");
+          el.value = value;
+          el.setAttribute("readonly", "");
+          el.style.position = "absolute";
+          el.style.left = "-9999px";
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          el.remove();
+        }
+        if (successMessage) toast?.success?.(successMessage);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [toast],
+  );
+
+  const handleShareMovement = useCallback(async () => {
+    if (!detailMovement) return;
+    const title = getMovementTitle(detailMovement);
+    const { amount, currency } = getMovementDisplayAmount(detailMovement);
+    const amountLabel = formatAmountWithSymbolLocal(amount, currency, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const hash = String(detailMovement?.txHash || "").trim();
+    const text = hash
+      ? `${title} • ${amountLabel}\n${hash}`
+      : `${title} • ${amountLabel}`;
+
+    try {
+      if (navigator?.share) {
+        await navigator.share({ title: `XCANNES ${globalTitle}`, text });
+        return;
+      }
+    } catch {
+      // fall back
+    }
+
+    if (hash) {
+      await copyToClipboard(hash, t("ui_copied_hash", "Hash copié"));
+      setCopiedHash(true);
+      window.setTimeout(() => setCopiedHash(false), 1200);
+    } else {
+      await copyToClipboard(text, t("ui_copied", "Copié"));
+    }
+  }, [
+    copyToClipboard,
+    detailMovement,
+    formatAmountWithSymbolLocal,
+    getMovementDisplayAmount,
+    getMovementTitle,
+    globalTitle,
+    t,
+  ]);
+
   /* ── ledger status ─────────────────────────────────────── */
   const ledgerEvidenceCount = useMemo(
-    () => (movements || []).filter((m) => m?.txHash).length,
-    [movements],
+    () => (recentMovements || []).filter((m) => m?.txHash).length,
+    [recentMovements],
   );
 
   const ledgerLastIndex = useMemo(() => {
-    const indexes = (movements || [])
+    const indexes = (recentMovements || [])
       .map((m) => Number(m?.ledgerIndex))
       .filter((v) => Number.isFinite(v));
     return indexes.length ? Math.max(...indexes) : null;
-  }, [movements]);
+  }, [recentMovements]);
 
   const ledgerStatus = useMemo(() => {
     if (isPreviewMode) return "preview";
     if (ledgerEvidenceCount > 0) return "verified";
-    if (Array.isArray(movements) && movements.length > 0) return "offchain";
+    if (Array.isArray(recentMovements) && recentMovements.length > 0)
+      return "offchain";
     return "available";
-  }, [isPreviewMode, ledgerEvidenceCount, movements]);
+  }, [isPreviewMode, ledgerEvidenceCount, recentMovements]);
 
   const ledgerStatusLabel = useMemo(() => {
     if (ledgerStatus === "verified")
@@ -246,17 +459,23 @@ export default function GlobalStatement({
       issuer: token?.issuer || "",
       isTrustlineOnly: Boolean(token?.isTrustlineOnly),
     }));
-    const movementPayload = (movements || []).map((m) => ({
+    const movementPayload = (recentMovements || []).map((m) => ({
       kind: m?.kind || "",
       fromCurrencyCode: m?.fromCurrencyCode || "",
       toCurrencyCode: m?.toCurrencyCode || "",
       amountRlusd: Number.isFinite(Number(m?.amountRlusd))
         ? Number(m.amountRlusd)
         : 0,
+      displayAmount: Number.isFinite(Number(m?.displayAmount))
+        ? Number(m.displayAmount)
+        : null,
+      displayCurrencyCode: m?.displayCurrencyCode || "",
       fxRate: Number.isFinite(Number(m?.fxRate)) ? Number(m.fxRate) : null,
       fxSource: m?.fxSource || "",
       txHash: m?.txHash || "",
       note: m?.note || "",
+      counterparty: m?.counterparty || "",
+      direction: m?.direction || "",
       createdAt: m?.createdAt || "",
     }));
     return JSON.stringify({
@@ -271,7 +490,7 @@ export default function GlobalStatement({
   }, [
     currentPeriod,
     fallbackPeriod,
-    movements,
+    recentMovements,
     tokens,
     totalBalance,
     walletAddress,
@@ -319,11 +538,17 @@ export default function GlobalStatement({
         )}</td>
       </tr>
     `;
-    const movementRows = (movements || [])
+    const movementRows = (recentMovements || [])
       .map((m) => {
         const from = String(m?.fromCurrencyCode || "").toUpperCase();
         const to = String(m?.toCurrencyCode || "").toUpperCase();
-        const amount = Number(m?.amountRlusd || 0);
+        const displayAmount = Number(m?.displayAmount);
+        const displayCurrency = String(m?.displayCurrencyCode || "").trim();
+        const amount =
+          Number.isFinite(displayAmount) && displayCurrency
+            ? displayAmount
+            : Number(m?.amountRlusd || 0);
+        const currency = displayCurrency || "RLUSD";
         const createdAt = m?.createdAt ? new Date(m.createdAt) : null;
         const when =
           createdAt && Number.isFinite(createdAt.getTime())
@@ -337,7 +562,7 @@ export default function GlobalStatement({
           <td>${escapeHtml(to)}</td>
           <td class="right">${escapeHtml(
             Number.isFinite(amount)
-              ? amount.toLocaleString(locale, { maximumFractionDigits: 2 })
+              ? `${amount.toLocaleString(locale, { maximumFractionDigits: 2 })} ${escapeHtml(currency)}`
               : "-",
           )}</td>
           <td>${escapeHtml(m?.txHash || "")}</td>
@@ -383,7 +608,7 @@ export default function GlobalStatement({
             <th>${escapeHtml(t("ui_type_label_8b1a4d2c7e", "Type"))}</th>
             <th>${escapeHtml(t("ui_from_label_2c7a1d9b5e", "From"))}</th>
             <th>${escapeHtml(t("ui_to_label_7b2c1a9d5e", "To"))}</th>
-            <th class="right">${escapeHtml(t("ui_amount_rlusd_label_2c7a1d9b5e", "Amount (RLUSD)"))}</th>
+            <th class="right">${escapeHtml(t("ui_amount_label_2c7a1d9b5e", "Amount"))}</th>
             <th>${escapeHtml(t("ui_tx_hash_label_2b7c1a9d5e", "Tx hash"))}</th>
           </tr>
         </thead>
@@ -402,7 +627,7 @@ export default function GlobalStatement({
     getUsdValue,
     ledgerStatusLabel,
     locale,
-    movements,
+    recentMovements,
     sortedTokens,
     t,
     totalBalance,
@@ -469,6 +694,279 @@ export default function GlobalStatement({
     : "fixed inset-0 z-[10200] flex";
   const modalBgClass =
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
+
+  const detailStatusLabel = useMemo(() => {
+    if (!detailMovement) return "";
+    if (detailMovement?.txHash) return t("ui_status_confirmed", "Confirmé");
+    if (isPreviewMode) return t("ui_status_preview", "Aperçu");
+    return t("ui_status_offchain", "Hors chaîne");
+  }, [detailMovement, isPreviewMode, t]);
+
+  const detailTypeLabel = useMemo(() => {
+    if (!detailMovement) return "";
+    const kind = normalizeKind(detailMovement?.kind);
+    if (kind === "CONVERSION") return t("ui_conversion", "Conversion");
+    if (kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN")
+      return t("ui_received", "Reçu");
+    if (kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT")
+      return t("ui_sent", "Envoyé");
+    if (kind === "XRPL_FEES_TOTAL") return t("ui_fee", "Frais");
+    if (kind === "RECONCILE") return t("ui_adjustment", "Ajustement");
+    return t("ui_transaction", "Transaction");
+  }, [detailMovement, normalizeKind, t]);
+
+  const transactionDetailModal =
+    detailOpen && detailMovement && typeof document !== "undefined"
+      ? createPortal(
+          <div className="fixed inset-0 z-[10300] flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm wallet-modal-backdrop-in"
+              onClick={closeMovementDetails}
+            />
+            <div
+              className={`relative w-full max-w-md rounded-[14px] ${modalBgClass} p-4 md:p-5 ring-1 ring-white/10 ring-inset shadow-[0_24px_60px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] wallet-modal-lift-in`}
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    {detailTypeLabel}
+                  </div>
+                  <div
+                    className={[
+                      "mt-1 text-[22px] md:text-[26px] font-bold font-mono whitespace-nowrap",
+                      getMovementUiType(detailMovement) === "debit"
+                        ? "text-red-400"
+                        : getMovementUiType(detailMovement) === "credit"
+                          ? "text-xcannes-green"
+                          : "text-white/90",
+                    ].join(" ")}
+                  >
+                    {(() => {
+                      const uiType = getMovementUiType(detailMovement);
+                      const { amount, currency } =
+                        getMovementDisplayAmount(detailMovement);
+                      const sign =
+                        uiType === "debit"
+                          ? "−"
+                          : uiType === "credit"
+                            ? "+"
+                            : "";
+                      return `${sign}${formatAmountWithSymbolLocal(
+                        amount,
+                        currency,
+                      )}`;
+                    })()}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeMovementDetails}
+                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl w-10 h-10 -mr-2 flex items-center justify-center rounded-lg hover:bg-white/5"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="h-px bg-white/[0.04] my-3" />
+
+              {/* Status & Date */}
+              <div className="space-y-3">
+                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  {t("ui_status_and_date", "Statut & date")}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                    <div className="text-xs text-white/60">
+                      {t("ui_status_label", "Statut")}
+                    </div>
+                    <div className="mt-0.5 text-sm text-white/90 font-semibold">
+                      {detailStatusLabel}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                    <div className="text-xs text-white/60">
+                      {t("ui_date_label_7a2c1b9d5e", "Date")}
+                    </div>
+                    <div className="mt-0.5 text-sm text-white/90 font-semibold truncate">
+                      {formatMovementDateTime(detailMovement)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-white/[0.04] my-3" />
+
+              {/* Details */}
+              <div className="space-y-2">
+                <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                  {t("ui_details", "Détails")}
+                </div>
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3 space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-white/60">
+                      {t("ui_type_label_8b1a4d2c7e", "Type")}
+                    </span>
+                    <span className="text-sm font-semibold text-white/90">
+                      {String(detailMovement?.kind || "").trim() || "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-white/60">
+                      {t("ui_from_label_2c7a1d9b5e", "From")}
+                    </span>
+                    <span className="text-sm font-semibold text-white/90 font-mono">
+                      {String(detailMovement?.fromCurrencyCode || "")
+                        .toUpperCase()
+                        .trim() || "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-white/60">
+                      {t("ui_to_label_7b2c1a9d5e", "To")}
+                    </span>
+                    <span className="text-sm font-semibold text-white/90 font-mono">
+                      {String(detailMovement?.toCurrencyCode || "")
+                        .toUpperCase()
+                        .trim() || "—"}
+                    </span>
+                  </div>
+                  {detailMovement?.fxRate ? (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs text-white/60">
+                        {t("ui_fx_rate", "Taux")}
+                      </span>
+                      <span className="text-sm font-semibold text-white/90 font-mono">
+                        {Number(detailMovement.fxRate).toLocaleString(locale, {
+                          maximumFractionDigits: 8,
+                        })}
+                      </span>
+                    </div>
+                  ) : null}
+                  {detailMovement?.note ? (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs text-white/60">
+                        {t("ui_note", "Note")}
+                      </span>
+                      <span className="text-sm font-semibold text-white/90 truncate">
+                        {String(detailMovement.note)}
+                      </span>
+                    </div>
+                  ) : null}
+                  {detailMovement?.counterparty ? (
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-xs text-white/60">
+                        {t("ui_counterparty", "Contrepartie")}
+                      </span>
+                      <span className="text-sm font-semibold text-white/90 font-mono truncate">
+                        {isXrplAddress(detailMovement.counterparty)
+                          ? truncateMiddle(detailMovement.counterparty, 8, 6)
+                          : String(detailMovement.counterparty)}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Counterparty copy */}
+              {detailMovement?.counterparty &&
+              isXrplAddress(detailMovement.counterparty) ? (
+                <div className="mt-3 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await copyToClipboard(
+                        detailMovement.counterparty,
+                        t("ui_copied_address", "Adresse copiée"),
+                      );
+                      setCopiedCounterparty(true);
+                      window.setTimeout(
+                        () => setCopiedCounterparty(false),
+                        1200,
+                      );
+                    }}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors text-sm font-semibold"
+                  >
+                    {t("ui_copy_address", "Copier l’adresse")}
+                  </button>
+                  {copiedCounterparty ? (
+                    <span className="text-[10px] text-xcannes-green/90 font-medium">
+                      {t("ui_copied", "Copié")}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="h-px bg-white/[0.04] my-3" />
+
+              {/* Technical */}
+              {detailMovement?.txHash ? (
+                <div className="space-y-2">
+                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                    {t("ui_transaction", "Transaction")}
+                  </div>
+                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-xs text-white/60">
+                          {t("ui_tx_hash_label_2b7c1a9d5e", "Hash")}
+                        </div>
+                        <div className="mt-0.5 text-sm text-white/90 font-mono whitespace-nowrap overflow-hidden text-ellipsis">
+                          {truncateMiddle(detailMovement.txHash, 10, 8)}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-none">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await copyToClipboard(
+                              detailMovement.txHash,
+                              t("ui_copied_hash", "Hash copié"),
+                            );
+                            setCopiedHash(true);
+                            window.setTimeout(
+                              () => setCopiedHash(false),
+                              1200,
+                            );
+                          }}
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          aria-label={t("ui_copy_hash", "Copy hash")}
+                          title={t("ui_copy_hash", "Copy hash")}
+                        >
+                          ⧉
+                        </button>
+                        {copiedHash ? (
+                          <span className="text-[10px] text-xcannes-green/90 font-medium">
+                            {t("ui_copied", "Copié")}
+                          </span>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={handleShareMovement}
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          aria-label={t("ui_share", "Partager")}
+                          title={t("ui_share", "Partager")}
+                        >
+                          ↗
+                        </button>
+                      </div>
+                    </div>
+                    {detailMovement?.ledgerIndex ? (
+                      <div className="mt-2 text-xs text-white/55 font-mono">
+                        {t("ui_ledger_index", "Ledger")}:{" "}
+                        {Number(detailMovement.ledgerIndex).toLocaleString(
+                          locale,
+                        )}
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   /* ── render ────────────────────────────────────────────── */
   const content = (
@@ -605,25 +1103,144 @@ export default function GlobalStatement({
 
         {/* Content - Zone scrollable */}
         <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-4 flex flex-col gap-4">
-          {/* Controls */}
+          {/* Recent transactions */}
+          <div className="space-y-2">
+            <div className="flex items-end justify-between gap-3">
+              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                {t(
+                  "ui_recent_transactions_9b1c7a2d5e",
+                  "Dernières transactions",
+                )}
+              </div>
+              <div className="text-xs text-white/45">
+                {t("ui_last_n_2c7a1d9b5e", {
+                  defaultValue: "{{count}} dernières",
+                  count: MAX_RECENT_TRANSACTIONS,
+                })}
+              </div>
+            </div>
+
+            {movementsLoading ? (
+              <div className="rounded-xl px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+                {t("ui_loading_1386baebe9", "Loading…")}
+              </div>
+            ) : movementsError ? (
+              <div className="rounded-xl px-3 py-3 ring-1 ring-red-500/20 ring-inset bg-red-500/10 text-sm text-red-200">
+                {String(movementsError)}
+              </div>
+            ) : recentMovements.length === 0 ? (
+              <div className="rounded-xl px-3 py-3 ring-1 ring-white/10 ring-inset bg-white/5 text-sm text-white/70">
+                {t(
+                  "ui_no_transactions_yet_2c7a1d9b5e",
+                  "Aucune transaction pour le moment",
+                )}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {recentMovements.map((m, idx) => {
+                  const uiType = getMovementUiType(m);
+                  const { amount, currency } = getMovementDisplayAmount(m);
+                  const sign =
+                    uiType === "debit"
+                      ? "−"
+                      : uiType === "credit"
+                        ? "+"
+                        : "";
+                  const from = String(m?.fromCurrencyCode || "").toUpperCase();
+                  const to = String(m?.toCurrencyCode || "").toUpperCase();
+                  const when = formatMovementDateTime(m);
+                  const key =
+                    m?.movementId ||
+                    m?.id ||
+                    `${m?.txHash || "nohash"}-${m?.ledgerIndex || "n"}-${m?.kind || ""}-${m?.createdAt || ""}-${idx}`;
+
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => openMovementDetails(m)}
+                      className="w-full text-left rounded-xl px-3 py-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="text-[13px] font-medium text-white/90 truncate">
+                            {getMovementTitle(m)}
+                          </div>
+                          <div className="mt-0.5 text-[11px] text-white/45 truncate">
+                            {from && to
+                              ? `${from} → ${to}`
+                              : from || to || "—"}
+                            {m?.note ? ` · ${String(m.note)}` : ""}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="text-right">
+                            <div
+                              className={[
+                                "text-[15px] font-semibold font-mono whitespace-nowrap",
+                                uiType === "debit"
+                                  ? "text-red-300"
+                                  : uiType === "credit"
+                                    ? "text-xcannes-green"
+                                    : "text-white/90",
+                              ].join(" ")}
+                            >
+                              {sign}
+                              {formatAmountWithSymbolLocal(amount, currency, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </div>
+                            {when ? (
+                              <div className="text-[11px] text-white/45 mt-0.5 whitespace-nowrap">
+                                {when}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          <svg
+                            className="w-5 h-5 text-white/35"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            aria-hidden="true"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Balances header + sort */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
             <div>
               <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                {t("ui_statement_period_4674b18f25", "Période")}
+                {t("ui_balances_label_1c7a2d9b5e", "Balances")}
               </div>
-              <StatementMonthSelect
-                value={selectedMonth}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-              />
+              <div className="text-xs text-white/50">
+                {ledgerStatusLabel}
+                {ledgerLastIndex ? (
+                  <>
+                    {" "}
+                    ·{" "}
+                    {t("ui_last_ledger_index", {
+                      defaultValue: "Dernier ledger : {{index}}",
+                      index: Number(ledgerLastIndex).toLocaleString(locale),
+                    })}
+                  </>
+                ) : null}
+              </div>
             </div>
 
             <div className="md:justify-self-end">
@@ -799,7 +1416,14 @@ export default function GlobalStatement({
     </div>
   );
 
-  if (inline) return content;
+  const rendered = (
+    <>
+      {content}
+      {transactionDetailModal}
+    </>
+  );
+
+  if (inline) return rendered;
   if (typeof document === "undefined") return null;
-  return createPortal(content, document.body);
+  return createPortal(rendered, document.body);
 }

@@ -119,7 +119,9 @@ export default function WalletDashboardStatementModals({
     try {
       const data = await fetchStatement({
         address: backendWalletAddress,
-        limit: 100,
+        // Fetch more than we display so GlobalStatement can filter out
+        // internal/system movements and still show the last 20 user txs.
+        limit: 60,
       });
       setGlobalMovements(Array.isArray(data?.movements) ? data.movements : []);
       setGlobalHasMore(Boolean(data?.hasMore));
@@ -146,7 +148,7 @@ export default function WalletDashboardStatementModals({
     try {
       const data = await fetchStatement({
         address: backendWalletAddress,
-        limit: 100,
+        limit: 60,
         cursor: globalCursorNext,
       });
       const more = Array.isArray(data?.movements) ? data.movements : [];
