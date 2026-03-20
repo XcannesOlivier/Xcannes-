@@ -11,6 +11,7 @@ import {
 import { ShareIcon } from "./statementShared";
 import useStatementWalletLabel from "./useStatementWalletLabel";
 import useStatementDocHash from "./useStatementDocHash";
+import { useSavedAddresses } from "../hooks/useSavedAddresses";
 
 /**
  * Composant de relevé bancaire global (toutes les devises consolidées).
@@ -83,6 +84,22 @@ export default function GlobalStatement({
     walletAddress,
     walletLabelOverride,
   );
+
+  const { savedAddresses } = useSavedAddresses({
+    walletAddress,
+  });
+
+  const savedAddressLabelByAddress = useMemo(() => {
+    const map = new Map();
+    (savedAddresses || []).forEach((entry) => {
+      const address = String(entry?.address || "").trim();
+      if (!address) return;
+      const label = String(entry?.label || entry?.onChainLabel || "").trim();
+      if (!label) return;
+      map.set(address, label);
+    });
+    return map;
+  }, [savedAddresses]);
   /* ── helpers ───────────────────────────────────────────── */
   const isUsdStablecoin = useCallback(
     (currency) =>
@@ -760,30 +777,50 @@ export default function GlobalStatement({
 
   const detailRecipientLabel = useMemo(() => {
     if (!detailMovement) return "—";
-    const raw =
-      detailMovement?.counterpartyLabel ||
-      detailMovement?.counterparty ||
-      detailMovement?.note ||
-      "";
+    const counterparty = String(detailMovement?.counterparty || "").trim();
+    if (counterparty && isXrplAddress(counterparty)) {
+      const label = String(
+        savedAddressLabelByAddress.get(counterparty) || "",
+      ).trim();
+      if (label) return label;
+      return truncateMiddle(counterparty, 8, 6);
+    }
+
+    const raw = detailMovement?.note || counterparty || "";
     const label = String(raw || "").trim();
     if (!label) return "—";
     // Avoid showing "XCANNES" as a recipient.
     if (label.toUpperCase() === "XCANNES") return "—";
     return label;
-  }, [detailMovement]);
+  }, [
+    detailMovement,
+    isXrplAddress,
+    savedAddressLabelByAddress,
+    truncateMiddle,
+  ]);
 
   const detailSenderLabel = useMemo(() => {
     if (!detailMovement) return "—";
-    const raw =
-      detailMovement?.counterpartyLabel ||
-      detailMovement?.counterparty ||
-      detailMovement?.note ||
-      "";
+    const counterparty = String(detailMovement?.counterparty || "").trim();
+    if (counterparty && isXrplAddress(counterparty)) {
+      const label = String(
+        savedAddressLabelByAddress.get(counterparty) || "",
+      ).trim();
+      if (label) return label;
+      return truncateMiddle(counterparty, 8, 6);
+    }
+
+    const raw = detailMovement?.note || counterparty || "";
     const label = String(raw || "").trim();
     if (!label) return "—";
     if (label.toUpperCase() === "XCANNES") return "—";
     return label;
-  }, [detailMovement]);
+  }, [
+    detailMovement,
+    isXrplAddress,
+    savedAddressLabelByAddress,
+    truncateMiddle,
+  ]);
 
   const detailConversionHeader = useMemo(() => {
     if (!detailMovement) return "";
