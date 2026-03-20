@@ -213,22 +213,47 @@ export default function GlobalStatement({
     [normalizeKind],
   );
 
-  const getMovementDisplayAmount = useCallback((m) => {
-    const displayAmount = Number(m?.displayAmount);
-    const displayCurrency = String(m?.displayCurrencyCode || "").trim();
-    if (
-      Number.isFinite(displayAmount) &&
-      displayAmount !== 0 &&
-      displayCurrency
-    ) {
-      return { amount: displayAmount, currency: displayCurrency };
-    }
-    const amountRlusd = Number(m?.amountRlusd);
-    if (Number.isFinite(amountRlusd)) {
+  const getMovementDisplayAmount = useCallback(
+    (m) => {
+      const displayAmount = Number(m?.displayAmount);
+      const displayCurrency = String(m?.displayCurrencyCode || "").trim();
+      if (
+        Number.isFinite(displayAmount) &&
+        displayAmount !== 0 &&
+        displayCurrency
+      ) {
+        return { amount: displayAmount, currency: displayCurrency };
+      }
+
+      const kind = normalizeKind(m?.kind);
+      const amountRlusd = Number(m?.amountRlusd);
+      if (!Number.isFinite(amountRlusd)) {
+        return { amount: 0, currency: "RLUSD" };
+      }
+
+      // Payment sent: show the amount in the paid currency (fromCurrencyCode)
+      // instead of RLUSD.
+      if (kind === "PAYMENT_OUT") {
+        const from = String(m?.fromCurrencyCode || "").toUpperCase().trim();
+        if (from) {
+          const rate = Number(usdRates?.[from]);
+          const fallbackRate = Number(m?.fxRate);
+          const effectiveRate =
+            Number.isFinite(rate) && rate > 0
+              ? rate
+              : Number.isFinite(fallbackRate) && fallbackRate > 0
+                ? fallbackRate
+                : null;
+          const units =
+            effectiveRate != null ? amountRlusd / effectiveRate : amountRlusd;
+          return { amount: units, currency: from };
+        }
+      }
+
       return { amount: amountRlusd, currency: "RLUSD" };
-    }
-    return { amount: 0, currency: "RLUSD" };
-  }, []);
+    },
+    [normalizeKind, usdRates],
+  );
 
   const getMovementTitle = useCallback(
     (m) => {
@@ -1177,6 +1202,7 @@ export default function GlobalStatement({
               <div className="space-y-2">
                 {recentMovements.map((m, idx) => {
                   const isConversion = normalizeKind(m?.kind) === "CONVERSION";
+                  const isPaymentOut = normalizeKind(m?.kind) === "PAYMENT_OUT";
                   const uiType = getMovementUiType(m);
                   const sign =
                     uiType === "debit"
@@ -1205,12 +1231,12 @@ export default function GlobalStatement({
                             {getMovementTitle(m)}
                           </div>
                           <div className="mt-0.5 text-[11px] text-white/45 truncate">
-                            {isConversion
+                            {isConversion || isPaymentOut
                               ? when || ""
                               : from && to
                                 ? `${from} → ${to}`
                                 : from || to || "—"}
-                            {!isConversion && m?.note
+                            {!isConversion && !isPaymentOut && m?.note
                               ? ` · ${String(m.note)}`
                               : ""}
                           </div>
