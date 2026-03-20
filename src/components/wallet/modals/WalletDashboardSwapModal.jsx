@@ -189,8 +189,8 @@ export default function WalletDashboardSwapModal({
   const formatAmountWithSymbolLocal = (value, currency, options = {}) => {
     const display = getDisplayCurrencyCode(currency);
     return formatAmountWithSymbol(locale, value, display, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 6,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
       ...options,
     });
   };
@@ -526,7 +526,7 @@ export default function WalletDashboardSwapModal({
                           "ui_insufficient_balance_convert_a3b4c5d6",
                           "Solde insuffisant. Disponible : {{amount}} {{currency}}",
                         )
-                          .replace("{{amount}}", insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 6 }))
+                          .replace("{{amount}}", insufficientBalance.availableUnits.toLocaleString(locale, { maximumFractionDigits: 2 }))
                           .replace("{{currency}}", getDisplayCurrencyCode(insufficientBalance.currency))}
                       </div>
                     ) : null}
@@ -548,7 +548,7 @@ export default function WalletDashboardSwapModal({
                           <div className="text-2xl font-semibold text-white">
                             {formatAmountWithSymbolLocal(previewAmount, quoteCode, {
                               minimumFractionDigits: 2,
-                              maximumFractionDigits: 6,
+                              maximumFractionDigits: 2,
                             })}
                           </div>
                           {previewMeta?.route === "allocation" &&
@@ -569,8 +569,8 @@ export default function WalletDashboardSwapModal({
                               {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
                                 previewMeta.unitRate,
                               ).toLocaleString(locale, {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 6,
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
                               })} ${getDisplayCurrencyCode(quoteCode)}`}
                             </div>
                           ) : null}

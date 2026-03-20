@@ -80,7 +80,7 @@ export function useDemoActions({
     const usdNet = Math.max(0, usdGross - feeUsd);
     const toAmount = usdNet / quoteUsd;
     const amountLabel = toAmount.toLocaleString(locale, {
-      maximumFractionDigits: 6,
+      maximumFractionDigits: 2,
     });
     const usdLabel = usdNet.toLocaleString(locale, {
       maximumFractionDigits: 2,
@@ -151,10 +151,10 @@ export function useDemoActions({
         const diff = Math.abs(paymentRlusd - requestedRlusd);
         if (diff > Math.max(0.01, requestedRlusd * 0.005)) {
           const requestedLabel = requestedRlusd.toLocaleString(locale, {
-            maximumFractionDigits: 6,
+            maximumFractionDigits: 2,
           });
           const computedLabel = paymentRlusd.toLocaleString(locale, {
-            maximumFractionDigits: 6,
+            maximumFractionDigits: 2,
           });
           return {
             error: t("demo_error_payment_request_mismatch", {

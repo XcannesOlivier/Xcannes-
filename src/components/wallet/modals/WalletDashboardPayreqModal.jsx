@@ -86,8 +86,8 @@ export default function WalletDashboardPayreqModal({
           Number(requestAmountValue),
           requestCurrencyCode,
           {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 6,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           },
         )
       : null;
@@ -249,7 +249,7 @@ export default function WalletDashboardPayreqModal({
               locale,
               Number(sendFxInfo.paymentRlusd || 0),
               "USD",
-              { maximumFractionDigits: 6 },
+              { maximumFractionDigits: 2 },
             )}
           </div>
         ) : null}

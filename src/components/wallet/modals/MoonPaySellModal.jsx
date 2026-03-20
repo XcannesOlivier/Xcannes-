@@ -93,12 +93,12 @@ const MoonPaySellModal = ({
       const amountValue = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amountValue)
         ? formatAmountWithSymbol(locale, amountValue, currency, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           })
         : formatAmountWithSymbol(locale, 0, currency, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 4,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           });
       const fallbackRight = `${balanceLabel} = ${amountLabel}`;
       let labelRight =

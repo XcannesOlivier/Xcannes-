@@ -282,8 +282,8 @@ export default function DemoGlobalStatement({
           <td>${escapeHtml(displayCode || "-")}</td>
           <td class="right">${escapeHtml(
             formatAmountWithSymbol(locale, token?.value, token?.currency, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 6,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             }),
           )}</td>
           <td class="right">${
@@ -319,7 +319,7 @@ export default function DemoGlobalStatement({
           <td>${escapeHtml(to)}</td>
           <td class="right">${escapeHtml(
             Number.isFinite(amount)
-              ? amount.toLocaleString(locale, { maximumFractionDigits: 6 })
+              ? amount.toLocaleString(locale, { maximumFractionDigits: 2 })
               : "-",
           )}</td>
           <td>${escapeHtml(m?.txHash || "")}</td>
@@ -857,7 +857,7 @@ export default function DemoGlobalStatement({
                             locale,
                             token.value,
                             token.currency,
-                            { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                            { minimumFractionDigits: 2, maximumFractionDigits: 2 },
                           )}
                         </div>
                         {showConverted ? (

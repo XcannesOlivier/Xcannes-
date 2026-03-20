@@ -48,8 +48,8 @@ export default function WalletPendingPayreqs({
                   Number(displayAmount),
                   currency,
                   {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 6,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                   },
                 )
               : null;

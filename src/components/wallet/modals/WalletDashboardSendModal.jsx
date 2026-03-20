@@ -196,8 +196,8 @@ export default function WalletDashboardSendModal({
           Number(requestAmountValue),
           requestCurrencyCode,
           {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 6,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           },
         )
       : null;
@@ -478,8 +478,8 @@ export default function WalletDashboardSendModal({
   const summaryAmount = Number.isFinite(normalizedSendAmount) ? normalizedSendAmount : 0;
   const confirmAmountLabel = confirmCurrencyCode
     ? formatAmountWithSymbol(locale, summaryAmount, confirmCurrencyCode, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 6,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       })
     : null;
   const savedDestinationLabel = useMemo(() => {

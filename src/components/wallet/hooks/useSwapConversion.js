@@ -122,7 +122,7 @@ export function useSwapConversion({
       const availableBaseUnits = Number(baseLine.units || 0);
       if (amountBase > availableBaseUnits + 1e-8) {
         toast?.error(
-          `Amount too high. Available ${base}: ${availableBaseUnits.toLocaleString("en-US", { maximumFractionDigits: 4 })}.`,
+          `Amount too high. Available ${base}: ${availableBaseUnits.toLocaleString("en-US", { maximumFractionDigits: 2 })}.`,
         );
         return;
       }
@@ -155,7 +155,7 @@ export function useSwapConversion({
         const priceSource =
           base === "RLUSD"
             ? `1 RLUSD ≈ ${(1 / rlusdPerQuote).toLocaleString("en-US", {
-                maximumFractionDigits: 4,
+                maximumFractionDigits: 2,
               })} ${quote}`
             : `Prix implicite via RLUSD (base=${base}, quote=${quote})`;
 
@@ -234,12 +234,12 @@ export function useSwapConversion({
           spread?.isFx && spreadFee > 0
             ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
                 "en-US",
-                { maximumFractionDigits: 6 },
+                { maximumFractionDigits: 2 },
               )} RLUSD)`
             : "";
         setConvertPreview(
           `Démo: ${amountBase.toLocaleString("en-US", {
-            maximumFractionDigits: 4,
+            maximumFractionDigits: 2,
           })} ${base} ≈ ${quoteUnits.toLocaleString("en-US", {
             maximumFractionDigits: 2,
           })} ${quote}${spreadLabel} (${priceSource})`,
@@ -316,7 +316,7 @@ export function useSwapConversion({
           unallocated + epsilon < grossRlusd
         ) {
           toast?.error(
-            `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD.`,
+            `Insufficient unallocated RLUSD. Available: ${unallocated.toLocaleString("en-US", { maximumFractionDigits: 2 })} RLUSD.`,
           );
           return;
         }
@@ -328,7 +328,7 @@ export function useSwapConversion({
           const maxUnits =
             availableAllocated > 0 ? availableAllocated / rlusdPerBase : 0;
           toast?.error(
-            `Amount too high. Available ${base}: ${maxUnits.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${base} (≈ ${availableAllocated.toLocaleString("en-US", { maximumFractionDigits: 6 })} RLUSD).`,
+            `Amount too high. Available ${base}: ${maxUnits.toLocaleString("en-US", { maximumFractionDigits: 2 })} ${base} (≈ ${availableAllocated.toLocaleString("en-US", { maximumFractionDigits: 2 })} RLUSD).`,
           );
           return;
         }
@@ -427,16 +427,16 @@ export function useSwapConversion({
         spread?.isFx && spreadFee > 0
           ? `, frais ${(Number(spread.spreadFraction) * 100).toFixed(2)}% (≈ ${spreadFee.toLocaleString(
               "en-US",
-              { maximumFractionDigits: 6 },
+              { maximumFractionDigits: 2 },
             )} RLUSD)`
           : "";
       setConvertPreview(
         `Conversion envoyée: ${amountBase.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} ${base} → ${amountQuote.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} ${quote} (≈ ${netRlusd.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} RLUSD${spreadLabel})`,
       );
 

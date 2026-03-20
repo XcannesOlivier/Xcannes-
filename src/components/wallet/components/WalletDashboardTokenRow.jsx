@@ -116,14 +116,14 @@ export default function WalletDashboardTokenRow({
           <div className="flex-1" />
           <div className="text-right text-[14px] md:text-[15px] text-primary shrink-0">
             <div className="font-mono">
-              {Number.isFinite(displayValue)
+                  {Number.isFinite(displayValue)
                 ? formatAmountWithSymbol(locale, displayValue, displayCode, {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 4,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                   })
                 : formatAmountWithSymbol(locale, 0, displayCode, {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 4,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                   })}
             </div>
           </div>

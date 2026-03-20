@@ -291,8 +291,8 @@ export default function GlobalStatement({
           <td>${escapeHtml(displayCode || "-")}</td>
           <td class="right">${escapeHtml(
             formatAmountWithSymbol(locale, token?.value, token?.currency, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 6,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             }),
           )}</td>
           <td class="right">${
@@ -329,7 +329,7 @@ export default function GlobalStatement({
           <td>${escapeHtml(to)}</td>
           <td class="right">${escapeHtml(
             Number.isFinite(amount)
-              ? amount.toLocaleString(locale, { maximumFractionDigits: 6 })
+              ? amount.toLocaleString(locale, { maximumFractionDigits: 2 })
               : "-",
           )}</td>
           <td>${escapeHtml(m?.txHash || "")}</td>
@@ -568,7 +568,7 @@ export default function GlobalStatement({
                   ? totalInPreferred
                   : totalBalance,
                 displayCurrencyCode === "USD" ? "RLUSD" : displayCurrencyCode,
-                { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                { minimumFractionDigits: 2, maximumFractionDigits: 2 },
               )}
             </div>
             <div className="mt-1 text-xs text-white/50">
@@ -698,18 +698,17 @@ export default function GlobalStatement({
                           {formatAmountWithSymbolLocal(
                             token.value,
                             token.currency,
-                            { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                            { minimumFractionDigits: 2, maximumFractionDigits: 2 },
                           )}
                         </div>
                         {showConverted ? (
                           <div className="text-[11px] text-white/45 font-mono mt-0.5">
-                            ≈{" "}
                             {formatAmountWithSymbolLocal(
                               convertedValue,
                               displayCurrencyCode === "USD"
                                 ? "RLUSD"
                                 : displayCurrencyCode,
-                              { minimumFractionDigits: 0, maximumFractionDigits: 6 },
+                              { minimumFractionDigits: 2, maximumFractionDigits: 2 },
                             )}
                           </div>
                         ) : null}

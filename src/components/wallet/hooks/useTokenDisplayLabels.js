@@ -90,12 +90,12 @@ export function useTokenDisplayLabels({
         const amount = Number(token?.value || 0);
         const amountLabel = Number.isFinite(amount)
           ? formatAmountWithSymbol(locale, amount, display, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 4,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             })
           : formatAmountWithSymbol(locale, 0, display, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 4,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             });
         if (token?.key) labels[token.key] = amountLabel;
         labels[code] = amountLabel;
@@ -114,12 +114,12 @@ export function useTokenDisplayLabels({
         const amount = Number(token?.value || 0);
         const amountLabel = Number.isFinite(amount)
           ? formatAmountWithSymbol(locale, amount, display, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 4,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             })
           : formatAmountWithSymbol(locale, 0, display, {
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 4,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
             });
         const label = `${display} (${amountLabel})`;
         if (token?.key) labels[token.key] = label;

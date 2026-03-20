@@ -81,7 +81,7 @@ const DemoMoonPaySellModal = ({
         currency;
       const amountValue = Number(token?.value || 0);
       const amountLabel = Number.isFinite(amountValue)
-        ? amountValue.toLocaleString("en-US", { maximumFractionDigits: 4 })
+        ? amountValue.toLocaleString("en-US", { maximumFractionDigits: 2 })
         : "0";
       const fallbackRight = amountLabel;
       let labelRight =

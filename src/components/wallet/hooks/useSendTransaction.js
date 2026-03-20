@@ -262,11 +262,11 @@ export function useSendTransaction({
           ? availableAllocatedRlusd / rlusdPerUnit
           : 0;
       toast.warn(
-        `Allocation insuffisante en ${currency}.\n\n` +
+          `Allocation insuffisante en ${currency}.\n\n` +
           `Disponible: ≈ ${availableAllocatedRlusd.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
+            maximumFractionDigits: 2,
           })} RLUSD\n` +
-          `Maximum: ≈ ${maxFx.toLocaleString("en-US", { maximumFractionDigits: 6 })} ${currency}`,
+          `Maximum: ≈ ${maxFx.toLocaleString("en-US", { maximumFractionDigits: 2 })} ${currency}`,
       );
       return { ok: false };
     }
@@ -351,7 +351,7 @@ export function useSendTransaction({
       action: "wallet:send",
       progressDetails: {
         amountLabel: `${amountNum.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} ${currency}`,
         beneficiaryLabel: beneficiaryLabel || null,
         beneficiaryAddress: dest,
@@ -500,22 +500,22 @@ export function useSendTransaction({
     const amountLabel = (() => {
       if (currency === "XRP") {
         return `${amountNum.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} XRP`;
       }
       if (currency === "USD") {
         // USD is paid on-chain as RLUSD, but keep the user's selected currency for UI.
         return `${amountNum.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} USD`;
       }
       if (currency === "RLUSD") {
         return `${amountNum.toLocaleString("en-US", {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: 2,
         })} RLUSD`;
       }
       return `${amountNum.toLocaleString("en-US", {
-        maximumFractionDigits: 6,
+        maximumFractionDigits: 2,
       })} ${currency}`;
     })();
 
