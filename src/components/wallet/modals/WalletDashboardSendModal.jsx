@@ -1209,7 +1209,8 @@ export default function WalletDashboardSendModal({
             <button
               type="button"
               onClick={() => setScanActive(false)}
-              className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 ring-1 ring-white/20 ring-inset text-white/80 hover:bg-white/20 hover:text-white transition-colors"
+              className="absolute top-4 right-4 z-10 flex items-center justify-center w-10 h-10 text-white/55 hover:text-white/85 transition-colors"
+              aria-label={t("close", "Fermer")}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

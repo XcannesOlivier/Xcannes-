@@ -490,13 +490,35 @@ export default function GlobalStatement({
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
-              <Image
-                src="/assets/statement.svg"
-                alt={t("ui_statement_a87c93acb8", "Statement")}
-                width={40}
-                height={40}
-                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 mt-0.5"
-              />
+              <span
+                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 mt-0.5 inline-flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/85"
+                aria-hidden="true"
+                title={t("ui_global_statement_13e29aa8aa", "Global")}
+              >
+                <svg
+                  className="w-5 h-5 md:w-6 md:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 2a10 10 0 100 20 10 10 0 000-20z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2 12h20"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 2c2.9 2.7 4.5 6.2 4.5 10S14.9 19.3 12 22c-2.9-2.7-4.5-6.2-4.5-10S9.1 4.7 12 2z"
+                  />
+                </svg>
+              </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
                   <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
@@ -538,10 +560,9 @@ export default function GlobalStatement({
 
           <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <div className="text-xs text-white/60">
-              {t("ui_total_assets_label_fr", "Total des actifs")}
+              {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
             </div>
             <div className="mt-1 text-3xl md:text-[32px] font-semibold text-white/95">
-              ≈{" "}
               {formatAmountWithSymbolLocal(
                 totalInPreferred !== null && Number.isFinite(totalInPreferred)
                   ? totalInPreferred

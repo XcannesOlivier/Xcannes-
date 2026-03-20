@@ -28,6 +28,10 @@ export default function WalletSettingsDropdown({
   const { goToChoice } = useWallet();
   const [isOpen, setIsOpen] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [helpOpenIndex, setHelpOpenIndex] = useState(0);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -48,6 +52,74 @@ export default function WalletSettingsDropdown({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [isOpen]);
+
+  // Close help modal on Escape
+  useEffect(() => {
+    if (!showHelpModal) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setShowHelpModal(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showHelpModal]);
+
+  // Close security modal on Escape
+  useEffect(() => {
+    if (!showSecurityModal) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setShowSecurityModal(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showSecurityModal]);
+
+  // Close terms modal on Escape
+  useEffect(() => {
+    if (!showTermsModal) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setShowTermsModal(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showTermsModal]);
+
+  const HELP_QA = [
+    {
+      q: t("ui_help_q1", "Comment recevoir des fonds ?"),
+      a: t(
+        "ui_help_a1",
+        "Ouvrez “Recevoir”, partagez le QR code ou copiez votre adresse publique.",
+      ),
+    },
+    {
+      q: t("ui_help_q2", "Quels sont les frais ?"),
+      a: t(
+        "ui_help_a2",
+        "Les frais XRPL varient selon le réseau. XCANNES affiche les coûts avant validation quand c’est possible.",
+      ),
+    },
+    {
+      q: t("ui_help_q3", "Pourquoi une conversion RLUSD ?"),
+      a: t(
+        "ui_help_a3",
+        "Certaines opérations utilisent RLUSD comme base. Vous pouvez convertir depuis/vers vos lignes de devises.",
+      ),
+    },
+    {
+      q: t("ui_help_q4", "Que faire si une transaction est en attente ?"),
+      a: t(
+        "ui_help_a4",
+        "Attendez la validation sur le ledger. Si le réseau est lent, relancez le rafraîchissement du wallet.",
+      ),
+    },
+    {
+      q: t("ui_help_q5", "Sécurité : comment verrouiller mon wallet ?"),
+      a: t(
+        "ui_help_a5",
+        "Le wallet se déconnecte automatiquement après inactivité et lors du changement d’onglet (hors mode PWA).",
+      ),
+    },
+  ];
 
   // header → visible on md+ only ; footer → mobile only ; inline → always visible
   const visibilityClass =
@@ -144,7 +216,7 @@ export default function WalletSettingsDropdown({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                className="h-10 w-10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
                 aria-label={t("close", "Fermer")}
               >
                 ✕
@@ -172,7 +244,7 @@ export default function WalletSettingsDropdown({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="h-8 w-8 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors duration-150"
+                className="h-8 w-8 text-white/45 hover:text-white/80 flex items-center justify-center transition-colors duration-150"
                 aria-label={t("close", "Fermer")}
               >
                 ✕
@@ -264,7 +336,7 @@ export default function WalletSettingsDropdown({
                   onClick={() => setIsOpen(false)}
                   className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/55 shrink-0">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 6v4m0 4h.01" />
                     </svg>
@@ -288,7 +360,7 @@ export default function WalletSettingsDropdown({
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
                 >
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/55 shrink-0">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
                     </svg>
@@ -299,6 +371,119 @@ export default function WalletSettingsDropdown({
                     </div>
                     <div className="text-[11px] text-white/40 mt-0.5">
                       {t("ui_settings_info_hint", "Comprendre les frais et le fonctionnement")}
+                    </div>
+                  </div>
+                  <span className="text-white/20 text-lg">›</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setShowSecurityModal(true);
+                  }}
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 12l2 2 4-4"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("ui_security", "Sécurité")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_security_hint", "Comprendre la protection du compte")}
+                    </div>
+                  </div>
+                  <span className="text-white/20 text-lg">›</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setHelpOpenIndex(0);
+                    setShowHelpModal(true);
+                  }}
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a10.2 10.2 0 01-4.4-1l-3.6 1 1.2-3.2A7.61 7.61 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("ui_questions_and_help", "Questions et aides")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_questions_and_help_hint", "FAQ rapide et réponses")}
+                    </div>
+                  </div>
+                  <span className="text-white/20 text-lg">›</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setShowTermsModal(true);
+                  }}
+                  className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+                >
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M7 3h10a2 2 0 012 2v14a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 7h6M9 11h6M9 15h4"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-white/85">
+                      {t("ui_terms_of_use", "Conditions d'utilisations")}
+                    </div>
+                    <div className="text-[11px] text-white/40 mt-0.5">
+                      {t("ui_terms_of_use_hint", "Lire les conditions d'utilisation")}
                     </div>
                   </div>
                   <span className="text-white/20 text-lg">›</span>
@@ -359,6 +544,260 @@ export default function WalletSettingsDropdown({
             <p className="mt-3 text-[11px] text-white/40">
               {t("ui_create_or_import_wallet", "Créer ou importer un compte")}
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen security modal */}
+      {showSecurityModal && (
+        <div
+          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("ui_security", "Sécurité")}
+        >
+          <div className="h-full w-full flex flex-col">
+            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+                    {t("ui_security", "Sécurité")}
+                  </div>
+                  <div className="text-[12px] text-white/80 mt-1 truncate">
+                    {t("ui_security_subtitle", "Protection du compte XCANNES")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSecurityModal(false)}
+                  className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                  aria-label={t("close", "Fermer")}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4">
+              <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
+                  {t("ui_security_section_account", "Compte")}
+                </div>
+                <div className="mt-2 text-[13px] leading-relaxed text-white/75">
+                  {t(
+                    "ui_security_account_body",
+                    "XCANNES protège l’accès à vos opérations via la connexion au wallet (Xumm / PWA) et des mécanismes de verrouillage automatique. Nous n’affichons pas vos clés privées dans l’interface.",
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
+                  {t("ui_security_section_lock", "Verrouillage")}
+                </div>
+                <div className="mt-2 text-[13px] leading-relaxed text-white/75">
+                  {t(
+                    "ui_security_lock_body",
+                    "Le wallet peut se déconnecter automatiquement après une période d’inactivité et lors du changement d’onglet (selon le mode). Utilisez aussi le bouton de déconnexion pour verrouiller immédiatement.",
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
+                  {t("ui_security_section_tips", "Bonnes pratiques")}
+                </div>
+                <ul className="mt-2 space-y-2 text-[13px] text-white/75">
+                  <li>
+                    {t(
+                      "ui_security_tip_1",
+                      "Ne partagez jamais vos phrases de récupération / secrets.",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_security_tip_2",
+                      "Vérifiez toujours l’adresse et le montant avant de signer.",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_security_tip_3",
+                      "Évitez les réseaux Wi‑Fi publics pour des opérations sensibles.",
+                    )}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen help modal (FAQ) */}
+      {showHelpModal && (
+        <div
+          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("ui_questions_and_help", "Questions et aides")}
+        >
+          <div className="h-full w-full flex flex-col">
+            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+                    {t("ui_questions_and_help", "Questions et aides")}
+                  </div>
+                  <div className="text-[12px] text-white/80 mt-1 truncate">
+                    {t("ui_questions_and_help_subtitle", "Réponses rapides")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowHelpModal(false)}
+                  className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                  aria-label={t("close", "Fermer")}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-2">
+              {HELP_QA.map((item, idx) => {
+                const open = helpOpenIndex === idx;
+                const id = `wallet-help-${idx}`;
+                return (
+                  <div
+                    key={id}
+                    className="rounded-[14px] border border-white/10 bg-white/5 overflow-hidden"
+                  >
+                    <button
+                      type="button"
+                      className="w-full flex items-center justify-between gap-4 px-4 py-3 text-left"
+                      onClick={() => setHelpOpenIndex(open ? -1 : idx)}
+                      aria-expanded={open}
+                      aria-controls={`${id}-panel`}
+                    >
+                      <div className="text-[14px] font-medium text-white/90">
+                        {item.q}
+                      </div>
+                      <svg
+                        className={[
+                          "w-5 h-5 text-white/50 transition-transform",
+                          open ? "rotate-180" : "",
+                        ].join(" ")}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+
+                    {open && (
+                      <div
+                        id={`${id}-panel`}
+                        className="px-4 pb-4 text-[12px] leading-relaxed text-white/70"
+                      >
+                        {item.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen terms modal */}
+      {showTermsModal && (
+        <div
+          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("ui_terms_of_use", "Conditions d'utilisations")}
+        >
+          <div className="h-full w-full flex flex-col">
+            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+                    {t("ui_terms_of_use", "Conditions d'utilisations")}
+                  </div>
+                  <div className="text-[12px] text-white/80 mt-1 truncate">
+                    {t("ui_terms_subtitle", "Conditions d'utilisation XCANNES")}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowTermsModal(false)}
+                  className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
+                  aria-label={t("close", "Fermer")}
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4">
+              <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
+                  {t("ui_terms_section_scope", "Portée")}
+                </div>
+                <div className="mt-2 text-[13px] leading-relaxed text-white/75">
+                  {t(
+                    "ui_terms_scope_body",
+                    "Ces conditions encadrent l’utilisation du wallet et des services XCANNES. Elles ne constituent pas un conseil financier.",
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
+                  {t("ui_terms_section_user", "Responsabilités")}
+                </div>
+                <ul className="mt-2 space-y-2 text-[13px] text-white/75">
+                  <li>
+                    {t(
+                      "ui_terms_user_1",
+                      "Vous êtes responsable des adresses, montants et destinataires avant signature.",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_terms_user_2",
+                      "Ne partagez jamais vos secrets / phrases de récupération.",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_terms_user_3",
+                      "Respectez les lois applicables à votre juridiction.",
+                    )}
+                  </li>
+                </ul>
+              </div>
+
+              <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+                <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
+                  {t("ui_terms_section_limits", "Limites")}
+                </div>
+                <div className="mt-2 text-[13px] leading-relaxed text-white/75">
+                  {t(
+                    "ui_terms_limits_body",
+                    "XCANNES s’appuie sur XRPL et des fournisseurs tiers. La disponibilité, les délais de validation et les frais réseau peuvent varier.",
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
