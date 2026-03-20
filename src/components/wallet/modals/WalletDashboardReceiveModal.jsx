@@ -33,7 +33,6 @@ export default function WalletDashboardReceiveModal({
   open,
   onClose,
   noticeVariant = "preview",
-  renderWalletMeta,
   wallet,
   requestAmount,
   setRequestAmount,
@@ -673,13 +672,6 @@ export default function WalletDashboardReceiveModal({
   const qrPixelSize = inline ? 360 : 380;
   const requestQrPixelSize = inline ? 360 : 520;
 
-  const shortWalletAddress = useMemo(() => {
-    const addr = String(wallet || "").trim();
-    if (!addr) return "";
-    if (addr.length <= 10) return addr;
-    return `${addr.slice(0, 4)}...${addr.slice(-3)}`;
-  }, [wallet]);
-
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -740,13 +732,11 @@ export default function WalletDashboardReceiveModal({
             if (!inline) e.stopPropagation();
           }}
         >
-          <div className="flex items-start justify-between gap-3 mb-1 pr-6">
+          <div className="flex items-center justify-between gap-3 mb-1 pr-6">
             <div className="flex min-w-0 flex-col gap-1.5">
-              <div>
-                {renderWalletMeta?.(
-                  "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
-                )}
-              </div>
+              <h2 className="text-base md:text-lg font-semibold text-white/90">
+                {t("ui_receive_funds_title", "Recevoir des fonds")}
+              </h2>
               <div className="flex flex-wrap items-center gap-2">
                 {noticeVariant === "demo" ? (
                   <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
@@ -771,9 +761,6 @@ export default function WalletDashboardReceiveModal({
             <div className="flex-1 min-h-0 flex flex-col gap-5">
               {/* SECTION 1 — RECEIVE FUNDS */}
               <div className="space-y-2">
-                <h2 className="text-base md:text-lg font-semibold text-white/90">
-                  {t("ui_receive_funds_title", "Recevoir des fonds")}
-                </h2>
                 <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
                   <div className="flex flex-col items-center">
                     <div
@@ -791,11 +778,13 @@ export default function WalletDashboardReceiveModal({
                       />
                     </div>
 
-                    <div className="mt-3 text-[11px] tracking-[0.22em] uppercase text-white/45">
-                      {t("ui_public_address_label", "Adresse publique")}
-                    </div>
-                    <div className="mt-1 text-sm font-mono text-white/80">
-                      {shortWalletAddress || "—"}
+                    <div className="mt-3 text-[13px] text-white/80">
+                      <span className="text-white/50">
+                        {t("ui_current_account_prefix", "Compte actuel:")}
+                      </span>{" "}
+                      <span className="font-medium">
+                        {String(walletLabel || "").trim() || fallbackWalletLabel}
+                      </span>
                     </div>
 
                     <div className="mt-4 w-full grid grid-cols-2 gap-2">
