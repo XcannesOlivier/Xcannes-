@@ -1386,7 +1386,7 @@ export default function GlobalStatement({
             ) : null}
           </div>
 
-          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-black">
+          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#050708]">
             <div className="text-xs text-white/60">
               {t("ui_current_account_prefix", "Compte actuel :")}
             </div>
@@ -1503,7 +1503,7 @@ export default function GlobalStatement({
                       className={[
                         "w-full text-left rounded-xl px-3 py-3 ring-1 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150",
                         isLatest
-                          ? "ring-2 ring-xcannes-green/45"
+                          ? "ring-2 ring-xcannes-green/45 relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:rounded-xl before:bg-[radial-gradient(70%_60%_at_18%_12%,rgba(34,197,94,0.22)_0%,rgba(34,197,94,0)_70%)] before:pointer-events-none"
                           : "ring-white/10",
                       ].join(" ")}
                     >
