@@ -721,13 +721,8 @@ export default function GlobalStatement({
       // Main line (amount or conversion line)
       const mainY = cardY + 220;
       if (isConversion) {
-        ctx.fillStyle = "rgba(255,255,255,0.92)";
-        ctx.font = "800 54px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-        ctx.fillText(
-          ellipsize(`${from || "—"} → ${to || "—"}`, cardW - 88),
-          cardX + 44,
-          mainY,
-        );
+        // Keep the pair only in the title ("Convertion BASE → QUOTE")
+        // to avoid duplicating it in the card.
       } else {
         ctx.font = "800 86px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
         ctx.fillStyle = isDebit ? "#f87171" : "#22c55e";

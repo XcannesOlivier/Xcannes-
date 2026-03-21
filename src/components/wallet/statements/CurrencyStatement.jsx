@@ -944,7 +944,16 @@ export default function CurrencyStatement({
     if (!detailTx) return;
     if (typeof document === "undefined") return;
 
-    const typeLabel = detailTypeLabel || t("ui_transaction", "Transaction");
+    const typeLabelBase =
+      detailTypeLabel || t("ui_transaction", "Transaction");
+    const conversionPair =
+      detailTx?.category === "exchange"
+        ? parseConversionPair(detailTx?.description || "")
+        : null;
+    const typeLabel =
+      conversionPair?.from && conversionPair?.to
+        ? `${typeLabelBase} ${conversionPair.from} → ${conversionPair.to}`
+        : typeLabelBase;
     const amountLabel = `${detailTx?.type === "debit" ? "−" : "+"}${formatAmountRlusdAsLocal(
       detailTx?.amount ?? 0,
     )}`;
@@ -1103,6 +1112,7 @@ export default function CurrencyStatement({
     flashShareNotice,
     formatAmountRlusdAsLocal,
     formatDateTime,
+    parseConversionPair,
     t,
   ]);
 
