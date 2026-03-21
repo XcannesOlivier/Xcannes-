@@ -99,6 +99,9 @@ export default function WalletDashboard({
     "wallet:setup": t("ui_tx_label_setup", "Configuration"),
   }), [t]);
 
+  // ── UI state (needs to exist before callbacks deps) ───────
+  const [activeAction, setActiveAction] = useState(null);
+
   const handleTxProgressClose = useCallback(() => {
     setTxProgress((prev) => {
       // Auto-close the swap panel after a successful conversion
@@ -237,7 +240,6 @@ export default function WalletDashboard({
   );
 
   // ── UI state ───────────────────────────────────────────────
-  const [activeAction, setActiveAction] = useState(null);
   const [showActivationModal, setShowActivationModal] = useState(false);
   const [showActivationRequestModal, setShowActivationRequestModal] =
     useState(false);
