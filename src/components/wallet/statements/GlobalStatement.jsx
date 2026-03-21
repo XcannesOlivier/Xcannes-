@@ -1456,8 +1456,12 @@ export default function GlobalStatement({
               <div className="space-y-2">
                 {recentMovements.map((m, idx) => {
                   const isConversion = normalizeKind(m?.kind) === "CONVERSION";
-                  const isPaymentOut = normalizeKind(m?.kind) === "PAYMENT_OUT";
-                  const isPaymentIn = normalizeKind(m?.kind) === "PAYMENT_IN";
+                  const isPaymentOut =
+                    normalizeKind(m?.kind) === "PAYMENT_OUT" ||
+                    normalizeKind(m?.kind) === "XRPL_PAYMENT_OUT";
+                  const isPaymentIn =
+                    normalizeKind(m?.kind) === "PAYMENT_IN" ||
+                    normalizeKind(m?.kind) === "XRPL_PAYMENT_IN";
                   const uiType = getMovementUiType(m);
                   const sign =
                     uiType === "debit"
@@ -1468,6 +1472,23 @@ export default function GlobalStatement({
                   const from = String(m?.fromCurrencyCode || "").toUpperCase();
                   const to = String(m?.toCurrencyCode || "").toUpperCase();
                   const when = formatMovementDateTime(m);
+                  const rowCounterparty = String(m?.counterparty || "").trim();
+                  const rowCounterpartyLabel = (() => {
+                    if (!rowCounterparty) return "";
+                    if (
+                      rowCounterparty &&
+                      rowCounterparty.toUpperCase() === "XCANNES"
+                    ) {
+                      return "";
+                    }
+                    if (isXrplAddress(rowCounterparty)) {
+                      return (
+                        getOnChainLabelForAddress(rowCounterparty) ||
+                        truncateMiddle(rowCounterparty, 8, 6)
+                      );
+                    }
+                    return rowCounterparty;
+                  })();
                   const key =
                     m?.movementId ||
                     m?.id ||
@@ -1485,19 +1506,32 @@ export default function GlobalStatement({
                           <div className="text-[13px] font-medium text-white/90 truncate">
                             {getMovementTitle(m)}
                           </div>
-                          <div className="mt-0.5 text-[11px] text-white/45 truncate">
-                            {isConversion || isPaymentOut || isPaymentIn
-                              ? when || ""
-                              : from && to
-                                ? `${from} → ${to}`
-                                : from || to || "—"}
-                            {!isConversion &&
-                            !isPaymentOut &&
-                            !isPaymentIn &&
-                            m?.note
-                              ? ` · ${String(m.note)}`
-                              : ""}
-                          </div>
+                          {isPaymentOut || isPaymentIn ? (
+                            <>
+                              <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                                {(isPaymentOut
+                                  ? t("ui_recipient_label", "Destinataire")
+                                  : t("ui_sender_label", "Expéditeur")) +
+                                  " : " +
+                                  (rowCounterpartyLabel ||
+                                    t("ui_unknown", "—"))}
+                              </div>
+                              <div className="mt-0.5 text-[11px] text-white/45 truncate">
+                                {when || ""}
+                              </div>
+                            </>
+                          ) : (
+                            <div className="mt-0.5 text-[11px] text-white/45 truncate">
+                              {isConversion
+                                ? when || ""
+                                : from && to
+                                  ? `${from} → ${to}`
+                                  : from || to || "—"}
+                              {!isConversion && m?.note
+                                ? ` · ${String(m.note)}`
+                                : ""}
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-3 shrink-0">
