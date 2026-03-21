@@ -1386,7 +1386,7 @@ export default function GlobalStatement({
             ) : null}
           </div>
 
-          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-black">
             <div className="text-xs text-white/60">
               {t("ui_current_account_prefix", "Compte actuel :")}
             </div>
@@ -1502,7 +1502,9 @@ export default function GlobalStatement({
                       onClick={() => openMovementDetails(m)}
                       className={[
                         "w-full text-left rounded-xl px-3 py-3 ring-1 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150",
-                        isLatest ? "ring-xcannes-green/30" : "ring-white/10",
+                        isLatest
+                          ? "ring-2 ring-xcannes-green/45"
+                          : "ring-white/10",
                       ].join(" ")}
                     >
                       <div className="flex items-start justify-between gap-3">
