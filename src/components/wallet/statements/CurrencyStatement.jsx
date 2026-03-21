@@ -32,6 +32,7 @@ import useStatementWalletLabel from "./useStatementWalletLabel";
 import useStatementDocHash from "./useStatementDocHash";
 import useCurrencyStatementData from "./useCurrencyStatementData";
 import useCurrencyStatementFormatters from "./useCurrencyStatementFormatters";
+import XrpNetworkStatement from "./XrpNetworkStatement";
 
 /**
  * Composant de relevé bancaire pour une devise spécifique.
@@ -72,6 +73,7 @@ export default function CurrencyStatement({
     () => String(currency || "").toUpperCase(),
     [currency],
   );
+  const isXrpNetworkView = normalizedCurrency === "XRP";
   const displayCurrency = useMemo(
     () => getDisplayCurrencyCode(normalizedCurrency),
     [normalizedCurrency],
@@ -80,6 +82,15 @@ export default function CurrencyStatement({
     () => String(getCurrencyDescription(normalizedCurrency) || "").trim(),
     [normalizedCurrency],
   );
+  const headerTitle = useMemo(() => {
+    if (isXrpNetworkView) {
+      return t(
+        "ui_xrp_ledger_native_token_title",
+        "XRP Ledger Native Token",
+      );
+    }
+    return currencyDescription || displayCurrency;
+  }, [currencyDescription, displayCurrency, isXrpNetworkView, t]);
 
   /* ── RLUSD → local-currency converter ───────────────────
    * All internal amounts (balance, tx.amount, tx.runningBalance) are
@@ -121,7 +132,6 @@ export default function CurrencyStatement({
   const [selectedMonth, setSelectedMonth] = useState(0);
   const [showFullAddress, setShowFullAddress] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
-  const [reserveOpen, setReserveOpen] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
     useState(null);
   const [detailTx, setDetailTx] = useState(null);
@@ -625,22 +635,6 @@ export default function CurrencyStatement({
     },
     [normalizedCurrency, parseConversionPair],
   );
-
-  /* ── XRP reserve ───────────────────────────────────────── */
-  const showReserveDetails = isPreviewMode || isWalletActivated === true;
-  const reservePlaceholder = "\u2014";
-
-  const xrpReserveDetails = useMemo(() => {
-    if (normalizedCurrency !== "XRP" || !showReserveDetails) return null;
-    const activationXrp = 1;
-    const trustlineReserveXrp = 0.2;
-    const trustlineRlusdXrp = hasRlusdTrustline ? trustlineReserveXrp : 0;
-    return {
-      totalReserveXrp: activationXrp + trustlineRlusdXrp,
-      activationXrp,
-      trustlineRlusdXrp,
-    };
-  }, [hasRlusdTrustline, normalizedCurrency, showReserveDetails]);
 
   /* ── ledger status ─────────────────────────────────────── */
   const ledgerEvidenceCount = useMemo(
@@ -1464,7 +1458,7 @@ export default function CurrencyStatement({
                 <div className="flex items-center gap-2 min-w-0">
                   <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
                     <span className="truncate">
-                      {currencyDescription || displayCurrency}
+                      {headerTitle}
                     </span>
                   </h2>
                   {noticeVariant === "demo" ? (
@@ -1516,117 +1510,54 @@ export default function CurrencyStatement({
                 ) : null}
               </div>
             </div>
-            <div>
-              <p className="text-xs text-white/60 mb-1">
-                {t("ui_statement_period_6dedec11d9", "Statement Period")}
-              </p>
-              <StatementMonthSelect
-                value={selectedMonth}
-                onChange={(nextValue) => {
-                  if (nextValue === "archives") {
-                    setSelectedMonth("archives");
-                    return;
-                  }
-                  const parsed = Number.parseInt(nextValue, 10);
-                  setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
-                }}
-                options={availableMonths}
-                menuClassName={modalBgClass}
-              />
-            </div>
-            <div>
-              <p className="text-xs text-white/60 mb-1">
-                {t("ui_balance_445d830d72", "Balance")}
-              </p>
-              <p className="text-sm text-white font-semibold">
-                {formatAmountWithSymbolLocal(balance)}
-              </p>
-              {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                <p className="text-[11px] text-white/60">
-                  ≈{" "}
-                  {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              ) : null}
-
-              {normalizedCurrency === "XRP" && (
-                <div className="mt-2 relative">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <p className="text-xs text-white/60 whitespace-pre-line">
-                        {t("ui_reserve_2d584ec9c7", "Reserve")}
-                      </p>
-                      <p className="text-[11px] text-white/80 font-mono">
-                        {xrpReserveDetails
-                          ? `${xrpReserveDetails.totalReserveXrp.toFixed(2)}${t("ui_xrp_034964b994", "XRP")}`
-                          : reservePlaceholder}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setReserveOpen((v) => !v)}
-                      disabled={!xrpReserveDetails}
-                      className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 text-[11px] text-white/80 transition-colors disabled:opacity-40 disabled:hover:bg-white/5 disabled:cursor-not-allowed"
-                      aria-expanded={reserveOpen}
-                      aria-disabled={!xrpReserveDetails}
-                      aria-label={t(
-                        "ui_reserve_breakdown_de2c3de53e",
-                        "Reserve breakdown",
-                      )}
-                    >
-                      {t("ui_details_e9615e470d", "Details")}
-                    </button>
-                  </div>
-
-                  {reserveOpen && (
-                    <div className="mt-2 rounded-lg bg-black/60 p-3 space-y-2">
-                      <div className="text-[11px] text-white/80">
-                        <div className="flex items-center justify-between gap-2">
-                          <span>
-                            {t(
-                              "ui_activation_wallet_1dcd314549",
-                              "Activation wallet",
-                            )}
-                          </span>
-                          <span className="font-mono">
-                            {xrpReserveDetails.activationXrp.toFixed(2)}{" "}
-                            {t("ui_xrp_034964b994", "XRP")}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center justify-between gap-2">
-                          <span>
-                            {t(
-                              "ui_trustline_rlusd_9c077313dc",
-                              "Trustline RLUSD",
-                            )}{" "}
-                            {hasRlusdTrustline
-                              ? t(
-                                  "ui_status_active_short_4c8b1a7d2e",
-                                  "(active)",
-                                )
-                              : t(
-                                  "ui_status_to_activate_short_7a1c4d9b2e",
-                                  "(to activate)",
-                                )}
-                          </span>
-                          <span className="font-mono">
-                            {xrpReserveDetails.trustlineRlusdXrp.toFixed(2)}{" "}
-                            {t("ui_xrp_034964b994", "XRP")}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+            {!isXrpNetworkView ? (
+              <>
+                <div>
+                  <p className="text-xs text-white/60 mb-1">
+                    {t("ui_statement_period_6dedec11d9", "Statement Period")}
+                  </p>
+                  <StatementMonthSelect
+                    value={selectedMonth}
+                    onChange={(nextValue) => {
+                      if (nextValue === "archives") {
+                        setSelectedMonth("archives");
+                        return;
+                      }
+                      const parsed = Number.parseInt(nextValue, 10);
+                      setSelectedMonth(Number.isFinite(parsed) ? parsed : 0);
+                    }}
+                    options={availableMonths}
+                    menuClassName={modalBgClass}
+                  />
                 </div>
-              )}
-            </div>
+                <div>
+                  <p className="text-xs text-white/60 mb-1">
+                    {t("ui_balance_445d830d72", "Balance")}
+                  </p>
+                  <p className="text-sm text-white font-semibold">
+                    {formatAmountWithSymbolLocal(balance)}
+                  </p>
+                  {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+                    <p className="text-[11px] text-white/60">
+                      ≈{" "}
+                      {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  ) : null}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
 
         {/* Content - Zone scrollable */}
         <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
+          {isXrpNetworkView ? (
+            <XrpNetworkStatement hasRlusdTrustline={hasRlusdTrustline} />
+          ) : (
+            <>
           {/* Archive Notice */}
           {selectedMonth === "archives" && (
             <div className="bg-blue-500/10 rounded-lg p-3 md:p-4">
@@ -1776,44 +1707,48 @@ export default function CurrencyStatement({
                 : t("ui_load_more_3f7a1c9d5b", "Load more")}
             </button>
           )}
+            </>
+          )}
         </div>
 
         {/* Footer Actions */}
-        <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={handleExportPdf}
-              disabled={exportFormat === "pdf"}
-              className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
-            >
-              {exportFormat === "pdf" ? (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5 opacity-60" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_loading_1386baebe9", "Loading…")}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="md:hidden" aria-hidden>
-                    <ShareIcon className="w-5 h-5" />
-                  </span>
-                  <span className="hidden md:inline text-[13px] sm:text-inherit">
-                    {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
-                  </span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={handlePrint}
-              className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
-            >
-              {t("ui_print_1313eff37c", "🖨️ Print")}
-            </button>
+        {!isXrpNetworkView ? (
+          <div className="relative px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-transparent md:bg-black/30 before:content-[''] before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-white/10">
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={handleExportPdf}
+                disabled={exportFormat === "pdf"}
+                className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
+              >
+                {exportFormat === "pdf" ? (
+                  <>
+                    <span className="md:hidden" aria-hidden>
+                      <ShareIcon className="w-5 h-5 opacity-60" />
+                    </span>
+                    <span className="hidden md:inline text-[13px] sm:text-inherit">
+                      {t("ui_loading_1386baebe9", "Loading…")}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="md:hidden" aria-hidden>
+                      <ShareIcon className="w-5 h-5" />
+                    </span>
+                    <span className="hidden md:inline text-[13px] sm:text-inherit">
+                      {t("ui_export_pdf_9c8d16b4fe", "📄 Export PDF")}
+                    </span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handlePrint}
+                className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
+              >
+                {t("ui_print_1313eff37c", "🖨️ Print")}
+              </button>
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
