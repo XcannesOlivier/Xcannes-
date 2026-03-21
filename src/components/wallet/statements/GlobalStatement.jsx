@@ -771,13 +771,32 @@ export default function GlobalStatement({
         const quoteUnits = rlusdToLocal(netRlusd, to);
         const fromLine = `${formatConversionUnits(baseUnits, from)}`;
         const toLine = `${formatConversionUnits(quoteUnits, to)}`;
+        const spread = Number(detailMovement?.spreadRlusd);
+        const feeUnits =
+          Number.isFinite(spread) && spread > 0 ? rlusdToLocal(spread, to) : null;
+        const feeLine =
+          feeUnits != null ? `${formatConversionUnits(feeUnits, to)}` : "—";
 
-        ctx.fillText("From", cardX + 44, y);
-        ctx.fillText("To", cardX + 44, y + 78);
+        ctx.fillText(t("ui_account", "Compte"), cardX + 44, y);
+        ctx.fillStyle = "rgba(255,255,255,0.86)";
+        ctx.font = "600 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(
+          ellipsize(walletLabel || t("nav_wallet", "Wallet"), cardW - 88),
+          cardX + 44,
+          y + 38,
+        );
+
+        y += 86;
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(t("ui_from_label_2c7a1d9b5e", "From"), cardX + 44, y);
+        ctx.fillText(t("ui_to_label_7b2c1a9d5e", "To"), cardX + 44, y + 78);
+        ctx.fillText(t("ui_fees", "Frais"), cardX + 44, y + 156);
         ctx.fillStyle = "rgba(255,255,255,0.86)";
         ctx.font = "600 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
         ctx.fillText(ellipsize(fromLine, cardW - 88), cardX + 44, y + 38);
         ctx.fillText(ellipsize(toLine, cardW - 88), cardX + 44, y + 116);
+        ctx.fillText(ellipsize(feeLine, cardW - 88), cardX + 44, y + 194);
       }
 
       // Tx hash (if any)
@@ -884,6 +903,7 @@ export default function GlobalStatement({
     t,
     toast,
     truncateMiddle,
+    walletLabel,
   ]);
 
   /* ── ledger status ─────────────────────────────────────── */
