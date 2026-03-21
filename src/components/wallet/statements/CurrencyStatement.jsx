@@ -905,12 +905,14 @@ export default function CurrencyStatement({
     return t("statement_xrpl_mobile_in", "Reçu");
   }, [detailIsOutgoing, detailTx, t]);
 
+  const detailIsConversion = detailTx?.category === "exchange";
+
   const showConversionFee = useMemo(() => {
     if (!detailTx) return false;
-    if (detailTx?.category === "exchange") return isQuoteSideConversion(detailTx);
+    if (detailIsConversion) return isQuoteSideConversion(detailTx);
     const spread = Number(detailTx?.spreadRlusd);
     return Number.isFinite(spread) && spread > 0;
-  }, [detailTx, isQuoteSideConversion]);
+  }, [detailIsConversion, detailTx, isQuoteSideConversion]);
 
   const detailStatusLabel = useMemo(() => {
     if (!detailTx) return "";
@@ -961,6 +963,15 @@ export default function CurrencyStatement({
     const statusLabel = detailStatusLabel || "";
     const nameLabel = counterpartyName || "";
     const addressLabel = counterpartyAddress || "";
+    const walletLabelText = String(walletLabel || t("nav_wallet", "Wallet")).trim();
+    const showTaux =
+      detailTx?.category === "exchange" &&
+      showConversionFee &&
+      Number(detailTx?.spreadRlusd) > 0;
+    const tauxLabel = showTaux
+      ? formatAmountRlusdAsLocal(detailTx.spreadRlusd)
+      : "";
+    const isConversionShare = detailIsConversion;
 
     const buildCardBlob = async () => {
       const w = 1080;
@@ -1025,30 +1036,50 @@ export default function CurrencyStatement({
       ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
       ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), cardX + 44, metaY);
       ctx.fillText(t("ui_status_label", "Statut"), cardX + 44, metaY + 64);
+      if (showTaux) {
+        ctx.fillText(t("ui_fx_rate", "Taux"), cardX + 44, metaY + 128);
+      }
+      if (isConversionShare) {
+        ctx.fillText(t("ui_account", "Compte"), cardX + 480, metaY);
+      }
 
       ctx.fillStyle = "rgba(255,255,255,0.86)";
       ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
       ctx.fillText(dateLabel, cardX + 44, metaY + 34);
       ctx.fillText(statusLabel || "—", cardX + 44, metaY + 98);
+      if (showTaux) {
+        ctx.fillText(tauxLabel || "—", cardX + 44, metaY + 162);
+      }
+      if (isConversionShare) {
+        ctx.fillText(walletLabelText || "—", cardX + 480, metaY + 34);
+      }
 
-      // Counterparty
-      const cpTitle = counterpartyTitle || t("ui_counterparty", "Contrepartie");
-      const cpY = metaY + 150;
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
-      ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText(cpTitle, cardX + 44, cpY);
+      if (!isConversionShare) {
+        // Counterparty
+        const cpTitle = counterpartyTitle || t("ui_counterparty", "Contrepartie");
+        const cpY = metaY + (showTaux ? 214 : 150);
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.font = "600 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(cpTitle, cardX + 44, cpY);
 
-      ctx.fillStyle = "rgba(255,255,255,0.90)";
-      ctx.font = "650 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
-      ctx.fillText(nameLabel || t("ui_no_name_found", "Aucun nom trouvé"), cardX + 44, cpY + 38);
+        ctx.fillStyle = "rgba(255,255,255,0.90)";
+        ctx.font = "650 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(
+          nameLabel || t("ui_no_name_found", "Aucun nom trouvé"),
+          cardX + 44,
+          cpY + 38,
+        );
 
-      if (addressLabel) {
-        const addr = addressLabel.length > 26
-          ? `${addressLabel.slice(0, 10)}…${addressLabel.slice(-8)}`
-          : addressLabel;
-        ctx.fillStyle = "rgba(255,255,255,0.60)";
-        ctx.font = "600 22px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-        ctx.fillText(addr, cardX + 44, cpY + 78);
+        if (addressLabel) {
+          const addr =
+            addressLabel.length > 26
+              ? `${addressLabel.slice(0, 10)}…${addressLabel.slice(-8)}`
+              : addressLabel;
+          ctx.fillStyle = "rgba(255,255,255,0.60)";
+          ctx.font =
+            "600 22px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+          ctx.fillText(addr, cardX + 44, cpY + 78);
+        }
       }
 
       return await new Promise((resolve) =>
@@ -1106,6 +1137,7 @@ export default function CurrencyStatement({
     counterpartyAddress,
     counterpartyName,
     counterpartyTitle,
+    detailIsConversion,
     detailStatusLabel,
     detailTx,
     detailTypeLabel,
@@ -1113,7 +1145,9 @@ export default function CurrencyStatement({
     formatAmountRlusdAsLocal,
     formatDateTime,
     parseConversionPair,
+    showConversionFee,
     t,
+    walletLabel,
   ]);
 
   const transactionDetailModal =
@@ -1182,13 +1216,26 @@ export default function CurrencyStatement({
 
               <div className="h-px bg-white/[0.04] my-3" />
 
-              {/* Counterparty */}
-              {counterpartyAddress ? (
-                <div className="space-y-2">
-                  <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
-                    {counterpartyTitle}
+                {detailIsConversion ? (
+                  <div className="space-y-2">
+                    <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                      {t("ui_account", "Compte")}
+                    </div>
+                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                      <div className="text-sm text-white/90 font-semibold truncate">
+                        {walletLabel || t("nav_wallet", "Wallet")}
+                      </div>
+                    </div>
                   </div>
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                ) : null}
+
+                {/* Counterparty */}
+                {!detailIsConversion && counterpartyAddress ? (
+                  <div className="space-y-2">
+                    <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
+                      {counterpartyTitle}
+                    </div>
+                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="text-sm text-white/90 font-semibold truncate">
@@ -1226,9 +1273,9 @@ export default function CurrencyStatement({
                         </span>
                       ) : null}
                     </div>
-                  </div>
-                </div>
-              ) : null}
+	                  </div>
+	                </div>
+	              ) : null}
 
               <div className="h-px bg-white/[0.04] my-3" />
 

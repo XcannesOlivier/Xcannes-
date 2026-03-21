@@ -648,8 +648,10 @@ export default function GlobalStatement({
       })();
 
       const buildCardBlob = async () => {
+        // Conversion cards contain more rows (Compte + From/To/Frais).
+        // Use a taller canvas to avoid cropped content on mobile shares.
         const w = 1080;
-        const h = 720;
+        const h = isConversion ? 900 : 720;
         const canvas = document.createElement("canvas");
         canvas.width = w;
         canvas.height = h;
