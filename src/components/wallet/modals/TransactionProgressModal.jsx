@@ -273,7 +273,40 @@ export default function TransactionProgressModal({
                 </svg>
               </div>
 
-              {showDetailsCard ? (
+              {isConversionAction && showConversionDetailsCard ? (
+                <div className="mt-6 w-full rounded-2xl bg-white/7 border border-white/10 px-5 py-4">
+                  {conversionFromLabel ? (
+                    <div className="mb-3">
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_from", "From")}:
+                      </div>
+                      <div className="mt-1 text-[20px] font-semibold text-white">
+                        {conversionFromLabel}
+                      </div>
+                    </div>
+                  ) : null}
+                  {conversionToLabel ? (
+                    <div className="mb-3">
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_to", "To")}:
+                      </div>
+                      <div className="mt-1 text-[20px] font-semibold text-white">
+                        {conversionToLabel}
+                      </div>
+                    </div>
+                  ) : null}
+                  {conversionFeeLabel ? (
+                    <div>
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_fees", "Frais")}:
+                      </div>
+                      <div className="mt-1 text-[14px] text-white/80">
+                        {conversionFeeLabel}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : !isConversionAction && showSendDetailsCard ? (
                 <div className="mt-6 w-full rounded-2xl bg-white/7 border border-white/10 px-5 py-4">
                   {amountLabel ? (
                     <div className="mb-3">
@@ -292,7 +325,8 @@ export default function TransactionProgressModal({
                         {t("ui_beneficiary", "Bénéficiaire")}:
                       </div>
                       <div className="mt-1 text-[14px] text-sky-300">
-                        {beneficiaryLabel || t("ui_no_name_found", "Aucun nom trouvé")}
+                        {beneficiaryLabel ||
+                          t("ui_no_name_found", "Aucun nom trouvé")}
                       </div>
                       <div className="mt-1 font-mono text-[12px] text-white/55 break-all">
                         {beneficiaryAddress}

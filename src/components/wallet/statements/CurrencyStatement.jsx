@@ -762,17 +762,18 @@ export default function CurrencyStatement({
         </tbody>
       </table>
     `;
-  }, [
-    balance,
-    currentPeriod,
-    docHash,
-    displayCurrency,
-    fallbackPeriod,
-    getLocalizedDescription,
-    rlusdToLocal,
-    transactionsWithDisplayBalance,
-    formatDate,
-    ledgerStatusLabel,
+	  }, [
+	    balance,
+	    currentPeriod,
+	    docHash,
+	    displayCurrency,
+	    fallbackPeriod,
+	    getLocalizedDescription,
+	    isQuoteSideConversion,
+	    rlusdToLocal,
+	    transactionsWithDisplayBalance,
+	    formatDate,
+	    ledgerStatusLabel,
     locale,
     normalizedCurrency,
     t,
