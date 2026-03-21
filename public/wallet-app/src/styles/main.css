@@ -781,9 +781,17 @@ body.keyboard-open .screen-content.center.keyboard-avoid {
 }
 
 .unlock-btn-icon {
-  font-size: 18px;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   transform: translateY(-1px);
+}
+
+.unlock-btn-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 #screen-pin-unlock {
