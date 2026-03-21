@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "next-i18next";
 
 /**
@@ -75,12 +75,6 @@ export default function TransactionProgressModal({
     return () => clearTimeout(id);
   }, [autoCloseMs, handleClose, status, visible]);
 
-  const statusPill = useMemo(() => {
-    if (isSuccess) return { label: t("ui_sent", "Envoyé"), tone: "success" };
-    if (isError) return { label: t("ui_error", "Erreur"), tone: "error" };
-    return { label: t("ui_sent", "Envoyé"), tone: "pending" };
-  }, [isError, isSuccess, t]);
-
   if (!visible) return null;
 
   return (
@@ -95,44 +89,6 @@ export default function TransactionProgressModal({
       </div>
 
       <div className="relative h-full w-full flex flex-col items-center px-6 pt-14 pb-8">
-        {/* status pill */}
-        {!isSuccess ? (
-          <div
-            className={[
-              "inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 border",
-              statusPill.tone === "error"
-                ? "border-red-400/25 bg-red-400/10 text-red-200"
-                : "border-xcannes-green/30 bg-xcannes-green/10 text-xcannes-green",
-            ].join(" ")}
-          >
-            <svg
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              {statusPill.tone === "error" ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              )}
-            </svg>
-            <span className="text-[18px] font-semibold">{statusPill.label}</span>
-            {isPending ? (
-              <span className="text-[18px] font-semibold opacity-90">✓</span>
-            ) : null}
-          </div>
-        ) : null}
-
         {/* main */}
         <div className="mt-7 w-full max-w-[440px] flex-1 flex flex-col items-center">
           {isPending ? (
