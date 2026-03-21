@@ -417,6 +417,20 @@ export function useSwapConversion({
 
       const result = await signTransaction(txjson, {
         action: "wallet:convert",
+        progressDetails: {
+          fromLabel: `${amountBase.toLocaleString("en-US", {
+            maximumFractionDigits: 2,
+          })} ${base}`,
+          toLabel: `${amountQuote.toLocaleString("en-US", {
+            maximumFractionDigits: 2,
+          })} ${quote}`,
+          feeLabel:
+            Number.isFinite(spreadFee) && spreadFee > 0
+              ? `${spreadFee.toLocaleString("en-US", {
+                  maximumFractionDigits: 2,
+                })} RLUSD`
+              : null,
+        },
       });
       if (!result?.signed) {
         toast?.error("Conversion cancelled or expired.");

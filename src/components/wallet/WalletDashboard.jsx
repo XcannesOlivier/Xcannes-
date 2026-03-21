@@ -102,12 +102,15 @@ export default function WalletDashboard({
   const handleTxProgressClose = useCallback(() => {
     setTxProgress((prev) => {
       // Auto-close the swap panel after a successful conversion
-      if (prev.status === "success" && prev.actionKey === "wallet:convert") {
+      if (
+        prev.status === "success" &&
+        (prev.actionKey === "wallet:convert" || prev.actionKey === "wallet:send")
+      ) {
         setActiveAction(null);
       }
       return { ...prev, visible: false };
     });
-  }, []);
+  }, [setActiveAction]);
 
   /**
    * Poll XRPL tx-status endpoint until the transaction is validated
@@ -920,9 +923,16 @@ export default function WalletDashboard({
         visible={txProgress.visible}
         status={txProgress.status}
         actionLabel={txProgress.actionLabel}
+        actionKey={txProgress.actionKey}
         errorMessage={txProgress.errorMessage}
         details={txProgress.details}
-        autoCloseMs={txProgress.actionKey === "wallet:convert" ? 1600 : null}
+        autoCloseMs={
+          txProgress.actionKey === "wallet:convert"
+            ? 1600
+            : txProgress.actionKey === "wallet:send"
+              ? 2000
+              : null
+        }
         onClose={handleTxProgressClose}
       />
       <WalletToastOverlay

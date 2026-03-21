@@ -15,6 +15,7 @@ export default function TransactionProgressModal({
   visible = false,
   status = "pending",
   actionLabel = "",
+  actionKey = "",
   errorMessage = "",
   details = null,
   autoCloseMs = null,
@@ -33,13 +34,28 @@ export default function TransactionProgressModal({
   const amountLabel = trimmed(details?.amountLabel);
   const beneficiaryLabel = trimmed(details?.beneficiaryLabel);
   const beneficiaryAddress = trimmed(details?.beneficiaryAddress);
-  const showDetailsCard =
+  const conversionFromLabel = trimmed(details?.fromLabel);
+  const conversionToLabel = trimmed(details?.toLabel);
+  const conversionFeeLabel = trimmed(details?.feeLabel);
+
+  const showSendDetailsCard =
     Boolean(amountLabel) ||
     Boolean(beneficiaryAddress) ||
     Boolean(beneficiaryLabel);
-  const pendingTitle = beneficiaryAddress
-    ? t("ui_tx_sending_eta", "Envoi en cours (≈3 secondes)")
+  const showConversionDetailsCard =
+    Boolean(conversionFromLabel) ||
+    Boolean(conversionToLabel) ||
+    Boolean(conversionFeeLabel);
+  const normalizedActionKey = String(actionKey || "").trim();
+  const isConversionAction = normalizedActionKey === "wallet:convert";
+  const pendingTitle = isConversionAction
+    ? t("ui_tx_conversion_in_progress", "Conversion en cours")
+    : beneficiaryAddress
+    ? t("ui_tx_sending_eta", "Envoi en cours")
     : t("ui_tx_verifying", "En cours de vérification");
+  const successTitle = isConversionAction
+    ? t("ui_tx_convert_success", "Converti avec succès !")
+    : t("ui_tx_sent_success", "Envoyé avec succès!");
 
   const handleClose = useCallback(() => {
     setClosing(true);
@@ -80,42 +96,42 @@ export default function TransactionProgressModal({
 
       <div className="relative h-full w-full flex flex-col items-center px-6 pt-14 pb-8">
         {/* status pill */}
-        <div
-          className={[
-            "inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 border",
-            statusPill.tone === "success"
-              ? "border-xcannes-green/30 bg-xcannes-green/10 text-xcannes-green"
-              : statusPill.tone === "error"
+        {!isSuccess ? (
+          <div
+            className={[
+              "inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 border",
+              statusPill.tone === "error"
                 ? "border-red-400/25 bg-red-400/10 text-red-200"
                 : "border-xcannes-green/30 bg-xcannes-green/10 text-xcannes-green",
-          ].join(" ")}
-        >
-          <svg
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.5}
+            ].join(" ")}
           >
-            {statusPill.tone === "error" ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            )}
-          </svg>
-          <span className="text-[18px] font-semibold">{statusPill.label}</span>
-          {isPending ? (
-            <span className="text-[18px] font-semibold opacity-90">✓</span>
-          ) : null}
-        </div>
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              {statusPill.tone === "error" ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              )}
+            </svg>
+            <span className="text-[18px] font-semibold">{statusPill.label}</span>
+            {isPending ? (
+              <span className="text-[18px] font-semibold opacity-90">✓</span>
+            ) : null}
+          </div>
+        ) : null}
 
         {/* main */}
         <div className="mt-7 w-full max-w-[440px] flex-1 flex flex-col items-center">
@@ -124,9 +140,44 @@ export default function TransactionProgressModal({
               <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-white">
                 {pendingTitle}
               </h1>
-              <div className="mt-6 text-white/70">{label}</div>
+              {!isConversionAction ? (
+                <div className="mt-6 text-white/70">{label}</div>
+              ) : null}
 
-              {showDetailsCard ? (
+              {isConversionAction && showConversionDetailsCard ? (
+                <div className="mt-6 w-full rounded-2xl bg-white/7 border border-white/10 px-5 py-4">
+                  {conversionFromLabel ? (
+                    <div className="mb-3">
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_from", "From")}:
+                      </div>
+                      <div className="mt-1 text-[20px] font-semibold text-white">
+                        {conversionFromLabel}
+                      </div>
+                    </div>
+                  ) : null}
+                  {conversionToLabel ? (
+                    <div className="mb-3">
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_to", "To")}:
+                      </div>
+                      <div className="mt-1 text-[20px] font-semibold text-white">
+                        {conversionToLabel}
+                      </div>
+                    </div>
+                  ) : null}
+                  {conversionFeeLabel ? (
+                    <div>
+                      <div className="text-[12px] text-white/55">
+                        {t("ui_fees", "Frais")}:
+                      </div>
+                      <div className="mt-1 text-[14px] text-white/80">
+                        {conversionFeeLabel}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : !isConversionAction && showSendDetailsCard ? (
                 <div className="mt-6 w-full rounded-2xl bg-white/7 border border-white/10 px-5 py-4">
                   {amountLabel ? (
                     <div className="mb-3">
@@ -190,7 +241,7 @@ export default function TransactionProgressModal({
           {isSuccess ? (
             <>
               <h1 className="mt-1 text-center text-[34px] leading-tight font-bold text-xcannes-green">
-                {t("ui_tx_sent_success", "Envoyé avec succès!")}
+                {successTitle}
               </h1>
               <p className="mt-2 text-center text-[13px] text-xcannes-green/70">
                 {t(
