@@ -150,7 +150,7 @@ export default function XrpNetworkStatement({
                   <div className="mt-1 text-[12px] text-white/55">
                     {t(
                       "ui_trustline_rlusd_needed_hint",
-                      "Activez la trustline RLUSD pour utiliser le wallet et payer les frais de transactions RLUSD.",
+                      "Activez la trustline RLUSD pour utiliser le Compte et payer les frais de transactions RLUSD.",
                     )}
                   </div>
                 </div>

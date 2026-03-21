@@ -18,6 +18,8 @@ export default function WalletDashboardStatementModals({
   walletDisplayLabel = "",
   isPreviewMode = false,
   isWalletActivated = null,
+  hasRlusdTrustline: hasRlusdTrustlineOverride = null,
+  rlusdBalance: rlusdBalanceOverride = null,
   noticeVariant = "preview",
   noticeContextLabel = "",
   walletId = "",
@@ -44,18 +46,24 @@ export default function WalletDashboardStatementModals({
   toast,
 }) {
   const { t } = useTranslation("common");
-  const hasRlusdTrustline = (augmentedTokens || []).some((t) => {
-    const code = String(t?.currency || "").toUpperCase();
-    return code === "RLUSD" && !t?.isMissingTrustline;
-  });
+  const hasRlusdTrustline = useMemo(() => {
+    if (hasRlusdTrustlineOverride === true) return true;
+    if (hasRlusdTrustlineOverride === false) return false;
+    return (augmentedTokens || []).some((tok) => {
+      const code = String(tok?.currency || "").toUpperCase();
+      return code === "RLUSD" && !tok?.isMissingTrustline;
+    });
+  }, [augmentedTokens, hasRlusdTrustlineOverride]);
 
   const rlusdBalance = useMemo(() => {
+    const overrideNum = Number(rlusdBalanceOverride);
+    if (Number.isFinite(overrideNum) && overrideNum >= 0) return overrideNum;
     const token = (augmentedTokens || []).find(
       (entry) => String(entry?.currency || "").toUpperCase() === "RLUSD",
     );
     const value = Number.parseFloat(token?.value ?? token?.balance ?? 0);
     return Number.isFinite(value) ? value : 0;
-  }, [augmentedTokens]);
+  }, [augmentedTokens, rlusdBalanceOverride]);
 
   const canFetchStatements = useMemo(() => {
     return (
