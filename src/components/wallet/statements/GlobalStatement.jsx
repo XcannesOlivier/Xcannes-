@@ -60,8 +60,11 @@ export default function GlobalStatement({
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedCounterparty, setCopiedCounterparty] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
+  const [shareNotice, setShareNotice] = useState("");
+  const [shareNoticeTone, setShareNoticeTone] = useState("success");
   const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
+  const shareNoticeTimerRef = useRef(null);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -477,7 +480,32 @@ export default function GlobalStatement({
     setDetailMovement(null);
     setCopiedHash(false);
     setCopiedCounterparty(false);
+    setShareNotice("");
+    setShareNoticeTone("success");
+    if (shareNoticeTimerRef.current) {
+      window.clearTimeout(shareNoticeTimerRef.current);
+      shareNoticeTimerRef.current = null;
+    }
   }, []);
+
+  const flashShareNotice = useCallback(
+    (message, { tone = "success", autoClose = true } = {}) => {
+      const text = String(message || "").trim();
+      if (!text) return;
+      setShareNotice(text);
+      setShareNoticeTone(tone === "error" ? "error" : "success");
+      if (shareNoticeTimerRef.current) {
+        window.clearTimeout(shareNoticeTimerRef.current);
+        shareNoticeTimerRef.current = null;
+      }
+      if (!autoClose) return;
+      shareNoticeTimerRef.current = window.setTimeout(() => {
+        shareNoticeTimerRef.current = null;
+        closeMovementDetails();
+      }, 1100);
+    },
+    [closeMovementDetails],
+  );
 
   const getUsdValue = useCallback(
     (token) => {
@@ -814,6 +842,7 @@ export default function GlobalStatement({
             throw new Error("canShare:false");
           }
           await navigator.share(payload);
+          flashShareNotice(t("ui_shared", "Partagé"), { tone: "success" });
           return;
         }
       } catch {
@@ -830,14 +859,21 @@ export default function GlobalStatement({
         a.remove();
         setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
         toast?.success?.(t("ui_downloaded", "Téléchargé"));
+        flashShareNotice(t("ui_downloaded", "Téléchargé"), {
+          tone: "success",
+        });
       } catch {
         // ignore
       }
     } catch {
-      toast?.error?.(t("ui_share_failed", "Impossible de partager"));
+      flashShareNotice(t("ui_share_failed", "Impossible de partager"), {
+        tone: "error",
+        autoClose: false,
+      });
     }
   }, [
     detailMovement,
+    flashShareNotice,
     formatAmountWithSymbolLocal,
     formatConversionUnits,
     formatMovementDateTime,
@@ -1523,6 +1559,18 @@ export default function GlobalStatement({
                         </button>
                       </div>
                     </div>
+                    {shareNotice ? (
+                      <div
+                        className={[
+                          "mt-3 text-xs font-medium",
+                          shareNoticeTone === "error"
+                            ? "text-red-200"
+                            : "text-xcannes-green/90",
+                        ].join(" ")}
+                      >
+                        {shareNotice}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ) : null}

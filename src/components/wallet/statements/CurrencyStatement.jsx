@@ -130,8 +130,11 @@ export default function CurrencyStatement({
   const [detailLabelLoading, setDetailLabelLoading] = useState(false);
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [shareNotice, setShareNotice] = useState("");
+  const [shareNoticeTone, setShareNoticeTone] = useState("success");
   const copiedHashTimerRef = useRef(null);
   const copiedAddressTimerRef = useRef(null);
+  const shareNoticeTimerRef = useRef(null);
   const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
   const highlightRowRef = useRef(null);
@@ -213,6 +216,8 @@ export default function CurrencyStatement({
     setDetailLabelLoading(false);
     setCopiedHash(false);
     setCopiedAddress(false);
+    setShareNotice("");
+    setShareNoticeTone("success");
     if (copiedHashTimerRef.current) {
       window.clearTimeout(copiedHashTimerRef.current);
       copiedHashTimerRef.current = null;
@@ -221,7 +226,30 @@ export default function CurrencyStatement({
       window.clearTimeout(copiedAddressTimerRef.current);
       copiedAddressTimerRef.current = null;
     }
+    if (shareNoticeTimerRef.current) {
+      window.clearTimeout(shareNoticeTimerRef.current);
+      shareNoticeTimerRef.current = null;
+    }
   }, []);
+
+  const flashShareNotice = useCallback(
+    (message, { tone = "success", autoClose = true } = {}) => {
+      const text = String(message || "").trim();
+      if (!text) return;
+      setShareNotice(text);
+      setShareNoticeTone(tone === "error" ? "error" : "success");
+      if (shareNoticeTimerRef.current) {
+        window.clearTimeout(shareNoticeTimerRef.current);
+        shareNoticeTimerRef.current = null;
+      }
+      if (!autoClose) return;
+      shareNoticeTimerRef.current = window.setTimeout(() => {
+        shareNoticeTimerRef.current = null;
+        closeTxDetails();
+      }, 1100);
+    },
+    [closeTxDetails],
+  );
 
   const formatDateTime = useCallback(
     (tx) => {
@@ -1039,9 +1067,11 @@ export default function CurrencyStatement({
           throw new Error("canShare:false");
         }
         await navigator.share(payload);
+        flashShareNotice(t("ui_shared", "Partagé"), { tone: "success" });
         return;
       }
-    } catch {
+    } catch (err) {
+      if (String(err?.name || "") === "AbortError") return;
       // fall back below
     }
     // Fallback: download the image
@@ -1054,9 +1084,14 @@ export default function CurrencyStatement({
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
-      toast?.success?.(t("ui_downloaded", "Téléchargé"));
+      flashShareNotice(t("ui_downloaded", "Téléchargé"), {
+        tone: "success",
+      });
     } catch {
-      // ignore
+      flashShareNotice(t("ui_share_failed", "Partage impossible"), {
+        tone: "error",
+        autoClose: false,
+      });
     }
   }, [
     counterpartyAddress,
@@ -1065,10 +1100,10 @@ export default function CurrencyStatement({
     detailStatusLabel,
     detailTx,
     detailTypeLabel,
+    flashShareNotice,
     formatAmountRlusdAsLocal,
     formatDateTime,
     t,
-    toast,
   ]);
 
   const transactionDetailModal =
@@ -1295,6 +1330,18 @@ export default function CurrencyStatement({
                         </button>
                       </div>
                     </div>
+                    {shareNotice ? (
+                      <div
+                        className={[
+                          "mt-3 text-xs font-medium",
+                          shareNoticeTone === "error"
+                            ? "text-red-200"
+                            : "text-xcannes-green/90",
+                        ].join(" ")}
+                      >
+                        {shareNotice}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               ) : null}
