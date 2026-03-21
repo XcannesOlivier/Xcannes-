@@ -39,6 +39,7 @@ import {
 import { useWalletSendOrchestrator } from "./hooks/useWalletSendOrchestrator";
 import { useWalletSwapOrchestrator } from "./hooks/useWalletSwapOrchestrator";
 import { useWalletIncomingToast } from "./hooks/useWalletIncomingToast";
+import { useWalletRecentActivityBanner } from "./hooks/useWalletRecentActivityBanner";
 import { useDesktopInlineFlags } from "./hooks/useDesktopInlineFlags";
 import { useAugmentedCurrencyLines } from "./hooks/useAugmentedCurrencyLines";
 import { useReconciliation } from "./hooks/useReconciliation";
@@ -244,6 +245,8 @@ export default function WalletDashboard({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
   const desktopDefaultActionSetRef = useRef(false);
+  const [recentActivityMessage, setRecentActivityMessage] = useState("");
+  const recentActivityTimerRef = useRef(null);
 
 
   // ── Desktop panel media query ──────────────────────────────
@@ -440,6 +443,36 @@ export default function WalletDashboard({
   });
 
   useWalletIncomingToast({ backendWalletAddress, flashWalletHeaderToast });
+
+  const flashRecentActivity = useCallback((message) => {
+    const text = String(message || "").trim();
+    if (!text) return;
+    setRecentActivityMessage(text);
+    if (recentActivityTimerRef.current) {
+      window.clearTimeout(recentActivityTimerRef.current);
+      recentActivityTimerRef.current = null;
+    }
+    recentActivityTimerRef.current = window.setTimeout(() => {
+      setRecentActivityMessage("");
+      recentActivityTimerRef.current = null;
+    }, 10000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (recentActivityTimerRef.current) {
+        window.clearTimeout(recentActivityTimerRef.current);
+        recentActivityTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  useWalletRecentActivityBanner({
+    backendWalletAddress,
+    rlusdPerUnitRates,
+    savedAddresses: sendState?.savedAddresses || [],
+    onActivity: ({ message }) => flashRecentActivity(message),
+  });
 
   // ── Reset previous action state on desktop inline switch ──
   const prevActionRef = useRef(null);
@@ -832,16 +865,34 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <button
-                  type="button"
-                  onClick={handleOpenGlobalStatement}
-                  className="text-sm md:text-xs text-white/80 hover:text-white transition-colors"
-                >
-                  {t(
-                    "ui_consult_global_statement_3b89f4a7a2",
-                    "Consulter vos dernières transactions",
-                  )}
-                </button>
+                recentActivityMessage ? (
+                  <button
+                    type="button"
+                    onClick={handleOpenGlobalStatement}
+                    className="w-full text-left rounded-xl px-3 py-2 ring-1 ring-inset ring-xcannes-green/35 bg-[radial-gradient(70%_70%_at_18%_15%,rgba(34,197,94,0.18)_0%,rgba(5,7,8,0.95)_70%)] text-sm md:text-xs text-white/90 hover:text-white transition-colors"
+                    title={t(
+                      "ui_open_statement",
+                      "Ouvrir le relevé des transactions",
+                    )}
+                    aria-label={t(
+                      "ui_open_statement",
+                      "Ouvrir le relevé des transactions",
+                    )}
+                  >
+                    {recentActivityMessage}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleOpenGlobalStatement}
+                    className="text-sm md:text-xs text-white/80 hover:text-white transition-colors"
+                  >
+                    {t(
+                      "ui_consult_global_statement_3b89f4a7a2",
+                      "Consulter vos dernières transactions",
+                    )}
+                  </button>
+                )
               }
               className="touch-pan-y"
               style={{ WebkitOverflowScrolling: "touch" }}
