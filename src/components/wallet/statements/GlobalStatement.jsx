@@ -575,54 +575,58 @@ export default function GlobalStatement({
     if (!detailMovement) return;
     if (typeof document === "undefined") return;
 
-    const kind = normalizeKind(detailMovement?.kind);
-    const isConversion = kind === "CONVERSION";
-    const isPaymentOut = kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT";
-    const isPaymentIn = kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN";
-    const isDebit = getMovementUiType(detailMovement) === "debit";
+    try {
+      const kind = normalizeKind(detailMovement?.kind);
+      const isConversion = kind === "CONVERSION";
+      const isPaymentOut =
+        kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT";
+      const isPaymentIn = kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN";
+      const isDebit = getMovementUiType(detailMovement) === "debit";
 
-    const from = String(detailMovement?.fromCurrencyCode || "")
-      .toUpperCase()
-      .trim();
-    const to = String(detailMovement?.toCurrencyCode || "").toUpperCase().trim();
+      const from = String(detailMovement?.fromCurrencyCode || "")
+        .toUpperCase()
+        .trim();
+      const to = String(detailMovement?.toCurrencyCode || "")
+        .toUpperCase()
+        .trim();
 
-    const { amount, currency } = getMovementDisplayAmount(detailMovement);
-    const amountLabel = formatAmountWithSymbolLocal(amount, currency, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-    const amountSigned = `${isDebit ? "−" : "+"}${amountLabel}`;
+      const { amount, currency } = getMovementDisplayAmount(detailMovement);
+      const amountLabel = formatAmountWithSymbolLocal(amount, currency, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      const amountSigned = `${isDebit ? "−" : "+"}${amountLabel}`;
 
-    const counterparty = String(detailMovement?.counterparty || "").trim();
-    const counterpartyLabel =
-      counterparty && isXrplAddress(counterparty)
-        ? getOnChainLabelForAddress(counterparty) ||
-          truncateMiddle(counterparty, 8, 6)
-        : "";
+      const counterparty = String(detailMovement?.counterparty || "").trim();
+      const counterpartyLabel =
+        counterparty && isXrplAddress(counterparty)
+          ? getOnChainLabelForAddress(counterparty) ||
+            truncateMiddle(counterparty, 8, 6)
+          : "";
 
-    const title = isConversion
-      ? `Convertion ${from || "—"} → ${to || "—"}`
-      : isPaymentOut
-        ? t("ui_sent", "Envoyé")
-        : isPaymentIn
-          ? t("ui_received", "Reçu")
-          : getMovementTitle(detailMovement);
+      const title = isConversion
+        ? `Convertion ${from || "—"} → ${to || "—"}`
+        : isPaymentOut
+          ? t("ui_sent", "Envoyé")
+          : isPaymentIn
+            ? t("ui_received", "Reçu")
+            : getMovementTitle(detailMovement);
 
-    const subtitle = formatMovementDateTime(detailMovement) || "";
-    const statusLabel = (() => {
-      if (detailMovement?.txHash) return t("ui_status_confirmed", "Confirmé");
-      if (isPreviewMode) return t("ui_status_preview", "Aperçu");
-      return t("ui_status_offchain", "Hors chaîne");
-    })();
+      const subtitle = formatMovementDateTime(detailMovement) || "";
+      const statusLabel = (() => {
+        if (detailMovement?.txHash) return t("ui_status_confirmed", "Confirmé");
+        if (isPreviewMode) return t("ui_status_preview", "Aperçu");
+        return t("ui_status_offchain", "Hors chaîne");
+      })();
 
-    const buildCardBlob = async () => {
-      const w = 1080;
-      const h = 720;
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return null;
+      const buildCardBlob = async () => {
+        const w = 1080;
+        const h = 720;
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return null;
 
       const roundedRect = (x, y, width, height, r) => {
         const radius = Math.max(0, Math.min(r, width / 2, height / 2));
@@ -765,53 +769,72 @@ export default function GlobalStatement({
         );
       }
 
-      return await new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob), "image/png", 0.92);
-      });
-    };
-
-    const blob = await buildCardBlob();
-    if (!blob) return;
-
-    const fileBase =
-      String(detailMovement?.txHash || "").trim().slice(0, 10) ||
-      String(Date.now());
-    const file = new File([blob], `xcannes-transaction-${fileBase}.png`, {
-      type: "image/png",
-    });
-
-    try {
-      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
-        const payload = {
-          title: `XCANNES ${globalTitle}`,
-          text: t(
-            "ui_share_transaction_card",
-            "Partager la carte de transaction",
-          ),
-          files: [file],
-        };
-        if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
-          throw new Error("canShare:false");
+        if (typeof canvas.toBlob === "function") {
+          return await new Promise((resolve) => {
+            canvas.toBlob((blob) => resolve(blob), "image/png", 0.92);
+          });
         }
-        await navigator.share(payload);
-        return;
+
+        // Safari fallback: toBlob may be missing
+        const dataUrl = canvas.toDataURL("image/png");
+        const res = await fetch(dataUrl);
+        return await res.blob();
+      };
+
+      const blob = await buildCardBlob();
+      if (!blob) return;
+
+      const fileBase =
+        String(detailMovement?.txHash || "").trim().slice(0, 10) ||
+        String(Date.now());
+      const fileName = `xcannes-transaction-${fileBase}.png`;
+      const file =
+        typeof File !== "undefined"
+          ? new File([blob], fileName, { type: "image/png" })
+          : null;
+
+      try {
+        if (
+          file &&
+          typeof navigator !== "undefined" &&
+          typeof navigator.share === "function"
+        ) {
+          const payload = {
+            title: `XCANNES ${globalTitle}`,
+            text: t(
+              "ui_share_transaction_card",
+              "Partager la carte de transaction",
+            ),
+            files: [file],
+          };
+          if (
+            typeof navigator.canShare === "function" &&
+            !navigator.canShare(payload)
+          ) {
+            throw new Error("canShare:false");
+          }
+          await navigator.share(payload);
+          return;
+        }
+      } catch {
+        // fall back below
+      }
+
+      try {
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = file?.name || fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+        toast?.success?.(t("ui_downloaded", "Téléchargé"));
+      } catch {
+        // ignore
       }
     } catch {
-      // fall back below
-    }
-
-    try {
-      const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = objectUrl;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
-      toast?.success?.(t("ui_downloaded", "Téléchargé"));
-    } catch {
-      // ignore
+      toast?.error?.(t("ui_share_failed", "Impossible de partager"));
     }
   }, [
     detailMovement,
