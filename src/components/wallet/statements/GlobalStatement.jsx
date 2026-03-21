@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
+import { apiUrl } from "@/lib/runtimeConfig";
 import {
   formatAmountWithSymbol,
   USD_STABLECOINS,
@@ -59,6 +60,8 @@ export default function GlobalStatement({
   const [copiedHash, setCopiedHash] = useState(false);
   const [copiedCounterparty, setCopiedCounterparty] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
+  const [counterpartyLabels, setCounterpartyLabels] = useState({});
+  const labelCacheRef = useRef(new Map());
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -194,6 +197,110 @@ export default function GlobalStatement({
       /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(String(value || "").trim()),
     [],
   );
+
+  const getOnChainLabelForAddress = useCallback(
+    (address) => {
+      const key = String(address || "").trim();
+      if (!key || !isXrplAddress(key)) return "";
+      const fromSaved = String(savedAddressLabelByAddress.get(key) || "").trim();
+      if (fromSaved) return fromSaved;
+      const cached = labelCacheRef.current.get(key);
+      if (cached != null) return String(cached || "").trim();
+      const fromState = String(counterpartyLabels?.[key] || "").trim();
+      if (fromState) return fromState;
+      return "";
+    },
+    [counterpartyLabels, isXrplAddress, savedAddressLabelByAddress],
+  );
+
+  useEffect(() => {
+    if (!detailOpen || !detailMovement) return;
+    const counterparty = String(detailMovement?.counterparty || "").trim();
+    if (!counterparty || !isXrplAddress(counterparty)) return;
+    if (savedAddressLabelByAddress.get(counterparty)) return;
+    if (labelCacheRef.current.has(counterparty)) return;
+    if (counterpartyLabels?.[counterparty] != null) return;
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          apiUrl(`/wallet/label?address=${encodeURIComponent(counterparty)}`),
+        );
+        const data = await res.json().catch(() => ({}));
+        const label = String(data?.label || "").trim();
+        labelCacheRef.current.set(counterparty, label);
+        if (cancelled) return;
+        setCounterpartyLabels((prev) =>
+          prev?.[counterparty] === label
+            ? prev
+            : { ...(prev || {}), [counterparty]: label },
+        );
+      } catch {
+        // ignore
+      }
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [
+    counterpartyLabels,
+    detailMovement,
+    detailOpen,
+    isXrplAddress,
+    savedAddressLabelByAddress,
+  ]);
+
+  useEffect(() => {
+    const list = Array.isArray(recentMovements) ? recentMovements : [];
+    if (!list.length) return;
+    let cancelled = false;
+
+    const toFetch = [];
+    for (const m of list) {
+      const addr = String(m?.counterparty || "").trim();
+      if (!addr || !isXrplAddress(addr)) continue;
+      if (savedAddressLabelByAddress.get(addr)) continue;
+      if (labelCacheRef.current.has(addr)) continue;
+      if (counterpartyLabels?.[addr] != null) continue;
+      toFetch.push(addr);
+      if (toFetch.length >= 20) break;
+    }
+
+    if (!toFetch.length) return;
+    (async () => {
+      for (const addr of Array.from(new Set(toFetch))) {
+        if (cancelled) return;
+        try {
+          const res = await fetch(
+            apiUrl(`/wallet/label?address=${encodeURIComponent(addr)}`),
+          );
+          const data = await res.json().catch(() => ({}));
+          const label = String(data?.label || "").trim();
+          labelCacheRef.current.set(addr, label);
+          if (cancelled) return;
+          setCounterpartyLabels((prev) =>
+            prev?.[addr] === label
+              ? prev
+              : { ...(prev || {}), [addr]: label },
+          );
+        } catch {
+          // ignore
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    counterpartyLabels,
+    isXrplAddress,
+    recentMovements,
+    savedAddressLabelByAddress,
+  ]);
 
   const truncateMiddle = useCallback((value, left = 10, right = 8) => {
     const s = String(value || "");
@@ -779,9 +886,7 @@ export default function GlobalStatement({
     if (!detailMovement) return "—";
     const counterparty = String(detailMovement?.counterparty || "").trim();
     if (counterparty && isXrplAddress(counterparty)) {
-      const label = String(
-        savedAddressLabelByAddress.get(counterparty) || "",
-      ).trim();
+      const label = getOnChainLabelForAddress(counterparty);
       if (label) return label;
       return truncateMiddle(counterparty, 8, 6);
     }
@@ -794,8 +899,8 @@ export default function GlobalStatement({
     return label;
   }, [
     detailMovement,
+    getOnChainLabelForAddress,
     isXrplAddress,
-    savedAddressLabelByAddress,
     truncateMiddle,
   ]);
 
@@ -803,9 +908,7 @@ export default function GlobalStatement({
     if (!detailMovement) return "—";
     const counterparty = String(detailMovement?.counterparty || "").trim();
     if (counterparty && isXrplAddress(counterparty)) {
-      const label = String(
-        savedAddressLabelByAddress.get(counterparty) || "",
-      ).trim();
+      const label = getOnChainLabelForAddress(counterparty);
       if (label) return label;
       return truncateMiddle(counterparty, 8, 6);
     }
@@ -817,8 +920,8 @@ export default function GlobalStatement({
     return label;
   }, [
     detailMovement,
+    getOnChainLabelForAddress,
     isXrplAddress,
-    savedAddressLabelByAddress,
     truncateMiddle,
   ]);
 
