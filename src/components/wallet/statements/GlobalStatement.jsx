@@ -573,41 +573,258 @@ export default function GlobalStatement({
 
   const handleShareMovement = useCallback(async () => {
     if (!detailMovement) return;
-    const title = getMovementTitle(detailMovement);
+    if (typeof document === "undefined") return;
+
+    const kind = normalizeKind(detailMovement?.kind);
+    const isConversion = kind === "CONVERSION";
+    const isPaymentOut = kind === "PAYMENT_OUT" || kind === "XRPL_PAYMENT_OUT";
+    const isPaymentIn = kind === "PAYMENT_IN" || kind === "XRPL_PAYMENT_IN";
+    const isDebit = getMovementUiType(detailMovement) === "debit";
+
+    const from = String(detailMovement?.fromCurrencyCode || "")
+      .toUpperCase()
+      .trim();
+    const to = String(detailMovement?.toCurrencyCode || "").toUpperCase().trim();
+
     const { amount, currency } = getMovementDisplayAmount(detailMovement);
     const amountLabel = formatAmountWithSymbolLocal(amount, currency, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    const hash = String(detailMovement?.txHash || "").trim();
-    const text = hash
-      ? `${title} • ${amountLabel}\n${hash}`
-      : `${title} • ${amountLabel}`;
+    const amountSigned = `${isDebit ? "−" : "+"}${amountLabel}`;
+
+    const counterparty = String(detailMovement?.counterparty || "").trim();
+    const counterpartyLabel =
+      counterparty && isXrplAddress(counterparty)
+        ? getOnChainLabelForAddress(counterparty) ||
+          truncateMiddle(counterparty, 8, 6)
+        : "";
+
+    const title = isConversion
+      ? `Convertion ${from || "—"} → ${to || "—"}`
+      : isPaymentOut
+        ? t("ui_sent", "Envoyé")
+        : isPaymentIn
+          ? t("ui_received", "Reçu")
+          : getMovementTitle(detailMovement);
+
+    const subtitle = formatMovementDateTime(detailMovement) || "";
+
+    const buildCardBlob = async () => {
+      const w = 1080;
+      const h = 720;
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+
+      const roundedRect = (x, y, width, height, r) => {
+        const radius = Math.max(0, Math.min(r, width / 2, height / 2));
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
+      };
+
+      const ellipsize = (text, maxWidth) => {
+        const raw = String(text || "");
+        if (!raw) return "";
+        if (ctx.measureText(raw).width <= maxWidth) return raw;
+        const ell = "…";
+        let out = raw;
+        while (out.length > 0 && ctx.measureText(out + ell).width > maxWidth) {
+          out = out.slice(0, -1);
+        }
+        return out ? out + ell : ell;
+      };
+
+      // Background
+      ctx.fillStyle = "#0b0f10";
+      ctx.fillRect(0, 0, w, h);
+      const glow = ctx.createRadialGradient(
+        w * 0.5,
+        h * 0.22,
+        0,
+        w * 0.5,
+        h * 0.22,
+        h * 0.95,
+      );
+      glow.addColorStop(0, "rgba(34,197,94,0.22)");
+      glow.addColorStop(0.6, "rgba(34,197,94,0.08)");
+      glow.addColorStop(1, "rgba(34,197,94,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+
+      // Card
+      const pad = 56;
+      const cardX = pad;
+      const cardY = pad;
+      const cardW = w - pad * 2;
+      const cardH = h - pad * 2;
+      roundedRect(cardX, cardY, cardW, cardH, 42);
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.10)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Header
+      ctx.fillStyle = "rgba(255,255,255,0.70)";
+      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText("XCANNES", cardX + 44, cardY + 62);
+
+      ctx.fillStyle = "rgba(255,255,255,0.90)";
+      ctx.font = "800 44px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(ellipsize(title, cardW - 88), cardX + 44, cardY + 120);
+
+      // Main line (amount or conversion line)
+      const mainY = cardY + 220;
+      if (isConversion) {
+        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        ctx.font = "800 54px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(
+          ellipsize(`${from || "—"} → ${to || "—"}`, cardW - 88),
+          cardX + 44,
+          mainY,
+        );
+      } else {
+        ctx.font = "800 86px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillStyle = isDebit ? "#f87171" : "#22c55e";
+        ctx.fillText(ellipsize(amountSigned, cardW - 88), cardX + 44, mainY);
+      }
+
+      // Meta blocks
+      let y = cardY + 292;
+      const metaGap = 56;
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(t("ui_date_label_7a2c1b9d5e", "Date"), cardX + 44, y);
+      ctx.fillText(t("ui_status_label", "Statut"), cardX + 44, y + metaGap);
+
+      ctx.fillStyle = "rgba(255,255,255,0.86)";
+      ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+      ctx.fillText(ellipsize(subtitle, cardW - 88), cardX + 44, y + 32);
+      ctx.fillText(
+        ellipsize(detailStatusLabel || "", cardW - 88),
+        cardX + 44,
+        y + metaGap + 32,
+      );
+
+      // Counterparty / conversion details
+      y = cardY + 430;
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.font = "700 22px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+
+      if (isPaymentOut || isPaymentIn) {
+        const cpTitle = isPaymentOut
+          ? t("ui_recipient_label", "Destinataire")
+          : t("ui_sender_label", "Expéditeur");
+        ctx.fillText(cpTitle, cardX + 44, y);
+        ctx.fillStyle = "rgba(255,255,255,0.86)";
+        ctx.font = "600 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(
+          ellipsize(counterpartyLabel || "—", cardW - 88),
+          cardX + 44,
+          y + 38,
+        );
+      } else if (isConversion) {
+        const grossRlusd = Number(detailMovement?.amountRlusdGross);
+        const netRlusd = Number(detailMovement?.amountRlusd);
+        const baseRlusd = Number.isFinite(grossRlusd) ? grossRlusd : netRlusd;
+        const baseUnits = rlusdToLocal(baseRlusd, from);
+        const quoteUnits = rlusdToLocal(netRlusd, to);
+        const fromLine = `${formatConversionUnits(baseUnits, from)}`;
+        const toLine = `${formatConversionUnits(quoteUnits, to)}`;
+
+        ctx.fillText("From", cardX + 44, y);
+        ctx.fillText("To", cardX + 44, y + 78);
+        ctx.fillStyle = "rgba(255,255,255,0.86)";
+        ctx.font = "600 28px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
+        ctx.fillText(ellipsize(fromLine, cardW - 88), cardX + 44, y + 38);
+        ctx.fillText(ellipsize(toLine, cardW - 88), cardX + 44, y + 116);
+      }
+
+      // Tx hash (if any)
+      const hash = String(detailMovement?.txHash || "").trim();
+      if (hash) {
+        ctx.fillStyle = "rgba(255,255,255,0.50)";
+        ctx.font = "600 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+        ctx.fillText(
+          ellipsize(hash, cardW - 88),
+          cardX + 44,
+          cardY + cardH - 44,
+        );
+      }
+
+      return await new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/png", 0.92);
+      });
+    };
+
+    const blob = await buildCardBlob();
+    if (!blob) return;
+
+    const fileBase =
+      String(detailMovement?.txHash || "").trim().slice(0, 10) ||
+      String(Date.now());
+    const file = new File([blob], `xcannes-transaction-${fileBase}.png`, {
+      type: "image/png",
+    });
 
     try {
-      if (navigator?.share) {
-        await navigator.share({ title: `XCANNES ${globalTitle}`, text });
+      if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+        const payload = {
+          title: `XCANNES ${globalTitle}`,
+          text: t(
+            "ui_share_transaction_card",
+            "Partager la carte de transaction",
+          ),
+          files: [file],
+        };
+        if (typeof navigator.canShare === "function" && !navigator.canShare(payload)) {
+          throw new Error("canShare:false");
+        }
+        await navigator.share(payload);
         return;
       }
     } catch {
-      // fall back
+      // fall back below
     }
 
-    if (hash) {
-      await copyToClipboard(hash, t("ui_copied_hash", "Hash copié"));
-      setCopiedHash(true);
-      window.setTimeout(() => setCopiedHash(false), 1200);
-    } else {
-      await copyToClipboard(text, t("ui_copied", "Copié"));
+    try {
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+      toast?.success?.(t("ui_downloaded", "Téléchargé"));
+    } catch {
+      // ignore
     }
   }, [
-    copyToClipboard,
     detailMovement,
+    detailStatusLabel,
     formatAmountWithSymbolLocal,
+    formatConversionUnits,
+    formatMovementDateTime,
     getMovementDisplayAmount,
     getMovementTitle,
+    getMovementUiType,
+    getOnChainLabelForAddress,
     globalTitle,
+    isXrplAddress,
+    normalizeKind,
+    rlusdToLocal,
     t,
+    toast,
+    truncateMiddle,
   ]);
 
   /* ── ledger status ─────────────────────────────────────── */
