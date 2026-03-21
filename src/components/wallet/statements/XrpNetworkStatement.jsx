@@ -2,9 +2,15 @@
 
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
+import { useEffect, useMemo, useState } from "react";
 
-export default function XrpNetworkStatement({ hasRlusdTrustline = false }) {
-  const { t } = useTranslation("common");
+export default function XrpNetworkStatement({
+  hasRlusdTrustline = false,
+  rlusdBalance = null,
+}) {
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
+  const [showRlusdModal, setShowRlusdModal] = useState(false);
 
   // Design-only placeholders (logic will be wired later).
   const activationReserveXrp = 1.0;
@@ -12,8 +18,34 @@ export default function XrpNetworkStatement({ hasRlusdTrustline = false }) {
   const totalFeesPaidXrp = 0.01;
   const reserveFillPct = 72;
 
+  const formattedRlusdBalance = useMemo(() => {
+    const value = Number(rlusdBalance);
+    const safe = Number.isFinite(value) ? value : 0;
+    try {
+      return new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(safe);
+    } catch {
+      return safe.toFixed(2);
+    }
+  }, [locale, rlusdBalance]);
+
+  useEffect(() => {
+    if (!showRlusdModal) return;
+    const handler = (e) => {
+      if (e.key === "Escape") setShowRlusdModal(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showRlusdModal]);
+
   return (
     <div className="flex flex-col gap-4 min-h-0">
+      {showRlusdModal ? (
+        <RlusdInfoModal onClose={() => setShowRlusdModal(false)} />
+      ) : null}
+
       <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between gap-3">
@@ -64,47 +96,78 @@ export default function XrpNetworkStatement({ hasRlusdTrustline = false }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {}}
-          className="w-full px-4 py-4 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors"
-          aria-label={t("ui_rlusd_details", "RLUSD Details")}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
-              <Image
-                src="/symbols/rlusd.png"
-                alt="RLUSD"
-                width={28}
-                height={28}
-                className="rounded-md"
-              />
-            </span>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <div className="text-sm font-semibold text-white">RLUSD</div>
-                <span className="text-[11px] text-white/40">
-                  {t("ui_ripple_usd", "Ripple USD")}
+        {hasRlusdTrustline ? (
+          <button
+            type="button"
+            onClick={() => setShowRlusdModal(true)}
+            className="w-full px-4 py-4 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors"
+            aria-label={t("ui_rlusd_details", "RLUSD Details")}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
+                <Image
+                  src="/symbols/rlusd.png"
+                  alt="RLUSD"
+                  width={28}
+                  height={28}
+                  className="rounded-md"
+                />
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-semibold text-white">RLUSD</div>
+                  <span className="text-[11px] text-white/40">
+                    {t("ui_ripple_usd", "Ripple USD")}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-xcannes-green/10 text-xcannes-green border border-xcannes-green/20">
+                    {t("ui_active_short", "Active")}
+                  </span>
+                </div>
+                <div className="text-[12px] text-white/55 mt-0.5">
+                  {t("ui_trustline_active", "Trustline active")}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-sm font-semibold text-white">
+                {formattedRlusdBalance}{" "}
+                <span className="text-white/70">{t("ui_rlusd", "RLUSD")}</span>
+              </div>
+              <div className="text-sm text-white/40">
+                {t("ui_details_e9615e470d", "Details")} ›
+              </div>
+            </div>
+          </button>
+        ) : (
+          <div className="px-4 py-4">
+            <div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white/85">
+                    {t("ui_no_active_trustlines", "No active trustlines")}
+                  </div>
+                  <div className="mt-1 text-[12px] text-white/55">
+                    {t(
+                      "ui_trustline_rlusd_needed_hint",
+                      "Activez la trustline RLUSD pour utiliser le wallet et payer les frais de transactions RLUSD.",
+                    )}
+                  </div>
+                </div>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/5 text-white/70 border border-white/10 shrink-0">
+                  {t("ui_inactive_short", "Inactive")}
                 </span>
               </div>
-              <div className="text-[12px] text-white/55 mt-0.5">
-                {hasRlusdTrustline
-                  ? t("ui_trustline_active", "Trustline active")
-                  : t("ui_trustline_inactive", "Trustline inactive")}
-              </div>
+              <button
+                type="button"
+                onClick={() => {}}
+                className="mt-3 w-full px-3 py-2 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/15 text-white/80 transition-colors"
+              >
+                {t("ui_activate_rlusd_trustline", "Activer RLUSD (gratuit)")}
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="text-sm font-semibold text-white">
-              0.00{" "}
-              <span className="text-white/70">{t("ui_rlusd", "RLUSD")}</span>
-            </div>
-            <div className="text-sm text-white/40">
-              {t("ui_details_e9615e470d", "Details")} ›
-            </div>
-          </div>
-        </button>
+        )}
       </div>
 
       <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] overflow-hidden">
@@ -143,3 +206,243 @@ export default function XrpNetworkStatement({ hasRlusdTrustline = false }) {
   );
 }
 
+function RlusdInfoModal({ onClose }) {
+  const { t } = useTranslation("common");
+
+  return (
+    <div
+      className="fixed inset-0 z-[10260] flex flex-col bg-black/70 backdrop-blur-[2px]"
+      role="dialog"
+      aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose?.();
+      }}
+    >
+      <div className="relative w-full h-full bg-elevated overflow-y-auto shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
+        <div className="sticky top-0 z-10 bg-elevated/95 backdrop-blur border-b border-white/10 px-4 py-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
+                <Image
+                  src="/symbols/rlusd.png"
+                  alt="RLUSD"
+                  width={28}
+                  height={28}
+                  className="rounded-md"
+                />
+              </span>
+              <div className="min-w-0">
+                <div className="text-lg font-bold text-white leading-tight">
+                  {t("ui_discover_rlusd", "Découvrez RLUSD")}
+                </div>
+                <div className="text-sm text-white/60">
+                  {t("ui_rlusd_ripple_usd", "(Ripple USD)")}
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-10 w-10 flex items-center justify-center rounded-lg text-white/55 hover:text-white hover:bg-white/5 transition-colors"
+              aria-label={t("close", "Fermer")}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div className="px-4 pb-10 pt-5 max-w-[520px] mx-auto">
+          <div className="text-sm text-white/70 leading-relaxed">
+            {t(
+              "ui_rlusd_intro",
+              "Le RLUSD (Ripple USD) est un stablecoin rattaché en 1:1 au dollar américain (1 RLUSD = 1 USD), émis par Ripple sur le XRP Ledger.",
+            )}
+          </div>
+
+          <div className="mt-5 h-px bg-white/10" />
+
+          <div className="mt-5">
+            <div className="text-sm font-bold text-white/85">
+              {t("ui_why_rlusd_secure", "Pourquoi RLUSD est sécurisé ?")}
+            </div>
+
+            <div className="mt-3 space-y-3">
+              <div className="rounded-xl border border-white/10 bg-black/30 p-4">
+                <div className="flex items-start gap-3">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 12l2 2 4-4"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-white/85">
+                      {t("ui_stablecoin_1_1", "Stablecoin garanti 1:1")}
+                    </div>
+                    <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+                      {t(
+                        "ui_stablecoin_1_1_desc",
+                        "Chaque RLUSD est garanti par 1 dollar américain détenu dans des réserves réglementées par Ripple.",
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-black/30 p-4">
+                <div className="flex items-start gap-3">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9 12l2 2 4-4"
+                      />
+                    </svg>
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-white/85">
+                      {t("ui_issued_by_licensed_company", "Émis par une société agréée")}
+                    </div>
+                    <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+                      {t(
+                        "ui_issued_by_licensed_company_desc",
+                        "Ripple, la société émettrice du RLUSD, est enregistrée comme entreprise de services monétaires auprès de la FinCEN aux États-Unis et autorisée comme entité par Singapour et l’Irlande.",
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div className="text-sm font-bold text-white/85">
+              {t("ui_what_is_rlusd_exactly", "RLUSD, c’est quoi exactement ?")}
+            </div>
+            <div className="mt-2 text-[12px] text-white/65 leading-relaxed">
+              {t(
+                "ui_what_is_rlusd_exactly_desc",
+                "RLUSD est un stablecoin indexé sur le dollar américain émis par Ripple sur le XRP Ledger, ce qui signifie que 1 RLUSD est toujours équivalent à 1 dollar américain.",
+              )}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-white/10 bg-[radial-gradient(70%_70%_at_50%_30%,rgba(34,197,94,0.14)_0%,rgba(0,0,0,0.20)_55%,rgba(0,0,0,0.55)_100%)] overflow-hidden">
+              <div className="px-4 py-8 flex items-center justify-center">
+                <div className="relative">
+                  <div className="absolute inset-0 blur-2xl bg-xcannes-green/20" />
+                  <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/80">
+                    <span className="text-2xl font-black">$</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-4 pb-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-3">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-lg bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </span>
+                      <div className="min-w-0">
+                        <div className="text-[12px] font-semibold text-white/85">
+                          {t("ui_guaranteed_stability", "Stabilité garantie")}
+                        </div>
+                        <div className="text-[11px] text-white/55 mt-0.5">
+                          {t("ui_1_rlusd_equals_1_usd", "1 RLUSD = 1 USD")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-3">
+                    <div className="flex items-start gap-2">
+                      <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-lg bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </span>
+                      <div className="min-w-0">
+                        <div className="text-[12px] font-semibold text-white/85">
+                          {t("ui_issued_by_ripple", "Émis par Ripple")}
+                        </div>
+                        <div className="text-[11px] text-white/55 mt-0.5">
+                          {t(
+                            "ui_regulatory_compliance",
+                            "Ripple assure la conformité réglementaire",
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => {}}
+              className="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-white/10 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label={t("ui_share", "Partager")}
+              title={t("ui_share", "Partager")}
+            >
+              ↗
+            </button>
+            <div className="text-[11px] text-white/40">
+              {t("ui_disclaimer_info", "Informations indicatives (design).")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
