@@ -609,6 +609,11 @@ export default function GlobalStatement({
           : getMovementTitle(detailMovement);
 
     const subtitle = formatMovementDateTime(detailMovement) || "";
+    const statusLabel = (() => {
+      if (detailMovement?.txHash) return t("ui_status_confirmed", "Confirmé");
+      if (isPreviewMode) return t("ui_status_preview", "Aperçu");
+      return t("ui_status_offchain", "Hors chaîne");
+    })();
 
     const buildCardBlob = async () => {
       const w = 1080;
@@ -709,7 +714,7 @@ export default function GlobalStatement({
       ctx.font = "600 26px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
       ctx.fillText(ellipsize(subtitle, cardW - 88), cardX + 44, y + 32);
       ctx.fillText(
-        ellipsize(detailStatusLabel || "", cardW - 88),
+        ellipsize(statusLabel || "", cardW - 88),
         cardX + 44,
         y + metaGap + 32,
       );
@@ -810,7 +815,6 @@ export default function GlobalStatement({
     }
   }, [
     detailMovement,
-    detailStatusLabel,
     formatAmountWithSymbolLocal,
     formatConversionUnits,
     formatMovementDateTime,
@@ -820,6 +824,7 @@ export default function GlobalStatement({
     getOnChainLabelForAddress,
     globalTitle,
     isXrplAddress,
+    isPreviewMode,
     normalizeKind,
     rlusdToLocal,
     t,
