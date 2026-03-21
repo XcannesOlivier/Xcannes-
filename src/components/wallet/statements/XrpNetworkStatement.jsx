@@ -114,17 +114,17 @@ export default function XrpNetworkStatement({
                 />
               </span>
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <div className="text-sm font-semibold text-white">RLUSD</div>
                   <span className="text-[11px] text-white/40">
                     {t("ui_ripple_usd", "Ripple USD")}
                   </span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-xcannes-green/10 text-xcannes-green border border-xcannes-green/20">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-xcannes-green/10 text-xcannes-green border border-xcannes-green/20 whitespace-nowrap">
                     {t("ui_active_short", "Active")}
                   </span>
                 </div>
                 <div className="text-[12px] text-white/55 mt-0.5">
-                  {t("ui_trustline_active", "Trustline active")}
+                  {t("ui_1_rlusd_equals_1_usd", "1 RLUSD = 1 USD")}
                 </div>
               </div>
             </div>
