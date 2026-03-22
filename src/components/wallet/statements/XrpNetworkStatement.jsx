@@ -353,15 +353,6 @@ function RlusdInfoModal({ onClose }) {
             </div>
 
             <div className="mt-4 rounded-2xl border border-white/10 bg-[radial-gradient(70%_70%_at_50%_30%,rgba(34,197,94,0.14)_0%,rgba(0,0,0,0.20)_55%,rgba(0,0,0,0.55)_100%)] overflow-hidden">
-              <div className="px-4 py-8 flex items-center justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 blur-2xl bg-xcannes-green/20" />
-                  <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-white/80">
-                    <span className="text-2xl font-black">$</span>
-                  </div>
-                </div>
-              </div>
-
               <div className="px-4 pb-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-xl border border-white/10 bg-black/30 px-3 py-3">
@@ -428,18 +419,7 @@ function RlusdInfoModal({ onClose }) {
           </div>
 
           <div className="mt-6 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => {}}
-              className="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-white/10 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-              aria-label={t("ui_share", "Partager")}
-              title={t("ui_share", "Partager")}
-            >
-              ↗
-            </button>
-            <div className="text-[11px] text-white/40">
-              {t("ui_disclaimer_info", "Informations indicatives (design).")}
-            </div>
+            <div />
           </div>
         </div>
       </div>
