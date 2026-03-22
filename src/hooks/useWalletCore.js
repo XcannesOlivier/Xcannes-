@@ -49,6 +49,9 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
           : [];
         setBalance({
           xrp: data.xrp,
+          xrpReserveBase: data.xrpReserveBase ?? null,
+          xrpReserveInc: data.xrpReserveInc ?? null,
+          xrpOwnerCount: data.xrpOwnerCount ?? null,
           xrpReserved: data.xrpReserved ?? 0,
           xrpAvailable: data.xrpAvailable ?? 0,
           xrpLowAlert: Boolean(data.xrpLowAlert),
@@ -63,7 +66,16 @@ export function useWalletCore({ logPrefix = "Wallet" } = {}) {
           .includes("not activated")
       ) {
         setIsWalletActivated(false);
-        setBalance({ xrp: 0, xrpReserved: 0, xrpAvailable: 0, xrpLowAlert: false, tokens: [] });
+        setBalance({
+          xrp: 0,
+          xrpReserveBase: null,
+          xrpReserveInc: null,
+          xrpOwnerCount: null,
+          xrpReserved: 0,
+          xrpAvailable: 0,
+          xrpLowAlert: false,
+          tokens: [],
+        });
       }
     } catch (error) {
       console.error(`[${logPrefix}] Fetch balance error:`, error);

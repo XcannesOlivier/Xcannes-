@@ -3,20 +3,46 @@
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { useEffect, useMemo, useState } from "react";
+import { useWallet } from "@/context/WalletContext";
 
 export default function XrpNetworkStatement({
   hasRlusdTrustline = false,
   rlusdBalance = null,
+  transactions = [],
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const [showRlusdModal, setShowRlusdModal] = useState(false);
+  const { balance: walletBalance } = useWallet();
 
-  // Design-only placeholders (logic will be wired later).
-  const activationReserveXrp = 1.0;
-  const availableForFeesXrp = 0.32;
-  const totalFeesPaidXrp = 0.01;
-  const reserveFillPct = 72;
+  const activationReserveXrp = useMemo(() => {
+    const base = Number(walletBalance?.xrpReserveBase);
+    if (Number.isFinite(base) && base > 0) return base;
+    return 1.0;
+  }, [walletBalance?.xrpReserveBase]);
+
+  const availableForFeesXrp = useMemo(() => {
+    const v = Number(walletBalance?.xrpAvailable);
+    return Number.isFinite(v) ? Math.max(0, v) : 0;
+  }, [walletBalance?.xrpAvailable]);
+
+  const totalFeesPaidXrp = useMemo(() => {
+    const list = Array.isArray(transactions) ? transactions : [];
+    const totalRow = list.find(
+      (tx) => String(tx?.kind || "").toUpperCase() === "XRPL_FEES_TOTAL",
+    );
+    const amount = Number(totalRow?.amount);
+    if (Number.isFinite(amount) && amount >= 0) return amount;
+    return 0;
+  }, [transactions]);
+
+  const reserveFillPct = useMemo(() => {
+    const total = Number(walletBalance?.xrp);
+    if (!Number.isFinite(total) || total <= 0) return 0;
+    const pct = (activationReserveXrp / total) * 100;
+    if (!Number.isFinite(pct)) return 0;
+    return Math.max(0, Math.min(100, pct));
+  }, [activationReserveXrp, walletBalance?.xrp]);
 
   const formattedRlusdBalance = useMemo(() => {
     const value = Number(rlusdBalance);

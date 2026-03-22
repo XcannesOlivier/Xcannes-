@@ -1558,6 +1558,7 @@ export default function CurrencyStatement({
             <XrpNetworkStatement
               hasRlusdTrustline={hasRlusdTrustline}
               rlusdBalance={_rlusdBalance}
+              transactions={transactions}
             />
           ) : (
             <>
