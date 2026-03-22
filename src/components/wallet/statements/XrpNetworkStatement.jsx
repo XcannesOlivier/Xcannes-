@@ -43,14 +43,16 @@ export default function XrpNetworkStatement({
     walletBalance?.xrpReserved,
   ]);
 
+  const lockedReserveXrp = useMemo(() => {
+    return Math.max(0, reservedTotalXrp - activationReserveXrp);
+  }, [activationReserveXrp, reservedTotalXrp]);
+
   const availableForFeesXrp = useMemo(() => {
-    // XRPL: spendable XRP is balance minus total reserve (base + owner reserve).
-    // Prefer server-provided `xrpAvailable` when present; otherwise recompute.
-    const server = Number(walletBalance?.xrpAvailable);
-    if (Number.isFinite(server) && server >= 0) return server;
-    const available = currentXrpBalance - reservedTotalXrp;
+    // Product rule: the activation reserve is treated as a fee buffer.
+    // Only the "extra" reserve (due to owned objects like trustlines) is locked.
+    const available = currentXrpBalance - lockedReserveXrp;
     return Number.isFinite(available) ? Math.max(0, available) : 0;
-  }, [currentXrpBalance, reservedTotalXrp, walletBalance?.xrpAvailable]);
+  }, [currentXrpBalance, lockedReserveXrp]);
 
   const totalFeesPaidXrp = useMemo(() => {
     const list = Array.isArray(transactions) ? transactions : [];
@@ -152,7 +154,7 @@ export default function XrpNetworkStatement({
                 <div className="text-[11px] text-white/45 mt-0.5 truncate">
                   {t("ui_xrp_available_breakdown", "Solde {{bal}} • Réserve {{res}}", {
                     bal: `${formatXrpAmount(currentXrpBalance, { smallMaxDecimals: 6, largeMaxDecimals: 6 })} ${t("ui_xrp_034964b994", "XRP")}`,
-                    res: `${formatXrpAmount(reservedTotalXrp, { smallMaxDecimals: 6, largeMaxDecimals: 6 })} ${t("ui_xrp_034964b994", "XRP")}`,
+                    res: `${formatXrpAmount(lockedReserveXrp, { smallMaxDecimals: 6, largeMaxDecimals: 6 })} ${t("ui_xrp_034964b994", "XRP")}`,
                   })}
                 </div>
               </div>
