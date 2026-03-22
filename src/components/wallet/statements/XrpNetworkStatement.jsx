@@ -187,6 +187,99 @@ export default function XrpNetworkStatement({
         </div>
       </div>
 
+      <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] overflow-hidden">
+        <div className="px-4 py-4">
+          <div className="text-sm font-bold text-white/85">
+            {t(
+              "ui_xrp_network_explainer_title",
+              "Comprendre la réserve, les fees et les trustlines",
+            )}
+          </div>
+          <div className="mt-2 text-[12px] text-white/65 leading-relaxed">
+            {t(
+              "ui_xrp_network_explainer_intro",
+              "Dans XCANNES, le XRP n’est pas échangé : il sert à activer le Compte, à maintenir les trustlines (ex: RLUSD) et à payer les frais réseau du XRPL.",
+            )}
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
+                ⓘ
+              </span>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-white/85">
+                  {t("ui_xrp_explainer_reserve_title", "Réserve")}
+                </div>
+                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+                  {t(
+                    "ui_xrp_explainer_reserve_desc",
+                    "La réserve est un minimum requis par le XRPL. Elle dépend de votre Compte (activation) et des objets détenus (ex: trustlines). Une partie peut servir de buffer pour les frais.",
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.8}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12l2 2 4-4"
+                  />
+                </svg>
+              </span>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-white/85">
+                  {t("ui_xrp_explainer_fees_title", "Fees réseau")}
+                </div>
+                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+                  {t(
+                    "ui_xrp_explainer_fees_desc",
+                    "Chaque transaction sur le XRPL paie des frais en XRP (souvent ~0.00001 XRP). Ils sont débités de votre solde XRP.",
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
+                <Image
+                  src="/symbols/rlusd.png"
+                  alt="RLUSD"
+                  width={20}
+                  height={20}
+                  className="rounded-md"
+                />
+              </span>
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-white/85">
+                  {t("ui_xrp_explainer_trustlines_title", "Trustlines (RLUSD)")}
+                </div>
+                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+                  {t(
+                    "ui_xrp_explainer_trustlines_desc",
+                    "Une trustline est une autorisation sur le XRPL. XCANNES utilise RLUSD comme base : vous activez la trustline pour envoyer/recevoir et convertir.",
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden">
         <div className="px-4 py-3 border-b border-white/10">
           <div className="text-sm font-semibold text-white/85">
