@@ -21,10 +21,17 @@ export default function XrpNetworkStatement({
     return 1.0;
   }, [walletBalance?.xrpReserveBase]);
 
-  const availableForFeesXrp = useMemo(() => {
-    const v = Number(walletBalance?.xrpAvailable);
+  const currentXrpBalance = useMemo(() => {
+    const v = Number(walletBalance?.xrp);
     return Number.isFinite(v) ? Math.max(0, v) : 0;
-  }, [walletBalance?.xrpAvailable]);
+  }, [walletBalance?.xrp]);
+
+  const availableForFeesXrp = useMemo(() => {
+    // Product rule: activation reserve (base) is kept, the rest is usable for fees.
+    // This makes the value decrease naturally as fees are paid (balance drops).
+    const available = currentXrpBalance - activationReserveXrp;
+    return Number.isFinite(available) ? Math.max(0, available) : 0;
+  }, [activationReserveXrp, currentXrpBalance]);
 
   const totalFeesPaidXrp = useMemo(() => {
     const list = Array.isArray(transactions) ? transactions : [];
@@ -35,6 +42,32 @@ export default function XrpNetworkStatement({
     if (Number.isFinite(amount) && amount >= 0) return amount;
     return 0;
   }, [transactions]);
+
+  const totalFeesPaidCount = useMemo(() => {
+    const list = Array.isArray(transactions) ? transactions : [];
+    const totalRow = list.find(
+      (tx) => String(tx?.kind || "").toUpperCase() === "XRPL_FEES_TOTAL",
+    );
+    const count = Number(totalRow?.feesCount);
+    return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+  }, [transactions]);
+
+  const formatXrpAmount = useMemo(() => {
+    return (value, { smallMaxDecimals = 6, largeMaxDecimals = 2 } = {}) => {
+      const v = Number(value);
+      const safe = Number.isFinite(v) ? v : 0;
+      const abs = Math.abs(safe);
+      const maxFractionDigits = abs > 0 && abs < 0.01 ? smallMaxDecimals : largeMaxDecimals;
+      try {
+        return new Intl.NumberFormat(locale, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: maxFractionDigits,
+        }).format(safe);
+      } catch {
+        return safe.toFixed(Math.max(2, maxFractionDigits));
+      }
+    };
+  }, [locale]);
 
   const reserveFillPct = useMemo(() => {
     const total = Number(walletBalance?.xrp);
@@ -79,7 +112,7 @@ export default function XrpNetworkStatement({
               {t("ui_activation_reserve", "Activation Reserve")}
             </div>
             <div className="text-sm font-semibold text-white">
-              {activationReserveXrp.toFixed(2)}{" "}
+              {formatXrpAmount(activationReserveXrp, { smallMaxDecimals: 2, largeMaxDecimals: 2 })}{" "}
               {t("ui_xrp_034964b994", "XRP")}
             </div>
           </div>
@@ -97,7 +130,7 @@ export default function XrpNetworkStatement({
                 {t("ui_available_for_fees", "Available for Fees")}
               </div>
               <div className="text-sm font-semibold text-white">
-                {availableForFeesXrp.toFixed(2)}{" "}
+                {formatXrpAmount(availableForFeesXrp, { smallMaxDecimals: 6, largeMaxDecimals: 2 })}{" "}
                 {t("ui_xrp_034964b994", "XRP")}
               </div>
             </div>
@@ -107,10 +140,17 @@ export default function XrpNetworkStatement({
                 {t("ui_total_fees_paid", "Total Fees Paid")}
               </div>
               <div className="text-sm font-semibold text-white">
-                {totalFeesPaidXrp.toFixed(2)}{" "}
+                {formatXrpAmount(totalFeesPaidXrp, { smallMaxDecimals: 6, largeMaxDecimals: 2 })}{" "}
                 {t("ui_xrp_034964b994", "XRP")}
               </div>
             </div>
+            {totalFeesPaidCount > 0 ? (
+              <div className="text-[11px] text-white/45">
+                {t("ui_transactions_count_short", "{{count}} tx", {
+                  count: totalFeesPaidCount,
+                })}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -224,6 +264,13 @@ export default function XrpNetworkStatement({
                 "ui_xrpl_fees_note",
                 "Les frais de transaction sur le XRPL sont extrêmement faibles (≈ 0.00001 XRP, soit < 0.0001 USD) et sont déduits de votre reserve XRP.",
               )}
+            </div>
+            <div className="mt-2 text-[12px] text-white/65">
+              {t("ui_total_fees_paid", "Total Fees Paid")}:{" "}
+              <span className="font-semibold text-white/85">
+                {formatXrpAmount(totalFeesPaidXrp, { smallMaxDecimals: 6, largeMaxDecimals: 6 })}{" "}
+                {t("ui_xrp_034964b994", "XRP")}
+              </span>
             </div>
           </div>
         </div>
