@@ -375,7 +375,7 @@ export default function WalletSettingsDropdown({
                 </div>
 
                 <a
-                  href="https://ripple.com"
+                  href="https://rlusd.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
