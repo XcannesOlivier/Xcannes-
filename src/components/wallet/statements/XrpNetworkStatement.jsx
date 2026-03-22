@@ -419,7 +419,31 @@ function RlusdInfoModal({ onClose }) {
           </div>
 
           <div className="mt-6 flex items-center justify-between">
-            <div />
+            <a
+              href="https://rlusd.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-white/10 bg-black/30 hover:bg-white/[0.04] hover:border-white/15 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+            >
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/5 border border-white/10 text-white/85 shrink-0">
+                <Image
+                  src="/symbols/rlusd.png"
+                  alt="RLUSD"
+                  width={22}
+                  height={22}
+                  className="rounded-md"
+                />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[13px] font-medium text-white/85">
+                  {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
+                </div>
+                <div className="text-[11px] text-white/40 mt-0.5">
+                  {t("ui_open_ripple_com", "Ouvrir ripple.com")}
+                </div>
+              </div>
+              <span className="text-white/20 text-lg">↗</span>
+            </a>
           </div>
         </div>
       </div>
