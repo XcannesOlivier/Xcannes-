@@ -375,7 +375,7 @@ export default function WalletSettingsDropdown({
                 </div>
 
                 <a
-                  href="https://rlusd.com"
+                  href="https://ripple.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsOpen(false)}
@@ -391,7 +391,7 @@ export default function WalletSettingsDropdown({
                       {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
                     </div>
                     <div className="text-[11px] text-white/40 mt-0.5">
-                      {t("ui_stablecoin_rlusd_hint", "Ouvrir rlusd.com")}
+                      {t("ui_stablecoin_rlusd_hint", "Ouvrir ripple.com")}
                     </div>
                   </div>
                   <span className="text-white/20 text-lg">↗</span>
