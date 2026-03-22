@@ -26,12 +26,31 @@ export default function XrpNetworkStatement({
     return Number.isFinite(v) ? Math.max(0, v) : 0;
   }, [walletBalance?.xrp]);
 
+  const reservedTotalXrp = useMemo(() => {
+    const v = Number(walletBalance?.xrpReserved);
+    if (Number.isFinite(v) && v >= 0) return v;
+    const base = Number(walletBalance?.xrpReserveBase);
+    const inc = Number(walletBalance?.xrpReserveInc);
+    const ownerCount = Number(walletBalance?.xrpOwnerCount);
+    const safeBase = Number.isFinite(base) && base >= 0 ? base : 1;
+    const safeInc = Number.isFinite(inc) && inc >= 0 ? inc : 0.2;
+    const safeOwner = Number.isFinite(ownerCount) && ownerCount >= 0 ? ownerCount : 0;
+    return safeBase + safeInc * safeOwner;
+  }, [
+    walletBalance?.xrpOwnerCount,
+    walletBalance?.xrpReserveBase,
+    walletBalance?.xrpReserveInc,
+    walletBalance?.xrpReserved,
+  ]);
+
   const availableForFeesXrp = useMemo(() => {
-    // Product rule: activation reserve (base) is kept, the rest is usable for fees.
-    // This makes the value decrease naturally as fees are paid (balance drops).
-    const available = currentXrpBalance - activationReserveXrp;
+    // XRPL: spendable XRP is balance minus total reserve (base + owner reserve).
+    // Prefer server-provided `xrpAvailable` when present; otherwise recompute.
+    const server = Number(walletBalance?.xrpAvailable);
+    if (Number.isFinite(server) && server >= 0) return server;
+    const available = currentXrpBalance - reservedTotalXrp;
     return Number.isFinite(available) ? Math.max(0, available) : 0;
-  }, [activationReserveXrp, currentXrpBalance]);
+  }, [currentXrpBalance, reservedTotalXrp, walletBalance?.xrpAvailable]);
 
   const totalFeesPaidXrp = useMemo(() => {
     const list = Array.isArray(transactions) ? transactions : [];
@@ -126,11 +145,22 @@ export default function XrpNetworkStatement({
 
           <div className="mt-4 space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-sm text-white/75">
-                {t("ui_available_for_fees", "Available for Fees")}
+              <div className="min-w-0">
+                <div className="text-sm text-white/75">
+                  {t("ui_available_for_fees", "Available for Fees")}
+                </div>
+                <div className="text-[11px] text-white/45 mt-0.5 truncate">
+                  {t("ui_xrp_available_breakdown", "Solde {{bal}} • Réserve {{res}}", {
+                    bal: `${formatXrpAmount(currentXrpBalance, { smallMaxDecimals: 6, largeMaxDecimals: 6 })} ${t("ui_xrp_034964b994", "XRP")}`,
+                    res: `${formatXrpAmount(reservedTotalXrp, { smallMaxDecimals: 6, largeMaxDecimals: 6 })} ${t("ui_xrp_034964b994", "XRP")}`,
+                  })}
+                </div>
               </div>
-              <div className="text-sm font-semibold text-white">
-                {formatXrpAmount(availableForFeesXrp, { smallMaxDecimals: 6, largeMaxDecimals: 2 })}{" "}
+              <div className="text-sm font-semibold text-white shrink-0">
+                {formatXrpAmount(availableForFeesXrp, {
+                  smallMaxDecimals: 6,
+                  largeMaxDecimals: 6,
+                })}{" "}
                 {t("ui_xrp_034964b994", "XRP")}
               </div>
             </div>
@@ -140,7 +170,7 @@ export default function XrpNetworkStatement({
                 {t("ui_total_fees_paid", "Total Fees Paid")}
               </div>
               <div className="text-sm font-semibold text-white">
-                {formatXrpAmount(totalFeesPaidXrp, { smallMaxDecimals: 6, largeMaxDecimals: 2 })}{" "}
+                {formatXrpAmount(totalFeesPaidXrp, { smallMaxDecimals: 6, largeMaxDecimals: 6 })}{" "}
                 {t("ui_xrp_034964b994", "XRP")}
               </div>
             </div>
