@@ -420,19 +420,21 @@ export default function XrpNetworkStatement({
 	        </div>
 	      </div>
 
-      <div className="mt-1 flex justify-end">
-        <a
-          href="https://rlusd.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex text-[12px] font-medium text-white/55 underline underline-offset-4 decoration-white/30 hover:text-white/75 hover:decoration-white/60 transition-colors"
-        >
-          {t(
-            "ui_learn_more_stablecoin_rlusd",
-            "En savoir plus sur le Stablecoin RLUSD",
-          )}
-        </a>
-      </div>
+      {!showRlusdModal ? (
+        <div className="mt-1 flex justify-end">
+          <a
+            href="https://rlusd.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex text-[12px] font-medium text-white/55 underline underline-offset-4 decoration-white/30 hover:text-white/75 hover:decoration-white/60 transition-colors"
+          >
+            {t(
+              "ui_learn_more_stablecoin_rlusd",
+              "En savoir plus sur le Stablecoin RLUSD",
+            )}
+          </a>
+        </div>
+      ) : null}
       <div ref={reserveDetailsEndRef} />
 	    </div>
 	  );
