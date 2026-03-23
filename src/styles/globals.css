@@ -104,12 +104,16 @@
 /* Fullscreen helpers (mobile safe) */
 .xcannes-fullscreen {
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
 }
 
 .xcannes-fullscreen-safe {
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
 }
 
 @media (max-width: 767px) {
