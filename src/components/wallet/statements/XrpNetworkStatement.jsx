@@ -202,14 +202,14 @@ export default function XrpNetworkStatement({
             )}
           </div>
 
-          <div className="mt-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
-                ⓘ
-              </span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-white/85">
-                  {t("ui_xrp_explainer_reserve_title", "Réserve")}
+	          <div className="mt-4 space-y-3">
+	            <div className="flex items-start gap-3">
+	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
+	                ⓘ
+	              </span>
+	              <div className="min-w-0">
+	                <div className="text-sm font-semibold text-white/85">
+	                  {t("ui_xrp_explainer_reserve_title", "Réserve")}
                 </div>
                 <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
                   {t(
@@ -218,14 +218,14 @@ export default function XrpNetworkStatement({
                   )}
                 </div>
               </div>
-            </div>
+	            </div>
 
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
+	            <div className="flex items-start gap-3">
+	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
+	                <svg
+	                  className="w-5 h-5"
+	                  fill="none"
+	                  stroke="currentColor"
                   viewBox="0 0 24 24"
                   strokeWidth={1.8}
                 >
@@ -241,25 +241,44 @@ export default function XrpNetworkStatement({
                   />
                 </svg>
               </span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-white/85">
-                  {t("ui_xrp_explainer_fees_title", "Fees réseau")}
-                </div>
-                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
-                  {t(
-                    "ui_xrp_explainer_fees_desc",
-                    "Chaque transaction sur le XRPL paie des frais en XRP (souvent ~0.00001 XRP). Ils sont débités de votre solde XRP.",
-                  )}
-                </div>
-              </div>
-            </div>
+	              <div className="min-w-0">
+	                <div className="text-sm font-semibold text-white/85">
+	                  {t("ui_xrp_explainer_fees_title", "Fees réseau")}
+	                </div>
+	                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+	                  {t(
+	                    "ui_xrpl_fees_note",
+	                    "Les frais de transaction sur le XRPL sont extrêmement faibles (≈ 0.00001 XRP, soit < 0.0001 USD) et sont déduits de votre reserve XRP.",
+	                  )}
+	                </div>
+	                <div className="mt-2 text-[12px] text-white/65">
+	                  {t("ui_total_fees_paid", "Total Fees Paid")}:{" "}
+	                  <span className="font-semibold text-white/85">
+	                    {formatXrpAmount(totalFeesPaidXrp, {
+	                      smallMaxDecimals: 6,
+	                      largeMaxDecimals: 6,
+	                    })}{" "}
+	                    {t("ui_xrp_034964b994", "XRP")}
+	                  </span>
+	                  {totalFeesPaidCount > 0 ? (
+	                    <span className="text-white/45">
+	                      {" "}
+	                      ·{" "}
+	                      {t("ui_transactions_count_short", "{{count}} tx", {
+	                        count: totalFeesPaidCount,
+	                      })}
+	                    </span>
+	                  ) : null}
+	                </div>
+	              </div>
+	            </div>
 
-            <div className="flex items-start gap-3">
-              <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
-                <Image
-                  src="/symbols/rlusd.png"
-                  alt="RLUSD"
-                  width={20}
+	            <div className="flex items-start gap-3">
+	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
+	                <Image
+	                  src="/symbols/rlusd.png"
+	                  alt="RLUSD"
+	                  width={20}
                   height={20}
                   className="rounded-md"
                 />
@@ -358,51 +377,11 @@ export default function XrpNetworkStatement({
               </button>
             </div>
           </div>
-        )}
-      </div>
-
-      <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] overflow-hidden">
-        <div className="px-4 py-3 flex items-start gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12l2 2 4-4"
-              />
-            </svg>
-          </span>
-          <div className="min-w-0">
-            <div className="text-sm text-white/85 leading-snug">
-              {t(
-                "ui_xrpl_fees_note",
-                "Les frais de transaction sur le XRPL sont extrêmement faibles (≈ 0.00001 XRP, soit < 0.0001 USD) et sont déduits de votre reserve XRP.",
-              )}
-            </div>
-            <div className="mt-2 text-[12px] text-white/65">
-              {t("ui_total_fees_paid", "Total Fees Paid")}:{" "}
-              <span className="font-semibold text-white/85">
-                {formatXrpAmount(totalFeesPaidXrp, { smallMaxDecimals: 6, largeMaxDecimals: 6 })}{" "}
-                {t("ui_xrp_034964b994", "XRP")}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+	        )}
+	      </div>
+	    </div>
+	  );
+	}
 
 function RlusdInfoModal({ onClose }) {
   const { t } = useTranslation("common");
