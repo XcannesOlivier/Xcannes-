@@ -373,30 +373,32 @@ export default function XrpNetworkStatement({
 		            </div>
 
 	            <div className="flex items-start gap-3">
-	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
-	                <Image
-	                  src="/symbols/rlusd.png"
-	                  alt="RLUSD"
+		              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
+		                <Image
+		                  src="/symbols/rlusd.png"
+		                  alt="RLUSD"
 	                  width={20}
                   height={20}
                   className="rounded-md"
                 />
               </span>
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-white/85">
-                  {t("ui_xrp_explainer_trustlines_title", "Trustlines (RLUSD)")}
-                </div>
-                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
-                  {t(
-                    "ui_xrp_explainer_trustlines_desc",
-                    "Une trustline est une autorisation sur le XRPL. XCANNES utilise RLUSD comme base : vous activez la trustline pour envoyer/recevoir et convertir.",
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+	              <div className="min-w-0">
+	                <div className="text-sm font-semibold text-white/85">
+	                  {t("ui_xrp_explainer_trustlines_title", "Trustlines (RLUSD)")}
+	                </div>
+	                {showReserveAndFees ? (
+	                  <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+	                    {t(
+	                      "ui_xrp_explainer_trustlines_desc",
+	                      "Une trustline est une autorisation sur le XRPL. XCANNES utilise RLUSD comme base : vous activez la trustline pour envoyer/recevoir et convertir.",
+	                    )}
+	                  </div>
+	                ) : null}
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
 	    </div>
 	  );
 	}

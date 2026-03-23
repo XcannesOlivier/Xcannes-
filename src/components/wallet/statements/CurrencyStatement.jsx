@@ -1556,8 +1556,11 @@ export default function CurrencyStatement({
         <div
           className={[
             "flex-1 px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain",
-            isXrpNetworkView ? "overflow-y-auto" : "overflow-hidden",
+            isXrpNetworkView
+              ? "overflow-y-auto touch-pan-y"
+              : "overflow-hidden",
           ].join(" ")}
+          style={isXrpNetworkView ? { WebkitOverflowScrolling: "touch" } : undefined}
         >
           {isXrpNetworkView ? (
             <XrpNetworkStatement
