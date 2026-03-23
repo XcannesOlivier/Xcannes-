@@ -60,7 +60,7 @@ export default function WalletDesktopModals({
   selectableTokens,
 }) {
   return (
-    <aside className="hidden lg:flex lg:flex-col min-h-0 relative">
+    <aside className="hidden lg:flex lg:flex-col min-h-0 h-full relative overflow-hidden">
       {showInlineQrScanner ? (
         <div className="flex-1 min-h-0">
           <QRScanner

@@ -615,14 +615,17 @@ function RlusdInfoModal({ onClose }) {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end">
+          <div className="mt-4 flex justify-end">
             <a
               href="https://rlusd.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex text-[12px] font-medium text-white/55 hover:text-white/75 transition-colors"
+              className="inline-flex text-[12px] font-medium text-white/55 underline underline-offset-4 decoration-white/30 hover:text-white/75 hover:decoration-white/60 transition-colors"
             >
-              {t("ui_stablecoin_rlusd", "Stablecoin RLUSD")}
+              {t(
+                "ui_learn_more_stablecoin_rlusd",
+                "En savoir plus sur le Stablecoin RLUSD",
+              )}
             </a>
           </div>
         </div>

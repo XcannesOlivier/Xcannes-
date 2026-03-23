@@ -74,6 +74,12 @@ export default function CurrencyStatement({
     [currency],
   );
   const isXrpNetworkView = normalizedCurrency === "XRP";
+  const statementPanelOverflowClass = isXrpNetworkView
+    ? "overflow-y-auto overscroll-contain touch-pan-y"
+    : "overflow-hidden";
+  const statementPanelScrollStyle = isXrpNetworkView
+    ? { WebkitOverflowScrolling: "touch" }
+    : undefined;
   const displayCurrency = useMemo(
     () => getDisplayCurrencyCode(normalizedCurrency),
     [normalizedCurrency],
@@ -1420,9 +1426,10 @@ export default function CurrencyStatement({
       }}
     >
       <div
-        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
+        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col min-h-0 ${statementPanelOverflowClass} z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+        style={statementPanelScrollStyle}
       >
         {/* Header avec Account Info intégré */}
         <div
@@ -1555,12 +1562,13 @@ export default function CurrencyStatement({
         {/* Content - Zone scrollable */}
         <div
           className={[
-            "flex-1 px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain",
+            "px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 overscroll-contain",
+            isXrpNetworkView ? "flex-none" : "flex-1 min-h-0",
             isXrpNetworkView
-              ? "overflow-y-auto touch-pan-y max-h-[92dvh]"
+              ? "overflow-visible"
               : "overflow-hidden",
           ].join(" ")}
-          style={isXrpNetworkView ? { WebkitOverflowScrolling: "touch" } : undefined}
+          style={undefined}
         >
           {isXrpNetworkView ? (
             <XrpNetworkStatement
