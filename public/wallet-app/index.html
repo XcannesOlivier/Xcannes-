@@ -284,7 +284,14 @@
 	    <!-- ========== 6. CREATE — GENERATING ========== -->
 	    <div id="screen-creating" class="screen hidden">
 	      <div class="screen-content center">
-	        <div class="creating-icon" aria-hidden="true">🔐</div>
+	        <div class="creating-icon" aria-hidden="true">
+	          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+	            <path d="M8 11V8a4 4 0 0 1 8 0v3" opacity="0.85" />
+	            <rect x="6.5" y="11" width="11" height="9.5" rx="2.5" opacity="0.95" />
+	            <path d="M12 15.2v2.3" />
+	            <circle cx="12" cy="15.1" r="1.2" fill="currentColor" opacity="0.16" stroke="none" />
+	          </svg>
+	        </div>
 	        <h2>Création du compte</h2>
 	        <p id="creating-status" class="status">Génération des clés…</p>
 	        <div class="spinner"></div>
@@ -313,15 +320,9 @@
 	          <!-- 12 word slots filled by JS -->
 	        </div>
 
-	        <div class="info-box">
-	          <p class="info-label">ADRESSE DU COMPTE</p>
-	          <code id="backup-address">…</code>
-	        </div>
-
 	        <div class="button-group">
 	          <button id="btn-backup-continue" class="btn btn-primary">J'ai noté mes 12 mots</button>
 	        </div>
-	        <button id="btn-backup-regenerate" class="btn-link">Nouvelle liste</button>
 	      </div>
 	    </div>
 

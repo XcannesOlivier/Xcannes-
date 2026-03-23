@@ -2489,9 +2489,25 @@ textarea.error {
 }
 
 .creating-icon {
-  font-size: 64px;
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10), rgba(255,255,255,0.02) 56%, rgba(0,0,0,0.0) 72%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   margin-bottom: 16px;
   filter: drop-shadow(0 0 18px rgba(0, 200, 83, 0.30));
+}
+
+.creating-icon svg {
+  width: 40px;
+  height: 40px;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 #screen-creating h2 {
