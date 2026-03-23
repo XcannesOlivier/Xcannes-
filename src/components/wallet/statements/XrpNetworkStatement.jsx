@@ -13,6 +13,7 @@ export default function XrpNetworkStatement({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const [showRlusdModal, setShowRlusdModal] = useState(false);
+  const [showReserveAndFees, setShowReserveAndFees] = useState(false);
   const { balance: walletBalance } = useWallet();
 
   const activationReserveXrp = useMemo(() => {
@@ -268,18 +269,29 @@ export default function XrpNetworkStatement({
         )}
       </div>
 
-      <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] overflow-hidden">
-        <div className="px-4 py-4">
-          <div className="text-sm font-bold text-white/85">
-            {t(
-              "ui_xrp_network_explainer_title",
-              "Comprendre la réserve, les fees et les trustlines",
-            )}
-          </div>
-          <div className="mt-2 text-[12px] text-white/65 leading-relaxed">
-            {t(
-              "ui_xrp_network_explainer_intro",
-              "Dans XCANNES, le XRP n’est pas échangé : il sert à activer le Compte, à maintenir les trustlines (ex: RLUSD) et à payer les frais réseau du XRPL.",
+	      <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] overflow-hidden">
+	        <div className="px-4 py-4">
+	          <div className="flex items-start justify-between gap-3">
+	            <div className="text-sm font-bold text-white/85">
+	              {t(
+	                "ui_xrp_network_explainer_title",
+	                "Comprendre la réserve, les fees et les trustlines",
+	              )}
+	            </div>
+	            <button
+	              type="button"
+	              onClick={() => setShowReserveAndFees((v) => !v)}
+	              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/70 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+	              aria-expanded={showReserveAndFees}
+	              aria-label={t("ui_expand_details", "Afficher les détails")}
+	            >
+	              {showReserveAndFees ? "−" : "+"}
+	            </button>
+	          </div>
+	          <div className="mt-2 text-[12px] text-white/65 leading-relaxed">
+	            {t(
+	              "ui_xrp_network_explainer_intro",
+	              "Dans XCANNES, le XRP n’est pas échangé : il sert à activer le Compte, à maintenir les trustlines (ex: RLUSD) et à payer les frais réseau du XRPL.",
             )}
           </div>
 
@@ -288,18 +300,20 @@ export default function XrpNetworkStatement({
 	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
 	                ⓘ
 	              </span>
-	              <div className="min-w-0">
-	                <div className="text-sm font-semibold text-white/85">
-	                  {t("ui_xrp_explainer_reserve_title", "Réserve")}
-                </div>
-                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
-                  {t(
-                    "ui_xrp_explainer_reserve_desc",
-                    "La réserve est un minimum requis par le XRPL. Elle dépend de votre Compte (activation) et des objets détenus (ex: trustlines). Une partie peut servir de buffer pour les frais.",
-                  )}
-                </div>
-              </div>
-	            </div>
+		              <div className="min-w-0">
+		                <div className="text-sm font-semibold text-white/85">
+		                  {t("ui_xrp_explainer_reserve_title", "Réserve")}
+	                </div>
+	                {showReserveAndFees ? (
+	                  <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+	                    {t(
+	                      "ui_xrp_explainer_reserve_desc",
+	                      "La réserve est un minimum requis par le XRPL. Elle dépend de votre Compte (activation) et des objets détenus (ex: trustlines). Une partie peut servir de buffer pour les frais.",
+	                    )}
+	                  </div>
+	                ) : null}
+	              </div>
+		            </div>
 
 	            <div className="flex items-start gap-3">
 	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-xcannes-green/10 border border-xcannes-green/25 text-xcannes-green shrink-0">
@@ -322,37 +336,41 @@ export default function XrpNetworkStatement({
                   />
                 </svg>
               </span>
-	              <div className="min-w-0">
-	                <div className="text-sm font-semibold text-white/85">
-	                  {t("ui_xrp_explainer_fees_title", "Fees réseau")}
-	                </div>
-	                <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
-	                  {t(
-	                    "ui_xrpl_fees_note",
-	                    "Les frais de transaction sur le XRPL sont extrêmement faibles (≈ 0.00001 XRP, soit < 0.0001 USD) et sont déduits de votre reserve XRP.",
-	                  )}
-	                </div>
-	                <div className="mt-2 text-[12px] text-white/65">
-	                  {t("ui_total_fees_paid", "Total Fees Paid")}:{" "}
-	                  <span className="font-semibold text-white/85">
-	                    {formatXrpAmount(totalFeesPaidXrp, {
-	                      smallMaxDecimals: 6,
-	                      largeMaxDecimals: 6,
-	                    })}{" "}
-	                    {t("ui_xrp_034964b994", "XRP")}
-	                  </span>
-	                  {totalFeesPaidCount > 0 ? (
-	                    <span className="text-white/45">
-	                      {" "}
-	                      ·{" "}
-	                      {t("ui_transactions_count_short", "{{count}} tx", {
-	                        count: totalFeesPaidCount,
-	                      })}
-	                    </span>
-	                  ) : null}
-	                </div>
-	              </div>
-	            </div>
+		              <div className="min-w-0">
+		                <div className="text-sm font-semibold text-white/85">
+		                  {t("ui_xrp_explainer_fees_title", "Frais de réseaux XRPL")}
+		                </div>
+		                {showReserveAndFees ? (
+		                  <>
+		                    <div className="mt-1 text-[12px] text-white/60 leading-relaxed">
+		                      {t(
+		                        "ui_xrpl_fees_note",
+		                        "Les frais de transaction sur le XRPL sont extrêmement faibles (≈ 0.00001 XRP, soit < 0.0001 USD) et sont déduits de votre reserve XRP.",
+		                      )}
+		                    </div>
+		                    <div className="mt-2 text-[12px] text-white/65">
+		                      {t("ui_total_fees_paid", "Total Fees Paid")}:{" "}
+		                      <span className="font-semibold text-white/85">
+		                        {formatXrpAmount(totalFeesPaidXrp, {
+		                          smallMaxDecimals: 6,
+		                          largeMaxDecimals: 6,
+		                        })}{" "}
+		                        {t("ui_xrp_034964b994", "XRP")}
+		                      </span>
+		                      {totalFeesPaidCount > 0 ? (
+		                        <span className="text-white/45">
+		                          {" "}
+		                          ·{" "}
+		                          {t("ui_transactions_count_short", "{{count}} tx", {
+		                            count: totalFeesPaidCount,
+		                          })}
+		                        </span>
+		                      ) : null}
+		                    </div>
+		                  </>
+		                ) : null}
+		              </div>
+		            </div>
 
 	            <div className="flex items-start gap-3">
 	              <span className="mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/80 shrink-0">
