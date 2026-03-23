@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
 
 export default function XrpNetworkStatement({
@@ -14,6 +14,8 @@ export default function XrpNetworkStatement({
   const locale = i18n?.language || "en";
   const [showRlusdModal, setShowRlusdModal] = useState(false);
   const [showReserveAndFees, setShowReserveAndFees] = useState(false);
+  const reserveDetailsEndRef = useRef(null);
+  const prevShowReserveAndFeesRef = useRef(showReserveAndFees);
   const { balance: walletBalance } = useWallet();
 
   const activationReserveXrp = useMemo(() => {
@@ -120,6 +122,24 @@ export default function XrpNetworkStatement({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [showRlusdModal]);
+
+  useEffect(() => {
+    const wasOpen = prevShowReserveAndFeesRef.current;
+    prevShowReserveAndFeesRef.current = showReserveAndFees;
+    if (wasOpen || !showReserveAndFees) return;
+
+    const target = reserveDetailsEndRef.current;
+    if (!target || typeof target.scrollIntoView !== "function") return;
+
+    const id = window.requestAnimationFrame(() => {
+      try {
+        target.scrollIntoView({ behavior: "smooth", block: "end" });
+      } catch {
+        target.scrollIntoView();
+      }
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [showReserveAndFees]);
 
   return (
     <div className="flex flex-col gap-4 min-h-0">
@@ -399,6 +419,21 @@ export default function XrpNetworkStatement({
 	          </div>
 	        </div>
 	      </div>
+
+      <div className="mt-1 flex justify-end">
+        <a
+          href="https://rlusd.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex text-[12px] font-medium text-white/55 underline underline-offset-4 decoration-white/30 hover:text-white/75 hover:decoration-white/60 transition-colors"
+        >
+          {t(
+            "ui_learn_more_stablecoin_rlusd",
+            "En savoir plus sur le Stablecoin RLUSD",
+          )}
+        </a>
+      </div>
+      <div ref={reserveDetailsEndRef} />
 	    </div>
 	  );
 	}
