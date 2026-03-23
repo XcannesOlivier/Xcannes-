@@ -1553,7 +1553,12 @@ export default function CurrencyStatement({
         </div>
 
         {/* Content - Zone scrollable */}
-        <div className="flex-1 overflow-hidden px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain">
+        <div
+          className={[
+            "flex-1 px-4 md:px-6 py-4 md:py-6 flex flex-col gap-4 min-h-0 overscroll-contain",
+            isXrpNetworkView ? "overflow-y-auto" : "overflow-hidden",
+          ].join(" ")}
+        >
           {isXrpNetworkView ? (
             <XrpNetworkStatement
               hasRlusdTrustline={hasRlusdTrustline}

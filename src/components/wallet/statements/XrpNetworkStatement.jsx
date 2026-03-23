@@ -187,6 +187,87 @@ export default function XrpNetworkStatement({
         </div>
       </div>
 
+      <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/10">
+          <div className="text-sm font-semibold text-white/85">
+            {t("ui_active_trustlines", "Active Trustlines")}
+          </div>
+        </div>
+
+        {hasRlusdTrustline ? (
+          <button
+            type="button"
+            onClick={() => setShowRlusdModal(true)}
+            className="w-full px-4 py-4 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors"
+            aria-label={t("ui_rlusd_details", "RLUSD Details")}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
+                <Image
+                  src="/symbols/rlusd.png"
+                  alt="RLUSD"
+                  width={28}
+                  height={28}
+                  className="rounded-md"
+                />
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="text-sm font-semibold text-white">RLUSD</div>
+                  <span className="text-[11px] text-white/40">
+                    {t("ui_ripple_usd", "Ripple USD")}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-xcannes-green/10 text-xcannes-green border border-xcannes-green/20 whitespace-nowrap">
+                    {t("ui_active_short", "Active")}
+                  </span>
+                </div>
+                <div className="text-[12px] text-white/55 mt-0.5">
+                  {t("ui_1_rlusd_equals_1_usd", "1 RLUSD = 1 USD")}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-sm font-semibold text-white">
+                {formattedRlusdBalance}{" "}
+                <span className="text-white/70">{t("ui_rlusd", "RLUSD")}</span>
+              </div>
+              <div className="text-sm text-white/40">
+                {t("ui_details_e9615e470d", "Details")} ›
+              </div>
+            </div>
+          </button>
+        ) : (
+          <div className="px-4 py-4">
+            <div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white/85">
+                    {t("ui_no_active_trustlines", "No active trustlines")}
+                  </div>
+                  <div className="mt-1 text-[12px] text-white/55">
+                    {t(
+                      "ui_trustline_rlusd_needed_hint",
+                      "Activez la trustline RLUSD pour utiliser le Compte et payer les frais de transactions RLUSD.",
+                    )}
+                  </div>
+                </div>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/5 text-white/70 border border-white/10 shrink-0">
+                  {t("ui_inactive_short", "Inactive")}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {}}
+                className="mt-3 w-full px-3 py-2 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/15 text-white/80 transition-colors"
+              >
+                {t("ui_activate_rlusd_trustline", "Activer RLUSD (gratuit)")}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] overflow-hidden">
         <div className="px-4 py-4">
           <div className="text-sm font-bold text-white/85">
@@ -298,87 +379,6 @@ export default function XrpNetworkStatement({
           </div>
         </div>
       </div>
-
-      <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/10">
-          <div className="text-sm font-semibold text-white/85">
-            {t("ui_active_trustlines", "Active Trustlines")}
-          </div>
-        </div>
-
-        {hasRlusdTrustline ? (
-          <button
-            type="button"
-            onClick={() => setShowRlusdModal(true)}
-            className="w-full px-4 py-4 flex items-center justify-between gap-3 text-left hover:bg-white/[0.04] transition-colors"
-            aria-label={t("ui_rlusd_details", "RLUSD Details")}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
-                <Image
-                  src="/symbols/rlusd.png"
-                  alt="RLUSD"
-                  width={28}
-                  height={28}
-                  className="rounded-md"
-                />
-              </span>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="text-sm font-semibold text-white">RLUSD</div>
-                  <span className="text-[11px] text-white/40">
-                    {t("ui_ripple_usd", "Ripple USD")}
-                  </span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold bg-xcannes-green/10 text-xcannes-green border border-xcannes-green/20 whitespace-nowrap">
-                    {t("ui_active_short", "Active")}
-                  </span>
-                </div>
-                <div className="text-[12px] text-white/55 mt-0.5">
-                  {t("ui_1_rlusd_equals_1_usd", "1 RLUSD = 1 USD")}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="text-sm font-semibold text-white">
-                {formattedRlusdBalance}{" "}
-                <span className="text-white/70">{t("ui_rlusd", "RLUSD")}</span>
-              </div>
-              <div className="text-sm text-white/40">
-                {t("ui_details_e9615e470d", "Details")} ›
-              </div>
-            </div>
-          </button>
-        ) : (
-          <div className="px-4 py-4">
-            <div className="rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-white/85">
-                    {t("ui_no_active_trustlines", "No active trustlines")}
-                  </div>
-                  <div className="mt-1 text-[12px] text-white/55">
-                    {t(
-                      "ui_trustline_rlusd_needed_hint",
-                      "Activez la trustline RLUSD pour utiliser le Compte et payer les frais de transactions RLUSD.",
-                    )}
-                  </div>
-                </div>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/5 text-white/70 border border-white/10 shrink-0">
-                  {t("ui_inactive_short", "Inactive")}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {}}
-                className="mt-3 w-full px-3 py-2 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/15 text-white/80 transition-colors"
-              >
-                {t("ui_activate_rlusd_trustline", "Activer RLUSD (gratuit)")}
-              </button>
-            </div>
-          </div>
-	        )}
-	      </div>
 	    </div>
 	  );
 	}
