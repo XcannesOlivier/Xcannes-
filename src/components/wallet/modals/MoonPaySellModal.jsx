@@ -443,33 +443,33 @@ const MoonPaySellModal = ({
                 "Vous vendez",
               )}
             </label>
-            <div className="rounded-lg ring-1 ring-white/10">
-              <ModalSelect
-                value={currency}
-                onChange={setCurrency}
-                options={supportedCurrencies.map((curr) => ({
-                  value: curr.code,
-                  label: curr.label || curr.name || curr.code,
-                  labelLeft:
-                    curr.labelLeft || curr.label || curr.name || curr.code,
-                  labelRight: curr.labelRight || null,
-                  labelMobile:
-                    curr.labelMobile ||
-                    curr.labelLeft ||
-                    curr.label ||
-                    curr.name ||
-                    curr.code,
-                  icon: curr.icon || null,
-                }))}
-                useNativeSelect={false}
-                showMobileOptionRight={true}
-                buttonClassName="bg-black/40 border border-transparent rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
-                menuClassName={
-                  noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-                }
-                selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-transparent rounded-lg text-white focus:border-xcannes-green focus:outline-none"
-              />
-            </div>
+            <ModalSelect
+              value={currency}
+              onChange={setCurrency}
+              options={supportedCurrencies.map((curr) => ({
+                value: curr.code,
+                label: curr.label || curr.name || curr.code,
+                labelLeft:
+                  curr.labelLeft || curr.label || curr.name || curr.code,
+                labelRight: curr.labelRight || null,
+                labelMobile:
+                  curr.labelMobile ||
+                  curr.labelLeft ||
+                  curr.label ||
+                  curr.name ||
+                  curr.code,
+                icon: curr.icon || null,
+              }))}
+              useNativeSelect={false}
+              showMobileOptionRight={true}
+              buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
+              menuClassName={`${
+                noticeVariant === "demo"
+                  ? "bg-xcannes-surface-demo"
+                  : "bg-elevated"
+              } ring-1 ring-white/10`}
+              selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
+            />
           </div>
 
           {/* Amount input */}

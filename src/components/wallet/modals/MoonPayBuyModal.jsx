@@ -400,32 +400,32 @@ const MoonPayBuyModal = ({
                 "Vous recevrez des dollars numériques (USD)",
               )}
             </label>
-            <div className="rounded-lg ring-1 ring-white/10">
-              <ModalSelect
-                value={currency}
-                onChange={setCurrency}
-                options={supportedCurrencies.map((curr) => ({
-                  value: curr.code,
-                  label: curr.code,
-                  labelLeft: curr.code,
-                  labelMobile: curr.code,
-                  description:
-                    curr.code === "XRP"
-                      ? t(
-                          "moonpay_xrp_network_note",
-                          "Utilisé pour les transferts et frais réseau",
-                        )
-                      : null,
-                  icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
-                }))}
-                useNativeSelect={false}
-                buttonClassName="bg-black/40 border border-transparent rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
-                menuClassName={
-                  noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-                }
-                selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-transparent rounded-lg text-white focus:border-xcannes-green focus:outline-none"
-              />
-            </div>
+            <ModalSelect
+              value={currency}
+              onChange={setCurrency}
+              options={supportedCurrencies.map((curr) => ({
+                value: curr.code,
+                label: curr.code,
+                labelLeft: curr.code,
+                labelMobile: curr.code,
+                description:
+                  curr.code === "XRP"
+                    ? t(
+                        "moonpay_xrp_network_note",
+                        "Utilisé pour les transferts et frais réseau",
+                      )
+                    : null,
+                icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
+              }))}
+              useNativeSelect={false}
+              buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
+              menuClassName={`${
+                noticeVariant === "demo"
+                  ? "bg-xcannes-surface-demo"
+                  : "bg-elevated"
+              } ring-1 ring-white/10`}
+              selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
+            />
           </div>
 
           {/* Fiat currency selector */}

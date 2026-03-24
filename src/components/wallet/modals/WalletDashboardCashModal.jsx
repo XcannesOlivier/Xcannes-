@@ -118,7 +118,7 @@ export default function WalletDashboardCashModal({
                       strokeLinecap="round"
                     />
                   </svg>
-                  <span>{t("ui_buy_crypto_f72f8661b9", "Buy Crypto")}</span>
+                  <span>{t("ui_buy_crypto_f72f8661b9", "Ajouter de l'argent")}</span>
                 </div>
                 {t("ui_fiat_crypto_21ae637b23", "") ? (
                   <div className="text-[10px] mt-1 opacity-70">
