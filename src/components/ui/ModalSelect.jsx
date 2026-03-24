@@ -141,6 +141,7 @@ export default function ModalSelect({
               const rightClassName = showMobileOptionRight
                 ? "ml-auto text-white/50 tabular-nums"
                 : "ml-auto text-white/50 tabular-nums hidden md:inline";
+              const description = opt.description ?? null;
               return (
               <button
                 key={String(opt.value)}
@@ -148,17 +149,34 @@ export default function ModalSelect({
                 onClick={() => handleSelect(opt.value)}
                 className={`w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 ${optionClassName}`}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-start gap-2">
                   {renderIcon(opt.icon)}
-                  <span className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="truncate md:hidden">{optionLeft}</span>
-                    <span className="truncate hidden md:inline">{left}</span>
-                    {right ? (
-                      <span className={rightClassName}>
-                        {right}
+                  {description ? (
+                    <span className="flex flex-col min-w-0 flex-1">
+                      <span className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="truncate md:hidden">{optionLeft}</span>
+                        <span className="truncate hidden md:inline">{left}</span>
+                        {right ? (
+                          <span className={rightClassName}>
+                            {right}
+                          </span>
+                        ) : null}
                       </span>
-                    ) : null}
-                  </span>
+                      <span className="text-[11px] text-white/50 leading-tight mt-0.5">
+                        {description}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2 min-w-0 flex-1">
+                      <span className="truncate md:hidden">{optionLeft}</span>
+                      <span className="truncate hidden md:inline">{left}</span>
+                      {right ? (
+                        <span className={rightClassName}>
+                          {right}
+                        </span>
+                      ) : null}
+                    </span>
+                  )}
                 </span>
               </button>
               );

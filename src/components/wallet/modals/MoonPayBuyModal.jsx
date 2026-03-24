@@ -83,9 +83,10 @@ const MoonPayBuyModal = ({
     return "Failed to load fiat currencies";
   };
 
-  // Cryptos supportées par MoonPay (USD via RLUSD)
+  // Cryptos supportées par MoonPay
   const supportedCurrencies = [
-    { code: "RLUSD", name: "USD Stablecoin", icon: CRYPTO_ICONS.RLUSD },
+    { code: "RLUSD", icon: CRYPTO_ICONS.RLUSD },
+    { code: "XRP", icon: CRYPTO_ICONS.XRP },
   ];
 
   const PRODUCT_MIN_USD = 5;
@@ -363,7 +364,7 @@ const MoonPayBuyModal = ({
     ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
     : demoMode
       ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
-      : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continue to MoonPay");
+      : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continuer");
   const continueDisabled = loading || !amount || fiatCurrencies.length === 0;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
@@ -394,14 +395,26 @@ const MoonPayBuyModal = ({
           {/* Currency selector */}
           <div>
             <label className="block text-sm font-medium text-white/80 mb-2">
-              {t("moonpay_select_cryptocurrency", "Select cryptocurrency")}
+              {t(
+                "moonpay_select_cryptocurrency",
+                "Vous recevrez des dollars numériques (USD)",
+              )}
             </label>
             <ModalSelect
               value={currency}
               onChange={setCurrency}
               options={supportedCurrencies.map((curr) => ({
                 value: curr.code,
-                label: curr.name,
+                label: curr.code,
+                labelLeft: curr.code,
+                labelMobile: curr.code,
+                description:
+                  curr.code === "XRP"
+                    ? t(
+                        "moonpay_xrp_network_note",
+                        "Utilisé pour les transferts et frais réseau",
+                      )
+                    : null,
                 icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
               }))}
               useNativeSelect={false}
@@ -499,25 +512,6 @@ const MoonPayBuyModal = ({
             </div>
           )}
 
-          {/* Info box */}
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-            <p className="text-xs text-blue-400">
-              {demoMode
-                ? `ℹ️ ${t(
-                    "moonpay_info_buy_demo_1b7d2c9a5e",
-                    "Demo mode: no MoonPay redirect. The buy is simulated.",
-                  )}`
-                : `ℹ️ ${t(
-                    "moonpay_info_buy_live_3c8a1d6b2f",
-                    "You'll be redirected to MoonPay to complete the payment. Accepted: Credit card, debit card, Apple Pay, Google Pay, bank transfer.",
-                  )}`}{" "}
-              {t(
-                "moonpay_minimum_note",
-                "Minimums depend on MoonPay (currency, country, payment method).",
-              )}
-            </p>
-          </div>
-
           {/* Continue button */}
           <SwipeConfirmButton
             label={continueLabel}
@@ -534,6 +528,12 @@ const MoonPayBuyModal = ({
           >
             {continueLabel}
           </button>
+          <p className="mt-2 text-[11px] md:text-xs text-white/60 text-center">
+            {t(
+              "moonpay_buy_secure_partner_note",
+              "Fourni par un partenaire sécurisé",
+            )}
+          </p>
         </div>
       )}
 

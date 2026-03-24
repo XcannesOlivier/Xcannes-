@@ -403,7 +403,7 @@ const MoonPaySellModal = ({
     ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
     : demoMode
       ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
-      : t("moonpay_action_continue_sell_2c8a1d6b4f", "Continue to Sell");
+      : t("moonpay_action_continue_sell_2c8a1d6b4f", "Retirer");
   const continueDisabled =
     loading ||
     !hasValidAmount ||
@@ -548,18 +548,13 @@ const MoonPaySellModal = ({
             )}
           </div>
 
-          {/* Wallet address display */}
+          {/* Destination display */}
           <div className="bg-black/40 border border-white/10 rounded-lg p-3">
-            <p className="text-xs text-white/60 mb-1">
-              {t("moonpay_from_wallet", "From wallet")}
-            </p>
-            {String(walletLabel || "").trim() ? (
-              <p className="text-[16px] md:text-[17px] text-white/80 font-semibold truncate mb-1">
-                {walletLabel}
-              </p>
-            ) : null}
-            <p className="text-[8px] md:text-[10px] text-white/60 font-mono break-all">
-              {walletAddress}
+            <p className="text-[16px] md:text-[17px] text-white/80 font-semibold truncate">
+              <span className="text-white/60 font-normal">
+                {t("moonpay_sell_destination_prefix", "Vers :")}{" "}
+              </span>
+              {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
             </p>
           </div>
 
@@ -570,25 +565,6 @@ const MoonPaySellModal = ({
               <p className="text-sm text-red-400">{displayError}</p>
             </div>
           )}
-
-          {/* Info box */}
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-            <p className="text-xs text-blue-400">
-              {demoMode
-                ? `💰 ${t(
-                    "moonpay_info_sell_demo_6d1a9c2b7e",
-                    "Demo mode: the sell is simulated (no bank transfer).",
-                  )}`
-                : `💰 ${t(
-                    "moonpay_info_sell_live_8b2c1a7d5f",
-                    "Funds will be transferred to your bank account. MoonPay supports SEPA, wire transfer, and instant bank transfer in supported countries.",
-                  )}`}{" "}
-              {t(
-                "moonpay_minimum_note",
-                "Minimums depend on MoonPay (currency, country, payment method).",
-              )}
-            </p>
-          </div>
 
           {/* Continue button */}
           <SwipeConfirmButton
@@ -606,6 +582,12 @@ const MoonPaySellModal = ({
           >
             {continueLabel}
           </button>
+          <p className="mt-2 text-[11px] md:text-xs text-white/60 text-center">
+            {t(
+              "moonpay_sell_secure_bank_transfer_note",
+              "Virement sécurisé vers votre banque",
+            )}
+          </p>
         </div>
       )}
 
