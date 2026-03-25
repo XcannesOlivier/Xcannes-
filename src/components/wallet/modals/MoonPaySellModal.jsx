@@ -254,6 +254,12 @@ const MoonPaySellModal = ({
     const ageMs = Date.now() - Number(resume.ts || 0);
     if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 60 * 60 * 1000) return;
 
+    if (resume.lastIframeUrl) {
+      setIframeUrl(String(resume.lastIframeUrl));
+      setStep("iframe");
+      return;
+    }
+
     const nextCurrency = String(resume.currency || "").toUpperCase();
     if (nextCurrency) setCurrency(nextCurrency);
     if (resume.amount != null) setAmount(String(resume.amount));
@@ -517,6 +523,7 @@ const MoonPaySellModal = ({
       }
 
       if (type === "close" || type === "widget_closed") {
+        clearResumeState();
         clearAutoOpen();
         onClose();
       }
