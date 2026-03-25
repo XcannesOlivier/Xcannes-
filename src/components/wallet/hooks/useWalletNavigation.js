@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
 
 /**
  * useWalletNavigation — Centralises all "open view" navigation handlers,
@@ -121,6 +122,14 @@ export function useWalletNavigation({
         setSwapLockedView(null);
       }
       if (nextAction === "cash") {
+        if (!MOONPAY_UI_ENABLED) {
+          toast.info(
+            t("ui_moonpay_disabled", {
+              defaultValue: "MoonPay est temporairement désactivé.",
+            }),
+          );
+          return;
+        }
         setCashBuyPrefill(null);
       }
       setActiveAction(nextAction);
@@ -132,6 +141,8 @@ export function useWalletNavigation({
       setSwapDefaultView,
       setSwapLockedView,
       setCashBuyPrefill,
+      t,
+      toast,
     ],
   );
 

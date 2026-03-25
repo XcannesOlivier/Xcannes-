@@ -5,6 +5,7 @@
  */
 
 import { useTranslation } from "next-i18next";
+import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
 
 export default function DemoWalletActionBar({
   setSendTab,
@@ -12,6 +13,7 @@ export default function DemoWalletActionBar({
   setCashModalTab,
 }) {
   const { t } = useTranslation("common");
+  const cashEnabled = MOONPAY_UI_ENABLED;
 
   return (
     <div className="px-3 py-2 md:py-3 border-b border-white/5">
@@ -117,11 +119,17 @@ export default function DemoWalletActionBar({
         <button
           type="button"
           onClick={() => {
+            if (!cashEnabled) return;
             setCashModalTab("buy");
             setActiveAction("cash");
           }}
           title={t("demo_tt_cash", "Acheter ou vendre des cryptos (démo).")}
-          className="wallet-action-btn wallet-action-buysell group"
+          disabled={!cashEnabled}
+          aria-disabled={!cashEnabled}
+          className={[
+            "wallet-action-btn wallet-action-buysell group",
+            !cashEnabled ? "opacity-40 cursor-not-allowed" : "",
+          ].join(" ")}
         >
           <div className="wallet-action-icon">
             <svg

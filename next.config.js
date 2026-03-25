@@ -16,6 +16,16 @@ const securityHeaders = [
     key: "X-Content-Type-Options",
     value: "nosniff",
   },
+  // Phase 1: allow MoonPay widget iframe (Buy + Sell).
+  // Keep this directive isolated to avoid breaking existing resource loading
+  // (the stricter nonce-based CSP can be reintroduced later via middleware).
+  {
+    key: "Content-Security-Policy",
+    value:
+      process.env.MOONPAY_UI_ENABLED === "true"
+        ? "frame-src 'self' https://moonpay.com https://*.moonpay.com"
+        : "frame-src 'self'",
+  },
 ];
 
 const nextConfig = {
@@ -23,6 +33,14 @@ const nextConfig = {
   i18n,
   experimental: {
     externalDir: true,
+  },
+
+  // Expose selected non-sensitive flags to the client bundle.
+  // (Next.js only exposes env vars to client when declared here or prefixed with NEXT_PUBLIC_.)
+  env: {
+    MOONPAY_UI_ENABLED: process.env.MOONPAY_UI_ENABLED,
+    MOONPAY_STATEMENT_TAG_FALLBACK: process.env.MOONPAY_STATEMENT_TAG_FALLBACK,
+    MOONPAY_SELL_STATUS_ENABLED: process.env.MOONPAY_SELL_STATUS_ENABLED,
   },
 
   // ✅ Optimisation des images

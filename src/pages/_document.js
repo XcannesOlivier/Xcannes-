@@ -3,8 +3,9 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 /**
  * _document.js — Injecte le nonce CSP dans tous les scripts Next.js.
  *
- * Le nonce est généré par src/middleware.js et transmis via le header `x-nonce`.
- * <Head nonce> et <NextScript nonce> l'appliquent à tous les <script> générés.
+ * Le nonce peut être généré en amont (middleware / reverse proxy) et transmis
+ * via le header `x-nonce`. Si absent, le nonce reste vide (aucun impact tant
+ * qu'aucun CSP "script-src nonce-…" n'est activé côté headers).
  */
 export default function XcannesDocument(props) {
   const nonce = props.nonce || "";

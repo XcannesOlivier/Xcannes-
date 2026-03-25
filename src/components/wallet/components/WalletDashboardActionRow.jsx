@@ -1,8 +1,10 @@
 "use client";
 import { useTranslation } from "next-i18next";
+import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
 
 export default function WalletDashboardActionRow({ onAction }) {
   const { t } = useTranslation("common");
+  const cashEnabled = MOONPAY_UI_ENABLED;
   return (
     <div
       className="px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
@@ -89,8 +91,23 @@ export default function WalletDashboardActionRow({ onAction }) {
 
         <button
           type="button"
-          onClick={() => onAction("cash")}
-          className="wallet-action-btn wallet-action-buysell group"
+          onClick={() => {
+            if (!cashEnabled) return;
+            onAction("cash");
+          }}
+          disabled={!cashEnabled}
+          aria-disabled={!cashEnabled}
+          title={
+            cashEnabled
+              ? undefined
+              : t("ui_moonpay_disabled", {
+                  defaultValue: "MoonPay est temporairement désactivé.",
+                })
+          }
+          className={[
+            "wallet-action-btn wallet-action-buysell group",
+            !cashEnabled ? "opacity-40 cursor-not-allowed" : "",
+          ].join(" ")}
         >
           <div className="wallet-action-icon">
             <svg
