@@ -9,6 +9,8 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
 const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
+const MOONPAY_BUY_RESUME_KEY = "xcannes_moonpay_resume_buy_v1";
+const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_TAG_XRP = Number.parseInt(
   process.env.NEXT_PUBLIC_MOONPAY_TAG_XRP || "589",
   10,
@@ -67,6 +69,7 @@ const MoonPayBuyModal = ({
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const moonpayActiveRef = useRef(false);
+  const pendingAutoStartRef = useRef(false);
 
   // Mark MoonPay iframe flow as active so wallet-level auto-lock does not
   // disconnect while the user completes KYC/Apple flows (events inside iframe
@@ -79,6 +82,7 @@ const MoonPayBuyModal = ({
     try {
       if (active) {
         window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
+        window.sessionStorage?.setItem(MOONPAY_AUTOOPEN_TAB_KEY, "buy");
         window.__XCANNES_MOONPAY_ACTIVE__ = true;
       } else {
         window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
@@ -117,6 +121,67 @@ const MoonPayBuyModal = ({
 
   const PRODUCT_MIN_USD = 5;
 
+  const saveResumeState = useMemo(() => {
+    return (extra = {}) => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.setItem(
+          MOONPAY_BUY_RESUME_KEY,
+          JSON.stringify({
+            v: 1,
+            kind: "buy",
+            ts: Date.now(),
+            walletAddress: String(walletAddress || ""),
+            currency: String(currency || "").toUpperCase(),
+            amountType: amountType === "crypto" ? "crypto" : "fiat",
+            amount: String(amount || ""),
+            fiatCurrency: String(fiatCurrency || "").toUpperCase(),
+            ...extra,
+          }),
+        );
+      } catch {
+        // Ignore
+      }
+    };
+  }, [amount, amountType, currency, fiatCurrency, walletAddress]);
+
+  const readResumeState = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return null;
+      try {
+        const raw = window.sessionStorage?.getItem(MOONPAY_BUY_RESUME_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.v !== 1 || parsed.kind !== "buy") return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    };
+  }, []);
+
+  const clearResumeState = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.removeItem(MOONPAY_BUY_RESUME_KEY);
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
+
+  const clearAutoOpen = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.removeItem(MOONPAY_AUTOOPEN_TAB_KEY);
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
+
   const prefillSignature = useMemo(() => {
     if (!prefill) return "";
     return JSON.stringify({
@@ -150,6 +215,54 @@ const MoonPayBuyModal = ({
       setFiatCurrency(String(prefill.fiatCurrency).toUpperCase());
     }
   }, [isOpen, prefill, prefillSignature]);
+
+  // Resume flow after iOS background / reconnect:
+  // restore the last inputs and auto-generate the widget URL so the user
+  // lands directly back on the MoonPay iframe.
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!walletAddress) return;
+    if (demoMode) return;
+    if (step !== "form" || iframeUrl) return;
+    if (fiatLoading) return;
+    if (!fiatCurrency) return;
+
+    const resume = readResumeState();
+    if (!resume) return;
+    if (String(resume.walletAddress || "") !== String(walletAddress || "")) return;
+    const ageMs = Date.now() - Number(resume.ts || 0);
+    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 60 * 60 * 1000) return;
+
+    const nextCurrency = String(resume.currency || "").toUpperCase();
+    if (nextCurrency) setCurrency(nextCurrency);
+    if (resume.amountType) setAmountType(resume.amountType === "crypto" ? "crypto" : "fiat");
+    if (resume.amount != null) setAmount(String(resume.amount));
+    if (resume.fiatCurrency) setFiatCurrency(String(resume.fiatCurrency).toUpperCase());
+
+    pendingAutoStartRef.current = true;
+  }, [
+    demoMode,
+    fiatCurrency,
+    fiatLoading,
+    iframeUrl,
+    isOpen,
+    readResumeState,
+    step,
+    walletAddress,
+  ]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!pendingAutoStartRef.current) return;
+    if (demoMode) return;
+    pendingAutoStartRef.current = false;
+
+    const id = window.setTimeout(() => {
+      generateBuyUrl();
+    }, 0);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode, isOpen]);
 
   const selectedFiat = useMemo(() => {
     return (fiatCurrencies || []).find((fiat) => fiat.code === fiatCurrency);
@@ -253,6 +366,9 @@ const MoonPayBuyModal = ({
       return;
     }
 
+    // Persist inputs so we can resume after iOS Apple flows / reconnect.
+    saveResumeState();
+
     setLoading(true);
     setError(null);
 
@@ -312,6 +428,7 @@ const MoonPayBuyModal = ({
       if (data.success && data.url) {
         setIframeUrl(data.url);
         setStep("iframe");
+        saveResumeState({ lastIframeUrl: data.url });
       } else {
         throw new Error(
           t(
@@ -349,6 +466,8 @@ const MoonPayBuyModal = ({
 
       // Transaction complétée
       if (type === "transaction_completed" || status === "completed") {
+        clearResumeState();
+        clearAutoOpen();
         setStep("success");
         setTimeout(() => {
           onClose();
@@ -368,6 +487,7 @@ const MoonPayBuyModal = ({
 
       // Utilisateur a fermé le widget
       if (type === "close" || type === "widget_closed") {
+        clearAutoOpen();
         onClose();
       }
     };

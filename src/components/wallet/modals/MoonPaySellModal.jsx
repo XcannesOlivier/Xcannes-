@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -13,6 +13,8 @@ import { formatAmountWithSymbol } from "../walletDashboardConfig";
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
 const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
+const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
+const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 
 const isTrustedMoonPayOrigin = (origin) => {
   try {
@@ -58,6 +60,7 @@ const MoonPaySellModal = ({
   const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
+  const pendingAutoStartRef = useRef(false);
 
   // Keep MoonPay flow "active" to prevent wallet-level auto-lock disconnects
   // while user interacts with the iframe (KYC/Apple flows).
@@ -67,6 +70,7 @@ const MoonPaySellModal = ({
     try {
       if (active) {
         window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
+        window.sessionStorage?.setItem(MOONPAY_AUTOOPEN_TAB_KEY, "sell");
         window.__XCANNES_MOONPAY_ACTIVE__ = true;
       } else {
         window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
@@ -95,6 +99,66 @@ const MoonPaySellModal = ({
     if (data?.message) return data.message;
     return "Failed to load fiat currencies";
   };
+
+  const saveResumeState = useMemo(() => {
+    return (extra = {}) => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.setItem(
+          MOONPAY_SELL_RESUME_KEY,
+          JSON.stringify({
+            v: 1,
+            kind: "sell",
+            ts: Date.now(),
+            walletAddress: String(walletAddress || ""),
+            currency: String(currency || "").toUpperCase(),
+            amount: String(amount || ""),
+            quoteCurrency: String(quoteCurrency || "").toUpperCase(),
+            ...extra,
+          }),
+        );
+      } catch {
+        // Ignore
+      }
+    };
+  }, [amount, currency, quoteCurrency, walletAddress]);
+
+  const readResumeState = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return null;
+      try {
+        const raw = window.sessionStorage?.getItem(MOONPAY_SELL_RESUME_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.v !== 1 || parsed.kind !== "sell") return null;
+        return parsed;
+      } catch {
+        return null;
+      }
+    };
+  }, []);
+
+  const clearResumeState = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.removeItem(MOONPAY_SELL_RESUME_KEY);
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
+
+  const clearAutoOpen = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.removeItem(MOONPAY_AUTOOPEN_TAB_KEY);
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
 
   const supportedCurrencies = useMemo(() => {
     const seen = new Set();
@@ -174,6 +238,50 @@ const MoonPaySellModal = ({
       return supportedCurrencies[0].code;
     });
   }, [isOpen, supportedCurrencies]);
+
+  // Resume sell flow after iOS background / reconnect.
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!walletAddress) return;
+    if (demoMode) return;
+    if (step !== "form" || iframeUrl) return;
+    if (fiatLoading) return;
+    if (!quoteCurrency) return;
+
+    const resume = readResumeState();
+    if (!resume) return;
+    if (String(resume.walletAddress || "") !== String(walletAddress || "")) return;
+    const ageMs = Date.now() - Number(resume.ts || 0);
+    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 60 * 60 * 1000) return;
+
+    const nextCurrency = String(resume.currency || "").toUpperCase();
+    if (nextCurrency) setCurrency(nextCurrency);
+    if (resume.amount != null) setAmount(String(resume.amount));
+    if (resume.quoteCurrency) setQuoteCurrency(String(resume.quoteCurrency).toUpperCase());
+
+    pendingAutoStartRef.current = true;
+  }, [
+    demoMode,
+    fiatLoading,
+    iframeUrl,
+    isOpen,
+    quoteCurrency,
+    readResumeState,
+    step,
+    walletAddress,
+  ]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!pendingAutoStartRef.current) return;
+    if (demoMode) return;
+    pendingAutoStartRef.current = false;
+    const id = window.setTimeout(() => {
+      generateSellUrl();
+    }, 0);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode, isOpen]);
 
   const selectedToken = useMemo(() => {
     const current = String(currency || "").toUpperCase();
@@ -299,6 +407,9 @@ const MoonPaySellModal = ({
       return;
     }
 
+    // Persist inputs so we can resume after iOS Apple flows / reconnect.
+    saveResumeState();
+
     setLoading(true);
     setError(null);
 
@@ -352,6 +463,7 @@ const MoonPaySellModal = ({
       if (data.success && data.url) {
         setIframeUrl(data.url);
         setStep("iframe");
+        saveResumeState({ lastIframeUrl: data.url });
       } else {
         throw new Error(
           t(
@@ -386,6 +498,8 @@ const MoonPaySellModal = ({
       }
 
       if (type === "transaction_completed" || status === "completed") {
+        clearResumeState();
+        clearAutoOpen();
         setStep("success");
         setTimeout(() => {
           onClose();
@@ -403,6 +517,7 @@ const MoonPaySellModal = ({
       }
 
       if (type === "close" || type === "widget_closed") {
+        clearAutoOpen();
         onClose();
       }
     };

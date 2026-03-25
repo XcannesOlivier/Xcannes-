@@ -407,6 +407,24 @@ export default function WalletDashboard({
     toast,
   });
 
+  // Auto-resume MoonPay after a reconnect (iOS Apple flows can background the page).
+  // If a MoonPay iframe was active before the disconnect, reopen the Cash modal
+  // and let the MoonPay modal restore/generate the widget URL.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isConnected) return;
+    if (activeAction) return;
+    try {
+      const tab = window.sessionStorage?.getItem("xcannes_moonpay_autoopen_tab");
+      if (tab !== "buy" && tab !== "sell") return;
+      swapState.setCashModalTab(tab);
+      setActiveAction("cash");
+      window.sessionStorage?.removeItem("xcannes_moonpay_autoopen_tab");
+    } catch {
+      // Ignore
+    }
+  }, [activeAction, isConnected, setActiveAction, swapState.setCashModalTab]);
+
   // Augment currency line codes with whatever the user has currently
   // selected in the swap modal — this ensures we fetch rates for new
   // currencies that are not yet in the wallet.
