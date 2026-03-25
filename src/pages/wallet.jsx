@@ -23,6 +23,16 @@ export default function Wallet() {
   const { isConnected, isSessionReady, disconnect } = useWallet();
   const isEmbedded = useIsEmbedded();
 
+  const readMoonpayActive = () => {
+    if (typeof window === "undefined") return false;
+    try {
+      if (window.__XCANNES_MOONPAY_ACTIVE__) return true;
+      return window.sessionStorage?.getItem("xcannes_moonpay_active") === "1";
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.body.classList.add("wallet-page");
@@ -41,20 +51,47 @@ export default function Wallet() {
   disconnectRef.current = disconnect;
   const isConnectedRef = useRef(isConnected);
   isConnectedRef.current = isConnected;
+  const moonpayActiveRef = useRef(false);
+  moonpayActiveRef.current = readMoonpayActive();
+  const moonpayHiddenTimerRef = useRef(null);
 
   useEffect(() => {
     if (isEmbedded) return;
 
     // When the user switches tabs or minimizes the browser, disconnect
     const handleVisibility = () => {
-      if (document.visibilityState === "hidden" && isConnectedRef.current) {
-        disconnectRef.current();
+      const hidden = document.visibilityState === "hidden";
+
+      // Clear any pending MoonPay grace timer when coming back.
+      if (!hidden && moonpayHiddenTimerRef.current) {
+        window.clearTimeout(moonpayHiddenTimerRef.current);
+        moonpayHiddenTimerRef.current = null;
+        return;
       }
+
+      if (!hidden || !isConnectedRef.current) return;
+
+      // MoonPay flows can temporarily background the browser (Apple Pay / Apple ID / KYC).
+      // Give a short grace period so users can return without losing the widget state.
+      if (moonpayActiveRef.current) {
+        if (moonpayHiddenTimerRef.current) return;
+        moonpayHiddenTimerRef.current = window.setTimeout(() => {
+          moonpayHiddenTimerRef.current = null;
+          if (isConnectedRef.current) disconnectRef.current();
+        }, 3 * 60 * 1000);
+        return;
+      }
+
+      disconnectRef.current();
     };
     document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility);
+      if (moonpayHiddenTimerRef.current) {
+        window.clearTimeout(moonpayHiddenTimerRef.current);
+        moonpayHiddenTimerRef.current = null;
+      }
       // Component unmounting (navigating away) → disconnect
       if (isConnectedRef.current) {
         disconnectRef.current();
@@ -72,6 +109,7 @@ export default function Wallet() {
     const resetTimer = () => {
       if (timer) clearTimeout(timer);
       if (!isConnectedRef.current) return;
+      if (moonpayActiveRef.current) return;
       timer = setTimeout(() => {
         if (isConnectedRef.current) {
           disconnectRef.current();
@@ -82,12 +120,25 @@ export default function Wallet() {
     const events = ["click", "scroll", "keydown", "touchstart", "mousemove"];
     events.forEach((ev) => window.addEventListener(ev, resetTimer, { passive: true }));
 
+    const handleMoonpayActive = (event) => {
+      const nextActive = Boolean(event?.detail?.active);
+      moonpayActiveRef.current = nextActive;
+      if (nextActive) {
+        if (timer) clearTimeout(timer);
+        timer = null;
+        return;
+      }
+      resetTimer();
+    };
+    window.addEventListener("xcannes:moonpay-active", handleMoonpayActive);
+
     // Start the timer immediately
     resetTimer();
 
     return () => {
       if (timer) clearTimeout(timer);
       events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+      window.removeEventListener("xcannes:moonpay-active", handleMoonpayActive);
     };
   }, [isEmbedded, isConnected]);
 

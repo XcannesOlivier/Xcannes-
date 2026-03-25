@@ -8,6 +8,7 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
+const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
 const MOONPAY_TAG_XRP = Number.parseInt(
   process.env.NEXT_PUBLIC_MOONPAY_TAG_XRP || "589",
   10,
@@ -65,6 +66,31 @@ const MoonPayBuyModal = ({
   const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
+  const moonpayActiveRef = useRef(false);
+
+  // Mark MoonPay iframe flow as active so wallet-level auto-lock does not
+  // disconnect while the user completes KYC/Apple flows (events inside iframe
+  // don't bubble to the parent window).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const active = Boolean(isOpen && step === "iframe" && iframeUrl);
+    if (active === moonpayActiveRef.current) return;
+    moonpayActiveRef.current = active;
+    try {
+      if (active) {
+        window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
+        window.__XCANNES_MOONPAY_ACTIVE__ = true;
+      } else {
+        window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
+        window.__XCANNES_MOONPAY_ACTIVE__ = false;
+      }
+      window.dispatchEvent(
+        new CustomEvent("xcannes:moonpay-active", { detail: { active } }),
+      );
+    } catch {
+      // Ignore storage errors
+    }
+  }, [iframeUrl, isOpen, step]);
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");

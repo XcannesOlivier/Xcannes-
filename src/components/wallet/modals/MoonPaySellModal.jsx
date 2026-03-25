@@ -12,6 +12,7 @@ import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
+const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
 
 const isTrustedMoonPayOrigin = (origin) => {
   try {
@@ -57,6 +58,27 @@ const MoonPaySellModal = ({
   const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
+
+  // Keep MoonPay flow "active" to prevent wallet-level auto-lock disconnects
+  // while user interacts with the iframe (KYC/Apple flows).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const active = Boolean(isOpen && step === "iframe" && iframeUrl);
+    try {
+      if (active) {
+        window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
+        window.__XCANNES_MOONPAY_ACTIVE__ = true;
+      } else {
+        window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
+        window.__XCANNES_MOONPAY_ACTIVE__ = false;
+      }
+      window.dispatchEvent(
+        new CustomEvent("xcannes:moonpay-active", { detail: { active } }),
+      );
+    } catch {
+      // Ignore
+    }
+  }, [iframeUrl, isOpen, step]);
 
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
