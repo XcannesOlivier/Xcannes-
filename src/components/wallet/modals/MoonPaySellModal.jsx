@@ -609,7 +609,8 @@ const MoonPaySellModal = ({
           <iframe
             src={iframeUrl}
             className="w-full h-full rounded-lg"
-            allow="payment"
+            allow="payment; camera; microphone; fullscreen; clipboard-read; clipboard-write"
+            allowFullScreen
             title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
           />
 
