@@ -26,7 +26,7 @@ const securityHeaders = [
         ? "frame-src 'self' https://moonpay.com https://*.moonpay.com"
         : "frame-src 'self'",
   },
-];
+].filter(Boolean);
 
 const nextConfig = {
   reactStrictMode: true,

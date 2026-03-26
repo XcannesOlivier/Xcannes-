@@ -9,6 +9,7 @@ import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { isIOSDevice } from "@/utils/deviceDetect";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -61,12 +62,18 @@ const MoonPaySellModal = ({
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const pendingAutoStartRef = useRef(false);
+  const isEmbeddedPwa =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("embedded") === "pwa";
+  const showIOSKycFallback = isEmbeddedPwa && isIOSDevice();
 
   // Keep MoonPay flow "active" to prevent wallet-level auto-lock disconnects
-  // while user interacts with the iframe (KYC/Apple flows).
+  // while user interacts with MoonPay (KYC/Apple flows).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const active = Boolean(isOpen && step === "iframe" && iframeUrl);
+    const active = Boolean(
+      isOpen && iframeUrl && (step === "iframe" || step === "external"),
+    );
     try {
       if (active) {
         window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
@@ -468,8 +475,15 @@ const MoonPaySellModal = ({
 
       if (data.success && data.url) {
         setIframeUrl(data.url);
-        setStep("iframe");
         saveResumeState({ lastIframeUrl: data.url });
+
+        if (showIOSKycFallback) {
+          setStep("external");
+          window.open(data.url, "_blank", "noopener,noreferrer");
+          return;
+        }
+
+        setStep("iframe");
       } else {
         throw new Error(
           t(
@@ -753,7 +767,7 @@ const MoonPaySellModal = ({
           <iframe
             src={iframeUrl}
             className="w-full h-full rounded-lg"
-            allow="payment; camera; microphone; fullscreen; clipboard-read; clipboard-write"
+            allow="clipboard-write"
             allowFullScreen
             title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
           />
@@ -765,6 +779,40 @@ const MoonPaySellModal = ({
           >
             {t("close", "Close")}
           </button>
+        </div>
+      )}
+
+      {/* iOS fallback: open MoonPay in new tab */}
+      {step === "external" && iframeUrl && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <h4 className="text-lg font-semibold text-white mb-2">
+            {t("moonpay_opened_in_new_tab", "MoonPay opened in a new tab")}
+          </h4>
+          <p className="text-white/60 text-sm mb-4 max-w-[420px]">
+            {t(
+              "moonpay_ios_camera_requires_new_tab",
+              "On iPhone/iPad, the KYC camera may be blocked inside an embedded wallet. Continue in Safari.",
+            )}
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                saveResumeState({ lastIframeUrl: iframeUrl });
+                window.open(iframeUrl, "_blank", "noopener,noreferrer");
+              }}
+              className="px-5 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all"
+            >
+              {t("open", "Open")}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+            >
+              {t("close", "Close")}
+            </button>
+          </div>
         </div>
       )}
 

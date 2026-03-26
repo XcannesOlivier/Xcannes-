@@ -21,3 +21,16 @@ export function isMobileDevice() {
     (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1)
   );
 }
+
+/**
+ * @returns {boolean} true if the current device is iOS/iPadOS (incl. iPad with desktop UA)
+ */
+export function isIOSDevice() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const isAppleTouchDevice =
+    /iphone|ipad|ipod/i.test(ua) ||
+    (/Macintosh/i.test(ua) && Number(navigator.maxTouchPoints || 0) > 1);
+  const isAndroid = /android/i.test(ua);
+  return isAppleTouchDevice && !isAndroid;
+}
