@@ -731,20 +731,6 @@ const MoonPayBuyModal = ({
           >
             {t("close", "Close")}
           </button>
-
-          {showIOSKycFallback && (
-            <a
-              href={iframeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute bottom-2 left-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-xs transition-colors"
-            >
-              {t(
-                "moonpay_open_in_safari_for_kyc",
-                "Caméra bloquée ? Ouvrir en plein écran",
-              )}
-            </a>
-          )}
         </div>
       )}
 
