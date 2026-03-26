@@ -16,6 +16,7 @@ const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
 const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
 const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
 const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
+const MOONPAY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
 
 const isTrustedMoonPayOrigin = (origin) => {
   try {
@@ -70,6 +71,13 @@ const MoonPaySellModal = ({
   const moonpayIframeAllow = isIOS
     ? "camera *; microphone *; clipboard-write"
     : "camera https://moonpay.com https://buy.moonpay.com https://buy-sandbox.moonpay.com https://sell.moonpay.com https://sell-sandbox.moonpay.com https://wallet.moonpay.com https://*.moonpay.com; clipboard-write";
+  const latestStepRef = useRef(step);
+  const latestIframeUrlRef = useRef(iframeUrl);
+
+  useEffect(() => {
+    latestStepRef.current = step;
+    latestIframeUrlRef.current = iframeUrl;
+  }, [iframeUrl, step]);
 
   // Keep MoonPay flow "active" to prevent wallet-level auto-lock disconnects
   // while user interacts with MoonPay (KYC/Apple flows).
@@ -92,6 +100,55 @@ const MoonPaySellModal = ({
       // Ignore
     }
   }, [iframeUrl, isOpen, step]);
+
+  const deactivateMoonpayActive = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
+        window.__XCANNES_MOONPAY_ACTIVE__ = false;
+        window.dispatchEvent(
+          new CustomEvent("xcannes:moonpay-active", { detail: { active: false } }),
+        );
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
+
+  const handleUserClose = useMemo(() => {
+    return () => {
+      clearResumeState();
+      clearAutoOpen();
+      deactivateMoonpayActive();
+      setIframeUrl(null);
+      setError(null);
+      setStep("form");
+      onClose?.();
+    };
+  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive, onClose]);
+
+  const handleWidgetClose = useMemo(() => {
+    return () => {
+      clearResumeState();
+      clearAutoOpen();
+      deactivateMoonpayActive();
+      setIframeUrl(null);
+      setError(null);
+      setStep("form");
+    };
+  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive]);
+
+  // If the user closes the Cash modal while the MoonPay widget is open,
+  // don't keep the resume cache around.
+  useEffect(() => {
+    return () => {
+      if (latestStepRef.current !== "iframe" || !latestIframeUrlRef.current) return;
+      clearResumeState();
+      clearAutoOpen();
+      deactivateMoonpayActive();
+    };
+  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive]);
 
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
@@ -261,7 +318,7 @@ const MoonPaySellModal = ({
     if (!resume) return;
     if (String(resume.walletAddress || "") !== String(walletAddress || "")) return;
     const ageMs = Date.now() - Number(resume.ts || 0);
-    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 60 * 60 * 1000) return;
+    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > MOONPAY_RESUME_MAX_AGE_MS) return;
 
     if (resume.lastIframeUrl) {
       setIframeUrl(String(resume.lastIframeUrl));
@@ -532,9 +589,7 @@ const MoonPaySellModal = ({
       }
 
       if (type === "close" || type === "widget_closed") {
-        clearResumeState();
-        clearAutoOpen();
-        onClose();
+        handleWidgetClose();
       }
     };
 
@@ -545,7 +600,15 @@ const MoonPaySellModal = ({
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [clearAutoOpen, clearResumeState, isOpen, onClose, t]);
+  }, [
+    clearAutoOpen,
+    clearResumeState,
+    deactivateMoonpayActive,
+    handleWidgetClose,
+    isOpen,
+    onClose,
+    t,
+  ]);
 
   // Reset au changement de devise
   useEffect(() => {
@@ -769,7 +832,7 @@ const MoonPaySellModal = ({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleUserClose}
             className="absolute top-2 right-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors"
           >
             {t("close", "Close")}
