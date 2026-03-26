@@ -61,6 +61,7 @@ export function useWalletSendOrchestrator({
 
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
+  const [moonpaySellRequest, setMoonpaySellRequest] = useState(null);
 
   // ── Receive form ───────────────────────────────────────────
   const [receiveTab, setReceiveTab] = useState("receive");
@@ -88,10 +89,21 @@ export function useWalletSendOrchestrator({
   }, [requestCurrency, setRequestCurrency]);
 
   // ── Selected send token ────────────────────────────────────
-  const selectedSendToken =
-    selectableTokens.find((tok) => tok.key === sendAssetKey) ||
-    selectableTokens[0] ||
-    null;
+  const selectedSendToken = useMemo(() => {
+    const activeCurrency = String(moonpaySellRequest?.baseCurrencyCode || "")
+      .trim()
+      .toUpperCase();
+    const activePool = moonpaySellRequest ? augmentedTokens : selectableTokens;
+    const byKey = (activePool || []).find((tok) => tok.key === sendAssetKey);
+    if (byKey) return byKey;
+    if (activeCurrency) {
+      const byCurrency = (augmentedTokens || []).find(
+        (tok) => String(tok?.currency || "").trim().toUpperCase() === activeCurrency,
+      );
+      if (byCurrency) return byCurrency;
+    }
+    return (activePool || [])[0] || null;
+  }, [augmentedTokens, moonpaySellRequest, selectableTokens, sendAssetKey]);
 
   // ── Send FX info ───────────────────────────────────────────
   const sendFxInfo = useMemo(() => {
@@ -196,6 +208,7 @@ export function useWalletSendOrchestrator({
     (entry) => {
       if (!entry?.payreq) return;
       const pr = entry.payreq;
+      setMoonpaySellRequest(null);
       if (pr.to) setSendDestination(pr.to);
       setSendDestinationLabel("");
       const targetCurrency = String(pr.targetCurrencyCode || "").toUpperCase();
@@ -227,6 +240,49 @@ export function useWalletSendOrchestrator({
     ],
   );
 
+  const startMoonpaySellRequest = useCallback(
+    (request) => {
+      if (!request) return false;
+      const currency = String(request?.baseCurrencyCode || "")
+        .trim()
+        .toUpperCase();
+      const destination = String(request?.depositWalletAddress || "").trim();
+      const amount = String(request?.baseCurrencyAmount || "").trim();
+      if (!currency || !destination || !amount) return false;
+
+      const matchingToken = (augmentedTokens || []).find(
+        (tok) => String(tok?.currency || "").trim().toUpperCase() === currency,
+      );
+      if (!matchingToken) return false;
+
+      setMoonpaySellRequest({
+        ...request,
+        baseCurrencyCode: currency,
+        beneficiaryLabel: "MoonPay",
+      });
+      setSendPaymentRequest(null);
+      setSendTab("manual");
+      setSendAssetKey(matchingToken.key);
+      setSendDestination(destination);
+      setSendDestinationLabel("MoonPay");
+      setSendAmount(amount);
+      return true;
+    },
+    [
+      augmentedTokens,
+      setSendAmount,
+      setSendAssetKey,
+      setSendDestination,
+      setSendDestinationLabel,
+      setSendPaymentRequest,
+      setSendTab,
+    ],
+  );
+
+  const clearMoonpaySellRequest = useCallback(() => {
+    setMoonpaySellRequest(null);
+  }, []);
+
   // ── Send transaction handler ───────────────────────────────
   const { handleSendSubmit } = useSendTransaction({
     isConnected,
@@ -239,6 +295,7 @@ export function useWalletSendOrchestrator({
     sendDestination,
     sendDestinationLabel,
     sendPaymentRequest,
+    moonpaySellRequest,
     setSendProcessing,
     setSendAmount,
     setSendDestination,
@@ -256,6 +313,7 @@ export function useWalletSendOrchestrator({
     confirm,
     removePayreq,
     pendingPayreqs,
+    clearMoonpaySellRequest,
   });
 
   return {
@@ -271,6 +329,7 @@ export function useWalletSendOrchestrator({
     sendProcessing,
     sendPaymentRequest,
     setSendPaymentRequest,
+    moonpaySellRequest,
     // Addresses
     savedAddresses,
     saveAddress,
@@ -305,6 +364,8 @@ export function useWalletSendOrchestrator({
     // Handlers
     closeInlineQr,
     handleResumePayreq,
+    startMoonpaySellRequest,
+    clearMoonpaySellRequest,
     handleSendSubmit,
     resetSendForm,
     resetReceiveForm,

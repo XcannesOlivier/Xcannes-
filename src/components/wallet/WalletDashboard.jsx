@@ -50,11 +50,59 @@ function isAcceptedOnChainToken(currency) {
   return WALLET_ACCEPTED_TOKENS.has(code);
 }
 
+const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
+const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
+const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
+const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
+const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
+const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
+
+function isTrustedMoonpayUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return false;
+    const host = String(url.hostname || "").toLowerCase();
+    return host === "moonpay.com" || host.endsWith(MOONPAY_ORIGIN_SUFFIX);
+  } catch {
+    return false;
+  }
+}
+
+function clearMoonpaySellClientState() {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
+    window.sessionStorage?.removeItem(MOONPAY_AUTOOPEN_TAB_KEY);
+    window.sessionStorage?.removeItem(MOONPAY_SELL_RESUME_KEY);
+    window.sessionStorage?.removeItem(MOONPAY_SELL_FLOW_KEY);
+    window.localStorage?.removeItem(MOONPAY_WALLET_ADDRESS_KEY);
+    window.__XCANNES_MOONPAY_ACTIVE__ = false;
+    window.dispatchEvent(
+      new CustomEvent("xcannes:moonpay-active", { detail: { active: false } }),
+    );
+  } catch {
+    // ignore
+  }
+}
+
+function returnToMoonpaySellWidget(returnUrl) {
+  if (typeof window === "undefined") return;
+  clearMoonpaySellClientState();
+  if (isTrustedMoonpayUrl(returnUrl)) {
+    window.location.href = returnUrl;
+    return;
+  }
+  if (window.history.length > 1) {
+    window.history.back();
+  }
+}
+
 export default function WalletDashboard({
   showDesktopStatement = false,
   qrSizingVariant = "default",
   showMobileHomeLink = false,
   allowBackgroundScrollOnMobile = false,
+  initialMoonpaySellRequest = null,
 }) {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -94,6 +142,7 @@ export default function WalletDashboard({
   const TX_ACTION_LABELS = useMemo(() => ({
     "wallet:convert": t("ui_tx_label_conversion", "Conversion"),
     "wallet:send": t("ui_tx_label_payment", "Paiement"),
+    "moonpay:sell": t("ui_tx_label_moonpay_sell", "Envoi MoonPay"),
     "wallet:reconcile": t("ui_tx_label_reconciliation", "Réconciliation"),
     "wallet:activate_xrp": t("ui_tx_label_activation", "Activation"),
     "wallet:setup": t("ui_tx_label_setup", "Configuration"),
@@ -103,16 +152,27 @@ export default function WalletDashboard({
   const [activeAction, setActiveAction] = useState(null);
 
   const handleTxProgressClose = useCallback(() => {
+    let shouldCloseAction = false;
+    let shouldReturnToMoonpay = false;
+    let moonpayReturnUrl = "";
+
     setTxProgress((prev) => {
-      // Auto-close the swap panel after a successful conversion
-      if (
-        prev.status === "success" &&
-        (prev.actionKey === "wallet:convert" || prev.actionKey === "wallet:send")
-      ) {
-        setActiveAction(null);
+      if (prev.status === "success") {
+        shouldCloseAction =
+          prev.actionKey === "wallet:convert" ||
+          prev.actionKey === "wallet:send" ||
+          prev.actionKey === "moonpay:sell";
+        shouldReturnToMoonpay = prev.actionKey === "moonpay:sell";
+        moonpayReturnUrl = String(prev.details?.moonpayReturnUrl || "").trim();
       }
       return { ...prev, visible: false };
     });
+    if (shouldCloseAction) {
+      setActiveAction(null);
+    }
+    if (shouldReturnToMoonpay) {
+      returnToMoonpaySellWidget(moonpayReturnUrl);
+    }
   }, [setActiveAction]);
 
   /**
@@ -468,6 +528,34 @@ export default function WalletDashboard({
     confirm,
     setActiveAction,
   });
+  const { startMoonpaySellRequest } = sendState;
+
+  const handledMoonpaySellRequestRef = useRef("");
+
+  useEffect(() => {
+    const request = initialMoonpaySellRequest;
+    if (!request?.depositWalletAddress) return;
+
+    const requestKey =
+      String(request?.flowId || "").trim() ||
+      String(request?.transactionId || "").trim() ||
+      [
+        request.depositWalletAddress,
+        request.baseCurrencyCode,
+        request.baseCurrencyAmount,
+      ]
+        .map((value) => String(value || "").trim())
+        .join(":");
+
+    if (!requestKey) return;
+    if (handledMoonpaySellRequestRef.current === requestKey) return;
+
+    const started = startMoonpaySellRequest?.(request);
+    if (!started) return;
+
+    handledMoonpaySellRequestRef.current = requestKey;
+    setActiveAction("send");
+  }, [initialMoonpaySellRequest, setActiveAction, startMoonpaySellRequest]);
 
   useWalletIncomingToast({ backendWalletAddress, flashWalletHeaderToast });
 
@@ -953,7 +1041,8 @@ export default function WalletDashboard({
         autoCloseMs={
           txProgress.actionKey === "wallet:convert"
             ? 1600
-            : txProgress.actionKey === "wallet:send"
+            : txProgress.actionKey === "wallet:send" ||
+                txProgress.actionKey === "moonpay:sell"
               ? 2000
               : null
         }

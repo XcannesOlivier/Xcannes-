@@ -26,6 +26,7 @@ export default function WalletDashboardSendModal({
   sendAmount,
   setSendAmount,
   sendPaymentRequest,
+  moonpaySellRequest,
   selectLabelByAssetKey,
   selectLabelRightByAssetKey,
   selectIconByAssetKey,
@@ -77,6 +78,7 @@ export default function WalletDashboardSendModal({
     () => String(sendDestination || "").trim(),
     [sendDestination],
   );
+  const hasMoonpaySellRequest = Boolean(moonpaySellRequest?.depositWalletAddress);
   const effectiveDestination = String(
     sendPaymentRequest?.to || normalizedDestination || "",
   ).trim();
@@ -105,6 +107,7 @@ export default function WalletDashboardSendModal({
     );
   }, [savedAddresses, effectiveDestination]);
   const canSaveDestination =
+    !hasMoonpaySellRequest &&
     enableSaveAddress &&
     effectiveDestination &&
     !isSavedDestination;
@@ -701,6 +704,7 @@ export default function WalletDashboardSendModal({
   ) : null;
 
   const recipientCard = !hasPaymentRequest ? (
+    hasMoonpaySellRequest ? null : (
     <div>
       <label
         className="block text-base md:text-lg text-white/60 mb-1.5"
@@ -837,9 +841,103 @@ export default function WalletDashboardSendModal({
 
       {saveAddressBlock}
     </div>
+    )
   ) : null;
 
-  const manualForm = (
+  const moonpayDestinationLabel =
+    String(moonpaySellRequest?.beneficiaryLabel || "MoonPay").trim() || "MoonPay";
+  const moonpayReturnHint = String(moonpaySellRequest?.returnUrl || "").trim()
+    ? t(
+        "moonpay_sell_sign_return_hint",
+        "Après signature, vous serez renvoyé automatiquement vers MoonPay.",
+      )
+    : t(
+        "moonpay_sell_sign_return_manual_hint",
+        "Après signature, revenez sur MoonPay pour finaliser la vente.",
+      );
+
+  const moonpaySellPreset = hasMoonpaySellRequest ? (
+    <div className="space-y-3">
+      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
+          {t("moonpay_sell_signature_title", "Validation MoonPay")}
+        </div>
+        <div className="space-y-3 text-sm text-white/80">
+          <div className="space-y-0.5">
+            <div className="text-[11px] text-white/45">
+              {t("ui_beneficiary_label", "Destinataire")}
+            </div>
+            <div className="text-sm font-semibold text-white/90">
+              {moonpayDestinationLabel}
+            </div>
+          </div>
+          <div className="space-y-0.5">
+            <div className="text-[11px] text-white/45">
+              {t("ui_address", "Adresse")}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowFullRecipientAccount((prev) => !prev)}
+              className={[
+                "font-mono text-xs text-white/80 text-left transition-colors",
+                "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
+                showFullRecipientAccount ? "break-all" : "",
+              ].join(" ")}
+              title={t(
+                "ui_toggle_full_account_number",
+                "Afficher/masquer l’adresse complète",
+              )}
+            >
+              {showFullRecipientAccount ? normalizedDestination : compactDestinationLabel}
+            </button>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-0.5">
+              <div className="text-[11px] text-white/45">
+                {t("ui_currency_label", "Devise")}
+              </div>
+              <div className="text-sm text-white/90">
+                {confirmCurrencyCode || "—"}
+              </div>
+            </div>
+            <div className="text-right space-y-0.5">
+              <div className="text-[11px] text-white/45">
+                {t("ui_amount_52cea2dd3d", "Montant")}
+              </div>
+              <div className="text-lg font-semibold text-white/95">
+                {confirmAmountLabel || "—"}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="rounded-lg ring-1 ring-sky-400/20 ring-inset bg-sky-400/10 px-3 py-2 text-xs text-sky-100/90">
+        {moonpayReturnHint}
+      </div>
+      {manualInsufficientBalance ? (
+        <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
+          <div className="font-semibold">
+            {t("ui_insufficient_balance_title", "Solde insuffisant")}
+          </div>
+          <div>
+            {t(
+              "ui_insufficient_balance_manual_detail",
+              "Vous n'avez pas assez de {{currency}} pour ce montant.",
+              {
+                currency: String(
+                  selectedSendToken?.currency || "",
+                ).toUpperCase(),
+              },
+            )}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  ) : null;
+
+  const manualForm = hasMoonpaySellRequest ? (
+    moonpaySellPreset
+  ) : (
     <div className="space-y-3">
         {/* ── Destination ── */}
         {recipientCard}
@@ -1159,8 +1257,12 @@ export default function WalletDashboardSendModal({
       <SwipeConfirmButton
         label={
           sendProcessing
-            ? t("ui_sending_3b8c1a7d5e", "Sending...")
-            : t("ui_send_504b64a87b", "Send")
+            ? hasMoonpaySellRequest
+              ? t("moonpay_sell_signing_action", "Signature en cours...")
+              : t("ui_sending_3b8c1a7d5e", "Sending...")
+            : hasMoonpaySellRequest
+              ? t("moonpay_sell_sign_submit", "Signer et envoyer")
+              : t("ui_send_504b64a87b", "Send")
         }
         onConfirm={handleManualSend}
         disabled={
@@ -1189,8 +1291,12 @@ export default function WalletDashboardSendModal({
         className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
       >
         {sendProcessing
-          ? t("ui_sending_3b8c1a7d5e", "Sending...")
-          : t("ui_send_504b64a87b", "Send")}
+          ? hasMoonpaySellRequest
+            ? t("moonpay_sell_signing_action", "Signature en cours...")
+            : t("ui_sending_3b8c1a7d5e", "Sending...")
+          : hasMoonpaySellRequest
+            ? t("moonpay_sell_sign_submit", "Signer et envoyer")
+            : t("ui_send_504b64a87b", "Send")}
       </button>
     </div>
   );
@@ -1306,7 +1412,7 @@ export default function WalletDashboardSendModal({
           >
             <div className="flex flex-col gap-3">
               {hasPaymentRequest ? payreqFinalStep : manualForm}
-              {!hasPaymentRequest ? inlineSummary : null}
+              {!hasPaymentRequest && !hasMoonpaySellRequest ? inlineSummary : null}
               {scannerModal}
             </div>
           </div>

@@ -25,8 +25,9 @@ const isMoonpaySellDestination = (address) => {
 const buildMoonpaySellMemos = (
   destination,
   { currency, amount, amountRlusd } = {},
+  { force = false } = {},
 ) => {
-  if (!isMoonpaySellDestination(destination)) return null;
+  if (!force && !isMoonpaySellDestination(destination)) return null;
   const payload = buildMoonpayMemo({
     side: "sell",
     provider: "moonpay",
@@ -85,6 +86,7 @@ export function useSendTransaction({
   sendDestination,
   sendDestinationLabel,
   sendPaymentRequest,
+  moonpaySellRequest,
   setSendProcessing,
   setSendAmount,
   setSendDestination,
@@ -109,6 +111,7 @@ export function useSendTransaction({
   // usePayreqStorage()
   removePayreq,
   pendingPayreqs,
+  clearMoonpaySellRequest,
 }) {
   // ------------------------------------------------------------------
   // handleSendSubmit
@@ -170,8 +173,10 @@ export function useSendTransaction({
     }
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
+    const isMoonpaySell = Boolean(moonpaySellRequest?.depositWalletAddress);
     // USD (pool non alloué) est envoyé comme RLUSD natif, pas comme une conversion FX.
     const isFxSend =
+      !isMoonpaySell &&
       selectedSendToken?.isTrustlineOnly &&
       currency !== "XRP" &&
       currency !== "RLUSD" &&
@@ -188,6 +193,7 @@ export function useSendTransaction({
           amountNum,
           dest,
           currency,
+          isMoonpaySell,
           handleAddressSave,
           normalizedSaveDestination,
           saveLabel,
@@ -198,6 +204,7 @@ export function useSendTransaction({
         amountNum,
         dest,
         currency,
+        isMoonpaySell,
         handleAddressSave,
         normalizedSaveDestination,
         saveLabel,
@@ -220,6 +227,7 @@ export function useSendTransaction({
     amountNum,
     dest,
     currency,
+    isMoonpaySell,
     handleAddressSave,
     normalizedSaveDestination,
     saveLabel,
@@ -332,7 +340,7 @@ export function useSendTransaction({
         currency,
         amount: amountNum,
         amountRlusd: paymentRlusd,
-      }),
+      }, { force: isMoonpaySell }),
     );
     appendMemos(
       payTx,
@@ -342,19 +350,26 @@ export function useSendTransaction({
     const savedEntry = (savedAddresses || []).find(
       (a) => String(a?.address || "").trim() === String(dest || "").trim(),
     );
+    const moonpayBeneficiaryLabel = isMoonpaySell
+      ? String(moonpaySellRequest?.beneficiaryLabel || "MoonPay").trim()
+      : "";
     const beneficiaryLabel =
+      moonpayBeneficiaryLabel ||
       String(sendDestinationLabel || "").trim() ||
       String(savedEntry?.onChainLabel || savedEntry?.label || "").trim() ||
       "";
 
     const payResult = await signTransaction(payTx, {
-      action: "wallet:send",
+      action: isMoonpaySell ? "moonpay:sell" : "wallet:send",
       progressDetails: {
         amountLabel: `${amountNum.toLocaleString("en-US", {
           maximumFractionDigits: 2,
         })} ${currency}`,
         beneficiaryLabel: beneficiaryLabel || null,
         beneficiaryAddress: dest,
+        moonpayReturnUrl: isMoonpaySell
+          ? String(moonpaySellRequest?.returnUrl || "").trim()
+          : "",
       },
     });
     if (payResult?.signed) {
@@ -388,6 +403,7 @@ export function useSendTransaction({
         if (match) removePayreq(match.id);
       }
       setSendPaymentRequest(null);
+      clearMoonpaySellRequest?.();
       // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {
@@ -403,6 +419,7 @@ export function useSendTransaction({
     amountNum,
     dest,
     currency,
+    isMoonpaySell,
     handleAddressSave,
     normalizedSaveDestination,
     saveLabel,
@@ -482,7 +499,7 @@ export function useSendTransaction({
         currency,
         amount: amountNum,
         amountRlusd: currency === "RLUSD" ? amountNum : null,
-      }),
+      }, { force: isMoonpaySell }),
     );
     appendMemos(
       txjson,
@@ -492,7 +509,11 @@ export function useSendTransaction({
     const savedEntry = (savedAddresses || []).find(
       (a) => String(a?.address || "").trim() === String(dest || "").trim(),
     );
+    const moonpayBeneficiaryLabel = isMoonpaySell
+      ? String(moonpaySellRequest?.beneficiaryLabel || "MoonPay").trim()
+      : "";
     const beneficiaryLabel =
+      moonpayBeneficiaryLabel ||
       String(sendDestinationLabel || "").trim() ||
       String(savedEntry?.onChainLabel || savedEntry?.label || "").trim() ||
       "";
@@ -520,11 +541,14 @@ export function useSendTransaction({
     })();
 
     const result = await signTransaction(txjson, {
-      action: "wallet:send",
+      action: isMoonpaySell ? "moonpay:sell" : "wallet:send",
       progressDetails: {
         amountLabel,
         beneficiaryLabel: beneficiaryLabel || null,
         beneficiaryAddress: dest,
+        moonpayReturnUrl: isMoonpaySell
+          ? String(moonpaySellRequest?.returnUrl || "").trim()
+          : "",
       },
     });
     if (result && result.signed) {
@@ -559,6 +583,7 @@ export function useSendTransaction({
         if (match) removePayreq(match.id);
       }
       setSendPaymentRequest(null);
+      clearMoonpaySellRequest?.();
       // Balance refresh is handled automatically via WebSocket wallet:address channel
       return { ok: true };
     } else {

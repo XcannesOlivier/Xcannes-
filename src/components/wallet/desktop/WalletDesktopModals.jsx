@@ -56,8 +56,8 @@ export default function WalletDesktopModals({
   setQrScannerOpen,
   handleAddressScan,
 
-  // desktop cash uses selectableTokens
-  selectableTokens,
+  // desktop cash uses wallet tokens compatible with MoonPay
+  augmentedTokens,
 }) {
   return (
     <aside className="hidden lg:flex lg:flex-col min-h-0 h-full relative overflow-hidden">
@@ -121,7 +121,7 @@ export default function WalletDesktopModals({
             setCashBuyPrefill(null);
           }}
           {...cashModalProps}
-          availableTokens={selectableTokens}
+          availableTokens={augmentedTokens}
         />
       ) : null}
 

@@ -6,7 +6,6 @@ import WalletDashboard from "@/components/wallet/WalletDashboard";
 import WalletConnectScreen from "@/components/wallet/WalletConnectScreen";
 import SEOHead from "@/components/layout/SEOHead";
 import { useWallet } from "@/context/WalletContext";
-import { buildMoonpayMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
 const MOONPAY_BUY_FLOW_KEY = "xcannes_moonpay_buy_flow_v1";
@@ -31,21 +30,6 @@ function isTrustedMoonpayReferrer(referrer) {
   }
 }
 
-function xrpToDropsString(xrpAmountRaw) {
-  const raw = String(xrpAmountRaw ?? "").trim();
-  if (!raw) return null;
-  const m = raw.match(/^(\d+)(?:\.(\d{0,6}))?$/);
-  if (!m) return null;
-  const whole = m[1] || "0";
-  const frac = (m[2] || "").padEnd(6, "0");
-  try {
-    const drops = BigInt(whole) * 1000000n + BigInt(frac || "0");
-    return drops > 0n ? drops.toString() : null;
-  } catch {
-    return null;
-  }
-}
-
 /** Detect PWA embedded mode (?embedded=pwa) */
 function useIsEmbedded() {
   const [embedded, setEmbedded] = useState(false);
@@ -59,10 +43,9 @@ function useIsEmbedded() {
 
 export default function Wallet() {
   const { t } = useTranslation("common");
-  const { isConnected, isSessionReady, disconnect, signTransaction } = useWallet();
+  const { isConnected, isSessionReady, disconnect } = useWallet();
   const isEmbedded = useIsEmbedded();
-  const [moonpayDeposit, setMoonpayDeposit] = useState(null);
-  const [depositStatus, setDepositStatus] = useState({ state: "idle", error: "" });
+  const [moonpaySellRequest, setMoonpaySellRequest] = useState(null);
   const [moonpayIframeReturn, setMoonpayIframeReturn] = useState(null);
 
   useEffect(() => {
@@ -161,21 +144,14 @@ export default function Wallet() {
         return;
       }
 
-      const depositWalletAddressTagRaw = getFirst([
-        "depositWalletAddressTag",
-        "depositWalletTag",
-        "walletAddressTag",
-        "destinationTag",
-      ]);
-      const depositWalletAddressTag = depositWalletAddressTagRaw
-        ? Number.parseInt(depositWalletAddressTagRaw, 10)
-        : null;
+      const normalizedCurrency = String(baseCurrencyCode || "").trim().toUpperCase();
+      if (moonpayKind !== "sell") return;
+      if (normalizedCurrency !== "XRP" && normalizedCurrency !== "RLUSD") return;
+
       const transactionId = getFirst(["transactionId", "externalTransactionId"]);
-      setMoonpayDeposit({
+      setMoonpaySellRequest({
         depositWalletAddress,
-        depositWalletAddressTag:
-          Number.isFinite(depositWalletAddressTag) ? depositWalletAddressTag : null,
-        baseCurrencyCode: String(baseCurrencyCode).trim().toUpperCase(),
+        baseCurrencyCode: normalizedCurrency,
         baseCurrencyAmount: String(baseCurrencyAmount).trim(),
         transactionId: String(transactionId || "").trim() || null,
         returnUrl: referrerOk ? referrer : "",
@@ -333,7 +309,7 @@ export default function Wallet() {
 
   // Not connected: show wallet-app style connect screen with QR code
   if (!isConnected && !isEmbedded) {
-    if (moonpayDeposit) {
+    if (moonpaySellRequest) {
       return (
         <main className="min-h-[100svh] flex items-center justify-center bg-xcannes-surface-demo text-white font-montserrat px-6">
           <div className="max-w-md w-full space-y-4">
@@ -355,149 +331,6 @@ export default function Wallet() {
       <>
         {seoHead}
         <WalletConnectScreen />
-      </>
-    );
-  }
-
-  if (moonpayDeposit && !isEmbedded) {
-    const { depositWalletAddress, depositWalletAddressTag, baseCurrencyCode, baseCurrencyAmount } =
-      moonpayDeposit;
-    const canSend = Boolean(signTransaction);
-    const isBusy = depositStatus.state === "sending";
-
-    const handleDepositSend = async () => {
-      if (!canSend) return;
-      if (!moonpayDeposit) return;
-      if (isBusy) return;
-
-      setDepositStatus({ state: "sending", error: "" });
-      try {
-        const currency = String(baseCurrencyCode || "").toUpperCase();
-        const issuer =
-          currency === "RLUSD"
-            ? (process.env.NEXT_PUBLIC_RLUSD_ISSUER || "").trim()
-            : "";
-        const amountStr = String(baseCurrencyAmount || "").trim();
-
-        const txjson = {
-          TransactionType: "Payment",
-          Destination: depositWalletAddress,
-        };
-        if (depositWalletAddressTag != null) {
-          txjson.DestinationTag = depositWalletAddressTag;
-        }
-
-        if (currency === "XRP") {
-          const drops = xrpToDropsString(amountStr);
-          if (!drops) throw new Error("Invalid XRP amount");
-          txjson.Amount = drops;
-        } else if (currency === "RLUSD") {
-          if (!issuer) throw new Error("Missing RLUSD issuer");
-          const num = Number(amountStr);
-          if (!Number.isFinite(num) || num <= 0) throw new Error("Invalid RLUSD amount");
-          txjson.Amount = { currency: "RLUSD", issuer, value: amountStr };
-        } else {
-          throw new Error(`Unsupported currency: ${currency}`);
-        }
-
-        const memoPayload = buildMoonpayMemo({
-          side: "sell",
-          provider: "moonpay",
-          currencyCode: currency,
-          amount: Number.isFinite(Number(amountStr)) ? Number(amountStr) : null,
-          amountRlusd: currency === "RLUSD" ? Number(amountStr) : null,
-        });
-        const memos = memoPayload ? buildXrplJsonMemo(memoPayload) : null;
-        if (memos) txjson.Memos = memos;
-
-        const result = await signTransaction(txjson, {
-          action: "moonpay:deposit",
-          progressDetails: {
-            amountLabel: `${amountStr} ${currency}`,
-            beneficiaryAddress: depositWalletAddress,
-            beneficiaryLabel: "MoonPay",
-          },
-        });
-
-        if (!result?.signed) {
-          throw new Error("Signature cancelled");
-        }
-
-        setDepositStatus({ state: "sent", error: "" });
-
-        // Return back to the widget (safe-guarded)
-        const returnUrl = moonpayDeposit.returnUrl || "";
-        try {
-          window.sessionStorage?.removeItem(MOONPAY_SELL_FLOW_KEY);
-        } catch {
-          // ignore
-        }
-        if (isTrustedMoonpayReferrer(returnUrl)) {
-          window.location.href = returnUrl;
-          return;
-        }
-        if (window.history.length > 1) {
-          window.history.back();
-        }
-      } catch (err) {
-        setDepositStatus({
-          state: "error",
-          error: err?.message || String(err),
-        });
-      }
-    };
-
-    return (
-      <>
-        {seoHead}
-        <main className="min-h-[100svh] flex items-center justify-center bg-xcannes-surface-demo text-white font-montserrat px-6">
-          <div className="max-w-md w-full space-y-4">
-            <h1 className="text-lg font-semibold">
-              {t("moonpay_deposit_title", "Finaliser la vente MoonPay")}
-            </h1>
-            <p className="text-sm text-white/70">
-              {t(
-                "moonpay_deposit_desc",
-                "Confirmez l’envoi demandé par MoonPay. Après signature, vous serez renvoyé automatiquement au widget.",
-              )}
-            </p>
-            <div className="rounded-xl border border-white/10 bg-black/30 p-4 text-sm text-white/80 space-y-2">
-              <div>
-                <span className="text-white/60">{t("asset", "Actif")}:</span>{" "}
-                <span className="font-semibold">{baseCurrencyCode}</span>
-              </div>
-              <div>
-                <span className="text-white/60">{t("amount", "Montant")}:</span>{" "}
-                <span className="font-semibold">{baseCurrencyAmount}</span>
-              </div>
-              <div className="break-all">
-                <span className="text-white/60">{t("destination", "Destination")}:</span>{" "}
-                <span className="font-mono text-xs">{depositWalletAddress}</span>
-              </div>
-              {depositWalletAddressTag != null ? (
-                <div>
-                  <span className="text-white/60">{t("tag", "Tag")}:</span>{" "}
-                  <span className="font-semibold">{depositWalletAddressTag}</span>
-                </div>
-              ) : null}
-            </div>
-
-            {depositStatus.state === "error" ? (
-              <div className="text-sm text-red-300">{depositStatus.error}</div>
-            ) : null}
-
-            <button
-              type="button"
-              onClick={handleDepositSend}
-              disabled={isBusy || !canSend}
-              className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 disabled:opacity-60"
-            >
-              {isBusy
-                ? t("moonpay_deposit_sending", "Signature en cours…")
-                : t("moonpay_deposit_confirm", "Signer & envoyer")}
-            </button>
-          </div>
-        </main>
       </>
     );
   }
@@ -576,6 +409,7 @@ export default function Wallet() {
               qrSizingVariant="dex"
               showMobileHomeLink={!isEmbedded}
               allowBackgroundScrollOnMobile
+              initialMoonpaySellRequest={moonpaySellRequest}
             />
           </div>
         </div>

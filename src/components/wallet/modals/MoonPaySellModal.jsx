@@ -50,7 +50,6 @@ const MoonPaySellModal = ({
   demoMode = false,
   onDemoSubmit,
   availableTokens,
-  rlusdPerUnitRates,
   selectLabelByCurrency,
   selectLabelRightByCurrency,
   selectIconByCurrency,
@@ -321,62 +320,55 @@ const MoonPaySellModal = ({
   ]);
 
   const supportedCurrencies = useMemo(() => {
-    const seen = new Set();
-    const options = [];
-    (availableTokens || []).forEach((token) => {
-      const currencyRaw = token?.currency;
-      const currency = String(currencyRaw || "").toUpperCase();
-      if (!currency || currency === "RLUSD" || seen.has(currency)) return;
-      seen.add(currency);
-      const labelLeft =
-        selectLabelByCurrency?.[currencyRaw] ||
-        selectLabelByCurrency?.[currency] ||
-        currency;
-      const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(
-        /:\s*$/,
-        "",
-      );
-      const amountValue = Number(token?.value || 0);
-      const amountLabel = Number.isFinite(amountValue)
-        ? formatAmountWithSymbol(locale, amountValue, currency, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })
-        : formatAmountWithSymbol(locale, 0, currency, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          });
-      const fallbackRight = `${balanceLabel} = ${amountLabel}`;
-      let labelRight =
-        selectLabelRightByCurrency?.[currencyRaw] ||
-        selectLabelRightByCurrency?.[currency] ||
-        fallbackRight;
-      let labelMobile =
-        selectLabelMobileByCurrency?.[currencyRaw] ||
-        selectLabelMobileByCurrency?.[currency] ||
-        labelLeft;
-      options.push({
-        code: currency,
-        label: labelLeft,
-        labelLeft,
-        labelRight,
-        labelMobile,
-        icon:
-          selectIconByCurrency?.[currencyRaw] ||
-          selectIconByCurrency?.[currency] ||
-          null,
-      });
-    });
+    const preferredOrder = ["RLUSD", "XRP"];
+    return preferredOrder
+      .map((currency) => {
+        const token = (availableTokens || []).find(
+          (entry) => String(entry?.currency || "").toUpperCase() === currency,
+        );
+        if (!token) return null;
 
-    if (options.length > 0) return options;
-    return [
-      {
-        code: "RLUSD",
-        label: "USD Stablecoin",
-        labelLeft: "USD Stablecoin",
-        labelMobile: "USD Stablecoin",
-      },
-    ];
+        const currencyRaw = token?.currency || currency;
+        const labelLeft =
+          selectLabelByCurrency?.[currencyRaw] ||
+          selectLabelByCurrency?.[currency] ||
+          currency;
+        const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(
+          /:\s*$/,
+          "",
+        );
+        const amountValue = Number(token?.value || 0);
+        const amountLabel = Number.isFinite(amountValue)
+          ? formatAmountWithSymbol(locale, amountValue, currency, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          : formatAmountWithSymbol(locale, 0, currency, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+        const fallbackRight = `${balanceLabel} = ${amountLabel}`;
+        const labelRight =
+          selectLabelRightByCurrency?.[currencyRaw] ||
+          selectLabelRightByCurrency?.[currency] ||
+          fallbackRight;
+        const labelMobile =
+          selectLabelMobileByCurrency?.[currencyRaw] ||
+          selectLabelMobileByCurrency?.[currency] ||
+          labelLeft;
+        return {
+          code: currency,
+          label: labelLeft,
+          labelLeft,
+          labelRight,
+          labelMobile,
+          icon:
+            selectIconByCurrency?.[currencyRaw] ||
+            selectIconByCurrency?.[currency] ||
+            null,
+        };
+      })
+      .filter(Boolean);
   }, [
     availableTokens,
     selectLabelByCurrency,
@@ -461,29 +453,21 @@ const MoonPaySellModal = ({
 
   const amountValue = Number.parseFloat(amount || "");
   const currencyUpper = String(currency || "").toUpperCase();
-  const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
-  const rlusdRate = isCurrencyLine
-    ? currencyUpper === "RLUSD" || currencyUpper === "USD"
-      ? 1
-      : Number(rlusdPerUnitRates?.[currencyUpper])
-    : Number.NaN;
+  const availableBalance = Number.parseFloat(selectedToken?.value ?? 0);
   const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
-  const conversionMissing =
-    isCurrencyLine &&
+  const insufficientBalance =
     hasValidAmount &&
-    (!Number.isFinite(rlusdRate) || rlusdRate <= 0);
-  const rlusdEquivalent =
-    isCurrencyLine && hasValidAmount && !conversionMissing
-      ? amountValue * rlusdRate
-      : null;
-  const baseCurrencyCode = isCurrencyLine ? "RLUSD" : currencyUpper;
-  const baseCurrencyAmount = isCurrencyLine
-    ? Number.isFinite(rlusdEquivalent)
-      ? Number(rlusdEquivalent.toFixed(6))
-      : Number.NaN
-    : hasValidAmount
-      ? amountValue
-      : Number.NaN;
+    Number.isFinite(availableBalance) &&
+    availableBalance >= 0 &&
+    amountValue > availableBalance;
+  const balanceLabel = Number.isFinite(availableBalance)
+    ? formatAmountWithSymbol(locale, availableBalance, currencyUpper || "XRP", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : null;
+  const baseCurrencyCode = currencyUpper;
+  const baseCurrencyAmount = hasValidAmount ? amountValue : Number.NaN;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -554,20 +538,20 @@ const MoonPaySellModal = ({
       );
       return;
     }
-    if (conversionMissing) {
-      setError(
-        t(
-          "ui_rate_unavailable_base_5c1a9b7d2e",
-          "Rate unavailable for base currency.",
-        ),
-      );
-      return;
-    }
     if (!Number.isFinite(baseCurrencyAmount) || baseCurrencyAmount <= 0) {
       setError(
         t(
           "moonpay_error_invalid_amount_8c3b1a6d2f",
           "Please enter a valid amount.",
+        ),
+      );
+      return;
+    }
+    if (insufficientBalance) {
+      setError(
+        t(
+          "moonpay_error_insufficient_balance_sell",
+          "Insufficient balance for this MoonPay sale.",
         ),
       );
       return;
@@ -723,8 +707,9 @@ const MoonPaySellModal = ({
   const continueDisabled =
     loading ||
     !hasValidAmount ||
+    !selectedToken ||
     fiatCurrencies.length === 0 ||
-    conversionMissing;
+    insufficientBalance;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
   const showFiatError = fiatError && !fiatLoading;
@@ -808,28 +793,25 @@ const MoonPaySellModal = ({
                 {currency}
               </span>
             </div>
-            {isCurrencyLine && hasValidAmount && (
+            {balanceLabel ? (
               <p
                 className={`mt-1 text-xs ${
-                  conversionMissing ? "text-red-400" : "text-white/60"
+                  insufficientBalance ? "text-red-400" : "text-white/60"
                 }`}
               >
-                {conversionMissing
+                {insufficientBalance
                   ? t(
-                      "ui_rate_unavailable_base_5c1a9b7d2e",
-                      "Rate unavailable for base currency.",
+                      "moonpay_sell_balance_insufficient",
+                      "Solde insuffisant. Disponible: {{amount}}",
+                      { amount: balanceLabel },
                     )
-                  : `≈ ${formatAmountWithSymbol(
-                      locale,
-                      Number(rlusdEquivalent || 0),
-                      "USD",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      },
-                    )}`}
+                  : t(
+                      "moonpay_sell_balance_available",
+                      "Disponible: {{amount}}",
+                      { amount: balanceLabel },
+                    )}
               </p>
-            )}
+            ) : null}
           </div>
 
           {/* Arrow down */}
