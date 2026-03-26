@@ -415,6 +415,9 @@ export default function WalletDashboard({
     if (typeof window === "undefined") return;
     if (!isConnected) return;
     if (activeAction) return;
+    // When the wallet is rendered inside a third-party iframe (ex: MoonPay confirm step),
+    // never auto-open the Cash modal: it would duplicate the UI inside the widget.
+    if (window.self !== window.top) return;
     try {
       const tab = window.sessionStorage?.getItem("xcannes_moonpay_autoopen_tab");
       if (tab !== "buy" && tab !== "sell") return;
