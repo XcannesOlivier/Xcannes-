@@ -7,10 +7,39 @@ import WalletConnectScreen from "@/components/wallet/WalletConnectScreen";
 import SEOHead from "@/components/layout/SEOHead";
 import { useWallet } from "@/context/WalletContext";
 import { buildMoonpayMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
+import { apiUrl } from "@/lib/runtimeConfig";
 
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
 const MOONPAY_BUY_FLOW_KEY = "xcannes_moonpay_buy_flow_v1";
 const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
+const NATIVE_WALLET_STORAGE_KEY = "xcannes_native_wallet";
+const MOONPAY_IFRAME_DEPOSIT_KEY = "xcannes_moonpay_iframe_deposit_v1";
+const MOONPAY_IFRAME_CONNECT_KEY = "xcannes_moonpay_iframe_connect_v1";
+const MOONPAY_IFRAME_SIGN_KEY = "xcannes_moonpay_iframe_sign_v1";
+
+function safeSessionGet(key) {
+  try {
+    return window.sessionStorage?.getItem(key) || "";
+  } catch {
+    return "";
+  }
+}
+
+function safeSessionSet(key, value) {
+  try {
+    window.sessionStorage?.setItem(key, value);
+  } catch {
+    // ignore
+  }
+}
+
+function safeSessionRemove(key) {
+  try {
+    window.sessionStorage?.removeItem(key);
+  } catch {
+    // ignore
+  }
+}
 
 function isTrustedMoonpayReferrer(referrer) {
   try {
@@ -47,6 +76,328 @@ function useIsEmbedded() {
     setEmbedded(params.get("embedded") === "pwa" || !!window.__XCANNES_PWA_EMBEDDED__);
   }, []);
   return embedded;
+}
+
+function isInIframe() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+async function pollRelayStatus(challengeId, { timeoutMs = 90_000 } = {}) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    try {
+      const res = await fetch(apiUrl(`/wallet-relay/status/${encodeURIComponent(challengeId)}`), {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const status = String(data?.status || "");
+        if (status && status !== "pending" && status !== "submitting") {
+          return data;
+        }
+      }
+    } catch {
+      // ignore transient errors
+    }
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  return { status: "timeout" };
+}
+
+function MoonpayIframeDepositFlow({ deposit, t }) {
+  const [state, setState] = useState({ step: "init", error: "" });
+  const depositRef = useRef(deposit);
+  depositRef.current = deposit;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isInIframe()) return;
+    if (!deposit) return;
+    try {
+      safeSessionSet(
+        MOONPAY_IFRAME_DEPOSIT_KEY,
+        JSON.stringify({ v: 1, ts: Date.now(), deposit }),
+      );
+    } catch {
+      // ignore
+    }
+  }, [deposit]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isInIframe()) return;
+    if (!deposit) return;
+
+    let cancelled = false;
+
+    const setStep = (step, error = "") => {
+      if (cancelled) return;
+      setState({ step, error });
+    };
+
+    const startConnect = async () => {
+      setStep("connect");
+      const res = await fetch(apiUrl("/wallet-relay/challenge"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "connect",
+          origin: window.location.origin,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Failed to create connect challenge");
+      safeSessionSet(
+        MOONPAY_IFRAME_CONNECT_KEY,
+        JSON.stringify({ v: 1, ts: Date.now(), id: data.challengeId }),
+      );
+      window.location.href = `/wallet-app/?connect=${encodeURIComponent(data.challengeId)}`;
+    };
+
+    const startSign = async (address) => {
+      setStep("sign");
+
+      const d = depositRef.current;
+      const currency = String(d?.baseCurrencyCode || "").toUpperCase();
+      const amountStr = String(d?.baseCurrencyAmount || "").trim();
+      const destination = String(d?.depositWalletAddress || "").trim();
+      const destinationTag = d?.depositWalletAddressTag != null ? d.depositWalletAddressTag : null;
+
+      const issuer =
+        currency === "RLUSD"
+          ? (process.env.NEXT_PUBLIC_RLUSD_ISSUER || "").trim()
+          : "";
+
+      const txjson = {
+        TransactionType: "Payment",
+        Destination: destination,
+      };
+      if (destinationTag != null) txjson.DestinationTag = destinationTag;
+
+      if (currency === "XRP") {
+        const drops = xrpToDropsString(amountStr);
+        if (!drops) throw new Error("Invalid XRP amount");
+        txjson.Amount = drops;
+      } else if (currency === "RLUSD") {
+        if (!issuer) throw new Error("Missing RLUSD issuer");
+        const num = Number(amountStr);
+        if (!Number.isFinite(num) || num <= 0) throw new Error("Invalid RLUSD amount");
+        txjson.Amount = { currency: "RLUSD", issuer, value: amountStr };
+      } else {
+        throw new Error(`Unsupported currency: ${currency}`);
+      }
+
+      const memoPayload = buildMoonpayMemo({
+        side: "sell",
+        provider: "moonpay",
+        currencyCode: currency,
+        amount: Number.isFinite(Number(amountStr)) ? Number(amountStr) : null,
+        amountRlusd: currency === "RLUSD" ? Number(amountStr) : null,
+      });
+      const memos = memoPayload ? buildXrplJsonMemo(memoPayload) : null;
+      if (memos) txjson.Memos = memos;
+
+      // Autofill (Fee, Sequence, LastLedgerSequence) using the connected address.
+      const afRes = await fetch(apiUrl("/wallet-relay/autofill"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ txjson, address }),
+      });
+      const afData = afRes.ok ? await afRes.json() : null;
+      if (!afRes.ok || !afData?.txjson) {
+        throw new Error(afData?.error || "Autofill failed");
+      }
+
+      const challengeRes = await fetch(apiUrl("/wallet-relay/challenge"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "sign",
+          origin: window.location.origin,
+          action: "MoonPay • Confirmer la vente",
+          txjson: afData.txjson,
+          returnAddress: address,
+        }),
+      });
+      const challengeData = await challengeRes.json();
+      if (!challengeRes.ok) {
+        throw new Error(challengeData?.error || "Failed to create sign challenge");
+      }
+
+      safeSessionSet(
+        MOONPAY_IFRAME_SIGN_KEY,
+        JSON.stringify({ v: 1, ts: Date.now(), id: challengeData.challengeId }),
+      );
+      window.location.href = `/wallet-app/?sign=${encodeURIComponent(challengeData.challengeId)}`;
+    };
+
+    const redirectBackToMoonpay = () => {
+      const returnUrl = String(depositRef.current?.returnUrl || "");
+      safeSessionRemove(MOONPAY_IFRAME_DEPOSIT_KEY);
+      safeSessionRemove(MOONPAY_IFRAME_CONNECT_KEY);
+      safeSessionRemove(MOONPAY_IFRAME_SIGN_KEY);
+      safeSessionRemove(MOONPAY_SELL_FLOW_KEY);
+      safeSessionRemove(MOONPAY_BUY_FLOW_KEY);
+
+      if (isTrustedMoonpayReferrer(returnUrl)) {
+        window.location.href = returnUrl;
+        return;
+      }
+      if (window.history.length > 1) {
+        window.history.back();
+      }
+    };
+
+    (async () => {
+      try {
+        // 1) If returning from wallet-app after connect/sign, resolve pending steps.
+        const pendingConnectRaw = safeSessionGet(MOONPAY_IFRAME_CONNECT_KEY);
+        if (pendingConnectRaw) {
+          setStep("waiting_connect");
+          const pendingConnect = JSON.parse(pendingConnectRaw);
+          const id = String(pendingConnect?.id || "");
+          if (!id) throw new Error("Invalid connect state");
+          const status = await pollRelayStatus(id, { timeoutMs: 90_000 });
+          const finalStatus = String(status?.status || "");
+          if (finalStatus === "signed" && status?.result?.address) {
+            safeSessionSet(NATIVE_WALLET_STORAGE_KEY, String(status.result.address));
+            if (status.result.publicKey) {
+              safeSessionSet(
+                `${NATIVE_WALLET_STORAGE_KEY}_publicKey`,
+                String(status.result.publicKey),
+              );
+            }
+            safeSessionRemove(MOONPAY_IFRAME_CONNECT_KEY);
+          } else if (finalStatus === "expired") {
+            safeSessionRemove(MOONPAY_IFRAME_CONNECT_KEY);
+            throw new Error("Connexion expirée");
+          } else if (finalStatus === "timeout") {
+            throw new Error("Connexion en attente…");
+          } else {
+            safeSessionRemove(MOONPAY_IFRAME_CONNECT_KEY);
+            throw new Error("Connexion refusée");
+          }
+        }
+
+        const pendingSignRaw = safeSessionGet(MOONPAY_IFRAME_SIGN_KEY);
+        if (pendingSignRaw) {
+          setStep("waiting_sign");
+          const pendingSign = JSON.parse(pendingSignRaw);
+          const id = String(pendingSign?.id || "");
+          if (!id) throw new Error("Invalid sign state");
+          const status = await pollRelayStatus(id, { timeoutMs: 120_000 });
+          const finalStatus = String(status?.status || "");
+          if (finalStatus === "submitted") {
+            safeSessionRemove(MOONPAY_IFRAME_SIGN_KEY);
+            redirectBackToMoonpay();
+            return;
+          }
+          if (finalStatus === "rejected") {
+            safeSessionRemove(MOONPAY_IFRAME_SIGN_KEY);
+            throw new Error(status?.result?.engineMessage || "Transaction rejetée");
+          }
+          if (finalStatus === "expired") {
+            safeSessionRemove(MOONPAY_IFRAME_SIGN_KEY);
+            throw new Error("Signature expirée");
+          }
+          if (finalStatus === "timeout") {
+            throw new Error("Signature en attente…");
+          }
+          safeSessionRemove(MOONPAY_IFRAME_SIGN_KEY);
+          throw new Error("Signature annulée");
+        }
+
+        // 2) No pending relay step: connect or sign.
+        const addr = safeSessionGet(NATIVE_WALLET_STORAGE_KEY);
+        if (!addr) {
+          await startConnect();
+          return;
+        }
+        await startSign(addr);
+      } catch (err) {
+        setStep("error", err?.message || String(err));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [deposit]);
+
+  const title =
+    state.step === "waiting_sign" || state.step === "sign"
+      ? t("moonpay_iframe_sign_title", "Validation de la transaction")
+      : t("moonpay_iframe_connect_title", "Connexion du wallet");
+
+  const desc = (() => {
+    if (state.step === "connect") {
+      return t(
+        "moonpay_iframe_connect_desc",
+        "Ouverture de XCANNES Wallet pour confirmer votre identité…",
+      );
+    }
+    if (state.step === "waiting_connect") {
+      return t(
+        "moonpay_iframe_wait_connect_desc",
+        "En attente de confirmation dans XCANNES Wallet…",
+      );
+    }
+    if (state.step === "sign") {
+      return t(
+        "moonpay_iframe_sign_desc",
+        "Préparation de la transaction et ouverture de XCANNES Wallet…",
+      );
+    }
+    if (state.step === "waiting_sign") {
+      return t(
+        "moonpay_iframe_wait_sign_desc",
+        "En attente de signature dans XCANNES Wallet…",
+      );
+    }
+    if (state.step === "error") {
+      return state.error || t("moonpay_iframe_error", "Une erreur est survenue.");
+    }
+    return t(
+      "moonpay_iframe_init_desc",
+      "Préparation de la confirmation…",
+    );
+  })();
+
+  const handleRetry = () => {
+    safeSessionRemove(MOONPAY_IFRAME_CONNECT_KEY);
+    safeSessionRemove(MOONPAY_IFRAME_SIGN_KEY);
+    setState({ step: "init", error: "" });
+    window.location.reload();
+  };
+
+  return (
+    <main className="min-h-[100svh] flex items-center justify-center bg-xcannes-surface-demo text-white font-montserrat px-6">
+      <div className="max-w-md w-full space-y-4">
+        <h1 className="text-lg font-semibold">{title}</h1>
+        <p className="text-sm text-white/70">{desc}</p>
+        {state.step === "error" ? (
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30"
+          >
+            {t("retry", "Réessayer")}
+          </button>
+        ) : (
+          <div className="text-white/40 text-sm animate-pulse">
+            {t("loading", "Chargement…")}
+          </div>
+        )}
+      </div>
+    </main>
+  );
 }
 
 export default function Wallet() {
@@ -144,10 +495,52 @@ export default function Wallet() {
         returnUrl: referrerOk ? referrer : "",
         flowId: flowId || null,
       });
+      try {
+        safeSessionSet(
+          MOONPAY_IFRAME_DEPOSIT_KEY,
+          JSON.stringify({
+            v: 1,
+            ts: Date.now(),
+            deposit: {
+              depositWalletAddress,
+              depositWalletAddressTag:
+                Number.isFinite(depositWalletAddressTag) ? depositWalletAddressTag : null,
+              baseCurrencyCode: String(baseCurrencyCode).trim().toUpperCase(),
+              baseCurrencyAmount: String(baseCurrencyAmount).trim(),
+              transactionId: String(transactionId || "").trim() || null,
+              returnUrl: referrerOk ? referrer : "",
+              flowId: flowId || null,
+            },
+          }),
+        );
+      } catch {
+        // ignore
+      }
     } catch {
       // ignore
     }
   }, []);
+
+  // Restore pending MoonPay deposit after /wallet-app/?sign=... redirects back to /wallet
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isInIframe()) return;
+    if (moonpayDeposit) return;
+    try {
+      const raw = safeSessionGet(MOONPAY_IFRAME_DEPOSIT_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.v !== 1 || !parsed.deposit) return;
+      const ageMs = Date.now() - Number(parsed.ts || 0);
+      if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 15 * 60 * 1000) {
+        safeSessionRemove(MOONPAY_IFRAME_DEPOSIT_KEY);
+        return;
+      }
+      setMoonpayDeposit(parsed.deposit);
+    } catch {
+      // ignore
+    }
+  }, [moonpayDeposit]);
 
   const readMoonpayActive = () => {
     if (typeof window === "undefined") return false;
@@ -292,6 +685,18 @@ export default function Wallet() {
       );
     }
     return null;
+  }
+
+  // When MoonPay opens /wallet inside its own iframe (iOS Safari / ITP),
+  // storage may be partitioned, so the regular connect screen (wallet-app onboarding)
+  // would "duplicate" the app. Use the relay + wallet-app sign flow instead.
+  if (moonpayDeposit && !isEmbedded && isInIframe()) {
+    return (
+      <>
+        {seoHead}
+        <MoonpayIframeDepositFlow deposit={moonpayDeposit} t={t} />
+      </>
+    );
   }
 
   // Not connected: show wallet-app style connect screen with QR code
