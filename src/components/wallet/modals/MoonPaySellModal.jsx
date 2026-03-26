@@ -101,55 +101,6 @@ const MoonPaySellModal = ({
     }
   }, [iframeUrl, isOpen, step]);
 
-  const deactivateMoonpayActive = useMemo(() => {
-    return () => {
-      if (typeof window === "undefined") return;
-      try {
-        window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
-        window.__XCANNES_MOONPAY_ACTIVE__ = false;
-        window.dispatchEvent(
-          new CustomEvent("xcannes:moonpay-active", { detail: { active: false } }),
-        );
-      } catch {
-        // Ignore
-      }
-    };
-  }, []);
-
-  const handleUserClose = useMemo(() => {
-    return () => {
-      clearResumeState();
-      clearAutoOpen();
-      deactivateMoonpayActive();
-      setIframeUrl(null);
-      setError(null);
-      setStep("form");
-      onClose?.();
-    };
-  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive, onClose]);
-
-  const handleWidgetClose = useMemo(() => {
-    return () => {
-      clearResumeState();
-      clearAutoOpen();
-      deactivateMoonpayActive();
-      setIframeUrl(null);
-      setError(null);
-      setStep("form");
-    };
-  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive]);
-
-  // If the user closes the Cash modal while the MoonPay widget is open,
-  // don't keep the resume cache around.
-  useEffect(() => {
-    return () => {
-      if (latestStepRef.current !== "iframe" || !latestIframeUrlRef.current) return;
-      clearResumeState();
-      clearAutoOpen();
-      deactivateMoonpayActive();
-    };
-  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive]);
-
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
   const [amount, setAmount] = useState("");
@@ -225,6 +176,55 @@ const MoonPaySellModal = ({
       }
     };
   }, []);
+
+  const deactivateMoonpayActive = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
+        window.__XCANNES_MOONPAY_ACTIVE__ = false;
+        window.dispatchEvent(
+          new CustomEvent("xcannes:moonpay-active", { detail: { active: false } }),
+        );
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
+
+  const handleUserClose = useMemo(() => {
+    return () => {
+      clearResumeState();
+      clearAutoOpen();
+      deactivateMoonpayActive();
+      setIframeUrl(null);
+      setError(null);
+      setStep("form");
+      onClose?.();
+    };
+  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive, onClose]);
+
+  const handleWidgetClose = useMemo(() => {
+    return () => {
+      clearResumeState();
+      clearAutoOpen();
+      deactivateMoonpayActive();
+      setIframeUrl(null);
+      setError(null);
+      setStep("form");
+    };
+  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive]);
+
+  // If the user closes the Cash modal while the MoonPay widget is open,
+  // don't keep the resume cache around.
+  useEffect(() => {
+    return () => {
+      if (latestStepRef.current !== "iframe" || !latestIframeUrlRef.current) return;
+      clearResumeState();
+      clearAutoOpen();
+      deactivateMoonpayActive();
+    };
+  }, [clearAutoOpen, clearResumeState, deactivateMoonpayActive]);
 
   const supportedCurrencies = useMemo(() => {
     const seen = new Set();
