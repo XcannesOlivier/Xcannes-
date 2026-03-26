@@ -715,7 +715,7 @@ const MoonPayBuyModal = ({
           <iframe
             src={iframeUrl}
             className="w-full h-full rounded-lg"
-            allow="clipboard-write"
+            allow="camera; clipboard-write"
             allowFullScreen
             title={t("moonpay_widget_title_buy", "MoonPay Widget")}
           />
@@ -737,7 +737,7 @@ const MoonPayBuyModal = ({
             >
               {t(
                 "moonpay_open_in_safari_for_kyc",
-                "KYC caméra iOS: ouvrir dans Safari",
+                "Caméra bloquée ? Ouvrir en plein écran",
               )}
             </a>
           )}
