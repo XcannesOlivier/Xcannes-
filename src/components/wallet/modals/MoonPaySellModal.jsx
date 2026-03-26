@@ -17,6 +17,7 @@ const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
 const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
 const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
+const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
 const MOONPAY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
 const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 
@@ -91,6 +92,14 @@ const MoonPaySellModal = ({
         window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
         window.sessionStorage?.setItem(MOONPAY_AUTOOPEN_TAB_KEY, "sell");
         window.__XCANNES_MOONPAY_ACTIVE__ = true;
+        try {
+          window.localStorage?.setItem(
+            MOONPAY_WALLET_ADDRESS_KEY,
+            JSON.stringify({ v: 1, ts: Date.now(), address: String(walletAddress || "") }),
+          );
+        } catch {
+          // ignore
+        }
       } else {
         window.sessionStorage?.removeItem(MOONPAY_ACTIVE_STORAGE_KEY);
         window.__XCANNES_MOONPAY_ACTIVE__ = false;
@@ -101,7 +110,7 @@ const MoonPaySellModal = ({
     } catch {
       // Ignore
     }
-  }, [iframeUrl, isOpen, step]);
+  }, [iframeUrl, isOpen, step, walletAddress]);
 
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
@@ -189,6 +198,17 @@ const MoonPaySellModal = ({
     };
   }, []);
 
+  const clearMoonpayWalletAddress = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.localStorage?.removeItem(MOONPAY_WALLET_ADDRESS_KEY);
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
+
   const readResumeState = useMemo(() => {
     return () => {
       if (typeof window === "undefined") return null;
@@ -246,25 +266,40 @@ const MoonPaySellModal = ({
       clearResumeState();
       clearAutoOpen();
       clearFlowId();
+      clearMoonpayWalletAddress();
       deactivateMoonpayActive();
       setIframeUrl(null);
       setError(null);
       setStep("form");
       onClose?.();
     };
-  }, [clearAutoOpen, clearFlowId, clearResumeState, deactivateMoonpayActive, onClose]);
+  }, [
+    clearAutoOpen,
+    clearFlowId,
+    clearMoonpayWalletAddress,
+    clearResumeState,
+    deactivateMoonpayActive,
+    onClose,
+  ]);
 
   const handleWidgetClose = useMemo(() => {
     return () => {
       clearResumeState();
       clearAutoOpen();
       clearFlowId();
+      clearMoonpayWalletAddress();
       deactivateMoonpayActive();
       setIframeUrl(null);
       setError(null);
       setStep("form");
     };
-  }, [clearAutoOpen, clearFlowId, clearResumeState, deactivateMoonpayActive]);
+  }, [
+    clearAutoOpen,
+    clearFlowId,
+    clearMoonpayWalletAddress,
+    clearResumeState,
+    deactivateMoonpayActive,
+  ]);
 
   // If the user closes the Cash modal while the MoonPay widget is open,
   // don't keep the resume cache around.
@@ -274,9 +309,16 @@ const MoonPaySellModal = ({
       clearResumeState();
       clearAutoOpen();
       clearFlowId();
+      clearMoonpayWalletAddress();
       deactivateMoonpayActive();
     };
-  }, [clearAutoOpen, clearFlowId, clearResumeState, deactivateMoonpayActive]);
+  }, [
+    clearAutoOpen,
+    clearFlowId,
+    clearMoonpayWalletAddress,
+    clearResumeState,
+    deactivateMoonpayActive,
+  ]);
 
   const supportedCurrencies = useMemo(() => {
     const seen = new Set();
@@ -627,6 +669,7 @@ const MoonPaySellModal = ({
         clearResumeState();
         clearAutoOpen();
         clearFlowId();
+        clearMoonpayWalletAddress();
         setStep("success");
         setTimeout(() => {
           onClose();
@@ -658,6 +701,7 @@ const MoonPaySellModal = ({
   }, [
     clearAutoOpen,
     clearFlowId,
+    clearMoonpayWalletAddress,
     clearResumeState,
     deactivateMoonpayActive,
     handleWidgetClose,
