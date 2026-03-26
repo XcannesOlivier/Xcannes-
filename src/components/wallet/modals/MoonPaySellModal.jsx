@@ -455,11 +455,6 @@ const MoonPaySellModal = ({
   const currencyUpper = String(currency || "").toUpperCase();
   const availableBalance = Number.parseFloat(selectedToken?.value ?? 0);
   const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
-  const insufficientBalance =
-    hasValidAmount &&
-    Number.isFinite(availableBalance) &&
-    availableBalance >= 0 &&
-    amountValue > availableBalance;
   const balanceLabel = Number.isFinite(availableBalance)
     ? formatAmountWithSymbol(locale, availableBalance, currencyUpper || "XRP", {
         minimumFractionDigits: 2,
@@ -543,15 +538,6 @@ const MoonPaySellModal = ({
         t(
           "moonpay_error_invalid_amount_8c3b1a6d2f",
           "Please enter a valid amount.",
-        ),
-      );
-      return;
-    }
-    if (insufficientBalance) {
-      setError(
-        t(
-          "moonpay_error_insufficient_balance_sell",
-          "Insufficient balance for this MoonPay sale.",
         ),
       );
       return;
@@ -708,8 +694,7 @@ const MoonPaySellModal = ({
     loading ||
     !hasValidAmount ||
     !selectedToken ||
-    fiatCurrencies.length === 0 ||
-    insufficientBalance;
+    fiatCurrencies.length === 0;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
   const showFiatError = fiatError && !fiatLoading;
@@ -794,22 +779,12 @@ const MoonPaySellModal = ({
               </span>
             </div>
             {balanceLabel ? (
-              <p
-                className={`mt-1 text-xs ${
-                  insufficientBalance ? "text-red-400" : "text-white/60"
-                }`}
-              >
-                {insufficientBalance
-                  ? t(
-                      "moonpay_sell_balance_insufficient",
-                      "Solde insuffisant. Disponible: {{amount}}",
-                      { amount: balanceLabel },
-                    )
-                  : t(
-                      "moonpay_sell_balance_available",
-                      "Disponible: {{amount}}",
-                      { amount: balanceLabel },
-                    )}
+              <p className="mt-1 text-xs text-white/60">
+                {t(
+                  "moonpay_sell_balance_available",
+                  "Disponible: {{amount}}",
+                  { amount: balanceLabel },
+                )}
               </p>
             ) : null}
           </div>
