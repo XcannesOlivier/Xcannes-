@@ -71,9 +71,7 @@ const MoonPaySellModal = ({
   // while user interacts with MoonPay (KYC/Apple flows).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const active = Boolean(
-      isOpen && iframeUrl && (step === "iframe" || step === "external"),
-    );
+    const active = Boolean(isOpen && step === "iframe" && iframeUrl);
     try {
       if (active) {
         window.sessionStorage?.setItem(MOONPAY_ACTIVE_STORAGE_KEY, "1");
@@ -476,13 +474,6 @@ const MoonPaySellModal = ({
       if (data.success && data.url) {
         setIframeUrl(data.url);
         saveResumeState({ lastIframeUrl: data.url });
-
-        if (showIOSKycFallback) {
-          setStep("external");
-          window.open(data.url, "_blank", "noopener,noreferrer");
-          return;
-        }
-
         setStep("iframe");
       } else {
         throw new Error(
@@ -779,40 +770,20 @@ const MoonPaySellModal = ({
           >
             {t("close", "Close")}
           </button>
-        </div>
-      )}
 
-      {/* iOS fallback: open MoonPay in new tab */}
-      {step === "external" && iframeUrl && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <h4 className="text-lg font-semibold text-white mb-2">
-            {t("moonpay_opened_in_new_tab", "MoonPay opened in a new tab")}
-          </h4>
-          <p className="text-white/60 text-sm mb-4 max-w-[420px]">
-            {t(
-              "moonpay_ios_camera_requires_new_tab",
-              "On iPhone/iPad, the KYC camera may be blocked inside an embedded wallet. Continue in Safari.",
-            )}
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                saveResumeState({ lastIframeUrl: iframeUrl });
-                window.open(iframeUrl, "_blank", "noopener,noreferrer");
-              }}
-              className="px-5 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-lg transition-all"
+          {showIOSKycFallback && (
+            <a
+              href={iframeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-2 left-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-xs transition-colors"
             >
-              {t("open", "Open")}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
-            >
-              {t("close", "Close")}
-            </button>
-          </div>
+              {t(
+                "moonpay_open_in_safari_for_kyc",
+                "KYC caméra iOS: ouvrir dans Safari",
+              )}
+            </a>
+          )}
         </div>
       )}
 

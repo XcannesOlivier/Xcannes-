@@ -81,9 +81,7 @@ const MoonPayBuyModal = ({
   // don't bubble to the parent window).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const active = Boolean(
-      isOpen && iframeUrl && (step === "iframe" || step === "external"),
-    );
+    const active = Boolean(isOpen && step === "iframe" && iframeUrl);
     if (active === moonpayActiveRef.current) return;
     moonpayActiveRef.current = active;
     try {
@@ -443,15 +441,6 @@ const MoonPayBuyModal = ({
       if (data.success && data.url) {
         setIframeUrl(data.url);
         saveResumeState({ lastIframeUrl: data.url });
-
-        if (showIOSKycFallback) {
-          // iOS Safari often blocks camera access in cross-origin iframes.
-          // Prefer opening MoonPay in a top-level tab for KYC.
-          setStep("external");
-          window.open(data.url, "_blank", "noopener,noreferrer");
-          return;
-        }
-
         setStep("iframe");
       } else {
         throw new Error(
@@ -720,7 +709,7 @@ const MoonPayBuyModal = ({
         </div>
       )}
 
-      {/* MoonPay iframe */}
+	      {/* MoonPay iframe */}
       {step === "iframe" && iframeUrl && (
         <div className="relative" style={{ height: "600px" }}>
           <iframe
@@ -740,56 +729,18 @@ const MoonPayBuyModal = ({
           </button>
 
           {showIOSKycFallback && (
-            <button
-              type="button"
-              onClick={() => {
-                // iOS Safari often blocks camera access in cross-origin iframes.
-                // Opening MoonPay in a top-level tab allows KYC camera to work.
-                saveResumeState({ lastIframeUrl: iframeUrl });
-                window.open(iframeUrl, "_blank", "noopener,noreferrer");
-              }}
+            <a
+              href={iframeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="absolute bottom-2 left-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-xs transition-colors"
             >
               {t(
                 "moonpay_open_in_safari_for_kyc",
                 "KYC caméra iOS: ouvrir dans Safari",
               )}
-            </button>
+            </a>
           )}
-        </div>
-      )}
-
-      {/* iOS fallback: open MoonPay in new tab */}
-      {step === "external" && iframeUrl && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <h4 className="text-lg font-semibold text-white mb-2">
-            {t("moonpay_opened_in_new_tab", "MoonPay opened in a new tab")}
-          </h4>
-          <p className="text-white/60 text-sm mb-4 max-w-[420px]">
-            {t(
-              "moonpay_ios_camera_requires_new_tab",
-              "On iPhone/iPad, the KYC camera may be blocked inside an embedded wallet. Continue in Safari.",
-            )}
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                saveResumeState({ lastIframeUrl: iframeUrl });
-                window.open(iframeUrl, "_blank", "noopener,noreferrer");
-              }}
-              className="px-5 py-2 bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold rounded-lg transition-colors"
-            >
-              {t("open", "Open")}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-5 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
-            >
-              {t("close", "Close")}
-            </button>
-          </div>
         </div>
       )}
 
