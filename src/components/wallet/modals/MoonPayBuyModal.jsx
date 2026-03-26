@@ -74,7 +74,11 @@ const MoonPayBuyModal = ({
   const isEmbeddedPwa =
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).get("embedded") === "pwa";
-  const showIOSKycFallback = isEmbeddedPwa && isIOSDevice();
+  const isIOS = isIOSDevice();
+  const showIOSKycFallback = isEmbeddedPwa && isIOS;
+  const moonpayIframeAllow = isIOS
+    ? "camera *; microphone *; clipboard-write"
+    : "camera https://moonpay.com https://buy.moonpay.com https://buy-sandbox.moonpay.com https://sell.moonpay.com https://sell-sandbox.moonpay.com https://wallet.moonpay.com https://*.moonpay.com; clipboard-write";
 
   // Mark MoonPay iframe flow as active so wallet-level auto-lock does not
   // disconnect while the user completes KYC/Apple flows (events inside iframe
@@ -715,7 +719,7 @@ const MoonPayBuyModal = ({
           <iframe
             src={iframeUrl}
             className="w-full h-full rounded-lg"
-            allow="camera; clipboard-write"
+            allow={moonpayIframeAllow}
             allowFullScreen
             title={t("moonpay_widget_title_buy", "MoonPay Widget")}
           />

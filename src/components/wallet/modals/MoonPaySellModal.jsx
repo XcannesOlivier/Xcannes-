@@ -65,7 +65,11 @@ const MoonPaySellModal = ({
   const isEmbeddedPwa =
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).get("embedded") === "pwa";
-  const showIOSKycFallback = isEmbeddedPwa && isIOSDevice();
+  const isIOS = isIOSDevice();
+  const showIOSKycFallback = isEmbeddedPwa && isIOS;
+  const moonpayIframeAllow = isIOS
+    ? "camera *; microphone *; clipboard-write"
+    : "camera https://moonpay.com https://buy.moonpay.com https://buy-sandbox.moonpay.com https://sell.moonpay.com https://sell-sandbox.moonpay.com https://wallet.moonpay.com https://*.moonpay.com; clipboard-write";
 
   // Keep MoonPay flow "active" to prevent wallet-level auto-lock disconnects
   // while user interacts with MoonPay (KYC/Apple flows).
@@ -758,7 +762,7 @@ const MoonPaySellModal = ({
           <iframe
             src={iframeUrl}
             className="w-full h-full rounded-lg"
-            allow="camera; clipboard-write"
+            allow={moonpayIframeAllow}
             allowFullScreen
             title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
           />
