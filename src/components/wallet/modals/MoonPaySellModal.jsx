@@ -521,7 +521,22 @@ const MoonPaySellModal = ({
       ? 1
       : Number(rlusdPerUnitRates?.[currencyUpper])
     : Number.NaN;
-  const availableBalance = Number.parseFloat(selectedToken?.value ?? 0);
+  const allocatedRlusdBalance = Number.parseFloat(
+    selectedToken?.allocatedRlusd ?? Number.NaN,
+  );
+  const availableBalance = (() => {
+    const directBalance = Number.parseFloat(selectedToken?.value ?? 0);
+    if (!isCurrencyLine) return directBalance;
+    if (
+      Number.isFinite(allocatedRlusdBalance) &&
+      allocatedRlusdBalance > 0 &&
+      Number.isFinite(rlusdRate) &&
+      rlusdRate > 0
+    ) {
+      return allocatedRlusdBalance / rlusdRate;
+    }
+    return directBalance;
+  })();
   const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
   const conversionMissing =
     isCurrencyLine &&
