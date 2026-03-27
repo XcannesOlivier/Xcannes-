@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import WalletActiveLabel from "../components/WalletActiveLabel";
 
 export function useWalletMeta({
   walletAddress,
@@ -20,12 +21,11 @@ export function useWalletMeta({
       return (
         <div className={`text-xs text-white/60 ${className}`}>
           <div className="text-xl md:text-2xl font-semibold text-white/80 leading-tight">
-            {resolvedPrefix ? (
-              <span className="font-medium text-white/55 mr-2">
-                {resolvedPrefix}
-              </span>
-            ) : null}
-            {resolvedLabel || "Wallet"}
+            <WalletActiveLabel
+              prefix={resolvedPrefix}
+              label={resolvedLabel || "Wallet"}
+              labelClassName="font-semibold text-white/80"
+            />
           </div>
           {!hideAddress && resolvedAddress ? (
             <div className="font-mono text-xs md:text-base flex flex-wrap items-center gap-2">

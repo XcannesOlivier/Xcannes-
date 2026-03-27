@@ -11,6 +11,7 @@ import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
 
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import WalletActiveLabel from "../components/WalletActiveLabel";
 
 const ShareIcon = ({ className = "" }) => (
   <svg
@@ -778,14 +779,13 @@ export default function WalletDashboardReceiveModal({
                       />
                     </div>
 
-                    <div className="mt-3 text-[13px] text-white/80">
-                      <span className="text-white/50">
-                        {t("ui_current_account_prefix", "Compte actuel:")}
-                      </span>{" "}
-                      <span className="font-medium">
-                        {String(walletLabel || "").trim() || fallbackWalletLabel}
-                      </span>
-                    </div>
+                    <WalletActiveLabel
+                      prefix={t("ui_current_account_prefix", "Compte actuel:")}
+                      label={String(walletLabel || "").trim() || fallbackWalletLabel}
+                      className="mt-3 text-[13px] text-white/80 justify-center"
+                      prefixClassName="text-white/50"
+                      labelClassName="font-medium text-white/80"
+                    />
 
                     <div className="mt-4 w-full grid grid-cols-2 gap-2">
                       <button

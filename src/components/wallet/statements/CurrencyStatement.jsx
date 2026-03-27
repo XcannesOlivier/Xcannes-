@@ -15,6 +15,7 @@ import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import { useTranslation } from "next-i18next";
 import StatementMonthSelect from "./StatementMonthSelect";
 import { apiUrl } from "@/lib/runtimeConfig";
+import WalletActiveLabel from "../components/WalletActiveLabel";
 import {
   formatAmountWithSymbol,
   getDisplayCurrencyCode,
@@ -1489,12 +1490,13 @@ export default function CurrencyStatement({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className={isInlineDesktop ? "md:col-span-3" : ""}>
               <div className="min-w-0 space-y-0.5 rounded-xl border border-white/10 px-3 py-2 bg-black/40">
-                <p className="text-sm text-white font-semibold truncate">
-                  <span className="text-white/55 font-medium">
-                    {t("ui_current_account_prefix", "Compte actuel :")}
-                  </span>{" "}
-                  {walletLabel || t("nav_wallet", "Wallet")}
-                </p>
+                <WalletActiveLabel
+                  prefix={t("ui_current_account_prefix", "Compte actuel :")}
+                  label={walletLabel || t("nav_wallet", "Wallet")}
+                  className="text-sm text-white font-semibold"
+                  prefixClassName="text-white/55 font-medium"
+                  labelClassName="text-white font-semibold"
+                />
                 {walletAddress ? (
                   <button
                     type="button"

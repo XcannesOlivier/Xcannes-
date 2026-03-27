@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
 import { apiUrl } from "@/lib/runtimeConfig";
+import WalletActiveLabel from "../components/WalletActiveLabel";
 import {
   formatAmountWithSymbol,
   USD_STABLECOINS,
@@ -1697,12 +1698,13 @@ export default function GlobalStatement({
           </div>
 
           <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#050708]">
-            <div className="text-xs text-white/60">
-              {t("ui_current_account_prefix", "Compte actuel :")}
-            </div>
-            <div className="mt-1 text-lg md:text-xl font-semibold text-white/95 truncate">
-              {walletLabel || t("nav_wallet", "Wallet")}
-            </div>
+            <WalletActiveLabel
+              prefix={t("ui_current_account_prefix", "Compte actuel :")}
+              label={walletLabel || t("nav_wallet", "Wallet")}
+              className="text-lg md:text-xl font-semibold text-white/95"
+              prefixClassName="text-xs md:text-sm text-white/60 font-medium"
+              labelClassName="text-lg md:text-xl font-semibold text-white/95"
+            />
             {walletAddress ? (
               <button
                 type="button"
