@@ -55,6 +55,7 @@ const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
 const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
 const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
+const MOONPAY_SELL_SOURCE_KEY = "xcannes_moonpay_sell_source_v1";
 const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
 
 function isTrustedMoonpayUrl(value) {
@@ -75,6 +76,7 @@ function clearMoonpaySellClientState() {
     window.sessionStorage?.removeItem(MOONPAY_AUTOOPEN_TAB_KEY);
     window.sessionStorage?.removeItem(MOONPAY_SELL_RESUME_KEY);
     window.sessionStorage?.removeItem(MOONPAY_SELL_FLOW_KEY);
+    window.localStorage?.removeItem(MOONPAY_SELL_SOURCE_KEY);
     window.localStorage?.removeItem(MOONPAY_WALLET_ADDRESS_KEY);
     window.__XCANNES_MOONPAY_ACTIVE__ = false;
     window.dispatchEvent(

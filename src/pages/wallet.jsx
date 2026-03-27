@@ -8,6 +8,8 @@ import SEOHead from "@/components/layout/SEOHead";
 import { useWallet } from "@/context/WalletContext";
 
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
+const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
+const MOONPAY_SELL_SOURCE_KEY = "xcannes_moonpay_sell_source_v1";
 const MOONPAY_BUY_FLOW_KEY = "xcannes_moonpay_buy_flow_v1";
 const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
 const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
@@ -28,6 +30,69 @@ function isTrustedMoonpayReferrer(referrer) {
   } catch {
     return false;
   }
+}
+
+function readMoonpaySellSourceState(flowId) {
+  if (typeof window === "undefined") return null;
+  const expectedFlowId = String(flowId || "").trim();
+
+  const normalizeCandidate = (parsed, { allowResumeFallback = false } = {}) => {
+    if (!parsed || parsed.v !== 1) return null;
+    const ageMs = Date.now() - Number(parsed?.ts || 0);
+    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > MOONPAY_FLOW_MAX_AGE_MS) {
+      return null;
+    }
+
+    const parsedFlowId = String(parsed?.flowId || "").trim();
+    if (expectedFlowId) {
+      if (!parsedFlowId || parsedFlowId !== expectedFlowId) return null;
+    }
+
+    const sourceCurrencyCode = String(
+      parsed?.sourceCurrencyCode ||
+        (allowResumeFallback ? parsed?.currency : "") ||
+        "",
+    )
+      .trim()
+      .toUpperCase();
+    const sourceAmount = Number.parseFloat(
+      parsed?.sourceAmount ?? (allowResumeFallback ? parsed?.amount : ""),
+    );
+
+    if (!sourceCurrencyCode || !Number.isFinite(sourceAmount) || sourceAmount <= 0) {
+      return null;
+    }
+
+    return {
+      flowId: parsedFlowId || null,
+      sourceCurrencyCode,
+      sourceAmount,
+      baseCurrencyCode: String(parsed?.baseCurrencyCode || "").trim().toUpperCase() || null,
+      baseCurrencyAmount: Number.isFinite(Number(parsed?.baseCurrencyAmount))
+        ? Number(parsed.baseCurrencyAmount)
+        : null,
+    };
+  };
+
+  try {
+    const raw = window.localStorage?.getItem(MOONPAY_SELL_SOURCE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    const match = normalizeCandidate(parsed);
+    if (match) return match;
+  } catch {
+    // ignore
+  }
+
+  try {
+    const raw = window.sessionStorage?.getItem(MOONPAY_SELL_RESUME_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    const match = normalizeCandidate(parsed, { allowResumeFallback: true });
+    if (match) return match;
+  } catch {
+    // ignore
+  }
+
+  return null;
 }
 
 /** Detect PWA embedded mode (?embedded=pwa) */
@@ -149,6 +214,7 @@ export default function Wallet() {
       if (normalizedCurrency !== "XRP" && normalizedCurrency !== "RLUSD") return;
 
       const transactionId = getFirst(["transactionId", "externalTransactionId"]);
+      const sellSourceState = readMoonpaySellSourceState(flowId);
       setMoonpaySellRequest({
         depositWalletAddress,
         baseCurrencyCode: normalizedCurrency,
@@ -156,6 +222,11 @@ export default function Wallet() {
         transactionId: String(transactionId || "").trim() || null,
         returnUrl: referrerOk ? referrer : "",
         flowId: flowId || null,
+        sourceCurrencyCode: sellSourceState?.sourceCurrencyCode || null,
+        sourceAmount:
+          sellSourceState?.sourceAmount != null
+            ? String(sellSourceState.sourceAmount)
+            : null,
       });
     } catch {
       // ignore

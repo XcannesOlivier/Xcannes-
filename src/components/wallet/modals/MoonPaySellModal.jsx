@@ -17,6 +17,7 @@ const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
 const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
 const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
+const MOONPAY_SELL_SOURCE_KEY = "xcannes_moonpay_sell_source_v1";
 const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
 const MOONPAY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
 const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
@@ -50,6 +51,7 @@ const MoonPaySellModal = ({
   demoMode = false,
   onDemoSubmit,
   availableTokens,
+  rlusdPerUnitRates,
   selectLabelByCurrency,
   selectLabelRightByCurrency,
   selectIconByCurrency,
@@ -234,6 +236,50 @@ const MoonPaySellModal = ({
     };
   }, []);
 
+  const saveSellSourceState = useMemo(() => {
+    return (data = {}) => {
+      if (typeof window === "undefined") return;
+      try {
+        window.localStorage?.setItem(
+          MOONPAY_SELL_SOURCE_KEY,
+          JSON.stringify({
+            v: 1,
+            kind: "sell",
+            ts: Date.now(),
+            flowId: String(data?.flowId || "").trim() || null,
+            walletAddress: String(walletAddress || "").trim() || null,
+            sourceCurrencyCode:
+              String(data?.sourceCurrencyCode || "").trim().toUpperCase() || null,
+            sourceAmount:
+              Number.isFinite(Number(data?.sourceAmount)) && Number(data?.sourceAmount) > 0
+                ? Number(data.sourceAmount)
+                : null,
+            baseCurrencyCode:
+              String(data?.baseCurrencyCode || "").trim().toUpperCase() || null,
+            baseCurrencyAmount:
+              Number.isFinite(Number(data?.baseCurrencyAmount)) &&
+              Number(data?.baseCurrencyAmount) > 0
+                ? Number(data.baseCurrencyAmount)
+                : null,
+          }),
+        );
+      } catch {
+        // Ignore
+      }
+    };
+  }, [walletAddress]);
+
+  const clearSellSourceState = useMemo(() => {
+    return () => {
+      if (typeof window === "undefined") return;
+      try {
+        window.localStorage?.removeItem(MOONPAY_SELL_SOURCE_KEY);
+      } catch {
+        // Ignore
+      }
+    };
+  }, []);
+
   const clearAutoOpen = useMemo(() => {
     return () => {
       if (typeof window === "undefined") return;
@@ -263,6 +309,7 @@ const MoonPaySellModal = ({
   const handleUserClose = useMemo(() => {
     return () => {
       clearResumeState();
+      clearSellSourceState();
       clearAutoOpen();
       clearFlowId();
       clearMoonpayWalletAddress();
@@ -277,6 +324,7 @@ const MoonPaySellModal = ({
     clearFlowId,
     clearMoonpayWalletAddress,
     clearResumeState,
+    clearSellSourceState,
     deactivateMoonpayActive,
     onClose,
   ]);
@@ -284,6 +332,7 @@ const MoonPaySellModal = ({
   const handleWidgetClose = useMemo(() => {
     return () => {
       clearResumeState();
+      clearSellSourceState();
       clearAutoOpen();
       clearFlowId();
       clearMoonpayWalletAddress();
@@ -297,6 +346,7 @@ const MoonPaySellModal = ({
     clearFlowId,
     clearMoonpayWalletAddress,
     clearResumeState,
+    clearSellSourceState,
     deactivateMoonpayActive,
   ]);
 
@@ -306,6 +356,7 @@ const MoonPaySellModal = ({
     return () => {
       if (latestStepRef.current !== "iframe" || !latestIframeUrlRef.current) return;
       clearResumeState();
+      clearSellSourceState();
       clearAutoOpen();
       clearFlowId();
       clearMoonpayWalletAddress();
@@ -316,19 +367,30 @@ const MoonPaySellModal = ({
     clearFlowId,
     clearMoonpayWalletAddress,
     clearResumeState,
+    clearSellSourceState,
     deactivateMoonpayActive,
   ]);
 
   const supportedCurrencies = useMemo(() => {
-    const preferredOrder = ["RLUSD", "XRP"];
-    return preferredOrder
-      .map((currency) => {
-        const token = (availableTokens || []).find(
-          (entry) => String(entry?.currency || "").toUpperCase() === currency,
-        );
-        if (!token) return null;
+    const seen = new Set();
+    const orderedTokens = [
+      ...(availableTokens || []).filter((token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        return code === "XRP" || code === "RLUSD";
+      }),
+      ...(availableTokens || []).filter((token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        return code !== "XRP" && code !== "RLUSD";
+      }),
+    ];
 
-        const currencyRaw = token?.currency || currency;
+    return orderedTokens
+      .map((token) => {
+        const currencyRaw = token?.currency;
+        const currency = String(currencyRaw || "").toUpperCase();
+        if (!currency || seen.has(currency)) return null;
+        seen.add(currency);
+
         const labelLeft =
           selectLabelByCurrency?.[currencyRaw] ||
           selectLabelByCurrency?.[currency] ||
@@ -453,16 +515,43 @@ const MoonPaySellModal = ({
 
   const amountValue = Number.parseFloat(amount || "");
   const currencyUpper = String(currency || "").toUpperCase();
+  const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
+  const rlusdRate = isCurrencyLine
+    ? currencyUpper === "RLUSD" || currencyUpper === "USD"
+      ? 1
+      : Number(rlusdPerUnitRates?.[currencyUpper])
+    : Number.NaN;
   const availableBalance = Number.parseFloat(selectedToken?.value ?? 0);
   const hasValidAmount = Number.isFinite(amountValue) && amountValue > 0;
+  const conversionMissing =
+    isCurrencyLine &&
+    hasValidAmount &&
+    (!Number.isFinite(rlusdRate) || rlusdRate <= 0);
+  const rlusdEquivalent =
+    isCurrencyLine && hasValidAmount && !conversionMissing
+      ? amountValue * rlusdRate
+      : null;
+  const rlusdEquivalentLabel =
+    Number.isFinite(Number(rlusdEquivalent)) && Number(rlusdEquivalent) > 0
+      ? formatAmountWithSymbol(locale, Number(rlusdEquivalent), "RLUSD", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      : null;
   const balanceLabel = Number.isFinite(availableBalance)
     ? formatAmountWithSymbol(locale, availableBalance, currencyUpper || "XRP", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })
     : null;
-  const baseCurrencyCode = currencyUpper;
-  const baseCurrencyAmount = hasValidAmount ? amountValue : Number.NaN;
+  const baseCurrencyCode = isCurrencyLine ? "RLUSD" : currencyUpper;
+  const baseCurrencyAmount = isCurrencyLine
+    ? Number.isFinite(rlusdEquivalent)
+      ? Number(rlusdEquivalent.toFixed(6))
+      : Number.NaN
+    : hasValidAmount
+      ? amountValue
+      : Number.NaN;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -533,6 +622,15 @@ const MoonPaySellModal = ({
       );
       return;
     }
+    if (conversionMissing) {
+      setError(
+        t(
+          "ui_rate_unavailable_base_5c1a9b7d2e",
+          "Rate unavailable for base currency.",
+        ),
+      );
+      return;
+    }
     if (!Number.isFinite(baseCurrencyAmount) || baseCurrencyAmount <= 0) {
       setError(
         t(
@@ -545,7 +643,20 @@ const MoonPaySellModal = ({
 
     // Persist inputs so we can resume after iOS Apple flows / reconnect.
     const flowId = getOrCreateFlowId();
-    saveResumeState({ flowId });
+    saveResumeState({
+      flowId,
+      sourceCurrencyCode: currencyUpper,
+      sourceAmount: amountValue,
+      baseCurrencyCode,
+      baseCurrencyAmount,
+    });
+    saveSellSourceState({
+      flowId,
+      sourceCurrencyCode: currencyUpper,
+      sourceAmount: amountValue,
+      baseCurrencyCode,
+      baseCurrencyAmount,
+    });
 
     setLoading(true);
     setError(null);
@@ -637,6 +748,7 @@ const MoonPaySellModal = ({
 
       if (type === "transaction_completed" || status === "completed") {
         clearResumeState();
+        clearSellSourceState();
         clearAutoOpen();
         clearFlowId();
         clearMoonpayWalletAddress();
@@ -673,6 +785,7 @@ const MoonPaySellModal = ({
     clearFlowId,
     clearMoonpayWalletAddress,
     clearResumeState,
+    clearSellSourceState,
     deactivateMoonpayActive,
     handleWidgetClose,
     isOpen,
@@ -694,7 +807,8 @@ const MoonPaySellModal = ({
     loading ||
     !hasValidAmount ||
     !selectedToken ||
-    fiatCurrencies.length === 0;
+    fiatCurrencies.length === 0 ||
+    conversionMissing;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
   const showFiatError = fiatError && !fiatLoading;
@@ -785,6 +899,24 @@ const MoonPaySellModal = ({
                   "Disponible: {{amount}}",
                   { amount: balanceLabel },
                 )}
+              </p>
+            ) : null}
+            {isCurrencyLine && hasValidAmount ? (
+              <p
+                className={`mt-1 text-xs ${
+                  conversionMissing ? "text-red-400" : "text-white/70"
+                }`}
+              >
+                {conversionMissing
+                  ? t(
+                      "ui_rate_unavailable_base_5c1a9b7d2e",
+                      "Rate unavailable for base currency.",
+                    )
+                  : t(
+                      "moonpay_sell_rlusd_equivalent_sentence",
+                      "{{amount}} seront envoyés à MoonPay en RLUSD pour ce retrait.",
+                      { amount: rlusdEquivalentLabel || "0 RLUSD" },
+                    )}
               </p>
             ) : null}
           </div>

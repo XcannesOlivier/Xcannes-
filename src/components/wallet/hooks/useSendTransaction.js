@@ -24,10 +24,19 @@ const isMoonpaySellDestination = (address) => {
 
 const buildMoonpaySellMemos = (
   destination,
-  { currency, amount, amountRlusd } = {},
+  { currency, amount, amountRlusd, sourceCurrencyCode, sourceAmount } = {},
   { force = false } = {},
 ) => {
   if (!force && !isMoonpaySellDestination(destination)) return null;
+  const effectiveSourceCurrency =
+    String(sourceCurrencyCode || currency || "")
+      .trim()
+      .toUpperCase() || null;
+  const effectiveSourceAmount = Number.isFinite(Number(sourceAmount))
+    ? Number(sourceAmount)
+    : Number.isFinite(Number(amount))
+      ? Number(amount)
+      : null;
   const payload = buildMoonpayMemo({
     side: "sell",
     provider: "moonpay",
@@ -36,6 +45,11 @@ const buildMoonpaySellMemos = (
     amountRlusd: Number.isFinite(Number(amountRlusd))
       ? Number(amountRlusd)
       : null,
+    sourceCurrencyCode: effectiveSourceCurrency,
+    sourceAmount:
+      Number.isFinite(effectiveSourceAmount) && effectiveSourceAmount > 0
+        ? effectiveSourceAmount
+        : null,
   });
   if (!payload) return null;
   return buildXrplJsonMemo(payload);
@@ -340,6 +354,8 @@ export function useSendTransaction({
         currency,
         amount: amountNum,
         amountRlusd: paymentRlusd,
+        sourceCurrencyCode: moonpaySellRequest?.sourceCurrencyCode ?? currency,
+        sourceAmount: moonpaySellRequest?.sourceAmount ?? amountNum,
       }, { force: isMoonpaySell }),
     );
     appendMemos(
@@ -499,6 +515,8 @@ export function useSendTransaction({
         currency,
         amount: amountNum,
         amountRlusd: currency === "RLUSD" ? amountNum : null,
+        sourceCurrencyCode: moonpaySellRequest?.sourceCurrencyCode ?? currency,
+        sourceAmount: moonpaySellRequest?.sourceAmount ?? amountNum,
       }, { force: isMoonpaySell }),
     );
     appendMemos(

@@ -203,6 +203,8 @@ function expandV2Moonpay(p) {
     currencyCode: p.c ?? p.currencyCode,
     amount: p.a ?? p.amount,
     amountRlusd: p.r ?? p.amountRlusd,
+    sourceCurrencyCode: p.sc ?? p.sourceCurrencyCode,
+    sourceAmount: p.sa ?? p.sourceAmount,
   };
 }
 
@@ -408,10 +410,18 @@ function normalizeMoonpayPayload(payload, errors) {
   const amountRlusdRes = parseOptionalNumber(payload?.amountRlusd, { min: 0, minExclusive: true });
   if (!amountRlusdRes.ok) errors.push('moonpay.amountRlusd');
 
+  const sourceCurrencyCode = normalizeCurrencyCode(payload?.sourceCurrencyCode);
+  if (payload?.sourceCurrencyCode != null && !sourceCurrencyCode) errors.push('moonpay.sourceCurrencyCode');
+
+  const sourceAmountRes = parseOptionalNumber(payload?.sourceAmount, { min: 0, minExclusive: true });
+  if (!sourceAmountRes.ok) errors.push('moonpay.sourceAmount');
+
   const normalized = { side, provider };
   if (currencyCode) normalized.currencyCode = currencyCode;
   if (amountRes.provided) normalized.amount = amountRes.value;
   if (amountRlusdRes.provided) normalized.amountRlusd = amountRlusdRes.value;
+  if (sourceCurrencyCode) normalized.sourceCurrencyCode = sourceCurrencyCode;
+  if (sourceAmountRes.provided) normalized.sourceAmount = sourceAmountRes.value;
   return normalized;
 }
 
@@ -566,6 +576,8 @@ function toV2Compact(type, body) {
     if (body.currencyCode) compact.c = body.currencyCode;
     if (body.amount != null) compact.a = body.amount;
     if (body.amountRlusd != null) compact.r = body.amountRlusd;
+    if (body.sourceCurrencyCode) compact.sc = body.sourceCurrencyCode;
+    if (body.sourceAmount != null) compact.sa = body.sourceAmount;
   } else if (type === 'reconcile') {
     compact.d = body.deficit;
     if (body.operations && body.operations.length > 0) {
