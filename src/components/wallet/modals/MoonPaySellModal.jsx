@@ -886,14 +886,6 @@ const MoonPaySellModal = ({
             allowFullScreen
             title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
           />
-
-          <button
-            type="button"
-            onClick={handleUserClose}
-            className="absolute top-2 right-2 bg-black/80 text-white/80 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors"
-          >
-            {t("close", "Close")}
-          </button>
         </div>
       )}
 
