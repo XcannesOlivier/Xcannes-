@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { isIOSDevice } from "@/utils/deviceDetect";
+import { greenActionBtnBase } from "./walletModalTokens";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -724,10 +725,10 @@ const MoonPayBuyModal = ({
     <div className={embedded ? "" : "p-4 md:p-5"}>
       {/* Form */}
       {step === "form" && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Currency selector */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t(
                 "moonpay_select_cryptocurrency",
                 "Vous recevrez des dollars numériques (USD)",
@@ -751,19 +752,19 @@ const MoonPayBuyModal = ({
                 icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
               }))}
               useNativeSelect={false}
-              buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer"
+              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150"
               menuClassName={`${
                 noticeVariant === "demo"
                   ? "bg-xcannes-surface-demo"
                   : "bg-elevated"
               } ring-1 ring-white/10`}
-              selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none"
+              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
             />
           </div>
 
           {/* Fiat currency selector */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_fiat_currency_label", "Fiat currency")}
             </label>
             <ModalSelect
@@ -772,14 +773,14 @@ const MoonPayBuyModal = ({
               options={fiatOptions}
               placeholder={fiatPlaceholder}
               disabled={fiatLoading || fiatCurrencies.length === 0}
-              buttonClassName="bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-xcannes-green focus:outline-none cursor-pointer disabled:opacity-60"
+              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150"
               menuClassName={
                 noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
               }
-              selectClassName="xcannes-select w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none disabled:opacity-60"
+              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60"
             />
             {fiatLoading && (
-              <p className="text-xs text-white/60 mt-1">
+              <p className="text-[11px] text-white/55 mt-2">
                 {t("moonpay_fiat_loading", "Loading fiat currencies...")}
               </p>
             )}
@@ -787,7 +788,7 @@ const MoonPayBuyModal = ({
               <p className="text-xs text-red-400 mt-1">{fiatError}</p>
             )}
             {!fiatLoading && !fiatError && fiatUnavailable && (
-              <p className="text-xs text-white/60 mt-1">
+              <p className="text-[11px] text-white/55 mt-2">
                 {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
               </p>
             )}
@@ -795,7 +796,7 @@ const MoonPayBuyModal = ({
 
           {/* Amount input */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_amount_in_currency_8b1c7d2a9e", {
                 defaultValue: "Amount in {{currency}}",
                 currency: amountType === "fiat" ? fiatCurrency : currency,
@@ -809,7 +810,7 @@ const MoonPayBuyModal = ({
                 placeholder={amountType === "fiat" ? "100" : "1.0"}
                 step={amountType === "fiat" ? "10" : "0.1"}
                 min="0"
-                className="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-lg text-white focus:border-xcannes-green focus:outline-none pr-16"
+                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150"
               />
 
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
@@ -817,7 +818,7 @@ const MoonPayBuyModal = ({
               </span>
             </div>
             {amountType === "fiat" && minFiatAmount !== null && (
-              <p className="text-xs text-white/40 mt-1">
+              <p className="text-[11px] text-white/45 mt-2">
                 {t("moonpay_minimum_prefix", "Minimum:")} {minFiatAmount}{" "}
                 {fiatCurrency}
               </p>
@@ -825,18 +826,30 @@ const MoonPayBuyModal = ({
           </div>
 
           {/* Wallet address display */}
-          <div className="bg-black/40 border border-white/10 rounded-lg p-3">
-            <p className="text-xs text-white/60 mb-1">
+          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+            <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_destination_wallet", "Destination wallet")}
             </p>
             {String(walletLabel || "").trim() ? (
-              <p className="text-[16px] md:text-[17px] text-white/80 font-semibold truncate mb-1">
+              <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mb-1">
                 {walletLabel}
               </p>
             ) : null}
-            <p className="text-[8px] md:text-[10px] text-white/60 font-mono break-all">
+            <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
               {walletAddress}
             </p>
+          </div>
+
+          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+            {demoMode
+              ? t(
+                  "moonpay_info_buy_demo_1b7d2c9a5e",
+                  "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
+                )
+              : t(
+                  "moonpay_info_buy_live_3c8a1d6b2f",
+                  "Vous serez redirigé vers MoonPay pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+                )}
           </div>
 
           {/* Error message */}
@@ -859,7 +872,7 @@ const MoonPayBuyModal = ({
             type="button"
             onClick={generateBuyUrl}
             disabled={continueDisabled}
-            className="hidden md:block w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200 border bg-xcannes-green/20 text-xcannes-green border-xcannes-green/40 hover:bg-xcannes-green/30 hover:scale-[1.02] disabled:bg-xcannes-green/10 disabled:text-xcannes-green/60 disabled:border-xcannes-green/25 disabled:hover:scale-100"
+            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
           >
             {continueLabel}
           </button>
