@@ -774,7 +774,13 @@ function setupBackupVerifyScreen(words) {
   btnConfirm?.addEventListener('click', async () => {
     try {
       // Ask for Face ID or PIN confirmation before saving
-      const confirmed = await confirmWithAuth('Sécurisez ce compte', 'Confirmez votre identité pour chiffrer et sauvegarder ce compte.');
+      const addr = pendingWalletData?.address;
+      const confirmed = await confirmWithAuth(
+        'Sécurisez ce compte',
+        addr
+          ? `Confirmez pour chiffrer et sauvegarder le compte ${addr.slice(0, 8)}…`
+          : 'Confirmez votre identité pour chiffrer et sauvegarder ce compte.'
+      );
       if (!confirmed) {
         // User cancelled — stay on verify screen
         showScreen('backup-verify');
