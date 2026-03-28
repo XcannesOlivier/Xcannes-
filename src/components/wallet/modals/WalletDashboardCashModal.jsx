@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
 import { createPortal } from "react-dom";
@@ -33,10 +34,31 @@ export default function WalletDashboardCashModal({
 }) {
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
+  const [moonpayActive, setMoonpayActive] = useState(false);
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const readActive = () => {
+      try {
+        const fromGlobal = Boolean(window.__XCANNES_MOONPAY_ACTIVE__);
+        const fromSession =
+          window.sessionStorage?.getItem("xcannes_moonpay_active") === "1";
+        setMoonpayActive(fromGlobal || fromSession);
+      } catch {
+        setMoonpayActive(false);
+      }
+    };
+
+    readActive();
+    const handler = (e) => setMoonpayActive(Boolean(e?.detail?.active));
+    window.addEventListener("xcannes:moonpay-active", handler);
+    return () => window.removeEventListener("xcannes:moonpay-active", handler);
+  }, [open]);
 
   if (!shouldRender) return null;
 
@@ -176,7 +198,11 @@ export default function WalletDashboardCashModal({
 
           {/* Contenu selon l'onglet actif */}
           <div
-            className="p-4 md:p-5 overflow-y-auto overscroll-contain flex-1 min-h-0"
+            className={`${
+              // MoonPay iframe already has its own margins/padding inside the widget.
+              // Remove horizontal padding here to avoid double side-margins.
+              moonpayActive ? "px-0 py-4 md:py-5" : "p-4 md:p-5"
+            } overflow-y-auto overscroll-contain flex-1 min-h-0`}
             style={{ WebkitOverflowScrolling: "touch" }}
           >
             <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
