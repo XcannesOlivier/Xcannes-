@@ -730,8 +730,8 @@ const MoonPayBuyModal = ({
           <div>
             <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t(
-                "moonpay_select_cryptocurrency",
-                "Vous recevrez des dollars numériques (USD)",
+                "moonpay_buy_select_asset",
+                "Choisissez l'actif que vous voulez ajouter",
               )}
             </label>
             <ModalSelect
@@ -828,12 +828,18 @@ const MoonPayBuyModal = ({
           {/* Wallet address display */}
           <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_destination_wallet", "Destination wallet")}
+              {t("moonpay_destination_wallet", "Vers le compte")}
             </p>
             {String(walletLabel || "").trim() ? (
-              <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mb-1">
-                {walletLabel}
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-xcannes-green/80 shrink-0"
+                  aria-hidden
+                />
+                <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+                  {walletLabel}
+                </p>
+              </div>
             ) : null}
             <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
               {walletAddress}

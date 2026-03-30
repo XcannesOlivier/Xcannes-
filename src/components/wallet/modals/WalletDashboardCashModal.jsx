@@ -36,6 +36,8 @@ export default function WalletDashboardCashModal({
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const [moonpayActive, setMoonpayActive] = useState(false);
   const isSell = cashModalTab === "sell";
+  const showWalletMeta = isSell;
+  const showActionPill = Boolean(moonpayEnabled && isSell);
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -105,7 +107,7 @@ export default function WalletDashboardCashModal({
           <div className="border-b border-white/10">
             <div className="flex items-start justify-between p-4 gap-3">
               <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
-                <div>{renderWalletMeta?.("pr-8")}</div>
+                {showWalletMeta ? <div>{renderWalletMeta?.("pr-8")}</div> : null}
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
                     <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
@@ -123,34 +125,21 @@ export default function WalletDashboardCashModal({
                 ✕
               </button>
             </div>
-            {moonpayEnabled ? (
+            {showActionPill ? (
               <div className="px-4 pb-4">
                 <div className="w-full px-4 py-3 rounded-lg font-semibold text-xs md:text-sm border bg-xcannes-btn-green text-white border-xcannes-btn-green">
                   <div className="flex items-center justify-center gap-2">
-                    {isSell ? (
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M5 12H19M12 5L19 12L12 19"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M12 5V19M5 12H19"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    )}
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M5 12H19M12 5L19 12L12 19"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                     <span>
-                      {isSell
-                        ? t("ui_sell_crypto_c12d62c0d6", "Retirer de l'argent")
-                        : t("ui_buy_crypto_f72f8661b9", "Ajouter de l'argent")}
+                      {t("ui_sell_crypto_c12d62c0d6", "Retirer de l'argent")}
                     </span>
                   </div>
                 </div>
