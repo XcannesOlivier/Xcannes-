@@ -1016,17 +1016,14 @@ const MoonPaySellModal = ({
             </div>
           </div>
 
-          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-            {demoMode
-              ? t(
-                  "moonpay_info_sell_demo_6d1a9c2b7e",
-                  "Mode démo : la vente est simulée (pas de virement bancaire).",
-                )
-              : t(
-                  "moonpay_info_sell_live_8b2c1a7d5f",
-                  "Les fonds seront transférés vers votre compte bancaire.",
-                )}
-          </div>
+          {demoMode ? (
+            <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+              {t(
+                "moonpay_info_sell_demo_6d1a9c2b7e",
+                "Mode démo : la vente est simulée (pas de virement bancaire).",
+              )}
+            </div>
+          ) : null}
 
           {/* Error message */}
           {displayError && (

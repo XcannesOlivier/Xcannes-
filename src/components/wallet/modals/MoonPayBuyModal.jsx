@@ -726,14 +726,14 @@ const MoonPayBuyModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-          {/* Currency selector */}
-          <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t(
-                "moonpay_buy_select_asset",
-                "Choisissez l'actif que vous voulez ajouter",
-              )}
-            </label>
+	          {/* Currency selector */}
+	          <div>
+	            <label className="block text-[15px] md:text-base font-orbitron font-bold text-white mb-3">
+	              {t(
+	                "moonpay_buy_select_asset",
+	                "Choisissez l'actif que vous voulez ajouter",
+	              )}
+	            </label>
             <ModalSelect
               value={currency}
               onChange={setCurrency}
@@ -851,12 +851,12 @@ const MoonPayBuyModal = ({
               ? t(
                   "moonpay_info_buy_demo_1b7d2c9a5e",
                   "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
-                )
-              : t(
-                  "moonpay_info_buy_live_3c8a1d6b2f",
-                  "Vous serez redirigé vers MoonPay pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
-                )}
-          </div>
+	                )
+	              : t(
+	                  "moonpay_info_buy_live_3c8a1d6b2f",
+	                  "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+	                )}
+	          </div>
 
           {/* Error message */}
           {displayError && (

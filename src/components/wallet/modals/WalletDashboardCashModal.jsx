@@ -130,7 +130,7 @@ export default function WalletDashboardCashModal({
 	            <button
 	              type="button"
 	              onClick={onClose}
-	              className="absolute top-4 right-4 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-black/40 hover:bg-black/55 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center"
+	              className="absolute top-4 right-4 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center"
 	            >
 	              ✕
 	            </button>
