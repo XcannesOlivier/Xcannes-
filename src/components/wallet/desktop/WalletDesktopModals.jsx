@@ -12,6 +12,7 @@ import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
 import WalletDashboardCashChoiceModal from "../modals/WalletDashboardCashChoiceModal";
+import WalletDashboardUsdSwapModal from "../modals/WalletDashboardUsdSwapModal";
 import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
@@ -26,6 +27,7 @@ export default function WalletDesktopModals({
   showInlineReceive,
   showInlineSwap,
   showInlineCashChoice,
+  showInlineCashUsdSwap,
   showInlineCash,
   showInlineActivation,
   showInlineActivationRequest,
@@ -130,7 +132,17 @@ export default function WalletDesktopModals({
             cashModalProps?.setCashModalTab?.("sell");
             setActiveAction("cash");
           }}
-          renderWalletMeta={cashModalProps?.renderWalletMeta}
+          onChooseUsdSwap={() => setActiveAction("cashUsdSwap")}
+        />
+      ) : null}
+
+      {showInlineCashUsdSwap ? (
+        <WalletDashboardUsdSwapModal
+          open
+          inline
+          onClose={() => setActiveAction("cashChoice")}
+          walletLabel={cashModalProps?.walletLabel || ""}
+          walletAddress={cashModalProps?.walletAddress || ""}
         />
       ) : null}
 

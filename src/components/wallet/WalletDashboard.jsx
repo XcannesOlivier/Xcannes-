@@ -880,6 +880,7 @@ export default function WalletDashboard({
     !isDesktopPanel &&
     (activeAction === "cash" ||
       activeAction === "cashChoice" ||
+      activeAction === "cashUsdSwap" ||
       (activeAction === "swap" && swapState.swapLockedView === "lines") ||
       (activeAction === "send" && sendState.sendTab === "payreq"));
   const lockForActiveAction = Boolean(
