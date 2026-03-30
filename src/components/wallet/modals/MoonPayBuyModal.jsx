@@ -903,29 +903,14 @@ const MoonPayBuyModal = ({
 
       {/* MoonPay iframe */}
       {step === "iframe" && iframeUrl && (
-        <div className="space-y-3">
-          <div className="rounded-[14px] px-4 py-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-1">
-              {t("moonpay_destination_wallet", "Vers le compte")}
-            </p>
-            {String(walletLabel || "").trim() ? (
-              <p className="text-[14px] md:text-[15px] text-white font-semibold truncate">
-                {walletLabel}
-              </p>
-            ) : null}
-            <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
-              {walletAddress}
-            </p>
-          </div>
-          <div className="relative" style={{ height: "600px" }}>
-            <iframe
-              src={iframeUrl}
-              className="w-full h-full rounded-lg"
-              allow={moonpayIframeAllow}
-              allowFullScreen
-              title={t("moonpay_widget_title_buy", "MoonPay Widget")}
-            />
-          </div>
+        <div className="relative" style={{ height: "600px" }}>
+          <iframe
+            src={iframeUrl}
+            className="w-full h-full rounded-lg"
+            allow={moonpayIframeAllow}
+            allowFullScreen
+            title={t("moonpay_widget_title_buy", "MoonPay Widget")}
+          />
         </div>
       )}
 
