@@ -21,6 +21,7 @@ const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
 const MOONPAY_SELL_SOURCE_KEY = "xcannes_moonpay_sell_source_v1";
 const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
+const MOONPAY_NAV_EVENT = "xcannes:moonpay-nav";
 const MOONPAY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
 const MOONPAY_FLOW_MAX_AGE_MS = 8 * 60 * 60 * 1000;
 
@@ -32,6 +33,86 @@ const isTrustedMoonPayOrigin = (origin) => {
     return host === "moonpay.com" || host.endsWith(MOONPAY_ORIGIN_SUFFIX);
   } catch (_) {
     return false;
+  }
+};
+
+const dispatchMoonpayNav = (detail) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new CustomEvent(MOONPAY_NAV_EVENT, { detail }));
+  } catch {
+    // ignore
+  }
+};
+
+const extractMoonpayWidgetUrl = (payload) => {
+  if (!payload) return "";
+  const candidates = [
+    payload.url,
+    payload.href,
+    payload.location,
+    payload?.data?.url,
+    payload?.data?.href,
+    payload?.data?.location,
+    payload?.payload?.url,
+    payload?.payload?.href,
+    payload?.payload?.location,
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate !== "string") continue;
+    const trimmed = candidate.trim();
+    if (!trimmed) continue;
+    if (!/^https?:\/\//i.test(trimmed)) continue;
+    return trimmed;
+  }
+  return "";
+};
+
+const extractMoonpayCanGoBack = (payload) => {
+  if (!payload) return null;
+  const candidates = [
+    payload.canGoBack,
+    payload?.data?.canGoBack,
+    payload?.payload?.canGoBack,
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === "boolean") return candidate;
+  }
+  const depthCandidates = [
+    payload.navigationStackDepth,
+    payload?.data?.navigationStackDepth,
+    payload?.payload?.navigationStackDepth,
+  ];
+  for (const candidate of depthCandidates) {
+    const depth = Number(candidate);
+    if (!Number.isFinite(depth)) continue;
+    return depth > 0;
+  }
+  const historyLengthCandidates = [
+    payload.historyLength,
+    payload?.data?.historyLength,
+    payload?.payload?.historyLength,
+  ];
+  for (const candidate of historyLengthCandidates) {
+    const depth = Number(candidate);
+    if (!Number.isFinite(depth)) continue;
+    return depth > 1;
+  }
+  return null;
+};
+
+const inferMoonpayAtEntryFromUrls = (entryUrl, currentUrl) => {
+  if (!entryUrl || !currentUrl) return null;
+  try {
+    const entry = new URL(entryUrl);
+    const current = new URL(currentUrl);
+    if (entry.origin !== current.origin) return false;
+    if (entry.pathname !== current.pathname) return false;
+    if (current.hash && entry.hash && current.hash !== entry.hash) return false;
+    if (current.hash && !entry.hash) return false;
+    return true;
+  } catch {
+    return null;
   }
 };
 
@@ -69,6 +150,8 @@ const MoonPaySellModal = ({
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const pendingAutoStartRef = useRef(false);
+  const iframeEntryUrlRef = useRef(null);
+  const iframeLoadCountRef = useRef(0);
   const isEmbeddedPwa =
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).get("embedded") === "pwa";
@@ -84,6 +167,22 @@ const MoonPaySellModal = ({
     latestStepRef.current = step;
     latestIframeUrlRef.current = iframeUrl;
   }, [iframeUrl, step]);
+
+  // Notify parent that the MoonPay iframe is at its "entry" URL.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isOpen) return;
+    if (step !== "iframe" || !iframeUrl) return;
+    iframeEntryUrlRef.current = iframeUrl;
+    iframeLoadCountRef.current = 0;
+    dispatchMoonpayNav({
+      kind: "sell",
+      entryUrl: iframeUrl,
+      url: iframeUrl,
+      atEntry: true,
+      canGoBack: false,
+    });
+  }, [iframeUrl, isOpen, step]);
 
   // Keep MoonPay flow "active" to prevent wallet-level auto-lock disconnects
   // while user interacts with MoonPay (KYC/Apple flows).
@@ -758,9 +857,30 @@ const MoonPaySellModal = ({
     const handleMessage = (event) => {
       if (!isTrustedMoonPayOrigin(event.origin)) return;
 
-      const { type, status } = event.data;
+      const payload = event?.data || {};
+      const { type, status } = payload;
+      const navCanGoBack = extractMoonpayCanGoBack(payload);
+      const navUrl = extractMoonpayWidgetUrl(payload);
       if (DEBUG_LOGS) {
-        console.log("MoonPay sell message received:", event.data);
+        console.log("MoonPay sell message received:", payload);
+      }
+
+      if (navCanGoBack != null) {
+        dispatchMoonpayNav({
+          kind: "sell",
+          canGoBack: navCanGoBack,
+          atEntry: !navCanGoBack,
+        });
+      } else if (navUrl) {
+        const atEntry = inferMoonpayAtEntryFromUrls(
+          iframeEntryUrlRef.current,
+          navUrl,
+        );
+        dispatchMoonpayNav({
+          kind: "sell",
+          url: navUrl,
+          ...(typeof atEntry === "boolean" ? { atEntry } : null),
+        });
       }
 
       if (type === "transaction_completed" || status === "completed") {
@@ -1073,16 +1193,23 @@ const MoonPaySellModal = ({
 
       {/* MoonPay iframe */}
       {step === "iframe" && iframeUrl && (
-        <div className="relative" style={{ height: "600px" }}>
-          <iframe
-            src={iframeUrl}
-            className="w-full h-full rounded-lg"
-            allow={moonpayIframeAllow}
-            allowFullScreen
-            title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
-          />
-        </div>
-      )}
+	        <div className="relative" style={{ height: "600px" }}>
+	          <iframe
+	            src={iframeUrl}
+	            className="w-full h-full rounded-lg"
+	            allow={moonpayIframeAllow}
+              onLoad={() => {
+                iframeLoadCountRef.current += 1;
+                dispatchMoonpayNav({
+                  kind: "sell",
+                  loadCount: iframeLoadCountRef.current,
+                });
+              }}
+	            allowFullScreen
+	            title={t("moonpay_widget_title_sell", "MoonPay Sell Widget")}
+	          />
+	        </div>
+	      )}
 
       {/* Success */}
       {step === "success" && (
