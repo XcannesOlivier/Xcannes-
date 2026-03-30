@@ -1171,41 +1171,48 @@ const MoonPaySellModal = ({
               : "bg-elevated border-subtle"
           } ${isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
           onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                  {t(
-                    "ui_sell_crypto_for_fiat_1167ce7e08",
-                    "Sell Crypto for Fiat",
-                  )}
-                </h3>
-                {noticeVariant === "demo" ? (
-                  <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                    {t("demo_notice_title", "Mode démo")}
-                  </span>
-                ) : null}
-
-              </div>
-              <p className="text-xs text-white/60 mt-1">
-                {t(
-                  "ui_powered_by_moonpay_instant_b_9e94ccf50e",
-                  "Powered by MoonPay • Instant bank transfer",
-                )}
-              </p>
-            </div>
-            {step !== "iframe" && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+	        >
+	          {/* Header */}
+	          {step === "iframe" ? (
+	            <button
+	              type="button"
+	              onClick={handleUserClose}
+	              className="absolute top-4 right-4 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center"
+	            >
+	              ✕
+	            </button>
+	          ) : (
+	            <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
+	              <div>
+	                <div className="flex items-center gap-2 flex-wrap">
+	                  <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+	                    {t(
+	                      "ui_sell_crypto_for_fiat_1167ce7e08",
+	                      "Sell Crypto for Fiat",
+	                    )}
+	                  </h3>
+	                  {noticeVariant === "demo" ? (
+	                    <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
+	                      {t("demo_notice_title", "Mode démo")}
+	                    </span>
+	                  ) : null}
+	                </div>
+	                <p className="text-xs text-white/60 mt-1">
+	                  {t(
+	                    "ui_powered_by_moonpay_instant_b_9e94ccf50e",
+	                    "Powered by MoonPay • Instant bank transfer",
+	                  )}
+	                </p>
+	              </div>
+	              <button
+	                type="button"
+	                onClick={handleUserClose}
+	                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+	              >
+	                ✕
+	              </button>
+	            </div>
+	          )}
 
           {/* Content */}
           {renderContent()}
