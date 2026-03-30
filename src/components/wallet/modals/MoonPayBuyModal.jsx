@@ -846,12 +846,12 @@ const MoonPayBuyModal = ({
             </p>
           </div>
 
-          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[13px] md:text-sm leading-snug text-white/60">
             {demoMode
               ? t(
                   "moonpay_info_buy_demo_1b7d2c9a5e",
                   "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
-	                )
+                )
 	              : t(
 	                  "moonpay_info_buy_live_3c8a1d6b2f",
 	                  "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
