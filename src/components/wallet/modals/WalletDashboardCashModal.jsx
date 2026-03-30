@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
-
-const MOONPAY_NAV_EVENT = "xcannes:moonpay-nav";
 
 export default function WalletDashboardCashModal({
   open,
@@ -37,8 +35,6 @@ export default function WalletDashboardCashModal({
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const [moonpayActive, setMoonpayActive] = useState(false);
-  const [moonpayAtEntry, setMoonpayAtEntry] = useState(true);
-  const lastMoonpayKindRef = useRef(null);
   const showWalletMeta = false;
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -65,48 +61,6 @@ export default function WalletDashboardCashModal({
     return () => window.removeEventListener("xcannes:moonpay-active", handler);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    if (!moonpayActive) {
-      lastMoonpayKindRef.current = null;
-      setMoonpayAtEntry(true);
-      return;
-    }
-    lastMoonpayKindRef.current =
-      cashModalTab === "sell" ? "sell" : cashModalTab === "buy" ? "buy" : null;
-    setMoonpayAtEntry(true);
-  }, [cashModalTab, moonpayActive, open]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!open) return;
-
-    const handler = (e) => {
-      const detail = e?.detail || {};
-      const kind = typeof detail.kind === "string" ? detail.kind : null;
-      if (kind && lastMoonpayKindRef.current && kind !== lastMoonpayKindRef.current) {
-        return;
-      }
-      if (!moonpayActive) return;
-
-      if (typeof detail.atEntry === "boolean") {
-        setMoonpayAtEntry(detail.atEntry);
-        return;
-      }
-      if (typeof detail.canGoBack === "boolean") {
-        setMoonpayAtEntry(!detail.canGoBack);
-        return;
-      }
-      const loadCount = Number(detail.loadCount);
-      if (Number.isFinite(loadCount) && loadCount > 1) {
-        setMoonpayAtEntry(false);
-      }
-    };
-
-    window.addEventListener(MOONPAY_NAV_EVENT, handler);
-    return () => window.removeEventListener(MOONPAY_NAV_EVENT, handler);
-  }, [moonpayActive, open]);
-
   if (!shouldRender) return null;
 
   const wrapperClass = inline
@@ -126,7 +80,6 @@ export default function WalletDashboardCashModal({
         : "wallet-modal-lift-in"
       : "",
   ].join(" ");
-  const showCloseButton = inline || !moonpayActive || moonpayAtEntry;
 
   const content = (
     <>
@@ -162,15 +115,13 @@ export default function WalletDashboardCashModal({
 
 	                </div>
 	              </div>
-	              {showCloseButton ? (
-	                <button
-	                  type="button"
-	                  onClick={onClose}
-	                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-	                >
-	                  ✕
-	                </button>
-	              ) : null}
+	              <button
+	                type="button"
+	                onClick={onClose}
+	                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+	              >
+	                ✕
+	              </button>
 	            </div>
 	          </div>
 
