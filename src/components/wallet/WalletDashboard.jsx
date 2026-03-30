@@ -879,6 +879,7 @@ export default function WalletDashboard({
   const allowBackgroundScrollForActions =
     !isDesktopPanel &&
     (activeAction === "cash" ||
+      activeAction === "cashChoice" ||
       (activeAction === "swap" && swapState.swapLockedView === "lines") ||
       (activeAction === "send" && sendState.sendTab === "payreq"));
   const lockForActiveAction = Boolean(

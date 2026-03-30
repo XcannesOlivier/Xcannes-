@@ -11,6 +11,7 @@ import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
 import WalletDashboardSwapModal from "../modals/WalletDashboardSwapModal";
+import WalletDashboardCashChoiceModal from "../modals/WalletDashboardCashChoiceModal";
 import WalletDashboardCashModal from "../modals/WalletDashboardCashModal";
 import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
@@ -24,6 +25,7 @@ export default function WalletDesktopModals({
   showInlinePayreq,
   showInlineReceive,
   showInlineSwap,
+  showInlineCashChoice,
   showInlineCash,
   showInlineActivation,
   showInlineActivationRequest,
@@ -108,6 +110,27 @@ export default function WalletDesktopModals({
             setActiveAction(null);
           }}
           {...swapModalProps}
+        />
+      ) : null}
+
+      {showInlineCashChoice ? (
+        <WalletDashboardCashChoiceModal
+          open
+          inline
+          onClose={() => {
+            resetCashForm?.();
+            setActiveAction(null);
+            setCashBuyPrefill(null);
+          }}
+          onChooseBuy={() => {
+            cashModalProps?.setCashModalTab?.("buy");
+            setActiveAction("cash");
+          }}
+          onChooseSell={() => {
+            cashModalProps?.setCashModalTab?.("sell");
+            setActiveAction("cash");
+          }}
+          renderWalletMeta={cashModalProps?.renderWalletMeta}
         />
       ) : null}
 

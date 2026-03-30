@@ -132,6 +132,17 @@ export function useWalletNavigation({
         }
         setCashBuyPrefill(null);
       }
+      if (nextAction === "cashChoice") {
+        if (!MOONPAY_UI_ENABLED) {
+          toast.info(
+            t("ui_moonpay_disabled", {
+              defaultValue: "MoonPay est temporairement désactivé.",
+            }),
+          );
+          return;
+        }
+        setCashBuyPrefill(null);
+      }
       setActiveAction(nextAction);
     },
     [

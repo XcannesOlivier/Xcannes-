@@ -93,7 +93,7 @@ export default function WalletDashboardActionRow({ onAction }) {
           type="button"
           onClick={() => {
             if (!cashEnabled) return;
-            onAction("cash");
+            onAction("cashChoice");
           }}
           disabled={!cashEnabled}
           aria-disabled={!cashEnabled}
