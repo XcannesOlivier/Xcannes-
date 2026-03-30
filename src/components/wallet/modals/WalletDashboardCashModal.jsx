@@ -126,16 +126,14 @@ export default function WalletDashboardCashModal({
 	          </div>
 
 	          {/* Contenu selon l'onglet actif */}
-	          <div
-	            className={`${
-	              // MoonPay iframe already has its own margins/padding inside the widget.
-	              // Remove horizontal padding here to avoid double side-margins.
-	              moonpayActive
-	                ? "px-0 pt-4 md:pt-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] md:pb-5"
-	                : "p-4 md:p-5"
-	            } overflow-y-auto overscroll-contain flex-1 min-h-0`}
-	            style={{ WebkitOverflowScrolling: "touch" }}
-	          >
+		          <div
+		            className={`${
+		              // MoonPay iframe already has its own margins/padding inside the widget.
+		              // Remove horizontal padding here to avoid double side-margins.
+		              moonpayActive ? "px-0 py-4 md:py-5" : "p-4 md:p-5"
+		            } overflow-y-auto overscroll-contain flex-1 min-h-0`}
+		            style={{ WebkitOverflowScrolling: "touch" }}
+		          >
             <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
               {moonpayEnabled ? (
                 cashModalTab === "buy" ? (

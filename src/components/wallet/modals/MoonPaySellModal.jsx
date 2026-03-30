@@ -1073,7 +1073,10 @@ const MoonPaySellModal = ({
 
       {/* MoonPay iframe */}
       {step === "iframe" && iframeUrl && (
-        <div className="relative" style={{ height: "600px" }}>
+        <div
+          className="relative"
+          style={{ height: "calc(100vh - 240px)", minHeight: "600px", maxHeight: "760px" }}
+        >
           <iframe
             src={iframeUrl}
             className="w-full h-full rounded-lg"
