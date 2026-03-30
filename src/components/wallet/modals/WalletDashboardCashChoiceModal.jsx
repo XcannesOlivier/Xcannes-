@@ -3,6 +3,7 @@
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { greenActionBtnBase } from "./walletModalTokens";
 
 export default function WalletDashboardCashChoiceModal({
   open,
@@ -20,6 +21,14 @@ export default function WalletDashboardCashChoiceModal({
   });
 
   if (!shouldRender) return null;
+
+  const secondaryActionBtnBase = [
+    "rounded-lg border border-white/10",
+    "bg-black/20 text-white/70 font-semibold",
+    "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
+    "hover:bg-black/40 hover:text-white/90 hover:-translate-y-px",
+    "active:translate-y-0 active:scale-[0.97]",
+  ].join(" ");
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -74,19 +83,18 @@ export default function WalletDashboardCashChoiceModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+                className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
               >
                 ✕
               </button>
             </div>
-          </div>
-
-          <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-5">
-            <div className="w-full max-w-lg flex gap-2">
+            <div className="flex gap-2 px-4 pb-4">
               <button
                 type="button"
                 onClick={onChooseBuy}
-                className="flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] border bg-black/20 text-white/80 border-white/10 hover:bg-black/40 hover:text-white"
+                className={[greenActionBtnBase, "flex-1 px-4 py-3 text-xs md:text-sm"].join(
+                  " ",
+                )}
               >
                 <div className="flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -97,14 +105,18 @@ export default function WalletDashboardCashChoiceModal({
                       strokeLinecap="round"
                     />
                   </svg>
-                  <span>{t("ui_buy_crypto_f72f8661b9", "Ajouter de l'argent")}</span>
+                  <span>
+                    {t("ui_buy_crypto_f72f8661b9", "Ajouter de l'argent")}
+                  </span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={onChooseSell}
-                className="flex-1 px-4 py-3 rounded-lg font-semibold text-xs md:text-sm transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] border bg-black/20 text-white/80 border-white/10 hover:bg-black/40 hover:text-white"
+                className={[secondaryActionBtnBase, "flex-1 px-4 py-3 text-xs md:text-sm"].join(
+                  " ",
+                )}
               >
                 <div className="flex items-center justify-center gap-2">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -116,11 +128,15 @@ export default function WalletDashboardCashChoiceModal({
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span>{t("ui_sell_crypto_c12d62c0d6", "Retirer de l'argent")}</span>
+                  <span>
+                    {t("ui_sell_crypto_c12d62c0d6", "Retirer de l'argent")}
+                  </span>
                 </div>
               </button>
             </div>
           </div>
+
+          <div className="flex-1 min-h-0" />
         </div>
       </div>
     </>
@@ -130,4 +146,3 @@ export default function WalletDashboardCashChoiceModal({
   if (typeof document === "undefined") return null;
   return createPortal(content, document.body);
 }
-
