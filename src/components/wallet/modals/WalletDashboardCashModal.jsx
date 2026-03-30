@@ -95,35 +95,46 @@ export default function WalletDashboardCashModal({
 
       {/* Modal */}
       <div className={wrapperClass}>
-        <div
-          className={panelClass}
-          onClick={(e) => {
-            if (!inline) e.stopPropagation();
-          }}
-        >
-          {/* Header */}
-	          <div className="border-b border-white/10">
-	            <div className="flex items-start justify-between p-4 gap-3">
-	              <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
-	                {showWalletMeta ? <div>{renderWalletMeta?.("pr-8")}</div> : null}
-	                <div className="flex flex-wrap items-center gap-2">
-	                  {noticeVariant === "demo" ? (
-	                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-	                      {t("demo_notice_title", "Mode démo")}
-	                    </span>
+	        <div
+	          className={panelClass}
+	          onClick={(e) => {
+	            if (!inline) e.stopPropagation();
+	          }}
+	        >
+	          {/* Header */}
+	          {!moonpayActive ? (
+	            <div className="border-b border-white/10">
+	              <div className="flex items-start justify-between p-4 gap-3">
+	                <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
+	                  {showWalletMeta ? (
+	                    <div>{renderWalletMeta?.("pr-8")}</div>
 	                  ) : null}
-
+	                  <div className="flex flex-wrap items-center gap-2">
+	                    {noticeVariant === "demo" ? (
+	                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+	                        {t("demo_notice_title", "Mode démo")}
+	                      </span>
+	                    ) : null}
+	                  </div>
 	                </div>
+	                <button
+	                  type="button"
+	                  onClick={onClose}
+	                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+	                >
+	                  ✕
+	                </button>
 	              </div>
-	              <button
-	                type="button"
-	                onClick={onClose}
-	                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-	              >
-	                ✕
-	              </button>
 	            </div>
-	          </div>
+	          ) : (
+	            <button
+	              type="button"
+	              onClick={onClose}
+	              className="absolute top-4 right-4 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-black/40 hover:bg-black/55 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center"
+	            >
+	              ✕
+	            </button>
+	          )}
 
 	          {/* Contenu selon l'onglet actif */}
 		          <div
