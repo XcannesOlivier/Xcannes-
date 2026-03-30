@@ -153,7 +153,7 @@ export default function WalletMobileModals({
               open={activeAction === "cash"}
               onClose={() => {
                 resetCashForm?.();
-                setActiveAction(null);
+                setActiveAction("cashChoice");
                 setCashBuyPrefill(null);
               }}
               {...cashModalProps}

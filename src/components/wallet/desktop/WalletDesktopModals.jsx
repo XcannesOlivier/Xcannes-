@@ -152,7 +152,7 @@ export default function WalletDesktopModals({
           inline
           onClose={() => {
             resetCashForm?.();
-            setActiveAction(null);
+            setActiveAction("cashChoice");
             setCashBuyPrefill(null);
           }}
           {...cashModalProps}

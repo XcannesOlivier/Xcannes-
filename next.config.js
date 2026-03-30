@@ -98,26 +98,6 @@ const nextConfig = {
           },
         ],
       },
-      // MoonPay widget uses external navigation / auth flows that may rely on popups.
-      // Allow popups for wallet contexts to avoid "blocked by cross-origin-opener-policy".
-      {
-        source: "/wallet",
-        headers: [
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin-allow-popups",
-          },
-        ],
-      },
-      {
-        source: "/wallet-app/:path*",
-        headers: [
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin-allow-popups",
-          },
-        ],
-      },
       {
         source: "/:path*",
         headers: securityHeaders,

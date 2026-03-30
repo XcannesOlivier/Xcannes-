@@ -117,24 +117,24 @@ export default function WalletDashboardCashModal({
 	                    ) : null}
 	                  </div>
 	                </div>
-	                <button
-	                  type="button"
-	                  onClick={onClose}
-	                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-	                >
-	                  ✕
-	                </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+                  >
+                    ✕
+                  </button>
 	              </div>
 	            </div>
 	          ) : (
-	            <button
-	              type="button"
-	              onClick={onClose}
-	              className="absolute top-1 right-1 md:top-2 md:right-2 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center"
-	            >
-	              ✕
-	            </button>
-	          )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute top-1 right-1 md:top-2 md:right-2 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center"
+            >
+              ✕
+            </button>
+          )}
 
 	          {/* Contenu selon l'onglet actif */}
 		          <div
