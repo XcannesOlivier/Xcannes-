@@ -557,6 +557,7 @@
   "moonpay_fiat_loading": "Chargement des devises…",
   "moonpay_fiat_unavailable": "Devises indisponibles",
   "moonpay_from_wallet": "Depuis le wallet",
+  "moonpay_from_account": "Depuis le compte",
   "moonpay_loading_widget": "Chargement du widget MoonPay...",
   "moonpay_minimum_note": "Les minimums dépendent du partenaire (devise, pays, moyen de paiement).",
   "moonpay_minimum_prefix": "Minimum :",

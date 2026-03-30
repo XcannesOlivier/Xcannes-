@@ -35,9 +35,7 @@ export default function WalletDashboardCashModal({
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const [moonpayActive, setMoonpayActive] = useState(false);
-  const isSell = cashModalTab === "sell";
-  const showWalletMeta = isSell;
-  const showActionPill = Boolean(moonpayEnabled && isSell);
+  const showWalletMeta = false;
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -125,26 +123,6 @@ export default function WalletDashboardCashModal({
                 ✕
               </button>
             </div>
-            {showActionPill ? (
-              <div className="px-4 pb-4">
-                <div className="w-full px-4 py-3 rounded-lg font-semibold text-xs md:text-sm border bg-xcannes-btn-green text-white border-xcannes-btn-green">
-                  <div className="flex items-center justify-center gap-2">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M5 12H19M12 5L19 12L12 19"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span>
-                      {t("ui_sell_crypto_c12d62c0d6", "Retirer de l'argent")}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ) : null}
           </div>
 
           {/* Contenu selon l'onglet actif */}
