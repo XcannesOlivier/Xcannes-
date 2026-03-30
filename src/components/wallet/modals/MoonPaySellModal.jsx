@@ -1006,12 +1006,12 @@ const MoonPaySellModal = ({
                 <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
                   {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
                 </p>
-                <p className="text-[11px] text-white/55 mt-2">
-                  {t(
-                    "moonpay_sell_destination_helper",
-                    "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-                  )}
-                </p>
+	                <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
+	                  {t(
+	                    "moonpay_sell_destination_helper",
+	                    "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                  )}
+	                </p>
               </div>
             </div>
           </div>
