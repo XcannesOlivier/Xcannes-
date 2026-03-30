@@ -51,6 +51,23 @@ let pendingWalletData = null; // { address, seed, publicKey, mnemonic, wallet }
 // --- Auto-lock ---
 const AUTO_LOCK_MS = 5 * 60 * 1000;
 let inactivityTimer = null;
+const MOONPAY_BACKGROUND_GRACE_MS = 3 * 60 * 1000;
+let moonpayActiveInDashboard = false;
+let moonpayBackgroundLockTimer = null;
+
+function clearMoonpayBackgroundLockTimer() {
+  if (moonpayBackgroundLockTimer) clearTimeout(moonpayBackgroundLockTimer);
+  moonpayBackgroundLockTimer = null;
+}
+
+function scheduleMoonpayBackgroundLock() {
+  clearMoonpayBackgroundLockTimer();
+  moonpayBackgroundLockTimer = setTimeout(() => {
+    try {
+      if (document.hidden && isUnlocked) lockWallet();
+    } catch { /* ignore */ }
+  }, MOONPAY_BACKGROUND_GRACE_MS);
+}
 
 function resetInactivityTimer() {
   if (inactivityTimer) clearTimeout(inactivityTimer);
@@ -62,8 +79,13 @@ function resetInactivityTimer() {
 
 document.addEventListener('visibilitychange', async () => {
   if (document.hidden && isUnlocked) {
+    if (moonpayActiveInDashboard) {
+      scheduleMoonpayBackgroundLock();
+      return;
+    }
     lockWallet();
   } else if (!document.hidden && !isUnlocked) {
+    clearMoonpayBackgroundLockTimer();
     // App came back — try Face ID auto-unlock if on unlock screen
     const unlockScreen = document.getElementById('screen-unlock');
     if (unlockScreen && !unlockScreen.classList.contains('hidden')) {
@@ -85,6 +107,8 @@ document.addEventListener('visibilitychange', async () => {
         if (pinInput && !pinInput.disabled) pinInput.focus();
       }, 300);
     }
+  } else if (!document.hidden) {
+    clearMoonpayBackgroundLockTimer();
   }
 });
 
@@ -1218,17 +1242,24 @@ function setupWalletEmbedded() {
   }
 
   // --- postMessage bridge ---
-  function handleIframeMessage(event) {
-    // Security: only accept messages from same origin or the dashboard URL
-    const data = event.data;
-    if (!data || !data.type) return;
+	  function handleIframeMessage(event) {
+	    // Security: only accept messages from same origin or the dashboard URL
+	    const data = event.data;
+	    if (!data || !data.type) return;
 
-    switch (data.type) {
-      case 'READY':
-        // iframe loaded — send wallet identity
-        sendToIframe({
-          type: 'INIT',
-          address: currentWallet?.address || '',
+	    switch (data.type) {
+	      case 'MOONPAY_ACTIVE':
+	        moonpayActiveInDashboard = Boolean(data.active);
+	        if (!moonpayActiveInDashboard) {
+	          clearMoonpayBackgroundLockTimer();
+	        }
+	        break;
+
+	      case 'READY':
+	        // iframe loaded — send wallet identity
+	        sendToIframe({
+	          type: 'INIT',
+	          address: currentWallet?.address || '',
           publicKey: currentWallet?.publicKey || '',
         });
         break;

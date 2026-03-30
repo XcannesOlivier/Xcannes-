@@ -35,6 +35,23 @@ const isTrustedMoonPayOrigin = (origin) => {
   }
 };
 
+const notifyPwaMoonpayActive = (active, tab = "sell") => {
+  if (typeof window === "undefined") return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const isPwaEmbedded =
+      params.get("embedded") === "pwa" || Boolean(window.__XCANNES_PWA_EMBEDDED__);
+    if (!isPwaEmbedded) return;
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage(
+      { type: "MOONPAY_ACTIVE", active: Boolean(active), tab },
+      "*",
+    );
+  } catch {
+    // ignore
+  }
+};
+
 /**
  * MoonPaySellModal - Modal pour vendre des cryptos contre fiat
  *
@@ -110,6 +127,7 @@ const MoonPaySellModal = ({
       window.dispatchEvent(
         new CustomEvent("xcannes:moonpay-active", { detail: { active } }),
       );
+      notifyPwaMoonpayActive(active, "sell");
     } catch {
       // Ignore
     }
