@@ -1193,7 +1193,9 @@ const MoonPaySellModal = ({
 	          <button
 	            type="button"
 	            onClick={handleUserClose}
-	            className="absolute top-4 right-4 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center"
+	            className={`absolute ${
+	              step === "iframe" ? "top-1 right-1 md:top-2 md:right-2" : "top-4 right-4"
+	            } z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center`}
 	          >
 	            ✕
 	          </button>
