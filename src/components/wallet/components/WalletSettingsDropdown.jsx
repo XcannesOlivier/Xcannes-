@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
@@ -17,8 +17,12 @@ import PreferredCurrencySelector from "./PreferredCurrencySelector";
  */
 export default function WalletSettingsDropdown({
   position = "header",
+  isDesktopPanel = false,
   onOpenInfo,
   onOpenXrplActivity,
+  onOpenSecurity,
+  onOpenHelp,
+  onOpenTerms,
   // Preferred currency props
   preferredCurrency,
   topCurrencies,
@@ -36,6 +40,11 @@ export default function WalletSettingsDropdown({
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [helpOpenIndex, setHelpOpenIndex] = useState(0);
   const ref = useRef(null);
+  const buttonRef = useRef(null);
+  const menuRef = useRef(null);
+  const [desktopMenuStyle, setDesktopMenuStyle] = useState(null);
+  const [desktopArrowX, setDesktopArrowX] = useState(null);
+  const [desktopPlacement, setDesktopPlacement] = useState("bottom");
 
   const RETURN_FLAG = "__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__";
 
@@ -181,27 +190,83 @@ export default function WalletSettingsDropdown({
         ? "relative md:hidden"
         : "relative";
 
-  // dropdown opens downward from header/inline, upward from footer
-  // md: prefixed so it doesn't override mobile fullscreen (fixed inset-0)
-  const dropdownPositionClass =
-    position === "footer"
-      ? "md:absolute md:right-0 md:bottom-full md:mb-1.5"
-      : "md:absolute md:right-0 md:top-full md:mt-1.5";
+  const isDesktop =
+    typeof window !== "undefined"
+      ? window.matchMedia?.("(min-width: 768px)")?.matches
+      : false;
 
-  const arrowPositionClass =
-    position === "footer"
-      ? "md:bottom-[-7px] md:right-3 md:rotate-45"
-      : "md:top-[-7px] md:right-3 md:rotate-45";
+  const updateDesktopPosition = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia?.("(min-width: 768px)")?.matches) return;
+    if (!buttonRef.current || !menuRef.current) return;
 
-  const isDesktop = typeof window !== "undefined"
-    ? window.matchMedia?.("(min-width: 768px)")?.matches
-    : false;
+    const margin = 12;
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+
+    const buttonRect = buttonRef.current.getBoundingClientRect();
+    const menuW = menuRef.current.offsetWidth || 360;
+    const menuH = menuRef.current.offsetHeight || 480;
+
+    // Prefer aligning the menu's right edge with the button's right edge.
+    let left = buttonRect.right - menuW;
+    left = Math.max(margin, Math.min(left, viewportW - menuW - margin));
+
+    // Prefer opening below; if not enough space, open above.
+    const fitsBelow = buttonRect.bottom + margin + menuH + margin <= viewportH;
+    const fitsAbove = buttonRect.top - margin - menuH >= margin;
+
+    let top;
+    let placement = "bottom";
+    if (!fitsBelow && fitsAbove) {
+      placement = "top";
+      top = Math.max(margin, buttonRect.top - margin - menuH);
+    } else {
+      top = Math.max(
+        margin,
+        Math.min(viewportH - menuH - margin, buttonRect.bottom + margin),
+      );
+    }
+
+    // Arrow X in menu coordinates (clamped so it never hits rounded corners).
+    const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+    const arrowX = Math.max(
+      18,
+      Math.min(menuW - 18, buttonCenterX - left),
+    );
+
+    setDesktopPlacement(placement);
+    setDesktopArrowX(arrowX);
+    setDesktopMenuStyle({ top: `${Math.round(top)}px`, left: `${Math.round(left)}px` });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    updateDesktopPosition();
+
+    const onTick = () => updateDesktopPosition();
+    window.addEventListener("resize", onTick);
+    // Use capture to handle scroll containers (dashboard has nested scroll areas).
+    window.addEventListener("scroll", onTick, true);
+    return () => {
+      window.removeEventListener("resize", onTick);
+      window.removeEventListener("scroll", onTick, true);
+    };
+  }, [isOpen, updateDesktopPosition]);
+
+  useEffect(() => {
+    if (isOpen) return;
+    setDesktopMenuStyle(null);
+    setDesktopArrowX(null);
+    setDesktopPlacement("bottom");
+  }, [isOpen]);
 
   return (
     <div className={visibilityClass} ref={ref}>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
+        ref={buttonRef}
         className={[
           "shrink-0 h-9 w-9 flex items-center justify-center rounded-lg border transition-all active:scale-95",
           isOpen
@@ -240,18 +305,27 @@ export default function WalletSettingsDropdown({
 
 	          <div
 	            role="menu"
+              ref={menuRef}
+              style={isDesktop ? desktopMenuStyle || undefined : undefined}
 	            className={[
 	              "fixed inset-0 z-50 overflow-y-auto bg-elevated",
-	              "md:inset-auto md:w-[min(360px,calc(100vw-24px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
-	              dropdownPositionClass,
+	              "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
 	            ].join(" ")}
 	          >
             {/* Pointer (desktop) */}
             <div
               className={[
-                "hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10",
-                arrowPositionClass,
+                "hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45",
               ].join(" ")}
+              style={
+                !isDesktop || desktopArrowX == null
+                  ? undefined
+                  : {
+                      left: `${Math.round(desktopArrowX - 7)}px`,
+                      top: desktopPlacement === "bottom" ? "-7px" : undefined,
+                      bottom: desktopPlacement === "top" ? "-7px" : undefined,
+                    }
+              }
               aria-hidden
             />
 
@@ -472,6 +546,10 @@ export default function WalletSettingsDropdown({
                   onClick={() => {
                     markReturnToSettings();
                     setIsOpen(false);
+                    if (isDesktopPanel) {
+                      onOpenSecurity?.();
+                      return;
+                    }
                     setShowSecurityModal(true);
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
@@ -512,6 +590,10 @@ export default function WalletSettingsDropdown({
                   onClick={() => {
                     markReturnToSettings();
                     setIsOpen(false);
+                    if (isDesktopPanel) {
+                      onOpenHelp?.();
+                      return;
+                    }
                     setHelpOpenIndex(0);
                     setShowHelpModal(true);
                   }}
@@ -548,6 +630,10 @@ export default function WalletSettingsDropdown({
                   onClick={() => {
                     markReturnToSettings();
                     setIsOpen(false);
+                    if (isDesktopPanel) {
+                      onOpenTerms?.();
+                      return;
+                    }
                     setShowTermsModal(true);
                   }}
                   className="mt-2 w-full flex items-center gap-3 px-3 py-3 rounded-[10px] border border-transparent hover:border-white/10 hover:bg-white/5 transition-colors duration-150 text-left focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"

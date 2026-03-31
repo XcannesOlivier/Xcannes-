@@ -18,6 +18,11 @@ import WalletActivationModal from "../modals/WalletActivationModal";
 import WalletActivationRequestModal from "../modals/WalletActivationRequestModal";
 import WalletInfoModal from "../modals/WalletInfoModal";
 import WalletDashboardStatementModals from "../modals/WalletDashboardStatementModals";
+import {
+  WalletDesktopHelpPage,
+  WalletDesktopSecurityPage,
+  WalletDesktopTermsPage,
+} from "./WalletDesktopSupportPages";
 
 export default function WalletDesktopModals({
   // visibility flags (calculés par WalletDashboard)
@@ -32,6 +37,9 @@ export default function WalletDesktopModals({
   showInlineActivation,
   showInlineActivationRequest,
   showInlineInfo,
+  showInlineSecurity,
+  showInlineHelp,
+  showInlineTerms,
   showInlineCurrencyStatement,
   showInlineGlobalStatement,
 
@@ -51,6 +59,7 @@ export default function WalletDesktopModals({
   setShowActivationModal,
   setShowActivationRequestModal,
   setWalletInfoOpen,
+  setDesktopSettingsPage,
   setSendPaymentRequest,
   setCashBuyPrefill,
   resetSendForm,
@@ -63,6 +72,21 @@ export default function WalletDesktopModals({
   // desktop cash uses wallet tokens compatible with MoonPay
   augmentedTokens,
 }) {
+  const closeSettingsPage = () => {
+    setDesktopSettingsPage?.(null);
+    try {
+      if (
+        typeof window !== "undefined" &&
+        window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__
+      ) {
+        window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__ = false;
+        window.dispatchEvent(new CustomEvent("xcannes:wallet-settings-open"));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <aside className="hidden lg:flex lg:flex-col min-h-0 h-full relative overflow-hidden">
       {showInlineQrScanner ? (
@@ -178,24 +202,31 @@ export default function WalletDesktopModals({
         />
       ) : null}
 
-      {/* Desktop: open "Infos & frais" as a real modal (portal to body). */}
+      {showInlineSecurity ? (
+        <div className="flex-1 min-h-0">
+          <WalletDesktopSecurityPage onBack={closeSettingsPage} />
+        </div>
+      ) : null}
+
+      {showInlineHelp ? (
+        <div className="flex-1 min-h-0">
+          <WalletDesktopHelpPage onBack={closeSettingsPage} />
+        </div>
+      ) : null}
+
+      {showInlineTerms ? (
+        <div className="flex-1 min-h-0">
+          <WalletDesktopTermsPage onBack={closeSettingsPage} />
+        </div>
+      ) : null}
+
+      {/* Desktop: "Infos & frais" in the right panel */}
       <WalletInfoModal
         isOpen={showInlineInfo}
+        inline
         onClose={() => {
           setWalletInfoOpen(false);
-          try {
-            if (
-              typeof window !== "undefined" &&
-              window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__
-            ) {
-              window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__ = false;
-              window.dispatchEvent(
-                new CustomEvent("xcannes:wallet-settings-open"),
-              );
-            }
-          } catch {
-            // ignore
-          }
+          closeSettingsPage();
         }}
         {...infoModalProps}
       />

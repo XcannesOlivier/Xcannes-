@@ -191,7 +191,6 @@ export default function WalletInfoModal({
   noticeVariant = "preview",
   inline = false,
 }) {
-  const { t } = useTranslation("common");
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
     enabled: shouldAnimate,
@@ -199,7 +198,14 @@ export default function WalletInfoModal({
 
   if (!shouldRender) return null;
 
-  const content = (
+  const content = inline ? (
+    <div className="flex-1 min-h-0 h-full">
+      <WalletInfoContent
+        noticeVariant={noticeVariant}
+        onBack={() => onClose && onClose()}
+      />
+    </div>
+  ) : (
     <div
       className={`fixed inset-0 z-[11001] bg-[#0b0f10] ${
         isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"

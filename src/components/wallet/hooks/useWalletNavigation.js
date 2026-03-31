@@ -30,6 +30,7 @@ export function useWalletNavigation({
   closeInlineQr,
   setActiveAction,
   setWalletInfoOpen,
+  setDesktopSettingsPage,
   setSwapDefaultView,
   setSwapLockedView,
   setCashBuyPrefill,
@@ -113,6 +114,7 @@ export function useWalletNavigation({
     (nextAction) => {
       closeInlineQr();
       setWalletInfoOpen(false);
+      setDesktopSettingsPage?.(null);
       // Label requirement disabled — will be re-enabled later.
       // if (isConnected && isWalletLabelRequired) {
       //   flashWalletHeaderToast("Nom du wallet requis.", 2000);
@@ -149,6 +151,7 @@ export function useWalletNavigation({
       closeInlineQr,
       setActiveAction,
       setWalletInfoOpen,
+      setDesktopSettingsPage,
       setSwapDefaultView,
       setSwapLockedView,
       setCashBuyPrefill,
@@ -163,6 +166,7 @@ export function useWalletNavigation({
     (token) => {
       closeInlineQr();
       setWalletInfoOpen(false);
+      setDesktopSettingsPage?.(null);
       if (isDesktopPanel) {
         setActiveAction(null);
         setShowActivationModal(false);
@@ -181,6 +185,7 @@ export function useWalletNavigation({
       setShowActivationRequestModal,
       setShowCurrencyStatement,
       setShowGlobalStatement,
+      setDesktopSettingsPage,
       setWalletInfoOpen,
     ],
   );
@@ -189,6 +194,7 @@ export function useWalletNavigation({
 
   const handleOpenInfo = useCallback(() => {
     closeInlineQr();
+    setDesktopSettingsPage?.(null);
     if (isDesktopPanel) {
       setActiveAction(null);
       setShowActivationModal(false);
@@ -207,6 +213,7 @@ export function useWalletNavigation({
     setShowActivationRequestModal,
     setShowCurrencyStatement,
     setShowGlobalStatement,
+    setDesktopSettingsPage,
     setWalletInfoOpen,
   ]);
 
@@ -215,6 +222,7 @@ export function useWalletNavigation({
   const handleOpenGlobalStatement = useCallback(() => {
     closeInlineQr();
     setWalletInfoOpen(false);
+    setDesktopSettingsPage?.(null);
     if (isDesktopPanel) {
       setActiveAction(null);
       setShowActivationModal(false);
@@ -234,8 +242,54 @@ export function useWalletNavigation({
     setShowActivationRequestModal,
     setShowCurrencyStatement,
     setShowGlobalStatement,
+    setDesktopSettingsPage,
     setWalletInfoOpen,
   ]);
+
+  // ─── Desktop settings pages (inline panel) ───────────────────────────
+
+  const handleOpenDesktopSettingsPage = useCallback(
+    (page) => {
+      closeInlineQr();
+      setWalletInfoOpen(false);
+      if (isDesktopPanel) {
+        setActiveAction(null);
+        setShowActivationModal(false);
+        setShowActivationRequestModal(false);
+        setShowCurrencyStatement(false);
+        setSelectedStatementToken(null);
+        setShowGlobalStatement(false);
+      }
+      setDesktopSettingsPage?.(page);
+    },
+    [
+      closeInlineQr,
+      isDesktopPanel,
+      setActiveAction,
+      setDesktopSettingsPage,
+      setSelectedStatementToken,
+      setShowActivationModal,
+      setShowActivationRequestModal,
+      setShowCurrencyStatement,
+      setShowGlobalStatement,
+      setWalletInfoOpen,
+    ],
+  );
+
+  const handleOpenSecurity = useCallback(
+    () => handleOpenDesktopSettingsPage("security"),
+    [handleOpenDesktopSettingsPage],
+  );
+
+  const handleOpenHelp = useCallback(
+    () => handleOpenDesktopSettingsPage("help"),
+    [handleOpenDesktopSettingsPage],
+  );
+
+  const handleOpenTerms = useCallback(
+    () => handleOpenDesktopSettingsPage("terms"),
+    [handleOpenDesktopSettingsPage],
+  );
 
   // ─── Copy wallet address ──────────────────────────────────────────────
 
@@ -319,6 +373,7 @@ export function useWalletNavigation({
     const handler = async (event) => {
       closeInlineQr();
       setWalletInfoOpen(false);
+      setDesktopSettingsPage?.(null);
       const detail = event?.detail || {};
       const action = String(detail.action || "").toLowerCase();
       const base = String(detail.base || "")
@@ -353,6 +408,7 @@ export function useWalletNavigation({
     setConvertQuoteCurrency,
     setSwapDefaultView,
     setSwapLockedView,
+    setDesktopSettingsPage,
     setWalletInfoOpen,
   ]);
 
@@ -362,6 +418,9 @@ export function useWalletNavigation({
     handleAction,
     handleOpenCurrencyStatement,
     handleOpenInfo,
+    handleOpenSecurity,
+    handleOpenHelp,
+    handleOpenTerms,
     handleOpenGlobalStatement,
     handleCopyAddress,
     handleRefreshWallet,

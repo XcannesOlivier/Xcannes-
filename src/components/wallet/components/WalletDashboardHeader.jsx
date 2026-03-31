@@ -63,6 +63,10 @@ export default function WalletDashboardHeader({
   isWalletLabelLocked,
   onOpenInfo,
   onOpenXrplActivity,
+  onOpenSecurity,
+  onOpenHelp,
+  onOpenTerms,
+  isDesktopPanel = false,
   showMobileHomeLink = false,
   walletAddresses = [],
   onSwitchWallet,
@@ -453,8 +457,12 @@ export default function WalletDashboardHeader({
               {/* Bouton Paramètres (à côté du refresh, même style) */}
               <WalletSettingsDropdown
                 position="inline"
+                isDesktopPanel={isDesktopPanel}
                 onOpenInfo={onOpenInfo}
                 onOpenXrplActivity={onOpenXrplActivity}
+                onOpenSecurity={onOpenSecurity}
+                onOpenHelp={onOpenHelp}
+                onOpenTerms={onOpenTerms}
                 preferredCurrency={preferredCurrency}
                 topCurrencies={topCurrencies}
                 fawazCurrencies={fawazCurrencies}

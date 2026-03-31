@@ -308,6 +308,7 @@ export default function WalletDashboard({
   const [showGlobalStatement, setShowGlobalStatement] = useState(false);
   const [showCurrencyStatement, setShowCurrencyStatement] = useState(false);
   const [walletInfoOpen, setWalletInfoOpen] = useState(false);
+  const [desktopSettingsPage, setDesktopSettingsPage] = useState(null);
   const [selectedStatementToken, setSelectedStatementToken] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isDesktopPanel, setIsDesktopPanel] = useState(false);
@@ -334,6 +335,11 @@ export default function WalletDashboard({
     media.addListener(handleChange);
     return () => media.removeListener(handleChange);
   }, [showDesktopStatementPanel]);
+
+  useEffect(() => {
+    if (isDesktopPanel) return;
+    setDesktopSettingsPage(null);
+  }, [isDesktopPanel]);
 
   // ── Currency lines (backend) — called first so label can feed useWalletLabel
   const backendWalletAddress = wallet || null;
@@ -687,6 +693,9 @@ export default function WalletDashboard({
     handleAction,
     handleOpenCurrencyStatement,
     handleOpenInfo,
+    handleOpenSecurity,
+    handleOpenHelp,
+    handleOpenTerms,
     handleOpenGlobalStatement,
     handleCopyAddress,
     handleRefreshWallet,
@@ -705,6 +714,7 @@ export default function WalletDashboard({
     closeInlineQr: sendState.closeInlineQr,
     setActiveAction,
     setWalletInfoOpen,
+    setDesktopSettingsPage,
     setSwapDefaultView: swapState.setSwapDefaultView,
     setSwapLockedView: swapState.setSwapLockedView,
     setCashBuyPrefill: swapState.setCashBuyPrefill,
@@ -805,6 +815,7 @@ export default function WalletDashboard({
     showActivationModal,
     showActivationRequestModal,
     walletInfoOpen,
+    desktopSettingsPage,
     showCurrencyStatement,
     selectedStatementToken,
   });
@@ -937,8 +948,12 @@ export default function WalletDashboard({
             showMobileHomeLink={showMobileHomeLink}
             walletAddresses={walletAddresses}
             onSwitchWallet={switchWallet}
+            isDesktopPanel={isDesktopPanel}
             onOpenInfo={handleOpenInfo}
             onOpenXrplActivity={handleOpenXrplActivity}
+            onOpenSecurity={handleOpenSecurity}
+            onOpenHelp={handleOpenHelp}
+            onOpenTerms={handleOpenTerms}
             isWalletActivated={isWalletActivated}
             hasRlusdTrustline={hasRlusdTrustline}
             onActivateWallet={handleOpenActivationModal}
@@ -1032,7 +1047,11 @@ export default function WalletDashboard({
         </div>
 
         {isDesktopPanel ? (
-          <WalletDesktopModals {...inlineFlags} {...modalProps} />
+          <WalletDesktopModals
+            {...inlineFlags}
+            {...modalProps}
+            setDesktopSettingsPage={setDesktopSettingsPage}
+          />
         ) : null}
       </div>
       <TransactionProgressModal

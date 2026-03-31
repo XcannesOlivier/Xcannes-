@@ -10,6 +10,7 @@ export function useDesktopInlineFlags({
   showActivationModal,
   showActivationRequestModal,
   walletInfoOpen,
+  desktopSettingsPage,
   showCurrencyStatement,
   selectedStatementToken,
 }) {
@@ -49,8 +50,23 @@ export function useDesktopInlineFlags({
     isDesktopPanel &&
     !showInlineQrScanner &&
     showActivationRequestModal;
+  const showInlineSecurity =
+    isDesktopPanel &&
+    !showInlineQrScanner &&
+    desktopSettingsPage === "security";
+  const showInlineHelp =
+    isDesktopPanel &&
+    !showInlineQrScanner &&
+    desktopSettingsPage === "help";
+  const showInlineTerms =
+    isDesktopPanel &&
+    !showInlineQrScanner &&
+    desktopSettingsPage === "terms";
   const showInlineInfo =
-    isDesktopPanel && !showInlineQrScanner && walletInfoOpen;
+    isDesktopPanel &&
+    !showInlineQrScanner &&
+    !desktopSettingsPage &&
+    walletInfoOpen;
   const hasInlineModal =
     showInlineQrScanner ||
     showInlineSend ||
@@ -62,6 +78,9 @@ export function useDesktopInlineFlags({
     showInlineCash ||
     showInlineActivation ||
     showInlineActivationRequest ||
+    showInlineSecurity ||
+    showInlineHelp ||
+    showInlineTerms ||
     showInlineInfo;
   const showInlineCurrencyStatement =
     isDesktopPanel &&
@@ -82,6 +101,9 @@ export function useDesktopInlineFlags({
     showInlineCash,
     showInlineActivation,
     showInlineActivationRequest,
+    showInlineSecurity,
+    showInlineHelp,
+    showInlineTerms,
     showInlineInfo,
     showInlineCurrencyStatement,
     showInlineGlobalStatement,
