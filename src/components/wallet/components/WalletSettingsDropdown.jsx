@@ -238,14 +238,14 @@ export default function WalletSettingsDropdown({
             onClick={() => setIsOpen(false)}
           />
 
-          <div
-            role="menu"
-            className={[
-              "fixed inset-0 z-50 overflow-y-auto bg-elevated",
-              "md:inset-auto md:w-[320px] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
-              dropdownPositionClass,
-            ].join(" ")}
-          >
+	          <div
+	            role="menu"
+	            className={[
+	              "fixed inset-0 z-50 overflow-y-auto bg-elevated",
+	              "md:inset-auto md:w-[min(360px,calc(100vw-24px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
+	              dropdownPositionClass,
+	            ].join(" ")}
+	          >
             {/* Pointer (desktop) */}
             <div
               className={[
@@ -297,7 +297,7 @@ export default function WalletSettingsDropdown({
               </button>
             </div>
 
-            <div className="px-3 pb-4 md:px-3 md:pb-3">
+	            <div className="px-3 pb-4 md:px-3 md:pb-3 md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain">
               {/* Section: Comptes */}
               <div className="pt-2 md:pt-2.5">
                 <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
