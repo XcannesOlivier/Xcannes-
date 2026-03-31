@@ -599,12 +599,10 @@ function setupChoiceScreen() {
   const btnClose = document.getElementById('btn-choice-close');
 
   btnCreate?.addEventListener('click', () => {
-    choiceOpenedFromDashboardSettings = false;
     startCreateWallet();
   }, { once: true });
 
   btnImport?.addEventListener('click', () => {
-    choiceOpenedFromDashboardSettings = false;
     showScreen('import');
     setupImportScreen();
   }, { once: true });
@@ -675,7 +673,6 @@ function setupBackupScreen(walletData) {
       if (pendingWalletData) clearWalletFromMemory(pendingWalletData);
       pendingMnemonic = null;
       pendingWalletData = null;
-      choiceOpenedFromDashboardSettings = false;
       goToChoice();
     }, { once: true });
   }
@@ -886,6 +883,8 @@ function setupBackupVerifyScreen(words) {
       // Notify parent if embedded in an iframe (site onboarding flow)
       notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
 
+      choiceOpenedFromDashboardSettings = false;
+
       showSuccess('Compte créé !', "Votre compte est prêt. Conservez votre phrase de récupération en lieu sûr.");
       await delay(2500);
       await goToHome();
@@ -1011,6 +1010,8 @@ async function handleImport(statusEl) {
 
     // Notify parent if embedded in an iframe (site onboarding flow)
     notifyParentWalletCreated(currentWallet.address, currentWallet.publicKey);
+
+    choiceOpenedFromDashboardSettings = false;
 
     showSuccess('Compte importé !', `Adresse : ${walletResult.address.slice(0, 10)}…${walletResult.address.slice(-6)}`);
     await delay(2500);
