@@ -2,6 +2,7 @@
 
 import DemoMoonPayBuyModal from "./DemoMoonPayBuyModal";
 import DemoMoonPaySellModal from "./DemoMoonPaySellModal";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
@@ -84,23 +85,36 @@ export default function DemoWalletDashboardCashModal({
             if (!inline) e.stopPropagation();
           }}
         >
-          {/* Header avec onglets Buy/Sell */}
-          <div className="border-b border-white/10">
-            <div className="flex items-start justify-between p-4 pb-0 gap-3">
-              <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
-                <div>{renderWalletMeta?.("pr-8")}</div>
-                <div className="flex flex-wrap items-center gap-2">
-
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-              >
-                ✕
-              </button>
-            </div>
+	          {/* Header avec onglets Buy/Sell */}
+	          <div className="border-b border-white/10">
+	            <div className="flex items-start gap-3 p-4 pb-0">
+	              {cashModalTab === "buy" ? (
+	                <button
+	                  type="button"
+	                  onClick={onClose}
+	                  className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+	                  aria-label={t("back", "Back")}
+	                >
+	                  <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	                </button>
+	              ) : null}
+	              <div className="flex min-w-0 flex-1 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
+	                <div>{renderWalletMeta?.("pr-8")}</div>
+	                <div className="flex flex-wrap items-center gap-2">
+	
+	                </div>
+	              </div>
+	              {cashModalTab !== "buy" ? (
+	                <button
+	                  type="button"
+	                  onClick={onClose}
+	                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+	                  aria-label={t("close", "Close")}
+	                >
+	                  ✕
+	                </button>
+	              ) : null}
+	            </div>
             {/* Onglets Buy/Sell */}
             <div className="flex gap-2 px-4 pt-3">
               <button

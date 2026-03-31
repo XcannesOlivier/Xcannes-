@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
 import { createPortal } from "react-dom";
@@ -101,40 +102,64 @@ export default function WalletDashboardCashModal({
 	            if (!inline) e.stopPropagation();
 	          }}
 	        >
-	          {/* Header */}
-	          {!moonpayActive ? (
-	            <div className="border-b border-white/10">
-	              <div className="flex items-start justify-between p-4 gap-3">
-	                <div className="flex min-w-0 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
-	                  {showWalletMeta ? (
-	                    <div>{renderWalletMeta?.("pr-8")}</div>
-	                  ) : null}
-	                  <div className="flex flex-wrap items-center gap-2">
-	                    {noticeVariant === "demo" ? (
+		          {/* Header */}
+		          {!moonpayActive ? (
+		            <div className="border-b border-white/10">
+		              <div className="flex items-start gap-3 p-4">
+		                {cashModalTab === "buy" ? (
+		                  <button
+		                    type="button"
+		                    onClick={onClose}
+		                    className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+		                    aria-label={t("back", "Back")}
+		                  >
+		                    <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+		                  </button>
+		                ) : null}
+		                <div className="flex min-w-0 flex-1 flex-col gap-1.5 md:flex-row md:items-center md:gap-2">
+		                  {showWalletMeta ? (
+		                    <div>{renderWalletMeta?.("pr-8")}</div>
+		                  ) : null}
+		                  <div className="flex flex-wrap items-center gap-2">
+		                    {noticeVariant === "demo" ? (
 	                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
 	                        {t("demo_notice_title", "Mode démo")}
 	                      </span>
-	                    ) : null}
-	                  </div>
-	                </div>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-                  >
-                    ✕
-                  </button>
-	              </div>
-	            </div>
-	          ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute top-1 right-1 md:top-2 md:right-2 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center"
-            >
-              ✕
-            </button>
-          )}
+		                    ) : null}
+		                  </div>
+		                </div>
+	                  {cashModalTab !== "buy" ? (
+	                    <button
+	                      type="button"
+	                      onClick={onClose}
+	                      className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
+	                      aria-label={t("close", "Close")}
+	                    >
+	                      ✕
+	                    </button>
+	                  ) : null}
+		              </div>
+		            </div>
+		          ) : (
+	            <button
+	              type="button"
+	              onClick={onClose}
+	              className={`absolute top-1 ${
+	                cashModalTab === "buy"
+	                  ? "left-1 md:left-2"
+	                  : "right-1 md:right-2"
+	              } md:top-2 z-20 wallet-modal-close text-white/70 hover:text-white transition-colors text-xl bg-transparent rounded-full w-10 h-10 flex items-center justify-center`}
+	              aria-label={
+	                cashModalTab === "buy" ? t("back", "Back") : t("close", "Close")
+	              }
+	            >
+	              {cashModalTab === "buy" ? (
+	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	              ) : (
+	                "✕"
+	              )}
+	            </button>
+	          )}
 
 	          {/* Contenu selon l'onglet actif */}
 		          <div
