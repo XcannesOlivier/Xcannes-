@@ -170,12 +170,16 @@ export default function WalletDashboardCashModal({
 		              </div>
 		            </div>
 		          ) : (
-		            <div className="border-b border-white/10 bg-black/40 backdrop-blur-md">
+		            <div className="relative z-20 border-b border-white/10 bg-black/40 backdrop-blur-md">
 		              <div className="flex items-center justify-between px-3 py-2">
 		                <div className="flex items-center gap-2 min-w-0">
-		                  <div className="w-8 h-8 rounded-lg bg-[#6d28d9] ring-1 ring-white/10 flex items-center justify-center flex-shrink-0">
-		                    <span className="w-2.5 h-2.5 rounded-full bg-white/90" aria-hidden />
-		                  </div>
+			                  <div className="relative w-8 h-8 rounded-lg bg-[#6d28d9] ring-1 ring-white/10 flex items-center justify-center flex-shrink-0">
+			                    <span className="w-3.5 h-3.5 rounded-full bg-white/90" aria-hidden />
+			                    <span
+			                      className="absolute left-1/2 top-1/2 translate-x-[7px] translate-y-[-7px] w-1.5 h-1.5 rounded-full bg-white/90"
+			                      aria-hidden
+			                    />
+			                  </div>
 		                  <p className="text-white font-semibold truncate">
 		                    {cashModalTab === "sell"
 		                      ? t("moonpay_header_sell", "MoonPay Sell")
@@ -188,16 +192,19 @@ export default function WalletDashboardCashModal({
 		                    <button
 		                      type="button"
 		                      onClick={() => setWalletMenuOpen((v) => !v)}
-		                      className="h-9 px-3 rounded-full bg-white/10 ring-1 ring-white/10 hover:bg-white/[0.15] transition-colors flex items-center gap-2 text-white/90"
+		                      className="h-10 px-3.5 rounded-full bg-white/10 ring-1 ring-white/10 hover:bg-white/[0.15] transition-colors flex items-center gap-2.5 text-white/90"
 		                      aria-label={t("wallet_menu", "Wallet menu")}
 		                      aria-expanded={walletMenuOpen}
 		                    >
-		                      <span className="w-2 h-2 rounded-full bg-[#6d28d9]" aria-hidden />
-		                      <EllipsisHorizontalIcon className="w-5 h-5" aria-hidden="true" />
+		                      <span
+		                        className="w-2.5 h-2.5 rounded-full bg-[#6d28d9]"
+		                        aria-hidden
+		                      />
+		                      <EllipsisHorizontalIcon className="w-6 h-6" aria-hidden="true" />
 		                    </button>
 
 		                    {walletMenuOpen ? (
-		                      <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-24px))] rounded-xl bg-elevated ring-1 ring-white/10 shadow-2xl p-3 z-30">
+		                      <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-24px))] rounded-xl bg-elevated ring-1 ring-white/10 shadow-2xl p-3 z-50">
 		                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/50">
 		                          {t("current_wallet", "Wallet actuel")}
 		                        </p>
@@ -227,14 +234,14 @@ export default function WalletDashboardCashModal({
 	          )}
 
 		          {/* Contenu selon l'onglet actif */}
-			          <div
-			            className={`${
-			              // MoonPay iframe already has its own margins/padding inside the widget.
-			              // Remove horizontal padding here to avoid double side-margins.
-			              moonpayActive ? "px-0 py-0" : "p-4 md:p-5"
-			            } overflow-y-auto overscroll-contain flex-1 min-h-0`}
-			            style={{ WebkitOverflowScrolling: "touch" }}
-			          >
+				          <div
+				            className={`${
+				              // MoonPay iframe already has its own margins/padding inside the widget.
+				              // Remove horizontal padding here to avoid double side-margins.
+				              moonpayActive ? "px-0 py-0" : "p-4 md:p-5"
+				            } relative z-0 overflow-y-auto overscroll-contain flex-1 min-h-0`}
+				            style={{ WebkitOverflowScrolling: "touch" }}
+				          >
             <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
               {moonpayEnabled ? (
                 cashModalTab === "buy" ? (
