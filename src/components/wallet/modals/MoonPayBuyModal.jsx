@@ -309,10 +309,10 @@ const MoonPayBuyModal = ({
     };
   }, []);
 
-  const handleUserClose = useMemo(() => {
-    return () => {
-      clearResumeState();
-      clearAutoOpen();
+	  const handleUserClose = useMemo(() => {
+	    return () => {
+	      clearResumeState();
+	      clearAutoOpen();
       clearFlowId();
       clearMoonpayWalletAddress();
       deactivateMoonpayActive();
@@ -321,14 +321,21 @@ const MoonPayBuyModal = ({
       setStep("form");
       onClose?.();
     };
-  }, [
-    clearAutoOpen,
-    clearFlowId,
-    clearMoonpayWalletAddress,
-    clearResumeState,
-    deactivateMoonpayActive,
-    onClose,
-  ]);
+	  }, [
+	    clearAutoOpen,
+	    clearFlowId,
+	    clearMoonpayWalletAddress,
+	    clearResumeState,
+	    deactivateMoonpayActive,
+	    onClose,
+	  ]);
+
+	  useEffect(() => {
+	    return () => {
+	      deactivateMoonpayActive();
+	      notifyPwaMoonpayActive(false, "buy");
+	    };
+	  }, [deactivateMoonpayActive]);
 
   const handleWidgetClose = useMemo(() => {
     return () => {

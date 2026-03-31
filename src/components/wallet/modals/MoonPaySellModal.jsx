@@ -349,6 +349,13 @@ const MoonPaySellModal = ({
     onClose,
   ]);
 
+  useEffect(() => {
+    return () => {
+      deactivateMoonpayActive();
+      notifyPwaMoonpayActive(false, "sell");
+    };
+  }, [deactivateMoonpayActive]);
+
   const handleWidgetClose = useMemo(() => {
     return () => {
       clearResumeState();

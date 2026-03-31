@@ -206,7 +206,7 @@ export default function WalletDashboardCashModal({
 		                    {walletMenuOpen ? (
 		                      <div className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-24px))] rounded-xl bg-elevated ring-1 ring-white/10 shadow-2xl p-3 z-50">
 		                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/50">
-		                          {t("current_wallet", "Wallet actuel")}
+		                          {t("current_wallet", "Compte actuel")}
 		                        </p>
 		                        {String(walletLabel || "").trim() ? (
 		                          <p className="mt-2 text-[14px] text-white font-semibold truncate">
