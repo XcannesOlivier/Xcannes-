@@ -181,7 +181,22 @@ export default function WalletDesktopModals({
       {/* Desktop: open "Infos & frais" as a real modal (portal to body). */}
       <WalletInfoModal
         isOpen={showInlineInfo}
-        onClose={() => setWalletInfoOpen(false)}
+        onClose={() => {
+          setWalletInfoOpen(false);
+          try {
+            if (
+              typeof window !== "undefined" &&
+              window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__
+            ) {
+              window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__ = false;
+              window.dispatchEvent(
+                new CustomEvent("xcannes:wallet-settings-open"),
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }}
         {...infoModalProps}
       />
 

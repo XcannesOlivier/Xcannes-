@@ -46,6 +46,19 @@ export default function WalletDashboardStatementModals({
   toast,
 }) {
   const { t } = useTranslation("common");
+  const maybeReturnToSettingsDropdown = useCallback(() => {
+    try {
+      if (
+        typeof window !== "undefined" &&
+        window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__
+      ) {
+        window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__ = false;
+        window.dispatchEvent(new CustomEvent("xcannes:wallet-settings-open"));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
   const hasRlusdTrustline = useMemo(() => {
     if (hasRlusdTrustlineOverride === true) return true;
     if (hasRlusdTrustlineOverride === false) return false;
@@ -446,7 +459,10 @@ export default function WalletDashboardStatementModals({
             loading={canFetchStatements ? currencyLoading : false}
             error={canFetchStatements ? currencyError : null}
             highlightTransactionId={highlightTransactionId}
-            onClose={() => setShowCurrencyStatement(false)}
+            onClose={() => {
+              setShowCurrencyStatement(false);
+              maybeReturnToSettingsDropdown();
+            }}
             toast={toast}
           />
         </div>
@@ -476,7 +492,10 @@ export default function WalletDashboardStatementModals({
           movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
           onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
           isClosing={globalModalTransition.isClosing}
-          onClose={() => setShowGlobalStatement(false)}
+          onClose={() => {
+            setShowGlobalStatement(false);
+            maybeReturnToSettingsDropdown();
+          }}
           onViewCurrency={(token) => {
             setSelectedStatementToken(token);
             setShowGlobalStatement(false);
@@ -533,6 +552,7 @@ export default function WalletDashboardStatementModals({
           onClose={() => {
             setShowCurrencyStatement(false);
             setSelectedStatementToken(null);
+            maybeReturnToSettingsDropdown();
           }}
           toast={toast}
         />

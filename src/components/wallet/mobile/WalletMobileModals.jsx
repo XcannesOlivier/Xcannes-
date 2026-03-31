@@ -77,7 +77,22 @@ export default function WalletMobileModals({
       {/* Modales non-portalisées, affichées sous le header en mobile */}
       <WalletInfoModal
         isOpen={walletInfoOpen}
-        onClose={() => setWalletInfoOpen(false)}
+        onClose={() => {
+          setWalletInfoOpen(false);
+          try {
+            if (
+              typeof window !== "undefined" &&
+              window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__
+            ) {
+              window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__ = false;
+              window.dispatchEvent(
+                new CustomEvent("xcannes:wallet-settings-open"),
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }}
         {...infoModalProps}
       />
       <WalletActivationModal

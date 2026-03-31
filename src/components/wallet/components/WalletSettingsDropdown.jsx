@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
@@ -36,6 +36,47 @@ export default function WalletSettingsDropdown({
   const [helpOpenIndex, setHelpOpenIndex] = useState(0);
   const ref = useRef(null);
 
+  const RETURN_FLAG = "__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__";
+
+  const markReturnToSettings = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window[RETURN_FLAG] = true;
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const reopenSettingsDropdown = useCallback(() => {
+    if (typeof window !== "undefined") {
+      try {
+        window[RETURN_FLAG] = false;
+      } catch {
+        // ignore
+      }
+    }
+    try {
+      window.dispatchEvent(new CustomEvent("xcannes:wallet-settings-open"));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const closeSecurityModal = useCallback(() => {
+    setShowSecurityModal(false);
+    reopenSettingsDropdown();
+  }, [reopenSettingsDropdown]);
+
+  const closeHelpModal = useCallback(() => {
+    setShowHelpModal(false);
+    reopenSettingsDropdown();
+  }, [reopenSettingsDropdown]);
+
+  const closeTermsModal = useCallback(() => {
+    setShowTermsModal(false);
+    reopenSettingsDropdown();
+  }, [reopenSettingsDropdown]);
+
   // Allow the PWA host to reopen the dropdown after returning from "add account" flow.
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -67,31 +108,31 @@ export default function WalletSettingsDropdown({
   useEffect(() => {
     if (!showHelpModal) return;
     const handler = (e) => {
-      if (e.key === "Escape") setShowHelpModal(false);
+      if (e.key === "Escape") closeHelpModal();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [showHelpModal]);
+  }, [closeHelpModal, showHelpModal]);
 
   // Close security modal on Escape
   useEffect(() => {
     if (!showSecurityModal) return;
     const handler = (e) => {
-      if (e.key === "Escape") setShowSecurityModal(false);
+      if (e.key === "Escape") closeSecurityModal();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [showSecurityModal]);
+  }, [closeSecurityModal, showSecurityModal]);
 
   // Close terms modal on Escape
   useEffect(() => {
     if (!showTermsModal) return;
     const handler = (e) => {
-      if (e.key === "Escape") setShowTermsModal(false);
+      if (e.key === "Escape") closeTermsModal();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [showTermsModal]);
+  }, [closeTermsModal, showTermsModal]);
 
   const HELP_QA = [
     {
@@ -320,6 +361,7 @@ export default function WalletSettingsDropdown({
                   <button
                     type="button"
                     onClick={() => {
+                      markReturnToSettings();
                       setIsOpen(false);
                       onOpenXrplActivity?.();
                     }}
@@ -408,6 +450,7 @@ export default function WalletSettingsDropdown({
                 <button
                   type="button"
                   onClick={() => {
+                    markReturnToSettings();
                     onOpenInfo?.();
                     setIsOpen(false);
                   }}
@@ -432,6 +475,7 @@ export default function WalletSettingsDropdown({
                 <button
                   type="button"
                   onClick={() => {
+                    markReturnToSettings();
                     setIsOpen(false);
                     setShowSecurityModal(true);
                   }}
@@ -471,6 +515,7 @@ export default function WalletSettingsDropdown({
                 <button
                   type="button"
                   onClick={() => {
+                    markReturnToSettings();
                     setIsOpen(false);
                     setHelpOpenIndex(0);
                     setShowHelpModal(true);
@@ -506,6 +551,7 @@ export default function WalletSettingsDropdown({
                 <button
                   type="button"
                   onClick={() => {
+                    markReturnToSettings();
                     setIsOpen(false);
                     setShowTermsModal(true);
                   }}
@@ -622,7 +668,7 @@ export default function WalletSettingsDropdown({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowSecurityModal(false)}
+                  onClick={closeSecurityModal}
                   className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
                   aria-label={t("close", "Fermer")}
                 >
@@ -707,7 +753,7 @@ export default function WalletSettingsDropdown({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowHelpModal(false)}
+                  onClick={closeHelpModal}
                   className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
                   aria-label={t("close", "Fermer")}
                 >
@@ -791,7 +837,7 @@ export default function WalletSettingsDropdown({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowTermsModal(false)}
+                  onClick={closeTermsModal}
                   className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
                   aria-label={t("close", "Fermer")}
                 >
