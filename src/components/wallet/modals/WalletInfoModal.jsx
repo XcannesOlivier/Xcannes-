@@ -3,6 +3,7 @@
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 export function WalletInfoContent({
   noticeVariant = "preview",
@@ -10,54 +11,53 @@ export function WalletInfoContent({
 }) {
   const { t } = useTranslation("common");
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col h-full bg-[#0b0f10]">
       {/* Header (sticky) */}
-      <div className="sticky top-0 z-10 bg-[#0B0F14] border-b border-white/[0.06]">
-        <div className="h-14 px-4 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-10 h-10 -ml-2 rounded-lg inline-flex items-center justify-center text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-            aria-label={t("ui_back", "Back")}
-            title={t("ui_back", "Back")}
-          >
-            ←
-          </button>
-          <div className="min-w-0">
-            <div className="text-base font-semibold text-[#E6EDF3] truncate">
-              {t("ui_how_it_works", "How it works")}
-            </div>
-            <div className="text-xs text-[#8B98A5] truncate">
-              {t("ui_xcannes_wallet", "XCANNES Wallet")}
+      <div className="sticky top-0 z-10 shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20 backdrop-blur">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <button
+              type="button"
+              onClick={onBack}
+              className="h-10 w-10 -ml-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors flex-shrink-0"
+              aria-label={t("ui_back", "Back")}
+              title={t("ui_back", "Back")}
+            >
+              <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+            </button>
+            <div className="min-w-0">
+              <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+                {t("ui_how_it_works", "How it works")}
+              </div>
+              <div className="text-[12px] text-white/80 mt-1 truncate">
+                {t("ui_xcannes_wallet", "XCANNES Wallet")}
+              </div>
             </div>
           </div>
-          <div className="ml-auto">
+          <div className="flex items-center gap-2">
             {noticeVariant === "demo" ? (
-              <span className="inline-flex items-center text-[#E6EDF3]/80 text-xs font-semibold px-2 py-1 leading-none rounded-lg border border-white/[0.06] bg-white/[0.03]">
+              <span className="inline-flex items-center text-white/80 text-xs font-semibold px-2 py-1 leading-none rounded-lg border border-white/10 bg-white/5">
                 {t("demo_notice_title", "Mode démo")}
               </span>
             ) : null}
+            <span className="h-10 w-10" aria-hidden="true" />
           </div>
         </div>
       </div>
 
-      {/* Intro */}
-      <div className="px-4 pt-4">
-        <p className="text-sm leading-snug text-[#8B98A5]">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4">
+        <p className="text-[13px] leading-relaxed text-white/70">
           {t(
             "ui_wallet_intro_short_fees",
             "Non-custodial wallet on XRPL. Funds are organized into internal currency lines.",
           )}
         </p>
-      </div>
 
-      {/* Sections */}
-      <div className="px-4 py-5 space-y-4">
-        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
-          <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
+        <section className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+          <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
             {t("ui_core_features_fe8d86dd76", "Core features")}
           </div>
-          <ul className="mt-3 space-y-1.5 text-sm text-[#E6EDF3] list-disc pl-5">
+          <ul className="mt-3 space-y-1.5 text-[13px] text-white/80 list-disc pl-5">
             <li>
               {t(
                 "ui_hold_assets_on_chain_xrp_rlu_6e9344f999",
@@ -85,13 +85,13 @@ export function WalletInfoContent({
           </ul>
         </section>
 
-        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
-          <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
+        <section className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+          <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
             {t("ui_currency_lines_title", "Currency lines")}
           </div>
-          <div className="mt-3 space-y-3 text-sm text-[#E6EDF3]">
+          <div className="mt-3 space-y-3 text-[13px] text-white/80">
             <div className="space-y-1">
-              <div className="text-[#8B98A5] text-xs uppercase tracking-[0.08em]">
+              <div className="text-white/45 text-[11px] uppercase tracking-[0.22em]">
                 {t("ui_two_types", "Two types")}
               </div>
               <ul className="space-y-1.5 list-disc pl-5">
@@ -104,7 +104,7 @@ export function WalletInfoContent({
                 </li>
               </ul>
             </div>
-            <div className="text-[#8B98A5]">
+            <div className="text-white/65">
               {t(
                 "ui_currency_lines_note_short",
                 "Displayed values (EUR, GBP…) are based on USD allocation.",
@@ -113,16 +113,16 @@ export function WalletInfoContent({
           </div>
         </section>
 
-        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
-          <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
+        <section className="rounded-[14px] border border-white/10 bg-white/5 p-4">
+          <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
             {t("ui_fees_580613eea6", "Fees")}
           </div>
-          <div className="mt-3 space-y-3 text-sm text-[#E6EDF3]">
+          <div className="mt-3 space-y-3 text-[13px] text-white/80">
             <div>
-              <div className="text-[#E6EDF3] font-semibold">
+              <div className="text-white/90 font-semibold">
                 {t("ui_xrpl_network", "XRPL network")}
               </div>
-              <div className="text-[#8B98A5]">
+              <div className="text-white/65">
                 {t(
                   "ui_xrpl_network_fee_on_chain_pa_975e8f666a",
                   "Applies to on-chain transactions",
@@ -130,38 +130,35 @@ export function WalletInfoContent({
               </div>
             </div>
             <div>
-              <div className="text-[#E6EDF3] font-semibold">
+              <div className="text-white/90 font-semibold">
                 {t("ui_conversion_fee", "Conversion")}
               </div>
-              <div className="text-[#8B98A5]">
-                {t(
-                  "ui_conversion_fee_value",
-                  "1% fee (minimum $0.01)",
-                )}
+              <div className="text-white/65">
+                {t("ui_conversion_fee_value", "1% fee (minimum $0.01)")}
               </div>
             </div>
             <div>
-              <div className="text-[#E6EDF3] font-semibold">
+              <div className="text-white/90 font-semibold">
                 {t("ui_signatures", "Signatures")}
               </div>
-              <ul className="mt-1 space-y-1.5 text-[#8B98A5] list-disc pl-5">
-                <li>
-                  {t("ui_sig_conversion", "Internal conversion: 1 signature")}
-                </li>
+              <ul className="mt-1 space-y-1.5 text-white/65 list-disc pl-5">
+                <li>{t("ui_sig_conversion", "Internal conversion: 1 signature")}</li>
                 <li>{t("ui_sig_payments", "Payments: up to 2 signatures")}</li>
               </ul>
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl bg-[#11161C] border border-white/[0.06] p-4">
+        <section className="rounded-[14px] border border-white/10 bg-white/5 p-4">
           <div className="flex items-center gap-2">
-            <span className="text-[#8B98A5]">⚠️</span>
-            <div className="text-[13px] tracking-[0.08em] uppercase text-[#8B98A5]">
+            <span className="text-white/60" aria-hidden="true">
+              ⚠️
+            </span>
+            <div className="text-[12px] tracking-[0.22em] uppercase text-white/45">
               {t("ui_important_af28edf1c1", "Important")}
             </div>
           </div>
-          <ul className="mt-3 space-y-1.5 text-sm text-[#E6EDF3] list-disc pl-5">
+          <ul className="mt-3 space-y-1.5 text-[13px] text-white/80 list-disc pl-5">
             <li>
               {t(
                 "ui_xrpl_est_la_source_de_v_rit__bf1084eac7",
@@ -204,11 +201,11 @@ export default function WalletInfoModal({
 
   const content = (
     <div
-      className={`fixed inset-0 z-[11001] bg-[#0B0F14] ${
+      className={`fixed inset-0 z-[11001] bg-[#0b0f10] ${
         isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"
       }`}
     >
-      <div className="h-full overflow-y-auto overscroll-contain">
+      <div className="h-full">
         <WalletInfoContent
           noticeVariant={noticeVariant}
           onBack={() => onClose && onClose()}
