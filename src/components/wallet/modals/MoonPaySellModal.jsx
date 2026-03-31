@@ -871,10 +871,10 @@ const MoonPaySellModal = ({
       {step === "form" && (
         <div className="space-y-5">
           {/* From wallet display */}
-          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_from_account", "Depuis le compte")}
-            </p>
+	          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+	            <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+	              {t("moonpay_from_account", "Depuis le compte")}
+	            </p>
             {String(walletLabel || "").trim() ? (
               <div className="flex items-center gap-2 mb-1">
                 <span
@@ -886,19 +886,19 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-            <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
-              {walletAddress}
-            </p>
-          </div>
+	            <p className="text-[11px] md:text-[12px] text-white/60 font-mono break-all">
+	              {walletAddress}
+	            </p>
+	          </div>
 
           {/* Currency selector */}
           <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t(
-                "moonpay_select_crypto_to_sell",
-                "Vous vendez",
-              )}
-            </label>
+	            <label className="block text-[11px] tracking-[0.22em] uppercase text-white mb-2">
+	              {t(
+	                "moonpay_select_crypto_to_sell",
+	                "Choisissez l'actif que vous voulez vendre",
+	              )}
+	            </label>
             <ModalSelect
               value={currency}
               onChange={setCurrency}
@@ -1012,11 +1012,11 @@ const MoonPaySellModal = ({
           </div>
 
           {/* Destination display */}
-          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
-              </div>
+	          <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+	            <div className="flex items-start gap-3">
+	              <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+	                <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
+	              </div>
               <div className="min-w-0">
                 <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                   {t("moonpay_sell_destination_prefix", "Vers :")}
