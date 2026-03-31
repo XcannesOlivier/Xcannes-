@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "next-i18next";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWallet } from "@/context/WalletContext";
@@ -452,13 +453,21 @@ function RlusdInfoModal({ onClose }) {
         if (e.target === e.currentTarget) onClose?.();
       }}
     >
-      <div className="relative w-full h-full bg-elevated overflow-y-auto shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
-        <div className="sticky top-0 z-10 bg-elevated/95 backdrop-blur border-b border-white/10 px-4 py-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
-                <Image
-                  src="/symbols/rlusd.png"
+	      <div className="relative w-full h-full bg-elevated overflow-y-auto shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]">
+	        <div className="sticky top-0 z-10 bg-elevated/95 backdrop-blur border-b border-white/10 px-4 py-4">
+	          <div className="flex items-start justify-between gap-3">
+	            <button
+	              type="button"
+	              onClick={onClose}
+	              className="h-10 w-10 -ml-2 flex items-center justify-center rounded-lg text-white/55 hover:text-white hover:bg-white/5 transition-colors"
+	              aria-label={t("back", "Retour")}
+	            >
+	              <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	            </button>
+	            <div className="flex items-start gap-3 min-w-0">
+	              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 border border-white/10 shrink-0">
+	                <Image
+	                  src="/symbols/rlusd.png"
                   alt="RLUSD"
                   width={28}
                   height={28}
@@ -474,16 +483,9 @@ function RlusdInfoModal({ onClose }) {
                 </div>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="h-10 w-10 flex items-center justify-center rounded-lg text-white/55 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label={t("close", "Fermer")}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+	            <span className="h-10 w-10" aria-hidden="true" />
+	          </div>
+	        </div>
 
         <div className="px-4 pb-10 pt-5 max-w-[520px] mx-auto">
           <div className="text-sm text-white/70 leading-relaxed">

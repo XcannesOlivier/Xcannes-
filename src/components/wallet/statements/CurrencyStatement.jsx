@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { escapeHtml, openPrintWindow } from "@/utils/statementExport";
@@ -1432,16 +1433,26 @@ export default function CurrencyStatement({
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
         style={statementPanelScrollStyle}
       >
-        {/* Header avec Account Info intégré */}
-        <div
-          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
-        >
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
-              {CRYPTO_ICONS?.[displayCurrency] ? (
-                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+	        {/* Header avec Account Info intégré */}
+	        <div
+	          className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-6 py-3 md:py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+	        >
+	          <div className="flex items-start justify-between gap-3 mb-3">
+	            {isXrpNetworkView ? (
+	              <button
+	                type="button"
+	                onClick={onClose}
+	                className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors flex-shrink-0 w-10 h-10 flex items-center justify-center -ml-2"
+	                aria-label={t("back", "Retour")}
+	              >
+	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	              </button>
+	            ) : null}
+	            <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+	              {CRYPTO_ICONS?.[displayCurrency] ? (
+	                isSvgIcon(CRYPTO_ICONS[displayCurrency]) ? (
+	                  // eslint-disable-next-line @next/next/no-img-element
+	                  <img
                     src={CRYPTO_ICONS[displayCurrency]}
                     alt={displayCurrency}
                     width={32}
@@ -1462,11 +1473,11 @@ export default function CurrencyStatement({
                   {getCurrencyFlag(displayCurrency)}
                 </span>
               )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
-                    <span className="truncate">
-                      {headerTitle}
+	              <div className="min-w-0 flex-1">
+	                <div className="flex items-center gap-2 min-w-0">
+	                  <h2 className="text-lg md:text-xl font-bold text-white min-w-0 inline-flex items-baseline gap-2">
+	                    <span className="truncate">
+	                      {headerTitle}
                     </span>
                   </h2>
                   {noticeVariant === "demo" ? (
@@ -1475,16 +1486,20 @@ export default function CurrencyStatement({
                     </span>
                   ) : null}
 
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
-            >
-              ×
-            </button>
-          </div>
+	                </div>
+	              </div>
+	            </div>
+	            {!isXrpNetworkView ? (
+	              <button
+	                type="button"
+	                onClick={onClose}
+	                className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
+	                aria-label={t("close", "Fermer")}
+	              >
+	                ×
+	              </button>
+	            ) : null}
+	          </div>
 
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

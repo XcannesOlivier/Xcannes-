@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeSVG } from "qrcode.react";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
 import PreferredCurrencySelector from "./PreferredCurrencySelector";
 
@@ -254,18 +255,15 @@ export default function WalletSettingsDropdown({
               aria-hidden
             />
 
-            {/* Mobile header */}
-            <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
-              <div className="min-w-0">
-                <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
-                  {t("ui_settings_label", "Paramètres")}
-                </div>
-	                <div className="text-[12px] text-white/80 mt-1 truncate">
-	                  {t("ui_wallet_settings_subtitle", "Gestion du compte")}
+	            {/* Mobile header */}
+	            <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
+	              <div className="min-w-0">
+	                <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+	                  {t("ui_settings_label", "Paramètres")}
 	                </div>
-	              </div>
-              <button
-                type="button"
+		              </div>
+	              <button
+	                type="button"
                 onClick={() => setIsOpen(false)}
                 className="h-10 w-10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
                 aria-label={t("close", "Fermer")}
@@ -274,25 +272,22 @@ export default function WalletSettingsDropdown({
               </button>
             </div>
 
-            {/* Desktop header */}
-            <div className="hidden md:flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
+	            {/* Desktop header */}
+	            <div className="hidden md:flex items-center justify-between px-4 py-3">
+	              <div className="flex items-center gap-2 min-w-0">
+	                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
                 </span>
-                <div className="min-w-0">
-                  <div className="text-[11px] font-semibold tracking-[0.22em] uppercase text-white/60">
-                    {t("ui_settings_label", "Paramètres")}
-	                  </div>
-	                  <div className="text-[12px] text-white/80 truncate">
-	                    {t("ui_wallet_settings_subtitle", "Gestion du compte")}
-	                  </div>
-	                </div>
-	              </div>
-              <button
+	                <div className="min-w-0">
+	                  <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+	                    {t("ui_settings_label", "Paramètres")}
+		                  </div>
+		                </div>
+		              </div>
+	              <button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="h-8 w-8 text-white/45 hover:text-white/80 flex items-center justify-center transition-colors duration-150"
@@ -648,34 +643,37 @@ export default function WalletSettingsDropdown({
       )}
 
       {/* Fullscreen security modal */}
-      {showSecurityModal && (
-        <div
-          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
-          role="dialog"
+	      {showSecurityModal && (
+	        <div
+	          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
+	          role="dialog"
           aria-modal="true"
           aria-label={t("ui_security", "Sécurité")}
         >
-          <div className="h-full w-full flex flex-col">
-            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
-                    {t("ui_security", "Sécurité")}
-                  </div>
-                  <div className="text-[12px] text-white/80 mt-1 truncate">
-                    {t("ui_security_subtitle", "Protection du compte XCANNES")}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeSecurityModal}
-                  className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
-                  aria-label={t("close", "Fermer")}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
+	          <div className="h-full w-full flex flex-col">
+	            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
+	              <div className="flex items-center justify-between gap-3">
+	                <div className="flex items-center gap-3 min-w-0 flex-1">
+	                  <button
+	                    type="button"
+	                    onClick={closeSecurityModal}
+	                    className="h-10 w-10 -ml-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors flex-shrink-0"
+	                    aria-label={t("back", "Retour")}
+	                  >
+	                    <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	                  </button>
+	                  <div className="min-w-0">
+	                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+	                    {t("ui_security", "Sécurité")}
+	                  </div>
+	                  <div className="text-[12px] text-white/80 mt-1 truncate">
+	                    {t("ui_security_subtitle", "Protection du compte XCANNES")}
+	                  </div>
+	                  </div>
+	                </div>
+	                <span className="h-10 w-10" aria-hidden="true" />
+	              </div>
+	            </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4">
               <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
@@ -733,34 +731,37 @@ export default function WalletSettingsDropdown({
       )}
 
       {/* Fullscreen help modal (FAQ) */}
-      {showHelpModal && (
-        <div
-          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
+	      {showHelpModal && (
+	        <div
+	          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
           role="dialog"
           aria-modal="true"
           aria-label={t("ui_questions_and_help", "Questions et aides")}
         >
-          <div className="h-full w-full flex flex-col">
-            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
-                    {t("ui_questions_and_help", "Questions et aides")}
-                  </div>
-                  <div className="text-[12px] text-white/80 mt-1 truncate">
-                    {t("ui_questions_and_help_subtitle", "Réponses rapides")}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeHelpModal}
-                  className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
-                  aria-label={t("close", "Fermer")}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
+	          <div className="h-full w-full flex flex-col">
+	            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
+	              <div className="flex items-center justify-between gap-3">
+	                <div className="flex items-center gap-3 min-w-0 flex-1">
+	                  <button
+	                    type="button"
+	                    onClick={closeHelpModal}
+	                    className="h-10 w-10 -ml-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors flex-shrink-0"
+	                    aria-label={t("back", "Retour")}
+	                  >
+	                    <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	                  </button>
+	                  <div className="min-w-0">
+	                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+	                    {t("ui_questions_and_help", "Questions et aides")}
+	                  </div>
+	                  <div className="text-[12px] text-white/80 mt-1 truncate">
+	                    {t("ui_questions_and_help_subtitle", "Réponses rapides")}
+	                  </div>
+	                  </div>
+	                </div>
+	                <span className="h-10 w-10" aria-hidden="true" />
+	              </div>
+	            </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-2">
               {HELP_QA.map((item, idx) => {
@@ -817,34 +818,37 @@ export default function WalletSettingsDropdown({
       )}
 
       {/* Fullscreen terms modal */}
-      {showTermsModal && (
-        <div
-          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
+	      {showTermsModal && (
+	        <div
+	          className="fixed inset-0 z-[9999] bg-[#0b0f10]"
           role="dialog"
           aria-modal="true"
           aria-label={t("ui_terms_of_use", "Conditions d'utilisations")}
         >
-          <div className="h-full w-full flex flex-col">
-            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
-                    {t("ui_terms_of_use", "Conditions d'utilisations")}
-                  </div>
-                  <div className="text-[12px] text-white/80 mt-1 truncate">
-                    {t("ui_terms_subtitle", "Conditions d'utilisation XCANNES")}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={closeTermsModal}
-                  className="h-10 w-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors"
-                  aria-label={t("close", "Fermer")}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
+	          <div className="h-full w-full flex flex-col">
+	            <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10 bg-black/20">
+	              <div className="flex items-center justify-between gap-3">
+	                <div className="flex items-center gap-3 min-w-0 flex-1">
+	                  <button
+	                    type="button"
+	                    onClick={closeTermsModal}
+	                    className="h-10 w-10 -ml-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white flex items-center justify-center transition-colors flex-shrink-0"
+	                    aria-label={t("back", "Retour")}
+	                  >
+	                    <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	                  </button>
+	                  <div className="min-w-0">
+	                  <div className="text-[11px] font-semibold tracking-[0.24em] uppercase text-white/60">
+	                    {t("ui_terms_of_use", "Conditions d'utilisations")}
+	                  </div>
+	                  <div className="text-[12px] text-white/80 mt-1 truncate">
+	                    {t("ui_terms_subtitle", "Conditions d'utilisation XCANNES")}
+	                  </div>
+	                  </div>
+	                </div>
+	                <span className="h-10 w-10" aria-hidden="true" />
+	              </div>
+	            </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4">
               <div className="rounded-[14px] border border-white/10 bg-white/5 p-4">
