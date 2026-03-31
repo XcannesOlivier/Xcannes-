@@ -36,6 +36,14 @@ export default function WalletSettingsDropdown({
   const [helpOpenIndex, setHelpOpenIndex] = useState(0);
   const ref = useRef(null);
 
+  // Allow the PWA host to reopen the dropdown after returning from "add account" flow.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => setIsOpen(true);
+    window.addEventListener("xcannes:wallet-settings-open", handler);
+    return () => window.removeEventListener("xcannes:wallet-settings-open", handler);
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e) => {

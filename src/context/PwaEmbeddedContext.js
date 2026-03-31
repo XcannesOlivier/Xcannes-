@@ -152,6 +152,16 @@ export const PwaEmbeddedProvider = ({ children }) => {
           }
           break;
         }
+        case "OPEN_SETTINGS_DROPDOWN": {
+          try {
+            window.dispatchEvent(
+              new CustomEvent("xcannes:wallet-settings-open", { detail: { source: "pwa" } }),
+            );
+          } catch {
+            // ignore
+          }
+          break;
+        }
         default:
           break;
       }

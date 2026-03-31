@@ -53,7 +53,9 @@ const AUTO_LOCK_MS = 5 * 60 * 1000;
 let inactivityTimer = null;
 const MOONPAY_BACKGROUND_GRACE_MS = 3 * 60 * 1000;
 let moonpayActiveInDashboard = false;
+let moonpayBackgroundGraceAllowed = false;
 let moonpayBackgroundLockTimer = null;
+let choiceOpenedFromDashboardSettings = false;
 
 function clearMoonpayBackgroundLockTimer() {
   if (moonpayBackgroundLockTimer) clearTimeout(moonpayBackgroundLockTimer);
@@ -80,7 +82,16 @@ function resetInactivityTimer() {
 document.addEventListener('visibilitychange', async () => {
   if (document.hidden && isUnlocked) {
     if (moonpayActiveInDashboard) {
-      scheduleMoonpayBackgroundLock();
+      // Allow a single background grace window per MoonPay session so native
+      // iOS auth (Apple/PayPal sheets) doesn't force an immediate lock, but
+      // still locks immediately if the user backgrounds the app again after
+      // the MoonPay auth flow completes.
+      if (moonpayBackgroundGraceAllowed) {
+        moonpayBackgroundGraceAllowed = false;
+        scheduleMoonpayBackgroundLock();
+        return;
+      }
+      lockWallet();
       return;
     }
     lockWallet();
@@ -585,11 +596,35 @@ function goToChoice() {
 function setupChoiceScreen() {
   const btnCreate = document.getElementById('btn-create-wallet');
   const btnImport = document.getElementById('btn-import-wallet');
+  const btnClose = document.getElementById('btn-choice-close');
 
-  btnCreate?.addEventListener('click', () => startCreateWallet(), { once: true });
+  btnCreate?.addEventListener('click', () => {
+    choiceOpenedFromDashboardSettings = false;
+    startCreateWallet();
+  }, { once: true });
+
   btnImport?.addEventListener('click', () => {
+    choiceOpenedFromDashboardSettings = false;
     showScreen('import');
     setupImportScreen();
+  }, { once: true });
+
+  if (!btnClose) return;
+
+  // Always rearm (avoid accumulating listeners when returning to this screen).
+  const newBtnClose = btnClose.cloneNode(true);
+  btnClose.replaceWith(newBtnClose);
+
+  if (!choiceOpenedFromDashboardSettings) {
+    newBtnClose.classList.remove('is-visible');
+    return;
+  }
+
+  newBtnClose.classList.add('is-visible');
+  newBtnClose.addEventListener('click', () => {
+    choiceOpenedFromDashboardSettings = false;
+    showScreen('wallet-embedded');
+    sendToIframe({ type: 'OPEN_SETTINGS_DROPDOWN' });
   }, { once: true });
 }
 
@@ -1250,7 +1285,10 @@ function setupWalletEmbedded() {
 	    switch (data.type) {
 	      case 'MOONPAY_ACTIVE':
 	        moonpayActiveInDashboard = Boolean(data.active);
-	        if (!moonpayActiveInDashboard) {
+	        if (moonpayActiveInDashboard) {
+	          moonpayBackgroundGraceAllowed = true;
+	        } else {
+	          moonpayBackgroundGraceAllowed = false;
 	          clearMoonpayBackgroundLockTimer();
 	        }
 	        break;
@@ -1304,6 +1342,7 @@ function setupWalletEmbedded() {
       case 'GO_TO_CHOICE':
         // Dashboard requests navigation to create/import screen
         // User is already authenticated in the iframe, so go directly
+        choiceOpenedFromDashboardSettings = true;
         goToChoice();
         break;
 
