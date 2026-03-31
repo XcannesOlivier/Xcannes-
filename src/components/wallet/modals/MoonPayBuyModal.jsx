@@ -1,5 +1,9 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { XCircleIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import {
+  XCircleIcon,
+  CheckCircleIcon,
+  ChevronLeftIcon,
+} from "@heroicons/react/24/outline";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
@@ -864,17 +868,17 @@ const MoonPayBuyModal = ({
             </p>
           </div>
 
-          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[13px] md:text-sm leading-snug text-white/60">
-            {demoMode
-              ? t(
-                  "moonpay_info_buy_demo_1b7d2c9a5e",
-                  "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
-                )
-	              : t(
-	                  "moonpay_info_buy_live_3c8a1d6b2f",
-	                  "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
-	                )}
-	          </div>
+	          <div className="px-1 py-2 text-[16px] md:text-sm leading-snug text-white/85">
+	            {demoMode
+	              ? t(
+	                  "moonpay_info_buy_demo_1b7d2c9a5e",
+	                  "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
+	                )
+		              : t(
+		                  "moonpay_info_buy_live_3c8a1d6b2f",
+		                  "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+		                )}
+		          </div>
 
           {/* Error message */}
           {displayError && (
@@ -1023,13 +1027,23 @@ const MoonPayBuyModal = ({
           } ${isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 md:p-5 border-b border-white/10">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
-                  {t(
-                    "ui_buy_crypto_with_fiat_f09c7b4228",
+	          {/* Header */}
+	          <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
+	            {step !== "iframe" && (
+	              <button
+	                type="button"
+	                onClick={onClose}
+	                className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+	                aria-label={t("back", "Back")}
+	              >
+	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+	              </button>
+	            )}
+	            <div className="min-w-0 flex-1">
+	              <div className="flex items-center gap-2 flex-wrap">
+	                <h3 className="text-lg md:text-xl font-orbitron font-bold text-white">
+	                  {t(
+	                    "ui_buy_crypto_with_fiat_f09c7b4228",
                     "Buy Crypto with Fiat",
                   )}
                 </h3>
@@ -1040,23 +1054,14 @@ const MoonPayBuyModal = ({
                 ) : null}
 
               </div>
-              <p className="text-xs text-white/60 mt-1">
-                {t(
-                  "ui_powered_by_moonpay_secure_ch_0bcfb2aeb5",
-                  "Powered by MoonPay • Secure checkout",
-                )}
-              </p>
-            </div>
-            {step !== "iframe" && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+	              <p className="text-xs text-white/60 mt-1">
+	                {t(
+	                  "ui_powered_by_moonpay_secure_ch_0bcfb2aeb5",
+	                  "Powered by MoonPay • Secure checkout",
+	                )}
+	              </p>
+	            </div>
+	          </div>
 
           {/* Content */}
           {renderContent()}
