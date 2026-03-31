@@ -750,12 +750,12 @@ const MoonPayBuyModal = ({
         <div className="space-y-5">
 	          {/* Currency selector */}
 	          <div>
-	            <label className="block text-[15px] md:text-base font-orbitron font-bold text-white mb-3">
-	              {t(
-	                "moonpay_buy_select_asset",
-	                "Choisissez l'actif que vous voulez ajouter",
-	              )}
-	            </label>
+		            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
+		              {t(
+		                "moonpay_buy_select_asset",
+		                "Choisissez l'actif que vous voulez ajouter",
+		              )}
+		            </label>
             <ModalSelect
               value={currency}
               onChange={setCurrency}
@@ -863,10 +863,10 @@ const MoonPayBuyModal = ({
                 </p>
               </div>
             ) : null}
-            <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
-              {walletAddress}
-            </p>
-          </div>
+	            <p className="text-[11px] md:text-[12px] text-white/60 font-mono break-all">
+	              {walletAddress}
+	            </p>
+	          </div>
 
 		          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
 		            {demoMode
