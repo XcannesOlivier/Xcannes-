@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
+import { MOONPAY_UI_ENABLED, TOPPER_UI_ENABLED } from "@/utils/featureFlags";
 
 /**
  * useWalletNavigation — Centralises all "open view" navigation handlers,
@@ -50,6 +50,7 @@ export function useWalletNavigation({
   toast,
 }) {
   const refreshTimerRef = useRef(null);
+  const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
 
   // ─── Currency line activation (open converter) ────────────────────────
 
@@ -123,22 +124,11 @@ export function useWalletNavigation({
         setSwapDefaultView("convert");
         setSwapLockedView(null);
       }
-      if (nextAction === "cash") {
-        if (!MOONPAY_UI_ENABLED) {
+      if (nextAction === "cash" || nextAction === "cashChoice") {
+        if (!cashEnabled) {
           toast.info(
-            t("ui_moonpay_disabled", {
-              defaultValue: "MoonPay est temporairement désactivé.",
-            }),
-          );
-          return;
-        }
-        setCashBuyPrefill(null);
-      }
-      if (nextAction === "cashChoice") {
-        if (!MOONPAY_UI_ENABLED) {
-          toast.info(
-            t("ui_moonpay_disabled", {
-              defaultValue: "MoonPay est temporairement désactivé.",
+            t("ui_funds_disabled", {
+              defaultValue: "Onramp/offramp est temporairement désactivé.",
             }),
           );
           return;
@@ -148,6 +138,7 @@ export function useWalletNavigation({
       setActiveAction(nextAction);
     },
     [
+      cashEnabled,
       closeInlineQr,
       setActiveAction,
       setWalletInfoOpen,

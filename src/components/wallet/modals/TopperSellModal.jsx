@@ -112,6 +112,7 @@ const TopperSellModal = ({
           baseCurrencyAmount: parsedAmount,
           options: {
             label: walletLabel,
+            theme: "dark",
           },
         }),
       });
@@ -317,4 +318,3 @@ const TopperSellModal = ({
 };
 
 export default TopperSellModal;
-

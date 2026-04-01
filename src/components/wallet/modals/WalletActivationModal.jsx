@@ -3,6 +3,11 @@
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import {
+  MOONPAY_UI_ENABLED,
+  RAMP_DEFAULT_PROVIDER,
+  TOPPER_UI_ENABLED,
+} from "@/utils/featureFlags";
 
 export default function WalletActivationModal({
   open,
@@ -13,6 +18,41 @@ export default function WalletActivationModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
+  const moonpayEnabled = MOONPAY_UI_ENABLED;
+  const topperEnabled = TOPPER_UI_ENABLED;
+  const bothProvidersEnabled = moonpayEnabled && topperEnabled;
+  const preferredProvider = String(RAMP_DEFAULT_PROVIDER || "moonpay")
+    .trim()
+    .toLowerCase();
+  const primaryProvider =
+    preferredProvider === "topper" && topperEnabled ? "Topper" : "MoonPay";
+  const providerLabel = bothProvidersEnabled
+    ? "MoonPay / Topper"
+    : topperEnabled
+      ? "Topper"
+      : "MoonPay";
+  const buyTitle =
+    moonpayEnabled && !topperEnabled
+      ? t(
+          "ui_activation_buy_moonpay_23a9c1d5fe",
+          "Acheter via partenaire (MoonPay)",
+        )
+      : t("ui_activation_buy_partner", {
+          defaultValue: bothProvidersEnabled
+            ? `Acheter via partenaire (${providerLabel})`
+            : `Acheter via partenaire (${primaryProvider})`,
+        });
+  const buyDesc =
+    moonpayEnabled && !topperEnabled
+      ? t(
+          "ui_activation_buy_moonpay_desc_5c1d9a2b7e",
+          "Acheter du XRP avec carte ou virement.",
+        )
+      : t("ui_activation_buy_partner_desc", {
+          defaultValue: bothProvidersEnabled
+            ? "Choisissez MoonPay ou Topper pour acheter du XRP."
+            : "Acheter du XRP avec carte ou virement.",
+        });
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -223,16 +263,10 @@ export default function WalletActivationModal({
                 </div>
                 <div className="flex-1">
                   <div className={actionTitle}>
-                    {t(
-                      "ui_activation_buy_moonpay_23a9c1d5fe",
-                      "Acheter via partenaire (MoonPay)",
-                    )}
+                    {buyTitle}
                   </div>
                   <div className={actionDesc}>
-                    {t(
-                      "ui_activation_buy_moonpay_desc_5c1d9a2b7e",
-                      "Acheter du XRP avec carte ou virement.",
-                    )}
+                    {buyDesc}
                   </div>
                 </div>
                 <div className={actionArrowBase}>›</div>

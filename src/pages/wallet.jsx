@@ -243,6 +243,16 @@ export default function Wallet() {
     }
   };
 
+  const readTopperActive = () => {
+    if (typeof window === "undefined") return false;
+    try {
+      if (window.__XCANNES_TOPPER_ACTIVE__) return true;
+      return window.sessionStorage?.getItem("xcannes_topper_active") === "1";
+    } catch {
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.body.classList.add("wallet-page");
@@ -263,6 +273,8 @@ export default function Wallet() {
   isConnectedRef.current = isConnected;
   const moonpayActiveRef = useRef(false);
   moonpayActiveRef.current = readMoonpayActive();
+  const topperActiveRef = useRef(false);
+  topperActiveRef.current = readTopperActive();
   const moonpayHiddenTimerRef = useRef(null);
 
   useEffect(() => {
@@ -281,9 +293,9 @@ export default function Wallet() {
 
       if (!hidden || !isConnectedRef.current) return;
 
-      // MoonPay flows can temporarily background the browser (Apple Pay / Apple ID / KYC).
+      // Ramp flows can temporarily background the browser (Apple Pay / Apple ID / KYC).
       // Give a short grace period so users can return without losing the widget state.
-      if (moonpayActiveRef.current) {
+      if (moonpayActiveRef.current || topperActiveRef.current) {
         if (moonpayHiddenTimerRef.current) return;
         moonpayHiddenTimerRef.current = window.setTimeout(() => {
           moonpayHiddenTimerRef.current = null;
@@ -319,7 +331,7 @@ export default function Wallet() {
     const resetTimer = () => {
       if (timer) clearTimeout(timer);
       if (!isConnectedRef.current) return;
-      if (moonpayActiveRef.current) return;
+      if (moonpayActiveRef.current || topperActiveRef.current) return;
       timer = setTimeout(() => {
         if (isConnectedRef.current) {
           disconnectRef.current();
@@ -330,17 +342,26 @@ export default function Wallet() {
     const events = ["click", "scroll", "keydown", "touchstart", "mousemove"];
     events.forEach((ev) => window.addEventListener(ev, resetTimer, { passive: true }));
 
-    const handleMoonpayActive = (event) => {
-      const nextActive = Boolean(event?.detail?.active);
-      moonpayActiveRef.current = nextActive;
-      if (nextActive) {
+    const syncRampActive = () => {
+      const active = moonpayActiveRef.current || topperActiveRef.current;
+      if (active) {
         if (timer) clearTimeout(timer);
         timer = null;
         return;
       }
       resetTimer();
     };
+
+    const handleMoonpayActive = (event) => {
+      moonpayActiveRef.current = Boolean(event?.detail?.active);
+      syncRampActive();
+    };
+    const handleTopperActive = (event) => {
+      topperActiveRef.current = Boolean(event?.detail?.active);
+      syncRampActive();
+    };
     window.addEventListener("xcannes:moonpay-active", handleMoonpayActive);
+    window.addEventListener("xcannes:topper-active", handleTopperActive);
 
     // Start the timer immediately
     resetTimer();
@@ -349,6 +370,7 @@ export default function Wallet() {
       if (timer) clearTimeout(timer);
       events.forEach((ev) => window.removeEventListener(ev, resetTimer));
       window.removeEventListener("xcannes:moonpay-active", handleMoonpayActive);
+      window.removeEventListener("xcannes:topper-active", handleTopperActive);
     };
   }, [isEmbedded, isConnected]);
 

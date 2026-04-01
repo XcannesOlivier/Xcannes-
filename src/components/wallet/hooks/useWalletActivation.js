@@ -5,7 +5,7 @@ import {
   buildRlusdPaymentTxjson,
   XCANNES_RECONCILE_DESTINATION,
 } from "@/utils/walletSpread";
-import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
+import { MOONPAY_UI_ENABLED, TOPPER_UI_ENABLED } from "@/utils/featureFlags";
 
 /**
  * Encapsulates all wallet-activation and trustline-installation logic:
@@ -268,8 +268,8 @@ export function useWalletActivation({
   ]);
 
   const handleActivationBuyViaMoonpay = useCallback(() => {
-    if (!MOONPAY_UI_ENABLED) {
-      toast.info("MoonPay est temporairement désactivé.");
+    if (!MOONPAY_UI_ENABLED && !TOPPER_UI_ENABLED) {
+      toast.info("Onramp/offramp est temporairement désactivé.");
       return;
     }
     closeInlineQr();

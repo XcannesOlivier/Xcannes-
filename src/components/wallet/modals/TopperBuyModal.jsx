@@ -122,6 +122,7 @@ const TopperBuyModal = ({
             // Default behaviour: keep recipient fixed but allow address edits server-side
             // (can be overridden later if needed).
             recipientEditMode: "only-address-and-tag",
+            theme: "dark",
           },
         }),
       });
@@ -325,4 +326,3 @@ const TopperBuyModal = ({
 };
 
 export default TopperBuyModal;
-
