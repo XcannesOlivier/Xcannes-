@@ -32,3 +32,14 @@ export const MOONPAY_SELL_STATUS_ENABLED = parseEnvBoolean(
   process.env.MOONPAY_SELL_STATUS_ENABLED,
   false,
 );
+
+export const TOPPER_UI_ENABLED = parseEnvBoolean(
+  process.env.TOPPER_UI_ENABLED,
+  false,
+);
+
+export const RAMP_DEFAULT_PROVIDER = normalizeEnvString(
+  process.env.RAMP_DEFAULT_PROVIDER || "moonpay",
+)
+  .toLowerCase()
+  .trim();

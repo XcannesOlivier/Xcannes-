@@ -21,10 +21,20 @@ const securityHeaders = [
   // (the stricter nonce-based CSP can be reintroduced later via middleware).
   {
     key: "Content-Security-Policy",
-    value:
-      process.env.MOONPAY_UI_ENABLED === "true"
-        ? "frame-src 'self' https://moonpay.com https://*.moonpay.com"
-        : "frame-src 'self'",
+    value: (() => {
+      const frameSrc = ["'self'"];
+      if (process.env.MOONPAY_UI_ENABLED === "true") {
+        frameSrc.push("https://moonpay.com", "https://*.moonpay.com");
+      }
+      if (process.env.TOPPER_UI_ENABLED === "true") {
+        frameSrc.push(
+          "https://app.topperpay.com",
+          "https://app.sandbox.topperpay.com",
+          "https://*.topperpay.com",
+        );
+      }
+      return `frame-src ${frameSrc.join(" ")}`;
+    })(),
   },
 ].filter(Boolean);
 
@@ -41,6 +51,8 @@ const nextConfig = {
     MOONPAY_UI_ENABLED: process.env.MOONPAY_UI_ENABLED,
     MOONPAY_STATEMENT_TAG_FALLBACK: process.env.MOONPAY_STATEMENT_TAG_FALLBACK,
     MOONPAY_SELL_STATUS_ENABLED: process.env.MOONPAY_SELL_STATUS_ENABLED,
+    TOPPER_UI_ENABLED: process.env.TOPPER_UI_ENABLED,
+    RAMP_DEFAULT_PROVIDER: process.env.RAMP_DEFAULT_PROVIDER,
   },
 
   // ✅ Optimisation des images

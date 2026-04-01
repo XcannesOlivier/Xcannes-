@@ -8,10 +8,16 @@ import {
 } from "@heroicons/react/24/outline";
 import MoonPayBuyModal from "./MoonPayBuyModal";
 import MoonPaySellModal from "./MoonPaySellModal";
+import TopperBuyModal from "./TopperBuyModal";
+import TopperSellModal from "./TopperSellModal";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
-import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
+import {
+  MOONPAY_UI_ENABLED,
+  RAMP_DEFAULT_PROVIDER,
+  TOPPER_UI_ENABLED,
+} from "@/utils/featureFlags";
 
 export default function WalletDashboardCashModal({
   open,
@@ -39,7 +45,17 @@ export default function WalletDashboardCashModal({
 }) {
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
+  const topperEnabled = TOPPER_UI_ENABLED;
+  const [rampProvider, setRampProvider] = useState(() => {
+    const preferred = String(RAMP_DEFAULT_PROVIDER || "moonpay")
+      .trim()
+      .toLowerCase();
+    if (preferred === "topper" && topperEnabled) return "topper";
+    if (!moonpayEnabled && topperEnabled) return "topper";
+    return "moonpay";
+  });
   const [moonpayActive, setMoonpayActive] = useState(false);
+  const [topperActive, setTopperActive] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const walletMenuRef = useRef(null);
   const showWalletMeta = false;
@@ -69,8 +85,38 @@ export default function WalletDashboardCashModal({
   }, [open]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const readActive = () => {
+      try {
+        const fromGlobal = Boolean(window.__XCANNES_TOPPER_ACTIVE__);
+        const fromSession =
+          window.sessionStorage?.getItem("xcannes_topper_active") === "1";
+        setTopperActive(fromGlobal || fromSession);
+      } catch {
+        setTopperActive(false);
+      }
+    };
+
+    readActive();
+    const handler = (e) => setTopperActive(Boolean(e?.detail?.active));
+    window.addEventListener("xcannes:topper-active", handler);
+    return () => window.removeEventListener("xcannes:topper-active", handler);
+  }, [open]);
+
+  useEffect(() => {
+    if (rampProvider === "topper" && !topperEnabled && moonpayEnabled) {
+      setRampProvider("moonpay");
+      return;
+    }
+    if (rampProvider === "moonpay" && !moonpayEnabled && topperEnabled) {
+      setRampProvider("topper");
+    }
+  }, [moonpayEnabled, rampProvider, topperEnabled]);
+
+  useEffect(() => {
     setWalletMenuOpen(false);
-  }, [moonpayActive, cashModalTab, open]);
+  }, [cashModalTab, moonpayActive, open, rampProvider, topperActive]);
 
   useEffect(() => {
     if (!walletMenuOpen) return;
@@ -92,6 +138,10 @@ export default function WalletDashboardCashModal({
   }, [walletMenuOpen]);
 
   if (!shouldRender) return null;
+
+  const rampActive = rampProvider === "topper" ? topperActive : moonpayActive;
+  const rampEnabled = rampProvider === "topper" ? topperEnabled : moonpayEnabled;
+  const bothProvidersEnabled = moonpayEnabled && topperEnabled;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
@@ -132,7 +182,7 @@ export default function WalletDashboardCashModal({
 	          }}
 	        >
 		          {/* Header */}
-		          {!moonpayActive ? (
+		          {!rampActive ? (
 		            <div className="border-b border-white/10">
 		              <div className="flex items-start gap-3 p-4">
 				                {cashModalTab === "buy" || cashModalTab === "sell" ? (
@@ -157,6 +207,36 @@ export default function WalletDashboardCashModal({
 		                    ) : null}
 		                  </div>
 		                </div>
+
+                    {bothProvidersEnabled ? (
+                      <div className="flex items-center gap-1 rounded-full bg-white/10 ring-1 ring-white/10 p-1">
+                        <button
+                          type="button"
+                          onClick={() => setRampProvider("moonpay")}
+                          className={[
+                            "px-3 py-1 rounded-full text-xs font-semibold transition-colors",
+                            rampProvider === "moonpay"
+                              ? "bg-white/20 text-white"
+                              : "text-white/70 hover:text-white",
+                          ].join(" ")}
+                        >
+                          MoonPay
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRampProvider("topper")}
+                          className={[
+                            "px-3 py-1 rounded-full text-xs font-semibold transition-colors",
+                            rampProvider === "topper"
+                              ? "bg-white/20 text-white"
+                              : "text-white/70 hover:text-white",
+                          ].join(" ")}
+                        >
+                          Topper
+                        </button>
+                      </div>
+                    ) : null}
+
 		                  {cashModalTab !== "buy" && cashModalTab !== "sell" ? (
 		                    <button
 		                      type="button"
@@ -181,9 +261,13 @@ export default function WalletDashboardCashModal({
 			                    />
 			                  </div>
 		                  <p className="text-white font-semibold truncate">
-		                    {cashModalTab === "sell"
-		                      ? t("moonpay_header_sell", "MoonPay Sell")
-		                      : t("moonpay_header_buy", "MoonPay Buy")}
+		                    {rampProvider === "topper"
+                          ? cashModalTab === "sell"
+                            ? t("topper_header_sell", { defaultValue: "Topper Sell" })
+                            : t("topper_header_buy", { defaultValue: "Topper Buy" })
+                          : cashModalTab === "sell"
+                            ? t("moonpay_header_sell", "MoonPay Sell")
+                            : t("moonpay_header_buy", "MoonPay Buy")}
 		                  </p>
 		                </div>
 
@@ -238,14 +322,44 @@ export default function WalletDashboardCashModal({
 				            className={`${
 				              // MoonPay iframe already has its own margins/padding inside the widget.
 				              // Remove horizontal padding here to avoid double side-margins.
-				              moonpayActive ? "px-0 py-0" : "p-4 md:p-5"
+				              rampActive ? "px-0 py-0" : "p-4 md:p-5"
 				            } relative z-0 overflow-y-auto overscroll-contain flex-1 min-h-0`}
 				            style={{ WebkitOverflowScrolling: "touch" }}
 				          >
             <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
-              {moonpayEnabled ? (
+              {rampEnabled ? (
                 cashModalTab === "buy" ? (
-                  <MoonPayBuyModal
+                  rampProvider === "topper" ? (
+                    <TopperBuyModal
+                      isOpen={true}
+                      onClose={onClose}
+                      walletAddress={walletAddress || ""}
+                      walletLabel={walletLabel}
+                      embedded={true}
+                      isPreviewMode={isPreviewMode}
+                      demoMode={demoMode}
+                      onDemoSubmit={onDemoBuy}
+                      noticeVariant={noticeVariant}
+                      noticeContextLabel={noticeContextLabel}
+                      prefill={buyPrefill}
+                    />
+                  ) : (
+                    <MoonPayBuyModal
+                      isOpen={true}
+                      onClose={onClose}
+                      walletAddress={walletAddress || ""}
+                      walletLabel={walletLabel}
+                      embedded={true}
+                      isPreviewMode={isPreviewMode}
+                      demoMode={demoMode}
+                      onDemoSubmit={onDemoBuy}
+                      noticeVariant={noticeVariant}
+                      noticeContextLabel={noticeContextLabel}
+                      prefill={buyPrefill}
+                    />
+                  )
+                ) : rampProvider === "topper" ? (
+                  <TopperSellModal
                     isOpen={true}
                     onClose={onClose}
                     walletAddress={walletAddress || ""}
@@ -253,10 +367,9 @@ export default function WalletDashboardCashModal({
                     embedded={true}
                     isPreviewMode={isPreviewMode}
                     demoMode={demoMode}
-                    onDemoSubmit={onDemoBuy}
+                    onDemoSubmit={onDemoSell}
                     noticeVariant={noticeVariant}
                     noticeContextLabel={noticeContextLabel}
-                    prefill={buyPrefill}
                   />
                 ) : (
                   <MoonPaySellModal
@@ -280,9 +393,13 @@ export default function WalletDashboardCashModal({
                 )
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-sm text-white/60">
-                  {t("ui_moonpay_disabled", {
-                    defaultValue: "MoonPay est temporairement désactivé.",
-                  })}
+                  {rampProvider === "topper"
+                    ? t("ui_topper_disabled", {
+                        defaultValue: "Topper est temporairement désactivé.",
+                      })
+                    : t("ui_moonpay_disabled", {
+                        defaultValue: "MoonPay est temporairement désactivé.",
+                      })}
                 </div>
               )}
             </div>

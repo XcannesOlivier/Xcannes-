@@ -5,7 +5,7 @@
  */
 
 import { useTranslation } from "next-i18next";
-import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
+import { MOONPAY_UI_ENABLED, TOPPER_UI_ENABLED } from "@/utils/featureFlags";
 
 export default function DemoWalletActionBar({
   setSendTab,
@@ -13,7 +13,7 @@ export default function DemoWalletActionBar({
   setCashModalTab,
 }) {
   const { t } = useTranslation("common");
-  const cashEnabled = MOONPAY_UI_ENABLED;
+  const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
 
   return (
     <div className="px-3 py-2 md:py-3 border-b border-white/5">

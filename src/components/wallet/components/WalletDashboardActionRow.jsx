@@ -1,10 +1,10 @@
 "use client";
 import { useTranslation } from "next-i18next";
-import { MOONPAY_UI_ENABLED } from "@/utils/featureFlags";
+import { MOONPAY_UI_ENABLED, TOPPER_UI_ENABLED } from "@/utils/featureFlags";
 
 export default function WalletDashboardActionRow({ onAction }) {
   const { t } = useTranslation("common");
-  const cashEnabled = MOONPAY_UI_ENABLED;
+  const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
   return (
     <div
       className="px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
@@ -100,8 +100,8 @@ export default function WalletDashboardActionRow({ onAction }) {
           title={
             cashEnabled
               ? undefined
-              : t("ui_moonpay_disabled", {
-                  defaultValue: "MoonPay est temporairement désactivé.",
+              : t("ui_funds_disabled", {
+                  defaultValue: "Onramp/offramp est temporairement désactivé.",
                 })
           }
           className={[
