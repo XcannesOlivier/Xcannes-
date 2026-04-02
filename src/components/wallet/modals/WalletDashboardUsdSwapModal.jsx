@@ -1305,11 +1305,16 @@ export default function WalletDashboardUsdSwapModal({
                                             >
                                               <div className="flex items-center gap-2">
                                                 {renderCurrencyIcon(opt.currency)}
-                                                <div className="min-w-0">
+                                                <div className="min-w-0 flex-1">
                                                   <div className="text-sm font-semibold truncate">
                                                     {opt.label}
                                                   </div>
                                                 </div>
+                                                {active ? (
+                                                  <span className="text-xcannes-green font-semibold text-xs">
+                                                    ✓
+                                                  </span>
+                                                ) : null}
                                               </div>
                                             </button>
                                           );
