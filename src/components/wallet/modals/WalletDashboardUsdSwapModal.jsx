@@ -105,6 +105,14 @@ export default function WalletDashboardUsdSwapModal({
   const [stableDropdownOpen, setStableDropdownOpen] = useState(false);
   const stableDropdownRef = useRef(null);
   const stableDropdownOverlayRef = useRef(null);
+  const [stableOverlayDragging, setStableOverlayDragging] = useState(false);
+  const [stableOverlayTranslateY, setStableOverlayTranslateY] = useState(0);
+  const stableOverlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+  });
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
   const [receiveExtraId, setReceiveExtraId] = useState("");
@@ -295,6 +303,18 @@ export default function WalletDashboardUsdSwapModal({
       } catch {
         // ignore
       }
+    };
+  }, [stableDropdownOpen]);
+
+  useEffect(() => {
+    if (stableDropdownOpen) return;
+    setStableOverlayDragging(false);
+    setStableOverlayTranslateY(0);
+    stableOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
     };
   }, [stableDropdownOpen]);
 
@@ -1017,6 +1037,12 @@ export default function WalletDashboardUsdSwapModal({
                             <div
                               className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
                               onClick={() => setStableDropdownOpen(false)}
+                              style={{
+                                opacity: Math.max(
+                                  0,
+                                  Math.min(1, 1 - stableOverlayTranslateY / 420),
+                                ),
+                              }}
                             />
                             <div
                               ref={stableDropdownOverlayRef}
@@ -1025,8 +1051,75 @@ export default function WalletDashboardUsdSwapModal({
                               className={[
                                 "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
                                 "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+                                "will-change-transform",
                               ].join(" ")}
+                              style={{
+                                transform: `translateY(${Math.max(0, stableOverlayTranslateY)}px)`,
+                                transition: stableOverlayDragging
+                                  ? "none"
+                                  : "transform 180ms ease",
+                              }}
                             >
+                              <div className="sm:hidden flex justify-center pt-3 pb-1">
+                                <button
+                                  type="button"
+                                  className="w-16 h-5 flex items-center justify-center touch-none"
+                                  aria-label={t("ui_swipe_to_close", "Glisser pour fermer")}
+                                  onPointerDown={(event) => {
+                                    if (!event.isPrimary) return;
+                                    if (event.pointerType === "mouse") return;
+                                    const el = event.currentTarget;
+                                    try {
+                                      el.setPointerCapture(event.pointerId);
+                                    } catch {
+                                      // ignore
+                                    }
+                                    stableOverlayDragMetaRef.current = {
+                                      startY: event.clientY,
+                                      startAt: Date.now(),
+                                      pointerId: event.pointerId,
+                                      lastDelta: 0,
+                                    };
+                                    setStableOverlayDragging(true);
+                                  }}
+                                  onPointerMove={(event) => {
+                                    const meta = stableOverlayDragMetaRef.current;
+                                    if (!stableOverlayDragging) return;
+                                    if (meta.pointerId !== event.pointerId) return;
+                                    const delta = Math.max(0, event.clientY - meta.startY);
+                                    meta.lastDelta = delta;
+                                    setStableOverlayTranslateY(delta);
+                                  }}
+                                  onPointerUp={(event) => {
+                                    const meta = stableOverlayDragMetaRef.current;
+                                    if (meta.pointerId !== event.pointerId) return;
+                                    const delta = meta.lastDelta || 0;
+                                    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+                                    const velocity = delta / duration; // px/ms
+                                    const shouldClose = delta > 140 || velocity > 0.9;
+                                    setStableOverlayDragging(false);
+                                    if (shouldClose) {
+                                      setStableOverlayTranslateY(
+                                        Math.max(delta, typeof window !== "undefined" ? window.innerHeight : 9999),
+                                      );
+                                      window.setTimeout(() => {
+                                        setStableDropdownOpen(false);
+                                      }, 120);
+                                      return;
+                                    }
+                                    setStableOverlayTranslateY(0);
+                                  }}
+                                  onPointerCancel={(event) => {
+                                    const meta = stableOverlayDragMetaRef.current;
+                                    if (meta.pointerId !== event.pointerId) return;
+                                    setStableOverlayDragging(false);
+                                    setStableOverlayTranslateY(0);
+                                  }}
+                                >
+                                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                                </button>
+                              </div>
+
                               <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
                                 <div className="min-w-0">
                                   <div className="text-white font-semibold text-base leading-tight truncate">
@@ -1045,7 +1138,7 @@ export default function WalletDashboardUsdSwapModal({
                                 <button
                                   type="button"
                                   onClick={() => setStableDropdownOpen(false)}
-                                  className="text-white/70 hover:text-white transition-colors text-xl"
+                                  className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
                                   aria-label={t("ui_close", "Fermer")}
                                 >
                                   ✕
