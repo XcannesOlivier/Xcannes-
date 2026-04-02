@@ -126,8 +126,6 @@ export default function WalletDashboardUsdSwapModal({
     [exchange],
   );
 
-  if (!shouldRender) return null;
-
   const resetState = () => {
     setStep("form");
     setSearch("");
@@ -292,6 +290,8 @@ export default function WalletDashboardUsdSwapModal({
     fetchCurrencies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
