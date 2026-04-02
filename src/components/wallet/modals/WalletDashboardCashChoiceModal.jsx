@@ -216,7 +216,7 @@ export default function WalletDashboardCashChoiceModal({
                     <p className="mt-1 text-[11px] md:text-xs text-white/60">
                       {t(
                         "ui_funds_swap_usd_hint",
-                        "Swap externe RLUSD ↔ USDC/USDT (USD).",
+                        "Swap externe RLUSD ↔ stablecoins USD (multi-chain).",
                       )}
                     </p>
                   </div>

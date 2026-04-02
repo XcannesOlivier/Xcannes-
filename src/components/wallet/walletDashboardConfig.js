@@ -97,15 +97,19 @@ export function formatAmountWithSymbol(
   locale,
   amount,
   currencyCode,
-  _options = {},
+  options = {},
 ) {
   const num = Number(amount);
   if (!Number.isFinite(num)) return "-";
-  const minimumFractionDigits = 2;
-  const maximumFractionDigits = 2;
+  const {
+    minimumFractionDigits = 2,
+    maximumFractionDigits = 2,
+    ...rest
+  } = options || {};
   const value = new Intl.NumberFormat(locale || "en", {
     minimumFractionDigits,
     maximumFractionDigits,
+    ...rest,
   }).format(num);
   const symbol = getCurrencySymbol(currencyCode, locale);
   return symbol ? `${value} ${symbol}` : value;
