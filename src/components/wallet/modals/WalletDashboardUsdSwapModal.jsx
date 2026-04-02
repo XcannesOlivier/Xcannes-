@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
@@ -100,8 +100,9 @@ export default function WalletDashboardUsdSwapModal({
   const [currenciesLoading, setCurrenciesLoading] = useState(false);
   const [currenciesError, setCurrenciesError] = useState("");
   const [search, setSearch] = useState("");
-  const [showAllStableOptions, setShowAllStableOptions] = useState(false);
   const [stableKey, setStableKey] = useState("");
+  const [stableDropdownOpen, setStableDropdownOpen] = useState(false);
+  const stableDropdownRef = useRef(null);
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
   const [receiveExtraId, setReceiveExtraId] = useState("");
@@ -202,6 +203,8 @@ export default function WalletDashboardUsdSwapModal({
   const resetState = () => {
     setStep("form");
     setSearch("");
+    setStableDropdownOpen(false);
+    setStableKey("");
     setAmount("");
     setReceiveAddress("");
     setReceiveExtraId("");
@@ -212,7 +215,6 @@ export default function WalletDashboardUsdSwapModal({
     setApiError("");
     setExchange(null);
     setCurrenciesError("");
-    setShowAllStableOptions(false);
   };
 
   useEffect(() => {
@@ -225,6 +227,30 @@ export default function WalletDashboardUsdSwapModal({
     resetState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialDirection]);
+
+  useEffect(() => {
+    if (!stableDropdownOpen) return;
+    const handlePointerDown = (event) => {
+      const el = stableDropdownRef.current;
+      if (!el) {
+        setStableDropdownOpen(false);
+        return;
+      }
+      if (el.contains(event.target)) return;
+      setStableDropdownOpen(false);
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setStableDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [stableDropdownOpen]);
 
   const fetchCurrencies = async () => {
     setCurrenciesLoading(true);
@@ -245,7 +271,7 @@ export default function WalletDashboardUsdSwapModal({
       };
       setRlusdCurrency(nextRlusd);
 
-      // Default "to" selection: prefer USDC, then USDT (prefer ETH if present).
+      // Default stable selection: pick the most-used pairs first (USDT TRON, then USDT/USDC major networks).
       const byTicker = (ticker) =>
         list.filter(
           (c) =>
@@ -258,9 +284,22 @@ export default function WalletDashboardUsdSwapModal({
         return eth || items[0];
       };
 
+      const preferredQuick =
+        QUICK_STABLE_TARGETS.map((target) => list.find((cur) => matchStableTarget(cur, target)))
+          .find(Boolean) || null;
       const preferred =
-        pickPreferred(byTicker("usdc")) || pickPreferred(byTicker("usdt")) || list[0] || null;
-      if (preferred && !stableKey) setStableKey(currencyKey(preferred));
+        preferredQuick ||
+        pickPreferred(byTicker("usdt")) ||
+        pickPreferred(byTicker("usdc")) ||
+        list.find((cur) => currencyKey(cur) !== currencyKey(nextRlusd)) ||
+        null;
+      const preferredKey = preferred ? currencyKey(preferred) : "";
+      if (preferredKey) {
+        setStableKey((prev) => {
+          if (prev && list.some((cur) => currencyKey(cur) === prev)) return prev;
+          return preferredKey;
+        });
+      }
     } catch (error) {
       setCurrenciesError(error?.message || "Impossible de charger les devises SimpleSwap.");
       setCurrencies([]);
@@ -710,115 +749,168 @@ export default function WalletDashboardUsdSwapModal({
                           : t("ui_usd_swap_send_in", "Envoyer (ticker / réseau)")}
                       </label>
 	                      <div className="space-y-2">
-	                        {quickStableOptions.length ? (
-	                          <div className="grid grid-cols-2 gap-2">
-	                            {quickStableOptions.slice(0, 13).map((opt) => {
-	                              const active = opt.key === stableKey;
-	                              return (
-	                                <button
-	                                  key={opt.key}
-	                                  type="button"
-	                                  onClick={() => setStableKey(opt.key)}
-	                                  className={[
-	                                    "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-	                                    active
-	                                      ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-	                                      : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-	                                  ].join(" ")}
-	                                >
-	                                  <div className="flex items-center gap-2">
-	                                    {renderCurrencyIcon(opt.currency)}
-	                                    <div className="min-w-0">
-	                                      <div className="text-sm font-semibold truncate">
-	                                        {opt.label}
-	                                      </div>
-	                                      <div className="mt-0.5 text-[11px] text-white/55 truncate">
-	                                        {String(opt.currency?.name || "").trim() ||
-	                                          currencyLabel(opt.currency)}
-	                                      </div>
-	                                    </div>
-	                                  </div>
-	                                </button>
-	                              );
-	                            })}
-	                          </div>
-	                        ) : null}
-
-                        {!showAllStableOptions ? (
+                        <div className="relative space-y-2" ref={stableDropdownRef}>
                           <button
                             type="button"
-                            onClick={() => setShowAllStableOptions(true)}
-                            className="w-full rounded-xl px-4 py-3 ring-1 ring-white/10 ring-inset bg-white/[0.03] text-white/80 font-semibold hover:bg-white/[0.05] transition-colors"
+                            onClick={() => setStableDropdownOpen((prev) => !prev)}
+                            aria-expanded={stableDropdownOpen}
+                            className="w-full rounded-xl px-4 py-3 ring-1 ring-white/10 ring-inset bg-black/20 text-white/80 hover:bg-black/30 transition-colors text-left"
                           >
-                            {t("ui_see_more", "Voir plus")}
+                            <div className="flex items-center gap-3">
+                              {stableCurrency ? (
+                                renderCurrencyIcon(stableCurrency)
+                              ) : (
+                                <div className="w-6 h-6 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
+                              )}
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-semibold truncate">
+                                  {stableCurrency
+                                    ? `${String(stableCurrency?.ticker || "").toUpperCase()} (${String(
+                                        stableCurrency?.network || "",
+                                      ).toUpperCase()})`
+                                    : t("ui_choose_stable", "Choisir un stablecoin USD")}
+                                </div>
+                                <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                                  {stableCurrency
+                                    ? String(stableCurrency?.name || "").trim() ||
+                                      currencyLabel(stableCurrency)
+                                    : t(
+                                        "ui_choose_stable_hint",
+                                        "Stablecoins USD multi-chain (USDT, USDC…)",
+                                      )}
+                                </div>
+                              </div>
+                              <svg
+                                className={[
+                                  "w-4 h-4 flex-shrink-0 transition-transform",
+                                  stableDropdownOpen ? "rotate-180" : "",
+                                ].join(" ")}
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
                           </button>
-	                        ) : (
-	                          <>
-	                            <input
-	                              value={search}
-	                              onChange={(e) => setSearch(e.target.value)}
-	                              placeholder={t("ui_search", "Rechercher…")}
-	                              className="w-full px-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-	                            />
-	                            <div className="rounded-xl ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden">
-	                              <div className="max-h-64 overflow-y-auto">
-	                                {stableSearchResults.map((cur) => {
-	                                  const key = currencyKey(cur);
-	                                  const active = key === stableKey;
-	                                  return (
-	                                    <button
-	                                      key={key}
-	                                      type="button"
-	                                      onClick={() => {
-	                                        setStableKey(key);
-	                                        setShowAllStableOptions(false);
-	                                      }}
-	                                      className={[
-	                                        "w-full flex items-center gap-3 px-3 py-2 text-left border-b border-white/5 last:border-b-0",
-	                                        active
-	                                          ? "bg-xcannes-green/10 text-white"
-	                                          : "hover:bg-white/[0.04] text-white/80",
-	                                      ].join(" ")}
-	                                    >
-	                                      {renderCurrencyIcon(cur)}
-	                                      <div className="min-w-0 flex-1">
-	                                        <div className="text-sm font-semibold truncate">
-	                                          {String(cur?.ticker || "").toUpperCase()}{" "}
-	                                          <span className="text-white/50 font-normal">
-	                                            ({String(cur?.network || "").toUpperCase()})
-	                                          </span>
-	                                        </div>
-	                                        <div className="text-[11px] text-white/55 truncate">
-	                                          {String(cur?.name || "").trim() || currencyLabel(cur)}
-	                                        </div>
-	                                      </div>
-	                                      {active ? (
-	                                        <span className="text-xcannes-green font-semibold text-xs">
-	                                          ✓
-	                                        </span>
-	                                      ) : null}
-	                                    </button>
-	                                  );
-	                                })}
-	                              </div>
-	                              <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
-	                                {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
-	                                  ? t(
-	                                      "ui_search_limit",
-	                                      `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
-	                                    )
-	                                  : t("ui_search_results", "Sélectionnez un actif.")}
-	                              </div>
-	                            </div>
-	                            <button
-	                              type="button"
-	                              onClick={() => setShowAllStableOptions(false)}
-	                              className="w-full rounded-xl px-4 py-3 ring-1 ring-white/10 ring-inset bg-black/20 text-white/70 font-semibold hover:bg-black/30 hover:text-white transition-colors"
-                            >
-                              {t("ui_hide", "Masquer")}
-                            </button>
-                          </>
-                        )}
+
+                          {stableDropdownOpen ? (
+                            <div className="absolute left-0 right-0 mt-2 rounded-xl ring-1 ring-white/10 ring-inset bg-black/30 backdrop-blur-md overflow-hidden z-20">
+                              <div className="p-3 border-b border-white/10 bg-black/20">
+                                <input
+                                  value={search}
+                                  onChange={(e) => setSearch(e.target.value)}
+                                  placeholder={t("ui_search", "Rechercher…")}
+                                  autoFocus
+                                  className="w-full px-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+                                />
+                              </div>
+
+                              {quickStableOptions.length ? (
+                                <div className="px-3 py-3 border-b border-white/10">
+                                  <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+                                    {t("ui_popular", "Populaires")}
+                                  </div>
+                                  <div className="mt-2 grid grid-cols-2 gap-2">
+                                    {quickStableOptions.slice(0, 13).map((opt) => {
+                                      const active = opt.key === stableKey;
+                                      return (
+                                        <button
+                                          key={opt.key}
+                                          type="button"
+                                          onClick={() => {
+                                            setStableKey(opt.key);
+                                            setStableDropdownOpen(false);
+                                            setSearch("");
+                                          }}
+                                          className={[
+                                            "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+                                            active
+                                              ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+                                              : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+                                          ].join(" ")}
+                                        >
+                                          <div className="flex items-center gap-2">
+                                            {renderCurrencyIcon(opt.currency)}
+                                            <div className="min-w-0">
+                                              <div className="text-sm font-semibold truncate">
+                                                {opt.label}
+                                              </div>
+                                              <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                                                {String(opt.currency?.name || "").trim() ||
+                                                  currencyLabel(opt.currency)}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              <div className="max-h-64 overflow-y-auto">
+                                {stableSearchResults.length ? (
+                                  stableSearchResults.map((cur) => {
+                                    const key = currencyKey(cur);
+                                    const active = key === stableKey;
+                                    return (
+                                      <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => {
+                                          setStableKey(key);
+                                          setStableDropdownOpen(false);
+                                          setSearch("");
+                                        }}
+                                        className={[
+                                          "w-full flex items-center gap-3 px-3 py-2 text-left border-b border-white/5 last:border-b-0",
+                                          active
+                                            ? "bg-xcannes-green/10 text-white"
+                                            : "hover:bg-white/[0.04] text-white/80",
+                                        ].join(" ")}
+                                      >
+                                        {renderCurrencyIcon(cur)}
+                                        <div className="min-w-0 flex-1">
+                                          <div className="text-sm font-semibold truncate">
+                                            {String(cur?.ticker || "").toUpperCase()}{" "}
+                                            <span className="text-white/50 font-normal">
+                                              ({String(cur?.network || "").toUpperCase()})
+                                            </span>
+                                          </div>
+                                          <div className="text-[11px] text-white/55 truncate">
+                                            {String(cur?.name || "").trim() || currencyLabel(cur)}
+                                          </div>
+                                        </div>
+                                        {active ? (
+                                          <span className="text-xcannes-green font-semibold text-xs">
+                                            ✓
+                                          </span>
+                                        ) : null}
+                                      </button>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="px-4 py-6 text-sm text-white/60">
+                                    {t("ui_no_results", "Aucun résultat.")}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+                                {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
+                                  ? t(
+                                      "ui_search_limit",
+                                      `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
+                                    )
+                                  : t("ui_search_results", "Sélectionnez un actif.")}
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
                         {toCurrency?.hasExtraId ? (
                           <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
                             {t(
