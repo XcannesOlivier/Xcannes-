@@ -486,7 +486,8 @@ export default function WalletDashboardSwapModal({
                         "Search all currencies...",
                       )}
                       excludeCodes={["USD", "RLUSD", "XRP"]}
-                      showQuickAdd={true}
+                      showQuickAdd={false}
+                      fullscreen={true}
                       buttonClassName="w-full bg-white/3 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:ring-white/20 transition-colors duration-150"
                     />
                   </div>

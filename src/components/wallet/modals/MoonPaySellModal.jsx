@@ -526,25 +526,6 @@ const MoonPaySellModal = ({
     });
   }, [cryptoSearch, supportedCurrencies]);
 
-  const popularSellCurrencies = useMemo(() => {
-    const byCode = new Map(
-      supportedCurrencies.map((c) => [String(c?.code || "").toUpperCase(), c]),
-    );
-    const preferred = ["RLUSD", "XRP", "USDC", "USDT"];
-    const picks = [];
-    preferred.forEach((code) => {
-      const hit = byCode.get(code);
-      if (hit) picks.push(hit);
-    });
-    for (const item of supportedCurrencies) {
-      if (picks.length >= 4) break;
-      if (!item?.code) continue;
-      if (picks.some((p) => p.code === item.code)) continue;
-      picks.push(item);
-    }
-    return picks.slice(0, 4);
-  }, [supportedCurrencies]);
-
   useEffect(() => {
     if (!cryptoDropdownOpen) return;
     const prevOverflow = document?.body?.style?.overflow;
@@ -1255,11 +1236,11 @@ const MoonPaySellModal = ({
                           </button>
                         </div>
 
-                        <div className="px-4 pb-4">
-                          <div className="relative">
-                            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
-                              <svg
-                                viewBox="0 0 20 20"
+                          <div className="px-4 pb-4">
+                            <div className="relative">
+                              <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+                                <svg
+                                  viewBox="0 0 20 20"
                                 fill="currentColor"
                                 className="w-4 h-4"
                                 aria-hidden
@@ -1278,55 +1259,6 @@ const MoonPaySellModal = ({
                               className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
                             />
                           </div>
-
-                          {!String(cryptoSearch || "").trim() && popularSellCurrencies.length ? (
-                            <div className="mt-3">
-                              <div className="text-[10px] tracking-[0.22em] uppercase text-white/45 px-1">
-                                {t("ui_popular", "Populaires")}
-                              </div>
-                              <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                {popularSellCurrencies.slice(0, 4).map((opt) => {
-                                  const active =
-                                    String(opt?.code || "").toUpperCase() ===
-                                    String(currency || "").toUpperCase();
-                                  return (
-                                    <button
-                                      key={String(opt.code)}
-                                      type="button"
-                                      onClick={() => {
-                                        setCurrency(String(opt.code || "").toUpperCase());
-                                        setCryptoDropdownOpen(false);
-                                        setCryptoSearch("");
-                                      }}
-                                      className={[
-                                        "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-                                        active
-                                          ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                                          : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-                                      ].join(" ")}
-                                    >
-                                      <div className="flex items-center gap-2">
-                                        {renderSelectIcon(opt.icon)}
-                                        <div className="min-w-0 flex-1">
-                                          <div className="text-sm font-semibold truncate">
-                                            {opt.labelMobile ||
-                                              opt.labelLeft ||
-                                              opt.label ||
-                                              opt.code}
-                                          </div>
-                                        </div>
-                                        {active ? (
-                                          <span className="text-xcannes-green font-semibold text-xs">
-                                            ✓
-                                          </span>
-                                        ) : null}
-                                      </div>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ) : null}
                         </div>
                       </div>
 
