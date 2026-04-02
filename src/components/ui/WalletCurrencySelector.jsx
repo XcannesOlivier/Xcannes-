@@ -61,10 +61,11 @@ export default function WalletCurrencySelector({
   const [open, setOpen] = useState(false);
   const popupRef = useRef(null);
   const triggerRef = useRef(null);
+  const fullscreenBackdropRef = useRef(null);
   const fullscreenOverlayRef = useRef(null);
   const fullscreenListRef = useRef(null);
-  const [overlayDragging, setOverlayDragging] = useState(false);
-  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const overlayTranslateYRef = useRef(0);
+  const overlayRafRef = useRef(0);
   const overlayDragMetaRef = useRef({
     startY: 0,
     startAt: 0,
@@ -76,6 +77,41 @@ export default function WalletCurrencySelector({
     scrollLocked: false,
     lockedOverflowY: "",
   });
+
+  const applyOverlayTranslateY = (nextY, { animate } = { animate: false }) => {
+    overlayTranslateYRef.current = nextY;
+    const overlayEl = fullscreenOverlayRef.current;
+    const backdropEl = fullscreenBackdropRef.current;
+    const clampedY = Math.max(0, Number(nextY) || 0);
+
+    if (overlayEl) {
+      overlayEl.style.transform = `translate3d(0, ${clampedY}px, 0)`;
+      overlayEl.style.transition = animate
+        ? "transform 220ms cubic-bezier(0.2,0,0,1)"
+        : "none";
+    }
+
+    if (backdropEl) {
+      const opacity = Math.max(0, Math.min(1, 1 - clampedY / 420));
+      backdropEl.style.opacity = String(opacity);
+      backdropEl.style.transition = animate ? "opacity 220ms ease" : "none";
+    }
+  };
+
+  const scheduleOverlayTranslateY = (nextY) => {
+    overlayTranslateYRef.current = nextY;
+    if (overlayRafRef.current) return;
+    overlayRafRef.current = window.requestAnimationFrame(() => {
+      overlayRafRef.current = 0;
+      const overlayEl = fullscreenOverlayRef.current;
+      const backdropEl = fullscreenBackdropRef.current;
+      const clampedY = Math.max(0, Number(overlayTranslateYRef.current) || 0);
+      if (overlayEl) overlayEl.style.transform = `translate3d(0, ${clampedY}px, 0)`;
+      if (backdropEl) {
+        backdropEl.style.opacity = String(Math.max(0, Math.min(1, 1 - clampedY / 420)));
+      }
+    });
+  };
 
   const excludedSet = useMemo(() => {
     return new Set((excludeCodes || []).map(normalizeCode).filter(Boolean));
@@ -126,6 +162,16 @@ export default function WalletCurrencySelector({
   useEffect(() => {
     if (!open) return;
     if (!fullscreen) return;
+    try {
+      applyOverlayTranslateY(0, { animate: false });
+      // Ensure any pending rAF from a previous open doesn't apply stale values.
+      if (overlayRafRef.current) {
+        window.cancelAnimationFrame(overlayRafRef.current);
+        overlayRafRef.current = 0;
+      }
+    } catch {
+      // ignore
+    }
     const prevOverflow = document?.body?.style?.overflow;
     try {
       if (typeof document !== "undefined") document.body.style.overflow = "hidden";
@@ -157,8 +203,14 @@ export default function WalletCurrencySelector({
     } catch {
       // ignore
     }
-    setOverlayDragging(false);
-    setOverlayTranslateY(0);
+    try {
+      if (overlayRafRef.current) {
+        window.cancelAnimationFrame(overlayRafRef.current);
+        overlayRafRef.current = 0;
+      }
+    } catch {
+      // ignore
+    }
     overlayDragMetaRef.current = {
       startY: 0,
       startAt: 0,
@@ -243,11 +295,11 @@ export default function WalletCurrencySelector({
       }
 
       meta.dragging = true;
-      setOverlayDragging(true);
+      applyOverlayTranslateY(overlayTranslateYRef.current, { animate: false });
     }
 
     meta.lastDelta = delta;
-    setOverlayTranslateY(delta);
+    scheduleOverlayTranslateY(delta);
   };
 
   const handleOverlayPointerEnd = (event) => {
@@ -261,19 +313,18 @@ export default function WalletCurrencySelector({
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
-    setOverlayDragging(false);
     releaseOverlayScrollLock();
 
     if (shouldClose) {
       const height = typeof window !== "undefined" ? window.innerHeight : 9999;
-      setOverlayTranslateY(Math.max(delta, height));
+      applyOverlayTranslateY(Math.max(delta, height), { animate: true });
       window.setTimeout(() => {
         setOpen(false);
       }, 180);
       return;
     }
 
-    setOverlayTranslateY(0);
+    applyOverlayTranslateY(0, { animate: true });
     overlayDragMetaRef.current = {
       startY: 0,
       startAt: 0,
@@ -470,10 +521,8 @@ export default function WalletCurrencySelector({
             <div className="fixed inset-0 z-[10020]">
               <div
                 className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+                ref={fullscreenBackdropRef}
                 onClick={() => setOpen(false)}
-                style={{
-                  opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)),
-                }}
               />
               <div
                 ref={fullscreenOverlayRef}
@@ -484,18 +533,12 @@ export default function WalletCurrencySelector({
                   "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
                   "will-change-transform",
                 ].join(" ")}
-                style={{
-                  transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-                  transition: overlayDragging
-                    ? "none"
-                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
-                }}
                 onPointerMove={handleOverlayPointerMove}
                 onPointerUp={handleOverlayPointerEnd}
                 onPointerCancel={handleOverlayPointerEnd}
               >
                 <div
-                  className="border-b border-white/10"
+                  className="border-b border-white/10 touch-none"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "fixed");
                   }}
@@ -555,7 +598,7 @@ export default function WalletCurrencySelector({
 
                 <div
                   ref={fullscreenListRef}
-                  className="flex-1 min-h-0 overflow-y-auto"
+                  className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y"
                   onPointerDown={(event) => {
                     maybeStartOverlayDrag(event, "list");
                   }}
