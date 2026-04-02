@@ -9,7 +9,8 @@ export default function WalletDashboardCashChoiceModal({
   onClose,
   onChooseBuy,
   onChooseSell,
-  onChooseUsdSwap,
+  onChooseUsdSwapOut,
+  onChooseUsdSwapIn,
   noticeVariant = "preview",
   inline = false,
 }) {
@@ -176,7 +177,7 @@ export default function WalletDashboardCashChoiceModal({
 
               <button
                 type="button"
-                onClick={onChooseUsdSwap}
+                onClick={onChooseUsdSwapOut}
                 className="w-full text-left rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
               >
                 <div className="flex items-start gap-3">
@@ -201,7 +202,7 @@ export default function WalletDashboardCashChoiceModal({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
-                        {t("ui_funds_swap_usd_title", "Échanger RLUSD")}
+                        {t("ui_funds_swap_out_title", "RLUSD (XRPL) → stablecoin USD")}
                       </p>
                       <svg className="w-5 h-5 text-white/50" viewBox="0 0 24 24" fill="none">
                         <path
@@ -215,8 +216,57 @@ export default function WalletDashboardCashChoiceModal({
                     </div>
                     <p className="mt-1 text-[11px] md:text-xs text-white/60">
                       {t(
-                        "ui_funds_swap_usd_hint",
-                        "Swap externe RLUSD ↔ stablecoins USD (multi-chain).",
+                        "ui_funds_swap_out_hint",
+                        "Recevoir USDC/USDT (multi-chain) sur une autre adresse.",
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={onChooseUsdSwapIn}
+                className="w-full text-left rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                    <svg className="w-5 h-5 text-white/80" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M7 7H21M21 7V21M21 7L14 14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M17 17H3M3 17V3M3 17L10 10"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                        {t("ui_funds_swap_in_title", "Stablecoin USD → RLUSD (XRPL)")}
+                      </p>
+                      <svg className="w-5 h-5 text-white/50" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M9 18L15 12L9 6"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                      {t(
+                        "ui_funds_swap_in_hint",
+                        "Envoyer depuis un wallet externe et recevoir sur votre adresse XRPL.",
                       )}
                     </p>
                   </div>

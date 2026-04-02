@@ -44,6 +44,7 @@ export default function WalletDashboardUsdSwapModal({
   onClose,
   walletLabel = "",
   walletAddress = "",
+  initialDirection = SWAP_DIRECTIONS.RLUSD_TO_STABLE,
   noticeVariant = "preview",
   inline = false,
 }) {
@@ -153,6 +154,17 @@ export default function WalletDashboardUsdSwapModal({
     setExchange(null);
     setCurrenciesError("");
   };
+
+  useEffect(() => {
+    if (!open) return;
+    const allowed = Object.values(SWAP_DIRECTIONS);
+    const nextDirection = allowed.includes(initialDirection)
+      ? initialDirection
+      : SWAP_DIRECTIONS.RLUSD_TO_STABLE;
+    setDirection(nextDirection);
+    resetState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialDirection]);
 
   const fetchCurrencies = async () => {
     setCurrenciesLoading(true);

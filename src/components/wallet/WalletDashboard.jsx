@@ -152,6 +152,7 @@ export default function WalletDashboard({
 
   // ── UI state (needs to exist before callbacks deps) ───────
   const [activeAction, setActiveAction] = useState(null);
+  const [cashUsdSwapPreset, setCashUsdSwapPreset] = useState("rlusd_to_stable");
 
   const handleTxProgressClose = useCallback(() => {
     let shouldCloseAction = false;
@@ -821,12 +822,13 @@ export default function WalletDashboard({
   });
 
   // ── Modal props (shared desktop & mobile) ──────────────────
-  const modalProps = useWalletModalProps({
-    wallet,
-    isConnected,
-    isWalletActivated,
-    hasOnChainRlusd,
-    walletLabel,
+  const modalProps = {
+    ...useWalletModalProps({
+      wallet,
+      isConnected,
+      isWalletActivated,
+      hasOnChainRlusd,
+      walletLabel,
     walletHasCustomLabel,
     renderWalletMeta,
     signTransaction: signTransactionWithProgress,
@@ -879,10 +881,13 @@ export default function WalletDashboard({
     setSelectedStatementToken,
     statementBalance,
     toast,
-    // Spread sub-orchestrator state (keys match useWalletModalProps params)
-    ...sendState,
-    ...swapState,
-  });
+      // Spread sub-orchestrator state (keys match useWalletModalProps params)
+      ...sendState,
+      ...swapState,
+    }),
+    cashUsdSwapPreset,
+    setCashUsdSwapPreset,
+  };
 
   // ── Body scroll lock ───────────────────────────────────────
   const allowBackgroundScrollForStatements =
