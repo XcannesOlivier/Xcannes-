@@ -4,6 +4,13 @@ import { simpleSwapRequest } from "@/lib/simpleswapServer";
  * POST /api/simpleswap/create-exchange
  * Proxifie POST https://api.simpleswap.io/v3/exchanges
  */
+
+const SIMPLESWAP_TAG_RLUSD_RAW = process.env.SIMPLESWAP_TAG_RLUSD;
+const SIMPLESWAP_TAG_RLUSD_PARSED = Number.parseInt(SIMPLESWAP_TAG_RLUSD_RAW, 10);
+const SIMPLESWAP_TAG_RLUSD = Number.isFinite(SIMPLESWAP_TAG_RLUSD_PARSED)
+  ? SIMPLESWAP_TAG_RLUSD_PARSED
+  : 591;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -40,6 +47,14 @@ export default async function handler(req, res) {
   }
 
   try {
+    const normalizedTickerTo = String(tickerTo || "").trim().toLowerCase();
+    const normalizedNetworkTo = String(networkTo || "").trim().toLowerCase();
+    const normalizedExtraIdTo = String(extraIdTo || "").trim();
+    const resolvedExtraIdTo =
+      normalizedTickerTo === "rlusd" && normalizedNetworkTo === "xrpl"
+        ? String(SIMPLESWAP_TAG_RLUSD)
+        : normalizedExtraIdTo;
+
     const data = await simpleSwapRequest("/exchanges", {
       method: "POST",
       body: {
@@ -51,7 +66,7 @@ export default async function handler(req, res) {
         networkTo: String(networkTo),
         reverse: Boolean(reverse),
         addressTo: String(addressTo),
-        extraIdTo: String(extraIdTo || ""),
+        extraIdTo: String(resolvedExtraIdTo || ""),
         userRefundAddress: String(userRefundAddress || ""),
         userRefundExtraId: String(userRefundExtraId || ""),
         rateId,
@@ -68,4 +83,3 @@ export default async function handler(req, res) {
     });
   }
 }
-

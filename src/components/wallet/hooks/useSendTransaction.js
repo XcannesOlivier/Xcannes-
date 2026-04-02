@@ -1,6 +1,7 @@
 import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
 import {
   buildMoonpayMemo,
+  buildSimpleSwapMemo,
   buildPayreqMemo,
   buildAddressBookMemo,
   buildXrplJsonMemo,
@@ -17,9 +18,68 @@ const MOONPAY_SELL_WALLETS = new Set(
     .filter(Boolean),
 );
 
+const SIMPLESWAP_DEPOSITS_STORAGE_KEY = "xcannes_simpleswap_deposits_v1";
+
+const readSimpleSwapDeposits = () => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.sessionStorage?.getItem(SIMPLESWAP_DEPOSITS_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeSimpleSwapDeposits = (list) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage?.setItem(
+      SIMPLESWAP_DEPOSITS_STORAGE_KEY,
+      JSON.stringify(Array.isArray(list) ? list : []),
+    );
+  } catch {
+    // ignore
+  }
+};
+
+const consumeSimpleSwapDeposit = (depositAddress) => {
+  const addr = String(depositAddress || "").trim();
+  if (!addr) return;
+  const prev = readSimpleSwapDeposits();
+  const next = prev.filter(
+    (item) => String(item?.depositAddress || "").trim() !== addr,
+  );
+  if (next.length !== prev.length) writeSimpleSwapDeposits(next);
+};
+
 const isMoonpaySellDestination = (address) => {
   const dest = String(address || "").trim();
   return dest && MOONPAY_SELL_WALLETS.has(dest);
+};
+
+const buildSimpleSwapOutMemos = (
+  destination,
+  { amountRlusd, targetCurrencyCode = "USD" } = {},
+) => {
+  const dest = String(destination || "").trim();
+  if (!dest) return null;
+  const deposits = readSimpleSwapDeposits();
+  const hit = deposits.find(
+    (item) => String(item?.depositAddress || "").trim() === dest,
+  );
+  if (!hit) return null;
+
+  const payload = buildSimpleSwapMemo({
+    side: "out",
+    provider: "simpleswap",
+    exchangeId: hit?.exchangeId || null,
+    targetCurrencyCode,
+    amountRlusd: Number.isFinite(Number(amountRlusd)) ? Number(amountRlusd) : null,
+  });
+  if (!payload) return null;
+  return buildXrplJsonMemo(payload);
 };
 
 const buildMoonpaySellMemos = (
@@ -358,6 +418,12 @@ export function useSendTransaction({
         sourceAmount: moonpaySellRequest?.sourceAmount ?? amountNum,
       }, { force: isMoonpaySell }),
     );
+    const simpleSwapMemo = buildSimpleSwapOutMemos(dest, {
+      amountRlusd: paymentRlusd,
+      targetCurrencyCode: "USD",
+    });
+    const usedSimpleSwap = Boolean(simpleSwapMemo);
+    appendMemos(payTx, simpleSwapMemo);
     appendMemos(
       payTx,
       buildAddressBookMemos(normalizedSaveDestination, saveLabel),
@@ -388,6 +454,10 @@ export function useSendTransaction({
           : "",
       },
     });
+
+    if (usedSimpleSwap) {
+      consumeSimpleSwapDeposit(dest);
+    }
     if (payResult?.signed) {
       toast.success("✅ Payment submitted.");
       handleAddressSave(dest);
@@ -519,6 +589,15 @@ export function useSendTransaction({
         sourceAmount: moonpaySellRequest?.sourceAmount ?? amountNum,
       }, { force: isMoonpaySell }),
     );
+    const directSimpleSwapMemo =
+      currency === "RLUSD" || currency === "USD"
+        ? buildSimpleSwapOutMemos(dest, {
+            amountRlusd: amountNum,
+            targetCurrencyCode: "USD",
+          })
+        : null;
+    const usedDirectSimpleSwap = Boolean(directSimpleSwapMemo);
+    appendMemos(txjson, directSimpleSwapMemo);
     appendMemos(
       txjson,
       buildAddressBookMemos(normalizedSaveDestination, saveLabel),
@@ -570,6 +649,9 @@ export function useSendTransaction({
       },
     });
     if (result && result.signed) {
+      if (usedDirectSimpleSwap) {
+        consumeSimpleSwapDeposit(dest);
+      }
       toast.success("✅ Payment submitted.");
       handleAddressSave(dest);
 

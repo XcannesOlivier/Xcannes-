@@ -12,6 +12,7 @@ import {
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
+  buildSimpleSwapMemo,
   buildReconcileMemo,
 } from "./xcannesMemoSchemas";
 
@@ -137,5 +138,6 @@ export {
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
+  buildSimpleSwapMemo,
   buildReconcileMemo,
 };

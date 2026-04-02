@@ -13,11 +13,11 @@ const XCANNES_MEMO_FORMAT_ZLIB = 'application/x-xcannes-zlib';
 const MEMO_FORMAT_VERSION = 2;
 
 // Valid memo types
-const VALID_MEMO_TYPES = new Set(['wallet_label', 'conversion', 'payreq', 'moonpay', 'reconcile', 'address_book']);
+const VALID_MEMO_TYPES = new Set(['wallet_label', 'conversion', 'payreq', 'moonpay', 'simpleswap', 'reconcile', 'address_book']);
 
 // Short marker ↔ long type
-const V2_TYPE_SHORT_TO_LONG = { wl: 'wallet_label', cv: 'conversion', pr: 'payreq', mp: 'moonpay', rc: 'reconcile', ab: 'address_book' };
-const V2_TYPE_LONG_TO_SHORT = { wallet_label: 'wl', conversion: 'cv', payreq: 'pr', moonpay: 'mp', reconcile: 'rc', address_book: 'ab' };
+const V2_TYPE_SHORT_TO_LONG = { wl: 'wallet_label', cv: 'conversion', pr: 'payreq', mp: 'moonpay', ss: 'simpleswap', rc: 'reconcile', ab: 'address_book' };
+const V2_TYPE_LONG_TO_SHORT = { wallet_label: 'wl', conversion: 'cv', payreq: 'pr', moonpay: 'mp', simpleswap: 'ss', reconcile: 'rc', address_book: 'ab' };
 
 // Short origin ↔ long origin (payreq)
 const V2_ORIGIN_SHORT_TO_LONG = { p: 'payreq', m: 'manual', s: 'spread' };
@@ -27,9 +27,14 @@ const V2_ORIGIN_LONG_TO_SHORT = { payreq: 'p', manual: 'm', spread: 's' };
 const V2_SIDE_SHORT_TO_LONG = { b: 'buy', s: 'sell' };
 const V2_SIDE_LONG_TO_SHORT = { buy: 'b', sell: 's' };
 
+// Short side ↔ long side (simpleswap)
+const V2_SIMPLESWAP_SIDE_SHORT_TO_LONG = { i: 'in', o: 'out' };
+const V2_SIMPLESWAP_SIDE_LONG_TO_SHORT = { in: 'i', out: 'o' };
+
 // "spread" origin = conversion fee transaction.
 const VALID_ORIGINS = new Set(['payreq', 'manual', 'spread']);
 const VALID_MOONPAY_SIDES = new Set(['sell', 'buy']);
+const VALID_SIMPLESWAP_SIDES = new Set(['in', 'out']);
 const ADDRESS_LABEL_MAX_LENGTH = 40;
 // Maximum JSON byte length for memo payload (XRPL practical limit ~1 KB).
 const MEMO_MAX_JSON_BYTES = 900;
@@ -208,6 +213,21 @@ function expandV2Moonpay(p) {
   };
 }
 
+function expandV2SimpleSwap(p) {
+  let side = p.sd ?? p.side ?? null;
+  if (side && V2_SIMPLESWAP_SIDE_SHORT_TO_LONG[side]) {
+    side = V2_SIMPLESWAP_SIDE_SHORT_TO_LONG[side];
+  }
+
+  return {
+    side,
+    provider: p.provider ?? 'simpleswap',
+    exchangeId: p.id ?? p.exchangeId ?? null,
+    targetCurrencyCode: p.tc ?? p.targetCurrencyCode ?? null,
+    amountRlusd: p.r ?? p.amountRlusd,
+  };
+}
+
 function expandV2Reconcile(p) {
   let operations = p.operations ?? null;
   const ops = p.ops;
@@ -251,6 +271,7 @@ function expandV2Payload(payload, type) {
     conversion: expandV2Conversion,
     payreq: expandV2Payreq,
     moonpay: expandV2Moonpay,
+    simpleswap: expandV2SimpleSwap,
     reconcile: expandV2Reconcile,
     address_book: expandV2AddressBook,
   };
@@ -425,6 +446,27 @@ function normalizeMoonpayPayload(payload, errors) {
   return normalized;
 }
 
+function normalizeSimpleSwapPayload(payload, errors) {
+  const sideRaw = normalizeString(payload?.side);
+  const side = sideRaw ? sideRaw.toLowerCase() : null;
+  if (!side || !VALID_SIMPLESWAP_SIDES.has(side)) errors.push('simpleswap.side');
+
+  const providerRaw = normalizeString(payload?.provider ?? 'simpleswap');
+  const provider = providerRaw ? providerRaw.toLowerCase() : null;
+  if (!provider) errors.push('simpleswap.provider');
+
+  const amountRlusdRes = parseRequiredNumber(payload?.amountRlusd, { min: 0, minExclusive: true });
+  if (!amountRlusdRes.ok) errors.push('simpleswap.amountRlusd');
+
+  const exchangeId = normalizeString(payload?.exchangeId || payload?.id);
+  const targetCurrencyCode = normalizeCurrencyCode(payload?.targetCurrencyCode || payload?.target);
+
+  const normalized = { side, provider, amountRlusd: amountRlusdRes.value };
+  if (exchangeId) normalized.exchangeId = exchangeId;
+  if (targetCurrencyCode) normalized.targetCurrencyCode = targetCurrencyCode;
+  return normalized;
+}
+
 function normalizeReconcilePayload(payload, errors) {
   const deficitRes = parseRequiredNumber(payload?.deficit, { min: 0, minExclusive: true });
   if (!deficitRes.ok) errors.push('reconcile.deficit');
@@ -508,6 +550,8 @@ function validateXcannesMemoPayload(payload, options = {}) {
     normalizedBody = normalizePayreqPayload(expanded, errors, { requireOrigin: mode === 'create' });
   } else if (inferredType === 'moonpay') {
     normalizedBody = normalizeMoonpayPayload(expanded, errors);
+  } else if (inferredType === 'simpleswap') {
+    normalizedBody = normalizeSimpleSwapPayload(expanded, errors);
   } else if (inferredType === 'reconcile') {
     normalizedBody = normalizeReconcilePayload(expanded, errors);
   }
@@ -578,6 +622,11 @@ function toV2Compact(type, body) {
     if (body.amountRlusd != null) compact.r = body.amountRlusd;
     if (body.sourceCurrencyCode) compact.sc = body.sourceCurrencyCode;
     if (body.sourceAmount != null) compact.sa = body.sourceAmount;
+  } else if (type === 'simpleswap') {
+    compact.sd = V2_SIMPLESWAP_SIDE_LONG_TO_SHORT[body.side] || body.side;
+    if (body.exchangeId) compact.id = body.exchangeId;
+    if (body.targetCurrencyCode) compact.tc = body.targetCurrencyCode;
+    if (body.amountRlusd != null) compact.r = body.amountRlusd;
   } else if (type === 'reconcile') {
     compact.d = body.deficit;
     if (body.operations && body.operations.length > 0) {
@@ -646,6 +695,10 @@ function buildMoonpayMemo(data) {
   return createXcannesMemoPayload('moonpay', data);
 }
 
+function buildSimpleSwapMemo(data) {
+  return createXcannesMemoPayload('simpleswap', data);
+}
+
 function buildReconcileMemo(data) {
   return createXcannesMemoPayload('reconcile', data);
 }
@@ -661,5 +714,6 @@ export {
   buildConversionMemo,
   buildPayreqMemo,
   buildMoonpayMemo,
+  buildSimpleSwapMemo,
   buildReconcileMemo,
 };

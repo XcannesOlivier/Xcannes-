@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { greenActionBtnBase } from "./walletModalTokens";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
@@ -31,6 +31,8 @@ const QUICK_STABLE_TARGETS = [
   { ticker: "pyusd", networkAliases: ["eth", "ethereum", "erc20"], label: "PYUSD (ETH)" },
 ];
 const POPULAR_STABLE_TARGETS = QUICK_STABLE_TARGETS.slice(0, 4);
+const SIMPLESWAP_DEPOSITS_STORAGE_KEY = "xcannes_simpleswap_deposits_v1";
+const SIMPLESWAP_DEPOSITS_MAX = 10;
 
 function pick(obj, keys, fallback = "") {
   for (const key of keys) {
@@ -80,6 +82,16 @@ function renderCurrencyIcon(currency) {
   );
 }
 
+function safeReadJsonArray(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function WalletDashboardUsdSwapModal({
   open,
   onClose,
@@ -95,7 +107,7 @@ export default function WalletDashboardUsdSwapModal({
     enabled: shouldAnimate,
   });
 
-  const [step, setStep] = useState("form"); // form | confirm | pending | instructions
+  const [step, setStep] = useState("form"); // form | address | pending | deposit
   const [direction, setDirection] = useState(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
   const [rlusdCurrency, setRlusdCurrency] = useState(DEFAULT_RLUSD);
   const [currencies, setCurrencies] = useState([]);
@@ -122,14 +134,15 @@ export default function WalletDashboardUsdSwapModal({
   });
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
-  const [receiveExtraId, setReceiveExtraId] = useState("");
   const [refundAddress, setRefundAddress] = useState("");
   const [refundExtraId, setRefundExtraId] = useState("");
+  const [refundDetailsOpen, setRefundDetailsOpen] = useState(false);
   const [quote, setQuote] = useState(null);
   const [ranges, setRanges] = useState(null);
   const [apiError, setApiError] = useState("");
   const [exchange, setExchange] = useState(null);
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
+  const estimateAbortRef = useRef(null);
 
   const parsedAmount = useMemo(
     () => Number(String(amount || "").trim().replace(",", ".")),
@@ -174,11 +187,20 @@ export default function WalletDashboardUsdSwapModal({
     direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? rlusdCurrency : stableCurrency;
   const toCurrency =
     direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? stableCurrency : rlusdCurrency;
+  const fromCurrencyKey = currencyKey(fromCurrency);
+  const toCurrencyKey = currencyKey(toCurrency);
   const toLabel = toCurrency ? currencyLabel(toCurrency) : "";
   const fromTicker = String(fromCurrency?.ticker || "").trim().toUpperCase();
   const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
   const toTicker = String(toCurrency?.ticker || "").trim().toUpperCase();
   const toNetwork = String(toCurrency?.network || "").trim().toUpperCase();
+  const totalSteps = 3;
+  const currentStepIndex =
+    step === "form"
+      ? 1
+      : step === "address"
+        ? 2
+        : totalSteps;
 
   const quotedReceiveAmount = useMemo(() => {
     const raw = pick(quote, ["amount", "estimatedAmount", "estimate", "amountTo", "amount_to"], "");
@@ -193,6 +215,16 @@ export default function WalletDashboardUsdSwapModal({
     setRanges(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [direction, stableKey, amount]);
+
+  useEffect(() => {
+    if (!stableDropdownOpen) return;
+    // Prevent iOS keyboard from opening when the dropdown appears.
+    try {
+      document?.activeElement?.blur?.();
+    } catch {
+      // ignore
+    }
+  }, [stableDropdownOpen]);
 
   const filteredStableOptions = useMemo(() => {
     const needle = String(search || "").trim().toLowerCase();
@@ -256,6 +288,9 @@ export default function WalletDashboardUsdSwapModal({
     () => pick(exchange, ["amountFrom", "amount_from", "amount", "amountSend"], ""),
     [exchange],
   );
+  const receiveAmountExact = useMemo(() => {
+    return pick(exchange, ["amountTo", "amount_to", "amountReceive", "amount_received"], "");
+  }, [exchange]);
   const status = useMemo(
     () => pick(exchange, ["status", "state"], ""),
     [exchange],
@@ -268,9 +303,9 @@ export default function WalletDashboardUsdSwapModal({
     setStableKey("");
     setAmount("");
     setReceiveAddress("");
-    setReceiveExtraId("");
     setRefundAddress("");
     setRefundExtraId("");
+    setRefundDetailsOpen(false);
     setQuote(null);
     setRanges(null);
     setApiError("");
@@ -526,52 +561,82 @@ export default function WalletDashboardUsdSwapModal({
     }
   };
 
-  const fetchQuoteAndRanges = async () => {
-    if (!fromCurrency || !toCurrency || !hasValidAmount) return;
+  const fetchRanges = async () => {
+    if (!fromCurrency || !toCurrency) return;
     setApiError("");
-    setQuote(null);
     setRanges(null);
-
-    const params = new URLSearchParams({
-      fixed: "false",
-      reverse: "false",
-      tickerFrom: String(fromCurrency.ticker || ""),
-      networkFrom: String(fromCurrency.network || ""),
-      tickerTo: String(toCurrency.ticker || ""),
-      networkTo: String(toCurrency.network || ""),
-      amount: String(parsedAmount),
-    });
-
     try {
-      const [estimateRes, rangesRes] = await Promise.allSettled([
-        fetch(`/api/simpleswap/estimates?${params.toString()}`),
-        fetch(
-          `/api/simpleswap/ranges?${new URLSearchParams({
-            fixed: "false",
-            reverse: "false",
-            tickerFrom: String(fromCurrency.ticker || ""),
-            networkFrom: String(fromCurrency.network || ""),
-            tickerTo: String(toCurrency.ticker || ""),
-            networkTo: String(toCurrency.network || ""),
-          }).toString()}`,
-        ),
-      ]);
-
-      if (estimateRes.status === "fulfilled") {
-        const json = await estimateRes.value.json();
-        if (estimateRes.value.ok) setQuote(json);
-      }
-
-      if (rangesRes.status === "fulfilled") {
-        const json = await rangesRes.value.json();
-        if (rangesRes.value.ok) setRanges(json);
-      }
-    } catch (error) {
-      setApiError(error?.message || "Impossible de récupérer une estimation.");
+      const response = await fetch(
+        `/api/simpleswap/ranges?${new URLSearchParams({
+          fixed: "false",
+          reverse: "false",
+          tickerFrom: String(fromCurrency.ticker || ""),
+          networkFrom: String(fromCurrency.network || ""),
+          tickerTo: String(toCurrency.ticker || ""),
+          networkTo: String(toCurrency.network || ""),
+        }).toString()}`,
+      );
+      const data = await response.json();
+      if (response.ok) setRanges(data);
+    } catch {
+      // ignore (non-bloquant)
     }
   };
 
-  const createExchange = async () => {
+  const fetchEstimate = async ({ signal } = {}) => {
+    if (!fromCurrency || !toCurrency || !hasValidAmount) return;
+    setApiError("");
+    try {
+      const response = await fetch(
+        `/api/simpleswap/estimates?${new URLSearchParams({
+          fixed: "false",
+          reverse: "false",
+          tickerFrom: String(fromCurrency.ticker || ""),
+          networkFrom: String(fromCurrency.network || ""),
+          tickerTo: String(toCurrency.ticker || ""),
+          networkTo: String(toCurrency.network || ""),
+          amount: String(parsedAmount),
+        }).toString()}`,
+        { signal },
+      );
+      const data = await response.json();
+      if (response.ok) setQuote(data);
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+      // ignore (non-bloquant)
+    }
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    fetchRanges();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, fromCurrencyKey, toCurrencyKey]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!fromCurrency || !toCurrency || !hasValidAmount) return;
+
+    const controller = new AbortController();
+    try {
+      estimateAbortRef.current?.abort?.();
+    } catch {
+      // ignore
+    }
+    estimateAbortRef.current = controller;
+
+    const timer = window.setTimeout(() => {
+      fetchEstimate({ signal: controller.signal });
+    }, 450);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, fromCurrencyKey, toCurrencyKey, parsedAmount, hasValidAmount]);
+
+  const createExchange = async ({ returnStep = "address" } = {}) => {
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
     const defaultReceive = direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? walletAddress : "";
     const addr = String(receiveAddress || defaultReceive || "").trim();
@@ -603,7 +668,7 @@ export default function WalletDashboardUsdSwapModal({
           networkTo: String(toCurrency.network || ""),
           amount: String(parsedAmount),
           addressTo: addr,
-          extraIdTo: toCurrency?.hasExtraId ? String(receiveExtraId || "").trim() : "",
+          extraIdTo: "",
           userRefundAddress: refund,
           userRefundExtraId: refundExtra,
           rateId: null,
@@ -615,10 +680,58 @@ export default function WalletDashboardUsdSwapModal({
         throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
       }
       setExchange(data);
-      setStep("instructions");
+      if (
+        direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+        typeof window !== "undefined"
+      ) {
+        const exchangeIdValue = pick(data, ["id", "exchangeId", "publicId"], "");
+        const depositAddr = pick(data, ["addressFrom", "address_from", "depositAddress"], "");
+        const depositMemo = pick(data, ["extraIdFrom", "extra_id_from", "depositExtraId"], "");
+        const amountFromValue = pick(data, ["amountFrom", "amount_from", "amount", "amountSend"], "");
+        if (depositAddr) {
+          try {
+            const prev = safeReadJsonArray(
+              window.sessionStorage?.getItem(SIMPLESWAP_DEPOSITS_STORAGE_KEY),
+            );
+            const next = [
+              {
+                exchangeId: exchangeIdValue || null,
+                depositAddress: depositAddr,
+                depositExtraId: depositMemo || null,
+                amountFrom: amountFromValue || null,
+                tickerFrom: String(fromCurrency?.ticker || "rlusd"),
+                networkFrom: String(fromCurrency?.network || "xrpl"),
+                tickerTo: String(toCurrency?.ticker || ""),
+                networkTo: String(toCurrency?.network || ""),
+                createdAt: new Date().toISOString(),
+              },
+              ...prev,
+            ]
+              .filter(
+                (item, idx, arr) =>
+                  item &&
+                  typeof item === "object" &&
+                  String(item.depositAddress || "").trim() &&
+                  arr.findIndex(
+                    (other) =>
+                      String(other?.depositAddress || "").trim() ===
+                      String(item.depositAddress || "").trim(),
+                  ) === idx,
+              )
+              .slice(0, SIMPLESWAP_DEPOSITS_MAX);
+            window.sessionStorage?.setItem(
+              SIMPLESWAP_DEPOSITS_STORAGE_KEY,
+              JSON.stringify(next),
+            );
+          } catch {
+            // ignore
+          }
+        }
+      }
+      setStep("deposit");
     } catch (error) {
       setApiError(error?.message || "Impossible de créer l’échange.");
-      setStep("confirm");
+      setStep(returnStep);
     }
   };
 
@@ -658,6 +771,24 @@ export default function WalletDashboardUsdSwapModal({
 
   if (!shouldRender) return null;
 
+  const closeModal = () => {
+    resetState();
+    onClose?.();
+  };
+
+  const handleHeaderBack = () => {
+    if (step === "form") {
+      closeModal();
+      return;
+    }
+    if (step === "address") {
+      setApiError("");
+      setStep("form");
+      return;
+    }
+    closeModal();
+  };
+
   const wrapperClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
@@ -683,10 +814,7 @@ export default function WalletDashboardUsdSwapModal({
           className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
-          onClick={() => {
-            resetState();
-            onClose?.();
-          }}
+          onClick={closeModal}
         />
       ) : null}
 
@@ -702,10 +830,7 @@ export default function WalletDashboardUsdSwapModal({
               <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    resetState();
-                    onClose?.();
-                  }}
+                  onClick={handleHeaderBack}
                   className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
                   aria-label={t("ui_back", "Retour")}
                 >
@@ -747,25 +872,33 @@ export default function WalletDashboardUsdSwapModal({
           </div>
 
           <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5">
-            {step === "instructions" ? (
+            {step === "deposit" ? (
               <div className="space-y-5">
-                <div className="flex flex-col items-center justify-center pt-2 text-center">
-                  <CheckCircleIcon className="w-14 h-14 text-xcannes-green mb-3" />
-                  <div className="text-white font-semibold text-lg">
-                    {t("ui_usd_swap_created_title", "Échange créé")}
+                <div className="flex items-center gap-3 px-1">
+                  <span className="inline-flex items-center justify-center rounded-full bg-xcannes-green/15 text-xcannes-green text-xs font-semibold px-2.5 py-1">
+                    {currentStepIndex}/{totalSteps}
+                  </span>
+                  <div className="text-sm text-white/80 font-semibold">
+                    {t("ui_transfer_deposit", "Transférer le dépôt")}
                   </div>
-	                  <div className="mt-2 text-sm text-white/60 max-w-sm">
-	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                      ? t(
-	                          "ui_usd_swap_created_body_from_wallet",
-	                          "Envoyez le montant indiqué depuis votre wallet XCANNES à l’adresse de dépôt pour lancer l’échange.",
-	                        )
-	                      : t(
-	                          "ui_usd_swap_created_body_external",
-	                          "Envoyez le montant indiqué depuis votre wallet externe à l’adresse de dépôt pour lancer l’échange.",
-	                        )}
-	                  </div>
-	                </div>
+                </div>
+
+                <div className="text-center pt-1">
+                  <div className="text-white font-semibold text-2xl leading-tight">
+                    {t("ui_send_your_funds", "Envoyez vos fonds")}
+                  </div>
+                  <div className="mt-2 text-sm text-white/60 max-w-sm mx-auto">
+                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                      ? t(
+                          "ui_usd_swap_created_body_from_wallet",
+                          "Envoyez le montant indiqué depuis votre wallet XCANNES à l’adresse de dépôt pour lancer l’échange.",
+                        )
+                      : t(
+                          "ui_usd_swap_created_body_external",
+                          "Envoyez le montant indiqué depuis votre wallet externe à l’adresse de dépôt pour lancer l’échange.",
+                        )}
+                  </div>
+                </div>
 
                 {apiError ? (
                   <div className="rounded-lg ring-1 ring-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
@@ -774,11 +907,24 @@ export default function WalletDashboardUsdSwapModal({
                 ) : null}
 
                 <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
-	                  <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-	                    {t("ui_usd_swap_deposit", "Dépôt")}{" "}
-                      <span className="text-white/70">{fromTicker || "—"}</span>
-	                  </p>
-                  <div className="space-y-2 text-sm text-white/80">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-white/60 text-xs">
+                        {t("ui_usd_swap_send_amount", "Montant à envoyer")}
+                      </div>
+                      <div className="text-white font-semibold text-lg leading-tight">
+                        {sendAmountExact || (hasValidAmount ? parsedAmount : "—")}{" "}
+                        {fromTicker || ""}
+                      </div>
+                    </div>
+                    {fromNetwork ? (
+                      <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
+                        {fromNetwork}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-3 border-t border-white/10 pt-3 space-y-3 text-sm text-white/80">
                     {exchangeId ? (
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -839,17 +985,6 @@ export default function WalletDashboardUsdSwapModal({
                       </div>
                     ) : null}
 
-	                    {sendAmountExact ? (
-	                      <div>
-	                        <div className="text-white/60 text-xs">
-	                          {t("ui_usd_swap_exact_amount", "Montant à envoyer")}
-	                        </div>
-	                        <div className="text-white font-semibold">
-	                          {sendAmountExact} {fromTicker || ""}
-	                        </div>
-	                      </div>
-	                    ) : null}
-
                     {status ? (
                       <div>
                         <div className="text-white/60 text-xs">
@@ -859,14 +994,48 @@ export default function WalletDashboardUsdSwapModal({
                       </div>
                     ) : null}
                   </div>
+
+                  {depositAddress ? (
+                    <div className="mt-4 flex justify-center">
+                      <div className="rounded-2xl bg-white p-3">
+                        <QRCodeCanvas value={depositAddress} size={190} includeMargin />
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
 
-	                <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-	                  {t(
-	                    "ui_usd_swap_warning",
-	                    `Attention : envoyez uniquement ${fromTicker || "l'actif sélectionné"} (${fromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
-	                  )}
-	                </div>
+                {toTicker ? (
+                  <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-white/60 text-xs">
+                        {t("ui_you_get", "Vous obtenez")}
+                      </div>
+                      {toNetwork ? (
+                        <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
+                          {toNetwork}
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-1 text-white font-semibold text-lg leading-tight">
+                      {String(receiveAmountExact || "").trim()
+                        ? `${receiveAmountExact} ${toTicker}`
+                        : quotedReceiveAmount
+                          ? `≈${
+                              formatAmountNumber
+                                ? formatAmountNumber.format(quotedReceiveAmount)
+                                : String(quotedReceiveAmount)
+                            } ${toTicker}`
+                          : `— ${toTicker}`}
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="rounded-lg ring-1 ring-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
+                  {t(
+                    "ui_usd_swap_warning",
+                    `Attention : envoyez uniquement ${fromTicker || "l'actif sélectionné"} (${fromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
+                  )}
+                </div>
 
                 <div className="flex gap-2">
                   <button
@@ -881,10 +1050,7 @@ export default function WalletDashboardUsdSwapModal({
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      resetState();
-                      onClose?.();
-                    }}
+                    onClick={closeModal}
                     className={`flex-1 py-3 ${greenActionBtnBase}`}
                   >
                     {t("ui_close_08378568ba", "Fermer")}
@@ -1031,13 +1197,11 @@ export default function WalletDashboardUsdSwapModal({
 
                         <div className="mt-2 flex items-end justify-between gap-3">
                           <input
-                            type="number"
+                            type="text"
                             inputMode="decimal"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
-                            step="0.01"
-                            min="0"
                             className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
                           />
                           <div className="text-sm text-white/50 whitespace-nowrap pb-1">
@@ -1140,13 +1304,11 @@ export default function WalletDashboardUsdSwapModal({
 
                           <div className="mt-2 flex items-end justify-between gap-3">
                             <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
-                              {hasValidAmount
+                              {hasValidAmount && quotedReceiveAmount
                                 ? `≈${
                                     formatAmountNumber
-                                      ? formatAmountNumber.format(
-                                          quotedReceiveAmount ?? parsedAmount,
-                                        )
-                                      : String(quotedReceiveAmount ?? parsedAmount)
+                                      ? formatAmountNumber.format(quotedReceiveAmount)
+                                      : String(quotedReceiveAmount)
                                   }`
                                 : "—"}
                             </div>
@@ -1394,11 +1556,60 @@ export default function WalletDashboardUsdSwapModal({
                         )
                       : null}
 
-                    {toCurrency?.hasExtraId ? (
-                      <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+                    <button
+                      type="button"
+                      disabled={
+                        !hasValidAmount ||
+                        !fromCurrency ||
+                        !toCurrency ||
+                        !stableCurrency
+                      }
+                      onClick={() => {
+                        setApiError("");
+                        setStableDropdownOpen(false);
+                        setSearch("");
+                        setStep("address");
+                      }}
+                      className={`w-full text-xl py-4 ${greenActionBtnBase}`}
+                    >
+                      {t("ui_action_continue", "Continuer")}
+                    </button>
+                  </>
+                ) : null}
+
+                {step === "address" ? (
+                  <>
+                    <div className="flex items-center gap-3 px-1">
+                      <span className="inline-flex items-center justify-center rounded-full bg-xcannes-green/15 text-xcannes-green text-xs font-semibold px-2.5 py-1">
+                        {currentStepIndex}/{totalSteps}
+                      </span>
+                      <div className="text-sm text-white/80 font-semibold">
+                        {t("ui_enter_address", "Entrer l’adresse")}
+                      </div>
+                    </div>
+
+                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
+                      <div className="text-white/80 text-sm">
+                        <div>
+                          {t("ui_swap_you_send", "Vous envoyez")}{" "}
+                          <span className="text-white font-semibold">
+                            {hasValidAmount ? parsedAmount : 0} {fromTicker || ""}
+                          </span>
+                        </div>
+                        <div className="mt-1">
+                          {t("ui_usd_swap_you_receive", "Vous recevez")}{" "}
+                          <span className="text-white font-semibold">
+                            {toCurrency ? currencyLabel(toCurrency) : toLabel}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && toNetwork ? (
+                      <div className="rounded-lg ring-1 ring-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
                         {t(
-                          "ui_usd_swap_extraid_notice",
-                          "Cette devise peut nécessiter un Tag/Memo (extraId) pour la réception.",
+                          "ui_usd_swap_network_note",
+                          `Note : ${toTicker || "Le stablecoin"} sera envoyé sur le réseau ${toNetwork}.`,
                         )}
                       </div>
                     ) : null}
@@ -1407,7 +1618,10 @@ export default function WalletDashboardUsdSwapModal({
                       <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                         {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
                           ? t("ui_usd_swap_receive_address", "Adresse de réception")
-                          : t("ui_usd_swap_receive_address_rlusd", "Adresse de réception (RLUSD / XRPL)")}
+                          : t(
+                              "ui_usd_swap_receive_address_rlusd",
+                              "Adresse de réception (RLUSD / XRPL)",
+                            )}
                       </label>
                       <input
                         value={receiveAddress}
@@ -1420,49 +1634,58 @@ export default function WalletDashboardUsdSwapModal({
                         )}
                         className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
                       />
-                      {toCurrency?.hasExtraId ? (
-                        <div className="mt-2">
-                          <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                            {t("ui_usd_swap_receive_extraid", "Tag / Memo (extraId)")}
-                          </label>
-                          <input
-                            value={receiveExtraId}
-                            onChange={(e) => setReceiveExtraId(e.target.value)}
-                            placeholder={toCurrency?.extraIdName || "Memo / Tag"}
-                            className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                          />
-                        </div>
-                      ) : null}
                     </div>
 
                     {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                      <div>
-                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                          {t("ui_swap_refund_address", "Adresse de remboursement (optionnel)")}
-                        </label>
-                        <input
-                          value={refundAddress}
-                          onChange={(e) => setRefundAddress(e.target.value)}
-                          placeholder={t(
-                            "ui_swap_refund_address_placeholder",
-                            "Adresse sur le réseau d’envoi (si l’échange échoue)",
-                          )}
-                          className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                        />
-                        {fromCurrency?.hasExtraId ? (
-                          <div className="mt-2">
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setRefundDetailsOpen((v) => !v)}
+                          className="w-full flex items-center justify-between rounded-xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-3 text-sm text-white/75 hover:text-white transition-colors"
+                        >
+                          <span>
+                            {t(
+                              "ui_add_refund_details",
+                              "Ajouter les détails de remboursement",
+                            )}
+                          </span>
+                          <span className="text-white/50" aria-hidden>
+                            {refundDetailsOpen ? "–" : "+"}
+                          </span>
+                        </button>
+                        {refundDetailsOpen ? (
+                          <div className="mt-3">
                             <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                              {t("ui_swap_refund_extraid", "Tag / Memo de remboursement (optionnel)")}
+                              {t("ui_swap_refund_address", "Adresse de remboursement (optionnel)")}
                             </label>
                             <input
-                              value={refundExtraId}
-                              onChange={(e) => setRefundExtraId(e.target.value)}
-                              placeholder={fromCurrency?.extraIdName || "Memo / Tag"}
+                              value={refundAddress}
+                              onChange={(e) => setRefundAddress(e.target.value)}
+                              placeholder={t(
+                                "ui_swap_refund_address_placeholder",
+                                "Adresse sur le réseau d’envoi (si l’échange échoue)",
+                              )}
                               className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
                             />
+                            {fromCurrency?.hasExtraId ? (
+                              <div className="mt-2">
+                                <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                                  {t(
+                                    "ui_swap_refund_extraid",
+                                    "Tag / Memo de remboursement (optionnel)",
+                                  )}
+                                </label>
+                                <input
+                                  value={refundExtraId}
+                                  onChange={(e) => setRefundExtraId(e.target.value)}
+                                  placeholder={fromCurrency?.extraIdName || "Memo / Tag"}
+                                  className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+                                />
+                              </div>
+                            ) : null}
                           </div>
                         ) : null}
-                      </div>
+                      </>
                     ) : null}
 
                     <button
@@ -1497,8 +1720,7 @@ export default function WalletDashboardUsdSwapModal({
                           );
                           return;
                         }
-                        await fetchQuoteAndRanges();
-                        setStep("confirm");
+                        await createExchange({ returnStep: "address" });
                       }}
                       className={`w-full text-xl py-4 ${greenActionBtnBase}`}
                     >
@@ -1507,81 +1729,6 @@ export default function WalletDashboardUsdSwapModal({
                   </>
                 ) : null}
 
-                {step === "confirm" ? (
-                  <>
-                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
-                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {t("ui_review", "Récapitulatif")}
-                      </p>
-                      <div className="text-white/80 text-sm">
-                        <div>
-                          {t("ui_swap_you_send", "Vous envoyez")}{" "}
-                          <span className="text-white font-semibold">
-                            {hasValidAmount ? parsedAmount : 0} {fromTicker || ""}
-                          </span>
-                        </div>
-                        <div className="mt-1">
-                          {t("ui_usd_swap_you_receive", "Vous recevez")}{" "}
-                          <span className="text-white font-semibold">
-                            {toCurrency ? currencyLabel(toCurrency) : toLabel}
-                          </span>
-                        </div>
-                        {String(
-                          receiveAddress ||
-                            (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                              ? walletAddress
-                              : "") ||
-                            "",
-                        ).trim() ? (
-                          <div className="mt-2 text-xs text-white/60 font-mono break-all">
-                            {t("ui_usd_swap_receive_to", "Vers")}{" "}
-                            {String(
-                              receiveAddress ||
-                                (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                                  ? walletAddress
-                                  : "") ||
-                                "",
-                            ).trim()}
-                          </div>
-                        ) : null}
-                        {quote ? (
-                          <div className="mt-2 text-xs text-white/60">
-                            {t("ui_usd_swap_estimate", "Estimation")}:{" "}
-                            <span className="text-white/90 font-semibold">
-                              {pick(quote, ["amount", "estimatedAmount", "estimate"], "—")}
-                            </span>
-                          </div>
-                        ) : null}
-                        {ranges ? (
-                          <div className="mt-1 text-xs text-white/60">
-                            {t("ui_usd_swap_limits", "Limites")}:{" "}
-                            <span className="text-white/80">
-                              {pick(ranges, ["min", "minAmount", "minimum"], "—")} –{" "}
-                              {pick(ranges, ["max", "maxAmount", "maximum"], "—")}
-                            </span>
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setStep("form")}
-                        className="flex-1 rounded-lg border border-white/10 bg-black/20 text-white/70 font-semibold py-3 transition-colors hover:bg-black/30 hover:text-white"
-                      >
-                        {t("ui_back", "Retour")}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={createExchange}
-                        className={`flex-1 py-3 ${greenActionBtnBase}`}
-                      >
-                        {t("ui_confirm", "Confirmer")}
-                      </button>
-                    </div>
-                  </>
-                ) : null}
               </div>
             )}
           </div>
