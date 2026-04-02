@@ -41,12 +41,21 @@ export async function simpleSwapRequest(path, { method = "GET", query, body } = 
     body: method === "GET" ? undefined : JSON.stringify(body ?? {}),
   });
 
+  const contentType = String(response.headers.get("content-type") || "").toLowerCase();
   const text = await response.text();
   let data;
   try {
     data = text ? JSON.parse(text) : null;
   } catch {
     data = { raw: text };
+  }
+
+  // If upstream returns HTML (misconfigured base URL / WAF page), surface it as an error.
+  if (response.ok && contentType && !contentType.includes("json")) {
+    const error = new Error("Unexpected non-JSON response from SimpleSwap");
+    error.status = 502;
+    error.data = { contentType, preview: String(text || "").slice(0, 200) };
+    throw error;
   }
 
   if (!response.ok) {
@@ -119,4 +128,3 @@ export function isUsdStableCurrency(currency) {
   if (name.includes("us dollar")) return true;
   return false;
 }
-
