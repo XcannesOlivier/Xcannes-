@@ -698,42 +698,51 @@ export default function WalletDashboardUsdSwapModal({
           }}
         >
           <div className="border-b border-white/10">
-            <div className="flex items-start justify-between p-4 gap-3">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-                      ? t("ui_swap_title_out", "RLUSD → stablecoin USD")
-                      : t("ui_swap_title_in", "Stablecoin USD → RLUSD")}
-                  </h3>
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-1 text-xs md:text-sm text-white/60">
-                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-                    ? t(
-                        "ui_swap_subtitle_out",
-                        "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
-                      )
-                    : t(
-                        "ui_swap_subtitle_in",
-                        "Envoyez un stablecoin USD depuis un wallet externe et recevez du RLUSD sur XRPL via SimpleSwap.",
-                      )}
-                </p>
+            <div className="p-4">
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetState();
+                    onClose?.();
+                  }}
+                  className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
+                  aria-label={t("ui_back", "Retour")}
+                >
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="w-5 h-5"
+                    aria-hidden
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M11.78 3.22a.75.75 0 0 1 0 1.06L7.06 9l4.72 4.72a.75.75 0 1 1-1.06 1.06l-5.25-5.25a.75.75 0 0 1 0-1.06l5.25-5.25a.75.75 0 0 1 1.06 0Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+
+                {noticeVariant === "demo" ? (
+                  <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
+                    {t("demo_notice_title", "Mode démo")}
+                  </span>
+                ) : null}
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  resetState();
-                  onClose?.();
-                }}
-                className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
-              >
-                ✕
-              </button>
+
+              {direction !== SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                <div className="mt-3 min-w-0">
+                  <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
+                    {t("ui_swap_title_in", "Stablecoin USD → RLUSD")}
+                  </h3>
+                  <p className="mt-1 text-xs md:text-sm text-white/60">
+                    {t(
+                      "ui_swap_subtitle_in",
+                      "Envoyez un stablecoin USD depuis un wallet externe et recevez du RLUSD sur XRPL via SimpleSwap.",
+                    )}
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -884,40 +893,43 @@ export default function WalletDashboardUsdSwapModal({
               </div>
             ) : (
               <div className="space-y-5">
-	                <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-	                  <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-	                      ? t("moonpay_from_account", "Depuis le compte")
-	                      : t("ui_from_external_wallet", "Depuis un wallet externe")}
-	                  </p>
-	                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-	                    <>
-	                      {String(walletLabel || "").trim() ? (
-	                        <div className="flex items-center gap-2 mb-1">
-	                          <span
-	                            className="h-1.5 w-1.5 rounded-full bg-xcannes-green/80 shrink-0"
-	                            aria-hidden
-	                          />
-	                          <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-	                            {walletLabel}
-	                          </p>
-	                        </div>
-	                      ) : null}
-	                      {String(walletAddress || "").trim() ? (
-	                        <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
-	                          {walletAddress}
-	                        </p>
-	                      ) : null}
-	                    </>
-	                  ) : (
-	                    <p className="text-[11px] md:text-xs text-white/70">
-	                      {t(
-	                        "ui_external_wallet_hint",
-	                        "Vous initierez l’envoi depuis un wallet compatible avec le réseau choisi.",
-	                      )}
-	                    </p>
-	                  )}
-	                </div>
+	                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                        {t("moonpay_from_account", "Depuis le compte")}
+                      </p>
+                      {String(walletLabel || "").trim() ? (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className="h-1.5 w-1.5 rounded-full bg-xcannes-green/80 shrink-0"
+                            aria-hidden
+                          />
+                          <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+                            {walletLabel}
+                          </p>
+                        </div>
+                      ) : null}
+                      {String(walletAddress || "").trim() ? (
+                        <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
+                          {walletAddress}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                  <div className="px-1">
+                    <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
+                      {t("ui_swap_title_out", "RLUSD → stablecoin USD")}
+                    </h3>
+                    <p className="mt-1 text-xs md:text-sm text-white/60">
+                      {t(
+                        "ui_swap_subtitle_out",
+                        "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
+                      )}
+                    </p>
+                  </div>
+                ) : null}
 
                 {step === "pending" ? (
                   <div className="flex flex-col items-center justify-center py-10">
@@ -948,18 +960,6 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "form" ? (
                   <>
-                    <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-                        ? t(
-                            "ui_swap_send_from_wallet",
-                            "Vous enverrez du RLUSD depuis votre wallet XCANNES.",
-                          )
-                        : t(
-                            "ui_swap_send_from_external",
-                            "Vous enverrez le stablecoin depuis un wallet externe (Metamask, Exchange, etc.).",
-                          )}
-                    </div>
-
                     <div className="rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden">
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
@@ -1038,7 +1038,7 @@ export default function WalletDashboardUsdSwapModal({
                             placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
                             step="0.01"
                             min="0"
-                            className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none"
+                            className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
                           />
                           <div className="text-sm text-white/50 whitespace-nowrap pb-1">
                             {hasValidAmount
@@ -1403,13 +1403,6 @@ export default function WalletDashboardUsdSwapModal({
                       </div>
                     ) : null}
 
-                    <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-                      {t(
-                        "ui_usd_swap_explain",
-                        "Un swap entre stablecoins USD vise généralement une valeur 1:1. Des frais et délais peuvent s’appliquer selon le partenaire.",
-                      )}
-                    </div>
-
                     <div>
                       <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                         {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
@@ -1427,14 +1420,6 @@ export default function WalletDashboardUsdSwapModal({
                         )}
                         className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
                       />
-                      {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                        <div className="mt-2 rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-                          {t(
-                            "ui_swap_receive_rlusd_hint",
-                            "Par défaut, vous recevez le RLUSD sur votre adresse wallet. Vous pouvez la remplacer si besoin.",
-                          )}
-                        </div>
-                      ) : null}
                       {toCurrency?.hasExtraId ? (
                         <div className="mt-2">
                           <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">

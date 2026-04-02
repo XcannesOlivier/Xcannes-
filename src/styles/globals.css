@@ -71,6 +71,17 @@
   border-color: var(--border-subtle);
 }
 
+/* Hide number input spinners (Chrome/Safari/Edge + Firefox). */
+.xcannes-no-spinner::-webkit-outer-spin-button,
+.xcannes-no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.xcannes-no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .text-primary {
   color: var(--text-primary);
 }
