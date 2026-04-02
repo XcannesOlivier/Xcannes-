@@ -103,6 +103,7 @@ export default function WalletDashboardUsdSwapModal({
   const [stableKey, setStableKey] = useState("");
   const [stableDropdownOpen, setStableDropdownOpen] = useState(false);
   const stableDropdownRef = useRef(null);
+  const stableDropdownOverlayRef = useRef(null);
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
   const [receiveExtraId, setReceiveExtraId] = useState("");
@@ -119,6 +120,25 @@ export default function WalletDashboardUsdSwapModal({
     [amount],
   );
   const hasValidAmount = Number.isFinite(parsedAmount) && parsedAmount > 0;
+  const formatAmountNumber = useMemo(() => {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        maximumFractionDigits: 8,
+      });
+    } catch {
+      return null;
+    }
+  }, []);
+  const formatUsdNumber = useMemo(() => {
+    try {
+      return new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    } catch {
+      return null;
+    }
+  }, []);
   const rlusdKey = currencyKey(rlusdCurrency);
   const stableCurrency = useMemo(() => {
     if (!stableKey) return null;
@@ -131,20 +151,22 @@ export default function WalletDashboardUsdSwapModal({
   const toLabel = toCurrency ? currencyLabel(toCurrency) : "";
   const fromTicker = String(fromCurrency?.ticker || "").trim().toUpperCase();
   const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
+  const toTicker = String(toCurrency?.ticker || "").trim().toUpperCase();
+  const toNetwork = String(toCurrency?.network || "").trim().toUpperCase();
 
-  const quickStableOptions = useMemo(() => {
-    if (!currencies.length) return [];
-    return QUICK_STABLE_TARGETS.map((target) => {
-      const match =
-        currencies.find((cur) => matchStableTarget(cur, target)) || null;
-      if (!match) return null;
-      return {
-        key: currencyKey(match),
-        label: target.label,
-        currency: match,
-      };
-    }).filter(Boolean);
-  }, [currencies]);
+  const quotedReceiveAmount = useMemo(() => {
+    const raw = pick(quote, ["amount", "estimatedAmount", "estimate", "amountTo", "amount_to"], "");
+    const num = Number(String(raw || "").trim().replace(",", "."));
+    if (!Number.isFinite(num) || num <= 0) return null;
+    return num;
+  }, [quote]);
+
+  useEffect(() => {
+    // Avoid showing stale estimates when inputs change.
+    setQuote(null);
+    setRanges(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [direction, stableKey, amount]);
 
   const filteredStableOptions = useMemo(() => {
     const needle = String(search || "").trim().toLowerCase();
@@ -230,13 +252,21 @@ export default function WalletDashboardUsdSwapModal({
 
   useEffect(() => {
     if (!stableDropdownOpen) return;
+    const prevOverflow = document?.body?.style?.overflow;
+    try {
+      if (typeof document !== "undefined") document.body.style.overflow = "hidden";
+    } catch {
+      // ignore
+    }
     const handlePointerDown = (event) => {
       const el = stableDropdownRef.current;
+      const overlay = stableDropdownOverlayRef.current;
       if (!el) {
         setStableDropdownOpen(false);
         return;
       }
       if (el.contains(event.target)) return;
+      if (overlay && overlay.contains(event.target)) return;
       setStableDropdownOpen(false);
     };
     const handleKeyDown = (event) => {
@@ -249,6 +279,11 @@ export default function WalletDashboardUsdSwapModal({
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("touchstart", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
+      try {
+        if (typeof document !== "undefined") document.body.style.overflow = prevOverflow || "";
+      } catch {
+        // ignore
+      }
     };
   }, [stableDropdownOpen]);
 
@@ -742,64 +777,248 @@ export default function WalletDashboardUsdSwapModal({
                           )}
                     </div>
 
-                    <div>
-                      <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-                          ? t("ui_usd_swap_receive_in", "Recevoir (ticker / réseau)")
-                          : t("ui_usd_swap_send_in", "Envoyer (ticker / réseau)")}
-                      </label>
-	                      <div className="space-y-2">
-                        <div className="relative space-y-2" ref={stableDropdownRef}>
-                          <button
-                            type="button"
-                            onClick={() => setStableDropdownOpen((prev) => !prev)}
-                            aria-expanded={stableDropdownOpen}
-                            className="w-full rounded-xl px-4 py-3 ring-1 ring-white/10 ring-inset bg-black/20 text-white/80 hover:bg-black/30 transition-colors text-left"
-                          >
-                            <div className="flex items-center gap-3">
-                              {stableCurrency ? (
-                                renderCurrencyIcon(stableCurrency)
-                              ) : (
-                                <div className="w-6 h-6 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
-                              )}
-                              <div className="min-w-0 flex-1">
-                                <div className="text-sm font-semibold truncate">
-                                  {stableCurrency
-                                    ? `${String(stableCurrency?.ticker || "").toUpperCase()} (${String(
-                                        stableCurrency?.network || "",
-                                      ).toUpperCase()})`
-                                    : t("ui_choose_stable", "Choisir un stablecoin USD")}
-                                </div>
-                                <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                  {stableCurrency
-                                    ? String(stableCurrency?.name || "").trim() ||
-                                      currencyLabel(stableCurrency)
-                                    : t(
-                                        "ui_choose_stable_hint",
-                                        "Stablecoins USD multi-chain (USDT, USDC…)",
-                                      )}
-                                </div>
+                    <div className="rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden">
+                      <div className="p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-sm text-white/70">
+                            {t("ui_swap_you_send", "Vous envoyez")}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+                              <div ref={stableDropdownRef}>
+                                <button
+                                  type="button"
+                                  onClick={() => setStableDropdownOpen(true)}
+                                  aria-expanded={stableDropdownOpen}
+                                  className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:bg-black/40 transition-colors"
+                                >
+                                  {stableCurrency ? (
+                                    renderCurrencyIcon(stableCurrency)
+                                  ) : (
+                                    <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
+                                  )}
+                                  <span className="text-sm font-semibold">
+                                    {stableCurrency
+                                      ? String(stableCurrency?.ticker || "").toUpperCase()
+                                      : t("ui_choose", "Choisir")}
+                                  </span>
+                                  <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                    {stableCurrency
+                                      ? String(stableCurrency?.network || "").toUpperCase()
+                                      : "—"}
+                                  </span>
+                                  <svg
+                                    className="w-4 h-4 flex-shrink-0"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </button>
                               </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85">
+                                <div className="w-5 h-5 rounded-full bg-xcannes-green/20 ring-1 ring-white/10 flex-shrink-0" />
+                                <span className="text-sm font-semibold">
+                                  {String(rlusdCurrency?.ticker || "RLUSD").toUpperCase()}
+                                </span>
+                                <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                  {String(rlusdCurrency?.network || "xrpl").toUpperCase()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-2 flex items-end justify-between gap-3">
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
+                            step="0.01"
+                            min="0"
+                            className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none"
+                          />
+                          <div className="text-sm text-white/50 whitespace-nowrap pb-1">
+                            {hasValidAmount
+                              ? `~${formatUsdNumber ? formatUsdNumber.format(parsedAmount) : parsedAmount.toFixed(2)}$`
+                              : ""}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="relative border-t border-white/10">
+                        <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+                          <div className="w-10 h-10 rounded-full bg-black/40 ring-1 ring-white/10 flex items-center justify-center">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="w-5 h-5 text-white/60"
+                              aria-hidden
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M7 7h10M7 7l3-3M7 7l3 3M17 17H7m10 0l-3-3m3 3l-3 3"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+
+                        <div className="p-4 pt-6">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-sm text-white/70">
+                              {t("ui_usd_swap_you_receive", "Vous recevez")}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                                <div ref={stableDropdownRef}>
+                                  <button
+                                    type="button"
+                                    onClick={() => setStableDropdownOpen(true)}
+                                    aria-expanded={stableDropdownOpen}
+                                    className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:bg-black/40 transition-colors"
+                                  >
+                                    {stableCurrency ? (
+                                      renderCurrencyIcon(stableCurrency)
+                                    ) : (
+                                      <div className="w-5 h-5 rounded-full bg-white/10 ring-1 ring-white/10 flex-shrink-0" />
+                                    )}
+                                    <span className="text-sm font-semibold">
+                                      {stableCurrency
+                                        ? String(stableCurrency?.ticker || "").toUpperCase()
+                                        : t("ui_choose", "Choisir")}
+                                    </span>
+                                    <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                      {stableCurrency
+                                        ? String(stableCurrency?.network || "").toUpperCase()
+                                        : "—"}
+                                    </span>
+                                    <svg
+                                      className="w-4 h-4 flex-shrink-0"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      aria-hidden
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+
+                                  {/* Portal content rendered once above (stableDropdownOpen) */}
+                                </div>
+                              ) : (
+                                <div className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85">
+                                  <div className="w-5 h-5 rounded-full bg-xcannes-green/20 ring-1 ring-white/10 flex-shrink-0" />
+                                  <span className="text-sm font-semibold">
+                                    {String(rlusdCurrency?.ticker || "RLUSD").toUpperCase()}
+                                  </span>
+                                  <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
+                                    {String(rlusdCurrency?.network || "xrpl").toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mt-2 flex items-end justify-between gap-3">
+                            <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
+                              {hasValidAmount
+                                ? `≈${
+                                    formatAmountNumber
+                                      ? formatAmountNumber.format(
+                                          quotedReceiveAmount ?? parsedAmount,
+                                        )
+                                      : String(quotedReceiveAmount ?? parsedAmount)
+                                  }`
+                                : "—"}
+                            </div>
+                            <div className="text-sm text-white/50 whitespace-nowrap pb-1">
+                              {hasValidAmount
+                                ? `~${formatUsdNumber ? formatUsdNumber.format(parsedAmount) : parsedAmount.toFixed(2)}$`
+                                : ""}
+                            </div>
+                          </div>
+
+                          <div className="mt-3 flex items-center justify-between text-xs text-white/55">
+                            <div className="inline-flex items-center gap-2">
                               <svg
-                                className={[
-                                  "w-4 h-4 flex-shrink-0 transition-transform",
-                                  stableDropdownOpen ? "rotate-180" : "",
-                                ].join(" ")}
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="w-4 h-4 text-white/50"
                                 aria-hidden
                               >
                                 <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
-                                  clipRule="evenodd"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 17v-1m0-4V7m0 14a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"
                                 />
                               </svg>
+                              {t("ui_variable_rate", "Taux variable")}
                             </div>
-                          </button>
+                            <div className="text-white/40">
+                              {toTicker ? `${toTicker} ${toNetwork ? `(${toNetwork})` : ""}` : ""}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                          {stableDropdownOpen ? (
-                            <div className="absolute left-0 right-0 mt-2 rounded-xl ring-1 ring-white/10 ring-inset bg-black/30 backdrop-blur-md overflow-hidden z-20">
+                    {stableDropdownOpen
+                      ? createPortal(
+                          <div className="fixed inset-0 z-[10020]">
+                            <div
+                              className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+                              onClick={() => setStableDropdownOpen(false)}
+                            />
+                            <div
+                              ref={stableDropdownOverlayRef}
+                              role="dialog"
+                              aria-modal="true"
+                              className={[
+                                "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
+                                "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+                              ].join(" ")}
+                            >
+                              <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
+                                <div className="min-w-0">
+                                  <div className="text-white font-semibold text-base leading-tight truncate">
+                                    {t(
+                                      "ui_choose_stablecoin_title",
+                                      "Choisir un stablecoin USD",
+                                    )}
+                                  </div>
+                                  <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                                    {t(
+                                      "ui_choose_stablecoin_subtitle",
+                                      "Ticker / réseau (USDT, USDC…)",
+                                    )}
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setStableDropdownOpen(false)}
+                                  className="text-white/70 hover:text-white transition-colors text-xl"
+                                  aria-label={t("ui_close", "Fermer")}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+
                               <div className="p-3 border-b border-white/10 bg-black/20">
                                 <input
                                   value={search}
@@ -810,49 +1029,7 @@ export default function WalletDashboardUsdSwapModal({
                                 />
                               </div>
 
-                              <div className="max-h-64 overflow-y-auto">
-                                {quickStableOptions.length ? (
-                                  <div className="px-3 py-3 border-b border-white/10">
-                                    <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
-                                      {t("ui_popular", "Populaires")}
-                                    </div>
-                                    <div className="mt-2 grid grid-cols-2 gap-2">
-                                      {quickStableOptions.slice(0, 13).map((opt) => {
-                                        const active = opt.key === stableKey;
-                                        return (
-                                          <button
-                                            key={opt.key}
-                                            type="button"
-                                            onClick={() => {
-                                              setStableKey(opt.key);
-                                              setStableDropdownOpen(false);
-                                              setSearch("");
-                                            }}
-                                            className={[
-                                              "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-                                              active
-                                                ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                                                : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-                                            ].join(" ")}
-                                          >
-                                            <div className="flex items-center gap-2">
-                                              {renderCurrencyIcon(opt.currency)}
-                                              <div className="min-w-0">
-                                                <div className="text-sm font-semibold truncate">
-                                                  {opt.label}
-                                                </div>
-                                                <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                                  {String(opt.currency?.name || "").trim() ||
-                                                    currencyLabel(opt.currency)}
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                ) : null}
+                              <div className="flex-1 min-h-0 overflow-y-auto">
                                 {stableSearchResults.length ? (
                                   stableSearchResults.map((cur) => {
                                     const key = currencyKey(cur);
@@ -867,7 +1044,7 @@ export default function WalletDashboardUsdSwapModal({
                                           setSearch("");
                                         }}
                                         className={[
-                                          "w-full flex items-center gap-3 px-3 py-2 text-left border-b border-white/5 last:border-b-0",
+                                          "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
                                           active
                                             ? "bg-xcannes-green/10 text-white"
                                             : "hover:bg-white/[0.04] text-white/80",
@@ -882,7 +1059,8 @@ export default function WalletDashboardUsdSwapModal({
                                             </span>
                                           </div>
                                           <div className="text-[11px] text-white/55 truncate">
-                                            {String(cur?.name || "").trim() || currencyLabel(cur)}
+                                            {String(cur?.name || "").trim() ||
+                                              currencyLabel(cur)}
                                           </div>
                                         </div>
                                         {active ? (
@@ -899,6 +1077,7 @@ export default function WalletDashboardUsdSwapModal({
                                   </div>
                                 )}
                               </div>
+
                               <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
                                 {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
                                   ? t(
@@ -908,38 +1087,19 @@ export default function WalletDashboardUsdSwapModal({
                                   : t("ui_search_results", "Sélectionnez un actif.")}
                               </div>
                             </div>
-                          ) : null}
-                        </div>
-                        {toCurrency?.hasExtraId ? (
-                          <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
-                            {t(
-                              "ui_usd_swap_extraid_notice",
-                              "Cette devise peut nécessiter un Tag/Memo (extraId) pour la réception.",
-                            )}
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
+                          </div>,
+                          document.body,
+                        )
+                      : null}
 
-                    <div>
-                      <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {t("ui_swap_amount_send", "Montant à envoyer")}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
-                          step="0.01"
-                          min="0"
-                          className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150"
-                        />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-                          {fromTicker || "—"}
-                        </span>
+                    {toCurrency?.hasExtraId ? (
+                      <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
+                        {t(
+                          "ui_usd_swap_extraid_notice",
+                          "Cette devise peut nécessiter un Tag/Memo (extraId) pour la réception.",
+                        )}
                       </div>
-                    </div>
+                    ) : null}
 
                     <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
                       {t(
