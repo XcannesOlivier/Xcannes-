@@ -30,6 +30,7 @@ const QUICK_STABLE_TARGETS = [
   { ticker: "usdp", networkAliases: ["eth", "ethereum", "erc20"], label: "USDP (ETH)" },
   { ticker: "pyusd", networkAliases: ["eth", "ethereum", "erc20"], label: "PYUSD (ETH)" },
 ];
+const POPULAR_STABLE_TARGETS = QUICK_STABLE_TARGETS.slice(0, 4);
 
 function pick(obj, keys, fallback = "") {
   for (const key of keys) {
@@ -105,6 +106,7 @@ export default function WalletDashboardUsdSwapModal({
   const [stableDropdownOpen, setStableDropdownOpen] = useState(false);
   const stableDropdownRef = useRef(null);
   const stableDropdownOverlayRef = useRef(null);
+  const stableDropdownListRef = useRef(null);
   const [stableOverlayDragging, setStableOverlayDragging] = useState(false);
   const [stableOverlayTranslateY, setStableOverlayTranslateY] = useState(0);
   const stableOverlayDragMetaRef = useRef({
@@ -112,6 +114,11 @@ export default function WalletDashboardUsdSwapModal({
     startAt: 0,
     pointerId: null,
     lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
   });
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
@@ -220,6 +227,19 @@ export default function WalletDashboardUsdSwapModal({
     [filteredStableOptions],
   );
 
+  const popularStableOptions = useMemo(() => {
+    if (!currencies.length) return [];
+    return POPULAR_STABLE_TARGETS.map((target) => {
+      const match = currencies.find((cur) => matchStableTarget(cur, target));
+      if (!match) return null;
+      return {
+        key: currencyKey(match),
+        label: target.label,
+        currency: match,
+      };
+    }).filter(Boolean);
+  }, [currencies]);
+
   const exchangeId = useMemo(
     () => pick(exchange, ["id", "exchangeId", "publicId"], ""),
     [exchange],
@@ -315,8 +335,140 @@ export default function WalletDashboardUsdSwapModal({
       startAt: 0,
       pointerId: null,
       lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
     };
   }, [stableDropdownOpen]);
+
+  const releaseStableOverlayScrollLock = () => {
+    const meta = stableOverlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = stableDropdownListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartStableOverlayDrag = (event, source) => {
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = stableDropdownListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    stableOverlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleStableOverlayPointerMove = (event) => {
+    const meta = stableOverlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      // Start drag.
+      try {
+        stableDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = stableDropdownListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setStableOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setStableOverlayTranslateY(delta);
+  };
+
+  const handleStableOverlayPointerEnd = (event) => {
+    const meta = stableOverlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration; // px/ms
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    stableOverlayDragMetaRef.current.pending = false;
+    stableOverlayDragMetaRef.current.dragging = false;
+    setStableOverlayDragging(false);
+    releaseStableOverlayScrollLock();
+
+    if (shouldClose) {
+      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+      setStableOverlayTranslateY(Math.max(delta, height));
+      window.setTimeout(() => {
+        setStableDropdownOpen(false);
+      }, 180);
+      stableOverlayDragMetaRef.current = {
+        startY: 0,
+        startAt: 0,
+        pointerId: null,
+        lastDelta: 0,
+        pending: false,
+        source: null,
+        dragging: false,
+        scrollLocked: false,
+        lockedOverflowY: "",
+      };
+      return;
+    }
+
+    setStableOverlayTranslateY(0);
+    stableOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
 
   const fetchCurrencies = async () => {
     setCurrenciesLoading(true);
@@ -1057,120 +1209,124 @@ export default function WalletDashboardUsdSwapModal({
                                 transform: `translateY(${Math.max(0, stableOverlayTranslateY)}px)`,
                                 transition: stableOverlayDragging
                                   ? "none"
-                                  : "transform 180ms ease",
+                                  : "transform 220ms cubic-bezier(0.2,0,0,1)",
                               }}
+                              onPointerMove={handleStableOverlayPointerMove}
+                              onPointerUp={handleStableOverlayPointerEnd}
+                              onPointerCancel={handleStableOverlayPointerEnd}
                             >
-                              <div className="sm:hidden flex justify-center pt-3 pb-1">
-                                <button
-                                  type="button"
-                                  className="w-16 h-5 flex items-center justify-center touch-none"
-                                  aria-label={t("ui_swipe_to_close", "Glisser pour fermer")}
-                                  onPointerDown={(event) => {
-                                    if (!event.isPrimary) return;
-                                    if (event.pointerType === "mouse") return;
-                                    const el = event.currentTarget;
-                                    try {
-                                      el.setPointerCapture(event.pointerId);
-                                    } catch {
-                                      // ignore
-                                    }
-                                    stableOverlayDragMetaRef.current = {
-                                      startY: event.clientY,
-                                      startAt: Date.now(),
-                                      pointerId: event.pointerId,
-                                      lastDelta: 0,
-                                    };
-                                    setStableOverlayDragging(true);
-                                  }}
-                                  onPointerMove={(event) => {
-                                    const meta = stableOverlayDragMetaRef.current;
-                                    if (!stableOverlayDragging) return;
-                                    if (meta.pointerId !== event.pointerId) return;
-                                    const delta = Math.max(0, event.clientY - meta.startY);
-                                    meta.lastDelta = delta;
-                                    setStableOverlayTranslateY(delta);
-                                  }}
-                                  onPointerUp={(event) => {
-                                    const meta = stableOverlayDragMetaRef.current;
-                                    if (meta.pointerId !== event.pointerId) return;
-                                    const delta = meta.lastDelta || 0;
-                                    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
-                                    const velocity = delta / duration; // px/ms
-                                    const shouldClose = delta > 140 || velocity > 0.9;
-                                    setStableOverlayDragging(false);
-                                    if (shouldClose) {
-                                      setStableOverlayTranslateY(
-                                        Math.max(delta, typeof window !== "undefined" ? window.innerHeight : 9999),
-                                      );
-                                      window.setTimeout(() => {
-                                        setStableDropdownOpen(false);
-                                      }, 120);
-                                      return;
-                                    }
-                                    setStableOverlayTranslateY(0);
-                                  }}
-                                  onPointerCancel={(event) => {
-                                    const meta = stableOverlayDragMetaRef.current;
-                                    if (meta.pointerId !== event.pointerId) return;
-                                    setStableOverlayDragging(false);
-                                    setStableOverlayTranslateY(0);
-                                  }}
-                                >
-                                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                                </button>
-                              </div>
-
-                              <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
-                                <div className="min-w-0">
-                                  <div className="text-white font-semibold text-base leading-tight truncate">
-                                    {t(
-                                      "ui_choose_stablecoin_title",
-                                      "Choisir un stablecoin USD",
-                                    )}
-                                  </div>
-                                  <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                    {t(
-                                      "ui_choose_stablecoin_subtitle",
-                                      "Ticker / réseau (USDT, USDC…)",
-                                    )}
+                              <div
+                                className="border-b border-white/10"
+                                onPointerDown={(event) => {
+                                  maybeStartStableOverlayDrag(event, "fixed");
+                                }}
+                              >
+                                <div className="sm:hidden flex justify-center pt-3 pb-1">
+                                  <div
+                                    className="w-16 h-5 flex items-center justify-center"
+                                    aria-hidden
+                                  >
+                                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                                   </div>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => setStableDropdownOpen(false)}
-                                  className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
-                                  aria-label={t("ui_close", "Fermer")}
-                                >
-                                  ✕
-                                </button>
-                              </div>
 
-                              <div className="p-3 border-b border-white/10 bg-black/20">
-                                <div className="relative">
-                                  <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
-                                    <svg
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                      className="w-4 h-4"
-                                      aria-hidden
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
+                                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                                  <div className="min-w-0">
+                                    <div className="text-white font-semibold text-base leading-tight truncate">
+                                      {t(
+                                        "ui_choose_stablecoin_title",
+                                        "Choisir un stablecoin USD",
+                                      )}
+                                    </div>
+                                    <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                                      {t(
+                                        "ui_choose_stablecoin_subtitle",
+                                        "Ticker / réseau (USDT, USDC…)",
+                                      )}
+                                    </div>
                                   </div>
-                                <input
-                                  value={search}
-                                  onChange={(e) => setSearch(e.target.value)}
-                                  placeholder={t("ui_search", "Rechercher…")}
-                                  className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                                />
+                                  <button
+                                    type="button"
+                                    onClick={() => setStableDropdownOpen(false)}
+                                    className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
+                                    aria-label={t("ui_close", "Fermer")}
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+
+                                <div className="px-4 pb-4">
+                                  <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+                                      <svg
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        className="w-4 h-4"
+                                        aria-hidden
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <input
+                                      value={search}
+                                      onChange={(e) => setSearch(e.target.value)}
+                                      placeholder={t("ui_search", "Rechercher…")}
+                                      className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+                                    />
+                                  </div>
+
+                                  {!String(search || "").trim() && popularStableOptions.length ? (
+                                    <div className="mt-3">
+                                      <div className="text-[10px] tracking-[0.22em] uppercase text-white/45 px-1">
+                                        {t("ui_popular", "Populaires")}
+                                      </div>
+                                      <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                        {popularStableOptions.slice(0, 4).map((opt) => {
+                                          const active = opt.key === stableKey;
+                                          return (
+                                            <button
+                                              key={opt.key}
+                                              type="button"
+                                              onClick={() => {
+                                                setStableKey(opt.key);
+                                                setStableDropdownOpen(false);
+                                                setSearch("");
+                                              }}
+                                              className={[
+                                                "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+                                                active
+                                                  ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+                                                  : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+                                              ].join(" ")}
+                                            >
+                                              <div className="flex items-center gap-2">
+                                                {renderCurrencyIcon(opt.currency)}
+                                                <div className="min-w-0">
+                                                  <div className="text-sm font-semibold truncate">
+                                                    {opt.label}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </button>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  ) : null}
                                 </div>
                               </div>
 
-                              <div className="flex-1 min-h-0 overflow-y-auto">
+                              <div
+                                ref={stableDropdownListRef}
+                                className="flex-1 min-h-0 overflow-y-auto"
+                                onPointerDown={(event) => {
+                                  maybeStartStableOverlayDrag(event, "list");
+                                }}
+                              >
                                 {stableSearchResults.length ? (
                                   stableSearchResults.map((cur) => {
                                     const key = currencyKey(cur);
