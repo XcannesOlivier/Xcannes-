@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { greenActionBtnBase } from "./walletModalTokens";
+import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrpl" };
 const PRIORITY_TICKERS = ["usdc", "usdt", "dai", "usdp", "tusd", "fdusd", "pyusd"];
@@ -140,6 +141,16 @@ export default function WalletDashboardUsdSwapModal({
     }
   }, []);
   const rlusdKey = currencyKey(rlusdCurrency);
+  const rlusdDisplayCurrency = useMemo(() => {
+    const found = currencies.find((c) => currencyKey(c) === rlusdKey);
+    if (found) return found;
+    return {
+      ...DEFAULT_RLUSD,
+      ...rlusdCurrency,
+      name: "RLUSD",
+      image: CRYPTO_ICONS?.RLUSD || "",
+    };
+  }, [currencies, rlusdCurrency, rlusdKey]);
   const stableCurrency = useMemo(() => {
     if (!stableKey) return null;
     return currencies.find((c) => currencyKey(c) === stableKey) || null;
@@ -822,13 +833,24 @@ export default function WalletDashboardUsdSwapModal({
                                 </button>
                               </div>
                             ) : (
-                              <div className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85">
-                                <div className="w-5 h-5 rounded-full bg-xcannes-green/20 ring-1 ring-white/10 flex-shrink-0" />
-                                <span className="text-sm font-semibold">
-                                  {String(rlusdCurrency?.ticker || "RLUSD").toUpperCase()}
+                              <div className="inline-flex items-center gap-2 text-white/90">
+                                <img
+                                  src={
+                                    String(rlusdDisplayCurrency?.image || "").trim() ||
+                                    CRYPTO_ICONS?.RLUSD ||
+                                    "/symbols/rlusd.png"
+                                  }
+                                  alt=""
+                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                  loading="lazy"
+                                  decoding="async"
+                                  referrerPolicy="no-referrer"
+                                />
+                                <span className="text-base font-semibold tracking-tight">
+                                  {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
                                 </span>
-                                <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
-                                  {String(rlusdCurrency?.network || "xrpl").toUpperCase()}
+                                <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
+                                  {String(rlusdDisplayCurrency?.network || "xrpl").toUpperCase()}
                                 </span>
                               </div>
                             )}
@@ -920,13 +942,24 @@ export default function WalletDashboardUsdSwapModal({
                                   {/* Portal content rendered once above (stableDropdownOpen) */}
                                 </div>
                               ) : (
-                                <div className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85">
-                                  <div className="w-5 h-5 rounded-full bg-xcannes-green/20 ring-1 ring-white/10 flex-shrink-0" />
-                                  <span className="text-sm font-semibold">
-                                    {String(rlusdCurrency?.ticker || "RLUSD").toUpperCase()}
+                                <div className="inline-flex items-center gap-2 text-white/90">
+                                  <img
+                                    src={
+                                      String(rlusdDisplayCurrency?.image || "").trim() ||
+                                      CRYPTO_ICONS?.RLUSD ||
+                                      "/symbols/rlusd.png"
+                                    }
+                                    alt=""
+                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                    loading="lazy"
+                                    decoding="async"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  <span className="text-base font-semibold tracking-tight">
+                                    {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
                                   </span>
-                                  <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full bg-white/10 text-white/70">
-                                    {String(rlusdCurrency?.network || "xrpl").toUpperCase()}
+                                  <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
+                                    {String(rlusdDisplayCurrency?.network || "xrpl").toUpperCase()}
                                   </span>
                                 </div>
                               )}
@@ -1020,13 +1053,28 @@ export default function WalletDashboardUsdSwapModal({
                               </div>
 
                               <div className="p-3 border-b border-white/10 bg-black/20">
+                                <div className="relative">
+                                  <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+                                    <svg
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      className="w-4 h-4"
+                                      aria-hidden
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </div>
                                 <input
                                   value={search}
                                   onChange={(e) => setSearch(e.target.value)}
                                   placeholder={t("ui_search", "Rechercher…")}
-                                  autoFocus
-                                  className="w-full px-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+                                  className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
                                 />
+                                </div>
                               </div>
 
                               <div className="flex-1 min-h-0 overflow-y-auto">
