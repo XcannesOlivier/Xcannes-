@@ -810,50 +810,49 @@ export default function WalletDashboardUsdSwapModal({
                                 />
                               </div>
 
-                              {quickStableOptions.length ? (
-                                <div className="px-3 py-3 border-b border-white/10">
-                                  <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
-                                    {t("ui_popular", "Populaires")}
-                                  </div>
-                                  <div className="mt-2 grid grid-cols-2 gap-2">
-                                    {quickStableOptions.slice(0, 13).map((opt) => {
-                                      const active = opt.key === stableKey;
-                                      return (
-                                        <button
-                                          key={opt.key}
-                                          type="button"
-                                          onClick={() => {
-                                            setStableKey(opt.key);
-                                            setStableDropdownOpen(false);
-                                            setSearch("");
-                                          }}
-                                          className={[
-                                            "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-                                            active
-                                              ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                                              : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-                                          ].join(" ")}
-                                        >
-                                          <div className="flex items-center gap-2">
-                                            {renderCurrencyIcon(opt.currency)}
-                                            <div className="min-w-0">
-                                              <div className="text-sm font-semibold truncate">
-                                                {opt.label}
-                                              </div>
-                                              <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                                {String(opt.currency?.name || "").trim() ||
-                                                  currencyLabel(opt.currency)}
+                              <div className="max-h-64 overflow-y-auto">
+                                {quickStableOptions.length ? (
+                                  <div className="px-3 py-3 border-b border-white/10">
+                                    <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+                                      {t("ui_popular", "Populaires")}
+                                    </div>
+                                    <div className="mt-2 grid grid-cols-2 gap-2">
+                                      {quickStableOptions.slice(0, 13).map((opt) => {
+                                        const active = opt.key === stableKey;
+                                        return (
+                                          <button
+                                            key={opt.key}
+                                            type="button"
+                                            onClick={() => {
+                                              setStableKey(opt.key);
+                                              setStableDropdownOpen(false);
+                                              setSearch("");
+                                            }}
+                                            className={[
+                                              "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+                                              active
+                                                ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+                                                : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+                                            ].join(" ")}
+                                          >
+                                            <div className="flex items-center gap-2">
+                                              {renderCurrencyIcon(opt.currency)}
+                                              <div className="min-w-0">
+                                                <div className="text-sm font-semibold truncate">
+                                                  {opt.label}
+                                                </div>
+                                                <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                                                  {String(opt.currency?.name || "").trim() ||
+                                                    currencyLabel(opt.currency)}
+                                                </div>
                                               </div>
                                             </div>
-                                          </div>
-                                        </button>
-                                      );
-                                    })}
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
                                   </div>
-                                </div>
-                              ) : null}
-
-                              <div className="max-h-64 overflow-y-auto">
+                                ) : null}
                                 {stableSearchResults.length ? (
                                   stableSearchResults.map((cur) => {
                                     const key = currencyKey(cur);
