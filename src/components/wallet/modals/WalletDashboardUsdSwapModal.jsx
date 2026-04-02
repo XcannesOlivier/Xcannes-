@@ -13,6 +13,22 @@ const SWAP_DIRECTIONS = {
   RLUSD_TO_STABLE: "rlusd_to_stable",
   STABLE_TO_RLUSD: "stable_to_rlusd",
 };
+const MAX_STABLE_SEARCH_RESULTS = 200;
+const QUICK_STABLE_TARGETS = [
+  { ticker: "usdt", networkAliases: ["tron", "trx", "trc20"], label: "USDT (TRON)" },
+  { ticker: "usdt", networkAliases: ["eth", "ethereum", "erc20"], label: "USDT (ETH)" },
+  { ticker: "usdt", networkAliases: ["bsc", "bnb", "bep20"], label: "USDT (BSC)" },
+  { ticker: "usdc", networkAliases: ["eth", "ethereum", "erc20"], label: "USDC (ETH)" },
+  { ticker: "usdc", networkAliases: ["sol", "solana"], label: "USDC (SOL)" },
+  { ticker: "usdc", networkAliases: ["arbitrum", "arb"], label: "USDC (ARBITRUM)" },
+  { ticker: "usdc", networkAliases: ["base"], label: "USDC (BASE)" },
+  { ticker: "usdc", networkAliases: ["polygon", "matic"], label: "USDC (POLYGON)" },
+  { ticker: "usdc", networkAliases: ["optimism", "op"], label: "USDC (OPTIMISM)" },
+  { ticker: "dai", networkAliases: ["eth", "ethereum", "erc20"], label: "DAI (ETH)" },
+  { ticker: "fdusd", networkAliases: ["bsc", "bnb", "bep20"], label: "FDUSD (BSC)" },
+  { ticker: "usdp", networkAliases: ["eth", "ethereum", "erc20"], label: "USDP (ETH)" },
+  { ticker: "pyusd", networkAliases: ["eth", "ethereum", "erc20"], label: "PYUSD (ETH)" },
+];
 
 function pick(obj, keys, fallback = "") {
   for (const key of keys) {
@@ -39,6 +55,29 @@ function currencyLabel(cur) {
   return `${ticker} (${network})`;
 }
 
+function matchStableTarget(currency, { ticker, networkAliases }) {
+  const curTicker = String(currency?.ticker || "").trim().toLowerCase();
+  const curNetwork = String(currency?.network || "").trim().toLowerCase();
+  if (!curTicker || !curNetwork) return false;
+  if (curTicker !== String(ticker || "").trim().toLowerCase()) return false;
+  return (networkAliases || []).includes(curNetwork);
+}
+
+function renderCurrencyIcon(currency) {
+  const url = String(currency?.image || "").trim();
+  if (!url) return null;
+  return (
+    <img
+      src={url}
+      alt=""
+      className="w-6 h-6 rounded-full bg-white/10 ring-1 ring-white/10 object-cover flex-shrink-0"
+      loading="lazy"
+      decoding="async"
+      referrerPolicy="no-referrer"
+    />
+  );
+}
+
 export default function WalletDashboardUsdSwapModal({
   open,
   onClose,
@@ -61,6 +100,7 @@ export default function WalletDashboardUsdSwapModal({
   const [currenciesLoading, setCurrenciesLoading] = useState(false);
   const [currenciesError, setCurrenciesError] = useState("");
   const [search, setSearch] = useState("");
+  const [showAllStableOptions, setShowAllStableOptions] = useState(false);
   const [stableKey, setStableKey] = useState("");
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
@@ -91,6 +131,20 @@ export default function WalletDashboardUsdSwapModal({
   const fromTicker = String(fromCurrency?.ticker || "").trim().toUpperCase();
   const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
 
+  const quickStableOptions = useMemo(() => {
+    if (!currencies.length) return [];
+    return QUICK_STABLE_TARGETS.map((target) => {
+      const match =
+        currencies.find((cur) => matchStableTarget(cur, target)) || null;
+      if (!match) return null;
+      return {
+        key: currencyKey(match),
+        label: target.label,
+        currency: match,
+      };
+    }).filter(Boolean);
+  }, [currencies]);
+
   const filteredStableOptions = useMemo(() => {
     const needle = String(search || "").trim().toLowerCase();
     const list = currencies
@@ -118,6 +172,11 @@ export default function WalletDashboardUsdSwapModal({
 
     return list;
   }, [currencies, rlusdKey, search]);
+
+  const stableSearchResults = useMemo(
+    () => filteredStableOptions.slice(0, MAX_STABLE_SEARCH_RESULTS),
+    [filteredStableOptions],
+  );
 
   const exchangeId = useMemo(
     () => pick(exchange, ["id", "exchangeId", "publicId"], ""),
@@ -153,6 +212,7 @@ export default function WalletDashboardUsdSwapModal({
     setApiError("");
     setExchange(null);
     setCurrenciesError("");
+    setShowAllStableOptions(false);
   };
 
   useEffect(() => {
@@ -649,27 +709,116 @@ export default function WalletDashboardUsdSwapModal({
                           ? t("ui_usd_swap_receive_in", "Recevoir (ticker / réseau)")
                           : t("ui_usd_swap_send_in", "Envoyer (ticker / réseau)")}
                       </label>
-                      <div className="space-y-2">
-                        <input
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                          placeholder={t("ui_search", "Rechercher…")}
-                          className="w-full px-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                        />
-                        <select
-                          value={stableKey}
-                          onChange={(e) => setStableKey(e.target.value)}
-                          className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                        >
-                          {filteredStableOptions.map((cur) => {
-                            const key = currencyKey(cur);
-                            return (
-                              <option key={key} value={key}>
-                                {currencyLabel(cur)}
-                              </option>
-                            );
-                          })}
-                        </select>
+	                      <div className="space-y-2">
+	                        {quickStableOptions.length ? (
+	                          <div className="grid grid-cols-2 gap-2">
+	                            {quickStableOptions.slice(0, 13).map((opt) => {
+	                              const active = opt.key === stableKey;
+	                              return (
+	                                <button
+	                                  key={opt.key}
+	                                  type="button"
+	                                  onClick={() => setStableKey(opt.key)}
+	                                  className={[
+	                                    "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+	                                    active
+	                                      ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+	                                      : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+	                                  ].join(" ")}
+	                                >
+	                                  <div className="flex items-center gap-2">
+	                                    {renderCurrencyIcon(opt.currency)}
+	                                    <div className="min-w-0">
+	                                      <div className="text-sm font-semibold truncate">
+	                                        {opt.label}
+	                                      </div>
+	                                      <div className="mt-0.5 text-[11px] text-white/55 truncate">
+	                                        {String(opt.currency?.name || "").trim() ||
+	                                          currencyLabel(opt.currency)}
+	                                      </div>
+	                                    </div>
+	                                  </div>
+	                                </button>
+	                              );
+	                            })}
+	                          </div>
+	                        ) : null}
+
+                        {!showAllStableOptions ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowAllStableOptions(true)}
+                            className="w-full rounded-xl px-4 py-3 ring-1 ring-white/10 ring-inset bg-white/[0.03] text-white/80 font-semibold hover:bg-white/[0.05] transition-colors"
+                          >
+                            {t("ui_see_more", "Voir plus")}
+                          </button>
+	                        ) : (
+	                          <>
+	                            <input
+	                              value={search}
+	                              onChange={(e) => setSearch(e.target.value)}
+	                              placeholder={t("ui_search", "Rechercher…")}
+	                              className="w-full px-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+	                            />
+	                            <div className="rounded-xl ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden">
+	                              <div className="max-h-64 overflow-y-auto">
+	                                {stableSearchResults.map((cur) => {
+	                                  const key = currencyKey(cur);
+	                                  const active = key === stableKey;
+	                                  return (
+	                                    <button
+	                                      key={key}
+	                                      type="button"
+	                                      onClick={() => {
+	                                        setStableKey(key);
+	                                        setShowAllStableOptions(false);
+	                                      }}
+	                                      className={[
+	                                        "w-full flex items-center gap-3 px-3 py-2 text-left border-b border-white/5 last:border-b-0",
+	                                        active
+	                                          ? "bg-xcannes-green/10 text-white"
+	                                          : "hover:bg-white/[0.04] text-white/80",
+	                                      ].join(" ")}
+	                                    >
+	                                      {renderCurrencyIcon(cur)}
+	                                      <div className="min-w-0 flex-1">
+	                                        <div className="text-sm font-semibold truncate">
+	                                          {String(cur?.ticker || "").toUpperCase()}{" "}
+	                                          <span className="text-white/50 font-normal">
+	                                            ({String(cur?.network || "").toUpperCase()})
+	                                          </span>
+	                                        </div>
+	                                        <div className="text-[11px] text-white/55 truncate">
+	                                          {String(cur?.name || "").trim() || currencyLabel(cur)}
+	                                        </div>
+	                                      </div>
+	                                      {active ? (
+	                                        <span className="text-xcannes-green font-semibold text-xs">
+	                                          ✓
+	                                        </span>
+	                                      ) : null}
+	                                    </button>
+	                                  );
+	                                })}
+	                              </div>
+	                              <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+	                                {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
+	                                  ? t(
+	                                      "ui_search_limit",
+	                                      `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
+	                                    )
+	                                  : t("ui_search_results", "Sélectionnez un actif.")}
+	                              </div>
+	                            </div>
+	                            <button
+	                              type="button"
+	                              onClick={() => setShowAllStableOptions(false)}
+	                              className="w-full rounded-xl px-4 py-3 ring-1 ring-white/10 ring-inset bg-black/20 text-white/70 font-semibold hover:bg-black/30 hover:text-white transition-colors"
+                            >
+                              {t("ui_hide", "Masquer")}
+                            </button>
+                          </>
+                        )}
                         {toCurrency?.hasExtraId ? (
                           <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
                             {t(
