@@ -37,7 +37,7 @@ export function useDesktopInlineFlags({
   const showInlineCashUsdSwap =
     isDesktopPanel &&
     !showInlineQrScanner &&
-    activeAction === "cashUsdSwap";
+    (activeAction === "cashUsdSwapOut" || activeAction === "cashUsdSwapIn");
   const showInlineCash =
     isDesktopPanel &&
     !showInlineQrScanner &&

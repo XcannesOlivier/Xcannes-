@@ -53,8 +53,6 @@ export default function WalletMobileModals({
   resetReceiveForm,
   resetSwapForm,
   resetCashForm,
-  cashUsdSwapPreset,
-  setCashUsdSwapPreset,
 
   // QR scanner
   qrScannerOpen,
@@ -155,23 +153,25 @@ export default function WalletMobileModals({
                 setActiveAction("cash");
               }}
               onChooseUsdSwapOut={() => {
-                setCashUsdSwapPreset?.("rlusd_to_stable");
-                setActiveAction("cashUsdSwap");
+                setActiveAction("cashUsdSwapOut");
               }}
               onChooseUsdSwapIn={() => {
-                setCashUsdSwapPreset?.("stable_to_rlusd");
-                setActiveAction("cashUsdSwap");
+                setActiveAction("cashUsdSwapIn");
               }}
             />
 
             <WalletDashboardUsdSwapModal
-              open={activeAction === "cashUsdSwap"}
+              open={
+                activeAction === "cashUsdSwapOut" || activeAction === "cashUsdSwapIn"
+              }
               onClose={() => {
                 setActiveAction("cashChoice");
               }}
               walletLabel={cashModalProps?.walletLabel || ""}
               walletAddress={cashModalProps?.walletAddress || ""}
-              initialDirection={cashUsdSwapPreset}
+              initialDirection={
+                activeAction === "cashUsdSwapIn" ? "stable_to_rlusd" : "rlusd_to_stable"
+              }
             />
 
             <WalletDashboardCashModal

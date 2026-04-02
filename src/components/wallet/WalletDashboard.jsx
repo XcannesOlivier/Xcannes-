@@ -152,7 +152,6 @@ export default function WalletDashboard({
 
   // ── UI state (needs to exist before callbacks deps) ───────
   const [activeAction, setActiveAction] = useState(null);
-  const [cashUsdSwapPreset, setCashUsdSwapPreset] = useState("rlusd_to_stable");
 
   const handleTxProgressClose = useCallback(() => {
     let shouldCloseAction = false;
@@ -822,8 +821,7 @@ export default function WalletDashboard({
   });
 
   // ── Modal props (shared desktop & mobile) ──────────────────
-  const modalProps = {
-    ...useWalletModalProps({
+  const modalProps = useWalletModalProps({
       wallet,
       isConnected,
       isWalletActivated,
@@ -884,10 +882,7 @@ export default function WalletDashboard({
       // Spread sub-orchestrator state (keys match useWalletModalProps params)
       ...sendState,
       ...swapState,
-    }),
-    cashUsdSwapPreset,
-    setCashUsdSwapPreset,
-  };
+  });
 
   // ── Body scroll lock ───────────────────────────────────────
   const allowBackgroundScrollForStatements =
@@ -896,7 +891,8 @@ export default function WalletDashboard({
     !isDesktopPanel &&
     (activeAction === "cash" ||
       activeAction === "cashChoice" ||
-      activeAction === "cashUsdSwap" ||
+      activeAction === "cashUsdSwapOut" ||
+      activeAction === "cashUsdSwapIn" ||
       (activeAction === "swap" && swapState.swapLockedView === "lines") ||
       (activeAction === "send" && sendState.sendTab === "payreq"));
   const lockForActiveAction = Boolean(

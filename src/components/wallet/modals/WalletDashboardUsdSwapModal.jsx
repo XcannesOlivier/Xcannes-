@@ -385,7 +385,9 @@ export default function WalletDashboardUsdSwapModal({
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                    {t("ui_usd_swap_title", "Échanger des stablecoins USD")}
+                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                      ? t("ui_swap_title_out", "RLUSD → stablecoin USD")
+                      : t("ui_swap_title_in", "Stablecoin USD → RLUSD")}
                   </h3>
                   {noticeVariant === "demo" ? (
                     <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
@@ -394,10 +396,15 @@ export default function WalletDashboardUsdSwapModal({
                   ) : null}
                 </div>
                 <p className="mt-1 text-xs md:text-sm text-white/60">
-                  {t(
-                    "ui_usd_swap_subtitle",
-                    "Échangez RLUSD (XRPL) ↔ stablecoins USD multi-chain via SimpleSwap.",
-                  )}
+                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                    ? t(
+                        "ui_swap_subtitle_out",
+                        "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
+                      )
+                    : t(
+                        "ui_swap_subtitle_in",
+                        "Envoyez un stablecoin USD depuis un wallet externe et recevez du RLUSD sur XRPL via SimpleSwap.",
+                      )}
                 </p>
               </div>
               <button
@@ -624,60 +631,6 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "form" ? (
                   <>
-                    <div>
-                      <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {t("ui_swap_direction", "Sens du swap")}
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDirection(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
-                            setQuote(null);
-                            setRanges(null);
-                            setApiError("");
-                            setExchange(null);
-                            setStep("form");
-                          }}
-                          className={[
-                            "rounded-xl px-4 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-                            direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
-                              ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                              : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-                          ].join(" ")}
-                        >
-                          <div className="text-sm font-semibold">RLUSD (XRPL)</div>
-                          <div className="mt-0.5 text-[11px] text-white/55">
-                            {t("ui_swap_dir_out", "→ stablecoin USD (multi‑chain)")}
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDirection(SWAP_DIRECTIONS.STABLE_TO_RLUSD);
-                            setQuote(null);
-                            setRanges(null);
-                            setApiError("");
-                            setExchange(null);
-                            setStep("form");
-                          }}
-                          className={[
-                            "rounded-xl px-4 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-                            direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                              ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                              : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-                          ].join(" ")}
-                        >
-                          <div className="text-sm font-semibold">
-                            {t("ui_swap_dir_in", "Stablecoin USD")}
-                          </div>
-                          <div className="mt-0.5 text-[11px] text-white/55">
-                            {t("ui_swap_dir_in_hint", "→ RLUSD (XRPL)")}
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-
                     <div className="rounded-lg ring-1 ring-white/10 ring-inset bg-white/[0.03] px-3 py-2 text-[11px] text-white/60">
                       {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
                         ? t(

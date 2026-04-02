@@ -66,8 +66,6 @@ export default function WalletDesktopModals({
   resetReceiveForm,
   resetSwapForm,
   resetCashForm,
-  cashUsdSwapPreset,
-  setCashUsdSwapPreset,
   setQrScannerOpen,
   handleAddressScan,
 
@@ -159,12 +157,10 @@ export default function WalletDesktopModals({
             setActiveAction("cash");
           }}
           onChooseUsdSwapOut={() => {
-            setCashUsdSwapPreset?.("rlusd_to_stable");
-            setActiveAction("cashUsdSwap");
+            setActiveAction("cashUsdSwapOut");
           }}
           onChooseUsdSwapIn={() => {
-            setCashUsdSwapPreset?.("stable_to_rlusd");
-            setActiveAction("cashUsdSwap");
+            setActiveAction("cashUsdSwapIn");
           }}
         />
       ) : null}
@@ -176,7 +172,9 @@ export default function WalletDesktopModals({
           onClose={() => setActiveAction("cashChoice")}
           walletLabel={cashModalProps?.walletLabel || ""}
           walletAddress={cashModalProps?.walletAddress || ""}
-          initialDirection={cashUsdSwapPreset}
+          initialDirection={
+            activeAction === "cashUsdSwapIn" ? "stable_to_rlusd" : "rlusd_to_stable"
+          }
         />
       ) : null}
 
