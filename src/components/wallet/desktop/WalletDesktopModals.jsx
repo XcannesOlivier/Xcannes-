@@ -55,6 +55,7 @@ export default function WalletDesktopModals({
   statementSharedProps,
 
   // open/close handlers
+  activeAction,
   setActiveAction,
   setShowActivationModal,
   setShowActivationRequestModal,
