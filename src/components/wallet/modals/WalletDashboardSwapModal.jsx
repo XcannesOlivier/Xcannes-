@@ -630,26 +630,26 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-                  <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={(e) => {
+	                  <div className="flex justify-center">
+	                    <button
+	                      type="button"
+	                      onClick={(e) => {
                         e.stopPropagation();
                         const prevBase = convertBaseCurrency;
                         const prevQuote = convertQuoteCurrency;
                         if (!prevBase || !prevQuote) return;
                         setConvertBaseCurrency(prevQuote);
-                        setConvertQuoteCurrency(prevBase);
-                      }}
-                      className="h-10 w-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset hover:bg-white/10 hover:ring-white/20 transition-colors duration-150 flex items-center justify-center text-white/70"
-                      aria-label={t("ui_swap_currencies", "Inverser")}
-                      title={t("ui_swap_currencies", "Inverser")}
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h10M7 10l3-3M7 10l3 3M17 14H7m10 0l-3-3m3 3l-3 3" />
-                      </svg>
-                    </button>
-                  </div>
+	                        setConvertQuoteCurrency(prevBase);
+	                      }}
+	                      className="p-3.5 flex items-center justify-center text-white/70 hover:text-white/90 transition-colors duration-150"
+	                      aria-label={t("ui_swap_currencies", "Inverser")}
+	                      title={t("ui_swap_currencies", "Inverser")}
+	                    >
+	                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+	                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h10M7 10l3-3M7 10l3 3M17 14H7m10 0l-3-3m3 3l-3 3" />
+	                      </svg>
+	                    </button>
+	                  </div>
 
                   <div>
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">

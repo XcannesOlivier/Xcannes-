@@ -775,7 +775,7 @@ const MoonPayBuyModal = ({
         <div className="space-y-5">
 		          {/* Currency selector */}
 		          <div>
-			            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase">
+			            <label className="block text-[16px] md:text-base font-orbitron font-bold text-xcannes-green/90 mb-3 uppercase">
 			              {t(
 			                "moonpay_buy_select_asset",
 			                "Choisissez l'actif que vous voulez ajouter",
@@ -888,7 +888,7 @@ const MoonPayBuyModal = ({
                 </p>
               </div>
             ) : null}
-		            <p className="text-[12px] md:text-[13px] text-xcannes-green/80 font-mono break-all">
+		            <p className="text-[12px] md:text-[13px] text-white/60 font-mono break-all">
 		              {walletAddress}
 		            </p>
 		          </div>

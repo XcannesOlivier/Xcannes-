@@ -1367,7 +1367,7 @@ const MoonPaySellModal = ({
               </span>
             </div>
 	            {balanceLabel ? (
-	              <p className="mt-2 text-[11px] text-xcannes-green/85 font-medium">
+	              <p className="mt-2 text-[11px] text-white/55">
 	                {t(
 	                  "moonpay_sell_balance_available",
 	                  "Disponible: {{amount}}",
