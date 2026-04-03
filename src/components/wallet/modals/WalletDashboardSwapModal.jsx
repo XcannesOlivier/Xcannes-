@@ -320,20 +320,7 @@ export default function WalletDashboardSwapModal({
   const closeRequestedRef = useRef(false);
 
   useEffect(() => {
-    if (open) return;
-    closeRequestedRef.current = false;
-    try {
-      const listEl = overlayListRef.current;
-      const meta = overlayDragMetaRef.current;
-      if (listEl && meta?.scrollLocked) {
-        listEl.style.overflowY = meta.lockedOverflowY;
-      }
-    } catch {
-      // ignore
-    }
-    setOverlayDragging(false);
-    setOverlayTranslateY(0);
-    overlayDragMetaRef.current = {
+    const resetMeta = {
       startY: 0,
       startAt: 0,
       pointerId: null,
@@ -344,6 +331,27 @@ export default function WalletDashboardSwapModal({
       scrollLocked: false,
       lockedOverflowY: "",
     };
+
+    if (open) {
+      closeRequestedRef.current = false;
+      setOverlayDragging(false);
+      setOverlayTranslateY(0);
+      overlayDragMetaRef.current = resetMeta;
+      return;
+    }
+
+    try {
+      const listEl = overlayListRef.current;
+      const meta = overlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setOverlayDragging(false);
+    if (!closeRequestedRef.current) setOverlayTranslateY(0);
+    overlayDragMetaRef.current = resetMeta;
   }, [open]);
 
   const releaseOverlayScrollLock = () => {
