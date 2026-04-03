@@ -34,6 +34,21 @@ export default function WalletSettingsDropdown({
   const { t } = useTranslation("common");
   const { goToChoice } = useWallet();
   const [isOpen, setIsOpen] = useState(false);
+  const [overlayDragging, setOverlayDragging] = useState(false);
+  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const overlayRef = useRef(null);
+  const overlayListRef = useRef(null);
+  const overlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
   const [showQrModal, setShowQrModal] = useState(false);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
@@ -261,6 +276,145 @@ export default function WalletSettingsDropdown({
     setDesktopPlacement("bottom");
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) return;
+    try {
+      const listEl = overlayListRef.current;
+      const meta = overlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setOverlayDragging(false);
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  }, [isOpen]);
+
+  const releaseOverlayScrollLock = () => {
+    const meta = overlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = overlayListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartOverlayDrag = (event, source) => {
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = overlayListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    overlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleOverlayPointerMove = (event) => {
+    const meta = overlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        overlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = overlayListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setOverlayTranslateY(delta);
+  };
+
+  const handleOverlayPointerEnd = (event) => {
+    const meta = overlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration; // px/ms
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    overlayDragMetaRef.current.pending = false;
+    overlayDragMetaRef.current.dragging = false;
+    setOverlayDragging(false);
+    releaseOverlayScrollLock();
+
+    if (shouldClose) {
+      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+      setOverlayTranslateY(Math.max(delta, height));
+      window.setTimeout(() => setIsOpen(false), 180);
+      return;
+    }
+
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
+
   return (
     <div className={visibilityClass} ref={ref}>
       <button
@@ -293,24 +447,39 @@ export default function WalletSettingsDropdown({
         </svg>
       </button>
 
-      {isOpen && (
-        <>
-          {/* Backdrop on mobile (tap to close) */}
-          <button
-            type="button"
-            aria-label={t("close", "Fermer")}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
-            onClick={() => setIsOpen(false)}
-          />
+	      {isOpen && (
+	        <>
+	          {/* Backdrop on mobile (tap to close) */}
+	          <button
+	            type="button"
+	            aria-label={t("close", "Fermer")}
+	            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
+	            onClick={() => setIsOpen(false)}
+              style={{
+                opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)),
+              }}
+	          />
 
 	          <div
 	            role="menu"
-              ref={menuRef}
-              style={isDesktop ? desktopMenuStyle || undefined : undefined}
+              ref={(node) => {
+                menuRef.current = node;
+                overlayRef.current = node;
+              }}
+              style={{
+                ...(isDesktop ? desktopMenuStyle || {} : {}),
+                transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+                transition: overlayDragging
+                  ? "none"
+                  : "transform 220ms cubic-bezier(0.2,0,0,1)",
+              }}
 	            className={[
-	              "fixed inset-0 z-50 overflow-y-auto bg-elevated",
+	              "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
 	              "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
 	            ].join(" ")}
+              onPointerMove={handleOverlayPointerMove}
+              onPointerUp={handleOverlayPointerEnd}
+              onPointerCancel={handleOverlayPointerEnd}
 	          >
             {/* Pointer (desktop) */}
             <div
@@ -330,21 +499,33 @@ export default function WalletSettingsDropdown({
             />
 
 	            {/* Mobile header */}
-	            <div className="flex items-center justify-between px-4 pt-4 pb-3 md:hidden">
-	              <div className="min-w-0">
-	                <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
-	                  {t("ui_settings_label", "Paramètres")}
-	                </div>
-		              </div>
-	              <button
-	                type="button"
-                onClick={() => setIsOpen(false)}
-                className="h-10 w-10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
-                aria-label={t("close", "Fermer")}
+	            <div
+                className="shrink-0 md:hidden border-b border-white/10"
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "fixed");
+                }}
               >
-                ✕
-              </button>
-            </div>
+                <div className="flex justify-center pt-3 pb-1">
+                  <div className="w-16 h-5 flex items-center justify-center" aria-hidden>
+                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between px-4 pt-2 pb-3">
+                  <div className="min-w-0">
+                    <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+                      {t("ui_settings_label", "Paramètres")}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="h-10 w-10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
+                    aria-label={t("close", "Fermer")}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
 
 	            {/* Desktop header */}
 	            <div className="hidden md:flex items-center justify-between px-4 py-3">
@@ -357,7 +538,7 @@ export default function WalletSettingsDropdown({
                 </span>
 	                <div className="min-w-0">
 	                  <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
-	                    {t("ui_settings_label", "Paramètres")}
+		                    {t("ui_settings_label", "Paramètres")}
 		                  </div>
 		                </div>
 		              </div>
@@ -371,12 +552,18 @@ export default function WalletSettingsDropdown({
               </button>
             </div>
 
-	            <div className="px-3 pb-4 md:px-3 md:pb-3 md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain">
-              {/* Section: Comptes */}
-              <div className="pt-2 md:pt-2.5">
-                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
-                  {t("ui_settings_section_accounts", "Comptes")}
-                </div>
+	            <div
+                ref={overlayListRef}
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3 md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain"
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "list");
+                }}
+              >
+	              {/* Section: Comptes */}
+	              <div className="pt-2 md:pt-2.5">
+	                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
+	                  {t("ui_settings_section_accounts", "Comptes")}
+	                </div>
 
                 <button
                   type="button"
