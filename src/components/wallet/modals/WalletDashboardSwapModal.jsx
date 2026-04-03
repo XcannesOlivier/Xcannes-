@@ -619,13 +619,13 @@ export default function WalletDashboardSwapModal({
 	                      useNativeSelect={false}
 	                      showMobileOptionRight={true}
 	                      iconClassName="text-3xl leading-none"
-	                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+		                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
 	                      menuClassName={
 	                        noticeVariant === "demo"
 	                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
 	                          : "bg-elevated border-white/15 ring-1 ring-white/10"
 	                      }
-	                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+		                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
 	                    />
 	                  </div>
 
@@ -673,13 +673,13 @@ export default function WalletDashboardSwapModal({
 	                      useNativeSelect={false}
 	                      showMobileOptionRight={true}
 	                      iconClassName="text-3xl leading-none"
-	                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+		                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
 	                      menuClassName={
 	                        noticeVariant === "demo"
 	                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
 	                          : "bg-elevated border-white/15 ring-1 ring-white/10"
 	                      }
-	                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+		                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
 	                    />
 	                  </div>
 
@@ -752,7 +752,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
+	                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
                       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                         {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
                       </div>

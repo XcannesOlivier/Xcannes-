@@ -1693,7 +1693,7 @@ export default function CurrencyStatement({
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className={isInlineDesktop ? "md:col-span-3" : ""}>
-              <div className="min-w-0 space-y-0.5 rounded-xl border border-white/10 px-3 py-2 bg-black/40">
+	              <div className="min-w-0 space-y-0.5 rounded-xl border border-white/10 px-3 py-2 bg-black/40 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
                 <WalletActiveLabel
                   prefix={t("ui_current_account_prefix", "Compte actuel :")}
                   label={walletLabel || t("nav_wallet", "Wallet")}
