@@ -10,6 +10,26 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrp" };
 const PRIORITY_TICKERS = ["usdc", "usdt", "dai", "usdp", "tusd", "fdusd", "pyusd"];
+const STABLE_NETWORK_PREFERENCE = [
+  "tron",
+  "trx",
+  "trc20",
+  "bsc",
+  "bnb",
+  "bep20",
+  "eth",
+  "ethereum",
+  "erc20",
+  "polygon",
+  "matic",
+  "arbitrum",
+  "arb",
+  "optimism",
+  "op",
+  "base",
+  "sol",
+  "solana",
+];
 const SWAP_DIRECTIONS = {
   RLUSD_TO_STABLE: "rlusd_to_stable",
   STABLE_TO_RLUSD: "stable_to_rlusd",
@@ -162,6 +182,7 @@ export default function WalletDashboardUsdSwapModal({
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [ranges, setRanges] = useState(null);
   const [apiError, setApiError] = useState("");
+  const [pairUnavailable, setPairUnavailable] = useState(false);
   const [exchange, setExchange] = useState(null);
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
   const estimateAbortRef = useRef(null);
@@ -299,6 +320,11 @@ export default function WalletDashboardUsdSwapModal({
   const amountAboveMax =
     hasValidAmount && Number.isFinite(maxFromAmount) && parsedAmount > maxFromAmount;
   const amountOutOfRange = amountBelowMin || amountAboveMax;
+
+  useEffect(() => {
+    if (!open) return;
+    setPairUnavailable(false);
+  }, [open, direction, fromCurrencyKey, toCurrencyKey]);
 
   useEffect(() => {
     // Refresh min/max when the pair changes (not on amount typing).
@@ -677,52 +703,129 @@ export default function WalletDashboardUsdSwapModal({
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
     if (amountOutOfRange) return;
     try {
-      const params = new URLSearchParams({
-        fixed: "false",
-        reverse: "false",
-        tickerFrom: String(fromCurrency.ticker || ""),
-        networkFrom: String(fromCurrency.network || ""),
-        tickerTo: String(toCurrency.ticker || ""),
-        networkTo: String(toCurrency.network || ""),
-        amount: String(parsedAmount),
-      }).toString();
-
       const tryEndpoints = ["/api/simpleswap/estimates", "/api/simpleswap/check"];
-      let lastErrorMessage = "";
-      let lastStatus = 0;
-      for (const endpoint of tryEndpoints) {
-        const response = await fetch(`${endpoint}?${params}`, { signal });
-        const data = await response.json().catch(() => null);
-        if (!response.ok) {
-          lastStatus = response.status;
-          lastErrorMessage =
-            String(data?.message || data?.error || "").trim() ||
-            String(data?.details?.message || data?.details?.error || "").trim() ||
-            `HTTP ${response.status}`;
-          continue;
-        }
-        if (data == null) continue;
 
-        // Normalize primitives to a consistent shape.
+      const runEstimate = async (candidateFrom, candidateTo) => {
+        const params = new URLSearchParams({
+          fixed: "false",
+          reverse: "false",
+          tickerFrom: String(candidateFrom?.ticker || ""),
+          networkFrom: String(candidateFrom?.network || ""),
+          tickerTo: String(candidateTo?.ticker || ""),
+          networkTo: String(candidateTo?.network || ""),
+          amount: String(parsedAmount),
+        }).toString();
+
+        let lastErrorMessage = "";
+        let lastStatus = 0;
+        for (const endpoint of tryEndpoints) {
+          const response = await fetch(`${endpoint}?${params}`, { signal });
+          const data = await response.json().catch(() => null);
+          if (!response.ok) {
+            lastStatus = response.status;
+            lastErrorMessage =
+              String(data?.message || data?.error || "").trim() ||
+              String(data?.details?.message || data?.details?.error || "").trim() ||
+              `HTTP ${response.status}`;
+            continue;
+          }
+          if (data == null) continue;
+          return { ok: true, data };
+        }
+        return { ok: false, status: lastStatus, message: lastErrorMessage };
+      };
+
+      setPairUnavailable(false);
+      const primary = await runEstimate(fromCurrency, toCurrency);
+      if (primary.ok) {
+        const data = primary.data;
         if (typeof data === "string" || typeof data === "number") {
           setQuote({ estimatedAmount: data });
           setApiError("");
+          setPairUnavailable(false);
           return;
         }
         if (typeof data === "object") {
           setQuote(data);
           maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
           setApiError("");
+          setPairUnavailable(false);
           return;
+        }
+      }
+
+      const lastStatus = Number(primary?.status) || 0;
+      const lastErrorMessage = String(primary?.message || "").trim();
+      const pairIsUnavailable =
+        lastStatus === 404 &&
+        /pair is unavailable/i.test(lastErrorMessage || "");
+
+      if (
+        pairIsUnavailable &&
+        direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
+        stableCurrency &&
+        currencies.length
+      ) {
+        const stableTicker = String(stableCurrency?.ticker || "").trim().toLowerCase();
+        const candidates = currencies
+          .filter((cur) => {
+            if (!cur) return false;
+            if (currencyKey(cur) === rlusdKey) return false;
+            if (String(cur?.ticker || "").trim().toLowerCase() !== stableTicker) return false;
+            const key = currencyKey(cur);
+            return key && key !== stableKey;
+          })
+          .slice();
+
+        candidates.sort((a, b) => {
+          const an = String(a?.network || "").trim().toLowerCase();
+          const bn = String(b?.network || "").trim().toLowerCase();
+          const ai = STABLE_NETWORK_PREFERENCE.indexOf(an);
+          const bi = STABLE_NETWORK_PREFERENCE.indexOf(bn);
+          const ap = ai === -1 ? 999 : ai;
+          const bp = bi === -1 ? 999 : bi;
+          if (ap !== bp) return ap - bp;
+          return an.localeCompare(bn);
+        });
+
+        for (const candidate of candidates) {
+          const attempt = await runEstimate(candidate, toCurrency);
+          if (!attempt.ok) continue;
+
+          setStableKey(currencyKey(candidate));
+          setSearch("");
+          setPairUnavailable(false);
+          setApiError("");
+
+          const data = attempt.data;
+          if (typeof data === "string" || typeof data === "number") {
+            setQuote({ estimatedAmount: data });
+            return;
+          }
+          if (typeof data === "object") {
+            setQuote(data);
+            maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
+            return;
+          }
         }
       }
 
       if (lastErrorMessage) {
         if (lastStatus === 404) {
+          setPairUnavailable(true);
+          const rlusdPayoutBlocked =
+            direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
+            String(toCurrency?.ticker || "").trim().toLowerCase() === "rlusd" &&
+            String(toCurrency?.network || "").trim().toLowerCase() === "xrp" &&
+            pairIsUnavailable;
           setApiError(
             t(
               "ui_usd_swap_pair_not_supported",
-              `Paire non supportée (${fromTicker}/${fromNetwork} → ${toTicker}/${toNetwork}). Essayez un autre réseau.`,
+              rlusdPayoutBlocked
+                ? `SimpleSwap indique que RLUSD (XRPL) n’est pas disponible en réception via l’API (pair “unavailable”). Il faut activer les payouts RLUSD(XRP) côté SimpleSwap (API-key) ou utiliser un autre actif de réception.`
+                : pairIsUnavailable
+                  ? `Paire indisponible dans ce sens (${fromTicker}/${fromNetwork} → ${toTicker}/${toNetwork}). Essayez un autre réseau.`
+                  : `Paire non supportée (${fromTicker}/${fromNetwork} → ${toTicker}/${toNetwork}). Essayez un autre réseau.`,
             ),
           );
         } else {
@@ -773,6 +876,7 @@ export default function WalletDashboardUsdSwapModal({
     if (hasValidAmount) return;
     setQuoteLoading(false);
     setQuote(null);
+    setPairUnavailable(false);
   }, [hasValidAmount, open]);
 
   const createExchange = async ({ returnStep = "address" } = {}) => {
@@ -1748,6 +1852,7 @@ export default function WalletDashboardUsdSwapModal({
                       disabled={
                         !hasValidAmount ||
                         amountOutOfRange ||
+                        pairUnavailable ||
                         !fromCurrency ||
                         !toCurrency ||
                         !stableCurrency
@@ -1881,6 +1986,7 @@ export default function WalletDashboardUsdSwapModal({
                       disabled={
                         !hasValidAmount ||
                         amountOutOfRange ||
+                        pairUnavailable ||
                         !fromCurrency ||
                         !toCurrency ||
                         !stableCurrency ||
