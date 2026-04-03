@@ -1159,7 +1159,7 @@ export default function GlobalStatement({
     STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.full;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10200] flex relative";
+    : "fixed inset-0 z-[10200] flex";
   const modalBgClass =
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
   const swipeEnabled = !inline && variant === "full";

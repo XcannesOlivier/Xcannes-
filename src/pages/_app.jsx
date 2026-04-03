@@ -10,7 +10,6 @@ import wsClient from "@/lib/xcannesWebSocket";
 import WalletRelayQRModal from "@/components/wallet/WalletRelayQRModal";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import ClientErrorBoundary from "@/components/ui/ClientErrorBoundary";
 
 function App({ Component, pageProps }) {
   const router = useRouter();
@@ -88,28 +87,22 @@ function App({ Component, pageProps }) {
     : `page-transition page-transition--${transitionDirection}`;
 
   return (
-    <ClientErrorBoundary
-      name="AppRoot"
-      title="Erreur UI (client)"
-      resetKey={router?.asPath || "root"}
-    >
-      <NativeWalletProvider>
-        <PwaEmbeddedProvider>
-          <WalletProviderSwitch>
-            <WalletRelayQRModal />
-            <div className="font-sans">
-              <div
-                className={`${transitionClass}${
-                  isRouteChanging ? " page-transition--exit" : ""
-                }`}
-              >
-                <Component {...pageProps} />
-              </div>
+    <NativeWalletProvider>
+      <PwaEmbeddedProvider>
+        <WalletProviderSwitch>
+          <WalletRelayQRModal />
+          <div className="font-sans">
+            <div
+              className={`${transitionClass}${
+                isRouteChanging ? " page-transition--exit" : ""
+              }`}
+            >
+              <Component {...pageProps} />
             </div>
-          </WalletProviderSwitch>
-        </PwaEmbeddedProvider>
-      </NativeWalletProvider>
-    </ClientErrorBoundary>
+          </div>
+        </WalletProviderSwitch>
+      </PwaEmbeddedProvider>
+    </NativeWalletProvider>
   );
 }
 

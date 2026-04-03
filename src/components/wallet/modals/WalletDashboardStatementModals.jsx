@@ -10,7 +10,6 @@ import {
 import CurrencyStatement from "../statements/CurrencyStatement";
 import GlobalStatement from "../statements/GlobalStatement";
 import { useModalTransition } from "@/hooks/useModalTransition";
-import ClientErrorBoundary from "@/components/ui/ClientErrorBoundary";
 
 export default function WalletDashboardStatementModals({
   augmentedTokens,
@@ -470,114 +469,93 @@ export default function WalletDashboardStatementModals({
       ) : null}
 
       {globalModalTransition.shouldRender && !inlineGlobalStatement ? (
-        <ClientErrorBoundary
-          name="GlobalStatement"
-          title="Statement global: erreur UI"
-          resetKey={showGlobalStatement ? "open" : "closed"}
+        <GlobalStatement
+          tokens={globalStatementTokens || augmentedTokens}
+          walletAddress={wallet}
+          walletLabelOverride={walletDisplayLabel}
+          isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
+          noticeVariant={noticeVariant}
+          noticeContextLabel={noticeContextLabel}
+          walletId={walletId}
+          period="December 2025"
+          variant="full"
+          usdRates={usdRates}
+          preferredCurrency={preferredCurrency}
+          rlusdPerUnitRates={rlusdPerUnitRates}
+          totalBalanceOverride={statementTotalBalanceUsd}
+          movements={canFetchStatements ? globalMovements : previewMovements}
+          movementsLoading={canFetchStatements ? globalLoading : false}
+          movementsError={canFetchStatements ? globalError : null}
+          movementsHasMore={canFetchStatements ? globalHasMore : false}
+          movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
+          onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
+          isClosing={globalModalTransition.isClosing}
           onClose={() => {
             setShowGlobalStatement(false);
             maybeReturnToSettingsDropdown();
           }}
-        >
-          <GlobalStatement
-            tokens={globalStatementTokens || augmentedTokens}
-            walletAddress={wallet}
-            walletLabelOverride={walletDisplayLabel}
-            isPreviewMode={isPreviewMode}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel}
-            walletId={walletId}
-            period="December 2025"
-            variant="full"
-            usdRates={usdRates}
-            preferredCurrency={preferredCurrency}
-            rlusdPerUnitRates={rlusdPerUnitRates}
-            totalBalanceOverride={statementTotalBalanceUsd}
-            movements={canFetchStatements ? globalMovements : previewMovements}
-            movementsLoading={canFetchStatements ? globalLoading : false}
-            movementsError={canFetchStatements ? globalError : null}
-            movementsHasMore={canFetchStatements ? globalHasMore : false}
-            movementsLoadingMore={canFetchStatements ? globalLoadingMore : false}
-            onLoadMoreMovements={canFetchStatements ? loadGlobalMore : null}
-            isClosing={globalModalTransition.isClosing}
-            onClose={() => {
-              setShowGlobalStatement(false);
-              maybeReturnToSettingsDropdown();
-            }}
-            onViewCurrency={(token) => {
-              setSelectedStatementToken(token);
-              setShowGlobalStatement(false);
-              setShowCurrencyStatement(true);
-            }}
-            toast={toast}
-          />
-        </ClientErrorBoundary>
+          onViewCurrency={(token) => {
+            setSelectedStatementToken(token);
+            setShowGlobalStatement(false);
+            setShowCurrencyStatement(true);
+          }}
+          toast={toast}
+        />
       ) : null}
 
       {currencyModalTransition.shouldRender &&
       effectiveCurrencyToken &&
       !inlineCurrencyStatement ? (
-        <ClientErrorBoundary
-          name="CurrencyStatement"
-          title="Statement devise: erreur UI"
-          resetKey={String(effectiveCurrencyToken?.currency || "")}
+        <CurrencyStatement
+          currency={effectiveCurrencyToken.currency}
+          balance={
+            statementBalance !== null &&
+            statementBalance !== undefined &&
+            statementBalance !== "" &&
+            Number.isFinite(Number(statementBalance))
+              ? Number(statementBalance)
+              : parseFloat(effectiveCurrencyToken.value || 0)
+          }
+          issuer={effectiveCurrencyToken.issuer}
+          walletAddress={wallet}
+          walletLabelOverride={walletDisplayLabel}
+          backendWalletAddress={backendWalletAddress}
+          isPreviewMode={isPreviewMode}
+          isWalletActivated={isWalletActivated}
+          hasRlusdTrustline={hasRlusdTrustline}
+          noticeVariant={noticeVariant}
+          noticeContextLabel={noticeContextLabel}
+          walletId={walletId}
+          variant="full"
+          usdRates={usdRates}
+          rlusdBalance={rlusdBalance}
+          transactions={
+            canFetchStatements
+              ? currencyTransactions
+              : previewTransactions || []
+          }
+          statementMonths={canFetchStatements ? currencyStatementMonths : null}
+          hasMore={canFetchStatements ? currencyHasMore : false}
+          loadingMore={canFetchStatements ? currencyLoadingMore : false}
+          onLoadMore={
+            canFetchStatements
+              ? () => loadCurrencyMore(effectiveCurrencyToken.currency)
+              : null
+          }
+          loading={canFetchStatements ? currencyLoading : false}
+          error={canFetchStatements ? currencyError : null}
+          period="December 2025"
+          highlightTransactionId={highlightTransactionId}
+          isClosing={currencyModalTransition.isClosing}
           onClose={() => {
             setShowCurrencyStatement(false);
             setSelectedStatementToken(null);
             maybeReturnToSettingsDropdown();
           }}
-        >
-          <CurrencyStatement
-            currency={effectiveCurrencyToken.currency}
-            balance={
-              statementBalance !== null &&
-              statementBalance !== undefined &&
-              statementBalance !== "" &&
-              Number.isFinite(Number(statementBalance))
-                ? Number(statementBalance)
-                : parseFloat(effectiveCurrencyToken.value || 0)
-            }
-            issuer={effectiveCurrencyToken.issuer}
-            walletAddress={wallet}
-            walletLabelOverride={walletDisplayLabel}
-            backendWalletAddress={backendWalletAddress}
-            isPreviewMode={isPreviewMode}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            noticeVariant={noticeVariant}
-            noticeContextLabel={noticeContextLabel}
-            walletId={walletId}
-            variant="full"
-            usdRates={usdRates}
-            rlusdBalance={rlusdBalance}
-            transactions={
-              canFetchStatements
-                ? currencyTransactions
-                : previewTransactions || []
-            }
-            statementMonths={canFetchStatements ? currencyStatementMonths : null}
-            hasMore={canFetchStatements ? currencyHasMore : false}
-            loadingMore={canFetchStatements ? currencyLoadingMore : false}
-            onLoadMore={
-              canFetchStatements
-                ? () => loadCurrencyMore(effectiveCurrencyToken.currency)
-                : null
-            }
-            loading={canFetchStatements ? currencyLoading : false}
-            error={canFetchStatements ? currencyError : null}
-            period="December 2025"
-            highlightTransactionId={highlightTransactionId}
-            isClosing={currencyModalTransition.isClosing}
-            onClose={() => {
-              setShowCurrencyStatement(false);
-              setSelectedStatementToken(null);
-              maybeReturnToSettingsDropdown();
-            }}
-            toast={toast}
-          />
-        </ClientErrorBoundary>
+          toast={toast}
+        />
       ) : null}
     </>
   );
