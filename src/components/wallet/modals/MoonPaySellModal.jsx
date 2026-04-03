@@ -1100,7 +1100,7 @@ const MoonPaySellModal = ({
       {step === "form" && (
         <div className="space-y-5">
           {/* From wallet display */}
-	          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+		          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
 	            <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 	              {t("moonpay_from_account", "Depuis le compte")}
 	            </p>
@@ -1410,7 +1410,7 @@ const MoonPaySellModal = ({
           </div>
 
           {/* Destination display */}
-	          <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+		          <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
 	            <div className="flex items-start gap-3">
 	              <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
 	                <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
