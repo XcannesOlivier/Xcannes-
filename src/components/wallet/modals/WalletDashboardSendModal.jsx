@@ -1604,11 +1604,11 @@ export default function WalletDashboardSendModal({
                     className: "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
                     prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
                     pillClassName:
-                      "bg-white/[0.68] border border-black/12 px-4 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.28)]",
+                      "bg-white/[0.58] border border-black/15 px-4 py-3 shadow-[0_18px_54px_rgba(0,0,0,0.28)]",
                     prefixClassName:
-                      "!text-[color:var(--bg-elevated)] text-[13.5px] md:text-[14px] font-semibold tracking-wide",
+                      "!text-black text-[16px] md:text-[17px] font-semibold tracking-wide",
                     labelClassName:
-                      "!text-[color:var(--bg-elevated)] text-[16px] md:text-[17px] font-semibold",
+                      "!text-black text-[16px] md:text-[17px] font-semibold",
                     dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
                   })}
                 </div>
