@@ -1592,18 +1592,19 @@ export default function WalletDashboardSendModal({
               </div>
             ) : null}
             <div
-              className="flex items-start justify-between gap-3 mb-1 pr-6"
+              className="flex items-start justify-between gap-3 mb-1"
               onPointerDown={(event) => {
                 maybeStartOverlayDrag(event, "fixed");
               }}
             >
-              <div className="flex min-w-0 flex-col gap-1.5">
+              <div className="flex min-w-0 flex-col gap-1.5 w-full">
                 <div>
                   {renderWalletMeta?.({
                     variant: "pill",
                     className:
                       "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
                     prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
+                    labelWrap: true,
                     pillClassName:
                       "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
                     prefixClassName:

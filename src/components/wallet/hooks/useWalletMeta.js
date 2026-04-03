@@ -46,6 +46,7 @@ export function useWalletMeta({
               <WalletActiveLabel
                 prefix={effectivePrefix}
                 label={resolvedLabel || "Wallet"}
+                labelWrap={Boolean(options?.labelWrap)}
                 className={options?.labelRowClassName || ""}
                 prefixClassName={options?.prefixClassName || ""}
                 labelClassName={options?.labelClassName || ""}
