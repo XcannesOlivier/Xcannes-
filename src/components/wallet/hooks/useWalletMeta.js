@@ -37,7 +37,7 @@ export function useWalletMeta({
           <div className={className}>
             <div
               className={[
-                "inline-flex max-w-full items-center rounded-xl bg-white px-3 py-2 ring-1 ring-black/10 shadow-sm",
+                "inline-flex max-w-full items-center rounded-xl px-3 py-2",
                 options?.pillClassName || "",
               ]
                 .filter(Boolean)
