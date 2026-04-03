@@ -1496,8 +1496,8 @@ export default function WalletDashboardUsdSwapModal({
               </div>
             ) : (
               <div className="space-y-5">
-	                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+		                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+	                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
                       <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                         {t("moonpay_from_account", "Depuis le compte")}
                       </p>
@@ -1563,7 +1563,7 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "form" ? (
                   <>
-                    <div className="rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden">
+	                    <div className="rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="text-sm text-white/70">
