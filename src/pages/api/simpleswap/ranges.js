@@ -16,6 +16,12 @@ function uniqueLower(values) {
   return out;
 }
 
+const SIMPLESWAP_TAG_RLUSD_RAW = process.env.SIMPLESWAP_TAG_RLUSD;
+const SIMPLESWAP_TAG_RLUSD_PARSED = Number.parseInt(SIMPLESWAP_TAG_RLUSD_RAW, 10);
+const SIMPLESWAP_TAG_RLUSD = Number.isFinite(SIMPLESWAP_TAG_RLUSD_PARSED)
+  ? SIMPLESWAP_TAG_RLUSD_PARSED
+  : 591;
+
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -28,6 +34,7 @@ export default async function handler(req, res) {
     networkFrom,
     networkTo,
     reverse = "false",
+    extraIdTo = "",
   } = req.query || {};
 
   if (!tickerFrom || !tickerTo || !networkFrom || !networkTo) {
@@ -48,8 +55,26 @@ export default async function handler(req, res) {
     const normalized = String(value || "").trim().toLowerCase();
     return normalized === rlusdTicker || normalized === "rlusd";
   };
+  const isXrplLikeNetwork = (value) => {
+    const normalized = String(value || "").trim().toLowerCase();
+    return normalized === "xrp" || normalized === "xrpl";
+  };
 
-  const requestRanges = async ({ tickerFrom: tf, networkFrom: nf, tickerTo: tt, networkTo: nt }) => {
+  const requestRanges = async ({
+    tickerFrom: tf,
+    networkFrom: nf,
+    tickerTo: tt,
+    networkTo: nt,
+    extraIdTo: eid,
+  }) => {
+    const normalizedTickerTo = String(tt || "").trim().toLowerCase();
+    const normalizedNetworkTo = String(nt || "").trim().toLowerCase();
+    const normalizedExtraIdTo = String(eid || "").trim();
+    const resolvedExtraIdTo =
+      isRlusdTicker(normalizedTickerTo) && isXrplLikeNetwork(normalizedNetworkTo)
+        ? String(SIMPLESWAP_TAG_RLUSD)
+        : normalizedExtraIdTo;
+
     return simpleSwapRequest("/ranges", {
       query: {
         fixed: String(fixed),
@@ -58,6 +83,7 @@ export default async function handler(req, res) {
         networkFrom: String(nf),
         networkTo: String(nt),
         reverse: String(reverse),
+        ...(resolvedExtraIdTo ? { extraIdTo: String(resolvedExtraIdTo) } : {}),
       },
     });
   };
@@ -68,6 +94,7 @@ export default async function handler(req, res) {
       networkFrom: String(networkFrom),
       tickerTo: String(tickerTo),
       networkTo: String(networkTo),
+      extraIdTo: String(extraIdTo || ""),
     };
 
     try {

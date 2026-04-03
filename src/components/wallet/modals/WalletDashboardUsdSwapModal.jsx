@@ -10,26 +10,6 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
 const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrp" };
 const PRIORITY_TICKERS = ["usdc", "usdt", "dai", "usdp", "tusd", "fdusd", "pyusd"];
-const STABLE_NETWORK_PREFERENCE = [
-  "tron",
-  "trx",
-  "trc20",
-  "bsc",
-  "bnb",
-  "bep20",
-  "eth",
-  "ethereum",
-  "erc20",
-  "polygon",
-  "matic",
-  "arbitrum",
-  "arb",
-  "optimism",
-  "op",
-  "base",
-  "sol",
-  "solana",
-];
 const SWAP_DIRECTIONS = {
   RLUSD_TO_STABLE: "rlusd_to_stable",
   STABLE_TO_RLUSD: "stable_to_rlusd",
@@ -760,56 +740,6 @@ export default function WalletDashboardUsdSwapModal({
         lastStatus === 404 &&
         /pair is unavailable/i.test(lastErrorMessage || "");
 
-      if (
-        pairIsUnavailable &&
-        direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
-        stableCurrency &&
-        currencies.length
-      ) {
-        const stableTicker = String(stableCurrency?.ticker || "").trim().toLowerCase();
-        const candidates = currencies
-          .filter((cur) => {
-            if (!cur) return false;
-            if (currencyKey(cur) === rlusdKey) return false;
-            if (String(cur?.ticker || "").trim().toLowerCase() !== stableTicker) return false;
-            const key = currencyKey(cur);
-            return key && key !== stableKey;
-          })
-          .slice();
-
-        candidates.sort((a, b) => {
-          const an = String(a?.network || "").trim().toLowerCase();
-          const bn = String(b?.network || "").trim().toLowerCase();
-          const ai = STABLE_NETWORK_PREFERENCE.indexOf(an);
-          const bi = STABLE_NETWORK_PREFERENCE.indexOf(bn);
-          const ap = ai === -1 ? 999 : ai;
-          const bp = bi === -1 ? 999 : bi;
-          if (ap !== bp) return ap - bp;
-          return an.localeCompare(bn);
-        });
-
-        for (const candidate of candidates) {
-          const attempt = await runEstimate(candidate, toCurrency);
-          if (!attempt.ok) continue;
-
-          setStableKey(currencyKey(candidate));
-          setSearch("");
-          setPairUnavailable(false);
-          setApiError("");
-
-          const data = attempt.data;
-          if (typeof data === "string" || typeof data === "number") {
-            setQuote({ estimatedAmount: data });
-            return;
-          }
-          if (typeof data === "object") {
-            setQuote(data);
-            maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
-            return;
-          }
-        }
-      }
-
       if (lastErrorMessage) {
         if (lastStatus === 404) {
           setPairUnavailable(true);
@@ -822,7 +752,7 @@ export default function WalletDashboardUsdSwapModal({
             t(
               "ui_usd_swap_pair_not_supported",
               rlusdPayoutBlocked
-                ? `SimpleSwap indique que RLUSD (XRPL) n’est pas disponible en réception via l’API (pair “unavailable”). Il faut activer les payouts RLUSD(XRP) côté SimpleSwap (API-key) ou utiliser un autre actif de réception.`
+                ? `SimpleSwap renvoie “Pair is unavailable” pour RLUSD (XRPL) en réception. Vérifiez que votre API-key autorise bien cette paire et que le tag XRPL est correctement géré côté serveur (variable SIMPLESWAP_TAG_RLUSD).`
                 : pairIsUnavailable
                   ? `Paire indisponible dans ce sens (${fromTicker}/${fromNetwork} → ${toTicker}/${toNetwork}). Essayez un autre réseau.`
                   : `Paire non supportée (${fromTicker}/${fromNetwork} → ${toTicker}/${toNetwork}). Essayez un autre réseau.`,
