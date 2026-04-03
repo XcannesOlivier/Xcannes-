@@ -1899,12 +1899,12 @@ export default function GlobalStatement({
               <button
                 type="button"
                 onClick={() => setShowFullAddress((v) => !v)}
-                className={[
-                  "mt-2 text-xs md:text-sm text-white/60 font-mono text-left w-full",
-                  showFullAddress
-                    ? "break-all whitespace-normal"
-                    : "truncate",
-                ].join(" ")}
+	                className={[
+	                  "mt-2 text-xs md:text-sm text-xcannes-green/80 font-mono text-left w-full",
+	                  showFullAddress
+	                    ? "break-all whitespace-normal"
+	                    : "truncate",
+	                ].join(" ")}
                 title={t(
                   "ui_toggle_full_address",
                   "Cliquer pour afficher/masquer l'adresse complète",
@@ -2008,12 +2008,12 @@ export default function GlobalStatement({
                       key={key}
                       type="button"
                       onClick={() => openMovementDetails(m)}
-                      className={[
-                        "w-full text-left rounded-xl px-3 py-3 ring-1 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150",
-                        isLatest
-                          ? "ring-2 ring-xcannes-green/45 relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:rounded-xl before:bg-[radial-gradient(70%_60%_at_18%_12%,rgba(34,197,94,0.22)_0%,rgba(34,197,94,0)_70%)] before:pointer-events-none"
-                          : "ring-white/10",
-                      ].join(" ")}
+	                      className={[
+	                        "w-full text-left rounded-xl px-3 py-3 ring-1 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150",
+	                        isLatest
+	                          ? "ring-xcannes-green/30 transform-gpu scale-[1.02] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
+	                          : "ring-white/10",
+	                      ].join(" ")}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -2057,14 +2057,14 @@ export default function GlobalStatement({
                                 return (
                                   <>
                                     <div
-                                      className={[
-                                        "text-[15px] font-semibold font-mono whitespace-nowrap",
-                                        uiType === "debit"
-                                          ? "text-red-300"
-                                          : uiType === "credit"
-                                            ? "text-xcannes-green"
-                                            : "text-white/90",
-                                      ].join(" ")}
+	                                      className={[
+	                                        "text-[15px] font-semibold font-mono whitespace-nowrap",
+		                                        uiType === "debit"
+		                                          ? "text-red-300"
+		                                          : uiType === "credit"
+		                                            ? "text-xcannes-green"
+		                                            : "text-white/90",
+		                                      ].join(" ")}
                                     >
                                       {sign}
                                       {formatAmountWithSymbolLocal(

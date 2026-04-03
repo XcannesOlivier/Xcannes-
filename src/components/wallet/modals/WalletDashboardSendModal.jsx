@@ -543,14 +543,14 @@ export default function WalletDashboardSendModal({
         return true;
       });
       return (
-    <div
-      ref={savedMenuRef}
-      className={[
-        "rounded-xl ring-1 ring-white/10 ring-inset overflow-hidden shadow-lg",
-        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
-      ].join(" ")}
-      onClick={(e) => e.stopPropagation()}
-    >
+	    <div
+	      ref={savedMenuRef}
+	      className={[
+	        "rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg",
+	        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-black/40",
+	      ].join(" ")}
+	      onClick={(e) => e.stopPropagation()}
+	    >
       <div className="max-h-56 overflow-y-auto">
         {filteredSavedAddresses.length > 0 ? (
           filteredSavedAddresses.map((addr, idx) => (
@@ -896,8 +896,8 @@ export default function WalletDashboardSendModal({
       </label>
 
       <div className="relative" ref={savedPickerRef}>
-        <input
-          ref={destinationInputRef}
+	          <input
+	          ref={destinationInputRef}
           type="text"
           value={destinationDisplayValue}
           onChange={(e) => {
@@ -922,10 +922,10 @@ export default function WalletDashboardSendModal({
           onPaste={handlePastePayload}
           placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
           readOnly={shouldShowLabelInInput}
-          className={`w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl ${
-            !hasPaymentRequest ? "pl-8" : "pl-4"
-          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
-        />
+	          className={`w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)] ${
+	            !hasPaymentRequest ? "pl-8" : "pl-4"
+	          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
+	        />
 
         <button
           type="button"
@@ -1134,9 +1134,9 @@ export default function WalletDashboardSendModal({
             >
               {t("ui_asset_e5170a7a06", "Devise")}
             </label>
-            <ModalSelect
-              value={selectedSendToken ? selectedSendToken.key : ""}
-              onChange={setSendAssetKey}
+	            <ModalSelect
+	              value={selectedSendToken ? selectedSendToken.key : ""}
+	              onChange={setSendAssetKey}
               options={(augmentedTokens || []).map((token) => {
                 const labelLeft =
                   selectLabelByAssetKey?.[token.key] ||
@@ -1160,19 +1160,20 @@ export default function WalletDashboardSendModal({
                     selectLabelMobileByAssetKey?.[token.currency] ||
                     labelLeft,
                 };
-              })}
-              useNativeSelect={false}
-              showMobileOptionRight={true}
-              iconClassName="text-3xl leading-none"
-	              buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
-	              menuClassName={
-	                noticeVariant === "demo"
-	                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
-	                  : "bg-elevated border-white/15 ring-1 ring-white/10"
-	              }
-	              selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer"
-	            />
-          </div>
+	              })}
+	              useNativeSelect={false}
+	              showMobileOptionRight={true}
+	              iconClassName="text-3xl leading-none"
+		              backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
+		              buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		              menuClassName={
+		                noticeVariant === "demo"
+		                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		                  : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		              }
+		              selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		            />
+	          </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
             <div className="rounded-lg ring-1 ring-amber-300/20 ring-inset bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
               <span className="text-white/80">
@@ -1215,8 +1216,8 @@ export default function WalletDashboardSendModal({
                   : "USD"
               }
               tokenClassName="text-white drop-shadow-sm text-xl"
-              containerClassName="py-4 rounded-xl bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/80 transition-colors duration-150"
-            />
+	              containerClassName="py-4 rounded-xl bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/80 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	            />
             {manualInsufficientBalance ? (
               <div className="mt-2 rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
                 <div className="font-semibold">
@@ -1250,7 +1251,7 @@ export default function WalletDashboardSendModal({
           "Vérifiez les informations avant d’envoyer",
         )}
       </div>
-      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+	      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
         <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
           {t("ui_send_confirmation_title", "Résumé de l'envoi")}
 	        </div>
@@ -1277,8 +1278,8 @@ export default function WalletDashboardSendModal({
 	                      setShowFullRecipientAccount((prev) => !prev)
 	                    }
 	                    className={[
-	                      "font-mono text-[12px] text-white/65 hover:text-white/85 transition-colors",
-	                      "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
+		                      "font-mono text-[12px] text-xcannes-green/80 hover:text-xcannes-green/95 transition-colors",
+		                      "underline decoration-white/25 underline-offset-2 hover:decoration-white/60",
 	                      showFullRecipientAccount
 	                        ? "break-all"
 	                        : "inline-block truncate max-w-[240px]",

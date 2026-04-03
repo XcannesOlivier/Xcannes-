@@ -1701,14 +1701,14 @@ export default function CurrencyStatement({
                   prefixClassName="text-white/55 font-medium"
                   labelClassName="text-white font-semibold"
                 />
-                {walletAddress ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowFullAddress((v) => !v)}
-                    className={[
-                      "text-xs md:text-sm text-white/60 font-mono text-left",
-                      showFullAddress ? "break-all whitespace-normal" : "truncate",
-                    ].join(" ")}
+	                {walletAddress ? (
+	                  <button
+	                    type="button"
+	                    onClick={() => setShowFullAddress((v) => !v)}
+	                    className={[
+	                      "text-xs md:text-sm text-xcannes-green/80 font-mono text-left",
+	                      showFullAddress ? "break-all whitespace-normal" : "truncate",
+	                    ].join(" ")}
                     title={t(
                       "ui_toggle_full_address",
                       "Cliquer pour afficher/masquer l'adresse complète",

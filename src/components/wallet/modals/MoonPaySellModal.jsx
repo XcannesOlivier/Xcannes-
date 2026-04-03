@@ -1115,10 +1115,10 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-	            <p className="text-[11px] md:text-[12px] text-white/60 font-mono break-all">
-	              {walletAddress}
-	            </p>
-	          </div>
+		            <p className="text-[11px] md:text-[12px] text-xcannes-green/80 font-mono break-all">
+		              {walletAddress}
+		            </p>
+		          </div>
 
           {/* Currency selector */}
           <div>
@@ -1128,11 +1128,11 @@ const MoonPaySellModal = ({
                 "Choisissez l'actif que vous voulez vendre",
               )}
             </label>
-            <button
-              type="button"
-              onClick={() => setCryptoDropdownOpen(true)}
-              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150"
-            >
+	            <button
+	              type="button"
+	              onClick={() => setCryptoDropdownOpen(true)}
+	              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	            >
               <span className="flex items-center gap-2 min-w-0 flex-1">
                 {renderSelectIcon(selectedSellCurrency?.icon)}
                 <span className="truncate">
@@ -1332,15 +1332,15 @@ const MoonPaySellModal = ({
               {t("moonpay_amount_to_sell", "Amount to sell")}
             </label>
             <div className="relative">
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150"
-              />
+	              <input
+	                type="number"
+	                value={amount}
+	                onChange={(e) => setAmount(e.target.value)}
+	                placeholder="0.00"
+	                step="0.01"
+	                min="0"
+	                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	              />
 
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
                 {currency}
@@ -1387,18 +1387,18 @@ const MoonPaySellModal = ({
             <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_receive_in", "Receive in")}
             </label>
-            <ModalSelect
-              value={fiatSelectValue}
-              onChange={setQuoteCurrency}
-              options={fiatOptions}
-              placeholder={fiatPlaceholder}
-              disabled={fiatLoading || fiatCurrencies.length === 0}
-              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60"
-            />
+	            <ModalSelect
+	              value={fiatSelectValue}
+	              onChange={setQuoteCurrency}
+	              options={fiatOptions}
+	              placeholder={fiatPlaceholder}
+	              disabled={fiatLoading || fiatCurrencies.length === 0}
+	              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	              menuClassName={
+	                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+	              }
+	              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	            />
             {showFiatError && (
               <p className="text-xs text-red-400 mt-1">{fiatError}</p>
             )}

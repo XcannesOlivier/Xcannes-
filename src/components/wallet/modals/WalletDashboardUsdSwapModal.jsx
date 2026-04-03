@@ -1512,11 +1512,11 @@ export default function WalletDashboardUsdSwapModal({
                           </p>
                         </div>
                       ) : null}
-                      {String(walletAddress || "").trim() ? (
-                        <p className="text-[10px] md:text-[11px] text-white/60 font-mono break-all">
-                          {walletAddress}
-                        </p>
-                      ) : null}
+	                      {String(walletAddress || "").trim() ? (
+	                        <p className="text-[10px] md:text-[11px] text-xcannes-green/80 font-mono break-all">
+	                          {walletAddress}
+	                        </p>
+	                      ) : null}
                     </div>
                   ) : null}
 

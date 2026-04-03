@@ -600,9 +600,9 @@ export default function WalletDashboardSwapModal({
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                       {t("ui_from_label_short", "De")}
                     </div>
-	                    <ModalSelect
-	                      value={convertBaseCurrency}
-	                      onChange={setConvertBaseCurrency}
+		                    <ModalSelect
+		                      value={convertBaseCurrency}
+		                      onChange={setConvertBaseCurrency}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -616,18 +616,19 @@ export default function WalletDashboardSwapModal({
                             selectLabelMobileByCurrency?.[code] || labelLeft,
                         };
                       })}
-	                      useNativeSelect={false}
-	                      showMobileOptionRight={true}
-	                      iconClassName="text-3xl leading-none"
-		                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                      menuClassName={
-	                        noticeVariant === "demo"
-	                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
-	                          : "bg-elevated border-white/15 ring-1 ring-white/10"
-	                      }
-		                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                    />
-	                  </div>
+		                      useNativeSelect={false}
+		                      showMobileOptionRight={true}
+		                      iconClassName="text-3xl leading-none"
+		                      backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
+		                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                      menuClassName={
+		                        noticeVariant === "demo"
+		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		                          : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		                      }
+		                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                    />
+		                  </div>
 
                   <div className="flex justify-center">
                     <button
@@ -654,9 +655,9 @@ export default function WalletDashboardSwapModal({
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                       {t("ui_to_label_short", "Vers")}
                     </div>
-	                    <ModalSelect
-	                      value={convertQuoteCurrency}
-	                      onChange={setConvertQuoteCurrency}
+		                    <ModalSelect
+		                      value={convertQuoteCurrency}
+		                      onChange={setConvertQuoteCurrency}
                       options={(swapCurrencyOptionsSanitized || []).map((code) => {
                         const labelLeft = selectLabelByCurrency?.[code] || code;
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
@@ -670,18 +671,19 @@ export default function WalletDashboardSwapModal({
                             selectLabelMobileByCurrency?.[code] || labelLeft,
                         };
                       })}
-	                      useNativeSelect={false}
-	                      showMobileOptionRight={true}
-	                      iconClassName="text-3xl leading-none"
-		                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                      menuClassName={
-	                        noticeVariant === "demo"
-	                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10"
-	                          : "bg-elevated border-white/15 ring-1 ring-white/10"
-	                      }
-		                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                    />
-	                  </div>
+		                      useNativeSelect={false}
+		                      showMobileOptionRight={true}
+		                      iconClassName="text-3xl leading-none"
+		                      backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
+		                      buttonClassName="bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                      menuClassName={
+		                        noticeVariant === "demo"
+		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		                          : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
+		                      }
+		                      selectClassName="xcannes-select w-full bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                    />
+		                  </div>
 
                   {!existingCurrencyLinesSet.has(quoteCode) && quoteCode && quoteCode !== "USD" ? (
                     <div className="rounded-lg ring-1 ring-xcannes-green/25 ring-inset bg-xcannes-green/10 px-3 py-2 text-xs text-xcannes-green/90">
@@ -696,41 +698,41 @@ export default function WalletDashboardSwapModal({
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/35 mb-2">
                       {t("ui_other_currency_d8e1f2a3b4", "Autre devise")}
                     </div>
-                    <WalletCurrencySelector
-                      value=""
-                      onChange={(code) => {
-                        if (code) setConvertQuoteCurrency(code);
-                      }}
-                      placeholder={t(
-                        "ui_search_all_currencies_c5d6e7f8",
-                        "Search all currencies...",
-                      )}
-                      excludeCodes={["USD", "RLUSD", "XRP"]}
-                      showQuickAdd={false}
-                      fullscreen={true}
-                      buttonClassName="w-full bg-white/3 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:ring-white/20 transition-colors duration-150"
-                    />
-                  </div>
-                </div>
+	                    <WalletCurrencySelector
+	                      value=""
+	                      onChange={(code) => {
+	                        if (code) setConvertQuoteCurrency(code);
+	                      }}
+	                      placeholder={t(
+	                        "ui_search_all_currencies_c5d6e7f8",
+	                        "Search all currencies...",
+	                      )}
+	                      excludeCodes={["USD", "RLUSD", "XRP"]}
+	                      showQuickAdd={false}
+	                      fullscreen={true}
+	                      buttonClassName="w-full bg-white/3 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:ring-white/20 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	                    />
+	                  </div>
+	                </div>
 
                 {/* ── SECTION 2: Amount input ─────────────────────────────── */}
                 <div className="space-y-2">
                   <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                     {t("ui_amount_52a20b2992", "Montant")}
                   </div>
-                  <TokenAmountInput
-                    value={convertAmount}
-                    onChange={setConvertAmount}
-                    placeholder="0.0000"
+	                  <TokenAmountInput
+	                    value={convertAmount}
+	                    onChange={setConvertAmount}
+	                    placeholder="0.0000"
                     token={
                       selectLabelByCurrency?.[convertBaseCurrency] ||
                       convertBaseCurrency ||
                       "USD"
-                    }
-                    tokenClassName="text-white text-base"
-                    containerClassName="rounded-xl px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/60 transition-colors duration-150"
-                  />
-                </div>
+	                    }
+	                    tokenClassName="text-white text-base"
+	                    containerClassName="rounded-xl px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/60 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	                  />
+	                </div>
 
                   <div className="space-y-2">
                     {sameCurrencySelected ? (

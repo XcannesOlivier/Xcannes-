@@ -763,9 +763,9 @@ const MoonPayBuyModal = ({
 		                "Choisissez l'actif que vous voulez ajouter",
 		              )}
 		            </label>
-            <ModalSelect
-              value={currency}
-              onChange={setCurrency}
+	            <ModalSelect
+	              value={currency}
+	              onChange={setCurrency}
               options={supportedCurrencies.map((curr) => ({
                 value: curr.code,
                 label: curr.code,
@@ -779,16 +779,16 @@ const MoonPayBuyModal = ({
                       )
                     : null,
                 icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
-              }))}
-              useNativeSelect={false}
-              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150"
-              menuClassName={`${
-                noticeVariant === "demo"
-                  ? "bg-xcannes-surface-demo"
-                  : "bg-elevated"
-              } ring-1 ring-white/10`}
-              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
-            />
+	              }))}
+	              useNativeSelect={false}
+	              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	              menuClassName={`${
+	                noticeVariant === "demo"
+	                  ? "bg-xcannes-surface-demo"
+	                  : "bg-elevated"
+	              } ring-1 ring-white/10`}
+	              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	            />
           </div>
 
           {/* Fiat currency selector */}
@@ -796,18 +796,18 @@ const MoonPayBuyModal = ({
             <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_fiat_currency_label", "Fiat currency")}
             </label>
-            <ModalSelect
-              value={fiatSelectValue}
-              onChange={setFiatCurrency}
+	            <ModalSelect
+	              value={fiatSelectValue}
+	              onChange={setFiatCurrency}
               options={fiatOptions}
-              placeholder={fiatPlaceholder}
-              disabled={fiatLoading || fiatCurrencies.length === 0}
-              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60"
-            />
+	              placeholder={fiatPlaceholder}
+	              disabled={fiatLoading || fiatCurrencies.length === 0}
+	              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	              menuClassName={
+	                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+	              }
+	              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	            />
             {fiatLoading && (
               <p className="text-[11px] text-white/55 mt-2">
                 {t("moonpay_fiat_loading", "Loading fiat currencies...")}
@@ -832,15 +832,15 @@ const MoonPayBuyModal = ({
               })}
             </label>
             <div className="relative">
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder={amountType === "fiat" ? "100" : "1.0"}
-                step={amountType === "fiat" ? "10" : "0.1"}
-                min="0"
-                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150"
-              />
+	              <input
+	                type="number"
+	                value={amount}
+	                onChange={(e) => setAmount(e.target.value)}
+	                placeholder={amountType === "fiat" ? "100" : "1.0"}
+	                step={amountType === "fiat" ? "10" : "0.1"}
+	                min="0"
+	                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	              />
 
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
                 {amountType === "fiat" ? fiatCurrency : currency}
@@ -870,10 +870,10 @@ const MoonPayBuyModal = ({
                 </p>
               </div>
             ) : null}
-	            <p className="text-[11px] md:text-[12px] text-white/60 font-mono break-all">
-	              {walletAddress}
-	            </p>
-	          </div>
+		            <p className="text-[11px] md:text-[12px] text-xcannes-green/80 font-mono break-all">
+		              {walletAddress}
+		            </p>
+		          </div>
 
 		          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
 		            {demoMode

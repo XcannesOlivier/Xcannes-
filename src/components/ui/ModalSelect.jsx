@@ -17,6 +17,7 @@ export default function ModalSelect({
   hideMobileSelectedRight = false,
   useMobileSelectedLabel = false,
   showMobileOptionRight = false,
+  backdropClassName = "",
   disabled = false,
 }) {
   const [open, setOpen] = useState(false);
@@ -83,6 +84,13 @@ export default function ModalSelect({
   return (
     <>
       <div className={customMenuClassName}>
+        {open && backdropClassName ? (
+          <div
+            className={`fixed inset-0 z-40 ${backdropClassName}`}
+            aria-hidden="true"
+            onClick={() => setOpen(false)}
+          />
+        ) : null}
         <button
           type="button"
           ref={triggerRef}
@@ -92,7 +100,9 @@ export default function ModalSelect({
             if (disabled) return;
             setOpen((prev) => !prev);
           }}
-          className={`w-full flex items-center justify-between gap-2 ${buttonClassName}`}
+          className={`w-full flex items-center justify-between gap-2 ${
+            open && backdropClassName ? "relative z-50" : ""
+          } ${buttonClassName}`}
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
             {renderIcon(selected?.icon)}
