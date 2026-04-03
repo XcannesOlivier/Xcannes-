@@ -1082,6 +1082,26 @@ const MoonPaySellModal = ({
   }));
   const fiatSelectValue = fiatCurrencies.length === 0 ? "" : quoteCurrency;
 
+  const highlightPhrases = (text, phrases) => {
+    const input = String(text || "");
+    const list = Array.isArray(phrases) ? phrases.filter(Boolean) : [];
+    if (!input || list.length === 0) return text;
+    const escapeRegExp = (str) =>
+      String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const parts = input.split(
+      new RegExp(`(${list.map(escapeRegExp).join("|")})`, "g"),
+    );
+    return parts.map((part, idx) =>
+      list.includes(part) ? (
+        <span key={idx} className="text-xcannes-green/90 font-semibold">
+          {part}
+        </span>
+      ) : (
+        <span key={idx}>{part}</span>
+      ),
+    );
+  };
+
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
     enabled: shouldAnimate,
@@ -1115,7 +1135,7 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-		            <p className="text-[11px] md:text-[12px] text-xcannes-green/80 font-mono break-all">
+		            <p className="text-[12px] md:text-[13px] text-xcannes-green/80 font-mono break-all">
 		              {walletAddress}
 		            </p>
 		          </div>
@@ -1339,22 +1359,22 @@ const MoonPaySellModal = ({
 	                placeholder="0.00"
 	                step="0.01"
 	                min="0"
-	                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)] xcannes-no-spinner"
 	              />
 
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
                 {currency}
               </span>
             </div>
-            {balanceLabel ? (
-              <p className="mt-2 text-[11px] text-white/55">
-                {t(
-                  "moonpay_sell_balance_available",
-                  "Disponible: {{amount}}",
-                  { amount: balanceLabel },
-                )}
-              </p>
-            ) : null}
+	            {balanceLabel ? (
+	              <p className="mt-2 text-[11px] text-xcannes-green/85 font-medium">
+	                {t(
+	                  "moonpay_sell_balance_available",
+	                  "Disponible: {{amount}}",
+	                  { amount: balanceLabel },
+	                )}
+	              </p>
+	            ) : null}
             {isCurrencyLine && hasValidAmount ? (
               <p
                 className={`mt-2 text-[11px] ${
@@ -1422,12 +1442,18 @@ const MoonPaySellModal = ({
                 <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
                   {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
                 </p>
-	                <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
-	                  {t(
-	                    "moonpay_sell_destination_helper",
-	                    "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                  )}
-	                </p>
+		                <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
+		                  {highlightPhrases(
+		                    t(
+		                      "moonpay_sell_destination_helper",
+		                      "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+		                    ),
+		                    [
+		                      "compte bancaire sur la page du partenaire (IBAN, etc.).",
+		                      "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+		                    ],
+		                  )}
+		                </p>
               </div>
             </div>
           </div>

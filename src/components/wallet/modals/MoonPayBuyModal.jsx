@@ -738,6 +738,24 @@ const MoonPayBuyModal = ({
   }));
   const fiatSelectValue = fiatCurrencies.length === 0 ? "" : fiatCurrency;
 
+  const highlightPaymentMethods = (text) => {
+    const input = String(text || "");
+    if (!input) return text;
+    const methods = ["carte bancaire", "Apple Pay", "Google Pay", "virement"];
+    const parts = input.split(
+      new RegExp(`(${methods.map((m) => m.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")).join("|")})`, "g"),
+    );
+    return parts.map((part, idx) =>
+      methods.includes(part) ? (
+        <span key={idx} className="text-xcannes-green/90 font-semibold">
+          {part}
+        </span>
+      ) : (
+        <span key={idx}>{part}</span>
+      ),
+    );
+  };
+
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
     enabled: shouldAnimate,
@@ -755,14 +773,14 @@ const MoonPayBuyModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-	          {/* Currency selector */}
-	          <div>
-		            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-		              {t(
-		                "moonpay_buy_select_asset",
-		                "Choisissez l'actif que vous voulez ajouter",
-		              )}
-		            </label>
+		          {/* Currency selector */}
+		          <div>
+			            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase">
+			              {t(
+			                "moonpay_buy_select_asset",
+			                "Choisissez l'actif que vous voulez ajouter",
+			              )}
+			            </label>
 	            <ModalSelect
 	              value={currency}
 	              onChange={setCurrency}
@@ -870,22 +888,24 @@ const MoonPayBuyModal = ({
                 </p>
               </div>
             ) : null}
-		            <p className="text-[11px] md:text-[12px] text-xcannes-green/80 font-mono break-all">
+		            <p className="text-[12px] md:text-[13px] text-xcannes-green/80 font-mono break-all">
 		              {walletAddress}
 		            </p>
 		          </div>
 
-		          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
-		            {demoMode
-		              ? t(
-		                  "moonpay_info_buy_demo_1b7d2c9a5e",
-		                  "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
-	                )
-		              : t(
-		                  "moonpay_info_buy_live_3c8a1d6b2f",
-		                  "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
-		                )}
-		          </div>
+			          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
+			            {highlightPaymentMethods(
+			              demoMode
+			                ? t(
+			                    "moonpay_info_buy_demo_1b7d2c9a5e",
+			                    "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
+			                  )
+			                : t(
+			                    "moonpay_info_buy_live_3c8a1d6b2f",
+			                    "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+			                  ),
+			            )}
+			          </div>
 
           {/* Error message */}
           {displayError && (
