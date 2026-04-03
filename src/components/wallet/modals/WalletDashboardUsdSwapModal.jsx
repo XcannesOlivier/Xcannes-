@@ -153,6 +153,22 @@ export default function WalletDashboardUsdSwapModal({
     scrollLocked: false,
     lockedOverflowY: "",
   });
+  const [modalOverlayDragging, setModalOverlayDragging] = useState(false);
+  const [modalOverlayTranslateY, setModalOverlayTranslateY] = useState(0);
+  const modalOverlayRef = useRef(null);
+  const modalOverlayListRef = useRef(null);
+  const modalOverlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
+  const modalCloseRequestedRef = useRef(false);
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
   const [refundAddress, setRefundAddress] = useState("");
@@ -984,6 +1000,33 @@ export default function WalletDashboardUsdSwapModal({
     setReceiveAddress(String(walletAddress).trim());
   }, [direction, open, receiveAddress, walletAddress]);
 
+  useEffect(() => {
+    if (open) return;
+    modalCloseRequestedRef.current = false;
+    try {
+      const listEl = modalOverlayListRef.current;
+      const meta = modalOverlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setModalOverlayDragging(false);
+    setModalOverlayTranslateY(0);
+    modalOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  }, [open]);
+
   if (!shouldRender) return null;
 
   const closeModal = () => {
@@ -1002,6 +1045,127 @@ export default function WalletDashboardUsdSwapModal({
       return;
     }
     closeModal();
+  };
+
+  const releaseModalOverlayScrollLock = () => {
+    const meta = modalOverlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = modalOverlayListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartModalOverlayDrag = (event, source) => {
+    if (inline) return false;
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = modalOverlayListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    modalOverlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleModalOverlayPointerMove = (event) => {
+    if (inline) return;
+    const meta = modalOverlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        modalOverlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = modalOverlayListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setModalOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setModalOverlayTranslateY(delta);
+  };
+
+  const handleModalOverlayPointerEnd = (event) => {
+    if (inline) return;
+    const meta = modalOverlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration; // px/ms
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    modalOverlayDragMetaRef.current.pending = false;
+    modalOverlayDragMetaRef.current.dragging = false;
+    setModalOverlayDragging(false);
+    releaseModalOverlayScrollLock();
+
+    if (shouldClose) {
+      if (!modalCloseRequestedRef.current) {
+        modalCloseRequestedRef.current = true;
+        const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+        setModalOverlayTranslateY(Math.max(delta, height));
+        window.setTimeout(() => {
+          closeModal();
+        }, 180);
+      }
+      return;
+    }
+
+    setModalOverlayTranslateY(0);
+    modalOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
   };
 
   const wrapperClass = inline
@@ -1030,18 +1194,52 @@ export default function WalletDashboardUsdSwapModal({
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={closeModal}
+          style={
+            modalOverlayTranslateY > 0
+              ? {
+                  opacity: Math.max(
+                    0,
+                    Math.min(1, 1 - modalOverlayTranslateY / 420),
+                  ),
+                }
+              : undefined
+          }
         />
       ) : null}
 
       <div className={wrapperClass}>
         <div
-          className={panelClass}
-          onClick={(e) => {
-            if (!inline) e.stopPropagation();
+          ref={modalOverlayRef}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          style={{
+            transform: `translateY(${Math.max(0, modalOverlayTranslateY)}px)`,
+            transition: modalOverlayDragging
+              ? "none"
+              : "transform 220ms cubic-bezier(0.2,0,0,1)",
+            willChange: modalOverlayTranslateY ? "transform" : undefined,
           }}
+          onPointerMove={handleModalOverlayPointerMove}
+          onPointerUp={handleModalOverlayPointerEnd}
+          onPointerCancel={handleModalOverlayPointerEnd}
         >
-          <div className="border-b border-white/10">
-            <div className="p-4">
+          <div
+            className={panelClass}
+            onClick={(e) => {
+              if (!inline) e.stopPropagation();
+            }}
+          >
+            <div
+              className="border-b border-white/10"
+              onPointerDown={(event) => {
+                maybeStartModalOverlayDrag(event, "fixed");
+              }}
+            >
+              {!inline ? (
+                <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
+                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                </div>
+              ) : null}
+              <div className="p-4">
               <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
@@ -1086,7 +1284,13 @@ export default function WalletDashboardUsdSwapModal({
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5">
+          <div
+            ref={modalOverlayListRef}
+            className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
+            onPointerDown={(event) => {
+              maybeStartModalOverlayDrag(event, "list");
+            }}
+          >
             {step === "deposit" ? (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 px-1">
@@ -1984,8 +2188,9 @@ export default function WalletDashboardUsdSwapModal({
           </div>
         </div>
       </div>
+    </div>
     </>
-  );
+	  );
 
   if (inline) return content;
   if (typeof document === "undefined") return null;

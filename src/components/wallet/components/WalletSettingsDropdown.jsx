@@ -516,14 +516,6 @@ export default function WalletSettingsDropdown({
                       {t("ui_settings_label", "Paramètres")}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsOpen(false)}
-                    className="h-10 w-10 text-white/50 hover:text-white/80 flex items-center justify-center transition-colors"
-                    aria-label={t("close", "Fermer")}
-                  >
-                    ✕
-                  </button>
                 </div>
               </div>
 
@@ -542,14 +534,6 @@ export default function WalletSettingsDropdown({
 		                  </div>
 		                </div>
 		              </div>
-	              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="h-8 w-8 text-white/45 hover:text-white/80 flex items-center justify-center transition-colors duration-150"
-                aria-label={t("close", "Fermer")}
-              >
-                ✕
-              </button>
             </div>
 
 	            <div

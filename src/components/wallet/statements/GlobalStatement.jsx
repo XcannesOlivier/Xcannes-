@@ -66,6 +66,22 @@ export default function GlobalStatement({
   const [counterpartyLabels, setCounterpartyLabels] = useState({});
   const labelCacheRef = useRef(new Map());
   const shareNoticeTimerRef = useRef(null);
+  const [overlayDragging, setOverlayDragging] = useState(false);
+  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const overlayRef = useRef(null);
+  const overlayListRef = useRef(null);
+  const overlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
+  const closeRequestedRef = useRef(false);
   const defaultPeriod = t(
     "ui_statement_period_default_5f4c8a7d2b",
     "December 2025",
@@ -1143,9 +1159,155 @@ export default function GlobalStatement({
     STATEMENT_LAYOUTS[variant] || STATEMENT_LAYOUTS.full;
   const wrapperBaseClass = inline
     ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10200] flex";
+    : "fixed inset-0 z-[10200] flex relative";
   const modalBgClass =
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated";
+  const swipeEnabled = !inline && variant === "full";
+
+  useEffect(() => {
+    closeRequestedRef.current = false;
+    try {
+      const listEl = overlayListRef.current;
+      const meta = overlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setOverlayDragging(false);
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  }, [swipeEnabled]);
+
+  const releaseOverlayScrollLock = () => {
+    const meta = overlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = overlayListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartOverlayDrag = (event, source) => {
+    if (!swipeEnabled) return false;
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = overlayListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    overlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleOverlayPointerMove = (event) => {
+    if (!swipeEnabled) return;
+    const meta = overlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        overlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = overlayListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setOverlayTranslateY(delta);
+  };
+
+  const handleOverlayPointerEnd = (event) => {
+    if (!swipeEnabled) return;
+    const meta = overlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration; // px/ms
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    overlayDragMetaRef.current.pending = false;
+    overlayDragMetaRef.current.dragging = false;
+    setOverlayDragging(false);
+    releaseOverlayScrollLock();
+
+    if (shouldClose) {
+      if (!closeRequestedRef.current) {
+        closeRequestedRef.current = true;
+        const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+        setOverlayTranslateY(Math.max(delta, height));
+        onClose?.();
+      }
+      return;
+    }
+
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
 
   const detailStatusLabel = useMemo(() => {
     if (!detailMovement) return "";
@@ -1601,28 +1763,50 @@ export default function GlobalStatement({
   /* ── render ────────────────────────────────────────────── */
   const content = (
     <div
-      className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass} ${
-        inline
-          ? ""
-          : `${resolvedLayout.backdropClass} ${
-              isClosing
-                ? "wallet-modal-backdrop-out"
-                : "wallet-modal-backdrop-in"
-            }`
-      }`}
-      onClick={(e) => {
-        if (inline) return;
-        if (e.target === e.currentTarget) onClose?.();
-      }}
+      className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass}`}
     >
+      {!inline ? (
+        <div
+          className={[
+            "absolute inset-0 z-[10200]",
+            resolvedLayout.backdropClass,
+            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in",
+          ].join(" ")}
+          onClick={onClose}
+          style={
+            overlayTranslateY > 0
+              ? { opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)) }
+              : undefined
+          }
+        />
+      ) : null}
+
       <div
+        ref={overlayRef}
         className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+        style={
+          swipeEnabled
+            ? {
+                transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+                transition: overlayDragging
+                  ? "none"
+                  : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                willChange: overlayTranslateY ? "transform" : undefined,
+              }
+            : undefined
+        }
+        onPointerMove={handleOverlayPointerMove}
+        onPointerUp={handleOverlayPointerEnd}
+        onPointerCancel={handleOverlayPointerEnd}
       >
         {/* Header */}
         <div
           className={`relative flex-shrink-0 ${modalBgClass} px-4 md:px-5 py-4 before:content-[''] before:absolute before:left-0 before:right-0 before:bottom-0 before:h-px before:bg-white/10`}
+          onPointerDown={(event) => {
+            maybeStartOverlayDrag(event, "fixed");
+          }}
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
@@ -1731,7 +1915,13 @@ export default function GlobalStatement({
         </div>
 
         {/* Content - Zone scrollable */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-4 flex flex-col gap-4">
+        <div
+          ref={overlayListRef}
+          className="flex-1 min-h-0 overflow-y-auto px-4 md:px-5 py-4 flex flex-col gap-4"
+          onPointerDown={(event) => {
+            maybeStartOverlayDrag(event, "list");
+          }}
+        >
           {/* Recent transactions */}
           <div className="space-y-2">
             <div className="flex items-end justify-between gap-3">

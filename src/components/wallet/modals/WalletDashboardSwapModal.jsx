@@ -302,6 +302,171 @@ export default function WalletDashboardSwapModal({
     enabled: shouldAnimate,
   });
 
+  const [overlayDragging, setOverlayDragging] = useState(false);
+  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const overlayRef = useRef(null);
+  const overlayListRef = useRef(null);
+  const overlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
+  const closeRequestedRef = useRef(false);
+
+  useEffect(() => {
+    if (open) return;
+    closeRequestedRef.current = false;
+    try {
+      const listEl = overlayListRef.current;
+      const meta = overlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setOverlayDragging(false);
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  }, [open]);
+
+  const releaseOverlayScrollLock = () => {
+    const meta = overlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = overlayListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartOverlayDrag = (event, source) => {
+    if (inline) return false;
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = overlayListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    overlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleOverlayPointerMove = (event) => {
+    if (inline) return;
+    const meta = overlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        overlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = overlayListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setOverlayTranslateY(delta);
+  };
+
+  const handleOverlayPointerEnd = (event) => {
+    if (inline) return;
+    const meta = overlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration; // px/ms
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    overlayDragMetaRef.current.pending = false;
+    overlayDragMetaRef.current.dragging = false;
+    setOverlayDragging(false);
+    releaseOverlayScrollLock();
+
+    if (shouldClose) {
+      if (!closeRequestedRef.current) {
+        closeRequestedRef.current = true;
+        const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+        setOverlayTranslateY(Math.max(delta, height));
+        window.setTimeout(() => {
+          onClose?.();
+        }, 180);
+      }
+      return;
+    }
+
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
+
   if (!shouldRender) return null;
 
   const wrapperClass = inline
@@ -331,47 +496,69 @@ export default function WalletDashboardSwapModal({
             isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
           }`}
           onClick={onClose}
+          style={
+            overlayTranslateY > 0
+              ? {
+                  opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)),
+                }
+              : undefined
+          }
         />
       ) : null}
 
       {/* Modale */}
       <div className={wrapperClass}>
         <div
-          className={panelClass}
-          onClick={(e) => {
-            if (!inline) e.stopPropagation();
+          ref={overlayRef}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          style={{
+            transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+            transition: overlayDragging
+              ? "none"
+              : "transform 220ms cubic-bezier(0.2,0,0,1)",
+            willChange: overlayTranslateY ? "transform" : undefined,
           }}
+          onPointerMove={handleOverlayPointerMove}
+          onPointerUp={handleOverlayPointerEnd}
+          onPointerCancel={handleOverlayPointerEnd}
         >
           <div
-            className="flex-1 min-h-0 flex flex-col p-4 md:p-5 space-y-4"
+            ref={overlayListRef}
+            className={panelClass}
+            onClick={(e) => {
+              if (!inline) e.stopPropagation();
+            }}
+            onPointerDown={(event) => {
+              maybeStartOverlayDrag(event, "list");
+            }}
           >
-            <div className="flex items-start justify-between gap-3 mb-1 pr-6">
-              <div className="flex min-w-0 flex-col gap-1.5">
-                <div>
-                  {renderWalletMeta?.(
-                    "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
-                  )}
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
+            <div className="flex-1 min-h-0 flex flex-col p-4 md:p-5 space-y-4">
+              <div
+                className="flex items-start justify-between gap-3 mb-1 pr-6"
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "fixed");
+                }}
+              >
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  {!inline ? (
+                    <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                    </div>
                   ) : null}
-
+                  <div>
+                    {renderWalletMeta?.(
+                      "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {noticeVariant === "demo" ? (
+                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                        {t("demo_notice_title", "Mode démo")}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
-              >
-                ✕
-              </button>
-            </div>
             <div className="wallet-tab-unfold-in">
               <div className="flex flex-col gap-4">
                 {/* ── SECTION 1: Currency selection ───────────────────────── */}
@@ -640,6 +827,7 @@ export default function WalletDashboardSwapModal({
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
