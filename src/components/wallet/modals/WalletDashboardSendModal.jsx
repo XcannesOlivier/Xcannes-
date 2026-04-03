@@ -861,6 +861,12 @@ export default function WalletDashboardSendModal({
       : "",
   ].join(" ");
 
+  const backdropAnimClass = closeRequestedRef.current
+    ? ""
+    : isClosing
+      ? "wallet-modal-backdrop-out"
+      : "wallet-modal-backdrop-in";
+
   const saveAddressBlock = shouldShowSaveAddressBlock ? (
     <div className="rounded-lg bg-gradient-to-b from-white/[0.08] to-white/[0.03] px-3 py-2 space-y-2 ring-1 ring-white/10 ring-inset shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
       <label className="flex items-center gap-2 text-xs text-white/60">
@@ -1536,9 +1542,7 @@ export default function WalletDashboardSendModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`}
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
           onClick={onClose}
           style={
             overlayTranslateY > 0

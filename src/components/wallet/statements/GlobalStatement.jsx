@@ -1761,6 +1761,17 @@ export default function GlobalStatement({
       : null;
 
   /* ── render ────────────────────────────────────────────── */
+  const backdropAnimClass = closeRequestedRef.current
+    ? ""
+    : isClosing
+      ? "wallet-modal-backdrop-out"
+      : "wallet-modal-backdrop-in";
+  const liftAnimClass = closeRequestedRef.current
+    ? ""
+    : isClosing
+      ? "wallet-modal-lift-out"
+      : "wallet-modal-lift-in";
+
   const content = (
     <div
       className={`${wrapperBaseClass} ${resolvedLayout.wrapperClass}`}
@@ -1770,7 +1781,7 @@ export default function GlobalStatement({
           className={[
             "absolute inset-0 z-[10200]",
             resolvedLayout.backdropClass,
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in",
+            backdropAnimClass,
           ].join(" ")}
           onClick={onClose}
           style={
@@ -1785,7 +1796,7 @@ export default function GlobalStatement({
         ref={overlayRef}
         className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col overflow-hidden z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
-        } ${inline ? "wallet-inline-zoom-in" : isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
+        } ${inline ? "wallet-inline-zoom-in" : liftAnimClass}`}
         style={
           swipeEnabled
             ? {

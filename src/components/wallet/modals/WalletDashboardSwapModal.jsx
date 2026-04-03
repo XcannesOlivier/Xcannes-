@@ -495,14 +495,18 @@ export default function WalletDashboardSwapModal({
       : "",
   ].join(" ");
 
+  const backdropAnimClass = closeRequestedRef.current
+    ? ""
+    : isClosing
+      ? "wallet-modal-backdrop-out"
+      : "wallet-modal-backdrop-in";
+
   const content = (
     <>
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`}
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
           onClick={onClose}
           style={
             overlayTranslateY > 0
