@@ -851,7 +851,7 @@ export default function WalletDashboardSendModal({
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-send-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
+    "relative w-full wallet-modal-panel wallet-send-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
       ? "h-full max-h-none rounded-xl"
       : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
@@ -1599,9 +1599,18 @@ export default function WalletDashboardSendModal({
             >
               <div className="flex min-w-0 flex-col gap-1.5">
                 <div>
-                  {renderWalletMeta?.(
-                    "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
-                  )}
+                  {renderWalletMeta?.({
+                    variant: "pill",
+                    className: "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
+                    prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
+                    pillClassName:
+                      "bg-white/95 border border-black/5 shadow-[0_16px_44px_rgba(0,0,0,0.25)]",
+                    prefixClassName:
+                      "text-[color:var(--bg-elevated)] text-[11px] font-semibold tracking-wide",
+                    labelClassName:
+                      "text-[color:var(--bg-elevated)] text-sm font-semibold",
+                    dotClassName: "ring-xcannes-green/20",
+                  })}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (

@@ -1604,7 +1604,7 @@ export default function CurrencyStatement({
 
       <div
         ref={overlayRef}
-        className={`relative w-full wallet-modal-panel ${modalBgClass} flex flex-col min-h-0 ${statementPanelOverflowClass} z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
+        className={`relative w-full wallet-modal-panel wallet-modal-no-top-highlight-mobile ${modalBgClass} flex flex-col min-h-0 ${statementPanelOverflowClass} z-[10201] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)] ${
           resolvedLayout.panelClass
         } ${inline ? "wallet-inline-zoom-in" : liftAnimClass}`}
         style={{

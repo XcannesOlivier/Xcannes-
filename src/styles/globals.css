@@ -412,6 +412,12 @@ body.wallet-page {
   }
 }
 
+@media (max-width: 767px) {
+  .wallet-modal-no-top-highlight-mobile {
+    box-shadow: inset 0 -26px 46px rgba(0, 0, 0, 0.55) !important;
+  }
+}
+
 @media (hover: none) {
   .demo-wallet-tooltip-scope [title] {
     position: relative;

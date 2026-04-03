@@ -13,16 +13,54 @@ export function useWalletMeta({
   addressTitle = "",
 } = {}) {
   const renderWalletMeta = useCallback(
-    (className = "") => {
+    (classNameOrOptions = "", maybeOptions = null) => {
+      const options =
+        classNameOrOptions && typeof classNameOrOptions === "object"
+          ? classNameOrOptions
+          : maybeOptions || {};
+      const className =
+        classNameOrOptions && typeof classNameOrOptions === "object"
+          ? String(classNameOrOptions.className || "")
+          : String(classNameOrOptions || "");
+
       const resolvedLabel = String(walletLabel || "").trim();
       const resolvedAddress = String(walletAddress || "").trim();
       const resolvedPrefix = String(labelPrefix || "").trim();
       if (!resolvedAddress && !resolvedLabel) return null;
+
+      const variant = String(options?.variant || "default");
+      const effectivePrefix =
+        options?.prefix != null ? String(options.prefix) : resolvedPrefix;
+
+      if (variant === "pill") {
+        return (
+          <div className={className}>
+            <div
+              className={[
+                "inline-flex max-w-full items-center rounded-xl bg-white px-3 py-2 ring-1 ring-black/10 shadow-sm",
+                options?.pillClassName || "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <WalletActiveLabel
+                prefix={effectivePrefix}
+                label={resolvedLabel || "Wallet"}
+                className={options?.labelRowClassName || ""}
+                prefixClassName={options?.prefixClassName || ""}
+                labelClassName={options?.labelClassName || ""}
+                dotClassName={options?.dotClassName || ""}
+              />
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className={`text-xs text-white/60 ${className}`}>
           <div className="text-xl md:text-2xl font-semibold text-white/80 leading-tight">
             <WalletActiveLabel
-              prefix={resolvedPrefix}
+              prefix={effectivePrefix}
               label={resolvedLabel || "Wallet"}
               labelClassName="font-semibold text-white/80"
             />
