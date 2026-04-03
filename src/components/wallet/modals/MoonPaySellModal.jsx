@@ -1126,10 +1126,10 @@ const MoonPaySellModal = ({
 	            </p>
             {String(walletLabel || "").trim() ? (
               <div className="flex items-center gap-2 mb-1">
-                <span
-                  className="h-1.5 w-1.5 rounded-full bg-xcannes-green/80 shrink-0"
-                  aria-hidden
-                />
+	                <span
+	                  className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
+	                  aria-hidden
+	                />
                 <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
                   {walletLabel}
                 </p>
@@ -1366,15 +1366,6 @@ const MoonPaySellModal = ({
                 {currency}
               </span>
             </div>
-	            {balanceLabel ? (
-	              <p className="mt-2 text-[11px] text-white/55">
-	                {t(
-	                  "moonpay_sell_balance_available",
-	                  "Disponible: {{amount}}",
-	                  { amount: balanceLabel },
-	                )}
-	              </p>
-	            ) : null}
             {isCurrencyLine && hasValidAmount ? (
               <p
                 className={`mt-2 text-[11px] ${

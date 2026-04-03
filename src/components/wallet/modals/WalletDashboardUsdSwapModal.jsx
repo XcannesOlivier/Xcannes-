@@ -1503,17 +1503,17 @@ export default function WalletDashboardUsdSwapModal({
                       </p>
                       {String(walletLabel || "").trim() ? (
                         <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className="h-1.5 w-1.5 rounded-full bg-xcannes-green/80 shrink-0"
-                            aria-hidden
-                          />
+	                          <span
+	                            className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
+	                            aria-hidden
+	                          />
                           <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
                             {walletLabel}
                           </p>
                         </div>
                       ) : null}
 	                      {String(walletAddress || "").trim() ? (
-	                        <p className="text-[10px] md:text-[11px] text-xcannes-green/80 font-mono break-all">
+	                        <p className="text-[11px] md:text-[12px] text-xcannes-green/80 font-mono break-all">
 	                          {walletAddress}
 	                        </p>
 	                      ) : null}

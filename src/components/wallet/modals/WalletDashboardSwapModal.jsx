@@ -646,7 +646,7 @@ export default function WalletDashboardSwapModal({
 	                      title={t("ui_swap_currencies", "Inverser")}
 	                    >
 	                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-	                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 10h10M7 10l3-3M7 10l3 3M17 14H7m10 0l-3-3m3 3l-3 3" />
+	                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 9h10M7 9l3-3M7 9l3 3M17 15H7m10 0l-3-3m3 3l-3 3" />
 	                      </svg>
 	                    </button>
 	                  </div>
