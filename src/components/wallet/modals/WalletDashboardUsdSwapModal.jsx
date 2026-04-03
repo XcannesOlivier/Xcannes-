@@ -138,11 +138,13 @@ export default function WalletDashboardUsdSwapModal({
   const [refundExtraId, setRefundExtraId] = useState("");
   const [refundDetailsOpen, setRefundDetailsOpen] = useState(false);
   const [quote, setQuote] = useState(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
   const [ranges, setRanges] = useState(null);
   const [apiError, setApiError] = useState("");
   const [exchange, setExchange] = useState(null);
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
   const estimateAbortRef = useRef(null);
+  const estimateSeqRef = useRef(0);
 
   const parsedAmount = useMemo(
     () => Number(String(amount || "").trim().replace(",", ".")),
@@ -203,7 +205,29 @@ export default function WalletDashboardUsdSwapModal({
         : totalSteps;
 
   const quotedReceiveAmount = useMemo(() => {
-    const raw = pick(quote, ["amount", "estimatedAmount", "estimate", "amountTo", "amount_to"], "");
+    if (quote == null) return null;
+    if (typeof quote === "number") {
+      return Number.isFinite(quote) && quote > 0 ? quote : null;
+    }
+    if (typeof quote === "string") {
+      const num = Number(String(quote || "").trim().replace(",", "."));
+      return Number.isFinite(num) && num > 0 ? num : null;
+    }
+    const keys = [
+      "amount",
+      "estimatedAmount",
+      "estimate",
+      "amountTo",
+      "amount_to",
+      "amountToEstimated",
+      "estimatedAmountTo",
+    ];
+    const raw =
+      pick(quote, keys, "") ||
+      pick(quote?.data, keys, "") ||
+      pick(quote?.result, keys, "") ||
+      pick(quote?.estimate, keys, "") ||
+      "";
     const num = Number(String(raw || "").trim().replace(",", "."));
     if (!Number.isFinite(num) || num <= 0) return null;
     return num;
@@ -211,7 +235,6 @@ export default function WalletDashboardUsdSwapModal({
 
   useEffect(() => {
     // Avoid showing stale estimates when inputs change.
-    setQuote(null);
     setRanges(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [direction, stableKey, amount]);
@@ -587,20 +610,33 @@ export default function WalletDashboardUsdSwapModal({
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
     setApiError("");
     try {
-      const response = await fetch(
-        `/api/simpleswap/estimates?${new URLSearchParams({
-          fixed: "false",
-          reverse: "false",
-          tickerFrom: String(fromCurrency.ticker || ""),
-          networkFrom: String(fromCurrency.network || ""),
-          tickerTo: String(toCurrency.ticker || ""),
-          networkTo: String(toCurrency.network || ""),
-          amount: String(parsedAmount),
-        }).toString()}`,
-        { signal },
-      );
-      const data = await response.json();
-      if (response.ok) setQuote(data);
+      const params = new URLSearchParams({
+        fixed: "false",
+        reverse: "false",
+        tickerFrom: String(fromCurrency.ticker || ""),
+        networkFrom: String(fromCurrency.network || ""),
+        tickerTo: String(toCurrency.ticker || ""),
+        networkTo: String(toCurrency.network || ""),
+        amount: String(parsedAmount),
+      }).toString();
+
+      const tryEndpoints = ["/api/simpleswap/estimates", "/api/simpleswap/check"];
+      for (const endpoint of tryEndpoints) {
+        const response = await fetch(`${endpoint}?${params}`, { signal });
+        const data = await response.json().catch(() => null);
+        if (!response.ok) continue;
+        if (data == null) continue;
+
+        // Normalize primitives to a consistent shape.
+        if (typeof data === "string" || typeof data === "number") {
+          setQuote({ estimatedAmount: data });
+          return;
+        }
+        if (typeof data === "object") {
+          setQuote(data);
+          return;
+        }
+      }
     } catch (error) {
       if (error?.name === "AbortError") return;
       // ignore (non-bloquant)
@@ -617,6 +653,7 @@ export default function WalletDashboardUsdSwapModal({
     if (!open) return;
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
 
+    const seq = (estimateSeqRef.current += 1);
     const controller = new AbortController();
     try {
       estimateAbortRef.current?.abort?.();
@@ -624,9 +661,12 @@ export default function WalletDashboardUsdSwapModal({
       // ignore
     }
     estimateAbortRef.current = controller;
+    setQuoteLoading(true);
 
     const timer = window.setTimeout(() => {
-      fetchEstimate({ signal: controller.signal });
+      fetchEstimate({ signal: controller.signal }).finally(() => {
+        if (estimateSeqRef.current === seq) setQuoteLoading(false);
+      });
     }, 450);
 
     return () => {
@@ -635,6 +675,13 @@ export default function WalletDashboardUsdSwapModal({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, fromCurrencyKey, toCurrencyKey, parsedAmount, hasValidAmount]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (hasValidAmount) return;
+    setQuoteLoading(false);
+    setQuote(null);
+  }, [hasValidAmount, open]);
 
   const createExchange = async ({ returnStep = "address" } = {}) => {
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
@@ -1304,13 +1351,21 @@ export default function WalletDashboardUsdSwapModal({
 
                           <div className="mt-2 flex items-end justify-between gap-3">
                             <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
-                              {hasValidAmount && quotedReceiveAmount
-                                ? `≈${
+                              {hasValidAmount ? (
+                                quotedReceiveAmount ? (
+                                  `≈${
                                     formatAmountNumber
                                       ? formatAmountNumber.format(quotedReceiveAmount)
                                       : String(quotedReceiveAmount)
                                   }`
-                                : "—"}
+                                ) : quoteLoading ? (
+                                  "…"
+                                ) : (
+                                  "—"
+                                )
+                              ) : (
+                                "—"
+                              )}
                             </div>
                             <div className="text-sm text-white/50 whitespace-nowrap pb-1">
                               {hasValidAmount
