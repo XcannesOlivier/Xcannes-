@@ -673,7 +673,32 @@ export default function WalletDashboardUsdSwapModal({
         }).toString()}`,
       );
       const data = await response.json();
-      if (response.ok) setRanges(data);
+      if (response.ok) {
+        setRanges(data);
+        setPairUnavailable(false);
+        return;
+      }
+
+      const message =
+        String(data?.message || data?.error || "").trim() ||
+        String(data?.details?.message || data?.details?.error || "").trim() ||
+        `HTTP ${response.status}`;
+
+      if (response.status === 404 && /pair is unavailable/i.test(message)) {
+        setPairUnavailable(true);
+        if (
+          direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
+          String(toCurrency?.ticker || "").trim().toLowerCase() === "rlusd" &&
+          String(toCurrency?.network || "").trim().toLowerCase() === "xrp"
+        ) {
+          setApiError(
+            t(
+              "ui_usd_swap_pair_unavailable_rlusd_xrp",
+              "RLUSD (XRPL) n’est pas disponible en réception via l’API SimpleSwap pour cette paire (voir /pairs).",
+            ),
+          );
+        }
+      }
     } catch {
       // ignore (non-bloquant)
     }
