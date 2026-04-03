@@ -854,8 +854,8 @@ const MoonPayBuyModal = ({
             )}
           </div>
 
-          {/* Wallet address display */}
-          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+	          {/* Wallet address display */}
+	          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
             <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_destination_wallet", "Vers le compte")}
             </p>
