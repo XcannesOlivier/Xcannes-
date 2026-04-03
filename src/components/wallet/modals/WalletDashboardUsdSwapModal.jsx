@@ -127,6 +127,7 @@ export default function WalletDashboardUsdSwapModal({
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
   });
+  const swipeEnabled = false;
 
   const [step, setStep] = useState("form"); // form | address | pending | deposit
   const [direction, setDirection] = useState(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
@@ -1063,6 +1064,7 @@ export default function WalletDashboardUsdSwapModal({
   };
 
   const maybeStartModalOverlayDrag = (event, source) => {
+    if (!swipeEnabled) return false;
     if (inline) return false;
     if (!event?.isPrimary) return false;
     if (event.pointerType === "mouse") return false;
@@ -1089,6 +1091,7 @@ export default function WalletDashboardUsdSwapModal({
   };
 
   const handleModalOverlayPointerMove = (event) => {
+    if (!swipeEnabled) return;
     if (inline) return;
     const meta = modalOverlayDragMetaRef.current;
     if (!meta?.pending && !meta?.dragging) return;
@@ -1128,6 +1131,7 @@ export default function WalletDashboardUsdSwapModal({
   };
 
   const handleModalOverlayPointerEnd = (event) => {
+    if (!swipeEnabled) return;
     if (inline) return;
     const meta = modalOverlayDragMetaRef.current;
     if (meta.pointerId !== event.pointerId) return;
@@ -1211,16 +1215,20 @@ export default function WalletDashboardUsdSwapModal({
         <div
           ref={modalOverlayRef}
           className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
-          style={{
-            transform: `translateY(${Math.max(0, modalOverlayTranslateY)}px)`,
-            transition: modalOverlayDragging
-              ? "none"
-              : "transform 220ms cubic-bezier(0.2,0,0,1)",
-            willChange: modalOverlayTranslateY ? "transform" : undefined,
-          }}
-          onPointerMove={handleModalOverlayPointerMove}
-          onPointerUp={handleModalOverlayPointerEnd}
-          onPointerCancel={handleModalOverlayPointerEnd}
+          style={
+            swipeEnabled
+              ? {
+                  transform: `translateY(${Math.max(0, modalOverlayTranslateY)}px)`,
+                  transition: modalOverlayDragging
+                    ? "none"
+                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                  willChange: modalOverlayTranslateY ? "transform" : undefined,
+                }
+              : undefined
+          }
+          onPointerMove={swipeEnabled ? handleModalOverlayPointerMove : undefined}
+          onPointerUp={swipeEnabled ? handleModalOverlayPointerEnd : undefined}
+          onPointerCancel={swipeEnabled ? handleModalOverlayPointerEnd : undefined}
         >
           <div
             className={panelClass}
@@ -1230,14 +1238,20 @@ export default function WalletDashboardUsdSwapModal({
           >
             <div
               className="border-b border-white/10"
-              onPointerDown={(event) => {
-                maybeStartModalOverlayDrag(event, "fixed");
-              }}
+              onPointerDown={
+                swipeEnabled
+                  ? (event) => {
+                      maybeStartModalOverlayDrag(event, "fixed");
+                    }
+                  : undefined
+              }
             >
               {!inline ? (
-                <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
-                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                </div>
+                swipeEnabled ? (
+                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
+                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                  </div>
+                ) : null
               ) : null}
               <div className="p-4">
               <div className="flex items-center justify-between gap-3">
@@ -1287,9 +1301,13 @@ export default function WalletDashboardUsdSwapModal({
           <div
             ref={modalOverlayListRef}
             className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
-            onPointerDown={(event) => {
-              maybeStartModalOverlayDrag(event, "list");
-            }}
+            onPointerDown={
+              swipeEnabled
+                ? (event) => {
+                    maybeStartModalOverlayDrag(event, "list");
+                  }
+                : undefined
+            }
           >
             {step === "deposit" ? (
               <div className="space-y-5">

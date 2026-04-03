@@ -988,7 +988,11 @@ export default function CurrencyStatement({
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration; // px/ms
-    const shouldClose = delta > 160 || velocity > 1.0;
+    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose =
+      delta > closeDistance ||
+      (delta > closeDistance * 0.6 && velocity > 1.25);
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
@@ -1342,13 +1346,7 @@ export default function CurrencyStatement({
                     {formatAmountRlusdAsLocal(detailTx?.amount ?? 0)}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={closeTxDetails}
-                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl w-10 h-10 -mr-2 flex items-center justify-center rounded-lg hover:bg-white/5"
-                >
-                  ✕
-                </button>
+                {/* closed via backdrop click */}
               </div>
 
               <div className="h-px bg-white/[0.04] my-3" />
@@ -1632,6 +1630,11 @@ export default function CurrencyStatement({
               maybeStartOverlayDrag(event, "fixed");
             }}
 	        >
+            {swipeEnabled ? (
+              <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+                <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+              </div>
+            ) : null}
 	          <div className="flex items-start justify-between gap-3 mb-3">
 	            {isXrpNetworkView ? (
 	              <button
@@ -1684,16 +1687,7 @@ export default function CurrencyStatement({
 	                </div>
 	              </div>
 	            </div>
-	            {!isXrpNetworkView ? (
-	              <button
-	                type="button"
-	                onClick={onClose}
-	                className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors text-2xl md:text-3xl leading-none flex-shrink-0 w-10 h-10 flex items-center justify-center -mr-2"
-	                aria-label={t("close", "Fermer")}
-	              >
-	                ×
-	              </button>
-	            ) : null}
+              {/* close via swipe/backdrop */}
 	          </div>
 
           {/* Account Info dans le header */}

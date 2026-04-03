@@ -240,6 +240,11 @@ export default function WalletCurrencySelector({
   };
 
   const maybeStartOverlayDrag = (event, source) => {
+    try {
+      event?.stopPropagation?.();
+    } catch {
+      // ignore
+    }
     if (!event?.isPrimary) return false;
     if (event.pointerType === "mouse") return false;
     if (event.target?.closest?.("input,textarea,select")) return false;
@@ -265,6 +270,11 @@ export default function WalletCurrencySelector({
   };
 
   const handleOverlayPointerMove = (event) => {
+    try {
+      event?.stopPropagation?.();
+    } catch {
+      // ignore
+    }
     const meta = overlayDragMetaRef.current;
     if (!meta?.pending && !meta?.dragging) return;
     if (meta.pointerId !== event.pointerId) return;
@@ -303,13 +313,22 @@ export default function WalletCurrencySelector({
   };
 
   const handleOverlayPointerEnd = (event) => {
+    try {
+      event?.stopPropagation?.();
+    } catch {
+      // ignore
+    }
     const meta = overlayDragMetaRef.current;
     if (meta.pointerId !== event.pointerId) return;
 
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration; // px/ms
-    const shouldClose = delta > 160 || velocity > 1.0;
+    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose =
+      delta > closeDistance ||
+      (delta > closeDistance * 0.6 && velocity > 1.25);
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
@@ -518,11 +537,21 @@ export default function WalletCurrencySelector({
 
       {open && fullscreen
         ? createPortal(
-            <div className="fixed inset-0 z-[10020]">
+            <div
+              className="fixed inset-0 z-[10020]"
+              onClick={(e) => e.stopPropagation()}
+              onPointerDown={(e) => e.stopPropagation()}
+              onPointerMove={(e) => e.stopPropagation()}
+              onPointerUp={(e) => e.stopPropagation()}
+              onPointerCancel={(e) => e.stopPropagation()}
+            >
               <div
                 className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
                 ref={fullscreenBackdropRef}
-                onClick={() => setOpen(false)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                }}
               />
               <div
                 ref={fullscreenOverlayRef}

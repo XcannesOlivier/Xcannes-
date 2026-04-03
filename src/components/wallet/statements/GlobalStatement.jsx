@@ -1278,7 +1278,11 @@ export default function GlobalStatement({
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration; // px/ms
-    const shouldClose = delta > 160 || velocity > 1.0;
+    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose =
+      delta > closeDistance ||
+      (delta > closeDistance * 0.6 && velocity > 1.25);
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
@@ -1476,13 +1480,7 @@ export default function GlobalStatement({
                     </div>
                   ) : null}
                 </div>
-                <button
-                  type="button"
-                  onClick={closeMovementDetails}
-                  className="wallet-modal-close text-white/60 hover:text-white transition-colors text-xl w-10 h-10 -mr-2 flex items-center justify-center rounded-lg hover:bg-white/5"
-                >
-                  ✕
-                </button>
+                {/* closed via backdrop click */}
               </div>
 
               <div className="h-px bg-white/[0.04] my-3" />
@@ -1819,6 +1817,11 @@ export default function GlobalStatement({
             maybeStartOverlayDrag(event, "fixed");
           }}
         >
+          {swipeEnabled ? (
+            <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
+              <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+            </div>
+          ) : null}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <span
@@ -1881,15 +1884,7 @@ export default function GlobalStatement({
                 <div className="mt-1 min-w-0" />
               </div>
             </div>
-            {!inline ? (
-              <button
-                type="button"
-                onClick={onClose}
-                className="wallet-modal-close text-white/60 hover:text-white transition-colors text-2xl leading-none flex-shrink-0"
-              >
-                ✕
-              </button>
-            ) : null}
+            {/* close via swipe/backdrop */}
           </div>
 
           <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#050708]">

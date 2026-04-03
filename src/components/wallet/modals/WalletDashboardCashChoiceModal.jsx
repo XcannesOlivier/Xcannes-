@@ -3,6 +3,7 @@
 import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import { useEffect, useRef, useState } from "react";
 
 export default function WalletDashboardCashChoiceModal({
   open,
@@ -20,11 +21,199 @@ export default function WalletDashboardCashChoiceModal({
     enabled: shouldAnimate,
   });
 
+  const [overlayDragging, setOverlayDragging] = useState(false);
+  const [overlayTranslateY, setOverlayTranslateY] = useState(0);
+  const overlayRef = useRef(null);
+  const overlayListRef = useRef(null);
+  const overlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
+  const closeRequestedRef = useRef(false);
+
+  useEffect(() => {
+    const resetMeta = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+
+    if (open) {
+      closeRequestedRef.current = false;
+      setOverlayDragging(false);
+      setOverlayTranslateY(0);
+      overlayDragMetaRef.current = resetMeta;
+      return;
+    }
+
+    try {
+      const listEl = overlayListRef.current;
+      const meta = overlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setOverlayDragging(false);
+    if (!closeRequestedRef.current) setOverlayTranslateY(0);
+    overlayDragMetaRef.current = resetMeta;
+  }, [open]);
+
+  const releaseOverlayScrollLock = () => {
+    const meta = overlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = overlayListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartOverlayDrag = (event, source) => {
+    if (inline) return false;
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = overlayListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    overlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleOverlayPointerMove = (event) => {
+    if (inline) return;
+    const meta = overlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        overlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = overlayListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setOverlayTranslateY(delta);
+  };
+
+  const handleOverlayPointerEnd = (event) => {
+    if (inline) return;
+    const meta = overlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration; // px/ms
+    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose =
+      delta > closeDistance ||
+      (delta > closeDistance * 0.6 && velocity > 1.25);
+
+    overlayDragMetaRef.current.pending = false;
+    overlayDragMetaRef.current.dragging = false;
+    setOverlayDragging(false);
+    releaseOverlayScrollLock();
+
+    if (shouldClose) {
+      if (!closeRequestedRef.current) {
+        closeRequestedRef.current = true;
+        setOverlayTranslateY(Math.max(delta, height));
+        window.setTimeout(() => {
+          onClose?.();
+        }, 180);
+      }
+      return;
+    }
+
+    setOverlayTranslateY(0);
+    overlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
+
   if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? "relative w-full h-full flex"
     : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+  const liftAnimClass = closeRequestedRef.current
+    ? ""
+    : !inline
+      ? isClosing
+        ? "wallet-modal-lift-out"
+        : "wallet-modal-lift-in"
+      : "";
+  const backdropAnimClass = closeRequestedRef.current
+    ? ""
+    : isClosing
+      ? "wallet-modal-backdrop-out"
+      : "wallet-modal-backdrop-in";
   const panelClass = [
     "relative w-full wallet-modal-panel wallet-cash-modal border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
     inline
@@ -33,11 +222,7 @@ export default function WalletDashboardCashChoiceModal({
     noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
     noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
     inline ? "wallet-inline-zoom-in" : "",
-    !inline
-      ? isClosing
-        ? "wallet-modal-lift-out"
-        : "wallet-modal-lift-in"
-      : "",
+    liftAnimClass,
   ].join(" ");
 
   const content = (
@@ -45,52 +230,80 @@ export default function WalletDashboardCashChoiceModal({
       {/* Backdrop */}
       {!inline ? (
         <div
-          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${
-            isClosing ? "wallet-modal-backdrop-out" : "wallet-modal-backdrop-in"
-          }`}
+          className={`fixed inset-0 z-[10000] bg-black/80 md:backdrop-blur-sm ${backdropAnimClass}`}
           onClick={onClose}
+          style={
+            overlayTranslateY > 0
+              ? {
+                  opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)),
+                }
+              : undefined
+          }
         />
       ) : null}
 
       {/* Modal */}
       <div className={wrapperClass}>
         <div
-          className={panelClass}
-          onClick={(e) => {
-            if (!inline) e.stopPropagation();
+          ref={overlayRef}
+          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          style={{
+            transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+            transition: overlayDragging
+              ? "none"
+              : "transform 220ms cubic-bezier(0.2,0,0,1)",
+            willChange: overlayTranslateY ? "transform" : undefined,
           }}
+          onPointerMove={handleOverlayPointerMove}
+          onPointerUp={handleOverlayPointerEnd}
+          onPointerCancel={handleOverlayPointerEnd}
         >
-          <div className="border-b border-white/10">
-            <div className="flex items-start justify-between p-4 gap-3">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                    {t("ui_funds_manage_title", "Gérer vos fonds")}
-                  </h3>
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
+          <div
+            className={panelClass}
+            onClick={(e) => {
+              if (!inline) e.stopPropagation();
+            }}
+          >
+            <div
+              className="border-b border-white/10"
+              onPointerDown={(event) => {
+                maybeStartOverlayDrag(event, "fixed");
+              }}
+            >
+              {!inline ? (
+                <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
+                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                 </div>
-                <p className="mt-1 text-xs md:text-sm text-white/60">
-                  {t(
-                    "ui_funds_manage_subtitle",
-                    "Ajoutez, retirez ou échangez vos stablecoins USD.",
-                  )}
-                </p>
+              ) : null}
+              <div className="flex items-start justify-between p-4 gap-3">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
+                      {t("ui_funds_manage_title", "Gérer vos fonds")}
+                    </h3>
+                    {noticeVariant === "demo" ? (
+                      <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
+                        {t("demo_notice_title", "Mode démo")}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-1 text-xs md:text-sm text-white/60">
+                    {t(
+                      "ui_funds_manage_subtitle",
+                      "Ajoutez, retirez ou échangez vos stablecoins USD.",
+                    )}
+                  </p>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="wallet-modal-close md:absolute md:top-4 md:right-4 text-white/60 hover:text-white transition-colors text-xl z-10"
-              >
-                ✕
-              </button>
             </div>
-          </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5">
+          <div
+            ref={overlayListRef}
+            className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
+            onPointerDown={(event) => {
+              maybeStartOverlayDrag(event, "list");
+            }}
+          >
             <div className="space-y-3">
               <button
                 type="button"
@@ -275,6 +488,7 @@ export default function WalletDashboardCashChoiceModal({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

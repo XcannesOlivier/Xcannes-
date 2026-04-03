@@ -808,7 +808,11 @@ export default function WalletDashboardSendModal({
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration; // px/ms
-    const shouldClose = delta > 160 || velocity > 1.0;
+    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const closeDistance = Math.max(220, Math.min(320, height * 0.28));
+    const shouldClose =
+      delta > closeDistance ||
+      (delta > closeDistance * 0.6 && velocity > 1.25);
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
@@ -1576,6 +1580,17 @@ export default function WalletDashboardSendModal({
               if (!inline) e.stopPropagation();
             }}
           >
+            {!inline ? (
+              <div
+                className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
+                aria-hidden
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "fixed");
+                }}
+              >
+                <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+              </div>
+            ) : null}
             <div
               className="flex items-start justify-between gap-3 mb-1 pr-6"
               onPointerDown={(event) => {
@@ -1583,11 +1598,6 @@ export default function WalletDashboardSendModal({
               }}
             >
               <div className="flex min-w-0 flex-col gap-1.5">
-                {!inline ? (
-                  <div className="md:hidden flex justify-center -mt-1 pt-1 pb-2" aria-hidden>
-                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                  </div>
-                ) : null}
                 <div>
                   {renderWalletMeta?.(
                     "pr-8 wallet-meta--plus-4 wallet-meta--desktop-gap",
