@@ -8,7 +8,7 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { greenActionBtnBase } from "./walletModalTokens";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 
-const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrpl" };
+const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrp" };
 const PRIORITY_TICKERS = ["usdc", "usdt", "dai", "usdp", "tusd", "fdusd", "pyusd"];
 const SWAP_DIRECTIONS = {
   RLUSD_TO_STABLE: "rlusd_to_stable",
@@ -16,10 +16,10 @@ const SWAP_DIRECTIONS = {
 };
 const MAX_STABLE_SEARCH_RESULTS = 200;
 const QUICK_STABLE_TARGETS = [
-  { ticker: "usdt", networkAliases: ["tron", "trx", "trc20"], label: "USDT (TRON)" },
   { ticker: "usdt", networkAliases: ["eth", "ethereum", "erc20"], label: "USDT (ETH)" },
-  { ticker: "usdt", networkAliases: ["bsc", "bnb", "bep20"], label: "USDT (BSC)" },
   { ticker: "usdc", networkAliases: ["eth", "ethereum", "erc20"], label: "USDC (ETH)" },
+  { ticker: "usdt", networkAliases: ["tron", "trx", "trc20"], label: "USDT (TRON)" },
+  { ticker: "usdt", networkAliases: ["bsc", "bnb", "bep20"], label: "USDT (BSC)" },
   { ticker: "usdc", networkAliases: ["sol", "solana"], label: "USDC (SOL)" },
   { ticker: "usdc", networkAliases: ["arbitrum", "arb"], label: "USDC (ARBITRUM)" },
   { ticker: "usdc", networkAliases: ["base"], label: "USDC (BASE)" },
@@ -92,6 +92,27 @@ function safeReadJsonArray(value) {
   }
 }
 
+function parseSimpleSwapRanges(ranges) {
+  if (!ranges) return { min: null, max: null };
+  const source = Array.isArray(ranges)
+    ? ranges[0]
+    : typeof ranges === "object"
+      ? ranges?.data || ranges?.result || ranges
+      : null;
+  if (!source || typeof source !== "object") return { min: null, max: null };
+
+  const rawMin = pick(source, ["min", "minAmount", "min_amount", "minAmountFrom", "min_amount_from"], "");
+  const rawMax = pick(source, ["max", "maxAmount", "max_amount", "maxAmountFrom", "max_amount_from"], "");
+
+  const min = rawMin ? Number(String(rawMin).trim().replace(",", ".")) : null;
+  const max = rawMax ? Number(String(rawMax).trim().replace(",", ".")) : null;
+
+  return {
+    min: Number.isFinite(min) && min > 0 ? min : null,
+    max: Number.isFinite(max) && max > 0 ? max : null,
+  };
+}
+
 export default function WalletDashboardUsdSwapModal({
   open,
   onClose,
@@ -145,6 +166,43 @@ export default function WalletDashboardUsdSwapModal({
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
   const estimateAbortRef = useRef(null);
   const estimateSeqRef = useRef(0);
+
+  const maybeApplyResolvedRlusdCurrency = (resolved) => {
+    if (!resolved || typeof resolved !== "object") return;
+    const resTickerFrom = String(resolved?.tickerFrom || "").trim().toLowerCase();
+    const resTickerTo = String(resolved?.tickerTo || "").trim().toLowerCase();
+    const resNetworkFrom = String(resolved?.networkFrom || "").trim().toLowerCase();
+    const resNetworkTo = String(resolved?.networkTo || "").trim().toLowerCase();
+    const currentTicker = String(rlusdCurrency?.ticker || DEFAULT_RLUSD.ticker)
+      .trim()
+      .toLowerCase();
+    const currentNetwork = String(rlusdCurrency?.network || DEFAULT_RLUSD.network)
+      .trim()
+      .toLowerCase();
+
+    const isRlusd = (ticker) => {
+      const normalized = String(ticker || "").trim().toLowerCase();
+      return normalized === currentTicker || normalized === DEFAULT_RLUSD.ticker;
+    };
+
+    let nextTicker = "";
+    let nextNetwork = "";
+    if (isRlusd(resTickerFrom)) {
+      nextTicker = resTickerFrom;
+      nextNetwork = resNetworkFrom;
+    } else if (isRlusd(resTickerTo)) {
+      nextTicker = resTickerTo;
+      nextNetwork = resNetworkTo;
+    }
+
+    if (!nextTicker || !nextNetwork) return;
+    if (nextTicker === currentTicker && nextNetwork === currentNetwork) return;
+
+    setRlusdCurrency((prev) => ({
+      ticker: nextTicker || prev?.ticker || DEFAULT_RLUSD.ticker,
+      network: nextNetwork || prev?.network || DEFAULT_RLUSD.network,
+    }));
+  };
 
   const parsedAmount = useMemo(
     () => Number(String(amount || "").trim().replace(",", ".")),
@@ -233,11 +291,20 @@ export default function WalletDashboardUsdSwapModal({
     return num;
   }, [quote]);
 
+  const rangeLimits = useMemo(() => parseSimpleSwapRanges(ranges), [ranges]);
+  const minFromAmount = rangeLimits?.min ?? null;
+  const maxFromAmount = rangeLimits?.max ?? null;
+  const amountBelowMin =
+    hasValidAmount && Number.isFinite(minFromAmount) && parsedAmount < minFromAmount;
+  const amountAboveMax =
+    hasValidAmount && Number.isFinite(maxFromAmount) && parsedAmount > maxFromAmount;
+  const amountOutOfRange = amountBelowMin || amountAboveMax;
+
   useEffect(() => {
-    // Avoid showing stale estimates when inputs change.
+    // Refresh min/max when the pair changes (not on amount typing).
     setRanges(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [direction, stableKey, amount]);
+  }, [fromCurrencyKey, toCurrencyKey, direction]);
 
   useEffect(() => {
     if (!stableDropdownOpen) return;
@@ -608,7 +675,7 @@ export default function WalletDashboardUsdSwapModal({
 
   const fetchEstimate = async ({ signal } = {}) => {
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
-    setApiError("");
+    if (amountOutOfRange) return;
     try {
       const params = new URLSearchParams({
         fixed: "false",
@@ -621,25 +688,50 @@ export default function WalletDashboardUsdSwapModal({
       }).toString();
 
       const tryEndpoints = ["/api/simpleswap/estimates", "/api/simpleswap/check"];
+      let lastErrorMessage = "";
+      let lastStatus = 0;
       for (const endpoint of tryEndpoints) {
         const response = await fetch(`${endpoint}?${params}`, { signal });
         const data = await response.json().catch(() => null);
-        if (!response.ok) continue;
+        if (!response.ok) {
+          lastStatus = response.status;
+          lastErrorMessage =
+            String(data?.message || data?.error || "").trim() ||
+            String(data?.details?.message || data?.details?.error || "").trim() ||
+            `HTTP ${response.status}`;
+          continue;
+        }
         if (data == null) continue;
 
         // Normalize primitives to a consistent shape.
         if (typeof data === "string" || typeof data === "number") {
           setQuote({ estimatedAmount: data });
+          setApiError("");
           return;
         }
         if (typeof data === "object") {
           setQuote(data);
+          maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
+          setApiError("");
           return;
+        }
+      }
+
+      if (lastErrorMessage) {
+        if (lastStatus === 404) {
+          setApiError(
+            t(
+              "ui_usd_swap_pair_not_supported",
+              `Paire non supportée (${fromTicker}/${fromNetwork} → ${toTicker}/${toNetwork}). Essayez un autre réseau.`,
+            ),
+          );
+        } else {
+          setApiError(lastErrorMessage);
         }
       }
     } catch (error) {
       if (error?.name === "AbortError") return;
-      // ignore (non-bloquant)
+      setApiError(error?.message || "Impossible de récupérer une estimation.");
     }
   };
 
@@ -685,6 +777,22 @@ export default function WalletDashboardUsdSwapModal({
 
   const createExchange = async ({ returnStep = "address" } = {}) => {
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
+    if (amountOutOfRange) {
+      const minText =
+        Number.isFinite(minFromAmount) && minFromAmount
+          ? `${minFromAmount} ${fromTicker || ""}`
+          : "";
+      const maxText =
+        Number.isFinite(maxFromAmount) && maxFromAmount
+          ? `${maxFromAmount} ${fromTicker || ""}`
+          : "";
+      setApiError(
+        amountBelowMin
+          ? t("ui_usd_swap_min_amount", `Montant minimum : ${minText}.`)
+          : t("ui_usd_swap_max_amount", `Montant maximum : ${maxText}.`),
+      );
+      return;
+    }
     const defaultReceive = direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? walletAddress : "";
     const addr = String(receiveAddress || defaultReceive || "").trim();
     if (!addr) {
@@ -727,6 +835,7 @@ export default function WalletDashboardUsdSwapModal({
         throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
       }
       setExchange(data);
+      maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
       if (
         direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
         typeof window !== "undefined"
@@ -747,7 +856,7 @@ export default function WalletDashboardUsdSwapModal({
                 depositExtraId: depositMemo || null,
                 amountFrom: amountFromValue || null,
                 tickerFrom: String(fromCurrency?.ticker || "rlusd"),
-                networkFrom: String(fromCurrency?.network || "xrpl"),
+                networkFrom: String(fromCurrency?.network || "xrp"),
                 tickerTo: String(toCurrency?.ticker || ""),
                 networkTo: String(toCurrency?.network || ""),
                 createdAt: new Date().toISOString(),
@@ -1235,7 +1344,7 @@ export default function WalletDashboardUsdSwapModal({
                                   {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
                                 </span>
                                 <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
-                                  {String(rlusdDisplayCurrency?.network || "xrpl").toUpperCase()}
+                                  {String(rlusdDisplayCurrency?.network || "xrp").toUpperCase()}
                                 </span>
                               </div>
                             )}
@@ -1247,7 +1356,10 @@ export default function WalletDashboardUsdSwapModal({
                             type="text"
                             inputMode="decimal"
                             value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
+                            onChange={(e) => {
+                              setAmount(e.target.value);
+                              setApiError("");
+                            }}
                             placeholder={direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? "25" : "100"}
                             className="w-full bg-transparent text-white text-4xl md:text-5xl font-semibold tracking-tight focus:outline-none xcannes-no-spinner"
                           />
@@ -1257,6 +1369,26 @@ export default function WalletDashboardUsdSwapModal({
                               : ""}
                           </div>
                         </div>
+
+                        {minFromAmount || maxFromAmount ? (
+                          <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-white/45">
+                            <div className="min-w-0 truncate">
+                              {minFromAmount
+                                ? `${t("ui_min", "Min")}: ${formatAmountNumber ? formatAmountNumber.format(minFromAmount) : String(minFromAmount)} ${fromTicker || ""}`
+                                : ""}
+                              {maxFromAmount
+                                ? `${minFromAmount ? " • " : ""}${t("ui_max", "Max")}: ${formatAmountNumber ? formatAmountNumber.format(maxFromAmount) : String(maxFromAmount)} ${fromTicker || ""}`
+                                : ""}
+                            </div>
+                            {amountOutOfRange ? (
+                              <span className="shrink-0 text-red-200 font-semibold">
+                                {amountBelowMin
+                                  ? t("ui_too_low", "Trop bas")
+                                  : t("ui_too_high", "Trop élevé")}
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : null}
                       </div>
 
                       <div className="relative border-t border-white/10">
@@ -1342,7 +1474,7 @@ export default function WalletDashboardUsdSwapModal({
                                     {String(rlusdDisplayCurrency?.ticker || "RLUSD").toUpperCase()}
                                   </span>
                                   <span className="text-[11px] tracking-[0.22em] uppercase text-white/55">
-                                    {String(rlusdDisplayCurrency?.network || "xrpl").toUpperCase()}
+                                    {String(rlusdDisplayCurrency?.network || "xrp").toUpperCase()}
                                   </span>
                                 </div>
                               )}
@@ -1368,8 +1500,8 @@ export default function WalletDashboardUsdSwapModal({
                               )}
                             </div>
                             <div className="text-sm text-white/50 whitespace-nowrap pb-1">
-                              {hasValidAmount
-                                ? `~${formatUsdNumber ? formatUsdNumber.format(parsedAmount) : parsedAmount.toFixed(2)}$`
+                              {hasValidAmount && quotedReceiveAmount
+                                ? `~${formatUsdNumber ? formatUsdNumber.format(quotedReceiveAmount) : Number(quotedReceiveAmount).toFixed(2)}$`
                                 : ""}
                             </div>
                           </div>
@@ -1615,6 +1747,7 @@ export default function WalletDashboardUsdSwapModal({
                       type="button"
                       disabled={
                         !hasValidAmount ||
+                        amountOutOfRange ||
                         !fromCurrency ||
                         !toCurrency ||
                         !stableCurrency
@@ -1747,6 +1880,7 @@ export default function WalletDashboardUsdSwapModal({
                       type="button"
                       disabled={
                         !hasValidAmount ||
+                        amountOutOfRange ||
                         !fromCurrency ||
                         !toCurrency ||
                         !stableCurrency ||

@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const rlusdTicker = String(process.env.SIMPLESWAP_RLUSD_TICKER || "rlusd")
     .trim()
     .toLowerCase();
-  const rlusdNetwork = String(process.env.SIMPLESWAP_RLUSD_NETWORK || "xrpl")
+  const rlusdNetwork = String(process.env.SIMPLESWAP_RLUSD_NETWORK || "xrp")
     .trim()
     .toLowerCase();
 
