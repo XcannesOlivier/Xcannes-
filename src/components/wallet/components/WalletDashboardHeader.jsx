@@ -284,9 +284,16 @@ export default function WalletDashboardHeader({
         {/* Bloc wallet — sélecteur + copier + refresh */}
         {isConnected && wallet && (
           <div className="w-full mt-6 md:mt-1.5 px-2 flex justify-center">
-            <div className="relative flex items-center gap-2 w-full max-w-[460px]">
-              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
-                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
+	            <div className="relative flex items-center gap-2 w-full max-w-[460px]">
+	              {isSwitcherOpen && hasMultipleWallets ? (
+	                <div
+	                  className="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px]"
+	                  aria-hidden="true"
+	                  onClick={() => setIsSwitcherOpen(false)}
+	                />
+	              ) : null}
+	              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
+	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
                     <button
@@ -320,11 +327,11 @@ export default function WalletDashboardHeader({
                       </div>
                     </button>
 
-                    {/* Multi-wallet dropdown */}
-                    {isSwitcherOpen && hasMultipleWallets && (
-                      <div className="absolute z-50 left-0 right-0 top-full mt-1.5 rounded-lg bg-[#151b1e] border border-white/10 shadow-xl max-h-52 overflow-y-auto">
-                        {walletAddresses.map((w, index) => {
-                          const addr = typeof w === "string" ? w : w.address;
+	                    {/* Multi-wallet dropdown */}
+	                    {isSwitcherOpen && hasMultipleWallets && (
+	                      <div className="absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] max-h-[340px] overflow-y-auto">
+	                        {walletAddresses.map((w, index) => {
+	                          const addr = typeof w === "string" ? w : w.address;
                           const label =
                             typeof w === "string"
                               ? ""

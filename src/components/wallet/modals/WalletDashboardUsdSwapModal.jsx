@@ -7,6 +7,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { greenActionBtnBase } from "./walletModalTokens";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
+import useIsDesktop from "../hooks/useIsDesktop";
 
 const DEFAULT_RLUSD = { ticker: "rlusd", network: "xrp" };
 const PRIORITY_TICKERS = ["usdc", "usdt", "dai", "usdp", "tusd", "fdusd", "pyusd"];
@@ -123,6 +124,7 @@ export default function WalletDashboardUsdSwapModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
+  const isDesktop = useIsDesktop();
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -138,6 +140,7 @@ export default function WalletDashboardUsdSwapModal({
   const [search, setSearch] = useState("");
   const [stableKey, setStableKey] = useState("");
   const [stableDropdownOpen, setStableDropdownOpen] = useState(false);
+  const [stableDesktopPopupStyle, setStableDesktopPopupStyle] = useState(null);
   const stableDropdownRef = useRef(null);
   const stableDropdownOverlayRef = useRef(null);
   const stableDropdownListRef = useRef(null);
@@ -372,6 +375,62 @@ export default function WalletDashboardUsdSwapModal({
     [filteredStableOptions],
   );
 
+  useEffect(() => {
+    if (!stableDropdownOpen || !isDesktop) {
+      setStableDesktopPopupStyle(null);
+      return;
+    }
+
+    const update = () => {
+      try {
+        const triggerEl = stableDropdownRef.current;
+        const modalEl = modalOverlayRef.current;
+        if (!triggerEl || !modalEl) return;
+
+        const triggerRect = triggerEl.getBoundingClientRect();
+        const modalRect = modalEl.getBoundingClientRect();
+        const padding = 12;
+        const gap = 8;
+
+        const maxWidth = Math.max(280, modalRect.width - padding * 2);
+        const width = Math.min(560, maxWidth);
+        const centerX = triggerRect.left + triggerRect.width / 2;
+        let left = centerX - width / 2;
+        left = Math.max(modalRect.left + padding, left);
+        left = Math.min(modalRect.right - padding - width, left);
+
+        let top = triggerRect.bottom + gap;
+        let maxHeight = modalRect.bottom - padding - top;
+
+        if (maxHeight < 220) {
+          const spaceAbove = triggerRect.top - gap - (modalRect.top + padding);
+          if (spaceAbove > maxHeight) {
+            maxHeight = spaceAbove;
+            top = Math.max(modalRect.top + padding, triggerRect.top - gap - maxHeight);
+          }
+        }
+
+        setStableDesktopPopupStyle({
+          position: "fixed",
+          left: `${Math.round(left)}px`,
+          top: `${Math.round(top)}px`,
+          width: `${Math.round(width)}px`,
+          maxHeight: `${Math.round(Math.max(180, maxHeight))}px`,
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [isDesktop, stableDropdownOpen]);
+
   const popularStableOptions = useMemo(() => {
     if (!currencies.length) return [];
     return POPULAR_STABLE_TARGETS.map((target) => {
@@ -441,7 +500,8 @@ export default function WalletDashboardUsdSwapModal({
     if (!stableDropdownOpen) return;
     const prevOverflow = document?.body?.style?.overflow;
     try {
-      if (typeof document !== "undefined") document.body.style.overflow = "hidden";
+      if (typeof document !== "undefined" && !isDesktop)
+        document.body.style.overflow = "hidden";
     } catch {
       // ignore
     }
@@ -460,7 +520,7 @@ export default function WalletDashboardUsdSwapModal({
       if (event.key === "Escape") setStableDropdownOpen(false);
     };
     document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
+    if (!isDesktop) document.addEventListener("touchstart", handlePointerDown);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
@@ -472,7 +532,7 @@ export default function WalletDashboardUsdSwapModal({
         // ignore
       }
     };
-  }, [stableDropdownOpen]);
+  }, [isDesktop, stableDropdownOpen]);
 
   useEffect(() => {
     if (stableDropdownOpen) return;
@@ -1813,216 +1873,390 @@ export default function WalletDashboardUsdSwapModal({
                       </div>
                     </div>
 
-                    {stableDropdownOpen
-                      ? createPortal(
-                          <div className="fixed inset-0 z-[10020]">
-                            <div
-                              className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
-                              onClick={() => setStableDropdownOpen(false)}
-                              style={{
-                                opacity: Math.max(
-                                  0,
-                                  Math.min(1, 1 - stableOverlayTranslateY / 420),
-                                ),
-                              }}
-                            />
-                            <div
-                              ref={stableDropdownOverlayRef}
-                              role="dialog"
-                              aria-modal="true"
-                              className={[
-                                "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
-                                "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
-                                "will-change-transform",
-                              ].join(" ")}
-                              style={{
-                                transform: `translateY(${Math.max(0, stableOverlayTranslateY)}px)`,
-                                transition: stableOverlayDragging
-                                  ? "none"
-                                  : "transform 220ms cubic-bezier(0.2,0,0,1)",
-                              }}
-                              onPointerMove={handleStableOverlayPointerMove}
-                              onPointerUp={handleStableOverlayPointerEnd}
-                              onPointerCancel={handleStableOverlayPointerEnd}
-                            >
-                              <div
-                                className="border-b border-white/10"
-                                onPointerDown={(event) => {
-                                  maybeStartStableOverlayDrag(event, "fixed");
-                                }}
-                              >
-                                <div className="sm:hidden flex justify-center pt-3 pb-1">
-                                  <div
-                                    className="w-16 h-5 flex items-center justify-center"
-                                    aria-hidden
-                                  >
-                                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                                  </div>
-                                </div>
+		                    {stableDropdownOpen
+		                      ? isDesktop
+		                        ? stableDesktopPopupStyle
+		                          ? createPortal(
+		                            <div
+		                              ref={stableDropdownOverlayRef}
+		                              role="dialog"
+		                              aria-modal="true"
+	                              className={[
+	                                noticeVariant === "demo"
+	                                  ? "bg-xcannes-surface-demo"
+	                                  : "bg-elevated",
+	                                "fixed z-[10030] rounded-2xl ring-1 ring-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col",
+	                              ].join(" ")}
+	                              style={stableDesktopPopupStyle || undefined}
+	                              onClick={(e) => e.stopPropagation()}
+	                            >
+	                              <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
+	                                <div className="min-w-0">
+	                                  <div className="text-white font-semibold text-base leading-tight truncate">
+	                                    {t(
+	                                      "ui_choose_stablecoin_title",
+	                                      "Choisir un stablecoin USD",
+	                                    )}
+	                                  </div>
+	                                  <div className="mt-0.5 text-[11px] text-white/55 truncate">
+	                                    {t(
+	                                      "ui_choose_stablecoin_subtitle",
+	                                      "Ticker / réseau (USDT, USDC…)",
+	                                    )}
+	                                  </div>
+	                                </div>
+	                                <button
+	                                  type="button"
+	                                  onClick={() => setStableDropdownOpen(false)}
+	                                  className="text-white/70 hover:text-white transition-colors text-xl leading-none"
+	                                  aria-label={t("ui_close", "Fermer")}
+	                                >
+	                                  ✕
+	                                </button>
+	                              </div>
 
-                                <div className="flex items-center justify-between gap-3 px-4 py-4">
-                                  <div className="min-w-0">
-                                    <div className="text-white font-semibold text-base leading-tight truncate">
-                                      {t(
-                                        "ui_choose_stablecoin_title",
-                                        "Choisir un stablecoin USD",
-                                      )}
-                                    </div>
-                                    <div className="mt-0.5 text-[11px] text-white/55 truncate">
-                                      {t(
-                                        "ui_choose_stablecoin_subtitle",
-                                        "Ticker / réseau (USDT, USDC…)",
-                                      )}
-                                    </div>
-                                  </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => setStableDropdownOpen(false)}
-                                    className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
-                                    aria-label={t("ui_close", "Fermer")}
-                                  >
-                                    ✕
-                                  </button>
-                                </div>
+	                              <div className="px-4 py-4 border-b border-white/10">
+	                                <div className="relative">
+	                                  <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+	                                    <svg
+	                                      viewBox="0 0 20 20"
+	                                      fill="currentColor"
+	                                      className="w-4 h-4"
+	                                      aria-hidden
+	                                    >
+	                                      <path
+	                                        fillRule="evenodd"
+	                                        d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+	                                        clipRule="evenodd"
+	                                      />
+	                                    </svg>
+	                                  </div>
+	                                  <input
+	                                    value={search}
+	                                    onChange={(e) => setSearch(e.target.value)}
+	                                    placeholder={t("ui_search", "Rechercher…")}
+	                                    className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+	                                  />
+	                                </div>
 
-                                <div className="px-4 pb-4">
-                                  <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
-                                      <svg
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                        className="w-4 h-4"
-                                        aria-hidden
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                    </div>
-                                    <input
-                                      value={search}
-                                      onChange={(e) => setSearch(e.target.value)}
-                                      placeholder={t("ui_search", "Rechercher…")}
-                                      className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                                    />
-                                  </div>
+	                                {!String(search || "").trim() && popularStableOptions.length ? (
+	                                  <div className="mt-3">
+	                                    <div className="text-[10px] tracking-[0.22em] uppercase text-white/45 px-1">
+	                                      {t("ui_popular", "Populaires")}
+	                                    </div>
+	                                    <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
+	                                      {popularStableOptions.slice(0, 4).map((opt) => {
+	                                        const active = opt.key === stableKey;
+	                                        return (
+	                                          <button
+	                                            key={opt.key}
+	                                            type="button"
+	                                            onClick={() => {
+	                                              setStableKey(opt.key);
+	                                              setStableDropdownOpen(false);
+	                                              setSearch("");
+	                                            }}
+	                                            className={[
+	                                              "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+	                                              active
+	                                                ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+	                                                : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+	                                            ].join(" ")}
+	                                          >
+	                                            <div className="flex items-center gap-2">
+	                                              {renderCurrencyIcon(opt.currency)}
+	                                              <div className="min-w-0 flex-1">
+	                                                <div className="text-sm font-semibold truncate">
+	                                                  {opt.label}
+	                                                </div>
+	                                              </div>
+	                                              {active ? (
+	                                                <span className="text-xcannes-green font-semibold text-xs">
+	                                                  ✓
+	                                                </span>
+	                                              ) : null}
+	                                            </div>
+	                                          </button>
+	                                        );
+	                                      })}
+	                                    </div>
+	                                  </div>
+	                                ) : null}
+	                              </div>
 
-                                  {!String(search || "").trim() && popularStableOptions.length ? (
-                                    <div className="mt-3">
-                                      <div className="text-[10px] tracking-[0.22em] uppercase text-white/45 px-1">
-                                        {t("ui_popular", "Populaires")}
-                                      </div>
-                                      <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        {popularStableOptions.slice(0, 4).map((opt) => {
-                                          const active = opt.key === stableKey;
-                                          return (
-                                            <button
-                                              key={opt.key}
-                                              type="button"
-                                              onClick={() => {
-                                                setStableKey(opt.key);
-                                                setStableDropdownOpen(false);
-                                                setSearch("");
-                                              }}
-                                              className={[
-                                                "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-                                                active
-                                                  ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-                                                  : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-                                              ].join(" ")}
-                                            >
-                                              <div className="flex items-center gap-2">
-                                                {renderCurrencyIcon(opt.currency)}
-                                                <div className="min-w-0 flex-1">
-                                                  <div className="text-sm font-semibold truncate">
-                                                    {opt.label}
-                                                  </div>
-                                                </div>
-                                                {active ? (
-                                                  <span className="text-xcannes-green font-semibold text-xs">
-                                                    ✓
-                                                  </span>
-                                                ) : null}
-                                              </div>
-                                            </button>
-                                          );
-                                        })}
-                                      </div>
-                                    </div>
-                                  ) : null}
-                                </div>
-                              </div>
+	                              <div
+	                                ref={stableDropdownListRef}
+	                                className="flex-1 min-h-0 overflow-y-auto"
+	                              >
+	                                {stableSearchResults.length ? (
+	                                  stableSearchResults.map((cur) => {
+	                                    const key = currencyKey(cur);
+	                                    const active = key === stableKey;
+	                                    return (
+	                                      <button
+	                                        key={key}
+	                                        type="button"
+	                                        onClick={() => {
+	                                          setStableKey(key);
+	                                          setStableDropdownOpen(false);
+	                                          setSearch("");
+	                                        }}
+	                                        className={[
+	                                          "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+	                                          active
+	                                            ? "bg-xcannes-green/10 text-white"
+	                                            : "hover:bg-white/[0.04] text-white/80",
+	                                        ].join(" ")}
+	                                      >
+	                                        {renderCurrencyIcon(cur)}
+	                                        <div className="min-w-0 flex-1">
+	                                          <div className="text-sm font-semibold truncate">
+	                                            {String(cur?.ticker || "").toUpperCase()}{" "}
+	                                            <span className="text-white/50 font-normal">
+	                                              ({String(cur?.network || "").toUpperCase()})
+	                                            </span>
+	                                          </div>
+	                                          <div className="text-[11px] text-white/55 truncate">
+	                                            {String(cur?.name || "").trim() ||
+	                                              currencyLabel(cur)}
+	                                          </div>
+	                                        </div>
+	                                        {active ? (
+	                                          <span className="text-xcannes-green font-semibold text-xs">
+	                                            ✓
+	                                          </span>
+	                                        ) : null}
+	                                      </button>
+	                                    );
+	                                  })
+	                                ) : (
+	                                  <div className="px-4 py-6 text-sm text-white/60">
+	                                    {t("ui_no_results", "Aucun résultat.")}
+	                                  </div>
+	                                )}
+	                              </div>
 
-                              <div
-                                ref={stableDropdownListRef}
-                                className="flex-1 min-h-0 overflow-y-auto"
-                                onPointerDown={(event) => {
-                                  maybeStartStableOverlayDrag(event, "list");
-                                }}
-                              >
-                                {stableSearchResults.length ? (
-                                  stableSearchResults.map((cur) => {
-                                    const key = currencyKey(cur);
-                                    const active = key === stableKey;
-                                    return (
-                                      <button
-                                        key={key}
-                                        type="button"
-                                        onClick={() => {
-                                          setStableKey(key);
-                                          setStableDropdownOpen(false);
-                                          setSearch("");
-                                        }}
-                                        className={[
-                                          "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
-                                          active
-                                            ? "bg-xcannes-green/10 text-white"
-                                            : "hover:bg-white/[0.04] text-white/80",
-                                        ].join(" ")}
-                                      >
-                                        {renderCurrencyIcon(cur)}
-                                        <div className="min-w-0 flex-1">
-                                          <div className="text-sm font-semibold truncate">
-                                            {String(cur?.ticker || "").toUpperCase()}{" "}
-                                            <span className="text-white/50 font-normal">
-                                              ({String(cur?.network || "").toUpperCase()})
-                                            </span>
-                                          </div>
-                                          <div className="text-[11px] text-white/55 truncate">
-                                            {String(cur?.name || "").trim() ||
-                                              currencyLabel(cur)}
-                                          </div>
-                                        </div>
-                                        {active ? (
-                                          <span className="text-xcannes-green font-semibold text-xs">
-                                            ✓
-                                          </span>
-                                        ) : null}
-                                      </button>
-                                    );
-                                  })
-                                ) : (
-                                  <div className="px-4 py-6 text-sm text-white/60">
-                                    {t("ui_no_results", "Aucun résultat.")}
-                                  </div>
-                                )}
-                              </div>
+	                              <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+	                                {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
+	                                  ? t(
+	                                      "ui_search_limit",
+	                                      `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
+	                                    )
+	                                  : t("ui_search_results", "Sélectionnez un actif.")}
+	                              </div>
+		                            </div>,
+		                            document.body,
+		                          )
+		                          : null
+		                        : createPortal(
+	                            <div className="fixed inset-0 z-[10020]">
+	                              <div
+	                                className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+	                                onClick={() => setStableDropdownOpen(false)}
+	                                style={{
+	                                  opacity: Math.max(
+	                                    0,
+	                                    Math.min(1, 1 - stableOverlayTranslateY / 420),
+	                                  ),
+	                                }}
+	                              />
+	                              <div
+	                                ref={stableDropdownOverlayRef}
+	                                role="dialog"
+	                                aria-modal="true"
+	                                className={[
+	                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
+	                                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+	                                  "will-change-transform",
+	                                ].join(" ")}
+	                                style={{
+	                                  transform: `translateY(${Math.max(0, stableOverlayTranslateY)}px)`,
+	                                  transition: stableOverlayDragging
+	                                    ? "none"
+	                                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
+	                                }}
+	                                onPointerMove={handleStableOverlayPointerMove}
+	                                onPointerUp={handleStableOverlayPointerEnd}
+	                                onPointerCancel={handleStableOverlayPointerEnd}
+	                              >
+	                                <div
+	                                  className="border-b border-white/10"
+	                                  onPointerDown={(event) => {
+	                                    maybeStartStableOverlayDrag(event, "fixed");
+	                                  }}
+	                                >
+	                                  <div className="sm:hidden flex justify-center pt-3 pb-1">
+	                                    <div
+	                                      className="w-16 h-5 flex items-center justify-center"
+	                                      aria-hidden
+	                                    >
+	                                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+	                                    </div>
+	                                  </div>
 
-                              <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
-                                {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
-                                  ? t(
-                                      "ui_search_limit",
-                                      `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
-                                    )
-                                  : t("ui_search_results", "Sélectionnez un actif.")}
-                              </div>
-                            </div>
-                          </div>,
-                          document.body,
-                        )
-                      : null}
+	                                  <div className="flex items-center justify-between gap-3 px-4 py-4">
+	                                    <div className="min-w-0">
+	                                      <div className="text-white font-semibold text-base leading-tight truncate">
+	                                        {t(
+	                                          "ui_choose_stablecoin_title",
+	                                          "Choisir un stablecoin USD",
+	                                        )}
+	                                      </div>
+	                                      <div className="mt-0.5 text-[11px] text-white/55 truncate">
+	                                        {t(
+	                                          "ui_choose_stablecoin_subtitle",
+	                                          "Ticker / réseau (USDT, USDC…)",
+	                                        )}
+	                                      </div>
+	                                    </div>
+	                                    <button
+	                                      type="button"
+	                                      onClick={() => setStableDropdownOpen(false)}
+	                                      className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
+	                                      aria-label={t("ui_close", "Fermer")}
+	                                    >
+	                                      ✕
+	                                    </button>
+	                                  </div>
+
+	                                  <div className="px-4 pb-4">
+	                                    <div className="relative">
+	                                      <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+	                                        <svg
+	                                          viewBox="0 0 20 20"
+	                                          fill="currentColor"
+	                                          className="w-4 h-4"
+	                                          aria-hidden
+	                                        >
+	                                          <path
+	                                            fillRule="evenodd"
+	                                            d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+	                                            clipRule="evenodd"
+	                                          />
+	                                        </svg>
+	                                      </div>
+	                                      <input
+	                                        value={search}
+	                                        onChange={(e) => setSearch(e.target.value)}
+	                                        placeholder={t("ui_search", "Rechercher…")}
+	                                        className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+	                                      />
+	                                    </div>
+
+	                                    {!String(search || "").trim() && popularStableOptions.length ? (
+	                                      <div className="mt-3">
+	                                        <div className="text-[10px] tracking-[0.22em] uppercase text-white/45 px-1">
+	                                          {t("ui_popular", "Populaires")}
+	                                        </div>
+	                                        <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
+	                                          {popularStableOptions.slice(0, 4).map((opt) => {
+	                                            const active = opt.key === stableKey;
+	                                            return (
+	                                              <button
+	                                                key={opt.key}
+	                                                type="button"
+	                                                onClick={() => {
+	                                                  setStableKey(opt.key);
+	                                                  setStableDropdownOpen(false);
+	                                                  setSearch("");
+	                                                }}
+	                                                className={[
+	                                                  "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+	                                                  active
+	                                                    ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
+	                                                    : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+	                                                ].join(" ")}
+	                                              >
+	                                                <div className="flex items-center gap-2">
+	                                                  {renderCurrencyIcon(opt.currency)}
+	                                                  <div className="min-w-0 flex-1">
+	                                                    <div className="text-sm font-semibold truncate">
+	                                                      {opt.label}
+	                                                    </div>
+	                                                  </div>
+	                                                  {active ? (
+	                                                    <span className="text-xcannes-green font-semibold text-xs">
+	                                                      ✓
+	                                                    </span>
+	                                                  ) : null}
+	                                                </div>
+	                                              </button>
+	                                            );
+	                                          })}
+	                                        </div>
+	                                      </div>
+	                                    ) : null}
+	                                  </div>
+	                                </div>
+
+	                                <div
+	                                  ref={stableDropdownListRef}
+	                                  className="flex-1 min-h-0 overflow-y-auto"
+	                                  onPointerDown={(event) => {
+	                                    maybeStartStableOverlayDrag(event, "list");
+	                                  }}
+	                                >
+	                                  {stableSearchResults.length ? (
+	                                    stableSearchResults.map((cur) => {
+	                                      const key = currencyKey(cur);
+	                                      const active = key === stableKey;
+	                                      return (
+	                                        <button
+	                                          key={key}
+	                                          type="button"
+	                                          onClick={() => {
+	                                            setStableKey(key);
+	                                            setStableDropdownOpen(false);
+	                                            setSearch("");
+	                                          }}
+	                                          className={[
+	                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+	                                            active
+	                                              ? "bg-xcannes-green/10 text-white"
+	                                              : "hover:bg-white/[0.04] text-white/80",
+	                                          ].join(" ")}
+	                                        >
+	                                          {renderCurrencyIcon(cur)}
+	                                          <div className="min-w-0 flex-1">
+	                                            <div className="text-sm font-semibold truncate">
+	                                              {String(cur?.ticker || "").toUpperCase()}{" "}
+	                                              <span className="text-white/50 font-normal">
+	                                                ({String(cur?.network || "").toUpperCase()})
+	                                              </span>
+	                                            </div>
+	                                            <div className="text-[11px] text-white/55 truncate">
+	                                              {String(cur?.name || "").trim() ||
+	                                                currencyLabel(cur)}
+	                                            </div>
+	                                          </div>
+	                                          {active ? (
+	                                            <span className="text-xcannes-green font-semibold text-xs">
+	                                              ✓
+	                                            </span>
+	                                          ) : null}
+	                                        </button>
+	                                      );
+	                                    })
+	                                  ) : (
+	                                    <div className="px-4 py-6 text-sm text-white/60">
+	                                      {t("ui_no_results", "Aucun résultat.")}
+	                                    </div>
+	                                  )}
+	                                </div>
+
+	                                <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+	                                  {filteredStableOptions.length > MAX_STABLE_SEARCH_RESULTS
+	                                    ? t(
+	                                        "ui_search_limit",
+	                                        `Résultats limités à ${MAX_STABLE_SEARCH_RESULTS}. Affinez votre recherche.`,
+	                                      )
+	                                    : t("ui_search_results", "Sélectionnez un actif.")}
+	                                </div>
+	                              </div>
+	                            </div>,
+	                            document.body,
+	                          )
+	                      : null}
 
                     <button
                       type="button"

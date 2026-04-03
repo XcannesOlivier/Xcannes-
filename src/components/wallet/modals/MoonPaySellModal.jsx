@@ -139,10 +139,16 @@ const MoonPaySellModal = ({
   const [currency, setCurrency] = useState("RLUSD");
   const [amount, setAmount] = useState("");
   const [quoteCurrency, setQuoteCurrency] = useState("USD"); // Fiat code
+  const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(window.matchMedia?.("(min-width: 768px)")?.matches);
+  });
   const [cryptoDropdownOpen, setCryptoDropdownOpen] = useState(false);
   const [cryptoSearch, setCryptoSearch] = useState("");
   const cryptoDropdownOverlayRef = useRef(null);
   const cryptoDropdownListRef = useRef(null);
+  const cryptoDropdownTriggerRef = useRef(null);
+  const cryptoDropdownDesktopPopupRef = useRef(null);
   const [cryptoOverlayDragging, setCryptoOverlayDragging] = useState(false);
   const [cryptoOverlayTranslateY, setCryptoOverlayTranslateY] = useState(0);
   const cryptoOverlayDragMetaRef = useRef({
@@ -527,10 +533,26 @@ const MoonPaySellModal = ({
   }, [cryptoSearch, supportedCurrencies]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia?.("(min-width: 768px)");
+    if (!mediaQuery) return;
+    const update = () => setIsDesktopViewport(Boolean(mediaQuery.matches));
+    update();
+    try {
+      mediaQuery.addEventListener?.("change", update);
+      return () => mediaQuery.removeEventListener?.("change", update);
+    } catch {
+      mediaQuery.addListener?.(update);
+      return () => mediaQuery.removeListener?.(update);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!cryptoDropdownOpen) return;
     const prevOverflow = document?.body?.style?.overflow;
     try {
-      if (typeof document !== "undefined") document.body.style.overflow = "hidden";
+      if (typeof document !== "undefined" && !isDesktopViewport)
+        document.body.style.overflow = "hidden";
     } catch {
       // ignore
     }
@@ -546,7 +568,22 @@ const MoonPaySellModal = ({
         // ignore
       }
     };
-  }, [cryptoDropdownOpen]);
+  }, [cryptoDropdownOpen, isDesktopViewport]);
+
+  useEffect(() => {
+    if (!cryptoDropdownOpen) return;
+    if (!isDesktopViewport) return;
+    const handler = (event) => {
+      const popupEl = cryptoDropdownDesktopPopupRef.current;
+      const triggerEl = cryptoDropdownTriggerRef.current;
+      if (popupEl && popupEl.contains(event.target)) return;
+      if (triggerEl && triggerEl.contains(event.target)) return;
+      setCryptoDropdownOpen(false);
+      setCryptoSearch("");
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [cryptoDropdownOpen, isDesktopViewport]);
 
   useEffect(() => {
     if (cryptoDropdownOpen) return;
@@ -1148,47 +1185,168 @@ const MoonPaySellModal = ({
                 "Choisissez l'actif que vous voulez vendre",
               )}
             </label>
-	            <button
-	              type="button"
-	              onClick={() => setCryptoDropdownOpen(true)}
-	              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	            >
-              <span className="flex items-center gap-2 min-w-0 flex-1">
-                {renderSelectIcon(selectedSellCurrency?.icon)}
-                <span className="truncate">
-                  {selectedSellCurrency?.labelMobile ||
-                    selectedSellCurrency?.labelLeft ||
-                    selectedSellCurrency?.label ||
-                    currency}
-                </span>
-                {selectedSellCurrency?.labelRight ? (
-                  <span className="ml-auto text-white/60 tabular-nums hidden md:inline">
-                    {selectedSellCurrency.labelRight}
-                  </span>
-                ) : null}
-              </span>
-              <svg
-                className="w-3 h-3 text-white/70"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
+	            <div className="relative">
+		            <button
+		              type="button"
+		              ref={cryptoDropdownTriggerRef}
+		              onClick={() => setCryptoDropdownOpen((prev) => !prev)}
+		              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		            >
+		              <span className="flex items-center gap-2 min-w-0 flex-1">
+		                {renderSelectIcon(selectedSellCurrency?.icon)}
+		                <span className="truncate">
+		                  {selectedSellCurrency?.labelMobile ||
+		                    selectedSellCurrency?.labelLeft ||
+		                    selectedSellCurrency?.label ||
+		                    currency}
+		                </span>
+		                {selectedSellCurrency?.labelRight ? (
+		                  <span className="ml-auto text-white/60 tabular-nums hidden md:inline">
+		                    {selectedSellCurrency.labelRight}
+		                  </span>
+		                ) : null}
+		              </span>
+		              <svg
+		                className="w-3 h-3 text-white/70"
+		                fill="none"
+		                stroke="currentColor"
+		                viewBox="0 0 24 24"
+		                aria-hidden
+		              >
+		                <path
+		                  strokeLinecap="round"
+		                  strokeLinejoin="round"
+		                  strokeWidth={2}
+		                  d="M19 9l-7 7-7-7"
+		                />
+		              </svg>
+		            </button>
 
-            {cryptoDropdownOpen
-              ? createPortal(
-                  <div className="fixed inset-0 z-[10020]">
-                    <div
-                      className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
-                      onClick={() => {
+		            {cryptoDropdownOpen && isDesktopViewport ? (
+		              <div
+		                ref={cryptoDropdownDesktopPopupRef}
+		                role="dialog"
+		                aria-modal="true"
+		                className={[
+		                  noticeVariant === "demo"
+		                    ? "bg-xcannes-surface-demo"
+		                    : "bg-elevated",
+		                  "absolute left-0 right-0 top-full mt-2 z-[10030] rounded-2xl border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] overflow-hidden",
+		                ].join(" ")}
+		              >
+		                <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
+		                  <div className="min-w-0">
+		                    <div className="text-white font-semibold text-base leading-tight truncate">
+		                      {t(
+		                        "moonpay_select_crypto_to_sell",
+		                        "Choisissez l'actif que vous voulez vendre",
+		                      )}
+		                    </div>
+		                    <div className="mt-0.5 text-[11px] text-white/55 truncate">
+		                      {t("ui_search", "Rechercher…")}
+		                    </div>
+		                  </div>
+		                  <button
+		                    type="button"
+		                    onClick={() => {
+		                      setCryptoDropdownOpen(false);
+		                      setCryptoSearch("");
+		                    }}
+		                    className="text-white/70 hover:text-white transition-colors text-xl leading-none"
+		                    aria-label={t("ui_close", "Fermer")}
+		                  >
+		                    ✕
+		                  </button>
+		                </div>
+
+		                <div className="px-4 py-4 border-b border-white/10">
+		                  <div className="relative">
+		                    <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+		                      <svg
+		                        viewBox="0 0 20 20"
+		                        fill="currentColor"
+		                        className="w-4 h-4"
+		                        aria-hidden
+		                      >
+		                        <path
+		                          fillRule="evenodd"
+		                          d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+		                          clipRule="evenodd"
+		                        />
+		                      </svg>
+		                    </div>
+		                    <input
+		                      value={cryptoSearch}
+		                      onChange={(e) => setCryptoSearch(e.target.value)}
+		                      placeholder={t("ui_search", "Rechercher…")}
+		                      className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+		                    />
+		                  </div>
+		                </div>
+
+		                <div
+		                  ref={cryptoDropdownListRef}
+		                  className="max-h-[320px] overflow-y-auto"
+		                >
+		                  {filteredSellCurrencies.length ? (
+		                    filteredSellCurrencies.map((opt) => {
+		                      const active =
+		                        String(opt?.code || "").toUpperCase() ===
+		                        String(currency || "").toUpperCase();
+		                      return (
+		                        <button
+		                          key={String(opt.code)}
+		                          type="button"
+		                          onClick={() => {
+		                            setCurrency(String(opt.code || "").toUpperCase());
+		                            setCryptoDropdownOpen(false);
+		                            setCryptoSearch("");
+		                          }}
+		                          className={[
+		                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+		                            active
+		                              ? "bg-xcannes-green/10 text-white"
+		                              : "hover:bg-white/[0.04] text-white/80",
+		                          ].join(" ")}
+		                        >
+		                          {renderSelectIcon(opt.icon)}
+		                          <div className="min-w-0 flex-1">
+		                            <div className="text-sm font-semibold truncate">
+		                              {opt.labelLeft || opt.label || opt.code}
+		                            </div>
+		                            {opt.labelRight ? (
+		                              <div className="text-[11px] text-white/55 truncate tabular-nums">
+		                                {opt.labelRight}
+		                              </div>
+		                            ) : null}
+		                          </div>
+		                          {active ? (
+		                            <span className="text-xcannes-green font-semibold text-xs">
+		                              ✓
+		                            </span>
+		                          ) : null}
+		                        </button>
+		                      );
+		                    })
+		                  ) : (
+		                    <div className="px-4 py-6 text-sm text-white/60">
+		                      {t("ui_no_results", "Aucun résultat.")}
+		                    </div>
+		                  )}
+		                </div>
+
+		                <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+		                  {t("ui_search_results", "Sélectionnez un actif.")}
+		                </div>
+		              </div>
+		            ) : null}
+
+		            {cryptoDropdownOpen && !isDesktopViewport
+		              ? createPortal(
+	                  <div className="fixed inset-0 z-[10020]">
+	                    <div
+	                      className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+	                      onClick={() => {
                         setCryptoDropdownOpen(false);
                         setCryptoSearch("");
                       }}
@@ -1340,11 +1498,12 @@ const MoonPaySellModal = ({
                         {t("ui_search_results", "Sélectionnez un actif.")}
                       </div>
                     </div>
-                  </div>,
-                  document.body,
-                )
-              : null}
-          </div>
+	                  </div>,
+	                  document.body,
+	                )
+	              : null}
+		          </div>
+	          </div>
 
           {/* Amount input */}
           <div>
