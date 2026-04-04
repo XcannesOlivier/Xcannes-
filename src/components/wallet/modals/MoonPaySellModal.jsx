@@ -81,6 +81,9 @@ const MoonPaySellModal = ({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
 
+  const modalPanelRef = useRef(null);
+  const contentRootRef = useRef(null);
+
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -1152,7 +1155,7 @@ const MoonPaySellModal = ({
 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
-    <div className={embedded ? "" : "p-4 md:p-5"}>
+    <div ref={contentRootRef} className={embedded ? "relative" : "relative p-4 md:p-5"}>
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
@@ -1222,124 +1225,145 @@ const MoonPaySellModal = ({
 		              </svg>
 		            </button>
 
-		            {cryptoDropdownOpen && isDesktopViewport ? (
-		              <div
-		                ref={cryptoDropdownDesktopPopupRef}
-		                role="dialog"
-		                aria-modal="true"
-		                className={[
-		                  noticeVariant === "demo"
-		                    ? "bg-xcannes-surface-demo"
-		                    : "bg-elevated",
-		                  "absolute left-0 right-0 top-full mt-2 z-[10030] rounded-2xl border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] overflow-hidden",
-		                ].join(" ")}
-		              >
-		                <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
-		                  <div className="min-w-0">
-		                    <div className="text-white font-semibold text-base leading-tight truncate">
-		                      {t(
-		                        "moonpay_select_crypto_to_sell",
-		                        "Choisissez l'actif que vous voulez vendre",
-		                      )}
-		                    </div>
-		                    <div className="mt-0.5 text-[11px] text-white/55 truncate">
-		                      {t("ui_search", "Rechercher…")}
-		                    </div>
-		                  </div>
-		                  <button
-		                    type="button"
-		                    onClick={() => {
-		                      setCryptoDropdownOpen(false);
-		                      setCryptoSearch("");
-		                    }}
-		                    className="text-white/70 hover:text-white transition-colors text-xl leading-none"
-		                    aria-label={t("ui_close", "Fermer")}
-		                  >
-		                    ✕
-		                  </button>
-		                </div>
-
-		                <div className="px-4 py-4 border-b border-white/10">
-		                  <div className="relative">
-		                    <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
-		                      <svg
-		                        viewBox="0 0 20 20"
-		                        fill="currentColor"
-		                        className="w-4 h-4"
-		                        aria-hidden
+		            {cryptoDropdownOpen && isDesktopViewport
+		              ? (() => {
+		                  const portalTarget = embedded
+		                    ? contentRootRef.current
+		                    : modalPanelRef.current;
+		                  if (!portalTarget) return null;
+		                  return createPortal(
+		                    <div
+		                      ref={cryptoDropdownDesktopPopupRef}
+		                      role="dialog"
+		                      aria-modal="true"
+		                      className="absolute inset-0 z-[10040]"
+		                      onClick={(e) => e.stopPropagation()}
+		                    >
+		                      <div
+		                        className="absolute inset-0 bg-black/70"
+		                        onClick={() => {
+		                          setCryptoDropdownOpen(false);
+		                          setCryptoSearch("");
+		                        }}
+		                      />
+		                      <div
+		                        className={[
+		                          noticeVariant === "demo"
+		                            ? "bg-xcannes-surface-demo"
+		                            : "bg-elevated",
+		                          "absolute inset-0 flex flex-col min-h-0 overflow-hidden",
+		                        ].join(" ")}
 		                      >
-		                        <path
-		                          fillRule="evenodd"
-		                          d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
-		                          clipRule="evenodd"
-		                        />
-		                      </svg>
-		                    </div>
-		                    <input
-		                      value={cryptoSearch}
-		                      onChange={(e) => setCryptoSearch(e.target.value)}
-		                      placeholder={t("ui_search", "Rechercher…")}
-		                      className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-		                    />
-		                  </div>
-		                </div>
-
-		                <div
-		                  ref={cryptoDropdownListRef}
-		                  className="max-h-[320px] overflow-y-auto"
-		                >
-		                  {filteredSellCurrencies.length ? (
-		                    filteredSellCurrencies.map((opt) => {
-		                      const active =
-		                        String(opt?.code || "").toUpperCase() ===
-		                        String(currency || "").toUpperCase();
-		                      return (
-		                        <button
-		                          key={String(opt.code)}
-		                          type="button"
-		                          onClick={() => {
-		                            setCurrency(String(opt.code || "").toUpperCase());
-		                            setCryptoDropdownOpen(false);
-		                            setCryptoSearch("");
-		                          }}
-		                          className={[
-		                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
-		                            active
-		                              ? "bg-xcannes-green/10 text-white"
-		                              : "hover:bg-white/[0.04] text-white/80",
-		                          ].join(" ")}
-		                        >
-		                          {renderSelectIcon(opt.icon)}
-		                          <div className="min-w-0 flex-1">
-		                            <div className="text-sm font-semibold truncate">
-		                              {opt.labelLeft || opt.label || opt.code}
+		                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
+		                          <div className="min-w-0">
+		                            <div className="text-white font-semibold text-base leading-tight truncate">
+		                              {t(
+		                                "moonpay_select_crypto_to_sell",
+		                                "Choisissez l'actif que vous voulez vendre",
+		                              )}
 		                            </div>
-		                            {opt.labelRight ? (
-		                              <div className="text-[11px] text-white/55 truncate tabular-nums">
-		                                {opt.labelRight}
-		                              </div>
-		                            ) : null}
+		                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
+		                              {t("ui_search", "Rechercher…")}
+		                            </div>
 		                          </div>
-		                          {active ? (
-		                            <span className="text-xcannes-green font-semibold text-xs">
-		                              ✓
-		                            </span>
-		                          ) : null}
-		                        </button>
-		                      );
-		                    })
-		                  ) : (
-		                    <div className="px-4 py-6 text-sm text-white/60">
-		                      {t("ui_no_results", "Aucun résultat.")}
-		                    </div>
-		                  )}
-		                </div>
+		                          <button
+		                            type="button"
+		                            onClick={() => {
+		                              setCryptoDropdownOpen(false);
+		                              setCryptoSearch("");
+		                            }}
+		                            className="text-white/70 hover:text-white transition-colors text-xl leading-none"
+		                            aria-label={t("ui_close", "Fermer")}
+		                          >
+		                            ✕
+		                          </button>
+		                        </div>
 
-		                <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
-		                  {t("ui_search_results", "Sélectionnez un actif.")}
-		                </div>
-		              </div>
-		            ) : null}
+		                        <div className="px-4 py-4 border-b border-white/10">
+		                          <div className="relative">
+		                            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+		                              <svg
+		                                viewBox="0 0 20 20"
+		                                fill="currentColor"
+		                                className="w-4 h-4"
+		                                aria-hidden
+		                              >
+		                                <path
+		                                  fillRule="evenodd"
+		                                  d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+		                                  clipRule="evenodd"
+		                                />
+		                              </svg>
+		                            </div>
+		                            <input
+		                              value={cryptoSearch}
+		                              onChange={(e) => setCryptoSearch(e.target.value)}
+		                              placeholder={t("ui_search", "Rechercher…")}
+		                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+		                            />
+		                          </div>
+		                        </div>
+
+		                        <div
+		                          ref={cryptoDropdownListRef}
+		                          className="flex-1 min-h-0 overflow-y-auto"
+		                        >
+		                          {filteredSellCurrencies.length ? (
+		                            filteredSellCurrencies.map((opt) => {
+		                              const active =
+		                                String(opt?.code || "").toUpperCase() ===
+		                                String(currency || "").toUpperCase();
+		                              return (
+		                                <button
+		                                  key={String(opt.code)}
+		                                  type="button"
+		                                  onClick={() => {
+		                                    setCurrency(String(opt.code || "").toUpperCase());
+		                                    setCryptoDropdownOpen(false);
+		                                    setCryptoSearch("");
+		                                  }}
+		                                  className={[
+		                                    "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+		                                    active
+		                                      ? "bg-xcannes-green/10 text-white"
+		                                      : "hover:bg-white/[0.04] text-white/80",
+		                                  ].join(" ")}
+		                                >
+		                                  {renderSelectIcon(opt.icon)}
+		                                  <div className="min-w-0 flex-1">
+		                                    <div className="text-sm font-semibold truncate">
+		                                      {opt.labelLeft || opt.label || opt.code}
+		                                    </div>
+		                                    {opt.labelRight ? (
+		                                      <div className="text-[11px] text-white/55 truncate tabular-nums">
+		                                        {opt.labelRight}
+		                                      </div>
+		                                    ) : null}
+		                                  </div>
+		                                  {active ? (
+		                                    <span className="text-xcannes-green font-semibold text-xs">
+		                                      ✓
+		                                    </span>
+		                                  ) : null}
+		                                </button>
+		                              );
+		                            })
+		                          ) : (
+		                            <div className="px-4 py-6 text-sm text-white/60">
+		                              {t("ui_no_results", "Aucun résultat.")}
+		                            </div>
+		                          )}
+		                        </div>
+
+		                        <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+		                          {t("ui_search_results", "Sélectionnez un actif.")}
+		                        </div>
+		                      </div>
+		                    </div>,
+		                    portalTarget,
+		                  );
+		                })()
+		              : null}
 
 		            {cryptoDropdownOpen && !isDesktopViewport
 		              ? createPortal(
@@ -1757,6 +1781,7 @@ const MoonPaySellModal = ({
       {/* Modal */}
       <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
 	        <div
+	          ref={modalPanelRef}
 	          className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
 	            noticeVariant === "demo"
 	              ? "bg-xcannes-surface-demo border-white/10"
