@@ -7,6 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
 import PreferredCurrencySelector from "./PreferredCurrencySelector";
+import { createPortal } from "react-dom";
 
 /**
  * Settings gear button + dropdown menu.
@@ -113,7 +114,9 @@ export default function WalletSettingsDropdown({
   useEffect(() => {
     if (!isOpen) return;
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setIsOpen(false);
+      if (menuRef.current && menuRef.current.contains(e.target)) return;
+      if (ref.current && ref.current.contains(e.target)) return;
+      setIsOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -214,6 +217,27 @@ export default function WalletSettingsDropdown({
     isDesktopPanel &&
     typeof window !== "undefined" &&
     window.matchMedia?.("(min-width: 1024px)")?.matches;
+
+  const [desktopInlinePanelTarget, setDesktopInlinePanelTarget] = useState(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!isDesktopInlinePanel) {
+      setDesktopInlinePanelTarget(null);
+      return;
+    }
+    try {
+      setDesktopInlinePanelTarget(
+        document.getElementById("wallet-desktop-inline-panel"),
+      );
+    } catch {
+      setDesktopInlinePanelTarget(null);
+    }
+  }, [isDesktopInlinePanel, isOpen]);
+
+  const shouldPortalToInlinePanel = Boolean(
+    isDesktopInlinePanel && desktopInlinePanelTarget,
+  );
 
   const updateDesktopPosition = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -467,35 +491,39 @@ export default function WalletSettingsDropdown({
               }}
 	          />
 
-	          <div
-	            role="menu"
-              ref={(node) => {
-                menuRef.current = node;
-                overlayRef.current = node;
-              }}
-              style={{
-                ...(isDesktopInlinePanel
-                  ? {}
-                  : isDesktop
-                    ? desktopMenuStyle || {}
-                    : {}),
-                transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-                transition: overlayDragging
-                  ? "none"
-                  : "transform 220ms cubic-bezier(0.2,0,0,1)",
-              }}
-	            className={[
-	              "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
-	              isDesktopInlinePanel
-                  ? "lg:fixed lg:inset-y-0 lg:right-0 lg:left-auto lg:w-[min(600px,42vw)] lg:min-w-[480px] lg:rounded-none lg:border-l lg:border-white/10 lg:bg-elevated lg:shadow-[0_28px_90px_rgba(0,0,0,0.6)] lg:overflow-hidden lg:animate-walletSettingsIn"
-                  : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
-	            ].join(" ")}
-              onPointerMove={handleOverlayPointerMove}
-              onPointerUp={handleOverlayPointerEnd}
-              onPointerCancel={handleOverlayPointerEnd}
-	          >
+            {(() => {
+              const menu = (
+                <div
+                  role="menu"
+                  ref={(node) => {
+                    menuRef.current = node;
+                    overlayRef.current = node;
+                  }}
+                  style={{
+                    ...(shouldPortalToInlinePanel
+                      ? {}
+                      : isDesktop
+                        ? desktopMenuStyle || {}
+                        : {}),
+                    transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+                    transition: overlayDragging
+                      ? "none"
+                      : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                  }}
+                  className={[
+                    shouldPortalToInlinePanel
+                      ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform"
+                      : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
+                    shouldPortalToInlinePanel
+                      ? ""
+                      : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
+                  ].join(" ")}
+                  onPointerMove={handleOverlayPointerMove}
+                  onPointerUp={handleOverlayPointerEnd}
+                  onPointerCancel={handleOverlayPointerEnd}
+                >
             {/* Pointer (desktop) */}
-            {!isDesktopInlinePanel ? (
+            {!shouldPortalToInlinePanel ? (
               <div
                 className={[
                   "hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45",
@@ -519,7 +547,13 @@ export default function WalletSettingsDropdown({
                 onPointerDown={(event) => {
                   maybeStartOverlayDrag(event, "fixed");
                 }}
-              >
+                </div>
+              );
+
+              return shouldPortalToInlinePanel
+                ? createPortal(menu, desktopInlinePanelTarget)
+                : menu;
+            })()}
                 <div className="flex justify-center pt-3 pb-1">
                   <div className="w-16 h-5 flex items-center justify-center" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
@@ -553,7 +587,12 @@ export default function WalletSettingsDropdown({
 
 	            <div
                 ref={overlayListRef}
-                className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3 md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain"
+                className={[
+                  "flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3",
+                  shouldPortalToInlinePanel
+                    ? ""
+                    : "md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain",
+                ].join(" ")}
                 onPointerDown={(event) => {
                   maybeStartOverlayDrag(event, "list");
                 }}
