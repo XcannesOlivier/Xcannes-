@@ -634,24 +634,24 @@ export default function WalletDashboardSwapModal({
 		                    />
 		                  </div>
 
-	                  <div className="flex justify-center">
-	                    <button
-	                      type="button"
-	                      onClick={(e) => {
-                        e.stopPropagation();
-                        const prevBase = convertBaseCurrency;
-                        const prevQuote = convertQuoteCurrency;
+		                  <div className="flex justify-center py-1">
+		                    <button
+		                      type="button"
+		                      onClick={(e) => {
+	                        e.stopPropagation();
+	                        const prevBase = convertBaseCurrency;
+	                        const prevQuote = convertQuoteCurrency;
                         if (!prevBase || !prevQuote) return;
                         setConvertBaseCurrency(prevQuote);
-	                        setConvertQuoteCurrency(prevBase);
-	                      }}
-	                      className="p-3.5 flex items-center justify-center text-white/70 hover:text-white/90 transition-colors duration-150"
-	                      aria-label={t("ui_swap_currencies", "Inverser")}
-	                      title={t("ui_swap_currencies", "Inverser")}
-	                    >
-	                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-	                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 9h10M7 9l3-3M7 9l3 3M17 15H7m10 0l-3-3m3 3l-3 3" />
-	                      </svg>
+		                        setConvertQuoteCurrency(prevBase);
+		                      }}
+		                      className="p-4 flex items-center justify-center text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150"
+		                      aria-label={t("ui_swap_currencies", "Inverser")}
+		                      title={t("ui_swap_currencies", "Inverser")}
+		                    >
+		                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+		                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 9h10M7 9l3-3M7 9l3 3M17 15H7m10 0l-3-3m3 3l-3 3" />
+		                      </svg>
 	                    </button>
 	                  </div>
 

@@ -16,6 +16,15 @@ export default function WalletDashboardCashChoiceModal({
   inline = false,
 }) {
   const { t } = useTranslation("common");
+  const addHintText = t("ui_funds_add_hint", "Carte ou virement bancaire");
+  const withdrawHintText = t(
+    "ui_funds_withdraw_hint",
+    "Vers votre compte bancaire",
+  );
+  const swapOutHintText = t(
+    "ui_funds_swap_out_hint",
+    "Depuis un wallet (USDC, USDT)",
+  );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -443,7 +452,7 @@ export default function WalletDashboardCashChoiceModal({
               >
                 <div className="flex flex-col gap-7 pb-2">
                   <div className="space-y-4">
-                    {sectionHeader(t("ui_funds_section_agent", "Agent"))}
+                    {sectionHeader(t("ui_funds_section_agent", "Argent"))}
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
@@ -471,10 +480,21 @@ export default function WalletDashboardCashChoiceModal({
                             </svg>
                           </div>
                           <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
-                            {t(
-                              "ui_funds_add_hint",
-                              "Carte ou virement bancaire",
-                            )}
+                            {(() => {
+                              const parts = String(addHintText || "").split(
+                                " ou ",
+                              );
+                              if (parts.length === 2) {
+                                return (
+                                  <>
+                                    {parts[0]}{" "}
+                                    <span className="text-white/60">ou</span>{" "}
+                                    {parts[1]}
+                                  </>
+                                );
+                              }
+                              return addHintText;
+                            })()}
                           </p>
                         </div>
                       </div>
@@ -506,7 +526,21 @@ export default function WalletDashboardCashChoiceModal({
                             </svg>
                           </div>
                           <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
-                            {t("ui_funds_withdraw_hint", "Vers votre compte bancaire")}
+                            {(() => {
+                              const text = String(withdrawHintText || "");
+                              const prefix = "Vers votre ";
+                              if (text.startsWith(prefix)) {
+                                return (
+                                  <>
+                                    <span className="text-white/60">
+                                      Vers votre{" "}
+                                    </span>
+                                    {text.slice(prefix.length)}
+                                  </>
+                                );
+                              }
+                              return withdrawHintText;
+                            })()}
                           </p>
                         </div>
                       </div>
@@ -549,10 +583,32 @@ export default function WalletDashboardCashChoiceModal({
                             </svg>
                           </div>
                           <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
-                            {t(
-                              "ui_funds_swap_out_hint",
-                              "Depuis un wallet (USDC, USDT)",
-                            )}
+                            {(() => {
+                              const text = String(swapOutHintText || "");
+                              const idx = text.indexOf("(");
+                              if (idx > 0) {
+                                return (
+                                  <>
+                                    <span className="text-white/60">
+                                      {text.slice(0, idx)}
+                                    </span>
+                                    {text.slice(idx)}
+                                  </>
+                                );
+                              }
+                              const prefix = "Depuis un wallet ";
+                              if (text.startsWith(prefix)) {
+                                return (
+                                  <>
+                                    <span className="text-white/60">
+                                      Depuis un wallet{" "}
+                                    </span>
+                                    {text.slice(prefix.length)}
+                                  </>
+                                );
+                              }
+                              return swapOutHintText;
+                            })()}
                           </p>
                         </div>
                       </div>
