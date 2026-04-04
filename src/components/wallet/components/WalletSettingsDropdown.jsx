@@ -210,9 +210,15 @@ export default function WalletSettingsDropdown({
       ? window.matchMedia?.("(min-width: 768px)")?.matches
       : false;
 
+  const isDesktopInlinePanel =
+    isDesktopPanel &&
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(min-width: 1024px)")?.matches;
+
   const updateDesktopPosition = useCallback(() => {
     if (typeof window === "undefined") return;
     if (!window.matchMedia?.("(min-width: 768px)")?.matches) return;
+    if (isDesktopInlinePanel) return;
     if (!buttonRef.current || !menuRef.current) return;
 
     const margin = 12;
@@ -253,10 +259,11 @@ export default function WalletSettingsDropdown({
     setDesktopPlacement(placement);
     setDesktopArrowX(arrowX);
     setDesktopMenuStyle({ top: `${Math.round(top)}px`, left: `${Math.round(left)}px` });
-  }, []);
+  }, [isDesktopInlinePanel]);
 
   useLayoutEffect(() => {
     if (!isOpen) return;
+    if (isDesktopInlinePanel) return;
     updateDesktopPosition();
 
     const onTick = () => updateDesktopPosition();
@@ -267,7 +274,7 @@ export default function WalletSettingsDropdown({
       window.removeEventListener("resize", onTick);
       window.removeEventListener("scroll", onTick, true);
     };
-  }, [isOpen, updateDesktopPosition]);
+  }, [isDesktopInlinePanel, isOpen, updateDesktopPosition]);
 
   useEffect(() => {
     if (isOpen) return;
@@ -467,7 +474,11 @@ export default function WalletSettingsDropdown({
                 overlayRef.current = node;
               }}
               style={{
-                ...(isDesktop ? desktopMenuStyle || {} : {}),
+                ...(isDesktopInlinePanel
+                  ? {}
+                  : isDesktop
+                    ? desktopMenuStyle || {}
+                    : {}),
                 transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
                 transition: overlayDragging
                   ? "none"
@@ -475,28 +486,32 @@ export default function WalletSettingsDropdown({
               }}
 	            className={[
 	              "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
-	              "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
+	              isDesktopInlinePanel
+                  ? "lg:fixed lg:inset-y-0 lg:right-0 lg:left-auto lg:w-[min(600px,42vw)] lg:min-w-[480px] lg:rounded-none lg:border-l lg:border-white/10 lg:bg-elevated lg:shadow-[0_28px_90px_rgba(0,0,0,0.6)] lg:overflow-hidden lg:animate-walletSettingsIn"
+                  : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
 	            ].join(" ")}
               onPointerMove={handleOverlayPointerMove}
               onPointerUp={handleOverlayPointerEnd}
               onPointerCancel={handleOverlayPointerEnd}
 	          >
             {/* Pointer (desktop) */}
-            <div
-              className={[
-                "hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45",
-              ].join(" ")}
-              style={
-                !isDesktop || desktopArrowX == null
-                  ? undefined
-                  : {
-                      left: `${Math.round(desktopArrowX - 7)}px`,
-                      top: desktopPlacement === "bottom" ? "-7px" : undefined,
-                      bottom: desktopPlacement === "top" ? "-7px" : undefined,
-                    }
-              }
-              aria-hidden
-            />
+            {!isDesktopInlinePanel ? (
+              <div
+                className={[
+                  "hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45",
+                ].join(" ")}
+                style={
+                  !isDesktop || desktopArrowX == null
+                    ? undefined
+                    : {
+                        left: `${Math.round(desktopArrowX - 7)}px`,
+                        top: desktopPlacement === "bottom" ? "-7px" : undefined,
+                        bottom: desktopPlacement === "top" ? "-7px" : undefined,
+                      }
+                }
+                aria-hidden
+              />
+            ) : null}
 
 	            {/* Mobile header */}
 	            <div
