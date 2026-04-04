@@ -1172,7 +1172,7 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-		            <p className="text-[12px] md:text-[13px] text-xcannes-green/80 font-mono break-all">
+		            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono break-all">
 		              {walletAddress}
 		            </p>
 		          </div>
