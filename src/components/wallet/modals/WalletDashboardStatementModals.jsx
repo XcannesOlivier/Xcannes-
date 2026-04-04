@@ -53,6 +53,9 @@ export default function WalletDashboardStatementModals({
         window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__
       ) {
         window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__ = false;
+        window.dispatchEvent(
+          new CustomEvent("xcannes:wallet:restore-inline-view"),
+        );
         window.dispatchEvent(new CustomEvent("xcannes:wallet-settings-open"));
       }
     } catch {
@@ -461,6 +464,7 @@ export default function WalletDashboardStatementModals({
             highlightTransactionId={highlightTransactionId}
             onClose={() => {
               setShowCurrencyStatement(false);
+              setSelectedStatementToken(null);
               maybeReturnToSettingsDropdown();
             }}
             toast={toast}

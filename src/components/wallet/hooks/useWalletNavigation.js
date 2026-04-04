@@ -51,6 +51,45 @@ export function useWalletNavigation({
 }) {
   const refreshTimerRef = useRef(null);
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
+  const DESKTOP_INLINE_RETURN_STATE = "__XCANNES_DESKTOP_INLINE_RETURN_STATE__";
+
+  const stashDesktopInlineReturnState = useCallback(() => {
+    try {
+      if (typeof window === "undefined") return;
+      if (!isDesktopPanel) return;
+      if (!window.__XCANNES_RETURN_TO_SETTINGS_DROPDOWN__) return;
+      if (window[DESKTOP_INLINE_RETURN_STATE]) return;
+
+      window[DESKTOP_INLINE_RETURN_STATE] = {
+        activeAction: activeAction || null,
+      };
+    } catch {
+      // ignore
+    }
+  }, [DESKTOP_INLINE_RETURN_STATE, activeAction, isDesktopPanel]);
+
+  // Desktop inline: restore the underlying right-panel view after closing a
+  // settings subpage / statement opened from the settings dropdown.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handler = () => {
+      try {
+        if (!isDesktopPanel) return;
+        const state = window[DESKTOP_INLINE_RETURN_STATE];
+        if (state?.activeAction) {
+          setActiveAction(state.activeAction);
+        }
+        window[DESKTOP_INLINE_RETURN_STATE] = null;
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener("xcannes:wallet:restore-inline-view", handler);
+    return () =>
+      window.removeEventListener("xcannes:wallet:restore-inline-view", handler);
+  }, [DESKTOP_INLINE_RETURN_STATE, isDesktopPanel, setActiveAction]);
 
   // ─── Currency line activation (open converter) ────────────────────────
 
@@ -155,6 +194,7 @@ export function useWalletNavigation({
 
   const handleOpenCurrencyStatement = useCallback(
     (token) => {
+      stashDesktopInlineReturnState();
       closeInlineQr();
       setWalletInfoOpen(false);
       setDesktopSettingsPage?.(null);
@@ -170,6 +210,7 @@ export function useWalletNavigation({
     [
       closeInlineQr,
       isDesktopPanel,
+      stashDesktopInlineReturnState,
       setActiveAction,
       setSelectedStatementToken,
       setShowActivationModal,
@@ -184,6 +225,7 @@ export function useWalletNavigation({
   // ─── Open info panel ──────────────────────────────────────────────────
 
   const handleOpenInfo = useCallback(() => {
+    stashDesktopInlineReturnState();
     closeInlineQr();
     setDesktopSettingsPage?.(null);
     if (isDesktopPanel) {
@@ -198,6 +240,7 @@ export function useWalletNavigation({
   }, [
     closeInlineQr,
     isDesktopPanel,
+    stashDesktopInlineReturnState,
     setActiveAction,
     setSelectedStatementToken,
     setShowActivationModal,
@@ -211,6 +254,7 @@ export function useWalletNavigation({
   // ─── Open global statement ────────────────────────────────────────────
 
   const handleOpenGlobalStatement = useCallback(() => {
+    stashDesktopInlineReturnState();
     closeInlineQr();
     setWalletInfoOpen(false);
     setDesktopSettingsPage?.(null);
@@ -227,6 +271,7 @@ export function useWalletNavigation({
   }, [
     closeInlineQr,
     isDesktopPanel,
+    stashDesktopInlineReturnState,
     setActiveAction,
     setSelectedStatementToken,
     setShowActivationModal,
@@ -241,6 +286,7 @@ export function useWalletNavigation({
 
   const handleOpenDesktopSettingsPage = useCallback(
     (page) => {
+      stashDesktopInlineReturnState();
       closeInlineQr();
       setWalletInfoOpen(false);
       if (isDesktopPanel) {
@@ -256,6 +302,7 @@ export function useWalletNavigation({
     [
       closeInlineQr,
       isDesktopPanel,
+      stashDesktopInlineReturnState,
       setActiveAction,
       setDesktopSettingsPage,
       setSelectedStatementToken,
