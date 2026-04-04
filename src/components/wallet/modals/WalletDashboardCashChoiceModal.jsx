@@ -21,6 +21,18 @@ export default function WalletDashboardCashChoiceModal({
     enabled: shouldAnimate,
   });
 
+  const sectionHeader = (label) => (
+    <div className="flex items-center gap-3 px-1">
+      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+        {label}
+      </div>
+      <div className="h-px flex-1 bg-white/10" aria-hidden />
+    </div>
+  );
+
+  const cardClassName =
+    "w-full text-left rounded-[16px] px-4 py-3.5 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]";
+
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
   const overlayRef = useRef(null);
@@ -264,231 +276,277 @@ export default function WalletDashboardCashChoiceModal({
               if (!inline) e.stopPropagation();
             }}
           >
-            <div
-              className="border-b border-white/10"
-              onPointerDown={(event) => {
-                maybeStartOverlayDrag(event, "fixed");
-              }}
-            >
-              {!inline ? (
-                <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
-                  <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                </div>
-              ) : null}
-              <div className="flex items-start justify-between p-4 gap-3">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                      {t("ui_funds_manage_title", "Gérer vos fonds")}
-                    </h3>
-                    {noticeVariant === "demo" ? (
-                      <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                        {t("demo_notice_title", "Mode démo")}
-                      </span>
-                    ) : null}
+            <div className="pointer-events-none absolute inset-0" aria-hidden>
+              <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_12%_0%,rgba(255,255,255,0.08),transparent_55%),radial-gradient(850px_circle_at_95%_25%,rgba(0,255,150,0.09),transparent_55%)]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/10 to-black/55" />
+            </div>
+
+            <div className="relative z-10 flex flex-col flex-1 min-h-0">
+              <div
+                className="border-b border-white/10"
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "fixed");
+                }}
+              >
+                {!inline ? (
+                  <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
+                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
-                  <p className="mt-1 text-xs md:text-sm text-white/60">
-                    {t(
-                      "ui_funds_manage_subtitle",
-                      "Ajoutez, retirez ou échangez vos stablecoins USD.",
-                    )}
-                  </p>
+                ) : null}
+                <div className="flex items-start justify-between p-4 gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-white font-semibold text-[22px] md:text-2xl leading-tight">
+                        {t("ui_funds_manage_title", "Gérer vos fonds")}
+                      </h3>
+                      {noticeVariant === "demo" ? (
+                        <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
+                          {t("demo_notice_title", "Mode démo")}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-1 text-sm text-white/55">
+                      {t(
+                        "ui_funds_manage_subtitle",
+                        "Ajoutez, retirez ou échangez vos stablecoins USD.",
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                ref={overlayListRef}
+                className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
+                onPointerDown={(event) => {
+                  maybeStartOverlayDrag(event, "list");
+                }}
+              >
+                <div className="space-y-5">
+                  <div className="space-y-3">
+                    {sectionHeader(t("ui_funds_section_agent", "Agent"))}
+
+                    <button type="button" onClick={onChooseBuy} className={cardClassName}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-xcannes-green/10 ring-1 ring-xcannes-green/25 ring-inset flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-5 h-5 text-xcannes-green"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M12 5V19M5 12H19"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                              {t("ui_funds_add_title", "Ajouter de l'argent")}
+                            </p>
+                            <svg
+                              className="w-5 h-5 text-white/45"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden
+                            >
+                              <path
+                                d="M9 18L15 12L9 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                            {t(
+                              "ui_funds_add_hint",
+                              "Par carte ou virement via partenaire.",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button type="button" onClick={onChooseSell} className={cardClassName}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-5 h-5 text-white/80"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M5 12H19M12 5L19 12L12 19"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                              {t("ui_funds_withdraw_title", "Retirer des fonds")}
+                            </p>
+                            <svg
+                              className="w-5 h-5 text-white/45"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden
+                            >
+                              <path
+                                d="M9 18L15 12L9 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                            {t("ui_funds_withdraw_hint", "Vers votre compte bancaire.")}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {sectionHeader(t("ui_funds_section_digital_dollars", "Dollars numériques"))}
+
+                    <button
+                      type="button"
+                      onClick={onChooseUsdSwapOut}
+                      className={cardClassName}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-5 h-5 text-white/80"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M7 7H21M21 7V21M21 7L14 14"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M17 17H3M3 17V3M3 17L10 10"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                              {t(
+                                "ui_funds_swap_out_title",
+                                "RLUSD (XRPL) → stablecoin USD",
+                              )}
+                            </p>
+                            <svg
+                              className="w-5 h-5 text-white/45"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden
+                            >
+                              <path
+                                d="M9 18L15 12L9 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                            {t(
+                              "ui_funds_swap_out_hint",
+                              "Recevoir USDC/USDT (multi-chain) sur une autre adresse.",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={onChooseUsdSwapIn}
+                      className={cardClassName}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <svg
+                            className="w-5 h-5 text-white/80"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <path
+                              d="M7 7H21M21 7V21M21 7L14 14"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M17 17H3M3 17V3M3 17L10 10"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                              {t(
+                                "ui_funds_swap_in_title",
+                                "Stablecoin USD → RLUSD (XRPL)",
+                              )}
+                            </p>
+                            <svg
+                              className="w-5 h-5 text-white/45"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden
+                            >
+                              <path
+                                d="M9 18L15 12L9 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                            {t(
+                              "ui_funds_swap_in_hint",
+                              "Envoyer depuis un wallet externe et recevoir sur votre adresse XRPL.",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-
-          <div
-            ref={overlayListRef}
-            className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
-            onPointerDown={(event) => {
-              maybeStartOverlayDrag(event, "list");
-            }}
-          >
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={onChooseBuy}
-                className="w-full text-left rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-xcannes-green/10 ring-1 ring-xcannes-green/25 ring-inset flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-xcannes-green" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M12 5V19M5 12H19"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
-                        {t("ui_funds_add_title", "ajouter des fonds")}
-                      </p>
-                      <svg className="w-5 h-5 text-white/50" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M9 18L15 12L9 6"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <p className="mt-1 text-[11px] md:text-xs text-white/60">
-                      {t(
-                        "ui_funds_add_hint",
-                        "Par carte ou virement via partenaire.",
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={onChooseSell}
-                className="w-full text-left rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white/80" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M5 12H19M12 5L19 12L12 19"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
-                        {t("ui_funds_withdraw_title", "virement")}
-                      </p>
-                      <svg className="w-5 h-5 text-white/50" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M9 18L15 12L9 6"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <p className="mt-1 text-[11px] md:text-xs text-white/60">
-                      {t(
-                        "ui_funds_withdraw_hint",
-                        "Vers votre compte bancaire.",
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={onChooseUsdSwapOut}
-                className="w-full text-left rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white/80" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M7 7H21M21 7V21M21 7L14 14"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M17 17H3M3 17V3M3 17L10 10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
-                        {t("ui_funds_swap_out_title", "RLUSD (XRPL) → stablecoin USD")}
-                      </p>
-                      <svg className="w-5 h-5 text-white/50" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M9 18L15 12L9 6"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <p className="mt-1 text-[11px] md:text-xs text-white/60">
-                      {t(
-                        "ui_funds_swap_out_hint",
-                        "Recevoir USDC/USDT (multi-chain) sur une autre adresse.",
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={onChooseUsdSwapIn}
-                className="w-full text-left rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white/80" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M7 7H21M21 7V21M21 7L14 14"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M17 17H3M3 17V3M3 17L10 10"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
-                        {t("ui_funds_swap_in_title", "Stablecoin USD → RLUSD (XRPL)")}
-                      </p>
-                      <svg className="w-5 h-5 text-white/50" viewBox="0 0 24 24" fill="none">
-                        <path
-                          d="M9 18L15 12L9 6"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <p className="mt-1 text-[11px] md:text-xs text-white/60">
-                      {t(
-                        "ui_funds_swap_in_hint",
-                        "Envoyer depuis un wallet externe et recevoir sur votre adresse XRPL.",
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            </div>
           </div>
         </div>
-      </div>
       </div>
     </>
   );
