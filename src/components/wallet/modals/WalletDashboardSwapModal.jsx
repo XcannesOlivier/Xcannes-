@@ -694,7 +694,7 @@ export default function WalletDashboardSwapModal({
                     </div>
                   ) : null}
 
-                  <div className="pt-1 px-3.5">
+                  <div className="pt-1">
                     <WalletCurrencySelector
                       value=""
                       onChange={(code) => {
@@ -703,7 +703,7 @@ export default function WalletDashboardSwapModal({
                       triggerVariant="text"
                       triggerLabel={t(
                         "ui_choose_new_currency_plus",
-                        "choisissez une nouvelle devise +",
+                        "Choisissez une nouvelle devise +",
                       )}
                       placeholder={t(
                         "ui_search_all_currencies_c5d6e7f8",
