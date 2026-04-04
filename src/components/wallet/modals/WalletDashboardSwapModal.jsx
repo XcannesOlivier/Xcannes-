@@ -54,6 +54,7 @@ export default function WalletDashboardSwapModal({
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
   const isDesktop = useIsDesktop();
+  const modalPanelRef = useRef(null);
 
   // Résout l'icône (drapeau) pour un code devise, y compris les devises
   // pas encore présentes dans le wallet (absentes de selectIconByCurrency).
@@ -539,7 +540,10 @@ export default function WalletDashboardSwapModal({
           onPointerCancel={handleOverlayPointerEnd}
         >
           <div
-            ref={overlayListRef}
+            ref={(node) => {
+              overlayListRef.current = node;
+              modalPanelRef.current = node;
+            }}
             className={panelClass}
             onClick={(e) => {
               if (!inline) e.stopPropagation();
@@ -705,6 +709,7 @@ export default function WalletDashboardSwapModal({
                         "ui_choose_new_currency_plus",
                         "Choisissez une nouvelle devise +",
                       )}
+                      fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                       placeholder={t(
                         "ui_search_all_currencies_c5d6e7f8",
                         "Search all currencies...",

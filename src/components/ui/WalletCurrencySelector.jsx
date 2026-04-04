@@ -49,6 +49,7 @@ export default function WalletCurrencySelector({
   placeholder = "Select currency...",
   triggerLabel = "",
   triggerVariant = "button",
+  fullscreenPortalTarget = null,
   extraOptions = [],
   quickOptions = [],
   showQuickAdd = true,
@@ -164,6 +165,7 @@ export default function WalletCurrencySelector({
   useEffect(() => {
     if (!open) return;
     if (!fullscreen) return;
+    if (fullscreenPortalTarget) return;
     try {
       applyOverlayTranslateY(0, { animate: false });
       // Ensure any pending rAF from a previous open doesn't apply stale values.
@@ -192,7 +194,7 @@ export default function WalletCurrencySelector({
         // ignore
       }
     };
-  }, [fullscreen, open]);
+  }, [fullscreen, fullscreenPortalTarget, open]);
 
   useEffect(() => {
     if (open) return;
@@ -552,7 +554,11 @@ export default function WalletCurrencySelector({
       {open && fullscreen
         ? createPortal(
             <div
-              className="fixed inset-0 z-[10020]"
+              className={
+                fullscreenPortalTarget
+                  ? "absolute inset-0 z-[10020]"
+                  : "fixed inset-0 z-[10020]"
+              }
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
               onPointerMove={(e) => e.stopPropagation()}
@@ -573,7 +579,9 @@ export default function WalletCurrencySelector({
                 aria-modal="true"
                 className={[
                   "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
-                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+                  fullscreenPortalTarget
+                    ? ""
+                    : "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
                   "will-change-transform",
                 ].join(" ")}
                 onPointerMove={handleOverlayPointerMove}
@@ -696,7 +704,7 @@ export default function WalletCurrencySelector({
                 </div>
               </div>
             </div>,
-            document.body,
+            fullscreenPortalTarget || document.body,
           )
         : null}
     </div>);
