@@ -649,11 +649,23 @@ export default function WalletDashboardSwapModal({
 		                      aria-label={t("ui_swap_currencies", "Inverser")}
 		                      title={t("ui_swap_currencies", "Inverser")}
 		                    >
-		                      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-		                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 9h10M7 9l3-3M7 9l3 3M17 15H7m10 0l-3-3m3 3l-3 3" />
+		                      <svg
+		                        className="w-7 h-7"
+		                        viewBox="0 0 24 24"
+		                        fill="none"
+		                        stroke="currentColor"
+		                        strokeWidth="2"
+		                        strokeLinecap="round"
+		                        strokeLinejoin="round"
+		                        aria-hidden
+		                      >
+		                        <polyline points="17 1 21 5 17 9" />
+		                        <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+		                        <polyline points="7 23 3 19 7 15" />
+		                        <path d="M21 13v2a4 4 0 0 1-4 4H3" />
 		                      </svg>
-	                    </button>
-	                  </div>
+		                    </button>
+		                  </div>
 
                   <div>
                     <div className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">

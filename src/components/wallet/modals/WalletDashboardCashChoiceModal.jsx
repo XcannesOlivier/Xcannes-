@@ -25,6 +25,10 @@ export default function WalletDashboardCashChoiceModal({
     "ui_funds_swap_out_hint",
     "Depuis un wallet (USDC, USDT)",
   );
+  const swapInHintText = t(
+    "ui_funds_swap_in_hint",
+    "Vers une adresse crypto",
+  );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -488,7 +492,9 @@ export default function WalletDashboardCashChoiceModal({
                                 return (
                                   <>
                                     {parts[0]}{" "}
-                                    <span className="text-white/60">ou</span>{" "}
+                                    <span className="text-white/60 text-[12px] md:text-[13px]">
+                                      ou
+                                    </span>{" "}
                                     {parts[1]}
                                   </>
                                 );
@@ -532,7 +538,7 @@ export default function WalletDashboardCashChoiceModal({
                               if (text.startsWith(prefix)) {
                                 return (
                                   <>
-                                    <span className="text-white/60">
+                                    <span className="text-white/60 text-[12px] md:text-[13px]">
                                       Vers votre{" "}
                                     </span>
                                     {text.slice(prefix.length)}
@@ -589,7 +595,7 @@ export default function WalletDashboardCashChoiceModal({
                               if (idx > 0) {
                                 return (
                                   <>
-                                    <span className="text-white/60">
+                                    <span className="text-white/60 text-[12px] md:text-[13px]">
                                       {text.slice(0, idx)}
                                     </span>
                                     {text.slice(idx)}
@@ -600,7 +606,7 @@ export default function WalletDashboardCashChoiceModal({
                               if (text.startsWith(prefix)) {
                                 return (
                                   <>
-                                    <span className="text-white/60">
+                                    <span className="text-white/60 text-[12px] md:text-[13px]">
                                       Depuis un wallet{" "}
                                     </span>
                                     {text.slice(prefix.length)}
@@ -647,10 +653,27 @@ export default function WalletDashboardCashChoiceModal({
                             </svg>
                           </div>
                           <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
-                            {t(
-                              "ui_funds_swap_in_hint",
-                              "Vers une adresse crypto",
-                            )}
+                            {(() => {
+                              const text = String(swapInHintText || "");
+                              const prefix = "Vers une ";
+                              if (text.startsWith(prefix)) {
+                                return (
+                                  <>
+                                    <span className="text-white/60">
+                                      Vers une{" "}
+                                    </span>
+                                    <span className="text-[12px] md:text-[13px]">
+                                      {text.slice(prefix.length)}
+                                    </span>
+                                  </>
+                                );
+                              }
+                              return (
+                                <span className="text-[12px] md:text-[13px]">
+                                  {swapInHintText}
+                                </span>
+                              );
+                            })()}
                           </p>
                         </div>
                       </div>

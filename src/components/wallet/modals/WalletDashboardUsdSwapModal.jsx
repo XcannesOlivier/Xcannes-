@@ -1745,10 +1745,25 @@ export default function WalletDashboardUsdSwapModal({
                               className="w-5 h-5 text-xcannes-green/90"
                               aria-hidden
                             >
+                              <polyline
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                points="17 1 21 5 17 9"
+                              />
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                d="M7 7h10M7 7l3-3M7 7l3 3M17 17H7m10 0l-3-3m3 3l-3 3"
+                                d="M3 11V9a4 4 0 0 1 4-4h14"
+                              />
+                              <polyline
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                points="7 23 3 19 7 15"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M21 13v2a4 4 0 0 1-4 4H3"
                               />
                             </svg>
                           </div>
