@@ -1033,6 +1033,7 @@
   "ui_funds_swap_out_hint": "Depuis un wallet (USDC, USDT)",
   "ui_funds_swap_in_title": "Envoyer des dollars",
   "ui_funds_swap_in_hint": "Vers une adresse crypto",
+  "ui_choose_new_currency_plus": "choisissez une nouvelle devise +",
   "ui_funds_swap_usd_title": "Échanger RLUSD",
   "ui_funds_swap_usd_hint": "Swap externe RLUSD ↔ USDC/USDT (USD).",
   "ui_usd_swap_title": "Échanger des stablecoins USD",

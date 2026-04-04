@@ -47,6 +47,8 @@ export default function WalletCurrencySelector({
   value,
   onChange,
   placeholder = "Select currency...",
+  triggerLabel = "",
+  triggerVariant = "button",
   extraOptions = [],
   quickOptions = [],
   showQuickAdd = true,
@@ -433,28 +435,40 @@ export default function WalletCurrencySelector({
           setOpen((v) => !v);
         }}
         ref={triggerRef}
-        className={buttonClassName || "w-full bg-black/20 border border-white/10 rounded-md px-2.5 py-1.5 text-[15px] text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98"}>
-
-        <div className="flex items-center gap-2">
-          <span className="truncate">
-            {selected ? `${selected.code} – ${selected.name}` : placeholder}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className={
+          buttonClassName ||
+          (triggerVariant === "text"
+            ? "inline-flex items-center gap-2 text-[15px] md:text-sm leading-snug text-xcannes-green/85 font-semibold hover:text-xcannes-green transition-colors"
+            : "w-full bg-black/20 border border-white/10 rounded-md px-2.5 py-1.5 text-[15px] text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98")
+        }
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <span className={triggerVariant === "text" ? "" : "truncate"}>
+            {String(triggerLabel || "").trim()
+              ? triggerLabel
+              : selected
+                ? `${selected.code} – ${selected.name}`
+                : placeholder}
           </span>
         </div>
-        <svg
-          className={`w-3 h-3 transition-transform ${
-          open ? "rotate-180" : ""}`
-          }
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24">
-
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7" />
-
-        </svg>
+        {triggerVariant === "text" ? null : (
+          <svg
+            className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        )}
       </button>
 
 	      {open && !fullscreen &&

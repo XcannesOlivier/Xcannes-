@@ -694,25 +694,26 @@ export default function WalletDashboardSwapModal({
                     </div>
                   ) : null}
 
-                  <div className="pt-1">
-                    <div className="text-[11px] tracking-[0.22em] uppercase text-white/35 mb-2">
-                      {t("ui_other_currency_d8e1f2a3b4", "Autre devise")}
-                    </div>
-	                    <WalletCurrencySelector
-	                      value=""
-	                      onChange={(code) => {
-	                        if (code) setConvertQuoteCurrency(code);
-	                      }}
-	                      placeholder={t(
-	                        "ui_search_all_currencies_c5d6e7f8",
-	                        "Search all currencies...",
-	                      )}
-	                      excludeCodes={["USD", "RLUSD", "XRP"]}
-	                      showQuickAdd={false}
-	                      fullscreen={true}
-	                      buttonClassName="w-full bg-white/3 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white/80 flex items-center justify-between gap-2 hover:ring-white/20 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                    />
-	                  </div>
+                  <div className="pt-1 px-1">
+                    <WalletCurrencySelector
+                      value=""
+                      onChange={(code) => {
+                        if (code) setConvertQuoteCurrency(code);
+                      }}
+                      triggerVariant="text"
+                      triggerLabel={t(
+                        "ui_choose_new_currency_plus",
+                        "choisissez une nouvelle devise +",
+                      )}
+                      placeholder={t(
+                        "ui_search_all_currencies_c5d6e7f8",
+                        "Search all currencies...",
+                      )}
+                      excludeCodes={["USD", "RLUSD", "XRP"]}
+                      showQuickAdd={false}
+                      fullscreen={true}
+                    />
+                  </div>
 	                </div>
 
                 {/* ── SECTION 2: Amount input ─────────────────────────────── */}
