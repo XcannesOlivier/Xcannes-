@@ -21,6 +21,125 @@ export default function WalletDashboardCashChoiceModal({
     enabled: shouldAnimate,
   });
 
+  const FundsCardAddIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+      <rect
+        x="6"
+        y="14"
+        width="32"
+        height="22"
+        rx="6"
+        className="fill-xcannes-green/15 stroke-xcannes-green/45"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="10"
+        y="18"
+        width="18"
+        height="4"
+        rx="2"
+        className="fill-xcannes-green/35"
+      />
+      <rect
+        x="10"
+        y="26"
+        width="12"
+        height="3"
+        rx="1.5"
+        className="fill-xcannes-green/25"
+      />
+      <path
+        d="M36 24v8m-4-4h8"
+        className="stroke-xcannes-green"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
+  const FundsCardBankIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+      <path
+        d="M10 18l14-8 14 8"
+        className="stroke-white/65"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14 18h20"
+        className="stroke-white/65"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 18v16m6-16v16m6-16v16m6-16v16"
+        className="stroke-white/45"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12 34h24"
+        className="stroke-white/65"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10 38h28"
+        className="stroke-white/35"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
+  const FundsCardWalletIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+      <path
+        d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
+        className="fill-white/5 stroke-white/25"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M14 20h20c2.2 0 4 1.8 4 4v0H28c-2.2 0-4 1.8-4 4v0H14"
+        className="stroke-white/35"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <circle cx="30.5" cy="27" r="5.5" className="fill-xcannes-green/15" />
+      <path
+        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
+        className="stroke-xcannes-green/85"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
+  const FundsCardSendIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+      <path
+        d="M10 22l28-12-10 28-6-10-12-6Z"
+        className="fill-white/5 stroke-white/35"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M38 10L22 28"
+        className="stroke-xcannes-green/75"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M22 28l0 10"
+        className="stroke-white/25"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
   const sectionHeader = (label) => (
     <div className="flex items-center gap-3 px-1">
       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
@@ -31,7 +150,7 @@ export default function WalletDashboardCashChoiceModal({
   );
 
   const cardClassName =
-    "w-full text-left rounded-[16px] px-4 py-3.5 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]";
+    "w-full text-left rounded-[16px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]";
 
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
@@ -308,7 +427,7 @@ export default function WalletDashboardCashChoiceModal({
                     <p className="mt-1 text-sm text-white/55">
                       {t(
                         "ui_funds_manage_subtitle",
-                        "Ajoutez, retirez ou échangez vos stablecoins USD.",
+                        "Ajoutez ou retirez de l'argent facilement",
                       )}
                     </p>
                   </div>
@@ -322,25 +441,14 @@ export default function WalletDashboardCashChoiceModal({
                   maybeStartOverlayDrag(event, "list");
                 }}
               >
-                <div className="space-y-5">
-                  <div className="space-y-3">
+                <div className="min-h-full flex flex-col justify-between gap-7">
+                  <div className="space-y-4">
                     {sectionHeader(t("ui_funds_section_agent", "Agent"))}
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-xcannes-green/10 ring-1 ring-xcannes-green/25 ring-inset flex items-center justify-center flex-shrink-0">
-                          <svg
-                            className="w-5 h-5 text-xcannes-green"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M12 5V19M5 12H19"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                            />
-                          </svg>
+                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <FundsCardAddIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
@@ -365,7 +473,7 @@ export default function WalletDashboardCashChoiceModal({
                           <p className="mt-1 text-[11px] md:text-xs text-white/60">
                             {t(
                               "ui_funds_add_hint",
-                              "Par carte ou virement via partenaire.",
+                              "Carte ou virement bancaire",
                             )}
                           </p>
                         </div>
@@ -374,25 +482,13 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseSell} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                          <svg
-                            className="w-5 h-5 text-white/80"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M5 12H19M12 5L19 12L12 19"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <FundsCardBankIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
-                              {t("ui_funds_withdraw_title", "Retirer des fonds")}
+                              {t("ui_funds_withdraw_title", "Retirer vers la banque")}
                             </p>
                             <svg
                               className="w-5 h-5 text-white/45"
@@ -410,14 +506,14 @@ export default function WalletDashboardCashChoiceModal({
                             </svg>
                           </div>
                           <p className="mt-1 text-[11px] md:text-xs text-white/60">
-                            {t("ui_funds_withdraw_hint", "Vers votre compte bancaire.")}
+                            {t("ui_funds_withdraw_hint", "Vers votre compte bancaire")}
                           </p>
                         </div>
                       </div>
                     </button>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {sectionHeader(t("ui_funds_section_digital_dollars", "Dollars numériques"))}
 
                     <button
@@ -426,34 +522,15 @@ export default function WalletDashboardCashChoiceModal({
                       className={cardClassName}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                          <svg
-                            className="w-5 h-5 text-white/80"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M7 7H21M21 7V21M21 7L14 14"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M17 17H3M3 17V3M3 17L10 10"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <FundsCardWalletIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_out_title",
-                                "RLUSD (XRPL) → stablecoin USD",
+                                "Recevoir des dollars",
                               )}
                             </p>
                             <svg
@@ -474,7 +551,7 @@ export default function WalletDashboardCashChoiceModal({
                           <p className="mt-1 text-[11px] md:text-xs text-white/60">
                             {t(
                               "ui_funds_swap_out_hint",
-                              "Recevoir USDC/USDT (multi-chain) sur une autre adresse.",
+                              "Depuis un wallet (USDC, USDT)",
                             )}
                           </p>
                         </div>
@@ -487,34 +564,15 @@ export default function WalletDashboardCashChoiceModal({
                       className={cardClassName}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                          <svg
-                            className="w-5 h-5 text-white/80"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                          >
-                            <path
-                              d="M7 7H21M21 7V21M21 7L14 14"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M17 17H3M3 17V3M3 17L10 10"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                          <FundsCardSendIcon />
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_in_title",
-                                "Stablecoin USD → RLUSD (XRPL)",
+                                "Envoyer des dollars",
                               )}
                             </p>
                             <svg
@@ -535,7 +593,7 @@ export default function WalletDashboardCashChoiceModal({
                           <p className="mt-1 text-[11px] md:text-xs text-white/60">
                             {t(
                               "ui_funds_swap_in_hint",
-                              "Envoyer depuis un wallet externe et recevoir sur votre adresse XRPL.",
+                              "Vers une adresse crypto",
                             )}
                           </p>
                         </div>
