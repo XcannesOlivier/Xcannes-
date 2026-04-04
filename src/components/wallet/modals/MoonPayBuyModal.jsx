@@ -888,7 +888,7 @@ const MoonPayBuyModal = ({
                 </p>
               </div>
             ) : null}
-		            <p className="text-[13px] md:text-sm text-white/60 font-mono break-all">
+		            <p className="text-[13px] md:text-sm text-white/60 font-mono font-semibold break-all">
 		              {walletAddress}
 		            </p>
 		          </div>

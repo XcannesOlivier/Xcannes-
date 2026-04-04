@@ -1573,7 +1573,7 @@ export default function WalletDashboardUsdSwapModal({
                         </div>
                       ) : null}
 	                      {String(walletAddress || "").trim() ? (
-	                        <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono break-all">
+	                        <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
 	                          {walletAddress}
 	                        </p>
 	                      ) : null}
@@ -2275,7 +2275,7 @@ export default function WalletDashboardUsdSwapModal({
                           </div>
                         ) : null}
                         {String(walletAddress || "").trim() ? (
-                          <p className="text-[13px] md:text-sm text-xcannes-green/90 font-mono break-all">
+                          <p className="text-[13px] md:text-sm text-xcannes-green/90 font-mono font-semibold break-all">
                             {walletAddress}
                           </p>
                         ) : null}
