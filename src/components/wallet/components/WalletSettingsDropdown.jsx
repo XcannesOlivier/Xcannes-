@@ -478,125 +478,171 @@ export default function WalletSettingsDropdown({
         </svg>
       </button>
 
-	      {isOpen && (
-	        <>
-	          {/* Backdrop on mobile (tap to close) */}
-	          <button
-	            type="button"
-	            aria-label={t("close", "Fermer")}
-	            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
-	            onClick={() => setIsOpen(false)}
-              style={{
-                opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)),
-              }}
-	          />
+      {isOpen && (
+        <>
+          {/* Backdrop on mobile (tap to close) */}
+          <button
+            type="button"
+            aria-label={t("close", "Fermer")}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden"
+            onClick={() => setIsOpen(false)}
+            style={{
+              opacity: Math.max(0, Math.min(1, 1 - overlayTranslateY / 420)),
+            }}
+          />
 
-            {(() => {
-              const menu = (
-                <div
-                  role="menu"
-                  ref={(node) => {
-                    menuRef.current = node;
-                    overlayRef.current = node;
-                  }}
-                  style={{
-                    ...(shouldPortalToInlinePanel
-                      ? {}
-                      : isDesktop
-                        ? desktopMenuStyle || {}
-                        : {}),
-                    transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-                    transition: overlayDragging
-                      ? "none"
-                      : "transform 220ms cubic-bezier(0.2,0,0,1)",
-                  }}
-                  className={[
-                    shouldPortalToInlinePanel
-                      ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform"
-                      : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
-                    shouldPortalToInlinePanel
-                      ? ""
-                      : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
-                  ].join(" ")}
-                  onPointerMove={handleOverlayPointerMove}
-                  onPointerUp={handleOverlayPointerEnd}
-                  onPointerCancel={handleOverlayPointerEnd}
-                >
-            {/* Pointer (desktop) */}
-            {!shouldPortalToInlinePanel ? (
+          {(() => {
+            const menu = (
               <div
-                className={[
-                  "hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45",
-                ].join(" ")}
-                style={
-                  !isDesktop || desktopArrowX == null
-                    ? undefined
-                    : {
-                        left: `${Math.round(desktopArrowX - 7)}px`,
-                        top: desktopPlacement === "bottom" ? "-7px" : undefined,
-                        bottom: desktopPlacement === "top" ? "-7px" : undefined,
-                      }
-                }
-                aria-hidden
-              />
-            ) : null}
-
-	            {/* Mobile header */}
-	            <div
-                className="shrink-0 md:hidden border-b border-white/10"
-                onPointerDown={(event) => {
-                  maybeStartOverlayDrag(event, "fixed");
+                role="menu"
+                ref={(node) => {
+                  menuRef.current = node;
+                  overlayRef.current = node;
                 }}
-                </div>
-              );
-
-              return shouldPortalToInlinePanel
-                ? createPortal(menu, desktopInlinePanelTarget)
-                : menu;
-            })()}
-                <div className="flex justify-center pt-3 pb-1">
-                  <div className="w-16 h-5 flex items-center justify-center" aria-hidden>
-                    <span className="block w-12 h-1.5 rounded-full bg-white/20" />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between px-4 pt-2 pb-3">
-                  <div className="min-w-0">
-                    <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
-                      {t("ui_settings_label", "Paramètres")}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-	            {/* Desktop header */}
-	            <div className="hidden md:flex items-center justify-between px-4 py-3">
-	              <div className="flex items-center gap-2 min-w-0">
-	                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                </span>
-	                <div className="min-w-0">
-	                  <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
-		                    {t("ui_settings_label", "Paramètres")}
-		                  </div>
-		                </div>
-		              </div>
-            </div>
-
-	            <div
-                ref={overlayListRef}
+                style={{
+                  ...(shouldPortalToInlinePanel
+                    ? {}
+                    : isDesktop
+                      ? desktopMenuStyle || {}
+                      : {}),
+                  transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
+                  transition: overlayDragging
+                    ? "none"
+                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                }}
                 className={[
-                  "flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3",
+                  shouldPortalToInlinePanel
+                    ? "absolute inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform"
+                    : "fixed inset-0 z-50 bg-elevated flex flex-col min-h-0 overflow-hidden will-change-transform",
                   shouldPortalToInlinePanel
                     ? ""
-                    : "md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain",
+                    : "md:fixed md:inset-auto md:w-[min(420px,calc(100vw-32px))] md:rounded-xl md:border md:border-white/10 md:bg-elevated md:shadow-[0_28px_90px_rgba(0,0,0,0.6)] md:overflow-visible md:animate-walletSettingsIn",
                 ].join(" ")}
-                onPointerDown={(event) => {
-                  maybeStartOverlayDrag(event, "list");
-                }}
+                onPointerMove={handleOverlayPointerMove}
+                onPointerUp={handleOverlayPointerEnd}
+                onPointerCancel={handleOverlayPointerEnd}
               >
+                {/* Pointer (desktop) */}
+                {!shouldPortalToInlinePanel ? (
+                  <div
+                    className="hidden md:block absolute h-3.5 w-3.5 bg-elevated border border-white/10 rotate-45"
+                    style={
+                      !isDesktop || desktopArrowX == null
+                        ? undefined
+                        : {
+                            left: `${Math.round(desktopArrowX - 7)}px`,
+                            top: desktopPlacement === "bottom" ? "-7px" : undefined,
+                            bottom:
+                              desktopPlacement === "top" ? "-7px" : undefined,
+                          }
+                    }
+                    aria-hidden
+                  />
+                ) : null}
+
+                {/* Mobile header */}
+                <div
+                  className="shrink-0 md:hidden border-b border-white/10"
+                  onPointerDown={(event) => {
+                    maybeStartOverlayDrag(event, "fixed");
+                  }}
+                >
+                  <div className="flex justify-center pt-3 pb-1">
+                    <div
+                      className="w-16 h-5 flex items-center justify-center"
+                      aria-hidden
+                    >
+                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between px-4 pt-2 pb-3">
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+                        {t("ui_settings_label", "Paramètres")}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label={t("close", "Fermer")}
+                      className="h-9 w-9 inline-flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/5 active:scale-95 transition"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Desktop header */}
+                <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-white/10">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60">
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.8}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.066z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-semibold tracking-[0.28em] uppercase text-white">
+                        {t("ui_settings_label", "Paramètres")}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label={t("close", "Fermer")}
+                    className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <div
+                  ref={overlayListRef}
+                  className={[
+                    "flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pb-4 md:px-3 md:pb-3",
+                    shouldPortalToInlinePanel
+                      ? ""
+                      : "md:max-h-[min(680px,calc(100vh-140px))] md:overflow-y-auto md:overscroll-contain",
+                  ].join(" ")}
+                  onPointerDown={(event) => {
+                    maybeStartOverlayDrag(event, "list");
+                  }}
+                >
 	              {/* Section: Comptes */}
 	              <div className="pt-2 md:pt-2.5">
 	                <div className="px-1.5 pb-2 text-[10px] font-semibold tracking-[0.22em] uppercase text-white/35">
@@ -894,8 +940,15 @@ export default function WalletSettingsDropdown({
                   <span className="text-white/20 text-lg">›</span>
                 </button>
               </div>
-            </div>
-          </div>
+                </div>
+              </div>
+            );
+
+            if (shouldPortalToInlinePanel) {
+              return createPortal(menu, desktopInlinePanelTarget);
+            }
+            return menu;
+          })()}
 
           <style jsx global>{`
             @keyframes walletSettingsIn {
