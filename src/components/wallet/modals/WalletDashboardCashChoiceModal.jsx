@@ -441,7 +441,7 @@ export default function WalletDashboardCashChoiceModal({
                   maybeStartOverlayDrag(event, "list");
                 }}
               >
-                <div className="min-h-full flex flex-col justify-between gap-7">
+                <div className="flex flex-col gap-7 pb-2">
                   <div className="space-y-4">
                     {sectionHeader(t("ui_funds_section_agent", "Agent"))}
 
