@@ -694,7 +694,7 @@ export default function WalletDashboardSwapModal({
                     </div>
                   ) : null}
 
-                  <div className="pt-1 px-1">
+                  <div className="pt-1 px-3.5">
                     <WalletCurrencySelector
                       value=""
                       onChange={(code) => {

@@ -440,7 +440,7 @@ export default function WalletCurrencySelector({
         className={
           buttonClassName ||
           (triggerVariant === "text"
-            ? "inline-flex items-center gap-2 text-[15px] md:text-sm leading-snug text-xcannes-green/85 font-semibold hover:text-xcannes-green transition-colors"
+            ? "inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-xcannes-green/85 font-semibold hover:text-xcannes-green transition-colors"
             : "w-full bg-black/20 border border-white/10 rounded-md px-2.5 py-1.5 text-[15px] text-white/70 flex items-center justify-between gap-2 hover:border-white/20 hover:text-white/85 transition-colors active:scale-98")
         }
       >
