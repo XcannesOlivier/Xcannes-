@@ -1640,7 +1640,10 @@ export default function CurrencyStatement({
 	              <button
 	                type="button"
 	                onClick={onClose}
-	                className="wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors flex-shrink-0 w-10 h-10 flex items-center justify-center -ml-2"
+	                className={[
+                    "wallet-modal-close text-white/60 hover:text-xcannes-green transition-colors flex-shrink-0 w-10 h-10 flex items-center justify-center -ml-2",
+                    inline ? "wallet-modal-close--force" : "",
+                  ].join(" ")}
 	                aria-label={t("back", "Retour")}
 	              >
 	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />

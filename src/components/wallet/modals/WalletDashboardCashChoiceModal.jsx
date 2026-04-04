@@ -470,7 +470,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
                             {t(
                               "ui_funds_add_hint",
                               "Carte ou virement bancaire",
@@ -505,7 +505,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
                             {t("ui_funds_withdraw_hint", "Vers votre compte bancaire")}
                           </p>
                         </div>
@@ -548,7 +548,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
                             {t(
                               "ui_funds_swap_out_hint",
                               "Depuis un wallet (USDC, USDT)",
@@ -590,7 +590,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-white/60">
+                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
                             {t(
                               "ui_funds_swap_in_hint",
                               "Vers une adresse crypto",
