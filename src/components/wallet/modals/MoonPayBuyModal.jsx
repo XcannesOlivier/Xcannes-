@@ -1157,10 +1157,10 @@ const MoonPayBuyModal = ({
     <div ref={contentRootRef} className={embedded ? "relative" : "relative p-4 md:p-5"}>
       {/* Form */}
       {step === "form" && (
-        <div className="space-y-5">
-          <div className="flex items-center justify-between">
-            {wizardStep === 2 ? (
-              <button
+	        <div className="space-y-5">
+	          <div className="flex items-center justify-between">
+	            {wizardStep === 2 ? (
+	              <button
                 type="button"
                 onClick={() => setWizardStep(1)}
                 className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
@@ -1172,22 +1172,41 @@ const MoonPayBuyModal = ({
             ) : (
               <div />
             )}
-            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-              {wizardStep === 1 ? "1/3" : "2/3"}
-            </div>
-          </div>
-			          {/* Currency selector */}
-			          <div>
-					            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase underline underline-offset-4 decoration-white/35">
-					              {t(
-					                "moonpay_buy_select_asset",
-					                "Choisissez l'actif que vous voulez ajouter",
-					              )}
-					            </label>
-		            <div className="relative">
-			            <button
-			              type="button"
-			              ref={assetDropdownTriggerRef}
+	            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	              {wizardStep === 1 ? "1/3" : "2/3"}
+	            </div>
+	          </div>
+
+		          {/* Wallet + Title (merged) */}
+		          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase underline underline-offset-4 decoration-white/35">
+		              {t(
+		                "moonpay_buy_select_asset",
+		                "Choisissez la devise que vous voulez créditer au compte :",
+		              )}
+		            </p>
+		            {String(walletLabel || "").trim() ? (
+		              <div className="flex items-center gap-2 mb-1">
+		                <span
+		                  className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
+		                  aria-hidden
+		                />
+		                <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+		                  {walletLabel}
+		                </p>
+		              </div>
+		            ) : null}
+		            <p className="text-[13px] md:text-sm text-white/60 font-mono font-semibold break-all">
+		              {walletAddress}
+		            </p>
+		          </div>
+
+		          {/* Currency selector */}
+		          <div>
+			            <div className="relative">
+				            <button
+				              type="button"
+				              ref={assetDropdownTriggerRef}
 			              onClick={() => setAssetDropdownOpen((prev) => !prev)}
 			              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
 			            >
@@ -1252,13 +1271,13 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-			                                "Choisissez l'actif que vous voulez ajouter",
+			                                "Choisissez la devise que vous voulez créditer au compte :",
 			                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 			                              {t("ui_search", "Rechercher…")}
-			                            </div>
-			                          </div>
+				          </div>
+				          </div>
 			                          <button
 			                            type="button"
 			                            onClick={() => {
@@ -1410,7 +1429,7 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-			                                "Choisissez l'actif que vous voulez ajouter",
+			                                "Choisissez la devise que vous voulez créditer au compte :",
 			                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1608,31 +1627,10 @@ const MoonPayBuyModal = ({
                   </>
 	                ) : null}
 
-	          {/* Wallet address display */}
-	          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-            <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_destination_wallet", "Vers le compte")}
-            </p>
-            {String(walletLabel || "").trim() ? (
-              <div className="flex items-center gap-2 mb-1">
-	                <span
-	                  className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
-	                  aria-hidden
-	                />
-                <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-                  {walletLabel}
-                </p>
-              </div>
-            ) : null}
-		            <p className="text-[13px] md:text-sm text-white/60 font-mono font-semibold break-all">
-		              {walletAddress}
-		            </p>
-		          </div>
-
-			          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
-			            {highlightPaymentMethods(
-			              demoMode
-			                ? t(
+				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
+				            {highlightPaymentMethods(
+				              demoMode
+				                ? t(
 			                    "moonpay_info_buy_demo_1b7d2c9a5e",
 			                    "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
 			                  )
