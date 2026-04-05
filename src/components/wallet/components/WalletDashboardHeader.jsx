@@ -310,21 +310,18 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-                        <span className="text-[13px] md:text-[14px] font-semibold text-white/90 truncate">
-                          {activeWalletLabel}
-                        </span>
+	                        <span className="text-[16px] md:text-[17px] font-semibold text-white/90 truncate">
+	                          {activeWalletLabel}
+	                        </span>
                       </div>
 
-                      <div className="mt-0.5 flex items-center gap-2 min-w-0">
-                        <span className="font-mono text-[10px] text-white/60 truncate">
-                          {wallet.slice(0, 10)}…{wallet.slice(-8)}
-                        </span>
-                        {walletHeaderToast ? (
-                          <span className="text-[10px] text-xcannes-green/90">
-                            {walletHeaderToast}
-                          </span>
-                        ) : null}
-                      </div>
+	                      {walletHeaderToast ? (
+	                        <div className="mt-0.5 flex items-center gap-2 min-w-0">
+	                          <span className="text-[10px] text-xcannes-green/90">
+	                            {walletHeaderToast}
+	                          </span>
+	                        </div>
+	                      ) : null}
                     </button>
 
 	                    {/* Multi-wallet dropdown */}
@@ -359,22 +356,22 @@ export default function WalletDashboardHeader({
                                   isActive ? "bg-xcannes-green" : "bg-white/20"
                                 }`}
                               />
-                              <div className="min-w-0">
-                                <div
-                                  className={`text-[13px] font-medium truncate ${
-                                    isActive ? "text-xcannes-green" : "text-white/80"
-                                  }`}
-                                >
-                                  {displayName}
-                                </div>
-                                <div
-                                  className={`font-mono text-[12px] truncate ${
-                                    isActive ? "text-xcannes-green/70" : "text-white/40"
-                                  }`}
-                                >
-                                  {addr.slice(0, 10)}…{addr.slice(-8)}
-                                </div>
-                              </div>
+		                              <div className="min-w-0">
+		                                <div
+		                                  className={`text-[15px] md:text-[16px] font-medium truncate ${
+		                                    isActive ? "text-xcannes-green" : "text-white/80"
+		                                  }`}
+		                                >
+		                                  {displayName}
+		                                </div>
+		                                <div
+		                                  className={`font-mono text-[13px] md:text-[14px] whitespace-normal break-all leading-snug ${
+		                                    isActive ? "text-xcannes-green/70" : "text-white/40"
+		                                  }`}
+		                                >
+		                                  {addr}
+		                                </div>
+		                              </div>
                               {isActive && (
                                 <span className="ml-auto text-[11px] text-xcannes-green/80 font-medium uppercase tracking-wider">
                                   {t("ui_active_wallet", "actif")}
