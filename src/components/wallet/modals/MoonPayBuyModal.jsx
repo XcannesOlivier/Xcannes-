@@ -233,6 +233,8 @@ const MoonPayBuyModal = ({
       .map((token) => {
         const currencyRaw = token?.currency;
         const currencyCode = String(currencyRaw || "").toUpperCase();
+        // Do not offer XRP in the buy flow selector.
+        if (currencyCode === "XRP") return null;
         if (!currencyCode || seen.has(currencyCode)) return null;
         seen.add(currencyCode);
 
@@ -1155,9 +1157,20 @@ const MoonPayBuyModal = ({
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
     <div ref={contentRootRef} className={embedded ? "relative" : "relative p-4 md:p-5"}>
+      <style jsx global>{`
+        .xcannes-no-number-spin::-webkit-outer-spin-button,
+        .xcannes-no-number-spin::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        .xcannes-no-number-spin {
+          -moz-appearance: textfield;
+          appearance: textfield;
+        }
+      `}</style>
       {/* Form */}
       {step === "form" && (
-	        <div className="space-y-5">
+        <div className="space-y-5">
 	          <div className="flex items-center justify-between">
 	            {wizardStep === 2 ? (
 	              <button
@@ -1172,14 +1185,14 @@ const MoonPayBuyModal = ({
             ) : (
               <div />
             )}
-	            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	              {wizardStep === 1 ? "1/3" : "2/3"}
-	            </div>
+		            <div className="text-[13px] tracking-[0.22em] uppercase text-white/55">
+		              {wizardStep === 1 ? "1/3" : "2/3"}
+		            </div>
 	          </div>
 
 		          {/* Wallet + Title (merged) */}
 		          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase underline underline-offset-4 decoration-white/35">
+		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
 		              {t(
 		                "moonpay_buy_select_asset",
 		                "Choisissez la devise que vous voulez créditer au compte :",
@@ -1196,7 +1209,7 @@ const MoonPayBuyModal = ({
 		                </p>
 		              </div>
 		            ) : null}
-		            <p className="text-[13px] md:text-sm text-white/60 font-mono font-semibold break-all">
+		            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
 		              {walletAddress}
 		            </p>
 		          </div>
@@ -1268,7 +1281,7 @@ const MoonPayBuyModal = ({
 			                      >
 			                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
 			                          <div className="min-w-0">
-			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
+			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
 			                                "Choisissez la devise que vous voulez créditer au compte :",
@@ -1426,7 +1439,7 @@ const MoonPayBuyModal = ({
 
 			                        <div className="flex items-center justify-between gap-3 px-4 py-4">
 			                          <div className="min-w-0">
-			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
+			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
 			                                "Choisissez la devise que vous voulez créditer au compte :",
@@ -1540,17 +1553,17 @@ const MoonPayBuyModal = ({
                     <label className="block text-white/70 mb-2">
                       {t("moonpay_buy_selected_asset_amount", "Montant")}
                     </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={targetAssetAmount}
-                        onChange={(e) => setTargetAssetAmount(e.target.value)}
-                        placeholder="0.0000"
-                        step="0.0001"
-                        min="0"
-                        inputMode="decimal"
-                        className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-                      />
+	                    <div className="relative">
+	                      <input
+	                        type="number"
+	                        value={targetAssetAmount}
+	                        onChange={(e) => setTargetAssetAmount(e.target.value)}
+	                        placeholder="0.0000"
+	                        step="0.0001"
+	                        min="0"
+	                        inputMode="decimal"
+	                        className="xcannes-no-number-spin w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	                      />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
                         {String(currency || "").toUpperCase()}
                       </span>
