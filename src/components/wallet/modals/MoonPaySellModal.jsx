@@ -1182,12 +1182,12 @@ const MoonPaySellModal = ({
 
           {/* Currency selector */}
           <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white mb-2">
-              {t(
-                "moonpay_select_crypto_to_sell",
-                "Choisissez l'actif que vous voulez vendre",
-              )}
-            </label>
+	            <label className="block text-[11px] tracking-[0.22em] uppercase text-[#006AFE] mb-2">
+	              {t(
+	                "moonpay_select_crypto_to_sell",
+	                "Choisissez l'actif que vous voulez vendre",
+	              )}
+	            </label>
 	            <div className="relative">
 		            <button
 		              type="button"
@@ -1256,12 +1256,12 @@ const MoonPaySellModal = ({
 		                      >
 		                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
 		                          <div className="min-w-0">
-		                            <div className="text-white font-semibold text-base leading-tight truncate">
-		                              {t(
-		                                "moonpay_select_crypto_to_sell",
-		                                "Choisissez l'actif que vous voulez vendre",
-		                              )}
-		                            </div>
+			                            <div className="text-[#006AFE] font-semibold text-base leading-tight truncate">
+			                              {t(
+			                                "moonpay_select_crypto_to_sell",
+			                                "Choisissez l'actif que vous voulez vendre",
+			                              )}
+			                            </div>
 		                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 		                              {t("ui_search", "Rechercher…")}
 		                            </div>
@@ -1415,12 +1415,12 @@ const MoonPaySellModal = ({
 
                         <div className="flex items-center justify-between gap-3 px-4 py-4">
                           <div className="min-w-0">
-                            <div className="text-white font-semibold text-base leading-tight truncate">
-                              {t(
-                                "moonpay_select_crypto_to_sell",
-                                "Choisissez l'actif que vous voulez vendre",
-                              )}
-                            </div>
+	                            <div className="text-[#006AFE] font-semibold text-base leading-tight truncate">
+	                              {t(
+	                                "moonpay_select_crypto_to_sell",
+	                                "Choisissez l'actif que vous voulez vendre",
+	                              )}
+	                            </div>
                             <div className="mt-0.5 text-[11px] text-white/55 truncate">
                               {t("ui_search", "Rechercher…")}
                             </div>

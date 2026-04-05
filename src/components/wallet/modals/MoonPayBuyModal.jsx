@@ -775,12 +775,12 @@ const MoonPayBuyModal = ({
         <div className="space-y-5">
 		          {/* Currency selector */}
 		          <div>
-			            <label className="block text-[16px] md:text-base font-orbitron font-bold text-xcannes-green/90 mb-3 uppercase">
-			              {t(
-			                "moonpay_buy_select_asset",
-			                "Choisissez l'actif que vous voulez ajouter",
-			              )}
-			            </label>
+				            <label className="block text-[16px] md:text-base font-orbitron font-bold text-[#006AFE] mb-3 uppercase">
+				              {t(
+				                "moonpay_buy_select_asset",
+				                "Choisissez l'actif que vous voulez ajouter",
+				              )}
+				            </label>
 	            <ModalSelect
 	              value={currency}
 	              onChange={setCurrency}
