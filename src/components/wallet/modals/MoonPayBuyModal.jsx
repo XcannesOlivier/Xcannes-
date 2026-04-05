@@ -166,6 +166,7 @@ const MoonPayBuyModal = ({
 
   // Options d'achat (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
+  const [targetAssetAmount, setTargetAssetAmount] = useState("");
   const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState("fiat");
   const [fiatCurrency, setFiatCurrency] = useState("USD");
@@ -673,6 +674,7 @@ const MoonPayBuyModal = ({
 	      setError(null);
 	      setStep("form");
 	      setWizardStep(1);
+	      setTargetAssetAmount("");
 	      onClose?.();
 	    };
 	  }, [
@@ -702,6 +704,7 @@ const MoonPayBuyModal = ({
       setError(null);
       setStep("form");
       setWizardStep(1);
+      setTargetAssetAmount("");
     };
   }, [
     clearAutoOpen,
@@ -1098,6 +1101,10 @@ const MoonPayBuyModal = ({
     setError(null);
   }, [currency, amount, fiatCurrency]);
 
+  useEffect(() => {
+    setTargetAssetAmount("");
+  }, [currency]);
+
   const continueLabel = loading
     ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
     : demoMode
@@ -1105,7 +1112,7 @@ const MoonPayBuyModal = ({
       : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continuer");
   const continueDisabled =
     wizardStep === 1
-      ? loading
+      ? loading || !targetAssetAmount || Number.parseFloat(targetAssetAmount) <= 0
       : loading || !amount || fiatCurrencies.length === 0;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
@@ -1521,15 +1528,24 @@ const MoonPayBuyModal = ({
                       )}
                     </label>
                     <div className="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="min-w-0 flex items-center gap-2">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 text-white/85 shrink-0">
                           {renderSelectIcon(selectedAssetCurrency?.icon)}
-                          <span className="text-white/85 truncate">
-                            {selectedAssetCurrency?.labelLeft || selectedAssetCurrency?.label || currency}
+                          <span className="font-semibold">
+                            {String(currency || "").toUpperCase()}
                           </span>
                         </div>
-                        <div className="text-white/80 tabular-nums whitespace-nowrap">
-                          {selectedAssetCurrency?.labelRight || ""}
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            value={targetAssetAmount}
+                            onChange={(e) => setTargetAssetAmount(e.target.value)}
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                            className="w-full bg-transparent text-right text-white text-base focus:outline-none"
+                            inputMode="decimal"
+                          />
                         </div>
                       </div>
                     </div>
