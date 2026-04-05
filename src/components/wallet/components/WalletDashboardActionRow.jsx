@@ -34,7 +34,7 @@ export default function WalletDashboardActionRow({ onAction }) {
               <line x1="4" y1="12" x2="20" y2="12" />
             </svg>
           </div>
-          <span className="wallet-action-label !text-base !font-medium">
+          <span className="wallet-action-label !text-[18px] !font-medium">
             {t("ui_send_bee4f9e2f5", "Send")}
           </span>
         </button>
@@ -58,7 +58,7 @@ export default function WalletDashboardActionRow({ onAction }) {
               <polyline points="19 12 12 19 5 12"></polyline>
             </svg>
           </div>
-          <span className="wallet-action-label !text-sm !font-normal">
+          <span className="wallet-action-label !text-[16px] !font-normal">
             {t("ui_receive_127eab0703", "Receive")}
           </span>
         </button>
@@ -84,7 +84,7 @@ export default function WalletDashboardActionRow({ onAction }) {
               <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
             </svg>
           </div>
-          <span className="wallet-action-label !text-sm !font-normal">
+          <span className="wallet-action-label !text-[16px] !font-normal">
             {t("ui_convert_e0fbc97f15", "Convert")}
           </span>
         </button>
@@ -128,7 +128,7 @@ export default function WalletDashboardActionRow({ onAction }) {
               </text>
             </svg>
           </div>
-          <span className="wallet-action-label !text-sm !font-normal">Funds</span>
+          <span className="wallet-action-label !text-[16px] !font-normal">Funds</span>
         </button>
       </div>
     </div>
