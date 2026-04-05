@@ -343,21 +343,26 @@ export default function WalletDashboardCashModal({
                       noticeContextLabel={noticeContextLabel}
                       prefill={buyPrefill}
                     />
-                  ) : (
-                    <MoonPayBuyModal
-                      isOpen={true}
-                      onClose={onClose}
-                      walletAddress={walletAddress || ""}
-                      walletLabel={walletLabel}
-                      embedded={true}
-                      isPreviewMode={isPreviewMode}
-                      demoMode={demoMode}
-                      onDemoSubmit={onDemoBuy}
-                      noticeVariant={noticeVariant}
-                      noticeContextLabel={noticeContextLabel}
-                      prefill={buyPrefill}
-                    />
-                  )
+	                  ) : (
+	                    <MoonPayBuyModal
+	                      isOpen={true}
+	                      onClose={onClose}
+	                      walletAddress={walletAddress || ""}
+	                      walletLabel={walletLabel}
+	                      embedded={true}
+	                      isPreviewMode={isPreviewMode}
+	                      demoMode={demoMode}
+	                      onDemoSubmit={onDemoBuy}
+	                      availableTokens={availableTokens}
+	                      selectLabelByCurrency={selectLabelByCurrency}
+	                      selectLabelRightByCurrency={selectLabelRightByCurrency}
+	                      selectIconByCurrency={selectIconByCurrency}
+	                      selectLabelMobileByCurrency={selectLabelMobileByCurrency}
+	                      noticeVariant={noticeVariant}
+	                      noticeContextLabel={noticeContextLabel}
+	                      prefill={buyPrefill}
+	                    />
+	                  )
                 ) : rampProvider === "topper" ? (
                   <TopperSellModal
                     isOpen={true}

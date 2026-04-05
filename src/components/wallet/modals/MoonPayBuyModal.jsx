@@ -1,4 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+import Image from "next/image";
 import {
   XCircleIcon,
   CheckCircleIcon,
@@ -11,6 +13,7 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { greenActionBtnBase } from "./walletModalTokens";
+import { formatAmountWithSymbol } from "../walletDashboardConfig";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -40,6 +43,12 @@ const resolveMoonpayTag = (currencyCode) => {
     return Number.isFinite(MOONPAY_TAG_RLUSD) ? MOONPAY_TAG_RLUSD : null;
   return null;
 };
+
+// Cryptos supportées par MoonPay
+const MOONPAY_SUPPORTED_CURRENCIES = [
+  { code: "RLUSD", icon: CRYPTO_ICONS.RLUSD },
+  { code: "XRP", icon: CRYPTO_ICONS.XRP },
+];
 
 const isTrustedMoonPayOrigin = (origin) => {
   try {
@@ -86,9 +95,17 @@ const MoonPayBuyModal = ({
   noticeVariant = "preview",
   demoMode = false,
   onDemoSubmit,
+  availableTokens,
+  selectLabelByCurrency,
+  selectLabelRightByCurrency,
+  selectIconByCurrency,
+  selectLabelMobileByCurrency,
   prefill = null,
 }) => {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
+  const modalPanelRef = useRef(null);
+  const contentRootRef = useRef(null);
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -164,13 +181,348 @@ const MoonPayBuyModal = ({
     return "Failed to load fiat currencies";
   };
 
-  // Cryptos supportées par MoonPay
-  const supportedCurrencies = [
-    { code: "RLUSD", icon: CRYPTO_ICONS.RLUSD },
-    { code: "XRP", icon: CRYPTO_ICONS.XRP },
-  ];
+  const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(window.matchMedia?.("(min-width: 768px)")?.matches);
+  });
+  const [assetDropdownOpen, setAssetDropdownOpen] = useState(false);
+  const [assetSearch, setAssetSearch] = useState("");
+  const assetDropdownOverlayRef = useRef(null);
+  const assetDropdownListRef = useRef(null);
+  const assetDropdownTriggerRef = useRef(null);
+  const assetDropdownDesktopPopupRef = useRef(null);
+  const [assetOverlayDragging, setAssetOverlayDragging] = useState(false);
+  const [assetOverlayTranslateY, setAssetOverlayTranslateY] = useState(0);
+  const assetOverlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
 
   const PRODUCT_MIN_USD = 5;
+
+  const supportedCurrencies = useMemo(() => {
+    const fallbackTokens = MOONPAY_SUPPORTED_CURRENCIES.map((curr) => ({
+      currency: curr.code,
+      value: 0,
+    }));
+    const sourceTokens =
+      Array.isArray(availableTokens) && availableTokens.length ? availableTokens : fallbackTokens;
+
+    const seen = new Set();
+    const orderedTokens = [
+      ...sourceTokens.filter((token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        return code === "XRP" || code === "RLUSD";
+      }),
+      ...sourceTokens.filter((token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        return code !== "XRP" && code !== "RLUSD";
+      }),
+    ];
+
+    return orderedTokens
+      .map((token) => {
+        const currencyRaw = token?.currency;
+        const currencyCode = String(currencyRaw || "").toUpperCase();
+        if (!currencyCode || seen.has(currencyCode)) return null;
+        seen.add(currencyCode);
+
+        const labelLeft =
+          selectLabelByCurrency?.[currencyRaw] ||
+          selectLabelByCurrency?.[currencyCode] ||
+          currencyCode;
+        const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
+        const amountValue = Number(token?.value || 0);
+        const amountLabel = Number.isFinite(amountValue)
+          ? formatAmountWithSymbol(locale, amountValue, currencyCode, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          : formatAmountWithSymbol(locale, 0, currencyCode, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+        const fallbackRight = `${balanceLabel} = ${amountLabel}`;
+        const labelRight =
+          selectLabelRightByCurrency?.[currencyRaw] ||
+          selectLabelRightByCurrency?.[currencyCode] ||
+          fallbackRight;
+        const labelMobile =
+          selectLabelMobileByCurrency?.[currencyRaw] ||
+          selectLabelMobileByCurrency?.[currencyCode] ||
+          labelLeft;
+        const moonpayIcon =
+          MOONPAY_SUPPORTED_CURRENCIES.find(
+            (curr) => String(curr?.code || "").toUpperCase() === currencyCode,
+          )?.icon || null;
+        return {
+          code: currencyCode,
+          label: labelLeft,
+          labelLeft,
+          labelRight,
+          labelMobile,
+          icon:
+            selectIconByCurrency?.[currencyRaw] ||
+            selectIconByCurrency?.[currencyCode] ||
+            moonpayIcon,
+        };
+      })
+      .filter(Boolean);
+  }, [
+    availableTokens,
+    locale,
+    selectIconByCurrency,
+    selectLabelByCurrency,
+    selectLabelMobileByCurrency,
+    selectLabelRightByCurrency,
+    t,
+  ]);
+
+  const selectedAssetCurrency = useMemo(() => {
+    const code = String(currency || "").toUpperCase();
+    return supportedCurrencies.find((c) => String(c?.code || "").toUpperCase() === code) || null;
+  }, [currency, supportedCurrencies]);
+
+  const renderSelectIcon = (icon) => {
+    if (!icon) return null;
+    if (typeof icon === "string" || typeof icon === "number") {
+      return (
+        <span className="text-base leading-none" aria-hidden="true">
+          {icon}
+        </span>
+      );
+    }
+    if (icon?.src) {
+      return (
+        <Image src={icon.src} alt={icon.alt || ""} width={22} height={22} className="w-5 h-5 object-contain" />
+      );
+    }
+    return null;
+  };
+
+  const filteredAssetCurrencies = useMemo(() => {
+    const needle = String(assetSearch || "").trim().toLowerCase();
+    if (!needle) return supportedCurrencies;
+    return supportedCurrencies.filter((c) => {
+      const code = String(c?.code || "").toLowerCase();
+      const label = String(c?.label || c?.labelLeft || "").toLowerCase();
+      const right = String(c?.labelRight || "").toLowerCase();
+      return `${code} ${label} ${right}`.includes(needle);
+    });
+  }, [assetSearch, supportedCurrencies]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia?.("(min-width: 768px)");
+    if (!mediaQuery) return;
+    const update = () => setIsDesktopViewport(Boolean(mediaQuery.matches));
+    update();
+    try {
+      mediaQuery.addEventListener?.("change", update);
+      return () => mediaQuery.removeEventListener?.("change", update);
+    } catch {
+      mediaQuery.addListener?.(update);
+      return () => mediaQuery.removeListener?.(update);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!assetDropdownOpen) return;
+    const prevOverflow = document?.body?.style?.overflow;
+    try {
+      if (typeof document !== "undefined" && !isDesktopViewport) document.body.style.overflow = "hidden";
+    } catch {
+      // ignore
+    }
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setAssetDropdownOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      try {
+        if (typeof document !== "undefined") document.body.style.overflow = prevOverflow || "";
+      } catch {
+        // ignore
+      }
+    };
+  }, [assetDropdownOpen, isDesktopViewport]);
+
+  useEffect(() => {
+    if (!assetDropdownOpen) return;
+    if (!isDesktopViewport) return;
+    const handler = (event) => {
+      const popupEl = assetDropdownDesktopPopupRef.current;
+      const triggerEl = assetDropdownTriggerRef.current;
+      if (popupEl && popupEl.contains(event.target)) return;
+      if (triggerEl && triggerEl.contains(event.target)) return;
+      setAssetDropdownOpen(false);
+      setAssetSearch("");
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [assetDropdownOpen, isDesktopViewport]);
+
+  useEffect(() => {
+    if (assetDropdownOpen) return;
+    try {
+      const listEl = assetDropdownListRef.current;
+      const meta = assetOverlayDragMetaRef.current;
+      if (listEl && meta?.scrollLocked) {
+        listEl.style.overflowY = meta.lockedOverflowY;
+      }
+    } catch {
+      // ignore
+    }
+    setAssetOverlayDragging(false);
+    setAssetOverlayTranslateY(0);
+    assetOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  }, [assetDropdownOpen]);
+
+  const releaseAssetOverlayScrollLock = () => {
+    const meta = assetOverlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = assetDropdownListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartAssetOverlayDrag = (event, source) => {
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = assetDropdownListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    assetOverlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleAssetOverlayPointerMove = (event) => {
+    const meta = assetOverlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        assetDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = assetDropdownListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setAssetOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setAssetOverlayTranslateY(delta);
+  };
+
+  const handleAssetOverlayPointerEnd = (event) => {
+    const meta = assetOverlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration;
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    assetOverlayDragMetaRef.current.pending = false;
+    assetOverlayDragMetaRef.current.dragging = false;
+    setAssetOverlayDragging(false);
+    releaseAssetOverlayScrollLock();
+
+    if (shouldClose) {
+      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+      setAssetOverlayTranslateY(Math.max(delta, height));
+      window.setTimeout(() => {
+        setAssetDropdownOpen(false);
+        setAssetSearch("");
+      }, 180);
+      return;
+    }
+
+    setAssetOverlayTranslateY(0);
+    assetOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!supportedCurrencies.length) return;
+    setCurrency((prev) => {
+      const current = String(prev || "").toUpperCase();
+      if (supportedCurrencies.some((curr) => curr.code === current)) {
+        return current;
+      }
+      return supportedCurrencies[0].code;
+    });
+  }, [isOpen, supportedCurrencies]);
 
   const saveResumeState = useMemo(() => {
     return (extra = {}) => {
@@ -542,6 +894,9 @@ const MoonPayBuyModal = ({
       return;
     }
 
+    const currencyUpper = String(currency || "RLUSD").trim().toUpperCase();
+    const moonpayCurrencyCode = currencyUpper === "XRP" ? "XRP" : "RLUSD";
+
     if (!amount || parseFloat(amount) <= 0) {
       setError(
         t(
@@ -569,7 +924,7 @@ const MoonPayBuyModal = ({
 
     // Persist inputs so we can resume after iOS Apple flows / reconnect.
     const flowId = getOrCreateFlowId();
-    saveResumeState({ flowId });
+    saveResumeState({ flowId, moonpayCurrencyCode });
 
     setLoading(true);
     setError(null);
@@ -578,7 +933,7 @@ const MoonPayBuyModal = ({
       if (demoMode) {
         const res = await Promise.resolve(
           onDemoSubmit?.({
-            currencyCode: String(currency || "RLUSD").toUpperCase(),
+            currencyCode: String(moonpayCurrencyCode || "RLUSD").toUpperCase(),
             baseCurrencyCode: String(fiatCurrency || "USD").toUpperCase(),
             amountType,
             amount: parseFloat(amount),
@@ -597,7 +952,7 @@ const MoonPayBuyModal = ({
 
       setStep("loading");
 
-      const walletAddressTag = resolveMoonpayTag(currency);
+      const walletAddressTag = resolveMoonpayTag(moonpayCurrencyCode);
       const options = {
         ...(walletAddressTag != null ? { walletAddressTag } : null),
         ...(flowId ? { xcannesFlowId: flowId } : null),
@@ -609,7 +964,7 @@ const MoonPayBuyModal = ({
         },
         body: JSON.stringify({
           walletAddress,
-          currencyCode: currency,
+          currencyCode: moonpayCurrencyCode,
           baseCurrencyCode: fiatCurrency,
           baseCurrencyAmount:
             amountType === "fiat" ? parseFloat(amount) : undefined,
@@ -672,13 +1027,28 @@ const MoonPayBuyModal = ({
 
       // Transaction complétée
       if (type === "transaction_completed" || status === "completed") {
+        const targetCurrency = String(currency || "RLUSD").trim().toUpperCase();
+        const needsConvert = targetCurrency !== "RLUSD" && targetCurrency !== "XRP";
         clearResumeState();
         clearAutoOpen();
         clearFlowId();
         clearMoonpayWalletAddress();
         setStep("success");
         setTimeout(() => {
-          onClose();
+          onClose?.();
+          if (needsConvert && typeof window !== "undefined") {
+            window.setTimeout(() => {
+              try {
+                window.dispatchEvent(
+                  new CustomEvent("xcannes:wallet:open-convert", {
+                    detail: { action: "sell", base: "RLUSD", quote: targetCurrency },
+                  }),
+                );
+              } catch {
+                // ignore
+              }
+            }, 50);
+          }
         }, 3000);
       }
 
@@ -706,15 +1076,16 @@ const MoonPayBuyModal = ({
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [
-    clearAutoOpen,
-    clearFlowId,
-    clearMoonpayWalletAddress,
-    clearResumeState,
-    deactivateMoonpayActive,
-    handleWidgetClose,
-    isOpen,
-    onClose,
+	  }, [
+	    clearAutoOpen,
+	    clearFlowId,
+	    clearMoonpayWalletAddress,
+	    clearResumeState,
+	    currency,
+	    deactivateMoonpayActive,
+	    handleWidgetClose,
+	    isOpen,
+	    onClose,
     t,
   ]);
 
@@ -769,47 +1140,354 @@ const MoonPayBuyModal = ({
 
   // Mode embedded: retourner seulement le contenu
   const renderContent = () => (
-    <div className={embedded ? "" : "p-4 md:p-5"}>
+    <div ref={contentRootRef} className={embedded ? "relative" : "relative p-4 md:p-5"}>
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-		          {/* Currency selector */}
-		          <div>
-				            <label className="block text-[16px] md:text-base font-orbitron font-bold text-[#006AFE] mb-3 uppercase">
-				              {t(
-				                "moonpay_buy_select_asset",
-				                "Choisissez l'actif que vous voulez ajouter",
-				              )}
-				            </label>
-	            <ModalSelect
-	              value={currency}
-	              onChange={setCurrency}
-              options={supportedCurrencies.map((curr) => ({
-                value: curr.code,
-                label: curr.code,
-                labelLeft: curr.code,
-                labelMobile: curr.code,
-                description:
-                  curr.code === "XRP"
-                    ? t(
-                        "moonpay_xrp_network_note",
-                        "Utilisé pour les transferts et frais réseau",
-                      )
-                    : null,
-                icon: curr.icon ? { src: curr.icon, alt: curr.code } : null,
-	              }))}
-	              useNativeSelect={false}
-	              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	              menuClassName={`${
-	                noticeVariant === "demo"
-	                  ? "bg-xcannes-surface-demo"
-	                  : "bg-elevated"
-	              } ring-1 ring-white/10`}
-	              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	            />
-          </div>
+			          {/* Currency selector */}
+			          <div>
+					            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase underline underline-offset-4 decoration-white/35">
+					              {t(
+					                "moonpay_buy_select_asset",
+					                "Choisissez l'actif que vous voulez ajouter",
+					              )}
+					            </label>
+		            <div className="relative">
+			            <button
+			              type="button"
+			              ref={assetDropdownTriggerRef}
+			              onClick={() => setAssetDropdownOpen((prev) => !prev)}
+			              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			            >
+			              <span className="flex items-center gap-2 min-w-0 flex-1">
+			                {renderSelectIcon(selectedAssetCurrency?.icon)}
+			                <span className="truncate">
+			                  {selectedAssetCurrency?.labelMobile ||
+			                    selectedAssetCurrency?.labelLeft ||
+			                    selectedAssetCurrency?.label ||
+			                    currency}
+			                </span>
+			                {selectedAssetCurrency?.labelRight ? (
+			                  <span className="ml-auto text-white/60 tabular-nums hidden md:inline">
+			                    {selectedAssetCurrency.labelRight}
+			                  </span>
+			                ) : null}
+			              </span>
+			              <svg
+			                className="w-3 h-3 text-white/70"
+			                fill="none"
+			                stroke="currentColor"
+			                viewBox="0 0 24 24"
+			                aria-hidden
+			              >
+			                <path
+			                  strokeLinecap="round"
+			                  strokeLinejoin="round"
+			                  strokeWidth={2}
+			                  d="M19 9l-7 7-7-7"
+			                />
+			              </svg>
+			            </button>
 
-          {/* Fiat currency selector */}
+			            {assetDropdownOpen && isDesktopViewport
+			              ? (() => {
+			                  const portalTarget = embedded
+			                    ? contentRootRef.current
+			                    : modalPanelRef.current;
+			                  if (!portalTarget) return null;
+			                  return createPortal(
+			                    <div
+			                      ref={assetDropdownDesktopPopupRef}
+			                      role="dialog"
+			                      aria-modal="true"
+			                      className="absolute inset-0 z-[10040]"
+			                      onClick={(e) => e.stopPropagation()}
+			                    >
+			                      <div
+			                        className="absolute inset-0 bg-black/70"
+			                        onClick={() => {
+			                          setAssetDropdownOpen(false);
+			                          setAssetSearch("");
+			                        }}
+			                      />
+			                      <div
+			                        className={[
+			                          noticeVariant === "demo"
+			                            ? "bg-xcannes-surface-demo"
+			                            : "bg-elevated",
+			                          "absolute inset-0 flex flex-col min-h-0 overflow-hidden",
+			                        ].join(" ")}
+			                      >
+			                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
+			                          <div className="min-w-0">
+			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
+			                              {t(
+			                                "moonpay_buy_select_asset",
+			                                "Choisissez l'actif que vous voulez ajouter",
+			                              )}
+			                            </div>
+			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
+			                              {t("ui_search", "Rechercher…")}
+			                            </div>
+			                          </div>
+			                          <button
+			                            type="button"
+			                            onClick={() => {
+			                              setAssetDropdownOpen(false);
+			                              setAssetSearch("");
+			                            }}
+			                            className="text-white/70 hover:text-white transition-colors text-xl leading-none"
+			                            aria-label={t("ui_close", "Fermer")}
+			                          >
+			                            ✕
+			                          </button>
+			                        </div>
+
+			                        <div className="px-4 py-4 border-b border-white/10">
+			                          <div className="relative">
+			                            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+			                              <svg
+			                                viewBox="0 0 20 20"
+			                                fill="currentColor"
+			                                className="w-4 h-4"
+			                                aria-hidden
+			                              >
+			                                <path
+			                                  fillRule="evenodd"
+			                                  d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+			                                  clipRule="evenodd"
+			                                />
+			                              </svg>
+			                            </div>
+			                            <input
+			                              value={assetSearch}
+			                              onChange={(e) => setAssetSearch(e.target.value)}
+			                              placeholder={t("ui_search", "Rechercher…")}
+			                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+			                            />
+			                          </div>
+			                        </div>
+
+			                        <div ref={assetDropdownListRef} className="flex-1 min-h-0 overflow-y-auto">
+			                          {filteredAssetCurrencies.length ? (
+			                            filteredAssetCurrencies.map((opt) => {
+			                              const active =
+			                                String(opt?.code || "").toUpperCase() ===
+			                                String(currency || "").toUpperCase();
+			                              return (
+			                                <button
+			                                  key={String(opt.code)}
+			                                  type="button"
+			                                  onClick={() => {
+			                                    setCurrency(String(opt.code || "").toUpperCase());
+			                                    setAssetDropdownOpen(false);
+			                                    setAssetSearch("");
+			                                  }}
+			                                  className={[
+			                                    "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+			                                    active
+			                                      ? "bg-xcannes-green/10 text-white"
+			                                      : "hover:bg-white/[0.04] text-white/80",
+			                                  ].join(" ")}
+			                                >
+			                                  {renderSelectIcon(opt.icon)}
+			                                  <div className="min-w-0 flex-1">
+			                                    <div className="text-sm font-semibold truncate">
+			                                      {opt.labelLeft || opt.label || opt.code}
+			                                    </div>
+			                                    {opt.labelRight ? (
+			                                      <div className="text-[11px] text-white/55 truncate tabular-nums">
+			                                        {opt.labelRight}
+			                                      </div>
+			                                    ) : null}
+			                                  </div>
+			                                  {active ? (
+			                                    <span className="text-xcannes-green font-semibold text-xs">
+			                                      ✓
+			                                    </span>
+			                                  ) : null}
+			                                </button>
+			                              );
+			                            })
+			                          ) : (
+			                            <div className="px-4 py-6 text-sm text-white/60">
+			                              {t("ui_no_results", "Aucun résultat.")}
+			                            </div>
+			                          )}
+			                        </div>
+
+			                        <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+			                          {t("ui_search_results", "Sélectionnez un actif.")}
+			                        </div>
+			                      </div>
+			                    </div>,
+			                    portalTarget,
+			                  );
+			                })()
+			              : null}
+
+			            {assetDropdownOpen && !isDesktopViewport
+			              ? createPortal(
+			                  <div className="fixed inset-0 z-[10020]">
+			                    <div
+			                      className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+			                      onClick={() => {
+			                        setAssetDropdownOpen(false);
+			                        setAssetSearch("");
+			                      }}
+			                      style={{
+			                        opacity: Math.max(
+			                          0,
+			                          Math.min(1, 1 - assetOverlayTranslateY / 420),
+			                        ),
+			                      }}
+			                    />
+			                    <div
+			                      ref={assetDropdownOverlayRef}
+			                      role="dialog"
+			                      aria-modal="true"
+			                      className={[
+			                        noticeVariant === "demo"
+			                          ? "bg-xcannes-surface-demo"
+			                          : "bg-elevated",
+			                        "absolute inset-0 flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
+			                        "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+			                        "will-change-transform",
+			                      ].join(" ")}
+			                      style={{
+			                        transform: `translateY(${Math.max(0, assetOverlayTranslateY)}px)`,
+			                        transition: assetOverlayDragging
+			                          ? "none"
+			                          : "transform 220ms cubic-bezier(0.2,0,0,1)",
+			                      }}
+			                      onPointerMove={handleAssetOverlayPointerMove}
+			                      onPointerUp={handleAssetOverlayPointerEnd}
+			                      onPointerCancel={handleAssetOverlayPointerEnd}
+			                    >
+			                      <div
+			                        className="border-b border-white/10"
+			                        onPointerDown={(event) => {
+			                          maybeStartAssetOverlayDrag(event, "fixed");
+			                        }}
+			                      >
+			                        <div className="sm:hidden flex justify-center pt-3 pb-1">
+			                          <div className="w-16 h-5 flex items-center justify-center" aria-hidden>
+			                            <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+			                          </div>
+			                        </div>
+
+			                        <div className="flex items-center justify-between gap-3 px-4 py-4">
+			                          <div className="min-w-0">
+			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
+			                              {t(
+			                                "moonpay_buy_select_asset",
+			                                "Choisissez l'actif que vous voulez ajouter",
+			                              )}
+			                            </div>
+			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
+			                              {t("ui_search", "Rechercher…")}
+			                            </div>
+			                          </div>
+			                          <button
+			                            type="button"
+			                            onClick={() => {
+			                              setAssetDropdownOpen(false);
+			                              setAssetSearch("");
+			                            }}
+			                            className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
+			                            aria-label={t("ui_close", "Fermer")}
+			                          >
+			                            ✕
+			                          </button>
+			                        </div>
+
+			                        <div className="px-4 pb-4">
+			                          <div className="relative">
+			                            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+			                              <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4" aria-hidden>
+			                                <path
+			                                  fillRule="evenodd"
+			                                  d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+			                                  clipRule="evenodd"
+			                                />
+			                              </svg>
+			                            </div>
+			                            <input
+			                              value={assetSearch}
+			                              onChange={(e) => setAssetSearch(e.target.value)}
+			                              placeholder={t("ui_search", "Rechercher…")}
+			                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+			                            />
+			                          </div>
+			                        </div>
+			                      </div>
+
+			                      <div
+			                        ref={assetDropdownListRef}
+			                        className="flex-1 min-h-0 overflow-y-auto"
+			                        onPointerDown={(event) => {
+			                          maybeStartAssetOverlayDrag(event, "list");
+			                        }}
+			                      >
+			                        {filteredAssetCurrencies.length ? (
+			                          filteredAssetCurrencies.map((opt) => {
+			                            const active =
+			                              String(opt?.code || "").toUpperCase() ===
+			                              String(currency || "").toUpperCase();
+			                            return (
+			                              <button
+			                                key={String(opt.code)}
+			                                type="button"
+			                                onClick={() => {
+			                                  setCurrency(String(opt.code || "").toUpperCase());
+			                                  setAssetDropdownOpen(false);
+			                                  setAssetSearch("");
+			                                }}
+			                                className={[
+			                                  "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+			                                  active
+			                                    ? "bg-xcannes-green/10 text-white"
+			                                    : "hover:bg-white/[0.04] text-white/80",
+			                                ].join(" ")}
+			                              >
+			                                {renderSelectIcon(opt.icon)}
+			                                <div className="min-w-0 flex-1">
+			                                  <div className="text-sm font-semibold truncate">
+			                                    {opt.labelLeft || opt.label || opt.code}
+			                                  </div>
+			                                  {opt.labelRight ? (
+			                                    <div className="text-[11px] text-white/55 truncate tabular-nums">
+			                                      {opt.labelRight}
+			                                    </div>
+			                                  ) : null}
+			                                </div>
+			                                {active ? (
+			                                  <span className="text-xcannes-green font-semibold text-xs">
+			                                    ✓
+			                                  </span>
+			                                ) : null}
+			                              </button>
+			                            );
+			                          })
+			                        ) : (
+			                          <div className="px-4 py-6 text-sm text-white/60">
+			                            {t("ui_no_results", "Aucun résultat.")}
+			                          </div>
+			                        )}
+			                      </div>
+
+			                      <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+			                        {t("ui_search_results", "Sélectionnez un actif.")}
+			                      </div>
+			                    </div>
+			                  </div>,
+			                  document.body,
+			                )
+			              : null}
+			          </div>
+	          </div>
+
+	          {/* Fiat currency selector */}
           <div>
             <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
               {t("moonpay_fiat_currency_label", "Fiat currency")}
@@ -1045,12 +1723,13 @@ const MoonPayBuyModal = ({
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
-        <div
-          className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
-            noticeVariant === "demo"
-              ? "bg-xcannes-surface-demo border-white/10"
-              : "bg-elevated border-subtle"
+	      <div className="fixed inset-0 z-[10001] flex items-center justify-center px-4 pointer-events-none">
+	        <div
+	          ref={modalPanelRef}
+	          className={`relative w-full wallet-modal-panel max-w-2xl border rounded-2xl overflow-hidden pointer-events-auto shadow-2xl ${
+	            noticeVariant === "demo"
+	              ? "bg-xcannes-surface-demo border-white/10"
+	              : "bg-elevated border-subtle"
           } ${isClosing ? "wallet-modal-lift-out" : "wallet-modal-lift-in"}`}
           onClick={(e) => e.stopPropagation()}
         >

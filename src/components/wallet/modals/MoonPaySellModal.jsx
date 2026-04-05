@@ -1182,7 +1182,7 @@ const MoonPaySellModal = ({
 
           {/* Currency selector */}
           <div>
-	            <label className="block text-[11px] tracking-[0.22em] uppercase text-[#006AFE] mb-2">
+	            <label className="block text-[11px] tracking-[0.22em] uppercase text-white mb-2 underline underline-offset-4 decoration-white/35">
 	              {t(
 	                "moonpay_select_crypto_to_sell",
 	                "Choisissez l'actif que vous voulez vendre",
@@ -1256,7 +1256,7 @@ const MoonPaySellModal = ({
 		                      >
 		                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
 		                          <div className="min-w-0">
-			                            <div className="text-[#006AFE] font-semibold text-base leading-tight truncate">
+			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 			                              {t(
 			                                "moonpay_select_crypto_to_sell",
 			                                "Choisissez l'actif que vous voulez vendre",
@@ -1415,7 +1415,7 @@ const MoonPaySellModal = ({
 
                         <div className="flex items-center justify-between gap-3 px-4 py-4">
                           <div className="min-w-0">
-	                            <div className="text-[#006AFE] font-semibold text-base leading-tight truncate">
+	                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 	                              {t(
 	                                "moonpay_select_crypto_to_sell",
 	                                "Choisissez l'actif que vous voulez vendre",
