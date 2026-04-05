@@ -310,7 +310,7 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[16px] md:text-[17px] font-semibold text-white/90 truncate">
+	                        <span className="text-[17px] md:text-[18px] font-semibold text-white/90 truncate">
 	                          {activeWalletLabel}
 	                        </span>
                       </div>
@@ -358,7 +358,7 @@ export default function WalletDashboardHeader({
                               />
 		                              <div className="min-w-0">
 		                                <div
-		                                  className={`text-[15px] md:text-[16px] font-medium truncate ${
+		                                  className={`text-[16px] md:text-[17px] font-medium truncate ${
 		                                    isActive ? "text-xcannes-green" : "text-white/80"
 		                                  }`}
 		                                >
