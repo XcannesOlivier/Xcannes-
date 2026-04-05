@@ -1921,12 +1921,12 @@ export default function WalletDashboardUsdSwapModal({
 		                                        "Choisir un stablecoin USD",
 		                                      )}
 		                                    </div>
-		                                    <div className="mt-0.5 text-[11px] text-white/55 truncate">
-		                                      {t(
-		                                        "ui_choose_stablecoin_subtitle",
-		                                        "Ticker / réseau (USDT, USDC…)",
-		                                      )}
-		                                    </div>
+			                                    <div className="mt-0.5 text-[11px] text-xcannes-green/80 truncate">
+			                                      {t(
+			                                        "ui_choose_stablecoin_subtitle",
+			                                        "Ticker / réseau (USDT, USDC…)",
+			                                      )}
+			                                    </div>
 		                                  </div>
 		                                  <button
 		                                    type="button"
@@ -2126,12 +2126,12 @@ export default function WalletDashboardUsdSwapModal({
 	                                          "Choisir un stablecoin USD",
 	                                        )}
 	                                      </div>
-	                                      <div className="mt-0.5 text-[11px] text-white/55 truncate">
-	                                        {t(
-	                                          "ui_choose_stablecoin_subtitle",
-	                                          "Ticker / réseau (USDT, USDC…)",
-	                                        )}
-	                                      </div>
+		                                      <div className="mt-0.5 text-[11px] text-xcannes-green/80 truncate">
+		                                        {t(
+		                                          "ui_choose_stablecoin_subtitle",
+		                                          "Ticker / réseau (USDT, USDC…)",
+		                                        )}
+		                                      </div>
 	                                    </div>
 	                                    <button
 	                                      type="button"

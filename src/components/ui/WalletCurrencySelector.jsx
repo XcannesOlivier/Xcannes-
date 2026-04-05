@@ -605,7 +605,7 @@ export default function WalletCurrencySelector({
                       <div className="text-white font-semibold text-base leading-tight truncate">
                         {t("ui_select_currency_title", "Choisir une nouvelle devise")}
                       </div>
-                      <div className="mt-0.5 text-[11px] text-white/55 truncate">
+                      <div className="mt-0.5 text-[11px] text-xcannes-green/80 truncate">
                         {t("ui_select_currency_subtitle", "Code / nom (EUR, GBP…)")}
                       </div>
                     </div>

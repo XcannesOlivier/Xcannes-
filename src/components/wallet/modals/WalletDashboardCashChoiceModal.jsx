@@ -491,11 +491,13 @@ export default function WalletDashboardCashChoiceModal({
                               if (parts.length === 2) {
                                 return (
                                   <>
-                                    {parts[0]}{" "}
-                                    <span className="text-white/60 text-[12px] md:text-[13px]">
-                                      ou
+                                    <span className="text-[12px] md:text-[13px]">
+                                      {parts[0]}
                                     </span>{" "}
-                                    {parts[1]}
+                                    <span className="text-white/60">ou</span>{" "}
+                                    <span className="text-[12px] md:text-[13px]">
+                                      {parts[1]}
+                                    </span>
                                   </>
                                 );
                               }
@@ -538,10 +540,12 @@ export default function WalletDashboardCashChoiceModal({
                               if (text.startsWith(prefix)) {
                                 return (
                                   <>
-                                    <span className="text-white/60 text-[12px] md:text-[13px]">
+                                    <span className="text-white/60">
                                       Vers votre{" "}
                                     </span>
-                                    {text.slice(prefix.length)}
+                                    <span className="text-[12px] md:text-[13px]">
+                                      {text.slice(prefix.length)}
+                                    </span>
                                   </>
                                 );
                               }
@@ -595,10 +599,12 @@ export default function WalletDashboardCashChoiceModal({
                               if (idx > 0) {
                                 return (
                                   <>
-                                    <span className="text-white/60 text-[12px] md:text-[13px]">
+                                    <span className="text-white/60">
                                       {text.slice(0, idx)}
                                     </span>
-                                    {text.slice(idx)}
+                                    <span className="text-[12px] md:text-[13px]">
+                                      {text.slice(idx)}
+                                    </span>
                                   </>
                                 );
                               }
@@ -606,10 +612,12 @@ export default function WalletDashboardCashChoiceModal({
                               if (text.startsWith(prefix)) {
                                 return (
                                   <>
-                                    <span className="text-white/60 text-[12px] md:text-[13px]">
+                                    <span className="text-white/60">
                                       Depuis un wallet{" "}
                                     </span>
-                                    {text.slice(prefix.length)}
+                                    <span className="text-[12px] md:text-[13px]">
+                                      {text.slice(prefix.length)}
+                                    </span>
                                   </>
                                 );
                               }
