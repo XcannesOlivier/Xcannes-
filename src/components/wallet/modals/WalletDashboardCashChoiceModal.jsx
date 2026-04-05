@@ -155,7 +155,7 @@ export default function WalletDashboardCashChoiceModal({
 
   const sectionHeader = (label) => (
     <div className="flex items-center gap-3 px-1">
-      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+      <div className="text-[13px] tracking-[0.22em] uppercase text-white/45">
         {label}
       </div>
       <div className="h-px flex-1 bg-white/10" aria-hidden />
@@ -465,7 +465,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t("ui_funds_add_title", "Ajouter de l'argent")}
                             </p>
                             <svg
@@ -483,7 +483,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                             {(() => {
                               const parts = String(addHintText || "").split(
                                 " ou ",
@@ -491,13 +491,9 @@ export default function WalletDashboardCashChoiceModal({
                               if (parts.length === 2) {
                                 return (
                                   <>
-                                    <span className="text-[12px] md:text-[13px]">
-                                      {parts[0]}
-                                    </span>{" "}
+                                    {parts[0]}{" "}
                                     <span className="text-white/60">ou</span>{" "}
-                                    <span className="text-[12px] md:text-[13px]">
-                                      {parts[1]}
-                                    </span>
+                                    {parts[1]}
                                   </>
                                 );
                               }
@@ -515,7 +511,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t("ui_funds_withdraw_title", "Retirer vers la banque")}
                             </p>
                             <svg
@@ -533,7 +529,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                             {(() => {
                               const text = String(withdrawHintText || "");
                               const prefix = "Vers votre ";
@@ -543,9 +539,7 @@ export default function WalletDashboardCashChoiceModal({
                                     <span className="text-white/60">
                                       Vers votre{" "}
                                     </span>
-                                    <span className="text-[12px] md:text-[13px]">
-                                      {text.slice(prefix.length)}
-                                    </span>
+                                    {text.slice(prefix.length)}
                                   </>
                                 );
                               }
@@ -571,7 +565,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_out_title",
                                 "Recevoir des dollars",
@@ -592,7 +586,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                             {(() => {
                               const text = String(swapOutHintText || "");
                               const idx = text.indexOf("(");
@@ -602,9 +596,7 @@ export default function WalletDashboardCashChoiceModal({
                                     <span className="text-white/60">
                                       {text.slice(0, idx)}
                                     </span>
-                                    <span className="text-[12px] md:text-[13px]">
-                                      {text.slice(idx)}
-                                    </span>
+                                    {text.slice(idx)}
                                   </>
                                 );
                               }
@@ -615,9 +607,7 @@ export default function WalletDashboardCashChoiceModal({
                                     <span className="text-white/60">
                                       Depuis un wallet{" "}
                                     </span>
-                                    <span className="text-[12px] md:text-[13px]">
-                                      {text.slice(prefix.length)}
-                                    </span>
+                                    {text.slice(prefix.length)}
                                   </>
                                 );
                               }
@@ -639,7 +629,7 @@ export default function WalletDashboardCashChoiceModal({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[16px] md:text-[17px] text-white font-semibold truncate">
+                            <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_in_title",
                                 "Envoyer des dollars",
@@ -660,7 +650,7 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[11px] md:text-xs text-xcannes-green/90">
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                             {(() => {
                               const text = String(swapInHintText || "");
                               const prefix = "Vers une ";
@@ -670,17 +660,11 @@ export default function WalletDashboardCashChoiceModal({
                                     <span className="text-white/60">
                                       Vers une{" "}
                                     </span>
-                                    <span className="text-[12px] md:text-[13px]">
-                                      {text.slice(prefix.length)}
-                                    </span>
+                                    {text.slice(prefix.length)}
                                   </>
                                 );
                               }
-                              return (
-                                <span className="text-[12px] md:text-[13px]">
-                                  {swapInHintText}
-                                </span>
-                              );
+                              return swapInHintText;
                             })()}
                           </p>
                         </div>
