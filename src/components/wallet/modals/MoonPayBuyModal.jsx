@@ -204,6 +204,7 @@ const MoonPayBuyModal = ({
     scrollLocked: false,
     lockedOverflowY: "",
   });
+  const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset, 2/3 = fiat+amount, 3/3 = MoonPay iframe
 
   const PRODUCT_MIN_USD = 5;
 
@@ -665,14 +666,15 @@ const MoonPayBuyModal = ({
 	    return () => {
 	      clearResumeState();
 	      clearAutoOpen();
-      clearFlowId();
-      clearMoonpayWalletAddress();
-      deactivateMoonpayActive();
-      setIframeUrl(null);
-      setError(null);
-      setStep("form");
-      onClose?.();
-    };
+	      clearFlowId();
+	      clearMoonpayWalletAddress();
+	      deactivateMoonpayActive();
+	      setIframeUrl(null);
+	      setError(null);
+	      setStep("form");
+	      setWizardStep(1);
+	      onClose?.();
+	    };
 	  }, [
 	    clearAutoOpen,
 	    clearFlowId,
@@ -699,6 +701,7 @@ const MoonPayBuyModal = ({
       setIframeUrl(null);
       setError(null);
       setStep("form");
+      setWizardStep(1);
     };
   }, [
     clearAutoOpen,
@@ -743,6 +746,7 @@ const MoonPayBuyModal = ({
       lastPrefillRef.current = null;
       return;
     }
+    setWizardStep(1);
     if (!prefill || !prefillSignature) return;
     if (lastPrefillRef.current === prefillSignature) return;
     lastPrefillRef.current = prefillSignature;
@@ -1099,7 +1103,10 @@ const MoonPayBuyModal = ({
     : demoMode
       ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
       : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continuer");
-  const continueDisabled = loading || !amount || fiatCurrencies.length === 0;
+  const continueDisabled =
+    wizardStep === 1
+      ? loading
+      : loading || !amount || fiatCurrencies.length === 0;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
   const showFiatError = fiatError && !fiatLoading;
@@ -1144,6 +1151,24 @@ const MoonPayBuyModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            {wizardStep === 2 ? (
+              <button
+                type="button"
+                onClick={() => setWizardStep(1)}
+                className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+                aria-label={t("back", "Back")}
+              >
+                <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+                <span className="text-sm">{t("ui_back", "Retour")}</span>
+              </button>
+            ) : (
+              <div />
+            )}
+            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+              {wizardStep === 1 ? "1/3" : "2/3"}
+            </div>
+          </div>
 			          {/* Currency selector */}
 			          <div>
 					            <label className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3 uppercase underline underline-offset-4 decoration-white/35">
@@ -1485,70 +1510,100 @@ const MoonPayBuyModal = ({
 			                )
 			              : null}
 			          </div>
-	          </div>
+			          </div>
 
-	          {/* Fiat currency selector */}
-          <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_fiat_currency_label", "Fiat currency")}
-            </label>
-	            <ModalSelect
-	              value={fiatSelectValue}
-	              onChange={setFiatCurrency}
-              options={fiatOptions}
-	              placeholder={fiatPlaceholder}
-	              disabled={fiatLoading || fiatCurrencies.length === 0}
-	              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	              menuClassName={
-	                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-	              }
-	              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	            />
-            {fiatLoading && (
-              <p className="text-[11px] text-white/55 mt-2">
-                {t("moonpay_fiat_loading", "Loading fiat currencies...")}
-              </p>
-            )}
-            {showFiatError && (
-              <p className="text-xs text-red-400 mt-1">{fiatError}</p>
-            )}
-            {!fiatLoading && !fiatError && fiatUnavailable && (
-              <p className="text-[11px] text-white/55 mt-2">
-                {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
-              </p>
-            )}
-          </div>
+                {wizardStep === 1 ? (
+                  <div>
+                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                      {t(
+                        "moonpay_buy_selected_asset_amount",
+                        "Montant de l'actif sélectionné",
+                      )}
+                    </label>
+                    <div className="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0 flex items-center gap-2">
+                          {renderSelectIcon(selectedAssetCurrency?.icon)}
+                          <span className="text-white/85 truncate">
+                            {selectedAssetCurrency?.labelLeft || selectedAssetCurrency?.label || currency}
+                          </span>
+                        </div>
+                        <div className="text-white/80 tabular-nums whitespace-nowrap">
+                          {selectedAssetCurrency?.labelRight || ""}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 
-          {/* Amount input */}
-          <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_amount_in_currency_8b1c7d2a9e", {
-                defaultValue: "Amount in {{currency}}",
-                currency: amountType === "fiat" ? fiatCurrency : currency,
-              })}
-            </label>
-            <div className="relative">
-	              <input
-	                type="number"
-	                value={amount}
-	                onChange={(e) => setAmount(e.target.value)}
-	                placeholder={amountType === "fiat" ? "100" : "1.0"}
-	                step={amountType === "fiat" ? "10" : "0.1"}
-	                min="0"
-	                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	              />
+	                {wizardStep === 2 ? (
+	                  <>
+                    {/* Fiat currency selector */}
+                    <div>
+                      <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                        {t("moonpay_fiat_currency_label", "Fiat currency")}
+                      </label>
+                      <ModalSelect
+                        value={fiatSelectValue}
+                        onChange={setFiatCurrency}
+                        options={fiatOptions}
+                        placeholder={fiatPlaceholder}
+                        disabled={fiatLoading || fiatCurrencies.length === 0}
+                        buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+                        menuClassName={
+                          noticeVariant === "demo"
+                            ? "bg-xcannes-surface-demo"
+                            : "bg-elevated"
+                        }
+                        selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+                      />
+                      {fiatLoading && (
+                        <p className="text-[11px] text-white/55 mt-2">
+                          {t("moonpay_fiat_loading", "Loading fiat currencies...")}
+                        </p>
+                      )}
+                      {showFiatError && (
+                        <p className="text-xs text-red-400 mt-1">{fiatError}</p>
+                      )}
+                      {!fiatLoading && !fiatError && fiatUnavailable && (
+                        <p className="text-[11px] text-white/55 mt-2">
+                          {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
+                        </p>
+                      )}
+                    </div>
 
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-                {amountType === "fiat" ? fiatCurrency : currency}
-              </span>
-            </div>
-            {amountType === "fiat" && minFiatAmount !== null && (
-              <p className="text-[11px] text-white/45 mt-2">
-                {t("moonpay_minimum_prefix", "Minimum:")} {minFiatAmount}{" "}
-                {fiatCurrency}
-              </p>
-            )}
-          </div>
+                    {/* Amount input */}
+                    <div>
+                      <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                        {t("moonpay_amount_in_currency_8b1c7d2a9e", {
+                          defaultValue: "Amount in {{currency}}",
+                          currency: amountType === "fiat" ? fiatCurrency : currency,
+                        })}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          placeholder={amountType === "fiat" ? "100" : "1.0"}
+                          step={amountType === "fiat" ? "10" : "0.1"}
+                          min="0"
+                          className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+                        />
+
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
+                          {amountType === "fiat" ? fiatCurrency : currency}
+                        </span>
+                      </div>
+                      {amountType === "fiat" && minFiatAmount !== null && (
+                        <p className="text-[11px] text-white/45 mt-2">
+                          {t("moonpay_minimum_prefix", "Minimum:")} {minFiatAmount}{" "}
+                          {fiatCurrency}
+                        </p>
+                      )}
+                    </div>
+                  </>
+	                ) : null}
 
 	          {/* Wallet address display */}
 	          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
@@ -1593,22 +1648,22 @@ const MoonPayBuyModal = ({
             </div>
           )}
 
-          {/* Continue button */}
-          <SwipeConfirmButton
-            label={continueLabel}
-            onConfirm={generateBuyUrl}
-            disabled={continueDisabled}
-            variant="xcannesGreen"
-            className="md:hidden"
-          />
-          <button
-            type="button"
-            onClick={generateBuyUrl}
-            disabled={continueDisabled}
-            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
-          >
-            {continueLabel}
-          </button>
+	          {/* Continue button */}
+	          <SwipeConfirmButton
+	            label={continueLabel}
+	            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateBuyUrl}
+	            disabled={continueDisabled}
+	            variant="xcannesGreen"
+	            className="md:hidden"
+	          />
+	          <button
+	            type="button"
+	            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateBuyUrl}
+	            disabled={continueDisabled}
+	            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
+	          >
+	            {continueLabel}
+	          </button>
           <p className="mt-2 text-[11px] md:text-xs text-white/60 text-center">
             {t(
               "moonpay_buy_secure_partner_note",
@@ -1628,21 +1683,28 @@ const MoonPayBuyModal = ({
         </div>
       )}
 
-      {/* MoonPay iframe */}
-      {step === "iframe" && iframeUrl && (
-        <div
-          className="relative"
-          style={{ height: "calc(100vh - 40px)", minHeight: "600px", maxHeight: "760px" }}
-        >
-          <iframe
-            src={iframeUrl}
-            className="w-full h-full rounded-lg"
-            allow={moonpayIframeAllow}
-            allowFullScreen
-            title={t("moonpay_widget_title_buy", "MoonPay Widget")}
-          />
-        </div>
-      )}
+	      {/* MoonPay iframe */}
+	      {step === "iframe" && iframeUrl && (
+	        <div className="relative">
+	          <div className="flex justify-end pb-2">
+	            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	              3/3
+	            </div>
+	          </div>
+	          <div
+	            className="relative"
+	            style={{ height: "calc(100vh - 40px)", minHeight: "600px", maxHeight: "760px" }}
+	          >
+	          <iframe
+	            src={iframeUrl}
+	            className="w-full h-full rounded-lg"
+	            allow={moonpayIframeAllow}
+	            allowFullScreen
+	            title={t("moonpay_widget_title_buy", "MoonPay Widget")}
+	          />
+	          </div>
+	        </div>
+	      )}
 
       {/* Success */}
       {step === "success" && (
@@ -1734,16 +1796,22 @@ const MoonPayBuyModal = ({
           onClick={(e) => e.stopPropagation()}
         >
 	          {/* Header */}
-	          <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
-	            {step !== "iframe" && (
-	              <button
-	                type="button"
-	                onClick={onClose}
-	                className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-	                aria-label={t("back", "Back")}
-	              >
-	                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
-	              </button>
+		          <div className="flex items-center gap-3 p-4 md:p-5 border-b border-white/10">
+		            {step !== "iframe" && (
+		              <button
+		                type="button"
+		                onClick={() => {
+		                  if (step === "form" && wizardStep > 1) {
+		                    setWizardStep((prev) => Math.max(1, prev - 1));
+		                    return;
+		                  }
+		                  handleUserClose();
+		                }}
+		                className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+		                aria-label={t("back", "Back")}
+		              >
+		                <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
+		              </button>
 	            )}
 	            <div className="min-w-0 flex-1">
 	              <div className="flex items-center gap-2 flex-wrap">
