@@ -1600,74 +1600,71 @@ const MoonPaySellModal = ({
                       { amount: rlusdEquivalentLabel || "0 RLUSD" },
                     )}
               </p>
-	            ) : null}
+		            ) : null}
+		          </div>
+
+	          {/* Arrow down */}
+	          <div className="flex justify-center">
+	            <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
+	              <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
+	            </div>
+	          </div>
+
+	          {/* Destination display */}
+	          <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+	            <div className="flex items-start gap-3">
+	              <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+	                <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
+	              </div>
+	              <div className="min-w-0">
+	                <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	                  {t("moonpay_sell_destination_prefix", "Vers :")}
+	                </p>
+	                <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
+	                  {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
+	                </p>
+	                <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
+	                  {highlightPhrases(
+	                    t(
+	                      "moonpay_sell_destination_helper",
+	                      "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                    ),
+	                    [
+	                      "compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                      "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                    ],
+	                  )}
+	                </p>
+	              </div>
+	            </div>
 	          </div>
 
 	          {wizardStep === 2 ? (
-	            <>
-	              {/* Arrow down */}
-	              <div className="flex justify-center">
-	                <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
-	                  <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
-	                </div>
-	              </div>
-
-	              {/* Fiat currency selector */}
-	              <div>
-	                <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-	                  {t("moonpay_receive_in", "Receive in")}
-	                </label>
-	                <ModalSelect
-	                  value={fiatSelectValue}
-	                  onChange={setQuoteCurrency}
-	                  options={fiatOptions}
-	                  placeholder={fiatPlaceholder}
-	                  disabled={fiatLoading || fiatCurrencies.length === 0}
-	                  buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                  menuClassName={
-	                    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-	                  }
-	                  selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                />
-	                {showFiatError && (
-	                  <p className="text-xs text-red-400 mt-1">{fiatError}</p>
-	                )}
-	                {!fiatLoading && !fiatError && fiatUnavailable && (
-	                  <p className="text-[11px] text-white/55 mt-2">
-	                    {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
-	                  </p>
-	                )}
-	              </div>
-
-	              {/* Destination display */}
-	              <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
-	                <div className="flex items-start gap-3">
-	                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-	                    <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
-	                  </div>
-	                  <div className="min-w-0">
-	                    <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	                      {t("moonpay_sell_destination_prefix", "Vers :")}
-	                    </p>
-	                    <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
-	                      {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
-	                    </p>
-	                    <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
-	                      {highlightPhrases(
-	                        t(
-	                          "moonpay_sell_destination_helper",
-	                          "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                        ),
-	                        [
-	                          "compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                          "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                        ],
-	                      )}
-	                    </p>
-	                  </div>
-	                </div>
-	              </div>
-	            </>
+	            <div>
+	              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+	                {t("moonpay_receive_in", "Receive in")}
+	              </label>
+	              <ModalSelect
+	                value={fiatSelectValue}
+	                onChange={setQuoteCurrency}
+	                options={fiatOptions}
+	                placeholder={fiatPlaceholder}
+	                disabled={fiatLoading || fiatCurrencies.length === 0}
+	                buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	                menuClassName={
+	                  noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
+	                }
+	                selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	              />
+	              {showFiatError && (
+	                <p className="text-xs text-red-400 mt-1">{fiatError}</p>
+	              )}
+	              {!fiatLoading && !fiatError && fiatUnavailable && (
+	                <p className="text-[11px] text-white/55 mt-2">
+	                  {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
+	                </p>
+	              )}
+	            </div>
 	          ) : null}
 
 	          {demoMode ? (
