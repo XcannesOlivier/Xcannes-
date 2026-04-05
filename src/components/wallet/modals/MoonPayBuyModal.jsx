@@ -1193,14 +1193,11 @@ const MoonPayBuyModal = ({
 			            >
 			              <span className="flex items-center gap-2 min-w-0 flex-1">
 			                {renderSelectIcon(selectedAssetCurrency?.icon)}
-			                <span className="truncate">
-			                  {selectedAssetCurrency?.labelMobile ||
-			                    selectedAssetCurrency?.labelLeft ||
-			                    selectedAssetCurrency?.label ||
-			                    currency}
+			                <span className="truncate font-semibold">
+			                  {String(currency || "").toUpperCase()}
 			                </span>
 			                {selectedAssetCurrency?.labelRight ? (
-			                  <span className="ml-auto text-white/60 tabular-nums hidden md:inline">
+			                  <span className="ml-auto text-white/60 tabular-nums">
 			                    {selectedAssetCurrency.labelRight}
 			                  </span>
 			                ) : null}
@@ -1521,33 +1518,23 @@ const MoonPayBuyModal = ({
 
                 {wizardStep === 1 ? (
                   <div>
-                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                      {t(
-                        "moonpay_buy_selected_asset_amount",
-                        "Montant de l'actif sélectionné",
-                      )}
+                    <label className="block text-white/70 mb-2">
+                      {t("moonpay_buy_selected_asset_amount", "Montant")}
                     </label>
-                    <div className="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 text-white/85 shrink-0">
-                          {renderSelectIcon(selectedAssetCurrency?.icon)}
-                          <span className="font-semibold">
-                            {String(currency || "").toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="flex-1">
-                          <input
-                            type="number"
-                            value={targetAssetAmount}
-                            onChange={(e) => setTargetAssetAmount(e.target.value)}
-                            placeholder="0.00"
-                            step="0.01"
-                            min="0"
-                            className="w-full bg-transparent text-right text-white text-base focus:outline-none"
-                            inputMode="decimal"
-                          />
-                        </div>
-                      </div>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={targetAssetAmount}
+                        onChange={(e) => setTargetAssetAmount(e.target.value)}
+                        placeholder="0.0000"
+                        step="0.0001"
+                        min="0"
+                        inputMode="decimal"
+                        className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
+                        {String(currency || "").toUpperCase()}
+                      </span>
                     </div>
                   </div>
                 ) : null}
