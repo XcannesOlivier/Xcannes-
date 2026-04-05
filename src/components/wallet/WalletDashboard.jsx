@@ -1002,12 +1002,12 @@ export default function WalletDashboard({
               headerTitle={
                 recentActivityMessage ? (
                   <button
-                    type="button"
-                    onClick={handleOpenGlobalStatement}
-                    className="w-full text-left rounded-xl px-3 py-2 ring-1 ring-inset ring-xcannes-green/35 bg-[radial-gradient(70%_70%_at_18%_15%,rgba(34,197,94,0.18)_0%,rgba(5,7,8,0.95)_70%)] text-sm md:text-xs text-white/90 hover:text-white transition-colors"
-                    title={t(
-                      "ui_open_statement",
-                      "Ouvrir le relevé des transactions",
+	                    type="button"
+	                    onClick={handleOpenGlobalStatement}
+	                    className="w-full text-left rounded-xl px-3 py-2 ring-1 ring-inset ring-xcannes-green/35 bg-[radial-gradient(70%_70%_at_18%_15%,rgba(34,197,94,0.18)_0%,rgba(5,7,8,0.95)_70%)] text-[16px] md:text-[18px] text-white/90 hover:text-white transition-colors"
+	                    title={t(
+	                      "ui_open_statement",
+	                      "Ouvrir le relevé des transactions",
                     )}
                     aria-label={t(
                       "ui_open_statement",
@@ -1017,13 +1017,13 @@ export default function WalletDashboard({
                     {recentActivityMessage}
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={handleOpenGlobalStatement}
-                    className="text-sm md:text-xs text-white/80 hover:text-white transition-colors"
-                  >
-                    {t(
-                      "ui_consult_global_statement_3b89f4a7a2",
+	                  <button
+	                    type="button"
+	                    onClick={handleOpenGlobalStatement}
+	                    className="text-[16px] md:text-[18px] text-white/80 hover:text-white transition-colors"
+	                  >
+	                    {t(
+	                      "ui_consult_global_statement_3b89f4a7a2",
                       "Consulter vos dernières transactions",
                     )}
                   </button>
