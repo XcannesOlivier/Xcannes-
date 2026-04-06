@@ -15,6 +15,7 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { greenActionBtnBase } from "./walletModalTokens";
+import { useRlusdXrpQuote } from "@/components/wallet/hooks/useRlusdXrpQuote";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -873,6 +874,35 @@ const MoonPaySellModal = ({
       ? amountValue
       : Number.NaN;
 
+  const rlusdAmountForXrpQuote =
+    String(baseCurrencyCode || "").toUpperCase() === "RLUSD" &&
+    Number.isFinite(baseCurrencyAmount) &&
+    baseCurrencyAmount > 0
+      ? baseCurrencyAmount
+      : null;
+  const rlusdAmountForXrpQuoteLabel =
+    Number.isFinite(Number(rlusdAmountForXrpQuote)) && Number(rlusdAmountForXrpQuote) > 0
+      ? formatAmountWithSymbol(locale, Number(rlusdAmountForXrpQuote), "RLUSD", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 6,
+        })
+      : null;
+
+  const xrplQuoteState = useRlusdXrpQuote({
+    amountRlusd: rlusdAmountForXrpQuote,
+    direction: "RLUSD_TO_XRP",
+    enabled: Boolean(isOpen && wizardStep === 2 && rlusdAmountForXrpQuote),
+    debounceMs: 250,
+  });
+  const xrpEquivalent = Number(xrplQuoteState?.data?.xrpAmount);
+  const xrpEquivalentLabel =
+    Number.isFinite(xrpEquivalent) && xrpEquivalent > 0
+      ? formatAmountWithSymbol(locale, xrpEquivalent, "XRP", {
+          minimumFractionDigits: 4,
+          maximumFractionDigits: 6,
+        })
+      : null;
+
   useEffect(() => {
     if (!isOpen) return;
     let active = true;
@@ -1640,6 +1670,39 @@ const MoonPaySellModal = ({
 	          </div>
 
 	          {wizardStep === 2 ? (
+              <>
+                <div className="rounded-xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+                  <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                    {t("ui_summary", "Résumé")}
+                  </p>
+                  <div className="mt-2 space-y-1 text-sm text-white/80">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
+                        {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}
+                      </span>
+                      <span className="font-semibold tabular-nums">
+                        {rlusdAmountForXrpQuoteLabel || rlusdEquivalentLabel || "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
+                        {t("ui_equivalent_xrp", { defaultValue: "≈ XRP (XRPL)" })}
+                      </span>
+                      <span className="font-semibold tabular-nums">
+                        {xrplQuoteState?.status === "loading"
+                          ? t("ui_loading", "Loading...")
+                          : xrpEquivalentLabel || "—"}
+                      </span>
+                    </div>
+                    {xrplQuoteState?.status === "error" ? (
+                      <p className="pt-2 text-[11px] text-white/55">
+                        {t("ui_xrpl_quote_unavailable", {
+                          defaultValue: "Taux XRPL indisponible pour le moment.",
+                        })}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
 	            <div>
 	              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 	                {t("moonpay_receive_in", "Receive in")}
@@ -1665,6 +1728,7 @@ const MoonPaySellModal = ({
 	                </p>
 	              )}
 	            </div>
+              </>
 	          ) : null}
 
 	          {demoMode ? (

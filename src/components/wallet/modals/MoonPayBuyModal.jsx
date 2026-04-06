@@ -14,6 +14,7 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { greenActionBtnBase } from "./walletModalTokens";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { useRlusdXrpQuote } from "@/components/wallet/hooks/useRlusdXrpQuote";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -96,6 +97,7 @@ const MoonPayBuyModal = ({
   demoMode = false,
   onDemoSubmit,
   availableTokens,
+  rlusdPerUnitRates,
   selectLabelByCurrency,
   selectLabelRightByCurrency,
   selectIconByCurrency,
@@ -293,6 +295,58 @@ const MoonPayBuyModal = ({
     const code = String(currency || "").toUpperCase();
     return supportedCurrencies.find((c) => String(c?.code || "").toUpperCase() === code) || null;
   }, [currency, supportedCurrencies]);
+
+  const selectedToken = useMemo(() => {
+    const current = String(currency || "").toUpperCase();
+    if (!current) return null;
+    return (
+      (availableTokens || []).find(
+        (token) => String(token?.currency || "").toUpperCase() === current,
+      ) || null
+    );
+  }, [availableTokens, currency]);
+
+  const targetAmountValue = Number.parseFloat(targetAssetAmount || "");
+  const currencyUpper = String(currency || "").toUpperCase();
+  const isCurrencyLine = Boolean(selectedToken?.isTrustlineOnly);
+  const rlusdRate = isCurrencyLine
+    ? currencyUpper === "RLUSD" || currencyUpper === "USD"
+      ? 1
+      : Number(rlusdPerUnitRates?.[currencyUpper])
+    : 1;
+  const hasValidTargetAmount = Number.isFinite(targetAmountValue) && targetAmountValue > 0;
+  const conversionMissing =
+    isCurrencyLine &&
+    hasValidTargetAmount &&
+    (!Number.isFinite(rlusdRate) || rlusdRate <= 0);
+  const rlusdEquivalent =
+    hasValidTargetAmount && !conversionMissing
+      ? isCurrencyLine
+        ? targetAmountValue * rlusdRate
+        : targetAmountValue
+      : null;
+  const rlusdEquivalentLabel =
+    Number.isFinite(Number(rlusdEquivalent)) && Number(rlusdEquivalent) > 0
+      ? formatAmountWithSymbol(locale, Number(rlusdEquivalent), "RLUSD", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      : null;
+
+  const xrplQuoteState = useRlusdXrpQuote({
+    amountRlusd: rlusdEquivalent,
+    direction: "XRP_TO_RLUSD",
+    enabled: Boolean(isOpen && wizardStep === 2 && rlusdEquivalentLabel),
+    debounceMs: 250,
+  });
+  const xrpEquivalent = Number(xrplQuoteState?.data?.xrpAmount);
+  const xrpEquivalentLabel =
+    Number.isFinite(xrpEquivalent) && xrpEquivalent > 0
+      ? formatAmountWithSymbol(locale, xrpEquivalent, "XRP", {
+          minimumFractionDigits: 4,
+          maximumFractionDigits: 6,
+        })
+      : null;
 
   const renderSelectIcon = (icon) => {
     if (!icon) return null;
@@ -1107,6 +1161,20 @@ const MoonPayBuyModal = ({
     setTargetAssetAmount("");
   }, [currency]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    if (wizardStep !== 2) return;
+    if (!hasValidTargetAmount) return;
+    if (conversionMissing) return;
+    if (!Number.isFinite(Number(rlusdEquivalent)) || Number(rlusdEquivalent) <= 0) return;
+
+    const next = Number(Number(rlusdEquivalent).toFixed(6));
+    if (!Number.isFinite(next) || next <= 0) return;
+
+    setAmountType("crypto");
+    setAmount(String(next));
+  }, [conversionMissing, hasValidTargetAmount, isOpen, rlusdEquivalent, wizardStep]);
+
   const continueLabel = loading
     ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
     : demoMode
@@ -1114,8 +1182,13 @@ const MoonPayBuyModal = ({
       : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continuer");
   const continueDisabled =
     wizardStep === 1
-      ? loading || !targetAssetAmount || Number.parseFloat(targetAssetAmount) <= 0
-      : loading || !amount || fiatCurrencies.length === 0;
+      ? loading || !hasValidTargetAmount || conversionMissing
+      : loading ||
+        !hasValidTargetAmount ||
+        conversionMissing ||
+        fiatCurrencies.length === 0 ||
+        !Number.isFinite(Number(amount || "")) ||
+        Number(amount || 0) <= 0;
   const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
   const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
   const showFiatError = fiatError && !fiatLoading;
@@ -1607,35 +1680,53 @@ const MoonPayBuyModal = ({
                       )}
                     </div>
 
-                    {/* Amount input */}
-                    <div>
-                      <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {t("moonpay_amount_in_currency_8b1c7d2a9e", {
-                          defaultValue: "Amount in {{currency}}",
-                          currency: amountType === "fiat" ? fiatCurrency : currency,
-                        })}
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder={amountType === "fiat" ? "100" : "1.0"}
-                          step={amountType === "fiat" ? "10" : "0.1"}
-                          min="0"
-                          className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-                        />
-
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-                          {amountType === "fiat" ? fiatCurrency : currency}
-                        </span>
+                    {/* Quote summary */}
+                    <div className="rounded-xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                        {t("ui_summary", "Résumé")}
+                      </p>
+                      <div className="mt-2 space-y-1 text-sm text-white/80">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-white/60">
+                            {t("ui_amount", "Montant")}
+                          </span>
+                          <span className="font-semibold tabular-nums">
+                            {hasValidTargetAmount
+                              ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper || "USD", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 6,
+                                })
+                              : "—"}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-white/60">
+                            {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}
+                          </span>
+                          <span className="font-semibold tabular-nums">
+                            {conversionMissing
+                              ? t("ui_rate_unavailable_base_5c1a9b7d2e", "Rate unavailable for base currency.")
+                              : rlusdEquivalentLabel || "—"}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-white/60">
+                            {t("ui_equivalent_xrp", { defaultValue: "≈ XRP (XRPL)" })}
+                          </span>
+                          <span className="font-semibold tabular-nums">
+                            {xrplQuoteState?.status === "loading"
+                              ? t("ui_loading", "Loading...")
+                              : xrpEquivalentLabel || "—"}
+                          </span>
+                        </div>
+                        {xrplQuoteState?.status === "error" ? (
+                          <p className="pt-2 text-[11px] text-white/55">
+                            {t("ui_xrpl_quote_unavailable", {
+                              defaultValue: "Taux XRPL indisponible pour le moment.",
+                            })}
+                          </p>
+                        ) : null}
                       </div>
-                      {amountType === "fiat" && minFiatAmount !== null && (
-                        <p className="text-[11px] text-white/45 mt-2">
-                          {t("moonpay_minimum_prefix", "Minimum:")} {minFiatAmount}{" "}
-                          {fiatCurrency}
-                        </p>
-                      )}
                     </div>
                   </>
 	                ) : null}

@@ -24,6 +24,7 @@ const API_CONFIG = {
 const API_ENDPOINTS = {
   FX_RATE: '/api/v1/fx/rate',
   FX_CURRENCIES: '/api/v1/fx/currencies',
+  XRPL_RLUSD_XRP_QUOTE: '/wallet/rlusd-xrp-quote',
 };
 
 class XcannesAPI {
@@ -38,6 +39,7 @@ class XcannesAPI {
     this.getHealthStatus = this.getHealthStatus.bind(this);
     this.getFxRate = this.getFxRate.bind(this);
     this.getFxCurrencies = this.getFxCurrencies.bind(this);
+    this.getRlusdXrpQuote = this.getRlusdXrpQuote.bind(this);
   }
 
   /**
@@ -229,6 +231,29 @@ class XcannesAPI {
       }
       return [];
     }
+  }
+
+  /**
+   * Quote indicatif RLUSD/XRP depuis le DEX XRPL (book_offers).
+   * @param {number} amountRlusd - Montant RLUSD (USD) à convertir
+   * @param {'XRP_TO_RLUSD'|'RLUSD_TO_XRP'} direction
+   */
+  async getRlusdXrpQuote(amountRlusd, direction = 'XRP_TO_RLUSD') {
+    const amt = Number(amountRlusd);
+    const dir = String(direction || '').trim().toUpperCase();
+    if (!Number.isFinite(amt) || amt <= 0) {
+      throw new Error('Invalid amountRlusd');
+    }
+    const params = new URLSearchParams({
+      amountRlusd: String(amt),
+      direction: dir === 'RLUSD_TO_XRP' ? 'RLUSD_TO_XRP' : 'XRP_TO_RLUSD',
+    });
+
+    return this.request(`${API_ENDPOINTS.XRPL_RLUSD_XRP_QUOTE}?${params.toString()}`, {
+      useCache: true,
+      cacheTTL: 2000,
+      negativeCacheTTL: 3000,
+    });
   }
 }
 

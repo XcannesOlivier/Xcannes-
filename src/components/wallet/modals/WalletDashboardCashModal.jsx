@@ -354,6 +354,7 @@ export default function WalletDashboardCashModal({
 	                      demoMode={demoMode}
 	                      onDemoSubmit={onDemoBuy}
 	                      availableTokens={availableTokens}
+	                      rlusdPerUnitRates={rlusdPerUnitRates}
 	                      selectLabelByCurrency={selectLabelByCurrency}
 	                      selectLabelRightByCurrency={selectLabelRightByCurrency}
 	                      selectIconByCurrency={selectIconByCurrency}
