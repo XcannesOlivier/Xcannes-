@@ -1176,12 +1176,12 @@ const MoonPaySellModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between relative">
             {wizardStep === 2 ? (
               <button
                 type="button"
                 onClick={() => setWizardStep(1)}
-                className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+                className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
                 aria-label={t("back", "Back")}
               >
                 <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
@@ -1594,24 +1594,14 @@ const MoonPaySellModal = ({
 	                  {currency}
 	                </span>
 	              </div>
-	              {isCurrencyLine && hasValidAmount ? (
-	                <p
-	                  className={`mt-2 text-[11px] ${
-	                    conversionMissing ? "text-red-300" : "text-white/60"
-	                  }`}
-                >
-                  {conversionMissing
-                    ? t(
-                        "ui_rate_unavailable_base_5c1a9b7d2e",
-                        "Rate unavailable for base currency.",
-                      )
-                    : t(
-                        "moonpay_sell_rlusd_equivalent_sentence",
-                        "{{amount}} seront envoyés à MoonPay en RLUSD pour ce retrait.",
-                        { amount: rlusdEquivalentLabel || "0 RLUSD" },
-                      )}
-                </p>
-		              ) : null}
+	              {isCurrencyLine && hasValidAmount && conversionMissing ? (
+	                <p className="mt-2 text-[11px] text-red-300">
+	                  {t(
+	                    "ui_rate_unavailable_base_5c1a9b7d2e",
+	                    "Rate unavailable for base currency.",
+	                  )}
+	                </p>
+	              ) : null}
 		            </div>
 	          ) : null}
 

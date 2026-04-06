@@ -1200,20 +1200,20 @@ const MoonPayBuyModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-	          <div className="flex items-center justify-between">
+	          <div className="flex items-center justify-between relative">
 	            {wizardStep === 2 ? (
 	              <button
-                type="button"
-                onClick={() => setWizardStep(1)}
-                className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
-                aria-label={t("back", "Back")}
-              >
-                <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
-                <span className="text-sm">{t("ui_back", "Retour")}</span>
-              </button>
-            ) : (
-              <div />
-            )}
+                  type="button"
+                  onClick={() => setWizardStep(1)}
+                  className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
+                  aria-label={t("back", "Back")}
+                >
+                  <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+                  <span className="text-sm">{t("ui_back", "Retour")}</span>
+                </button>
+              ) : (
+                <div />
+              )}
 		            <div className="text-[13px] tracking-[0.22em] uppercase text-white/55">
 		              {wizardStep === 1 ? "1/3" : "2/3"}
 		            </div>
@@ -1676,15 +1676,6 @@ const MoonPayBuyModal = ({
                             )}
                           </li>
                         </ol>
-
-                        <div className="mt-3 rounded-xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-3 py-2">
-                          <p className="text-[12px] text-white/70 tabular-nums">
-                            {t(
-                              "ui_credit_flow_compact",
-                              "Paiement → XRP → RLUSD → CHF dans votre wallet",
-                            )}
-                          </p>
-                        </div>
 
                         <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
                           {t(
