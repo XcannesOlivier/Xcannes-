@@ -585,6 +585,7 @@ export default function DemoWalletDashboard({
         convertProcessing={convertProcessing}
         walletContextLabel={walletContextLabel}
         isWalletLabelLocked={isWalletLabelLocked}
+        preferredCurrency={preferredCurrency}
         handleDemoBuy={handleDemoBuy}
         handleDemoSell={handleDemoSell}
         cashModalTab={cashModalTab}

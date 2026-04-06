@@ -20,6 +20,7 @@ export default function DemoWalletDashboardCashModal({
   renderWalletMeta,
   walletLabel = "",
   hideWalletAddress = false,
+  preferredFiatCurrency = "",
   availableTokens,
   rlusdPerUnitRates,
   selectLabelByCurrency,
@@ -187,6 +188,7 @@ export default function DemoWalletDashboardCashModal({
                   walletAddress={walletAddress || ""}
                   walletLabel={walletLabel}
                   hideWalletAddress={hideWalletAddress}
+                  preferredFiatCurrency={preferredFiatCurrency}
                   embedded={true}
                   isPreviewMode={isPreviewMode}
                   demoMode={demoMode}
@@ -200,6 +202,7 @@ export default function DemoWalletDashboardCashModal({
                   walletAddress={walletAddress || ""}
                   walletLabel={walletLabel}
                   hideWalletAddress={hideWalletAddress}
+                  preferredFiatCurrency={preferredFiatCurrency}
                   embedded={true}
                   isPreviewMode={isPreviewMode}
                   demoMode={demoMode}

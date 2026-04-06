@@ -24,6 +24,13 @@ const DEMO_FIAT_CURRENCIES = [
   { code: "PHP", name: "Philippine Peso", minBuyAmount: 250 },
 ];
 
+const normalizeFiatCurrencyCode = (value) => {
+  const upper = String(value || "").trim().toUpperCase();
+  if (!upper) return "";
+  if (upper === "XRP" || upper === "RLUSD") return "";
+  return upper;
+};
+
 /**
  * MoonPayBuyModal - Modal pour acheter des cryptos avec MoonPay
  *
@@ -38,6 +45,7 @@ const DemoMoonPayBuyModal = ({
   walletAddress,
   walletLabel = "",
   hideWalletAddress = false,
+  preferredFiatCurrency = "",
   embedded = false,
   isPreviewMode = false,
   noticeVariant = "preview",
@@ -56,7 +64,9 @@ const DemoMoonPayBuyModal = ({
   const [currency, setCurrency] = useState("RLUSD");
   const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState("fiat");
-  const [fiatCurrency, setFiatCurrency] = useState("USD");
+  const [fiatCurrency, setFiatCurrency] = useState(() => {
+    return normalizeFiatCurrencyCode(preferredFiatCurrency) || "USD";
+  });
   const [fiatCurrencies, setFiatCurrencies] = useState([]);
 
   // Cryptos supportées par MoonPay (USD via RLUSD)
@@ -89,9 +99,13 @@ const DemoMoonPayBuyModal = ({
     setFiatCurrencies(DEMO_FIAT_CURRENCIES);
     setFiatCurrency((prev) => {
       if (DEMO_FIAT_CURRENCIES.some((fiat) => fiat.code === prev)) return prev;
+      const preferred = normalizeFiatCurrencyCode(preferredFiatCurrency);
+      if (preferred && DEMO_FIAT_CURRENCIES.some((fiat) => fiat.code === preferred)) {
+        return preferred;
+      }
       return "USD";
     });
-  }, [isOpen]);
+  }, [isOpen, preferredFiatCurrency]);
 
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
@@ -184,14 +198,7 @@ const DemoMoonPayBuyModal = ({
     : demoMode
       ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
       : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continue to MoonPay");
-  const continueDisabled = loading || !amount || fiatCurrencies.length === 0;
-  const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
-  const fiatUnavailable = fiatCurrencies.length === 0;
-  const fiatOptions = fiatCurrencies.map((fiat) => ({
-    value: fiat.code,
-    label: `${fiat.name || fiat.code} (${fiat.code})`,
-  }));
-  const fiatSelectValue = fiatCurrencies.length === 0 ? "" : fiatCurrency;
+  const continueDisabled = loading || !amount;
 
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
@@ -230,30 +237,6 @@ const DemoMoonPayBuyModal = ({
               }
               selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
             />
-          </div>
-
-          {/* Fiat currency selector */}
-          <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_fiat_currency_label", "Fiat currency")}
-            </label>
-            <ModalSelect
-              value={fiatSelectValue}
-              onChange={setFiatCurrency}
-              options={fiatOptions}
-              placeholder={fiatPlaceholder}
-              disabled={fiatCurrencies.length === 0}
-              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60"
-            />
-            {fiatUnavailable && (
-              <p className="text-[11px] text-white/55 mt-2">
-                {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
-              </p>
-            )}
           </div>
 
           {/* Amount input */}

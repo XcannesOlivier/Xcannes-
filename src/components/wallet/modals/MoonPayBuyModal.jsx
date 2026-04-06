@@ -13,7 +13,6 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { greenActionBtnBase } from "./walletModalTokens";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
-import { useRlusdXrpQuote } from "@/components/wallet/hooks/useRlusdXrpQuote";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -342,21 +341,6 @@ const MoonPayBuyModal = ({
       ? formatAmountWithSymbol(locale, Number(rlusdEquivalent), "RLUSD", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        })
-      : null;
-
-  const xrplQuoteState = useRlusdXrpQuote({
-    amountRlusd: rlusdEquivalent,
-    direction: "XRP_TO_RLUSD",
-    enabled: Boolean(isOpen && wizardStep === 2 && rlusdEquivalentLabel),
-    debounceMs: 250,
-  });
-  const xrpEquivalent = Number(xrplQuoteState?.data?.xrpAmount);
-  const xrpEquivalentLabel =
-    Number.isFinite(xrpEquivalent) && xrpEquivalent > 0
-      ? formatAmountWithSymbol(locale, xrpEquivalent, "XRP", {
-          minimumFractionDigits: 4,
-          maximumFractionDigits: 6,
         })
       : null;
 
@@ -1684,34 +1668,6 @@ const MoonPayBuyModal = ({
                           )}
                         </p>
                       </div>
-                    </div>
-
-                    {/* XRP dans un bloc à part */}
-                    <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-5 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.35)]">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
-                            {renderSelectIcon({ src: CRYPTO_ICONS.XRP, alt: "XRP" })}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[12px] text-white/60">
-                              {t("ui_equivalent_xrp", { defaultValue: "≈ XRP (XRPL)" })}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="text-[14px] md:text-[15px] font-semibold text-white tabular-nums">
-                          {xrplQuoteState?.status === "loading"
-                            ? t("ui_loading", "Loading...")
-                            : xrpEquivalentLabel || "—"}
-                        </p>
-                      </div>
-                      {xrplQuoteState?.status === "error" ? (
-                        <p className="pt-2 text-[11px] text-white/55">
-                          {t("ui_xrpl_quote_unavailable", {
-                            defaultValue: "Taux XRPL indisponible pour le moment.",
-                          })}
-                        </p>
-                      ) : null}
                     </div>
 
                   </>

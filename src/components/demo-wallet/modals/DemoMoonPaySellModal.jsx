@@ -27,6 +27,13 @@ const DEMO_FIAT_CURRENCIES = [
   { code: "PHP", name: "Philippine Peso" },
 ];
 
+const normalizeFiatCurrencyCode = (value) => {
+  const upper = String(value || "").trim().toUpperCase();
+  if (!upper) return "";
+  if (upper === "XRP" || upper === "RLUSD") return "";
+  return upper;
+};
+
 /**
  * MoonPaySellModal - Modal pour vendre des cryptos contre fiat
  *
@@ -41,6 +48,7 @@ const DemoMoonPaySellModal = ({
   walletAddress,
   walletLabel = "",
   hideWalletAddress = false,
+  preferredFiatCurrency = "",
   embedded = false,
   isPreviewMode = false,
   noticeVariant = "preview",
@@ -65,7 +73,9 @@ const DemoMoonPaySellModal = ({
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
   const [amount, setAmount] = useState("");
-  const [quoteCurrency, setQuoteCurrency] = useState("USD"); // Fiat code
+  const [quoteCurrency, setQuoteCurrency] = useState(() => {
+    return normalizeFiatCurrencyCode(preferredFiatCurrency) || "USD";
+  }); // Fiat code
   const [fiatCurrencies, setFiatCurrencies] = useState([]);
 
   const supportedCurrencies = useMemo(() => {
@@ -177,9 +187,13 @@ const DemoMoonPaySellModal = ({
     setFiatCurrencies(DEMO_FIAT_CURRENCIES);
     setQuoteCurrency((prev) => {
       if (DEMO_FIAT_CURRENCIES.some((fiat) => fiat.code === prev)) return prev;
+      const preferred = normalizeFiatCurrencyCode(preferredFiatCurrency);
+      if (preferred && DEMO_FIAT_CURRENCIES.some((fiat) => fiat.code === preferred)) {
+        return preferred;
+      }
       return "USD";
     });
-  }, [isOpen]);
+  }, [isOpen, preferredFiatCurrency]);
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -273,18 +287,7 @@ const DemoMoonPaySellModal = ({
     : demoMode
       ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
       : t("moonpay_action_continue_sell_2c8a1d6b4f", "Continue to Sell");
-  const continueDisabled =
-    loading ||
-    !hasValidAmount ||
-    fiatCurrencies.length === 0 ||
-    conversionMissing;
-  const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
-  const fiatUnavailable = fiatCurrencies.length === 0;
-  const fiatOptions = fiatCurrencies.map((fiat) => ({
-    value: fiat.code,
-    label: `${fiat.name || fiat.code} (${fiat.code})`,
-  }));
-  const fiatSelectValue = fiatCurrencies.length === 0 ? "" : quoteCurrency;
+  const continueDisabled = loading || !hasValidAmount || conversionMissing;
 
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
@@ -381,30 +384,6 @@ const DemoMoonPaySellModal = ({
             <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
               <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
             </div>
-          </div>
-
-          {/* Fiat currency selector */}
-          <div>
-            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-              {t("moonpay_receive_in", "Receive in")}
-            </label>
-            <ModalSelect
-              value={fiatSelectValue}
-              onChange={setQuoteCurrency}
-              options={fiatOptions}
-              placeholder={fiatPlaceholder}
-              disabled={fiatCurrencies.length === 0}
-              buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150"
-              menuClassName={
-                noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-              }
-              selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60"
-            />
-            {fiatUnavailable && (
-              <p className="text-[11px] text-white/55 mt-2">
-                {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
-              </p>
-            )}
           </div>
 
           {/* Wallet address display */}

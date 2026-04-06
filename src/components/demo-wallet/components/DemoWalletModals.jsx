@@ -73,6 +73,7 @@ export default function DemoWalletModals({
   // Cash modal
   walletContextLabel,
   isWalletLabelLocked,
+  preferredCurrency,
   handleDemoBuy,
   handleDemoSell,
   cashModalTab,
@@ -217,6 +218,7 @@ export default function DemoWalletModals({
         noticeVariant="demo"
         walletLabel={walletContextLabel}
         hideWalletAddress={isWalletLabelLocked}
+        preferredFiatCurrency={preferredCurrency}
         demoMode={true}
         onDemoBuy={handleDemoBuy}
         onDemoSell={handleDemoSell}
