@@ -1166,7 +1166,7 @@ const MoonPaySellModal = ({
                       )
                     : t(
                         "moonpay_sell_asset_details",
-                        "Détails de la devise que vous voulez débiter :",
+                        "Détails de transaction de la devise que vous voulez débiter du compte :",
                       )}
 		            </p>
             {String(walletLabel || "").trim() ? (

@@ -1209,10 +1209,10 @@ const MoonPayBuyModal = ({
 		                    "moonpay_buy_select_asset",
 		                    "Choisissez la devise que vous voulez créditer au compte :",
 		                  )
-		                : t(
-		                    "moonpay_buy_asset_details",
-		                    "Détails de la devise que vous voulez créditer au compte :",
-		                  )}
+			                : t(
+			                    "moonpay_buy_asset_details",
+			                    "Détails de transaction de la devise que vous voulez créditer au compte :",
+			                  )}
 		            </p>
 		            {String(walletLabel || "").trim() ? (
 		              <div className="flex items-center gap-2 mb-1">
