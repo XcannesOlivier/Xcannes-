@@ -180,6 +180,13 @@ const MoonPaySellModal = ({
     return "Failed to load fiat currencies";
   };
 
+  // Étape 2 = résumé : on verrouille le sélecteur pour éviter les edits involontaires.
+  useEffect(() => {
+    if (wizardStep === 1) return;
+    setCryptoDropdownOpen(false);
+    setCryptoSearch("");
+  }, [wizardStep]);
+
   const saveResumeState = useMemo(() => {
     return (extra = {}) => {
       if (typeof window === "undefined") return;
@@ -1257,8 +1264,18 @@ const MoonPaySellModal = ({
 			            <button
 			              type="button"
 			              ref={cryptoDropdownTriggerRef}
-			              onClick={() => setCryptoDropdownOpen((prev) => !prev)}
-			              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			              onClick={
+			                wizardStep === 1
+			                  ? () => setCryptoDropdownOpen((prev) => !prev)
+			                  : undefined
+			              }
+			              aria-disabled={wizardStep !== 1}
+			              className={[
+			                "w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+			                wizardStep === 1
+			                  ? "cursor-pointer hover:ring-white/25"
+			                  : "cursor-default opacity-95",
+			              ].join(" ")}
 			            >
 			              <span className="flex items-center gap-2 min-w-0 flex-1">
 			                {renderSelectIcon(selectedSellCurrency?.icon)}
@@ -1274,21 +1291,23 @@ const MoonPaySellModal = ({
 			                  </span>
 			                ) : null}
 			              </span>
-		              <svg
-		                className="w-3 h-3 text-white/70"
-		                fill="none"
-		                stroke="currentColor"
-		                viewBox="0 0 24 24"
-		                aria-hidden
-		              >
-		                <path
-		                  strokeLinecap="round"
-		                  strokeLinejoin="round"
-		                  strokeWidth={2}
-		                  d="M19 9l-7 7-7-7"
-		                />
-		              </svg>
-		            </button>
+		              {wizardStep === 1 ? (
+		                <svg
+		                  className="w-3 h-3 text-white/70"
+		                  fill="none"
+		                  stroke="currentColor"
+		                  viewBox="0 0 24 24"
+		                  aria-hidden
+		                >
+		                  <path
+		                    strokeLinecap="round"
+		                    strokeLinejoin="round"
+		                    strokeWidth={2}
+		                    d="M19 9l-7 7-7-7"
+		                  />
+		                </svg>
+		              ) : null}
+			            </button>
 
 		            {cryptoDropdownOpen && isDesktopViewport
 		              ? (() => {
@@ -1594,44 +1613,46 @@ const MoonPaySellModal = ({
 		          </div>
 	          </div>
 
-	          {/* Amount input */}
-	          <div>
-	            <label className="block text-white/70 mb-2">
-	              {t("moonpay_amount_to_sell", "Montant")}
-	            </label>
-	            <div className="relative">
-		              <input
-		                type="text"
-		                value={amount}
-		                onChange={(e) => setAmount(e.target.value)}
-		                placeholder="0.0000"
-		                inputMode="decimal"
-		                className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-		              />
+	          {/* Amount input (étape 1) */}
+	          {wizardStep === 1 ? (
+	            <div>
+	              <label className="block text-white/70 mb-2">
+	                {t("moonpay_amount_to_sell", "Montant")}
+	              </label>
+	              <div className="relative">
+		                <input
+		                  type="text"
+		                  value={amount}
+		                  onChange={(e) => setAmount(e.target.value)}
+		                  placeholder="0.0000"
+		                  inputMode="decimal"
+		                  className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                />
 
-	              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
-	                {currency}
-	              </span>
-	            </div>
-	            {isCurrencyLine && hasValidAmount ? (
-	              <p
-	                className={`mt-2 text-[11px] ${
-	                  conversionMissing ? "text-red-300" : "text-white/60"
-	                }`}
-              >
-                {conversionMissing
-                  ? t(
-                      "ui_rate_unavailable_base_5c1a9b7d2e",
-                      "Rate unavailable for base currency.",
-                    )
-                  : t(
-                      "moonpay_sell_rlusd_equivalent_sentence",
-                      "{{amount}} seront envoyés à MoonPay en RLUSD pour ce retrait.",
-                      { amount: rlusdEquivalentLabel || "0 RLUSD" },
-                    )}
-              </p>
-		            ) : null}
-		          </div>
+	                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
+	                  {currency}
+	                </span>
+	              </div>
+	              {isCurrencyLine && hasValidAmount ? (
+	                <p
+	                  className={`mt-2 text-[11px] ${
+	                    conversionMissing ? "text-red-300" : "text-white/60"
+	                  }`}
+                >
+                  {conversionMissing
+                    ? t(
+                        "ui_rate_unavailable_base_5c1a9b7d2e",
+                        "Rate unavailable for base currency.",
+                      )
+                    : t(
+                        "moonpay_sell_rlusd_equivalent_sentence",
+                        "{{amount}} seront envoyés à MoonPay en RLUSD pour ce retrait.",
+                        { amount: rlusdEquivalentLabel || "0 RLUSD" },
+                      )}
+                </p>
+		              ) : null}
+		            </div>
+	          ) : null}
 
 	          {/* Arrow down */}
 	          <div className="flex justify-center">
@@ -1678,10 +1699,28 @@ const MoonPaySellModal = ({
                   <div className="mt-2 space-y-1 text-sm text-white/80">
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-white/60">
+                        {t("ui_amount", "Montant")}
+                      </span>
+                      <span className="font-semibold tabular-nums">
+                        {hasValidAmount
+                          ? formatAmountWithSymbol(locale, amountValue, currencyUpper || "XRP", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 6,
+                            })
+                          : "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
                         {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}
                       </span>
                       <span className="font-semibold tabular-nums">
-                        {rlusdAmountForXrpQuoteLabel || rlusdEquivalentLabel || "—"}
+                        {conversionMissing
+                          ? t(
+                              "ui_rate_unavailable_base_5c1a9b7d2e",
+                              "Rate unavailable for base currency.",
+                            )
+                          : rlusdAmountForXrpQuoteLabel || rlusdEquivalentLabel || "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-3">

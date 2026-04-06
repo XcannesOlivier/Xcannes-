@@ -211,6 +211,13 @@ const MoonPayBuyModal = ({
 
   const PRODUCT_MIN_USD = 5;
 
+  // Étape 2 = résumé : on verrouille le sélecteur pour éviter les edits involontaires.
+  useEffect(() => {
+    if (wizardStep === 1) return;
+    setAssetDropdownOpen(false);
+    setAssetSearch("");
+  }, [wizardStep]);
+
   const supportedCurrencies = useMemo(() => {
     const fallbackTokens = MOONPAY_SUPPORTED_CURRENCIES.map((curr) => ({
       currency: curr.code,
@@ -1290,11 +1297,21 @@ const MoonPayBuyModal = ({
 		          {/* Currency selector */}
 		          <div>
 			            <div className="relative">
-				            <button
+			            <button
 				              type="button"
 				              ref={assetDropdownTriggerRef}
-			              onClick={() => setAssetDropdownOpen((prev) => !prev)}
-			              className="w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			              onClick={
+			                wizardStep === 1
+			                  ? () => setAssetDropdownOpen((prev) => !prev)
+			                  : undefined
+			              }
+			              aria-disabled={wizardStep !== 1}
+			              className={[
+			                "w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+			                wizardStep === 1
+			                  ? "cursor-pointer hover:ring-white/25"
+			                  : "cursor-default opacity-95",
+			              ].join(" ")}
 			            >
 			              <span className="flex items-center gap-2 min-w-0 flex-1">
 			                {renderSelectIcon(selectedAssetCurrency?.icon)}
@@ -1307,20 +1324,22 @@ const MoonPayBuyModal = ({
 			                  </span>
 			                ) : null}
 			              </span>
-			              <svg
-			                className="w-3 h-3 text-white/70"
-			                fill="none"
-			                stroke="currentColor"
-			                viewBox="0 0 24 24"
-			                aria-hidden
-			              >
-			                <path
-			                  strokeLinecap="round"
-			                  strokeLinejoin="round"
-			                  strokeWidth={2}
-			                  d="M19 9l-7 7-7-7"
-			                />
-			              </svg>
+			              {wizardStep === 1 ? (
+			                <svg
+			                  className="w-3 h-3 text-white/70"
+			                  fill="none"
+			                  stroke="currentColor"
+			                  viewBox="0 0 24 24"
+			                  aria-hidden
+			                >
+			                  <path
+			                    strokeLinecap="round"
+			                    strokeLinejoin="round"
+			                    strokeWidth={2}
+			                    d="M19 9l-7 7-7-7"
+			                  />
+			                </svg>
+			              ) : null}
 			            </button>
 
 			            {assetDropdownOpen && isDesktopViewport
