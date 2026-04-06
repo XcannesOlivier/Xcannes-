@@ -1647,44 +1647,7 @@ const MoonPayBuyModal = ({
 			          </div>
 			          </div>
 		          </>
-		          ) : (
-		            <div className="rounded-2xl bg-gradient-to-b from-white/[0.06] via-white/[0.03] to-black/[0.35] ring-1 ring-white/10 ring-inset px-5 py-5 shadow-[0_6px_18px_rgba(0,0,0,0.45),0_0_10px_rgba(0,255,150,0.12)]">
-		              <div className="flex items-center justify-between gap-4">
-		                <div className="flex items-center gap-3 min-w-0">
-		                  <div className="w-11 h-11 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
-		                    {renderSelectIcon(selectedAssetCurrency?.icon)}
-		                  </div>
-		                  <div className="min-w-0">
-		                    <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-		                      {t("ui_selected_currency", "Devise sélectionnée")}
-		                    </p>
-		                    <p className="text-[18px] md:text-[20px] font-orbitron font-bold text-white truncate">
-		                      {currencyUpper || "—"}
-		                    </p>
-		                    {selectedAssetCurrency?.labelRight ? (
-		                      <p className="mt-0.5 text-[11px] text-white/55 truncate tabular-nums">
-		                        {selectedAssetCurrency.labelRight}
-		                      </p>
-		                    ) : null}
-		                  </div>
-		                </div>
-
-		                <div className="text-right">
-		                  <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-		                    {t("ui_amount_to_credit", "À créditer")}
-		                  </p>
-		                  <p className="text-[18px] md:text-[20px] font-semibold text-white tabular-nums">
-		                    {hasValidTargetAmount
-		                      ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper || "USD", {
-		                          minimumFractionDigits: 2,
-		                          maximumFractionDigits: 6,
-		                        })
-		                      : "—"}
-		                  </p>
-		                </div>
-		              </div>
-		            </div>
-		          )}
+		          ) : null}
 
                 {wizardStep === 1 ? (
                   <div>
@@ -1711,68 +1674,96 @@ const MoonPayBuyModal = ({
 
 	                {wizardStep === 2 ? (
 	                  <>
-                    {/* Résumé (étape 2) */}
-                    <div className="rounded-2xl bg-gradient-to-b from-white/[0.06] via-white/[0.03] to-black/[0.40] ring-1 ring-white/10 ring-inset px-5 py-6 shadow-[0_6px_18px_rgba(0,0,0,0.45),0_0_10px_rgba(0,255,150,0.12)]">
-                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                        {t("ui_summary", "Résumé")}
-                      </p>
-                      <div className="mt-4 space-y-3 text-sm text-white/85">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="flex items-center gap-2 text-white/60 min-w-0">
-                            <span className="w-8 h-8 rounded-xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
+                    {/* Détails + Résumé fusionnés (étape 2) */}
+                    <div className="rounded-2xl bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] ring-1 ring-white/10 ring-inset px-5 py-6 shadow-[0_10px_26px_rgba(0,0,0,0.55),0_0_12px_rgba(0,255,150,0.14)]">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                            {t("ui_amount_to_credit", "Montant à créditer")}
+                          </p>
+                          <div className="mt-2 flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
                               {renderSelectIcon(selectedAssetCurrency?.icon)}
-                            </span>
-                            <span className="truncate">
-                              {t("ui_amount", "Montant")}
-                            </span>
-                          </span>
-                          <span className="font-semibold tabular-nums">
-                            {hasValidTargetAmount
-                              ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper || "USD", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 6,
-                                })
-                              : "—"}
-                          </span>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[18px] md:text-[22px] font-semibold text-white tabular-nums truncate">
+                                {hasValidTargetAmount
+                                  ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper || "USD", {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 6,
+                                    })
+                                  : "—"}
+                              </p>
+                              <p className="mt-0.5 text-[11px] text-white/55 truncate">
+                                {currencyUpper || "—"}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="flex items-center gap-2 text-white/60 min-w-0">
-                            <span className="w-8 h-8 rounded-xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
+                      </div>
+
+                      <div className="mt-5 pt-5 border-t border-white/10">
+                        <p className="text-[13px] text-white/70">
+                          {t("ui_you_will_receive_about", "Vous recevrez environ")}
+                        </p>
+
+                        <div className="mt-3 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
                               {renderSelectIcon({ src: CRYPTO_ICONS.RLUSD, alt: "RLUSD" })}
-                            </span>
-                            <span className="truncate">
-                              {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}
-                            </span>
-                          </span>
-                          <span className="font-semibold tabular-nums">
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[14px] md:text-[15px] text-white/70">
+                                {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}{" "}
+                                {t("ui_stablecoin_usd", "(Stablecoin USD)")}
+                              </p>
+                            </div>
+                          </div>
+
+                          <p className="text-[16px] md:text-[18px] font-semibold text-white tabular-nums">
                             {conversionMissing
-                              ? t("ui_rate_unavailable_base_5c1a9b7d2e", "Rate unavailable for base currency.")
+                              ? t(
+                                  "ui_rate_unavailable_base_5c1a9b7d2e",
+                                  "Rate unavailable for base currency.",
+                                )
                               : rlusdEquivalentLabel || "—"}
-                          </span>
+                          </p>
                         </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="flex items-center gap-2 text-white/60 min-w-0">
-                            <span className="w-8 h-8 rounded-xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
-                              {renderSelectIcon({ src: CRYPTO_ICONS.XRP, alt: "XRP" })}
-                            </span>
-                            <span className="truncate">
-                              {t("ui_equivalent_xrp", { defaultValue: "≈ XRP (XRPL)" })}
-                            </span>
-                          </span>
-                          <span className="font-semibold tabular-nums">
-                            {xrplQuoteState?.status === "loading"
-                              ? t("ui_loading", "Loading...")
-                              : xrpEquivalentLabel || "—"}
-                          </span>
-                        </div>
-                        {xrplQuoteState?.status === "error" ? (
-                          <p className="pt-2 text-[11px] text-white/55">
-                            {t("ui_xrpl_quote_unavailable", {
-                              defaultValue: "Taux XRPL indisponible pour le moment.",
-                            })}
+
+                        {!conversionMissing && hasValidTargetAmount ? (
+                          <p className="mt-3 text-[12px] text-white/55">
+                            {t("ui_conversion_included", "ℹ️ Conversion automatique incluse")}
                           </p>
                         ) : null}
                       </div>
+                    </div>
+
+                    {/* XRP dans un bloc à part */}
+                    <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-5 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.35)]">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
+                            {renderSelectIcon({ src: CRYPTO_ICONS.XRP, alt: "XRP" })}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[12px] text-white/60">
+                              {t("ui_equivalent_xrp", { defaultValue: "≈ XRP (XRPL)" })}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-[14px] md:text-[15px] font-semibold text-white tabular-nums">
+                          {xrplQuoteState?.status === "loading"
+                            ? t("ui_loading", "Loading...")
+                            : xrpEquivalentLabel || "—"}
+                        </p>
+                      </div>
+                      {xrplQuoteState?.status === "error" ? (
+                        <p className="pt-2 text-[11px] text-white/55">
+                          {t("ui_xrpl_quote_unavailable", {
+                            defaultValue: "Taux XRPL indisponible pour le moment.",
+                          })}
+                        </p>
+                      ) : null}
                     </div>
 
                     {/* Fiat currency selector (sous le résumé) */}
