@@ -1575,7 +1575,6 @@ const MoonPayBuyModal = ({
 			              : null}
 			          </div>
 			          </div>
-		          </div>
 
                 {wizardStep === 1 || wizardStep === 2 ? (
                   <div>
