@@ -1186,18 +1186,31 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-		            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
-		              {walletAddress}
-		            </p>
-		          </div>
+			            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
+			              {walletAddress}
+			            </p>
+			            {wizardStep === 1 && isOtherBlockchainsDestination ? (
+			              <p className="mt-2 text-[13px] md:text-sm text-white/70 font-semibold">
+			                {t(
+			                  "ui_convert_to_other_stablecoin_aad01bb7a5",
+			                  "Convertir vers un autre stablecoin",
+			                )}
+			              </p>
+			            ) : null}
+			          </div>
 
-	          {/* Currency selector */}
-	          <div>
-		            <div className="relative">
-			            <button
-			              type="button"
-			              ref={cryptoDropdownTriggerRef}
-			              onClick={
+		          {/* Currency selector */}
+		          <div>
+		            {wizardStep === 1 && isOtherBlockchainsDestination ? (
+		              <p className="mb-2 px-1 text-[11px] tracking-[0.22em] uppercase text-white/45">
+		                {t("ui_from_short_f9b4f9f4a1", "De")}
+		              </p>
+		            ) : null}
+			            <div className="relative">
+				            <button
+				              type="button"
+				              ref={cryptoDropdownTriggerRef}
+				              onClick={
 			                wizardStep === 1
 			                  ? () => setCryptoDropdownOpen((prev) => !prev)
 			                  : undefined
@@ -1587,62 +1600,62 @@ const MoonPaySellModal = ({
 		            </div>
 	          ) : null}
 
-            {wizardStep === 1 ? (
-              <>
-                {/* Arrow down */}
-                <div className="flex justify-center">
-                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
-                    <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
-                  </div>
-                </div>
+	            {wizardStep === 1 ? (
+	              <>
+	                {/* Arrow down */}
+	                <div className="flex justify-center">
+	                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
+	                    <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
+	                  </div>
+	                </div>
 
 	                {/* Destination display */}
-	                <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
-	                  <div className="flex items-start gap-3">
-	                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-	                      <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
-	                    </div>
-	                    <div className="min-w-0">
-	                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	                        {isOtherBlockchainsDestination
-	                          ? t(
-	                              "ui_other_blockchains_1c761d1a3e",
-	                              "Autres blockchains",
-	                            )
-	                          : t("moonpay_sell_destination_prefix", "Vers :")}
-	                      </p>
-	                      {!isOtherBlockchainsDestination ? (
+	                {isOtherBlockchainsDestination ? (
+	                  <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+	                    <p className="text-[13px] md:text-sm leading-snug text-white/55 whitespace-pre-line">
+	                      {highlightPhrases(
+	                        t(
+	                          "ui_simpleswap_choose_stablecoin_and_network_65fbbf3a2a",
+	                          "Vous choisirez le stablecoin de destination (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)",
+	                        ),
+	                        ["(USDC, USDT…)", "SimpleSwap)"],
+	                      )}
+	                    </p>
+	                  </div>
+	                ) : (
+	                  <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+	                    <div className="flex items-start gap-3">
+	                      <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+	                        <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
+	                      </div>
+	                      <div className="min-w-0">
+	                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	                          {t("moonpay_sell_destination_prefix", "Vers :")}
+	                        </p>
 	                        <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
 	                          {t(
 	                            "moonpay_sell_destination_bank_account",
 	                            "Compte bancaire",
 	                          )}
 	                        </p>
-	                      ) : null}
-	                      <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
-	                        {highlightPhrases(
-	                          isOtherBlockchainsDestination
-	                            ? t(
-	                                "ui_stablecoin_choice_partner_2d4f5f5a68",
-	                                "Vous renseignerez le stablecoin souhaitez sur la page du partenaire (USDT, USDC,etc.).",
-	                              )
-	                            : t(
-	                                "moonpay_sell_destination_helper",
-	                                "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                              ),
-	                          [
-	                            "compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                            "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                            "stablecoin souhaitez sur la page du partenaire (USDT, USDC,etc.).",
-	                            "le stablecoin souhaitez sur la page du partenaire (USDT, USDC,etc.).",
-	                          ],
-	                        )}
-	                      </p>
+	                        <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
+	                          {highlightPhrases(
+	                            t(
+	                              "moonpay_sell_destination_helper",
+	                              "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                            ),
+	                            [
+	                              "compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                              "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                            ],
+	                          )}
+	                        </p>
+	                      </div>
 	                    </div>
 	                  </div>
-	                </div>
-              </>
-            ) : null}
+	                )}
+	              </>
+	            ) : null}
 
 	          {wizardStep === 2 ? (
               <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">

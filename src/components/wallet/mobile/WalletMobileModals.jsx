@@ -171,7 +171,7 @@ export default function WalletMobileModals({
 	                // "Envoyer des dollars" utilise le même parcours que "Retirer vers la banque"
 	                // (MoonPay Sell 1/3 + 2/3).
 	                setCashSellSelectTitleOverride?.(
-	                  "Choisissez la devise que vous voulez échanger du compte :",
+	                  "Depuis le compte :",
 	                );
 	                setCashSellDestinationMode?.("other_blockchains");
 	                setCashBuyPrefill(null);
