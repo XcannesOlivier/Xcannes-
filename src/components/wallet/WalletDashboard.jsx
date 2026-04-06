@@ -1029,7 +1029,7 @@ export default function WalletDashboard({
 	                          "Consulter vos dernières transactions",
 	                        )}
 	                      </span>
-	                      <span className="text-white/35 text-lg leading-none">›</span>
+	                      <span className="text-white/35 text-lg md:text-xl leading-none">›</span>
 	                    </span>
 	                  </button>
                 )
