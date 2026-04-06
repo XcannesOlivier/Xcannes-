@@ -1638,7 +1638,7 @@ const MoonPayBuyModal = ({
                         <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
                           {t(
                             "ui_credit_all_automatic",
-                            "✔ Tout est automatique — aucune action requise",
+                            "✔ Tout est automatique — vous validez simplement",
                           )}
                         </p>
                       </div>

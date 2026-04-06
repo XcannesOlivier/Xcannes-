@@ -1162,7 +1162,7 @@ const MoonPaySellModal = ({
 		              {wizardStep === 1
                     ? t(
                         "moonpay_select_crypto_to_sell",
-                        "Choisissez la devise que vous voulez débiter :",
+                        "Choisissez la devise que vous voulez débiter du compte :",
                       )
                     : t(
                         "moonpay_sell_asset_details",
@@ -1270,7 +1270,7 @@ const MoonPaySellModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 				                              {t(
 				                                "moonpay_select_crypto_to_sell",
-				                                "Choisissez la devise que vous voulez débiter :",
+				                                "Choisissez la devise que vous voulez débiter du compte :",
 				                              )}
 				                            </div>
 		                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1429,7 +1429,7 @@ const MoonPaySellModal = ({
 	                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 		                              {t(
 		                                "moonpay_select_crypto_to_sell",
-		                                "Choisissez la devise que vous voulez débiter :",
+		                                "Choisissez la devise que vous voulez débiter du compte :",
 		                              )}
 		                            </div>
                             <div className="mt-0.5 text-[11px] text-white/55 truncate">
