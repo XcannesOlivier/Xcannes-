@@ -1631,7 +1631,11 @@ const MoonPayBuyModal = ({
                           <li>
                             {t(
                               "ui_credit_step_3_convert_credit",
-                              "Conversion (en RLUSD) et crédit dans votre wallet en CHF",
+                              {
+                                defaultValue:
+                                  "Conversion (en RLUSD) et crédit dans votre wallet en {{currency}}",
+                                currency: currencyUpper || "USD",
+                              },
                             )}
                           </li>
                         </ol>
