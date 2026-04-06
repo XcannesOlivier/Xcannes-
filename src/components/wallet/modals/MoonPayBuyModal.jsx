@@ -1703,38 +1703,46 @@ const MoonPayBuyModal = ({
                       </div>
 
                       <div className="mt-5 pt-5 border-t border-white/10">
-                        <p className="text-[13px] text-white/70">
-                          {t("ui_you_will_receive_about", "Vous recevrez environ")}
+                        <p className="text-[13px] text-white/80 font-semibold">
+                          {t("ui_how_credit_works", "Comment fonctionne le crédit ?")}
                         </p>
 
-                        <div className="mt-3 flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-10 h-10 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
-                              {renderSelectIcon({ src: CRYPTO_ICONS.RLUSD, alt: "RLUSD" })}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[14px] md:text-[15px] text-white/70">
-                                {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}{" "}
-                                {t("ui_stablecoin_usd", "(Stablecoin USD)")}
-                              </p>
-                            </div>
-                          </div>
+                        <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
+                          <li>
+                            {t(
+                              "ui_credit_step_1_secure_payment",
+                              "Paiement sécurisé (carte, Apple Pay…)",
+                            )}
+                          </li>
+                          <li>
+                            {t(
+                              "ui_credit_step_2_auto_buy_xrp",
+                              "Achat automatique de crypto (XRP)",
+                            )}
+                          </li>
+                          <li>
+                            {t(
+                              "ui_credit_step_3_convert_credit",
+                              "Conversion (en RLUSD) et crédit dans votre wallet en CHF",
+                            )}
+                          </li>
+                        </ol>
 
-                          <p className="text-[16px] md:text-[18px] font-semibold text-white tabular-nums">
-                            {conversionMissing
-                              ? t(
-                                  "ui_rate_unavailable_base_5c1a9b7d2e",
-                                  "Rate unavailable for base currency.",
-                                )
-                              : rlusdEquivalentLabel || "—"}
+                        <div className="mt-3 rounded-xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-3 py-2">
+                          <p className="text-[12px] text-white/70 tabular-nums">
+                            {t(
+                              "ui_credit_flow_compact",
+                              "Paiement → XRP → RLUSD → CHF dans votre wallet",
+                            )}
                           </p>
                         </div>
 
-                        {!conversionMissing && hasValidTargetAmount ? (
-                          <p className="mt-3 text-[12px] text-white/55">
-                            {t("ui_conversion_included", "ℹ️ Conversion automatique incluse")}
-                          </p>
-                        ) : null}
+                        <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
+                          {t(
+                            "ui_credit_all_automatic",
+                            "✔ Tout est automatique — aucune action requise",
+                          )}
+                        </p>
                       </div>
                     </div>
 
