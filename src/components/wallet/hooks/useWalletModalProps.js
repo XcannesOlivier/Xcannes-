@@ -95,10 +95,14 @@ export function useWalletModalProps({
   handleDemoConvert,
 
   // --- Cash ---
-  cashModalTab,
-  setCashModalTab,
-  cashBuyPrefill,
-  setCashBuyPrefill,
+	  cashModalTab,
+	  setCashModalTab,
+	  cashBuyPrefill,
+	  setCashBuyPrefill,
+	  cashSellSelectTitleOverride,
+	  setCashSellSelectTitleOverride,
+	  cashSellDestinationMode,
+	  setCashSellDestinationMode,
 
   // --- Activation ---
   showActivationModal,
@@ -393,6 +397,8 @@ export function useWalletModalProps({
       selectLabelMobileByCurrency: selectLabelMobileByAssetKey,
       walletAddress: wallet || "",
       buyPrefill: cashBuyPrefill,
+      sellSelectTitleOverride: cashSellSelectTitleOverride,
+      sellDestinationMode: cashSellDestinationMode,
       resetCashForm,
     }),
     [
@@ -409,6 +415,8 @@ export function useWalletModalProps({
       cashBuyPrefill,
       resetCashForm,
       preferredCurrency,
+      cashSellSelectTitleOverride,
+      cashSellDestinationMode,
     ],
   );
 
@@ -515,6 +523,8 @@ export function useWalletModalProps({
     setWalletInfoOpen,
     setSendPaymentRequest,
     setCashBuyPrefill,
+    setCashSellSelectTitleOverride,
+    setCashSellDestinationMode,
     resetSendForm,
     resetReceiveForm,
     resetSwapForm,

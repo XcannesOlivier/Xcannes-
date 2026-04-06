@@ -49,6 +49,8 @@ export default function WalletMobileModals({
   setWalletInfoOpen,
   setSendPaymentRequest,
   setCashBuyPrefill,
+  setCashSellSelectTitleOverride,
+  setCashSellDestinationMode,
   resetSendForm,
   resetReceiveForm,
   resetSwapForm,
@@ -145,16 +147,22 @@ export default function WalletMobileModals({
 	                setCashBuyPrefill(null);
 	              }}
 	              onChooseBuy={() => {
+	                setCashSellSelectTitleOverride?.("");
+	                setCashSellDestinationMode?.("");
 	                cashModalProps?.setCashModalTab?.("buy");
 	                setActiveAction("cash");
 	              }}
 	              onChooseSell={() => {
+	                setCashSellSelectTitleOverride?.("");
+	                setCashSellDestinationMode?.("");
 	                cashModalProps?.setCashModalTab?.("sell");
 	                setActiveAction("cash");
 	              }}
 	              onChooseUsdSwapOut={() => {
 	                // "Recevoir des dollars" utilise le même parcours que "Ajouter de l'argent"
 	                // (pré-sélection USD côté devise créditée).
+	                setCashSellSelectTitleOverride?.("");
+	                setCashSellDestinationMode?.("");
 	                setCashBuyPrefill({ currency: "USD" });
 	                cashModalProps?.setCashModalTab?.("buy");
 	                setActiveAction("cash");
@@ -162,6 +170,10 @@ export default function WalletMobileModals({
 	              onChooseUsdSwapIn={() => {
 	                // "Envoyer des dollars" utilise le même parcours que "Retirer vers la banque"
 	                // (MoonPay Sell 1/3 + 2/3).
+	                setCashSellSelectTitleOverride?.(
+	                  "Choisissez la devise que vous voulez échanger du compte :",
+	                );
+	                setCashSellDestinationMode?.("other_blockchains");
 	                setCashBuyPrefill(null);
 	                cashModalProps?.setCashModalTab?.("sell");
 	                setActiveAction("cash");

@@ -25,6 +25,9 @@ export function useWalletSwapOrchestrator({
   // ── Cash (MoonPay) state ───────────────────────────────────
   const [cashBuyPrefill, setCashBuyPrefill] = useState(null);
   const [cashModalTab, setCashModalTab] = useState("buy");
+  const [cashSellSelectTitleOverride, setCashSellSelectTitleOverride] =
+    useState("");
+  const [cashSellDestinationMode, setCashSellDestinationMode] = useState("");
 
   // ── Convert form ───────────────────────────────────────────
   const [convertBaseCurrency, setConvertBaseCurrency] = useState("USD");
@@ -46,6 +49,8 @@ export function useWalletSwapOrchestrator({
   const resetCashForm = () => {
     setCashBuyPrefill(null);
     setCashModalTab("buy");
+    setCashSellSelectTitleOverride("");
+    setCashSellDestinationMode("");
   };
 
   // Guard: prevent XRP/RLUSD in convert selectors.
@@ -129,6 +134,10 @@ export function useWalletSwapOrchestrator({
     setCashBuyPrefill,
     cashModalTab,
     setCashModalTab,
+    cashSellSelectTitleOverride,
+    setCashSellSelectTitleOverride,
+    cashSellDestinationMode,
+    setCashSellDestinationMode,
     // Convert form
     convertBaseCurrency,
     setConvertBaseCurrency,

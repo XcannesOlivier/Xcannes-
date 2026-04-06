@@ -75,6 +75,8 @@ const MoonPaySellModal = ({
   walletAddress,
   walletLabel = "",
   preferredFiatCurrency = "",
+  selectCryptoTitleOverride = "",
+  destinationMode = "",
   embedded = false,
   noticeVariant = "preview",
   demoMode = false,
@@ -88,6 +90,9 @@ const MoonPaySellModal = ({
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+  const resolvedSelectCryptoTitleOverride = String(selectCryptoTitleOverride || "").trim();
+  const resolvedDestinationMode = String(destinationMode || "").trim().toLowerCase();
+  const isOtherBlockchainsDestination = resolvedDestinationMode === "other_blockchains";
 
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
@@ -1157,18 +1162,19 @@ const MoonPaySellModal = ({
           </div>
 
           {/* From wallet display */}
-		          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
-		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-		              {wizardStep === 1
-                    ? t(
-                        "moonpay_select_crypto_to_sell",
-                        "Choisissez la devise que vous voulez débiter du compte :",
-                      )
-                    : t(
-                        "moonpay_sell_asset_details",
-                        "Détails de transaction de la devise que vous voulez débiter du compte :",
-                      )}
-		            </p>
+			          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
+			            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
+			              {wizardStep === 1
+	                    ? resolvedSelectCryptoTitleOverride ||
+	                      t(
+	                        "moonpay_select_crypto_to_sell",
+	                        "Choisissez la devise que vous voulez débiter du compte :",
+	                      )
+	                    : t(
+	                        "moonpay_sell_asset_details",
+	                        "Détails de transaction de la devise que vous voulez débiter du compte :",
+	                      )}
+			            </p>
             {String(walletLabel || "").trim() ? (
               <div className="flex items-center gap-2 mb-1">
 	                <span
@@ -1267,12 +1273,13 @@ const MoonPaySellModal = ({
 		                      >
 		                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
 		                          <div className="min-w-0">
-			                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
-				                              {t(
-				                                "moonpay_select_crypto_to_sell",
-				                                "Choisissez la devise que vous voulez débiter du compte :",
-				                              )}
-				                            </div>
+				                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
+					                              {resolvedSelectCryptoTitleOverride ||
+					                                t(
+					                                  "moonpay_select_crypto_to_sell",
+					                                  "Choisissez la devise que vous voulez débiter du compte :",
+					                                )}
+					                            </div>
 		                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 		                              {t("ui_search", "Rechercher…")}
 		                            </div>
@@ -1426,12 +1433,13 @@ const MoonPaySellModal = ({
 
                         <div className="flex items-center justify-between gap-3 px-4 py-4">
                           <div className="min-w-0">
-	                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
-		                              {t(
-		                                "moonpay_select_crypto_to_sell",
-		                                "Choisissez la devise que vous voulez débiter du compte :",
-		                              )}
-		                            </div>
+		                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
+			                              {resolvedSelectCryptoTitleOverride ||
+			                                t(
+			                                  "moonpay_select_crypto_to_sell",
+			                                  "Choisissez la devise que vous voulez débiter du compte :",
+			                                )}
+			                            </div>
                             <div className="mt-0.5 text-[11px] text-white/55 truncate">
                               {t("ui_search", "Rechercher…")}
                             </div>
@@ -1588,34 +1596,51 @@ const MoonPaySellModal = ({
                   </div>
                 </div>
 
-                {/* Destination display */}
-                <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-                      <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                        {t("moonpay_sell_destination_prefix", "Vers :")}
-                      </p>
-                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
-                        {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
-                      </p>
-                      <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
-                        {highlightPhrases(
-                          t(
-                            "moonpay_sell_destination_helper",
-                            "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-                          ),
-                          [
-                            "compte bancaire sur la page du partenaire (IBAN, etc.).",
-                            "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-                          ],
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+	                {/* Destination display */}
+	                <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+	                  <div className="flex items-start gap-3">
+	                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+	                      <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
+	                    </div>
+	                    <div className="min-w-0">
+	                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	                        {isOtherBlockchainsDestination
+	                          ? t(
+	                              "ui_other_blockchains_1c761d1a3e",
+	                              "Autres blockchains",
+	                            )
+	                          : t("moonpay_sell_destination_prefix", "Vers :")}
+	                      </p>
+	                      {!isOtherBlockchainsDestination ? (
+	                        <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
+	                          {t(
+	                            "moonpay_sell_destination_bank_account",
+	                            "Compte bancaire",
+	                          )}
+	                        </p>
+	                      ) : null}
+	                      <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
+	                        {highlightPhrases(
+	                          isOtherBlockchainsDestination
+	                            ? t(
+	                                "ui_stablecoin_choice_partner_2d4f5f5a68",
+	                                "Vous renseignerez le stablecoin souhaitez sur la page du partenaire (USDT, USDC,etc.).",
+	                              )
+	                            : t(
+	                                "moonpay_sell_destination_helper",
+	                                "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                              ),
+	                          [
+	                            "compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                            "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+	                            "stablecoin souhaitez sur la page du partenaire (USDT, USDC,etc.).",
+	                            "le stablecoin souhaitez sur la page du partenaire (USDT, USDC,etc.).",
+	                          ],
+	                        )}
+	                      </p>
+	                    </div>
+	                  </div>
+	                </div>
               </>
             ) : null}
 

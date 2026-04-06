@@ -41,6 +41,8 @@ export default function WalletDashboardCashModal({
   selectIconByCurrency,
   selectLabelMobileByCurrency,
   walletAddress,
+  sellSelectTitleOverride = "",
+  sellDestinationMode = "",
   resetCashForm: _resetCashForm,
   inline = false,
 }) {
@@ -380,16 +382,18 @@ export default function WalletDashboardCashModal({
                     noticeContextLabel={noticeContextLabel}
                   />
                 ) : (
-                  <MoonPaySellModal
-                    isOpen={true}
-                    onClose={onClose}
-                    walletAddress={walletAddress || ""}
-                    walletLabel={walletLabel}
-                    preferredFiatCurrency={preferredFiatCurrency}
-                    embedded={true}
-                    isPreviewMode={isPreviewMode}
-                    demoMode={demoMode}
-                    onDemoSubmit={onDemoSell}
+	                  <MoonPaySellModal
+	                    isOpen={true}
+	                    onClose={onClose}
+	                    walletAddress={walletAddress || ""}
+	                    walletLabel={walletLabel}
+	                    preferredFiatCurrency={preferredFiatCurrency}
+	                    selectCryptoTitleOverride={sellSelectTitleOverride}
+	                    destinationMode={sellDestinationMode}
+	                    embedded={true}
+	                    isPreviewMode={isPreviewMode}
+	                    demoMode={demoMode}
+	                    onDemoSubmit={onDemoSell}
                     availableTokens={availableTokens}
                     rlusdPerUnitRates={rlusdPerUnitRates}
                     selectLabelByCurrency={selectLabelByCurrency}
