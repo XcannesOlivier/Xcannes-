@@ -137,28 +137,36 @@ export default function WalletMobileModals({
               {...swapModalProps}
             />
 
-            <WalletDashboardCashChoiceModal
-              open={activeAction === "cashChoice"}
-              onClose={() => {
-                resetCashForm?.();
-                setActiveAction(null);
-                setCashBuyPrefill(null);
-              }}
-              onChooseBuy={() => {
-                cashModalProps?.setCashModalTab?.("buy");
-                setActiveAction("cash");
-              }}
-              onChooseSell={() => {
-                cashModalProps?.setCashModalTab?.("sell");
-                setActiveAction("cash");
-              }}
-              onChooseUsdSwapOut={() => {
-                setActiveAction("cashUsdSwapOut");
-              }}
-              onChooseUsdSwapIn={() => {
-                setActiveAction("cashUsdSwapIn");
-              }}
-            />
+	            <WalletDashboardCashChoiceModal
+	              open={activeAction === "cashChoice"}
+	              onClose={() => {
+	                resetCashForm?.();
+	                setActiveAction(null);
+	                setCashBuyPrefill(null);
+	              }}
+	              onChooseBuy={() => {
+	                cashModalProps?.setCashModalTab?.("buy");
+	                setActiveAction("cash");
+	              }}
+	              onChooseSell={() => {
+	                cashModalProps?.setCashModalTab?.("sell");
+	                setActiveAction("cash");
+	              }}
+	              onChooseUsdSwapOut={() => {
+	                // "Recevoir des dollars" utilise le même parcours que "Ajouter de l'argent"
+	                // (pré-sélection USD côté devise créditée).
+	                setCashBuyPrefill({ currency: "USD" });
+	                cashModalProps?.setCashModalTab?.("buy");
+	                setActiveAction("cash");
+	              }}
+	              onChooseUsdSwapIn={() => {
+	                // "Envoyer des dollars" utilise le même parcours que "Retirer vers la banque"
+	                // (MoonPay Sell 1/3 + 2/3).
+	                setCashBuyPrefill(null);
+	                cashModalProps?.setCashModalTab?.("sell");
+	                setActiveAction("cash");
+	              }}
+	            />
 
             <WalletDashboardUsdSwapModal
               open={
