@@ -33,6 +33,7 @@ export default function WalletDashboardCashModal({
   setCashModalTab: _setCashModalTab,
   renderWalletMeta,
   walletLabel = "",
+  preferredFiatCurrency = "",
   availableTokens,
   rlusdPerUnitRates,
   selectLabelByCurrency,
@@ -349,6 +350,7 @@ export default function WalletDashboardCashModal({
 	                      onClose={onClose}
 	                      walletAddress={walletAddress || ""}
 	                      walletLabel={walletLabel}
+	                      preferredFiatCurrency={preferredFiatCurrency}
 	                      embedded={true}
 	                      isPreviewMode={isPreviewMode}
 	                      demoMode={demoMode}
@@ -383,6 +385,7 @@ export default function WalletDashboardCashModal({
                     onClose={onClose}
                     walletAddress={walletAddress || ""}
                     walletLabel={walletLabel}
+                    preferredFiatCurrency={preferredFiatCurrency}
                     embedded={true}
                     isPreviewMode={isPreviewMode}
                     demoMode={demoMode}

@@ -9,7 +9,6 @@ import {
   ChevronLeftIcon,
 } from "@heroicons/react/24/outline";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
-import ModalSelect from "@/components/ui/ModalSelect";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
@@ -56,6 +55,13 @@ const notifyPwaMoonpayActive = (active, tab = "sell") => {
   }
 };
 
+const normalizeFiatCurrencyCode = (value) => {
+  const upper = String(value || "").trim().toUpperCase();
+  if (!upper) return "";
+  if (upper === "XRP" || upper === "RLUSD") return "";
+  return upper;
+};
+
 /**
  * MoonPaySellModal - Modal pour vendre des cryptos contre fiat
  *
@@ -69,6 +75,7 @@ const MoonPaySellModal = ({
   onClose,
   walletAddress,
   walletLabel = "",
+  preferredFiatCurrency = "",
   embedded = false,
   noticeVariant = "preview",
   demoMode = false,
@@ -143,7 +150,12 @@ const MoonPaySellModal = ({
   // Options de vente (RLUSD par défaut)
   const [currency, setCurrency] = useState("RLUSD");
   const [amount, setAmount] = useState("");
-  const [quoteCurrency, setQuoteCurrency] = useState("USD"); // Fiat code
+  const [quoteCurrency, setQuoteCurrency] = useState(() => {
+    return normalizeFiatCurrencyCode(preferredFiatCurrency) || "USD";
+  }); // Fiat code
+  const normalizedPreferredFiatCurrency = useMemo(() => {
+    return normalizeFiatCurrencyCode(preferredFiatCurrency);
+  }, [preferredFiatCurrency]);
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset+amount, 2/3 = receive in, 3/3 = MoonPay iframe
   const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -168,17 +180,6 @@ const MoonPaySellModal = ({
     scrollLocked: false,
     lockedOverflowY: "",
   });
-  const [fiatCurrencies, setFiatCurrencies] = useState([]);
-  const [fiatLoading, setFiatLoading] = useState(false);
-  const [fiatError, setFiatError] = useState(null);
-  const resolveFiatErrorMessage = (data) => {
-    if (!data) return "Failed to load fiat currencies";
-    if (typeof data === "string") return data;
-    if (typeof data?.error === "string") return data.error;
-    if (data?.error?.message) return data.error.message;
-    if (data?.message) return data.message;
-    return "Failed to load fiat currencies";
-  };
 
   // Étape 2 = résumé : on verrouille le sélecteur pour éviter les edits involontaires.
   useEffect(() => {
@@ -756,6 +757,22 @@ const MoonPaySellModal = ({
     });
   }, [isOpen, supportedCurrencies]);
 
+  // Quote currency (fiat) defaults to the wallet's on-chain defaultCurrency memo.
+  // The user can still change it inside MoonPay if needed.
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!normalizedPreferredFiatCurrency) return;
+    if (step !== "form" || iframeUrl) return;
+    if (quoteCurrency === normalizedPreferredFiatCurrency) return;
+    setQuoteCurrency(normalizedPreferredFiatCurrency);
+  }, [
+    iframeUrl,
+    isOpen,
+    normalizedPreferredFiatCurrency,
+    quoteCurrency,
+    step,
+  ]);
+
   useEffect(() => {
     if (!isOpen) return;
     if (!supportedCurrencies.length) return;
@@ -771,7 +788,6 @@ const MoonPaySellModal = ({
     if (!walletAddress) return;
     if (demoMode) return;
     if (step !== "form" || iframeUrl) return;
-    if (fiatLoading) return;
     if (!quoteCurrency) return;
 
     const resume = readResumeState();
@@ -790,12 +806,14 @@ const MoonPaySellModal = ({
     const nextCurrency = String(resume.currency || "").toUpperCase();
     if (nextCurrency) setCurrency(nextCurrency);
     if (resume.amount != null) setAmount(String(resume.amount));
-    if (resume.quoteCurrency) setQuoteCurrency(String(resume.quoteCurrency).toUpperCase());
+    if (resume.quoteCurrency) {
+      const nextQuote = normalizeFiatCurrencyCode(resume.quoteCurrency);
+      if (nextQuote) setQuoteCurrency(nextQuote);
+    }
 
     pendingAutoStartRef.current = true;
   }, [
     demoMode,
-    fiatLoading,
     iframeUrl,
     isOpen,
     quoteCurrency,
@@ -909,54 +927,6 @@ const MoonPaySellModal = ({
           maximumFractionDigits: 6,
         })
       : null;
-
-  useEffect(() => {
-    if (!isOpen) return;
-    let active = true;
-
-    const loadFiatCurrencies = async () => {
-      setFiatLoading(true);
-      setFiatError(null);
-      try {
-        const response = await fetch("/api/moonpay/fiat-currencies");
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(resolveFiatErrorMessage(data));
-        }
-        const list = data?.currencies || data?.data || data || [];
-        const normalized = Array.isArray(list)
-          ? list
-              .map((fiat) => ({
-                ...fiat,
-                code: String(fiat?.code || "").toUpperCase(),
-              }))
-              .filter((fiat) => fiat.code)
-          : [];
-
-        if (!active) return;
-        setFiatCurrencies(normalized);
-        setQuoteCurrency((prev) => {
-          if (normalized.some((fiat) => fiat.code === prev)) {
-            return prev;
-          }
-          const usd = normalized.find((fiat) => fiat.code === "USD");
-          return usd?.code || normalized[0]?.code || "USD";
-        });
-      } catch (error) {
-        if (!active) return;
-        setFiatError(error?.message || "Failed to load fiat currencies");
-        setFiatCurrencies([]);
-      } finally {
-        if (active) setFiatLoading(false);
-      }
-    };
-
-    loadFiatCurrencies();
-
-    return () => {
-      active = false;
-    };
-  }, [isOpen]);
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -1167,16 +1137,7 @@ const MoonPaySellModal = ({
       : loading ||
         !hasValidAmount ||
         !selectedToken ||
-        fiatCurrencies.length === 0 ||
         conversionMissing;
-  const fiatPlaceholder = t("moonpay_fiat_currency_label", "Fiat currency");
-  const fiatUnavailable = !fiatLoading && fiatCurrencies.length === 0;
-  const showFiatError = fiatError && !fiatLoading;
-  const fiatOptions = fiatCurrencies.map((fiat) => ({
-    value: fiat.code,
-    label: `${fiat.name || fiat.code} (${fiat.code})`,
-  }));
-  const fiatSelectValue = fiatCurrencies.length === 0 ? "" : quoteCurrency;
 
   const highlightPhrases = (text, phrases) => {
     const input = String(text || "");
@@ -1699,6 +1660,14 @@ const MoonPaySellModal = ({
                   <div className="mt-2 space-y-1 text-sm text-white/80">
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-white/60">
+                        {t("moonpay_receive_in", "Receive in")}
+                      </span>
+                      <span className="font-semibold tabular-nums">
+                        {String(quoteCurrency || "USD").toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-white/60">
                         {t("ui_amount", "Montant")}
                       </span>
                       <span className="font-semibold tabular-nums">
@@ -1742,31 +1711,6 @@ const MoonPaySellModal = ({
                     ) : null}
                   </div>
                 </div>
-	            <div>
-	              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-	                {t("moonpay_receive_in", "Receive in")}
-	              </label>
-	              <ModalSelect
-	                value={fiatSelectValue}
-	                onChange={setQuoteCurrency}
-	                options={fiatOptions}
-	                placeholder={fiatPlaceholder}
-	                disabled={fiatLoading || fiatCurrencies.length === 0}
-	                buttonClassName="w-full bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer disabled:opacity-60 hover:ring-white/25 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	                menuClassName={
-	                  noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated"
-	                }
-	                selectClassName="xcannes-select w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 disabled:opacity-60 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-	              />
-	              {showFiatError && (
-	                <p className="text-xs text-red-400 mt-1">{fiatError}</p>
-	              )}
-	              {!fiatLoading && !fiatError && fiatUnavailable && (
-	                <p className="text-[11px] text-white/55 mt-2">
-	                  {t("moonpay_fiat_unavailable", "Fiat currencies unavailable")}
-	                </p>
-	              )}
-	            </div>
               </>
 	          ) : null}
 

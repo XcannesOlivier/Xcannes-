@@ -385,6 +385,7 @@ export function useWalletModalProps({
       setCashModalTab,
       renderWalletMeta,
       walletLabel,
+      preferredFiatCurrency: preferredCurrency,
       rlusdPerUnitRates,
       selectLabelByCurrency: selectLabelByAssetKey,
       selectLabelRightByCurrency: selectLabelRightByAssetKey,
@@ -407,6 +408,7 @@ export function useWalletModalProps({
       wallet,
       cashBuyPrefill,
       resetCashForm,
+      preferredCurrency,
     ],
   );
 
