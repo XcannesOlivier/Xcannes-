@@ -1184,7 +1184,7 @@ const MoonPayBuyModal = ({
       {/* Form */}
       {step === "form" && (
         <div className="space-y-5">
-	          <div className="flex items-center justify-between relative">
+	          <div className="relative flex items-center">
 	            {wizardStep === 2 ? (
 	              <button
                   type="button"
@@ -1195,10 +1195,8 @@ const MoonPayBuyModal = ({
                   <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
                   <span className="text-sm">{t("ui_back", "Retour")}</span>
                 </button>
-              ) : (
-                <div />
-              )}
-		            <div className="text-[13px] tracking-[0.22em] uppercase text-white/55">
+              ) : null}
+		            <div className="ml-auto text-[13px] tracking-[0.22em] uppercase text-white/55">
 		              {wizardStep === 1 ? "1/3" : "2/3"}
 		            </div>
 	          </div>
@@ -1232,8 +1230,6 @@ const MoonPayBuyModal = ({
 		            </p>
 		          </div>
 
-		          {wizardStep === 1 ? (
-		          <>
 		          {/* Currency selector */}
 		          <div>
 			            <div className="relative">
@@ -1579,10 +1575,9 @@ const MoonPayBuyModal = ({
 			              : null}
 			          </div>
 			          </div>
-		          </>
-		          ) : null}
+		          </div>
 
-                {wizardStep === 1 ? (
+                {wizardStep === 1 || wizardStep === 2 ? (
                   <div>
                     <label className="block text-white/70 mb-2">
                       {t("moonpay_buy_selected_asset_amount", "Montant")}
@@ -1591,12 +1586,22 @@ const MoonPayBuyModal = ({
 	                      <input
 	                        type="number"
 	                        value={targetAssetAmount}
-	                        onChange={(e) => setTargetAssetAmount(e.target.value)}
+	                        onChange={
+                            wizardStep === 1
+                              ? (e) => setTargetAssetAmount(e.target.value)
+                              : undefined
+                          }
 	                        placeholder="0.0000"
 	                        step="0.0001"
 	                        min="0"
 	                        inputMode="decimal"
-	                        className="xcannes-no-number-spin w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+                          readOnly={wizardStep !== 1}
+	                        className={[
+                            "xcannes-no-number-spin w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+                            wizardStep === 1
+                              ? "focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                              : "cursor-default opacity-95",
+                          ].join(" ")}
 	                      />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
                         {String(currency || "").toUpperCase()}
@@ -1605,41 +1610,12 @@ const MoonPayBuyModal = ({
                   </div>
                 ) : null}
 
-	                {wizardStep === 2 ? (
-	                  <>
-                    {/* Détails + Résumé fusionnés (étape 2) */}
-                    <div className="rounded-2xl bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] ring-1 ring-white/10 ring-inset px-5 py-6 shadow-[0_10px_26px_rgba(0,0,0,0.55),0_0_12px_rgba(0,255,150,0.14)]">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="min-w-0">
-                          <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                            {t("ui_amount_to_credit", "Montant à créditer")}
-                          </p>
-                          <div className="mt-2 flex items-center gap-3">
-                            <div className="w-11 h-11 rounded-2xl bg-white/[0.04] ring-1 ring-white/10 ring-inset flex items-center justify-center shrink-0">
-                              {renderSelectIcon(selectedAssetCurrency?.icon)}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[18px] md:text-[22px] font-semibold text-white tabular-nums truncate">
-                                {hasValidTargetAmount
-                                  ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper || "USD", {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 6,
-                                    })
-                                  : "—"}
-                              </p>
-                              <p className="mt-0.5 text-[11px] text-white/55 truncate">
-                                {currencyUpper || "—"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-5 pt-5 border-t border-white/10">
+				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
+                    {wizardStep === 2 ? (
+                      <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
                         <p className="text-[13px] text-white/80 font-semibold">
                           {t("ui_how_credit_works", "Comment fonctionne le crédit ?")}
                         </p>
-
                         <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
                           <li>
                             {t(
@@ -1660,7 +1636,6 @@ const MoonPayBuyModal = ({
                             )}
                           </li>
                         </ol>
-
                         <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
                           {t(
                             "ui_credit_all_automatic",
@@ -1668,23 +1643,19 @@ const MoonPayBuyModal = ({
                           )}
                         </p>
                       </div>
-                    </div>
-
-                  </>
-	                ) : null}
-
-				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
-				            {highlightPaymentMethods(
-				              demoMode
-				                ? t(
-			                    "moonpay_info_buy_demo_1b7d2c9a5e",
-			                    "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
-			                  )
-			                : t(
-			                    "moonpay_info_buy_live_3c8a1d6b2f",
-			                    "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
-			                  ),
-			            )}
+                    ) : (
+                      highlightPaymentMethods(
+                        demoMode
+                          ? t(
+                              "moonpay_info_buy_demo_1b7d2c9a5e",
+                              "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
+                            )
+                          : t(
+                              "moonpay_info_buy_live_3c8a1d6b2f",
+                              "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+                            ),
+                      )
+                    )}
 			          </div>
 
           {/* Error message */}
