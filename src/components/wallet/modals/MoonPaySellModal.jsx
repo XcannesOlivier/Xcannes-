@@ -14,7 +14,6 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { greenActionBtnBase } from "./walletModalTokens";
-import { useRlusdXrpQuote } from "@/components/wallet/hooks/useRlusdXrpQuote";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -877,13 +876,6 @@ const MoonPaySellModal = ({
     isCurrencyLine && hasValidAmount && !conversionMissing
       ? amountValue * rlusdRate
       : null;
-  const rlusdEquivalentLabel =
-    Number.isFinite(Number(rlusdEquivalent)) && Number(rlusdEquivalent) > 0
-      ? formatAmountWithSymbol(locale, Number(rlusdEquivalent), "RLUSD", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : null;
   const balanceLabel = Number.isFinite(availableBalance)
     ? formatAmountWithSymbol(locale, availableBalance, currencyUpper || "XRP", {
         minimumFractionDigits: 2,
@@ -898,35 +890,6 @@ const MoonPaySellModal = ({
     : hasValidAmount
       ? amountValue
       : Number.NaN;
-
-  const rlusdAmountForXrpQuote =
-    String(baseCurrencyCode || "").toUpperCase() === "RLUSD" &&
-    Number.isFinite(baseCurrencyAmount) &&
-    baseCurrencyAmount > 0
-      ? baseCurrencyAmount
-      : null;
-  const rlusdAmountForXrpQuoteLabel =
-    Number.isFinite(Number(rlusdAmountForXrpQuote)) && Number(rlusdAmountForXrpQuote) > 0
-      ? formatAmountWithSymbol(locale, Number(rlusdAmountForXrpQuote), "RLUSD", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 6,
-        })
-      : null;
-
-  const xrplQuoteState = useRlusdXrpQuote({
-    amountRlusd: rlusdAmountForXrpQuote,
-    direction: "RLUSD_TO_XRP",
-    enabled: Boolean(isOpen && wizardStep === 2 && rlusdAmountForXrpQuote),
-    debounceMs: 250,
-  });
-  const xrpEquivalent = Number(xrplQuoteState?.data?.xrpAmount);
-  const xrpEquivalentLabel =
-    Number.isFinite(xrpEquivalent) && xrpEquivalent > 0
-      ? formatAmountWithSymbol(locale, xrpEquivalent, "XRP", {
-          minimumFractionDigits: 4,
-          maximumFractionDigits: 6,
-        })
-      : null;
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -1194,12 +1157,17 @@ const MoonPaySellModal = ({
           </div>
 
           {/* From wallet display */}
-			          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
+		          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
 		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-		              {t(
-		                "moonpay_select_crypto_to_sell",
-		                "Choisissez la devise que vous voulez débiter :",
-		              )}
+		              {wizardStep === 1
+                    ? t(
+                        "moonpay_select_crypto_to_sell",
+                        "Choisissez la devise que vous voulez débiter :",
+                      )
+                    : t(
+                        "moonpay_sell_asset_details",
+                        "Détails de la devise que vous voulez débiter :",
+                      )}
 		            </p>
             {String(walletLabel || "").trim() ? (
               <div className="flex items-center gap-2 mb-1">
@@ -1572,8 +1540,8 @@ const MoonPaySellModal = ({
 		          </div>
 	          </div>
 
-	          {/* Amount input (étape 1) */}
-	          {wizardStep === 1 ? (
+	          {/* Amount input (étape 1/2) */}
+	          {wizardStep === 1 || wizardStep === 2 ? (
 	            <div>
 	              <label className="block text-white/70 mb-2">
 	                {t("moonpay_amount_to_sell", "Montant")}
@@ -1582,10 +1550,18 @@ const MoonPaySellModal = ({
 		                <input
 		                  type="text"
 		                  value={amount}
-		                  onChange={(e) => setAmount(e.target.value)}
+		                  onChange={
+                        wizardStep === 1 ? (e) => setAmount(e.target.value) : undefined
+                      }
 		                  placeholder="0.0000"
 		                  inputMode="decimal"
-		                  className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+                      readOnly={wizardStep !== 1}
+		                  className={[
+                        "w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+                        wizardStep === 1
+                          ? "focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                          : "cursor-default opacity-95",
+                      ].join(" ")}
 		                />
 
 	                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-sm font-semibold">
@@ -1603,103 +1579,84 @@ const MoonPaySellModal = ({
 		            </div>
 	          ) : null}
 
-	          {/* Arrow down */}
-	          <div className="flex justify-center">
-	            <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
-	              <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
-	            </div>
-	          </div>
-
-	          {/* Destination display */}
-	          <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
-	            <div className="flex items-start gap-3">
-	              <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-	                <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
-	              </div>
-	              <div className="min-w-0">
-	                <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	                  {t("moonpay_sell_destination_prefix", "Vers :")}
-	                </p>
-	                <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
-	                  {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
-	                </p>
-	                <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
-	                  {highlightPhrases(
-	                    t(
-	                      "moonpay_sell_destination_helper",
-	                      "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                    ),
-	                    [
-	                      "compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                      "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                    ],
-	                  )}
-	                </p>
-	              </div>
-	            </div>
-	          </div>
-
-	          {wizardStep === 2 ? (
+            {wizardStep === 1 ? (
               <>
-                <div className="rounded-xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
-                  <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                    {t("ui_summary", "Résumé")}
-                  </p>
-                  <div className="mt-2 space-y-1 text-sm text-white/80">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t("moonpay_receive_in", "Receive in")}
-                      </span>
-                      <span className="font-semibold tabular-nums">
-                        {String(quoteCurrency || "USD").toUpperCase()}
-                      </span>
+                {/* Arrow down */}
+                <div className="flex justify-center">
+                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
+                    <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
+                  </div>
+                </div>
+
+                {/* Destination display */}
+                <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                      <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
                     </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t("ui_amount", "Montant")}
-                      </span>
-                      <span className="font-semibold tabular-nums">
-                        {hasValidAmount
-                          ? formatAmountWithSymbol(locale, amountValue, currencyUpper || "XRP", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 6,
-                            })
-                          : "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t("ui_equivalent_rlusd", { defaultValue: "≈ RLUSD" })}
-                      </span>
-                      <span className="font-semibold tabular-nums">
-                        {conversionMissing
-                          ? t(
-                              "ui_rate_unavailable_base_5c1a9b7d2e",
-                              "Rate unavailable for base currency.",
-                            )
-                          : rlusdAmountForXrpQuoteLabel || rlusdEquivalentLabel || "—"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-white/60">
-                        {t("ui_equivalent_xrp", { defaultValue: "≈ XRP (XRPL)" })}
-                      </span>
-                      <span className="font-semibold tabular-nums">
-                        {xrplQuoteState?.status === "loading"
-                          ? t("ui_loading", "Loading...")
-                          : xrpEquivalentLabel || "—"}
-                      </span>
-                    </div>
-                    {xrplQuoteState?.status === "error" ? (
-                      <p className="pt-2 text-[11px] text-white/55">
-                        {t("ui_xrpl_quote_unavailable", {
-                          defaultValue: "Taux XRPL indisponible pour le moment.",
-                        })}
+                    <div className="min-w-0">
+                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                        {t("moonpay_sell_destination_prefix", "Vers :")}
                       </p>
-                    ) : null}
+                      <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
+                        {t("moonpay_sell_destination_bank_account", "Compte bancaire")}
+                      </p>
+                      <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
+                        {highlightPhrases(
+                          t(
+                            "moonpay_sell_destination_helper",
+                            "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+                          ),
+                          [
+                            "compte bancaire sur la page du partenaire (IBAN, etc.).",
+                            "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
+                          ],
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </>
+            ) : null}
+
+	          {wizardStep === 2 ? (
+              <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+                <p className="text-[13px] text-white/80 font-semibold">
+                  {t("ui_how_debit_works", "Comment fonctionne le débit ?")}
+                </p>
+                <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
+                  <li>
+                    {t(
+                      "ui_debit_step_1_wallet_debit",
+                      "Débit du montant depuis votre wallet",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_debit_step_2_partner_conversion_sale",
+                      "Conversion automatique et vente via notre partenaire",
+                    )}
+                  </li>
+                  <li>
+                    {t(
+                      "ui_debit_step_3_bank_transfer",
+                      "Virement vers votre compte bancaire",
+                    )}
+                  </li>
+                </ol>
+                <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
+                  {t(
+                    "ui_debit_all_automatic_validate_only",
+                    "✔ Tout est automatique — vous validez simplement",
+                  )}
+                </p>
+                <p className="mt-1 text-[12px] text-xcannes-green/90 font-semibold">
+                  {t(
+                    "ui_debit_partner_secure",
+                    "✔ Traitement sécurisé via partenaire",
+                  )}
+                </p>
+              </div>
 	          ) : null}
 
 	          {demoMode ? (
