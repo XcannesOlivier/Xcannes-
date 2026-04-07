@@ -566,7 +566,7 @@
   "moonpay_select_crypto_to_sell": "Envoyer vers la banque depuis le compte :",
   "moonpay_sell_withdraw_title_prefix": "Envoyer vers la banque",
   "moonpay_sell_withdraw_title_suffix": "depuis le compte :",
-  "moonpay_sell_send_currency_label": "Devise à envoyée",
+  "moonpay_sell_send_currency_label": "Devise à envoyer",
   "moonpay_sell_asset_details": "Détails de la transaction depuis le compte :",
   "moonpay_sell_asset_details_prefix": "Détails de la transaction",
   "moonpay_sell_asset_details_suffix": "depuis le compte :",

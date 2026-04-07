@@ -490,10 +490,7 @@ const MoonPaySellModal = ({
             ? amountLabelFromProps
             : fallbackAmountLabel;
         const labelRight = amountLabel;
-        const labelMobile =
-          selectLabelMobileByCurrency?.[currencyRaw] ||
-          selectLabelMobileByCurrency?.[currency] ||
-          labelLeft;
+        const labelMobile = labelLeft;
         return {
           code: currency,
           label: labelLeft,
@@ -1219,15 +1216,9 @@ const MoonPaySellModal = ({
 		                        <span className="text-[20px] tracking-[0.14em]">
 		                          {t(
 		                            "moonpay_sell_withdraw_title_prefix",
-		                            "Retirer vers la banque",
+		                            "Envoyer vers la banque",
 		                          )}
 		                        </span>{" "}
-			                        <span className="hidden md:inline text-[14px] md:text-[14px]">
-			                          {t(
-			                            "moonpay_sell_withdraw_title_suffix",
-			                            "depuis le compte :",
-			                          )}
-			                        </span>
 		                      </>
 		                    )
 			                    : isOtherBlockchainsDestination
@@ -1281,7 +1272,7 @@ const MoonPaySellModal = ({
 		            <label className="block text-white/70 mb-2">
 		              {t(
 		                "moonpay_sell_send_currency_label",
-		                "Devise que vous envoyer vers la banque",
+		                "Devise à envoyer",
 		              )}
 		            </label>
 		            {wizardStep === 1 && isOtherBlockchainsDestination ? (
@@ -1311,8 +1302,7 @@ const MoonPaySellModal = ({
 			                  {renderSelectIcon(selectedSellCurrency?.icon)}
 			                </span>
 			                <span className="truncate font-semibold">
-			                  {selectedSellCurrency?.labelMobile ||
-			                    selectedSellCurrency?.labelLeft ||
+			                  {selectedSellCurrency?.labelLeft ||
 			                    selectedSellCurrency?.label ||
 			                    currency}
 			                </span>
@@ -1379,8 +1369,8 @@ const MoonPaySellModal = ({
 				                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 						                              {resolvedSelectCryptoTitleOverride ||
 						                                t(
-						                                  "moonpay_select_crypto_to_sell",
-						                                  "Retirer vers la banque depuis le compte :",
+						                                  "moonpay_sell_withdraw_title_prefix",
+						                                  "Envoyer vers la banque",
 						                                )}
 					                            </div>
 		                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1543,8 +1533,8 @@ const MoonPaySellModal = ({
 		                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
 				                              {resolvedSelectCryptoTitleOverride ||
 				                                t(
-				                                  "moonpay_select_crypto_to_sell",
-				                                  "Retirer vers la banque depuis le compte :",
+				                                  "moonpay_sell_withdraw_title_prefix",
+				                                  "Envoyer vers la banque",
 				                                )}
 			                            </div>
                             <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1672,7 +1662,7 @@ const MoonPaySellModal = ({
 		                  onChange={
                         wizardStep === 1 ? (e) => setAmount(e.target.value) : undefined
                       }
-		                  placeholder="0.0000"
+		                  placeholder={t("ui_enter_amount_placeholder", "Entrez un montant")}
 		                  inputMode="decimal"
                       readOnly={wizardStep !== 1}
 		                  className={[
