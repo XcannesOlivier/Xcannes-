@@ -1602,26 +1602,26 @@ const MoonPaySellModal = ({
 
 	            {wizardStep === 1 ? (
 	              <>
-	                {/* Arrow down */}
-	                <div className="flex justify-center">
-	                  <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
-	                    <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
+	                {/* Arrow down (hide for "other stablecoin" flow) */}
+	                {!isOtherBlockchainsDestination ? (
+	                  <div className="flex justify-center">
+	                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
+	                      <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
+	                    </div>
 	                  </div>
-	                </div>
+	                ) : null}
 
 	                {/* Destination display */}
 	                {isOtherBlockchainsDestination ? (
-	                  <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
-	                    <p className="text-[13px] md:text-sm leading-snug text-white/55 whitespace-pre-line">
-	                      {highlightPhrases(
-	                        t(
-	                          "ui_simpleswap_choose_stablecoin_and_network_65fbbf3a2a",
-	                          "Vous choisirez le stablecoin de destination (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)",
-	                        ),
-	                        ["(USDC, USDT…)", "SimpleSwap)"],
-	                      )}
-	                    </p>
-	                  </div>
+	                  <p className="px-1 text-[13px] md:text-sm leading-snug text-white/55 whitespace-pre-line">
+	                    {highlightPhrases(
+	                      t(
+	                        "ui_simpleswap_choose_stablecoin_and_network_65fbbf3a2a",
+	                        "Vous choisirez le stablecoin de destination (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)",
+	                      ),
+	                      ["(USDC, USDT…)", "SimpleSwap)"],
+	                    )}
+	                  </p>
 	                ) : (
 	                  <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
 	                    <div className="flex items-start gap-3">
