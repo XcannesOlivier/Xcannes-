@@ -1321,7 +1321,7 @@ const MoonPaySellModal = ({
 			                {selectedSellCurrency?.amountLabel ? (
 			                  <span className="text-white/70 font-mono tabular-nums text-sm">
 			                    <span className="text-white/45 mr-2">
-			                      {t("ui_balance_short", "Solde")}
+			                      {t("ui_balance_short", "Solde :")}
 			                    </span>
 			                    {selectedSellCurrency.amountLabel}
 			                  </span>
