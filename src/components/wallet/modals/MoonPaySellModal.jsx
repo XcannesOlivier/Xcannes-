@@ -1175,12 +1175,12 @@ const MoonPaySellModal = ({
 		                            "Retirer vers la banque",
 		                          )}
 		                        </span>{" "}
-		                        <span className="text-[14px] md:text-[14px]">
-		                          {t(
-		                            "moonpay_sell_withdraw_title_suffix",
-		                            "depuis le compte :",
-		                          )}
-		                        </span>
+			                        <span className="hidden md:inline text-[14px] md:text-[14px]">
+			                          {t(
+			                            "moonpay_sell_withdraw_title_suffix",
+			                            "depuis le compte :",
+			                          )}
+			                        </span>
 		                      </>
 		                    )
 		                    : isOtherBlockchainsDestination
