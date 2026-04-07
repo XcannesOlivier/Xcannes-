@@ -599,6 +599,7 @@
   "moonpay_buy_asset_details": "Détails de la transaction vers le compte :",
   "moonpay_buy_asset_details_prefix": "Détails de la transaction",
   "moonpay_buy_asset_details_suffix": "vers le compte :",
+  "moonpay_buy_receive_currency_label": "Devise que vous recevrez ",
   "moonpay_buy_secure_partner_note": "Fourni par nos partenaires sécurisés",
   "moonpay_buy_partner_location_note": "Le partenaire proposé dépend de votre localisation.",
   "moonpay_sell_secure_bank_transfer_note": "Virement sécurisé vers votre banque",

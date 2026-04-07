@@ -570,6 +570,7 @@
   "moonpay_buy_asset_details": "Transaction details to the account:",
   "moonpay_buy_asset_details_prefix": "Transaction details",
   "moonpay_buy_asset_details_suffix": "to the account:",
+  "moonpay_buy_receive_currency_label": "Currency you will receive",
   "moonpay_buy_payment_methods": "Partners and payment methods",
   "moonpay_buy_partner_location_note": "The partner offered depends on your location.",
   "moonpay_sell_demo_notice": "Demo mode: the sell is simulated (no MoonPay redirect).",

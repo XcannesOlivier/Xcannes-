@@ -1261,7 +1261,7 @@ const MoonPayBuyModal = ({
 			                      "Détails de la transaction",
 			                    )}
 			                  </span>{" "}
-			                  <span className="text-[14px] md:text-[14px]">
+			                  <span className="hidden md:inline text-[14px] md:text-[14px]">
 			                    {t(
 			                      "moonpay_buy_asset_details_suffix",
 			                      "vers le compte :",
@@ -1288,7 +1288,9 @@ const MoonPayBuyModal = ({
 
 		          {/* Currency selector */}
 		          <div>
-		            <label className="block text-white/70 mb-2">{t("ui_to", "Vers")}</label>
+		            <label className="block text-white/70 mb-2">
+		              {t("moonpay_buy_receive_currency_label", "Devise que vous recevrez ")}
+		            </label>
 				            <div className="relative">
 				            <button
 					              type="button"
