@@ -1156,12 +1156,23 @@ const MoonPayBuyModal = ({
     );
   };
 
-  const PaymentLogo = ({ src, alt, fallback, containerClassName = "bg-white/5" }) => {
+  const PaymentLogo = ({
+    src,
+    alt,
+    fallback,
+    containerClassName = "bg-white/5",
+    widthClassName = "w-auto",
+  }) => {
     const [failed, setFailed] = useState(false);
 
     if (failed) {
       return (
-        <span className="inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75 leading-none">
+        <span
+          className={[
+            "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75 leading-none",
+            widthClassName,
+          ].join(" ")}
+        >
           {fallback}
         </span>
       );
@@ -1172,6 +1183,7 @@ const MoonPayBuyModal = ({
         className={[
           "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none",
           containerClassName,
+          widthClassName,
         ].join(" ")}
       >
         <img
@@ -1739,12 +1751,14 @@ const MoonPayBuyModal = ({
 		                alt="MoonPay"
 		                fallback="MoonPay"
 		                containerClassName="bg-white/90"
+		                widthClassName="w-[110px]"
 		              />
 		              <PaymentLogo
 		                src="/assets/payment-logos/topper.svg"
 		                alt="Topper"
 		                fallback="Topper"
 		                containerClassName="bg-black/40"
+		                widthClassName="w-[110px]"
 		              />
 		            </span>
 		          </div>
