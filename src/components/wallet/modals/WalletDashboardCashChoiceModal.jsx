@@ -23,7 +23,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Depuis un wallet (USDC, USDT, ...)",
+    "Depuis un autre wallet (USDC, USDT, ...)",
   );
   const swapOutSubhintText = t(
     "ui_funds_swap_out_subhint",
@@ -31,7 +31,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapInHintText = t(
     "ui_funds_swap_in_hint",
-    "Vers une adresse wallet",
+    "Vers un wallet",
   );
   const swapInSubhintText = t(
     "ui_funds_swap_in_subhint",
@@ -688,14 +688,11 @@ export default function WalletDashboardCashChoiceModal({
                               .split("\n")
                               .map((line, lineIdx, lines) => {
                                 const input = String(line || "");
-                                const parts = input.split(
-                                  /(stablecoins?\s+USD|adresse wallet)/i,
-                                );
+                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
                                 return (
                                   <span key={`${lineIdx}-${input}`}>
                                     {parts.map((part, idx) =>
-                                      /^stablecoins?\s+usd$/i.test(part) ||
-                                      /^adresse wallet$/i.test(part) ? (
+                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
                                         <span
                                           key={`${lineIdx}-${idx}-${part}`}
                                           className="text-xcannes-green/90 font-semibold"
