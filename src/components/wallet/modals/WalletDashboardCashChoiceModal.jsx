@@ -23,7 +23,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Depuis un autre wallet (USDC, USDT, RLUSD, ...)",
+    "Depuis un wallet (USDC, USDT, RLUSD, ...)",
   );
   const swapOutSubhintText = t(
     "ui_funds_swap_out_subhint",
@@ -720,7 +720,7 @@ export default function WalletDashboardCashChoiceModal({
                     </button>
                     <div className="h-0.5" />
 
-                    <p className="pt-3 px-1 md:px-0 md:ml-[76px] md:max-w-[420px] text-[11px] md:text-[12px] text-white/65 leading-snug">
+                    <p className="pt-3 px-1 md:px-2 md:mx-auto md:max-w-[520px] text-[11px] md:text-[12px] text-white/65 leading-snug">
                       {stablecoinLiquidityNote}
                     </p>
                   </div>
