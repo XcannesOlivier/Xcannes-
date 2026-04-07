@@ -1170,10 +1170,15 @@ const MoonPaySellModal = ({
 	                        "moonpay_select_crypto_to_sell",
 	                        "Choisissez la devise que vous voulez débiter du compte :",
 	                      )
-	                    : t(
-	                        "moonpay_sell_asset_details",
-	                        "Détails de transaction de la devise que vous voulez débiter du compte :",
-	                      )}
+	                    : isOtherBlockchainsDestination
+	                      ? t(
+	                          "ui_sell_conversion_details_title_2e4b2e67c9",
+	                          "Détails de la conversion que vous voulez débiter du compte :",
+	                        )
+	                      : t(
+	                          "moonpay_sell_asset_details",
+	                          "Détails de transaction de la devise que vous voulez débiter du compte :",
+	                        )}
 			            </p>
             {String(walletLabel || "").trim() ? (
               <div className="flex items-center gap-2 mb-1">
@@ -1657,34 +1662,54 @@ const MoonPaySellModal = ({
 	              </>
 	            ) : null}
 
-	          {wizardStep === 2 ? (
-              <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
-                <p className="text-[13px] text-white/80 font-semibold">
-                  {t("ui_how_debit_works", "Comment fonctionne le débit ?")}
-                </p>
-                <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
-                  <li>
-                    {t(
-                      "ui_debit_step_1_wallet_debit",
-                      "Débit du montant depuis votre wallet",
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "ui_debit_step_2_partner_conversion_sale",
-                      "Conversion automatique et vente via notre partenaire",
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "ui_debit_step_3_bank_transfer",
-                      "Virement vers votre compte bancaire",
-                    )}
-                  </li>
-                </ol>
-                <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
-                  {t(
-                    "ui_debit_all_automatic_validate_only",
+		          {wizardStep === 2 ? (
+	              <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+	                <p className="text-[13px] text-white/80 font-semibold">
+	                  {isOtherBlockchainsDestination
+	                    ? t(
+	                        "ui_how_conversion_works_1f46b6f3ad",
+	                        "Comment fonctionne la conversion ?",
+	                      )
+	                    : t("ui_how_debit_works", "Comment fonctionne le débit ?")}
+	                </p>
+	                <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
+	                  <li>
+	                    {isOtherBlockchainsDestination
+	                      ? t(
+	                          "ui_conversion_step_1_account_debit_4b0b1e5cde",
+	                          "Débit du montant depuis votre compte",
+	                        )
+	                      : t(
+	                          "ui_debit_step_1_wallet_debit",
+	                          "Débit du montant depuis votre wallet",
+	                        )}
+	                  </li>
+	                  <li>
+	                    {isOtherBlockchainsDestination
+	                      ? t(
+	                          "ui_conversion_step_2_partner_conversion_0e540ff0a4",
+	                          "Conversion automatique via notre partenaire",
+	                        )
+	                      : t(
+	                          "ui_debit_step_2_partner_conversion_sale",
+	                          "Conversion automatique et vente via notre partenaire",
+	                        )}
+	                  </li>
+	                  <li>
+	                    {isOtherBlockchainsDestination
+	                      ? t(
+	                          "ui_conversion_step_3_add_to_external_wallet_76c21b8c05",
+	                          "Ajout vers votre wallet extérieur",
+	                        )
+	                      : t(
+	                          "ui_debit_step_3_bank_transfer",
+	                          "Virement vers votre compte bancaire",
+	                        )}
+	                  </li>
+	                </ol>
+	                <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
+	                  {t(
+	                    "ui_debit_all_automatic_validate_only",
                     "✔ Tout est automatique — vous validez simplement",
                   )}
                 </p>
