@@ -1206,8 +1206,10 @@ const MoonPayBuyModal = ({
 		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
 		              {wizardStep === 1 ? (
 		                <>
-		                  <span className="text-[20px]">Ajouter de l&apos;argent</span>{" "}
-		                  <span>au compte:</span>
+		                  <span className="text-[20px] tracking-[0.14em]">
+		                    Ajouter de l&apos;argent
+		                  </span>{" "}
+		                  <span className="text-[14px] md:text-[14px]">au compte:</span>
 		                </>
 		              ) : (
 		                t(
