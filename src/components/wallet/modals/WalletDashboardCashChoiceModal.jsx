@@ -23,7 +23,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Recevoir des stablecoins USD\nDepuis un wallet (USDC, USDT, RLUSD)",
+    "Recevoir des stablecoins USD\nDepuis un wallet (USDC, USDT, ...)",
   );
   const swapOutSubhintText = t(
     "ui_funds_swap_out_subhint",
@@ -576,7 +576,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_out_title",
-                                "Échanger vos stablecoin USD",
+                                "Recevoir (deposit)",
                               )}
                             </p>
                             <svg
@@ -594,13 +594,59 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90 whitespace-pre-line">
-                            {swapOutHintText}
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                            {String(swapOutHintText || "")
+                              .split("\n")
+                              .map((line, lineIdx, lines) => {
+                                const text = String(line || "");
+                                const highlightStablecoin = (value) => {
+                                  const input = String(value || "");
+                                  if (!input) return input;
+                                  const parts = input.split(/(stablecoins?\s+USD)/i);
+                                  return parts.map((part, idx) =>
+                                    /^stablecoins?\s+usd$/i.test(part) ? (
+                                      <span
+                                        key={`${lineIdx}-${idx}-${part}`}
+                                        className="text-xcannes-green/90 font-semibold"
+                                      >
+                                        {part}
+                                      </span>
+                                    ) : (
+                                      <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
+                                    ),
+                                  );
+                                };
+                                const openIdx = text.indexOf("(");
+                                const closeIdx = text.lastIndexOf(")");
+                                const hasParens =
+                                  openIdx >= 0 && closeIdx > openIdx;
+                                const before = hasParens
+                                  ? text.slice(0, openIdx)
+                                  : text;
+                                const parens = hasParens
+                                  ? text.slice(openIdx, closeIdx + 1)
+                                  : "";
+                                const after = hasParens
+                                  ? text.slice(closeIdx + 1)
+                                  : "";
+                                return (
+                                  <span key={`${lineIdx}-${text}`}>
+                                    {highlightStablecoin(before)}
+                                    {parens ? (
+                                      <span className="text-xcannes-green/90 font-semibold">
+                                        {parens}
+                                      </span>
+                                    ) : null}
+                                    {highlightStablecoin(after)}
+                                    {lineIdx < lines.length - 1 ? <br /> : null}
+                                  </span>
+                                );
+                              })}
                           </p>
                         </div>
                       </div>
                     </button>
-                    <p className="px-1 -mt-2 text-[12px] md:text-xs text-white/50">
+                    <p className="px-1 -mt-2 mb-5 text-[12px] md:text-xs text-white/50">
                       {swapOutSubhintText}
                     </p>
 
@@ -636,8 +682,33 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90 whitespace-pre-line">
-                            {swapInHintText}
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                            {String(swapInHintText || "")
+                              .split("\n")
+                              .map((line, lineIdx, lines) => {
+                                const input = String(line || "");
+                                const parts = input.split(
+                                  /(stablecoins?\s+USD|adresse wallet)/i,
+                                );
+                                return (
+                                  <span key={`${lineIdx}-${input}`}>
+                                    {parts.map((part, idx) =>
+                                      /^stablecoins?\s+usd$/i.test(part) ||
+                                      /^adresse wallet$/i.test(part) ? (
+                                        <span
+                                          key={`${lineIdx}-${idx}-${part}`}
+                                          className="text-xcannes-green/90 font-semibold"
+                                        >
+                                          {part}
+                                        </span>
+                                      ) : (
+                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
+                                      ),
+                                    )}
+                                    {lineIdx < lines.length - 1 ? <br /> : null}
+                                  </span>
+                                );
+                              })}
                           </p>
                         </div>
                       </div>
