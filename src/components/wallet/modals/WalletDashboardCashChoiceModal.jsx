@@ -23,7 +23,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Depuis un autre wallet (USDC, USDT, ...)",
+    "Depuis un autre wallet (USDC, USDT, RLUSD, ...)",
   );
   const swapOutSubhintText = t(
     "ui_funds_swap_out_subhint",

@@ -1057,7 +1057,7 @@
   "ui_funds_withdraw_hint": "Vers votre compte bancaire",
   "ui_funds_section_digital_dollars": "Stablecoins USD",
   "ui_funds_swap_out_title": "Recevoir",
-  "ui_funds_swap_out_hint": "Depuis un autre wallet (USDC, USDT, ...)",
+  "ui_funds_swap_out_hint": "Depuis un autre wallet (USDC, USDT, RLUSD, ...)",
   "ui_funds_swap_out_subhint": "Ajoutés automatiquement à votre solde",
   "ui_funds_swap_in_title": "Envoyer",
   "ui_funds_swap_in_hint": "Vers un wallet",
