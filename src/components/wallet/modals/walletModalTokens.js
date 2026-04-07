@@ -31,11 +31,11 @@ export const greenActionBtnMuted = [
 /** Neutral blue action button — with disabled states. */
 export const blueNeutralActionBtnBase = [
   "rounded-lg border border-transparent",
-  "bg-xcannes-blue-weight text-white font-semibold",
+  "bg-xcannes-blue text-white font-semibold",
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
-  "hover:bg-xcannes-blue hover:-translate-y-px",
+  "hover:bg-xcannes-blue/40 hover:-translate-y-px",
   "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-blue-weight/40 disabled:text-white/60 disabled:cursor-not-allowed",
+  "disabled:bg-xcannes-blue/40 disabled:text-white/60 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 
