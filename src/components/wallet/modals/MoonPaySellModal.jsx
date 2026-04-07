@@ -1162,18 +1162,31 @@ const MoonPaySellModal = ({
           </div>
 
           {/* From wallet display */}
-			          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
-			            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-			              {wizardStep === 1
-	                    ? resolvedSelectCryptoTitleOverride ||
-	                      t(
-	                        "moonpay_select_crypto_to_sell",
-	                        "Choisissez la devise que vous voulez débiter du compte :",
-	                      )
-	                    : isOtherBlockchainsDestination
-	                      ? t(
-	                          "ui_sell_conversion_details_title_2e4b2e67c9",
-	                          "Détails de la conversion que vous voulez débiter du compte :",
+				          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
+				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
+				              {wizardStep === 1
+		                    ? resolvedSelectCryptoTitleOverride ? (
+		                      resolvedSelectCryptoTitleOverride
+		                    ) : (
+		                      <>
+		                        <span className="text-[20px] tracking-[0.14em]">
+		                          {t(
+		                            "moonpay_sell_withdraw_title_prefix",
+		                            "Retirer vers la banque",
+		                          )}
+		                        </span>{" "}
+		                        <span className="text-[14px] md:text-[14px]">
+		                          {t(
+		                            "moonpay_sell_withdraw_title_suffix",
+		                            "depuis le compte :",
+		                          )}
+		                        </span>
+		                      </>
+		                    )
+		                    : isOtherBlockchainsDestination
+		                      ? t(
+		                          "ui_sell_conversion_details_title_2e4b2e67c9",
+		                          "Détails de la conversion que vous voulez débiter du compte :",
 	                        )
 	                      : t(
 	                          "moonpay_sell_asset_details",
@@ -1206,12 +1219,18 @@ const MoonPaySellModal = ({
 
 		          {/* Currency selector */}
 		          <div>
+		            <label className="block text-white/70 mb-2">
+		              {t(
+		                "moonpay_sell_send_currency_label",
+		                "Devise que vous envoyer vers la banque",
+		              )}
+		            </label>
 		            {wizardStep === 1 && isOtherBlockchainsDestination ? (
 		              <p className="mb-2 px-1 text-[11px] tracking-[0.22em] uppercase text-white/45">
 		                {t("ui_from_short_f9b4f9f4a1", "De")}
 		              </p>
 		            ) : null}
-			            <div className="relative">
+				            <div className="relative">
 				            <button
 				              type="button"
 				              ref={cryptoDropdownTriggerRef}
@@ -1292,11 +1311,11 @@ const MoonPaySellModal = ({
 		                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
 		                          <div className="min-w-0">
 				                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
-					                              {resolvedSelectCryptoTitleOverride ||
-					                                t(
-					                                  "moonpay_select_crypto_to_sell",
-					                                  "Choisissez la devise que vous voulez débiter du compte :",
-					                                )}
+						                              {resolvedSelectCryptoTitleOverride ||
+						                                t(
+						                                  "moonpay_select_crypto_to_sell",
+						                                  "Retirer vers la banque depuis le compte :",
+						                                )}
 					                            </div>
 		                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 		                              {t("ui_search", "Rechercher…")}
@@ -1452,11 +1471,11 @@ const MoonPaySellModal = ({
                         <div className="flex items-center justify-between gap-3 px-4 py-4">
                           <div className="min-w-0">
 		                            <div className="text-white font-semibold text-base leading-tight truncate underline underline-offset-4 decoration-white/35">
-			                              {resolvedSelectCryptoTitleOverride ||
-			                                t(
-			                                  "moonpay_select_crypto_to_sell",
-			                                  "Choisissez la devise que vous voulez débiter du compte :",
-			                                )}
+				                              {resolvedSelectCryptoTitleOverride ||
+				                                t(
+				                                  "moonpay_select_crypto_to_sell",
+				                                  "Retirer vers la banque depuis le compte :",
+				                                )}
 			                            </div>
                             <div className="mt-0.5 text-[11px] text-white/55 truncate">
                               {t("ui_search", "Rechercher…")}
