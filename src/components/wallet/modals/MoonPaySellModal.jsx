@@ -13,7 +13,7 @@ import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { isIOSDevice } from "@/utils/deviceDetect";
-import { greenActionBtnBase } from "./walletModalTokens";
+import { blueNeutralActionBtnBase } from "./walletModalTokens";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -1818,18 +1818,18 @@ const MoonPaySellModal = ({
           )}
 
 	          {/* Continue button */}
-	          <SwipeConfirmButton
-	            label={continueLabel}
-	            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
-	            disabled={continueDisabled}
-	            variant="xcannesGreen"
-	            className="md:hidden"
-	          />
+		          <SwipeConfirmButton
+		            label={continueLabel}
+		            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
+		            disabled={continueDisabled}
+		            variant="xcannesBlueNeutral"
+		            className="md:hidden"
+		          />
 		          <button
 		            type="button"
 		            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
 		            disabled={continueDisabled}
-		            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
+		            className={`hidden md:block w-full text-xl py-4 ${blueNeutralActionBtnBase}`}
 		          >
 		            {continueLabel}
 		          </button>

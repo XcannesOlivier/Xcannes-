@@ -17,6 +17,10 @@ const VARIANTS = {
     btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
     disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",
   },
+  xcannesBlueNeutral: {
+    btn: "border-transparent bg-xcannes-blue-weight text-white hover:bg-xcannes-blue hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn: "border-transparent bg-xcannes-blue-weight/40 text-white/50",
+  },
   orange: {
     btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
     disabledBtn: "border-transparent bg-xcannes-btn-green/40 text-white/50",

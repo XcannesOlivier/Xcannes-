@@ -563,7 +563,7 @@
   "moonpay_minimum_prefix": "Minimum:",
   "moonpay_minimum_prefix_usd": "Minimum: $",
   "moonpay_receive_in": "Receive in",
-  "moonpay_select_crypto_to_sell": "Choose the currency to debit:",
+  "moonpay_select_crypto_to_sell": "Send to bank from account:",
   "moonpay_sell_withdraw_title_prefix": "Send to bank",
   "moonpay_sell_withdraw_title_suffix": "from account:",
   "moonpay_sell_send_currency_label": "Currency you send to the bank",
