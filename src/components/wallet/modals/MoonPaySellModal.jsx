@@ -1127,6 +1127,48 @@ const MoonPaySellModal = ({
     );
   };
 
+  const PaymentLogo = ({
+    src,
+    alt,
+    fallback,
+    containerClassName = "bg-white/5",
+    widthClassName = "w-auto",
+  }) => {
+    const [failed, setFailed] = useState(false);
+
+    if (failed) {
+      return (
+        <span
+          className={[
+            "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75 leading-none",
+            widthClassName,
+          ].join(" ")}
+        >
+          {fallback}
+        </span>
+      );
+    }
+
+    return (
+      <span
+        className={[
+          "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none",
+          containerClassName,
+          widthClassName,
+        ].join(" ")}
+      >
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-auto object-contain"
+          onError={() => setFailed(true)}
+        />
+      </span>
+    );
+  };
+
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
     enabled: shouldAnimate,
@@ -1781,22 +1823,46 @@ const MoonPaySellModal = ({
 	            variant="xcannesGreen"
 	            className="md:hidden"
 	          />
-	          <button
-	            type="button"
-	            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
-	            disabled={continueDisabled}
-	            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
-	          >
-	            {continueLabel}
-	          </button>
-          <p className="mt-2 text-[11px] md:text-xs text-white/60 text-center">
-            {t(
-              "moonpay_sell_secure_bank_transfer_note",
-              "Virement sécurisé vers votre banque",
-            )}
-          </p>
-        </div>
-      )}
+		          <button
+		            type="button"
+		            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
+		            disabled={continueDisabled}
+		            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
+		          >
+		            {continueLabel}
+		          </button>
+	          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+	            <span>
+	              {t(
+	                "moonpay_buy_secure_partner_note",
+	                "Fourni par nos partenaires sécurisés",
+	              )}
+	            </span>
+	            <span
+	              className="inline-flex items-center gap-1.5"
+	              aria-label={t(
+	                "moonpay_buy_payment_methods",
+	                "Partenaires et moyens de paiement",
+	              )}
+	            >
+	              <PaymentLogo
+	                src="/assets/payment-logos/moonpay.png"
+	                alt="MoonPay"
+	                fallback="MoonPay"
+	                containerClassName="bg-white/90"
+	                widthClassName="w-[110px]"
+	              />
+	              <PaymentLogo
+	                src="/assets/payment-logos/topper.svg"
+	                alt="Topper"
+	                fallback="Topper"
+	                containerClassName="bg-black/40"
+	                widthClassName="w-[110px]"
+	              />
+	            </span>
+	          </div>
+	        </div>
+	      )}
 
       {/* Loading */}
       {step === "loading" && (
