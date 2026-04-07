@@ -39,7 +39,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const stablecoinLiquidityNote = t(
     "ui_funds_stablecoin_liquidity_note",
-    "Les transactions utilisent des stablecoins USD (RLUSD) et la liquidité du réseau XRP",
+    "Optimisé via stablecoins USD (RLUSD) et la liquidité du réseau XRP",
   );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -720,7 +720,7 @@ export default function WalletDashboardCashChoiceModal({
                     </button>
                     <div className="h-0.5" />
 
-                    <p className="pt-3 px-1 md:px-2 md:mx-auto md:max-w-[520px] text-[11px] md:text-[12px] text-white/65 leading-snug">
+                    <p className="pt-3 px-2 w-full md:max-w-[520px] mx-auto text-center text-[11px] md:text-[12px] text-white/65 leading-snug">
                       {stablecoinLiquidityNote}
                     </p>
                   </div>
