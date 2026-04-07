@@ -11,7 +11,8 @@ import {
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
-import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { getCurrencyFlag, formatAmountWithSymbol } from "../walletDashboardConfig";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { violetActionBtnBase } from "./walletModalTokens";
 
@@ -468,11 +469,8 @@ const MoonPaySellModal = ({
         const labelLeft =
           selectLabelByCurrency?.[currencyRaw] ||
           selectLabelByCurrency?.[currency] ||
+          getCurrencyDescription(currency) ||
           currency;
-        const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(
-          /:\s*$/,
-          "",
-        );
         const amountValue = Number(token?.value || 0);
         const amountLabel = Number.isFinite(amountValue)
           ? formatAmountWithSymbol(locale, amountValue, currency, {
@@ -483,11 +481,10 @@ const MoonPaySellModal = ({
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             });
-        const fallbackRight = `${balanceLabel} = ${amountLabel}`;
         const labelRight =
           selectLabelRightByCurrency?.[currencyRaw] ||
           selectLabelRightByCurrency?.[currency] ||
-          fallbackRight;
+          amountLabel;
         const labelMobile =
           selectLabelMobileByCurrency?.[currencyRaw] ||
           selectLabelMobileByCurrency?.[currency] ||
@@ -497,11 +494,12 @@ const MoonPaySellModal = ({
           label: labelLeft,
           labelLeft,
           labelRight,
+          amountLabel,
           labelMobile,
           icon:
             selectIconByCurrency?.[currencyRaw] ||
             selectIconByCurrency?.[currency] ||
-            null,
+            getCurrencyFlag(currency),
         };
       })
       .filter(Boolean);
@@ -549,7 +547,7 @@ const MoonPaySellModal = ({
     return supportedCurrencies.filter((c) => {
       const code = String(c?.code || "").toLowerCase();
       const label = String(c?.label || c?.labelLeft || "").toLowerCase();
-      const right = String(c?.labelRight || "").toLowerCase();
+      const right = String(c?.amountLabel || c?.labelRight || "").toLowerCase();
       return `${code} ${label} ${right}`.includes(needle);
     });
   }, [cryptoSearch, supportedCurrencies]);
@@ -1303,36 +1301,43 @@ const MoonPaySellModal = ({
 			                  : "cursor-default opacity-95",
 			              ].join(" ")}
 			            >
-			              <span className="flex items-center gap-2 min-w-0 flex-1">
-			                {renderSelectIcon(selectedSellCurrency?.icon)}
+			              <span className="flex items-center gap-3 min-w-0 flex-1">
+			                <span className="shrink-0">
+			                  {renderSelectIcon(selectedSellCurrency?.icon)}
+			                </span>
 			                <span className="truncate font-semibold">
 			                  {selectedSellCurrency?.labelMobile ||
 			                    selectedSellCurrency?.labelLeft ||
 			                    selectedSellCurrency?.label ||
 			                    currency}
 			                </span>
-			                {selectedSellCurrency?.labelRight ? (
-			                  <span className="ml-auto text-white/60 tabular-nums">
-			                    {selectedSellCurrency.labelRight}
+			              </span>
+			              <span className="flex items-center gap-2 shrink-0">
+			                {selectedSellCurrency?.amountLabel ? (
+			                  <span className="text-white/70 font-mono tabular-nums text-sm">
+			                    <span className="text-white/45 mr-1">
+			                      {t("ui_balance_short", "Solde")}
+			                    </span>
+			                    {selectedSellCurrency.amountLabel}
 			                  </span>
 			                ) : null}
+			                {wizardStep === 1 ? (
+			                  <svg
+			                    className="w-3 h-3 text-white/70"
+			                    fill="none"
+			                    stroke="currentColor"
+			                    viewBox="0 0 24 24"
+			                    aria-hidden
+			                  >
+			                    <path
+			                      strokeLinecap="round"
+			                      strokeLinejoin="round"
+			                      strokeWidth={2}
+			                      d="M19 9l-7 7-7-7"
+			                    />
+			                  </svg>
+			                ) : null}
 			              </span>
-		              {wizardStep === 1 ? (
-		                <svg
-		                  className="w-3 h-3 text-white/70"
-		                  fill="none"
-		                  stroke="currentColor"
-		                  viewBox="0 0 24 24"
-		                  aria-hidden
-		                >
-		                  <path
-		                    strokeLinecap="round"
-		                    strokeLinejoin="round"
-		                    strokeWidth={2}
-		                    d="M19 9l-7 7-7-7"
-		                  />
-		                </svg>
-		              ) : null}
 			            </button>
 
 		            {cryptoDropdownOpen && isDesktopViewport
@@ -1440,22 +1445,26 @@ const MoonPaySellModal = ({
 		                                      : "hover:bg-white/[0.04] text-white/80",
 		                                  ].join(" ")}
 		                                >
-		                                  {renderSelectIcon(opt.icon)}
+		                                  <span className="shrink-0">
+		                                    {renderSelectIcon(opt.icon)}
+		                                  </span>
 		                                  <div className="min-w-0 flex-1">
 		                                    <div className="text-sm font-semibold truncate">
 		                                      {opt.labelLeft || opt.label || opt.code}
 		                                    </div>
-		                                    {opt.labelRight ? (
-		                                      <div className="text-[11px] text-white/55 truncate tabular-nums">
-		                                        {opt.labelRight}
-		                                      </div>
+		                                  </div>
+		                                  <div className="flex items-center gap-2 shrink-0">
+		                                    {opt.amountLabel ? (
+		                                      <span className="text-sm font-mono tabular-nums text-white/70">
+		                                        {opt.amountLabel}
+		                                      </span>
+		                                    ) : null}
+		                                    {active ? (
+		                                      <span className="text-xcannes-green font-semibold text-xs">
+		                                        ✓
+		                                      </span>
 		                                    ) : null}
 		                                  </div>
-		                                  {active ? (
-		                                    <span className="text-xcannes-green font-semibold text-xs">
-		                                      ✓
-		                                    </span>
-		                                  ) : null}
 		                                </button>
 		                              );
 		                            })
@@ -1604,22 +1613,26 @@ const MoonPaySellModal = ({
                                     : "hover:bg-white/[0.04] text-white/80",
                                 ].join(" ")}
                               >
-                                {renderSelectIcon(opt.icon)}
+                                <span className="shrink-0">
+                                  {renderSelectIcon(opt.icon)}
+                                </span>
                                 <div className="min-w-0 flex-1">
                                   <div className="text-sm font-semibold truncate">
                                     {opt.labelLeft || opt.label || opt.code}
                                   </div>
-                                  {opt.labelRight ? (
-                                    <div className="text-[11px] text-white/55 truncate tabular-nums">
-                                      {opt.labelRight}
-                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {opt.amountLabel ? (
+                                    <span className="text-sm font-mono tabular-nums text-white/70">
+                                      {opt.amountLabel}
+                                    </span>
+                                  ) : null}
+                                  {active ? (
+                                    <span className="text-xcannes-green font-semibold text-xs">
+                                      ✓
+                                    </span>
                                   ) : null}
                                 </div>
-                                {active ? (
-                                  <span className="text-xcannes-green font-semibold text-xs">
-                                    ✓
-                                  </span>
-                                ) : null}
                               </button>
                             );
                           })
@@ -1837,7 +1850,7 @@ const MoonPaySellModal = ({
 	            <span>
 	              {t(
 	                "moonpay_buy_secure_partner_note",
-	                "Fourni par nos partenaires sécurisés",
+	                "Paiement sécurisé via",
 	              )}
 	            </span>
 	            <span

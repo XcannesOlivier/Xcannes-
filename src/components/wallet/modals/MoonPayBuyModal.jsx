@@ -12,7 +12,8 @@ import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import { greenActionBtnBase } from "./walletModalTokens";
-import { formatAmountWithSymbol } from "../walletDashboardConfig";
+import { getCurrencyFlag, formatAmountWithSymbol } from "../walletDashboardConfig";
+import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -254,8 +255,8 @@ const MoonPayBuyModal = ({
         const labelLeft =
           selectLabelByCurrency?.[currencyRaw] ||
           selectLabelByCurrency?.[currencyCode] ||
+          getCurrencyDescription(currencyCode) ||
           currencyCode;
-        const balanceLabel = t("ui_balance_label_4db9aa0c31", "Balance").replace(/:\s*$/, "");
         const amountValue = Number(token?.value || 0);
         const amountLabel = Number.isFinite(amountValue)
           ? formatAmountWithSymbol(locale, amountValue, currencyCode, {
@@ -266,11 +267,10 @@ const MoonPayBuyModal = ({
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             });
-        const fallbackRight = `${balanceLabel} = ${amountLabel}`;
         const labelRight =
           selectLabelRightByCurrency?.[currencyRaw] ||
           selectLabelRightByCurrency?.[currencyCode] ||
-          fallbackRight;
+          amountLabel;
         const labelMobile =
           selectLabelMobileByCurrency?.[currencyRaw] ||
           selectLabelMobileByCurrency?.[currencyCode] ||
@@ -284,11 +284,13 @@ const MoonPayBuyModal = ({
           label: labelLeft,
           labelLeft,
           labelRight,
+          amountLabel,
           labelMobile,
           icon:
             selectIconByCurrency?.[currencyRaw] ||
             selectIconByCurrency?.[currencyCode] ||
-            moonpayIcon,
+            moonpayIcon ||
+            getCurrencyFlag(currencyCode),
         };
       })
       .filter(Boolean);
@@ -367,7 +369,7 @@ const MoonPayBuyModal = ({
     return supportedCurrencies.filter((c) => {
       const code = String(c?.code || "").toLowerCase();
       const label = String(c?.label || c?.labelLeft || "").toLowerCase();
-      const right = String(c?.labelRight || "").toLowerCase();
+      const right = String(c?.amountLabel || c?.labelRight || "").toLowerCase();
       return `${code} ${label} ${right}`.includes(needle);
     });
   }, [assetSearch, supportedCurrencies]);
@@ -1129,7 +1131,7 @@ const MoonPayBuyModal = ({
 	    : demoMode
 	      ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
 	      : wizardStep === 2
-	        ? t("ui_add_funds_action", "Ajouter de l'argent")
+	        ? t("moonpay_action_continue_buy_8d2a1c6b9f", "Continuer")
 	        : t("ui_next_step", "Étape suivante");
   const continueDisabled =
     wizardStep === 1
@@ -1291,7 +1293,7 @@ const MoonPayBuyModal = ({
 		          {/* Currency selector */}
 		          <div>
 		            <label className="block text-white/70 mb-2">
-		              {t("moonpay_buy_receive_currency_label", "Devise que vous recevrez ")}
+		              {t("moonpay_buy_receive_currency_label", "Devise reçu")}
 		            </label>
 				            <div className="relative">
 				            <button
@@ -1310,33 +1312,42 @@ const MoonPayBuyModal = ({
 			                  : "cursor-default opacity-95",
 			              ].join(" ")}
 			            >
-			              <span className="flex items-center gap-2 min-w-0 flex-1">
-			                {renderSelectIcon(selectedAssetCurrency?.icon)}
-			                <span className="truncate font-semibold">
-			                  {String(currency || "").toUpperCase()}
+			              <span className="flex items-center gap-3 min-w-0 flex-1">
+			                <span className="shrink-0">
+			                  {renderSelectIcon(selectedAssetCurrency?.icon)}
 			                </span>
-			                {selectedAssetCurrency?.labelRight ? (
-			                  <span className="ml-auto text-white/60 tabular-nums">
-			                    {selectedAssetCurrency.labelRight}
+			                <span className="truncate font-semibold">
+			                  {selectedAssetCurrency?.labelLeft ||
+			                    selectedAssetCurrency?.label ||
+			                    String(currency || "").toUpperCase()}
+			                </span>
+			              </span>
+			              <span className="flex items-center gap-2 shrink-0">
+			                {selectedAssetCurrency?.amountLabel ? (
+			                  <span className="text-white/70 font-mono tabular-nums text-sm">
+			                    <span className="text-white/45 mr-1">
+			                      {t("ui_balance_short", "Solde")}
+			                    </span>
+			                    {selectedAssetCurrency.amountLabel}
 			                  </span>
 			                ) : null}
+			                {wizardStep === 1 ? (
+			                  <svg
+			                    className="w-3 h-3 text-white/70"
+			                    fill="none"
+			                    stroke="currentColor"
+			                    viewBox="0 0 24 24"
+			                    aria-hidden
+			                  >
+			                    <path
+			                      strokeLinecap="round"
+			                      strokeLinejoin="round"
+			                      strokeWidth={2}
+			                      d="M19 9l-7 7-7-7"
+			                    />
+			                  </svg>
+			                ) : null}
 			              </span>
-			              {wizardStep === 1 ? (
-			                <svg
-			                  className="w-3 h-3 text-white/70"
-			                  fill="none"
-			                  stroke="currentColor"
-			                  viewBox="0 0 24 24"
-			                  aria-hidden
-			                >
-			                  <path
-			                    strokeLinecap="round"
-			                    strokeLinejoin="round"
-			                    strokeWidth={2}
-			                    d="M19 9l-7 7-7-7"
-			                  />
-			                </svg>
-			              ) : null}
 			            </button>
 
 			            {assetDropdownOpen && isDesktopViewport
@@ -1373,7 +1384,7 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-				                                "Ajouter de l'argent au compte :",
+				                                "Ajouter de l’argent",
 				                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1440,22 +1451,26 @@ const MoonPayBuyModal = ({
 			                                      : "hover:bg-white/[0.04] text-white/80",
 			                                  ].join(" ")}
 			                                >
-			                                  {renderSelectIcon(opt.icon)}
+			                                  <span className="shrink-0">
+			                                    {renderSelectIcon(opt.icon)}
+			                                  </span>
 			                                  <div className="min-w-0 flex-1">
 			                                    <div className="text-sm font-semibold truncate">
 			                                      {opt.labelLeft || opt.label || opt.code}
 			                                    </div>
-			                                    {opt.labelRight ? (
-			                                      <div className="text-[11px] text-white/55 truncate tabular-nums">
-			                                        {opt.labelRight}
-			                                      </div>
+			                                  </div>
+			                                  <div className="flex items-center gap-2 shrink-0">
+			                                    {opt.amountLabel ? (
+			                                      <span className="text-sm font-mono tabular-nums text-white/70">
+			                                        {opt.amountLabel}
+			                                      </span>
+			                                    ) : null}
+			                                    {active ? (
+			                                      <span className="text-xcannes-green font-semibold text-xs">
+			                                        ✓
+			                                      </span>
 			                                    ) : null}
 			                                  </div>
-			                                  {active ? (
-			                                    <span className="text-xcannes-green font-semibold text-xs">
-			                                      ✓
-			                                    </span>
-			                                  ) : null}
 			                                </button>
 			                              );
 			                            })
@@ -1531,7 +1546,7 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-				                                "Ajouter de l'argent au compte :",
+				                                "Ajouter de l’argent",
 				                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1600,22 +1615,26 @@ const MoonPayBuyModal = ({
 			                                    : "hover:bg-white/[0.04] text-white/80",
 			                                ].join(" ")}
 			                              >
-			                                {renderSelectIcon(opt.icon)}
+			                                <span className="shrink-0">
+			                                  {renderSelectIcon(opt.icon)}
+			                                </span>
 			                                <div className="min-w-0 flex-1">
 			                                  <div className="text-sm font-semibold truncate">
 			                                    {opt.labelLeft || opt.label || opt.code}
 			                                  </div>
-			                                  {opt.labelRight ? (
-			                                    <div className="text-[11px] text-white/55 truncate tabular-nums">
-			                                      {opt.labelRight}
-			                                    </div>
+			                                </div>
+			                                <div className="flex items-center gap-2 shrink-0">
+			                                  {opt.amountLabel ? (
+			                                    <span className="text-sm font-mono tabular-nums text-white/70">
+			                                      {opt.amountLabel}
+			                                    </span>
+			                                  ) : null}
+			                                  {active ? (
+			                                    <span className="text-xcannes-green font-semibold text-xs">
+			                                      ✓
+			                                    </span>
 			                                  ) : null}
 			                                </div>
-			                                {active ? (
-			                                  <span className="text-xcannes-green font-semibold text-xs">
-			                                    ✓
-			                                  </span>
-			                                ) : null}
 			                              </button>
 			                            );
 			                          })
@@ -1651,7 +1670,7 @@ const MoonPayBuyModal = ({
                               ? (e) => setTargetAssetAmount(e.target.value)
                               : undefined
                           }
-	                        placeholder="0.0000"
+	                        placeholder={t("ui_enter_amount_placeholder", "Entrez un montant")}
 	                        step="0.0001"
 	                        min="0"
 	                        inputMode="decimal"
@@ -1676,7 +1695,7 @@ const MoonPayBuyModal = ({
 		                        <p className="text-[13px] md:text-sm text-white/80 font-semibold">
 		                          {t(
 		                            "ui_how_add_funds_works",
-		                            "Comment fonctionne l'ajout d'argent ?",
+		                            "Comment ça marche ?",
 		                          )}
 		                        </p>
 		                        <ol className="mt-3 space-y-1 text-[13px] md:text-sm text-white/70 list-decimal list-inside">
@@ -1689,18 +1708,14 @@ const MoonPayBuyModal = ({
 	                          <li>
 	                            {t(
 	                              "ui_credit_step_2_auto_buy_xrp",
-	                              "Achat automatique de crypto (XRP)",
+	                              "Achat automatique de crypto",
 	                            )}
 	                          </li>
 	                          <li>
 	                            {t(
 	                              "ui_credit_step_3_convert_credit",
-	                              {
-	                                defaultValue:
-	                                  "Conversion (en RLUSD) et crédit dans votre compte de la devise choisie",
-	                                currency: currencyUpper || "USD",
-	                              },
-		                            )}
+	                              "Conversion et crédit sur votre compte",
+	                            )}
 		                          </li>
 		                        </ol>
 		                        <p className="mt-3 text-[12px] md:text-sm text-xcannes-green/90 font-semibold">
@@ -1723,7 +1738,7 @@ const MoonPayBuyModal = ({
 	                          {highlightPaymentMethods(
 	                            t(
 	                              "moonpay_info_buy_live_3c8a1d6b2f",
-	                              "Vous serez redirigé vers notre partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+	                              "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.",
 	                            ),
 	                          )}
 	                          <div className="mt-1 text-[11px] md:text-xs text-white/45">
@@ -1765,7 +1780,7 @@ const MoonPayBuyModal = ({
 	            <span>
 	              {t(
 	                "moonpay_buy_secure_partner_note",
-	                "Fourni par nos partenaires sécurisés",
+	                "Paiement sécurisé via",
 	              )}
 	            </span>
 		            <span

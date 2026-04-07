@@ -15,7 +15,7 @@ export const greenActionBtnBase = [
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-btn-green-hover hover:-translate-y-px",
   "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-btn-green/40 disabled:text-white/60 disabled:cursor-not-allowed",
+  "disabled:bg-xcannes-btn-green/45 disabled:text-white/75 disabled:border-white/10 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 
@@ -35,7 +35,7 @@ export const blueNeutralActionBtnBase = [
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-blue/40 hover:-translate-y-px",
   "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-blue/40 disabled:text-white/60 disabled:cursor-not-allowed",
+  "disabled:bg-xcannes-blue/45 disabled:text-white/75 disabled:border-white/10 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 
@@ -46,7 +46,7 @@ export const violetActionBtnBase = [
   "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
   "hover:bg-xcannes-violet-weight hover:-translate-y-px",
   "active:translate-y-0 active:scale-[0.97]",
-  "disabled:bg-xcannes-violet/40 disabled:text-white/60 disabled:cursor-not-allowed",
+  "disabled:bg-xcannes-violet/45 disabled:text-white/75 disabled:border-white/10 disabled:cursor-not-allowed",
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 
