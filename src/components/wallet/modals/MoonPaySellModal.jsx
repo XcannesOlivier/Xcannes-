@@ -13,7 +13,7 @@ import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { formatAmountWithSymbol } from "../walletDashboardConfig";
 import { isIOSDevice } from "@/utils/deviceDetect";
-import { blueNeutralActionBtnBase } from "./walletModalTokens";
+import { violetActionBtnBase } from "./walletModalTokens";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -1120,7 +1120,7 @@ const MoonPaySellModal = ({
     );
     return parts.map((part, idx) =>
       list.includes(part) ? (
-        <span key={idx} className="text-xcannes-green/90 font-semibold">
+        <span key={idx} className="text-xcannes-violet/90 font-semibold">
           {part}
         </span>
       ) : (
@@ -1206,7 +1206,7 @@ const MoonPaySellModal = ({
           </div>
 
           {/* From wallet display */}
-				          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
+				          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(124,58,237,0.18),inset_0_1px_0_rgba(255,255,255,0.06)]">
 				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
 				              {wizardStep === 1
 		                    ? resolvedSelectCryptoTitleOverride ? (
@@ -1252,7 +1252,7 @@ const MoonPaySellModal = ({
             {String(walletLabel || "").trim() ? (
               <div className="flex items-center gap-2 mb-1">
 	                <span
-	                  className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
+	                  className="h-3 w-3 rounded-full ring-4 ring-xcannes-violet/25 bg-xcannes-violet shrink-0 animate-pulse"
 	                  aria-hidden
 	                />
                 <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
@@ -1260,7 +1260,7 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-			            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
+			            <p className="text-[13px] md:text-sm text-xcannes-violet/80 font-mono font-semibold break-all">
 			              {walletAddress}
 			            </p>
 			            {wizardStep === 1 && isOtherBlockchainsDestination ? (
@@ -1297,7 +1297,7 @@ const MoonPaySellModal = ({
 			              }
 			              aria-disabled={wizardStep !== 1}
 			              className={[
-			                "w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+			                "w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 focus:ring-xcannes-violet/60 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(124,58,237,0.18)]",
 			                wizardStep === 1
 			                  ? "cursor-pointer hover:ring-white/25"
 			                  : "cursor-default opacity-95",
@@ -1410,7 +1410,7 @@ const MoonPaySellModal = ({
 		                              value={cryptoSearch}
 		                              onChange={(e) => setCryptoSearch(e.target.value)}
 		                              placeholder={t("ui_search", "Rechercher…")}
-		                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+		                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-violet/60 transition-all duration-150"
 		                            />
 		                          </div>
 		                        </div>
@@ -1436,7 +1436,7 @@ const MoonPaySellModal = ({
 		                                  className={[
 		                                    "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
 		                                    active
-		                                      ? "bg-xcannes-green/10 text-white"
+		                                      ? "bg-xcannes-violet/10 text-white"
 		                                      : "hover:bg-white/[0.04] text-white/80",
 		                                  ].join(" ")}
 		                                >
@@ -1452,7 +1452,7 @@ const MoonPaySellModal = ({
 		                                    ) : null}
 		                                  </div>
 		                                  {active ? (
-		                                    <span className="text-xcannes-green font-semibold text-xs">
+		                                    <span className="text-xcannes-violet font-semibold text-xs">
 		                                      ✓
 		                                    </span>
 		                                  ) : null}
@@ -1570,7 +1570,7 @@ const MoonPaySellModal = ({
                               value={cryptoSearch}
                               onChange={(e) => setCryptoSearch(e.target.value)}
                               placeholder={t("ui_search", "Rechercher…")}
-                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
+                              className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-violet/60 transition-all duration-150"
                             />
                           </div>
                         </div>
@@ -1600,7 +1600,7 @@ const MoonPaySellModal = ({
                                 className={[
                                   "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
                                   active
-                                    ? "bg-xcannes-green/10 text-white"
+                                    ? "bg-xcannes-violet/10 text-white"
                                     : "hover:bg-white/[0.04] text-white/80",
                                 ].join(" ")}
                               >
@@ -1616,7 +1616,7 @@ const MoonPaySellModal = ({
                                   ) : null}
                                 </div>
                                 {active ? (
-                                  <span className="text-xcannes-green font-semibold text-xs">
+                                  <span className="text-xcannes-violet font-semibold text-xs">
                                     ✓
                                   </span>
                                 ) : null}
@@ -1658,9 +1658,9 @@ const MoonPaySellModal = ({
 		                  inputMode="decimal"
                       readOnly={wizardStep !== 1}
 		                  className={[
-                        "w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
+                        "w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(124,58,237,0.18)]",
                         wizardStep === 1
-                          ? "focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
+                          ? "focus:outline-none focus:ring-2 focus:ring-xcannes-violet/60"
                           : "cursor-default opacity-95",
                       ].join(" ")}
 		                />
@@ -1686,7 +1686,7 @@ const MoonPaySellModal = ({
 	                {!isOtherBlockchainsDestination ? (
 	                  <div className="flex justify-center">
 	                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
-	                      <ArrowDownIcon className="w-5 h-5 text-xcannes-green" />
+	                      <ArrowDownIcon className="w-5 h-5 text-xcannes-violet" />
 	                    </div>
 	                  </div>
 	                ) : null}
@@ -1703,7 +1703,7 @@ const MoonPaySellModal = ({
 	                    )}
 	                  </p>
 	                ) : (
-	                  <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
+	                  <div className="rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(124,58,237,0.18),inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]">
 	                    <div className="flex items-start gap-3">
 	                      <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
 	                        <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
@@ -1785,13 +1785,13 @@ const MoonPaySellModal = ({
 		                      )}
 		                </li>
 		              </ol>
-			              <p className="mt-3 text-[12px] md:text-sm text-xcannes-green/90 font-semibold">
+			              <p className="mt-3 text-[12px] md:text-sm text-xcannes-violet/90 font-semibold">
 		                {t(
 		                  "ui_debit_all_automatic_validate_only",
 		                  "✔ Tout est automatique — vous validez simplement",
 		                )}
 		              </p>
-			              <p className="hidden md:block mt-1 text-[12px] md:text-sm text-xcannes-green/90 font-semibold">
+			              <p className="hidden md:block mt-1 text-[12px] md:text-sm text-xcannes-violet/90 font-semibold">
 			                {t(
 			                  "ui_debit_partner_secure",
 			                  "✔ Traitement sécurisé via partenaire",
@@ -1822,14 +1822,14 @@ const MoonPaySellModal = ({
 		            label={continueLabel}
 		            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
 		            disabled={continueDisabled}
-		            variant="xcannesBlueNeutral"
+		            variant="xcannesViolet"
 		            className="md:hidden"
 		          />
 		          <button
 		            type="button"
 		            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
 		            disabled={continueDisabled}
-		            className={`hidden md:block w-full text-xl py-4 ${blueNeutralActionBtnBase}`}
+		            className={`hidden md:block w-full text-xl py-4 ${violetActionBtnBase}`}
 		          >
 		            {continueLabel}
 		          </button>
