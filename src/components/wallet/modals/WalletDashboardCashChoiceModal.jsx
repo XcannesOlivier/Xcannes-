@@ -23,11 +23,19 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Créditez votre compte Xcannes",
+    "Recevoir des stablecoins USD\nDepuis un wallet (USDC, USDT, RLUSD)",
+  );
+  const swapOutSubhintText = t(
+    "ui_funds_swap_out_subhint",
+    "Ajoutés automatiquement à votre solde",
   );
   const swapInHintText = t(
     "ui_funds_swap_in_hint",
-    "Envoyer à une adresse crypto de votre choix",
+    "Envoyer des stablecoins USD\nVers une adresse wallet",
+  );
+  const swapInSubhintText = t(
+    "ui_funds_swap_in_subhint",
+    "Conversion automatique si nécessaire",
   );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -586,37 +594,15 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
-                            {(() => {
-                              const text = String(swapOutHintText || "");
-                              const idx = text.indexOf("(");
-                              if (idx > 0) {
-                                return (
-                                  <>
-                                    <span className="text-white/60">
-                                      {text.slice(0, idx)}
-                                    </span>
-                                    {text.slice(idx)}
-                                  </>
-                                );
-                              }
-                              const prefix = "Depuis un wallet ";
-                              if (text.startsWith(prefix)) {
-                                return (
-                                  <>
-                                    <span className="text-white/60">
-                                      Depuis un wallet{" "}
-                                    </span>
-                                    {text.slice(prefix.length)}
-                                  </>
-                                );
-                              }
-                              return swapOutHintText;
-                            })()}
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90 whitespace-pre-line">
+                            {swapOutHintText}
                           </p>
                         </div>
                       </div>
                     </button>
+                    <p className="px-1 -mt-2 text-[12px] md:text-xs text-white/50">
+                      {swapOutSubhintText}
+                    </p>
 
                     <button
                       type="button"
@@ -632,7 +618,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_in_title",
-                                "Obtenir des stablecoins USD",
+                                "Envoyer (withdraw)",
                               )}
                             </p>
                             <svg
@@ -650,26 +636,15 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
-                            {(() => {
-                              const text = String(swapInHintText || "");
-                              const prefix = "Vers une ";
-                              if (text.startsWith(prefix)) {
-                                return (
-                                  <>
-                                    <span className="text-white/60">
-                                      Vers une{" "}
-                                    </span>
-                                    {text.slice(prefix.length)}
-                                  </>
-                                );
-                              }
-                              return swapInHintText;
-                            })()}
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90 whitespace-pre-line">
+                            {swapInHintText}
                           </p>
                         </div>
                       </div>
                     </button>
+                    <p className="px-1 -mt-2 text-[12px] md:text-xs text-white/50">
+                      {swapInSubhintText}
+                    </p>
                   </div>
                 </div>
               </div>
