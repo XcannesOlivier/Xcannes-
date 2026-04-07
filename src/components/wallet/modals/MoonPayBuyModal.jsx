@@ -1207,7 +1207,7 @@ const MoonPayBuyModal = ({
 		              {wizardStep === 1
 		                ? t(
 		                    "moonpay_buy_select_asset",
-		                    "Choisissez la devise que vous voulez créditer au compte :",
+		                    "Ajouter de l'argent au compte: ",
 		                  )
 			                : t(
 			                    "moonpay_buy_asset_details",
@@ -1312,7 +1312,7 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-			                                "Choisissez la devise que vous voulez créditer au compte :",
+			                                "Ajouter de l'argent au compte: ",
 			                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
@@ -1470,7 +1470,7 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-			                                "Choisissez la devise que vous voulez créditer au compte :",
+			                                "Ajouter de l'argent au compte: ",
 			                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
