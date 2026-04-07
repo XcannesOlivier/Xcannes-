@@ -1246,20 +1246,30 @@ const MoonPayBuyModal = ({
 		          {/* Wallet + Title (merged) */}
 		          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
 		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-		              {wizardStep === 1 ? (
-		                <>
-		                  <span className="text-[20px] tracking-[0.14em]">
-		                    Ajouter de l&apos;argent
-		                  </span>{" "}
-		                  <span className="text-[14px] md:text-[14px]">au compte :</span>
-		                </>
-		              ) : (
-		                t(
-		                  "moonpay_buy_asset_details",
-		                  "Détails de transaction de la devise que vous voulez créditer au compte :",
-		                )
-		              )}
-		            </p>
+			              {wizardStep === 1 ? (
+			                <>
+			                  <span className="text-[20px] tracking-[0.14em]">
+			                    Ajouter de l&apos;argent
+			                  </span>{" "}
+			                  <span className="text-[14px] md:text-[14px]">au compte :</span>
+			                </>
+			              ) : (
+			                <>
+			                  <span className="text-[20px] tracking-[0.14em]">
+			                    {t(
+			                      "moonpay_buy_asset_details_prefix",
+			                      "Détails de la transaction",
+			                    )}
+			                  </span>{" "}
+			                  <span className="text-[14px] md:text-[14px]">
+			                    {t(
+			                      "moonpay_buy_asset_details_suffix",
+			                      "vers le compte :",
+			                    )}
+			                  </span>
+			                </>
+			              )}
+			            </p>
 		            {String(walletLabel || "").trim() ? (
 		              <div className="flex items-center gap-2 mb-1">
 		                <span
@@ -1659,9 +1669,12 @@ const MoonPayBuyModal = ({
 				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
                     {wizardStep === 2 ? (
                       <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
-                        <p className="text-[13px] text-white/80 font-semibold">
-                          {t("ui_how_credit_works", "Comment fonctionne le crédit ?")}
-                        </p>
+	                        <p className="text-[13px] text-white/80 font-semibold">
+	                          {t(
+	                            "ui_how_add_funds_works",
+	                            "Comment fonctionne l'ajout d'argent ?",
+	                          )}
+	                        </p>
                         <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
                           <li>
                             {t(
@@ -1675,16 +1688,16 @@ const MoonPayBuyModal = ({
                               "Achat automatique de crypto (XRP)",
                             )}
                           </li>
-                          <li>
-                            {t(
-                              "ui_credit_step_3_convert_credit",
-                              {
-                                defaultValue:
-                                  "Conversion (en RLUSD) et crédit dans votre wallet en {{currency}}",
-                                currency: currencyUpper || "USD",
-                              },
-                            )}
-                          </li>
+	                          <li>
+	                            {t(
+	                              "ui_credit_step_3_convert_credit",
+	                              {
+	                                defaultValue:
+	                                  "Conversion (en RLUSD) et crédit dans votre compte de la devise choisie",
+	                                currency: currencyUpper || "USD",
+	                              },
+	                            )}
+	                          </li>
                         </ol>
                         <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
                           {t(
