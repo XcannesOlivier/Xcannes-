@@ -1204,15 +1204,17 @@ const MoonPayBuyModal = ({
 		          {/* Wallet + Title (merged) */}
 		          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
 		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-		              {wizardStep === 1
-		                ? t(
-		                    "moonpay_buy_select_asset",
-		                    "Ajouter de l'argent au compte: ",
-		                  )
-			                : t(
-			                    "moonpay_buy_asset_details",
-			                    "Détails de transaction de la devise que vous voulez créditer au compte :",
-			                  )}
+		              {wizardStep === 1 ? (
+		                <>
+		                  <span className="text-[20px]">Ajouter de l&apos;argent</span>{" "}
+		                  <span>au compte:</span>
+		                </>
+		              ) : (
+		                t(
+		                  "moonpay_buy_asset_details",
+		                  "Détails de transaction de la devise que vous voulez créditer au compte :",
+		                )
+		              )}
 		            </p>
 		            {String(walletLabel || "").trim() ? (
 		              <div className="flex items-center gap-2 mb-1">
@@ -1232,10 +1234,11 @@ const MoonPayBuyModal = ({
 
 		          {/* Currency selector */}
 		          <div>
-			            <div className="relative">
-			            <button
-				              type="button"
-				              ref={assetDropdownTriggerRef}
+		            <label className="block text-white/70 mb-2">{t("ui_to", "Vers")}</label>
+				            <div className="relative">
+				            <button
+					              type="button"
+					              ref={assetDropdownTriggerRef}
 			              onClick={
 			                wizardStep === 1
 			                  ? () => setAssetDropdownOpen((prev) => !prev)
