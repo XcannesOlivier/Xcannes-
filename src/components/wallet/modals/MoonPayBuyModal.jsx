@@ -1693,20 +1693,32 @@ const MoonPayBuyModal = ({
                           )}
                         </p>
                       </div>
-                    ) : (
-                      highlightPaymentMethods(
-                        demoMode
-                          ? t(
-                              "moonpay_info_buy_demo_1b7d2c9a5e",
-                              "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
-                            )
-                          : t(
-                              "moonpay_info_buy_live_3c8a1d6b2f",
-                              "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
-                            ),
-                      )
-                    )}
-			          </div>
+	                    ) : (
+	                      demoMode ? (
+	                        highlightPaymentMethods(
+	                          t(
+	                            "moonpay_info_buy_demo_1b7d2c9a5e",
+	                            "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
+	                          ),
+	                        )
+	                      ) : (
+	                        <>
+	                          {highlightPaymentMethods(
+	                            t(
+	                              "moonpay_info_buy_live_3c8a1d6b2f",
+	                              "Vous serez redirigé vers notre partenaire sécurisé pour finaliser le paiement. Accepté : carte bancaire, Apple Pay, Google Pay, virement.",
+	                            ),
+	                          )}
+	                          <div className="mt-1 text-[11px] md:text-xs text-white/45">
+	                            {t(
+	                              "moonpay_buy_partner_location_note",
+	                              "Le partenaire proposé dépend de votre localisation.",
+	                            )}
+	                          </div>
+	                        </>
+	                      )
+	                    )}
+				          </div>
 
           {/* Error message */}
           {displayError && (
@@ -1733,12 +1745,12 @@ const MoonPayBuyModal = ({
 	            {continueLabel}
 		          </button>
 		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-		            <span>
-		              {t(
-		                "moonpay_buy_secure_partner_note",
-		                "Fourni par un partenaire sécurisé",
-		              )}
-		            </span>
+	            <span>
+	              {t(
+	                "moonpay_buy_secure_partner_note",
+	                "Fourni par nos partenaires sécurisés",
+	              )}
+	            </span>
 		            <span
 		              className="inline-flex items-center gap-1.5"
 		              aria-label={t(
