@@ -720,8 +720,8 @@ export default function WalletDashboardCashChoiceModal({
                     </button>
                     <div className="h-0.5" />
 
-                    <p className="pt-3 text-[12px] md:text-xs text-white/45 leading-snug">
-                      <span className="inline-block text-[16px] md:text-[18px] leading-none text-white/60 mr-1.5 align-middle">
+                    <p className="pt-3 text-[12px] md:text-[13px] text-white/45 leading-snug">
+                      <span className="inline-block text-[16px] md:text-[19px] leading-none text-white/60 mr-1.5 align-middle">
                         →
                       </span>
                       <span className="align-middle">{stablecoinLiquidityNote}</span>
