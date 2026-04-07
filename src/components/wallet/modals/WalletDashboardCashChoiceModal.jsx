@@ -23,7 +23,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Recevoir des stablecoins USD\nDepuis un wallet (USDC, USDT, ...)",
+    "Depuis un wallet (USDC, USDT, ...)",
   );
   const swapOutSubhintText = t(
     "ui_funds_swap_out_subhint",
@@ -31,7 +31,7 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapInHintText = t(
     "ui_funds_swap_in_hint",
-    "Envoyer des stablecoins USD\nVers une adresse wallet",
+    "Vers une adresse wallet",
   );
   const swapInSubhintText = t(
     "ui_funds_swap_in_subhint",
@@ -560,7 +560,7 @@ export default function WalletDashboardCashChoiceModal({
                   </div>
 
                   <div className="space-y-4">
-                    {sectionHeader(t("ui_funds_section_digital_dollars", "Dollars numériques"))}
+                    {sectionHeader(t("ui_funds_section_digital_dollars", "Stablecoins USD"))}
 
                     <button
                       type="button"
@@ -576,7 +576,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_out_title",
-                                "Recevoir (deposit)",
+                                "Recevoir",
                               )}
                             </p>
                             <svg
@@ -643,12 +643,13 @@ export default function WalletDashboardCashChoiceModal({
                                 );
                               })}
                           </p>
+                          <p className="mt-2 text-[12px] md:text-xs text-white/50">
+                            {swapOutSubhintText}
+                          </p>
                         </div>
                       </div>
                     </button>
-                    <p className="px-1 -mt-2 mb-5 text-[12px] md:text-xs text-white/50">
-                      {swapOutSubhintText}
-                    </p>
+                    <div className="mb-5" />
 
                     <button
                       type="button"
@@ -664,7 +665,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_in_title",
-                                "Envoyer (withdraw)",
+                                "Envoyer",
                               )}
                             </p>
                             <svg
@@ -710,12 +711,13 @@ export default function WalletDashboardCashChoiceModal({
                                 );
                               })}
                           </p>
+                          <p className="mt-2 text-[12px] md:text-xs text-white/50">
+                            {swapInSubhintText}
+                          </p>
                         </div>
                       </div>
                     </button>
-                    <p className="px-1 -mt-2 text-[12px] md:text-xs text-white/50">
-                      {swapInSubhintText}
-                    </p>
+                    <div className="h-0.5" />
                   </div>
                 </div>
               </div>
