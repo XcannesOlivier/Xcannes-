@@ -23,11 +23,11 @@ export default function WalletDashboardCashChoiceModal({
   );
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
-    "Depuis un wallet (USDC, USDT)",
+    "Créditez votre compte Xcannes",
   );
   const swapInHintText = t(
     "ui_funds_swap_in_hint",
-    "Vers une adresse crypto",
+    "Envoyer à une adresse crypto de votre choix",
   );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -568,7 +568,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_out_title",
-                                "Recevoir des dollars",
+                                "Échanger vos stablecoin USD",
                               )}
                             </p>
                             <svg
@@ -632,7 +632,7 @@ export default function WalletDashboardCashChoiceModal({
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
                               {t(
                                 "ui_funds_swap_in_title",
-                                "Envoyer des dollars",
+                                "Obtenir des stablecoins USD",
                               )}
                             </p>
                             <svg
