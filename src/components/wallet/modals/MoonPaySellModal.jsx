@@ -1196,12 +1196,12 @@ const MoonPaySellModal = ({
 			                              "Détails de la transaction",
 			                            )}
 			                          </span>{" "}
-			                          <span className="text-[14px] md:text-[14px]">
-			                            {t(
-			                              "moonpay_sell_asset_details_suffix",
-			                              "depuis le compte :",
-			                            )}
-			                          </span>
+				                          <span className="hidden md:inline text-[14px] md:text-[14px]">
+				                            {t(
+				                              "moonpay_sell_asset_details_suffix",
+				                              "depuis le compte :",
+				                            )}
+				                          </span>
 			                        </>
 			                      )}
 					            </p>
@@ -1747,12 +1747,12 @@ const MoonPaySellModal = ({
 		                  "✔ Tout est automatique — vous validez simplement",
 		                )}
 		              </p>
-			              <p className="mt-1 text-[12px] md:text-sm text-xcannes-green/90 font-semibold">
-		                {t(
-		                  "ui_debit_partner_secure",
-		                  "✔ Traitement sécurisé via partenaire",
-		                )}
-		              </p>
+			              <p className="hidden md:block mt-1 text-[12px] md:text-sm text-xcannes-green/90 font-semibold">
+			                {t(
+			                  "ui_debit_partner_secure",
+			                  "✔ Traitement sécurisé via partenaire",
+			                )}
+			              </p>
 		            </>
 		          ) : null}
 
