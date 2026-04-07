@@ -1770,7 +1770,7 @@ const MoonPaySellModal = ({
 		                      )
 		                    : t(
 		                        "ui_debit_step_2_partner_conversion_sale",
-		                        "Conversion automatique et vente via notre partenaire",
+		                        "Conversion automatique et traitement via notre partenaire",
 		                      )}
 		                </li>
 		                <li>
