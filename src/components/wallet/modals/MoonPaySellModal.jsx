@@ -472,7 +472,7 @@ const MoonPaySellModal = ({
           getCurrencyDescription(currency) ||
           currency;
         const amountValue = Number(token?.value || 0);
-        const amountLabel = Number.isFinite(amountValue)
+        const fallbackAmountLabel = Number.isFinite(amountValue)
           ? formatAmountWithSymbol(locale, amountValue, currency, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -481,10 +481,15 @@ const MoonPaySellModal = ({
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             });
-        const labelRight =
+        const amountLabelFromProps =
           selectLabelRightByCurrency?.[currencyRaw] ||
           selectLabelRightByCurrency?.[currency] ||
-          amountLabel;
+          "";
+        const amountLabel =
+          typeof amountLabelFromProps === "string" && amountLabelFromProps.trim()
+            ? amountLabelFromProps
+            : fallbackAmountLabel;
+        const labelRight = amountLabel;
         const labelMobile =
           selectLabelMobileByCurrency?.[currencyRaw] ||
           selectLabelMobileByCurrency?.[currency] ||
@@ -1315,7 +1320,7 @@ const MoonPaySellModal = ({
 			              <span className="flex items-center gap-2 shrink-0">
 			                {selectedSellCurrency?.amountLabel ? (
 			                  <span className="text-white/70 font-mono tabular-nums text-sm">
-			                    <span className="text-white/45 mr-1">
+			                    <span className="text-white/45 mr-2">
 			                      {t("ui_balance_short", "Solde")}
 			                    </span>
 			                    {selectedSellCurrency.amountLabel}
