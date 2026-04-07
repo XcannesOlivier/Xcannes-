@@ -1669,27 +1669,27 @@ const MoonPayBuyModal = ({
                 ) : null}
 
 				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
-                    {wizardStep === 2 ? (
-                      <div className="rounded-2xl bg-white/[0.03] ring-1 ring-white/10 ring-inset px-4 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+	                    {wizardStep === 2 ? (
+	                      <>
 	                        <p className="text-[13px] text-white/80 font-semibold">
 	                          {t(
 	                            "ui_how_add_funds_works",
 	                            "Comment fonctionne l'ajout d'argent ?",
 	                          )}
 	                        </p>
-                        <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
-                          <li>
-                            {t(
-                              "ui_credit_step_1_secure_payment",
-                              "Paiement sécurisé (carte, Apple Pay…)",
-                            )}
-                          </li>
-                          <li>
-                            {t(
-                              "ui_credit_step_2_auto_buy_xrp",
-                              "Achat automatique de crypto (XRP)",
-                            )}
-                          </li>
+	                        <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
+	                          <li>
+	                            {t(
+	                              "ui_credit_step_1_secure_payment",
+	                              "Paiement sécurisé (carte, Apple Pay…)",
+	                            )}
+	                          </li>
+	                          <li>
+	                            {t(
+	                              "ui_credit_step_2_auto_buy_xrp",
+	                              "Achat automatique de crypto (XRP)",
+	                            )}
+	                          </li>
 	                          <li>
 	                            {t(
 	                              "ui_credit_step_3_convert_credit",
@@ -1700,18 +1700,18 @@ const MoonPayBuyModal = ({
 	                              },
 	                            )}
 	                          </li>
-                        </ol>
-                        <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
-                          {t(
-                            "ui_credit_all_automatic",
-                            "✔ Tout est automatique — vous validez simplement",
-                          )}
-                        </p>
-                      </div>
-	                    ) : (
-	                      demoMode ? (
-	                        highlightPaymentMethods(
-	                          t(
+	                        </ol>
+	                        <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
+	                          {t(
+	                            "ui_credit_all_automatic",
+	                            "✔ Tout est automatique — vous validez simplement",
+	                          )}
+	                        </p>
+	                      </>
+		                    ) : (
+		                      demoMode ? (
+		                        highlightPaymentMethods(
+		                          t(
 	                            "moonpay_info_buy_demo_1b7d2c9a5e",
 	                            "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
 	                          ),
