@@ -1056,6 +1056,7 @@
   "ui_funds_withdraw_title": "Envoyer vers la banque",
   "ui_funds_withdraw_hint": "Vers votre compte bancaire",
   "ui_funds_section_digital_dollars": "Stablecoins USD",
+  "ui_funds_stablecoin_liquidity_note": "Les transactions utilisent des stablecoins USD (RLUSD) et la liquidité du réseau XRP",
   "ui_funds_swap_out_title": "Recevoir",
   "ui_funds_swap_out_hint": "Depuis un autre wallet (USDC, USDT, RLUSD, ...)",
   "ui_funds_swap_out_subhint": "Ajoutés automatiquement à votre solde",
