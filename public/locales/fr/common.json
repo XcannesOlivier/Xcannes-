@@ -565,7 +565,7 @@
   "moonpay_receive_in": "Recevoir en",
   "moonpay_select_crypto_to_sell": "Vous vendez",
   "moonpay_select_cryptocurrency": "Vous recevrez des dollars numériques (USD)",
-  "moonpay_buy_select_asset": "Ajouter de l'argent au compte: ",
+  "moonpay_buy_select_asset": "Ajouter de l'argent au compte :",
   "moonpay_xrp_network_note": "Utilisé pour les transferts et frais réseau",
   "moonpay_sell_demo_notice": "Mode démo : la vente est simulée (aucune redirection MoonPay).",
   "moonpay_sell_success_body": "Vos fonds seront transférés sur votre compte bancaire.",

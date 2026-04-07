@@ -1209,7 +1209,7 @@ const MoonPayBuyModal = ({
 		                  <span className="text-[20px] tracking-[0.14em]">
 		                    Ajouter de l&apos;argent
 		                  </span>{" "}
-		                  <span className="text-[14px] md:text-[14px]">au compte:</span>
+		                  <span className="text-[14px] md:text-[14px]">au compte :</span>
 		                </>
 		              ) : (
 		                t(
@@ -1317,8 +1317,8 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-			                                "Ajouter de l'argent au compte: ",
-			                              )}
+				                                "Ajouter de l'argent au compte :",
+				                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 			                              {t("ui_search", "Rechercher…")}
@@ -1475,8 +1475,8 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-			                                "Ajouter de l'argent au compte: ",
-			                              )}
+				                                "Ajouter de l'argent au compte :",
+				                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 			                              {t("ui_search", "Rechercher…")}
@@ -1690,14 +1690,36 @@ const MoonPayBuyModal = ({
 	          >
 	            {continueLabel}
 	          </button>
-          <p className="mt-2 text-[11px] md:text-xs text-white/60 text-center">
-            {t(
-              "moonpay_buy_secure_partner_note",
-              "Fourni par un partenaire sécurisé",
-            )}
-          </p>
-        </div>
-      )}
+	          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+	            <span>
+	              {t(
+	                "moonpay_buy_secure_partner_note",
+	                "Fourni par un partenaire sécurisé",
+	              )}
+	            </span>
+	            <span
+	              className="inline-flex items-center gap-1.5"
+	              aria-label={t(
+	                "moonpay_buy_payment_methods",
+	                "Partenaires et moyens de paiement",
+	              )}
+	            >
+	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
+	                MoonPay
+	              </span>
+	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
+	                Topper
+	              </span>
+	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
+	                Pay
+	              </span>
+	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
+	                GPay
+	              </span>
+	            </span>
+	          </div>
+	        </div>
+	      )}
 
       {/* Loading */}
       {step === "loading" && (
