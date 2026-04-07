@@ -1161,7 +1161,7 @@ const MoonPayBuyModal = ({
 
     if (failed) {
       return (
-        <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
+        <span className="inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75 leading-none">
           {fallback}
         </span>
       );
@@ -1170,7 +1170,7 @@ const MoonPayBuyModal = ({
     return (
       <span
         className={[
-          "inline-flex items-center rounded-md px-1.5 py-1 ring-1 ring-white/10",
+          "inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none",
           containerClassName,
         ].join(" ")}
       >
@@ -1179,7 +1179,7 @@ const MoonPayBuyModal = ({
           alt={alt}
           loading="lazy"
           decoding="async"
-          className="h-3.5 md:h-4 w-auto"
+          className="h-full w-auto object-contain"
           onError={() => setFailed(true)}
         />
       </span>
