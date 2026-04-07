@@ -1156,6 +1156,36 @@ const MoonPayBuyModal = ({
     );
   };
 
+  const PaymentLogo = ({ src, alt, fallback, containerClassName = "bg-white/5" }) => {
+    const [failed, setFailed] = useState(false);
+
+    if (failed) {
+      return (
+        <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
+          {fallback}
+        </span>
+      );
+    }
+
+    return (
+      <span
+        className={[
+          "inline-flex items-center rounded-md px-1.5 py-1 ring-1 ring-white/10",
+          containerClassName,
+        ].join(" ")}
+      >
+        <img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          className="h-3.5 md:h-4 w-auto"
+          onError={() => setFailed(true)}
+        />
+      </span>
+    );
+  };
+
   const shouldAnimate = !embedded;
   const { shouldRender, isClosing } = useModalTransition(isOpen, {
     enabled: shouldAnimate,
@@ -1689,35 +1719,35 @@ const MoonPayBuyModal = ({
 	            className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
 	          >
 	            {continueLabel}
-	          </button>
-	          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-	            <span>
-	              {t(
-	                "moonpay_buy_secure_partner_note",
-	                "Fourni par un partenaire sécurisé",
-	              )}
-	            </span>
-	            <span
-	              className="inline-flex items-center gap-1.5"
-	              aria-label={t(
-	                "moonpay_buy_payment_methods",
-	                "Partenaires et moyens de paiement",
-	              )}
-	            >
-	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
-	                MoonPay
-	              </span>
-	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
-	                Topper
-	              </span>
-	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
-	                Pay
-	              </span>
-	              <span className="inline-flex items-center rounded-md px-1.5 py-0.5 bg-white/5 ring-1 ring-white/10 text-[9px] md:text-[10px] font-semibold text-white/75">
-	                GPay
-	              </span>
-	            </span>
-	          </div>
+		          </button>
+		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+		            <span>
+		              {t(
+		                "moonpay_buy_secure_partner_note",
+		                "Fourni par un partenaire sécurisé",
+		              )}
+		            </span>
+		            <span
+		              className="inline-flex items-center gap-1.5"
+		              aria-label={t(
+		                "moonpay_buy_payment_methods",
+		                "Partenaires et moyens de paiement",
+		              )}
+		            >
+		              <PaymentLogo
+		                src="/assets/payment-logos/moonpay.png"
+		                alt="MoonPay"
+		                fallback="MoonPay"
+		                containerClassName="bg-white/90"
+		              />
+		              <PaymentLogo
+		                src="/assets/payment-logos/topper.svg"
+		                alt="Topper"
+		                fallback="Topper"
+		                containerClassName="bg-black/40"
+		              />
+		            </span>
+		          </div>
 	        </div>
 	      )}
 
