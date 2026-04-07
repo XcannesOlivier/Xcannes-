@@ -1094,12 +1094,29 @@ const MoonPaySellModal = ({
     setError(null);
   }, [currency, amount, quoteCurrency]);
 
+  const amountForCtaLabel = useMemo(() => {
+    const raw = String(amount || "").trim();
+    if (!raw) return "";
+    const num = Number(raw);
+    if (!Number.isFinite(num)) return raw;
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 6 }).format(num);
+  }, [amount, locale]);
+
 	  const continueLabel = loading
 	    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
 	    : demoMode
 	      ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
 	      : wizardStep === 2
-	        ? t("ui_send_to_bank_action", "Envoyer vers la banque")
+	        ? hasValidAmount && amountForCtaLabel
+	          ? t("ui_send_to_bank_action_with_amount", {
+	              defaultValue: "Envoyer {{amount}} {{currency}} vers la banque",
+	              amount: amountForCtaLabel,
+	              currency:
+	                selectedSellCurrency?.labelLeft ||
+	                selectedSellCurrency?.label ||
+	                String(currency || "").toUpperCase(),
+	            })
+	          : t("ui_send_to_bank_action", "Envoyer vers la banque")
 	        : t("ui_next_step", "Étape suivante");
   const continueDisabled =
     wizardStep === 1
@@ -1233,13 +1250,7 @@ const MoonPaySellModal = ({
 			                              "moonpay_sell_asset_details_prefix",
 			                              "Détails de la transaction",
 			                            )}
-			                          </span>{" "}
-				                          <span className="hidden md:inline text-[14px] md:text-[14px]">
-				                            {t(
-				                              "moonpay_sell_asset_details_suffix",
-				                              "depuis le compte :",
-				                            )}
-				                          </span>
+			                          </span>
 			                        </>
 			                      )}
 					            </p>
@@ -1755,7 +1766,7 @@ const MoonPaySellModal = ({
 		                    )
 		                  : t(
 		                      "ui_how_bank_send_works",
-		                      "Comment fonctionne l'envoi vers votre banque ?",
+		                      "Comment ça fonctionne ?",
 		                    )}
 		              </p>
 			              <ol className="mt-3 space-y-1 text-[13px] md:text-sm text-white/70 list-decimal list-inside">
@@ -1767,7 +1778,7 @@ const MoonPaySellModal = ({
 		                      )
 		                    : t(
 		                        "ui_debit_step_1_account_debit",
-		                        "Débit du montant depuis votre compte .",
+		                        "Débit du montant sur votre compte .",
 		                      )}
 		                </li>
 		                <li>
@@ -1778,7 +1789,7 @@ const MoonPaySellModal = ({
 		                      )
 		                    : t(
 		                        "ui_debit_step_2_partner_conversion_sale",
-		                        "Conversion automatique et traitement via notre partenaire",
+		                        "Conversion automatique",
 		                      )}
 		                </li>
 		                <li>

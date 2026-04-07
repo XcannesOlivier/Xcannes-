@@ -578,6 +578,7 @@
   "ui_next_step": "Next step",
   "ui_add_funds_action": "Add funds",
   "ui_send_to_bank_action": "Send to bank",
+  "ui_send_to_bank_action_with_amount": "Send {{amount}} {{currency}} to bank",
   "ui_balance_short": "Balance:",
   "moonpay_buy_asset_details": "Transaction details to the account:",
   "moonpay_buy_asset_details_prefix": "Transaction details",
