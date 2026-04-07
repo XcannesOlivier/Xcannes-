@@ -512,7 +512,7 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t("ui_funds_withdraw_title", "Retirer vers la banque")}
+                              {t("ui_funds_withdraw_title", "Envoyer vers la banque")}
                             </p>
                             <svg
                               className="w-5 h-5 text-white/45"

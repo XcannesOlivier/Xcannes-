@@ -1124,11 +1124,13 @@ const MoonPayBuyModal = ({
     setAmount(String(next));
   }, [conversionMissing, hasValidTargetAmount, isOpen, rlusdEquivalent, wizardStep]);
 
-  const continueLabel = loading
-    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
-    : demoMode
-      ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
-      : t("moonpay_action_continue_buy_8d2a1c6b9f", "Continuer");
+	  const continueLabel = loading
+	    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
+	    : demoMode
+	      ? t("moonpay_action_simulate_buy_5a1c9d7b3e", "Simulate buy")
+	      : wizardStep === 2
+	        ? t("ui_add_funds_action", "Ajouter de l'argent")
+	        : t("ui_next_step", "Étape suivante");
   const continueDisabled =
     wizardStep === 1
       ? loading || !hasValidTargetAmount || conversionMissing

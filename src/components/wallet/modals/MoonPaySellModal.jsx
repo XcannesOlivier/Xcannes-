@@ -1094,11 +1094,13 @@ const MoonPaySellModal = ({
     setError(null);
   }, [currency, amount, quoteCurrency]);
 
-  const continueLabel = loading
-    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
-    : demoMode
-      ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
-      : t("moonpay_action_continue_sell_2c8a1d6b4f", "Retirer");
+	  const continueLabel = loading
+	    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
+	    : demoMode
+	      ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
+	      : wizardStep === 2
+	        ? t("ui_send_to_bank_action", "Envoyer vers la banque")
+	        : t("ui_next_step", "Étape suivante");
   const continueDisabled =
     wizardStep === 1
       ? loading || !hasValidAmount || !selectedToken || conversionMissing
