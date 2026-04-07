@@ -1669,19 +1669,19 @@ const MoonPayBuyModal = ({
                 ) : null}
 
 				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
-	                    {wizardStep === 2 ? (
-	                      <>
-	                        <p className="text-[13px] text-white/80 font-semibold">
-	                          {t(
-	                            "ui_how_add_funds_works",
-	                            "Comment fonctionne l'ajout d'argent ?",
-	                          )}
-	                        </p>
-	                        <ol className="mt-3 space-y-1 text-[13px] text-white/70 list-decimal list-inside">
-	                          <li>
-	                            {t(
-	                              "ui_credit_step_1_secure_payment",
-	                              "Paiement sécurisé (carte, Apple Pay…)",
+		                    {wizardStep === 2 ? (
+		                      <>
+		                        <p className="text-[13px] md:text-sm text-white/80 font-semibold">
+		                          {t(
+		                            "ui_how_add_funds_works",
+		                            "Comment fonctionne l'ajout d'argent ?",
+		                          )}
+		                        </p>
+		                        <ol className="mt-3 space-y-1 text-[13px] md:text-sm text-white/70 list-decimal list-inside">
+		                          <li>
+		                            {t(
+		                              "ui_credit_step_1_secure_payment",
+		                              "Paiement sécurisé (carte, Apple Pay…)",
 	                            )}
 	                          </li>
 	                          <li>
@@ -1698,14 +1698,14 @@ const MoonPayBuyModal = ({
 	                                  "Conversion (en RLUSD) et crédit dans votre compte de la devise choisie",
 	                                currency: currencyUpper || "USD",
 	                              },
-	                            )}
-	                          </li>
-	                        </ol>
-	                        <p className="mt-3 text-[12px] text-xcannes-green/90 font-semibold">
-	                          {t(
-	                            "ui_credit_all_automatic",
-	                            "✔ Tout est automatique — vous validez simplement",
-	                          )}
+		                            )}
+		                          </li>
+		                        </ol>
+		                        <p className="mt-3 text-[12px] md:text-sm text-xcannes-green/90 font-semibold">
+		                          {t(
+		                            "ui_credit_all_automatic",
+		                            "✔ Tout est automatique — vous validez simplement",
+		                          )}
 	                        </p>
 	                      </>
 		                    ) : (
