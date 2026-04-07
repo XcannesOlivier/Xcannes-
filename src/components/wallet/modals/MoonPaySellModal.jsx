@@ -1265,7 +1265,7 @@ const MoonPaySellModal = ({
                 </p>
               </div>
             ) : null}
-			            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
+			            <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all md:tracking-[0.06em]">
 			              {walletAddress}
 			            </p>
 			            {wizardStep === 1 && isOtherBlockchainsDestination ? (
