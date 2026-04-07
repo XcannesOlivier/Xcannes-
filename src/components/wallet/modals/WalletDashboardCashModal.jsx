@@ -185,14 +185,21 @@ export default function WalletDashboardCashModal({
 	          }}
 	        >
 		          {/* Header */}
-		          {!rampActive ? (
-		            <div className="border-b border-white/10">
-		              <div className="flex items-start gap-3 p-4">
-				                {cashModalTab === "buy" || cashModalTab === "sell" ? (
-				                  <button
-			                    type="button"
-			                    onClick={onClose}
-			                    className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+			          {!rampActive ? (
+			            <div className="border-b border-white/10">
+			              <div
+			                className={[
+			                  "flex gap-3",
+			                  cashModalTab === "buy" || cashModalTab === "sell"
+			                    ? "items-center px-3 py-2 md:items-start md:p-4"
+			                    : "items-start p-4",
+			                ].join(" ")}
+			              >
+					                {cashModalTab === "buy" || cashModalTab === "sell" ? (
+					                  <button
+				                    type="button"
+				                    onClick={onClose}
+				                    className="wallet-modal-close -ml-1 w-10 h-10 flex items-center justify-center rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors"
 			                    aria-label={t("back", "Back")}
 			                  >
 			                    <ChevronLeftIcon className="w-6 h-6" aria-hidden="true" />
