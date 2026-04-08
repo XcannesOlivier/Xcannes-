@@ -1315,13 +1315,13 @@ const MoonPaySellModal = ({
 		                </p>
 		              </div>
 		            ) : null}
-		            <p
-		              className={[
-		                "text-[13px] md:text-sm font-mono font-semibold break-all md:tracking-[0.06em]",
-		                accentText80,
-		              ].join(" ")}
-		            >
-		              {walletAddress}
+			            <p
+			              className={[
+			                "text-[13px] md:text-sm font-mono break-all md:tracking-[0.06em]",
+			                accentText80,
+			              ].join(" ")}
+			            >
+			              {walletAddress}
 		            </p>
 					          </div>
 
