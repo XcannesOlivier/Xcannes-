@@ -1780,32 +1780,25 @@ const MoonPayBuyModal = ({
 	            <span>
 	              {t(
 	                "moonpay_buy_secure_partner_note",
-	                "Paiement sécurisé via",
+	                "Conversion sécurisé via",
 	              )}
 	            </span>
-		            <span
-		              className="inline-flex items-center gap-1.5"
-		              aria-label={t(
-		                "moonpay_buy_payment_methods",
-		                "Partenaires et moyens de paiement",
-		              )}
-		            >
-		              <PaymentLogo
-		                src="/assets/payment-logos/moonpay.png"
-		                alt="MoonPay"
-		                fallback="MoonPay"
-		                containerClassName="bg-white/90"
-		                widthClassName="w-[110px]"
-		              />
-		              <PaymentLogo
-		                src="/assets/payment-logos/topper.svg"
-		                alt="Topper"
-		                fallback="Topper"
-		                containerClassName="bg-black/40"
-		                widthClassName="w-[110px]"
-		              />
-		            </span>
-		          </div>
+			            <span
+			              className="inline-flex items-center gap-1.5"
+			              aria-label={t(
+			                "moonpay_buy_payment_methods",
+			                "Partenaires et moyens de paiement",
+			              )}
+			            >
+			              <PaymentLogo
+			                src="/assets/payment-logos/simpleswap.jpeg"
+			                alt="SimpleSwap"
+			                fallback="SimpleSwap"
+			                containerClassName="bg-white/90"
+			                widthClassName="w-[140px]"
+			              />
+			            </span>
+			          </div>
 	        </div>
 	      )}
 

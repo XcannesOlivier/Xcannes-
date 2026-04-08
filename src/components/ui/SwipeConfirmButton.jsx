@@ -31,6 +31,11 @@ const VARIANTS = {
     disabledBtn:
       "border-white/10 bg-xcannes-violet/45 text-white/75 cursor-not-allowed",
   },
+  simpleSwapBlue: {
+    btn: "border-transparent bg-[#0870f8] text-white hover:bg-[#0765df] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn:
+      "border-white/10 bg-[#0870f8]/45 text-white/75 cursor-not-allowed",
+  },
   orange: {
     btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
     disabledBtn:
