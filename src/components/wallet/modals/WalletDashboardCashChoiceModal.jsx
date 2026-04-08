@@ -17,10 +17,24 @@ export default function WalletDashboardCashChoiceModal({
 }) {
   const { t } = useTranslation("common");
   const addHintText = t("ui_funds_add_hint", "Carte ou virement bancaire");
-  const withdrawHintText = t(
-    "ui_funds_withdraw_hint",
-    "Vers votre compte bancaire",
-  );
+	  const withdrawHintText = t(
+	    "ui_funds_withdraw_hint",
+	    "Vers votre compte bancaire",
+	  );
+	  const highlightWithdraw = (value) => {
+	    const input = String(value || "");
+	    if (!input) return input;
+	    const parts = input.split(/(compte bancaire)/i);
+	    return parts.map((part, idx) =>
+	      /^compte bancaire$/i.test(part) ? (
+	        <span key={`${idx}-${part}`} className="text-xcannes-violet/90 font-semibold">
+	          {part}
+	        </span>
+	      ) : (
+	        <span key={`${idx}-${part}`}>{part}</span>
+	      ),
+	    );
+	  };
   const swapOutHintText = t(
     "ui_funds_swap_out_hint",
     "Depuis un wallet (USDC, USDT, RLUSD, ...)",
@@ -109,17 +123,17 @@ export default function WalletDashboardCashChoiceModal({
         strokeWidth="2"
         strokeLinecap="round"
       />
-      <path
-        d="M10 38h28"
-        className="stroke-white/35"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
+	      <path
+	        d="M10 38h28"
+	        className="stroke-xcannes-violet/75"
+	        strokeWidth="2"
+	        strokeLinecap="round"
+	      />
+	    </svg>
+	  );
 
-  const FundsCardWalletIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+	  const FundsCardWalletIcon = () => (
+	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
         d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
         className="fill-white/5 stroke-white/25"
@@ -131,34 +145,34 @@ export default function WalletDashboardCashChoiceModal({
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <circle cx="30.5" cy="27" r="5.5" className="fill-xcannes-green/15" />
-      <path
-        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
-        className="stroke-xcannes-green/85"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+	      <circle cx="30.5" cy="27" r="5.5" className="fill-[#0870f8]/15" />
+	      <path
+	        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
+	        className="stroke-[#0870f8]/85"
+	        strokeWidth="1.4"
+	        strokeLinecap="round"
+	        strokeLinejoin="round"
+	      />
+	    </svg>
+	  );
 
-  const FundsCardSendIcon = () => (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-      <path
-        d="M10 22l28-12-10 28-6-10-12-6Z"
-        className="fill-white/5 stroke-white/35"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M38 10L22 28"
-        className="stroke-xcannes-green/75"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M22 28l0 10"
-        className="stroke-white/25"
+	  const FundsCardSendIcon = () => (
+	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+	      <path
+	        d="M10 22l28-12-10 28-6-10-12-6Z"
+	        className="fill-white/5 stroke-white/35"
+	        strokeWidth="1.5"
+	        strokeLinejoin="round"
+	      />
+	      <path
+	        d="M38 10L22 28"
+	        className="stroke-[#ff6a00]/75"
+	        strokeWidth="1.8"
+	        strokeLinecap="round"
+	      />
+	      <path
+	        d="M22 28l0 10"
+	        className="stroke-white/25"
         strokeWidth="1.5"
         strokeLinecap="round"
       />
@@ -541,23 +555,23 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
-                            {(() => {
-                              const text = String(withdrawHintText || "");
-                              const prefix = "Vers votre ";
-                              if (text.startsWith(prefix)) {
-                                return (
-                                  <>
-                                    <span className="text-white/60">
-                                      Vers votre{" "}
-                                    </span>
-                                    {text.slice(prefix.length)}
-                                  </>
-                                );
-                              }
-                              return withdrawHintText;
-                            })()}
-                          </p>
+	                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
+	                            {(() => {
+	                              const text = String(withdrawHintText || "");
+	                              const prefix = "Vers votre ";
+	                              if (text.startsWith(prefix)) {
+	                                return (
+	                                  <>
+	                                    <span className="text-white/60">
+	                                      Vers votre{" "}
+	                                    </span>
+	                                    {highlightWithdraw(text.slice(prefix.length))}
+	                                  </>
+	                                );
+	                              }
+	                              return highlightWithdraw(withdrawHintText);
+	                            })()}
+	                          </p>
                         </div>
                       </div>
                     </button>
@@ -607,15 +621,16 @@ export default function WalletDashboardCashChoiceModal({
                                   const input = String(value || "");
                                   if (!input) return input;
                                   const parts = input.split(/(stablecoins?\s+USD)/i);
-                                  return parts.map((part, idx) =>
-                                    /^stablecoins?\s+usd$/i.test(part) ? (
-                                      <span
-                                        key={`${lineIdx}-${idx}-${part}`}
-                                        className="text-xcannes-green/90 font-semibold"
-                                      >
-                                        {part}
-                                      </span>
-                                    ) : (
+	                                  return parts.map((part, idx) =>
+	                                    /^stablecoins?\s+usd$/i.test(part) ||
+	                                    /USDC|USDT|RLUSD/i.test(part) ? (
+	                                      <span
+	                                        key={`${lineIdx}-${idx}-${part}`}
+	                                        className="text-[#0870f8]/90 font-semibold"
+	                                      >
+	                                        {part}
+	                                      </span>
+	                                    ) : (
                                       <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
                                     ),
                                   );
@@ -687,25 +702,25 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                            {String(swapInHintText || "")
-                              .split("\n")
-                              .map((line, lineIdx, lines) => {
-                                const input = String(line || "");
-                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
-                                return (
-                                  <span key={`${lineIdx}-${input}`}>
-                                    {parts.map((part, idx) =>
-                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
-                                        <span
-                                          key={`${lineIdx}-${idx}-${part}`}
-                                          className="text-xcannes-green/90 font-semibold"
-                                        >
-                                          {part}
-                                        </span>
-                                      ) : (
-                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
-                                      ),
+	                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+	                            {String(swapInHintText || "")
+	                              .split("\n")
+	                              .map((line, lineIdx, lines) => {
+	                                const input = String(line || "");
+	                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
+	                                return (
+	                                  <span key={`${lineIdx}-${input}`}>
+	                                    {parts.map((part, idx) =>
+	                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
+	                                        <span
+	                                          key={`${lineIdx}-${idx}-${part}`}
+	                                          className="text-[#ff6a00]/90 font-semibold"
+	                                        >
+	                                          {part}
+	                                        </span>
+	                                      ) : (
+	                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
+	                                      ),
                                     )}
                                     {lineIdx < lines.length - 1 ? <br /> : null}
                                   </span>
