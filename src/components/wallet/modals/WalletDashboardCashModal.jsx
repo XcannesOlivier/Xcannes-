@@ -43,6 +43,7 @@ export default function WalletDashboardCashModal({
   walletAddress,
   sellSelectTitleOverride = "",
   sellDestinationMode = "",
+  onOpenUsdSwapOut,
   resetCashForm: _resetCashForm,
   inline = false,
 }) {
@@ -397,6 +398,7 @@ export default function WalletDashboardCashModal({
 	                    preferredFiatCurrency={preferredFiatCurrency}
 	                    selectCryptoTitleOverride={sellSelectTitleOverride}
 	                    destinationMode={sellDestinationMode}
+                      onProceedToUsdSwapOut={onOpenUsdSwapOut}
 	                    embedded={true}
 	                    isPreviewMode={isPreviewMode}
 	                    demoMode={demoMode}

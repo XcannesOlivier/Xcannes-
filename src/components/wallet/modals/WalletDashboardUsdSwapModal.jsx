@@ -120,6 +120,7 @@ export default function WalletDashboardUsdSwapModal({
   walletLabel = "",
   walletAddress = "",
   initialDirection = SWAP_DIRECTIONS.RLUSD_TO_STABLE,
+  initialAmount = "",
   noticeVariant = "preview",
   inline = false,
 }) {
@@ -188,6 +189,7 @@ export default function WalletDashboardUsdSwapModal({
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
   const estimateAbortRef = useRef(null);
   const estimateSeqRef = useRef(0);
+  const openedRef = useRef(false);
 
   const maybeApplyResolvedRlusdCurrency = (resolved) => {
     if (!resolved || typeof resolved !== "object") return;
@@ -469,12 +471,12 @@ export default function WalletDashboardUsdSwapModal({
     [exchange],
   );
 
-  const resetState = () => {
+  const resetState = (prefill = "") => {
     setStep("form");
     setSearch("");
     setStableDropdownOpen(false);
     setStableKey("");
-    setAmount("");
+    setAmount(String(prefill || ""));
     setReceiveAddress("");
     setRefundAddress("");
     setRefundExtraId("");
@@ -487,15 +489,20 @@ export default function WalletDashboardUsdSwapModal({
   };
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      openedRef.current = false;
+      return;
+    }
+    if (openedRef.current) return;
+    openedRef.current = true;
     const allowed = Object.values(SWAP_DIRECTIONS);
     const nextDirection = allowed.includes(initialDirection)
       ? initialDirection
       : SWAP_DIRECTIONS.RLUSD_TO_STABLE;
     setDirection(nextDirection);
-    resetState();
+    resetState(initialAmount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, initialDirection]);
+  }, [open, initialDirection, initialAmount]);
 
   useEffect(() => {
     if (!stableDropdownOpen) return;

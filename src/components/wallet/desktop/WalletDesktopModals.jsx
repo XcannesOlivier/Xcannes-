@@ -7,6 +7,7 @@
  */
 
 import QRScanner from "../components/QRScanner";
+import { useCallback, useState } from "react";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
 import WalletDashboardReceiveModal from "../modals/WalletDashboardReceiveModal";
@@ -75,6 +76,17 @@ export default function WalletDesktopModals({
   // desktop cash uses wallet tokens compatible with MoonPay
   augmentedTokens,
 }) {
+  const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
+
+  const openUsdSwapOut = useCallback(
+    (amount) => {
+      const next = amount == null ? "" : String(amount);
+      setUsdSwapPrefillAmount(next);
+      setActiveAction?.("cashUsdSwapOut");
+    },
+    [setActiveAction],
+  );
+
   const closeSettingsPage = () => {
     setDesktopSettingsPage?.(null);
     try {
@@ -202,12 +214,16 @@ export default function WalletDesktopModals({
         <WalletDashboardUsdSwapModal
           open
           inline
-          onClose={() => setActiveAction("cashChoice")}
+          onClose={() => {
+            setUsdSwapPrefillAmount("");
+            setActiveAction("cashChoice");
+          }}
           walletLabel={cashModalProps?.walletLabel || ""}
           walletAddress={cashModalProps?.walletAddress || ""}
           initialDirection={
             activeAction === "cashUsdSwapIn" ? "stable_to_rlusd" : "rlusd_to_stable"
           }
+          initialAmount={usdSwapPrefillAmount}
         />
       ) : null}
 
@@ -222,6 +238,7 @@ export default function WalletDesktopModals({
           }}
           {...cashModalProps}
           availableTokens={augmentedTokens}
+          onOpenUsdSwapOut={openUsdSwapOut}
         />
       ) : null}
 

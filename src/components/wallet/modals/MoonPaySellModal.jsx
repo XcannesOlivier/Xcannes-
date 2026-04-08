@@ -81,6 +81,7 @@ const MoonPaySellModal = ({
   preferredFiatCurrency = "",
   selectCryptoTitleOverride = "",
   destinationMode = "",
+  onProceedToUsdSwapOut,
   embedded = false,
   noticeVariant = "preview",
   demoMode = false,
@@ -1136,7 +1137,7 @@ const MoonPaySellModal = ({
     return new Intl.NumberFormat(locale, { maximumFractionDigits: 6 }).format(num);
   }, [amount, locale]);
 
-	  const continueLabel = loading
+  const continueLabel = loading
 	    ? t("moonpay_action_loading_7c2b1d9a3e", "Loading...")
 	    : demoMode
 	      ? t("moonpay_action_simulate_sell_4d1a9c7b2e", "Simulate sell")
@@ -1159,6 +1160,26 @@ const MoonPaySellModal = ({
         !hasValidAmount ||
         !selectedToken ||
         conversionMissing;
+
+  const handleContinue = () => {
+    if (wizardStep === 1) {
+      if (
+        isOtherBlockchainsDestination &&
+        typeof onProceedToUsdSwapOut === "function"
+      ) {
+        const prefill = Number.isFinite(baseCurrencyAmount)
+          ? String(baseCurrencyAmount)
+          : hasValidAmount
+            ? String(amountValue)
+            : "";
+        onProceedToUsdSwapOut(prefill);
+        return;
+      }
+      setWizardStep(2);
+      return;
+    }
+    generateSellUrl();
+  };
 
   const highlightPhrases = (text, phrases) => {
     const input = String(text || "");
@@ -1920,14 +1941,14 @@ const MoonPaySellModal = ({
 	          {/* Continue button */}
 			          <SwipeConfirmButton
 			            label={continueLabel}
-			            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
+			            onConfirm={handleContinue}
 			            disabled={continueDisabled}
 			            variant={isSendToWalletFlow ? "fireOrange" : "xcannesViolet"}
 			            className="md:hidden"
 			          />
 			          <button
 			            type="button"
-			            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
+			            onClick={handleContinue}
 			            disabled={continueDisabled}
 			            className={`hidden md:block w-full text-xl py-4 ${
 			              isSendToWalletFlow

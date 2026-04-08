@@ -11,6 +11,7 @@
  */
 
 import { createPortal } from "react-dom";
+import { useCallback, useState } from "react";
 import QRScanner from "../components/QRScanner";
 import WalletDashboardSendModal from "../modals/WalletDashboardSendModal";
 import WalletDashboardPayreqModal from "../modals/WalletDashboardPayreqModal";
@@ -74,6 +75,17 @@ export default function WalletMobileModals({
   // mobile cash uses augmentedTokens (not selectableTokens)
   augmentedTokens,
 }) {
+  const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
+
+  const openUsdSwapOut = useCallback(
+    (amount) => {
+      const next = amount == null ? "" : String(amount);
+      setUsdSwapPrefillAmount(next);
+      setActiveAction?.("cashUsdSwapOut");
+    },
+    [setActiveAction],
+  );
+
   return (
     <>
       {/* Modales non-portalisées, affichées sous le header en mobile */}
@@ -191,6 +203,7 @@ export default function WalletMobileModals({
                 activeAction === "cashUsdSwapOut" || activeAction === "cashUsdSwapIn"
               }
               onClose={() => {
+                setUsdSwapPrefillAmount("");
                 setActiveAction("cashChoice");
               }}
               walletLabel={cashModalProps?.walletLabel || ""}
@@ -198,6 +211,7 @@ export default function WalletMobileModals({
               initialDirection={
                 activeAction === "cashUsdSwapIn" ? "stable_to_rlusd" : "rlusd_to_stable"
               }
+              initialAmount={usdSwapPrefillAmount}
             />
 
             <WalletDashboardCashModal
@@ -209,6 +223,7 @@ export default function WalletMobileModals({
               }}
               {...cashModalProps}
               availableTokens={augmentedTokens}
+              onOpenUsdSwapOut={openUsdSwapOut}
             />
           </>,
           document.body,
