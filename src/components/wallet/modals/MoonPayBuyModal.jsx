@@ -1735,26 +1735,33 @@ const MoonPayBuyModal = ({
 	                            "Mode démo : pas de redirection MoonPay. L’achat est simulé.",
 	                          ),
 	                        )
-	                      ) : (
-	                        <>
-	                          <p className="whitespace-pre-line">
-	                            {highlightPaymentMethods(
-	                              t(
-	                                "moonpay_info_buy_live_3c8a1d6b2f",
-	                                "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.",
-	                              ),
-	                            )}
-	                          </p>
-	                          <div className="mt-1 text-[11px] md:text-xs text-white/45">
-	                            {t(
-	                              "moonpay_buy_partner_location_note",
-	                              "Le partenaire proposé dépend de votre localisation.",
-	                            )}
-	                          </div>
-	                        </>
-	                      )
-	                    )}
-				          </div>
+		                      ) : (
+		                        <>
+		                          <p className="whitespace-pre-line">
+		                            {useSimpleSwapPartner
+		                              ? t(
+		                                  "ui_simpleswap_choose_conversion_stablecoin_and_network_0c0b2b64d1",
+		                                  "Vous choisirez le stablecoin de conversion (USDC, USDT…)\net le réseau sur la page suivante (SimpleSwap)",
+		                                )
+		                              : highlightPaymentMethods(
+		                                  t(
+		                                    "moonpay_info_buy_live_3c8a1d6b2f",
+		                                    "Vous serez redirigé vers un partenaire sécurisé pour finaliser le paiement.\nMoyens acceptés : carte bancaire, Apple Pay, Google Pay, virement.",
+		                                  ),
+		                                )}
+		                          </p>
+		                          {!useSimpleSwapPartner ? (
+		                            <div className="mt-1 text-[11px] md:text-xs text-white/45">
+		                              {t(
+		                                "moonpay_buy_partner_location_note",
+		                                "Le partenaire proposé dépend de votre localisation.",
+		                              )}
+		                            </div>
+		                          ) : null}
+		                        </>
+		                      )
+		                    )}
+					          </div>
 
           {/* Error message */}
           {displayError && (
