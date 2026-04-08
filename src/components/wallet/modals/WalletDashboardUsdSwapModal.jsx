@@ -5,7 +5,11 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
-import { greenActionBtnBase } from "./walletModalTokens";
+import {
+  fireOrangeActionBtnBase,
+  greenActionBtnBase,
+  simpleSwapBlueActionBtnBase,
+} from "./walletModalTokens";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import useIsDesktop from "../hooks/useIsDesktop";
 
@@ -121,11 +125,89 @@ export default function WalletDashboardUsdSwapModal({
   walletAddress = "",
   initialDirection = SWAP_DIRECTIONS.RLUSD_TO_STABLE,
   initialAmount = "",
+  accentVariant = "",
   noticeVariant = "preview",
   inline = false,
 }) {
   const { t } = useTranslation("common");
   const isDesktop = useIsDesktop();
+  const resolvedAccent = String(accentVariant || "").trim().toLowerCase();
+  const isFireOrange = resolvedAccent === "fireorange" || resolvedAccent === "fire_orange";
+  const isSimpleSwapBlue =
+    resolvedAccent === "simpleswapblue" ||
+    resolvedAccent === "simpleswap_blue" ||
+    resolvedAccent === "simpleswap" ||
+    resolvedAccent === "blue";
+  const accentShadowPanel = isFireOrange
+    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,106,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
+    : isSimpleSwapBlue
+      ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
+    : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]";
+  const accentShadowCard = isFireOrange
+    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,106,0,0.22)]"
+    : isSimpleSwapBlue
+      ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22)]"
+    : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]";
+  const accentText80 = isFireOrange
+    ? "text-[#ff6a00]/80"
+    : isSimpleSwapBlue
+      ? "text-[#0870f8]/80"
+      : "text-xcannes-green/80";
+  const accentText90 = isFireOrange
+    ? "text-[#ff6a00]/90"
+    : isSimpleSwapBlue
+      ? "text-[#0870f8]/90"
+      : "text-xcannes-green/90";
+  const accentTextSolid = isFireOrange
+    ? "text-[#ff6a00]"
+    : isSimpleSwapBlue
+      ? "text-[#0870f8]"
+      : "text-xcannes-green";
+  const accentBadge = isFireOrange
+    ? "bg-[#ff6a00]/15 text-[#ff6a00]"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/15 text-[#0870f8]"
+    : "bg-xcannes-green/15 text-xcannes-green";
+  const accentRing60 = isFireOrange
+    ? "focus:ring-[#ff6a00]/60"
+    : isSimpleSwapBlue
+      ? "focus:ring-[#0870f8]/60"
+    : "focus:ring-xcannes-green/60";
+  const accentPulseDot = isFireOrange
+    ? "ring-[#ff6a00]/25 bg-[#ff6a00]"
+    : isSimpleSwapBlue
+      ? "ring-[#0870f8]/25 bg-[#0870f8]"
+    : "ring-xcannes-green/25 bg-xcannes-green";
+  const accentSpinnerBorder = isFireOrange
+    ? "border-[#ff6a00]"
+    : isSimpleSwapBlue
+      ? "border-[#0870f8]"
+      : "border-xcannes-green";
+  const accentSwapIconShell = isFireOrange
+    ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/30"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/30"
+    : "bg-xcannes-green/10 ring-1 ring-xcannes-green/30";
+  const accentSwapIcon = isFireOrange
+    ? "text-[#ff6a00]/90"
+    : isSimpleSwapBlue
+      ? "text-[#0870f8]/90"
+      : "text-xcannes-green/90";
+  const accentActiveCard = isFireOrange
+    ? "bg-[#ff6a00]/10 ring-[#ff6a00]/35 text-white"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/10 ring-[#0870f8]/35 text-white"
+    : "bg-xcannes-green/10 ring-xcannes-green/35 text-white";
+  const accentActiveRow = isFireOrange
+    ? "bg-[#ff6a00]/10 text-white"
+    : isSimpleSwapBlue
+      ? "bg-[#0870f8]/10 text-white"
+      : "bg-xcannes-green/10 text-white";
+  const actionBtnBase = isFireOrange
+    ? fireOrangeActionBtnBase
+    : isSimpleSwapBlue
+      ? simpleSwapBlueActionBtnBase
+      : greenActionBtnBase;
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
     enabled: shouldAnimate,
@@ -1381,9 +1463,9 @@ export default function WalletDashboardUsdSwapModal({
             {step === "deposit" ? (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 px-1">
-                  <span className="inline-flex items-center justify-center rounded-full bg-xcannes-green/15 text-xcannes-green text-xs font-semibold px-2.5 py-1">
-                    {currentStepIndex}/{totalSteps}
-                  </span>
+	                  <span className={`inline-flex items-center justify-center rounded-full text-xs font-semibold px-2.5 py-1 ${accentBadge}`}>
+	                    {currentStepIndex}/{totalSteps}
+	                  </span>
                   <div className="text-sm text-white/80 font-semibold">
                     {t("ui_transfer_deposit", "Transférer le dépôt")}
                   </div>
@@ -1557,7 +1639,7 @@ export default function WalletDashboardUsdSwapModal({
                   <button
                     type="button"
                     onClick={closeModal}
-                    className={`flex-1 py-3 ${greenActionBtnBase}`}
+                    className={`flex-1 py-3 ${actionBtnBase}`}
                   >
                     {t("ui_close_08378568ba", "Fermer")}
                   </button>
@@ -1565,27 +1647,32 @@ export default function WalletDashboardUsdSwapModal({
               </div>
             ) : (
               <div className="space-y-5">
-		                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-	                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+			                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+		                    <div
+                          className={[
+                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
+                            accentShadowPanel,
+                          ].join(" ")}
+                        >
                       <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                         {t("moonpay_from_account", "Depuis le compte")}
                       </p>
                       {String(walletLabel || "").trim() ? (
                         <div className="flex items-center gap-2 mb-1">
-	                          <span
-	                            className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
-	                            aria-hidden
-	                          />
+		                          <span
+		                            className={`h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse ${accentPulseDot}`}
+		                            aria-hidden
+		                          />
                           <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
                             {walletLabel}
                           </p>
                         </div>
                       ) : null}
-	                      {String(walletAddress || "").trim() ? (
-	                        <p className="text-[13px] md:text-sm text-xcannes-green/80 font-mono font-semibold break-all">
-	                          {walletAddress}
-	                        </p>
-	                      ) : null}
+		                      {String(walletAddress || "").trim() ? (
+		                        <p className={`text-[13px] md:text-sm font-mono font-semibold break-all ${accentText80}`}>
+		                          {walletAddress}
+		                        </p>
+		                      ) : null}
                     </div>
                   ) : null}
 
@@ -1605,7 +1692,7 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "pending" ? (
                   <div className="flex flex-col items-center justify-center py-10">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-xcannes-green mb-4" />
+                    <div className={`animate-spin rounded-full h-12 w-12 border-b-2 mb-4 ${accentSpinnerBorder}`} />
                     <p className="text-white/80">
                       {t("ui_usd_swap_pending", "Création de l’échange…")}
                     </p>
@@ -1632,7 +1719,7 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "form" ? (
                   <>
-	                    <div className="rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
+		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden", accentShadowCard].join(" ")}>
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="text-sm text-white/70">
@@ -1741,17 +1828,17 @@ export default function WalletDashboardUsdSwapModal({
                         ) : null}
                       </div>
 
-                      <div className="relative border-t border-white/10">
-                        <div className="absolute -top-5 left-1/2 -translate-x-1/2">
-                          <div className="w-10 h-10 rounded-full bg-xcannes-green/10 ring-1 ring-xcannes-green/30 flex items-center justify-center">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
+	                      <div className="relative border-t border-white/10">
+	                        <div className="absolute -top-5 left-1/2 -translate-x-1/2">
+	                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${accentSwapIconShell}`}>
+	                            <svg
+	                              viewBox="0 0 24 24"
+	                              fill="none"
                               stroke="currentColor"
                               strokeWidth="2"
-                              className="w-5 h-5 text-xcannes-green/90"
-                              aria-hidden
-                            >
+	                              className={`w-5 h-5 ${accentSwapIcon}`}
+	                              aria-hidden
+	                            >
                               <polyline
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -1928,12 +2015,12 @@ export default function WalletDashboardUsdSwapModal({
 		                                        "Choisir un stablecoin USD",
 		                                      )}
 		                                    </div>
-			                                    <div className="mt-0.5 text-[11px] text-xcannes-green/80 truncate">
-			                                      {t(
-			                                        "ui_choose_stablecoin_subtitle",
-			                                        "Ticker / réseau (USDT, USDC…)",
-			                                      )}
-			                                    </div>
+				                                    <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
+				                                      {t(
+				                                        "ui_choose_stablecoin_subtitle",
+				                                        "Ticker / réseau (USDT, USDC…)",
+				                                      )}
+				                                    </div>
 		                                  </div>
 		                                  <button
 		                                    type="button"
@@ -1965,8 +2052,8 @@ export default function WalletDashboardUsdSwapModal({
 		                                      value={search}
 		                                      onChange={(e) => setSearch(e.target.value)}
 		                                      placeholder={t("ui_search", "Rechercher…")}
-		                                      className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-		                                    />
+			                                      className={`w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+			                                    />
 		                                  </div>
 
 	                                {!String(search || "").trim() && popularStableOptions.length ? (
@@ -1986,13 +2073,13 @@ export default function WalletDashboardUsdSwapModal({
 	                                              setStableDropdownOpen(false);
 	                                              setSearch("");
 	                                            }}
-	                                            className={[
-	                                              "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-	                                              active
-	                                                ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-	                                                : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-	                                            ].join(" ")}
-	                                          >
+		                                            className={[
+		                                              "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+		                                              active
+		                                                ? accentActiveCard
+		                                                : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+		                                            ].join(" ")}
+		                                          >
 	                                            <div className="flex items-center gap-2">
 	                                              {renderCurrencyIcon(opt.currency)}
 	                                              <div className="min-w-0 flex-1">
@@ -2000,11 +2087,11 @@ export default function WalletDashboardUsdSwapModal({
 	                                                  {opt.label}
 	                                                </div>
 	                                              </div>
-	                                              {active ? (
-	                                                <span className="text-xcannes-green font-semibold text-xs">
-	                                                  ✓
-	                                                </span>
-	                                              ) : null}
+		                                              {active ? (
+		                                                <span className={`font-semibold text-xs ${accentTextSolid}`}>
+		                                                  ✓
+		                                                </span>
+		                                              ) : null}
 	                                            </div>
 	                                          </button>
 	                                        );
@@ -2031,13 +2118,13 @@ export default function WalletDashboardUsdSwapModal({
 		                                            setStableDropdownOpen(false);
 		                                            setSearch("");
 		                                          }}
-		                                          className={[
-		                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
-		                                            active
-		                                              ? "bg-xcannes-green/10 text-white"
-		                                              : "hover:bg-white/[0.04] text-white/80",
-		                                          ].join(" ")}
-		                                        >
+			                                          className={[
+			                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+			                                            active
+			                                              ? accentActiveRow
+			                                              : "hover:bg-white/[0.04] text-white/80",
+			                                          ].join(" ")}
+			                                        >
 		                                          {renderCurrencyIcon(cur)}
 		                                          <div className="min-w-0 flex-1">
 		                                            <div className="text-sm font-semibold truncate">
@@ -2051,11 +2138,11 @@ export default function WalletDashboardUsdSwapModal({
 		                                                currencyLabel(cur)}
 		                                            </div>
 		                                          </div>
-		                                          {active ? (
-		                                            <span className="text-xcannes-green font-semibold text-xs">
-		                                              ✓
-		                                            </span>
-		                                          ) : null}
+			                                          {active ? (
+			                                            <span className={`font-semibold text-xs ${accentTextSolid}`}>
+			                                              ✓
+			                                            </span>
+			                                          ) : null}
 		                                        </button>
 		                                      );
 		                                    })
@@ -2133,12 +2220,12 @@ export default function WalletDashboardUsdSwapModal({
 	                                          "Choisir un stablecoin USD",
 	                                        )}
 	                                      </div>
-		                                      <div className="mt-0.5 text-[11px] text-xcannes-green/80 truncate">
-		                                        {t(
-		                                          "ui_choose_stablecoin_subtitle",
-		                                          "Ticker / réseau (USDT, USDC…)",
-		                                        )}
-		                                      </div>
+			                                      <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
+			                                        {t(
+			                                          "ui_choose_stablecoin_subtitle",
+			                                          "Ticker / réseau (USDT, USDC…)",
+			                                        )}
+			                                      </div>
 	                                    </div>
 	                                    <button
 	                                      type="button"
@@ -2170,8 +2257,8 @@ export default function WalletDashboardUsdSwapModal({
 	                                        value={search}
 	                                        onChange={(e) => setSearch(e.target.value)}
 	                                        placeholder={t("ui_search", "Rechercher…")}
-	                                        className="w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-	                                      />
+		                                        className={`w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+		                                      />
 	                                    </div>
 
 	                                    {!String(search || "").trim() && popularStableOptions.length ? (
@@ -2191,13 +2278,13 @@ export default function WalletDashboardUsdSwapModal({
 	                                                  setStableDropdownOpen(false);
 	                                                  setSearch("");
 	                                                }}
-	                                                className={[
-	                                                  "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
-	                                                  active
-	                                                    ? "bg-xcannes-green/10 ring-xcannes-green/35 text-white"
-	                                                    : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
-	                                                ].join(" ")}
-	                                              >
+		                                                className={[
+		                                                  "rounded-xl px-3 py-3 ring-1 ring-inset transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)] text-left",
+		                                                  active
+		                                                    ? accentActiveCard
+		                                                    : "bg-black/20 ring-white/10 text-white/70 hover:bg-black/30 hover:text-white/90 hover:ring-white/15",
+		                                                ].join(" ")}
+		                                              >
 	                                                <div className="flex items-center gap-2">
 	                                                  {renderCurrencyIcon(opt.currency)}
 	                                                  <div className="min-w-0 flex-1">
@@ -2205,11 +2292,11 @@ export default function WalletDashboardUsdSwapModal({
 	                                                      {opt.label}
 	                                                    </div>
 	                                                  </div>
-	                                                  {active ? (
-	                                                    <span className="text-xcannes-green font-semibold text-xs">
-	                                                      ✓
-	                                                    </span>
-	                                                  ) : null}
+		                                                  {active ? (
+		                                                    <span className={`font-semibold text-xs ${accentTextSolid}`}>
+		                                                      ✓
+		                                                    </span>
+		                                                  ) : null}
 	                                                </div>
 	                                              </button>
 	                                            );
@@ -2240,13 +2327,13 @@ export default function WalletDashboardUsdSwapModal({
 	                                            setStableDropdownOpen(false);
 	                                            setSearch("");
 	                                          }}
-	                                          className={[
-	                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
-	                                            active
-	                                              ? "bg-xcannes-green/10 text-white"
-	                                              : "hover:bg-white/[0.04] text-white/80",
-	                                          ].join(" ")}
-	                                        >
+		                                          className={[
+		                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+		                                            active
+		                                              ? accentActiveRow
+		                                              : "hover:bg-white/[0.04] text-white/80",
+		                                          ].join(" ")}
+		                                        >
 	                                          {renderCurrencyIcon(cur)}
 	                                          <div className="min-w-0 flex-1">
 	                                            <div className="text-sm font-semibold truncate">
@@ -2260,11 +2347,11 @@ export default function WalletDashboardUsdSwapModal({
 	                                                currencyLabel(cur)}
 	                                            </div>
 	                                          </div>
-	                                          {active ? (
-	                                            <span className="text-xcannes-green font-semibold text-xs">
-	                                              ✓
-	                                            </span>
-	                                          ) : null}
+		                                          {active ? (
+		                                            <span className={`font-semibold text-xs ${accentTextSolid}`}>
+		                                              ✓
+		                                            </span>
+		                                          ) : null}
 	                                        </button>
 	                                      );
 	                                    })
@@ -2289,29 +2376,34 @@ export default function WalletDashboardUsdSwapModal({
 	                          )
 	                      : null}
 
-                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-                      <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                          {t("moonpay_destination_wallet", "Vers le compte")}
-                        </p>
-                        {String(walletLabel || "").trim() ? (
-                          <div className="flex items-center gap-2 mb-1">
-                            <span
-                              className="h-3 w-3 rounded-full ring-4 ring-xcannes-green/25 bg-xcannes-green shrink-0 animate-pulse"
-                              aria-hidden
-                            />
-                            <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-                              {walletLabel}
-                            </p>
-                          </div>
-                        ) : null}
-                        {String(walletAddress || "").trim() ? (
-                          <p className="text-[13px] md:text-sm text-xcannes-green/90 font-mono font-semibold break-all">
-                            {walletAddress}
-                          </p>
-                        ) : null}
-                      </div>
-                    ) : null}
+	                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+	                      <div
+                          className={[
+                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
+                            accentShadowPanel,
+                          ].join(" ")}
+                        >
+	                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+	                          {t("moonpay_destination_wallet", "Vers le compte")}
+	                        </p>
+	                        {String(walletLabel || "").trim() ? (
+	                          <div className="flex items-center gap-2 mb-1">
+	                            <span
+	                              className={`h-3 w-3 rounded-full ring-4 shrink-0 animate-pulse ${accentPulseDot}`}
+	                              aria-hidden
+	                            />
+	                            <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+	                              {walletLabel}
+	                            </p>
+	                          </div>
+	                        ) : null}
+	                        {String(walletAddress || "").trim() ? (
+	                          <p className={`text-[13px] md:text-sm font-mono font-semibold break-all ${accentText90}`}>
+	                            {walletAddress}
+	                          </p>
+	                        ) : null}
+	                      </div>
+	                    ) : null}
 
                     <button
                       type="button"
@@ -2329,19 +2421,19 @@ export default function WalletDashboardUsdSwapModal({
                         setSearch("");
                         setStep("address");
                       }}
-                      className={`w-full text-xl py-4 ${greenActionBtnBase}`}
-                    >
-                      {t("ui_action_continue", "Continuer")}
-                    </button>
+	                      className={`w-full text-xl py-4 ${actionBtnBase}`}
+	                    >
+	                      {t("ui_action_continue", "Continuer")}
+	                    </button>
                   </>
                 ) : null}
 
                 {step === "address" ? (
                   <>
                     <div className="flex items-center gap-3 px-1">
-                      <span className="inline-flex items-center justify-center rounded-full bg-xcannes-green/15 text-xcannes-green text-xs font-semibold px-2.5 py-1">
-                        {currentStepIndex}/{totalSteps}
-                      </span>
+	                      <span className={`inline-flex items-center justify-center rounded-full text-xs font-semibold px-2.5 py-1 ${accentBadge}`}>
+	                        {currentStepIndex}/{totalSteps}
+	                      </span>
                       <div className="text-sm text-white/80 font-semibold">
                         {t("ui_enter_address", "Entrer l’adresse")}
                       </div>
@@ -2391,8 +2483,8 @@ export default function WalletDashboardUsdSwapModal({
                             ? "Adresse XRPL (ex: r…)"
                             : "Adresse sur le réseau choisi (ex: 0x… / T…)",
                         )}
-                        className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                      />
+	                        className={`w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+	                      />
                     </div>
 
                     {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
@@ -2424,8 +2516,8 @@ export default function WalletDashboardUsdSwapModal({
                                 "ui_swap_refund_address_placeholder",
                                 "Adresse sur le réseau d’envoi (si l’échange échoue)",
                               )}
-                              className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                            />
+	                              className={`w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+	                            />
                             {fromCurrency?.hasExtraId ? (
                               <div className="mt-2">
                                 <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
@@ -2438,8 +2530,8 @@ export default function WalletDashboardUsdSwapModal({
                                   value={refundExtraId}
                                   onChange={(e) => setRefundExtraId(e.target.value)}
                                   placeholder={fromCurrency?.extraIdName || "Memo / Tag"}
-                                  className="w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-all duration-150"
-                                />
+	                                  className={`w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+	                                />
                               </div>
                             ) : null}
                           </div>
@@ -2483,10 +2575,10 @@ export default function WalletDashboardUsdSwapModal({
                         }
                         await createExchange({ returnStep: "address" });
                       }}
-                      className={`w-full text-xl py-4 ${greenActionBtnBase}`}
-                    >
-                      {t("ui_action_continue", "Continuer")}
-                    </button>
+	                      className={`w-full text-xl py-4 ${actionBtnBase}`}
+	                    >
+	                      {t("ui_action_continue", "Continuer")}
+	                    </button>
                   </>
                 ) : null}
 

@@ -1191,7 +1191,10 @@ const MoonPayBuyModal = ({
           Number.isFinite(resolved) && resolved > 0
             ? String(Number(resolved.toFixed(6)))
             : String(targetAssetAmount || "").trim();
-        onProceedToUsdSwapOut(prefill, { direction: "stable_to_rlusd" });
+        onProceedToUsdSwapOut(prefill, {
+          direction: "stable_to_rlusd",
+          accentVariant: "simpleSwapBlue",
+        });
         return;
       }
       setWizardStep(2);

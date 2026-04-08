@@ -1172,7 +1172,10 @@ const MoonPaySellModal = ({
           : hasValidAmount
             ? String(amountValue)
             : "";
-        onProceedToUsdSwapOut(prefill, { direction: "rlusd_to_stable" });
+        onProceedToUsdSwapOut(prefill, {
+          direction: "rlusd_to_stable",
+          accentVariant: "fireOrange",
+        });
         return;
       }
       setWizardStep(2);

@@ -77,11 +77,13 @@ export default function WalletDesktopModals({
   augmentedTokens,
 }) {
   const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
+  const [usdSwapAccentVariant, setUsdSwapAccentVariant] = useState("");
 
   const openUsdSwapOut = useCallback(
     (amount, options = {}) => {
       const next = amount == null ? "" : String(amount);
       setUsdSwapPrefillAmount(next);
+      setUsdSwapAccentVariant(String(options?.accentVariant || "").trim());
       const dir = String(options?.direction || "").trim().toLowerCase();
       setActiveAction?.(dir === "stable_to_rlusd" ? "cashUsdSwapIn" : "cashUsdSwapOut");
     },
@@ -217,6 +219,7 @@ export default function WalletDesktopModals({
           inline
           onClose={() => {
             setUsdSwapPrefillAmount("");
+            setUsdSwapAccentVariant("");
             setActiveAction("cashChoice");
           }}
           walletLabel={cashModalProps?.walletLabel || ""}
@@ -225,6 +228,7 @@ export default function WalletDesktopModals({
             activeAction === "cashUsdSwapIn" ? "stable_to_rlusd" : "rlusd_to_stable"
           }
           initialAmount={usdSwapPrefillAmount}
+          accentVariant={usdSwapAccentVariant}
         />
       ) : null}
 
