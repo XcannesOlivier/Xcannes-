@@ -102,6 +102,7 @@ const MoonPayBuyModal = ({
   walletAddress,
   walletLabel = "",
   preferredFiatCurrency = "",
+  onProceedToUsdSwapOut,
   embedded = false,
   noticeVariant = "preview",
   demoMode = false,
@@ -1182,6 +1183,23 @@ const MoonPayBuyModal = ({
         !Number.isFinite(Number(amount || "")) ||
         Number(amount || 0) <= 0;
 
+  const handleContinue = () => {
+    if (wizardStep === 1) {
+      if (useSimpleSwapPartner && typeof onProceedToUsdSwapOut === "function") {
+        const resolved = Number(rlusdEquivalent);
+        const prefill =
+          Number.isFinite(resolved) && resolved > 0
+            ? String(Number(resolved.toFixed(6)))
+            : String(targetAssetAmount || "").trim();
+        onProceedToUsdSwapOut(prefill);
+        return;
+      }
+      setWizardStep(2);
+      return;
+    }
+    generateBuyUrl();
+  };
+
   const highlightPaymentMethods = (text) => {
     const input = String(text || "");
     if (!input) return text;
@@ -1843,14 +1861,14 @@ const MoonPayBuyModal = ({
 	          {/* Continue button */}
 	          <SwipeConfirmButton
 	            label={continueLabel}
-	            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateBuyUrl}
+	            onConfirm={handleContinue}
 	            disabled={continueDisabled}
 	            variant={useSimpleSwapPartner ? "simpleSwapBlue" : "xcannesGreen"}
 	            className="md:hidden"
 	          />
 	          <button
 	            type="button"
-	            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateBuyUrl}
+	            onClick={handleContinue}
 	            disabled={continueDisabled}
 	            className={`hidden md:block w-full text-xl py-4 ${
 	              useSimpleSwapPartner ? simpleSwapBlueActionBtnBase : greenActionBtnBase

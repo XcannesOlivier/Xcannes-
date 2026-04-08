@@ -50,6 +50,10 @@ export default function WalletDashboardCashModal({
   const { t } = useTranslation("common");
   const moonpayEnabled = MOONPAY_UI_ENABLED;
   const topperEnabled = TOPPER_UI_ENABLED;
+  const forceSimpleSwapBuy =
+    String(buyPrefill?.partnerOverride || "").trim().toLowerCase() === "simpleswap";
+  const forceSimpleSwapSell = String(sellDestinationMode || "").trim().toLowerCase() ===
+    "other_blockchains";
   const [rampProvider, setRampProvider] = useState(() => {
     const preferred = String(RAMP_DEFAULT_PROVIDER || "moonpay")
       .trim()
@@ -143,8 +147,9 @@ export default function WalletDashboardCashModal({
 
   if (!shouldRender) return null;
 
-  const rampActive = rampProvider === "topper" ? topperActive : moonpayActive;
-  const rampEnabled = rampProvider === "topper" ? topperEnabled : moonpayEnabled;
+  const forcedProvider = forceSimpleSwapBuy || forceSimpleSwapSell ? "moonpay" : rampProvider;
+  const rampActive = forcedProvider === "topper" ? topperActive : moonpayActive;
+  const rampEnabled = forcedProvider === "topper" ? topperEnabled : moonpayEnabled;
   const bothProvidersEnabled = moonpayEnabled && topperEnabled;
 
   const wrapperClass = inline
@@ -219,7 +224,7 @@ export default function WalletDashboardCashModal({
 		                  </div>
 		                </div>
 
-                    {bothProvidersEnabled ? (
+                    {bothProvidersEnabled && !(forceSimpleSwapBuy || forceSimpleSwapSell) ? (
                       <div className="flex items-center gap-1 rounded-full bg-white/10 ring-1 ring-white/10 p-1">
                         <button
                           type="button"
@@ -340,7 +345,7 @@ export default function WalletDashboardCashModal({
             <div key={cashModalTab} className="wallet-tab-unfold-in h-full">
               {rampEnabled ? (
                 cashModalTab === "buy" ? (
-                  rampProvider === "topper" ? (
+                  forcedProvider === "topper" ? (
                     <TopperBuyModal
                       isOpen={true}
                       onClose={onClose}
@@ -361,6 +366,7 @@ export default function WalletDashboardCashModal({
 	                      walletAddress={walletAddress || ""}
 	                      walletLabel={walletLabel}
 	                      preferredFiatCurrency={preferredFiatCurrency}
+                        onProceedToUsdSwapOut={onOpenUsdSwapOut}
 	                      embedded={true}
 	                      isPreviewMode={isPreviewMode}
 	                      demoMode={demoMode}
@@ -376,7 +382,7 @@ export default function WalletDashboardCashModal({
 	                      prefill={buyPrefill}
 	                    />
 	                  )
-                ) : rampProvider === "topper" ? (
+                ) : forcedProvider === "topper" ? (
                   <TopperSellModal
                     isOpen={true}
                     onClose={onClose}
@@ -415,7 +421,7 @@ export default function WalletDashboardCashModal({
                 )
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-sm text-white/60">
-                  {rampProvider === "topper"
+                  {forcedProvider === "topper"
                     ? t("ui_topper_disabled", {
                         defaultValue: "Topper est temporairement désactivé.",
                       })
