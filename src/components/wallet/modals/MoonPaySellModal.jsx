@@ -1282,7 +1282,10 @@ const MoonPaySellModal = ({
           {/* From wallet display */}
 					          <div
 					            className={[
-					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08]",
+					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset",
+					              isBankSellFlow || isSendToWalletFlow
+					                ? "bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40]"
+					                : "bg-white/[0.08]",
 					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06)]`,
 					            ].join(" ")}
 					          >
