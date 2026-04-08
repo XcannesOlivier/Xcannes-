@@ -178,17 +178,17 @@ export default function WalletDesktopModals({
 	            cashModalProps?.setCashModalTab?.("buy");
 	            setActiveAction("cash");
 	          }}
-	          onChooseUsdSwapIn={() => {
-	            // "Envoyer des dollars" utilise le même parcours que "Retirer vers la banque"
-	            // (MoonPay Sell 1/3 + 2/3).
-	            setCashSellSelectTitleOverride?.(
-	              "Depuis le compte :",
-	            );
-	            setCashSellDestinationMode?.("other_blockchains");
-	            setCashBuyPrefill(null);
-	            cashModalProps?.setCashModalTab?.("sell");
-	            setActiveAction("cash");
-	          }}
+		          onChooseUsdSwapIn={() => {
+		            // "Envoyer des dollars" utilise le même parcours que "Retirer vers la banque"
+		            // (MoonPay Sell 1/3 + 2/3).
+		            setCashSellSelectTitleOverride?.(
+		              "Envoyer vers un wallet",
+		            );
+		            setCashSellDestinationMode?.("other_blockchains");
+		            setCashBuyPrefill(null);
+		            cashModalProps?.setCashModalTab?.("sell");
+		            setActiveAction("cash");
+		          }}
 	        />
 	      ) : null}
 

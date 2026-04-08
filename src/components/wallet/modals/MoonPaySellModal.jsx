@@ -1225,14 +1225,16 @@ const MoonPaySellModal = ({
           {/* From wallet display */}
 				          <div className="rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-white/[0.08] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06)]">
 				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-				              {wizardStep === 1
-		                    ? resolvedSelectCryptoTitleOverride ? (
-		                      resolvedSelectCryptoTitleOverride
-		                    ) : (
-		                      <>
-		                        <span className="text-[20px] tracking-[0.14em]">
-		                          {t(
-		                            "moonpay_sell_withdraw_title_prefix",
+					              {wizardStep === 1
+			                    ? resolvedSelectCryptoTitleOverride ? (
+			                      <span className="text-[20px] tracking-[0.14em]">
+			                        {resolvedSelectCryptoTitleOverride}
+			                      </span>
+			                    ) : (
+			                      <>
+			                        <span className="text-[20px] tracking-[0.14em]">
+			                          {t(
+			                            "moonpay_sell_withdraw_title_prefix",
 		                            "Envoyer vers la banque",
 		                          )}
 		                        </span>{" "}
