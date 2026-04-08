@@ -648,17 +648,17 @@ export default function WalletDashboardCashChoiceModal({
                                 const after = hasParens
                                   ? text.slice(closeIdx + 1)
                                   : "";
-                                return (
-                                  <span key={`${lineIdx}-${text}`}>
-                                    {highlightStablecoin(before)}
-                                    {parens ? (
-                                      <span className="text-xcannes-green/90 font-semibold">
-                                        {parens}
-                                      </span>
-                                    ) : null}
-                                    {highlightStablecoin(after)}
-                                    {lineIdx < lines.length - 1 ? <br /> : null}
-                                  </span>
+	                                return (
+	                                  <span key={`${lineIdx}-${text}`}>
+	                                    {highlightStablecoin(before)}
+	                                    {parens ? (
+	                                      <span className="text-[#0870f8]/90 font-semibold">
+	                                        {parens}
+	                                      </span>
+	                                    ) : null}
+	                                    {highlightStablecoin(after)}
+	                                    {lineIdx < lines.length - 1 ? <br /> : null}
+	                                  </span>
                                 );
                               })}
                           </p>
