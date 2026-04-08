@@ -21,17 +21,17 @@ export default function WalletDashboardCashChoiceModal({
 	    "ui_funds_withdraw_hint",
 	    "Vers votre compte bancaire",
 	  );
-	  const highlightWithdraw = (value) => {
-	    const input = String(value || "");
-	    if (!input) return input;
-	    const parts = input.split(/(compte bancaire)/i);
-	    return parts.map((part, idx) =>
-	      /^compte bancaire$/i.test(part) ? (
-	        <span key={`${idx}-${part}`} className="text-xcannes-violet/90 font-semibold">
-	          {part}
-	        </span>
-	      ) : (
-	        <span key={`${idx}-${part}`}>{part}</span>
+		  const highlightWithdraw = (value) => {
+		    const input = String(value || "");
+		    if (!input) return input;
+		    const parts = input.split(/(compte bancaire)/i);
+		    return parts.map((part, idx) =>
+		      /^compte bancaire$/i.test(part) ? (
+		        <span key={`${idx}-${part}`} className="text-xcannes-violet/90">
+		          {part}
+		        </span>
+		      ) : (
+		        <span key={`${idx}-${part}`}>{part}</span>
 	      ),
 	    );
 	  };
@@ -621,16 +621,16 @@ export default function WalletDashboardCashChoiceModal({
                                   const input = String(value || "");
                                   if (!input) return input;
                                   const parts = input.split(/(stablecoins?\s+USD)/i);
-	                                  return parts.map((part, idx) =>
-	                                    /^stablecoins?\s+usd$/i.test(part) ||
-	                                    /USDC|USDT|RLUSD/i.test(part) ? (
-	                                      <span
-	                                        key={`${lineIdx}-${idx}-${part}`}
-	                                        className="text-[#0870f8]/90 font-semibold"
-	                                      >
-	                                        {part}
-	                                      </span>
-	                                    ) : (
+		                                  return parts.map((part, idx) =>
+		                                    /^stablecoins?\s+usd$/i.test(part) ||
+		                                    /USDC|USDT|RLUSD/i.test(part) ? (
+		                                      <span
+		                                        key={`${lineIdx}-${idx}-${part}`}
+		                                        className="text-[#0870f8]/90"
+		                                      >
+		                                        {part}
+		                                      </span>
+		                                    ) : (
                                       <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
                                     ),
                                   );
@@ -650,12 +650,12 @@ export default function WalletDashboardCashChoiceModal({
                                   : "";
 	                                return (
 	                                  <span key={`${lineIdx}-${text}`}>
-	                                    {highlightStablecoin(before)}
-	                                    {parens ? (
-	                                      <span className="text-[#0870f8]/90 font-semibold">
-	                                        {parens}
-	                                      </span>
-	                                    ) : null}
+		                                    {highlightStablecoin(before)}
+		                                    {parens ? (
+		                                      <span className="text-[#0870f8]/90">
+		                                        {parens}
+		                                      </span>
+		                                    ) : null}
 	                                    {highlightStablecoin(after)}
 	                                    {lineIdx < lines.length - 1 ? <br /> : null}
 	                                  </span>
@@ -710,15 +710,15 @@ export default function WalletDashboardCashChoiceModal({
 	                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
 	                                return (
 	                                  <span key={`${lineIdx}-${input}`}>
-	                                    {parts.map((part, idx) =>
-	                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
-	                                        <span
-	                                          key={`${lineIdx}-${idx}-${part}`}
-	                                          className="text-[#ff6a00]/90 font-semibold"
-	                                        >
-	                                          {part}
-	                                        </span>
-	                                      ) : (
+		                                    {parts.map((part, idx) =>
+		                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
+		                                        <span
+		                                          key={`${lineIdx}-${idx}-${part}`}
+		                                          className="text-[#ff6a00]/90"
+		                                        >
+		                                          {part}
+		                                        </span>
+		                                      ) : (
 	                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
 	                                      ),
                                     )}
