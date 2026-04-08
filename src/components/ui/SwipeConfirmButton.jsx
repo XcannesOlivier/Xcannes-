@@ -36,6 +36,11 @@ const VARIANTS = {
     disabledBtn:
       "border-white/10 bg-[#0870f8]/45 text-white/75 cursor-not-allowed",
   },
+  fireOrange: {
+    btn: "border-transparent bg-[#ff6a00] text-white hover:bg-[#e85f00] hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
+    disabledBtn:
+      "border-white/10 bg-[#ff6a00]/45 text-white/75 cursor-not-allowed",
+  },
   orange: {
     btn: "border-transparent bg-xcannes-btn-green text-white hover:bg-xcannes-btn-green-hover hover:-translate-y-px active:translate-y-0 active:scale-[0.97]",
     disabledBtn:

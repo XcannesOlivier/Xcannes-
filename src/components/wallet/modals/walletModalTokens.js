@@ -61,5 +61,16 @@ export const simpleSwapBlueActionBtnBase = [
   "disabled:hover:translate-y-0 disabled:hover:scale-100",
 ].join(" ");
 
+/** Fire orange action button — with disabled states. */
+export const fireOrangeActionBtnBase = [
+  "rounded-lg border border-transparent",
+  "bg-[#ff6a00] text-white font-semibold",
+  "transition-all duration-[120ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
+  "hover:bg-[#e85f00] hover:-translate-y-px",
+  "active:translate-y-0 active:scale-[0.97]",
+  "disabled:bg-[#ff6a00]/45 disabled:text-white/75 disabled:border-white/10 disabled:cursor-not-allowed",
+  "disabled:hover:translate-y-0 disabled:hover:scale-100",
+].join(" ");
+
 /** Standard modal max-height on desktop. */
 export const MODAL_MAX_H = "md:max-h-[100vh]";

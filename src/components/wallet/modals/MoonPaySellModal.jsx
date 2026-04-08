@@ -15,7 +15,7 @@ import { getCurrencyFlag, formatAmountWithSymbol } from "../walletDashboardConfi
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { isIOSDevice } from "@/utils/deviceDetect";
 import {
-  simpleSwapBlueActionBtnBase,
+  fireOrangeActionBtnBase,
   violetActionBtnBase,
 } from "./walletModalTokens";
 
@@ -101,53 +101,33 @@ const MoonPaySellModal = ({
     isOtherBlockchainsDestination && resolvedSelectCryptoTitleOverride,
   );
   const isBankSellFlow = !isSendToWalletFlow;
-  const accentVariant = isSendToWalletFlow
-    ? "simpleswapBlue"
-    : isBankSellFlow
-      ? "violet"
-      : "green";
+  const accentVariant = isSendToWalletFlow ? "fireOrange" : "violet";
   const accentText90 =
-    accentVariant === "simpleswapBlue"
-      ? "text-[#0870f8]/90"
-      : accentVariant === "violet"
-        ? "text-xcannes-violet/90"
-        : "text-xcannes-green/90";
+    accentVariant === "fireOrange"
+      ? "text-[#ff6a00]/90"
+      : "text-xcannes-violet/90";
   const accentText80 =
-    accentVariant === "simpleswapBlue"
-      ? "text-[#0870f8]/80"
-      : accentVariant === "violet"
-        ? "text-xcannes-violet/80"
-        : "text-xcannes-green/80";
+    accentVariant === "fireOrange"
+      ? "text-[#ff6a00]/80"
+      : "text-xcannes-violet/80";
   const accentRing25Bg =
-    accentVariant === "simpleswapBlue"
-      ? "ring-[#0870f8]/25 bg-[#0870f8]"
-      : accentVariant === "violet"
-        ? "ring-xcannes-violet/25 bg-xcannes-violet"
-        : "ring-xcannes-green/25 bg-xcannes-green";
+    accentVariant === "fireOrange"
+      ? "ring-[#ff6a00]/25 bg-[#ff6a00]"
+      : "ring-xcannes-violet/25 bg-xcannes-violet";
   const accentRing60 =
-    accentVariant === "simpleswapBlue"
-      ? "focus:ring-[#0870f8]/60"
-      : accentVariant === "violet"
-        ? "focus:ring-xcannes-violet/60"
-        : "focus:ring-xcannes-green/60";
+    accentVariant === "fireOrange"
+      ? "focus:ring-[#ff6a00]/60"
+      : "focus:ring-xcannes-violet/60";
   const accentBg10 =
-    accentVariant === "simpleswapBlue"
-      ? "bg-[#0870f8]/10 text-white"
-      : accentVariant === "violet"
-        ? "bg-xcannes-violet/10 text-white"
-        : "bg-xcannes-green/10 text-white";
+    accentVariant === "fireOrange"
+      ? "bg-[#ff6a00]/10 text-white"
+      : "bg-xcannes-violet/10 text-white";
   const accentCheck =
-    accentVariant === "simpleswapBlue"
-      ? "text-[#0870f8]"
-      : accentVariant === "violet"
-        ? "text-xcannes-violet"
-        : "text-xcannes-green";
+    accentVariant === "fireOrange" ? "text-[#ff6a00]" : "text-xcannes-violet";
   const accentGlowShadow =
-    accentVariant === "simpleswapBlue"
-      ? "0_0_8px_rgba(8,112,248,0.22)"
-      : accentVariant === "violet"
-        ? "0_0_8px_rgba(160,80,255,0.18)"
-        : "0_0_8px_rgba(0,255,150,0.15)";
+    accentVariant === "fireOrange"
+      ? "0_0_8px_rgba(255,106,0,0.22)"
+      : "0_0_8px_rgba(160,80,255,0.18)";
 
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
@@ -1942,7 +1922,7 @@ const MoonPaySellModal = ({
 			            label={continueLabel}
 			            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
 			            disabled={continueDisabled}
-			            variant={isSendToWalletFlow ? "simpleSwapBlue" : "xcannesViolet"}
+			            variant={isSendToWalletFlow ? "fireOrange" : "xcannesViolet"}
 			            className="md:hidden"
 			          />
 			          <button
@@ -1951,7 +1931,7 @@ const MoonPaySellModal = ({
 			            disabled={continueDisabled}
 			            className={`hidden md:block w-full text-xl py-4 ${
 			              isSendToWalletFlow
-			                ? simpleSwapBlueActionBtnBase
+			                ? fireOrangeActionBtnBase
 			                : violetActionBtnBase
 			            }`}
 			          >
