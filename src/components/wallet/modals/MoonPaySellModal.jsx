@@ -1163,16 +1163,16 @@ const MoonPaySellModal = ({
 
   const handleContinue = () => {
     if (wizardStep === 1) {
-      if (
-        isOtherBlockchainsDestination &&
-        typeof onProceedToUsdSwapOut === "function"
-      ) {
+        if (
+          isOtherBlockchainsDestination &&
+          typeof onProceedToUsdSwapOut === "function"
+        ) {
         const prefill = Number.isFinite(baseCurrencyAmount)
           ? String(baseCurrencyAmount)
           : hasValidAmount
             ? String(amountValue)
             : "";
-        onProceedToUsdSwapOut(prefill);
+        onProceedToUsdSwapOut(prefill, { direction: "rlusd_to_stable" });
         return;
       }
       setWizardStep(2);

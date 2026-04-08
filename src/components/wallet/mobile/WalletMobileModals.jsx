@@ -78,10 +78,11 @@ export default function WalletMobileModals({
   const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
 
   const openUsdSwapOut = useCallback(
-    (amount) => {
+    (amount, options = {}) => {
       const next = amount == null ? "" : String(amount);
       setUsdSwapPrefillAmount(next);
-      setActiveAction?.("cashUsdSwapOut");
+      const dir = String(options?.direction || "").trim().toLowerCase();
+      setActiveAction?.(dir === "stable_to_rlusd" ? "cashUsdSwapIn" : "cashUsdSwapOut");
     },
     [setActiveAction],
   );
