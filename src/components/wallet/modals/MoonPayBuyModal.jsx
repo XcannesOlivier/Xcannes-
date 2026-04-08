@@ -1777,12 +1777,12 @@ const MoonPayBuyModal = ({
 	            {continueLabel}
 		          </button>
 		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-	            <span>
-	              {t(
-	                "moonpay_buy_secure_partner_note",
-	                "Conversion sécurisé via",
-	              )}
-	            </span>
+		            <span>
+		              {t(
+		                "moonpay_buy_secure_partner_note",
+		                "Paiement sécurisé via",
+		              )}
+		            </span>
 			            <span
 			              className="inline-flex items-center gap-1.5"
 			              aria-label={t(
@@ -1791,11 +1791,18 @@ const MoonPayBuyModal = ({
 			              )}
 			            >
 			              <PaymentLogo
-			                src="/assets/payment-logos/simpleswap.jpeg"
-			                alt="SimpleSwap"
-			                fallback="SimpleSwap"
+			                src="/assets/payment-logos/moonpay.png"
+			                alt="MoonPay"
+			                fallback="MoonPay"
 			                containerClassName="bg-white/90"
-			                widthClassName="w-[140px]"
+			                widthClassName="w-[110px]"
+			              />
+			              <PaymentLogo
+			                src="/assets/payment-logos/topper.svg"
+			                alt="Topper"
+			                fallback="Topper"
+			                containerClassName="bg-black/40"
+			                widthClassName="w-[110px]"
 			              />
 			            </span>
 			          </div>

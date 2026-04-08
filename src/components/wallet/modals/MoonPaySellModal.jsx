@@ -14,7 +14,10 @@ import { useModalTransition } from "@/hooks/useModalTransition";
 import { getCurrencyFlag, formatAmountWithSymbol } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { isIOSDevice } from "@/utils/deviceDetect";
-import { simpleSwapBlueActionBtnBase } from "./walletModalTokens";
+import {
+  simpleSwapBlueActionBtnBase,
+  violetActionBtnBase,
+} from "./walletModalTokens";
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -94,6 +97,9 @@ const MoonPaySellModal = ({
   const resolvedSelectCryptoTitleOverride = String(selectCryptoTitleOverride || "").trim();
   const resolvedDestinationMode = String(destinationMode || "").trim().toLowerCase();
   const isOtherBlockchainsDestination = resolvedDestinationMode === "other_blockchains";
+  const isSendToWalletFlow = Boolean(
+    isOtherBlockchainsDestination && resolvedSelectCryptoTitleOverride,
+  );
 
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
@@ -1830,24 +1836,33 @@ const MoonPaySellModal = ({
 			            label={continueLabel}
 			            onConfirm={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
 			            disabled={continueDisabled}
-			            variant="simpleSwapBlue"
+			            variant={isSendToWalletFlow ? "simpleSwapBlue" : "xcannesViolet"}
 			            className="md:hidden"
 			          />
 			          <button
 			            type="button"
 			            onClick={wizardStep === 1 ? () => setWizardStep(2) : generateSellUrl}
 			            disabled={continueDisabled}
-			            className={`hidden md:block w-full text-xl py-4 ${simpleSwapBlueActionBtnBase}`}
+			            className={`hidden md:block w-full text-xl py-4 ${
+			              isSendToWalletFlow
+			                ? simpleSwapBlueActionBtnBase
+			                : violetActionBtnBase
+			            }`}
 			          >
 			            {continueLabel}
 			          </button>
-	          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
-	            <span>
-		              {t(
-		                "moonpay_buy_secure_partner_note",
-		                "Conversion sécurisé via",
-		              )}
-	            </span>
+		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+		            <span>
+		              {isSendToWalletFlow
+		                ? t(
+		                    "ui_simpleswap_secure_partner_note_f1d7a9c2b3",
+		                    "Conversion sécurisé via",
+		                  )
+		                : t(
+		                    "moonpay_buy_secure_partner_note",
+		                    "Paiement sécurisé via",
+		                  )}
+		            </span>
 		            <span
 		              className="inline-flex items-center gap-1.5"
 		              aria-label={t(
@@ -1855,13 +1870,32 @@ const MoonPaySellModal = ({
 		                "Partenaires et moyens de paiement",
 		              )}
 		            >
-		              <PaymentLogo
-		                src="/assets/payment-logos/simpleswap.jpeg"
-		                alt="SimpleSwap"
-		                fallback="SimpleSwap"
-		                containerClassName="bg-white/90"
-		                widthClassName="w-[140px]"
-		              />
+		              {isSendToWalletFlow ? (
+		                <PaymentLogo
+		                  src="/assets/payment-logos/simpleswap.jpeg"
+		                  alt="SimpleSwap"
+		                  fallback="SimpleSwap"
+		                  containerClassName="bg-white/90"
+		                  widthClassName="w-[140px]"
+		                />
+		              ) : (
+		                <>
+		                  <PaymentLogo
+		                    src="/assets/payment-logos/moonpay.png"
+		                    alt="MoonPay"
+		                    fallback="MoonPay"
+		                    containerClassName="bg-white/90"
+		                    widthClassName="w-[110px]"
+		                  />
+		                  <PaymentLogo
+		                    src="/assets/payment-logos/topper.svg"
+		                    alt="Topper"
+		                    fallback="Topper"
+		                    containerClassName="bg-black/40"
+		                    widthClassName="w-[110px]"
+		                  />
+		                </>
+		              )}
 		            </span>
 		          </div>
 	        </div>
