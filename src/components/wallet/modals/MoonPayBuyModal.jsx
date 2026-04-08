@@ -113,6 +113,9 @@ const MoonPayBuyModal = ({
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
+  const resolvedTitleOverride = String(prefill?.titleOverride || "").trim();
+  const useSimpleSwapPartner =
+    String(prefill?.partnerOverride || "").trim().toLowerCase() === "simpleswap";
   const modalPanelRef = useRef(null);
   const contentRootRef = useRef(null);
   const [iframeUrl, setIframeUrl] = useState(null);
@@ -1255,13 +1258,14 @@ const MoonPayBuyModal = ({
 		          {/* Wallet + Title (merged) */}
 		          <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
 		            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-			              {wizardStep === 1 ? (
-			                <>
-			                  <span className="text-[20px] tracking-[0.14em]">
-			                    {t("ui_funds_add_title", "Ajouter de l'argent")}
-			                  </span>
-			                </>
-			              ) : (
+				              {wizardStep === 1 ? (
+				                <>
+				                  <span className="text-[20px] tracking-[0.14em]">
+				                    {resolvedTitleOverride ||
+				                      t("ui_funds_add_title", "Ajouter de l'argent")}
+				                  </span>
+				                </>
+				              ) : (
 			                <>
 			                  <span className="text-[20px] tracking-[0.14em]">
 			                    {t(
@@ -1776,12 +1780,17 @@ const MoonPayBuyModal = ({
 	          >
 	            {continueLabel}
 		          </button>
-		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+			          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
 		            <span>
-		              {t(
-		                "moonpay_buy_secure_partner_note",
-		                "Paiement sécurisé via",
-		              )}
+		              {useSimpleSwapPartner
+		                ? t(
+		                    "ui_simpleswap_secure_partner_note_f1d7a9c2b3",
+		                    "Conversion sécurisé via",
+		                  )
+		                : t(
+		                    "moonpay_buy_secure_partner_note",
+		                    "Paiement sécurisé via",
+		                  )}
 		            </span>
 			            <span
 			              className="inline-flex items-center gap-1.5"
@@ -1790,24 +1799,36 @@ const MoonPayBuyModal = ({
 			                "Partenaires et moyens de paiement",
 			              )}
 			            >
-			              <PaymentLogo
-			                src="/assets/payment-logos/moonpay.png"
-			                alt="MoonPay"
-			                fallback="MoonPay"
-			                containerClassName="bg-white/90"
-			                widthClassName="w-[110px]"
-			              />
-			              <PaymentLogo
-			                src="/assets/payment-logos/topper.svg"
-			                alt="Topper"
-			                fallback="Topper"
-			                containerClassName="bg-black/40"
-			                widthClassName="w-[110px]"
-			              />
+			              {useSimpleSwapPartner ? (
+			                <PaymentLogo
+			                  src="/assets/payment-logos/simpleswap.jpeg"
+			                  alt="SimpleSwap"
+			                  fallback="SimpleSwap"
+			                  containerClassName="bg-white/90"
+			                  widthClassName="w-[140px]"
+			                />
+			              ) : (
+			                <>
+			                  <PaymentLogo
+			                    src="/assets/payment-logos/moonpay.png"
+			                    alt="MoonPay"
+			                    fallback="MoonPay"
+			                    containerClassName="bg-white/90"
+			                    widthClassName="w-[110px]"
+			                  />
+			                  <PaymentLogo
+			                    src="/assets/payment-logos/topper.svg"
+			                    alt="Topper"
+			                    fallback="Topper"
+			                    containerClassName="bg-black/40"
+			                    widthClassName="w-[110px]"
+			                  />
+			                </>
+			              )}
 			            </span>
 			          </div>
-	        </div>
-	      )}
+		        </div>
+		      )}
 
       {/* Loading */}
       {step === "loading" && (
