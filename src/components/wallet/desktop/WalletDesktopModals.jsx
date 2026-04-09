@@ -79,12 +79,20 @@ export default function WalletDesktopModals({
 }) {
   const [usdSwapPrefillAmount, setUsdSwapPrefillAmount] = useState("");
   const [usdSwapAccentVariant, setUsdSwapAccentVariant] = useState("");
+  const [usdSwapSourceSelectionMode, setUsdSwapSourceSelectionMode] = useState("");
+  const [usdSwapInitialSourceCurrency, setUsdSwapInitialSourceCurrency] = useState("");
+  const [usdSwapTitleOverride, setUsdSwapTitleOverride] = useState("");
+  const [usdSwapSubtitleOverride, setUsdSwapSubtitleOverride] = useState("");
 
   const openUsdSwapOut = useCallback(
     (amount, options = {}) => {
       const next = amount == null ? "" : String(amount);
       setUsdSwapPrefillAmount(next);
       setUsdSwapAccentVariant(String(options?.accentVariant || "").trim());
+      setUsdSwapSourceSelectionMode(String(options?.sourceSelectionMode || "").trim());
+      setUsdSwapInitialSourceCurrency(String(options?.initialSourceCurrency || "").trim());
+      setUsdSwapTitleOverride(String(options?.titleOverride || "").trim());
+      setUsdSwapSubtitleOverride(String(options?.subtitleOverride || "").trim());
       const dir = String(options?.direction || "").trim().toLowerCase();
       setActiveAction?.(dir === "stable_to_rlusd" ? "cashUsdSwapIn" : "cashUsdSwapOut");
     },
@@ -201,15 +209,18 @@ export default function WalletDesktopModals({
 		            setActiveAction("cash");
 		          }}
 		          onChooseUsdSwapIn={() => {
-		            // "Envoyer des dollars" utilise le même parcours que "Retirer vers la banque"
-		            // (MoonPay Sell 1/3 + 2/3).
-		            setCashSellSelectTitleOverride?.(
-		              "Envoyer vers un wallet",
-		            );
-		            setCashSellDestinationMode?.("other_blockchains");
+		            setCashSellSelectTitleOverride?.("");
+		            setCashSellDestinationMode?.("");
 		            setCashBuyPrefill(null);
-		            cashModalProps?.setCashModalTab?.("sell");
-		            setActiveAction("cash");
+		            openUsdSwapOut("", {
+		              direction: "rlusd_to_stable",
+		              accentVariant: "fireOrange",
+		              sourceSelectionMode: "wallet",
+		              initialSourceCurrency: "USD",
+		              titleOverride: "Envoyer vers un wallet",
+		              subtitleOverride:
+		                "Choisissez une devise XCANNES, puis le stablecoin et le réseau de destination via SimpleSwap.",
+		            });
 		          }}
 	        />
 	      ) : null}
@@ -221,6 +232,10 @@ export default function WalletDesktopModals({
           onClose={() => {
             setUsdSwapPrefillAmount("");
             setUsdSwapAccentVariant("");
+            setUsdSwapSourceSelectionMode("");
+            setUsdSwapInitialSourceCurrency("");
+            setUsdSwapTitleOverride("");
+            setUsdSwapSubtitleOverride("");
             setActiveAction("cashChoice");
           }}
           walletLabel={cashModalProps?.walletLabel || ""}
@@ -230,7 +245,16 @@ export default function WalletDesktopModals({
           }
           initialAmount={usdSwapPrefillAmount}
           accentVariant={usdSwapAccentVariant}
+          sourceSelectionMode={usdSwapSourceSelectionMode}
+          initialSourceCurrency={usdSwapInitialSourceCurrency}
+          titleOverride={usdSwapTitleOverride}
+          subtitleOverride={usdSwapSubtitleOverride}
           signTransaction={signTransaction}
+          availableTokens={augmentedTokens}
+          rlusdPerUnitRates={cashModalProps?.rlusdPerUnitRates}
+          selectLabelByCurrency={cashModalProps?.selectLabelByCurrency}
+          selectLabelRightByCurrency={cashModalProps?.selectLabelRightByCurrency}
+          selectIconByCurrency={cashModalProps?.selectIconByCurrency}
         />
       ) : null}
 

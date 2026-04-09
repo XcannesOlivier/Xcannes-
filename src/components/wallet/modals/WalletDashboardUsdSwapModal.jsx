@@ -198,10 +198,20 @@ export default function WalletDashboardUsdSwapModal({
   initialDirection = SWAP_DIRECTIONS.RLUSD_TO_STABLE,
   initialAmount = "",
   accentVariant = "",
+  sourceSelectionMode = "",
+  initialSourceCurrency = "",
+  titleOverride = "",
+  subtitleOverride = "",
+  availableTokens = [],
+  rlusdPerUnitRates = {},
+  selectLabelByCurrency = {},
+  selectLabelRightByCurrency = {},
+  selectIconByCurrency = {},
   noticeVariant = "preview",
   inline = false,
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const locale = i18n?.language || "en";
   const isDesktop = useIsDesktop();
   const resolvedAccent = String(accentVariant || "").trim().toLowerCase();
   const isFireOrange = resolvedAccent === "fireorange" || resolvedAccent === "fire_orange";
@@ -423,8 +433,153 @@ export default function WalletDashboardUsdSwapModal({
     if (!stableKey) return null;
     return currencies.find((c) => currencyKey(c) === stableKey) || null;
   }, [currencies, stableKey]);
+  const totalSteps = 3;
+  const currentStepIndex =
+    step === "form"
+      ? 1
+      : step === "address"
+        ? 2
+        : totalSteps;
+  const walletSourceSelectionEnabled =
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+    String(sourceSelectionMode || "").trim().toLowerCase() === "wallet";
+  const sourceCurrencyOptions = useMemo(() => {
+    if (!walletSourceSelectionEnabled) return [];
+    const seen = new Set();
+    const orderedTokens = [
+      ...availableTokens.filter((token) => String(token?.currency || "").toUpperCase() === "RLUSD"),
+      ...availableTokens.filter((token) => {
+        const code = String(token?.currency || "").toUpperCase();
+        return code !== "RLUSD" && code !== "XRP";
+      }),
+    ];
+
+    return orderedTokens
+      .map((token) => {
+        const currencyRaw = token?.currency;
+        const currency = String(currencyRaw || "").trim().toUpperCase();
+        if (!currency || seen.has(currency) || currency === "XRP") return null;
+        if (currency !== "RLUSD" && currency !== "USD" && !token?.isTrustlineOnly) {
+          return null;
+        }
+        seen.add(currency);
+
+        const amountValue = Number(token?.value || 0);
+        const fallbackAmountLabel = Number.isFinite(amountValue)
+          ? `Solde : ${amountValue.toLocaleString(locale, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} ${currency}`
+          : "";
+
+        return {
+          code: currency,
+          icon:
+            selectIconByCurrency?.[currencyRaw] ||
+            selectIconByCurrency?.[currency] ||
+            null,
+          label:
+            selectLabelByCurrency?.[currencyRaw] ||
+            selectLabelByCurrency?.[currency] ||
+            currency,
+          labelRight:
+            selectLabelRightByCurrency?.[currencyRaw] ||
+            selectLabelRightByCurrency?.[currency] ||
+            fallbackAmountLabel,
+          isTrustlineOnly: Boolean(token?.isTrustlineOnly),
+          value: Number(token?.value || 0),
+          allocatedRlusd: Number(token?.allocatedRlusd),
+        };
+      })
+      .filter(Boolean);
+  }, [
+    availableTokens,
+    locale,
+    selectIconByCurrency,
+    selectLabelByCurrency,
+    selectLabelRightByCurrency,
+    walletSourceSelectionEnabled,
+  ]);
+  const [sourceCurrencyCode, setSourceCurrencyCode] = useState("");
+  const selectedSourceOption = useMemo(() => {
+    const current = String(sourceCurrencyCode || "").trim().toUpperCase();
+    if (!current) return sourceCurrencyOptions[0] || null;
+    return (
+      sourceCurrencyOptions.find(
+        (option) => String(option?.code || "").trim().toUpperCase() === current,
+      ) || sourceCurrencyOptions[0] || null
+    );
+  }, [sourceCurrencyCode, sourceCurrencyOptions]);
+  const selectedSourceCurrencyCode = String(selectedSourceOption?.code || "RLUSD").toUpperCase();
+  const selectedSourceAmount = Number.parseFloat(amount || "");
+  const selectedSourceIsCurrencyLine =
+    walletSourceSelectionEnabled && selectedSourceCurrencyCode !== "RLUSD"
+      ? Boolean(selectedSourceOption?.isTrustlineOnly)
+      : false;
+  const selectedSourceRlusdRate = !walletSourceSelectionEnabled
+    ? 1
+    : selectedSourceCurrencyCode === "RLUSD" || selectedSourceCurrencyCode === "USD"
+      ? 1
+      : Number(rlusdPerUnitRates?.[selectedSourceCurrencyCode]);
+  const selectedSourceAvailableBalance = useMemo(() => {
+    if (!walletSourceSelectionEnabled) return Number.NaN;
+    const directBalance = Number(selectedSourceOption?.value);
+    if (
+      selectedSourceIsCurrencyLine &&
+      Number.isFinite(Number(selectedSourceOption?.allocatedRlusd)) &&
+      Number(selectedSourceOption?.allocatedRlusd) > 0 &&
+      Number.isFinite(selectedSourceRlusdRate) &&
+      selectedSourceRlusdRate > 0
+    ) {
+      return Number(selectedSourceOption.allocatedRlusd) / selectedSourceRlusdRate;
+    }
+    return Number.isFinite(directBalance) ? directBalance : Number.NaN;
+  }, [
+    selectedSourceIsCurrencyLine,
+    selectedSourceOption,
+    selectedSourceRlusdRate,
+    walletSourceSelectionEnabled,
+  ]);
+  const outboundAmountRlusd = useMemo(() => {
+    if (direction !== SWAP_DIRECTIONS.RLUSD_TO_STABLE) return Number.NaN;
+    if (!Number.isFinite(selectedSourceAmount) || selectedSourceAmount <= 0) return Number.NaN;
+    if (!walletSourceSelectionEnabled) return selectedSourceAmount;
+    if (selectedSourceCurrencyCode === "RLUSD" || selectedSourceCurrencyCode === "USD") {
+      return selectedSourceAmount;
+    }
+    if (selectedSourceIsCurrencyLine && Number.isFinite(selectedSourceRlusdRate) && selectedSourceRlusdRate > 0) {
+      return selectedSourceAmount * selectedSourceRlusdRate;
+    }
+    return Number.NaN;
+  }, [
+    direction,
+    selectedSourceAmount,
+    selectedSourceCurrencyCode,
+    selectedSourceIsCurrencyLine,
+    selectedSourceRlusdRate,
+    walletSourceSelectionEnabled,
+  ]);
+  const sourceConversionMissing =
+    walletSourceSelectionEnabled &&
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+    Number.isFinite(selectedSourceAmount) &&
+    selectedSourceAmount > 0 &&
+    selectedSourceCurrencyCode !== "RLUSD" &&
+    selectedSourceCurrencyCode !== "USD" &&
+    (!Number.isFinite(selectedSourceRlusdRate) || selectedSourceRlusdRate <= 0);
+  const insufficientSourceBalance =
+    walletSourceSelectionEnabled &&
+    hasValidAmount &&
+    Number.isFinite(selectedSourceAvailableBalance) &&
+    parsedAmount > selectedSourceAvailableBalance;
+  const sourceCurrencyDisplay = walletSourceSelectionEnabled
+    ? {
+        ticker: selectedSourceCurrencyCode.toLowerCase(),
+        network: "wallet",
+      }
+    : rlusdCurrency;
   const fromCurrency =
-    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? rlusdCurrency : stableCurrency;
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? sourceCurrencyDisplay : stableCurrency;
   const toCurrency =
     direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? stableCurrency : rlusdCurrency;
   const partnerPreviewFromCurrency =
@@ -438,13 +593,6 @@ export default function WalletDashboardUsdSwapModal({
   const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
   const toTicker = String(toCurrency?.ticker || "").trim().toUpperCase();
   const toNetwork = String(toCurrency?.network || "").trim().toUpperCase();
-  const totalSteps = 3;
-  const currentStepIndex =
-    step === "form"
-      ? 1
-      : step === "address"
-        ? 2
-        : totalSteps;
 
   const quotedReceiveAmount = useMemo(() => parseSimpleSwapEstimateAmount(quote), [quote]);
   const quotedPartnerReceiveAmount = useMemo(() => {
@@ -453,13 +601,68 @@ export default function WalletDashboardUsdSwapModal({
   }, [quote]);
 
   const rangeLimits = useMemo(() => parseSimpleSwapRanges(ranges), [ranges]);
-  const minFromAmount = rangeLimits?.min ?? null;
-  const maxFromAmount = rangeLimits?.max ?? null;
+  const minFromAmount = useMemo(() => {
+    const raw = rangeLimits?.min ?? null;
+    if (
+      direction !== SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
+      !walletSourceSelectionEnabled ||
+      !Number.isFinite(raw) ||
+      raw <= 0
+    ) {
+      return raw;
+    }
+    if (selectedSourceCurrencyCode === "RLUSD" || selectedSourceCurrencyCode === "USD") {
+      return raw;
+    }
+    if (Number.isFinite(selectedSourceRlusdRate) && selectedSourceRlusdRate > 0) {
+      return raw / selectedSourceRlusdRate;
+    }
+    return raw;
+  }, [
+    direction,
+    rangeLimits?.min,
+    selectedSourceCurrencyCode,
+    selectedSourceRlusdRate,
+    walletSourceSelectionEnabled,
+  ]);
+  const maxFromAmount = useMemo(() => {
+    const raw = rangeLimits?.max ?? null;
+    if (
+      direction !== SWAP_DIRECTIONS.RLUSD_TO_STABLE ||
+      !walletSourceSelectionEnabled ||
+      !Number.isFinite(raw) ||
+      raw <= 0
+    ) {
+      return raw;
+    }
+    if (selectedSourceCurrencyCode === "RLUSD" || selectedSourceCurrencyCode === "USD") {
+      return raw;
+    }
+    if (Number.isFinite(selectedSourceRlusdRate) && selectedSourceRlusdRate > 0) {
+      return raw / selectedSourceRlusdRate;
+    }
+    return raw;
+  }, [
+    direction,
+    rangeLimits?.max,
+    selectedSourceCurrencyCode,
+    selectedSourceRlusdRate,
+    walletSourceSelectionEnabled,
+  ]);
   const amountBelowMin =
     hasValidAmount && Number.isFinite(minFromAmount) && parsedAmount < minFromAmount;
   const amountAboveMax =
     hasValidAmount && Number.isFinite(maxFromAmount) && parsedAmount > maxFromAmount;
   const amountOutOfRange = amountBelowMin || amountAboveMax;
+  const sendApproxUsdAmount =
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+    walletSourceSelectionEnabled &&
+    Number.isFinite(outboundAmountRlusd) &&
+    outboundAmountRlusd > 0
+      ? outboundAmountRlusd
+      : hasValidAmount
+        ? parsedAmount
+        : Number.NaN;
 
   useEffect(() => {
     if (!open) return;
@@ -639,6 +842,7 @@ export default function WalletDashboardUsdSwapModal({
     setSearch("");
     setStableDropdownOpen(false);
     setStableKey("");
+    setSourceCurrencyCode("");
     setAmount(String(prefill || ""));
     setReceiveAddress("");
     setRefundAddress("");
@@ -668,6 +872,28 @@ export default function WalletDashboardUsdSwapModal({
     resetState(initialAmount);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialDirection, initialAmount]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!walletSourceSelectionEnabled) return;
+    const initial = String(initialSourceCurrency || "").trim().toUpperCase();
+    if (
+      initial &&
+      sourceCurrencyOptions.some(
+        (option) => String(option?.code || "").trim().toUpperCase() === initial,
+      )
+    ) {
+      setSourceCurrencyCode((prev) => (prev ? prev : initial));
+      return;
+    }
+    if (sourceCurrencyOptions.length) {
+      setSourceCurrencyCode((prev) =>
+        prev && sourceCurrencyOptions.some((option) => option.code === prev)
+          ? prev
+          : sourceCurrencyOptions[0].code,
+      );
+    }
+  }, [initialSourceCurrency, open, sourceCurrencyOptions, walletSourceSelectionEnabled]);
 
   useEffect(() => {
     if (!stableDropdownOpen) return;
@@ -909,6 +1135,10 @@ export default function WalletDashboardUsdSwapModal({
 
   const fetchRanges = async () => {
     if (!partnerPreviewFromCurrency || !partnerPreviewToCurrency) return;
+    if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && walletSourceSelectionEnabled && sourceConversionMissing) {
+      setRanges(null);
+      return;
+    }
     setApiError("");
     setRanges(null);
     try {
@@ -988,6 +1218,10 @@ export default function WalletDashboardUsdSwapModal({
   const fetchEstimate = async ({ signal } = {}) => {
     if (!fromCurrency || !toCurrency || !partnerPreviewFromCurrency || !partnerPreviewToCurrency || !hasValidAmount) return;
     if (amountOutOfRange) return;
+    if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && sourceConversionMissing) {
+      setQuote(null);
+      return;
+    }
     try {
       const tryEndpoints = ["/api/simpleswap/estimates", "/api/simpleswap/check"];
 
@@ -1024,7 +1258,7 @@ export default function WalletDashboardUsdSwapModal({
       setPairUnavailable(false);
       if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE) {
         const bridgeQuote = await xcannesApi.getRlusdXrpQuote({
-          amountRlusd: parsedAmount,
+          amountRlusd: outboundAmountRlusd,
           direction: "RLUSD_TO_XRP",
         });
         const bridgeXrpAmount = Number(bridgeQuote?.xrpAmount);
@@ -1188,6 +1422,24 @@ export default function WalletDashboardUsdSwapModal({
 
   const createExchange = async ({ returnStep = "address" } = {}) => {
     if (!fromCurrency || !toCurrency || !hasValidAmount) return;
+    if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE && sourceConversionMissing) {
+      setApiError(
+        t(
+          "ui_rate_unavailable_base_5c1a9b7d2e",
+          "Rate unavailable for base currency.",
+        ),
+      );
+      return;
+    }
+    if (insufficientSourceBalance) {
+      setApiError(
+        t(
+          "ui_insufficient_balance",
+          "Solde insuffisant.",
+        ),
+      );
+      return;
+    }
     if (amountOutOfRange) {
       const minText =
         Number.isFinite(minFromAmount) && minFromAmount
@@ -1234,7 +1486,7 @@ export default function WalletDashboardUsdSwapModal({
         preparedOutboundSwap = await xcannesApi.prepareRlusdXrpSwap({
           address: walletAddress,
           direction: "RLUSD_TO_XRP",
-          amountRlusd: parsedAmount,
+          amountRlusd: outboundAmountRlusd,
         });
         const preparedXrpAmount = Number(preparedOutboundSwap?.quote?.xrpAmount);
         if (!Number.isFinite(preparedXrpAmount) || preparedXrpAmount <= 0) {
@@ -1304,8 +1556,9 @@ export default function WalletDashboardUsdSwapModal({
                 networkTo: exchangeNetworkTo,
                 targetCurrencyCode:
                   String(toCurrency?.ticker || "USD").trim().toUpperCase() || "USD",
-                amountRlusd: parsedAmount,
-                sourceCurrencyCode: "RLUSD",
+                amountRlusd: outboundAmountRlusd,
+                sourceCurrencyCode:
+                  String(selectedSourceCurrencyCode || "RLUSD").trim().toUpperCase() || "RLUSD",
                 sourceAmount: parsedAmount,
                 createdAt: new Date().toISOString(),
               },
@@ -1390,12 +1643,44 @@ export default function WalletDashboardUsdSwapModal({
     setSwapSubmitting(true);
     setApiError("");
     try {
+      const effectiveSourceCurrency =
+        String(
+          walletSourceSelectionEnabled
+            ? selectedSourceCurrencyCode || "RLUSD"
+            : "RLUSD",
+        )
+          .trim()
+          .toUpperCase() || "RLUSD";
+      const effectiveSourceAmount =
+        walletSourceSelectionEnabled &&
+        Number.isFinite(selectedSourceAmount) &&
+        selectedSourceAmount > 0
+          ? Number(selectedSourceAmount)
+          : Number.isFinite(parsedAmount) && parsedAmount > 0
+            ? Number(parsedAmount)
+            : null;
+      const effectiveSourceAmountRlusd =
+        Number.isFinite(outboundAmountRlusd) && outboundAmountRlusd > 0
+          ? Number(outboundAmountRlusd)
+          : Number.isFinite(parsedAmount) && parsedAmount > 0
+            ? Number(parsedAmount)
+            : null;
+      const swapAmountLabel =
+        effectiveSourceCurrency !== "RLUSD" &&
+        effectiveSourceAmount != null &&
+        effectiveSourceAmountRlusd != null
+          ? `${effectiveSourceAmount.toLocaleString("en-US", {
+              maximumFractionDigits: 6,
+            })} ${effectiveSourceCurrency} (~${effectiveSourceAmountRlusd.toLocaleString("en-US", {
+              maximumFractionDigits: 6,
+            })} RLUSD) → XRP`
+          : `${(effectiveSourceAmountRlusd ?? parsedAmount).toLocaleString("en-US", {
+              maximumFractionDigits: 6,
+            })} RLUSD → XRP`;
       const swapResult = await signTransaction(preparedSwap.txjson, {
         action: "wallet:swap",
         progressDetails: {
-          amountLabel: `${parsedAmount.toLocaleString("en-US", {
-            maximumFractionDigits: 6,
-          })} RLUSD → XRP`,
+          amountLabel: swapAmountLabel,
           beneficiaryLabel: "SimpleSwap",
           beneficiaryAddress: depositAddress,
         },
@@ -1432,9 +1717,9 @@ export default function WalletDashboardUsdSwapModal({
         exchangeId: exchangeId || null,
         targetCurrencyCode:
           String(toCurrency?.ticker || "USD").trim().toUpperCase() || "USD",
-        amountRlusd: parsedAmount,
-        sourceCurrencyCode: "RLUSD",
-        sourceAmount: parsedAmount,
+        amountRlusd: effectiveSourceAmountRlusd,
+        sourceCurrencyCode: effectiveSourceCurrency,
+        sourceAmount: effectiveSourceAmount,
       });
       const encodedPartnerMemo = partnerMemo ? buildXrplJsonMemo(partnerMemo) : null;
       if (encodedPartnerMemo?.length) {
@@ -2129,13 +2414,15 @@ export default function WalletDashboardUsdSwapModal({
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
                   <div className="px-1">
                     <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                      {t("ui_swap_title_out", "RLUSD → stablecoin USD")}
+                      {String(titleOverride || "").trim() ||
+                        t("ui_swap_title_out", "RLUSD → stablecoin USD")}
                     </h3>
                     <p className="mt-1 text-xs md:text-sm text-white/60">
-                      {t(
-                        "ui_swap_subtitle_out",
-                        "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
-                      )}
+                      {String(subtitleOverride || "").trim() ||
+                        t(
+                          "ui_swap_subtitle_out",
+                          "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
+                        )}
                     </p>
                   </div>
                 ) : null}
@@ -2213,6 +2500,31 @@ export default function WalletDashboardUsdSwapModal({
                                   </svg>
                                 </button>
                               </div>
+                            ) : walletSourceSelectionEnabled ? (
+                              <div className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85">
+                                <label className="sr-only" htmlFor="wallet-source-currency">
+                                  {t("ui_send_currency", "Devise à envoyer")}
+                                </label>
+                                <select
+                                  id="wallet-source-currency"
+                                  value={selectedSourceCurrencyCode}
+                                  onChange={(event) => {
+                                    setSourceCurrencyCode(event.target.value);
+                                    setApiError("");
+                                    setQuote(null);
+                                  }}
+                                  className="bg-transparent text-sm font-semibold outline-none"
+                                >
+                                  {sourceCurrencyOptions.map((option) => (
+                                    <option key={option.code} value={option.code} className="bg-[#111] text-white">
+                                      {option.code}
+                                    </option>
+                                  ))}
+                                </select>
+                                <span className="text-[11px] text-white/55 whitespace-nowrap">
+                                  {selectedSourceOption?.labelRight || ""}
+                                </span>
+                              </div>
                             ) : (
                               <div className="inline-flex items-center gap-2 text-white/90">
                                 <img
@@ -2252,7 +2564,13 @@ export default function WalletDashboardUsdSwapModal({
                           />
                           <div className="text-sm text-white/50 whitespace-nowrap pb-1">
                             {hasValidAmount
-                              ? `~${formatUsdNumber ? formatUsdNumber.format(parsedAmount) : parsedAmount.toFixed(2)}$`
+                              ? `~${
+                                  formatUsdNumber && Number.isFinite(sendApproxUsdAmount)
+                                    ? formatUsdNumber.format(sendApproxUsdAmount)
+                                    : Number.isFinite(sendApproxUsdAmount)
+                                      ? sendApproxUsdAmount.toFixed(2)
+                                      : parsedAmount.toFixed(2)
+                                }$`
                               : ""}
                           </div>
                         </div>
@@ -2274,6 +2592,35 @@ export default function WalletDashboardUsdSwapModal({
                                   : t("ui_too_high", "Trop élevé")}
                               </span>
                             ) : null}
+                          </div>
+                        ) : null}
+                        {walletSourceSelectionEnabled ? (
+                          <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-white/50">
+                            <div className="min-w-0 truncate">
+                              {selectedSourceOption?.label || selectedSourceCurrencyCode}
+                            </div>
+                            {Number.isFinite(selectedSourceAvailableBalance) ? (
+                              <span className="shrink-0">
+                                {t("ui_balance", "Solde")} :{" "}
+                                {formatAmountNumber
+                                  ? formatAmountNumber.format(selectedSourceAvailableBalance)
+                                  : String(selectedSourceAvailableBalance)}{" "}
+                                {selectedSourceCurrencyCode}
+                              </span>
+                            ) : null}
+                          </div>
+                        ) : null}
+                        {walletSourceSelectionEnabled && insufficientSourceBalance ? (
+                          <div className="mt-2 text-[11px] text-red-200">
+                            {t("ui_insufficient_balance", "Solde insuffisant.")}
+                          </div>
+                        ) : null}
+                        {walletSourceSelectionEnabled && sourceConversionMissing ? (
+                          <div className="mt-2 text-[11px] text-red-200">
+                            {t(
+                              "ui_rate_unavailable_base_5c1a9b7d2e",
+                              "Rate unavailable for base currency.",
+                            )}
                           </div>
                         ) : null}
                       </div>
@@ -2860,10 +3207,13 @@ export default function WalletDashboardUsdSwapModal({
                       disabled={
                         !hasValidAmount ||
                         amountOutOfRange ||
+                        insufficientSourceBalance ||
+                        sourceConversionMissing ||
                         pairUnavailable ||
                         !fromCurrency ||
                         !toCurrency ||
-                        !stableCurrency
+                        !stableCurrency ||
+                        (walletSourceSelectionEnabled && !selectedSourceOption)
                       }
                       onClick={() => {
                         setApiError("");
@@ -2894,7 +3244,10 @@ export default function WalletDashboardUsdSwapModal({
                         <div>
                           {t("ui_swap_you_send", "Vous envoyez")}{" "}
                           <span className="text-white font-semibold">
-                            {hasValidAmount ? parsedAmount : 0} {fromTicker || ""}
+                            {hasValidAmount ? parsedAmount : 0}{" "}
+                            {walletSourceSelectionEnabled
+                              ? selectedSourceCurrencyCode || fromTicker || ""
+                              : fromTicker || ""}
                           </span>
                         </div>
                         <div className="mt-1">
@@ -2903,6 +3256,17 @@ export default function WalletDashboardUsdSwapModal({
                             {toCurrency ? currencyLabel(toCurrency) : toLabel}
                           </span>
                         </div>
+                        {walletSourceSelectionEnabled && Number.isFinite(outboundAmountRlusd) ? (
+                          <div className="mt-1 text-white/55">
+                            RLUSD utilisé pour le swap:{" "}
+                            <span className="text-white/80 font-semibold">
+                              {formatAmountNumber
+                                ? formatAmountNumber.format(outboundAmountRlusd)
+                                : String(outboundAmountRlusd)}{" "}
+                              RLUSD
+                            </span>
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 
