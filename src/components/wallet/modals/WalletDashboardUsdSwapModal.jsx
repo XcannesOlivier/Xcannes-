@@ -451,6 +451,24 @@ export default function WalletDashboardUsdSwapModal({
     const partnerAmount = Number(quote?.partnerEstimatedAmount);
     return Number.isFinite(partnerAmount) && partnerAmount > 0 ? partnerAmount : null;
   }, [quote]);
+  const previewOutboundXrpAmount = useMemo(() => {
+    const directQuote = Number(quote?.partnerAmountInXrp);
+    if (Number.isFinite(directQuote) && directQuote > 0) return directQuote;
+    const bridgeQuoteAmount = Number(quote?.bridgeQuote?.xrpAmount);
+    if (Number.isFinite(bridgeQuoteAmount) && bridgeQuoteAmount > 0) return bridgeQuoteAmount;
+    const preparedAmount = Number(preparedSwap?.quote?.xrpAmount);
+    if (Number.isFinite(preparedAmount) && preparedAmount > 0) return preparedAmount;
+    const exactAmount = Number(String(sendAmountExact || "").trim().replace(",", "."));
+    if (
+      direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+      String(partnerFromTicker || "").trim().toUpperCase() === "XRP" &&
+      Number.isFinite(exactAmount) &&
+      exactAmount > 0
+    ) {
+      return exactAmount;
+    }
+    return null;
+  }, [direction, partnerFromTicker, preparedSwap?.quote?.xrpAmount, quote, sendAmountExact]);
 
   const rangeLimits = useMemo(() => parseSimpleSwapRanges(ranges), [ranges]);
   const minFromAmount = rangeLimits?.min ?? null;
@@ -1904,12 +1922,22 @@ export default function WalletDashboardUsdSwapModal({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-white/60 text-xs">
-                        {t("ui_usd_swap_send_amount", "Montant à envoyer")}
+                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                          ? t("ui_usd_swap_send_amount_partner", "Montant envoyé à SimpleSwap")
+                          : t("ui_usd_swap_send_amount", "Montant à envoyer")}
                       </div>
                       <div className="text-white font-semibold text-lg leading-tight">
                         {sendAmountExact || (hasValidAmount ? parsedAmount : "—")}{" "}
                         {partnerFromTicker || ""}
                       </div>
+                      {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                        <div className="mt-1 text-xs text-white/55">
+                          {t("ui_usd_swap_source_debit_inline", "Débité depuis XCANNES:")}{" "}
+                          <span className="text-white/75 font-semibold">
+                            {hasValidAmount ? parsedAmount : "—"} RLUSD
+                          </span>
+                        </div>
+                      ) : null}
                     </div>
                     {partnerFromNetwork ? (
                       <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
@@ -2129,12 +2157,12 @@ export default function WalletDashboardUsdSwapModal({
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
                   <div className="px-1">
                     <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                      {t("ui_swap_title_out", "RLUSD → stablecoin USD")}
+                      {t("ui_swap_title_out", "Conversion RLUSD → XRP → stablecoin USD")}
                     </h3>
                     <p className="mt-1 text-xs md:text-sm text-white/60">
                       {t(
                         "ui_swap_subtitle_out",
-                        "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
+                        "XCANNES convertit d’abord votre RLUSD en XRP sur XRPL, puis SimpleSwap envoie le stablecoin USD sur l’autre réseau.",
                       )}
                     </p>
                   </div>
@@ -2173,7 +2201,9 @@ export default function WalletDashboardUsdSwapModal({
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="text-sm text-white/70">
-                            {t("ui_swap_you_send", "Vous envoyez")}
+                            {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                              ? t("ui_swap_you_send_source_rlusd", "Montant source XCANNES")
+                              : t("ui_swap_you_send", "Vous envoyez")}
                           </div>
                           <div className="flex items-center gap-2">
                             {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
@@ -2274,6 +2304,29 @@ export default function WalletDashboardUsdSwapModal({
                                   : t("ui_too_high", "Trop élevé")}
                               </span>
                             ) : null}
+                          </div>
+                        ) : null}
+
+                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                          <div className="mt-3 rounded-lg ring-1 ring-white/10 bg-white/[0.03] px-3 py-2 text-[11px] text-white/70">
+                            {previewOutboundXrpAmount ? (
+                              <>
+                                {t(
+                                  "ui_usd_swap_partner_xrp_preview",
+                                  "Rail partenaire SimpleSwap : ≈ {{amount}} XRP seront envoyés après le swap XRPL.",
+                                  {
+                                    amount: formatAmountNumber
+                                      ? formatAmountNumber.format(previewOutboundXrpAmount)
+                                      : String(previewOutboundXrpAmount),
+                                  },
+                                )}
+                              </>
+                            ) : (
+                              t(
+                                "ui_usd_swap_partner_xrp_preview_loading",
+                                "Le rail partenaire utilise XRP ; le montant exact sera affiché dès que l’estimation XRPL est disponible.",
+                              )
+                            )}
                           </div>
                         ) : null}
                       </div>
@@ -2892,11 +2945,29 @@ export default function WalletDashboardUsdSwapModal({
                     <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
                       <div className="text-white/80 text-sm">
                         <div>
-                          {t("ui_swap_you_send", "Vous envoyez")}{" "}
+                          {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                            ? t("ui_usd_swap_partner_sends", "SimpleSwap recevra")
+                            : t("ui_swap_you_send", "Vous envoyez")}{" "}
                           <span className="text-white font-semibold">
-                            {hasValidAmount ? parsedAmount : 0} {fromTicker || ""}
+                            {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                              ? `${
+                                  previewOutboundXrpAmount
+                                    ? formatAmountNumber
+                                      ? formatAmountNumber.format(previewOutboundXrpAmount)
+                                      : String(previewOutboundXrpAmount)
+                                    : "—"
+                                } XRP`
+                              : `${hasValidAmount ? parsedAmount : 0} ${fromTicker || ""}`}
                           </span>
                         </div>
+                        {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                          <div className="mt-1 text-white/55">
+                            {t("ui_usd_swap_source_debit", "Débit XCANNES:")}{" "}
+                            <span className="text-white font-semibold">
+                              {hasValidAmount ? parsedAmount : 0} RLUSD
+                            </span>
+                          </div>
+                        ) : null}
                         <div className="mt-1">
                           {t("ui_usd_swap_you_receive", "Vous recevez")}{" "}
                           <span className="text-white font-semibold">
