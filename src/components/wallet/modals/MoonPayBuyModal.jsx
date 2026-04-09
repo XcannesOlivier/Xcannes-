@@ -1561,8 +1561,8 @@ const MoonPayBuyModal = ({
 				              {wizardStep === 1 ? (
 				                <>
 				                  <span className="text-[20px] tracking-[0.14em]">
-				                    {resolvedTitleOverride ||
-				                      t("ui_funds_add_title", "Ajouter de l'argent")}
+					                    {resolvedTitleOverride ||
+					                      t("ui_funds_add_title", "AUGMENTER VOS SOLDES")}
 				                  </span>
 				                </>
 				              ) : (
@@ -1602,9 +1602,9 @@ const MoonPayBuyModal = ({
 
 		          {/* Currency selector */}
 		          <div>
-		            <label className="block text-white/70 mb-2">
-		              {t("moonpay_buy_receive_currency_label", "Devise reçue")}
-		            </label>
+			            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			              {t("moonpay_buy_receive_currency_label", "Devise souhaitée")}
+			            </label>
 				            <div className="relative">
 				            <button
 					              type="button"
@@ -1986,9 +1986,9 @@ const MoonPayBuyModal = ({
 
                 {wizardStep === 1 || wizardStep === 2 ? (
                   <div>
-                    <label className="block text-white/70 mb-2">
-                      {t("moonpay_buy_selected_asset_amount", "Montant")}
-                    </label>
+	                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+	                      {t("moonpay_buy_selected_asset_amount", "Montant")}
+	                    </label>
 	                    <div className="relative">
 	                      <input
 	                        type="number"

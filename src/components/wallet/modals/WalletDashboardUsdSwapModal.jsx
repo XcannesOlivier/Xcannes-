@@ -2849,7 +2849,9 @@ export default function WalletDashboardUsdSwapModal({
                         {outboundTitle}
                       </h3>
                     ) : null}
-                    <p className={`${walletSourceSelectionEnabled ? "" : "mt-1 "}text-xs md:text-sm text-white/60`}>
+                    <p
+                      className={`${walletSourceSelectionEnabled ? "" : "mt-1 "}text-[15px] md:text-sm leading-snug text-white/85`}
+                    >
                       {String(subtitleOverride || "").trim() ||
                         t(
                           "ui_swap_subtitle_out",
@@ -2891,7 +2893,7 @@ export default function WalletDashboardUsdSwapModal({
 		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden", accentShadowCard].join(" ")}>
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
-                          <div className="text-sm text-white/70">
+                          <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                             {t("ui_swap_you_send", "Vous envoyez")}
                           </div>
                           <div className="flex items-center gap-2">
@@ -3092,7 +3094,7 @@ export default function WalletDashboardUsdSwapModal({
 
                         <div className="p-4 pt-6">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-sm text-white/70">
+                            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                               {t("ui_usd_swap_you_receive", "Vous recevez")}
                             </div>
                             <div className="flex items-center gap-2">
@@ -4011,15 +4013,15 @@ export default function WalletDashboardUsdSwapModal({
 	                            "Partenaires et moyens de paiement",
 	                          )}
 	                        >
-	                          <span className="inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none bg-white/90 w-[140px]">
-	                            <Image
-	                              src="/assets/payment-logos/simpleswap.jpeg"
-	                              alt="SimpleSwap"
-	                              width={140}
-	                              height={24}
-	                              className="w-[112px] md:w-[120px] h-auto object-contain"
-	                            />
-	                          </span>
+                          <span className="inline-flex items-center justify-center leading-none">
+                            <Image
+                              src="/assets/payment-logos/simpleswap.jpeg"
+                              alt="SimpleSwap"
+                              width={140}
+                              height={24}
+                              className="block w-[112px] md:w-[120px] h-auto object-contain"
+                            />
+                          </span>
 	                        </span>
 	                      </div>
 	                    ) : null}

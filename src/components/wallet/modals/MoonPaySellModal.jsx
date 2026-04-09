@@ -1388,10 +1388,10 @@ const MoonPaySellModal = ({
 
 		          {/* Currency selector */}
 		          <div>
-		            <label className="block text-white/70 mb-2">
-		              {t(
-		                "moonpay_sell_send_currency_label",
-		                "Devise à envoyer",
+			            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			              {t(
+			                "moonpay_sell_send_currency_label",
+			                "Devise à envoyer",
 		              )}
 		            </label>
 					            <div className="relative">
@@ -1784,9 +1784,9 @@ const MoonPaySellModal = ({
 	          {/* Amount input (étape 1/2) */}
 	          {wizardStep === 1 || wizardStep === 2 ? (
 	            <div>
-	              <label className="block text-white/70 mb-2">
-	                {t("moonpay_amount_to_sell", "Montant")}
-	              </label>
+		              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+		                {t("moonpay_amount_to_sell", "Montant")}
+		              </label>
 	              <div className="relative">
 		                <input
 		                  type="text"
