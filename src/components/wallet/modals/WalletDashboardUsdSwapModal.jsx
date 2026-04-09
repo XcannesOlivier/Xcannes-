@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import xcannesApi from "@/lib/xcannesApi";
+import ModalSelect from "@/components/ui/ModalSelect";
 import { buildSimpleSwapMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import {
   fireOrangeActionBtnBase,
@@ -2501,29 +2502,29 @@ export default function WalletDashboardUsdSwapModal({
                                 </button>
                               </div>
                             ) : walletSourceSelectionEnabled ? (
-                              <div className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85">
-                                <label className="sr-only" htmlFor="wallet-source-currency">
-                                  {t("ui_send_currency", "Devise à envoyer")}
-                                </label>
-                                <select
-                                  id="wallet-source-currency"
+                              <div className="w-[220px] max-w-full">
+                                <ModalSelect
                                   value={selectedSourceCurrencyCode}
-                                  onChange={(event) => {
-                                    setSourceCurrencyCode(event.target.value);
+                                  onChange={(nextCode) => {
+                                    setSourceCurrencyCode(nextCode);
                                     setApiError("");
                                     setQuote(null);
                                   }}
-                                  className="bg-transparent text-sm font-semibold outline-none"
-                                >
-                                  {sourceCurrencyOptions.map((option) => (
-                                    <option key={option.code} value={option.code} className="bg-[#111] text-white">
-                                      {option.code}
-                                    </option>
-                                  ))}
-                                </select>
-                                <span className="text-[11px] text-white/55 whitespace-nowrap">
-                                  {selectedSourceOption?.labelRight || ""}
-                                </span>
+                                  options={sourceCurrencyOptions.map((option) => ({
+                                    value: option.code,
+                                    icon: option.icon,
+                                    label: option.label || option.code,
+                                    labelLeft: option.label || option.code,
+                                    labelRight: option.labelRight || null,
+                                    labelMobile: option.label || option.code,
+                                  }))}
+                                  useNativeSelect={false}
+                                  showMobileOptionRight={true}
+                                  iconClassName="text-base leading-none"
+                                  backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
+                                  buttonClassName="w-full rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-sm text-white/85 hover:bg-black/40 transition-colors"
+                                  menuClassName="bg-elevated border-white/15 ring-1 ring-white/10 max-h-[260px]"
+                                />
                               </div>
                             ) : (
                               <div className="inline-flex items-center gap-2 text-white/90">
