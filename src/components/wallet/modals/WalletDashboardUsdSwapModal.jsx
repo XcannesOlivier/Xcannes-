@@ -213,6 +213,98 @@ function buildPlainTextMemo(value) {
   ];
 }
 
+function normalizeAddressNetworkFamily(network) {
+  const normalized = String(network || "").trim().toLowerCase();
+  if (!normalized) return "";
+  if (["xrp", "xrpl"].includes(normalized)) return "xrpl";
+  if (["tron", "trx", "trc20"].includes(normalized)) return "tron";
+  if (["sol", "solana"].includes(normalized)) return "solana";
+  if (
+    [
+      "eth",
+      "ethereum",
+      "erc20",
+      "bsc",
+      "bnb",
+      "bep20",
+      "base",
+      "arb",
+      "arbitrum",
+      "matic",
+      "polygon",
+      "op",
+      "optimism",
+      "avax",
+      "avaxc",
+      "avaxcchain",
+      "cchain",
+      "linea",
+      "zksync",
+    ].includes(normalized) ||
+    normalized.includes("erc20") ||
+    normalized.includes("bep20")
+  ) {
+    return "evm";
+  }
+  if (["btc", "bitcoin"].includes(normalized)) return "bitcoin";
+  if (["ltc", "litecoin"].includes(normalized)) return "litecoin";
+  if (["doge", "dogecoin"].includes(normalized)) return "dogecoin";
+  if (["ton"].includes(normalized)) return "ton";
+  if (["xlm", "stellar"].includes(normalized)) return "stellar";
+  if (["algo", "algorand"].includes(normalized)) return "algorand";
+  if (["ada", "cardano"].includes(normalized)) return "cardano";
+  if (["near"].includes(normalized)) return "near";
+  if (["apt", "aptos"].includes(normalized)) return "aptos";
+  if (["sui"].includes(normalized)) return "sui";
+  return "";
+}
+
+function validateAddressByNetworkFamily(address, family) {
+  const value = String(address || "").trim();
+  if (!value || !family) return true;
+
+  switch (family) {
+    case "evm":
+      return /^0x[a-fA-F0-9]{40}$/.test(value);
+    case "tron":
+      return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(value);
+    case "solana":
+      return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value);
+    case "xrpl":
+      return (
+        /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(value) ||
+        /^[XT][1-9A-HJ-NP-Za-km-z]{46,55}$/.test(value)
+      );
+    case "bitcoin":
+      return (
+        /^(bc1|tb1)[ac-hj-np-z02-9]{11,71}$/i.test(value) ||
+        /^[13mn2][1-9A-HJ-NP-Za-km-z]{25,62}$/.test(value)
+      );
+    case "litecoin":
+      return (
+        /^ltc1[ac-hj-np-z02-9]{8,87}$/i.test(value) ||
+        /^[LM3][1-9A-HJ-NP-Za-km-z]{26,33}$/.test(value)
+      );
+    case "dogecoin":
+      return /^D[1-9A-HJ-NP-Za-km-z]{25,34}$/.test(value);
+    case "ton":
+      return /^(EQ|UQ)[A-Za-z0-9_-]{46}$/.test(value);
+    case "stellar":
+      return /^G[A-Z2-7]{55}$/.test(value);
+    case "algorand":
+      return /^[A-Z2-7]{58}$/.test(value);
+    case "cardano":
+      return /^(addr1[0-9a-z]{20,}|DdzFF[1-9A-HJ-NP-Za-km-z]{20,})$/i.test(value);
+    case "near":
+      return /^(?:[a-z0-9._-]{2,64}|[0-9a-f]{64})$/.test(value);
+    case "aptos":
+    case "sui":
+      return /^0x[0-9a-fA-F]{1,64}$/.test(value);
+    default:
+      return true;
+  }
+}
+
 export default function WalletDashboardUsdSwapModal({
   open,
   onClose,
@@ -289,16 +381,8 @@ export default function WalletDashboardUsdSwapModal({
     : isSimpleSwapBlue
       ? "border-[#0870f8]"
       : "border-xcannes-green";
-  const accentSwapIconShell = isFireOrange
-    ? "bg-[#ff6a00]/10 ring-1 ring-[#ff6a00]/30"
-    : isSimpleSwapBlue
-      ? "bg-[#0870f8]/10 ring-1 ring-[#0870f8]/30"
-    : "bg-xcannes-green/10 ring-1 ring-xcannes-green/30";
-  const accentSwapIcon = isFireOrange
-    ? "text-[#ff6a00]/90"
-    : isSimpleSwapBlue
-      ? "text-[#0870f8]/90"
-      : "text-xcannes-green/90";
+  const accentSwapIconShell = "bg-transparent ring-0";
+  const accentSwapIcon = "text-white";
   const accentActiveCard = isFireOrange
     ? "bg-[#ff6a00]/10 ring-[#ff6a00]/35 text-white"
     : isSimpleSwapBlue
@@ -646,6 +730,37 @@ export default function WalletDashboardUsdSwapModal({
   const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
   const toTicker = String(toCurrency?.ticker || "").trim().toUpperCase();
   const toNetwork = String(toCurrency?.network || "").trim().toUpperCase();
+  const defaultReceiveAddress = direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? String(walletAddress || "").trim() : "";
+  const effectiveReceiveAddress = String(receiveAddress || defaultReceiveAddress || "").trim();
+  const expectedReceiveTicker =
+    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+      ? String(rlusdCurrency?.ticker || "rlusd").trim().toUpperCase()
+      : toTicker;
+  const expectedReceiveNetwork =
+    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+      ? String(rlusdCurrency?.network || "xrp").trim().toUpperCase()
+      : toNetwork;
+  const receiveAddressNetworkFamily = useMemo(
+    () => normalizeAddressNetworkFamily(expectedReceiveNetwork),
+    [expectedReceiveNetwork],
+  );
+  const receiveAddressIsLocallyValid = useMemo(() => {
+    return validateAddressByNetworkFamily(effectiveReceiveAddress, receiveAddressNetworkFamily);
+  }, [effectiveReceiveAddress, receiveAddressNetworkFamily]);
+  const receiveAddressErrorMessage = useMemo(() => {
+    if (!effectiveReceiveAddress || receiveAddressIsLocallyValid) return "";
+    return t(
+      "ui_usd_swap_invalid_receive_addr_network",
+      `Adresse invalide pour ${expectedReceiveTicker || "cet actif"} sur ${expectedReceiveNetwork || "ce réseau"}.`,
+    );
+  }, [
+    effectiveReceiveAddress,
+    expectedReceiveNetwork,
+    expectedReceiveTicker,
+    receiveAddressIsLocallyValid,
+    t,
+  ]);
+  const hasReceiveAddressValidationError = Boolean(receiveAddressErrorMessage);
   const outboundTitle =
     String(titleOverride || "").trim() ||
     t("ui_swap_title_out", "RLUSD → stablecoin USD");
@@ -1761,10 +1876,13 @@ export default function WalletDashboardUsdSwapModal({
       );
       return;
     }
-    const defaultReceive = direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? walletAddress : "";
-    const addr = String(receiveAddress || defaultReceive || "").trim();
+    const addr = effectiveReceiveAddress;
     if (!addr) {
       setApiError(t("ui_usd_swap_missing_receive_addr", "Adresse de réception requise."));
+      return;
+    }
+    if (hasReceiveAddressValidationError) {
+      setApiError(receiveAddressErrorMessage);
       return;
     }
 
@@ -2400,8 +2518,8 @@ export default function WalletDashboardUsdSwapModal({
               ) : null}
               <div className="p-4">
               <div className="flex items-center justify-between gap-3">
-                <button
-                  type="button"
+	                    <button
+	                      type="button"
                   onClick={handleHeaderBack}
                   className="wallet-modal-close text-white/70 hover:text-white transition-colors text-xl flex items-center justify-center"
                   aria-label={t("ui_back", "Retour")}
@@ -2694,11 +2812,13 @@ export default function WalletDashboardUsdSwapModal({
                             accentShadowPanel,
                           ].join(" ")}
                         >
-                      {walletSourceSelectionEnabled ? (
-                        <h3 className="text-white font-semibold text-base md:text-lg leading-tight mb-2">
-                          {outboundTitle}
-                        </h3>
-                      ) : (
+	                      {walletSourceSelectionEnabled ? (
+	                        <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
+	                          <span className="text-[20px] tracking-[0.14em]">
+	                            {outboundTitle}
+	                          </span>
+	                        </p>
+	                      ) : (
                         <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                           {t("moonpay_from_account", "Depuis le compte")}
                         </p>
@@ -2715,7 +2835,7 @@ export default function WalletDashboardUsdSwapModal({
                         </div>
                       ) : null}
 		                      {String(walletAddress || "").trim() ? (
-		                        <p className={`text-[13px] md:text-sm font-mono font-semibold break-all ${accentText80}`}>
+		                        <p className={`text-[13px] md:text-sm font-mono break-all md:tracking-[0.06em] ${accentText80}`}>
 		                          {walletAddress}
 		                        </p>
 		                      ) : null}
@@ -2920,22 +3040,6 @@ export default function WalletDashboardUsdSwapModal({
                             ) : null}
                           </div>
                         ) : null}
-                        {walletSourceSelectionEnabled ? (
-                          <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-white/50">
-                            <div className="min-w-0 truncate">
-                              {selectedSourceOption?.label || selectedSourceCurrencyCode}
-                            </div>
-                            {Number.isFinite(selectedSourceAvailableBalance) ? (
-                              <span className="shrink-0">
-                                {t("ui_balance", "Solde")} :{" "}
-                                {formatAmountNumber
-                                  ? formatAmountNumber.format(selectedSourceAvailableBalance)
-                                  : String(selectedSourceAvailableBalance)}{" "}
-                                {selectedSourceCurrencyCode}
-                              </span>
-                            ) : null}
-                          </div>
-                        ) : null}
                         {walletSourceSelectionEnabled && insufficientSourceBalance ? (
                           <div className="mt-2 text-[11px] text-red-200">
                             {t("ui_insufficient_balance", "Solde insuffisant.")}
@@ -3103,9 +3207,6 @@ export default function WalletDashboardUsdSwapModal({
                               </svg>
                               {t("ui_variable_rate", "Taux variable")}
                             </div>
-                            <div className="text-white/40">
-                              {toTicker ? `${toTicker} ${toNetwork ? `(${toNetwork})` : ""}` : ""}
-                            </div>
                           </div>
 
                           {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
@@ -3128,10 +3229,15 @@ export default function WalletDashboardUsdSwapModal({
                                   "ui_usd_swap_receive_address_placeholder",
                                   "Adresse du wallet de réception (ex: 0x... / T...)",
                                 )}
-                                className={`w-full rounded-xl bg-black/30 ring-1 ring-white/15 ring-inset px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+                                className={`w-full rounded-xl bg-black/30 ring-1 ring-inset px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 transition-all duration-150 ${hasReceiveAddressValidationError ? "ring-red-500/40 focus:ring-red-500/60" : `ring-white/15 ${accentRing60}`}`}
                                 autoComplete="off"
                                 spellCheck={false}
                               />
+                              {hasReceiveAddressValidationError ? (
+                                <p className="mt-2 text-[11px] text-red-300">
+                                  {receiveAddressErrorMessage}
+                                </p>
+                              ) : null}
                             </div>
                           ) : null}
                         </div>
@@ -3873,6 +3979,7 @@ export default function WalletDashboardUsdSwapModal({
                         amountOutOfRange ||
                         insufficientSourceBalance ||
                         sourceConversionMissing ||
+                        hasReceiveAddressValidationError ||
                         pairUnavailable ||
                         !fromCurrency ||
                         !toCurrency ||
@@ -3887,10 +3994,37 @@ export default function WalletDashboardUsdSwapModal({
                       }}
 	                      className={`w-full text-xl py-4 ${actionBtnBase}`}
 	                    >
-	                      {t("ui_action_continue", "Continuer")}
-	                    </button>
-                  </>
-                ) : null}
+		                      {t("ui_action_continue", "Continuer")}
+		                    </button>
+	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+	                      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
+	                        <span>
+	                          {t(
+	                            "ui_simpleswap_secure_partner_note_f1d7a9c2b3",
+	                            "Conversion sécurisé via",
+	                          )}
+	                        </span>
+	                        <span
+	                          className="inline-flex items-center gap-1.5"
+	                          aria-label={t(
+	                            "moonpay_buy_payment_methods",
+	                            "Partenaires et moyens de paiement",
+	                          )}
+	                        >
+	                          <span className="inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none bg-white/90 w-[140px]">
+	                            <Image
+	                              src="/assets/payment-logos/simpleswap.jpeg"
+	                              alt="SimpleSwap"
+	                              width={140}
+	                              height={24}
+	                              className="w-[112px] md:w-[120px] h-auto object-contain"
+	                            />
+	                          </span>
+	                        </span>
+	                      </div>
+	                    ) : null}
+	                  </>
+	                ) : null}
 
                 {step === "address" ? (
                   <>
@@ -3954,15 +4088,23 @@ export default function WalletDashboardUsdSwapModal({
                       </label>
                       <input
                         value={receiveAddress}
-                        onChange={(e) => setReceiveAddress(e.target.value)}
+                        onChange={(e) => {
+                          setReceiveAddress(e.target.value);
+                          setApiError("");
+                        }}
                         placeholder={t(
                           "ui_usd_swap_receive_address_placeholder",
                           direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
                             ? "Adresse XRPL (ex: r…)"
                             : "Adresse sur le réseau choisi (ex: 0x… / T…)",
                         )}
-	                        className={`w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
-	                      />
+                        className={`w-full px-4 py-4 bg-black/30 ring-1 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 transition-all duration-150 ${hasReceiveAddressValidationError ? "ring-red-500/40 focus:ring-red-500/60" : `ring-white/15 ${accentRing60}`}`}
+                      />
+                      {hasReceiveAddressValidationError ? (
+                        <p className="mt-2 text-[11px] text-red-300">
+                          {receiveAddressErrorMessage}
+                        </p>
+                      ) : null}
                     </div>
 
                     {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
@@ -4022,26 +4164,15 @@ export default function WalletDashboardUsdSwapModal({
                       disabled={
                         !hasValidAmount ||
                         amountOutOfRange ||
+                        hasReceiveAddressValidationError ||
                         pairUnavailable ||
                         !fromCurrency ||
                         !toCurrency ||
                         !stableCurrency ||
-                        !String(
-                          receiveAddress ||
-                            (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                              ? walletAddress
-                              : "") ||
-                            "",
-                        ).trim()
+                        !effectiveReceiveAddress
                       }
                       onClick={async () => {
-                        const addr = String(
-                          receiveAddress ||
-                            (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
-                              ? walletAddress
-                              : "") ||
-                            "",
-                        ).trim();
+                        const addr = effectiveReceiveAddress;
                         if (!addr) {
                           setApiError(
                             t(
@@ -4049,6 +4180,10 @@ export default function WalletDashboardUsdSwapModal({
                               "Adresse de réception requise.",
                             ),
                           );
+                          return;
+                        }
+                        if (hasReceiveAddressValidationError) {
+                          setApiError(receiveAddressErrorMessage);
                           return;
                         }
                         await createExchange({ returnStep: "address" });
