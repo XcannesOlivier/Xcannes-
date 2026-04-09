@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import xcannesApi from "@/lib/xcannesApi";
-import ModalSelect from "@/components/ui/ModalSelect";
 import { buildSimpleSwapMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import {
   fireOrangeActionBtnBase,
@@ -89,6 +89,29 @@ function renderCurrencyIcon(currency) {
       referrerPolicy="no-referrer"
     />
   );
+}
+
+function renderWalletOptionIcon(icon) {
+  if (!icon) return null;
+  if (typeof icon === "string" || typeof icon === "number") {
+    return (
+      <span className="text-base leading-none" aria-hidden="true">
+        {icon}
+      </span>
+    );
+  }
+  if (icon?.src) {
+    return (
+      <Image
+        src={icon.src}
+        alt={icon.alt || ""}
+        width={22}
+        height={22}
+        className="w-5 h-5 object-contain"
+      />
+    );
+  }
+  return null;
 }
 
 function safeReadJsonArray(value) {
@@ -325,6 +348,25 @@ export default function WalletDashboardUsdSwapModal({
   });
   const [modalOverlayDragging, setModalOverlayDragging] = useState(false);
   const [modalOverlayTranslateY, setModalOverlayTranslateY] = useState(0);
+  const [sourceSearch, setSourceSearch] = useState("");
+  const [sourceDropdownOpen, setSourceDropdownOpen] = useState(false);
+  const [sourceDesktopPopupStyle, setSourceDesktopPopupStyle] = useState(null);
+  const sourceDropdownRef = useRef(null);
+  const sourceDropdownOverlayRef = useRef(null);
+  const sourceDropdownListRef = useRef(null);
+  const [sourceOverlayDragging, setSourceOverlayDragging] = useState(false);
+  const [sourceOverlayTranslateY, setSourceOverlayTranslateY] = useState(0);
+  const sourceOverlayDragMetaRef = useRef({
+    startY: 0,
+    startAt: 0,
+    pointerId: null,
+    lastDelta: 0,
+    pending: false,
+    source: null,
+    dragging: false,
+    scrollLocked: false,
+    lockedOverflowY: "",
+  });
   const modalOverlayRef = useRef(null);
   const modalOverlayListRef = useRef(null);
   const modalPanelRef = useRef(null);
@@ -501,6 +543,16 @@ export default function WalletDashboardUsdSwapModal({
     selectLabelRightByCurrency,
     walletSourceSelectionEnabled,
   ]);
+  const filteredSourceCurrencyOptions = useMemo(() => {
+    const needle = String(sourceSearch || "").trim().toLowerCase();
+    if (!needle) return sourceCurrencyOptions;
+    return sourceCurrencyOptions.filter((option) => {
+      const code = String(option?.code || "").toLowerCase();
+      const label = String(option?.label || "").toLowerCase();
+      const right = String(option?.labelRight || "").toLowerCase();
+      return `${code} ${label} ${right}`.includes(needle);
+    });
+  }, [sourceCurrencyOptions, sourceSearch]);
   const [sourceCurrencyCode, setSourceCurrencyCode] = useState("");
   const selectedSourceOption = useMemo(() => {
     const current = String(sourceCurrencyCode || "").trim().toUpperCase();
@@ -686,6 +738,15 @@ export default function WalletDashboardUsdSwapModal({
     }
   }, [stableDropdownOpen]);
 
+  useEffect(() => {
+    if (!sourceDropdownOpen) return;
+    try {
+      document?.activeElement?.blur?.();
+    } catch {
+      // ignore
+    }
+  }, [sourceDropdownOpen]);
+
   const filteredStableOptions = useMemo(() => {
     const needle = String(search || "").trim().toLowerCase();
     const list = currencies
@@ -775,6 +836,62 @@ export default function WalletDashboardUsdSwapModal({
     };
   }, [isDesktop, stableDropdownOpen]);
 
+  useEffect(() => {
+    if (!sourceDropdownOpen || !isDesktop) {
+      setSourceDesktopPopupStyle(null);
+      return;
+    }
+
+    const update = () => {
+      try {
+        const triggerEl = sourceDropdownRef.current;
+        const modalEl = modalOverlayRef.current;
+        if (!triggerEl || !modalEl) return;
+
+        const triggerRect = triggerEl.getBoundingClientRect();
+        const modalRect = modalEl.getBoundingClientRect();
+        const padding = 12;
+        const gap = 8;
+
+        const maxWidth = Math.max(280, modalRect.width - padding * 2);
+        const width = Math.min(560, maxWidth);
+        const centerX = triggerRect.left + triggerRect.width / 2;
+        let left = centerX - width / 2;
+        left = Math.max(modalRect.left + padding, left);
+        left = Math.min(modalRect.right - padding - width, left);
+
+        let top = triggerRect.bottom + gap;
+        let maxHeight = modalRect.bottom - padding - top;
+
+        if (maxHeight < 220) {
+          const spaceAbove = triggerRect.top - gap - (modalRect.top + padding);
+          if (spaceAbove > maxHeight) {
+            maxHeight = spaceAbove;
+            top = Math.max(modalRect.top + padding, triggerRect.top - gap - maxHeight);
+          }
+        }
+
+        setSourceDesktopPopupStyle({
+          position: "fixed",
+          left: `${Math.round(left)}px`,
+          top: `${Math.round(top)}px`,
+          width: `${Math.round(width)}px`,
+          maxHeight: `${Math.round(Math.max(180, maxHeight))}px`,
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [isDesktop, sourceDropdownOpen]);
+
   const popularStableOptions = useMemo(() => {
     if (!currencies.length) return [];
     return POPULAR_STABLE_TARGETS.map((target) => {
@@ -842,6 +959,8 @@ export default function WalletDashboardUsdSwapModal({
     setStep("form");
     setSearch("");
     setStableDropdownOpen(false);
+    setSourceSearch("");
+    setSourceDropdownOpen(false);
     setStableKey("");
     setSourceCurrencyCode("");
     setAmount(String(prefill || ""));
@@ -935,6 +1054,44 @@ export default function WalletDashboardUsdSwapModal({
   }, [isDesktop, stableDropdownOpen]);
 
   useEffect(() => {
+    if (!sourceDropdownOpen) return;
+    const prevOverflow = document?.body?.style?.overflow;
+    try {
+      if (typeof document !== "undefined" && !isDesktop)
+        document.body.style.overflow = "hidden";
+    } catch {
+      // ignore
+    }
+    const handlePointerDown = (event) => {
+      const el = sourceDropdownRef.current;
+      const overlay = sourceDropdownOverlayRef.current;
+      if (!el) {
+        setSourceDropdownOpen(false);
+        return;
+      }
+      if (el.contains(event.target)) return;
+      if (overlay && overlay.contains(event.target)) return;
+      setSourceDropdownOpen(false);
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setSourceDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    if (!isDesktop) document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+      try {
+        if (typeof document !== "undefined") document.body.style.overflow = prevOverflow || "";
+      } catch {
+        // ignore
+      }
+    };
+  }, [isDesktop, sourceDropdownOpen]);
+
+  useEffect(() => {
     if (stableDropdownOpen) return;
     setStableOverlayDragging(false);
     setStableOverlayTranslateY(0);
@@ -950,6 +1107,23 @@ export default function WalletDashboardUsdSwapModal({
       lockedOverflowY: "",
     };
   }, [stableDropdownOpen]);
+
+  useEffect(() => {
+    if (sourceDropdownOpen) return;
+    setSourceOverlayDragging(false);
+    setSourceOverlayTranslateY(0);
+    sourceOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  }, [sourceDropdownOpen]);
 
   const releaseStableOverlayScrollLock = () => {
     const meta = stableOverlayDragMetaRef.current;
@@ -1066,6 +1240,133 @@ export default function WalletDashboardUsdSwapModal({
 
     setStableOverlayTranslateY(0);
     stableOverlayDragMetaRef.current = {
+      startY: 0,
+      startAt: 0,
+      pointerId: null,
+      lastDelta: 0,
+      pending: false,
+      source: null,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+  };
+
+  const releaseSourceOverlayScrollLock = () => {
+    const meta = sourceOverlayDragMetaRef.current;
+    if (meta?.source !== "list") return;
+    if (!meta?.scrollLocked) return;
+    const listEl = sourceDropdownListRef.current;
+    if (!listEl) return;
+    try {
+      listEl.style.overflowY = meta.lockedOverflowY;
+    } catch {
+      // ignore
+    }
+    meta.scrollLocked = false;
+    meta.lockedOverflowY = "";
+  };
+
+  const maybeStartSourceOverlayDrag = (event, source) => {
+    if (!event?.isPrimary) return false;
+    if (event.pointerType === "mouse") return false;
+    if (event.target?.closest?.("input,textarea,select")) return false;
+
+    if (source === "list") {
+      const listEl = sourceDropdownListRef.current;
+      if (!listEl) return false;
+      if (listEl.scrollTop > 0) return false;
+    }
+
+    sourceOverlayDragMetaRef.current = {
+      startY: event.clientY,
+      startAt: Date.now(),
+      pointerId: event.pointerId,
+      lastDelta: 0,
+      pending: true,
+      source,
+      dragging: false,
+      scrollLocked: false,
+      lockedOverflowY: "",
+    };
+    return true;
+  };
+
+  const handleSourceOverlayPointerMove = (event) => {
+    const meta = sourceOverlayDragMetaRef.current;
+    if (!meta?.pending && !meta?.dragging) return;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = event.clientY - meta.startY;
+    if (delta <= 0) return;
+
+    if (!meta.dragging) {
+      if (delta < 8) return;
+      try {
+        sourceDropdownOverlayRef.current?.setPointerCapture?.(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      if (meta.source === "list") {
+        const listEl = sourceDropdownListRef.current;
+        if (listEl && listEl.scrollTop <= 0) {
+          try {
+            meta.lockedOverflowY = listEl.style.overflowY;
+            meta.scrollLocked = true;
+            listEl.style.overflowY = "hidden";
+            listEl.scrollTop = 0;
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      meta.dragging = true;
+      setSourceOverlayDragging(true);
+    }
+
+    meta.lastDelta = delta;
+    setSourceOverlayTranslateY(delta);
+  };
+
+  const handleSourceOverlayPointerEnd = (event) => {
+    const meta = sourceOverlayDragMetaRef.current;
+    if (meta.pointerId !== event.pointerId) return;
+
+    const delta = meta.lastDelta || 0;
+    const duration = Math.max(1, Date.now() - (meta.startAt || 0));
+    const velocity = delta / duration;
+    const shouldClose = delta > 160 || velocity > 1.0;
+
+    sourceOverlayDragMetaRef.current.pending = false;
+    sourceOverlayDragMetaRef.current.dragging = false;
+    setSourceOverlayDragging(false);
+    releaseSourceOverlayScrollLock();
+
+    if (shouldClose) {
+      const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+      setSourceOverlayTranslateY(Math.max(delta, height));
+      window.setTimeout(() => {
+        setSourceDropdownOpen(false);
+        setSourceSearch("");
+      }, 180);
+      sourceOverlayDragMetaRef.current = {
+        startY: 0,
+        startAt: 0,
+        pointerId: null,
+        lastDelta: 0,
+        pending: false,
+        source: null,
+        dragging: false,
+        scrollLocked: false,
+        lockedOverflowY: "",
+      };
+      return;
+    }
+
+    setSourceOverlayTranslateY(0);
+    sourceOverlayDragMetaRef.current = {
       startY: 0,
       startAt: 0,
       pointerId: null,
@@ -2468,7 +2769,11 @@ export default function WalletDashboardUsdSwapModal({
                               <div ref={stableDropdownRef}>
                                 <button
                                   type="button"
-                                  onClick={() => setStableDropdownOpen(true)}
+                                  onClick={() => {
+                                    setSourceDropdownOpen(false);
+                                    setSourceSearch("");
+                                    setStableDropdownOpen(true);
+                                  }}
                                   aria-expanded={stableDropdownOpen}
                                   className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:bg-black/40 transition-colors"
                                 >
@@ -2502,29 +2807,39 @@ export default function WalletDashboardUsdSwapModal({
                                 </button>
                               </div>
                             ) : walletSourceSelectionEnabled ? (
-                              <div className="w-[220px] max-w-full">
-                                <ModalSelect
-                                  value={selectedSourceCurrencyCode}
-                                  onChange={(nextCode) => {
-                                    setSourceCurrencyCode(nextCode);
-                                    setApiError("");
-                                    setQuote(null);
+                              <div ref={sourceDropdownRef}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setStableDropdownOpen(false);
+                                    setSearch("");
+                                    setSourceDropdownOpen((prev) => !prev);
                                   }}
-                                  options={sourceCurrencyOptions.map((option) => ({
-                                    value: option.code,
-                                    icon: option.icon,
-                                    label: option.label || option.code,
-                                    labelLeft: option.label || option.code,
-                                    labelRight: option.labelRight || null,
-                                    labelMobile: option.label || option.code,
-                                  }))}
-                                  useNativeSelect={false}
-                                  showMobileOptionRight={true}
-                                  iconClassName="text-base leading-none"
-                                  backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
-                                  buttonClassName="w-full rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-sm text-white/85 hover:bg-black/40 transition-colors"
-                                  menuClassName="bg-elevated border-white/15 ring-1 ring-white/10 max-h-[260px]"
-                                />
+                                  aria-expanded={sourceDropdownOpen}
+                                  className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:bg-black/40 transition-colors"
+                                >
+                                  <span className="shrink-0">
+                                    {renderWalletOptionIcon(selectedSourceOption?.icon)}
+                                  </span>
+                                  <span className="text-sm font-semibold">
+                                    {selectedSourceOption?.label || selectedSourceCurrencyCode}
+                                  </span>
+                                  <span className="text-white/70 font-mono tabular-nums text-sm">
+                                    {selectedSourceOption?.labelRight || ""}
+                                  </span>
+                                  <svg
+                                    className="w-4 h-4 flex-shrink-0"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    aria-hidden
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </button>
                               </div>
                             ) : (
                               <div className="inline-flex items-center gap-2 text-white/90">
@@ -2671,7 +2986,11 @@ export default function WalletDashboardUsdSwapModal({
                                 <div ref={stableDropdownRef}>
                                   <button
                                     type="button"
-                                    onClick={() => setStableDropdownOpen(true)}
+                                    onClick={() => {
+                                      setSourceDropdownOpen(false);
+                                      setSourceSearch("");
+                                      setStableDropdownOpen(true);
+                                    }}
                                     aria-expanded={stableDropdownOpen}
                                     className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:bg-black/40 transition-colors"
                                   >
@@ -3171,11 +3490,318 @@ export default function WalletDashboardUsdSwapModal({
 	                              </div>
 	                            </div>,
 	                            document.body,
-	                          )
-	                      : null}
+		                          )
+		                      : null}
 
-	                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
-	                      <div
+                    {sourceDropdownOpen
+                      ? isDesktop
+                        ? sourceDesktopPopupStyle
+                          ? createPortal(
+                            <div
+                              ref={sourceDropdownOverlayRef}
+                              role="dialog"
+                              aria-modal="true"
+                              className="absolute inset-0 z-[10040]"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div
+                                className="absolute inset-0 bg-black/70"
+                                onClick={() => {
+                                  setSourceDropdownOpen(false);
+                                  setSourceSearch("");
+                                }}
+                              />
+                              <div
+                                className={[
+                                  noticeVariant === "demo"
+                                    ? "bg-xcannes-surface-demo"
+                                    : "bg-elevated",
+                                  "absolute inset-0 flex flex-col min-h-0 overflow-hidden",
+                                ].join(" ")}
+                              >
+                                <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
+                                  <div className="min-w-0">
+                                    <div className="text-white font-semibold text-base leading-tight truncate">
+                                      {t("ui_choose_wallet_currency", "Choisir une devise XCANNES")}
+                                    </div>
+                                    <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
+                                      {t(
+                                        "ui_choose_wallet_currency_subtitle",
+                                        "Sélectionnez l’actif source du wallet.",
+                                      )}
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSourceDropdownOpen(false);
+                                      setSourceSearch("");
+                                    }}
+                                    className="text-white/70 hover:text-white transition-colors text-xl leading-none"
+                                    aria-label={t("ui_close", "Fermer")}
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+
+                                <div className="px-4 py-4 border-b border-white/10">
+                                  <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+                                      <svg
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        className="w-4 h-4"
+                                        aria-hidden
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <input
+                                      value={sourceSearch}
+                                      onChange={(e) => setSourceSearch(e.target.value)}
+                                      placeholder={t("ui_search", "Rechercher…")}
+                                      className={`w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div
+                                  ref={sourceDropdownListRef}
+                                  className="flex-1 min-h-0 overflow-y-auto"
+                                >
+                                  {filteredSourceCurrencyOptions.length ? (
+                                    filteredSourceCurrencyOptions.map((option) => {
+                                      const active =
+                                        String(option?.code || "").trim().toUpperCase() ===
+                                        selectedSourceCurrencyCode;
+                                      return (
+                                        <button
+                                          key={option.code}
+                                          type="button"
+                                          onClick={() => {
+                                            setSourceCurrencyCode(option.code);
+                                            setApiError("");
+                                            setQuote(null);
+                                            setSourceDropdownOpen(false);
+                                            setSourceSearch("");
+                                          }}
+                                          className={[
+                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+                                            active
+                                              ? accentActiveRow
+                                              : "hover:bg-white/[0.04] text-white/80",
+                                          ].join(" ")}
+                                        >
+                                          <span className="shrink-0">
+                                            {renderWalletOptionIcon(option.icon)}
+                                          </span>
+                                          <div className="min-w-0 flex-1">
+                                            <div className="text-sm font-semibold truncate">
+                                              {option.label || option.code}
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            {option.labelRight ? (
+                                              <span className="text-sm font-mono tabular-nums text-white/70">
+                                                {option.labelRight}
+                                              </span>
+                                            ) : null}
+                                            {active ? (
+                                              <span className={`font-semibold text-xs ${accentTextSolid}`}>
+                                                ✓
+                                              </span>
+                                            ) : null}
+                                          </div>
+                                        </button>
+                                      );
+                                    })
+                                  ) : (
+                                    <div className="px-4 py-6 text-sm text-white/60">
+                                      {t("ui_no_results", "Aucun résultat.")}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+                                  {t("ui_search_results", "Sélectionnez un actif.")}
+                                </div>
+                              </div>
+                            </div>,
+                            modalPanelRef.current || document.body,
+                          )
+                          : null
+                        : createPortal(
+                            <div className="fixed inset-0 z-[10020]">
+                              <div
+                                className="absolute inset-0 bg-black/80 md:backdrop-blur-sm"
+                                onClick={() => {
+                                  setSourceDropdownOpen(false);
+                                  setSourceSearch("");
+                                }}
+                                style={{
+                                  opacity: Math.max(
+                                    0,
+                                    Math.min(1, 1 - sourceOverlayTranslateY / 420),
+                                  ),
+                                }}
+                              />
+                              <div
+                                ref={sourceDropdownOverlayRef}
+                                role="dialog"
+                                aria-modal="true"
+                                className={[
+                                  "absolute inset-0 bg-elevated flex flex-col min-h-0 overflow-hidden pb-[env(safe-area-inset-bottom)]",
+                                  "sm:inset-6 sm:rounded-2xl sm:ring-1 sm:ring-white/10 sm:shadow-2xl",
+                                  "will-change-transform",
+                                ].join(" ")}
+                                style={{
+                                  transform: `translateY(${Math.max(0, sourceOverlayTranslateY)}px)`,
+                                  transition: sourceOverlayDragging
+                                    ? "none"
+                                    : "transform 220ms cubic-bezier(0.2,0,0,1)",
+                                }}
+                                onPointerMove={handleSourceOverlayPointerMove}
+                                onPointerUp={handleSourceOverlayPointerEnd}
+                                onPointerCancel={handleSourceOverlayPointerEnd}
+                              >
+                                <div
+                                  className="border-b border-white/10"
+                                  onPointerDown={(event) => {
+                                    maybeStartSourceOverlayDrag(event, "fixed");
+                                  }}
+                                >
+                                  <div className="sm:hidden flex justify-center pt-3 pb-1">
+                                    <div className="w-16 h-5 flex items-center justify-center" aria-hidden>
+                                      <span className="block w-12 h-1.5 rounded-full bg-white/20" />
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center justify-between gap-3 px-4 py-4">
+                                    <div className="min-w-0">
+                                      <div className="text-white font-semibold text-base leading-tight truncate">
+                                        {t("ui_choose_wallet_currency", "Choisir une devise XCANNES")}
+                                      </div>
+                                      <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
+                                        {t(
+                                          "ui_choose_wallet_currency_subtitle",
+                                          "Sélectionnez l’actif source du wallet.",
+                                        )}
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSourceDropdownOpen(false);
+                                        setSourceSearch("");
+                                      }}
+                                      className="hidden sm:inline-flex text-white/70 hover:text-white transition-colors text-xl"
+                                      aria-label={t("ui_close", "Fermer")}
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+
+                                  <div className="px-4 pb-4">
+                                    <div className="relative">
+                                      <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+                                        <svg
+                                          viewBox="0 0 20 20"
+                                          fill="currentColor"
+                                          className="w-4 h-4"
+                                          aria-hidden
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+                                            clipRule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <input
+                                        value={sourceSearch}
+                                        onChange={(e) => setSourceSearch(e.target.value)}
+                                        placeholder={t("ui_search", "Rechercher…")}
+                                        className={`w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 ${accentRing60} transition-all duration-150`}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div
+                                  ref={sourceDropdownListRef}
+                                  className="flex-1 min-h-0 overflow-y-auto"
+                                  onPointerDown={(event) => {
+                                    maybeStartSourceOverlayDrag(event, "list");
+                                  }}
+                                >
+                                  {filteredSourceCurrencyOptions.length ? (
+                                    filteredSourceCurrencyOptions.map((option) => {
+                                      const active =
+                                        String(option?.code || "").trim().toUpperCase() ===
+                                        selectedSourceCurrencyCode;
+                                      return (
+                                        <button
+                                          key={option.code}
+                                          type="button"
+                                          onClick={() => {
+                                            setSourceCurrencyCode(option.code);
+                                            setApiError("");
+                                            setQuote(null);
+                                            setSourceDropdownOpen(false);
+                                            setSourceSearch("");
+                                          }}
+                                          className={[
+                                            "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+                                            active
+                                              ? accentActiveRow
+                                              : "hover:bg-white/[0.04] text-white/80",
+                                          ].join(" ")}
+                                        >
+                                          <span className="shrink-0">
+                                            {renderWalletOptionIcon(option.icon)}
+                                          </span>
+                                          <div className="min-w-0 flex-1">
+                                            <div className="text-sm font-semibold truncate">
+                                              {option.label || option.code}
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            {option.labelRight ? (
+                                              <span className="text-sm font-mono tabular-nums text-white/70">
+                                                {option.labelRight}
+                                              </span>
+                                            ) : null}
+                                            {active ? (
+                                              <span className={`font-semibold text-xs ${accentTextSolid}`}>
+                                                ✓
+                                              </span>
+                                            ) : null}
+                                          </div>
+                                        </button>
+                                      );
+                                    })
+                                  ) : (
+                                    <div className="px-4 py-6 text-sm text-white/60">
+                                      {t("ui_no_results", "Aucun résultat.")}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+                                  {t("ui_search_results", "Sélectionnez un actif.")}
+                                </div>
+                              </div>
+                            </div>,
+                            document.body,
+                          )
+                      : null}
+
+		                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+		                      <div
                           className={[
                             "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
                             accentShadowPanel,
