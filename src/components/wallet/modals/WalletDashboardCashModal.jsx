@@ -67,6 +67,7 @@ export default function WalletDashboardCashModal({
   const [topperActive, setTopperActive] = useState(false);
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const walletMenuRef = useRef(null);
+  const cashContentRootRef = useRef(null);
   const showWalletMeta = false;
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -335,10 +336,11 @@ export default function WalletDashboardCashModal({
 	          )}
 
 		          {/* Contenu selon l'onglet actif */}
-				          <div
-				            className={`${
-				              // MoonPay iframe already has its own margins/padding inside the widget.
-				              // Remove horizontal padding here to avoid double side-margins.
+					          <div
+					            ref={cashContentRootRef}
+					            className={`${
+					              // MoonPay iframe already has its own margins/padding inside the widget.
+					              // Remove horizontal padding here to avoid double side-margins.
 				              rampActive ? "px-0 py-0" : "p-4 md:p-5"
 				            } relative z-0 overflow-y-auto overscroll-contain flex-1 min-h-0`}
 				            style={{ WebkitOverflowScrolling: "touch" }}
@@ -368,10 +370,11 @@ export default function WalletDashboardCashModal({
 	                      walletLabel={walletLabel}
                         signTransaction={signTransaction}
 	                      preferredFiatCurrency={preferredFiatCurrency}
-                        onProceedToUsdSwapOut={onOpenUsdSwapOut}
-	                      embedded={true}
-	                      isPreviewMode={isPreviewMode}
-	                      demoMode={demoMode}
+		                    onProceedToUsdSwapOut={onOpenUsdSwapOut}
+		                      embedded={true}
+		                      embeddedOverlayRootRef={cashContentRootRef}
+		                      isPreviewMode={isPreviewMode}
+		                      demoMode={demoMode}
 	                      onDemoSubmit={onDemoBuy}
 	                      availableTokens={availableTokens}
 	                      rlusdPerUnitRates={rlusdPerUnitRates}
@@ -405,11 +408,12 @@ export default function WalletDashboardCashModal({
 	                    walletLabel={walletLabel}
 	                    preferredFiatCurrency={preferredFiatCurrency}
 	                    selectCryptoTitleOverride={sellSelectTitleOverride}
-	                    destinationMode={sellDestinationMode}
-                      onProceedToUsdSwapOut={onOpenUsdSwapOut}
-	                    embedded={true}
-	                    isPreviewMode={isPreviewMode}
-	                    demoMode={demoMode}
+		                    destinationMode={sellDestinationMode}
+	                      onProceedToUsdSwapOut={onOpenUsdSwapOut}
+		                    embedded={true}
+		                    embeddedOverlayRootRef={cashContentRootRef}
+		                    isPreviewMode={isPreviewMode}
+		                    demoMode={demoMode}
 	                    onDemoSubmit={onDemoSell}
                     availableTokens={availableTokens}
                     rlusdPerUnitRates={rlusdPerUnitRates}

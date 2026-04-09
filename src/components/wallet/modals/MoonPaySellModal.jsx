@@ -93,6 +93,7 @@ const MoonPaySellModal = ({
   selectLabelRightByCurrency,
   selectIconByCurrency,
   selectLabelMobileByCurrency,
+  embeddedOverlayRootRef = null,
 }) => {
   const { t, i18n } = useTranslation("common");
   const locale = i18n?.language || "en";
@@ -1454,7 +1455,7 @@ const MoonPaySellModal = ({
 			            {cryptoDropdownOpen && isDesktopViewport
 			              ? (() => {
 			                  const portalTarget = embedded
-			                    ? contentRootRef.current
+			                    ? embeddedOverlayRootRef?.current || contentRootRef.current
 			                    : modalPanelRef.current;
 			                  if (!portalTarget) return null;
 			                  return createPortal(
