@@ -646,6 +646,9 @@ export default function WalletDashboardUsdSwapModal({
   const fromNetwork = String(fromCurrency?.network || "").trim().toUpperCase();
   const toTicker = String(toCurrency?.ticker || "").trim().toUpperCase();
   const toNetwork = String(toCurrency?.network || "").trim().toUpperCase();
+  const outboundTitle =
+    String(titleOverride || "").trim() ||
+    t("ui_swap_title_out", "RLUSD → stablecoin USD");
 
   const quotedReceiveAmount = useMemo(() => parseSimpleSwapEstimateAmount(quote), [quote]);
   const quotedPartnerReceiveAmount = useMemo(() => {
@@ -2691,9 +2694,15 @@ export default function WalletDashboardUsdSwapModal({
                             accentShadowPanel,
                           ].join(" ")}
                         >
-                      <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                        {t("moonpay_from_account", "Depuis le compte")}
-                      </p>
+                      {walletSourceSelectionEnabled ? (
+                        <h3 className="text-white font-semibold text-base md:text-lg leading-tight mb-2">
+                          {outboundTitle}
+                        </h3>
+                      ) : (
+                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                          {t("moonpay_from_account", "Depuis le compte")}
+                        </p>
+                      )}
                       {String(walletLabel || "").trim() ? (
                         <div className="flex items-center gap-2 mb-1">
 		                          <span
@@ -2715,11 +2724,12 @@ export default function WalletDashboardUsdSwapModal({
 
                 {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
                   <div className="px-1">
-                    <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                      {String(titleOverride || "").trim() ||
-                        t("ui_swap_title_out", "RLUSD → stablecoin USD")}
-                    </h3>
-                    <p className="mt-1 text-xs md:text-sm text-white/60">
+                    {!walletSourceSelectionEnabled ? (
+                      <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
+                        {outboundTitle}
+                      </h3>
+                    ) : null}
+                    <p className={`${walletSourceSelectionEnabled ? "" : "mt-1 "}text-xs md:text-sm text-white/60`}>
                       {String(subtitleOverride || "").trim() ||
                         t(
                           "ui_swap_subtitle_out",

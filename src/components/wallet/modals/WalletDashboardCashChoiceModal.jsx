@@ -27,7 +27,7 @@ export default function WalletDashboardCashChoiceModal({
 		    const parts = input.split(/(compte bancaire)/i);
 		    return parts.map((part, idx) =>
 		      /^compte bancaire$/i.test(part) ? (
-		        <span key={`${idx}-${part}`} className="text-xcannes-violet/90">
+		        <span key={`${idx}-${part}`} className="text-xcannes-green/90">
 		          {part}
 		        </span>
 		      ) : (
@@ -492,7 +492,7 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t("ui_funds_add_title", "Ajouter de l'argent")}
+                              {t("ui_funds_increase_balances_title", "Augmenter vos soldes")}
                             </p>
                             <svg
                               className="w-5 h-5 text-white/45"
@@ -626,7 +626,7 @@ export default function WalletDashboardCashChoiceModal({
 		                                    /USDC|USDT|RLUSD/i.test(part) ? (
 		                                      <span
 		                                        key={`${lineIdx}-${idx}-${part}`}
-		                                        className="text-[#0870f8]/90"
+		                                        className="text-xcannes-green/90"
 		                                      >
 		                                        {part}
 		                                      </span>
@@ -652,7 +652,7 @@ export default function WalletDashboardCashChoiceModal({
 	                                  <span key={`${lineIdx}-${text}`}>
 		                                    {highlightStablecoin(before)}
 		                                    {parens ? (
-		                                      <span className="text-[#0870f8]/90">
+		                                      <span className="text-xcannes-green/90">
 		                                        {parens}
 		                                      </span>
 		                                    ) : null}
@@ -714,7 +714,7 @@ export default function WalletDashboardCashChoiceModal({
 		                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
 		                                        <span
 		                                          key={`${lineIdx}-${idx}-${part}`}
-		                                          className="text-[#ff6a00]/90"
+		                                          className="text-xcannes-green/90"
 		                                        >
 		                                          {part}
 		                                        </span>

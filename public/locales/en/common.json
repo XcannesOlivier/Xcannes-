@@ -1041,6 +1041,7 @@
   "ui_funds_manage_title": "Manage funds",
   "ui_funds_manage_subtitle": "Add, withdraw, or swap your USD stablecoins.",
   "ui_funds_add_title": "add funds",
+  "ui_funds_increase_balances_title": "increase your balances",
   "ui_funds_add_hint": "Card or bank transfer via partner.",
   "ui_funds_withdraw_title": "bank transfer",
   "ui_funds_withdraw_hint": "To your bank account.",
