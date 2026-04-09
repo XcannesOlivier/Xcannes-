@@ -1825,7 +1825,7 @@ const MoonPaySellModal = ({
 	            {wizardStep === 1 ? (
 	              <>
 	                {/* Arrow down (hide for "other stablecoin" flow) */}
-		                {!isOtherBlockchainsDestination ? (
+		                {!isOtherBlockchainsDestination && !isBankSellFlow ? (
 		                  <div className="flex justify-center">
 		                    <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center">
 		                      <ArrowDownIcon
@@ -1849,43 +1849,25 @@ const MoonPaySellModal = ({
 	                      ["(USDC, USDT…)", "SimpleSwap)"],
 	                    )}
 	                  </p>
-	                ) : (
-		                  <div
-		                    className={[
-		                      "rounded-t-none rounded-b-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40]",
-		                      `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.07),inset_0_-24px_34px_rgba(0,0,0,0.68)]`,
-		                    ].join(" ")}
-		                  >
-	                    <div className="flex items-start gap-3">
-	                      <div className="w-10 h-10 rounded-full bg-white/5 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
-	                        <BuildingLibraryIcon className="w-5 h-5 text-white/70" />
-	                      </div>
-	                      <div className="min-w-0">
-	                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	                          {t("moonpay_sell_destination_prefix", "Vers :")}
-	                        </p>
-	                        <p className="text-[16px] md:text-[17px] text-white font-semibold truncate mt-1">
-	                          {t(
-	                            "moonpay_sell_destination_bank_account",
-	                            "Compte bancaire",
-	                          )}
-	                        </p>
-	                        <p className="text-[13px] md:text-sm leading-snug text-white/55 mt-2">
-	                          {highlightPhrases(
-	                            t(
-	                              "moonpay_sell_destination_helper",
-	                              "Vous renseignerez votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                            ),
-	                            [
-	                              "compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                              "votre compte bancaire sur la page du partenaire (IBAN, etc.).",
-	                            ],
-	                          )}
-	                        </p>
-	                      </div>
-	                    </div>
+	                ) : isBankSellFlow ? (
+	                  <div className="px-1">
+	                    <p className="text-[15px] md:text-sm leading-snug text-white/85 whitespace-pre-line">
+	                      {highlightPhrases(
+	                        t(
+	                          "moonpay_sell_bank_partner_notice",
+	                          "Le retrait sera effectué via un partenaire sécurisé (virement bancaire, carte ou PayPal selon votre pays).",
+	                        ),
+	                        ["virement bancaire, carte ou PayPal"],
+	                      )}
+	                    </p>
+	                    <p className="mt-1 text-[11px] md:text-xs text-white/45">
+	                      {t(
+	                        "moonpay_sell_partner_location_note",
+	                        "Le partenaire proposé dépend de votre localisation.",
+	                      )}
+	                    </p>
 	                  </div>
-	                )}
+	                ) : null}
 	              </>
 	            ) : null}
 
