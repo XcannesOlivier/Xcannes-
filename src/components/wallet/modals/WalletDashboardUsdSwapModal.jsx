@@ -564,7 +564,7 @@ export default function WalletDashboardUsdSwapModal({
     );
   }, [sourceCurrencyCode, sourceCurrencyOptions]);
   const selectedSourceCurrencyCode = String(selectedSourceOption?.code || "RLUSD").toUpperCase();
-  const selectedSourceAmount = Number.parseFloat(amount || "");
+  const selectedSourceAmount = parsedAmount;
   const selectedSourceIsCurrencyLine =
     walletSourceSelectionEnabled && selectedSourceCurrencyCode !== "RLUSD"
       ? Boolean(selectedSourceOption?.isTrustlineOnly)
