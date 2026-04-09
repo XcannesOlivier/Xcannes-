@@ -4006,23 +4006,23 @@ export default function WalletDashboardUsdSwapModal({
 	                            "Conversion sécurisé via",
 	                          )}
 	                        </span>
-	                        <span
-	                          className="inline-flex items-center gap-1.5"
-	                          aria-label={t(
-	                            "moonpay_buy_payment_methods",
-	                            "Partenaires et moyens de paiement",
-	                          )}
-	                        >
-                          <span className="inline-flex items-center justify-center leading-none">
+                        <span
+                          className="inline-flex items-center gap-1.5"
+                          aria-label={t(
+                            "moonpay_buy_payment_methods",
+                            "Partenaires et moyens de paiement",
+                          )}
+                        >
+                          <span className="inline-flex items-center justify-center h-[22px] md:h-6 rounded-md px-2 ring-1 ring-white/10 leading-none bg-white/90 w-[140px]">
                             <Image
                               src="/assets/payment-logos/simpleswap.jpeg"
                               alt="SimpleSwap"
                               width={140}
                               height={24}
-                              className="block w-[112px] md:w-[120px] h-auto object-contain"
+                              className="h-full w-auto object-contain"
                             />
                           </span>
-	                        </span>
+                        </span>
 	                      </div>
 	                    ) : null}
 	                  </>
