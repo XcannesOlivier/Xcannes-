@@ -219,7 +219,7 @@ export default function WalletDesktopModals({
 		              initialSourceCurrency: "USD",
 		              titleOverride: "Envoyer vers un wallet",
 		              subtitleOverride:
-		                "Choisissez une devise XCANNES, puis le stablecoin et le réseau de destination via SimpleSwap.",
+		                "Choisissez une devise, le montant, le stablecoin souhaité puis l'adresse de votre wallet de réception.",
 		            });
 		          }}
 	        />
