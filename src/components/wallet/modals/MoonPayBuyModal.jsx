@@ -2061,14 +2061,14 @@ const MoonPayBuyModal = ({
 		                      <>
                             <div
                               className={[
-                                "rounded-[18px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
+                                "rounded-[18px] px-4 py-5 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
                                 `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
                               ].join(" ")}
                             >
-                              <div className="mb-3 text-[12px] md:text-[13px] font-semibold tracking-[0.08em] text-white/80">
+                              <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
                                 💳 {resolvedTitleOverride || t("ui_funds_add_title", "AUGMENTER VOS SOLDES")}
                               </div>
-                              <div className="text-white text-[28px] md:text-[32px] font-semibold tracking-tight leading-none">
+                              <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                                 {hasValidTargetAmount
                                   ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper, {
                                       minimumFractionDigits: 0,
@@ -2076,21 +2076,21 @@ const MoonPayBuyModal = ({
                                     })
                                   : `— ${currencyUpper}`}
                               </div>
-                              <div className="mt-2 text-white/80 text-[17px] md:text-[18px] font-medium">
+                              <div className="mt-3 text-white/80 text-[21px] md:text-[24px] font-medium leading-snug">
                                 {rlusdEquivalentLabel
                                   ? `≈ ${rlusdEquivalentLabel}`
                                   : t("ui_amount_unavailable", "Montant estimé indisponible")}
                               </div>
 
                               {reviewTimestampLabel ? (
-                                <div className="mt-4 text-[12px] md:text-[13px] text-white/55">
+                                <div className="mt-5 text-[15px] md:text-[16px] text-white/55">
                                   {reviewTimestampLabel}
                                 </div>
                               ) : null}
 
-                              <div className="my-4 h-px bg-white/10" aria-hidden />
+                              <div className="my-5 h-px bg-white/10" aria-hidden />
 
-                              <div className="space-y-1">
+                              <div className="space-y-2">
                                 <div className="flex items-center gap-2 text-white">
                                   <span
                                     className={[
@@ -2099,16 +2099,16 @@ const MoonPayBuyModal = ({
                                     ].join(" ")}
                                     aria-hidden
                                   />
-                                  <span className="font-semibold text-[15px] md:text-base truncate">
+                                  <span className="font-semibold text-[18px] md:text-[20px] truncate">
                                     {walletLabel || "XCANNES"}
                                   </span>
                                 </div>
-                                <div className={`text-[13px] md:text-sm font-mono break-all ${accentText80}`}>
+                                <div className={`text-[15px] md:text-[17px] font-mono break-all ${accentText80}`}>
                                   {walletAddress}
                                 </div>
                               </div>
 
-                              <div className="mt-4 space-y-2 text-[13px] md:text-sm">
+                              <div className="mt-5 space-y-2 text-[16px] md:text-[18px]">
                                 <div className="flex items-center justify-between gap-4 text-white/75">
                                   <span>{t("ui_summary_estimated_fees", "Frais estimés")}</span>
                                   <span className="text-white font-medium text-right">
@@ -2119,12 +2119,35 @@ const MoonPayBuyModal = ({
                               </div>
                             </div>
 
-                            <p className="mt-3 text-[12px] md:text-sm text-white/60 leading-snug">
-                              {t(
-                                "ui_buy_summary_step_note",
-                                "Vous confirmez ensuite sur la page partenaire. Le montant final et les frais exacts y sont affichés avant paiement.",
-                              )}
-                            </p>
+                            <div className="mt-3 space-y-1.5 text-[13px] md:text-[15px] leading-snug">
+                              <div className="font-semibold text-white">
+                                {t("ui_buy_summary_how_it_works_title", "Comment ça marche ?")}
+                              </div>
+                              <div className="text-white/70">
+                                {t(
+                                  "ui_buy_summary_how_it_works_step_1",
+                                  "1. Paiement sécurisé (carte, Apple Pay…)",
+                                )}
+                              </div>
+                              <div className="text-white/70">
+                                {t(
+                                  "ui_buy_summary_how_it_works_step_2",
+                                  "2. Achat automatique de crypto",
+                                )}
+                              </div>
+                              <div className="text-white/70">
+                                {t(
+                                  "ui_buy_summary_how_it_works_step_3",
+                                  "3. Conversion et crédit sur votre compte",
+                                )}
+                              </div>
+                              <div className="pt-1 font-semibold text-emerald-400">
+                                {t(
+                                  "ui_buy_summary_how_it_works_success",
+                                  "✓ Tout est automatique — vous validez simplement",
+                                )}
+                              </div>
+                            </div>
                             {!useSimpleSwapPartner ? (
                               <p className="mt-1 text-[11px] md:text-xs text-white/45">
                                 {t(
