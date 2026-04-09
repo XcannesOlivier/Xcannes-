@@ -256,6 +256,7 @@ const MoonPayBuyModal = ({
     return Boolean(window.matchMedia?.("(min-width: 768px)")?.matches);
   });
   const [assetDropdownOpen, setAssetDropdownOpen] = useState(false);
+  const [assetDesktopPopupStyle, setAssetDesktopPopupStyle] = useState(null);
   const [assetSearch, setAssetSearch] = useState("");
   const assetDropdownOverlayRef = useRef(null);
   const assetDropdownListRef = useRef(null);
@@ -491,6 +492,62 @@ const MoonPayBuyModal = ({
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [assetDropdownOpen, isDesktopViewport]);
+
+  useEffect(() => {
+    if (!assetDropdownOpen || !isDesktopViewport) {
+      setAssetDesktopPopupStyle(null);
+      return;
+    }
+
+    const update = () => {
+      try {
+        const triggerEl = assetDropdownTriggerRef.current;
+        const boundsEl = embedded ? contentRootRef.current : modalPanelRef.current;
+        if (!triggerEl || !boundsEl) return;
+
+        const triggerRect = triggerEl.getBoundingClientRect();
+        const boundsRect = boundsEl.getBoundingClientRect();
+        const padding = 12;
+        const gap = 8;
+
+        const maxWidth = Math.max(280, boundsRect.width - padding * 2);
+        const width = Math.min(560, maxWidth);
+        const centerX = triggerRect.left + triggerRect.width / 2;
+        let left = centerX - width / 2;
+        left = Math.max(boundsRect.left + padding, left);
+        left = Math.min(boundsRect.right - padding - width, left);
+
+        let top = triggerRect.bottom + gap;
+        let maxHeight = boundsRect.bottom - padding - top;
+
+        if (maxHeight < 220) {
+          const spaceAbove = triggerRect.top - gap - (boundsRect.top + padding);
+          if (spaceAbove > maxHeight) {
+            maxHeight = spaceAbove;
+            top = Math.max(boundsRect.top + padding, triggerRect.top - gap - maxHeight);
+          }
+        }
+
+        setAssetDesktopPopupStyle({
+          position: "fixed",
+          left: `${Math.round(left)}px`,
+          top: `${Math.round(top)}px`,
+          width: `${Math.round(width)}px`,
+          maxHeight: `${Math.round(Math.max(180, maxHeight))}px`,
+        });
+      } catch {
+        // ignore
+      }
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [assetDropdownOpen, embedded, isDesktopViewport]);
 
   useEffect(() => {
     if (assetDropdownOpen) return;
@@ -1663,152 +1720,129 @@ const MoonPayBuyModal = ({
 			            </button>
 
 			            {assetDropdownOpen && isDesktopViewport
-			              ? (() => {
-			                  const portalTarget = embedded
-			                    ? contentRootRef.current
-			                    : modalPanelRef.current;
-			                  if (!portalTarget) return null;
-			                  return createPortal(
+			              ? assetDesktopPopupStyle
+			                ? createPortal(
 			                    <div
 			                      ref={assetDropdownDesktopPopupRef}
 			                      role="dialog"
 			                      aria-modal="true"
-			                      className="absolute inset-0 z-[10040]"
-			                      onClick={(e) => e.stopPropagation()}
+			                      style={assetDesktopPopupStyle}
+			                      className={[
+			                        noticeVariant === "demo"
+			                          ? "bg-xcannes-surface-demo"
+			                          : "bg-elevated",
+			                        "z-[10040] rounded-2xl ring-1 ring-white/10 shadow-2xl flex flex-col min-h-0 overflow-hidden",
+			                      ].join(" ")}
 			                    >
-			                      <div
-			                        className="absolute inset-0 bg-black/70"
-			                        onClick={() => {
-			                          setAssetDropdownOpen(false);
-			                          setAssetSearch("");
-			                        }}
-			                      />
-			                      <div
-			                        className={[
-			                          noticeVariant === "demo"
-			                            ? "bg-xcannes-surface-demo"
-			                            : "bg-elevated",
-			                          "absolute inset-0 flex flex-col min-h-0 overflow-hidden",
-			                        ].join(" ")}
-			                      >
-			                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
-			                          <div className="min-w-0">
-			                            <div className="text-white font-semibold text-base leading-tight truncate">
-			                              {t(
-			                                "moonpay_buy_select_asset",
-				                                "Ajouter de l’argent",
-				                              )}
-			                            </div>
-			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
-			                              {t("ui_search", "Rechercher…")}
-				          </div>
-				          </div>
-			                          <button
-			                            type="button"
-			                            onClick={() => {
-			                              setAssetDropdownOpen(false);
-			                              setAssetSearch("");
-			                            }}
-			                            className="text-white/70 hover:text-white transition-colors text-xl leading-none"
-			                            aria-label={t("ui_close", "Fermer")}
-			                          >
-			                            ✕
-			                          </button>
-			                        </div>
-
-			                        <div className="px-4 py-4 border-b border-white/10">
-			                          <div className="relative">
-			                            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
-			                              <svg
-			                                viewBox="0 0 20 20"
-			                                fill="currentColor"
-			                                className="w-4 h-4"
-			                                aria-hidden
-			                              >
-			                                <path
-			                                  fillRule="evenodd"
-			                                  d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
-			                                  clipRule="evenodd"
-			                                />
-			                              </svg>
-			                            </div>
-			                            <input
-			                              value={assetSearch}
-			                              onChange={(e) => setAssetSearch(e.target.value)}
-			                              placeholder={t("ui_search", "Rechercher…")}
-			                              className={[
-			                                "w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 transition-all duration-150",
-			                                accentRing60,
-			                              ].join(" ")}
-			                            />
+			                      <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
+			                        <div className="min-w-0">
+			                          <div className="text-white font-semibold text-base leading-tight truncate">
+			                            {t("moonpay_buy_select_asset", "Ajouter de l’argent")}
+			                          </div>
+			                          <div className="mt-0.5 text-[11px] text-white/55 truncate">
+			                            {t("ui_search", "Rechercher…")}
 			                          </div>
 			                        </div>
+			                        <button
+			                          type="button"
+			                          onClick={() => {
+			                            setAssetDropdownOpen(false);
+			                            setAssetSearch("");
+			                          }}
+			                          className="text-white/70 hover:text-white transition-colors text-xl leading-none"
+			                          aria-label={t("ui_close", "Fermer")}
+			                        >
+			                          ✕
+			                        </button>
+			                      </div>
 
-			                        <div ref={assetDropdownListRef} className="flex-1 min-h-0 overflow-y-auto">
-			                          {filteredAssetCurrencies.length ? (
-			                            filteredAssetCurrencies.map((opt) => {
-			                              const active =
-			                                String(opt?.code || "").toUpperCase() ===
-			                                String(currency || "").toUpperCase();
-			                              return (
-			                                <button
-			                                  key={String(opt.code)}
-			                                  type="button"
-			                                  onClick={() => {
-			                                    setCurrency(String(opt.code || "").toUpperCase());
-			                                    setAssetDropdownOpen(false);
-			                                    setAssetSearch("");
-			                                  }}
-			                                  className={[
-			                                    "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
-			                                    active
-			                                      ? accentBg10
-			                                      : "hover:bg-white/[0.04] text-white/80",
-			                                  ].join(" ")}
-			                                >
-			                                  <span className="shrink-0">
-			                                    {renderSelectIcon(opt.icon)}
-			                                  </span>
-			                                  <div className="min-w-0 flex-1">
-			                                    <div className="text-sm font-semibold truncate">
-			                                      {opt.labelLeft || opt.label || opt.code}
-			                                    </div>
-			                                  </div>
-			                                  <div className="flex items-center gap-2 shrink-0">
-			                                    {opt.amountLabel ? (
-			                                      <span className="text-sm font-mono tabular-nums text-white/70">
-			                                        {opt.amountLabel}
-			                                      </span>
-			                                    ) : null}
-			                                    {active ? (
-			                                      <span
-			                                        className={[
-			                                          "font-semibold text-xs",
-			                                          accentCheck,
-			                                        ].join(" ")}
-			                                      >
-			                                        ✓
-			                                      </span>
-			                                    ) : null}
-			                                  </div>
-			                                </button>
-			                              );
-			                            })
-			                          ) : (
-			                            <div className="px-4 py-6 text-sm text-white/60">
-			                              {t("ui_no_results", "Aucun résultat.")}
-			                            </div>
-			                          )}
-			                        </div>
-
-			                        <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
-			                          {t("ui_search_results", "Sélectionnez un actif.")}
+			                      <div className="px-4 py-4 border-b border-white/10">
+			                        <div className="relative">
+			                          <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-white/45">
+			                            <svg
+			                              viewBox="0 0 20 20"
+			                              fill="currentColor"
+			                              className="w-4 h-4"
+			                              aria-hidden
+			                            >
+			                              <path
+			                                fillRule="evenodd"
+			                                d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.391 4.273l2.168 2.168a1 1 0 0 1-1.414 1.414l-2.168-2.168A7 7 0 0 1 2 9Z"
+			                                clipRule="evenodd"
+			                              />
+			                            </svg>
+			                          </div>
+			                          <input
+			                            value={assetSearch}
+			                            onChange={(e) => setAssetSearch(e.target.value)}
+			                            placeholder={t("ui_search", "Rechercher…")}
+			                            className={[
+			                              "w-full pl-11 pr-4 py-3 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white focus:outline-none focus:ring-2 transition-all duration-150",
+			                              accentRing60,
+			                            ].join(" ")}
+			                          />
 			                        </div>
 			                      </div>
+
+			                      <div ref={assetDropdownListRef} className="flex-1 min-h-0 overflow-y-auto">
+			                        {filteredAssetCurrencies.length ? (
+			                          filteredAssetCurrencies.map((opt) => {
+			                            const active =
+			                              String(opt?.code || "").toUpperCase() ===
+			                              String(currency || "").toUpperCase();
+			                            return (
+			                              <button
+			                                key={String(opt.code)}
+			                                type="button"
+			                                onClick={() => {
+			                                  setCurrency(String(opt.code || "").toUpperCase());
+			                                  setAssetDropdownOpen(false);
+			                                  setAssetSearch("");
+			                                }}
+			                                className={[
+			                                  "w-full flex items-center gap-3 px-4 py-3 text-left border-b border-white/5 last:border-b-0",
+			                                  active
+			                                    ? accentBg10
+			                                    : "hover:bg-white/[0.04] text-white/80",
+			                                ].join(" ")}
+			                              >
+			                                <span className="shrink-0">{renderSelectIcon(opt.icon)}</span>
+			                                <div className="min-w-0 flex-1">
+			                                  <div className="text-sm font-semibold truncate">
+			                                    {opt.labelLeft || opt.label || opt.code}
+			                                  </div>
+			                                </div>
+			                                <div className="flex items-center gap-2 shrink-0">
+			                                  {opt.amountLabel ? (
+			                                    <span className="text-sm font-mono tabular-nums text-white/70">
+			                                      {opt.amountLabel}
+			                                    </span>
+			                                  ) : null}
+			                                  {active ? (
+			                                    <span
+			                                      className={["font-semibold text-xs", accentCheck].join(" ")}
+			                                    >
+			                                      ✓
+			                                    </span>
+			                                  ) : null}
+			                                </div>
+			                              </button>
+			                            );
+			                          })
+			                        ) : (
+			                          <div className="px-4 py-6 text-sm text-white/60">
+			                            {t("ui_no_results", "Aucun résultat.")}
+			                          </div>
+			                        )}
+			                      </div>
+
+			                      <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+			                        {t("ui_search_results", "Sélectionnez un actif.")}
+			                      </div>
 			                    </div>,
-			                    portalTarget,
-			                  );
-			                })()
+			                    document.body,
+			                  )
+			                : null
 			              : null}
 
 			            {assetDropdownOpen && !isDesktopViewport
