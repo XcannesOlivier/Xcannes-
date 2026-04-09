@@ -2132,7 +2132,7 @@ const MoonPayBuyModal = ({
                               <div className="text-white/70">
                                 {t(
                                   "ui_buy_summary_how_it_works_step_2",
-                                  "2. Achat automatique de crypto",
+                                  "2. Achat de l'actif système XRPL (XRP)",
                                 )}
                               </div>
                               <div className="text-white/70">
@@ -2141,7 +2141,7 @@ const MoonPayBuyModal = ({
                                   "3. Conversion et crédit sur votre compte",
                                 )}
                               </div>
-                              <div className="pt-1 font-semibold text-emerald-400">
+                              <div className={`pt-1 font-semibold ${accentText80}`}>
                                 {t(
                                   "ui_buy_summary_how_it_works_success",
                                   "✓ Tout est automatique — vous validez simplement",
