@@ -276,6 +276,7 @@ const MoonPayBuyModal = ({
     lockedOverflowY: "",
   });
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset, 2/3 = fiat+amount, 3/3 = MoonPay iframe
+  const [reviewTimestamp, setReviewTimestamp] = useState(null);
 
   const PRODUCT_MIN_USD = 5;
 
@@ -412,6 +413,33 @@ const MoonPayBuyModal = ({
           maximumFractionDigits: 2,
         })
       : null;
+  const estimatedFeeAmount = useMemo(() => {
+    if (!hasValidTargetAmount || !Number.isFinite(Number(rlusdEquivalent))) return null;
+    const diff = Number(targetAmountValue) - Number(rlusdEquivalent);
+    if (!Number.isFinite(diff) || diff <= 0) return null;
+    return diff;
+  }, [hasValidTargetAmount, rlusdEquivalent, targetAmountValue]);
+  const estimatedFeeLabel =
+    Number.isFinite(Number(estimatedFeeAmount)) && Number(estimatedFeeAmount) > 0
+      ? formatAmountWithSymbol(locale, Number(estimatedFeeAmount), currencyUpper, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })
+      : null;
+  const reviewTimestampLabel = useMemo(() => {
+    if (!reviewTimestamp) return "";
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(reviewTimestamp);
+    } catch {
+      return "";
+    }
+  }, [locale, reviewTimestamp]);
+  const estimatedProviderLabel = useSimpleSwapPartner ? "SimpleSwap" : "MoonPay / Topper";
 
   const renderSelectIcon = (icon) => {
     if (!icon) return null;
@@ -797,6 +825,7 @@ const MoonPayBuyModal = ({
 	      setError(null);
 	      setStep("form");
 	      setWizardStep(1);
+	      setReviewTimestamp(null);
 	      setTargetAssetAmount("");
         setPendingSwapTargetCurrency("");
         setPendingSwapDetectedXrp(null);
@@ -832,6 +861,7 @@ const MoonPayBuyModal = ({
       setError(null);
       setStep("form");
       setWizardStep(1);
+      setReviewTimestamp(null);
       setTargetAssetAmount("");
       setPendingSwapTargetCurrency("");
       setPendingSwapDetectedXrp(null);
@@ -883,9 +913,11 @@ const MoonPayBuyModal = ({
   useEffect(() => {
     if (!isOpen) {
       lastPrefillRef.current = null;
+      setReviewTimestamp(null);
       return;
     }
     setWizardStep(1);
+    setReviewTimestamp(null);
     if (!prefill || !prefillSignature) return;
     if (lastPrefillRef.current === prefillSignature) return;
     lastPrefillRef.current = prefillSignature;
@@ -1440,6 +1472,7 @@ const MoonPayBuyModal = ({
         });
         return;
       }
+      setReviewTimestamp(new Date());
       setWizardStep(2);
       return;
     }
@@ -1538,7 +1571,10 @@ const MoonPayBuyModal = ({
 	            {wizardStep === 2 ? (
 	              <button
                   type="button"
-                  onClick={() => setWizardStep(1)}
+                  onClick={() => {
+                    setReviewTimestamp(null);
+                    setWizardStep(1);
+                  }}
                   className="hidden md:inline-flex md:absolute md:left-0 md:-top-2 items-center gap-2 text-white/70 hover:text-white transition-colors"
                   aria-label={t("back", "Back")}
                 >
@@ -1602,6 +1638,7 @@ const MoonPayBuyModal = ({
 		          </div>
 
 		          {/* Currency selector */}
+		          {wizardStep === 1 ? (
 		          <div>
 			            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 			              {t("moonpay_buy_receive_currency_label", "Devise souhaitée")}
@@ -1981,8 +2018,9 @@ const MoonPayBuyModal = ({
 			              : null}
 			          </div>
 			          </div>
+                ) : null}
 
-                {wizardStep === 1 || wizardStep === 2 ? (
+                {wizardStep === 1 ? (
                   <div>
 	                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 	                      {t("moonpay_buy_selected_asset_amount", "Montant")}
@@ -2019,43 +2057,83 @@ const MoonPayBuyModal = ({
 				          <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
 		                    {wizardStep === 2 ? (
 		                      <>
-		                        <p className="text-[13px] md:text-sm text-white/80 font-semibold">
-		                          {t(
-		                            "ui_how_add_funds_works",
-		                            "Comment ça marche ?",
-		                          )}
-		                        </p>
-		                        <ol className="mt-3 space-y-1 text-[13px] md:text-sm text-white/70 list-decimal list-inside">
-		                          <li>
-		                            {t(
-		                              "ui_credit_step_1_secure_payment",
-		                              "Paiement sécurisé (carte, Apple Pay…)",
-	                            )}
-	                          </li>
-	                          <li>
-	                            {t(
-	                              "ui_credit_step_2_auto_buy_xrp",
-	                              "Achat automatique de crypto",
-	                            )}
-	                          </li>
-	                          <li>
-	                            {t(
-	                              "ui_credit_step_3_convert_credit",
-	                              "Conversion et crédit sur votre compte",
-	                            )}
-		                          </li>
-		                        </ol>
-		                        <p
-		                          className={[
-		                            "mt-3 text-[12px] md:text-sm font-semibold",
-		                            accentText90,
-		                          ].join(" ")}
-		                        >
-		                          {t(
-		                            "ui_credit_all_automatic",
-		                            "✔ Tout est automatique — vous validez simplement",
-		                          )}
-		                        </p>
+                            <div
+                              className={[
+                                "rounded-[18px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
+                                `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
+                              ].join(" ")}
+                            >
+                              <div className="text-white text-[28px] md:text-[32px] font-semibold tracking-tight leading-none">
+                                {hasValidTargetAmount
+                                  ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper, {
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 2,
+                                    })
+                                  : `— ${currencyUpper}`}
+                              </div>
+                              <div className="mt-2 text-white/80 text-[17px] md:text-[18px] font-medium">
+                                {rlusdEquivalentLabel
+                                  ? `≈ ${rlusdEquivalentLabel}`
+                                  : t("ui_amount_unavailable", "Montant estimé indisponible")}
+                              </div>
+
+                              {reviewTimestampLabel ? (
+                                <div className="mt-4 text-[12px] md:text-[13px] text-white/55">
+                                  {reviewTimestampLabel}
+                                </div>
+                              ) : null}
+
+                              <div className="my-4 h-px bg-white/10" aria-hidden />
+
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-white">
+                                  <span
+                                    className={[
+                                      "h-2.5 w-2.5 rounded-full ring-4 shrink-0 animate-pulse",
+                                      accentRing25Bg,
+                                    ].join(" ")}
+                                    aria-hidden
+                                  />
+                                  <span className="font-semibold text-[15px] md:text-base truncate">
+                                    {walletLabel || "XCANNES"}
+                                  </span>
+                                </div>
+                                <div className={`text-[13px] md:text-sm font-mono break-all ${accentText80}`}>
+                                  {walletAddress}
+                                </div>
+                              </div>
+
+                              <div className="mt-4 space-y-2 text-[13px] md:text-sm">
+                                <div className="flex items-center justify-between gap-4 text-white/75">
+                                  <span>{t("ui_summary_estimated_fees", "Frais estimés")}</span>
+                                  <span className="text-white font-medium text-right">
+                                    {estimatedFeeLabel ||
+                                      t("ui_partner_calculates_fees", "Calculés par le partenaire")}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between gap-4 text-white/75">
+                                  <span>{t("ui_summary_provider", "Via")}</span>
+                                  <span className="text-white font-medium text-right">
+                                    {estimatedProviderLabel}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <p className="mt-3 text-[12px] md:text-sm text-white/60 leading-snug">
+                              {t(
+                                "ui_buy_summary_step_note",
+                                "Vous confirmez ensuite sur la page partenaire. Le montant final et les frais exacts y sont affichés avant paiement.",
+                              )}
+                            </p>
+                            {!useSimpleSwapPartner ? (
+                              <p className="mt-1 text-[11px] md:text-xs text-white/45">
+                                {t(
+                                  "moonpay_buy_partner_location_note",
+                                  "Le partenaire proposé dépend de votre localisation.",
+                                )}
+                              </p>
+                            ) : null}
 	                      </>
 		                    ) : (
 		                      demoMode ? (
