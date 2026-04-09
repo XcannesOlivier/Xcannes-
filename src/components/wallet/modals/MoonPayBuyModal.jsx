@@ -469,6 +469,18 @@ const MoonPayBuyModal = ({
     });
   }, [assetSearch, supportedCurrencies]);
 
+  const selectedAssetTriggerLabel = useMemo(() => {
+    const selectedCode = String(selectedAssetCurrency?.code || currency || "")
+      .trim()
+      .toUpperCase();
+    return (
+      getCurrencyDescription(selectedCode) ||
+      selectedAssetCurrency?.labelLeft ||
+      selectedAssetCurrency?.label ||
+      selectedCode
+    );
+  }, [currency, selectedAssetCurrency]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mediaQuery = window.matchMedia?.("(min-width: 768px)");
@@ -1669,20 +1681,10 @@ const MoonPayBuyModal = ({
 			                  {renderSelectIcon(selectedAssetCurrency?.icon)}
 			                </span>
 			                <span className="truncate font-semibold">
-			                  {selectedAssetCurrency?.labelLeft ||
-			                    selectedAssetCurrency?.label ||
-			                    String(currency || "").toUpperCase()}
+			                  {selectedAssetTriggerLabel}
 			                </span>
 			              </span>
 			              <span className="flex items-center gap-2 shrink-0">
-			                {selectedAssetCurrency?.amountLabel ? (
-			                  <span className="text-white/70 font-mono tabular-nums text-sm">
-			                    <span className="text-white/45 mr-2">
-			                      {t("ui_balance_short", "Solde :")}
-			                    </span>
-			                    {selectedAssetCurrency.amountLabel}
-			                  </span>
-			                ) : null}
 			                {wizardStep === 1 ? (
 			                  <svg
 			                    className="w-3 h-3 text-white/70"
@@ -2119,7 +2121,7 @@ const MoonPayBuyModal = ({
                               </div>
                             </div>
 
-                            <div className="mt-3 space-y-1.5 text-[13px] md:text-[15px] leading-snug">
+                            <div className="mt-3 space-y-1.5 text-[15px] md:text-sm leading-snug">
                               <div className="font-semibold text-white">
                                 {t("ui_buy_summary_how_it_works_title", "Comment ça marche ?")}
                               </div>
