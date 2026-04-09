@@ -40,6 +40,7 @@ const QUICK_STABLE_TARGETS = [
 const POPULAR_STABLE_TARGETS = QUICK_STABLE_TARGETS.slice(0, 4);
 const SIMPLESWAP_DEPOSITS_STORAGE_KEY = "xcannes_simpleswap_deposits_v1";
 const SIMPLESWAP_DEPOSITS_MAX = 10;
+const XRP_RAIL_CURRENCY = { ticker: "xrp", network: "xrp", name: "XRP" };
 
 function pick(obj, keys, fallback = "") {
   for (const key of keys) {
@@ -118,6 +119,34 @@ function parseSimpleSwapRanges(ranges) {
     min: Number.isFinite(min) && min > 0 ? min : null,
     max: Number.isFinite(max) && max > 0 ? max : null,
   };
+}
+
+function parseSimpleSwapEstimateAmount(quote) {
+  if (quote == null) return null;
+  if (typeof quote === "number") {
+    return Number.isFinite(quote) && quote > 0 ? quote : null;
+  }
+  if (typeof quote === "string") {
+    const num = Number(String(quote || "").trim().replace(",", "."));
+    return Number.isFinite(num) && num > 0 ? num : null;
+  }
+  const keys = [
+    "amount",
+    "estimatedAmount",
+    "estimate",
+    "amountTo",
+    "amount_to",
+    "amountToEstimated",
+    "estimatedAmountTo",
+  ];
+  const raw =
+    pick(quote, keys, "") ||
+    pick(quote?.data, keys, "") ||
+    pick(quote?.result, keys, "") ||
+    pick(quote?.estimate, keys, "") ||
+    "";
+  const num = Number(String(raw || "").trim().replace(",", "."));
+  return Number.isFinite(num) && num > 0 ? num : null;
 }
 
 function buildXrpPaymentTxjson({ account, destination, amountXrp }) {
@@ -398,6 +427,10 @@ export default function WalletDashboardUsdSwapModal({
     direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? rlusdCurrency : stableCurrency;
   const toCurrency =
     direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? stableCurrency : rlusdCurrency;
+  const partnerPreviewFromCurrency =
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? XRP_RAIL_CURRENCY : stableCurrency;
+  const partnerPreviewToCurrency =
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? stableCurrency : XRP_RAIL_CURRENCY;
   const fromCurrencyKey = currencyKey(fromCurrency);
   const toCurrencyKey = currencyKey(toCurrency);
   const toLabel = toCurrency ? currencyLabel(toCurrency) : "";
@@ -413,33 +446,10 @@ export default function WalletDashboardUsdSwapModal({
         ? 2
         : totalSteps;
 
-  const quotedReceiveAmount = useMemo(() => {
-    if (quote == null) return null;
-    if (typeof quote === "number") {
-      return Number.isFinite(quote) && quote > 0 ? quote : null;
-    }
-    if (typeof quote === "string") {
-      const num = Number(String(quote || "").trim().replace(",", "."));
-      return Number.isFinite(num) && num > 0 ? num : null;
-    }
-    const keys = [
-      "amount",
-      "estimatedAmount",
-      "estimate",
-      "amountTo",
-      "amount_to",
-      "amountToEstimated",
-      "estimatedAmountTo",
-    ];
-    const raw =
-      pick(quote, keys, "") ||
-      pick(quote?.data, keys, "") ||
-      pick(quote?.result, keys, "") ||
-      pick(quote?.estimate, keys, "") ||
-      "";
-    const num = Number(String(raw || "").trim().replace(",", "."));
-    if (!Number.isFinite(num) || num <= 0) return null;
-    return num;
+  const quotedReceiveAmount = useMemo(() => parseSimpleSwapEstimateAmount(quote), [quote]);
+  const quotedPartnerReceiveAmount = useMemo(() => {
+    const partnerAmount = Number(quote?.partnerEstimatedAmount);
+    return Number.isFinite(partnerAmount) && partnerAmount > 0 ? partnerAmount : null;
   }, [quote]);
 
   const rangeLimits = useMemo(() => parseSimpleSwapRanges(ranges), [ranges]);
@@ -898,7 +908,7 @@ export default function WalletDashboardUsdSwapModal({
   };
 
   const fetchRanges = async () => {
-    if (!fromCurrency || !toCurrency) return;
+    if (!partnerPreviewFromCurrency || !partnerPreviewToCurrency) return;
     setApiError("");
     setRanges(null);
     try {
@@ -906,15 +916,46 @@ export default function WalletDashboardUsdSwapModal({
         `/api/simpleswap/ranges?${new URLSearchParams({
           fixed: "false",
           reverse: "false",
-          tickerFrom: String(fromCurrency.ticker || ""),
-          networkFrom: String(fromCurrency.network || ""),
-          tickerTo: String(toCurrency.ticker || ""),
-          networkTo: String(toCurrency.network || ""),
+          tickerFrom: String(partnerPreviewFromCurrency.ticker || ""),
+          networkFrom: String(partnerPreviewFromCurrency.network || ""),
+          tickerTo: String(partnerPreviewToCurrency.ticker || ""),
+          networkTo: String(partnerPreviewToCurrency.network || ""),
         }).toString()}`,
       );
       const data = await response.json();
       if (response.ok) {
-        setRanges(data);
+        if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE) {
+          const partnerLimits = parseSimpleSwapRanges(data);
+          const [minQuote, maxQuote] = await Promise.all([
+            Number.isFinite(partnerLimits?.min) && partnerLimits.min > 0
+              ? xcannesApi.getRlusdXrpQuote({
+                  amountXrp: partnerLimits.min,
+                  direction: "RLUSD_TO_XRP",
+                })
+              : Promise.resolve(null),
+            Number.isFinite(partnerLimits?.max) && partnerLimits.max > 0
+              ? xcannesApi.getRlusdXrpQuote({
+                  amountXrp: partnerLimits.max,
+                  direction: "RLUSD_TO_XRP",
+                })
+              : Promise.resolve(null),
+          ]);
+          setRanges({
+            minAmount: Number(minQuote?.amountRlusdFilled) > 0 ? Number(minQuote.amountRlusdFilled) : null,
+            maxAmount: Number(maxQuote?.amountRlusdFilled) > 0 ? Number(maxQuote.amountRlusdFilled) : null,
+            partnerMinAmount: partnerLimits?.min ?? null,
+            partnerMaxAmount: partnerLimits?.max ?? null,
+            xcannesPreviewMode: "rlusd_via_xrp",
+            xcannesPartnerPair: {
+              tickerFrom: "xrp",
+              networkFrom: "xrp",
+              tickerTo: String(toCurrency?.ticker || ""),
+              networkTo: String(toCurrency?.network || ""),
+            },
+          });
+        } else {
+          setRanges(data);
+        }
         setPairUnavailable(false);
         return;
       }
@@ -928,8 +969,8 @@ export default function WalletDashboardUsdSwapModal({
         setPairUnavailable(true);
         if (
           direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
-          String(toCurrency?.ticker || "").trim().toLowerCase() === "rlusd" &&
-          String(toCurrency?.network || "").trim().toLowerCase() === "xrp"
+          String(partnerPreviewToCurrency?.ticker || "").trim().toLowerCase() === "rlusd" &&
+          String(partnerPreviewToCurrency?.network || "").trim().toLowerCase() === "xrp"
         ) {
           setApiError(
             t(
@@ -945,12 +986,12 @@ export default function WalletDashboardUsdSwapModal({
   };
 
   const fetchEstimate = async ({ signal } = {}) => {
-    if (!fromCurrency || !toCurrency || !hasValidAmount) return;
+    if (!fromCurrency || !toCurrency || !partnerPreviewFromCurrency || !partnerPreviewToCurrency || !hasValidAmount) return;
     if (amountOutOfRange) return;
     try {
       const tryEndpoints = ["/api/simpleswap/estimates", "/api/simpleswap/check"];
 
-      const runEstimate = async (candidateFrom, candidateTo) => {
+      const runEstimate = async (candidateFrom, candidateTo, amountValue) => {
         const params = new URLSearchParams({
           fixed: "false",
           reverse: "false",
@@ -958,7 +999,7 @@ export default function WalletDashboardUsdSwapModal({
           networkFrom: String(candidateFrom?.network || ""),
           tickerTo: String(candidateTo?.ticker || ""),
           networkTo: String(candidateTo?.network || ""),
-          amount: String(parsedAmount),
+          amount: String(amountValue),
         }).toString();
 
         let lastErrorMessage = "";
@@ -981,21 +1022,92 @@ export default function WalletDashboardUsdSwapModal({
       };
 
       setPairUnavailable(false);
-      const primary = await runEstimate(fromCurrency, toCurrency);
-      if (primary.ok) {
-        const data = primary.data;
-        if (typeof data === "string" || typeof data === "number") {
-          setQuote({ estimatedAmount: data });
-          setApiError("");
-          setPairUnavailable(false);
-          return;
+      if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE) {
+        const bridgeQuote = await xcannesApi.getRlusdXrpQuote({
+          amountRlusd: parsedAmount,
+          direction: "RLUSD_TO_XRP",
+        });
+        const bridgeXrpAmount = Number(bridgeQuote?.xrpAmount);
+        if (!Number.isFinite(bridgeXrpAmount) || bridgeXrpAmount <= 0) {
+          throw new Error(
+            t(
+              "ui_usd_swap_prepare_xrpl_failed",
+              "Impossible de préparer le swap XRPL RLUSD → XRP.",
+            ),
+          );
         }
-        if (typeof data === "object") {
-          setQuote(data);
-          maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
-          setApiError("");
-          setPairUnavailable(false);
-          return;
+
+        const primary = await runEstimate(
+          partnerPreviewFromCurrency,
+          partnerPreviewToCurrency,
+          bridgeXrpAmount,
+        );
+        if (primary.ok) {
+          const partnerAmount = parseSimpleSwapEstimateAmount(primary.data);
+          if (partnerAmount != null) {
+            setQuote({
+              estimatedAmount: partnerAmount,
+              partnerEstimatedAmount: partnerAmount,
+              partnerAmountInXrp: bridgeXrpAmount,
+              bridgeQuote,
+              partnerQuote: primary.data,
+              xcannesPreviewMode: "rlusd_via_xrp",
+            });
+            setApiError("");
+            setPairUnavailable(false);
+            return;
+          }
+        }
+
+        const lastStatus = Number(primary?.status) || 0;
+        const lastErrorMessage = String(primary?.message || "").trim();
+        const pairIsUnavailable =
+          lastStatus === 404 &&
+          /pair is unavailable/i.test(lastErrorMessage || "");
+
+        if (lastErrorMessage) {
+          if (lastStatus === 404) {
+            setPairUnavailable(true);
+            setApiError(
+              t(
+                "ui_usd_swap_pair_not_supported",
+                pairIsUnavailable
+                  ? `Paire indisponible dans ce sens (XRP/XRP → ${toTicker}/${toNetwork}). Essayez un autre réseau.`
+                  : `Paire non supportée dans ce sens (XRP/XRP → ${toTicker}/${toNetwork}). Essayez un autre réseau.`,
+              ),
+            );
+          } else {
+            setApiError(lastErrorMessage);
+          }
+        }
+        return;
+      }
+
+      const primary = await runEstimate(
+        partnerPreviewFromCurrency,
+        partnerPreviewToCurrency,
+        parsedAmount,
+      );
+      if (primary.ok) {
+        const partnerXrpAmount = parseSimpleSwapEstimateAmount(primary.data);
+        if (partnerXrpAmount != null) {
+          const bridgeQuote = await xcannesApi.getRlusdXrpQuote({
+            amountXrp: partnerXrpAmount,
+            direction: "XRP_TO_RLUSD",
+          });
+          const finalRlusdAmount = Number(bridgeQuote?.amountRlusdFilled);
+          if (Number.isFinite(finalRlusdAmount) && finalRlusdAmount > 0) {
+            setQuote({
+              estimatedAmount: finalRlusdAmount,
+              partnerEstimatedAmount: partnerXrpAmount,
+              bridgeQuote,
+              partnerQuote: primary.data,
+              xcannesPreviewMode: "stable_via_xrp",
+            });
+            setApiError("");
+            setPairUnavailable(false);
+            return;
+          }
         }
       }
 
@@ -1010,8 +1122,8 @@ export default function WalletDashboardUsdSwapModal({
           setPairUnavailable(true);
           const rlusdPayoutBlocked =
             direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
-            String(toCurrency?.ticker || "").trim().toLowerCase() === "rlusd" &&
-            String(toCurrency?.network || "").trim().toLowerCase() === "xrp" &&
+            String(partnerPreviewToCurrency?.ticker || "").trim().toLowerCase() === "rlusd" &&
+            String(partnerPreviewToCurrency?.network || "").trim().toLowerCase() === "xrp" &&
             pairIsUnavailable;
           setApiError(
             t(
@@ -1903,11 +2015,21 @@ export default function WalletDashboardUsdSwapModal({
                     <div className="mt-1 text-white font-semibold text-lg leading-tight">
                       {String(receiveAmountExact || "").trim()
                         ? `${receiveAmountExact} ${partnerToTicker}`
-                        : quotedReceiveAmount
+                        : (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+                            ? quotedPartnerReceiveAmount
+                            : quotedReceiveAmount)
                           ? `≈${
                               formatAmountNumber
-                                ? formatAmountNumber.format(quotedReceiveAmount)
-                                : String(quotedReceiveAmount)
+                                ? formatAmountNumber.format(
+                                    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+                                      ? quotedPartnerReceiveAmount
+                                      : quotedReceiveAmount,
+                                  )
+                                : String(
+                                    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+                                      ? quotedPartnerReceiveAmount
+                                      : quotedReceiveAmount,
+                                  )
                             } ${partnerToTicker}`
                           : `— ${partnerToTicker}`}
                     </div>
