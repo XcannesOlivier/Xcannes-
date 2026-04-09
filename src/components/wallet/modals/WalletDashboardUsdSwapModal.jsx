@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "next-i18next";
 import { QRCodeCanvas } from "qrcode.react";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import xcannesApi from "@/lib/xcannesApi";
+import { buildSimpleSwapMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import {
   fireOrangeActionBtnBase,
   greenActionBtnBase,
@@ -118,11 +120,52 @@ function parseSimpleSwapRanges(ranges) {
   };
 }
 
+function buildXrpPaymentTxjson({ account, destination, amountXrp }) {
+  const amount = Number(amountXrp);
+  if (!account || !destination) return null;
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  return {
+    TransactionType: "Payment",
+    Account: account,
+    Destination: destination,
+    Amount: String(Math.round(amount * 1_000_000)),
+  };
+}
+
+function parseDestinationTag(value) {
+  const raw = String(value || "").trim();
+  if (!/^\d+$/.test(raw)) return null;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function encodeTextToHex(value) {
+  const input = String(value || "");
+  if (!input) return "";
+  return Array.from(new TextEncoder().encode(input))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+function buildPlainTextMemo(value) {
+  const encoded = encodeTextToHex(value);
+  if (!encoded) return null;
+  return [
+    {
+      Memo: {
+        MemoData: encoded,
+      },
+    },
+  ];
+}
+
 export default function WalletDashboardUsdSwapModal({
   open,
   onClose,
   walletLabel = "",
   walletAddress = "",
+  signTransaction = null,
   initialDirection = SWAP_DIRECTIONS.RLUSD_TO_STABLE,
   initialAmount = "",
   accentVariant = "",
@@ -269,6 +312,8 @@ export default function WalletDashboardUsdSwapModal({
   const [pairUnavailable, setPairUnavailable] = useState(false);
   const [exchange, setExchange] = useState(null);
   const [exchangeRefreshing, setExchangeRefreshing] = useState(false);
+  const [preparedSwap, setPreparedSwap] = useState(null);
+  const [swapSubmitting, setSwapSubmitting] = useState(false);
   const estimateAbortRef = useRef(null);
   const estimateSeqRef = useRef(0);
   const openedRef = useRef(false);
@@ -533,6 +578,12 @@ export default function WalletDashboardUsdSwapModal({
     () => pick(exchange, ["id", "exchangeId", "publicId"], ""),
     [exchange],
   );
+  const exchangeResolved = useMemo(() => {
+    if (exchange?.xcannesResolved && typeof exchange.xcannesResolved === "object") {
+      return exchange.xcannesResolved;
+    }
+    return exchange || {};
+  }, [exchange]);
   const depositAddress = useMemo(
     () => pick(exchange, ["addressFrom", "address_from", "depositAddress"], ""),
     [exchange],
@@ -552,6 +603,26 @@ export default function WalletDashboardUsdSwapModal({
     () => pick(exchange, ["status", "state"], ""),
     [exchange],
   );
+  const partnerFromTicker = useMemo(
+    () => pick(exchangeResolved, ["tickerFrom"], fromTicker).toUpperCase(),
+    [exchangeResolved, fromTicker],
+  );
+  const partnerFromNetwork = useMemo(
+    () => pick(exchangeResolved, ["networkFrom"], fromNetwork).toUpperCase(),
+    [exchangeResolved, fromNetwork],
+  );
+  const partnerToTicker = useMemo(
+    () => pick(exchangeResolved, ["tickerTo"], toTicker).toUpperCase(),
+    [exchangeResolved, toTicker],
+  );
+  const partnerToNetwork = useMemo(
+    () => pick(exchangeResolved, ["networkTo"], toNetwork).toUpperCase(),
+    [exchangeResolved, toNetwork],
+  );
+  const exactInboundXrp = useMemo(() => {
+    const value = Number(String(receiveAmountExact || "").trim().replace(",", "."));
+    return Number.isFinite(value) && value > 0 ? value : null;
+  }, [receiveAmountExact]);
 
   const resetState = (prefill = "") => {
     setStep("form");
@@ -567,6 +638,8 @@ export default function WalletDashboardUsdSwapModal({
     setRanges(null);
     setApiError("");
     setExchange(null);
+    setPreparedSwap(null);
+    setSwapSubmitting(false);
     setCurrenciesError("");
   };
 
@@ -1027,6 +1100,7 @@ export default function WalletDashboardUsdSwapModal({
     }
 
     setApiError("");
+    setPreparedSwap(null);
     setStep("pending");
     try {
       const refund =
@@ -1037,17 +1111,47 @@ export default function WalletDashboardUsdSwapModal({
         direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
           ? ""
           : String(refundExtraId || "").trim();
+      let preparedOutboundSwap = null;
+      let exchangeTickerFrom = String(fromCurrency.ticker || "");
+      let exchangeNetworkFrom = String(fromCurrency.network || "");
+      let exchangeTickerTo = String(toCurrency.ticker || "");
+      let exchangeNetworkTo = String(toCurrency.network || "");
+      let exchangeAmount = String(parsedAmount);
+
+      if (direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE) {
+        preparedOutboundSwap = await xcannesApi.prepareRlusdXrpSwap({
+          address: walletAddress,
+          direction: "RLUSD_TO_XRP",
+          amountRlusd: parsedAmount,
+        });
+        const preparedXrpAmount = Number(preparedOutboundSwap?.quote?.xrpAmount);
+        if (!Number.isFinite(preparedXrpAmount) || preparedXrpAmount <= 0) {
+          throw new Error(
+            t(
+              "ui_usd_swap_prepare_xrpl_failed",
+              "Impossible de préparer le swap XRPL RLUSD → XRP.",
+            ),
+          );
+        }
+        exchangeTickerFrom = "xrp";
+        exchangeNetworkFrom = "xrp";
+        exchangeAmount = String(Number(preparedXrpAmount.toFixed(6)));
+      } else {
+        exchangeTickerTo = "xrp";
+        exchangeNetworkTo = "xrp";
+      }
+
       const response = await fetch("/api/simpleswap/create-exchange", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fixed: false,
           reverse: false,
-          tickerFrom: String(fromCurrency.ticker || ""),
-          networkFrom: String(fromCurrency.network || ""),
-          tickerTo: String(toCurrency.ticker || ""),
-          networkTo: String(toCurrency.network || ""),
-          amount: String(parsedAmount),
+          tickerFrom: exchangeTickerFrom,
+          networkFrom: exchangeNetworkFrom,
+          tickerTo: exchangeTickerTo,
+          networkTo: exchangeNetworkTo,
+          amount: exchangeAmount,
           addressTo: addr,
           extraIdTo: "",
           userRefundAddress: refund,
@@ -1061,6 +1165,7 @@ export default function WalletDashboardUsdSwapModal({
         throw new Error(data?.message || data?.error || `HTTP ${response.status}`);
       }
       setExchange(data);
+      setPreparedSwap(preparedOutboundSwap);
       maybeApplyResolvedRlusdCurrency(data?.xcannesResolved);
       if (
         direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
@@ -1081,10 +1186,15 @@ export default function WalletDashboardUsdSwapModal({
                 depositAddress: depositAddr,
                 depositExtraId: depositMemo || null,
                 amountFrom: amountFromValue || null,
-                tickerFrom: String(fromCurrency?.ticker || "rlusd"),
-                networkFrom: String(fromCurrency?.network || "xrp"),
-                tickerTo: String(toCurrency?.ticker || ""),
-                networkTo: String(toCurrency?.network || ""),
+                tickerFrom: exchangeTickerFrom,
+                networkFrom: exchangeNetworkFrom,
+                tickerTo: exchangeTickerTo,
+                networkTo: exchangeNetworkTo,
+                targetCurrencyCode:
+                  String(toCurrency?.ticker || "USD").trim().toUpperCase() || "USD",
+                amountRlusd: parsedAmount,
+                sourceCurrencyCode: "RLUSD",
+                sourceAmount: parsedAmount,
                 createdAt: new Date().toISOString(),
               },
               ...prev,
@@ -1134,6 +1244,188 @@ export default function WalletDashboardUsdSwapModal({
       setApiError(error?.message || "Impossible de rafraîchir le statut.");
     } finally {
       setExchangeRefreshing(false);
+    }
+  };
+
+  const handleExecuteOutboundSwapAndDeposit = async () => {
+    if (!signTransaction || !preparedSwap?.txjson) {
+      setApiError(
+        t(
+          "ui_usd_swap_missing_signer",
+          "Signature wallet indisponible pour exécuter le swap XRPL.",
+        ),
+      );
+      return;
+    }
+    if (!depositAddress) {
+      setApiError(
+        t("ui_usd_swap_missing_deposit_address", "Adresse de dépôt indisponible."),
+      );
+      return;
+    }
+
+    const payoutXrp = Number(preparedSwap?.quote?.xrpAmount);
+    if (!Number.isFinite(payoutXrp) || payoutXrp <= 0) {
+      setApiError(
+        t(
+          "ui_usd_swap_invalid_xrp_amount",
+          "Montant XRP invalide pour le dépôt partenaire.",
+        ),
+      );
+      return;
+    }
+
+    setSwapSubmitting(true);
+    setApiError("");
+    try {
+      const swapResult = await signTransaction(preparedSwap.txjson, {
+        action: "wallet:swap",
+        progressDetails: {
+          amountLabel: `${parsedAmount.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} RLUSD → XRP`,
+          beneficiaryLabel: "SimpleSwap",
+          beneficiaryAddress: depositAddress,
+        },
+      });
+      if (!swapResult?.signed) {
+        setApiError(
+          t("ui_usd_swap_cancelled", "Swap XRPL annulé ou expiré."),
+        );
+        return;
+      }
+
+      const paymentTx = buildXrpPaymentTxjson({
+        account: walletAddress,
+        destination: depositAddress,
+        amountXrp: payoutXrp,
+      });
+      if (!paymentTx) {
+        throw new Error("Impossible de construire le paiement XRP SimpleSwap.");
+      }
+
+      const destinationTag = parseDestinationTag(depositExtraId);
+      if (destinationTag != null) {
+        paymentTx.DestinationTag = destinationTag;
+      } else if (String(depositExtraId || "").trim()) {
+        paymentTx.Memos = [
+          ...(paymentTx.Memos || []),
+          ...buildPlainTextMemo(depositExtraId),
+        ];
+      }
+
+      const partnerMemo = buildSimpleSwapMemo({
+        side: "out",
+        provider: "simpleswap",
+        exchangeId: exchangeId || null,
+        targetCurrencyCode:
+          String(toCurrency?.ticker || "USD").trim().toUpperCase() || "USD",
+        amountRlusd: parsedAmount,
+        sourceCurrencyCode: "RLUSD",
+        sourceAmount: parsedAmount,
+      });
+      const encodedPartnerMemo = partnerMemo ? buildXrplJsonMemo(partnerMemo) : null;
+      if (encodedPartnerMemo?.length) {
+        paymentTx.Memos = [...(paymentTx.Memos || []), ...encodedPartnerMemo];
+      }
+
+      const paymentResult = await signTransaction(paymentTx, {
+        action: "wallet:send",
+        progressDetails: {
+          amountLabel: `${payoutXrp.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} XRP`,
+          beneficiaryLabel: "SimpleSwap",
+          beneficiaryAddress: depositAddress,
+        },
+      });
+      if (!paymentResult?.signed) {
+        setApiError(
+          t(
+            "ui_usd_swap_payment_cancelled",
+            "Le dépôt XRP SimpleSwap a été annulé après le swap XRPL.",
+          ),
+        );
+        return;
+      }
+
+      try {
+        const prev = safeReadJsonArray(
+          window.sessionStorage?.getItem(SIMPLESWAP_DEPOSITS_STORAGE_KEY),
+        );
+        const next = prev.filter(
+          (item) => String(item?.depositAddress || "").trim() !== String(depositAddress || "").trim(),
+        );
+        window.sessionStorage?.setItem(
+          SIMPLESWAP_DEPOSITS_STORAGE_KEY,
+          JSON.stringify(next),
+        );
+      } catch {
+        // ignore
+      }
+      closeModal();
+    } catch (error) {
+      setApiError(
+        error?.message ||
+          t("ui_usd_swap_execution_failed", "Impossible d’exécuter le flow XRPL."),
+      );
+    } finally {
+      setSwapSubmitting(false);
+    }
+  };
+
+  const handleConvertInboundToRlusd = async () => {
+    if (!signTransaction) {
+      setApiError(
+        t(
+          "ui_usd_swap_missing_signer",
+          "Signature wallet indisponible pour exécuter le swap XRPL.",
+        ),
+      );
+      return;
+    }
+    if (!Number.isFinite(exactInboundXrp) || exactInboundXrp <= 0) {
+      setApiError(
+        t(
+          "ui_usd_swap_missing_inbound_xrp",
+          "Montant XRP reçu indisponible pour la conversion RLUSD.",
+        ),
+      );
+      return;
+    }
+
+    setSwapSubmitting(true);
+    setApiError("");
+    try {
+      const preparedInboundSwap = await xcannesApi.prepareRlusdXrpSwap({
+        address: walletAddress,
+        direction: "XRP_TO_RLUSD",
+        amountXrp: exactInboundXrp,
+      });
+      const result = await signTransaction(preparedInboundSwap.txjson, {
+        action: "wallet:swap",
+        progressDetails: {
+          amountLabel: `${exactInboundXrp.toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} XRP → RLUSD`,
+          beneficiaryLabel: walletLabel || "XCANNES",
+          beneficiaryAddress: walletAddress,
+        },
+      });
+      if (!result?.signed) {
+        setApiError(
+          t("ui_usd_swap_cancelled", "Swap XRPL annulé ou expiré."),
+        );
+        return;
+      }
+      closeModal();
+    } catch (error) {
+      setApiError(
+        error?.message ||
+          t("ui_usd_swap_execution_failed", "Impossible d’exécuter le flow XRPL."),
+      );
+    } finally {
+      setSwapSubmitting(false);
     }
   };
 
@@ -1473,17 +1765,19 @@ export default function WalletDashboardUsdSwapModal({
 
                 <div className="text-center pt-1">
                   <div className="text-white font-semibold text-2xl leading-tight">
-                    {t("ui_send_your_funds", "Envoyez vos fonds")}
+                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
+                      ? t("ui_execute_swap_and_send", "Swap XRPL puis dépôt partenaire")
+                      : t("ui_send_your_funds", "Envoyez vos fonds")}
                   </div>
                   <div className="mt-2 text-sm text-white/60 max-w-sm mx-auto">
                     {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE
                       ? t(
-                          "ui_usd_swap_created_body_from_wallet",
-                          "Envoyez le montant indiqué depuis votre wallet XCANNES à l’adresse de dépôt pour lancer l’échange.",
+                          "ui_usd_swap_created_body_from_wallet_xrp",
+                          "Le flow prépare un swap RLUSD → XRP sur XRPL, puis envoie automatiquement le XRP exact vers SimpleSwap.",
                         )
                       : t(
-                          "ui_usd_swap_created_body_external",
-                          "Envoyez le montant indiqué depuis votre wallet externe à l’adresse de dépôt pour lancer l’échange.",
+                          "ui_usd_swap_created_body_external_xrp",
+                          "Envoyez le stablecoin demandé vers SimpleSwap. Une fois le XRP reçu sur votre wallet XCANNES, signez la conversion XRP → RLUSD.",
                         )}
                   </div>
                 </div>
@@ -1502,12 +1796,12 @@ export default function WalletDashboardUsdSwapModal({
                       </div>
                       <div className="text-white font-semibold text-lg leading-tight">
                         {sendAmountExact || (hasValidAmount ? parsedAmount : "—")}{" "}
-                        {fromTicker || ""}
+                        {partnerFromTicker || ""}
                       </div>
                     </div>
-                    {fromNetwork ? (
+                    {partnerFromNetwork ? (
                       <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
-                        {fromNetwork}
+                        {partnerFromNetwork}
                       </span>
                     ) : null}
                   </div>
@@ -1592,44 +1886,78 @@ export default function WalletDashboardUsdSwapModal({
                   ) : null}
                 </div>
 
-                {toTicker ? (
+                {partnerToTicker ? (
                   <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-white/60 text-xs">
-                        {t("ui_you_get", "Vous obtenez")}
+                        {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+                          ? t("ui_you_get_xrp_first", "Vous recevez d’abord")
+                          : t("ui_you_get", "Vous obtenez")}
                       </div>
-                      {toNetwork ? (
+                      {partnerToNetwork ? (
                         <span className="shrink-0 rounded-full bg-white/10 text-white/70 text-xs font-semibold px-2.5 py-1">
-                          {toNetwork}
+                          {partnerToNetwork}
                         </span>
                       ) : null}
                     </div>
                     <div className="mt-1 text-white font-semibold text-lg leading-tight">
                       {String(receiveAmountExact || "").trim()
-                        ? `${receiveAmountExact} ${toTicker}`
+                        ? `${receiveAmountExact} ${partnerToTicker}`
                         : quotedReceiveAmount
                           ? `≈${
                               formatAmountNumber
                                 ? formatAmountNumber.format(quotedReceiveAmount)
                                 : String(quotedReceiveAmount)
-                            } ${toTicker}`
-                          : `— ${toTicker}`}
+                            } ${partnerToTicker}`
+                          : `— ${partnerToTicker}`}
                     </div>
+                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+                      <div className="mt-3 text-[11px] text-white/55">
+                        {t(
+                          "ui_usd_swap_convert_after_receive",
+                          "Quand le dépôt partenaire est terminé et que le XRP est crédité sur XRPL, signez la conversion XRP → RLUSD ci-dessous.",
+                        )}
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
 
                 <div className="rounded-lg ring-1 ring-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-200">
                   {t(
                     "ui_usd_swap_warning",
-                    `Attention : envoyez uniquement ${fromTicker || "l'actif sélectionné"} (${fromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
+                    `Attention : envoyez uniquement ${partnerFromTicker || "l'actif sélectionné"} (${partnerFromNetwork || "réseau sélectionné"}). Envoyer un autre actif ou oublier un Tag/Memo peut entraîner une perte.`,
                   )}
                 </div>
 
                 <div className="flex gap-2">
+                  {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                    <button
+                      type="button"
+                      onClick={handleExecuteOutboundSwapAndDeposit}
+                      disabled={swapSubmitting || !preparedSwap?.txjson || !depositAddress}
+                      className={`flex-1 py-3 ${actionBtnBase}`}
+                    >
+                      {swapSubmitting
+                        ? t("ui_signing_swap", "Signature…")
+                        : t("ui_execute_swap_and_send_btn", "Signer le swap puis envoyer")}
+                    </button>
+                  ) : null}
+                  {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+                    <button
+                      type="button"
+                      onClick={handleConvertInboundToRlusd}
+                      disabled={swapSubmitting || !signTransaction || !Number.isFinite(exactInboundXrp)}
+                      className={`flex-1 py-3 ${actionBtnBase}`}
+                    >
+                      {swapSubmitting
+                        ? t("ui_signing_swap", "Signature…")
+                        : t("ui_convert_xrp_to_rlusd", "Convertir le XRP en RLUSD")}
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={refreshExchange}
-                    disabled={!exchangeId || exchangeRefreshing}
+                    disabled={!exchangeId || exchangeRefreshing || swapSubmitting}
                     className="flex-1 rounded-lg border border-white/10 bg-black/20 text-white/80 font-semibold py-3 transition-colors hover:bg-black/30 hover:text-white disabled:opacity-50"
                   >
                     {exchangeRefreshing

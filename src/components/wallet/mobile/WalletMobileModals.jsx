@@ -37,6 +37,7 @@ export default function WalletMobileModals({
   activationRequestModalProps,
   infoModalProps,
   statementSharedProps,
+  signTransaction,
 
   // open/close handlers
   activeAction,
@@ -217,6 +218,7 @@ export default function WalletMobileModals({
               }
               initialAmount={usdSwapPrefillAmount}
               accentVariant={usdSwapAccentVariant}
+              signTransaction={signTransaction}
             />
 
             <WalletDashboardCashModal
@@ -227,6 +229,7 @@ export default function WalletMobileModals({
                 setCashBuyPrefill(null);
               }}
               {...cashModalProps}
+              signTransaction={signTransaction}
               availableTokens={augmentedTokens}
               onOpenUsdSwapOut={openUsdSwapOut}
             />

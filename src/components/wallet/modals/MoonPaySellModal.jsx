@@ -11,6 +11,7 @@ import {
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
+import xcannesApi from "@/lib/xcannesApi";
 import { getCurrencyFlag, formatAmountWithSymbol } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { isIOSDevice } from "@/utils/deviceDetect";
@@ -352,6 +353,11 @@ const MoonPaySellModal = ({
             sourceAmount:
               Number.isFinite(Number(data?.sourceAmount)) && Number(data?.sourceAmount) > 0
                 ? Number(data.sourceAmount)
+                : null,
+            sourceAmountRlusd:
+              Number.isFinite(Number(data?.sourceAmountRlusd)) &&
+              Number(data?.sourceAmountRlusd) > 0
+                ? Number(data.sourceAmountRlusd)
                 : null,
             baseCurrencyCode:
               String(data?.baseCurrencyCode || "").trim().toUpperCase() || null,
@@ -930,6 +936,13 @@ const MoonPaySellModal = ({
     : hasValidAmount
       ? amountValue
       : Number.NaN;
+  const sourceAmountRlusd = isCurrencyLine
+    ? Number.isFinite(rlusdEquivalent)
+      ? Number(rlusdEquivalent.toFixed(6))
+      : Number.NaN
+    : currencyUpper === "RLUSD" || currencyUpper === "USD"
+      ? amountValue
+      : Number.NaN;
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -977,6 +990,7 @@ const MoonPaySellModal = ({
       flowId,
       sourceCurrencyCode: currencyUpper,
       sourceAmount: amountValue,
+      sourceAmountRlusd,
       baseCurrencyCode,
       baseCurrencyAmount,
     });
@@ -984,6 +998,7 @@ const MoonPaySellModal = ({
       flowId,
       sourceCurrencyCode: currencyUpper,
       sourceAmount: amountValue,
+      sourceAmountRlusd,
       baseCurrencyCode,
       baseCurrencyAmount,
     });
@@ -1013,6 +1028,28 @@ const MoonPaySellModal = ({
 
       setStep("loading");
 
+      let effectiveBaseCurrencyCode = String(baseCurrencyCode || "").toUpperCase();
+      let effectiveBaseCurrencyAmount = baseCurrencyAmount;
+
+      if (effectiveBaseCurrencyCode !== "XRP") {
+        const preparedSwap = await xcannesApi.prepareRlusdXrpSwap({
+          address: walletAddress,
+          direction: "RLUSD_TO_XRP",
+          amountRlusd: sourceAmountRlusd,
+        });
+        const preparedXrpAmount = Number(preparedSwap?.quote?.xrpAmount);
+        if (!Number.isFinite(preparedXrpAmount) || preparedXrpAmount <= 0) {
+          throw new Error(
+            t(
+              "moonpay_error_prepare_swap_sell",
+              "Unable to prepare the XRPL swap before MoonPay sell.",
+            ),
+          );
+        }
+        effectiveBaseCurrencyCode = "XRP";
+        effectiveBaseCurrencyAmount = Number(preparedXrpAmount.toFixed(6));
+      }
+
       const response = await fetch("/api/moonpay/generate-sell-url", {
         method: "POST",
         headers: {
@@ -1020,9 +1057,9 @@ const MoonPaySellModal = ({
         },
         body: JSON.stringify({
           walletAddress,
-          baseCurrencyCode, // Crypto à vendre
+          baseCurrencyCode: effectiveBaseCurrencyCode,
           quoteCurrencyCode: quoteCurrency, // Fiat à recevoir
-          baseCurrencyAmount,
+          baseCurrencyAmount: effectiveBaseCurrencyAmount,
           options: flowId ? { xcannesFlowId: flowId } : undefined,
         }),
       });

@@ -11,6 +11,8 @@ import { useTranslation } from "next-i18next";
 import { CRYPTO_ICONS } from "@/utils/marketConstants";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import { isIOSDevice } from "@/utils/deviceDetect";
+import xcannesApi from "@/lib/xcannesApi";
+import { apiUrl } from "@/lib/runtimeConfig";
 import {
   greenActionBtnBase,
   simpleSwapBlueActionBtnBase,
@@ -88,6 +90,23 @@ const normalizeFiatCurrencyCode = (value) => {
   return upper;
 };
 
+const normalizeMovementKind = (value) => String(value || "").trim().toUpperCase();
+
+const resolveIncomingXrpAmount = (movement) => {
+  const displayAmount = Number(movement?.displayAmount);
+  if (Number.isFinite(displayAmount) && displayAmount > 0) return displayAmount;
+  const amountXrp = Number(movement?.amountXrp);
+  if (Number.isFinite(amountXrp) && amountXrp > 0) return amountXrp;
+  const amount = Number(movement?.amount);
+  if (Number.isFinite(amount) && amount > 0) return amount;
+  const amountRlusd = Number(movement?.amountRlusd);
+  const fxRate = Number(movement?.fxRate);
+  if (Number.isFinite(amountRlusd) && amountRlusd > 0 && Number.isFinite(fxRate) && fxRate > 0) {
+    return amountRlusd / fxRate;
+  }
+  return Number.NaN;
+};
+
 /**
  * MoonPayBuyModal - Modal pour acheter des cryptos avec MoonPay
  *
@@ -101,6 +120,7 @@ const MoonPayBuyModal = ({
   onClose,
   walletAddress,
   walletLabel = "",
+  signTransaction = null,
   preferredFiatCurrency = "",
   onProceedToUsdSwapOut,
   embedded = false,
@@ -154,7 +174,7 @@ const MoonPayBuyModal = ({
   const [iframeUrl, setIframeUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'success' | 'error'
+  const [step, setStep] = useState("form"); // 'form' | 'loading' | 'iframe' | 'awaiting_xrp' | 'swap_ready' | 'swapping' | 'success' | 'error'
   const displayError =
     error && /api\.sandbox\.moonpay\.com/i.test(error) ? null : error;
   const moonpayActiveRef = useRef(false);
@@ -169,6 +189,12 @@ const MoonPayBuyModal = ({
     : "camera https://moonpay.com https://buy.moonpay.com https://buy-sandbox.moonpay.com https://sell.moonpay.com https://sell-sandbox.moonpay.com https://wallet.moonpay.com https://*.moonpay.com; clipboard-write";
   const latestStepRef = useRef(step);
   const latestIframeUrlRef = useRef(iframeUrl);
+  const [pendingSwapTargetCurrency, setPendingSwapTargetCurrency] = useState("");
+  const [pendingSwapDetectedXrp, setPendingSwapDetectedXrp] = useState(null);
+  const [pendingSwapTxHash, setPendingSwapTxHash] = useState("");
+  const [awaitingXrpSince, setAwaitingXrpSince] = useState(null);
+  const [preparedInboundSwap, setPreparedInboundSwap] = useState(null);
+  const pendingSwapPollSeenRef = useRef("");
 
   useEffect(() => {
     latestStepRef.current = step;
@@ -342,7 +368,6 @@ const MoonPayBuyModal = ({
     selectLabelByCurrency,
     selectLabelMobileByCurrency,
     selectLabelRightByCurrency,
-    t,
   ]);
 
   const selectedAssetCurrency = useMemo(() => {
@@ -633,6 +658,8 @@ const MoonPayBuyModal = ({
             ts: Date.now(),
             walletAddress: String(walletAddress || ""),
             currency: String(currency || "").toUpperCase(),
+            targetCurrencyCode: String(currency || "").toUpperCase(),
+            targetAssetAmount: String(targetAssetAmount || ""),
             amountType: amountType === "crypto" ? "crypto" : "fiat",
             amount: String(amount || ""),
             fiatCurrency: String(fiatCurrency || "").toUpperCase(),
@@ -643,7 +670,7 @@ const MoonPayBuyModal = ({
         // Ignore
       }
     };
-  }, [amount, amountType, currency, fiatCurrency, walletAddress]);
+  }, [amount, amountType, currency, fiatCurrency, targetAssetAmount, walletAddress]);
 
   const getOrCreateFlowId = useMemo(() => {
     return () => {
@@ -770,6 +797,11 @@ const MoonPayBuyModal = ({
 	      setStep("form");
 	      setWizardStep(1);
 	      setTargetAssetAmount("");
+        setPendingSwapTargetCurrency("");
+        setPendingSwapDetectedXrp(null);
+        setPendingSwapTxHash("");
+        setAwaitingXrpSince(null);
+        setPreparedInboundSwap(null);
 	      onClose?.();
 	    };
 	  }, [
@@ -800,6 +832,11 @@ const MoonPayBuyModal = ({
       setStep("form");
       setWizardStep(1);
       setTargetAssetAmount("");
+      setPendingSwapTargetCurrency("");
+      setPendingSwapDetectedXrp(null);
+      setPendingSwapTxHash("");
+      setAwaitingXrpSince(null);
+      setPreparedInboundSwap(null);
     };
   }, [
     clearAutoOpen,
@@ -900,8 +937,42 @@ const MoonPayBuyModal = ({
       return;
     }
 
+    if (resume.awaitingXrpSwap) {
+      const restoredPreparedSwap =
+        resume.preparedInboundSwap && typeof resume.preparedInboundSwap === "object"
+          ? resume.preparedInboundSwap
+          : null;
+      setPendingSwapTargetCurrency(
+        String(resume.targetCurrencyCode || resume.currency || "").trim().toUpperCase(),
+      );
+      setPendingSwapDetectedXrp(
+        Number.isFinite(Number(resume.detectedXrpAmount)) &&
+          Number(resume.detectedXrpAmount) > 0
+          ? Number(resume.detectedXrpAmount)
+          : null,
+      );
+      setPendingSwapTxHash(String(resume.detectedXrpTxHash || "").trim());
+      setAwaitingXrpSince(
+        Number.isFinite(Number(resume.awaitingXrpSince))
+          ? Number(resume.awaitingXrpSince)
+          : Number.isFinite(Number(resume.ts))
+            ? Number(resume.ts)
+            : Date.now(),
+      );
+      setPreparedInboundSwap(restoredPreparedSwap);
+      setStep(
+        Number.isFinite(Number(resume.detectedXrpAmount)) &&
+          Number(resume.detectedXrpAmount) > 0 &&
+          restoredPreparedSwap?.txjson
+          ? "swap_ready"
+          : "awaiting_xrp",
+      );
+      return;
+    }
+
     const nextCurrency = String(resume.currency || "").toUpperCase();
     if (nextCurrency) setCurrency(nextCurrency);
+    if (resume.targetAssetAmount != null) setTargetAssetAmount(String(resume.targetAssetAmount));
     if (resume.amountType) setAmountType(resume.amountType === "crypto" ? "crypto" : "fiat");
     if (resume.amount != null) setAmount(String(resume.amount));
     if (resume.fiatCurrency) setFiatCurrency(String(resume.fiatCurrency).toUpperCase());
@@ -950,7 +1021,7 @@ const MoonPayBuyModal = ({
     }
 
     const currencyUpper = String(currency || "RLUSD").trim().toUpperCase();
-    const moonpayCurrencyCode = currencyUpper === "XRP" ? "XRP" : "RLUSD";
+    const moonpayCurrencyCode = "XRP";
 
     if (!amount || parseFloat(amount) <= 0) {
       setError(
@@ -979,7 +1050,12 @@ const MoonPayBuyModal = ({
 
     // Persist inputs so we can resume after iOS Apple flows / reconnect.
     const flowId = getOrCreateFlowId();
-    saveResumeState({ flowId, moonpayCurrencyCode });
+    saveResumeState({
+      flowId,
+      moonpayCurrencyCode,
+      targetCurrencyCode: currencyUpper,
+      targetAssetAmount: String(targetAssetAmount || ""),
+    });
 
     setLoading(true);
     setError(null);
@@ -1083,28 +1159,24 @@ const MoonPayBuyModal = ({
       // Transaction complétée
       if (type === "transaction_completed" || status === "completed") {
         const targetCurrency = String(currency || "RLUSD").trim().toUpperCase();
-        const needsConvert = targetCurrency !== "RLUSD" && targetCurrency !== "XRP";
-        clearResumeState();
         clearAutoOpen();
         clearFlowId();
         clearMoonpayWalletAddress();
-        setStep("success");
-        setTimeout(() => {
-          onClose?.();
-          if (needsConvert && typeof window !== "undefined") {
-            window.setTimeout(() => {
-              try {
-                window.dispatchEvent(
-                  new CustomEvent("xcannes:wallet:open-convert", {
-                    detail: { action: "sell", base: "RLUSD", quote: targetCurrency },
-                  }),
-                );
-              } catch {
-                // ignore
-              }
-            }, 50);
-          }
-        }, 3000);
+        deactivateMoonpayActive();
+        setIframeUrl(null);
+        setPendingSwapTargetCurrency(targetCurrency);
+        setPendingSwapDetectedXrp(null);
+        setPendingSwapTxHash("");
+        setPreparedInboundSwap(null);
+        setAwaitingXrpSince(Date.now());
+        saveResumeState({
+          awaitingXrpSwap: true,
+          awaitingXrpSince: Date.now(),
+          targetCurrencyCode: targetCurrency,
+          targetAssetAmount: String(targetAssetAmount || ""),
+          lastIframeUrl: "",
+        });
+        setStep("awaiting_xrp");
       }
 
       // Transaction échouée
@@ -1141,8 +1213,178 @@ const MoonPayBuyModal = ({
 	    handleWidgetClose,
 	    isOpen,
 	    onClose,
+      saveResumeState,
+      targetAssetAmount,
     t,
   ]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (step !== "awaiting_xrp") return;
+    if (!walletAddress) return;
+
+    let cancelled = false;
+
+    const pollIncomingXrp = async () => {
+      if (cancelled) return;
+      try {
+        const params = new URLSearchParams();
+        params.set("address", String(walletAddress || ""));
+        params.set("limit", "10");
+        params.set("source", "onchain");
+        const response = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) return;
+
+        const movements = Array.isArray(data?.movements) ? data.movements : [];
+        const incomingXrp = movements.find((movement) => {
+          const kind = normalizeMovementKind(movement?.kind);
+          if (kind !== "PAYMENT_IN" && kind !== "XRPL_PAYMENT_IN") return false;
+          const currencyCode = String(
+            movement?.toCurrencyCode || movement?.fromCurrencyCode || movement?.displayCurrency || "",
+          )
+            .trim()
+            .toUpperCase();
+          if (currencyCode !== "XRP") return false;
+          const movementId = String(movement?.movementId || movement?._id || movement?.txHash || "").trim();
+          if (movementId && movementId === pendingSwapPollSeenRef.current) return false;
+          const createdAtMs = movement?.createdAt ? new Date(movement.createdAt).getTime() : Number.NaN;
+          if (
+            Number.isFinite(awaitingXrpSince) &&
+            Number.isFinite(createdAtMs) &&
+            createdAtMs < awaitingXrpSince
+          ) {
+            return false;
+          }
+          return Number.isFinite(resolveIncomingXrpAmount(movement));
+        });
+
+        if (!incomingXrp) return;
+
+        const movementId = String(
+          incomingXrp?.movementId || incomingXrp?._id || incomingXrp?.txHash || "",
+        ).trim();
+        pendingSwapPollSeenRef.current = movementId;
+        const detectedAmount = resolveIncomingXrpAmount(incomingXrp);
+        if (!Number.isFinite(detectedAmount) || detectedAmount <= 0) return;
+
+        const preparedSwap = await xcannesApi.prepareRlusdXrpSwap({
+          address: walletAddress,
+          direction: "XRP_TO_RLUSD",
+          amountXrp: detectedAmount,
+        });
+        if (cancelled) return;
+
+        setPendingSwapDetectedXrp(detectedAmount);
+        setPendingSwapTxHash(String(incomingXrp?.txHash || "").trim());
+        setPreparedInboundSwap(preparedSwap);
+        saveResumeState({
+          awaitingXrpSwap: true,
+          awaitingXrpSince:
+            Number.isFinite(awaitingXrpSince) && awaitingXrpSince > 0
+              ? awaitingXrpSince
+              : Date.now(),
+          detectedXrpAmount: detectedAmount,
+          detectedXrpTxHash: String(incomingXrp?.txHash || "").trim(),
+          targetCurrencyCode: pendingSwapTargetCurrency || currency,
+          targetAssetAmount: String(targetAssetAmount || ""),
+          preparedInboundSwap: preparedSwap,
+        });
+        setStep("swap_ready");
+      } catch (pollError) {
+        if (DEBUG_LOGS) {
+          console.warn("[MoonPayBuyModal] XRP receipt poll failed:", pollError?.message || pollError);
+        }
+      }
+    };
+
+    pollIncomingXrp();
+    const intervalId = window.setInterval(pollIncomingXrp, 8000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [
+    awaitingXrpSince,
+    currency,
+    isOpen,
+    pendingSwapTargetCurrency,
+    saveResumeState,
+    step,
+    targetAssetAmount,
+    walletAddress,
+  ]);
+
+  const handleConvertReceivedXrpToRlusd = async () => {
+    if (!signTransaction || !preparedInboundSwap?.txjson) {
+      setError(
+        t(
+          "moonpay_error_prepare_swap_buy_missing_signer",
+          "Wallet signature is required to convert the received XRP.",
+        ),
+      );
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      setStep("swapping");
+      const result = await signTransaction(preparedInboundSwap.txjson, {
+        action: "wallet:swap",
+        progressDetails: {
+          amountLabel: `${Number(pendingSwapDetectedXrp || 0).toLocaleString("en-US", {
+            maximumFractionDigits: 6,
+          })} XRP → RLUSD`,
+          beneficiaryLabel: walletLabel || "XCANNES",
+          beneficiaryAddress: walletAddress,
+        },
+      });
+      if (!result?.signed) {
+        setError(
+          t(
+            "moonpay_error_prepare_swap_buy_cancelled",
+            "XRPL swap was cancelled or expired.",
+          ),
+        );
+        setStep("swap_ready");
+        return;
+      }
+
+      const targetCurrency = String(pendingSwapTargetCurrency || currency || "RLUSD")
+        .trim()
+        .toUpperCase();
+      clearResumeState();
+      setStep("success");
+      setTimeout(() => {
+        onClose?.();
+        if (targetCurrency && targetCurrency !== "RLUSD" && typeof window !== "undefined") {
+          window.setTimeout(() => {
+            try {
+              window.dispatchEvent(
+                new CustomEvent("xcannes:wallet:open-convert", {
+                  detail: { action: "sell", base: "RLUSD", quote: targetCurrency },
+                }),
+              );
+            } catch {
+              // ignore
+            }
+          }, 50);
+        }
+      }, 1800);
+    } catch (swapError) {
+      setError(
+        swapError?.message ||
+          t(
+            "moonpay_error_prepare_swap_buy_failed",
+            "Failed to convert the received XRP into RLUSD.",
+          ),
+      );
+      setStep("swap_ready");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Reset au changement de devise
   useEffect(() => {
@@ -1943,6 +2185,94 @@ const MoonPayBuyModal = ({
 	          </p>
 	        </div>
 	      )}
+
+        {step === "awaiting_xrp" && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div
+              className={[
+                "animate-pulse rounded-full h-12 w-12 mb-4 ring-4",
+                useSimpleSwapPartner ? "ring-[#0870f8]/25 bg-[#0870f8]" : "ring-xcannes-green/25 bg-xcannes-green",
+              ].join(" ")}
+            />
+            <h4 className="text-xl font-bold text-white mb-2">
+              {t("moonpay_buy_waiting_xrp_title", "En attente du XRP")}
+            </h4>
+            <p className="text-white/60 text-center mb-4 max-w-md">
+              {t(
+                "moonpay_buy_waiting_xrp_body",
+                "MoonPay est terminé. Dès que le XRP arrive sur votre wallet XCANNES, nous préparons la conversion XRPL vers RLUSD.",
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={handleWidgetClose}
+              className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+            >
+              {t("close", "Close")}
+            </button>
+          </div>
+        )}
+
+        {step === "swap_ready" && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <CheckCircleIcon
+              className={[
+                "w-16 h-16 mb-4",
+                useSimpleSwapPartner ? "text-[#0870f8]" : "text-xcannes-green",
+              ].join(" ")}
+            />
+            <h4 className="text-xl font-bold text-white mb-2">
+              {t("moonpay_buy_swap_ready_title", "XRP reçu")}
+            </h4>
+            <p className="text-white/60 text-center mb-2 max-w-md">
+              {t(
+                "moonpay_buy_swap_ready_body",
+                "Le XRP a été détecté sur votre wallet. Vous pouvez maintenant signer la conversion XRPL vers RLUSD.",
+              )}
+            </p>
+            {Number.isFinite(Number(pendingSwapDetectedXrp)) && Number(pendingSwapDetectedXrp) > 0 ? (
+              <div className="mb-5 rounded-lg bg-white/5 ring-1 ring-white/10 px-4 py-3 text-white/85">
+                {Number(pendingSwapDetectedXrp).toLocaleString("en-US", {
+                  maximumFractionDigits: 6,
+                })} XRP
+              </div>
+            ) : null}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleConvertReceivedXrpToRlusd}
+                className={`px-6 py-2 text-black font-semibold rounded-lg transition-colors ${
+                  useSimpleSwapPartner
+                    ? "bg-[#0870f8] hover:bg-[#0765df]"
+                    : "bg-xcannes-green hover:bg-xcannes-green/90"
+                }`}
+              >
+                {t("moonpay_buy_swap_ready_action", "Signer le swap XRP → RLUSD")}
+              </button>
+              <button
+                type="button"
+                onClick={handleWidgetClose}
+                className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+              >
+                {t("close", "Close")}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "swapping" && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div
+              className={[
+                "animate-spin rounded-full h-12 w-12 border-b-2 mb-4",
+                useSimpleSwapPartner ? "border-[#0870f8]" : "border-xcannes-green",
+              ].join(" ")}
+            />
+            <p className="text-white/80">
+              {t("moonpay_buy_swapping_label", "Préparation du swap XRPL…")}
+            </p>
+          </div>
+        )}
 
 	      {/* MoonPay iframe */}
 	      {step === "iframe" && iframeUrl && (

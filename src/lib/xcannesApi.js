@@ -25,6 +25,7 @@ const API_ENDPOINTS = {
   FX_RATE: '/api/v1/fx/rate',
   FX_CURRENCIES: '/api/v1/fx/currencies',
   XRPL_RLUSD_XRP_QUOTE: '/wallet/rlusd-xrp-quote',
+  XRPL_RLUSD_XRP_SWAP_PREPARE: '/wallet/xrpl-swap/prepare',
 };
 
 class XcannesAPI {
@@ -40,6 +41,7 @@ class XcannesAPI {
     this.getFxRate = this.getFxRate.bind(this);
     this.getFxCurrencies = this.getFxCurrencies.bind(this);
     this.getRlusdXrpQuote = this.getRlusdXrpQuote.bind(this);
+    this.prepareRlusdXrpSwap = this.prepareRlusdXrpSwap.bind(this);
   }
 
   /**
@@ -235,24 +237,57 @@ class XcannesAPI {
 
   /**
    * Quote indicatif RLUSD/XRP depuis le DEX XRPL (book_offers).
-   * @param {number} amountRlusd - Montant RLUSD (USD) à convertir
-   * @param {'XRP_TO_RLUSD'|'RLUSD_TO_XRP'} direction
+   * Signature legacy:
+   *   getRlusdXrpQuote(amountRlusd, direction)
+   *
+   * Signature étendue:
+   *   getRlusdXrpQuote({ amountRlusd?, amountXrp?, direction })
    */
-  async getRlusdXrpQuote(amountRlusd, direction = 'XRP_TO_RLUSD') {
-    const amt = Number(amountRlusd);
-    const dir = String(direction || '').trim().toUpperCase();
-    if (!Number.isFinite(amt) || amt <= 0) {
-      throw new Error('Invalid amountRlusd');
+  async getRlusdXrpQuote(input, direction = 'XRP_TO_RLUSD') {
+    const isObjectInput = input && typeof input === 'object' && !Array.isArray(input);
+    const amountRlusd = isObjectInput ? Number(input.amountRlusd) : Number(input);
+    const amountXrp = isObjectInput ? Number(input.amountXrp) : Number.NaN;
+    const dir = String((isObjectInput ? input.direction : direction) || '')
+      .trim()
+      .toUpperCase();
+
+    const hasAmountRlusd = Number.isFinite(amountRlusd) && amountRlusd > 0;
+    const hasAmountXrp = Number.isFinite(amountXrp) && amountXrp > 0;
+    if (hasAmountRlusd === hasAmountXrp) {
+      throw new Error('Provide exactly one of amountRlusd or amountXrp');
     }
+
     const params = new URLSearchParams({
-      amountRlusd: String(amt),
       direction: dir === 'RLUSD_TO_XRP' ? 'RLUSD_TO_XRP' : 'XRP_TO_RLUSD',
     });
+    if (hasAmountRlusd) params.set('amountRlusd', String(amountRlusd));
+    if (hasAmountXrp) params.set('amountXrp', String(amountXrp));
 
     return this.request(`${API_ENDPOINTS.XRPL_RLUSD_XRP_QUOTE}?${params.toString()}`, {
       useCache: true,
       cacheTTL: 2000,
       negativeCacheTTL: 3000,
+    });
+  }
+
+  async prepareRlusdXrpSwap({
+    address,
+    direction = 'XRP_TO_RLUSD',
+    amountRlusd,
+    amountXrp,
+    slippageBps = 100,
+  } = {}) {
+    return this.request(API_ENDPOINTS.XRPL_RLUSD_XRP_SWAP_PREPARE, {
+      method: 'POST',
+      body: {
+        address,
+        direction,
+        amountRlusd,
+        amountXrp,
+        slippageBps,
+      },
+      useCache: false,
+      retries: 1,
     });
   }
 }

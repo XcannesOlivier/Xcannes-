@@ -29,6 +29,7 @@ import { useTokenDisplayLabels } from "./hooks/useTokenDisplayLabels";
 import WalletPendingPayreqs from "./components/WalletPendingPayreqs";
 import ReconciliationBanner from "./components/ReconciliationBanner";
 import { useTranslation } from "next-i18next";
+import xcannesApi from "@/lib/xcannesApi";
 import {
   WALLET_LAYOUT,
   USD_STABLECOINS,
@@ -52,11 +53,63 @@ function isAcceptedOnChainToken(currency) {
 
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
 const MOONPAY_ACTIVE_STORAGE_KEY = "xcannes_moonpay_active";
+const MOONPAY_BUY_RESUME_KEY = "xcannes_moonpay_resume_buy_v1";
 const MOONPAY_SELL_RESUME_KEY = "xcannes_moonpay_resume_sell_v1";
 const MOONPAY_AUTOOPEN_TAB_KEY = "xcannes_moonpay_autoopen_tab";
 const MOONPAY_SELL_FLOW_KEY = "xcannes_moonpay_sell_flow_v1";
 const MOONPAY_SELL_SOURCE_KEY = "xcannes_moonpay_sell_source_v1";
 const MOONPAY_WALLET_ADDRESS_KEY = "xcannes_moonpay_wallet_address_v1";
+const MOONPAY_BUY_RESUME_MAX_AGE_MS = 5 * 60 * 1000;
+
+function normalizeMovementKind(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function resolveIncomingXrpAmount(movement) {
+  const displayAmount = Number(movement?.displayAmount);
+  if (Number.isFinite(displayAmount) && displayAmount > 0) return displayAmount;
+  const amountXrp = Number(movement?.amountXrp);
+  if (Number.isFinite(amountXrp) && amountXrp > 0) return amountXrp;
+  const amount = Number(movement?.amount);
+  if (Number.isFinite(amount) && amount > 0) return amount;
+  const amountRlusd = Number(movement?.amountRlusd);
+  const fxRate = Number(movement?.fxRate);
+  if (Number.isFinite(amountRlusd) && amountRlusd > 0 && Number.isFinite(fxRate) && fxRate > 0) {
+    return amountRlusd / fxRate;
+  }
+  return Number.NaN;
+}
+
+function readMoonpayBuyResumeState(walletAddress) {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage?.getItem(MOONPAY_BUY_RESUME_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.v !== 1 || parsed.kind !== "buy") return null;
+    if (!parsed.awaitingXrpSwap) return null;
+    if (String(parsed.walletAddress || "") !== String(walletAddress || "")) return null;
+    const ageMs = Date.now() - Number(parsed.ts || 0);
+    if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > MOONPAY_BUY_RESUME_MAX_AGE_MS) {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveMoonpayBuyResumeState(nextState) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage?.setItem(
+      MOONPAY_BUY_RESUME_KEY,
+      JSON.stringify({ ...nextState, v: 1, kind: "buy", ts: Date.now() }),
+    );
+  } catch {
+    // ignore
+  }
+}
 
 function isTrustedMoonpayUrl(value) {
   try {
@@ -143,6 +196,7 @@ export default function WalletDashboard({
 
   const TX_ACTION_LABELS = useMemo(() => ({
     "wallet:convert": t("ui_tx_label_conversion", "Conversion"),
+    "wallet:swap": t("ui_tx_label_swap", "Swap XRPL"),
     "wallet:send": t("ui_tx_label_payment", "Paiement"),
     "moonpay:sell": t("ui_tx_label_moonpay_sell", "Envoi MoonPay"),
     "wallet:reconcile": t("ui_tx_label_reconciliation", "Réconciliation"),
@@ -539,6 +593,7 @@ export default function WalletDashboard({
   const { startMoonpaySellRequest } = sendState;
 
   const handledMoonpaySellRequestRef = useRef("");
+  const moonpayBuyAutoOpenRef = useRef("");
 
   useEffect(() => {
     const request = initialMoonpaySellRequest;
@@ -566,6 +621,151 @@ export default function WalletDashboard({
   }, [initialMoonpaySellRequest, setActiveAction, startMoonpaySellRequest]);
 
   useWalletIncomingToast({ backendWalletAddress, flashWalletHeaderToast });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isConnected || !wallet) return;
+    if (window.self !== window.top) return;
+
+    const resume = readMoonpayBuyResumeState(wallet);
+    if (!resume) {
+      moonpayBuyAutoOpenRef.current = "";
+      return;
+    }
+
+    const shouldAutoOpen =
+      !activeAction &&
+      Number.isFinite(Number(resume.detectedXrpAmount)) &&
+      Number(resume.detectedXrpAmount) > 0 &&
+      resume.preparedInboundSwap?.txjson;
+    if (!shouldAutoOpen) return;
+
+    const resumeKey =
+      String(resume.detectedXrpTxHash || "").trim() ||
+      String(resume.flowId || "").trim() ||
+      String(resume.ts || "").trim();
+    if (!resumeKey || moonpayBuyAutoOpenRef.current === resumeKey) return;
+
+    moonpayBuyAutoOpenRef.current = resumeKey;
+    setCashModalTab("buy");
+    setActiveAction("cash");
+  }, [activeAction, isConnected, setActiveAction, setCashModalTab, wallet]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isConnected || !wallet) return;
+    if (activeAction === "cash") return;
+
+    const resume = readMoonpayBuyResumeState(wallet);
+    if (!resume) return;
+    if (
+      Number.isFinite(Number(resume.detectedXrpAmount)) &&
+      Number(resume.detectedXrpAmount) > 0 &&
+      resume.preparedInboundSwap?.txjson
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+    const seenMovementIdRef = { current: "" };
+
+    const pollMoonpayBuySettlement = async () => {
+      if (cancelled) return;
+      const freshResume = readMoonpayBuyResumeState(wallet);
+      if (!freshResume) return;
+      if (
+        Number.isFinite(Number(freshResume.detectedXrpAmount)) &&
+        Number(freshResume.detectedXrpAmount) > 0 &&
+        freshResume.preparedInboundSwap?.txjson
+      ) {
+        return;
+      }
+
+      try {
+        const params = new URLSearchParams();
+        params.set("address", String(wallet || ""));
+        params.set("limit", "10");
+        params.set("source", "onchain");
+        const response = await fetch(apiUrl(`/wallet/statement?${params.toString()}`));
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) return;
+
+        const movements = Array.isArray(data?.movements) ? data.movements : [];
+        const incomingXrp = movements.find((movement) => {
+          const kind = normalizeMovementKind(movement?.kind);
+          if (kind !== "PAYMENT_IN" && kind !== "XRPL_PAYMENT_IN") return false;
+          const currencyCode = String(
+            movement?.toCurrencyCode || movement?.fromCurrencyCode || movement?.displayCurrency || "",
+          )
+            .trim()
+            .toUpperCase();
+          if (currencyCode !== "XRP") return false;
+          const movementId = String(
+            movement?.movementId || movement?._id || movement?.txHash || "",
+          ).trim();
+          if (movementId && movementId === seenMovementIdRef.current) return false;
+          const createdAtMs = movement?.createdAt
+            ? new Date(movement.createdAt).getTime()
+            : Number.NaN;
+          const awaitingXrpSince = Number(freshResume.awaitingXrpSince);
+          if (
+            Number.isFinite(awaitingXrpSince) &&
+            Number.isFinite(createdAtMs) &&
+            createdAtMs < awaitingXrpSince
+          ) {
+            return false;
+          }
+          return Number.isFinite(resolveIncomingXrpAmount(movement));
+        });
+
+        if (!incomingXrp) return;
+
+        const movementId = String(
+          incomingXrp?.movementId || incomingXrp?._id || incomingXrp?.txHash || "",
+        ).trim();
+        if (movementId) {
+          seenMovementIdRef.current = movementId;
+        }
+
+        const detectedAmount = resolveIncomingXrpAmount(incomingXrp);
+        if (!Number.isFinite(detectedAmount) || detectedAmount <= 0) return;
+
+        const preparedInboundSwap = await xcannesApi.prepareRlusdXrpSwap({
+          address: wallet,
+          direction: "XRP_TO_RLUSD",
+          amountXrp: detectedAmount,
+        });
+        if (cancelled) return;
+
+        const nextResume = {
+          ...freshResume,
+          detectedXrpAmount: detectedAmount,
+          detectedXrpTxHash: String(incomingXrp?.txHash || "").trim(),
+          preparedInboundSwap,
+        };
+        saveMoonpayBuyResumeState(nextResume);
+
+        if (!activeAction && window.self === window.top) {
+          const resumeKey =
+            String(nextResume.detectedXrpTxHash || "").trim() ||
+            String(nextResume.flowId || "").trim() ||
+            String(Date.now());
+          moonpayBuyAutoOpenRef.current = resumeKey;
+          setCashModalTab("buy");
+          setActiveAction("cash");
+        }
+      } catch {
+        // ignore transient partner/XRPL errors; next poll retries
+      }
+    };
+
+    pollMoonpayBuySettlement();
+    const intervalId = window.setInterval(pollMoonpayBuySettlement, 8000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [activeAction, isConnected, setActiveAction, setCashModalTab, wallet]);
 
   const flashRecentActivity = useCallback((message) => {
     const text = String(message || "").trim();
@@ -1043,6 +1243,7 @@ export default function WalletDashboard({
           {!isDesktopPanel ? (
             <WalletMobileModals
               {...modalProps}
+              signTransaction={signTransactionWithProgress}
               showSaveAddressPrompt={sendState.showSaveAddressPrompt}
               setShowSaveAddressPrompt={sendState.setShowSaveAddressPrompt}
               addressToSave={sendState.addressToSave}
@@ -1056,6 +1257,7 @@ export default function WalletDashboard({
           <WalletDesktopModals
             {...inlineFlags}
             {...modalProps}
+            signTransaction={signTransactionWithProgress}
             setDesktopSettingsPage={setDesktopSettingsPage}
           />
         ) : null}

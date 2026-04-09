@@ -67,6 +67,9 @@ function readMoonpaySellSourceState(flowId) {
       flowId: parsedFlowId || null,
       sourceCurrencyCode,
       sourceAmount,
+      sourceAmountRlusd: Number.isFinite(Number(parsed?.sourceAmountRlusd))
+        ? Number(parsed.sourceAmountRlusd)
+        : null,
       baseCurrencyCode: String(parsed?.baseCurrencyCode || "").trim().toUpperCase() || null,
       baseCurrencyAmount: Number.isFinite(Number(parsed?.baseCurrencyAmount))
         ? Number(parsed.baseCurrencyAmount)
@@ -226,6 +229,10 @@ export default function Wallet() {
         sourceAmount:
           sellSourceState?.sourceAmount != null
             ? String(sellSourceState.sourceAmount)
+            : null,
+        sourceAmountRlusd:
+          sellSourceState?.sourceAmountRlusd != null
+            ? String(sellSourceState.sourceAmountRlusd)
             : null,
       });
     } catch {

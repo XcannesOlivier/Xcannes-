@@ -225,6 +225,8 @@ function expandV2SimpleSwap(p) {
     exchangeId: p.id ?? p.exchangeId ?? null,
     targetCurrencyCode: p.tc ?? p.targetCurrencyCode ?? null,
     amountRlusd: p.r ?? p.amountRlusd,
+    sourceCurrencyCode: p.sc ?? p.sourceCurrencyCode ?? null,
+    sourceAmount: p.sa ?? p.sourceAmount,
   };
 }
 
@@ -460,10 +462,18 @@ function normalizeSimpleSwapPayload(payload, errors) {
 
   const exchangeId = normalizeString(payload?.exchangeId || payload?.id);
   const targetCurrencyCode = normalizeCurrencyCode(payload?.targetCurrencyCode || payload?.target);
+  const sourceCurrencyCode = normalizeCurrencyCode(payload?.sourceCurrencyCode);
+  if (payload?.sourceCurrencyCode != null && !sourceCurrencyCode) {
+    errors.push('simpleswap.sourceCurrencyCode');
+  }
+  const sourceAmountRes = parseOptionalNumber(payload?.sourceAmount, { min: 0, minExclusive: true });
+  if (!sourceAmountRes.ok) errors.push('simpleswap.sourceAmount');
 
   const normalized = { side, provider, amountRlusd: amountRlusdRes.value };
   if (exchangeId) normalized.exchangeId = exchangeId;
   if (targetCurrencyCode) normalized.targetCurrencyCode = targetCurrencyCode;
+  if (sourceCurrencyCode) normalized.sourceCurrencyCode = sourceCurrencyCode;
+  if (sourceAmountRes.provided) normalized.sourceAmount = sourceAmountRes.value;
   return normalized;
 }
 
@@ -627,6 +637,8 @@ function toV2Compact(type, body) {
     if (body.exchangeId) compact.id = body.exchangeId;
     if (body.targetCurrencyCode) compact.tc = body.targetCurrencyCode;
     if (body.amountRlusd != null) compact.r = body.amountRlusd;
+    if (body.sourceCurrencyCode) compact.sc = body.sourceCurrencyCode;
+    if (body.sourceAmount != null) compact.sa = body.sourceAmount;
   } else if (type === 'reconcile') {
     compact.d = body.deficit;
     if (body.operations && body.operations.length > 0) {

@@ -34,6 +34,7 @@ export default function WalletDashboardCashModal({
   renderWalletMeta,
   walletLabel = "",
   preferredFiatCurrency = "",
+  signTransaction = null,
   availableTokens,
   rlusdPerUnitRates,
   selectLabelByCurrency,
@@ -365,6 +366,7 @@ export default function WalletDashboardCashModal({
 	                      onClose={onClose}
 	                      walletAddress={walletAddress || ""}
 	                      walletLabel={walletLabel}
+                        signTransaction={signTransaction}
 	                      preferredFiatCurrency={preferredFiatCurrency}
                         onProceedToUsdSwapOut={onOpenUsdSwapOut}
 	                      embedded={true}

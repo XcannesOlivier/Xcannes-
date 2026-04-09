@@ -54,6 +54,7 @@ export default function WalletDesktopModals({
   activationRequestModalProps,
   infoModalProps,
   statementSharedProps,
+  signTransaction,
 
   // open/close handlers
   activeAction,
@@ -229,6 +230,7 @@ export default function WalletDesktopModals({
           }
           initialAmount={usdSwapPrefillAmount}
           accentVariant={usdSwapAccentVariant}
+          signTransaction={signTransaction}
         />
       ) : null}
 
@@ -242,6 +244,7 @@ export default function WalletDesktopModals({
             setCashBuyPrefill(null);
           }}
           {...cashModalProps}
+          signTransaction={signTransaction}
           availableTokens={augmentedTokens}
           onOpenUsdSwapOut={openUsdSwapOut}
         />

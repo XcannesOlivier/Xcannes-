@@ -1,4 +1,5 @@
 import { buildRlusdPaymentTxjson } from "@/utils/walletSpread";
+import xcannesApi from "@/lib/xcannesApi";
 import {
   buildMoonpayMemo,
   buildSimpleSwapMemo,
@@ -59,9 +60,31 @@ const isMoonpaySellDestination = (address) => {
   return dest && MOONPAY_SELL_WALLETS.has(dest);
 };
 
+const buildXrpPaymentTxjson = ({ account, destination, amountXrp }) => {
+  const normalizedAmount = Number(amountXrp);
+  if (!account || !destination) return null;
+  if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) return null;
+  return {
+    TransactionType: "Payment",
+    Account: account,
+    Destination: destination,
+    Amount: String(Math.round(normalizedAmount * 1_000_000)),
+  };
+};
+
+const requiresMoonpaySwap = (request) => {
+  const baseCurrency = String(request?.baseCurrencyCode || "")
+    .trim()
+    .toUpperCase();
+  const sourceCurrency = String(request?.sourceCurrencyCode || "")
+    .trim()
+    .toUpperCase();
+  return Boolean(baseCurrency === "XRP" && sourceCurrency && sourceCurrency !== "XRP");
+};
+
 const buildSimpleSwapOutMemos = (
   destination,
-  { amountRlusd, targetCurrencyCode = "USD" } = {},
+  { amountRlusd, targetCurrencyCode = "USD", sourceCurrencyCode = null, sourceAmount = null } = {},
 ) => {
   const dest = String(destination || "").trim();
   if (!dest) return null;
@@ -77,9 +100,92 @@ const buildSimpleSwapOutMemos = (
     exchangeId: hit?.exchangeId || null,
     targetCurrencyCode,
     amountRlusd: Number.isFinite(Number(amountRlusd)) ? Number(amountRlusd) : null,
+    sourceCurrencyCode:
+      String(sourceCurrencyCode || hit?.sourceCurrencyCode || "")
+        .trim()
+        .toUpperCase() || null,
+    sourceAmount:
+      Number.isFinite(Number(sourceAmount || hit?.sourceAmount)) &&
+      Number(sourceAmount || hit?.sourceAmount) > 0
+        ? Number(sourceAmount || hit?.sourceAmount)
+        : null,
   });
+  if (!payload && Number.isFinite(Number(hit?.amountRlusd)) && Number(hit?.amountRlusd) > 0) {
+    return buildXrplJsonMemo(
+      buildSimpleSwapMemo({
+        side: "out",
+        provider: "simpleswap",
+        exchangeId: hit?.exchangeId || null,
+        targetCurrencyCode:
+          String(targetCurrencyCode || hit?.targetCurrencyCode || "USD")
+            .trim()
+            .toUpperCase() || "USD",
+        amountRlusd: Number(hit.amountRlusd),
+        sourceCurrencyCode:
+          String(sourceCurrencyCode || hit?.sourceCurrencyCode || "")
+            .trim()
+            .toUpperCase() || null,
+        sourceAmount:
+          Number.isFinite(Number(sourceAmount || hit?.sourceAmount)) &&
+          Number(sourceAmount || hit?.sourceAmount) > 0
+            ? Number(sourceAmount || hit?.sourceAmount)
+            : null,
+      }),
+    );
+  }
   if (!payload) return null;
   return buildXrplJsonMemo(payload);
+};
+
+const resolveMoonpaySellSourceAmountRlusd = ({
+  request,
+  currency,
+  amountNum,
+  selectedSendToken,
+  rlusdPerUnitRates,
+} = {}) => {
+  const fromRequest = Number(request?.sourceAmountRlusd);
+  if (Number.isFinite(fromRequest) && fromRequest > 0) return fromRequest;
+  const upperCurrency = String(currency || "").trim().toUpperCase();
+  if (upperCurrency === "RLUSD" || upperCurrency === "USD") {
+    return Number.isFinite(amountNum) && amountNum > 0 ? amountNum : Number.NaN;
+  }
+  if (!selectedSendToken?.isTrustlineOnly) return Number.NaN;
+  const rate = Number(rlusdPerUnitRates?.[upperCurrency]);
+  if (!Number.isFinite(rate) || rate <= 0) return Number.NaN;
+  return Number.isFinite(amountNum) && amountNum > 0 ? amountNum * rate : Number.NaN;
+};
+
+const buildMoonpaySellDestinationPayment = ({
+  wallet,
+  destination,
+  amountXrp,
+  moonpaySellRequest,
+} = {}) => {
+  const txjson = buildXrpPaymentTxjson({
+    account: wallet,
+    destination,
+    amountXrp,
+  });
+  if (!txjson) return null;
+  appendMemos(
+    txjson,
+    buildMoonpaySellMemos(
+      destination,
+      {
+        currency: "XRP",
+        amount: amountXrp,
+        amountRlusd: null,
+        sourceCurrencyCode: moonpaySellRequest?.sourceCurrencyCode ?? "RLUSD",
+        sourceAmount:
+          moonpaySellRequest?.sourceAmount ??
+          moonpaySellRequest?.sourceAmountRlusd ??
+          null,
+      },
+      { force: true },
+    ),
+  );
+  return txjson;
 };
 
 const buildMoonpaySellMemos = (
@@ -248,6 +354,7 @@ export function useSendTransaction({
 
     const currency = String(selectedSendToken.currency || "").toUpperCase();
     const isMoonpaySell = Boolean(moonpaySellRequest?.depositWalletAddress);
+    const shouldPrepareMoonpaySwap = isMoonpaySell && requiresMoonpaySwap(moonpaySellRequest);
     // USD (pool non alloué) est envoyé comme RLUSD natif, pas comme une conversion FX.
     const isFxSend =
       !isMoonpaySell &&
@@ -262,6 +369,15 @@ export function useSendTransaction({
     }
 
     try {
+      if (shouldPrepareMoonpaySwap) {
+        return await handleMoonpaySellWithSwap({
+          amountNum,
+          dest,
+          currency,
+          handleAddressSave,
+        });
+      }
+
       if (isFxSend) {
         return await handleFxSend({
           amountNum,
@@ -293,6 +409,89 @@ export function useSendTransaction({
       setSendProcessing(false);
     }
   };
+
+  async function handleMoonpaySellWithSwap({
+    amountNum,
+    dest,
+    currency,
+    handleAddressSave,
+  }) {
+    const sourceAmountRlusd = resolveMoonpaySellSourceAmountRlusd({
+      request: moonpaySellRequest,
+      currency,
+      amountNum,
+      selectedSendToken,
+      rlusdPerUnitRates,
+    });
+    if (!Number.isFinite(sourceAmountRlusd) || sourceAmountRlusd <= 0) {
+      toast.error("Impossible de calculer le montant RLUSD à swapper pour MoonPay.");
+      return { ok: false };
+    }
+
+    const preparedSwap = await xcannesApi.prepareRlusdXrpSwap({
+      address: typeof wallet === "string" ? wallet : wallet?.address || "",
+      direction: "RLUSD_TO_XRP",
+      amountRlusd: sourceAmountRlusd,
+    });
+    const payoutXrp = Number(preparedSwap?.quote?.xrpAmount);
+    if (!Number.isFinite(payoutXrp) || payoutXrp <= 0) {
+      throw new Error("MoonPay swap preparation returned an invalid XRP amount.");
+    }
+
+    const swapResult = await signTransaction(preparedSwap.txjson, {
+      action: "wallet:swap",
+      progressDetails: {
+        amountLabel: `${sourceAmountRlusd.toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} RLUSD → XRP`,
+        beneficiaryLabel: "MoonPay",
+        beneficiaryAddress: dest,
+      },
+    });
+    if (!swapResult?.signed) {
+      toast.warn("Swap XRPL annulé ou expiré.");
+      return { ok: false };
+    }
+
+    const paymentTx = buildMoonpaySellDestinationPayment({
+      wallet,
+      destination: dest,
+      amountXrp:
+        Number.isFinite(Number(moonpaySellRequest?.baseCurrencyAmount)) &&
+        Number(moonpaySellRequest?.baseCurrencyAmount) > 0
+          ? Number(moonpaySellRequest.baseCurrencyAmount)
+          : payoutXrp,
+      moonpaySellRequest,
+    });
+    if (!paymentTx) {
+      throw new Error("Failed to build MoonPay XRP payment.");
+    }
+
+    const result = await signTransaction(paymentTx, {
+      action: "moonpay:sell",
+      progressDetails: {
+        amountLabel: `${Number(moonpaySellRequest?.baseCurrencyAmount || payoutXrp).toLocaleString("en-US", {
+          maximumFractionDigits: 6,
+        })} XRP`,
+        beneficiaryLabel: "MoonPay",
+        beneficiaryAddress: dest,
+        moonpayReturnUrl: String(moonpaySellRequest?.returnUrl || "").trim(),
+      },
+    });
+
+    if (result?.signed) {
+      toast.success("✅ Paiement MoonPay soumis.");
+      handleAddressSave(dest);
+      setSendAmount("");
+      setSendDestination("");
+      setSendPaymentRequest(null);
+      clearMoonpaySellRequest?.();
+      return { ok: true };
+    }
+
+    toast.warn("Paiement MoonPay annulé ou expiré après le swap XRPL.");
+    return { ok: false };
+  }
 
   // ------------------------------------------------------------------
   // FX send — single RLUSD transaction (no spread fee on sends)
@@ -421,6 +620,8 @@ export function useSendTransaction({
     const simpleSwapMemo = buildSimpleSwapOutMemos(dest, {
       amountRlusd: paymentRlusd,
       targetCurrencyCode: "USD",
+      sourceCurrencyCode: currency,
+      sourceAmount: amountNum,
     });
     const usedSimpleSwap = Boolean(simpleSwapMemo);
     appendMemos(payTx, simpleSwapMemo);
@@ -589,13 +790,12 @@ export function useSendTransaction({
         sourceAmount: moonpaySellRequest?.sourceAmount ?? amountNum,
       }, { force: isMoonpaySell }),
     );
-    const directSimpleSwapMemo =
-      currency === "RLUSD" || currency === "USD"
-        ? buildSimpleSwapOutMemos(dest, {
-            amountRlusd: amountNum,
-            targetCurrencyCode: "USD",
-          })
-        : null;
+    const directSimpleSwapMemo = buildSimpleSwapOutMemos(dest, {
+      amountRlusd: currency === "RLUSD" || currency === "USD" ? amountNum : null,
+      targetCurrencyCode: "USD",
+      sourceCurrencyCode: currency,
+      sourceAmount: amountNum,
+    });
     const usedDirectSimpleSwap = Boolean(directSimpleSwapMemo);
     appendMemos(txjson, directSimpleSwapMemo);
     appendMemos(

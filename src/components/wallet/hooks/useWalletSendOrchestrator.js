@@ -62,6 +62,16 @@ export function useWalletSendOrchestrator({
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
   const [addressToSave, setAddressToSave] = useState("");
   const [moonpaySellRequest, setMoonpaySellRequest] = useState(null);
+  const activeMoonpaySourceCurrency = useMemo(() => {
+    const sourceCurrency = String(moonpaySellRequest?.sourceCurrencyCode || "")
+      .trim()
+      .toUpperCase();
+    const baseCurrency = String(moonpaySellRequest?.baseCurrencyCode || "")
+      .trim()
+      .toUpperCase();
+    if (sourceCurrency && sourceCurrency !== baseCurrency) return sourceCurrency;
+    return baseCurrency;
+  }, [moonpaySellRequest]);
 
   // ── Receive form ───────────────────────────────────────────
   const [receiveTab, setReceiveTab] = useState("receive");
@@ -90,9 +100,7 @@ export function useWalletSendOrchestrator({
 
   // ── Selected send token ────────────────────────────────────
   const selectedSendToken = useMemo(() => {
-    const activeCurrency = String(moonpaySellRequest?.baseCurrencyCode || "")
-      .trim()
-      .toUpperCase();
+    const activeCurrency = activeMoonpaySourceCurrency;
     const activePool = moonpaySellRequest ? augmentedTokens : selectableTokens;
     const byKey = (activePool || []).find((tok) => tok.key === sendAssetKey);
     if (byKey) return byKey;
@@ -103,7 +111,13 @@ export function useWalletSendOrchestrator({
       if (byCurrency) return byCurrency;
     }
     return (activePool || [])[0] || null;
-  }, [augmentedTokens, moonpaySellRequest, selectableTokens, sendAssetKey]);
+  }, [
+    activeMoonpaySourceCurrency,
+    augmentedTokens,
+    moonpaySellRequest,
+    selectableTokens,
+    sendAssetKey,
+  ]);
 
   // ── Send FX info ───────────────────────────────────────────
   const sendFxInfo = useMemo(() => {
@@ -243,11 +257,22 @@ export function useWalletSendOrchestrator({
   const startMoonpaySellRequest = useCallback(
     (request) => {
       if (!request) return false;
-      const currency = String(request?.baseCurrencyCode || "")
+      const baseCurrency = String(request?.baseCurrencyCode || "")
         .trim()
         .toUpperCase();
+      const sourceCurrency = String(request?.sourceCurrencyCode || "")
+        .trim()
+        .toUpperCase();
+      const currency =
+        sourceCurrency && sourceCurrency !== baseCurrency
+          ? sourceCurrency
+          : baseCurrency;
       const destination = String(request?.depositWalletAddress || "").trim();
-      const amount = String(request?.baseCurrencyAmount || "").trim();
+      const amount = String(
+        sourceCurrency && sourceCurrency !== baseCurrency
+          ? request?.sourceAmount
+          : request?.baseCurrencyAmount,
+      ).trim();
       if (!currency || !destination || !amount) return false;
 
       const matchingToken = (augmentedTokens || []).find(
