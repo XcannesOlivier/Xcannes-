@@ -316,6 +316,8 @@ export default function WalletDashboardUsdSwapModal({
   accentVariant = "",
   sourceSelectionMode = "",
   initialSourceCurrency = "",
+  targetSelectionMode = "",
+  initialTargetCurrency = "",
   titleOverride = "",
   subtitleOverride = "",
   availableTokens = [],
@@ -560,18 +562,23 @@ export default function WalletDashboardUsdSwapModal({
     if (!stableKey) return null;
     return currencies.find((c) => currencyKey(c) === stableKey) || null;
   }, [currencies, stableKey]);
-  const totalSteps = 3;
-  const currentStepIndex =
+  const walletSourceSelectionEnabled =
+    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
+    String(sourceSelectionMode || "").trim().toLowerCase() === "wallet";
+  const walletTargetSelectionEnabled =
+    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD &&
+    String(targetSelectionMode || "").trim().toLowerCase() === "wallet";
+  const walletInlineSelectionEnabled =
+    walletSourceSelectionEnabled || walletTargetSelectionEnabled;
+  const totalStepsResolved = walletTargetSelectionEnabled ? 2 : 3;
+  const currentStepIndexResolved =
     step === "form"
       ? 1
       : step === "address"
         ? 2
-        : totalSteps;
-  const walletSourceSelectionEnabled =
-    direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
-    String(sourceSelectionMode || "").trim().toLowerCase() === "wallet";
+        : totalStepsResolved;
   const sourceCurrencyOptions = useMemo(() => {
-    if (!walletSourceSelectionEnabled) return [];
+    if (!walletInlineSelectionEnabled) return [];
     const seen = new Set();
     const orderedTokens = [
       ...availableTokens.filter((token) => String(token?.currency || "").toUpperCase() === "RLUSD"),
@@ -625,7 +632,7 @@ export default function WalletDashboardUsdSwapModal({
     selectIconByCurrency,
     selectLabelByCurrency,
     selectLabelRightByCurrency,
-    walletSourceSelectionEnabled,
+    walletInlineSelectionEnabled,
   ]);
   const filteredSourceCurrencyOptions = useMemo(() => {
     const needle = String(sourceSearch || "").trim().toLowerCase();
@@ -650,10 +657,10 @@ export default function WalletDashboardUsdSwapModal({
   const selectedSourceCurrencyCode = String(selectedSourceOption?.code || "RLUSD").toUpperCase();
   const selectedSourceAmount = parsedAmount;
   const selectedSourceIsCurrencyLine =
-    walletSourceSelectionEnabled && selectedSourceCurrencyCode !== "RLUSD"
+    walletInlineSelectionEnabled && selectedSourceCurrencyCode !== "RLUSD"
       ? Boolean(selectedSourceOption?.isTrustlineOnly)
       : false;
-  const selectedSourceRlusdRate = !walletSourceSelectionEnabled
+  const selectedSourceRlusdRate = !walletInlineSelectionEnabled
     ? 1
     : selectedSourceCurrencyCode === "RLUSD" || selectedSourceCurrencyCode === "USD"
       ? 1
@@ -701,6 +708,12 @@ export default function WalletDashboardUsdSwapModal({
     direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE &&
     Number.isFinite(selectedSourceAmount) &&
     selectedSourceAmount > 0 &&
+    selectedSourceCurrencyCode !== "RLUSD" &&
+    selectedSourceCurrencyCode !== "USD" &&
+    (!Number.isFinite(selectedSourceRlusdRate) || selectedSourceRlusdRate <= 0);
+  const targetConversionMissing =
+    walletTargetSelectionEnabled &&
+    hasValidAmount &&
     selectedSourceCurrencyCode !== "RLUSD" &&
     selectedSourceCurrencyCode !== "USD" &&
     (!Number.isFinite(selectedSourceRlusdRate) || selectedSourceRlusdRate <= 0);
@@ -761,9 +774,35 @@ export default function WalletDashboardUsdSwapModal({
     t,
   ]);
   const hasReceiveAddressValidationError = Boolean(receiveAddressErrorMessage);
-  const outboundTitle =
+  const flowTitle =
     String(titleOverride || "").trim() ||
-    t("ui_swap_title_out", "RLUSD → stablecoin USD");
+    (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+      ? t("ui_swap_title_in_wallet", "Recevoir des stablecoins")
+      : t("ui_swap_title_out", "RLUSD → stablecoin USD"));
+  const flowSubtitle =
+    String(subtitleOverride || "").trim() ||
+    (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
+      ? t(
+          "ui_swap_subtitle_in_wallet",
+          "Choisissez le stablecoin, le montant puis la devise XCANNES créditée sur votre wallet.",
+        )
+      : t(
+          "ui_swap_subtitle_out",
+          "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
+        ));
+  const walletSelectorDialogTitle = t(
+    "ui_choose_wallet_currency",
+    "Choisir une devise XCANNES",
+  );
+  const walletSelectorDialogSubtitle = walletTargetSelectionEnabled
+    ? t(
+        "ui_choose_wallet_currency_target_subtitle",
+        "Sélectionnez la devise créditée sur votre wallet.",
+      )
+    : t(
+        "ui_choose_wallet_currency_subtitle",
+        "Sélectionnez l’actif source du wallet.",
+      );
 
   const quotedReceiveAmount = useMemo(() => parseSimpleSwapEstimateAmount(quote), [quote]);
   const quotedPartnerReceiveAmount = useMemo(() => {
@@ -834,6 +873,31 @@ export default function WalletDashboardUsdSwapModal({
       : hasValidAmount
         ? parsedAmount
         : Number.NaN;
+  const quotedWalletReceiveAmount = useMemo(() => {
+    if (!walletTargetSelectionEnabled) return quotedReceiveAmount;
+    if (!Number.isFinite(Number(quotedReceiveAmount)) || Number(quotedReceiveAmount) <= 0) {
+      return null;
+    }
+    if (selectedSourceCurrencyCode === "RLUSD" || selectedSourceCurrencyCode === "USD") {
+      return Number(quotedReceiveAmount);
+    }
+    if (Number.isFinite(selectedSourceRlusdRate) && selectedSourceRlusdRate > 0) {
+      return Number(quotedReceiveAmount) / selectedSourceRlusdRate;
+    }
+    return null;
+  }, [
+    quotedReceiveAmount,
+    selectedSourceCurrencyCode,
+    selectedSourceRlusdRate,
+    walletTargetSelectionEnabled,
+  ]);
+  const receiveDisplayAmount = walletTargetSelectionEnabled
+    ? quotedWalletReceiveAmount
+    : quotedReceiveAmount;
+  const receiveApproxUsdAmount =
+    direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && walletTargetSelectionEnabled
+      ? quotedReceiveAmount
+      : quotedReceiveAmount;
 
   useEffect(() => {
     if (!open) return;
@@ -1113,8 +1177,12 @@ export default function WalletDashboardUsdSwapModal({
 
   useEffect(() => {
     if (!open) return;
-    if (!walletSourceSelectionEnabled) return;
-    const initial = String(initialSourceCurrency || "").trim().toUpperCase();
+    if (!walletInlineSelectionEnabled) return;
+    const initial = String(
+      walletTargetSelectionEnabled ? initialTargetCurrency : initialSourceCurrency,
+    )
+      .trim()
+      .toUpperCase();
     if (
       initial &&
       sourceCurrencyOptions.some(
@@ -1131,7 +1199,14 @@ export default function WalletDashboardUsdSwapModal({
           : sourceCurrencyOptions[0].code,
       );
     }
-  }, [initialSourceCurrency, open, sourceCurrencyOptions, walletSourceSelectionEnabled]);
+  }, [
+    initialSourceCurrency,
+    initialTargetCurrency,
+    open,
+    sourceCurrencyOptions,
+    walletInlineSelectionEnabled,
+    walletTargetSelectionEnabled,
+  ]);
 
   useEffect(() => {
     if (!stableDropdownOpen) return;
@@ -2545,7 +2620,7 @@ export default function WalletDashboardUsdSwapModal({
                 ) : null}
               </div>
 
-              {direction !== SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+              {direction !== SWAP_DIRECTIONS.RLUSD_TO_STABLE && !walletTargetSelectionEnabled ? (
                 <div className="mt-3 min-w-0">
                   <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
                     {t("ui_swap_title_in", "Stablecoin USD → RLUSD")}
@@ -2576,7 +2651,7 @@ export default function WalletDashboardUsdSwapModal({
               <div className="space-y-5">
                 <div className="flex items-center gap-3 px-1">
 	                  <span className={`inline-flex items-center justify-center rounded-full text-xs font-semibold px-2.5 py-1 ${accentBadge}`}>
-	                    {currentStepIndex}/{totalSteps}
+	                    {currentStepIndexResolved}/{totalStepsResolved}
 	                  </span>
                   <div className="text-sm text-white/80 font-semibold">
                     {t("ui_transfer_deposit", "Transférer le dépôt")}
@@ -2805,22 +2880,24 @@ export default function WalletDashboardUsdSwapModal({
               </div>
             ) : (
               <div className="space-y-5">
-			                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+			                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 		                    <div
                           className={[
                             "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
                             accentShadowPanel,
                           ].join(" ")}
                         >
-	                      {walletSourceSelectionEnabled ? (
+	                      {walletInlineSelectionEnabled ? (
 	                        <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
 	                          <span className="text-[20px] tracking-[0.14em]">
-	                            {outboundTitle}
+	                            {flowTitle}
 	                          </span>
 	                        </p>
 	                      ) : (
                         <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                          {t("moonpay_from_account", "Depuis le compte")}
+                          {walletTargetSelectionEnabled
+                            ? t("moonpay_destination_wallet", "Vers le compte")
+                            : t("moonpay_from_account", "Depuis le compte")}
                         </p>
                       )}
                       {String(walletLabel || "").trim() ? (
@@ -2842,21 +2919,17 @@ export default function WalletDashboardUsdSwapModal({
                     </div>
                   ) : null}
 
-                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
                   <div className="px-1">
-                    {!walletSourceSelectionEnabled ? (
+                    {!walletInlineSelectionEnabled ? (
                       <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                        {outboundTitle}
+                        {flowTitle}
                       </h3>
                     ) : null}
                     <p
-                      className={`${walletSourceSelectionEnabled ? "" : "mt-1 "}text-[15px] md:text-sm leading-snug text-white/85`}
+                      className={`${walletInlineSelectionEnabled ? "" : "mt-1 "}text-[15px] md:text-sm leading-snug text-white/85`}
                     >
-                      {String(subtitleOverride || "").trim() ||
-                        t(
-                          "ui_swap_subtitle_out",
-                          "Recevez un stablecoin USD (multi-chain) sur une autre adresse via SimpleSwap.",
-                        )}
+                      {flowSubtitle}
                     </p>
                   </div>
                 ) : null}
@@ -2944,7 +3017,7 @@ export default function WalletDashboardUsdSwapModal({
                                   type="button"
                                   onClick={() => {
                                     setStableDropdownOpen(false);
-                                    setSearch("");
+                                    setSourceSearch("");
                                     setSourceDropdownOpen((prev) => !prev);
                                   }}
                                   aria-expanded={sourceDropdownOpen}
@@ -3023,7 +3096,7 @@ export default function WalletDashboardUsdSwapModal({
                           </div>
                         </div>
 
-                        {minFromAmount || maxFromAmount ? (
+                        {hasValidAmount && amountOutOfRange && (minFromAmount || maxFromAmount) ? (
                           <div className="mt-2 flex items-center justify-between gap-3 text-[11px] text-white/45">
                             <div className="min-w-0 truncate">
                               {minFromAmount
@@ -3052,6 +3125,14 @@ export default function WalletDashboardUsdSwapModal({
                             {t(
                               "ui_rate_unavailable_base_5c1a9b7d2e",
                               "Rate unavailable for base currency.",
+                            )}
+                          </div>
+                        ) : null}
+                        {walletTargetSelectionEnabled && targetConversionMissing ? (
+                          <div className="mt-2 text-[11px] text-red-200">
+                            {t(
+                              "ui_rate_unavailable_quote_f31d9f6c4a",
+                              "Rate unavailable for credited wallet currency.",
                             )}
                           </div>
                         ) : null}
@@ -3141,6 +3222,41 @@ export default function WalletDashboardUsdSwapModal({
 
                                   {/* Portal content rendered once above (stableDropdownOpen) */}
                                 </div>
+                              ) : walletTargetSelectionEnabled ? (
+                                <div ref={sourceDropdownRef}>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setStableDropdownOpen(false);
+                                      setSourceSearch("");
+                                      setSourceDropdownOpen((prev) => !prev);
+                                    }}
+                                    aria-expanded={sourceDropdownOpen}
+                                    className="inline-flex items-center gap-2 rounded-full bg-black/30 ring-1 ring-white/10 px-3 py-1.5 text-white/85 hover:bg-black/40 transition-colors"
+                                  >
+                                    <span className="shrink-0">
+                                      {renderWalletOptionIcon(selectedSourceOption?.icon)}
+                                    </span>
+                                    <span className="text-sm font-semibold">
+                                      {selectedSourceOption?.label || selectedSourceCurrencyCode}
+                                    </span>
+                                    <span className="text-white/70 font-mono tabular-nums text-sm">
+                                      {selectedSourceOption?.labelRight || ""}
+                                    </span>
+                                    <svg
+                                      className="w-4 h-4 flex-shrink-0"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                      aria-hidden
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+                                </div>
                               ) : (
                                 <div className="inline-flex items-center gap-2 text-white/90">
                                   <img
@@ -3169,11 +3285,11 @@ export default function WalletDashboardUsdSwapModal({
                           <div className="mt-2 flex items-end justify-between gap-3">
                             <div className="text-white text-4xl md:text-5xl font-semibold tracking-tight truncate">
                               {hasValidAmount ? (
-                                quotedReceiveAmount ? (
+                                receiveDisplayAmount ? (
                                   `≈${
                                     formatAmountNumber
-                                      ? formatAmountNumber.format(quotedReceiveAmount)
-                                      : String(quotedReceiveAmount)
+                                      ? formatAmountNumber.format(receiveDisplayAmount)
+                                      : String(receiveDisplayAmount)
                                   }`
                                 ) : quoteLoading ? (
                                   "…"
@@ -3185,8 +3301,8 @@ export default function WalletDashboardUsdSwapModal({
                               )}
                             </div>
                             <div className="text-sm text-white/50 whitespace-nowrap pb-1">
-                              {hasValidAmount && quotedReceiveAmount
-                                ? `~${formatUsdNumber ? formatUsdNumber.format(quotedReceiveAmount) : Number(quotedReceiveAmount).toFixed(2)}$`
+                              {hasValidAmount && receiveApproxUsdAmount
+                                ? `~${formatUsdNumber ? formatUsdNumber.format(receiveApproxUsdAmount) : Number(receiveApproxUsdAmount).toFixed(2)}$`
                                 : ""}
                             </div>
                           </div>
@@ -3667,13 +3783,10 @@ export default function WalletDashboardUsdSwapModal({
                                 <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-white/10">
                                   <div className="min-w-0">
                                     <div className="text-white font-semibold text-base leading-tight truncate">
-                                      {t("ui_choose_wallet_currency", "Choisir une devise XCANNES")}
+                                      {walletSelectorDialogTitle}
                                     </div>
                                     <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
-                                      {t(
-                                        "ui_choose_wallet_currency_subtitle",
-                                        "Sélectionnez l’actif source du wallet.",
-                                      )}
+                                      {walletSelectorDialogSubtitle}
                                     </div>
                                   </div>
                                   <button
@@ -3828,13 +3941,10 @@ export default function WalletDashboardUsdSwapModal({
                                   <div className="flex items-center justify-between gap-3 px-4 py-4">
                                     <div className="min-w-0">
                                       <div className="text-white font-semibold text-base leading-tight truncate">
-                                        {t("ui_choose_wallet_currency", "Choisir une devise XCANNES")}
+                                        {walletSelectorDialogTitle}
                                       </div>
                                       <div className={`mt-0.5 text-[11px] truncate ${accentText80}`}>
-                                        {t(
-                                          "ui_choose_wallet_currency_subtitle",
-                                          "Sélectionnez l’actif source du wallet.",
-                                        )}
+                                        {walletSelectorDialogSubtitle}
                                       </div>
                                     </div>
                                     <button
@@ -3945,7 +4055,7 @@ export default function WalletDashboardUsdSwapModal({
                           )
                       : null}
 
-		                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
+		                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && !walletTargetSelectionEnabled ? (
 		                      <div
                           className={[
                             "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
@@ -3981,24 +4091,30 @@ export default function WalletDashboardUsdSwapModal({
                         amountOutOfRange ||
                         insufficientSourceBalance ||
                         sourceConversionMissing ||
+                        targetConversionMissing ||
                         hasReceiveAddressValidationError ||
                         pairUnavailable ||
                         !fromCurrency ||
                         !toCurrency ||
                         !stableCurrency ||
-                        (walletSourceSelectionEnabled && !selectedSourceOption)
+                        ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) &&
+                          !selectedSourceOption)
                       }
                       onClick={() => {
                         setApiError("");
                         setStableDropdownOpen(false);
                         setSearch("");
+                        if (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && walletTargetSelectionEnabled) {
+                          createExchange({ returnStep: "form" });
+                          return;
+                        }
                         setStep("address");
                       }}
 	                      className={`w-full text-xl py-4 ${actionBtnBase}`}
 	                    >
 		                      {t("ui_action_continue", "Continuer")}
 		                    </button>
-	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
+	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 	                      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
 	                        <span>
 	                          {t(
@@ -4032,7 +4148,7 @@ export default function WalletDashboardUsdSwapModal({
                   <>
                     <div className="flex items-center gap-3 px-1">
 	                      <span className={`inline-flex items-center justify-center rounded-full text-xs font-semibold px-2.5 py-1 ${accentBadge}`}>
-	                        {currentStepIndex}/{totalSteps}
+	                        {currentStepIndexResolved}/{totalStepsResolved}
 	                      </span>
                       <div className="text-sm text-white/80 font-semibold">
                         {t("ui_enter_address", "Entrer l’adresse")}

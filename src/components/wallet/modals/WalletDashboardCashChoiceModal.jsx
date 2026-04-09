@@ -100,26 +100,26 @@ export default function WalletDashboardCashChoiceModal({
     <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
         d="M10 18l14-8 14 8"
-        className="stroke-white/65"
+        className="stroke-xcannes-violet/80"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14 18h20"
-        className="stroke-white/65"
+        className="stroke-xcannes-violet/80"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M16 18v16m6-16v16m6-16v16m6-16v16"
-        className="stroke-white/45"
+        className="stroke-xcannes-violet/60"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M12 34h24"
-        className="stroke-white/65"
+        className="stroke-xcannes-violet/80"
         strokeWidth="2"
         strokeLinecap="round"
       />
@@ -136,12 +136,12 @@ export default function WalletDashboardCashChoiceModal({
 	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
         d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
-        className="fill-white/5 stroke-white/25"
+        className="fill-[#0870f8]/8 stroke-[#0870f8]/35"
         strokeWidth="1.5"
       />
       <path
         d="M14 20h20c2.2 0 4 1.8 4 4v0H28c-2.2 0-4 1.8-4 4v0H14"
-        className="stroke-white/35"
+        className="stroke-[#0870f8]/55"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
@@ -160,7 +160,7 @@ export default function WalletDashboardCashChoiceModal({
 	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
 	      <path
 	        d="M10 22l28-12-10 28-6-10-12-6Z"
-	        className="fill-white/5 stroke-white/35"
+	        className="fill-[#ff6a00]/8 stroke-[#ff6a00]/45"
 	        strokeWidth="1.5"
 	        strokeLinejoin="round"
 	      />
@@ -172,7 +172,7 @@ export default function WalletDashboardCashChoiceModal({
 	      />
 	      <path
 	        d="M22 28l0 10"
-	        className="stroke-white/25"
+	        className="stroke-[#ff6a00]/45"
         strokeWidth="1.5"
         strokeLinecap="round"
       />

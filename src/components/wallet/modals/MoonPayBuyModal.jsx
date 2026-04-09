@@ -1695,7 +1695,7 @@ const MoonPayBuyModal = ({
 			                        <div className="flex items-start justify-between gap-3 px-4 py-4 border-b border-white/10">
 			                          <div className="min-w-0">
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
-			                              {t("moonpay_buy_select_asset", "Ajouter de l’argent")}
+			                              {t("moonpay_buy_select_asset", "Augmenter vos soldes")}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">
 			                              {t("ui_search", "Rechercher…")}
@@ -1864,7 +1864,7 @@ const MoonPayBuyModal = ({
 			                            <div className="text-white font-semibold text-base leading-tight truncate">
 			                              {t(
 			                                "moonpay_buy_select_asset",
-				                                "Ajouter de l’argent",
+				                                "Augmenter vos soldes",
 				                              )}
 			                            </div>
 			                            <div className="mt-0.5 text-[11px] text-white/55 truncate">

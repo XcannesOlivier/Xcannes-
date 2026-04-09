@@ -80,6 +80,8 @@ export default function WalletMobileModals({
   const [usdSwapAccentVariant, setUsdSwapAccentVariant] = useState("");
   const [usdSwapSourceSelectionMode, setUsdSwapSourceSelectionMode] = useState("");
   const [usdSwapInitialSourceCurrency, setUsdSwapInitialSourceCurrency] = useState("");
+  const [usdSwapTargetSelectionMode, setUsdSwapTargetSelectionMode] = useState("");
+  const [usdSwapInitialTargetCurrency, setUsdSwapInitialTargetCurrency] = useState("");
   const [usdSwapTitleOverride, setUsdSwapTitleOverride] = useState("");
   const [usdSwapSubtitleOverride, setUsdSwapSubtitleOverride] = useState("");
 
@@ -90,6 +92,8 @@ export default function WalletMobileModals({
       setUsdSwapAccentVariant(String(options?.accentVariant || "").trim());
       setUsdSwapSourceSelectionMode(String(options?.sourceSelectionMode || "").trim());
       setUsdSwapInitialSourceCurrency(String(options?.initialSourceCurrency || "").trim());
+      setUsdSwapTargetSelectionMode(String(options?.targetSelectionMode || "").trim());
+      setUsdSwapInitialTargetCurrency(String(options?.initialTargetCurrency || "").trim());
       setUsdSwapTitleOverride(String(options?.titleOverride || "").trim());
       setUsdSwapSubtitleOverride(String(options?.subtitleOverride || "").trim());
       const dir = String(options?.direction || "").trim().toLowerCase();
@@ -185,17 +189,18 @@ export default function WalletMobileModals({
 		                setActiveAction("cash");
 		              }}
 		              onChooseUsdSwapOut={() => {
-		                // "Recevoir des dollars" utilise le même parcours que "Ajouter de l'argent"
-		                // (pré-sélection USD côté devise créditée).
 		                setCashSellSelectTitleOverride?.("");
 		                setCashSellDestinationMode?.("");
-		                setCashBuyPrefill({
-		                  currency: "USD",
+		                setCashBuyPrefill(null);
+		                openUsdSwapOut("", {
+		                  direction: "stable_to_rlusd",
+		                  accentVariant: "simpleSwapBlue",
+		                  targetSelectionMode: "wallet",
+		                  initialTargetCurrency: "USD",
 		                  titleOverride: "Recevoir des stablecoins",
-		                  partnerOverride: "simpleswap",
+		                  subtitleOverride:
+		                    "Choisissez le stablecoin, le montant puis la devise XCANNES créditée sur votre wallet.",
 		                });
-		                cashModalProps?.setCashModalTab?.("buy");
-		                setActiveAction("cash");
 		              }}
 		              onChooseUsdSwapIn={() => {
 		                setCashSellSelectTitleOverride?.("");
@@ -222,6 +227,8 @@ export default function WalletMobileModals({
                 setUsdSwapAccentVariant("");
                 setUsdSwapSourceSelectionMode("");
                 setUsdSwapInitialSourceCurrency("");
+                setUsdSwapTargetSelectionMode("");
+                setUsdSwapInitialTargetCurrency("");
                 setUsdSwapTitleOverride("");
                 setUsdSwapSubtitleOverride("");
                 setActiveAction("cashChoice");
@@ -235,6 +242,8 @@ export default function WalletMobileModals({
               accentVariant={usdSwapAccentVariant}
               sourceSelectionMode={usdSwapSourceSelectionMode}
               initialSourceCurrency={usdSwapInitialSourceCurrency}
+              targetSelectionMode={usdSwapTargetSelectionMode}
+              initialTargetCurrency={usdSwapInitialTargetCurrency}
               titleOverride={usdSwapTitleOverride}
               subtitleOverride={usdSwapSubtitleOverride}
               signTransaction={signTransaction}
