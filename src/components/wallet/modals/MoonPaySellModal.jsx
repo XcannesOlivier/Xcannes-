@@ -5,7 +5,6 @@ import {
   XCircleIcon,
   CheckCircleIcon,
   ArrowDownIcon,
-  BuildingLibraryIcon,
   ChevronLeftIcon,
 } from "@heroicons/react/24/outline";
 import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
@@ -199,6 +198,7 @@ const MoonPaySellModal = ({
     return normalizeFiatCurrencyCode(preferredFiatCurrency);
   }, [preferredFiatCurrency]);
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset+amount, 2/3 = receive in, 3/3 = MoonPay iframe
+  const [reviewTimestamp, setReviewTimestamp] = useState(null);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
     if (typeof window === "undefined") return false;
     return Boolean(window.matchMedia?.("(min-width: 768px)")?.matches);
@@ -424,6 +424,7 @@ const MoonPaySellModal = ({
       setError(null);
       setStep("form");
       setWizardStep(1);
+      setReviewTimestamp(null);
       onClose?.();
     };
   }, [
@@ -455,6 +456,7 @@ const MoonPaySellModal = ({
       setError(null);
       setStep("form");
       setWizardStep(1);
+      setReviewTimestamp(null);
     };
   }, [
     clearAutoOpen,
@@ -944,6 +946,31 @@ const MoonPaySellModal = ({
     : currencyUpper === "RLUSD" || currencyUpper === "USD"
       ? amountValue
       : Number.NaN;
+  const summaryAmountLabel = hasValidAmount
+    ? formatAmountWithSymbol(locale, amountValue, currencyUpper || "USD", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      })
+    : `— ${currencyUpper || "USD"}`;
+  const summaryRlusdLabel = Number.isFinite(sourceAmountRlusd)
+    ? formatAmountWithSymbol(locale, sourceAmountRlusd, "RLUSD", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : null;
+  const reviewTimestampLabel = useMemo(() => {
+    if (!reviewTimestamp) return "";
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(reviewTimestamp);
+    } catch {
+      return "";
+    }
+  }, [locale, reviewTimestamp]);
 
   // Générer l'URL MoonPay pour la vente
   const generateSellUrl = async () => {
@@ -1216,6 +1243,7 @@ const MoonPaySellModal = ({
         });
         return;
       }
+      setReviewTimestamp(new Date());
       setWizardStep(2);
       return;
     }
@@ -1328,40 +1356,18 @@ const MoonPaySellModal = ({
 					              isBankSellFlow || isSendToWalletFlow
 					                ? "bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40]"
 					                : "bg-white/[0.08]",
+                        wizardStep === 1 ? "" : "hidden",
 					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06)]`,
 					            ].join(" ")}
 					          >
 				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
-					              {wizardStep === 1
-			                    ? resolvedSelectCryptoTitleOverride ? (
-			                      <span className="text-[20px] tracking-[0.14em]">
-			                        {resolvedSelectCryptoTitleOverride}
-			                      </span>
-			                    ) : (
-			                      <>
-			                        <span className="text-[20px] tracking-[0.14em]">
-			                          {t(
-			                            "moonpay_sell_withdraw_title_prefix",
-		                            "Envoyer vers la banque",
-		                          )}
-		                        </span>{" "}
-		                      </>
-		                    )
-			                    : isOtherBlockchainsDestination
-			                      ? t(
-			                          "ui_sell_conversion_details_title_2e4b2e67c9",
-			                          "Détails de la conversion que vous voulez débiter du compte :",
-		                        )
-			                      : (
-			                        <>
-			                          <span className="text-[20px] tracking-[0.14em]">
-			                            {t(
-			                              "moonpay_sell_asset_details_prefix",
-			                              "Détails de la transaction",
-			                            )}
-			                          </span>
-			                        </>
-			                      )}
+                      <span className="text-[20px] tracking-[0.14em] uppercase">
+                        {resolvedSelectCryptoTitleOverride ||
+                          t(
+                            "moonpay_sell_withdraw_title_prefix",
+                            "Envoyer vers la banque",
+                          )}
+                      </span>
 					            </p>
 		            {String(walletLabel || "").trim() ? (
 		              <div className="flex items-center gap-2 mb-1">
@@ -1384,11 +1390,11 @@ const MoonPaySellModal = ({
 			              ].join(" ")}
 			            >
 			              {walletAddress}
-		            </p>
+					            </p>
 					          </div>
 
 		          {/* Currency selector */}
-		          <div>
+		          <div className={wizardStep === 1 ? "" : "hidden"}>
 			            <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 			              {t(
 			                "moonpay_sell_send_currency_label",
@@ -1775,16 +1781,14 @@ const MoonPaySellModal = ({
                         {t("ui_search_results", "Sélectionnez un actif.")}
                       </div>
                     </div>
-	                  </div>,
-	                  document.body,
-	                )
-	              : null}
-		          </div>
-	          </div>
-
+		                  </div>,
+		                  document.body,
+		                )
+				              : null}
+			          </div>
+                </div>
 	          {/* Amount input (étape 1/2) */}
-	          {wizardStep === 1 || wizardStep === 2 ? (
-	            <div>
+	            <div className={wizardStep === 1 ? "" : "hidden"}>
 		              <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 		                {t("moonpay_amount_to_sell", "Montant")}
 		              </label>
@@ -1820,7 +1824,6 @@ const MoonPaySellModal = ({
 	                </p>
 	              ) : null}
 		            </div>
-	          ) : null}
 
 	            {wizardStep === 1 ? (
 	              <>
@@ -1873,6 +1876,61 @@ const MoonPaySellModal = ({
 
 		          {wizardStep === 2 ? (
 		            <>
+                  <div
+                    className={[
+                      "rounded-[18px] px-4 py-5 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
+                      `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
+                    ].join(" ")}
+                  >
+                    <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
+                      🏦 {t("ui_send_to_bank_action", "ENVOYER VERS LA BANQUE")}
+                    </div>
+                    <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
+                      {summaryAmountLabel}
+                    </div>
+                    <div className="mt-3 text-white/80 text-[21px] md:text-[24px] font-medium leading-snug">
+                      {summaryRlusdLabel
+                        ? `≈ ${summaryRlusdLabel}`
+                        : t("ui_amount_unavailable", "Montant estimé indisponible")}
+                    </div>
+
+                    {reviewTimestampLabel ? (
+                      <div className="mt-5 text-[15px] md:text-[16px] text-white/55">
+                        {reviewTimestampLabel}
+                      </div>
+                    ) : null}
+
+                    <div className="my-5 h-px bg-white/10" aria-hidden />
+
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-white">
+                        <span
+                          className={[
+                            "h-2.5 w-2.5 rounded-full ring-4 shrink-0 animate-pulse",
+                            accentRing25Bg,
+                          ].join(" ")}
+                          aria-hidden
+                        />
+                        <span className="font-semibold text-[18px] md:text-[20px] truncate">
+                          {walletLabel || "XCANNES"}
+                        </span>
+                      </div>
+                      <div className={`text-[15px] md:text-[17px] font-mono break-all ${accentText80}`}>
+                        {walletAddress}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 space-y-2 text-[16px] md:text-[18px]">
+                      <div className="flex items-center justify-between gap-4 text-white/75">
+                        <span>{t("ui_summary_estimated_fees", "Frais estimés")}</span>
+                        <span className="text-white font-medium text-right">
+                          {t("ui_partner_calculates_fees", "Calculés par le partenaire")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
 			              <p className="text-[13px] md:text-sm text-white/80 font-semibold">
 		                {isOtherBlockchainsDestination
 		                  ? t(
@@ -1930,17 +1988,15 @@ const MoonPaySellModal = ({
 			                  "✔ Tout est automatique — vous validez simplement",
 			                )}
 			              </p>
-				              <p
-				                className={[
-				                  "hidden md:block mt-1 text-[12px] md:text-sm font-semibold",
-				                  accentText90,
-				                ].join(" ")}
-				              >
-				                {t(
-				                  "ui_debit_partner_secure",
-				                  "✔ Traitement sécurisé via partenaire",
-				                )}
-				              </p>
+                    {!isOtherBlockchainsDestination ? (
+                      <p className="mt-1 text-[11px] md:text-xs text-white/45">
+                        {t(
+                          "moonpay_sell_partner_location_note",
+                          "Le partenaire proposé dépend de votre localisation.",
+                        )}
+                      </p>
+                    ) : null}
+                  </div>
 		            </>
 		          ) : null}
 
