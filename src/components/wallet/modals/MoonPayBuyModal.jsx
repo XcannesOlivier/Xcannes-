@@ -1949,7 +1949,7 @@ const MoonPayBuyModal = ({
       `}</style>
       {/* Form */}
       {step === "form" && (
-        <div className="space-y-5">
+        <div className={wizardStep === 2 ? "space-y-4 md:space-y-5" : "space-y-5"}>
 	          <div className="relative flex items-center">
 	            {wizardStep === 2 ? (
 	              <button
@@ -2447,7 +2447,7 @@ const MoonPayBuyModal = ({
 		                      <>
                             <div
                               className={[
-                                "rounded-[18px] px-4 py-5 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
+                                "rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
                                 `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
                               ].join(" ")}
                             >
