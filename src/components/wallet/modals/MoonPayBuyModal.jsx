@@ -241,6 +241,8 @@ const MoonPayBuyModal = ({
   const [targetAssetAmount, setTargetAssetAmount] = useState("");
   const [amount, setAmount] = useState("");
   const [amountType, setAmountType] = useState("fiat");
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
+  const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [fiatCurrency, setFiatCurrency] = useState(() => {
     return (
       normalizeFiatCurrencyCode(prefill?.fiatCurrency) ||
@@ -843,7 +845,9 @@ const MoonPayBuyModal = ({
         setPendingSwapDetectedXrp(null);
         setPendingSwapTxHash("");
         setAwaitingXrpSince(null);
-        setPreparedInboundSwap(null);
+	      setPreparedInboundSwap(null);
+        setWalletAddressExpanded(false);
+        setWalletAddressCopied(false);
 	      onClose?.();
 	    };
 	  }, [
@@ -880,6 +884,8 @@ const MoonPayBuyModal = ({
       setPendingSwapTxHash("");
       setAwaitingXrpSince(null);
       setPreparedInboundSwap(null);
+      setWalletAddressExpanded(false);
+      setWalletAddressCopied(false);
     };
   }, [
     clearAutoOpen,
@@ -888,6 +894,32 @@ const MoonPayBuyModal = ({
     clearResumeState,
     deactivateMoonpayActive,
   ]);
+
+  const handleCopyWalletAddress = async (event) => {
+    event?.stopPropagation?.();
+    try {
+      const value = String(walletAddress || "").trim();
+      if (!value) return;
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.style.position = "fixed";
+        textarea.style.top = "-1000px";
+        textarea.style.left = "-1000px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+      setWalletAddressCopied(true);
+      window.setTimeout(() => setWalletAddressCopied(false), 1400);
+    } catch {
+      // ignore
+    }
+  };
 
   // If the user closes the Cash modal while the MoonPay widget is open,
   // don't keep the resume cache around.
@@ -1640,14 +1672,30 @@ const MoonPayBuyModal = ({
 		                </p>
 		              </div>
 		            ) : null}
-				            <p
+                  <div className="mt-0.5 flex items-start gap-2">
+				            <button
+                      type="button"
+                      onClick={() => setWalletAddressExpanded((prev) => !prev)}
+                      aria-expanded={walletAddressExpanded}
 				              className={[
-				                "text-[13px] md:text-sm font-mono break-all md:tracking-[0.06em]",
+				                "min-w-0 flex-1 text-left font-mono md:tracking-[0.06em] transition-colors",
+                        walletAddressExpanded
+                          ? "text-[14px] md:text-[15px] break-all"
+                          : "text-[14px] md:text-[15px] truncate",
 				                accentText80,
 				              ].join(" ")}
 				            >
 				              {walletAddress}
-			            </p>
+			            </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyWalletAddress}
+                    className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-black/20 text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+                    aria-label={t("ui_copy_address", "Copier")}
+                  >
+                    {walletAddressCopied ? t("ui_copied", "Copié") : t("ui_copy", "Copier")}
+                  </button>
+                  </div>
 		          </div>
               ) : null}
 
@@ -1810,15 +1858,13 @@ const MoonPayBuyModal = ({
 			                                  </span>
 			                                  <div className="min-w-0 flex-1">
 			                                    <div className="text-sm font-semibold truncate">
-			                                      {opt.labelLeft || opt.label || opt.code}
+			                                      {getCurrencyDescription(String(opt?.code || "").toUpperCase()) ||
+			                                        opt.labelLeft ||
+			                                        opt.label ||
+			                                        opt.code}
 			                                    </div>
 			                                  </div>
 			                                  <div className="flex items-center gap-2 shrink-0">
-			                                    {opt.amountLabel ? (
-			                                      <span className="text-sm font-mono tabular-nums text-white/70">
-			                                        {opt.amountLabel}
-			                                      </span>
-			                                    ) : null}
 			                                    {active ? (
 			                                      <span
 			                                        className={[
@@ -1982,15 +2028,13 @@ const MoonPayBuyModal = ({
 			                                </span>
 			                                <div className="min-w-0 flex-1">
 			                                  <div className="text-sm font-semibold truncate">
-			                                    {opt.labelLeft || opt.label || opt.code}
+			                                    {getCurrencyDescription(String(opt?.code || "").toUpperCase()) ||
+			                                      opt.labelLeft ||
+			                                      opt.label ||
+			                                      opt.code}
 			                                  </div>
 			                                </div>
 			                                <div className="flex items-center gap-2 shrink-0">
-			                                  {opt.amountLabel ? (
-			                                    <span className="text-sm font-mono tabular-nums text-white/70">
-			                                      {opt.amountLabel}
-			                                    </span>
-			                                  ) : null}
 			                                  {active ? (
 			                                    <span
 			                                      className={[
@@ -2105,8 +2149,29 @@ const MoonPayBuyModal = ({
                                     {walletLabel || "XCANNES"}
                                   </span>
                                 </div>
-                                <div className={`text-[15px] md:text-[17px] font-mono break-all ${accentText80}`}>
-                                  {walletAddress}
+                                <div className="flex items-start gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setWalletAddressExpanded((prev) => !prev)}
+                                    aria-expanded={walletAddressExpanded}
+                                    className={[
+                                      "min-w-0 flex-1 text-left font-mono transition-colors",
+                                      walletAddressExpanded
+                                        ? "text-[15px] md:text-[17px] break-all"
+                                        : "text-[15px] md:text-[17px] truncate",
+                                      accentText80,
+                                    ].join(" ")}
+                                  >
+                                    {walletAddress}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={handleCopyWalletAddress}
+                                    className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-black/20 text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+                                    aria-label={t("ui_copy_address", "Copier")}
+                                  >
+                                    {walletAddressCopied ? t("ui_copied", "Copié") : t("ui_copy", "Copier")}
+                                  </button>
                                 </div>
                               </div>
 
