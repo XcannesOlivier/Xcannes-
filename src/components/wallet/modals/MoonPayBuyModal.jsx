@@ -509,7 +509,9 @@ const MoonPayBuyModal = ({
   );
 
   const resolvedMoonpayBaseFiatCurrencyCode = useMemo(() => {
-    const requested = String(currency || "").trim().toUpperCase();
+    // MoonPay fiat (payment) currency should default to the user's preferred fiat currency,
+    // stored in the wallet_label memo on the RLUSD trustline (preferredFiatCurrency).
+    const requested = String(fiatCurrency || "").trim().toUpperCase();
     if (!requested) return "USD";
     if (moonpayFiatCurrencyCodes.size > 0) {
       return moonpayFiatCurrencyCodes.has(requested) ? requested : "USD";
@@ -519,9 +521,203 @@ const MoonPayBuyModal = ({
     return COMMON_MOONPAY_FIATS.has(requested) ? requested : "USD";
   }, [
     COMMON_MOONPAY_FIATS,
-    currency,
+    fiatCurrency,
     moonpayFiatCurrenciesLoaded,
     moonpayFiatCurrencyCodes,
+  ]);
+
+  const resolveRlusdRateForFiat = (code) => {
+    const upper = String(code || "").trim().toUpperCase();
+    if (!upper) return Number.NaN;
+    if (upper === "USD" || upper === "RLUSD") return 1;
+    const rate = Number(rlusdPerUnitRates?.[upper]);
+    return Number.isFinite(rate) && rate > 0 ? rate : Number.NaN;
+  };
+
+  const fallbackMoonpayFeeEstimates = useMemo(() => {
+    const amountRlusdForQuote = Number(rlusdEquivalent);
+    if (!Number.isFinite(amountRlusdForQuote) || amountRlusdForQuote <= 0) return null;
+
+    const baseFiat = String(resolvedMoonpayBaseFiatCurrencyCode || "USD")
+      .trim()
+      .toUpperCase();
+    const baseFiatRlusdRate = resolveRlusdRateForFiat(baseFiat);
+    if (!Number.isFinite(baseFiatRlusdRate) || baseFiatRlusdRate <= 0) return null;
+
+    // Express fees in the wallet-selected currency line (e.g. DOP),
+    // even though MoonPay charges in the payment fiat (baseFiat).
+    const targetRlusdRate = isCurrencyLine ? Number(rlusdRate) : 1;
+    if (!Number.isFinite(targetRlusdRate) || targetRlusdRate <= 0) return null;
+
+    const amountInBaseFiat = amountRlusdForQuote / baseFiatRlusdRate;
+    if (!Number.isFinite(amountInBaseFiat) || amountInBaseFiat <= 0) return null;
+
+    const presets = [
+      {
+        key: "moonpay_balance",
+        label: t("moonpay_fee_method_balance", "MoonPay Balance"),
+        rate: 0,
+        min: 0,
+        requiresFiat: "USD",
+      },
+      {
+        key: "sepa",
+        label: t("moonpay_fee_method_sepa", "SEPA Bank Transfer"),
+        rate: 0.01,
+        min: 3.99,
+        requiresFiat: "EUR",
+      },
+      {
+        key: "cards",
+        label: t("moonpay_fee_method_cards", "Credit Cards"),
+        rate: 0.045,
+        min: 3.99,
+        requiresFiat: null,
+      },
+    ];
+
+    const items = presets
+      .map((preset) => {
+        if (preset.requiresFiat && preset.requiresFiat !== baseFiat) return null;
+        const feeBaseFiat = Math.max(amountInBaseFiat * preset.rate, preset.min);
+        if (!Number.isFinite(feeBaseFiat) || feeBaseFiat < 0) return null;
+        const feeRlusd = feeBaseFiat * baseFiatRlusdRate;
+        const feeTarget = feeRlusd / targetRlusdRate;
+        if (!Number.isFinite(feeTarget) || feeTarget < 0) return null;
+        return {
+          key: preset.key,
+          label: preset.label,
+          amount: feeTarget,
+        };
+      })
+      .filter(Boolean);
+
+    return items.length ? items : null;
+  }, [
+    isCurrencyLine,
+    resolvedMoonpayBaseFiatCurrencyCode,
+    rlusdEquivalent,
+    rlusdPerUnitRates,
+    rlusdRate,
+    t,
+  ]);
+
+  const [moonpayFeeEstimates, setMoonpayFeeEstimates] = useState(null);
+  const [moonpayFeeEstimateError, setMoonpayFeeEstimateError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!isOpen) return () => {};
+    if (demoMode) return () => {};
+    if (wizardStep !== 2) return () => {};
+    if (!hasValidTargetAmount || conversionMissing) return () => {};
+
+    const run = async () => {
+      try {
+        setMoonpayFeeEstimateError(null);
+
+        const amountRlusdForQuote = Number(rlusdEquivalent);
+        if (!Number.isFinite(amountRlusdForQuote) || amountRlusdForQuote <= 0) return;
+
+        const quote = await xcannesApi.getRlusdXrpQuote({
+          direction: "XRP_TO_RLUSD",
+          amountRlusd: amountRlusdForQuote,
+        });
+        const quotedXrpAmount = Number(quote?.xrpAmount);
+        if (!Number.isFinite(quotedXrpAmount) || quotedXrpAmount <= 0) return;
+
+        const xrpAmountToBuy = Number(quotedXrpAmount.toFixed(6));
+        if (!Number.isFinite(xrpAmountToBuy) || xrpAmountToBuy <= 0) return;
+
+        const baseFiat = String(resolvedMoonpayBaseFiatCurrencyCode || "USD")
+          .trim()
+          .toUpperCase();
+        const baseFiatRlusdRate = resolveRlusdRateForFiat(baseFiat);
+        if (!Number.isFinite(baseFiatRlusdRate) || baseFiatRlusdRate <= 0) return;
+
+        const targetRlusdRate = isCurrencyLine ? Number(rlusdRate) : 1;
+        if (!Number.isFinite(targetRlusdRate) || targetRlusdRate <= 0) return;
+
+        const methods = [
+          {
+            key: "moonpay_balance",
+            label: t("moonpay_fee_method_balance", "MoonPay Balance"),
+            paymentMethod: "moonpay_balance",
+            requiresFiat: "USD",
+          },
+          {
+            key: "sepa",
+            label: t("moonpay_fee_method_sepa", "SEPA Bank Transfer"),
+            paymentMethod: "sepa_bank_transfer",
+            requiresFiat: "EUR",
+          },
+          {
+            key: "cards",
+            label: t("moonpay_fee_method_cards", "Credit Cards"),
+            paymentMethod: "credit_debit_card",
+            requiresFiat: null,
+          },
+        ].filter((m) => !m.requiresFiat || m.requiresFiat === baseFiat);
+
+        const results = await Promise.all(
+          methods.map(async (method) => {
+            const res = await fetch("/api/moonpay/buy-quote", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                currencyCode: "xrp",
+                baseCurrencyCode: baseFiat,
+                quoteCurrencyAmount: xrpAmountToBuy,
+                paymentMethod: method.paymentMethod,
+                areFeesIncluded: true,
+                extraFeePercentage: 0,
+              }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              throw new Error(data?.message || data?.error || "MoonPay quote failed");
+            }
+            const q = data?.quote || {};
+            const feeAmount = Number(q?.feeAmount || 0);
+            const extraFeeAmount = Number(q?.extraFeeAmount || 0);
+            const networkFeeAmount = Number(q?.networkFeeAmount || 0);
+            const totalFeeBaseFiat = feeAmount + extraFeeAmount + networkFeeAmount;
+            if (!Number.isFinite(totalFeeBaseFiat) || totalFeeBaseFiat < 0) return null;
+            const feeRlusd = totalFeeBaseFiat * baseFiatRlusdRate;
+            const feeTarget = feeRlusd / targetRlusdRate;
+            if (!Number.isFinite(feeTarget) || feeTarget < 0) return null;
+            return { key: method.key, label: method.label, amount: feeTarget };
+          }),
+        );
+
+        const items = results.filter(Boolean);
+        if (!cancelled) {
+          setMoonpayFeeEstimates(items.length ? items : null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setMoonpayFeeEstimateError(error?.message || String(error));
+          setMoonpayFeeEstimates(null);
+        }
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    conversionMissing,
+    demoMode,
+    hasValidTargetAmount,
+    isCurrencyLine,
+    isOpen,
+    rlusdEquivalent,
+    rlusdRate,
+    resolvedMoonpayBaseFiatCurrencyCode,
+    t,
+    wizardStep,
+    xcannesApi,
   ]);
   const reviewTimestampLabel = useMemo(() => {
     if (!reviewTimestamp) return "";
@@ -2259,7 +2455,7 @@ const MoonPayBuyModal = ({
                                   ? `≈ ${rlusdEquivalentLabel}`
                                   : t("ui_amount_unavailable", "Montant estimé indisponible")}
                               </div>
-                              {resolvedMoonpayBaseFiatCurrencyCode !== currencyUpper ? (
+                              {resolvedMoonpayBaseFiatCurrencyCode !== String(fiatCurrency || "").toUpperCase() ? (
                                 <div className="mt-2 text-[12px] md:text-[13px] text-white/55">
                                   {t("moonpay_buy_fiat_fallback_note", {
                                     defaultValue:
@@ -2321,10 +2517,39 @@ const MoonPayBuyModal = ({
                                 <div className="flex items-center justify-between gap-4 text-white/75">
                                   <span>{t("ui_summary_estimated_fees", "Frais estimés")}</span>
                                   <span className="text-white font-medium text-right">
-                                    {estimatedFeeLabel ||
-                                      t("ui_partner_calculates_fees", "Calculés par le partenaire")}
+                                    {t("ui_partner_calculates_fees", "Calculés par le partenaire")}
                                   </span>
                                 </div>
+                                {(moonpayFeeEstimates || fallbackMoonpayFeeEstimates) ? (
+                                  <div className="space-y-1 text-[13px] md:text-sm text-white/70">
+                                    {(moonpayFeeEstimates || fallbackMoonpayFeeEstimates).map((item) => (
+                                      <div
+                                        key={item.key}
+                                        className="flex items-center justify-between gap-3"
+                                      >
+                                        <span className="truncate">{item.label}</span>
+                                        <span className="shrink-0 text-white/85 font-medium text-right">
+                                          {formatAmountWithCode(item.amount, currencyUpper, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                          })}
+                                        </span>
+                                      </div>
+                                    ))}
+                                    <div className="pt-1 text-[11px] md:text-xs text-white/45">
+                                      {moonpayFeeEstimateError
+                                        ? t("moonpay_fee_estimate_note_fallback", {
+                                            defaultValue:
+                                              "Estimations indicatives (fallback) — {{error}}",
+                                            error: moonpayFeeEstimateError,
+                                          })
+                                        : t(
+                                            "moonpay_fee_estimate_note",
+                                            "Estimations indicatives — les frais exacts dépendent de la méthode choisie dans MoonPay.",
+                                          )}
+                                    </div>
+                                  </div>
+                                ) : null}
                               </div>
                             </div>
 
