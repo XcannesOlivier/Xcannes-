@@ -1067,6 +1067,18 @@ const MoonPaySellModal = ({
 
   const [moonpayFeeEstimates, setMoonpayFeeEstimates] = useState(null);
   const [moonpayFeeEstimateError, setMoonpayFeeEstimateError] = useState(null);
+  const normalizeFeeError = (value) => {
+    if (!value) return null;
+    if (typeof value === "string") return value;
+    if (value instanceof Error) return value.message || "MoonPay quote failed";
+    try {
+      const msg = value?.message || value?.error || value?.code;
+      if (typeof msg === "string" && msg.trim()) return msg.trim();
+      return JSON.stringify(value);
+    } catch {
+      return "MoonPay quote failed";
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -1156,7 +1168,7 @@ const MoonPaySellModal = ({
         if (!cancelled) setMoonpayFeeEstimates(items.length ? items : null);
       } catch (error) {
         if (!cancelled) {
-          setMoonpayFeeEstimateError(error?.message || String(error));
+          setMoonpayFeeEstimateError(normalizeFeeError(error) || "MoonPay quote failed");
           setMoonpayFeeEstimates(null);
         }
       }
@@ -2195,9 +2207,6 @@ const MoonPaySellModal = ({
                     <div className="mt-5 space-y-2 text-[16px] md:text-[18px]">
                       <div className="flex items-center justify-between gap-4 text-white/75">
                         <span>{t("ui_summary_estimated_fees", "Frais estimés")}</span>
-                        <span className="text-white font-medium text-right">
-                          {t("ui_partner_calculates_fees", "Calculés par le partenaire")}
-                        </span>
                       </div>
                       {(moonpayFeeEstimates || fallbackMoonpayFeeEstimates) ? (
                         <div className="space-y-1 text-[13px] md:text-sm text-white/70">
@@ -2216,16 +2225,10 @@ const MoonPaySellModal = ({
                             </div>
                           ))}
                           <div className="pt-1 text-[11px] md:text-xs text-white/45">
-                            {moonpayFeeEstimateError
-                              ? t("moonpay_fee_estimate_note_fallback", {
-                                  defaultValue:
-                                    "Estimations indicatives (fallback) — {{error}}",
-                                  error: moonpayFeeEstimateError,
-                                })
-                              : t(
-                                  "moonpay_fee_estimate_note",
-                                  "Estimations indicatives — les frais exacts dépendent de la méthode choisie dans MoonPay.",
-                                )}
+                            {t(
+                              "moonpay_fee_estimate_note",
+                              "Estimations indicatives — les frais exacts dépendent de la méthode choisie dans MoonPay.",
+                            )}
                           </div>
                         </div>
                       ) : null}
