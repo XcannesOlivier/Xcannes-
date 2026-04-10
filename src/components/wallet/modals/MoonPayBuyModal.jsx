@@ -1086,11 +1086,12 @@ const MoonPayBuyModal = ({
   }, [demoMode, isOpen]);
 
   const minFiatAmount = useMemo(() => {
-    if (fiatCurrency === "USD") {
+    const requestedFiat = String(currency || "").trim().toUpperCase();
+    if (requestedFiat === "USD") {
       return PRODUCT_MIN_USD;
     }
     return null;
-  }, [PRODUCT_MIN_USD, fiatCurrency]);
+  }, [PRODUCT_MIN_USD, currency]);
 
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
@@ -1126,7 +1127,7 @@ const MoonPayBuyModal = ({
         t("moonpay_error_minimum_fiat", {
           defaultValue: "Minimum amount is {{amount}} {{currency}}.",
           amount: minFiatAmount,
-          currency: fiatCurrency,
+          currency: currencyUpper,
         }),
       );
       return;
@@ -1149,7 +1150,7 @@ const MoonPayBuyModal = ({
         const res = await Promise.resolve(
           onDemoSubmit?.({
             currencyCode: String(moonpayCurrencyCode || "RLUSD").toUpperCase(),
-            baseCurrencyCode: String(fiatCurrency || "USD").toUpperCase(),
+            baseCurrencyCode: String(currencyUpper || "USD").toUpperCase(),
             amountType,
             amount: parseFloat(amount),
           }),
@@ -1180,7 +1181,9 @@ const MoonPayBuyModal = ({
         body: JSON.stringify({
           walletAddress,
           currencyCode: moonpayCurrencyCode,
-          baseCurrencyCode: fiatCurrency,
+          // In this flow the user-selected "Devise souhaitée" is the fiat they want to fund.
+          // Use it as MoonPay baseCurrencyCode so the amount is interpreted in that fiat.
+          baseCurrencyCode: currencyUpper,
           baseCurrencyAmount:
             amountType === "fiat" ? parseFloat(amount) : undefined,
           quoteCurrencyAmount:
