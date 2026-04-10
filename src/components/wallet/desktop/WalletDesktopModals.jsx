@@ -219,7 +219,7 @@ export default function WalletDesktopModals({
 		            setCashBuyPrefill(null);
 		            openUsdSwapOut("", {
 		              direction: "rlusd_to_stable",
-		              accentVariant: "fireOrange",
+		              accentVariant: "binanceYellow",
 		              sourceSelectionMode: "wallet",
 		              initialSourceCurrency: "USD",
 		              titleOverride: "Envoyer vers un wallet",

@@ -10,6 +10,7 @@ import xcannesApi from "@/lib/xcannesApi";
 import { buildSimpleSwapMemo, buildXrplJsonMemo } from "@/utils/xrplMemo";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import {
+  binanceYellowActionBtnBase,
   fireOrangeActionBtnBase,
   greenActionBtnBase,
   simpleSwapBlueActionBtnBase,
@@ -340,71 +341,99 @@ export default function WalletDashboardUsdSwapModal({
   const locale = i18n?.language || "en";
   const isDesktop = useIsDesktop();
   const resolvedAccent = String(accentVariant || "").trim().toLowerCase();
+  const isBinanceYellow =
+    resolvedAccent === "binanceyellow" ||
+    resolvedAccent === "binance_yellow" ||
+    resolvedAccent === "binance";
   const isFireOrange = resolvedAccent === "fireorange" || resolvedAccent === "fire_orange";
   const isSimpleSwapBlue =
     resolvedAccent === "simpleswapblue" ||
     resolvedAccent === "simpleswap_blue" ||
     resolvedAccent === "simpleswap" ||
     resolvedAccent === "blue";
-  const accentShadowPanel = isFireOrange
+  const accentShadowPanel = isBinanceYellow
+    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(240,185,11,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
+    : isFireOrange
     ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,106,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
     : isSimpleSwapBlue
       ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
     : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]";
-  const accentShadowCard = isFireOrange
+  const accentShadowCard = isBinanceYellow
+    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(240,185,11,0.22)]"
+    : isFireOrange
     ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,106,0,0.22)]"
     : isSimpleSwapBlue
       ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22)]"
     : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]";
-  const accentText80 = isFireOrange
+  const accentText80 = isBinanceYellow
+    ? "text-[#F0B90B]/85"
+    : isFireOrange
     ? "text-[#ff6a00]/80"
     : isSimpleSwapBlue
       ? "text-[#0870f8]/80"
       : "text-xcannes-green/80";
-  const accentText90 = isFireOrange
+  const accentText90 = isBinanceYellow
+    ? "text-[#F0B90B]/95"
+    : isFireOrange
     ? "text-[#ff6a00]/90"
     : isSimpleSwapBlue
       ? "text-[#0870f8]/90"
       : "text-xcannes-green/90";
-  const accentTextSolid = isFireOrange
+  const accentTextSolid = isBinanceYellow
+    ? "text-[#F0B90B]"
+    : isFireOrange
     ? "text-[#ff6a00]"
     : isSimpleSwapBlue
       ? "text-[#0870f8]"
       : "text-xcannes-green";
-  const accentBadge = isFireOrange
+  const accentBadge = isBinanceYellow
+    ? "bg-[#F0B90B]/15 text-[#F0B90B]"
+    : isFireOrange
     ? "bg-[#ff6a00]/15 text-[#ff6a00]"
     : isSimpleSwapBlue
       ? "bg-[#0870f8]/15 text-[#0870f8]"
     : "bg-xcannes-green/15 text-xcannes-green";
-  const accentRing60 = isFireOrange
+  const accentRing60 = isBinanceYellow
+    ? "focus:ring-[#F0B90B]/60"
+    : isFireOrange
     ? "focus:ring-[#ff6a00]/60"
     : isSimpleSwapBlue
       ? "focus:ring-[#0870f8]/60"
     : "focus:ring-xcannes-green/60";
-  const accentPulseDot = isFireOrange
+  const accentPulseDot = isBinanceYellow
+    ? "ring-[#F0B90B]/25 bg-[#F0B90B]"
+    : isFireOrange
     ? "ring-[#ff6a00]/25 bg-[#ff6a00]"
     : isSimpleSwapBlue
       ? "ring-[#0870f8]/25 bg-[#0870f8]"
     : "ring-xcannes-green/25 bg-xcannes-green";
-  const accentSpinnerBorder = isFireOrange
+  const accentSpinnerBorder = isBinanceYellow
+    ? "border-[#F0B90B]"
+    : isFireOrange
     ? "border-[#ff6a00]"
     : isSimpleSwapBlue
       ? "border-[#0870f8]"
       : "border-xcannes-green";
   const accentSwapIconShell = "bg-transparent ring-0";
   const accentSwapIcon = "text-white";
-  const accentActiveCard = isFireOrange
+  const accentActiveCard = isBinanceYellow
+    ? "bg-[#F0B90B]/10 ring-[#F0B90B]/35 text-white"
+    : isFireOrange
     ? "bg-[#ff6a00]/10 ring-[#ff6a00]/35 text-white"
     : isSimpleSwapBlue
       ? "bg-[#0870f8]/10 ring-[#0870f8]/35 text-white"
     : "bg-xcannes-green/10 ring-xcannes-green/35 text-white";
-  const accentActiveRow = isFireOrange
+  const accentActiveRow = isBinanceYellow
+    ? "bg-[#F0B90B]/10 text-white"
+    : isFireOrange
     ? "bg-[#ff6a00]/10 text-white"
     : isSimpleSwapBlue
       ? "bg-[#0870f8]/10 text-white"
       : "bg-xcannes-green/10 text-white";
-  const actionBtnBase = isFireOrange
-    ? fireOrangeActionBtnBase
+  const actionBtnBase = isBinanceYellow
+    ? binanceYellowActionBtnBase
+    : isFireOrange
+      ? fireOrangeActionBtnBase
     : isSimpleSwapBlue
       ? simpleSwapBlueActionBtnBase
       : greenActionBtnBase;
