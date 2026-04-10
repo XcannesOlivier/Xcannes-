@@ -58,6 +58,13 @@ const notifyPwaMoonpayActive = (active, tab = "sell") => {
   }
 };
 
+const truncateMiddle = (value, head = 6, tail = 5) => {
+  const str = String(value ?? "");
+  if (!str) return "";
+  if (str.length <= head + tail + 1) return str;
+  return `${str.slice(0, head)}…${str.slice(-tail)}`;
+};
+
 const normalizeFiatCurrencyCode = (value) => {
   const upper = String(value || "").trim().toUpperCase();
   if (!upper) return "";
@@ -1420,15 +1427,16 @@ const MoonPaySellModal = ({
                     type="button"
                     onClick={() => setWalletAddressExpanded((prev) => !prev)}
                     aria-expanded={walletAddressExpanded}
+                    title={walletAddress}
 			              className={[
 			                "min-w-0 flex-1 text-left font-mono md:tracking-[0.06em] transition-colors",
                       walletAddressExpanded
                         ? "text-[14px] md:text-[15px] break-all"
-                        : "text-[14px] md:text-[15px] truncate",
+                        : "text-[14px] md:text-[15px] whitespace-nowrap",
 			                accentText80,
 			              ].join(" ")}
 			            >
-			              {walletAddress}
+			              {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
 					            </button>
                   <button
                     type="button"
@@ -1968,15 +1976,16 @@ const MoonPaySellModal = ({
                           type="button"
                           onClick={() => setWalletAddressExpanded((prev) => !prev)}
                           aria-expanded={walletAddressExpanded}
+                          title={walletAddress}
                           className={[
                             "min-w-0 flex-1 text-left font-mono transition-colors",
                             walletAddressExpanded
                               ? "text-[15px] md:text-[17px] break-all"
-                              : "text-[15px] md:text-[17px] truncate",
+                              : "text-[15px] md:text-[17px] whitespace-nowrap",
                             accentText80,
                           ].join(" ")}
                         >
-                          {walletAddress}
+                          {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
                         </button>
                         <button
                           type="button"

@@ -69,6 +69,13 @@ function currencyLabel(cur) {
   return `${ticker} (${network})`;
 }
 
+function truncateMiddle(value, head = 6, tail = 5) {
+  const str = String(value ?? "");
+  if (!str) return "";
+  if (str.length <= head + tail + 1) return str;
+  return `${str.slice(0, head)}…${str.slice(-tail)}`;
+}
+
 function matchStableTarget(currency, { ticker, networkAliases }) {
   const curTicker = String(currency?.ticker || "").trim().toLowerCase();
   const curNetwork = String(currency?.network || "").trim().toLowerCase();
@@ -2958,15 +2965,16 @@ export default function WalletDashboardUsdSwapModal({
                               type="button"
                               onClick={() => setWalletAddressExpanded((prev) => !prev)}
                               aria-expanded={walletAddressExpanded}
+                              title={walletAddress}
                               className={[
                                 "min-w-0 flex-1 text-left font-mono md:tracking-[0.06em] transition-colors",
                                 walletAddressExpanded
                                   ? "text-[14px] md:text-[15px] break-all"
-                                  : "text-[14px] md:text-[15px] truncate",
+                                  : "text-[14px] md:text-[15px] whitespace-nowrap",
                                 accentText80,
                               ].join(" ")}
                             >
-                              {walletAddress}
+                              {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
                             </button>
                             <button
                               type="button"
