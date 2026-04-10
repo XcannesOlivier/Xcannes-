@@ -2150,11 +2150,7 @@ const MoonPaySellModal = ({
                     <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                       {summaryAmountLabel}
                     </div>
-                    <div className="mt-3 text-white/80 text-[21px] md:text-[24px] font-medium leading-snug">
-                      {summaryRlusdLabel
-                        ? `≈ ${summaryRlusdLabel}`
-                        : t("ui_amount_unavailable", "Montant estimé indisponible")}
-                    </div>
+                    {/* Internal XCANNES accounting is backed by RLUSD — keep it out of this summary UI. */}
 
                     {reviewTimestampLabel ? (
                       <div className="mt-5 text-[15px] md:text-[16px] text-white/55">
