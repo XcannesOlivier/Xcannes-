@@ -422,19 +422,107 @@ const MoonPayBuyModal = ({
           maximumFractionDigits: 2,
         })
       : null;
-  const estimatedFeeAmount = useMemo(() => {
-    if (!hasValidTargetAmount || !Number.isFinite(Number(rlusdEquivalent))) return null;
-    const diff = Number(targetAmountValue) - Number(rlusdEquivalent);
-    if (!Number.isFinite(diff) || diff <= 0) return null;
-    return diff;
-  }, [hasValidTargetAmount, rlusdEquivalent, targetAmountValue]);
-  const estimatedFeeLabel =
-    Number.isFinite(Number(estimatedFeeAmount)) && Number(estimatedFeeAmount) > 0
-      ? formatAmountWithSymbol(locale, Number(estimatedFeeAmount), currencyUpper, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : null;
+  // Fees are always calculated by the partner (MoonPay/Topper). Avoid showing misleading "fees"
+  // derived from FX conversions (e.g. 20,000 DOP vs 329 RLUSD).
+  const estimatedFeeLabel = null;
+
+  const formatAmountWithCode = (amount, code, options = {}) => {
+    const num = Number(amount);
+    if (!Number.isFinite(num)) return "-";
+    const upper = String(code || "").toUpperCase();
+    const {
+      minimumFractionDigits = 2,
+      maximumFractionDigits = 2,
+      ...rest
+    } = options || {};
+    const value = new Intl.NumberFormat(locale || "en", {
+      minimumFractionDigits,
+      maximumFractionDigits,
+      ...rest,
+    }).format(num);
+    return upper ? `${value} ${upper}` : value;
+  };
+
+  const [moonpayFiatCurrencyCodes, setMoonpayFiatCurrencyCodes] = useState(() => new Set());
+  const [moonpayFiatCurrenciesLoaded, setMoonpayFiatCurrenciesLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!isOpen) return () => {};
+    if (demoMode) return () => {};
+    // Fetch supported fiat currencies from MoonPay (via our proxy) so we can
+    // fallback correctly when a wallet currency isn't supported by MoonPay.
+    (async () => {
+      try {
+        const res = await fetch("/api/moonpay/fiat-currencies");
+        const data = await res.json();
+        const list = Array.isArray(data?.currencies) ? data.currencies : [];
+        const codes = new Set(
+          list
+            .map((c) => String(c?.code || c?.currencyCode || "").trim().toUpperCase())
+            .filter(Boolean),
+        );
+        if (!cancelled && codes.size > 0) {
+          setMoonpayFiatCurrencyCodes(codes);
+        }
+      } catch {
+        // ignore: we'll fallback via a small allow-list
+      } finally {
+        if (!cancelled) setMoonpayFiatCurrenciesLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [demoMode, isOpen]);
+
+  const COMMON_MOONPAY_FIATS = useMemo(
+    () =>
+      new Set([
+        "USD",
+        "EUR",
+        "GBP",
+        "CHF",
+        "CAD",
+        "AUD",
+        "NZD",
+        "JPY",
+        "SEK",
+        "NOK",
+        "DKK",
+        "PLN",
+        "CZK",
+        "HUF",
+        "RON",
+        "BGN",
+        "TRY",
+        "ILS",
+        "ZAR",
+        "BRL",
+        "MXN",
+        "ARS",
+        "CLP",
+        "COP",
+        "PEN",
+      ]),
+    [],
+  );
+
+  const resolvedMoonpayBaseFiatCurrencyCode = useMemo(() => {
+    const requested = String(currency || "").trim().toUpperCase();
+    if (!requested) return "USD";
+    if (moonpayFiatCurrencyCodes.size > 0) {
+      return moonpayFiatCurrencyCodes.has(requested) ? requested : "USD";
+    }
+    // If the list isn't loaded yet, assume common fiats are supported.
+    if (!moonpayFiatCurrenciesLoaded && COMMON_MOONPAY_FIATS.has(requested)) return requested;
+    return COMMON_MOONPAY_FIATS.has(requested) ? requested : "USD";
+  }, [
+    COMMON_MOONPAY_FIATS,
+    currency,
+    moonpayFiatCurrenciesLoaded,
+    moonpayFiatCurrencyCodes,
+  ]);
   const reviewTimestampLabel = useMemo(() => {
     if (!reviewTimestamp) return "";
     try {
@@ -1086,12 +1174,11 @@ const MoonPayBuyModal = ({
   }, [demoMode, isOpen]);
 
   const minFiatAmount = useMemo(() => {
-    const requestedFiat = String(currency || "").trim().toUpperCase();
-    if (requestedFiat === "USD") {
+    if (resolvedMoonpayBaseFiatCurrencyCode === "USD") {
       return PRODUCT_MIN_USD;
     }
     return null;
-  }, [PRODUCT_MIN_USD, currency]);
+  }, [PRODUCT_MIN_USD, resolvedMoonpayBaseFiatCurrencyCode]);
 
   // Générer l'URL MoonPay
   const generateBuyUrl = async () => {
@@ -1108,6 +1195,7 @@ const MoonPayBuyModal = ({
     const currencyUpper = String(currency || "RLUSD").trim().toUpperCase();
     const moonpayCurrencyCode = "XRP";
     const requestedFiatAmount = Number.parseFloat(String(targetAssetAmount || "").trim());
+    const amountRlusdForQuote = Number(rlusdEquivalent);
 
     if (!Number.isFinite(requestedFiatAmount) || requestedFiatAmount <= 0) {
       setError(
@@ -1121,13 +1209,17 @@ const MoonPayBuyModal = ({
 
     if (
       minFiatAmount !== null &&
-      requestedFiatAmount < minFiatAmount
+      // When MoonPay falls back to USD (because the selected wallet currency isn't supported),
+      // validate the minimum on the RLUSD-equivalent amount (≈ USD).
+      (resolvedMoonpayBaseFiatCurrencyCode === "USD" && currencyUpper !== "USD"
+        ? !Number.isFinite(amountRlusdForQuote) || amountRlusdForQuote < minFiatAmount
+        : requestedFiatAmount < minFiatAmount)
     ) {
       setError(
         t("moonpay_error_minimum_fiat", {
           defaultValue: "Minimum amount is {{amount}} {{currency}}.",
           amount: minFiatAmount,
-          currency: currencyUpper,
+          currency: resolvedMoonpayBaseFiatCurrencyCode,
         }),
       );
       return;
@@ -1150,7 +1242,7 @@ const MoonPayBuyModal = ({
         const res = await Promise.resolve(
           onDemoSubmit?.({
             currencyCode: String(moonpayCurrencyCode || "RLUSD").toUpperCase(),
-            baseCurrencyCode: String(currencyUpper || "USD").toUpperCase(),
+            baseCurrencyCode: String(resolvedMoonpayBaseFiatCurrencyCode || "USD").toUpperCase(),
             amountType: "fiat",
             amount: requestedFiatAmount,
           }),
@@ -1167,8 +1259,6 @@ const MoonPayBuyModal = ({
       }
 
       setStep("loading");
-
-      const amountRlusdForQuote = Number(rlusdEquivalent);
       if (!Number.isFinite(amountRlusdForQuote) || amountRlusdForQuote <= 0) {
         throw new Error(
           t(
@@ -1215,9 +1305,9 @@ const MoonPayBuyModal = ({
         body: JSON.stringify({
           walletAddress,
           currencyCode: moonpayCurrencyCode,
-          // In this flow the user-selected "Devise souhaitée" is the fiat they want to fund.
-          // Use it as MoonPay baseCurrencyCode so the amount is interpreted in that fiat.
-          baseCurrencyCode: currencyUpper,
+          // Use the selected wallet currency as an input for the RLUSD quote, but only send
+          // a fiat code supported by MoonPay as the payment currency (fallback to USD).
+          baseCurrencyCode: resolvedMoonpayBaseFiatCurrencyCode,
           quoteCurrencyAmount: xrpAmountToBuy,
           options: Object.keys(options || {}).length ? options : undefined,
         }),
@@ -2158,7 +2248,7 @@ const MoonPayBuyModal = ({
                               </div>
                               <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
                                 {hasValidTargetAmount
-                                  ? formatAmountWithSymbol(locale, targetAmountValue, currencyUpper, {
+                                  ? formatAmountWithCode(targetAmountValue, currencyUpper, {
                                       minimumFractionDigits: 0,
                                       maximumFractionDigits: 2,
                                     })
@@ -2169,6 +2259,15 @@ const MoonPayBuyModal = ({
                                   ? `≈ ${rlusdEquivalentLabel}`
                                   : t("ui_amount_unavailable", "Montant estimé indisponible")}
                               </div>
+                              {resolvedMoonpayBaseFiatCurrencyCode !== currencyUpper ? (
+                                <div className="mt-2 text-[12px] md:text-[13px] text-white/55">
+                                  {t("moonpay_buy_fiat_fallback_note", {
+                                    defaultValue:
+                                      "Paiement en {{currency}} (devise non supportée → fallback).",
+                                    currency: resolvedMoonpayBaseFiatCurrencyCode,
+                                  })}
+                                </div>
+                              ) : null}
 
                               {reviewTimestampLabel ? (
                                 <div className="mt-5 text-[15px] md:text-[16px] text-white/55">
