@@ -1107,8 +1107,9 @@ const MoonPayBuyModal = ({
 
     const currencyUpper = String(currency || "RLUSD").trim().toUpperCase();
     const moonpayCurrencyCode = "XRP";
+    const requestedFiatAmount = Number.parseFloat(String(targetAssetAmount || "").trim());
 
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!Number.isFinite(requestedFiatAmount) || requestedFiatAmount <= 0) {
       setError(
         t(
           "moonpay_error_invalid_amount_8c3b1a6d2f",
@@ -1119,9 +1120,8 @@ const MoonPayBuyModal = ({
     }
 
     if (
-      amountType === "fiat" &&
       minFiatAmount !== null &&
-      parseFloat(amount) < minFiatAmount
+      requestedFiatAmount < minFiatAmount
     ) {
       setError(
         t("moonpay_error_minimum_fiat", {
@@ -1151,8 +1151,8 @@ const MoonPayBuyModal = ({
           onDemoSubmit?.({
             currencyCode: String(moonpayCurrencyCode || "RLUSD").toUpperCase(),
             baseCurrencyCode: String(currencyUpper || "USD").toUpperCase(),
-            amountType,
-            amount: parseFloat(amount),
+            amountType: "fiat",
+            amount: requestedFiatAmount,
           }),
         );
         if (res?.error) {
@@ -1167,6 +1167,40 @@ const MoonPayBuyModal = ({
       }
 
       setStep("loading");
+
+      const amountRlusdForQuote = Number(rlusdEquivalent);
+      if (!Number.isFinite(amountRlusdForQuote) || amountRlusdForQuote <= 0) {
+        throw new Error(
+          t(
+            "moonpay_error_invalid_rlusd_quote_amount",
+            "Unable to calculate the RLUSD amount for this purchase.",
+          ),
+        );
+      }
+
+      const quote = await xcannesApi.getRlusdXrpQuote({
+        direction: "XRP_TO_RLUSD",
+        amountRlusd: amountRlusdForQuote,
+      });
+      const quotedXrpAmount = Number(quote?.xrpAmount);
+      if (!Number.isFinite(quotedXrpAmount) || quotedXrpAmount <= 0) {
+        throw new Error(
+          t(
+            "moonpay_error_invalid_xrp_quote_amount",
+            "Unable to calculate the XRP amount to buy for this purchase.",
+          ),
+        );
+      }
+
+      const xrpAmountToBuy = Number(quotedXrpAmount.toFixed(6));
+      if (!Number.isFinite(xrpAmountToBuy) || xrpAmountToBuy <= 0) {
+        throw new Error(
+          t(
+            "moonpay_error_invalid_xrp_quote_amount_rounded",
+            "Unable to calculate the XRP amount to buy for this purchase.",
+          ),
+        );
+      }
 
       const walletAddressTag = resolveMoonpayTag(moonpayCurrencyCode);
       const options = {
@@ -1184,10 +1218,7 @@ const MoonPayBuyModal = ({
           // In this flow the user-selected "Devise souhaitée" is the fiat they want to fund.
           // Use it as MoonPay baseCurrencyCode so the amount is interpreted in that fiat.
           baseCurrencyCode: currencyUpper,
-          baseCurrencyAmount:
-            amountType === "fiat" ? parseFloat(amount) : undefined,
-          quoteCurrencyAmount:
-            amountType === "crypto" ? parseFloat(amount) : undefined,
+          quoteCurrencyAmount: xrpAmountToBuy,
           options: Object.keys(options || {}).length ? options : undefined,
         }),
       });
