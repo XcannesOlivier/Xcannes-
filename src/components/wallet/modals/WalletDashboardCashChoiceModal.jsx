@@ -100,32 +100,32 @@ export default function WalletDashboardCashChoiceModal({
     <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
         d="M10 18l14-8 14 8"
-        className="stroke-xcannes-violet/80"
+        className="stroke-white/80"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M14 18h20"
-        className="stroke-xcannes-violet/80"
+        className="stroke-white/80"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M16 18v16m6-16v16m6-16v16m6-16v16"
-        className="stroke-xcannes-violet/60"
+        className="stroke-white/60"
         strokeWidth="2"
         strokeLinecap="round"
       />
       <path
         d="M12 34h24"
-        className="stroke-xcannes-violet/80"
+        className="stroke-white/80"
         strokeWidth="2"
         strokeLinecap="round"
       />
 	      <path
 	        d="M10 38h28"
-	        className="stroke-xcannes-violet/75"
+	        className="stroke-white/75"
 	        strokeWidth="2"
 	        strokeLinecap="round"
 	      />
@@ -136,19 +136,19 @@ export default function WalletDashboardCashChoiceModal({
 	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
         d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
-        className="fill-[#0870f8]/8 stroke-[#0870f8]/35"
+        className="fill-[#0870f8]/8 stroke-white/35"
         strokeWidth="1.5"
       />
       <path
         d="M14 20h20c2.2 0 4 1.8 4 4v0H28c-2.2 0-4 1.8-4 4v0H14"
-        className="stroke-[#0870f8]/55"
+        className="stroke-white/55"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
 	      <circle cx="30.5" cy="27" r="5.5" className="fill-[#0870f8]/15" />
 	      <path
 	        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
-	        className="stroke-[#0870f8]/85"
+	        className="stroke-white/85"
 	        strokeWidth="1.4"
 	        strokeLinecap="round"
 	        strokeLinejoin="round"
@@ -160,19 +160,19 @@ export default function WalletDashboardCashChoiceModal({
 	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
 	      <path
 	        d="M10 22l28-12-10 28-6-10-12-6Z"
-	        className="fill-[#ff6a00]/8 stroke-[#ff6a00]/45"
+	        className="fill-[#ff6a00]/8 stroke-white/45"
 	        strokeWidth="1.5"
 	        strokeLinejoin="round"
 	      />
 	      <path
 	        d="M38 10L22 28"
-	        className="stroke-[#ff6a00]/75"
+	        className="stroke-white/75"
 	        strokeWidth="1.8"
 	        strokeLinecap="round"
 	      />
 	      <path
 	        d="M22 28l0 10"
-	        className="stroke-[#ff6a00]/45"
+	        className="stroke-white/45"
         strokeWidth="1.5"
         strokeLinecap="round"
       />
