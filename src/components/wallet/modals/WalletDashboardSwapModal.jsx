@@ -645,7 +645,7 @@ export default function WalletDashboardSwapModal({
                         setConvertBaseCurrency(prevQuote);
 		                        setConvertQuoteCurrency(prevBase);
 		                      }}
-		                      className="p-4 flex items-center justify-center text-xcannes-green/80 hover:text-xcannes-green transition-colors duration-150"
+		                      className="p-4 flex items-center justify-center text-white/80 hover:text-white transition-colors duration-150"
 		                      aria-label={t("ui_swap_currencies", "Inverser")}
 		                      title={t("ui_swap_currencies", "Inverser")}
 		                    >
@@ -719,7 +719,7 @@ export default function WalletDashboardSwapModal({
                       triggerVariant="text"
                       triggerLabel={t(
                         "ui_choose_new_currency_plus",
-                        "Choisissez une nouvelle devise +",
+                        "Ajouter une devise",
                       )}
                       fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                       placeholder={t(
