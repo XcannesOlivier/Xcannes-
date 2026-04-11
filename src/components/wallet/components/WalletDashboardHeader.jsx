@@ -257,8 +257,8 @@ export default function WalletDashboardHeader({
       <div className="flex flex-col items-center gap-2">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-1.5 mb-4 md:mb-3 px-2 flex justify-center">
-	            <div className="relative flex items-center gap-2 w-full max-w-[460px]">
+          <div className="w-full mt-1 md:mt-1.5 mb-4 md:mb-3 px-1 md:px-2 flex justify-center">
+	            <div className="relative flex items-center gap-2.5 w-full max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets ? (
 	                <div
 	                  className="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px]"
@@ -266,7 +266,7 @@ export default function WalletDashboardHeader({
 	                  onClick={() => setIsSwitcherOpen(false)}
 	                />
 	              ) : null}
-	              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-2.5 py-1.5 shadow-none">
+	              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-3 py-2 shadow-none">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -284,7 +284,7 @@ export default function WalletDashboardHeader({
                           aria-label={xrplConnectionIndicator.label}
                         />
 
-	                        <span className="text-[17px] md:text-[18px] font-semibold text-white/90 truncate">
+	                        <span className="text-[18px] md:text-[19px] font-semibold text-white/90 truncate">
 	                          {activeWalletLabel}
 	                        </span>
                       </div>
@@ -367,7 +367,7 @@ export default function WalletDashboardHeader({
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className={`w-4 h-4 transition-transform ${isSwitcherOpen ? "rotate-180" : ""}`}
+                        className={`w-[18px] h-[18px] transition-transform ${isSwitcherOpen ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -389,11 +389,11 @@ export default function WalletDashboardHeader({
                 type="button"
                 onClick={onCopyAddress}
                 title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
-                className="shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
+                className="shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
                 aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-[22px] h-[22px]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -413,7 +413,7 @@ export default function WalletDashboardHeader({
                 onClick={onRefreshWallet}
                 disabled={isConnecting || isRefreshing}
                 title={t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
-                className={`shrink-0 h-9 w-9 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
+                className={`shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
                   isRefreshing
                     ? "text-xcannes-green hover:text-xcannes-green/90"
                     : "text-white/60 hover:text-white"
@@ -424,7 +424,7 @@ export default function WalletDashboardHeader({
                 )}
               >
                 <svg
-                  className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`}
+                  className={`w-[22px] h-[22px] ${isRefreshing ? "animate-spin" : ""}`}
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
