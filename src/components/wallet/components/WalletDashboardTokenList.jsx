@@ -11,8 +11,8 @@ export default function WalletDashboardTokenList({
   disableInternalScroll = false,
 }) {
   const listClassName = disableInternalScroll
-    ? "flex-1 min-h-0 px-3 pb-3 rounded-2xl bg-[radial-gradient(95%_75%_at_50%_50%,rgba(34,197,94,0.08)_0%,rgba(0,0,0,0)_62%)]"
-    : "flex-1 min-h-0 px-3 pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-[radial-gradient(95%_75%_at_50%_50%,rgba(34,197,94,0.08)_0%,rgba(0,0,0,0)_62%)]";
+    ? "flex-1 min-h-0 px-3 pb-3 rounded-2xl bg-xcannes-green/5"
+    : "flex-1 min-h-0 px-3 pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-xcannes-green/5";
   const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
   return (
     <div

@@ -412,11 +412,24 @@ export default function WalletDashboardHeader({
         <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
           {totalLabel}
         </p>
-        {Number.isFinite(totalInUsd) && totalInUsd > 0 && preferredCurrency && preferredCurrency !== "USD" && preferredCurrency !== "RLUSD" && (
-          <p className="text-[11px] text-white/40 font-mono tabular-nums -mt-0.5">
-            {totalInUsd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RLUSD
-          </p>
-        )}
+        {Number.isFinite(totalInUsd) &&
+          totalInUsd > 0 &&
+          preferredCurrency &&
+          preferredCurrency !== "USD" &&
+          preferredCurrency !== "RLUSD" && (
+            <div className="text-[11px] text-white/40 -mt-0.5 inline-flex items-center gap-2">
+              <span>Devises numériques</span>
+              <button
+                type="button"
+                onClick={onOpenInfo}
+                className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/5 hover:bg-white/8 text-white/60 hover:text-white/80 transition-colors"
+                aria-label={t("ui_info", "Informations")}
+                title={t("ui_info", "Informations")}
+              >
+                <span className="text-[12px] leading-none font-semibold">i</span>
+              </button>
+            </div>
+          )}
 
         {/* ── Wallet setup dropdown (centralised activation steps) ── */}
         {isConnected && wallet && (
