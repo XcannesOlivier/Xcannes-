@@ -266,7 +266,7 @@ export default function WalletDashboardHeader({
 	                  onClick={() => setIsSwitcherOpen(false)}
 	                />
 	              ) : null}
-	              <div className="flex-1 min-w-0 rounded-md bg-black/20 px-3 py-2 shadow-none">
+	              <div className="flex-1 min-w-0 rounded-md bg-white/[0.02] px-3 py-2 shadow-none">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
