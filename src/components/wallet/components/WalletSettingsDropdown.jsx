@@ -453,7 +453,7 @@ export default function WalletSettingsDropdown({
         onClick={() => setIsOpen((v) => !v)}
         ref={buttonRef}
         className={[
-          "shrink-0 h-9 w-9 flex items-center justify-center rounded-lg border transition-all active:scale-95",
+          "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95",
           isOpen
             ? "bg-white/5 border-white/12 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)]"
             : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5",
@@ -476,6 +476,9 @@ export default function WalletSettingsDropdown({
           />
           <circle cx="12" cy="12" r="3" />
         </svg>
+        <span className="hidden lg:inline text-sm font-medium">
+          {t("ui_settings_label", "Paramètres")}
+        </span>
       </button>
 
       {isOpen && (
