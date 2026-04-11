@@ -255,35 +255,9 @@ export default function WalletDashboardHeader({
 
       {/* Solde et info wallet */}
       <div className="flex flex-col items-center gap-2">
-        <div className="text-lg md:text-sm text-white/60 tracking-[0.18em] uppercase mb-4 md:mb-0">
-          {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
-        </div>
-        <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
-          {totalLabel}
-        </p>
-        {Number.isFinite(totalInUsd) && totalInUsd > 0 && preferredCurrency && preferredCurrency !== "USD" && preferredCurrency !== "RLUSD" && (
-          <p className="text-[11px] text-white/40 font-mono tabular-nums mt-0.5">
-            {totalInUsd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RLUSD
-          </p>
-        )}
-
-        {/* ── Wallet setup dropdown (centralised activation steps) ── */}
+        {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <WalletSetupDropdown
-            key={wallet}
-            isWalletActivated={isWalletActivated}
-            hasRlusdTrustline={hasRlusdTrustline}
-            walletLabel={walletLabel}
-            isWalletLabelLocked={isWalletLabelLocked}
-            onActivateWallet={onActivateWallet}
-            onConfirmSetup={onConfirmSetup}
-            activeAction={activeAction}
-          />
-        )}
-
-        {/* Bloc wallet — sélecteur + copier + refresh */}
-        {isConnected && wallet && (
-          <div className="w-full mt-6 md:mt-1.5 px-2 flex justify-center">
+          <div className="w-full mt-1 md:mt-1.5 mb-4 md:mb-3 px-2 flex justify-center">
 	            <div className="relative flex items-center gap-2 w-full max-w-[460px]">
 	              {isSwitcherOpen && hasMultipleWallets ? (
 	                <div
@@ -476,6 +450,32 @@ export default function WalletDashboardHeader({
               />
             </div>
           </div>
+        )}
+
+        <div className="text-lg md:text-sm text-white/60 tracking-[0.18em] uppercase mb-4 md:mb-0">
+          {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
+        </div>
+        <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">
+          {totalLabel}
+        </p>
+        {Number.isFinite(totalInUsd) && totalInUsd > 0 && preferredCurrency && preferredCurrency !== "USD" && preferredCurrency !== "RLUSD" && (
+          <p className="text-[11px] text-white/40 font-mono tabular-nums mt-0.5">
+            {totalInUsd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RLUSD
+          </p>
+        )}
+
+        {/* ── Wallet setup dropdown (centralised activation steps) ── */}
+        {isConnected && wallet && (
+          <WalletSetupDropdown
+            key={wallet}
+            isWalletActivated={isWalletActivated}
+            hasRlusdTrustline={hasRlusdTrustline}
+            walletLabel={walletLabel}
+            isWalletLabelLocked={isWalletLabelLocked}
+            onActivateWallet={onActivateWallet}
+            onConfirmSetup={onConfirmSetup}
+            activeAction={activeAction}
+          />
         )}
       </div>
     </div>
