@@ -254,10 +254,10 @@ export default function WalletDashboardHeader({
       </div>
 
       {/* Solde et info wallet */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2 pb-2 md:pb-0">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-1.5 mb-4 md:mb-3 px-1 md:px-2 flex justify-center">
+          <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 -mx-2 md:mx-0 px-0 md:px-2 flex justify-center">
 	            <div className="relative flex items-center gap-2.5 w-full max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets ? (
 	                <div
@@ -266,7 +266,7 @@ export default function WalletDashboardHeader({
 	                  onClick={() => setIsSwitcherOpen(false)}
 	                />
 	              ) : null}
-	              <div className="flex-1 min-w-0 rounded-md bg-white/[0.02] px-3 py-2 shadow-none">
+	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-3 py-2 shadow-none">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -413,7 +413,7 @@ export default function WalletDashboardHeader({
           {totalLabel}
         </p>
         {Number.isFinite(totalInUsd) && totalInUsd > 0 && preferredCurrency && preferredCurrency !== "USD" && preferredCurrency !== "RLUSD" && (
-          <p className="text-[11px] text-white/40 font-mono tabular-nums mt-0.5">
+          <p className="text-[11px] text-white/40 font-mono tabular-nums -mt-0.5">
             {totalInUsd.toLocaleString("en", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} RLUSD
           </p>
         )}

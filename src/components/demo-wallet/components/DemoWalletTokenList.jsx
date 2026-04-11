@@ -33,7 +33,7 @@ export default function DemoWalletTokenList({
           >
             {t(
               "ui_consult_global_statement_3b89f4a7a2",
-              "Consulter vos dernières transactions",
+              "Dernières transactions",
             )}
           </button>
         </div>

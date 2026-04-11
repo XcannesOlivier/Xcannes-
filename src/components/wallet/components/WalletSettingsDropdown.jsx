@@ -208,6 +208,8 @@ export default function WalletSettingsDropdown({
         ? "relative md:hidden"
         : "relative";
 
+  const inlineButton = position === "inline";
+
   const isDesktop =
     typeof window !== "undefined"
       ? window.matchMedia?.("(min-width: 768px)")?.matches
@@ -453,10 +455,14 @@ export default function WalletSettingsDropdown({
         onClick={() => setIsOpen((v) => !v)}
         ref={buttonRef}
         className={[
-          "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95",
+          inlineButton
+            ? "shrink-0 h-10 px-3 flex items-center justify-center gap-2 rounded-md border transition-all active:scale-95 bg-elevated"
+            : "shrink-0 h-9 px-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all active:scale-95",
           isOpen
             ? "bg-white/5 border-white/12 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.06)]"
-            : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5",
+            : inlineButton
+              ? "border-white/10 text-white/70 hover:text-white hover:bg-white/5"
+              : "bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/5",
         ].join(" ")}
         aria-label={t("ui_settings_label", "Paramètres")}
         aria-haspopup="menu"

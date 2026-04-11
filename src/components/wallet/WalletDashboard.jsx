@@ -1220,13 +1220,13 @@ export default function WalletDashboard({
 	                  <button
 	                    type="button"
 	                    onClick={handleOpenGlobalStatement}
-	                    className="text-[16px] md:text-[18px] text-white/80 hover:text-white transition-colors"
+	                    className="w-full flex justify-center text-[16px] md:text-[18px] text-white/80 hover:text-white transition-colors"
 	                  >
 	                    <span className="inline-flex items-center gap-2">
 	                      <span>
 	                        {t(
 	                          "ui_consult_global_statement_3b89f4a7a2",
-	                          "Consulter vos dernières transactions",
+	                          "Dernières transactions",
 	                        )}
 	                      </span>
 	                      <span className="text-white/35 text-lg md:text-xl leading-none">›</span>
