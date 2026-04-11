@@ -109,6 +109,8 @@
 @media (max-width: 767px) {
   .panel-header {
     padding-top: 0.25rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
   }
 }
 
