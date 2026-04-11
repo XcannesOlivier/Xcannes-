@@ -257,7 +257,7 @@ export default function WalletDashboardHeader({
       <div className="flex flex-col items-center gap-2 pb-4 md:pb-0">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 px-3 md:px-2 flex justify-center">
+          <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 px-1 md:px-2 flex justify-center">
 	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets ? (
 	                <div
