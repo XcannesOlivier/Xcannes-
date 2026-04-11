@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSendForm } from "./useSendForm";
-import { useSavedAddresses } from "./useSavedAddresses";
-import { usePayreqStorage } from "./usePayreqStorage";
-import { usePaymentRequestScanner } from "./usePaymentRequestScanner";
-import { useSendTransaction } from "./useSendTransaction";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSendForm } from './useSendForm';
+import { useSavedAddresses } from './useSavedAddresses';
+import { usePayreqStorage } from './usePayreqStorage';
+import { usePaymentRequestScanner } from './usePaymentRequestScanner';
+import { useSendTransaction } from './useSendTransaction';
 
 /**
  * useWalletSendOrchestrator — Groups all send / receive / payment-request
@@ -28,8 +28,7 @@ export function useWalletSendOrchestrator({
   confirm,
   setActiveAction,
 }) {
-  const resolvedWalletAddress =
-    typeof wallet === "string" ? wallet : wallet?.address || "";
+  const resolvedWalletAddress = typeof wallet === 'string' ? wallet : wallet?.address || '';
 
   // ── Send form ──────────────────────────────────────────────
   const {
@@ -56,17 +55,18 @@ export function useWalletSendOrchestrator({
   });
 
   // ── Pending payment requests (local storage) ───────────────
-  const { pendingPayreqs, savePayreq, removePayreq, pendingCount } =
-    usePayreqStorage({ walletAddress: resolvedWalletAddress || null });
+  const { pendingPayreqs, savePayreq, removePayreq, pendingCount } = usePayreqStorage({
+    walletAddress: resolvedWalletAddress || null,
+  });
 
   const [showSaveAddressPrompt, setShowSaveAddressPrompt] = useState(false);
-  const [addressToSave, setAddressToSave] = useState("");
+  const [addressToSave, setAddressToSave] = useState('');
   const [moonpaySellRequest, setMoonpaySellRequest] = useState(null);
   const activeMoonpaySourceCurrency = useMemo(() => {
-    const sourceCurrency = String(moonpaySellRequest?.sourceCurrencyCode || "")
+    const sourceCurrency = String(moonpaySellRequest?.sourceCurrencyCode || '')
       .trim()
       .toUpperCase();
-    const baseCurrency = String(moonpaySellRequest?.baseCurrencyCode || "")
+    const baseCurrency = String(moonpaySellRequest?.baseCurrencyCode || '')
       .trim()
       .toUpperCase();
     if (sourceCurrency && sourceCurrency !== baseCurrency) return sourceCurrency;
@@ -74,27 +74,28 @@ export function useWalletSendOrchestrator({
   }, [moonpaySellRequest]);
 
   // ── Receive form ───────────────────────────────────────────
-  const [receiveTab, setReceiveTab] = useState("receive");
+  // "choice" | "share" | "request"
+  const [receiveTab, setReceiveTab] = useState('choice');
 
   // ── Payment-request creation form ──────────────────────────
-  const [requestAmount, setRequestAmount] = useState("");
-  const [requestCurrency, setRequestCurrency] = useState("USD");
-  const [requestMemo, setRequestMemo] = useState("");
+  const [requestAmount, setRequestAmount] = useState('');
+  const [requestCurrency, setRequestCurrency] = useState('USD');
+  const [requestMemo, setRequestMemo] = useState('');
 
   const resetReceiveForm = () => {
-    setReceiveTab("receive");
-    setRequestAmount("");
-    setRequestCurrency("USD");
-    setRequestMemo("");
+    setReceiveTab('choice');
+    setRequestAmount('');
+    setRequestCurrency('USD');
+    setRequestMemo('');
   };
 
   // Guard: prevent XRP/RLUSD as payment-request currency.
   useEffect(() => {
-    const upper = String(requestCurrency || "")
+    const upper = String(requestCurrency || '')
       .trim()
       .toUpperCase();
-    if (upper === "XRP" || upper === "RLUSD") {
-      setRequestCurrency("USD");
+    if (upper === 'XRP' || upper === 'RLUSD') {
+      setRequestCurrency('USD');
     }
   }, [requestCurrency, setRequestCurrency]);
 
@@ -102,36 +103,32 @@ export function useWalletSendOrchestrator({
   const selectedSendToken = useMemo(() => {
     const activeCurrency = activeMoonpaySourceCurrency;
     const activePool = moonpaySellRequest ? augmentedTokens : selectableTokens;
-    const byKey = (activePool || []).find((tok) => tok.key === sendAssetKey);
+    const byKey = (activePool || []).find(tok => tok.key === sendAssetKey);
     if (byKey) return byKey;
     if (activeCurrency) {
       const byCurrency = (augmentedTokens || []).find(
-        (tok) => String(tok?.currency || "").trim().toUpperCase() === activeCurrency,
+        tok =>
+          String(tok?.currency || '')
+            .trim()
+            .toUpperCase() === activeCurrency,
       );
       if (byCurrency) return byCurrency;
     }
     return (activePool || [])[0] || null;
-  }, [
-    activeMoonpaySourceCurrency,
-    augmentedTokens,
-    moonpaySellRequest,
-    selectableTokens,
-    sendAssetKey,
-  ]);
+  }, [activeMoonpaySourceCurrency, augmentedTokens, moonpaySellRequest, selectableTokens, sendAssetKey]);
 
   // ── Send FX info ───────────────────────────────────────────
   const sendFxInfo = useMemo(() => {
-    const code = String(selectedSendToken?.currency || "").toUpperCase();
+    const code = String(selectedSendToken?.currency || '').toUpperCase();
     if (!code) return null;
-    if (code === "XRP" || code === "RLUSD" || code === "USD") return null;
+    if (code === 'XRP' || code === 'RLUSD' || code === 'USD') return null;
     if (!selectedSendToken?.isTrustlineOnly) return null;
 
-    const amountFx = Number.parseFloat(sendAmount || "0");
+    const amountFx = Number.parseFloat(sendAmount || '0');
     if (!Number.isFinite(amountFx) || amountFx <= 0) return null;
 
     const rawRate = Number(rlusdPerUnitRates?.[code]);
-    const rlusdPerUnit =
-      Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
+    const rlusdPerUnit = Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
     if (!Number.isFinite(rlusdPerUnit) || rlusdPerUnit <= 0) return null;
 
     const paymentRlusd = amountFx * rlusdPerUnit;
@@ -151,21 +148,18 @@ export function useWalletSendOrchestrator({
     const requestedRlusd = Number(sendPaymentRequest?.amountRlusd);
     if (!Number.isFinite(requestedRlusd) || requestedRlusd <= 0) return;
 
-    const targetCurrency = String(sendPaymentRequest?.targetCurrencyCode || "")
+    const targetCurrency = String(sendPaymentRequest?.targetCurrencyCode || '')
       .trim()
       .toUpperCase();
-    const selectedCurrency = String(
-      selectedSendToken?.currency || "",
-    ).toUpperCase();
+    const selectedCurrency = String(selectedSendToken?.currency || '').toUpperCase();
     if (!selectedCurrency) return;
 
     const rawRate = Number(rlusdPerUnitRates?.[selectedCurrency]);
-    const fallbackRate =
-      Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
+    const fallbackRate = Number.isFinite(rawRate) && rawRate > 0 ? rawRate : Number.NaN;
 
     let nextAmount = null;
 
-    if (selectedCurrency === "RLUSD") {
+    if (selectedCurrency === 'RLUSD') {
       nextAmount = requestedRlusd;
     } else if (targetCurrency && selectedCurrency === targetCurrency) {
       const displayAmount = Number(sendPaymentRequest?.displayAmount);
@@ -173,10 +167,7 @@ export function useWalletSendOrchestrator({
         nextAmount = displayAmount;
       } else {
         const requestedFxRate = Number(sendPaymentRequest?.fxRate);
-        const rate =
-          Number.isFinite(requestedFxRate) && requestedFxRate > 0
-            ? requestedFxRate
-            : fallbackRate;
+        const rate = Number.isFinite(requestedFxRate) && requestedFxRate > 0 ? requestedFxRate : fallbackRate;
         if (Number.isFinite(rate) && rate > 0) {
           nextAmount = requestedRlusd / rate;
         }
@@ -189,17 +180,12 @@ export function useWalletSendOrchestrator({
 
     if (!Number.isFinite(nextAmount) || nextAmount <= 0) return;
 
-    const formatted = nextAmount.toFixed(6).replace(/\.?0+$/, "");
+    const formatted = nextAmount.toFixed(6).replace(/\.?0+$/, '');
     setSendAmount(formatted);
   }, [rlusdPerUnitRates, sendPaymentRequest, selectedSendToken, setSendAmount]);
 
   // ── QR scanner ─────────────────────────────────────────────
-  const {
-    qrScannerOpen,
-    setQrScannerOpen,
-    handleAddressScan,
-    handlePaymentRequestScan,
-  } = usePaymentRequestScanner({
+  const { qrScannerOpen, setQrScannerOpen, handleAddressScan, handlePaymentRequestScan } = usePaymentRequestScanner({
     augmentedTokens,
     setSendDestination,
     setSendDestinationLabel,
@@ -219,15 +205,15 @@ export function useWalletSendOrchestrator({
 
   // ── Resume a saved payment request ─────────────────────────
   const handleResumePayreq = useCallback(
-    (entry) => {
+    entry => {
       if (!entry?.payreq) return;
       const pr = entry.payreq;
       setMoonpaySellRequest(null);
       if (pr.to) setSendDestination(pr.to);
-      setSendDestinationLabel("");
-      const targetCurrency = String(pr.targetCurrencyCode || "").toUpperCase();
+      setSendDestinationLabel('');
+      const targetCurrency = String(pr.targetCurrencyCode || '').toUpperCase();
       const matchingToken = (augmentedTokens || []).find(
-        (tok) => String(tok.currency || "").toUpperCase() === targetCurrency,
+        tok => String(tok.currency || '').toUpperCase() === targetCurrency,
       );
       if (matchingToken) {
         setSendAssetKey(matchingToken.key);
@@ -239,8 +225,8 @@ export function useWalletSendOrchestrator({
         setSendAmount(String(pr.amountRlusd));
       }
       setSendPaymentRequest(pr);
-      setSendTab("manual");
-      setActiveAction("send");
+      setSendTab('manual');
+      setActiveAction('send');
     },
     [
       augmentedTokens,
@@ -255,41 +241,39 @@ export function useWalletSendOrchestrator({
   );
 
   const startMoonpaySellRequest = useCallback(
-    (request) => {
+    request => {
       if (!request) return false;
-      const baseCurrency = String(request?.baseCurrencyCode || "")
+      const baseCurrency = String(request?.baseCurrencyCode || '')
         .trim()
         .toUpperCase();
-      const sourceCurrency = String(request?.sourceCurrencyCode || "")
+      const sourceCurrency = String(request?.sourceCurrencyCode || '')
         .trim()
         .toUpperCase();
-      const currency =
-        sourceCurrency && sourceCurrency !== baseCurrency
-          ? sourceCurrency
-          : baseCurrency;
-      const destination = String(request?.depositWalletAddress || "").trim();
+      const currency = sourceCurrency && sourceCurrency !== baseCurrency ? sourceCurrency : baseCurrency;
+      const destination = String(request?.depositWalletAddress || '').trim();
       const amount = String(
-        sourceCurrency && sourceCurrency !== baseCurrency
-          ? request?.sourceAmount
-          : request?.baseCurrencyAmount,
+        sourceCurrency && sourceCurrency !== baseCurrency ? request?.sourceAmount : request?.baseCurrencyAmount,
       ).trim();
       if (!currency || !destination || !amount) return false;
 
       const matchingToken = (augmentedTokens || []).find(
-        (tok) => String(tok?.currency || "").trim().toUpperCase() === currency,
+        tok =>
+          String(tok?.currency || '')
+            .trim()
+            .toUpperCase() === currency,
       );
       if (!matchingToken) return false;
 
       setMoonpaySellRequest({
         ...request,
         baseCurrencyCode: currency,
-        beneficiaryLabel: "MoonPay",
+        beneficiaryLabel: 'MoonPay',
       });
       setSendPaymentRequest(null);
-      setSendTab("manual");
+      setSendTab('manual');
       setSendAssetKey(matchingToken.key);
       setSendDestination(destination);
-      setSendDestinationLabel("MoonPay");
+      setSendDestinationLabel('MoonPay');
       setSendAmount(amount);
       return true;
     },

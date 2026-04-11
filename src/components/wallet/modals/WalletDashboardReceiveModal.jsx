@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { Buffer } from "buffer";
-import { useEffect, useMemo, useRef, useState } from "react";
-import useIsDesktop from "../hooks/useIsDesktop";
-import { QRCodeCanvas } from "qrcode.react";
-import ModalSelect from "@/components/ui/ModalSelect";
-import { createPortal } from "react-dom";
-import { useTranslation } from "next-i18next";
-import { XRPL_KNOWN_ISSUERS } from "@/utils/xrpl";
+import { Buffer } from 'buffer';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import useIsDesktop from '../hooks/useIsDesktop';
+import { QRCodeCanvas } from 'qrcode.react';
+import ModalSelect from '@/components/ui/ModalSelect';
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'next-i18next';
+import { XRPL_KNOWN_ISSUERS } from '@/utils/xrpl';
 
-import { useModalTransition } from "@/hooks/useModalTransition";
-import { formatAmountWithSymbol } from "../walletDashboardConfig";
-import WalletActiveLabel from "../components/WalletActiveLabel";
+import { useModalTransition } from '@/hooks/useModalTransition';
+import { formatAmountWithSymbol } from '../walletDashboardConfig';
+import WalletActiveLabel from '../components/WalletActiveLabel';
 
-const ShareIcon = ({ className = "" }) => (
+const ShareIcon = ({ className = '' }) => (
   <svg
     viewBox="0 0 24 24"
     fill="none"
@@ -30,10 +30,84 @@ const ShareIcon = ({ className = "" }) => (
   </svg>
 );
 
+const ChevronRightIcon = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <polyline points="9 18 15 12 9 6" />
+  </svg>
+);
+
+const ArrowLeftIcon = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <line x1="19" y1="12" x2="5" y2="12" />
+    <polyline points="12 19 5 12 12 5" />
+  </svg>
+);
+
+const QrIcon = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M7 7h1v1H7V7Z" />
+    <path d="M16 7h1v1h-1V7Z" />
+    <path d="M7 16h1v1H7v-1Z" />
+    <path d="M4 4h6v6H4V4Z" />
+    <path d="M14 4h6v6h-6V4Z" />
+    <path d="M4 14h6v6H4v-6Z" />
+    <path d="M14 14h2v2h-2v-2Z" />
+    <path d="M18 14h2v6h-6v-2" />
+    <path d="M14 18h2" />
+  </svg>
+);
+
+const RequestIcon = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" />
+    <path d="M14 2v6h6" />
+    <path d="M8 13h8" />
+    <path d="M8 17h5" />
+  </svg>
+);
+
 export default function WalletDashboardReceiveModal({
   open,
   onClose,
-  noticeVariant = "preview",
+  noticeVariant = 'preview',
+  receiveTab,
+  setReceiveTab,
   wallet,
   requestAmount,
   setRequestAmount,
@@ -53,41 +127,60 @@ export default function WalletDashboardReceiveModal({
   resetReceiveForm,
   inline = false,
 }) {
-  const { t, i18n } = useTranslation("common");
-  const locale = i18n?.language || "en";
-  const fallbackWalletLabel = t("nav_wallet", "Wallet");
+  const { t, i18n } = useTranslation('common');
+  const locale = i18n?.language || 'en';
+  const fallbackWalletLabel = t('nav_wallet', 'Wallet');
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const isDesktop = useIsDesktop();
-  const [copyToast, setCopyToast] = useState("");
+  const [copyToast, setCopyToast] = useState('');
   const copyToastTimerRef = useRef(null);
   const autoCloseTimerRef = useRef(null);
   const receiveQrContainerRef = useRef(null);
   const requestQrContainerRef = useRef(null);
   const requestPreviewRef = useRef(null);
+  const [localReceiveTab, setLocalReceiveTab] = useState('choice');
+
+  const setReceiveTabSafe = setReceiveTab || setLocalReceiveTab;
+  const rawReceiveTab = receiveTab != null ? receiveTab : localReceiveTab;
+  const receiveView = useMemo(() => {
+    const tab = String(rawReceiveTab || '')
+      .trim()
+      .toLowerCase();
+    if (tab === 'choice' || tab === 'select') return 'choice';
+    if (tab === 'request' || tab === 'payreq' || tab === 'create') return 'request';
+    if (tab === 'share' || tab === 'receive') return 'share';
+    return 'choice';
+  }, [rawReceiveTab]);
+
+  const switchReceiveView = useCallback(
+    nextView => {
+      setGenerateError(null);
+      setCopyToast('');
+      setReceiveTabSafe(nextView);
+    },
+    [setReceiveTabSafe],
+  );
 
   const requestCurrencyCode = useMemo(
     () =>
-      String(requestCurrency || "")
+      String(requestCurrency || '')
         .trim()
         .toUpperCase(),
     [requestCurrency],
   );
 
   const selectedRequestToken = useMemo(() => {
-    return (
-      (augmentedTokens || []).find(
-        (t) => String(t?.currency || "").toUpperCase() === requestCurrencyCode,
-      ) || null
-    );
+    return (augmentedTokens || []).find(t => String(t?.currency || '').toUpperCase() === requestCurrencyCode) || null;
   }, [augmentedTokens, requestCurrencyCode]);
 
   useEffect(() => {
     if (!open) {
       setGeneratedRequest(null);
       setGenerateError(null);
+      if (!setReceiveTab) setLocalReceiveTab('choice');
     }
-  }, [open]);
+  }, [open, setReceiveTab]);
 
   useEffect(() => {
     return () => {
@@ -110,55 +203,40 @@ export default function WalletDashboardReceiveModal({
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
     if (!requestCurrencyCode) return false;
-    return (
-      requestCurrencyCode !== "XRP" &&
-      requestCurrencyCode !== "RLUSD" &&
-      requestCurrencyCode !== "USD"
-    );
+    return requestCurrencyCode !== 'XRP' && requestCurrencyCode !== 'RLUSD' && requestCurrencyCode !== 'USD';
   }, [requestCurrencyCode, selectedRequestToken?.isTrustlineOnly]);
 
   const handleGenerateRequest = () => {
     setGenerateError(null);
 
-    const amount = Number.parseFloat(requestAmount || "0");
+    const amount = Number.parseFloat(requestAmount || '0');
     if (!Number.isFinite(amount) || amount <= 0) {
-      setGenerateError(
-        t(
-          "ui_request_error_invalid_amount_5bd214c9a7",
-          "Please enter a valid amount.",
-        ),
-      );
+      setGenerateError(t('ui_request_error_invalid_amount_5bd214c9a7', 'Please enter a valid amount.'));
       return;
     }
 
     if (!wallet) {
-      setGenerateError(
-        t(
-          "ui_request_error_missing_wallet_4f7a2c9b1e",
-          "Wallet address is missing.",
-        ),
-      );
+      setGenerateError(t('ui_request_error_missing_wallet_4f7a2c9b1e', 'Wallet address is missing.'));
       return;
     }
 
-    const targetCurrencyCode = requestCurrencyCode || "USD";
-    const targetCurrencyUpper = String(targetCurrencyCode || "").toUpperCase();
-    const displayCurrencyUpper =
-      targetCurrencyUpper === "RLUSD" ? "USD" : targetCurrencyUpper;
+    const targetCurrencyCode = requestCurrencyCode || 'USD';
+    const targetCurrencyUpper = String(targetCurrencyCode || '').toUpperCase();
+    const displayCurrencyUpper = targetCurrencyUpper === 'RLUSD' ? 'USD' : targetCurrencyUpper;
     let amountRlusd = null;
     let fxRate = null;
     let fxSource = null;
 
-    if (targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD") {
+    if (targetCurrencyUpper === 'RLUSD' || targetCurrencyUpper === 'USD') {
       amountRlusd = amount;
       fxRate = 1;
-      fxSource = "FAWAZ";
+      fxSource = 'FAWAZ';
     } else {
       const rate = Number(rlusdPerUnitRates?.[targetCurrencyUpper]);
       if (!Number.isFinite(rate) || rate <= 0) {
         setGenerateError(
-          t("ui_request_error_rate_unavailable_8c2e1a7b5d", {
-            defaultValue: "Rate unavailable for {{currency}}.",
+          t('ui_request_error_rate_unavailable_8c2e1a7b5d', {
+            defaultValue: 'Rate unavailable for {{currency}}.',
             currency: targetCurrencyUpper,
           }),
         );
@@ -169,20 +247,14 @@ export default function WalletDashboardReceiveModal({
       amountRlusd = amount * rate;
     }
 
-    const issuerCandidate = String(selectedRequestToken?.issuer || "").trim();
-    const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(
-      issuerCandidate,
-    );
+    const issuerCandidate = String(selectedRequestToken?.issuer || '').trim();
+    const issuerLooksValid = /^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuerCandidate);
     // USD et RLUSD utilisent le même issuer on-chain (RLUSD)
     const knownIssuer =
-      targetCurrencyUpper === "RLUSD" || targetCurrencyUpper === "USD"
-        ? XRPL_KNOWN_ISSUERS.RLUSD
-        : null;
-    const issuer = isFxRequest
-      ? null
-      : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
+      targetCurrencyUpper === 'RLUSD' || targetCurrencyUpper === 'USD' ? XRPL_KNOWN_ISSUERS.RLUSD : null;
+    const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
-    const beneficiaryLabel = String(walletLabel || "").trim() || null;
+    const beneficiaryLabel = String(walletLabel || '').trim() || null;
     const req = {
       schema: 'xcannes-payreq',
       to: wallet,
@@ -193,18 +265,17 @@ export default function WalletDashboardReceiveModal({
       fxRate,
       fxSource,
       issuer,
-      memo: requestMemo || "",
+      memo: requestMemo || '',
       beneficiaryLabel,
       createdAt: new Date().toISOString(),
     };
 
     setGeneratedRequest(req);
     onRequestGenerated?.(req);
-    setIsRequestOpen(false);
   };
 
   const flashCopyToast = (message, autoClose = false) => {
-    const text = String(message || "").trim();
+    const text = String(message || '').trim();
     if (!text) return;
     setCopyToast(text);
     if (copyToastTimerRef.current) {
@@ -215,7 +286,7 @@ export default function WalletDashboardReceiveModal({
       autoCloseTimerRef.current = null;
     }
     copyToastTimerRef.current = window.setTimeout(() => {
-      setCopyToast("");
+      setCopyToast('');
       copyToastTimerRef.current = null;
     }, 1300);
     // Auto-close the modal after the toast fades out
@@ -227,10 +298,10 @@ export default function WalletDashboardReceiveModal({
     }
   };
 
-  const dataUrlToBlob = (url) => {
-    const parts = url.split(",");
+  const dataUrlToBlob = url => {
+    const parts = url.split(',');
     if (parts.length !== 2) return null;
-    const mime = (parts[0].match(/:(.*?);/) || [])[1] || "image/png";
+    const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/png';
     const binary = atob(parts[1]);
     const len = binary.length;
     const bytes = new Uint8Array(len);
@@ -241,10 +312,8 @@ export default function WalletDashboardReceiveModal({
   };
 
   const buildQrBlob = (useRequest = hasGeneratedRequest) => {
-    const container = useRequest
-      ? requestQrContainerRef.current
-      : receiveQrContainerRef.current;
-    const canvas = container?.querySelector?.("canvas");
+    const container = useRequest ? requestQrContainerRef.current : receiveQrContainerRef.current;
+    const canvas = container?.querySelector?.('canvas');
     if (!canvas) return null;
     const srcWidth = canvas.width;
     const srcHeight = canvas.height;
@@ -252,16 +321,13 @@ export default function WalletDashboardReceiveModal({
     const marginRatio = useRequest ? 0.12 : 0.1;
     const margin = Math.max(24, Math.round(srcWidth * marginRatio));
     const maxExportWidth = 1600;
-    const safeScale = Math.min(
-      baseScale,
-      maxExportWidth / (srcWidth + margin * 2),
-    );
+    const safeScale = Math.min(baseScale, maxExportWidth / (srcWidth + margin * 2));
     const scale = Math.max(1.8, safeScale);
-    const exportCanvas = document.createElement("canvas");
+    const exportCanvas = document.createElement('canvas');
     const exportWidth = Math.round((srcWidth + margin * 2) * scale);
     const baseHeight = (srcHeight + margin * 2) * scale;
     exportCanvas.width = exportWidth;
-    const ctx = exportCanvas.getContext("2d");
+    const ctx = exportCanvas.getContext('2d');
     if (!ctx) return null;
 
     const maxTextWidth = exportWidth - margin * scale * 2;
@@ -275,16 +341,16 @@ export default function WalletDashboardReceiveModal({
     const wrapText = (text, font) => {
       if (!text) return [];
       ctx.font = font;
-      const words = String(text).split(" ");
+      const words = String(text).split(' ');
       const lines = [];
-      let current = "";
+      let current = '';
       const pushCurrent = () => {
         if (current) {
           lines.push(current);
-          current = "";
+          current = '';
         }
       };
-      words.forEach((word) => {
+      words.forEach(word => {
         const test = current ? `${current} ${word}` : word;
         if (ctx.measureText(test).width <= maxTextWidth) {
           current = test;
@@ -295,7 +361,7 @@ export default function WalletDashboardReceiveModal({
           current = word;
           return;
         }
-        let chunk = "";
+        let chunk = '';
         for (const ch of word) {
           const next = `${chunk}${ch}`;
           if (ctx.measureText(next).width > maxTextWidth && chunk) {
@@ -315,85 +381,48 @@ export default function WalletDashboardReceiveModal({
 
     const textLines = [];
     const addLines = (text, font, color, lineHeight) => {
-      wrapText(text, font).forEach((line) => {
+      wrapText(text, font).forEach(line => {
         textLines.push({ text: line, font, color, lineHeight });
       });
     };
 
     const labelText = String(
       useRequest
-        ? generatedRequest?.beneficiaryLabel ||
-            walletLabel ||
-            fallbackWalletLabel
+        ? generatedRequest?.beneficiaryLabel || walletLabel || fallbackWalletLabel
         : walletLabel || fallbackWalletLabel,
     ).trim();
-    const addressText = String(
-      useRequest ? generatedRequest?.to || wallet || "" : wallet || "",
-    ).trim();
-    const amountLine = useRequest
-      ? `${requestDisplayAmountLabel} ${requestDisplayCurrency}`.trim()
-      : "";
-    const dateLine = useRequest ? requestDateLabel : "";
+    const addressText = String(useRequest ? generatedRequest?.to || wallet || '' : wallet || '').trim();
+    const amountLine = useRequest ? `${requestDisplayAmountLabel} ${requestDisplayCurrency}`.trim() : '';
+    const dateLine = useRequest ? requestDateLabel : '';
 
     if (labelText) {
-      addLines(
-        labelText,
-        labelFont,
-        "#111111",
-        Math.round(labelFontSize * 1.35),
-      );
+      addLines(labelText, labelFont, '#111111', Math.round(labelFontSize * 1.35));
     }
     if (addressText) {
-      addLines(
-        addressText,
-        addressFont,
-        "#333333",
-        Math.round(addressFontSize * 1.35),
-      );
+      addLines(addressText, addressFont, '#333333', Math.round(addressFontSize * 1.35));
     }
     if (amountLine) {
-      addLines(
-        amountLine,
-        metaFont,
-        "#444444",
-        Math.round(metaFontSize * 1.35),
-      );
+      addLines(amountLine, metaFont, '#444444', Math.round(metaFontSize * 1.35));
     }
     if (dateLine) {
-      addLines(
-        dateLine,
-        metaFont,
-        "#555555",
-        Math.round(metaFontSize * 1.35),
-      );
+      addLines(dateLine, metaFont, '#555555', Math.round(metaFontSize * 1.35));
     }
 
     const textGap = textLines.length ? Math.round(labelFontSize * 0.8) : 0;
-    const textBlockHeight = textLines.reduce(
-      (sum, line) => sum + line.lineHeight,
-      0,
-    );
+    const textBlockHeight = textLines.reduce((sum, line) => sum + line.lineHeight, 0);
     exportCanvas.height = baseHeight + textGap + textBlockHeight;
 
     ctx.imageSmoothingEnabled = false;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
     const offset = margin * scale;
     ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
     try {
-      const srcCtx = canvas.getContext("2d");
+      const srcCtx = canvas.getContext('2d');
       const srcPixel = srcCtx?.getImageData(0, 0, 1, 1)?.data;
-      const isDarkBg =
-        srcPixel && srcPixel.length >= 3
-          ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3
-          : false;
+      const isDarkBg = srcPixel && srcPixel.length >= 3 ? srcPixel[0] + srcPixel[1] + srcPixel[2] < 128 * 3 : false;
       if (isDarkBg) {
-        const imageData = ctx.getImageData(
-          offset,
-          offset,
-          srcWidth * scale,
-          srcHeight * scale,
-        );
+        const imageData = ctx.getImageData(offset, offset, srcWidth * scale, srcHeight * scale);
         const data = imageData.data;
         for (let i = 0; i < data.length; i += 4) {
           data[i] = 255 - data[i];
@@ -404,20 +433,14 @@ export default function WalletDashboardReceiveModal({
       }
     } catch {
       // fallback to raw canvas if pixel access fails
-      ctx.drawImage(
-        canvas,
-        offset,
-        offset,
-        srcWidth * scale,
-        srcHeight * scale,
-      );
+      ctx.drawImage(canvas, offset, offset, srcWidth * scale, srcHeight * scale);
     }
 
     if (textLines.length > 0) {
       let y = offset + srcHeight * scale + textGap;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      textLines.forEach((line) => {
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      textLines.forEach(line => {
         ctx.font = line.font;
         ctx.fillStyle = line.color;
         ctx.fillText(line.text, exportWidth / 2, y);
@@ -425,7 +448,7 @@ export default function WalletDashboardReceiveModal({
       });
     }
 
-    const dataUrl = exportCanvas.toDataURL("image/png");
+    const dataUrl = exportCanvas.toDataURL('image/png');
     return dataUrlToBlob(dataUrl);
   };
 
@@ -433,7 +456,7 @@ export default function WalletDashboardReceiveModal({
     if (!blob || !filename) return;
     try {
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
       link.download = filename;
       document.body.appendChild(link);
@@ -453,25 +476,25 @@ export default function WalletDashboardReceiveModal({
       if (navigator?.clipboard?.writeText) {
         try {
           await navigator.clipboard.writeText(fallbackText);
-          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          flashCopyToast(t('ui_qr_code_copied_5c1d2e', 'Code copié'), true);
           return;
         } catch {
           // fall through to execCommand
         }
       }
       try {
-        const el = document.createElement("textarea");
+        const el = document.createElement('textarea');
         el.value = fallbackText;
-        el.setAttribute("readonly", "");
-        el.style.position = "fixed";
-        el.style.left = "-9999px";
+        el.setAttribute('readonly', '');
+        el.style.position = 'fixed';
+        el.style.left = '-9999px';
         document.body.appendChild(el);
         el.focus();
         el.select();
-        const ok = document.execCommand("copy");
+        const ok = document.execCommand('copy');
         document.body.removeChild(el);
         if (ok) {
-          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          flashCopyToast(t('ui_qr_code_copied_5c1d2e', 'Code copié'), true);
           return;
         }
       } catch {
@@ -479,18 +502,18 @@ export default function WalletDashboardReceiveModal({
       }
     }
 
-    if (typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write) {
+    if (typeof ClipboardItem !== 'undefined' && navigator?.clipboard?.write) {
       try {
         if (blob) {
-          const items = { "image/png": blob };
+          const items = { 'image/png': blob };
           if (fallbackText) {
-            items["text/plain"] = new Blob([fallbackText], {
-              type: "text/plain",
+            items['text/plain'] = new Blob([fallbackText], {
+              type: 'text/plain',
             });
           }
           const item = new ClipboardItem(items);
           await navigator.clipboard.write([item]);
-          flashCopyToast(t("ui_qr_copied_7b1a9c", "QR copié"), true);
+          flashCopyToast(t('ui_qr_copied_7b1a9c', 'QR copié'), true);
           return;
         }
       } catch {
@@ -501,7 +524,7 @@ export default function WalletDashboardReceiveModal({
     if (navigator?.clipboard?.writeText && fallbackText) {
       try {
         await navigator.clipboard.writeText(fallbackText);
-        flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+        flashCopyToast(t('ui_qr_code_copied_5c1d2e', 'Code copié'), true);
         return;
       } catch {
         // fall through to execCommand
@@ -510,18 +533,18 @@ export default function WalletDashboardReceiveModal({
 
     if (fallbackText) {
       try {
-        const el = document.createElement("textarea");
+        const el = document.createElement('textarea');
         el.value = fallbackText;
-        el.setAttribute("readonly", "");
-        el.style.position = "fixed";
-        el.style.left = "-9999px";
+        el.setAttribute('readonly', '');
+        el.style.position = 'fixed';
+        el.style.left = '-9999px';
         document.body.appendChild(el);
         el.focus();
         el.select();
-        const ok = document.execCommand("copy");
+        const ok = document.execCommand('copy');
         document.body.removeChild(el);
         if (ok) {
-          flashCopyToast(t("ui_qr_code_copied_5c1d2e", "Code copié"), true);
+          flashCopyToast(t('ui_qr_code_copied_5c1d2e', 'Code copié'), true);
           return;
         }
       } catch {
@@ -529,7 +552,7 @@ export default function WalletDashboardReceiveModal({
       }
     }
 
-    flashCopyToast(t("ui_qr_copy_failed_a1b2c3", "Impossible de copier le QR"));
+    flashCopyToast(t('ui_qr_copy_failed_a1b2c3', 'Impossible de copier le QR'));
   };
 
   const handleShareQr = async (useRequest = hasGeneratedRequest) => {
@@ -538,35 +561,27 @@ export default function WalletDashboardReceiveModal({
 
     if (isDesktop || !navigator?.share) {
       if (blob) {
-        downloadBlob(blob, "xcannes-qr.png");
-        flashCopyToast(t("ui_qr_downloaded_2f1a7c9d5e", "QR téléchargé"), true);
+        downloadBlob(blob, 'xcannes-qr.png');
+        flashCopyToast(t('ui_qr_downloaded_2f1a7c9d5e', 'QR téléchargé'), true);
         return;
       }
       if (fallbackText) {
-        downloadBlob(
-          new Blob([fallbackText], { type: "text/plain" }),
-          "xcannes-qr.txt",
-        );
-        flashCopyToast(t("ui_code_downloaded_5c1d2e7f9a", "Code téléchargé"), true);
+        downloadBlob(new Blob([fallbackText], { type: 'text/plain' }), 'xcannes-qr.txt');
+        flashCopyToast(t('ui_code_downloaded_5c1d2e7f9a', 'Code téléchargé'), true);
         return;
       }
-      flashCopyToast(
-        t("ui_share_unavailable_3b7c1a9d5e", "Partager indisponible"),
-      );
+      flashCopyToast(t('ui_share_unavailable_3b7c1a9d5e', 'Partager indisponible'));
       return;
     }
 
     const shareData = {};
-    shareData.title = t("ui_share_qr_title_7f2a1b9c5e", "XCANNES QR");
+    shareData.title = t('ui_share_qr_title_7f2a1b9c5e', 'XCANNES QR');
 
-    const payreqShareText = t(
-      "ui_share_payreq_short",
-      "XCANNES payment request",
-    );
+    const payreqShareText = t('ui_share_payreq_short', 'XCANNES payment request');
 
-    if (blob && typeof File !== "undefined") {
-      const file = new File([blob], "xcannes-qr.png", {
-        type: blob.type || "image/png",
+    if (blob && typeof File !== 'undefined') {
+      const file = new File([blob], 'xcannes-qr.png', {
+        type: blob.type || 'image/png',
       });
       if (!navigator.canShare || navigator.canShare({ files: [file] })) {
         shareData.files = [file];
@@ -581,24 +596,20 @@ export default function WalletDashboardReceiveModal({
 
     try {
       await navigator.share(shareData);
-      flashCopyToast(t("ui_shared_ok_5c1d2e7f9a", "Partagé"), true);
+      flashCopyToast(t('ui_shared_ok_5c1d2e7f9a', 'Partagé'), true);
     } catch (err) {
-      if (err?.name === "AbortError") return;
-      flashCopyToast(t("ui_share_failed_1a2b3c", "Partage impossible"));
+      if (err?.name === 'AbortError') return;
+      flashCopyToast(t('ui_share_failed_1a2b3c', 'Partage impossible'));
     }
   };
 
   const requestValue = useMemo(() => {
-    if (!generatedRequest) return "";
+    if (!generatedRequest) return '';
     try {
-      const targetCurrency =
-        generatedRequest.targetCurrency ||
-        generatedRequest.targetCurrencyCode ||
-        "";
-      const displayCurrency = generatedRequest.displayCurrency || "";
+      const targetCurrency = generatedRequest.targetCurrency || generatedRequest.targetCurrencyCode || '';
+      const displayCurrency = generatedRequest.displayCurrency || '';
       // Omit displayCurrency (dc) if it equals targetCurrency to save space
-      const shouldIncludeDc =
-        displayCurrency && displayCurrency !== targetCurrency;
+      const shouldIncludeDc = displayCurrency && displayCurrency !== targetCurrency;
 
       const compact = {
         // Schema omitted — inferred from xcannes-payreq: prefix
@@ -613,58 +624,48 @@ export default function WalletDashboardReceiveModal({
         m: generatedRequest.memo ?? null,
         b: generatedRequest.beneficiaryLabel ?? null,
       };
-      Object.keys(compact).forEach((key) => {
-        if (compact[key] == null || compact[key] === "") delete compact[key];
+      Object.keys(compact).forEach(key => {
+        if (compact[key] == null || compact[key] === '') delete compact[key];
       });
       return JSON.stringify(compact);
     } catch {
-      return "";
+      return '';
     }
   }, [generatedRequest]);
   const requestQrValue = useMemo(() => {
-    if (!requestValue) return "";
+    if (!requestValue) return '';
     try {
-      const base64 = Buffer.from(requestValue, "utf8").toString("base64");
-      const base64Url = base64
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/g, "");
+      const base64 = Buffer.from(requestValue, 'utf8').toString('base64');
+      const base64Url = base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
       return `xcannes-payreq:${base64Url}`;
     } catch {
-      return "";
+      return '';
     }
   }, [requestValue]);
   const hasGeneratedRequest = Boolean(generatedRequest && requestQrValue);
-  const requestDisplayCurrency = String(
-    generatedRequest?.displayCurrency || requestCurrencyCode || "USD",
-  )
+  const requestDisplayCurrency = String(generatedRequest?.displayCurrency || requestCurrencyCode || 'USD')
     .trim()
     .toUpperCase();
-  const requestDisplayAmount =
-    generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || "0");
-  const requestDisplayAmountLabel = Number.isFinite(
-    Number(requestDisplayAmount),
-  )
-    ? formatAmountWithSymbol(
-        locale,
-        Number(requestDisplayAmount),
-        requestDisplayCurrency,
-        { minimumFractionDigits: 0, maximumFractionDigits: 2 },
-      )
+  const requestDisplayAmount = generatedRequest?.displayAmount ?? Number.parseFloat(requestAmount || '0');
+  const requestDisplayAmountLabel = Number.isFinite(Number(requestDisplayAmount))
+    ? formatAmountWithSymbol(locale, Number(requestDisplayAmount), requestDisplayCurrency, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      })
     : formatAmountWithSymbol(locale, 0, requestDisplayCurrency, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
   const requestDateLabel = useMemo(() => {
     const raw = generatedRequest?.createdAt;
-    if (!raw) return "";
+    if (!raw) return '';
     const parsed = new Date(raw);
-    if (!Number.isFinite(parsed.getTime())) return "";
+    if (!Number.isFinite(parsed.getTime())) return '';
     return parsed.toLocaleString(locale);
   }, [generatedRequest?.createdAt, locale]);
   const receiveQrValue = useMemo(() => {
-    if (!wallet) return "";
-    const label = String(walletLabel || "").trim();
+    if (!wallet) return '';
+    const label = String(walletLabel || '').trim();
     if (!label) return `xrpl:${wallet}`;
     return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
   }, [wallet, walletLabel]);
@@ -691,7 +692,7 @@ export default function WalletDashboardReceiveModal({
     source: null,
     dragging: false,
     scrollLocked: false,
-    lockedOverflowY: "",
+    lockedOverflowY: '',
   });
   const closeRequestedRef = useRef(false);
 
@@ -705,7 +706,7 @@ export default function WalletDashboardReceiveModal({
       source: null,
       dragging: false,
       scrollLocked: false,
-      lockedOverflowY: "",
+      lockedOverflowY: '',
     };
 
     if (open) {
@@ -732,7 +733,7 @@ export default function WalletDashboardReceiveModal({
 
   const releaseOverlayScrollLock = () => {
     const meta = overlayDragMetaRef.current;
-    if (meta?.source !== "list") return;
+    if (meta?.source !== 'list') return;
     if (!meta?.scrollLocked) return;
     const listEl = overlayListRef.current;
     if (!listEl) return;
@@ -742,16 +743,16 @@ export default function WalletDashboardReceiveModal({
       // ignore
     }
     meta.scrollLocked = false;
-    meta.lockedOverflowY = "";
+    meta.lockedOverflowY = '';
   };
 
   const maybeStartOverlayDrag = (event, source) => {
     if (inline) return false;
     if (!event?.isPrimary) return false;
-    if (event.pointerType === "mouse") return false;
-    if (event.target?.closest?.("input,textarea,select")) return false;
+    if (event.pointerType === 'mouse') return false;
+    if (event.target?.closest?.('input,textarea,select')) return false;
 
-    if (source === "list") {
+    if (source === 'list') {
       const listEl = overlayListRef.current;
       if (!listEl) return false;
       if (listEl.scrollTop > 0) return false;
@@ -766,12 +767,12 @@ export default function WalletDashboardReceiveModal({
       source,
       dragging: false,
       scrollLocked: false,
-      lockedOverflowY: "",
+      lockedOverflowY: '',
     };
     return true;
   };
 
-  const handleOverlayPointerMove = (event) => {
+  const handleOverlayPointerMove = event => {
     if (inline) return;
     const meta = overlayDragMetaRef.current;
     if (!meta?.pending && !meta?.dragging) return;
@@ -788,13 +789,13 @@ export default function WalletDashboardReceiveModal({
         // ignore
       }
 
-      if (meta.source === "list") {
+      if (meta.source === 'list') {
         const listEl = overlayListRef.current;
         if (listEl && listEl.scrollTop <= 0) {
           try {
             meta.lockedOverflowY = listEl.style.overflowY;
             meta.scrollLocked = true;
-            listEl.style.overflowY = "hidden";
+            listEl.style.overflowY = 'hidden';
             listEl.scrollTop = 0;
           } catch {
             // ignore
@@ -810,7 +811,7 @@ export default function WalletDashboardReceiveModal({
     setOverlayTranslateY(delta);
   };
 
-  const handleOverlayPointerEnd = (event) => {
+  const handleOverlayPointerEnd = event => {
     if (inline) return;
     const meta = overlayDragMetaRef.current;
     if (meta.pointerId !== event.pointerId) return;
@@ -818,11 +819,9 @@ export default function WalletDashboardReceiveModal({
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration; // px/ms
-    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
     const closeDistance = Math.max(220, Math.min(320, height * 0.28));
-    const shouldClose =
-      delta > closeDistance ||
-      (delta > closeDistance * 0.6 && velocity > 1.25);
+    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
@@ -832,7 +831,7 @@ export default function WalletDashboardReceiveModal({
     if (shouldClose) {
       if (!closeRequestedRef.current) {
         closeRequestedRef.current = true;
-        const height = typeof window !== "undefined" ? window.innerHeight : 9999;
+        const height = typeof window !== 'undefined' ? window.innerHeight : 9999;
         setOverlayTranslateY(Math.max(delta, height));
         window.setTimeout(() => {
           onClose?.();
@@ -851,7 +850,7 @@ export default function WalletDashboardReceiveModal({
       source: null,
       dragging: false,
       scrollLocked: false,
-      lockedOverflowY: "",
+      lockedOverflowY: '',
     };
   };
 
@@ -864,7 +863,7 @@ export default function WalletDashboardReceiveModal({
     const el = requestPreviewRef.current;
     if (!el) return;
     try {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch {
       // ignore
     }
@@ -873,28 +872,43 @@ export default function WalletDashboardReceiveModal({
   if (!shouldRender) return null;
 
   const wrapperClass = inline
-    ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+    ? 'relative w-full h-full flex'
+    : 'fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none';
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col min-h-0 overflow-y-auto overscroll-contain pointer-events-auto pb-[env(safe-area-inset-bottom)]",
+    'relative w-full wallet-modal-panel wallet-receive-modal border-white/10 md:border p-4 md:p-5 space-y-4 flex flex-col min-h-0 overflow-y-auto overscroll-contain pointer-events-auto pb-[env(safe-area-inset-bottom)]',
     inline
-      ? "h-full max-h-none rounded-xl"
-      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
-    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
-    noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
-    inline ? "wallet-inline-zoom-in" : "",
-    !inline
-      ? isClosing
-        ? "wallet-modal-lift-out"
-        : "wallet-modal-lift-in"
-      : "",
-  ].join(" ");
+      ? 'h-full max-h-none rounded-xl'
+      : 'h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl',
+    noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated',
+    noticeVariant === 'demo' ? 'demo-wallet-tooltip-scope' : '',
+    inline ? 'wallet-inline-zoom-in' : '',
+    !inline ? (isClosing ? 'wallet-modal-lift-out' : 'wallet-modal-lift-in') : '',
+  ].join(' ');
 
   const backdropAnimClass = closeRequestedRef.current
-    ? ""
+    ? ''
     : isClosing
-      ? "wallet-modal-backdrop-out"
-      : "wallet-modal-backdrop-in";
+      ? 'wallet-modal-backdrop-out'
+      : 'wallet-modal-backdrop-in';
+
+  const canNativeShare = !isDesktop && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  const shareActionLabel = canNativeShare ? t('ui_share_qr_cta', 'Partager') : t('ui_download', 'Télécharger');
+
+  const headerTitle =
+    receiveView === 'choice'
+      ? t('ui_receive_title_short', 'Recevoir')
+      : receiveView === 'share'
+        ? t('ui_receive_choice_share_title', 'Partager mon QR')
+        : t('ui_receive_choice_request_title', 'Créer une demande');
+  const headerSubtitle =
+    receiveView === 'choice'
+      ? t('ui_receive_choice_subtitle', 'Choisissez comment recevoir un paiement.')
+      : receiveView === 'share'
+        ? t('ui_receive_choice_share_desc', 'Recevez un paiement sans montant prédéfini.')
+        : t('ui_receive_choice_request_desc', 'Créez une demande avec un montant précis.');
+
+  const choiceCardClassName =
+    'w-full text-left rounded-[16px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const content = (
     <>
@@ -917,13 +931,11 @@ export default function WalletDashboardReceiveModal({
       <div className={wrapperClass}>
         <div
           ref={overlayRef}
-          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          className={inline ? 'w-full h-full flex' : 'pointer-events-auto w-full'}
           style={{
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-            transition: overlayDragging
-              ? "none"
-              : "transform 220ms cubic-bezier(0.2,0,0,1)",
-            willChange: overlayTranslateY ? "transform" : undefined,
+            transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
+            willChange: overlayTranslateY ? 'transform' : undefined,
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}
@@ -932,258 +944,315 @@ export default function WalletDashboardReceiveModal({
           <div
             ref={overlayListRef}
             className={panelClass}
-            onClick={(e) => {
+            onClick={e => {
               if (!inline) e.stopPropagation();
             }}
-            onPointerDown={(event) => {
-              maybeStartOverlayDrag(event, "list");
+            onPointerDown={event => {
+              maybeStartOverlayDrag(event, 'list');
             }}
           >
             {!inline ? (
               <div
                 className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
                 aria-hidden
-                onPointerDown={(event) => {
-                  maybeStartOverlayDrag(event, "fixed");
+                onPointerDown={event => {
+                  maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
                 <span className="block w-12 h-1.5 rounded-full bg-white/20" />
               </div>
             ) : null}
             <div
-              className="flex items-center justify-between gap-3 mb-1 pr-6"
-              onPointerDown={(event) => {
-                maybeStartOverlayDrag(event, "fixed");
+              className="flex items-center justify-between gap-3 mb-1"
+              onPointerDown={event => {
+                maybeStartOverlayDrag(event, 'fixed');
               }}
             >
-              <div className="flex min-w-0 flex-col gap-1.5">
-                <h2 className="text-base md:text-lg font-semibold text-white/90">
-                  {t("ui_receive_funds_title", "Recevoir des fonds")}
-                </h2>
-                <div className="flex flex-wrap items-center gap-2">
-                  {noticeVariant === "demo" ? (
-                    <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-                      {t("demo_notice_title", "Mode démo")}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          <div className="flex-1 min-h-0 flex flex-col">
-            <div className="flex-1 min-h-0 flex flex-col gap-5">
-              {/* SECTION 1 — RECEIVE FUNDS */}
-              <div className="space-y-2">
-                <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-                  <div className="flex flex-col items-center">
-                    <div
-                      ref={receiveQrContainerRef}
-                      className="rounded-xl border border-white/10 bg-white p-3"
-                    >
-                      <QRCodeCanvas
-                        value={receiveQrValue}
-                        size={qrPixelSize}
-                        style={{ width: qrDisplaySize, height: qrDisplaySize }}
-                        bgColor="#ffffff"
-                        fgColor="#000000"
-                        includeMargin={true}
-                        level="M"
-                      />
-                    </div>
-
-                    <WalletActiveLabel
-                      prefix={t("ui_current_account_prefix", "Compte actuel:")}
-                      label={String(walletLabel || "").trim() || fallbackWalletLabel}
-                      className="mt-3 text-[13px] text-white/80 justify-center"
-                      prefixClassName="text-white/50"
-                      labelClassName="font-medium text-white/80"
-                    />
-
-                    <div className="mt-4 w-full grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          await handleCopyQr(false);
-                        }}
-                        className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
-                      >
-                        {t("ui_copy", "Copier")}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          await handleShareQr(false);
-                        }}
-                        className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
-                      >
-                        {t("ui_download", "Télécharger")}
-                      </button>
-                    </div>
-
-                    {copyToast ? (
-                      <div className="mt-3 text-[11px] text-xcannes-green/90">
-                        {copyToast}
-                      </div>
+              <div className="flex items-center gap-3 min-w-0">
+                {receiveView !== 'choice' ? (
+                  <button
+                    type="button"
+                    onClick={e => {
+                      e.stopPropagation();
+                      switchReceiveView('choice');
+                    }}
+                    className="shrink-0 w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 transition-colors duration-150 flex items-center justify-center"
+                    aria-label={t('ui_back', 'Retour')}
+                    title={t('ui_back', 'Retour')}
+                  >
+                    <ArrowLeftIcon className="w-5 h-5" />
+                  </button>
+                ) : null}
+                <div className="flex min-w-0 flex-col gap-1.5">
+                  <h2 className="text-base md:text-lg font-semibold text-white/90">{headerTitle}</h2>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {noticeVariant === 'demo' ? (
+                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                        {t('demo_notice_title', 'Mode démo')}
+                      </span>
                     ) : null}
                   </div>
                 </div>
               </div>
-
-              {/* SECTION 2 — CREATE REQUEST */}
-              <div className="space-y-2">
-                <h2 className="text-base md:text-lg font-semibold text-white/90">
-                  {t("ui_create_request_title", "Créer une demande")}
-                </h2>
-                <div className="rounded-[14px] border border-white/10 bg-white/5 p-4 space-y-4">
-                  {/* Amount */}
-                  <div>
-                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                      {t("ui_amount_7668986206", "Amount")}
-                    </label>
-                    <input
-                      type="number"
-                      value={requestAmount}
-                      onChange={(e) => setRequestAmount(e.target.value)}
-                      placeholder="0.00"
-                      className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-                    />
-                  </div>
-
-                  {/* Currency */}
-                  <div>
-                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                      {t("ui_currency_1ed55673be", "Currency")}
-                    </label>
-                    <ModalSelect
-                      value={requestCurrency}
-                      onChange={setRequestCurrency}
-                      options={(augmentedTokens || []).map((token) => {
-                        const currencyUpper = String(
-                          token.currency || "",
-                        ).toUpperCase();
-                        const labelLeft =
-                          selectLabelByCurrency?.[token.currency] ||
-                          selectLabelByCurrency?.[currencyUpper] ||
-                          token.currency;
-                        const labelRight =
-                          selectLabelRightByCurrency?.[token.currency] ||
-                          selectLabelRightByCurrency?.[currencyUpper] ||
-                          null;
-                        return {
-                          value: token.currency,
-                          icon:
-                            selectIconByCurrency?.[token.currency] ||
-                            selectIconByCurrency?.[currencyUpper] ||
-                            null,
-                          label: labelLeft,
-                          labelLeft,
-                          labelRight,
-                          labelMobile:
-                            selectLabelMobileByCurrency?.[token.currency] ||
-                            selectLabelMobileByCurrency?.[currencyUpper] ||
-                            labelLeft,
-                        };
-                      })}
-                      useNativeSelect={false}
-	                      buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
-	                      menuClassName={
-	                        noticeVariant === "demo"
-	                          ? "bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10"
-	                          : "bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10"
-	                      }
-	                      selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-	                    />
-                  </div>
-
-                  {/* Memo (optional) */}
-                  <div>
-                    <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                      {t("ui_memo_optional_d9594474c7", "Memo (optional)")}
-                    </label>
-                    <input
-                      type="text"
-                      value={requestMemo}
-                      onChange={(e) => setRequestMemo(e.target.value)}
-                      placeholder={t(
-                        "ui_payment_memo_placeholder",
-                        "Objet du paiement (optionnel)",
-                      )}
-                      className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-                    />
-                  </div>
+            </div>
+            <div className="text-sm text-white/60 -mt-1">{headerSubtitle}</div>
+            <div className="flex-1 min-h-0 flex flex-col">
+              {receiveView === 'choice' ? (
+                <div className="flex flex-col gap-3 pt-2">
+                  <button
+                    type="button"
+                    className={choiceCardClassName}
+                    onClick={e => {
+                      e.stopPropagation();
+                      switchReceiveView('share');
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-xcannes-green/90">
+                        <QrIcon className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-[15px] font-semibold text-white/90">
+                            {t('ui_receive_choice_share_title', 'Partager mon QR')}
+                          </div>
+                          <ChevronRightIcon className="w-5 h-5 text-white/35" />
+                        </div>
+                        <div className="mt-1 text-[13px] text-white/60 leading-snug">
+                          {t('ui_receive_choice_share_desc', 'Recevez un paiement sans montant prédéfini.')}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
 
                   <button
                     type="button"
-                    onClick={(e) => {
+                    className={choiceCardClassName}
+                    onClick={e => {
                       e.stopPropagation();
-                      handleGenerateRequest();
+                      switchReceiveView('request');
                     }}
-                    className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors duration-150"
                   >
-                    {t("ui_generate_request_fr", "Générer la demande")}
-                  </button>
-
-                  {generateError ? (
-                    <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                      {generateError}
-                    </div>
-                  ) : null}
-
-                  {hasGeneratedRequest ? (
-                    <div
-                      ref={requestPreviewRef}
-                      className="pt-2 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3"
-                    >
-                      <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                        {t("ui_request_generated_label", "Demande générée")}
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-white/80">
+                        <RequestIcon className="w-6 h-6" />
                       </div>
-                      <div className="flex items-center justify-center">
-                        <div
-                          ref={requestQrContainerRef}
-                          className="rounded-xl border border-white/10 bg-white p-3"
-                        >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-[15px] font-semibold text-white/90">
+                            {t('ui_receive_choice_request_title', 'Créer une demande')}
+                          </div>
+                          <ChevronRightIcon className="w-5 h-5 text-white/35" />
+                        </div>
+                        <div className="mt-1 text-[13px] text-white/60 leading-snug">
+                          {t('ui_receive_choice_request_desc_detail', 'Montant, devise et mémo optionnel.')}
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              ) : null}
+
+              {receiveView === 'share' ? (
+                <>
+                  {/* SECTION 1 — RECEIVE FUNDS */}
+                  <div className="space-y-2 pt-2">
+                    <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+                      <div className="flex flex-col items-center">
+                        <div ref={receiveQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
                           <QRCodeCanvas
-                            value={requestQrValue}
-                            size={requestQrPixelSize}
-                            style={{ width: 200, height: 200 }}
+                            value={receiveQrValue}
+                            size={qrPixelSize}
+                            style={{ width: qrDisplaySize, height: qrDisplaySize }}
                             bgColor="#ffffff"
                             fgColor="#000000"
                             includeMargin={true}
                             level="M"
                           />
                         </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            await handleCopyQr(true);
-                          }}
-                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
-                        >
-                          {t("ui_copy", "Copier")}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            await handleShareQr(true);
-                          }}
-                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
-                        >
-                          {t("ui_download", "Télécharger")}
-                        </button>
-                      </div>
-                      <div className="text-[11px] text-white/50 text-center">
-                        {requestDisplayAmountLabel}
+
+                        <WalletActiveLabel
+                          prefix={t('ui_current_account_prefix', 'Compte actuel:')}
+                          label={String(walletLabel || '').trim() || fallbackWalletLabel}
+                          className="mt-3 text-[13px] text-white/80 justify-center"
+                          prefixClassName="text-white/50"
+                          labelClassName="font-medium text-white/80"
+                        />
+
+                        <div className="mt-4 w-full grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={async e => {
+                              e.stopPropagation();
+                              await handleCopyQr(false);
+                            }}
+                            className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                          >
+                            {t('ui_copy', 'Copier')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={async e => {
+                              e.stopPropagation();
+                              await handleShareQr(false);
+                            }}
+                            className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
+                          >
+                            <ShareIcon className="w-4 h-4" />
+                            <span>{shareActionLabel}</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
+                  </div>
+                </>
+              ) : null}
+
+              {receiveView === 'request' ? (
+                <>
+                  {/* SECTION 2 — CREATE REQUEST */}
+                  <div className="space-y-2 pt-2">
+                    <div className="rounded-[14px] border border-white/10 bg-white/5 p-4 space-y-4">
+                      {/* Amount */}
+                      <div>
+                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                          {t('ui_amount_7668986206', 'Amount')}
+                        </label>
+                        <input
+                          type="number"
+                          value={requestAmount}
+                          onChange={e => setRequestAmount(e.target.value)}
+                          placeholder="0.00"
+                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                        />
+                      </div>
+
+                      {/* Currency */}
+                      <div>
+                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                          {t('ui_currency_1ed55673be', 'Currency')}
+                        </label>
+                        <ModalSelect
+                          value={requestCurrency}
+                          onChange={setRequestCurrency}
+                          options={(augmentedTokens || []).map(token => {
+                            const currencyUpper = String(token.currency || '').toUpperCase();
+                            const labelLeft =
+                              selectLabelByCurrency?.[token.currency] ||
+                              selectLabelByCurrency?.[currencyUpper] ||
+                              token.currency;
+                            const labelRight =
+                              selectLabelRightByCurrency?.[token.currency] ||
+                              selectLabelRightByCurrency?.[currencyUpper] ||
+                              null;
+                            return {
+                              value: token.currency,
+                              icon:
+                                selectIconByCurrency?.[token.currency] || selectIconByCurrency?.[currencyUpper] || null,
+                              label: labelLeft,
+                              labelLeft,
+                              labelRight,
+                              labelMobile:
+                                selectLabelMobileByCurrency?.[token.currency] ||
+                                selectLabelMobileByCurrency?.[currencyUpper] ||
+                                labelLeft,
+                            };
+                          })}
+                          useNativeSelect={false}
+                          buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+                          menuClassName={
+                            noticeVariant === 'demo'
+                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+                          }
+                          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                        />
+                      </div>
+
+                      {/* Memo (optional) */}
+                      <div>
+                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
+                        </label>
+                        <input
+                          type="text"
+                          value={requestMemo}
+                          onChange={e => setRequestMemo(e.target.value)}
+                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
+                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleGenerateRequest();
+                        }}
+                        className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors duration-150"
+                      >
+                        {t('ui_generate_request_fr', 'Générer la demande')}
+                      </button>
+
+                      {generateError ? (
+                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                          {generateError}
+                        </div>
+                      ) : null}
+
+                      {hasGeneratedRequest ? (
+                        <div
+                          ref={requestPreviewRef}
+                          className="pt-2 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3"
+                        >
+                          <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+                            {t('ui_request_generated_label', 'Demande générée')}
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <div ref={requestQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
+                              <QRCodeCanvas
+                                value={requestQrValue}
+                                size={requestQrPixelSize}
+                                style={{ width: 200, height: 200 }}
+                                bgColor="#ffffff"
+                                fgColor="#000000"
+                                includeMargin={true}
+                                level="M"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={async e => {
+                                e.stopPropagation();
+                                await handleCopyQr(true);
+                              }}
+                              className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+                            >
+                              {t('ui_copy', 'Copier')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={async e => {
+                                e.stopPropagation();
+                                await handleShareQr(true);
+                              }}
+                              className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
+                            >
+                              <ShareIcon className="w-4 h-4" />
+                              <span>{shareActionLabel}</span>
+                            </button>
+                          </div>
+                          <div className="text-[11px] text-white/50 text-center">{requestDisplayAmountLabel}</div>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
+              {copyToast ? <div className="mt-3 text-[11px] text-xcannes-green/90 text-center">{copyToast}</div> : null}
             </div>
           </div>
         </div>
@@ -1192,6 +1261,6 @@ export default function WalletDashboardReceiveModal({
   );
 
   if (inline) return content;
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
   return createPortal(content, document.body);
 }
