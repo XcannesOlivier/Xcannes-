@@ -1887,7 +1887,7 @@ export default function GlobalStatement({
             {/* close via swipe/backdrop */}
           </div>
 
-	          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#050708] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]">
+	          <div className="mt-4 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
             <WalletActiveLabel
               prefix={t("ui_current_account_prefix", "Compte actuel :")}
               label={walletLabel || t("nav_wallet", "Wallet")}
@@ -2009,7 +2009,7 @@ export default function GlobalStatement({
                       type="button"
                       onClick={() => openMovementDetails(m)}
 	                      className={[
-	                        "w-full text-left rounded-xl px-3 py-3 ring-1 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] hover:from-white/[0.10] hover:to-white/[0.04] transition-colors duration-150",
+	                        "w-full text-left rounded-xl px-3 py-3 ring-1 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-14px_22px_rgba(0,0,0,0.5)] transition-colors duration-150",
 	                        isLatest
 	                          ? "ring-xcannes-green/30 transform-gpu scale-[1.02] origin-center drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)] transition-transform duration-150"
 	                          : "ring-white/10",
