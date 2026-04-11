@@ -76,9 +76,8 @@ export default function WalletDashboardTokenRow({
               ? `${getCurrencyDescription(currencyCode)}`
               : "XRPL Token");
 
-  // Slightly more opaque surface so the list background "glow" stays behind the rows,
-  // and doesn't tint the row content.
-  const rowSurfaceClass = "bg-black/25 hover:bg-black/20";
+  // Keep rows fully opaque so the list background "glow" stays behind them.
+  const rowSurfaceClass = "bg-[#050708] hover:bg-[#070a0b]";
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;

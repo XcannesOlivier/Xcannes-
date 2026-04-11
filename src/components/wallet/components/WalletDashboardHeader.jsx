@@ -384,53 +384,7 @@ export default function WalletDashboardHeader({
                 </div>
               </div>
 
-              {/* Bouton Copier (extérieur) */}
-              <button
-                type="button"
-                onClick={onCopyAddress}
-                title={t("ui_copy_address_82d1cf6e94", "Copier l'adresse")}
-                className="shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white transition-all active:scale-95"
-                aria-label={t("ui_copy_xrpl_address_4f63ed10fc", "Copier l'adresse XRPL")}
-              >
-                <svg
-                  className="w-[22px] h-[22px]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-              </button>
-
-              {/* Bouton Refresh (extérieur) */}
-              <button
-                type="button"
-                onClick={onRefreshWallet}
-                disabled={isConnecting || isRefreshing}
-                title={t("ui_refresh_wallet_4c31d0ce7a", "Recharger le wallet")}
-                className={`shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-transparent border border-transparent hover:bg-transparent transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed ${
-                  isRefreshing
-                    ? "text-xcannes-green hover:text-xcannes-green/90"
-                    : "text-white/60 hover:text-white"
-                }`}
-                aria-label={t(
-                  "ui_refresh_wallet_label_7b2d1a9c4e",
-                  "Recharger le wallet",
-                )}
-              >
-                <svg
-                  className={`w-[22px] h-[22px] ${isRefreshing ? "animate-spin" : ""}`}
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 .34-.02.67-.07 1h2.02c.03-.33.05-.66.05-1 0-4.42-3.58-8-8-8zm-6.93 7H3.05c-.03.33-.05.66-.05 1 0 4.42 3.58 8 8 8v3l4-4-4-4v3c-3.31 0-6-2.69-6-6 0-.34.02-.67.07-1z" />
-                </svg>
-              </button>
+              {/* Copier / Refresh removed (mobile UI simplification) */}
 
               {/* Bouton Paramètres (à côté du refresh, même style) */}
               <WalletSettingsDropdown
