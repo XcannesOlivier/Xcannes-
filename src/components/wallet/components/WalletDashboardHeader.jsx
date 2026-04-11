@@ -417,7 +417,7 @@ export default function WalletDashboardHeader({
           preferredCurrency &&
           preferredCurrency !== "USD" &&
           preferredCurrency !== "RLUSD" && (
-            <div className="text-[11px] text-white/40 -mt-0.5 inline-flex items-center gap-2">
+            <div className="text-[11px] text-white/40 -mt-0.5 mb-1.5 md:mb-0 inline-flex items-center gap-2">
               <span>Devises numériques</span>
               <button
                 type="button"
