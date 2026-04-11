@@ -624,13 +624,13 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
-		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		                          : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		                      }
-		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -691,13 +691,13 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
-		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		                          : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		                      }
-		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -721,6 +721,7 @@ export default function WalletDashboardSwapModal({
                         "ui_choose_new_currency_plus",
                         "Ajouter une devise",
                       )}
+                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-md px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
                       fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                       placeholder={t(
                         "ui_search_all_currencies_c5d6e7f8",
@@ -748,7 +749,7 @@ export default function WalletDashboardSwapModal({
                       "USD"
 	                    }
 	                    tokenClassName="text-white text-base"
-	                    containerClassName="rounded-xl px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/60 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+	                    containerClassName="rounded-xl px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset focus-within:ring-2 focus-within:ring-xcannes-green/60 transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 	                  />
 	                </div>
 
@@ -772,7 +773,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-	                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
+	                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
                       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                         {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
                       </div>

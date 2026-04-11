@@ -13,7 +13,9 @@ export default function WalletActiveLabel({
   const resolvedPrefix = String(prefix || "").trim();
   const wrapperAlignClass = labelWrap ? "items-start" : "items-center";
   const prefixAlignClass = labelWrap ? "mt-0.5" : "";
-  const dotAlignClass = labelWrap ? "mt-1" : "";
+  // When wrapping, align the pulsing dot with the first line's visual center.
+  // `mt-2` matches the typical (text-base) line-height minus dot size.
+  const dotAlignClass = labelWrap ? "mt-2" : "";
   const labelBaseClass = labelWrap
     ? "min-w-0 whitespace-normal break-words"
     : "truncate min-w-0";
