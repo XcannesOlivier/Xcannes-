@@ -25,9 +25,9 @@ function renderTokenIcon(token) {
       <Image
         src={CRYPTO_ICONS[code]}
         alt={code}
-        width={20}
-        height={20}
-        className="w-5 h-5 object-cover"
+        width={32}
+        height={32}
+        className="w-7 h-7 sm:w-8 sm:h-8 object-cover"
       />
     );
   }
@@ -55,10 +55,10 @@ export default function WalletDashboardTokenRow({
   const hasCryptoIcon = Boolean(displayCode && CRYPTO_ICONS?.[displayCode]);
   const isFlagIcon = isDisplayOverride || (isLineCurrency && !hasCryptoIcon);
   const iconSizeClass = isFlagIcon
-    ? "w-11 h-11 text-[20px] sm:w-12 sm:h-12 sm:text-[22px]"
+    ? "w-12 h-12 text-[22px] sm:w-14 sm:h-14 sm:text-[26px]"
     : isLineCurrency
-      ? "w-9 h-9 text-[16px]"
-      : "w-7 h-7 text-[13px]";
+      ? "w-10 h-10 text-[18px] sm:w-11 sm:h-11 sm:text-[20px]"
+      : "w-8 h-8 text-[14px] sm:w-9 sm:h-9 sm:text-[15px]";
   const iconRadiusClass = isNativeAsset ? "rounded-lg" : "";
   const iconEdgeSpacingClass = isNativeAsset ? "ml-1" : "";
   const iconTextGapClass = isNativeAsset ? "gap-3" : "gap-2";
@@ -108,14 +108,14 @@ export default function WalletDashboardTokenRow({
             </div>
             <div className="min-w-0">
               <div className="flex items-baseline gap-2 min-w-0">
-                <span className="text-[14px] md:text-[15px] text-primary truncate">
+                <span className="text-[15px] md:text-[16px] text-primary truncate">
                   {currencyLabel}
                 </span>
               </div>
             </div>
           </div>
           <div className="flex-1" />
-          <div className="text-right text-[14px] md:text-[15px] text-primary shrink-0">
+          <div className="text-right text-[15px] md:text-[16px] text-primary shrink-0">
             <div className="font-mono">
                   {Number.isFinite(displayValue)
                 ? formatAmountWithSymbol(locale, displayValue, displayCode, {
