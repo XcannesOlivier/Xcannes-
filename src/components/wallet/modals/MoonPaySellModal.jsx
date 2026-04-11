@@ -1597,10 +1597,7 @@ const MoonPaySellModal = ({
           {/* From wallet display */}
 					          <div
 					            className={[
-					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset",
-					              isBankSellFlow || isSendToWalletFlow
-					                ? "bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.40]"
-					                : "bg-white/[0.08]",
+					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
                         wizardStep === 1 ? "" : "hidden",
 					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06)]`,
 					            ].join(" ")}
@@ -1674,9 +1671,9 @@ const MoonPaySellModal = ({
 			              }
 				              aria-disabled={wizardStep !== 1}
 				              className={[
-				                "w-full flex items-center justify-between gap-2 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 transition-all duration-150",
+				                "w-full flex items-center justify-between gap-2 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl px-4 py-4 text-base text-white/90 focus:outline-none focus:ring-2 transition-all duration-150",
 				                accentRing60,
-				                `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow}]`,
+				                "shadow-[0_4px_12px_rgba(0,0,0,0.4)]",
 				                wizardStep === 1
 				                  ? "cursor-pointer hover:ring-white/25"
 				                  : "cursor-default opacity-95",
@@ -2065,8 +2062,8 @@ const MoonPaySellModal = ({
 		                  inputMode="decimal"
                       readOnly={wizardStep !== 1}
 			                  className={[
-	                        "w-full px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150",
-	                        `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow}]`,
+	                        "w-full px-4 py-4 bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl text-white pr-16 transition-all duration-150",
+	                        "shadow-[0_4px_12px_rgba(0,0,0,0.4)]",
 	                        wizardStep === 1
 	                          ? ["focus:outline-none focus:ring-2", accentRing60].join(" ")
 	                          : "cursor-default opacity-95",
@@ -2140,8 +2137,8 @@ const MoonPaySellModal = ({
 		            <>
                   <div
                     className={[
-                      "rounded-[18px] px-4 py-5 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.03] to-black/[0.35]",
-                      `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
+                      "rounded-[18px] px-4 py-5 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]",
+                      "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
                     ].join(" ")}
                   >
                     <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">

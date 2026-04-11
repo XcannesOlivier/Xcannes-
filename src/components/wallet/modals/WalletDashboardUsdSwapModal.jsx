@@ -359,11 +359,11 @@ export default function WalletDashboardUsdSwapModal({
       ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]"
     : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]";
   const accentShadowCard = isBinanceYellow
-    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(240,185,11,0.22)]"
+    ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
     : isFireOrange
     ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(255,106,0,0.22)]"
     : isSimpleSwapBlue
-      ? "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(8,112,248,0.22)]"
+      ? "shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
     : "shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]";
   const accentText80 = isBinanceYellow
     ? "text-[#F0B90B]/85"
@@ -2959,7 +2959,7 @@ export default function WalletDashboardUsdSwapModal({
 			                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 		                    <div
                           className={[
-                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
+                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
                             accentShadowPanel,
                           ].join(" ")}
                         >
@@ -3069,7 +3069,7 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "form" ? (
                   <>
-		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-black/20 overflow-hidden", accentShadowCard].join(" ")}>
+		                    <div className={["rounded-[18px] ring-1 ring-white/10 ring-inset bg-[#101415] overflow-hidden", accentShadowCard].join(" ")}>
                       <div className="p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
