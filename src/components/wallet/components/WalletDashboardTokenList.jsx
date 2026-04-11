@@ -22,19 +22,17 @@ export default function WalletDashboardTokenList({
       {(headerTitle || headerActionLabel) && (
         <div
           className={`flex items-center gap-2 mb-2 px-3 pt-4 ${
-            showHeaderAction ? "justify-between" : "justify-end"
+            showHeaderAction ? "justify-between" : "justify-center"
           }`}
         >
           {typeof headerTitle === "string" ? (
             <div
-              className={`text-xs text-white/40 ${showHeaderAction ? "" : "ml-auto"}`}
+              className="text-xs text-white/40"
             >
               {headerTitle}
             </div>
           ) : headerTitle ? (
-            <div className={showHeaderAction ? "" : "ml-auto"}>
-              {headerTitle}
-            </div>
+            <div>{headerTitle}</div>
           ) : null}
           {showHeaderAction ? (
             <button

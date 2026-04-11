@@ -254,11 +254,11 @@ export default function WalletDashboardHeader({
       </div>
 
       {/* Solde et info wallet */}
-      <div className="flex flex-col items-center gap-2 pb-2 md:pb-0">
+      <div className="flex flex-col items-center gap-2 pb-4 md:pb-0">
         {/* Bloc wallet — sélecteur + copier + refresh + paramètres */}
         {isConnected && wallet && (
-          <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 -mx-2 md:mx-0 px-0 md:px-2 flex justify-center">
-	            <div className="relative flex items-center gap-2.5 w-full max-w-[520px]">
+          <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 px-3 md:px-2 flex justify-center">
+	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets ? (
 	                <div
 	                  className="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px]"
@@ -266,7 +266,7 @@ export default function WalletDashboardHeader({
 	                  onClick={() => setIsSwitcherOpen(false)}
 	                />
 	              ) : null}
-	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-3 py-2 shadow-none">
+	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-2.5 md:px-3 py-2 shadow-none">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -406,7 +406,7 @@ export default function WalletDashboardHeader({
           </div>
         )}
 
-        <div className="text-lg md:text-sm text-white/60 tracking-[0.18em] uppercase mb-4 md:mb-0">
+        <div className="text-lg md:text-sm text-white/60 tracking-[0.18em] uppercase mb-2 md:mb-0">
           {t("ui_total_balance_label_a91b6b8c1e", "Solde total")}
         </div>
         <p className="text-6xl md:text-5xl lg:text-6xl font-sans font-bold text-white tabular-nums tracking-tight">

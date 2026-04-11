@@ -77,7 +77,9 @@ export default function WalletDashboardTokenRow({
               : "XRPL Token");
 
   // Keep rows fully opaque so the list background "glow" stays behind them.
-  const rowSurfaceClass = "bg-[#050708] hover:bg-[#070a0b]";
+  // Match the visual surface used by action buttons (e.g. "Convert") which is
+  // `rgba(255,255,255,0.02)` over the base background.
+  const rowSurfaceClass = "bg-[#101415] hover:bg-[#12181a]";
 
   const handleRowKeyDown = (event) => {
     if (!onClick) return;
