@@ -1871,7 +1871,7 @@ const MoonPayBuyModal = ({
                 <button
                   type="button"
                   onClick={handleCopyWalletAddress}
-                  className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-black/20 text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+                  className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
                   aria-label={t('ui_copy_address', 'Copier')}
                 >
                   {walletAddressCopied ? t('ui_copied', 'Copié') : t('ui_copy', 'Copier')}
@@ -2286,13 +2286,13 @@ const MoonPayBuyModal = ({
                         {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
                       </button>
                       <button
-                        type="button"
-                        onClick={handleCopyWalletAddress}
-                        className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-black/20 text-white/70 hover:text-white hover:ring-white/20 transition-colors"
-                        aria-label={t('ui_copy_address', 'Copier')}
-                      >
-                        {walletAddressCopied ? t('ui_copied', 'Copié') : t('ui_copy', 'Copier')}
-                      </button>
+                      type="button"
+                      onClick={handleCopyWalletAddress}
+                      className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+                      aria-label={t('ui_copy_address', 'Copier')}
+                    >
+                      {walletAddressCopied ? t('ui_copied', 'Copié') : t('ui_copy', 'Copier')}
+                    </button>
                     </div>
                   </div>
 

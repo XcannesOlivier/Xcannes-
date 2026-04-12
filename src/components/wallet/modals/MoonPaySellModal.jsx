@@ -1597,7 +1597,7 @@ const MoonPaySellModal = ({
           {/* From wallet display */}
 					          <div
 					            className={[
-					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
+					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
                         wizardStep === 1 ? "" : "hidden",
 					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06)]`,
 					            ].join(" ")}
@@ -1644,7 +1644,7 @@ const MoonPaySellModal = ({
                   <button
                     type="button"
                     onClick={handleCopyWalletAddress}
-                    className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-black/20 text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+                    className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
                     aria-label={t("ui_copy_address", "Copier")}
                   >
                     {walletAddressCopied ? t("ui_copied", "Copié") : t("ui_copy", "Copier")}
@@ -2189,7 +2189,7 @@ const MoonPaySellModal = ({
                         <button
                           type="button"
                           onClick={handleCopyWalletAddress}
-                          className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-black/20 text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+                          className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
                           aria-label={t("ui_copy_address", "Copier")}
                         >
                           {walletAddressCopied ? t("ui_copied", "Copié") : t("ui_copy", "Copier")}
