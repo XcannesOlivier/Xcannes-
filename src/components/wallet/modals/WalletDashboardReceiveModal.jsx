@@ -1062,14 +1062,14 @@ export default function WalletDashboardReceiveModal({
                 <span className="block w-12 h-1.5 rounded-full bg-white/20" />
               </div>
             ) : null}
-            <div
-              className={`flex items-center justify-between gap-3 mb-1 ${receiveView === 'choice' ? 'pt-1' : ''}`}
-              onPointerDown={event => {
-                maybeStartOverlayDrag(event, 'fixed');
-              }}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                {receiveView !== 'choice' ? (
+            {receiveView !== 'choice' ? (
+              <div
+                className="flex items-center justify-between gap-3 mb-1"
+                onPointerDown={event => {
+                  maybeStartOverlayDrag(event, 'fixed');
+                }}
+              >
+                <div className="flex items-center gap-3 min-w-0">
                   <button
                     type="button"
                     onClick={e => {
@@ -1082,19 +1082,19 @@ export default function WalletDashboardReceiveModal({
                   >
                     <ArrowLeftIcon className="w-5 h-5" />
                   </button>
-                ) : null}
-                <div className="flex min-w-0 flex-col gap-1.5">
-                  <h2 className="text-base md:text-lg font-semibold text-white/90">{headerTitle}</h2>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {noticeVariant === 'demo' ? (
-                      <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-                        {t('demo_notice_title', 'Mode démo')}
-                      </span>
-                    ) : null}
+                  <div className="flex min-w-0 flex-col gap-1.5">
+                    <h2 className="text-base md:text-lg font-semibold text-white/90">{headerTitle}</h2>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {noticeVariant === 'demo' ? (
+                        <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                          {t('demo_notice_title', 'Mode démo')}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : null}
             {receiveView !== 'choice' ? <div className="text-sm text-white/60 -mt-1">{headerSubtitle}</div> : null}
             <div className="flex-1 min-h-0 flex flex-col">
               {receiveView === 'choice' ? (
@@ -1105,15 +1105,18 @@ export default function WalletDashboardReceiveModal({
                       maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90">
-                      <ArrowDownIcon className="w-6 h-6" />
-                    </div>
-                    <h3 className="mt-4 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                    <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
                       {t('ui_receive_choice_decision_title', 'Comment voulez-vous recevoir ?')}
                     </h3>
                     <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                       {t('ui_receive_choice_decision_subtitle', 'Partagez votre QR ou créez une demande avec montant')}
                     </p>
+                    <div
+                      className="mt-5 w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90"
+                      aria-hidden="true"
+                    >
+                      <ArrowDownIcon className="w-6 h-6" />
+                    </div>
                   </div>
 
                   <div className="flex-1 min-h-0 flex flex-col justify-center gap-4 py-6">
