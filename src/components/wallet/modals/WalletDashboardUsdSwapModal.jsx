@@ -445,7 +445,7 @@ export default function WalletDashboardUsdSwapModal({
 
   const [step, setStep] = useState("form"); // form | address | pending | deposit
   const [direction, setDirection] = useState(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(true);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [rlusdCurrency, setRlusdCurrency] = useState(DEFAULT_RLUSD);
   const [currencies, setCurrencies] = useState([]);
@@ -3000,7 +3000,7 @@ export default function WalletDashboardUsdSwapModal({
                                 walletAddressExpanded
                                   ? "text-[14px] md:text-[15px] break-all"
                                   : "text-[14px] md:text-[15px] whitespace-nowrap",
-                                accentText80,
+                                "text-white/70 hover:text-white",
                               ].join(" ")}
                             >
                               {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
@@ -3017,7 +3017,7 @@ export default function WalletDashboardUsdSwapModal({
                             </button>
                           </div>
                         ) : (
-		                        <p className={`text-[13px] md:text-sm font-mono break-all md:tracking-[0.06em] ${accentText80}`}>
+		                        <p className="text-[13px] md:text-sm font-mono break-all md:tracking-[0.06em] text-white/70">
 		                          {walletAddress}
 		                        </p>
                         )
@@ -4163,7 +4163,7 @@ export default function WalletDashboardUsdSwapModal({
                           )
                       : null}
 
-		                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && !walletTargetSelectionEnabled ? (
+	                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && !walletTargetSelectionEnabled ? (
 		                      <div
                           className={[
                             "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
@@ -4185,7 +4185,7 @@ export default function WalletDashboardUsdSwapModal({
 	                          </div>
 	                        ) : null}
 	                        {String(walletAddress || "").trim() ? (
-	                          <p className={`text-[13px] md:text-sm font-mono font-semibold break-all ${accentText90}`}>
+	                          <p className="text-[13px] md:text-sm font-mono font-semibold break-all text-white/70">
 	                            {walletAddress}
 	                          </p>
 	                        ) : null}

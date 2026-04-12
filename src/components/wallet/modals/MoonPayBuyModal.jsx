@@ -214,7 +214,7 @@ const MoonPayBuyModal = ({
   const [targetAssetAmount, setTargetAssetAmount] = useState('');
   const [amount, setAmount] = useState('');
   const [amountType, setAmountType] = useState('fiat');
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(true);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [fiatCurrency, setFiatCurrency] = useState(() => {
     return (
@@ -1861,7 +1861,7 @@ const MoonPayBuyModal = ({
                     walletAddressExpanded
                       ? 'text-[14px] md:text-[15px] break-all'
                       : 'text-[14px] md:text-[15px] whitespace-nowrap',
-                    accentText80,
+                    'text-white/70 hover:text-white',
                   ].join(' ')}
                 >
                   {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
@@ -2278,7 +2278,7 @@ const MoonPayBuyModal = ({
                           walletAddressExpanded
                             ? 'text-[15px] md:text-[17px] break-all'
                             : 'text-[15px] md:text-[17px] whitespace-nowrap',
-                          accentText80,
+                          'text-white/70 hover:text-white',
                         ].join(' ')}
                       >
                         {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}

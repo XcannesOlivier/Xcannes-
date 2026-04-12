@@ -206,7 +206,7 @@ const MoonPaySellModal = ({
   }, [preferredFiatCurrency]);
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset+amount, 2/3 = receive in, 3/3 = MoonPay iframe
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(true);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -1634,7 +1634,7 @@ const MoonPaySellModal = ({
                       walletAddressExpanded
                         ? "text-[14px] md:text-[15px] break-all"
                         : "text-[14px] md:text-[15px] whitespace-nowrap",
-			                accentText80,
+			                "text-white/70 hover:text-white",
 			              ].join(" ")}
 			            >
 			              {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
@@ -2179,7 +2179,7 @@ const MoonPaySellModal = ({
                             walletAddressExpanded
                               ? "text-[15px] md:text-[17px] break-all"
                               : "text-[15px] md:text-[17px] whitespace-nowrap",
-                            accentText80,
+                            "text-white/70 hover:text-white",
                           ].join(" ")}
                         >
                           {walletAddressExpanded ? walletAddress : truncateMiddle(walletAddress)}
