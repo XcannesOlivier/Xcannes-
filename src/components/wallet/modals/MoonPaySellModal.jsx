@@ -206,7 +206,7 @@ const MoonPaySellModal = ({
   }, [preferredFiatCurrency]);
   const [wizardStep, setWizardStep] = useState(1); // 1/3 = asset+amount, 2/3 = receive in, 3/3 = MoonPay iframe
   const [reviewTimestamp, setReviewTimestamp] = useState(null);
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(true);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -1589,17 +1589,15 @@ const MoonPaySellModal = ({
                 <span className="text-sm">{t("ui_back", "Retour")}</span>
               </button>
             ) : null}
-            <div className="ml-auto text-[13px] tracking-[0.22em] uppercase text-white/55">
-              {wizardStep === 1 ? "1/3" : "2/3"}
-            </div>
+            <div className="ml-auto" />
           </div>
 
           {/* From wallet display */}
 					          <div
 					            className={[
-					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
+					              "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
                         wizardStep === 1 ? "" : "hidden",
-					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06)]`,
+					              `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
 					            ].join(" ")}
 					          >
 				            <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
@@ -2398,9 +2396,6 @@ const MoonPaySellModal = ({
       {/* MoonPay iframe */}
       {step === "iframe" && iframeUrl && (
         <div className="relative">
-          <div className="flex justify-end pb-2">
-            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">3/3</div>
-          </div>
           <div
             className="relative"
             style={{ height: "calc(100vh - 40px)", minHeight: "600px", maxHeight: "760px" }}

@@ -445,7 +445,7 @@ export default function WalletDashboardUsdSwapModal({
 
   const [step, setStep] = useState("form"); // form | address | pending | deposit
   const [direction, setDirection] = useState(SWAP_DIRECTIONS.RLUSD_TO_STABLE);
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(true);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [rlusdCurrency, setRlusdCurrency] = useState(DEFAULT_RLUSD);
   const [currencies, setCurrencies] = useState([]);
@@ -827,6 +827,9 @@ export default function WalletDashboardUsdSwapModal({
     (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
       ? t("ui_swap_title_in_wallet", "Recevoir des stablecoins")
       : t("ui_swap_title_out", "RLUSD → stablecoin USD"));
+  const flowTitleDisplay = String(flowTitle || "")
+    .trim()
+    .toUpperCase();
   const flowSubtitle =
     String(subtitleOverride || "").trim() ||
     (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
@@ -2726,9 +2729,6 @@ export default function WalletDashboardUsdSwapModal({
             {step === "deposit" ? (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 px-1">
-	                  <span className={`inline-flex items-center justify-center rounded-full text-xs font-semibold px-2.5 py-1 ${accentBadge}`}>
-	                    {currentStepIndexResolved}/{totalStepsResolved}
-	                  </span>
                   <div className="text-sm text-white/80 font-semibold">
                     {t("ui_transfer_deposit", "Transférer le dépôt")}
                   </div>
@@ -2966,7 +2966,7 @@ export default function WalletDashboardUsdSwapModal({
 	                      {walletInlineSelectionEnabled ? (
 	                        <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
 	                          <span className="text-[20px] tracking-[0.14em]">
-	                            {flowTitle}
+	                            {flowTitleDisplay}
 	                          </span>
 	                        </p>
 	                      ) : (
@@ -3029,7 +3029,7 @@ export default function WalletDashboardUsdSwapModal({
                   <div className="px-1">
                     {!walletInlineSelectionEnabled ? (
                       <h3 className="text-white font-semibold text-base md:text-lg leading-tight">
-                        {flowTitle}
+                        {flowTitleDisplay}
                       </h3>
                     ) : null}
                     <p
@@ -4254,14 +4254,11 @@ export default function WalletDashboardUsdSwapModal({
 
                 {step === "address" ? (
                   <>
-                    <div className="flex items-center gap-3 px-1">
-	                      <span className={`inline-flex items-center justify-center rounded-full text-xs font-semibold px-2.5 py-1 ${accentBadge}`}>
-	                        {currentStepIndexResolved}/{totalStepsResolved}
-	                      </span>
-                      <div className="text-sm text-white/80 font-semibold">
-                        {t("ui_enter_address", "Entrer l’adresse")}
-                      </div>
-                    </div>
+	                    <div className="flex items-center gap-3 px-1">
+	                      <div className="text-sm text-white/80 font-semibold">
+	                        {t("ui_enter_address", "Entrer l’adresse")}
+	                      </div>
+	                    </div>
 
                     <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-black/20">
                       <div className="text-white/80 text-sm">

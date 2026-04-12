@@ -214,7 +214,7 @@ const MoonPayBuyModal = ({
   const [targetAssetAmount, setTargetAssetAmount] = useState('');
   const [amount, setAmount] = useState('');
   const [amountType, setAmountType] = useState('fiat');
-  const [walletAddressExpanded, setWalletAddressExpanded] = useState(false);
+  const [walletAddressExpanded, setWalletAddressExpanded] = useState(true);
   const [walletAddressCopied, setWalletAddressCopied] = useState(false);
   const [fiatCurrency, setFiatCurrency] = useState(() => {
     return (
@@ -1815,9 +1815,7 @@ const MoonPayBuyModal = ({
                 <span className="text-sm">{t('ui_back', 'Retour')}</span>
               </button>
             ) : null}
-            <div className="ml-auto text-[13px] tracking-[0.22em] uppercase text-white/55">
-              {wizardStep === 1 ? '1/3' : '2/3'}
-            </div>
+            <div className="ml-auto" />
           </div>
 
           {/* Wallet + Title (merged) */}
@@ -2538,9 +2536,6 @@ const MoonPayBuyModal = ({
       {/* MoonPay iframe */}
       {step === 'iframe' && iframeUrl && (
         <div className="relative">
-          <div className="flex justify-end pb-2">
-            <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">3/3</div>
-          </div>
           <div className="relative" style={{ height: 'calc(100vh - 40px)', minHeight: '600px', maxHeight: '760px' }}>
             <iframe
               src={iframeUrl}

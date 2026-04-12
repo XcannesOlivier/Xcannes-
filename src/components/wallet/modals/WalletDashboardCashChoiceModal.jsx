@@ -394,7 +394,7 @@ export default function WalletDashboardCashChoiceModal({
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-1 text-[18px] md:text-[17px] leading-snug text-xcannes-green/80 font-semibold">
+                    <p className="mt-1 text-[18px] md:text-[17px] leading-snug text-white/60 font-semibold">
                       {t('ui_funds_manage_subtitle', "Ajoutez ou retirez de l'argent facilement")}
                     </p>
                   </div>
