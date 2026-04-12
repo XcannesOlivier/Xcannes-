@@ -1164,7 +1164,15 @@ export default function WalletDashboard({
             />
           </div>
 
-          <WalletDashboardFooter />
+          <WalletDashboardFooter
+            onScan={
+              !isDesktopPanel
+                ? () => {
+                    sendState.setQrScannerOpen?.(true);
+                  }
+                : null
+            }
+          />
           {!isDesktopPanel ? (
             <WalletMobileModals
               {...modalProps}

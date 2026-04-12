@@ -62,6 +62,7 @@ export default function WalletMobileModals({
   qrScannerOpen,
   setQrScannerOpen,
   handleAddressScan,
+  handlePaymentRequestScan,
 
   // Save address prompt
   showSaveAddressPrompt,
@@ -273,7 +274,21 @@ export default function WalletMobileModals({
       {/* QR Scanner Modal for Address */}
       <QRScanner
         isOpen={qrScannerOpen}
-        onScan={handleAddressScan}
+        onScan={(data) => {
+          const result = handlePaymentRequestScan?.(data);
+          if (result?.relayChallenge || result?.navigate) {
+            setQrScannerOpen(false);
+            return;
+          }
+          if (handlePaymentRequestScan) {
+            setActiveAction?.("send");
+            setQrScannerOpen(false);
+            return;
+          }
+          handleAddressScan?.(data);
+          setActiveAction?.("send");
+          setQrScannerOpen(false);
+        }}
         onClose={() => setQrScannerOpen(false)}
         hideTitle
       />

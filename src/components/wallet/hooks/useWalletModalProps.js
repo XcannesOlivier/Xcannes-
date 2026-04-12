@@ -528,6 +528,7 @@ export function useWalletModalProps({
     qrScannerOpen,
     setQrScannerOpen: setQrScannerOpen,
     handleAddressScan,
+    handlePaymentRequestScan,
 
     // Cash modal uses different availableTokens in desktop vs mobile
     selectableTokens,
