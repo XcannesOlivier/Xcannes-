@@ -39,7 +39,7 @@ function ScanIcon({ className = "h-10 w-10" }) {
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.7"
+      strokeWidth="2.15"
       aria-hidden
     >
       <path
@@ -47,10 +47,10 @@ function ScanIcon({ className = "h-10 w-10" }) {
         strokeLinejoin="round"
         d="M4 7V6a2 2 0 0 1 2-2h1M20 7V6a2 2 0 0 0-2-2h-1M4 17v1a2 2 0 0 0 2 2h1M20 17v1a2 2 0 0 1-2 2h-1"
       />
-      <rect x="8" y="8" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
-      <rect x="13.6" y="8" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
-      <rect x="8" y="13.6" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
-      <rect x="13.6" y="13.6" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
+      <rect x="7.7" y="7.7" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
+      <rect x="13.4" y="7.7" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
+      <rect x="7.7" y="13.4" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
+      <rect x="13.4" y="13.4" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -69,7 +69,7 @@ function MobileFooterOverlay() {
       <svg
         viewBox="0 0 390 36"
         preserveAspectRatio="none"
-        className="absolute inset-x-0 top-0 h-[36px] w-full text-white/16"
+        className="absolute inset-x-0 top-0 h-[36px] w-full text-[#697173]/40"
       >
         <path d={MUSTACHE_FILL_PATH} fill={MOBILE_MODAL_BG} />
         <path
@@ -124,7 +124,7 @@ function MobileScanButton({ onScan, ariaLabel }) {
       <button
         type="button"
         onClick={onScan}
-        className="absolute left-1/2 top-[4px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+        className="absolute left-1/2 top-[6px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
         style={scanButtonStyle}
         aria-label={ariaLabel}
       >
@@ -147,7 +147,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <MobileFooterOverlay />
 
           <span
-            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/38"
+            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/18"
             style={{ backgroundColor: MOBILE_BASE_BG }}
           >
             By XCANNES LLC
