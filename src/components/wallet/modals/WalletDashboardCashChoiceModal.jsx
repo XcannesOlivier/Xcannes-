@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { createPortal } from "react-dom";
-import { useTranslation } from "next-i18next";
-import { useModalTransition } from "@/hooks/useModalTransition";
-import { useEffect, useRef, useState } from "react";
+import { createPortal } from 'react-dom';
+import { useTranslation } from 'next-i18next';
+import { useModalTransition } from '@/hooks/useModalTransition';
+import { useEffect, useRef, useState } from 'react';
 
 export default function WalletDashboardCashChoiceModal({
   open,
@@ -12,48 +12,33 @@ export default function WalletDashboardCashChoiceModal({
   onChooseSell,
   onChooseUsdSwapOut,
   onChooseUsdSwapIn,
-  noticeVariant = "preview",
+  noticeVariant = 'preview',
   inline = false,
 }) {
-  const { t } = useTranslation("common");
-  const addHintText = t("ui_funds_add_hint", "Carte ou virement bancaire");
-	  const withdrawHintText = t(
-	    "ui_funds_withdraw_hint",
-	    "Vers votre compte bancaire",
-	  );
-		  const highlightWithdraw = (value) => {
-		    const input = String(value || "");
-		    if (!input) return input;
-		    const parts = input.split(/(compte bancaire)/i);
-		    return parts.map((part, idx) =>
-		      /^compte bancaire$/i.test(part) ? (
-		        <span key={`${idx}-${part}`} className="text-xcannes-green/90">
-		          {part}
-		        </span>
-		      ) : (
-		        <span key={`${idx}-${part}`}>{part}</span>
-	      ),
-	    );
-	  };
-  const swapOutHintText = t(
-    "ui_funds_swap_out_hint",
-    "Depuis un wallet (USDC, USDT, RLUSD, ...)",
-  );
-  const swapOutSubhintText = t(
-    "ui_funds_swap_out_subhint",
-    "Ajoutés automatiquement à votre solde",
-  );
-  const swapInHintText = t(
-    "ui_funds_swap_in_hint",
-    "Vers un wallet",
-  );
-  const swapInSubhintText = t(
-    "ui_funds_swap_in_subhint",
-    "Conversion automatique si nécessaire",
-  );
+  const { t } = useTranslation('common');
+  const addHintText = t('ui_funds_add_hint', 'Carte ou virement bancaire');
+  const withdrawHintText = t('ui_funds_withdraw_hint', 'Vers votre compte bancaire');
+  const highlightWithdraw = value => {
+    const input = String(value || '');
+    if (!input) return input;
+    const parts = input.split(/(compte bancaire)/i);
+    return parts.map((part, idx) =>
+      /^compte bancaire$/i.test(part) ? (
+        <span key={`${idx}-${part}`} className="text-xcannes-green/90">
+          {part}
+        </span>
+      ) : (
+        <span key={`${idx}-${part}`}>{part}</span>
+      ),
+    );
+  };
+  const swapOutHintText = t('ui_funds_swap_out_hint', 'Depuis un wallet (USDC, USDT, RLUSD, ...)');
+  const swapOutSubhintText = t('ui_funds_swap_out_subhint', 'Ajoutés automatiquement à votre solde');
+  const swapInHintText = t('ui_funds_swap_in_hint', 'Vers un wallet');
+  const swapInSubhintText = t('ui_funds_swap_in_subhint', 'Conversion automatique si nécessaire');
   const stablecoinLiquidityNote = t(
-    "ui_funds_stablecoin_liquidity_note",
-    "Optimisé via stablecoins USD (RLUSD) et la liquidité du réseau XRP",
+    'ui_funds_stablecoin_liquidity_note',
+    'Optimisé via stablecoins USD (RLUSD) et la liquidité du réseau XRP',
   );
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -71,28 +56,9 @@ export default function WalletDashboardCashChoiceModal({
         className="fill-xcannes-green/15 stroke-xcannes-green/45"
         strokeWidth="1.5"
       />
-      <rect
-        x="10"
-        y="18"
-        width="18"
-        height="4"
-        rx="2"
-        className="fill-xcannes-green/35"
-      />
-      <rect
-        x="10"
-        y="26"
-        width="12"
-        height="3"
-        rx="1.5"
-        className="fill-xcannes-green/25"
-      />
-      <path
-        d="M36 24v8m-4-4h8"
-        className="stroke-xcannes-green"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
+      <rect x="10" y="18" width="18" height="4" rx="2" className="fill-xcannes-green/35" />
+      <rect x="10" y="26" width="12" height="3" rx="1.5" className="fill-xcannes-green/25" />
+      <path d="M36 24v8m-4-4h8" className="stroke-xcannes-green" strokeWidth="2.5" strokeLinecap="round" />
     </svg>
   );
 
@@ -105,35 +71,15 @@ export default function WalletDashboardCashChoiceModal({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M14 18h20"
-        className="stroke-white/80"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M16 18v16m6-16v16m6-16v16m6-16v16"
-        className="stroke-white/60"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M12 34h24"
-        className="stroke-white/80"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-	      <path
-	        d="M10 38h28"
-	        className="stroke-white/75"
-	        strokeWidth="2"
-	        strokeLinecap="round"
-	      />
-	    </svg>
-	  );
+      <path d="M14 18h20" className="stroke-white/80" strokeWidth="2" strokeLinecap="round" />
+      <path d="M16 18v16m6-16v16m6-16v16m6-16v16" className="stroke-white/60" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 34h24" className="stroke-white/80" strokeWidth="2" strokeLinecap="round" />
+      <path d="M10 38h28" className="stroke-white/75" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
 
-	  const FundsCardWalletIcon = () => (
-	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+  const FundsCardWalletIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
         d="M14 18c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v16c0 2.2-1.8 4-4 4H18c-2.2 0-4-1.8-4-4V18Z"
         className="fill-[#0870f8]/8 stroke-white/35"
@@ -145,51 +91,40 @@ export default function WalletDashboardCashChoiceModal({
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-	      <circle cx="30.5" cy="27" r="5.5" className="fill-[#0870f8]/15" />
-	      <path
-	        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
-	        className="stroke-white/85"
-	        strokeWidth="1.4"
-	        strokeLinecap="round"
-	        strokeLinejoin="round"
-	      />
-	    </svg>
-	  );
-
-	  const FundsCardSendIcon = () => (
-	    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
-	      <path
-	        d="M10 22l28-12-10 28-6-10-12-6Z"
-	        className="fill-[#ff6a00]/8 stroke-white/45"
-	        strokeWidth="1.5"
-	        strokeLinejoin="round"
-	      />
-	      <path
-	        d="M38 10L22 28"
-	        className="stroke-white/75"
-	        strokeWidth="1.8"
-	        strokeLinecap="round"
-	      />
-	      <path
-	        d="M22 28l0 10"
-	        className="stroke-white/45"
-        strokeWidth="1.5"
+      <circle cx="30.5" cy="27" r="5.5" className="fill-[#0870f8]/15" />
+      <path
+        d="M30.5 23.6v6.8m-2.4-4.4c0-.8 1-1.4 2.4-1.4s2.4.6 2.4 1.4-1 1.4-2.4 1.4-2.4.6-2.4 1.4 1 1.4 2.4 1.4 2.4-.6 2.4-1.4"
+        className="stroke-white/85"
+        strokeWidth="1.4"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
 
-  const sectionHeader = (label) => (
+  const FundsCardSendIcon = () => (
+    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
+      <path
+        d="M10 22l28-12-10 28-6-10-12-6Z"
+        className="fill-[#ff6a00]/8 stroke-white/45"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M38 10L22 28" className="stroke-white/75" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M22 28l0 10" className="stroke-white/45" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+
+  const sectionHeader = label => (
     <div className="flex items-center gap-3 px-1">
-      <div className="text-[13px] tracking-[0.22em] uppercase text-white/45">
-        {label}
-      </div>
+      <div className="text-[13px] tracking-[0.22em] uppercase text-white/45">{label}</div>
       <div className="h-px flex-1 bg-white/10" aria-hidden />
     </div>
   );
 
+  // Match the "Convert" action button background (wallet-actions.css).
   const cardClassName =
-    "w-full text-left rounded-[16px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]";
+    'w-full text-left rounded-[16px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
@@ -204,7 +139,7 @@ export default function WalletDashboardCashChoiceModal({
     source: null,
     dragging: false,
     scrollLocked: false,
-    lockedOverflowY: "",
+    lockedOverflowY: '',
   });
   const closeRequestedRef = useRef(false);
 
@@ -218,7 +153,7 @@ export default function WalletDashboardCashChoiceModal({
       source: null,
       dragging: false,
       scrollLocked: false,
-      lockedOverflowY: "",
+      lockedOverflowY: '',
     };
 
     if (open) {
@@ -245,7 +180,7 @@ export default function WalletDashboardCashChoiceModal({
 
   const releaseOverlayScrollLock = () => {
     const meta = overlayDragMetaRef.current;
-    if (meta?.source !== "list") return;
+    if (meta?.source !== 'list') return;
     if (!meta?.scrollLocked) return;
     const listEl = overlayListRef.current;
     if (!listEl) return;
@@ -255,16 +190,16 @@ export default function WalletDashboardCashChoiceModal({
       // ignore
     }
     meta.scrollLocked = false;
-    meta.lockedOverflowY = "";
+    meta.lockedOverflowY = '';
   };
 
   const maybeStartOverlayDrag = (event, source) => {
     if (inline) return false;
     if (!event?.isPrimary) return false;
-    if (event.pointerType === "mouse") return false;
-    if (event.target?.closest?.("input,textarea,select")) return false;
+    if (event.pointerType === 'mouse') return false;
+    if (event.target?.closest?.('input,textarea,select')) return false;
 
-    if (source === "list") {
+    if (source === 'list') {
       const listEl = overlayListRef.current;
       if (!listEl) return false;
       if (listEl.scrollTop > 0) return false;
@@ -279,12 +214,12 @@ export default function WalletDashboardCashChoiceModal({
       source,
       dragging: false,
       scrollLocked: false,
-      lockedOverflowY: "",
+      lockedOverflowY: '',
     };
     return true;
   };
 
-  const handleOverlayPointerMove = (event) => {
+  const handleOverlayPointerMove = event => {
     if (inline) return;
     const meta = overlayDragMetaRef.current;
     if (!meta?.pending && !meta?.dragging) return;
@@ -301,13 +236,13 @@ export default function WalletDashboardCashChoiceModal({
         // ignore
       }
 
-      if (meta.source === "list") {
+      if (meta.source === 'list') {
         const listEl = overlayListRef.current;
         if (listEl && listEl.scrollTop <= 0) {
           try {
             meta.lockedOverflowY = listEl.style.overflowY;
             meta.scrollLocked = true;
-            listEl.style.overflowY = "hidden";
+            listEl.style.overflowY = 'hidden';
             listEl.scrollTop = 0;
           } catch {
             // ignore
@@ -323,7 +258,7 @@ export default function WalletDashboardCashChoiceModal({
     setOverlayTranslateY(delta);
   };
 
-  const handleOverlayPointerEnd = (event) => {
+  const handleOverlayPointerEnd = event => {
     if (inline) return;
     const meta = overlayDragMetaRef.current;
     if (meta.pointerId !== event.pointerId) return;
@@ -331,11 +266,9 @@ export default function WalletDashboardCashChoiceModal({
     const delta = meta.lastDelta || 0;
     const duration = Math.max(1, Date.now() - (meta.startAt || 0));
     const velocity = delta / duration; // px/ms
-    const height = typeof window !== "undefined" ? window.innerHeight : 800;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
     const closeDistance = Math.max(220, Math.min(320, height * 0.28));
-    const shouldClose =
-      delta > closeDistance ||
-      (delta > closeDistance * 0.6 && velocity > 1.25);
+    const shouldClose = delta > closeDistance || (delta > closeDistance * 0.6 && velocity > 1.25);
 
     overlayDragMetaRef.current.pending = false;
     overlayDragMetaRef.current.dragging = false;
@@ -363,37 +296,37 @@ export default function WalletDashboardCashChoiceModal({
       source: null,
       dragging: false,
       scrollLocked: false,
-      lockedOverflowY: "",
+      lockedOverflowY: '',
     };
   };
 
   if (!shouldRender) return null;
 
   const wrapperClass = inline
-    ? "relative w-full h-full flex"
-    : "fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none";
+    ? 'relative w-full h-full flex'
+    : 'fixed inset-0 z-[10001] flex items-end md:items-center justify-center md:px-4 pointer-events-none';
   const liftAnimClass = closeRequestedRef.current
-    ? ""
+    ? ''
     : !inline
       ? isClosing
-        ? "wallet-modal-lift-out"
-        : "wallet-modal-lift-in"
-      : "";
+        ? 'wallet-modal-lift-out'
+        : 'wallet-modal-lift-in'
+      : '';
   const backdropAnimClass = closeRequestedRef.current
-    ? ""
+    ? ''
     : isClosing
-      ? "wallet-modal-backdrop-out"
-      : "wallet-modal-backdrop-in";
+      ? 'wallet-modal-backdrop-out'
+      : 'wallet-modal-backdrop-in';
   const panelClass = [
-    "relative w-full wallet-modal-panel wallet-cash-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]",
+    'relative w-full wallet-modal-panel wallet-cash-modal wallet-modal-no-top-highlight-mobile border-white/10 md:border overflow-hidden flex flex-col pointer-events-auto pb-[env(safe-area-inset-bottom)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-26px_46px_rgba(0,0,0,0.55)]',
     inline
-      ? "h-full max-h-none rounded-xl"
-      : "h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl",
-    noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-elevated",
-    noticeVariant === "demo" ? "demo-wallet-tooltip-scope" : "",
-    inline ? "wallet-inline-zoom-in" : "",
+      ? 'h-full max-h-none rounded-xl'
+      : 'h-screen md:h-auto md:max-w-lg md:max-h-[100vh] rounded-none md:rounded-2xl',
+    noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated',
+    noticeVariant === 'demo' ? 'demo-wallet-tooltip-scope' : '',
+    inline ? 'wallet-inline-zoom-in' : '',
     liftAnimClass,
-  ].join(" ");
+  ].join(' ');
 
   const content = (
     <>
@@ -416,13 +349,11 @@ export default function WalletDashboardCashChoiceModal({
       <div className={wrapperClass}>
         <div
           ref={overlayRef}
-          className={inline ? "w-full h-full flex" : "pointer-events-auto w-full"}
+          className={inline ? 'w-full h-full flex' : 'pointer-events-auto w-full'}
           style={{
             transform: `translateY(${Math.max(0, overlayTranslateY)}px)`,
-            transition: overlayDragging
-              ? "none"
-              : "transform 220ms cubic-bezier(0.2,0,0,1)",
-            willChange: overlayTranslateY ? "transform" : undefined,
+            transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
+            willChange: overlayTranslateY ? 'transform' : undefined,
           }}
           onPointerMove={handleOverlayPointerMove}
           onPointerUp={handleOverlayPointerEnd}
@@ -430,7 +361,7 @@ export default function WalletDashboardCashChoiceModal({
         >
           <div
             className={panelClass}
-            onClick={(e) => {
+            onClick={e => {
               if (!inline) e.stopPropagation();
             }}
           >
@@ -442,8 +373,8 @@ export default function WalletDashboardCashChoiceModal({
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
               <div
                 className="border-b border-white/10"
-                onPointerDown={(event) => {
-                  maybeStartOverlayDrag(event, "fixed");
+                onPointerDown={event => {
+                  maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
                 {!inline ? (
@@ -455,19 +386,16 @@ export default function WalletDashboardCashChoiceModal({
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-white font-semibold text-[22px] md:text-2xl leading-tight">
-                        {t("ui_funds_manage_title", "Gérer vos fonds")}
+                        {t('ui_funds_manage_title', 'Gérer vos fonds')}
                       </h3>
-                      {noticeVariant === "demo" ? (
+                      {noticeVariant === 'demo' ? (
                         <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                          {t("demo_notice_title", "Mode démo")}
+                          {t('demo_notice_title', 'Mode démo')}
                         </span>
                       ) : null}
                     </div>
                     <p className="mt-1 text-[18px] md:text-[17px] leading-snug text-xcannes-green/80 font-semibold">
-                      {t(
-                        "ui_funds_manage_subtitle",
-                        "Ajoutez ou retirez de l'argent facilement",
-                      )}
+                      {t('ui_funds_manage_subtitle', "Ajoutez ou retirez de l'argent facilement")}
                     </p>
                   </div>
                 </div>
@@ -476,13 +404,13 @@ export default function WalletDashboardCashChoiceModal({
               <div
                 ref={overlayListRef}
                 className="flex-1 min-h-0 overflow-y-auto p-4 md:p-5"
-                onPointerDown={(event) => {
-                  maybeStartOverlayDrag(event, "list");
+                onPointerDown={event => {
+                  maybeStartOverlayDrag(event, 'list');
                 }}
               >
                 <div className="flex flex-col gap-7 pb-2">
                   <div className="space-y-4">
-                    {sectionHeader(t("ui_funds_section_agent", "Argent"))}
+                    {sectionHeader(t('ui_funds_section_agent', 'Argent'))}
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
@@ -492,14 +420,9 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t("ui_funds_increase_balances_title", "Augmenter vos soldes")}
+                              {t('ui_funds_increase_balances_title', 'Augmenter vos soldes')}
                             </p>
-                            <svg
-                              className="w-5 h-5 text-white/45"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              aria-hidden
-                            >
+                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
                                 d="M9 18L15 12L9 6"
                                 stroke="currentColor"
@@ -511,15 +434,11 @@ export default function WalletDashboardCashChoiceModal({
                           </div>
                           <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
                             {(() => {
-                              const parts = String(addHintText || "").split(
-                                " ou ",
-                              );
+                              const parts = String(addHintText || '').split(' ou ');
                               if (parts.length === 2) {
                                 return (
                                   <>
-                                    {parts[0]}{" "}
-                                    <span className="text-white/60">ou</span>{" "}
-                                    {parts[1]}
+                                    {parts[0]} <span className="text-white/60">ou</span> {parts[1]}
                                   </>
                                 );
                               }
@@ -538,14 +457,9 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t("ui_funds_withdraw_title", "Envoyer vers la banque")}
+                              {t('ui_funds_withdraw_title', 'Envoyer vers la banque')}
                             </p>
-                            <svg
-                              className="w-5 h-5 text-white/45"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              aria-hidden
-                            >
+                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
                                 d="M9 18L15 12L9 6"
                                 stroke="currentColor"
@@ -555,36 +469,30 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-	                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
-	                            {(() => {
-	                              const text = String(withdrawHintText || "");
-	                              const prefix = "Vers votre ";
-	                              if (text.startsWith(prefix)) {
-	                                return (
-	                                  <>
-	                                    <span className="text-white/60">
-	                                      Vers votre{" "}
-	                                    </span>
-	                                    {highlightWithdraw(text.slice(prefix.length))}
-	                                  </>
-	                                );
-	                              }
-	                              return highlightWithdraw(withdrawHintText);
-	                            })()}
-	                          </p>
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-xcannes-green/90">
+                            {(() => {
+                              const text = String(withdrawHintText || '');
+                              const prefix = 'Vers votre ';
+                              if (text.startsWith(prefix)) {
+                                return (
+                                  <>
+                                    <span className="text-white/60">Vers votre </span>
+                                    {highlightWithdraw(text.slice(prefix.length))}
+                                  </>
+                                );
+                              }
+                              return highlightWithdraw(withdrawHintText);
+                            })()}
+                          </p>
                         </div>
                       </div>
                     </button>
                   </div>
 
                   <div className="space-y-4">
-                    {sectionHeader(t("ui_funds_section_digital_dollars", "Stablecoins USD"))}
+                    {sectionHeader(t('ui_funds_section_digital_dollars', 'Stablecoins USD'))}
 
-                    <button
-                      type="button"
-                      onClick={onChooseUsdSwapOut}
-                      className={cardClassName}
-                    >
+                    <button type="button" onClick={onChooseUsdSwapOut} className={cardClassName}>
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardWalletIcon />
@@ -592,17 +500,9 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t(
-                                "ui_funds_swap_out_title",
-                                "Recevoir",
-                              )}
+                              {t('ui_funds_swap_out_title', 'Recevoir')}
                             </p>
-                            <svg
-                              className="w-5 h-5 text-white/45"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              aria-hidden
-                            >
+                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
                                 d="M9 18L15 12L9 6"
                                 stroke="currentColor"
@@ -613,68 +513,47 @@ export default function WalletDashboardCashChoiceModal({
                             </svg>
                           </div>
                           <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-                            {String(swapOutHintText || "")
-                              .split("\n")
+                            {String(swapOutHintText || '')
+                              .split('\n')
                               .map((line, lineIdx, lines) => {
-                                const text = String(line || "");
-                                const highlightStablecoin = (value) => {
-                                  const input = String(value || "");
+                                const text = String(line || '');
+                                const highlightStablecoin = value => {
+                                  const input = String(value || '');
                                   if (!input) return input;
                                   const parts = input.split(/(stablecoins?\s+USD)/i);
-		                                  return parts.map((part, idx) =>
-		                                    /^stablecoins?\s+usd$/i.test(part) ||
-		                                    /USDC|USDT|RLUSD/i.test(part) ? (
-		                                      <span
-		                                        key={`${lineIdx}-${idx}-${part}`}
-		                                        className="text-xcannes-green/90"
-		                                      >
-		                                        {part}
-		                                      </span>
-		                                    ) : (
+                                  return parts.map((part, idx) =>
+                                    /^stablecoins?\s+usd$/i.test(part) || /USDC|USDT|RLUSD/i.test(part) ? (
+                                      <span key={`${lineIdx}-${idx}-${part}`} className="text-xcannes-green/90">
+                                        {part}
+                                      </span>
+                                    ) : (
                                       <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
                                     ),
                                   );
                                 };
-                                const openIdx = text.indexOf("(");
-                                const closeIdx = text.lastIndexOf(")");
-                                const hasParens =
-                                  openIdx >= 0 && closeIdx > openIdx;
-                                const before = hasParens
-                                  ? text.slice(0, openIdx)
-                                  : text;
-                                const parens = hasParens
-                                  ? text.slice(openIdx, closeIdx + 1)
-                                  : "";
-                                const after = hasParens
-                                  ? text.slice(closeIdx + 1)
-                                  : "";
-	                                return (
-	                                  <span key={`${lineIdx}-${text}`}>
-		                                    {highlightStablecoin(before)}
-		                                    {parens ? (
-		                                      <span className="text-xcannes-green/90">
-		                                        {parens}
-		                                      </span>
-		                                    ) : null}
-	                                    {highlightStablecoin(after)}
-	                                    {lineIdx < lines.length - 1 ? <br /> : null}
-	                                  </span>
+                                const openIdx = text.indexOf('(');
+                                const closeIdx = text.lastIndexOf(')');
+                                const hasParens = openIdx >= 0 && closeIdx > openIdx;
+                                const before = hasParens ? text.slice(0, openIdx) : text;
+                                const parens = hasParens ? text.slice(openIdx, closeIdx + 1) : '';
+                                const after = hasParens ? text.slice(closeIdx + 1) : '';
+                                return (
+                                  <span key={`${lineIdx}-${text}`}>
+                                    {highlightStablecoin(before)}
+                                    {parens ? <span className="text-xcannes-green/90">{parens}</span> : null}
+                                    {highlightStablecoin(after)}
+                                    {lineIdx < lines.length - 1 ? <br /> : null}
+                                  </span>
                                 );
                               })}
                           </p>
-                          <p className="mt-2 text-[12px] md:text-xs text-white/50">
-                            {swapOutSubhintText}
-                          </p>
+                          <p className="mt-2 text-[12px] md:text-xs text-white/50">{swapOutSubhintText}</p>
                         </div>
                       </div>
                     </button>
                     <div className="mb-5" />
 
-                    <button
-                      type="button"
-                      onClick={onChooseUsdSwapIn}
-                      className={cardClassName}
-                    >
+                    <button type="button" onClick={onChooseUsdSwapIn} className={cardClassName}>
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardSendIcon />
@@ -682,17 +561,9 @@ export default function WalletDashboardCashChoiceModal({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <p className="text-[18px] md:text-[19px] text-white font-semibold truncate">
-                              {t(
-                                "ui_funds_swap_in_title",
-                                "Envoyer",
-                              )}
+                              {t('ui_funds_swap_in_title', 'Envoyer')}
                             </p>
-                            <svg
-                              className="w-5 h-5 text-white/45"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              aria-hidden
-                            >
+                            <svg className="w-5 h-5 text-white/45" viewBox="0 0 24 24" fill="none" aria-hidden>
                               <path
                                 d="M9 18L15 12L9 6"
                                 stroke="currentColor"
@@ -702,34 +573,29 @@ export default function WalletDashboardCashChoiceModal({
                               />
                             </svg>
                           </div>
-	                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
-	                            {String(swapInHintText || "")
-	                              .split("\n")
-	                              .map((line, lineIdx, lines) => {
-	                                const input = String(line || "");
-	                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
-	                                return (
-	                                  <span key={`${lineIdx}-${input}`}>
-		                                    {parts.map((part, idx) =>
-		                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
-		                                        <span
-		                                          key={`${lineIdx}-${idx}-${part}`}
-		                                          className="text-xcannes-green/90"
-		                                        >
-		                                          {part}
-		                                        </span>
-		                                      ) : (
-	                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
-	                                      ),
+                          <p className="mt-1 text-[15px] md:text-sm leading-snug text-white/60">
+                            {String(swapInHintText || '')
+                              .split('\n')
+                              .map((line, lineIdx, lines) => {
+                                const input = String(line || '');
+                                const parts = input.split(/(stablecoins?\s+USD|wallet)/i);
+                                return (
+                                  <span key={`${lineIdx}-${input}`}>
+                                    {parts.map((part, idx) =>
+                                      /^stablecoins?\s+usd$/i.test(part) || /^wallet$/i.test(part) ? (
+                                        <span key={`${lineIdx}-${idx}-${part}`} className="text-xcannes-green/90">
+                                          {part}
+                                        </span>
+                                      ) : (
+                                        <span key={`${lineIdx}-${idx}-${part}`}>{part}</span>
+                                      ),
                                     )}
                                     {lineIdx < lines.length - 1 ? <br /> : null}
                                   </span>
                                 );
                               })}
                           </p>
-                          <p className="mt-2 text-[12px] md:text-xs text-white/50">
-                            {swapInSubhintText}
-                          </p>
+                          <p className="mt-2 text-[12px] md:text-xs text-white/50">{swapInSubhintText}</p>
                         </div>
                       </div>
                     </button>
@@ -749,6 +615,6 @@ export default function WalletDashboardCashChoiceModal({
   );
 
   if (inline) return content;
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
   return createPortal(content, document.body);
 }

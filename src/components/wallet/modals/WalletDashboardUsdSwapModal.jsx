@@ -2956,10 +2956,10 @@ export default function WalletDashboardUsdSwapModal({
               </div>
             ) : (
               <div className="space-y-5">
-			                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
+		                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 		                    <div
                           className={[
-                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
+                            "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
                             accentShadowPanel,
                           ].join(" ")}
                         >
