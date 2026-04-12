@@ -53,20 +53,20 @@ export default function WalletDashboardFooter({ onScan } = {}) {
             </svg>
           </div>
 
-          <span className="absolute right-4 top-2 z-20 bg-[#090c0d] pl-2 text-[10px] font-light tracking-[0.14em] text-white/24 uppercase">
+          <span className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/15">
             By XCANNES LLC
           </span>
 
           {onScan ? (
             <>
               <div
-                className="pointer-events-none absolute left-1/2 top-[44px] z-0 h-[56px] w-[156px] -translate-x-1/2 rounded-full bg-black/65 blur-[12px]"
+                className="pointer-events-none absolute left-1/2 top-[40px] z-0 h-[56px] w-[156px] -translate-x-1/2 rounded-full bg-black/65 blur-[12px]"
                 aria-hidden
               />
               <button
                 type="button"
                 onClick={onScan}
-                className="absolute left-1/2 top-[34px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full border border-[#39d57c]/42 text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="absolute left-1/2 top-[30px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={{
                   background:
                     "linear-gradient(180deg, rgba(42,170,96,1) 0%, rgba(20,122,67,1) 100%)",
