@@ -7,7 +7,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   const mobileOverlayColor = "#111516";
 
   return (
-    <div className="mt-auto shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] border-t border-white/16 md:border-white/10">
+    <div className="mt-auto shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] border-t-0 md:border-t md:border-white/10">
       {/* Mobile only: sculpted footer dock with floating scan action */}
       <div
         className="md:hidden relative overflow-visible bg-[#090c0d]"
