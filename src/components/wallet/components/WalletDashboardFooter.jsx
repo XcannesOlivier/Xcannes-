@@ -26,11 +26,11 @@ export default function WalletDashboardFooter({ onScan } = {}) {
               className="absolute inset-x-0 top-0 h-[36px] w-full text-white/16"
             >
               <path
-                d="M0 30 C84 30 104 0 136 0 H314 C342 0 356 30 390 30 V36 H0 Z"
+                d="M0 30 C84 30 104 0 136 0 H254 C286 0 306 30 390 30 V36 H0 Z"
                 fill={mobileOverlayColor}
               />
               <path
-                d="M136 0 H314"
+                d="M136 0 H254"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
@@ -44,7 +44,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
                 strokeLinecap="round"
               />
               <path
-                d="M314 0 C342 0 356 30 390 30"
+                d="M254 0 C286 0 306 30 390 30"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
