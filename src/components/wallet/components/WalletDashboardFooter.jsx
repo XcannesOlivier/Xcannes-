@@ -15,9 +15,9 @@ const mobileOverlayFillStyle = {
 
 const scanButtonStyle = {
   background:
-    "linear-gradient(180deg, rgba(42,170,96,1) 0%, rgba(20,122,67,1) 100%)",
+    "linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)",
   boxShadow:
-    "0 12px 24px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -10px 18px rgba(0,0,0,0.16)",
+    "0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)",
 };
 
 const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
@@ -32,7 +32,7 @@ const MUSTACHE_RIGHT_CONNECT_PATH = "M254 0 C272 0 292 30 320 30";
 const LEFT_LABEL_LINE_PATH = "M0 30 H70";
 const RIGHT_LABEL_LINE_PATH = "M390 30 H320";
 
-function ScanIcon({ className = "h-9 w-9" }) {
+function ScanIcon({ className = "h-10 w-10" }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -47,11 +47,10 @@ function ScanIcon({ className = "h-9 w-9" }) {
         strokeLinejoin="round"
         d="M4 7V6a2 2 0 0 1 2-2h1M20 7V6a2 2 0 0 0-2-2h-1M4 17v1a2 2 0 0 0 2 2h1M20 17v1a2 2 0 0 1-2 2h-1"
       />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M7 8h3v3H7V8Zm7 0h3v3h-3V8ZM7 13h3v3H7v-3Zm7 2h3"
-      />
+      <rect x="8" y="8" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
+      <rect x="13.6" y="8" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
+      <rect x="8" y="13.6" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
+      <rect x="13.6" y="13.6" width="2.4" height="2.4" rx="0.55" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -119,13 +118,13 @@ function MobileScanButton({ onScan, ariaLabel }) {
   return (
     <>
       <div
-        className="pointer-events-none absolute left-1/2 top-[11px] z-0 h-[56px] w-[156px] -translate-x-1/2 rounded-full bg-black/65 blur-[12px]"
+        className="pointer-events-none absolute left-1/2 top-[11px] z-0 h-[58px] w-[162px] -translate-x-1/2 rounded-full bg-black/75 blur-[14px]"
         aria-hidden
       />
       <button
         type="button"
         onClick={onScan}
-        className="absolute left-1/2 top-[2px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+        className="absolute left-1/2 top-[4px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
         style={scanButtonStyle}
         aria-label={ariaLabel}
       >
@@ -148,7 +147,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <MobileFooterOverlay />
 
           <span
-            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/22"
+            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/38"
             style={{ backgroundColor: MOBILE_BASE_BG }}
           >
             By XCANNES LLC
