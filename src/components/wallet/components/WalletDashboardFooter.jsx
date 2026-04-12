@@ -6,10 +6,10 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-auto shrink-0 z-20 bg-elevated border-t-0 md:border-t md:border-white/10">
+    <div className="mt-auto shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] md:[--bg-elevated:unset] border-t-0 md:border-t md:border-white/10">
       {/* Mobile: scan button straddling list + footer */}
       <div className="md:hidden relative h-14 pb-[env(safe-area-inset-bottom)] before:content-[''] before:absolute before:inset-x-0 before:top-[1px] before:h-px before:bg-white/11 before:pointer-events-none">
-        <span className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+30px)] text-[10px] font-light text-white/25">
+        <span className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+30px)] text-[10px] font-light text-white/35">
           By XCANNES LLC
         </span>
         <div
