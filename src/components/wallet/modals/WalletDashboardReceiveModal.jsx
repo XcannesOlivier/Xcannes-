@@ -109,6 +109,8 @@ export default function WalletDashboardReceiveModal({
   receiveTab,
   setReceiveTab,
   wallet,
+  walletAddresses = [],
+  onSwitchWallet,
   requestAmount,
   setRequestAmount,
   requestCurrency,
@@ -130,6 +132,7 @@ export default function WalletDashboardReceiveModal({
   const { t, i18n } = useTranslation('common');
   const locale = i18n?.language || 'en';
   const fallbackWalletLabel = t('nav_wallet', 'Wallet');
+  const trimmed = useCallback(value => String(value || '').trim(), []);
   const [generatedRequest, setGeneratedRequest] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const isDesktop = useIsDesktop();
@@ -200,6 +203,85 @@ export default function WalletDashboardReceiveModal({
     setGenerateError(null);
   }, [wallet, requestAmount, requestCurrency, requestMemo]);
 
+  const activeWalletLabel = useMemo(() => {
+    const direct = trimmed(walletLabel);
+    if (direct) return direct;
+    const entry = (walletAddresses || []).find(w => (typeof w === 'string' ? w === wallet : w?.address === wallet));
+    const fromList = typeof entry === 'string' ? '' : trimmed(entry?.label);
+    return fromList || fallbackWalletLabel;
+  }, [fallbackWalletLabel, trimmed, wallet, walletAddresses, walletLabel]);
+
+  const activeWalletQrLabel = useMemo(() => {
+    const direct = trimmed(walletLabel);
+    if (direct) return direct;
+    const entry = (walletAddresses || []).find(w => (typeof w === 'string' ? w === wallet : w?.address === wallet));
+    const fromList = typeof entry === 'string' ? '' : trimmed(entry?.label);
+    return fromList || '';
+  }, [trimmed, wallet, walletAddresses, walletLabel]);
+
+  const walletList = useMemo(() => {
+    const list = Array.isArray(walletAddresses) ? walletAddresses : [];
+    if (!wallet) return list;
+    const hasActive = list.some(w => (typeof w === 'string' ? w === wallet : w?.address === wallet));
+    if (list.length > 0) return hasActive ? list : [wallet, ...list];
+    return [wallet];
+  }, [wallet, walletAddresses]);
+  const hasMultipleWallets = (walletList || []).length > 1;
+
+  const shortAddress = useCallback(
+    (addr, left = 6, right = 4) => {
+      const s = trimmed(addr);
+      if (!s) return '';
+      if (s.length <= left + right + 3) return s;
+      return `${s.slice(0, left)}...${s.slice(-right)}`;
+    },
+    [trimmed],
+  );
+
+  const walletOptions = useMemo(() => {
+    return (walletList || [])
+      .map((w, idx) => {
+        const addr = typeof w === 'string' ? w : w?.address;
+        if (!addr) return null;
+        const labelFromList = typeof w === 'string' ? '' : trimmed(w?.label);
+        const label = addr === wallet ? activeWalletLabel : labelFromList || `Wallet ${idx + 1}`;
+        return {
+          value: addr,
+          label,
+          labelLeft: label,
+          labelRight: shortAddress(addr),
+          labelMobile: label,
+        };
+      })
+      .filter(Boolean);
+  }, [activeWalletLabel, shortAddress, trimmed, wallet, walletList]);
+
+  const walletPicker =
+    wallet && hasMultipleWallets ? (
+      <div className="rounded-[14px] border border-white/10 bg-white/5 p-3 space-y-2">
+        <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+          {t('ui_receive_wallet_selector_label', 'Wallet de réception')}
+        </div>
+        <ModalSelect
+          value={wallet}
+          onChange={next => {
+            const addr = trimmed(next);
+            if (!addr || addr === wallet) return;
+            onSwitchWallet?.(addr);
+          }}
+          options={walletOptions}
+          useNativeSelect={false}
+          buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+          menuClassName={
+            noticeVariant === 'demo'
+              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+          }
+          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+        />
+      </div>
+    ) : null;
+
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
     if (!requestCurrencyCode) return false;
@@ -254,7 +336,7 @@ export default function WalletDashboardReceiveModal({
       targetCurrencyUpper === 'RLUSD' || targetCurrencyUpper === 'USD' ? XRPL_KNOWN_ISSUERS.RLUSD : null;
     const issuer = isFxRequest ? null : knownIssuer || (issuerLooksValid ? issuerCandidate : null);
 
-    const beneficiaryLabel = String(walletLabel || '').trim() || null;
+    const beneficiaryLabel = trimmed(activeWalletQrLabel) || null;
     const req = {
       schema: 'xcannes-payreq',
       to: wallet,
@@ -388,8 +470,8 @@ export default function WalletDashboardReceiveModal({
 
     const labelText = String(
       useRequest
-        ? generatedRequest?.beneficiaryLabel || walletLabel || fallbackWalletLabel
-        : walletLabel || fallbackWalletLabel,
+        ? generatedRequest?.beneficiaryLabel || activeWalletLabel || fallbackWalletLabel
+        : activeWalletLabel || fallbackWalletLabel,
     ).trim();
     const addressText = String(useRequest ? generatedRequest?.to || wallet || '' : wallet || '').trim();
     const amountLine = useRequest ? `${requestDisplayAmountLabel} ${requestDisplayCurrency}`.trim() : '';
@@ -665,10 +747,10 @@ export default function WalletDashboardReceiveModal({
   }, [generatedRequest?.createdAt, locale]);
   const receiveQrValue = useMemo(() => {
     if (!wallet) return '';
-    const label = String(walletLabel || '').trim();
+    const label = trimmed(activeWalletQrLabel);
     if (!label) return `xrpl:${wallet}`;
     return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
-  }, [wallet, walletLabel]);
+  }, [activeWalletQrLabel, trimmed, wallet]);
   // Public address QR should be visually smaller than the request QR preview.
   const qrDisplaySize = inline ? 240 : 190;
   const qrPixelSize = inline ? 360 : 380;
@@ -1057,6 +1139,7 @@ export default function WalletDashboardReceiveModal({
                 <>
                   {/* SECTION 1 — RECEIVE FUNDS */}
                   <div className="space-y-2 pt-2">
+                    {walletPicker}
                     <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
                       <div className="flex flex-col items-center">
                         <div ref={receiveQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
@@ -1072,8 +1155,8 @@ export default function WalletDashboardReceiveModal({
                         </div>
 
                         <WalletActiveLabel
-                          prefix={t('ui_current_account_prefix', 'Compte actuel:')}
-                          label={String(walletLabel || '').trim() || fallbackWalletLabel}
+                          prefix={t('ui_receive_wallet_prefix', 'Wallet de réception:')}
+                          label={activeWalletLabel}
                           className="mt-3 text-[13px] text-white/80 justify-center"
                           prefixClassName="text-white/50"
                           labelClassName="font-medium text-white/80"
@@ -1112,6 +1195,7 @@ export default function WalletDashboardReceiveModal({
                 <>
                   {/* SECTION 2 — CREATE REQUEST */}
                   <div className="space-y-2 pt-2">
+                    {walletPicker}
                     <div className="rounded-[14px] border border-white/10 bg-white/5 p-4 space-y-4">
                       {/* Amount */}
                       <div>

@@ -8,11 +8,13 @@
  * une seule fois, puis consommé par WalletDesktopModals et WalletMobileModals.
  */
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
 export function useWalletModalProps({
   // --- identité du wallet ---
   wallet,
+  walletAddresses,
+  switchWallet,
   isConnected,
   isWalletActivated,
   hasOnChainRlusd,
@@ -95,14 +97,14 @@ export function useWalletModalProps({
   handleDemoConvert,
 
   // --- Cash ---
-	  cashModalTab,
-	  setCashModalTab,
-	  cashBuyPrefill,
-	  setCashBuyPrefill,
-	  cashSellSelectTitleOverride,
-	  setCashSellSelectTitleOverride,
-	  cashSellDestinationMode,
-	  setCashSellDestinationMode,
+  cashModalTab,
+  setCashModalTab,
+  cashBuyPrefill,
+  setCashBuyPrefill,
+  cashSellSelectTitleOverride,
+  setCashSellSelectTitleOverride,
+  cashSellDestinationMode,
+  setCashSellDestinationMode,
 
   // --- Activation ---
   showActivationModal,
@@ -147,8 +149,7 @@ export function useWalletModalProps({
   // --- Send modal props ---
   const sendModalProps = useMemo(
     () => ({
-      currentWalletAddress:
-        typeof wallet === "string" ? wallet : wallet?.address || "",
+      currentWalletAddress: typeof wallet === 'string' ? wallet : wallet?.address || '',
       qrSizingVariant,
       renderWalletMeta,
       augmentedTokens: moonpaySellRequest ? augmentedTokens : selectableTokens,
@@ -255,11 +256,13 @@ export function useWalletModalProps({
   // --- Receive modal props ---
   const receiveModalProps = useMemo(
     () => ({
-      dashboardVariant: "full",
+      dashboardVariant: 'full',
       receiveTab,
       setReceiveTab,
       renderWalletMeta,
       wallet,
+      walletAddresses,
+      onSwitchWallet: switchWallet,
       handleCopyAddress,
       requestAmount,
       setRequestAmount,
@@ -282,6 +285,8 @@ export function useWalletModalProps({
       setReceiveTab,
       renderWalletMeta,
       wallet,
+      walletAddresses,
+      switchWallet,
       handleCopyAddress,
       requestAmount,
       setRequestAmount,
@@ -307,7 +312,7 @@ export function useWalletModalProps({
       renderWalletMeta,
       defaultView: swapDefaultView,
       lockedView: swapLockedView,
-      dashboardVariant: "full",
+      dashboardVariant: 'full',
       isConnected,
       isWalletActivated,
       walletAddress: wallet,
@@ -395,7 +400,7 @@ export function useWalletModalProps({
       selectLabelRightByCurrency: selectLabelRightByAssetKey,
       selectIconByCurrency: selectIconByAssetKey,
       selectLabelMobileByCurrency: selectLabelMobileByAssetKey,
-      walletAddress: wallet || "",
+      walletAddress: wallet || '',
       buyPrefill: cashBuyPrefill,
       sellSelectTitleOverride: cashSellSelectTitleOverride,
       sellDestinationMode: cashSellDestinationMode,
@@ -427,11 +432,7 @@ export function useWalletModalProps({
       onRequestFromThirdParty: handleActivationRequestFromThirdParty,
       onBuyViaMoonpay: handleActivationBuyViaMoonpay,
     }),
-    [
-      handleActivationSendFromWallet,
-      handleActivationRequestFromThirdParty,
-      handleActivationBuyViaMoonpay,
-    ],
+    [handleActivationSendFromWallet, handleActivationRequestFromThirdParty, handleActivationBuyViaMoonpay],
   );
 
   // --- Activation Request modal props ---
@@ -439,16 +440,11 @@ export function useWalletModalProps({
     () => ({
       walletAddress: wallet,
     }),
-    [
-      wallet,
-    ],
+    [wallet],
   );
 
   // --- Info modal props ---
-  const infoModalProps = useMemo(
-    () => ({}),
-    [],
-  );
+  const infoModalProps = useMemo(() => ({}), []);
 
   // --- Statement shared props ---
   const statementSharedProps = useMemo(
@@ -456,12 +452,12 @@ export function useWalletModalProps({
       augmentedTokens: displayTokensWithCurrencyLines || augmentedTokens,
       backendWalletAddress,
       wallet,
-      walletDisplayLabel: walletHasCustomLabel ? walletLabel : "",
+      walletDisplayLabel: walletHasCustomLabel ? walletLabel : '',
       isWalletActivated,
       hasRlusdTrustline: hasOnChainRlusd,
       rlusdBalance: effectiveCurrencyLinesSummary?.rlusdOnChain ?? null,
       isFullPageView: true,
-      statementVariant: "full",
+      statementVariant: 'full',
       usdRates,
       preferredCurrency,
       rlusdPerUnitRates,
