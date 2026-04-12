@@ -17,12 +17,12 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <button
             type="button"
             onClick={onScan}
-            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-elevated shadow-[0_18px_60px_rgba(0,0,0,0.55)] flex items-center justify-center text-white/90 hover:text-white transition-colors relative after:content-[''] after:absolute after:inset-0 after:rounded-full after:border after:border-white/10 after:pointer-events-none after:[-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)] after:[mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)]"
+            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated shadow-[0_18px_60px_rgba(0,0,0,0.55)] flex items-center justify-center text-white/90 hover:text-white transition-colors relative after:content-[''] after:absolute after:inset-0 after:rounded-full after:border after:border-white/10 after:pointer-events-none after:[-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)] after:[mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)]"
             aria-label={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
           >
             <svg
               viewBox="0 0 24 24"
-              className="w-12 h-12 translate-y-[2px]"
+              className="w-14 h-14 translate-y-[4px]"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"
