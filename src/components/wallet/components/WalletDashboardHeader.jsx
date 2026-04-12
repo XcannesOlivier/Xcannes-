@@ -419,13 +419,13 @@ export default function WalletDashboardHeader({
           preferredCurrency !== "RLUSD" && (
             <div className="text-[11px] text-white/40 -mt-0.5 mb-1.5 md:mb-0 inline-flex items-center gap-2">
               <span>Devises numériques</span>
-              <button
-                type="button"
-                onClick={onOpenInfo}
-                className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/5 hover:bg-white/8 text-white/60 hover:text-white/80 transition-colors"
-                aria-label={t("ui_info", "Informations")}
-                title={t("ui_info", "Informations")}
-              >
+                <button
+                  type="button"
+                  onClick={onOpenInfo}
+                  className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white/3 hover:bg-white/5 ring-1 ring-white/10 hover:ring-white/15 text-white/55 hover:text-white/75 transition-colors"
+                  aria-label={t("ui_info", "Informations")}
+                  title={t("ui_info", "Informations")}
+                >
                 <span className="text-[12px] leading-none font-semibold">i</span>
               </button>
             </div>
