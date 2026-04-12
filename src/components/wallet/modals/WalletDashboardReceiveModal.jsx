@@ -45,7 +45,7 @@ const ChevronRightIcon = ({ className = '' }) => (
   </svg>
 );
 
-const ArrowLeftIcon = ({ className = '' }) => (
+const ChevronLeftIcon = ({ className = '' }) => (
   <svg
     viewBox="0 0 24 24"
     fill="none"
@@ -56,8 +56,7 @@ const ArrowLeftIcon = ({ className = '' }) => (
     className={className}
     aria-hidden="true"
   >
-    <line x1="19" y1="12" x2="5" y2="12" />
-    <polyline points="12 19 5 12 12 5" />
+    <polyline points="15 18 9 12 15 6" />
   </svg>
 );
 
@@ -991,6 +990,7 @@ export default function WalletDashboardReceiveModal({
 
   const canNativeShare = !isDesktop && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
   const shareActionLabel = canNativeShare ? t('ui_share_qr_cta', 'Partager') : t('ui_download', 'Télécharger');
+  const disableSwipeToClose = !inline && !isDesktop && (receiveView === 'share' || receiveView === 'request');
 
   const headerTitle =
     receiveView === 'choice'
@@ -1039,9 +1039,9 @@ export default function WalletDashboardReceiveModal({
             transition: overlayDragging ? 'none' : 'transform 220ms cubic-bezier(0.2,0,0,1)',
             willChange: overlayTranslateY ? 'transform' : undefined,
           }}
-          onPointerMove={handleOverlayPointerMove}
-          onPointerUp={handleOverlayPointerEnd}
-          onPointerCancel={handleOverlayPointerEnd}
+          onPointerMove={disableSwipeToClose ? undefined : handleOverlayPointerMove}
+          onPointerUp={disableSwipeToClose ? undefined : handleOverlayPointerEnd}
+          onPointerCancel={disableSwipeToClose ? undefined : handleOverlayPointerEnd}
         >
           <div
             ref={overlayListRef}
@@ -1050,7 +1050,7 @@ export default function WalletDashboardReceiveModal({
               if (!inline) e.stopPropagation();
             }}
             onPointerDown={event => {
-              maybeStartOverlayDrag(event, 'list');
+              if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
           >
             {!inline ? (
@@ -1058,7 +1058,7 @@ export default function WalletDashboardReceiveModal({
                 className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : 'pb-2'}`}
                 aria-hidden
                 onPointerDown={event => {
-                  maybeStartOverlayDrag(event, 'fixed');
+                  if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
                 <span className="block w-12 h-1.5 rounded-full bg-white/20" />
@@ -1066,38 +1066,42 @@ export default function WalletDashboardReceiveModal({
             ) : null}
             {receiveView !== 'choice' ? (
               <div
-                className="flex items-center justify-between gap-3 mb-1"
+                className="relative pt-4 pb-3 flex flex-col items-center text-center"
                 onPointerDown={event => {
-                  maybeStartOverlayDrag(event, 'fixed');
+                  if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'fixed');
                 }}
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <button
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation();
-                      switchReceiveView('choice');
-                    }}
-                    className="shrink-0 w-9 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 transition-colors duration-150 flex items-center justify-center"
-                    aria-label={t('ui_back', 'Retour')}
-                    title={t('ui_back', 'Retour')}
-                  >
-                    <ArrowLeftIcon className="w-5 h-5" />
-                  </button>
-                  <div className="flex min-w-0 flex-col gap-1.5">
-                    <h2 className="text-base md:text-lg font-semibold text-white/90">{headerTitle}</h2>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {noticeVariant === 'demo' ? (
-                        <span className="inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
-                          {t('demo_notice_title', 'Mode démo')}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation();
+                    switchReceiveView('choice');
+                  }}
+                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 transition-colors duration-150 inline-flex items-center ${
+                    isDesktop ? 'px-2.5 gap-1.5' : 'w-9 justify-center'
+                  }`}
+                  aria-label={t('ui_back', 'Retour')}
+                  title={t('ui_back', 'Retour')}
+                >
+                  <ChevronLeftIcon className="w-5 h-5" />
+                  {isDesktop ? <span className="text-sm text-white/80">{t('ui_back', 'Retour')}</span> : null}
+                </button>
+
+                <h2 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                  {headerTitle}
+                </h2>
+
+                {noticeVariant === 'demo' ? (
+                  <span className="mt-2 inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                    {t('demo_notice_title', 'Mode démo')}
+                  </span>
+                ) : null}
+
+                <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                  {headerSubtitle}
+                </p>
               </div>
             ) : null}
-            {receiveView !== 'choice' ? <div className="text-sm text-white/60 -mt-1">{headerSubtitle}</div> : null}
             <div className="flex-1 min-h-0 flex flex-col">
               {receiveView === 'choice' ? (
                 <div className="flex-1 min-h-0 flex flex-col">
