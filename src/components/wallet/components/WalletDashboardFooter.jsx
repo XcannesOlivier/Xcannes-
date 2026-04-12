@@ -26,7 +26,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
               className="absolute inset-x-0 top-0 h-[36px] w-full text-white/16"
             >
               <path
-                d="M0 30 C48 30 82 30 102 22 C118 15 122 0 136 0 H254 C268 0 272 15 288 22 C308 30 342 30 390 30 V36 H0 Z"
+                d="M0 30 C56 30 88 30 108 24 C121 20 127 8 136 0 H254 C263 8 269 20 282 24 C302 30 334 30 390 30 V36 H0 Z"
                 fill={mobileOverlayColor}
               />
               <path
@@ -37,14 +37,14 @@ export default function WalletDashboardFooter({ onScan } = {}) {
                 strokeLinecap="round"
               />
               <path
-                d="M0 30 C48 30 82 30 102 22 C118 15 122 0 136 0"
+                d="M0 30 C56 30 88 30 108 24 C121 20 127 8 136 0"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
                 strokeLinecap="round"
               />
               <path
-                d="M254 0 C268 0 272 15 288 22 C308 30 342 30 390 30"
+                d="M254 0 C263 8 269 20 282 24 C302 30 334 30 390 30"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
@@ -53,20 +53,20 @@ export default function WalletDashboardFooter({ onScan } = {}) {
             </svg>
           </div>
 
-          <span className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/15">
+          <span className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/22">
             By XCANNES LLC
           </span>
 
           {onScan ? (
             <>
               <div
-                className="pointer-events-none absolute left-1/2 top-[40px] z-0 h-[56px] w-[156px] -translate-x-1/2 rounded-full bg-black/65 blur-[12px]"
+                className="pointer-events-none absolute left-1/2 top-[36px] z-0 h-[56px] w-[156px] -translate-x-1/2 rounded-full bg-black/65 blur-[12px]"
                 aria-hidden
               />
               <button
                 type="button"
                 onClick={onScan}
-                className="absolute left-1/2 top-[30px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+                className="absolute left-1/2 top-[26px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
                 style={{
                   background:
                     "linear-gradient(180deg, rgba(42,170,96,1) 0%, rgba(20,122,67,1) 100%)",
