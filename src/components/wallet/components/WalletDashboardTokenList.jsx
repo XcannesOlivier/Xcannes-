@@ -10,9 +10,10 @@ export default function WalletDashboardTokenList({
   onHeaderAction,
   disableInternalScroll = false,
 }) {
+  const hasHeader = Boolean(headerTitle || headerActionLabel);
   const listClassName = disableInternalScroll
-    ? "flex-1 min-h-0 px-0 md:px-3 pt-1.5 pb-14 md:pb-3 rounded-2xl bg-black"
-    : "flex-1 min-h-0 px-0 md:px-3 pt-1.5 pb-14 md:pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-black";
+    ? `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-0 md:pt-1.5" : "pt-1.5"} pb-14 md:pb-3 rounded-2xl bg-black`
+    : `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-0 md:pt-1.5" : "pt-1.5"} pb-14 md:pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-black`;
   const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
   return (
     <div
@@ -21,7 +22,7 @@ export default function WalletDashboardTokenList({
     >
       {(headerTitle || headerActionLabel) && (
         <div
-          className={`flex items-center gap-2 mb-2 px-3 pt-4 ${
+          className={`flex items-center gap-2 mb-1 md:mb-2 px-3 pt-4 ${
             showHeaderAction ? "justify-between" : "justify-center"
           }`}
         >
