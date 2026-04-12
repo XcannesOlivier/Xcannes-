@@ -78,6 +78,24 @@ export default function WalletDashboardCashChoiceModal({
     </svg>
   );
 
+  const HeaderArrowDownIcon = () => (
+    <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" aria-hidden>
+      <path
+        d="M12 5v11"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M7 13l5 5 5-5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
   const FundsCardWalletIcon = () => (
     <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none" aria-hidden>
       <path
@@ -371,35 +389,37 @@ export default function WalletDashboardCashChoiceModal({
             </div>
 
             <div className="relative z-10 flex flex-col flex-1 min-h-0">
-              <div
-                className="border-b border-white/10"
-                onPointerDown={event => {
-                  maybeStartOverlayDrag(event, 'fixed');
-                }}
-              >
+	              <div
+	                className="border-b border-white/10"
+	                onPointerDown={event => {
+	                  maybeStartOverlayDrag(event, 'fixed');
+	                }}
+	              >
                 {!inline ? (
                   <div className="md:hidden flex justify-center pt-3 pb-0" aria-hidden>
                     <span className="block w-12 h-1.5 rounded-full bg-white/20" />
                   </div>
                 ) : null}
-                <div className="flex items-start justify-between p-4 gap-3">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-white font-semibold text-[22px] md:text-2xl leading-tight">
-                        {t('ui_funds_manage_title', 'Gérer vos fonds')}
-                      </h3>
-                      {noticeVariant === 'demo' ? (
-                        <span className="inline-flex items-center text-white/80 text-xs md:text-sm font-semibold px-2 py-1 leading-none">
-                          {t('demo_notice_title', 'Mode démo')}
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-1 text-[18px] md:text-[17px] leading-snug text-white/60 font-semibold">
+	                <div className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center px-4">
+                    <h3 className="mt-1 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                      {t('ui_funds_manage_title', 'Gérer vos fonds')}
+                    </h3>
+                    {noticeVariant === 'demo' ? (
+                      <span className="mt-2 inline-flex items-center text-white/80 text-sm md:text-base font-semibold px-2 py-1 leading-none">
+                        {t('demo_notice_title', 'Mode démo')}
+                      </span>
+                    ) : null}
+                    <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
                       {t('ui_funds_manage_subtitle', "Ajoutez ou retirez de l'argent facilement")}
                     </p>
-                  </div>
-                </div>
-              </div>
+                    <div
+                      className="mt-5 w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90"
+                      aria-hidden="true"
+                    >
+                      <HeaderArrowDownIcon />
+                    </div>
+	                </div>
+	              </div>
 
               <div
                 ref={overlayListRef}
