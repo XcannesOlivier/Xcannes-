@@ -10,16 +10,17 @@ export default function WalletDashboardFooter({ onScan } = {}) {
       {/* Mobile only: sculpted footer dock with floating scan action */}
       <div
         className="md:hidden relative overflow-visible bg-[#090c0d]"
-        style={{ paddingTop: 20, paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
+        style={{ paddingTop: 0, paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
       >
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[96px] overflow-hidden"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[94px] overflow-hidden"
           aria-hidden
         >
           <div className="absolute inset-0 bg-[#090c0d]" />
-          <div className="absolute left-1/2 top-[44px] h-[46px] w-[176px] -translate-x-1/2 rounded-full bg-black/55 blur-[14px]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-white/18" />
+          <div className="absolute left-1/2 top-[46px] h-[40px] w-[156px] -translate-x-1/2 rounded-full bg-black/45 blur-[14px]" />
           <svg
-            viewBox="0 0 390 96"
+            viewBox="0 0 390 94"
             preserveAspectRatio="none"
             className="absolute inset-0 h-full w-full"
           >
@@ -34,14 +35,14 @@ export default function WalletDashboardFooter({ onScan } = {}) {
               </linearGradient>
             </defs>
             <path
-              d="M0 56 H72 C94 56 112 52 126 42 C139 33 151 28 166 29"
+              d="M0 0 H84 C104 0 119 4 131 13 C145 24 161 32 178 35"
               fill="none"
               stroke="url(#wallet-footer-line)"
               strokeWidth="1.1"
               strokeLinecap="round"
             />
             <path
-              d="M390 56 H318 C296 56 278 52 264 42 C251 33 239 28 224 29"
+              d="M390 0 H306 C286 0 271 4 259 13 C245 24 229 32 212 35"
               fill="none"
               stroke="url(#wallet-footer-line-rev)"
               strokeWidth="1.1"
@@ -50,25 +51,25 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           </svg>
         </div>
 
-        <span className="absolute right-4 top-[38px] text-[10px] font-light tracking-[0.14em] text-white/22 uppercase">
+        <span className="absolute right-3 top-[9px] bg-[#090c0d] pl-2 text-[10px] font-light tracking-[0.14em] text-white/22 uppercase">
           By XCANNES LLC
         </span>
 
         {onScan ? (
           <>
             <div
-              className="pointer-events-none absolute left-1/2 top-3 z-0 h-[66px] w-[168px] -translate-x-1/2 rounded-full bg-black/65 blur-[10px]"
+              className="pointer-events-none absolute left-1/2 top-[32px] z-0 h-[62px] w-[164px] -translate-x-1/2 rounded-full bg-black/60 blur-[12px]"
               aria-hidden
             />
             <button
               type="button"
               onClick={onScan}
-              className="absolute left-1/2 top-3 z-10 flex h-[62px] w-[172px] -translate-x-1/2 items-center justify-center rounded-full border border-[#39d57c]/40 text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+              className="absolute left-1/2 top-[22px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full border border-[#39d57c]/40 text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
               style={{
                 background:
                   "linear-gradient(180deg, rgba(42,170,96,1) 0%, rgba(20,122,67,1) 100%)",
                 boxShadow:
-                  "0 14px 28px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -10px 18px rgba(0,0,0,0.16)",
+                  "0 12px 24px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -10px 18px rgba(0,0,0,0.16)",
               }}
               aria-label={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
             >
@@ -95,7 +96,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           </>
         ) : null}
 
-        <div className="h-[76px]" aria-hidden />
+        <div className="h-[96px]" aria-hidden />
       </div>
 
       <div className="hidden md:flex px-5 md:px-4 py-4 md:py-5 items-center justify-center min-h-[52px] md:min-h-[56px]">
