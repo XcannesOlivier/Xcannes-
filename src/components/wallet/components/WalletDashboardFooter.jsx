@@ -6,7 +6,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-auto shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] md:[--bg-elevated:unset] border-t border-white/20 md:border-white/10">
+    <div className="mt-auto shrink-0 z-20 bg-elevated [--bg-elevated:#090c0d] md:[--bg-elevated:unset] border-t-2 border-white/30 md:border-t md:border-white/10">
       {/* Mobile: scan button straddling list + footer */}
       <div className="md:hidden relative h-14 pb-[env(safe-area-inset-bottom)]">
         <span className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+30px)] text-[10px] font-light text-white/35">
@@ -20,12 +20,12 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <button
             type="button"
             onClick={onScan}
-            className="absolute left-1/2 top-1 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated ring-1 ring-white/25 shadow-[0_-10px_22px_rgba(0,0,0,0.35)] flex items-center justify-center text-white/70 hover:text-white/90 transition-colors"
+            className="absolute left-1/2 top-2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated ring-2 ring-white/35 shadow-[0_-10px_22px_rgba(0,0,0,0.35)] flex items-center justify-center text-white/70 hover:text-white/90 transition-colors"
             aria-label={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
           >
             <svg
               viewBox="0 0 24 24"
-              className="w-14 h-14 translate-y-[4px]"
+              className="w-14 h-14"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.8"

@@ -1053,7 +1053,7 @@ export default function WalletDashboardReceiveModal({
               if (!disableSwipeToClose) maybeStartOverlayDrag(event, 'list');
             }}
           >
-            {!inline ? (
+            {!inline && receiveView === 'choice' ? (
               <div
                 className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : 'pb-2'}`}
                 aria-hidden
