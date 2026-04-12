@@ -1077,7 +1077,7 @@ export default function WalletDashboardReceiveModal({
                     e.stopPropagation();
                     switchReceiveView('choice');
                   }}
-                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white/80 transition-colors duration-150 inline-flex items-center ${
+                  className={`absolute left-0 top-3 shrink-0 h-9 rounded-xl bg-transparent border border-transparent hover:bg-white/5 text-white/80 transition-colors duration-150 inline-flex items-center ${
                     isDesktop ? 'px-2.5 gap-1.5' : 'w-9 justify-center'
                   }`}
                   aria-label={t('ui_back', 'Retour')}
