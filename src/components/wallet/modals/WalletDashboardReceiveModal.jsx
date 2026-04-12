@@ -61,6 +61,22 @@ const ArrowLeftIcon = ({ className = '' }) => (
   </svg>
 );
 
+const ArrowDownIcon = ({ className = '' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <polyline points="19 12 12 19 5 12" />
+  </svg>
+);
+
 const QrIcon = ({ className = '' }) => (
   <svg
     viewBox="0 0 24 24"
@@ -980,17 +996,19 @@ export default function WalletDashboardReceiveModal({
     receiveView === 'choice'
       ? t('ui_receive_title_short', 'Recevoir')
       : receiveView === 'share'
-        ? t('ui_receive_choice_share_title', 'Partager mon QR')
-        : t('ui_receive_choice_request_title', 'Créer une demande');
+        ? t('ui_receive_choice_share_title', 'Coordonnées de réception')
+        : t('ui_receive_choice_request_title', 'Demander un paiement');
   const headerSubtitle =
     receiveView === 'choice'
       ? t('ui_receive_choice_subtitle', 'Choisissez comment recevoir un paiement.')
       : receiveView === 'share'
-        ? t('ui_receive_choice_share_desc', 'Recevez un paiement sans montant prédéfini.')
-        : t('ui_receive_choice_request_desc', 'Créez une demande avec un montant précis.');
+        ? t('ui_receive_choice_share_desc', 'Affichez le QR code et l’adresse de réception associés à ce compte.')
+        : t('ui_receive_choice_request_desc', 'Définissez un montant, une devise et un mémo optionnel.');
 
-  const choiceCardClassName =
-    'w-full text-left rounded-[16px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] via-white/[0.035] to-black/[0.45] shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
+  const choiceCardBaseClassName =
+    'relative w-full text-left rounded-[20px] px-5 py-5 ring-1 ring-white/10 ring-inset shadow-[0_14px_46px_rgba(0,0,0,0.58),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.72)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-xcannes-green/60';
+  const choiceCardGreenClassName = `${choiceCardBaseClassName} bg-[radial-gradient(120%_90%_at_16%_16%,rgba(34,197,94,0.22)_0%,rgba(255,255,255,0.06)_30%,rgba(0,0,0,0.62)_100%)]`;
+  const choiceCardNeutralClassName = `${choiceCardBaseClassName} bg-[radial-gradient(120%_90%_at_16%_16%,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.05)_30%,rgba(0,0,0,0.62)_100%)]`;
 
   const content = (
     <>
@@ -1035,7 +1053,7 @@ export default function WalletDashboardReceiveModal({
           >
             {!inline ? (
               <div
-                className="md:hidden flex justify-center -mt-1 pt-1 pb-2"
+                className={`md:hidden flex justify-center -mt-1 pt-1 ${receiveView === 'choice' ? 'pb-4' : 'pb-2'}`}
                 aria-hidden
                 onPointerDown={event => {
                   maybeStartOverlayDrag(event, 'fixed');
@@ -1045,7 +1063,7 @@ export default function WalletDashboardReceiveModal({
               </div>
             ) : null}
             <div
-              className="flex items-center justify-between gap-3 mb-1"
+              className={`flex items-center justify-between gap-3 mb-1 ${receiveView === 'choice' ? 'pt-1' : ''}`}
               onPointerDown={event => {
                 maybeStartOverlayDrag(event, 'fixed');
               }}
@@ -1077,61 +1095,86 @@ export default function WalletDashboardReceiveModal({
                 </div>
               </div>
             </div>
-            <div className="text-sm text-white/60 -mt-1">{headerSubtitle}</div>
+            {receiveView !== 'choice' ? <div className="text-sm text-white/60 -mt-1">{headerSubtitle}</div> : null}
             <div className="flex-1 min-h-0 flex flex-col">
               {receiveView === 'choice' ? (
-                <div className="flex flex-col gap-3 pt-2">
-                  <button
-                    type="button"
-                    className={choiceCardClassName}
-                    onClick={e => {
-                      e.stopPropagation();
-                      switchReceiveView('share');
+                <div className="flex-1 min-h-0 flex flex-col">
+                  <div
+                    className="pt-6 md:pt-5 pb-3 flex flex-col items-center text-center"
+                    onPointerDown={event => {
+                      maybeStartOverlayDrag(event, 'fixed');
                     }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-xcannes-green/90">
-                        <QrIcon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="text-[15px] font-semibold text-white/90">
-                            {t('ui_receive_choice_share_title', 'Partager mon QR')}
-                          </div>
-                          <ChevronRightIcon className="w-5 h-5 text-white/35" />
-                        </div>
-                        <div className="mt-1 text-[13px] text-white/60 leading-snug">
-                          {t('ui_receive_choice_share_desc', 'Recevez un paiement sans montant prédéfini.')}
-                        </div>
-                      </div>
+                    <div className="w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90">
+                      <ArrowDownIcon className="w-6 h-6" />
                     </div>
-                  </button>
+                    <h3 className="mt-4 text-[22px] md:text-[24px] font-semibold text-white/95 tracking-tight">
+                      {t('ui_receive_choice_decision_title', 'Comment voulez-vous recevoir ?')}
+                    </h3>
+                    <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
+                      {t('ui_receive_choice_decision_subtitle', 'Partagez votre QR ou créez une demande avec montant')}
+                    </p>
+                  </div>
 
-                  <button
-                    type="button"
-                    className={choiceCardClassName}
-                    onClick={e => {
-                      e.stopPropagation();
-                      switchReceiveView('request');
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-white/80">
-                        <RequestIcon className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="text-[15px] font-semibold text-white/90">
-                            {t('ui_receive_choice_request_title', 'Créer une demande')}
+                  <div className="flex-1 min-h-0 flex flex-col justify-center gap-4 py-6">
+                    <button
+                      type="button"
+                      className={choiceCardGreenClassName}
+                      onClick={e => {
+                        e.stopPropagation();
+                        switchReceiveView('share');
+                      }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-xcannes-green/90">
+                          <QrIcon className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-[16px] md:text-[17px] font-semibold text-white/92">
+                              {t('ui_receive_choice_share_title', 'Coordonnées de réception')}
+                            </div>
+                            <ChevronRightIcon className="w-5 h-5 text-white/30" />
                           </div>
-                          <ChevronRightIcon className="w-5 h-5 text-white/35" />
-                        </div>
-                        <div className="mt-1 text-[13px] text-white/60 leading-snug">
-                          {t('ui_receive_choice_request_desc_detail', 'Montant, devise et mémo optionnel.')}
+                          <div className="mt-2 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+                            {t(
+                              'ui_receive_choice_share_desc',
+                              'Affichez le QR code et l’adresse de réception associés à ce compte.',
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={choiceCardNeutralClassName}
+                      onClick={e => {
+                        e.stopPropagation();
+                        switchReceiveView('request');
+                      }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 flex items-center justify-center text-white/85">
+                          <RequestIcon className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-[16px] md:text-[17px] font-semibold text-white/92">
+                              {t('ui_receive_choice_request_title', 'Demander un paiement')}
+                            </div>
+                            <ChevronRightIcon className="w-5 h-5 text-white/30" />
+                          </div>
+                          <div className="mt-2 text-[13px] md:text-[14px] text-white/55 leading-relaxed">
+                            {t(
+                              'ui_receive_choice_request_desc',
+                              'Définissez un montant, une devise et un mémo optionnel.',
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               ) : null}
 
