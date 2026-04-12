@@ -24,10 +24,13 @@ const SCAN_LABEL_KEY = "ui_scan_qr_code_12fa63d927";
 const BRAND_KEY = "ui_xcannes_3cdc66a392";
 const TAGLINE_KEY = "ui_global_usd_wallet_202f7e48be";
 
-const MUSTACHE_FILL_PATH = "M0 30 C84 30 104 0 136 0 H254 C286 0 306 30 390 30 V36 H0 Z";
+const MUSTACHE_FILL_PATH =
+  "M0 30 H70 C96 30 112 10 136 0 H254 C278 10 294 30 320 30 H390 V36 H0 Z";
 const MUSTACHE_CENTER_PATH = "M136 0 H254";
-const MUSTACHE_LEFT_PATH = "M0 30 C84 30 104 0 136 0";
-const MUSTACHE_RIGHT_PATH = "M254 0 C286 0 306 30 390 30";
+const MUSTACHE_LEFT_CONNECT_PATH = "M70 30 C96 30 112 10 136 0";
+const MUSTACHE_RIGHT_CONNECT_PATH = "M254 0 C278 10 294 30 320 30";
+const LEFT_LABEL_LINE_PATH = "M0 30 H70";
+const RIGHT_LABEL_LINE_PATH = "M390 30 H320";
 
 function ScanIcon({ className = "h-9 w-9" }) {
   return (
@@ -78,14 +81,28 @@ function MobileFooterOverlay() {
           strokeLinecap="round"
         />
         <path
-          d={MUSTACHE_LEFT_PATH}
+          d={LEFT_LABEL_LINE_PATH}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.1"
           strokeLinecap="round"
         />
         <path
-          d={MUSTACHE_RIGHT_PATH}
+          d={RIGHT_LABEL_LINE_PATH}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+        />
+        <path
+          d={MUSTACHE_LEFT_CONNECT_PATH}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+        />
+        <path
+          d={MUSTACHE_RIGHT_CONNECT_PATH}
           fill="none"
           stroke="currentColor"
           strokeWidth="1.1"
