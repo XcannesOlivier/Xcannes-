@@ -298,9 +298,9 @@ export default function WalletDashboardHeader({
 	                      ) : null}
                     </button>
 
-	                    {/* Multi-wallet dropdown */}
-	                    {isSwitcherOpen && hasMultipleWallets && (
-	                      <div className="absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] max-h-[340px] overflow-y-auto">
+                    {/* Multi-wallet dropdown */}
+                    {isSwitcherOpen && hasMultipleWallets && (
+                      <div className="absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-[#101415] border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] max-h-[340px] overflow-y-auto">
 	                        {walletAddresses.map((w, index) => {
 	                          const addr = typeof w === "string" ? w : w.address;
                           const label =

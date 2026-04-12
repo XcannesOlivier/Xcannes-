@@ -274,7 +274,7 @@ export default function WalletDashboardReceiveModal({
 
   const walletPicker =
     wallet && hasMultipleWallets ? (
-      <div className="rounded-[14px] border border-white/10 bg-white/5 p-3 space-y-2">
+      <div className="rounded-[14px] border border-white/10 bg-[#101415] p-3 space-y-2">
         <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
           {t('ui_receive_wallet_selector_label', 'Wallet de réception')}
         </div>
@@ -287,13 +287,13 @@ export default function WalletDashboardReceiveModal({
           }}
           options={walletOptions}
           useNativeSelect={false}
-          buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+          buttonClassName="bg-[#101415] hover:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
           menuClassName={
             noticeVariant === 'demo'
               ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
               : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
           }
-          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+          selectClassName="xcannes-select w-full bg-[#101415] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
         />
       </div>
     ) : null;
@@ -1188,7 +1188,7 @@ export default function WalletDashboardReceiveModal({
                   {/* SECTION 1 — RECEIVE FUNDS */}
                   <div className="space-y-2 pt-2">
                     {walletPicker}
-                    <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+                    <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
                       <div className="flex flex-col items-center">
                         <div ref={receiveQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
                           <QRCodeCanvas
@@ -1244,7 +1244,7 @@ export default function WalletDashboardReceiveModal({
                   {/* SECTION 2 — CREATE REQUEST */}
                   <div className="space-y-2 pt-2">
                     {walletPicker}
-                    <div className="rounded-[14px] border border-white/10 bg-white/5 p-4 space-y-4">
+                    <div className="rounded-[14px] border border-white/10 bg-[#101415] p-4 space-y-4">
                       {/* Amount */}
                       <div>
                         <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
@@ -1255,7 +1255,7 @@ export default function WalletDashboardReceiveModal({
                           value={requestAmount}
                           onChange={e => setRequestAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                          className="w-full bg-[#101415] focus:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
                         />
                       </div>
 
@@ -1291,13 +1291,13 @@ export default function WalletDashboardReceiveModal({
                             };
                           })}
                           useNativeSelect={false}
-                          buttonClassName="bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+                          buttonClassName="bg-[#101415] hover:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
                           menuClassName={
                             noticeVariant === 'demo'
                               ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
                               : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
                           }
-                          selectClassName="xcannes-select w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                          selectClassName="xcannes-select w-full bg-[#101415] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
                         />
                       </div>
 
@@ -1311,7 +1311,7 @@ export default function WalletDashboardReceiveModal({
                           value={requestMemo}
                           onChange={e => setRequestMemo(e.target.value)}
                           placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
-                          className="w-full bg-black/40 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+                          className="w-full bg-[#101415] focus:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
                         />
                       </div>
 
@@ -1335,7 +1335,7 @@ export default function WalletDashboardReceiveModal({
                       {hasGeneratedRequest ? (
                         <div
                           ref={requestPreviewRef}
-                          className="pt-2 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3"
+                          className="pt-2 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3"
                         >
                           <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                             {t('ui_request_generated_label', 'Demande générée')}

@@ -6,9 +6,12 @@ export default function WalletDashboardFooter({ onScan } = {}) {
   const { t } = useTranslation("common");
 
   return (
-    <div className="mt-auto shrink-0 z-20 bg-elevated border-t border-white/10">
+    <div className="mt-auto shrink-0 z-20 bg-elevated border-t border-white/12">
       {/* Mobile: scan button straddling list + footer */}
       <div className="md:hidden relative h-14 pb-[env(safe-area-inset-bottom)]">
+        <span className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+6px)] text-[10px] font-light text-white/25">
+          By XCANNES LLC
+        </span>
         <div
           className="absolute inset-x-0 top-0 h-14 pointer-events-none"
           aria-hidden
@@ -17,7 +20,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <button
             type="button"
             onClick={onScan}
-            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated shadow-[0_18px_60px_rgba(0,0,0,0.55)] flex items-center justify-center text-white/90 hover:text-white transition-colors relative after:content-[''] after:absolute after:inset-0 after:rounded-full after:border after:border-white/10 after:pointer-events-none after:[-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)] after:[mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)]"
+            className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated shadow-[0_18px_60px_rgba(0,0,0,0.55)] flex items-center justify-center text-white/70 hover:text-white/90 transition-colors relative after:content-[''] after:absolute after:inset-[1px] after:rounded-full after:border after:border-white/12 after:pointer-events-none after:[-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)] after:[mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)]"
             aria-label={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
           >
             <svg
