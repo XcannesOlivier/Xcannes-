@@ -14,12 +14,8 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)" }}
       >
         <div className="relative h-[108px]">
-          <span className="absolute right-4 top-2 text-[10px] font-light tracking-[0.14em] text-white/24 uppercase">
-            By XCANNES LLC
-          </span>
-
           <div
-            className="absolute inset-x-0 bottom-0 overflow-hidden"
+            className="absolute inset-x-0 top-0 overflow-hidden"
             style={{ height: 88 }}
             aria-hidden
           >
@@ -34,7 +30,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
                 fill={mobileOverlayColor}
               />
               <path
-                d="M144 0 H246"
+                d="M136 0 H254"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
@@ -56,6 +52,10 @@ export default function WalletDashboardFooter({ onScan } = {}) {
               />
             </svg>
           </div>
+
+          <span className="absolute right-4 top-2 z-20 bg-[#090c0d] pl-2 text-[10px] font-light tracking-[0.14em] text-white/24 uppercase">
+            By XCANNES LLC
+          </span>
 
           {onScan ? (
             <>
