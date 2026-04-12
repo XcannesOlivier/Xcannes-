@@ -545,12 +545,12 @@ export default function WalletDashboardSendModal({
       return (
 	    <div
 	      ref={savedMenuRef}
-	      className={[
-	        "rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg",
-	        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-black/40",
-	      ].join(" ")}
-	      onClick={(e) => e.stopPropagation()}
-	    >
+		      className={[
+		        "rounded-xl ring-1 ring-white/15 ring-inset overflow-hidden shadow-lg",
+		        noticeVariant === "demo" ? "bg-xcannes-surface-demo" : "bg-[#101415]",
+		      ].join(" ")}
+		      onClick={(e) => e.stopPropagation()}
+		    >
       <div className="max-h-56 overflow-y-auto">
         {filteredSavedAddresses.length > 0 ? (
           filteredSavedAddresses.map((addr, idx) => (
@@ -922,10 +922,10 @@ export default function WalletDashboardSendModal({
           onPaste={handlePastePayload}
           placeholder={t("ui_import_or_choose_recipient", "Import or choose address")}
           readOnly={shouldShowLabelInInput}
-	          className={`w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)] ${
-	            !hasPaymentRequest ? "pl-8" : "pl-4"
-	          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
-	        />
+		          className={`w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)] ${
+		            !hasPaymentRequest ? "pl-8" : "pl-4"
+		          } ${hasPaymentRequest ? "pr-4" : "pr-28"} py-3 text-base text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80`}
+		        />
 
         <button
           type="button"
@@ -1165,14 +1165,14 @@ export default function WalletDashboardSendModal({
 	              showMobileOptionRight={true}
 	              iconClassName="text-3xl leading-none"
 		              backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
-		              buttonClassName="bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			              buttonClassName="bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
 		              menuClassName={
 		                noticeVariant === "demo"
 		                  ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		                  : "bg-elevated border-white/15 ring-1 ring-white/10 max-h-[320px]"
 		              }
-		              selectClassName="xcannes-select w-full bg-black/40 ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
-		            />
+			              selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/15 ring-inset rounded-xl px-4 py-[18px] text-2xl text-white outline-none focus:outline-none focus:ring-2 focus:ring-xcannes-green/80 appearance-none cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]"
+			            />
 	          </div>
           {sendPaymentRequest?.beneficiaryLabel ? (
             <div className="rounded-lg ring-1 ring-amber-300/20 ring-inset bg-amber-300/10 px-3 py-2 text-xs text-amber-100/90">
@@ -1251,10 +1251,10 @@ export default function WalletDashboardSendModal({
           "Vérifiez les informations avant d’envoyer",
         )}
       </div>
-	      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
-          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
-	        </div>
+		      <div className="rounded-[14px] p-4 space-y-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+	        <div className="text-xs uppercase tracking-wide text-white/60 font-semibold">
+	          {t("ui_send_confirmation_title", "Résumé de l'envoi")}
+		        </div>
 	        <div className="space-y-3 text-sm text-white/80">
 	          <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">
 	            <div className="text-white/60 shrink-0">
@@ -1331,9 +1331,9 @@ export default function WalletDashboardSendModal({
             type="text"
             value={payreqSelectorValue}
             readOnly
-            className="w-full bg-black/40 backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
-          />
-        </div>
+	            className="w-full bg-[#101415] backdrop-blur-sm ring-1 ring-white/15 ring-inset rounded-xl px-4 pr-4 py-3 text-base text-white/90 outline-none truncate focus:outline-none focus:ring-2 focus:ring-xcannes-green/80"
+	          />
+	        </div>
         {selfSendBlocked ? (
           <div className="rounded-lg ring-1 ring-orange-400/30 ring-inset bg-orange-400/10 px-3 py-2 text-xs text-orange-200/90">
             <div className="font-semibold">
@@ -1364,11 +1364,11 @@ export default function WalletDashboardSendModal({
             "Vérifiez les informations avant d’envoyer",
           )}
         </div>
-        <div className="rounded-[14px] p-4 space-y-3 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-          <div className="space-y-0.5">
-            <div className="text-[11px] text-white/45">
-              {t("ui_beneficiary_label", "Destinataire")}
-            </div>
+	        <div className="rounded-[14px] p-4 space-y-3 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
+	          <div className="space-y-0.5">
+	            <div className="text-[11px] text-white/45">
+	              {t("ui_beneficiary_label", "Destinataire")}
+	            </div>
             <div className="text-sm font-semibold text-white/90">
               {payreqSelectorLabel || t("ui_wallet_unknown", "Unknown wallet")}
             </div>
