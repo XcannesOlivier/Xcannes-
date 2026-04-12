@@ -26,11 +26,11 @@ export default function WalletDashboardFooter({ onScan } = {}) {
               className="absolute inset-x-0 top-0 h-[36px] w-full text-white/16"
             >
               <path
-                d="M0 30 C84 30 104 0 136 0 H298 C334 0 350 30 390 30 V36 H0 Z"
+                d="M0 30 C84 30 104 0 136 0 H345 C360 0 372 18 390 22 V36 H0 Z"
                 fill={mobileOverlayColor}
               />
               <path
-                d="M136 0 H298"
+                d="M136 0 H345"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
@@ -44,7 +44,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
                 strokeLinecap="round"
               />
               <path
-                d="M298 0 C334 0 350 30 390 30"
+                d="M345 0 C360 0 372 18 390 22"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.1"
@@ -53,7 +53,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
             </svg>
           </div>
 
-          <span className="absolute right-3 top-[7px] z-20 whitespace-nowrap text-[8px] font-light tracking-[0.12em] text-white/22">
+          <span className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/22">
             By XCANNES LLC
           </span>
 
