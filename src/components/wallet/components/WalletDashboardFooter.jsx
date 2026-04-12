@@ -9,7 +9,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
     <div className="mt-auto shrink-0 z-20 bg-elevated border-t-0 md:border-t md:border-white/10">
       {/* Mobile: scan button straddling list + footer */}
       <div className="md:hidden relative h-14 pb-[env(safe-area-inset-bottom)] before:content-[''] before:absolute before:inset-x-0 before:top-[1px] before:h-px before:bg-white/11 before:pointer-events-none">
-        <span className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+22px)] text-[10px] font-light text-white/25">
+        <span className="absolute right-3 bottom-[calc(env(safe-area-inset-bottom)+30px)] text-[10px] font-light text-white/25">
           By XCANNES LLC
         </span>
         <div
@@ -20,7 +20,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <button
             type="button"
             onClick={onScan}
-            className="absolute left-1/2 top-[1px] -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated shadow-[0_18px_60px_rgba(0,0,0,0.55)] flex items-center justify-center text-white/70 hover:text-white/90 transition-colors relative after:content-[''] after:absolute after:inset-[1px] after:rounded-full after:border after:border-white/11 after:pointer-events-none after:[-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)] after:[mask-image:linear-gradient(to_bottom,black_0%,black_55%,transparent_80%)]"
+            className="absolute left-1/2 top-1 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-elevated shadow-[0_18px_60px_rgba(0,0,0,0.55)] flex items-center justify-center text-white/70 hover:text-white/90 transition-colors"
             aria-label={t("ui_scan_qr_code_12fa63d927", "Scan QR Code")}
           >
             <svg
