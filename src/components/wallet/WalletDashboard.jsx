@@ -1136,14 +1136,15 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                <div className="w-full flex items-center justify-between gap-3">
-                  <div className="text-[17px] md:text-[16px] font-semibold text-white/90">
+                <div className="w-full flex items-center gap-3">
+                  <div className="shrink-0 text-[17px] md:text-[16px] font-semibold text-white/90">
                     {t('ui_my_currencies_4d1f0e3a0a', 'Mes devises')}
                   </div>
+                  <div aria-hidden className="flex-1 h-px bg-white/10" />
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
-                    className="inline-flex items-center gap-2 text-[14px] md:text-[13px] font-normal text-white/65 hover:text-white/90 transition-colors"
+                    className="shrink-0 inline-flex items-center gap-2 text-[14px] md:text-[13px] font-normal text-white/65 hover:text-white/90 transition-colors"
                     title={
                       recentActivityMessage
                         ? recentActivityMessage
