@@ -267,8 +267,10 @@ export default function WalletDashboardReceiveModal({
 	          icon: (
 	            <span
 	              className={[
-	                'h-2.5 w-2.5 rounded-full ring-4 shrink-0',
-	                isActive ? 'ring-xcannes-green/25 bg-xcannes-green animate-pulse' : 'ring-white/10 bg-white/30',
+	                'inline-flex h-2 w-2 rounded-full ring-4 shrink-0',
+	                isActive
+	                  ? 'ring-xcannes-green/25 bg-xcannes-green animate-pulse'
+	                  : 'ring-white/10 bg-white/30',
 	              ].join(' ')}
 	              aria-hidden="true"
 	            />
@@ -302,6 +304,7 @@ export default function WalletDashboardReceiveModal({
 	          }}
 	          options={walletOptions}
 	          useNativeSelect={false}
+	          iconClassName="inline-flex items-center justify-center leading-none"
 	          buttonClassName={`${walletPickerSurfaceClass} hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150`}
 	          menuClassName={
 	            noticeVariant === 'demo'
