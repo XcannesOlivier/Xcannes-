@@ -6,7 +6,7 @@ const MOBILE_MODAL_BG = "#111516";
 const MOBILE_BASE_BG = "#090c0d";
 
 const mobileFooterStyle = {
-  paddingBottom: "calc(env(safe-area-inset-bottom) + 14px)",
+  paddingBottom: "14px",
 };
 
 const mobileOverlayFillStyle = {
