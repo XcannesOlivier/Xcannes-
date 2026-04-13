@@ -154,10 +154,9 @@ export default function WalletDashboardReceiveModal({
   const [copyToast, setCopyToast] = useState('');
   const copyToastTimerRef = useRef(null);
   const autoCloseTimerRef = useRef(null);
-  const receiveQrContainerRef = useRef(null);
-  const requestQrContainerRef = useRef(null);
-  const requestPreviewRef = useRef(null);
-  const [localReceiveTab, setLocalReceiveTab] = useState('choice');
+	  const receiveQrContainerRef = useRef(null);
+	  const requestQrContainerRef = useRef(null);
+	  const [localReceiveTab, setLocalReceiveTab] = useState('choice');
 
   const setReceiveTabSafe = setReceiveTab || setLocalReceiveTab;
   const rawReceiveTab = receiveTab != null ? receiveTab : localReceiveTab;
@@ -569,10 +568,10 @@ export default function WalletDashboardReceiveModal({
     return dataUrlToBlob(dataUrl);
   };
 
-  const downloadBlob = (blob, filename) => {
-    if (!blob || !filename) return;
-    try {
-      const url = URL.createObjectURL(blob);
+	  const downloadBlob = (blob, filename) => {
+	    if (!blob || !filename) return;
+	    try {
+	      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
@@ -582,12 +581,45 @@ export default function WalletDashboardReceiveModal({
       URL.revokeObjectURL(url);
     } catch {
       // noop
-    }
-  };
+	    }
+	  };
 
-  const handleCopyQr = async (useRequest = hasGeneratedRequest) => {
-    const fallbackText = useRequest ? requestQrValue : receiveQrValue;
-    const blob = buildQrBlob(useRequest);
+	  const handleCopyWalletAddress = async () => {
+	    const addr = trimmed(wallet);
+	    if (!addr) return;
+	    if (navigator?.clipboard?.writeText) {
+	      try {
+	        await navigator.clipboard.writeText(addr);
+	        flashCopyToast(t('ui_address_copied', 'Adresse copiée'));
+	        return;
+	      } catch {
+	        // fall through to execCommand
+	      }
+	    }
+	    try {
+	      const el = document.createElement('textarea');
+	      el.value = addr;
+	      el.setAttribute('readonly', '');
+	      el.style.position = 'fixed';
+	      el.style.left = '-9999px';
+	      document.body.appendChild(el);
+	      el.focus();
+	      el.select();
+	      const ok = document.execCommand('copy');
+	      document.body.removeChild(el);
+	      if (ok) {
+	        flashCopyToast(t('ui_address_copied', 'Adresse copiée'));
+	        return;
+	      }
+	    } catch {
+	      // fall through
+	    }
+	    flashCopyToast(t('ui_address_copy_failed', "Impossible de copier l'adresse"));
+	  };
+
+	  const handleCopyQr = async (useRequest = hasGeneratedRequest) => {
+	    const fallbackText = useRequest ? requestQrValue : receiveQrValue;
+	    const blob = buildQrBlob(useRequest);
 
     if (!isDesktop && fallbackText) {
       if (navigator?.clipboard?.writeText) {
@@ -773,23 +805,31 @@ export default function WalletDashboardReceiveModal({
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
       });
-  const requestDateLabel = useMemo(() => {
-    const raw = generatedRequest?.createdAt;
-    if (!raw) return '';
-    const parsed = new Date(raw);
-    if (!Number.isFinite(parsed.getTime())) return '';
-    return parsed.toLocaleString(locale);
-  }, [generatedRequest?.createdAt, locale]);
+	  const requestDateLabel = useMemo(() => {
+	    const raw = generatedRequest?.createdAt;
+	    if (!raw) return '';
+	    const parsed = new Date(raw);
+	    if (!Number.isFinite(parsed.getTime())) return '';
+	    return parsed.toLocaleString(locale);
+	  }, [generatedRequest?.createdAt, locale]);
+	  const requestDateParts = useMemo(() => {
+	    const raw = generatedRequest?.createdAt;
+	    if (!raw) return { date: '', time: '' };
+	    const parsed = new Date(raw);
+	    if (!Number.isFinite(parsed.getTime())) return { date: '', time: '' };
+	    return {
+	      date: parsed.toLocaleDateString(locale),
+	      time: parsed.toLocaleTimeString(locale),
+	    };
+	  }, [generatedRequest?.createdAt, locale]);
 	  const receiveQrValue = useMemo(() => {
 	    if (!wallet) return '';
 	    const label = trimmed(activeWalletQrLabel);
 	    if (!label) return `xrpl:${wallet}`;
 	    return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
 	  }, [activeWalletQrLabel, trimmed, wallet]);
-	  // Public address QR should be visually smaller than the request QR preview.
-	  const qrDisplaySize = inline ? 240 : 240;
-	  const qrPixelSize = inline ? 360 : 480;
-	  const requestQrPixelSize = inline ? 360 : 520;
+	  const qrPixelSize = inline ? 360 : 720;
+		  const requestQrPixelSize = inline ? 360 : 720;
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -971,22 +1011,7 @@ export default function WalletDashboardReceiveModal({
     };
   };
 
-  // After generating a request, scroll the modal to the generated QR block.
-  // This keeps the interaction single-flow without making the user hunt for the new QR.
-  // (Note: must run after we know the modal is rendered.)
-  useEffect(() => {
-    if (!shouldRender) return;
-    if (!hasGeneratedRequest) return;
-    const el = requestPreviewRef.current;
-    if (!el) return;
-    try {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch {
-      // ignore
-    }
-  }, [hasGeneratedRequest, shouldRender]);
-
-  if (!shouldRender) return null;
+	  if (!shouldRender) return null;
 
   const wrapperClass = inline
     ? 'relative w-full h-full flex'
@@ -1217,11 +1242,14 @@ export default function WalletDashboardReceiveModal({
 	                  <div className="space-y-2 pt-2">
 	                    {walletPicker}
 	                    <div className="flex flex-col items-center pt-2">
-	                      <div ref={receiveQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
+	                      <div
+	                        ref={receiveQrContainerRef}
+	                        className="w-full max-w-[520px] md:max-w-[420px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
+	                      >
 	                        <QRCodeCanvas
 	                          value={receiveQrValue}
 	                          size={qrPixelSize}
-	                          style={{ width: qrDisplaySize, height: qrDisplaySize }}
+	                          style={{ width: '100%', height: '100%' }}
 	                          bgColor="#ffffff"
 	                          fgColor="#000000"
 	                          includeMargin={true}
@@ -1236,15 +1264,41 @@ export default function WalletDashboardReceiveModal({
 	                        prefixClassName="text-white/50"
 	                        labelClassName="font-medium text-white/80"
 	                        dotClassName="hidden"
-	                      />
-	                      {wallet ? (
-	                        <div className="mt-1 text-[12px] text-white/55 font-mono break-all text-center">
-	                          {wallet}
-	                        </div>
-	                      ) : null}
+		                      />
+		                      {wallet ? (
+		                        <div className="mt-1 w-full flex items-start justify-center gap-2">
+		                          <div className="text-[12px] text-white/55 font-mono break-all text-center">
+		                            {wallet}
+		                          </div>
+		                          <button
+		                            type="button"
+		                            onClick={async e => {
+		                              e.stopPropagation();
+		                              await handleCopyWalletAddress();
+		                            }}
+		                            className="shrink-0 mt-[1px] h-7 w-7 inline-flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/80 ring-1 ring-white/10 ring-inset focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150"
+		                            aria-label={t('ui_copy_address', "Copier l'adresse")}
+		                            title={t('ui_copy_address', "Copier l'adresse")}
+		                          >
+		                            <svg
+		                              viewBox="0 0 24 24"
+		                              fill="none"
+		                              stroke="currentColor"
+		                              strokeWidth="2"
+		                              strokeLinecap="round"
+		                              strokeLinejoin="round"
+		                              className="w-4 h-4"
+		                              aria-hidden="true"
+		                            >
+		                              <rect x="9" y="9" width="13" height="13" rx="2" />
+		                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+		                            </svg>
+		                          </button>
+		                        </div>
+		                      ) : null}
 
-	                      <div className="mt-4 w-full grid grid-cols-2 gap-2">
-	                        <button
+		                      <div className="mt-4 w-full grid grid-cols-2 gap-2">
+		                        <button
 	                          type="button"
 	                          onClick={async e => {
 	                            e.stopPropagation();
@@ -1271,36 +1325,20 @@ export default function WalletDashboardReceiveModal({
 	                </>
 	              ) : null}
 
-	              {receiveView === 'request' ? (
-	                <>
-	                  {/* SECTION 2 — CREATE REQUEST */}
-	                  <div className="space-y-2 pt-2">
-                    {walletPicker}
-                    <div className="rounded-[14px] border border-white/10 bg-[#101415] p-4 space-y-4">
-                      {/* Amount */}
-	                      <div>
-	                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-	                          {t('ui_amount_7668986206', 'Amount')}
+		              {receiveView === 'request' ? (
+		                <>
+		                  {/* SECTION 2 — CREATE REQUEST */}
+		                  <div className="space-y-2 pt-2">
+	                    {walletPicker}
+	                    <div className="rounded-[14px] bg-[#101415] p-4 space-y-4 ring-1 ring-white/10 ring-inset">
+		                      {/* Currency */}
+		                      <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset">
+		                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+		                          {t('ui_currency_1ed55673be', 'Currency')}
 	                        </label>
-	                        <input
-	                          type="number"
-	                          value={requestAmount}
-	                          onChange={e => setRequestAmount(e.target.value)}
-	                          placeholder="0.00"
-	                          className={`w-full border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
-	                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-	                          }`}
-	                        />
-	                      </div>
-
-                      {/* Currency */}
-                      <div>
-                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                          {t('ui_currency_1ed55673be', 'Currency')}
-                        </label>
-	                        <ModalSelect
-	                          value={requestCurrency}
-	                          onChange={setRequestCurrency}
+		                        <ModalSelect
+		                          value={requestCurrency}
+		                          onChange={setRequestCurrency}
 	                          options={(augmentedTokens || []).map(token => {
                             const currencyUpper = String(token.currency || '').toUpperCase();
                             const labelLeft =
@@ -1337,23 +1375,39 @@ export default function WalletDashboardReceiveModal({
 		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
 		                          }`}
 		                        />
-	                      </div>
-
-                      {/* Memo (optional) */}
-	                      <div>
-	                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-	                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
-	                        </label>
-		                        <input
-		                          type="text"
-		                          value={requestMemo}
-		                          onChange={e => setRequestMemo(e.target.value)}
-		                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
-		                          className={`w-full border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
-		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-		                          }`}
-		                        />
 		                      </div>
+	
+	                      {/* Memo (optional) */}
+		                      <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset">
+		                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+		                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
+		                        </label>
+			                        <input
+			                          type="text"
+			                          value={requestMemo}
+			                          onChange={e => setRequestMemo(e.target.value)}
+			                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
+			                          className={`w-full border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+			                          }`}
+			                        />
+			                      </div>
+
+		                      {/* Amount */}
+			                      <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset">
+			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			                          {t('ui_amount_7668986206', 'Amount')}
+			                        </label>
+			                        <input
+			                          type="number"
+			                          value={requestAmount}
+			                          onChange={e => setRequestAmount(e.target.value)}
+			                          placeholder="0.00"
+			                          className={`xcannes-no-spinner w-full border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+			                          }`}
+			                        />
+			                      </div>
 
                       <button
                         type="button"
@@ -1366,60 +1420,12 @@ export default function WalletDashboardReceiveModal({
                         {t('ui_generate_request_fr', 'Générer la demande')}
                       </button>
 
-                      {generateError ? (
-                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                          {generateError}
-                        </div>
-                      ) : null}
-
-                      {hasGeneratedRequest ? (
-                        <div
-                          ref={requestPreviewRef}
-                          className="pt-2 rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3"
-                        >
-                          <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-                            {t('ui_request_generated_label', 'Demande générée')}
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <div ref={requestQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
-                              <QRCodeCanvas
-                                value={requestQrValue}
-                                size={requestQrPixelSize}
-                                style={{ width: 200, height: 200 }}
-                                bgColor="#ffffff"
-                                fgColor="#000000"
-                                includeMargin={true}
-                                level="M"
-                              />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <button
-                              type="button"
-                              onClick={async e => {
-                                e.stopPropagation();
-                                await handleCopyQr(true);
-                              }}
-                              className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
-                            >
-                              {t('ui_copy', 'Copier')}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={async e => {
-                                e.stopPropagation();
-                                await handleShareQr(true);
-                              }}
-                              className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
-                            >
-                              <ShareIcon className="w-4 h-4" />
-                              <span>{shareActionLabel}</span>
-                            </button>
-                          </div>
-                          <div className="text-[11px] text-white/50 text-center">{requestDisplayAmountLabel}</div>
-                        </div>
-                      ) : null}
-                    </div>
+	                      {generateError ? (
+	                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+	                          {generateError}
+	                        </div>
+	                      ) : null}
+	                    </div>
 	                  </div>
 	                </>
 	              ) : null}
@@ -1428,23 +1434,72 @@ export default function WalletDashboardReceiveModal({
 	                <>
 		                  {/* SECTION 3 — REQUEST QR */}
 		                  <div className="space-y-2 pt-2">
-		                    {hasGeneratedRequest ? (
-		                      <div className="flex flex-col items-center pt-2 space-y-4">
-		                        <div ref={requestQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
-		                          <QRCodeCanvas
-		                            value={requestQrValue}
-		                            size={requestQrPixelSize}
-		                            style={{ width: 260, height: 260 }}
-		                            bgColor="#ffffff"
-		                            fgColor="#000000"
-		                            includeMargin={true}
-		                            level="M"
-		                          />
-		                        </div>
+			                    {hasGeneratedRequest ? (
+				                      <div className="flex flex-col items-center pt-2 space-y-4">
+				                        <div
+				                          ref={requestQrContainerRef}
+				                          className="w-full max-w-[520px] md:max-w-[420px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
+				                        >
+				                          <QRCodeCanvas
+				                            value={requestQrValue}
+				                            size={requestQrPixelSize}
+				                            style={{ width: '100%', height: '100%' }}
+				                            bgColor="#ffffff"
+				                            fgColor="#000000"
+				                            includeMargin={true}
+				                            level="M"
+				                          />
+				                        </div>
 
-		                        <div className="grid grid-cols-2 gap-2">
-		                          <button
-		                            type="button"
+				                        <div className="w-full max-w-[520px] md:max-w-[420px] mx-auto rounded-[14px] bg-white/[0.02] ring-1 ring-white/10 ring-inset p-4">
+				                          <div className="space-y-3">
+				                            <div>
+				                              <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+				                                {t('ui_requester_account_label', 'Nom du compte demandeur')}
+				                              </div>
+				                              <div className="mt-1 text-[14px] text-white/85 font-semibold truncate">
+				                                {activeWalletLabel || t('nav_wallet', 'Wallet')}
+				                              </div>
+				                            </div>
+
+				                            {wallet ? (
+				                              <div>
+				                                <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+				                                  {t('ui_requester_account_address_label', 'Adresse')}
+				                                </div>
+				                                <div className="mt-1 text-[12px] text-white/60 font-mono break-all">
+				                                  {wallet}
+				                                </div>
+				                              </div>
+				                            ) : null}
+
+				                            <div className="grid grid-cols-2 gap-3">
+				                              <div className="rounded-xl bg-black/20 ring-1 ring-white/10 ring-inset px-3 py-2">
+				                                <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+				                                  {t('ui_requested_amount_label', 'Montant demandé')}
+				                                </div>
+				                                <div className="mt-1 text-[13px] text-white/80 font-semibold">
+				                                  {requestDisplayAmountLabel}
+				                                </div>
+				                              </div>
+				                              <div className="rounded-xl bg-black/20 ring-1 ring-white/10 ring-inset px-3 py-2">
+				                                <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+				                                  {t('ui_request_datetime_label', 'Date & heure')}
+				                                </div>
+				                                <div className="mt-1 text-[12px] text-white/60">
+				                                  {requestDateParts.date || requestDateLabel || '—'}
+				                                </div>
+				                                <div className="text-[12px] text-white/60">
+				                                  {requestDateParts.time || '—'}
+				                                </div>
+				                              </div>
+				                            </div>
+				                          </div>
+				                        </div>
+
+			                        <div className="grid grid-cols-2 gap-2">
+			                          <button
+			                            type="button"
 	                            onClick={async e => {
 	                              e.stopPropagation();
 	                              await handleCopyQr(true);
@@ -1462,18 +1517,11 @@ export default function WalletDashboardReceiveModal({
 	                            className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
 	                          >
 	                            <ShareIcon className="w-4 h-4" />
-		                            <span>{shareActionLabel}</span>
-		                          </button>
-		                        </div>
-
-		                        <div className="text-center space-y-1">
-		                          <div className="text-[12px] text-white/70">{requestDisplayAmountLabel}</div>
-		                          {requestDateLabel ? (
-		                            <div className="text-[11px] text-white/45">{requestDateLabel}</div>
-		                          ) : null}
-		                        </div>
-		                      </div>
-		                    ) : (
+			                            <span>{shareActionLabel}</span>
+			                          </button>
+			                        </div>
+			                      </div>
+			                    ) : (
 		                      <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] text-white/60 text-sm">
 		                        {t('ui_request_qr_missing', "Aucune demande n'a encore été générée.")}
 		                      </div>
