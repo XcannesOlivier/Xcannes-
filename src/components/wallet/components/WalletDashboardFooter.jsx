@@ -118,13 +118,13 @@ function MobileScanButton({ onScan, ariaLabel }) {
   return (
     <>
       <div
-        className="pointer-events-none absolute left-1/2 top-[47px] z-0 h-[58px] w-[162px] -translate-x-1/2 rounded-full bg-black/75 blur-[14px]"
+        className="pointer-events-none absolute left-1/2 top-[15px] z-0 h-[58px] w-[162px] -translate-x-1/2 rounded-full bg-black/75 blur-[14px]"
         aria-hidden
       />
       <button
         type="button"
         onClick={onScan}
-        className="absolute left-1/2 top-[40px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
+        className="absolute left-1/2 top-[8px] z-10 flex h-[60px] w-[170px] -translate-x-1/2 items-center justify-center rounded-full text-white transition-transform duration-150 hover:scale-[1.01] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#39d57c]/20"
         style={scanButtonStyle}
         aria-label={ariaLabel}
       >
@@ -147,7 +147,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <MobileFooterOverlay />
 
           <span
-            className="absolute right-2 top-[39px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/18"
+            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/18"
             style={{ backgroundColor: MOBILE_BASE_BG }}
           >
             By XCANNES LLC
