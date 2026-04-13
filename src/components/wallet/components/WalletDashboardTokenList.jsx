@@ -33,7 +33,7 @@ export default function WalletDashboardTokenList({
               {headerTitle}
             </div>
           ) : headerTitle ? (
-            <div>{headerTitle}</div>
+            <div className="w-full">{headerTitle}</div>
           ) : null}
           {showHeaderAction ? (
             <button
