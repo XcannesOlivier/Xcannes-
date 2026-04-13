@@ -59,7 +59,7 @@ function MobileFooterOverlay() {
   return (
     <div
       className="absolute inset-x-0 top-0 overflow-hidden"
-      style={{ height: 108 }}
+      style={{ height: 68 }}
       aria-hidden
     >
       <div
@@ -143,7 +143,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         className="relative overflow-visible bg-[#090c0d] md:hidden"
         style={mobileFooterStyle}
       >
-        <div className="relative h-[108px]">
+        <div className="relative h-[68px]">
           <MobileFooterOverlay />
 
           <span
