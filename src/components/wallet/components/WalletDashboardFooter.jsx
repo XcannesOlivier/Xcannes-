@@ -43,14 +43,14 @@ function ScanIcon({ className = "h-10 w-10" }) {
       aria-hidden
     >
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
         d="M4 7V6a2 2 0 0 1 2-2h1M20 7V6a2 2 0 0 0-2-2h-1M4 17v1a2 2 0 0 0 2 2h1M20 17v1a2 2 0 0 1-2 2h-1"
       />
-      <rect x="7.7" y="7.7" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
-      <rect x="13.4" y="7.7" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
-      <rect x="7.7" y="13.4" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
-      <rect x="13.4" y="13.4" width="2.9" height="2.9" rx="0.7" fill="currentColor" stroke="none" />
+      <rect x="7.7" y="7.7" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
+      <rect x="13.4" y="7.7" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
+      <rect x="7.7" y="13.4" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
+      <rect x="13.4" y="13.4" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
     </svg>
   );
 }
