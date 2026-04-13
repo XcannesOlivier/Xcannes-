@@ -15,6 +15,10 @@ export default function WalletDashboardTokenList({
     ? `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-[2px] md:pt-1.5" : "pt-1.5"} pb-[2px] md:pb-3 rounded-2xl bg-black`
     : `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-[2px] md:pt-1.5" : "pt-1.5"} pb-[2px] md:pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-black`;
   const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
+  const headerJustifyClass =
+    showHeaderAction || (headerTitle && typeof headerTitle !== "string")
+      ? "justify-between"
+      : "justify-center";
   return (
     <div
       className={`flex-1 min-h-0 flex flex-col max-h-none ${className}`}
@@ -23,7 +27,7 @@ export default function WalletDashboardTokenList({
       {(headerTitle || headerActionLabel) && (
         <div
           className={`flex items-center gap-2 mb-1 md:mb-2 px-3 pt-4 ${
-            showHeaderAction ? "justify-between" : "justify-center"
+            headerJustifyClass
           }`}
         >
           {typeof headerTitle === "string" ? (
