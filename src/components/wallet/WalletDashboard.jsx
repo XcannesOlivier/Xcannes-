@@ -1136,28 +1136,25 @@ export default function WalletDashboard({
               tokens={tokenListTokens}
               renderTokenRow={renderTokenRow}
               headerTitle={
-                recentActivityMessage ? (
+                <div className="w-full flex items-center justify-between gap-3">
+                  <div className="text-[17px] md:text-[16px] font-semibold text-white/90">
+                    {t('ui_my_currencies_4d1f0e3a0a', 'Mes devises')}
+                  </div>
                   <button
                     type="button"
                     onClick={handleOpenGlobalStatement}
-                    className="w-full text-left rounded-xl px-3 py-2 ring-1 ring-inset ring-xcannes-green/35 bg-[radial-gradient(70%_70%_at_18%_15%,rgba(34,197,94,0.18)_0%,rgba(5,7,8,0.95)_70%)] text-[16px] md:text-[18px] text-white/90 hover:text-white transition-colors"
-                    title={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
+                    className="inline-flex items-center gap-2 text-[14px] md:text-[13px] font-normal text-white/65 hover:text-white/90 transition-colors"
+                    title={
+                      recentActivityMessage
+                        ? recentActivityMessage
+                        : t('ui_open_statement', 'Ouvrir le relevé des transactions')
+                    }
                     aria-label={t('ui_open_statement', 'Ouvrir le relevé des transactions')}
                   >
-                    {recentActivityMessage}
+                    <span>{t('ui_consult_global_statement_3b89f4a7a2', 'Dernières transactions')}</span>
+                    <span className="text-white/35 text-base md:text-lg leading-none">›</span>
                   </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleOpenGlobalStatement}
-                    className="w-full flex justify-center text-[16px] md:text-[18px] text-white/80 hover:text-white transition-colors"
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <span>{t('ui_consult_global_statement_3b89f4a7a2', 'Dernières transactions')}</span>
-                      <span className="text-white/35 text-lg md:text-xl leading-none">›</span>
-                    </span>
-                  </button>
-                )
+                </div>
               }
               className="touch-pan-y"
               style={{ WebkitOverflowScrolling: 'touch' }}
