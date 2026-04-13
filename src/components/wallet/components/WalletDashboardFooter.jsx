@@ -6,7 +6,7 @@ const MOBILE_MODAL_BG = "#111516";
 const MOBILE_BASE_BG = "#090c0d";
 
 const mobileFooterStyle = {
-  paddingBottom: "10px",
+  paddingBottom: "0px",
 };
 
 const mobileOverlayFillStyle = {
@@ -59,7 +59,7 @@ function MobileFooterOverlay() {
   return (
     <div
       className="absolute inset-x-0 top-0 overflow-hidden"
-      style={{ height: 78 }}
+      style={{ height: 88 }}
       aria-hidden
     >
       <div
@@ -143,7 +143,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
         className="relative overflow-visible bg-[#090c0d] md:hidden"
         style={mobileFooterStyle}
       >
-        <div className="relative h-[78px]">
+        <div className="relative h-[88px]">
           <MobileFooterOverlay />
 
           <span
