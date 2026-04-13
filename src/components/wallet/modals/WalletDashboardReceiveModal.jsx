@@ -849,9 +849,11 @@ export default function WalletDashboardReceiveModal({
 	    if (!raw) return { date: '', time: '' };
 	    const parsed = new Date(raw);
 	    if (!Number.isFinite(parsed.getTime())) return { date: '', time: '' };
+	    // Force 'fr' locale for consistent date display (app is FR-first)
+	    const dateLoc = locale === 'en' ? 'fr-FR' : locale;
 	    return {
-	      date: parsed.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' }),
-	      time: parsed.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
+	      date: parsed.toLocaleDateString(dateLoc, { day: 'numeric', month: 'short', year: 'numeric' }),
+	      time: parsed.toLocaleTimeString(dateLoc, { hour: '2-digit', minute: '2-digit' }),
 	    };
 	  }, [generatedRequest?.createdAt, locale]);
 	  const receiveQrValue = useMemo(() => {
@@ -1470,64 +1472,66 @@ export default function WalletDashboardReceiveModal({
 	              {receiveView === 'request_qr' ? (
 	                <>
 		                  {/* SECTION 3 — REQUEST QR */}
-		                  <div className="space-y-2 pt-2">
+		                  <div className="space-y-5 pt-2">
 				                    {hasGeneratedRequest ? (
-					                      <div className="flex flex-col items-center pt-1 space-y-5">
+					                      <>
+					                        {/* ── Header card (match "Augmenter vos soldes" style) ── */}
+					                        <div
+					                          className={[
+					                            'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]',
+					                            'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
+					                          ].join(' ')}
+					                        >
+					                          <p className="text-[20px] tracking-[0.14em] font-orbitron font-bold text-white mb-3">
+					                            {t('ui_request_generated_card_title', 'DEMANDE DE PAIEMENT')}
+					                          </p>
 
-					                        {/* ── Success badge + Amount ── */}
-					                        <div className="flex flex-col items-center gap-2">
-					                          <div className="w-10 h-10 rounded-full bg-xcannes-green/10 ring-1 ring-xcannes-green/25 ring-inset flex items-center justify-center">
-					                            <CheckCircleIcon className="w-5 h-5 text-xcannes-green" />
-					                          </div>
-					                          <div className="text-[26px] md:text-[28px] font-semibold text-white/95 tracking-tight">
+					                          <div className="text-white text-[36px] md:text-[42px] font-semibold tracking-tight leading-none">
 					                            {requestDisplayAmountLabel}
 					                          </div>
-					                        </div>
 
-					                        {/* ── Info card (glassmorphism) ── */}
-					                        <div className="w-full max-w-[520px] md:max-w-[420px] mx-auto rounded-[16px] px-4 py-4 bg-white/[0.02] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] space-y-3">
-					                          <div className="flex items-start justify-between gap-4">
-					                            <div className="min-w-0 flex-1">
-					                              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-					                                {t('ui_requester_account_label', 'Nom du compte demandeur')}
-					                              </div>
-					                              <div className="mt-1 text-[15px] md:text-[16px] text-white font-semibold truncate">
-					                                {activeWalletLabel || t('nav_wallet', 'Wallet')}
-					                              </div>
-					                            </div>
-					                            <div className="text-right flex-shrink-0">
-					                              <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-					                                {t('ui_request_datetime_label', 'Date & heure')}
-					                              </div>
-					                              <div className="mt-1 text-[13px] text-white/60">
-					                                {requestDateParts.date && requestDateParts.time
-					                                  ? `${requestDateParts.date} · ${requestDateParts.time}`
-					                                  : requestDateLabel || '—'}
-					                              </div>
-					                            </div>
+					                          <div className="mt-3 text-[13px] text-white/55">
+					                            {requestDateParts.date && requestDateParts.time
+					                              ? `${requestDateParts.date} · ${requestDateParts.time}`
+					                              : requestDateLabel || '—'}
+					                          </div>
+
+					                          <div className="my-4 h-px bg-white/10" aria-hidden />
+
+					                          <div className="flex items-center gap-2 mb-1">
+					                            <span
+					                              className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
+					                              aria-hidden
+					                            />
+					                            <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+					                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
+					                            </p>
 					                          </div>
 
 					                          {wallet ? (
-					                            <div className="flex items-center gap-2 pt-1 border-t border-white/[0.06]">
-					                              <div className="text-[12px] text-white/50 font-mono">
+					                            <div className="mt-0.5 flex items-start gap-2">
+					                              <span className="min-w-0 flex-1 text-left font-mono text-[14px] md:text-[15px] text-white/70">
 					                                {shortAddress(wallet, 8, 6)}
-					                              </div>
+					                              </span>
 					                              <button
 					                                type="button"
 					                                onClick={() => { navigator.clipboard?.writeText(wallet); }}
-					                                className="text-white/40 hover:text-white/70 transition-colors"
-					                                title={t('ui_copy_address', "Copier l'adresse")}
+					                                className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+					                                aria-label={t('ui_copy_address', "Copier l'adresse")}
 					                              >
-					                                <CopySmallIcon className="w-3.5 h-3.5" />
+					                                {t('ui_copy', 'Copier')}
 					                              </button>
 					                            </div>
 					                          ) : null}
 					                        </div>
 
-					                        {/* ── QR Code (contained, not oversized) ── */}
+					                        {/* ── QR Code ── */}
 				                        <div
 				                          ref={requestQrContainerRef}
-				                          className="w-full max-w-[280px] md:max-w-[260px] mx-auto aspect-square rounded-2xl bg-white p-3 ring-1 ring-white/10 shadow-[0_8px_26px_rgba(0,0,0,0.55)]"
+				                          className={[
+				                            'w-full max-w-[260px] md:max-w-[240px] mx-auto aspect-square rounded-[14px] bg-white p-3',
+				                            'ring-1 ring-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+				                          ].join(' ')}
 				                        >
 					                          <QRCodeCanvas
 					                            value={requestQrValue}
@@ -1541,14 +1545,17 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── Actions ── */}
-			                        <div className="grid grid-cols-2 gap-3 w-full max-w-[520px] md:max-w-[420px] mx-auto">
+			                        <div className="grid grid-cols-2 gap-3">
 			                          <button
 			                            type="button"
 	                            onClick={async e => {
 	                              e.stopPropagation();
 	                              await handleCopyQr(true);
 	                            }}
-	                            className="w-full h-12 rounded-xl bg-white/[0.02] ring-1 ring-white/10 ring-inset hover:bg-white/[0.05] hover:ring-white/20 text-white/85 text-sm font-semibold transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] active:scale-[0.99]"
+	                            className={[
+	                              'w-full h-12 rounded-xl bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-sm font-semibold',
+	                              'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
+	                            ].join(' ')}
 	                          >
 	                            {t('ui_copy', 'Copier')}
 	                          </button>
@@ -1564,7 +1571,7 @@ export default function WalletDashboardReceiveModal({
 			                            <span>{shareActionLabel}</span>
 			                          </button>
 			                        </div>
-			                      </div>
+			                      </>
 			                    ) : (
 		                      <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] text-white/60 text-sm">
 		                        {t('ui_request_qr_missing', "Aucune demande n'a encore été générée.")}
