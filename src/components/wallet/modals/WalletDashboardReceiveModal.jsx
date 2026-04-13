@@ -1304,10 +1304,10 @@ export default function WalletDashboardReceiveModal({
 	                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 	                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 	                          }
-		                          buttonClassName={`hover:bg-white/5 border border-black/60 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150 ${
+		                          buttonClassName={`hover:bg-white/5 border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150 ${
 		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
 		                          }`}
-		                          selectClassName={`xcannes-select w-full border border-black/60 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+		                          selectClassName={`xcannes-select w-full border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
 		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
 		                          }`}
 		                        />
@@ -1318,16 +1318,16 @@ export default function WalletDashboardReceiveModal({
 	                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 	                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
 	                        </label>
-	                        <input
-	                          type="text"
-	                          value={requestMemo}
-	                          onChange={e => setRequestMemo(e.target.value)}
-	                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
-	                          className={`w-full border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
-	                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-	                          }`}
-	                        />
-	                      </div>
+		                        <input
+		                          type="text"
+		                          value={requestMemo}
+		                          onChange={e => setRequestMemo(e.target.value)}
+		                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
+		                          className={`w-full border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+		                          }`}
+		                        />
+		                      </div>
 
                       <button
                         type="button"
