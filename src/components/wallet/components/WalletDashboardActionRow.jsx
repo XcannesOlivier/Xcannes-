@@ -17,7 +17,7 @@ export default function WalletDashboardActionRow({ onAction }) {
         >
           <div className="wallet-action-icon">
             <svg
-              className="w-5 h-5"
+              className="w-6 h-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -25,13 +25,8 @@ export default function WalletDashboardActionRow({ onAction }) {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              {/* Viewfinder corners */}
-              <path d="M2 7V3a1 1 0 0 1 1-1h4" />
-              <path d="M17 2h4a1 1 0 0 1 1 1v4" />
-              <path d="M22 17v4a1 1 0 0 1-1 1h-4" />
-              <path d="M7 22H3a1 1 0 0 1-1-1v-4" />
-              {/* Scan line */}
-              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
           </div>
           <span className="wallet-action-label !text-[18px] !font-medium">
