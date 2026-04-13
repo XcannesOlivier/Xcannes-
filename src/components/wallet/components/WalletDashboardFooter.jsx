@@ -147,7 +147,7 @@ export default function WalletDashboardFooter({ onScan } = {}) {
           <MobileFooterOverlay />
 
           <span
-            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/18"
+            className="absolute right-2 top-[7px] z-20 bg-[#090c0d] pl-2 text-[8px] font-light tracking-[0.12em] text-white/12"
             style={{ backgroundColor: MOBILE_BASE_BG }}
           >
             By XCANNES LLC
