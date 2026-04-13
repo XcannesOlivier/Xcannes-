@@ -58,7 +58,7 @@ function ScanIcon({ className = "h-10 w-10" }) {
 function MobileFooterOverlay() {
   return (
     <div
-      className="absolute inset-x-0 top-[32px] overflow-hidden"
+      className="absolute inset-x-0 top-0 overflow-hidden"
       style={{ height: 108 }}
       aria-hidden
     >
