@@ -293,7 +293,7 @@ export default function WalletDashboardReceiveModal({
 	        className={`rounded-[14px] border border-white/10 p-3 space-y-2 ${walletPickerSurfaceClass}`}
 	      >
 	        <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-	          {t('ui_receive_wallet_selector_label', 'Wallet de réception')}
+	          {t('ui_receive_wallet_selector_label', 'Compte de réception')}
 	        </div>
 	        <ModalSelect
 	          value={wallet}
@@ -1230,13 +1230,18 @@ export default function WalletDashboardReceiveModal({
 	                      </div>
 
 	                      <WalletActiveLabel
-	                        prefix={t('ui_receive_wallet_prefix', 'Wallet de réception:')}
+	                        prefix={t('ui_receive_wallet_prefix', 'Compte de réception:')}
 	                        label={activeWalletLabel}
 	                        className="mt-3 text-[13px] text-white/80 justify-center gap-1"
 	                        prefixClassName="text-white/50"
 	                        labelClassName="font-medium text-white/80"
 	                        dotClassName="hidden"
 	                      />
+	                      {wallet ? (
+	                        <div className="mt-1 text-[12px] text-white/55 font-mono break-all text-center">
+	                          {wallet}
+	                        </div>
+	                      ) : null}
 
 	                      <div className="mt-4 w-full grid grid-cols-2 gap-2">
 	                        <button
@@ -1245,7 +1250,7 @@ export default function WalletDashboardReceiveModal({
 	                            e.stopPropagation();
 	                            await handleCopyQr(false);
 	                          }}
-	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 ring-1 ring-white/10 ring-inset focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
 	                        >
 	                          {t('ui_copy', 'Copier')}
 	                        </button>
@@ -1255,7 +1260,7 @@ export default function WalletDashboardReceiveModal({
 	                            e.stopPropagation();
 	                            await handleShareQr(false);
 	                          }}
-	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
+	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2 ring-1 ring-white/10 ring-inset focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
 	                        >
 	                          <ShareIcon className="w-4 h-4" />
 	                          <span>{shareActionLabel}</span>
