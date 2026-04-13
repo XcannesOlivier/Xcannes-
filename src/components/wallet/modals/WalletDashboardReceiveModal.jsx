@@ -271,31 +271,33 @@ export default function WalletDashboardReceiveModal({
       .filter(Boolean);
   }, [activeWalletLabel, shortAddress, trimmed, wallet, walletList]);
 
-  const walletPicker =
-    wallet && hasMultipleWallets ? (
-      <div className="rounded-[14px] border border-white/10 bg-[#101415] p-3 space-y-2">
-        <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
-          {t('ui_receive_wallet_selector_label', 'Wallet de réception')}
-        </div>
-        <ModalSelect
-          value={wallet}
-          onChange={next => {
-            const addr = trimmed(next);
-            if (!addr || addr === wallet) return;
-            onSwitchWallet?.(addr);
-          }}
-          options={walletOptions}
-          useNativeSelect={false}
-          buttonClassName="bg-[#101415] hover:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
-          menuClassName={
-            noticeVariant === 'demo'
-              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-          }
-          selectClassName="xcannes-select w-full bg-[#101415] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-        />
-      </div>
-    ) : null;
+	  const walletPicker =
+	    wallet && hasMultipleWallets ? (
+	      <div
+	        className="rounded-[14px] border border-white/10 bg-transparent p-3 space-y-2"
+	      >
+	        <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
+	          {t('ui_receive_wallet_selector_label', 'Wallet de réception')}
+	        </div>
+	        <ModalSelect
+	          value={wallet}
+	          onChange={next => {
+	            const addr = trimmed(next);
+	            if (!addr || addr === wallet) return;
+	            onSwitchWallet?.(addr);
+	          }}
+	          options={walletOptions}
+	          useNativeSelect={false}
+	          buttonClassName="bg-transparent hover:bg-white/5 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
+	          menuClassName={
+	            noticeVariant === 'demo'
+	              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	          }
+	          selectClassName="xcannes-select w-full bg-transparent border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
+	        />
+	      </div>
+	    ) : null;
 
   const isFxRequest = useMemo(() => {
     if (!selectedRequestToken?.isTrustlineOnly) return false;
@@ -1250,28 +1252,30 @@ export default function WalletDashboardReceiveModal({
                     {walletPicker}
                     <div className="rounded-[14px] border border-white/10 bg-[#101415] p-4 space-y-4">
                       {/* Amount */}
-                      <div>
-                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                          {t('ui_amount_7668986206', 'Amount')}
-                        </label>
-                        <input
-                          type="number"
-                          value={requestAmount}
-                          onChange={e => setRequestAmount(e.target.value)}
-                          placeholder="0.00"
-                          className="w-full bg-[#101415] focus:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-                        />
-                      </div>
+	                      <div>
+	                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+	                          {t('ui_amount_7668986206', 'Amount')}
+	                        </label>
+	                        <input
+	                          type="number"
+	                          value={requestAmount}
+	                          onChange={e => setRequestAmount(e.target.value)}
+	                          placeholder="0.00"
+	                          className={`w-full border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+	                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+	                          }`}
+	                        />
+	                      </div>
 
                       {/* Currency */}
                       <div>
                         <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
                           {t('ui_currency_1ed55673be', 'Currency')}
                         </label>
-                        <ModalSelect
-                          value={requestCurrency}
-                          onChange={setRequestCurrency}
-                          options={(augmentedTokens || []).map(token => {
+	                        <ModalSelect
+	                          value={requestCurrency}
+	                          onChange={setRequestCurrency}
+	                          options={(augmentedTokens || []).map(token => {
                             const currencyUpper = String(token.currency || '').toUpperCase();
                             const labelLeft =
                               selectLabelByCurrency?.[token.currency] ||
@@ -1293,31 +1297,37 @@ export default function WalletDashboardReceiveModal({
                                 selectLabelMobileByCurrency?.[currencyUpper] ||
                                 labelLeft,
                             };
-                          })}
-                          useNativeSelect={false}
-                          buttonClassName="bg-[#101415] hover:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150"
-                          menuClassName={
-                            noticeVariant === 'demo'
-                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-                          }
-                          selectClassName="xcannes-select w-full bg-[#101415] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-                        />
-                      </div>
+	                          })}
+	                          useNativeSelect={false}
+	                          menuClassName={
+	                            noticeVariant === 'demo'
+	                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                          }
+	                          buttonClassName={`hover:bg-white/5 border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150 ${
+	                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+	                          }`}
+	                          selectClassName={`xcannes-select w-full border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+	                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+	                          }`}
+	                        />
+	                      </div>
 
                       {/* Memo (optional) */}
-                      <div>
-                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
-                        </label>
-                        <input
-                          type="text"
-                          value={requestMemo}
-                          onChange={e => setRequestMemo(e.target.value)}
-                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
-                          className="w-full bg-[#101415] focus:bg-[#12181a] border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150"
-                        />
-                      </div>
+	                      <div>
+	                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+	                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
+	                        </label>
+	                        <input
+	                          type="text"
+	                          value={requestMemo}
+	                          onChange={e => setRequestMemo(e.target.value)}
+	                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
+	                          className={`w-full border border-white/15 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
+	                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+	                          }`}
+	                        />
+	                      </div>
 
                       <button
                         type="button"

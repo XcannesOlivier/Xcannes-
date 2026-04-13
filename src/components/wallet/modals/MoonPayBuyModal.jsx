@@ -1819,13 +1819,13 @@ const MoonPayBuyModal = ({
           </div>
 
           {/* Wallet + Title (merged) */}
-          {wizardStep === 1 ? (
-            <div
-              className={[
-                'rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]',
-                `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
-              ].join(' ')}
-            >
+	          {wizardStep === 1 ? (
+	            <div
+	              className={[
+	                'rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]',
+	                'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
+	              ].join(' ')}
+	            >
               <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
                 {wizardStep === 1 ? (
                   <>
@@ -2224,12 +2224,12 @@ const MoonPayBuyModal = ({
           <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
             {wizardStep === 2 ? (
               <>
-                <div
-                  className={[
-                    'rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]',
-                    `shadow-[0_4px_12px_rgba(0,0,0,0.4),${accentGlowShadow},inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]`,
-                  ].join(' ')}
-                >
+	                <div
+	                  className={[
+	                    'rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]',
+	                    'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
+	                  ].join(' ')}
+	                >
                   <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
                     💳 {resolvedTitleOverride || t('ui_funds_add_title', 'AUGMENTER VOS SOLDES')}
                   </div>

@@ -2957,12 +2957,12 @@ export default function WalletDashboardUsdSwapModal({
             ) : (
               <div className="space-y-5">
 		                {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
-		                    <div
-                          className={[
-                            "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
-                            accentShadowPanel,
-                          ].join(" ")}
-                        >
+			                    <div
+	                          className={[
+	                            "rounded-t-[14px] rounded-b-none px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]",
+	                            "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
+	                          ].join(" ")}
+	                        >
 	                      {walletInlineSelectionEnabled ? (
 	                        <p className="block text-[16px] md:text-base font-orbitron font-bold text-white mb-3">
 	                          <span className="text-[20px] tracking-[0.14em]">
@@ -4164,12 +4164,12 @@ export default function WalletDashboardUsdSwapModal({
                       : null}
 
 	                    {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && !walletTargetSelectionEnabled ? (
-		                      <div
-                          className={[
-                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
-                            accentShadowPanel,
-                          ].join(" ")}
-                        >
+			                      <div
+	                          className={[
+	                            "rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03]",
+	                            "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
+	                          ].join(" ")}
+	                        >
 	                        <p className="text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 	                          {t("moonpay_destination_wallet", "Vers le compte")}
 	                        </p>

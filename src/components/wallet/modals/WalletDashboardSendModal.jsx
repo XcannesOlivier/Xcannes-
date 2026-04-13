@@ -1600,20 +1600,20 @@ export default function WalletDashboardSendModal({
             >
               <div className="flex min-w-0 flex-col gap-1.5 w-full">
                 <div>
-                  {renderWalletMeta?.({
-                    variant: "pill",
-                    className:
-                      "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
-                    prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
-                    labelWrap: true,
-                    pillClassName:
-                      "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_8px_rgba(0,255,150,0.15)]",
-                    prefixClassName:
-                      "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
-                    labelClassName:
-                      "!text-white/95 text-[16px] md:text-[17px] font-semibold",
-                    dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
-                  })}
+	                  {renderWalletMeta?.({
+	                    variant: "pill",
+	                    className:
+	                      "w-full flex justify-center wallet-meta--plus-4 wallet-meta--desktop-gap",
+	                    prefix: `${t("moonpay_from_account", "Depuis le compte")} :`,
+	                    labelWrap: true,
+	                    pillClassName:
+	                      "bg-elevated px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.4)]",
+	                    prefixClassName:
+	                      "!text-white/70 text-[16px] md:text-[17px] font-semibold tracking-wide",
+	                    labelClassName:
+	                      "!text-white/95 text-[16px] md:text-[17px] font-semibold",
+	                    dotClassName: "!h-3 !w-3 ring-xcannes-green/20",
+	                  })}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {noticeVariant === "demo" ? (
