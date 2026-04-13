@@ -12,8 +12,8 @@ export default function WalletDashboardTokenList({
 }) {
   const hasHeader = Boolean(headerTitle || headerActionLabel);
   const listClassName = disableInternalScroll
-    ? `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-0 md:pt-1.5" : "pt-1.5"} pb-20 md:pb-3 rounded-2xl bg-black`
-    : `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-0 md:pt-1.5" : "pt-1.5"} pb-20 md:pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-black`;
+    ? `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-[2px] md:pt-1.5" : "pt-1.5"} pb-[2px] md:pb-3 rounded-2xl bg-black`
+    : `flex-1 min-h-0 px-0 md:px-3 ${hasHeader ? "pt-[2px] md:pt-1.5" : "pt-1.5"} pb-[2px] md:pb-3 overflow-y-auto overscroll-contain rounded-2xl bg-black`;
   const showHeaderAction = Boolean(headerActionLabel && onHeaderAction);
   return (
     <div
@@ -47,10 +47,10 @@ export default function WalletDashboardTokenList({
         </div>
       )}
       <div className={listClassName}>
-        <div className="space-y-[1px] md:hidden">
+        <div className="space-y-[2px] md:hidden">
           {tokens.map(renderTokenRow)}
         </div>
-        <div className="hidden md:flex md:flex-col md:space-y-[1px]">
+        <div className="hidden md:flex md:flex-col md:space-y-[2px]">
           {tokens.map(renderTokenRow)}
         </div>
       </div>
