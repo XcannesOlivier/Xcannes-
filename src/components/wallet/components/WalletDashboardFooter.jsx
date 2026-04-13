@@ -58,12 +58,12 @@ function ScanIcon({ className = "h-10 w-10" }) {
 function MobileFooterOverlay() {
   return (
     <div
-      className="absolute inset-x-0 top-0 overflow-hidden"
+      className="absolute inset-x-0 top-0 overflow-visible"
       style={{ height: 88 }}
       aria-hidden
     >
       <div
-        className="absolute inset-0"
+        className="absolute inset-x-0 bottom-0 top-[30px]"
         style={mobileOverlayFillStyle}
       />
       <svg
