@@ -828,8 +828,8 @@ export default function WalletDashboardReceiveModal({
 	    if (!label) return `xrpl:${wallet}`;
 	    return `xrpl:${wallet}?label=${encodeURIComponent(label)}`;
 	  }, [activeWalletQrLabel, trimmed, wallet]);
-	  const qrPixelSize = inline ? 360 : 720;
-		  const requestQrPixelSize = inline ? 360 : 720;
+		  const qrPixelSize = inline ? 360 : 560;
+		  const requestQrPixelSize = inline ? 360 : 560;
 
   const shouldAnimate = !inline;
   const { shouldRender, isClosing } = useModalTransition(open, {
@@ -1244,7 +1244,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="flex flex-col items-center pt-2">
 	                      <div
 	                        ref={receiveQrContainerRef}
-	                        className="w-full max-w-[520px] md:max-w-[420px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
+	                        className="w-full max-w-[420px] md:max-w-[360px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
 	                      >
 	                        <QRCodeCanvas
 	                          value={receiveQrValue}
@@ -1332,11 +1332,11 @@ export default function WalletDashboardReceiveModal({
 	                    {walletPicker}
 	                    <div className="rounded-[14px] bg-[#101415] p-4 space-y-4 ring-1 ring-white/10 ring-inset">
 		                      {/* Currency */}
-		                      <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset">
-		                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-		                          {t('ui_currency_1ed55673be', 'Currency')}
-	                        </label>
-		                        <ModalSelect
+			                      <div className="rounded-[14px] p-3">
+			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			                          {t('ui_currency_1ed55673be', 'Currency')}
+		                        </label>
+			                        <ModalSelect
 		                          value={requestCurrency}
 		                          onChange={setRequestCurrency}
 	                          options={(augmentedTokens || []).map(token => {
@@ -1363,51 +1363,56 @@ export default function WalletDashboardReceiveModal({
                             };
 	                          })}
 	                          useNativeSelect={false}
-	                          menuClassName={
-	                            noticeVariant === 'demo'
-	                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	                          }
-		                          buttonClassName={`hover:bg-white/5 border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 cursor-pointer transition-colors duration-150 ${
-		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-		                          }`}
-		                          selectClassName={`xcannes-select w-full border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
-		                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-		                          }`}
-		                        />
-		                      </div>
+		                          menuClassName={
+		                            noticeVariant === 'demo'
+		                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+		                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+		                          }
+			                          buttonClassName={`hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 ${
+			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+			                          }`}
+			                          selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
+			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+			                          }`}
+			                        />
+			                      </div>
 	
 	                      {/* Memo (optional) */}
-		                      <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset">
-		                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-		                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
-		                        </label>
-			                        <input
+			                      <div className="rounded-[14px] p-3">
+			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+			                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
+			                        </label>
+				                        <input
 			                          type="text"
-			                          value={requestMemo}
-			                          onChange={e => setRequestMemo(e.target.value)}
-			                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
-			                          className={`w-full border border-black/90 rounded-xl px-3.5 py-3 text-base text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
-			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-			                          }`}
-			                        />
-			                      </div>
+				                          value={requestMemo}
+				                          onChange={e => setRequestMemo(e.target.value)}
+				                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
+				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
+				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+				                          }`}
+				                        />
+				                      </div>
 
 		                      {/* Amount */}
-			                      <div className="rounded-[14px] p-3 ring-1 ring-white/10 ring-inset">
-			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-			                          {t('ui_amount_7668986206', 'Amount')}
-			                        </label>
-			                        <input
-			                          type="number"
-			                          value={requestAmount}
-			                          onChange={e => setRequestAmount(e.target.value)}
-			                          placeholder="0.00"
-			                          className={`xcannes-no-spinner w-full border border-white/15 rounded-xl px-3.5 py-3 text-lg font-semibold text-white outline-none focus:border-xcannes-green/80 transition-colors duration-150 ${
-			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
-			                          }`}
-			                        />
-			                      </div>
+					                      <div className="rounded-[14px] p-3">
+					                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
+					                          {t('ui_amount_7668986206', 'Amount')}
+					                        </label>
+					                        <div className="relative">
+					                          <input
+					                            type="number"
+					                            value={requestAmount}
+					                            onChange={e => setRequestAmount(e.target.value)}
+					                            placeholder="0.00"
+					                            className={`xcannes-no-spinner w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 pr-16 text-lg font-semibold text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
+					                              noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-elevated'
+					                            }`}
+					                          />
+					                          <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-white/70">
+					                            {requestCurrencyCode || 'USD'}
+					                          </span>
+					                        </div>
+					                      </div>
 
                       <button
                         type="button"
@@ -1434,68 +1439,66 @@ export default function WalletDashboardReceiveModal({
 	                <>
 		                  {/* SECTION 3 — REQUEST QR */}
 		                  <div className="space-y-2 pt-2">
-			                    {hasGeneratedRequest ? (
-				                      <div className="flex flex-col items-center pt-2 space-y-4">
+				                    {hasGeneratedRequest ? (
+					                      <div className="flex flex-col items-center pt-2 space-y-4">
+					                        <div className="w-full max-w-[520px] md:max-w-[420px] mx-auto space-y-3">
+					                          <div>
+					                            <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+					                              {t('ui_requester_account_label', 'Nom du compte demandeur')}
+					                            </div>
+					                            <div className="mt-1 text-[14px] text-white/85 font-semibold truncate">
+					                              {activeWalletLabel || t('nav_wallet', 'Wallet')}
+					                            </div>
+					                          </div>
+
+					                          {wallet ? (
+					                            <div>
+					                              <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+					                                {t('ui_requester_account_address_label', 'Adresse')}
+					                              </div>
+					                              <div className="mt-1 text-[12px] text-white/60 font-mono break-all">
+					                                {wallet}
+					                              </div>
+					                            </div>
+					                          ) : null}
+
+					                          <div className="grid grid-cols-2 gap-3">
+					                            <div className="rounded-xl bg-black/20 ring-1 ring-white/10 ring-inset px-3 py-2">
+					                              <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+					                                {t('ui_requested_amount_label', 'Montant demandé')}
+					                              </div>
+					                              <div className="mt-1 text-[13px] text-white/80 font-semibold">
+					                                {requestDisplayAmountLabel}
+					                              </div>
+					                            </div>
+					                            <div className="rounded-xl bg-black/20 ring-1 ring-white/10 ring-inset px-3 py-2">
+					                              <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
+					                                {t('ui_request_datetime_label', 'Date & heure')}
+					                              </div>
+					                              <div className="mt-1 text-[12px] text-white/60">
+					                                {requestDateParts.date || requestDateLabel || '—'}
+					                              </div>
+					                              <div className="text-[12px] text-white/60">
+					                                {requestDateParts.time || '—'}
+					                              </div>
+					                            </div>
+					                          </div>
+					                        </div>
+
 				                        <div
 				                          ref={requestQrContainerRef}
-				                          className="w-full max-w-[520px] md:max-w-[420px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
+				                          className="w-full max-w-[420px] md:max-w-[360px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
 				                        >
-				                          <QRCodeCanvas
-				                            value={requestQrValue}
-				                            size={requestQrPixelSize}
-				                            style={{ width: '100%', height: '100%' }}
-				                            bgColor="#ffffff"
-				                            fgColor="#000000"
-				                            includeMargin={true}
-				                            level="M"
-				                          />
-				                        </div>
-
-				                        <div className="w-full max-w-[520px] md:max-w-[420px] mx-auto rounded-[14px] bg-white/[0.02] ring-1 ring-white/10 ring-inset p-4">
-				                          <div className="space-y-3">
-				                            <div>
-				                              <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
-				                                {t('ui_requester_account_label', 'Nom du compte demandeur')}
-				                              </div>
-				                              <div className="mt-1 text-[14px] text-white/85 font-semibold truncate">
-				                                {activeWalletLabel || t('nav_wallet', 'Wallet')}
-				                              </div>
-				                            </div>
-
-				                            {wallet ? (
-				                              <div>
-				                                <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
-				                                  {t('ui_requester_account_address_label', 'Adresse')}
-				                                </div>
-				                                <div className="mt-1 text-[12px] text-white/60 font-mono break-all">
-				                                  {wallet}
-				                                </div>
-				                              </div>
-				                            ) : null}
-
-				                            <div className="grid grid-cols-2 gap-3">
-				                              <div className="rounded-xl bg-black/20 ring-1 ring-white/10 ring-inset px-3 py-2">
-				                                <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
-				                                  {t('ui_requested_amount_label', 'Montant demandé')}
-				                                </div>
-				                                <div className="mt-1 text-[13px] text-white/80 font-semibold">
-				                                  {requestDisplayAmountLabel}
-				                                </div>
-				                              </div>
-				                              <div className="rounded-xl bg-black/20 ring-1 ring-white/10 ring-inset px-3 py-2">
-				                                <div className="text-[10px] tracking-[0.22em] uppercase text-white/45">
-				                                  {t('ui_request_datetime_label', 'Date & heure')}
-				                                </div>
-				                                <div className="mt-1 text-[12px] text-white/60">
-				                                  {requestDateParts.date || requestDateLabel || '—'}
-				                                </div>
-				                                <div className="text-[12px] text-white/60">
-				                                  {requestDateParts.time || '—'}
-				                                </div>
-				                              </div>
-				                            </div>
-				                          </div>
-				                        </div>
+					                          <QRCodeCanvas
+					                            value={requestQrValue}
+					                            size={requestQrPixelSize}
+					                            style={{ width: '100%', height: '100%' }}
+					                            bgColor="#ffffff"
+					                            fgColor="#000000"
+					                            includeMargin={true}
+					                            level="M"
+					                          />
+					                        </div>
 
 			                        <div className="grid grid-cols-2 gap-2">
 			                          <button
