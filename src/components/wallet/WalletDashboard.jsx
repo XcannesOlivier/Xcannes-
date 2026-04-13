@@ -1137,7 +1137,7 @@ export default function WalletDashboard({
               renderTokenRow={renderTokenRow}
               headerTitle={
                 <div className="w-full flex items-center justify-between gap-3">
-                  <div className="shrink-0 pl-3 md:pl-0 text-[17px] md:text-[16px] font-semibold text-white/90">
+                  <div className="shrink-0 pl-3 md:pl-3 text-[17px] md:text-[18px] font-semibold text-white/90">
                     {t('ui_my_currencies_4d1f0e3a0a', 'Mes devises')}
                   </div>
                   <button
