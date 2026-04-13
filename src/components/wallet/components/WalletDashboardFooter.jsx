@@ -63,7 +63,7 @@ function MobileFooterOverlay() {
       aria-hidden
     >
       <div
-        className="absolute inset-x-0 bottom-0 h-[56px]"
+        className="absolute inset-0"
         style={mobileOverlayFillStyle}
       />
       <svg
