@@ -1197,59 +1197,57 @@ export default function WalletDashboardReceiveModal({
 
               {receiveView === 'share' ? (
                 <>
-                  {/* SECTION 1 — RECEIVE FUNDS */}
-                  <div className="space-y-2 pt-2">
-                    {walletPicker}
-                    <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]">
-                      <div className="flex flex-col items-center">
-                        <div ref={receiveQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
-                          <QRCodeCanvas
-                            value={receiveQrValue}
-                            size={qrPixelSize}
-                            style={{ width: qrDisplaySize, height: qrDisplaySize }}
-                            bgColor="#ffffff"
-                            fgColor="#000000"
-                            includeMargin={true}
-                            level="M"
-                          />
-                        </div>
+	                  {/* SECTION 1 — RECEIVE FUNDS */}
+	                  <div className="space-y-2 pt-2">
+	                    {walletPicker}
+	                    <div className="flex flex-col items-center pt-2">
+	                      <div ref={receiveQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
+	                        <QRCodeCanvas
+	                          value={receiveQrValue}
+	                          size={qrPixelSize}
+	                          style={{ width: qrDisplaySize, height: qrDisplaySize }}
+	                          bgColor="#ffffff"
+	                          fgColor="#000000"
+	                          includeMargin={true}
+	                          level="M"
+	                        />
+	                      </div>
 
-                        <WalletActiveLabel
-                          prefix={t('ui_receive_wallet_prefix', 'Wallet de réception:')}
-                          label={activeWalletLabel}
-                          className="mt-3 text-[13px] text-white/80 justify-center"
-                          prefixClassName="text-white/50"
-                          labelClassName="font-medium text-white/80"
-                        />
+	                      <WalletActiveLabel
+	                        prefix={t('ui_receive_wallet_prefix', 'Wallet de réception:')}
+	                        label={activeWalletLabel}
+	                        className="mt-3 text-[13px] text-white/80 justify-center"
+	                        prefixClassName="text-white/50"
+	                        labelClassName="font-medium text-white/80"
+	                      />
 
-                        <div className="mt-4 w-full grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={async e => {
-                              e.stopPropagation();
-                              await handleCopyQr(false);
-                            }}
-                            className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
-                          >
-                            {t('ui_copy', 'Copier')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={async e => {
-                              e.stopPropagation();
-                              await handleShareQr(false);
-                            }}
-                            className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
-                          >
-                            <ShareIcon className="w-4 h-4" />
-                            <span>{shareActionLabel}</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : null}
+	                      <div className="mt-4 w-full grid grid-cols-2 gap-2">
+	                        <button
+	                          type="button"
+	                          onClick={async e => {
+	                            e.stopPropagation();
+	                            await handleCopyQr(false);
+	                          }}
+	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150"
+	                        >
+	                          {t('ui_copy', 'Copier')}
+	                        </button>
+	                        <button
+	                          type="button"
+	                          onClick={async e => {
+	                            e.stopPropagation();
+	                            await handleShareQr(false);
+	                          }}
+	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
+	                        >
+	                          <ShareIcon className="w-4 h-4" />
+	                          <span>{shareActionLabel}</span>
+	                        </button>
+	                      </div>
+	                    </div>
+	                  </div>
+	                </>
+	              ) : null}
 
 	              {receiveView === 'request' ? (
 	                <>
@@ -1406,27 +1404,25 @@ export default function WalletDashboardReceiveModal({
 
 	              {receiveView === 'request_qr' ? (
 	                <>
-	                  {/* SECTION 3 — REQUEST QR */}
-	                  <div className="space-y-2 pt-2">
-	                    {hasGeneratedRequest ? (
-	                      <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-4">
-	                        <div className="flex items-center justify-center">
-	                          <div ref={requestQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
-	                            <QRCodeCanvas
-	                              value={requestQrValue}
-	                              size={requestQrPixelSize}
-	                              style={{ width: 260, height: 260 }}
-	                              bgColor="#ffffff"
-	                              fgColor="#000000"
-	                              includeMargin={true}
-	                              level="M"
-	                            />
-	                          </div>
-	                        </div>
+		                  {/* SECTION 3 — REQUEST QR */}
+		                  <div className="space-y-2 pt-2">
+		                    {hasGeneratedRequest ? (
+		                      <div className="flex flex-col items-center pt-2 space-y-4">
+		                        <div ref={requestQrContainerRef} className="rounded-xl border border-white/10 bg-white p-3">
+		                          <QRCodeCanvas
+		                            value={requestQrValue}
+		                            size={requestQrPixelSize}
+		                            style={{ width: 260, height: 260 }}
+		                            bgColor="#ffffff"
+		                            fgColor="#000000"
+		                            includeMargin={true}
+		                            level="M"
+		                          />
+		                        </div>
 
-	                        <div className="grid grid-cols-2 gap-2">
-	                          <button
-	                            type="button"
+		                        <div className="grid grid-cols-2 gap-2">
+		                          <button
+		                            type="button"
 	                            onClick={async e => {
 	                              e.stopPropagation();
 	                              await handleCopyQr(true);
@@ -1444,23 +1440,23 @@ export default function WalletDashboardReceiveModal({
 	                            className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 border border-white/10 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2"
 	                          >
 	                            <ShareIcon className="w-4 h-4" />
-	                            <span>{shareActionLabel}</span>
-	                          </button>
-	                        </div>
+		                            <span>{shareActionLabel}</span>
+		                          </button>
+		                        </div>
 
-	                        <div className="text-center space-y-1">
-	                          <div className="text-[12px] text-white/70">{requestDisplayAmountLabel}</div>
-	                          {requestDateLabel ? (
-	                            <div className="text-[11px] text-white/45">{requestDateLabel}</div>
-	                          ) : null}
-	                        </div>
-	                      </div>
-	                    ) : (
-	                      <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] text-white/60 text-sm">
-	                        {t('ui_request_qr_missing', "Aucune demande n'a encore été générée.")}
-	                      </div>
-	                    )}
-	                  </div>
+		                        <div className="text-center space-y-1">
+		                          <div className="text-[12px] text-white/70">{requestDisplayAmountLabel}</div>
+		                          {requestDateLabel ? (
+		                            <div className="text-[11px] text-white/45">{requestDateLabel}</div>
+		                          ) : null}
+		                        </div>
+		                      </div>
+		                    ) : (
+		                      <div className="rounded-[14px] p-4 ring-1 ring-white/10 ring-inset bg-[#101415] text-white/60 text-sm">
+		                        {t('ui_request_qr_missing', "Aucune demande n'a encore été générée.")}
+		                      </div>
+		                    )}
+		                  </div>
 	                </>
 	              ) : null}
 
