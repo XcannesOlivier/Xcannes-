@@ -7,7 +7,7 @@ export default function WalletDashboardActionRow({ onAction }) {
   const cashEnabled = MOONPAY_UI_ENABLED || TOPPER_UI_ENABLED;
   return (
     <div
-      className="px-3 py-2 md:py-3 md:border-b md:border-white/5 space-y-2 md:space-y-3"
+      className="px-3 py-2 md:py-3 border-b border-white/5 space-y-2 md:space-y-3"
     >
       <div className="grid grid-cols-4 gap-2 sm:gap-3">
         <button
