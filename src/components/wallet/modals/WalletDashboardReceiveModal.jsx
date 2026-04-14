@@ -1608,7 +1608,7 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className="w-full h-12 rounded-xl text-white font-semibold transition-all duration-150 hover:scale-[1.01] active:scale-[0.98]"
+                        className="w-full h-16 rounded-xl text-white text-lg font-semibold transition-all duration-150 hover:scale-[1.01] active:scale-[0.98]"
                         style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
                       >
                         {t('ui_generate_request_fr', 'Générer la demande')}
