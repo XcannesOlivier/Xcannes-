@@ -4219,8 +4219,7 @@ export default function WalletDashboardUsdSwapModal({
                         setStep("address");
                       }}
                       className={[
-                        "md:hidden w-full h-16 rounded-xl font-semibold text-lg transition-all duration-150",
-                        isBinanceYellow ? "text-black" : "text-white",
+                        "md:hidden w-full h-16 rounded-xl text-white font-semibold text-xl transition-all duration-150",
                         (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
@@ -4264,8 +4263,7 @@ export default function WalletDashboardUsdSwapModal({
                         setStep("address");
                       }}
                       className={[
-                        "hidden md:flex items-center justify-center w-full h-16 rounded-xl font-semibold text-xl transition-all duration-150",
-                        isBinanceYellow ? "text-black" : "text-white",
+                        "hidden md:flex items-center justify-center w-full h-16 rounded-xl text-white font-semibold text-xl transition-all duration-150",
                         (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
@@ -4472,8 +4470,7 @@ export default function WalletDashboardUsdSwapModal({
                         await createExchange({ returnStep: "address" });
                       }}
                       className={[
-                        "md:hidden w-full h-16 rounded-xl font-semibold text-lg transition-all duration-150",
-                        isBinanceYellow ? "text-black" : "text-white",
+                        "md:hidden w-full h-16 rounded-xl text-white font-semibold text-xl transition-all duration-150",
                         (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
@@ -4520,8 +4517,7 @@ export default function WalletDashboardUsdSwapModal({
                         await createExchange({ returnStep: "address" });
                       }}
                       className={[
-                        "hidden md:flex items-center justify-center w-full h-16 rounded-xl font-semibold text-xl transition-all duration-150",
-                        isBinanceYellow ? "text-black" : "text-white",
+                        "hidden md:flex items-center justify-center w-full h-16 rounded-xl text-white font-semibold text-xl transition-all duration-150",
                         (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
                           ? "opacity-45 cursor-not-allowed"
                           : "hover:scale-[1.01] active:scale-[0.98]",
