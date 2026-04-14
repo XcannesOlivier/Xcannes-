@@ -2129,12 +2129,7 @@ const MoonPaySellModal = ({
 
 		          {wizardStep === 2 ? (
 		            <>
-                  <div
-                    className={[
-                      "rounded-[18px] px-4 py-5 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]",
-                      "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
-                    ].join(" ")}
-                  >
+                  <div className="px-1">
                     <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
                       🏦 {t("ui_send_to_bank_action", "ENVOYER VERS LA BANQUE")}
                     </div>
@@ -2222,7 +2217,12 @@ const MoonPaySellModal = ({
                     </div>
                   </div>
 
-                  <div className="mt-3">
+                  <div
+                    className={[
+                      "mt-3 rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]",
+                      "shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]",
+                    ].join(" ")}
+                  >
 			              <p className="text-[13px] md:text-sm text-white/80 font-semibold">
 		                {isOtherBlockchainsDestination
 		                  ? t(
