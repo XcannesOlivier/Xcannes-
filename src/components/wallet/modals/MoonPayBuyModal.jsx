@@ -2224,12 +2224,7 @@ const MoonPayBuyModal = ({
           <div className="px-1 py-2 text-[15px] md:text-sm leading-snug text-white/85">
             {wizardStep === 2 ? (
               <>
-	                <div
-	                  className={[
-	                    'rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]',
-	                    'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
-	                  ].join(' ')}
-	                >
+	                <div className="px-1">
                   <div className="mb-4 text-[14px] md:text-[16px] font-semibold tracking-[0.08em] text-white/80">
                     💳 {resolvedTitleOverride || t('ui_funds_add_title', 'AUGMENTER VOS SOLDES')}
                   </div>
@@ -2322,28 +2317,35 @@ const MoonPayBuyModal = ({
                   </div>
                 </div>
 
-                <div className="mt-3 space-y-1.5 text-[15px] md:text-sm leading-snug">
-                  <div className="font-semibold text-white">
-                    {t('ui_buy_summary_how_it_works_title', 'Comment ça marche ?')}
+                <div
+                  className={[
+                    'mt-3 rounded-[18px] px-4 py-4 md:px-5 md:py-6 ring-1 ring-white/10 ring-inset bg-[#101415]',
+                    'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
+                  ].join(' ')}
+                >
+                  <div className="space-y-1.5 text-[15px] md:text-sm leading-snug">
+                    <div className="font-semibold text-white">
+                      {t('ui_buy_summary_how_it_works_title', 'Comment ça marche ?')}
+                    </div>
+                    <div className="text-white/70">
+                      {t('ui_buy_summary_how_it_works_step_1', '1. Paiement sécurisé (carte, Apple Pay…)')}
+                    </div>
+                    <div className="text-white/70">
+                      {t('ui_buy_summary_how_it_works_step_2', "2. Achat de l'actif système XRPL (XRP)")}
+                    </div>
+                    <div className="text-white/70">
+                      {t('ui_buy_summary_how_it_works_step_3', '3. Conversion et crédit sur votre compte')}
+                    </div>
+                    <div className={`pt-1 font-semibold ${accentText80}`}>
+                      {t('ui_buy_summary_how_it_works_success', '✓ Tout est automatique — vous validez simplement')}
+                    </div>
                   </div>
-                  <div className="text-white/70">
-                    {t('ui_buy_summary_how_it_works_step_1', '1. Paiement sécurisé (carte, Apple Pay…)')}
-                  </div>
-                  <div className="text-white/70">
-                    {t('ui_buy_summary_how_it_works_step_2', "2. Achat de l'actif système XRPL (XRP)")}
-                  </div>
-                  <div className="text-white/70">
-                    {t('ui_buy_summary_how_it_works_step_3', '3. Conversion et crédit sur votre compte')}
-                  </div>
-                  <div className={`pt-1 font-semibold ${accentText80}`}>
-                    {t('ui_buy_summary_how_it_works_success', '✓ Tout est automatique — vous validez simplement')}
-                  </div>
+                  {!useSimpleSwapPartner ? (
+                    <p className="mt-2 text-[11px] md:text-xs text-white/45">
+                      {t('moonpay_buy_partner_location_note', 'Le partenaire proposé dépend de votre localisation.')}
+                    </p>
+                  ) : null}
                 </div>
-                {!useSimpleSwapPartner ? (
-                  <p className="mt-1 text-[11px] md:text-xs text-white/45">
-                    {t('moonpay_buy_partner_location_note', 'Le partenaire proposé dépend de votre localisation.')}
-                  </p>
-                ) : null}
               </>
             ) : demoMode ? (
               highlightPaymentMethods(
