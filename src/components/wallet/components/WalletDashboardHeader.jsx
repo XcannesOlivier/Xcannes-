@@ -87,20 +87,27 @@ export default function WalletDashboardHeader({
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
+  const isSwitcherClosingRef = useRef(false);
   const switcherRef = useRef(null);
   const hasMultipleWallets = walletAddresses.length > 1;
 
   // Smooth open/close with two-phase state (mount → animate in, animate out → unmount)
   const openSwitcher = () => {
+    isSwitcherClosingRef.current = false;
     setIsSwitcherOpen(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
   };
   const closeSwitcher = () => {
+    if (isSwitcherClosingRef.current) return; // already closing
+    isSwitcherClosingRef.current = true;
     setIsSwitcherVisible(false);
     // Wait for the CSS transition to finish before unmounting
-    setTimeout(() => setIsSwitcherOpen(false), 530);
+    setTimeout(() => {
+      setIsSwitcherOpen(false);
+      isSwitcherClosingRef.current = false;
+    }, 580);
   };
-  const toggleSwitcher = () => (isSwitcherOpen ? closeSwitcher() : openSwitcher());
+  const toggleSwitcher = () => (isSwitcherOpen && !isSwitcherClosingRef.current ? closeSwitcher() : !isSwitcherOpen ? openSwitcher() : undefined);
   const [labelsByAddress, setLabelsByAddress] = useState({});
 
   const trimmed = (v) => String(v || "").trim();
@@ -281,11 +288,12 @@ export default function WalletDashboardHeader({
 	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
-	                  className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px] transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+	                  className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px] transition-opacity duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
 	                    isSwitcherVisible ? "opacity-100" : "opacity-0"
 	                  }`}
 	                  aria-hidden="true"
-	                  onClick={closeSwitcher}
+	                  onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
 	                />
 	              )}
 	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-2.5 md:px-3 py-2 shadow-none">
@@ -323,12 +331,14 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0"
                             : "opacity-0 scale-y-[0.92] -translate-y-1"
                         }`}
                         style={{ willChange: "transform, opacity" }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
                       >
 	                        {walletAddresses.map((w, index) => {
 	                          const addr = typeof w === "string" ? w : w.address;
@@ -387,7 +397,7 @@ export default function WalletDashboardHeader({
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className={`w-[18px] h-[18px] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSwitcherVisible ? "rotate-180" : ""}`}
+                        className={`w-[18px] h-[18px] transition-transform duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isSwitcherVisible ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
