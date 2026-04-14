@@ -879,7 +879,7 @@ export default function WalletDashboardSwapModal({
                         }}
                         disabled={convertButtonDisabled}
                         className={[
-                          "md:hidden w-full h-14 rounded-xl text-white font-semibold transition-all duration-150",
+                          "md:hidden w-full h-14 rounded-xl text-white text-lg font-semibold transition-all duration-150",
                           convertButtonDisabled
                             ? "opacity-45 cursor-not-allowed"
                             : "hover:scale-[1.01] active:scale-[0.98]",
