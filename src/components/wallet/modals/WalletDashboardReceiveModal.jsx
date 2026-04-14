@@ -1121,14 +1121,14 @@ export default function WalletDashboardReceiveModal({
           </button>
           <div
             className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] p-4 border-[20px] border-black"
-            style={{ backgroundColor: '#FFFFFF', filter: 'brightness(0.92)' }}
+            style={{ backgroundColor: '#E8E8E8' }}
             onClick={e => e.stopPropagation()}
           >
             <QRCodeCanvas
               value={qrZoomValue}
               size={1024}
               style={{ width: '100%', height: '100%' }}
-              bgColor="#FFFFFF"
+              bgColor="#E8E8E8"
               fgColor="#000000"
               includeMargin={true}
               level="M"
@@ -1384,14 +1384,14 @@ export default function WalletDashboardReceiveModal({
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[20px] border-black"
-	                          style={{ backgroundColor: '#FFFFFF', filter: 'brightness(0.92)' }}
+	                          style={{ backgroundColor: '#E8E8E8' }}
 	                          onClick={() => setQrZoomValue(receiveQrValue)}
 	                        >
 	                          <QRCodeCanvas
 	                            value={receiveQrValue}
 	                            size={qrPixelSize}
 	                            style={{ width: '100%', height: '100%' }}
-	                            bgColor="#FFFFFF"
+	                            bgColor="#E8E8E8"
 	                            fgColor="#000000"
 	                            includeMargin={true}
 	                            level="M"
@@ -1686,14 +1686,14 @@ export default function WalletDashboardReceiveModal({
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[20px] border-black"
-				                            style={{ backgroundColor: '#FFFFFF', filter: 'brightness(0.92)' }}
+				                            style={{ backgroundColor: '#E8E8E8' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
 					                          <QRCodeCanvas
 					                            value={requestQrValue}
 					                            size={requestQrPixelSize}
 					                            style={{ width: '100%', height: '100%' }}
-					                            bgColor="#FFFFFF"
+					                            bgColor="#E8E8E8"
 					                            fgColor="#000000"
 					                            includeMargin={true}
 					                            level="M"
