@@ -179,6 +179,22 @@ export default function WalletDashboard({
 
   const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } = useWalletToast();
 
+  // ── Smooth wallet-switch transition ─────────────────────────
+  const prevWalletRef = useRef(wallet);
+  const [walletSwitchFade, setWalletSwitchFade] = useState(false);
+
+  useEffect(() => {
+    if (prevWalletRef.current && wallet && prevWalletRef.current !== wallet) {
+      // New wallet selected → fade out immediately
+      setWalletSwitchFade(true);
+      // Fade back in after a short delay (data will reload in the meantime)
+      const timer = setTimeout(() => setWalletSwitchFade(false), 420);
+      prevWalletRef.current = wallet;
+      return () => clearTimeout(timer);
+    }
+    prevWalletRef.current = wallet;
+  }, [wallet]);
+
   // ── Transaction progress modal state ────────────────────────
   const [txProgress, setTxProgress] = useState({
     visible: false,
@@ -1067,7 +1083,7 @@ export default function WalletDashboard({
             : 'flex flex-col'
         }`}
       >
-        <div className="flex flex-col min-h-0">
+        <div className={`flex flex-col min-h-0 transition-opacity duration-[420ms] ease-in-out ${walletSwitchFade ? 'opacity-0' : 'opacity-100'}`}>
           {/* Header */}
           <WalletDashboardHeader
             isConnected={isConnected}
