@@ -180,20 +180,25 @@ export default function WalletDashboard({
   const { toasts, confirmState, toast, confirm, dismissToast, resolveConfirm } = useWalletToast();
 
   // ── Smooth wallet-switch transition ─────────────────────────
-  const prevWalletRef = useRef(wallet);
   const [walletSwitchFade, setWalletSwitchFade] = useState(false);
+  const switchFadeTimerRef = useRef(null);
+
+  const handleSwitchWallet = useCallback((addr) => {
+    if (!addr || addr === wallet) return;
+    // 1) Fade out immediately (before data changes)
+    setWalletSwitchFade(true);
+    // 2) After content is invisible, perform the actual switch
+    clearTimeout(switchFadeTimerRef.current);
+    switchFadeTimerRef.current = setTimeout(() => {
+      switchWallet(addr);
+      // 3) Fade back in after a short pause for data to settle
+      switchFadeTimerRef.current = setTimeout(() => setWalletSwitchFade(false), 250);
+    }, 180); // just enough time for opacity to reach ~0
+  }, [wallet, switchWallet]);
 
   useEffect(() => {
-    if (prevWalletRef.current && wallet && prevWalletRef.current !== wallet) {
-      // New wallet selected → fade out immediately
-      setWalletSwitchFade(true);
-      // Fade back in after a short delay (data will reload in the meantime)
-      const timer = setTimeout(() => setWalletSwitchFade(false), 600);
-      prevWalletRef.current = wallet;
-      return () => clearTimeout(timer);
-    }
-    prevWalletRef.current = wallet;
-  }, [wallet]);
+    return () => clearTimeout(switchFadeTimerRef.current);
+  }, []);
 
   // ── Transaction progress modal state ────────────────────────
   const [txProgress, setTxProgress] = useState({
@@ -1100,7 +1105,7 @@ export default function WalletDashboard({
             isWalletLabelLocked={isWalletLabelLocked}
             showMobileHomeLink={showMobileHomeLink}
             walletAddresses={walletAddresses}
-            onSwitchWallet={switchWallet}
+            onSwitchWallet={handleSwitchWallet}
             isDesktopPanel={isDesktopPanel}
             onOpenInfo={handleOpenInfo}
             onOpenXrplActivity={handleOpenXrplActivity}

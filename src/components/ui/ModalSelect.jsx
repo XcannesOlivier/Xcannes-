@@ -106,17 +106,17 @@ export default function ModalSelect({
 
   return (
     <>
+      {open && backdropClassName ? (
+        <div
+          className={`fixed inset-0 z-40 transition-opacity duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            visible ? "opacity-100" : "opacity-0"
+          } ${backdropClassName}`}
+          aria-hidden="true"
+          onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+          onClick={(e) => { e.stopPropagation(); closeMenu(); }}
+        />
+      ) : null}
       <div className={customMenuClassName}>
-        {open && backdropClassName ? (
-          <div
-            className={`fixed inset-0 z-40 transition-opacity duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              visible ? "opacity-100" : "opacity-0"
-            } ${backdropClassName}`}
-            aria-hidden="true"
-            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
-            onClick={(e) => { e.stopPropagation(); closeMenu(); }}
-          />
-        ) : null}
         <button
           type="button"
           ref={triggerRef}
