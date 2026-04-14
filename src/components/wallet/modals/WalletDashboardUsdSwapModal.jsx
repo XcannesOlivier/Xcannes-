@@ -2873,7 +2873,7 @@ export default function WalletDashboardUsdSwapModal({
                     </div>
                     <div className="mt-1 text-white font-semibold text-lg leading-tight">
                       {String(receiveAmountExact || "").trim()
-                        ? `${receiveAmountExact} ${partnerToTicker}`
+                        ? `${receiveAmountExact} ${direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? "XRP" : partnerToTicker}`
                         : (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD
                             ? quotedPartnerReceiveAmount
                             : quotedReceiveAmount)
@@ -2889,8 +2889,8 @@ export default function WalletDashboardUsdSwapModal({
                                       ? quotedPartnerReceiveAmount
                                       : quotedReceiveAmount,
                                   )
-                            } ${partnerToTicker}`
-                          : `— ${partnerToTicker}`}
+                            } ${direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? "XRP" : partnerToTicker}`
+                          : `— ${direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? "XRP" : partnerToTicker}`}
                     </div>
                     {direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD ? (
                       <div className="mt-3 text-[11px] text-white/55">
