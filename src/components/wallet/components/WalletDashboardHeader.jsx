@@ -98,7 +98,7 @@ export default function WalletDashboardHeader({
   const closeSwitcher = () => {
     setIsSwitcherVisible(false);
     // Wait for the CSS transition to finish before unmounting
-    setTimeout(() => setIsSwitcherOpen(false), 220);
+    setTimeout(() => setIsSwitcherOpen(false), 380);
   };
   const toggleSwitcher = () => (isSwitcherOpen ? closeSwitcher() : openSwitcher());
   const [labelsByAddress, setLabelsByAddress] = useState({});
@@ -279,7 +279,15 @@ export default function WalletDashboardHeader({
         {isConnected && wallet && (
           <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 px-1 md:px-2 flex justify-center">
 	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
-	
+	              {isSwitcherOpen && hasMultipleWallets && (
+	                <div
+	                  className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px] transition-opacity duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+	                    isSwitcherVisible ? "opacity-100" : "opacity-0"
+	                  }`}
+	                  aria-hidden="true"
+	                  onClick={closeSwitcher}
+	                />
+	              )}
 	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-2.5 md:px-3 py-2 shadow-none">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
@@ -315,7 +323,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-[#101415]/95 backdrop-blur-md border border-white/[0.08] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-200 ease-out ${
+                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0"
                             : "opacity-0 scale-y-[0.92] -translate-y-1"
@@ -340,11 +348,7 @@ export default function WalletDashboardHeader({
                                 if (!isActive) onSwitchWallet?.(addr);
                                 closeSwitcher();
                               }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors duration-150 ${
-                                isActive
-                                  ? "bg-xcannes-green/10 border-l-2 border-xcannes-green"
-                                  : "hover:bg-white/[0.06] border-l-2 border-transparent"
-                              }`}
+                              className="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors duration-150 hover:bg-white/[0.06]"
                             >
                               <span
                                 className={`h-2 w-2 rounded-full shrink-0 transition-colors duration-150 ${
@@ -367,11 +371,6 @@ export default function WalletDashboardHeader({
 		                                  {addr}
 		                                </div>
 		                              </div>
-                              {isActive && (
-                                <span className="ml-auto text-[11px] text-xcannes-green/80 font-medium uppercase tracking-wider">
-                                  {t("ui_active_wallet", "actif")}
-                                </span>
-                              )}
                             </button>
                           );
                         })}
@@ -388,7 +387,7 @@ export default function WalletDashboardHeader({
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className={`w-[18px] h-[18px] transition-transform duration-200 ease-out ${isSwitcherVisible ? "rotate-180" : ""}`}
+                        className={`w-[18px] h-[18px] transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${isSwitcherVisible ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
