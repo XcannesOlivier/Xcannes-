@@ -315,6 +315,10 @@ export default function WalletDashboardReceiveModal({
 	      .filter(Boolean);
 	  }, [activeWalletLabel, shortAddress, trimmed, wallet, walletList]);
 
+	  const shareWalletOptions = useMemo(() => {
+	    return walletOptions.map(opt => ({ ...opt, labelRight: undefined }));
+	  }, [walletOptions]);
+
 	  const walletPickerSurfaceClass =
 	    receiveView === 'share' ? 'bg-white/[0.02]' : 'bg-transparent';
 
@@ -1296,16 +1300,16 @@ export default function WalletDashboardReceiveModal({
 	                            if (!addr || addr === wallet) return;
 	                            onSwitchWallet?.(addr);
 	                          }}
-	                          options={walletOptions}
+	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
 	                          iconClassName="inline-flex items-center justify-center leading-none"
-	                          buttonClassName="w-full bg-transparent hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+	                          buttonClassName="w-full bg-transparent hover:bg-white/5 rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
 	                            noticeVariant === 'demo'
 	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 	                              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 	                          }
-	                          selectClassName="xcannes-select w-full bg-transparent ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150"
+	                          selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
 	                        />
 	                      ) : (
 	                        <div className="flex items-center gap-2 mb-1">
