@@ -188,7 +188,7 @@ export default function WalletDashboard({
       // New wallet selected → fade out immediately
       setWalletSwitchFade(true);
       // Fade back in after a short delay (data will reload in the meantime)
-      const timer = setTimeout(() => setWalletSwitchFade(false), 420);
+      const timer = setTimeout(() => setWalletSwitchFade(false), 600);
       prevWalletRef.current = wallet;
       return () => clearTimeout(timer);
     }
@@ -1083,7 +1083,7 @@ export default function WalletDashboard({
             : 'flex flex-col'
         }`}
       >
-        <div className={`flex flex-col min-h-0 transition-opacity duration-[420ms] ease-in-out ${walletSwitchFade ? 'opacity-0' : 'opacity-100'}`}>
+        <div className={`flex flex-col min-h-0 transition-opacity duration-[600ms] ease-in-out ${walletSwitchFade ? 'opacity-0' : 'opacity-100'}`}>
           {/* Header */}
           <WalletDashboardHeader
             isConnected={isConnected}
