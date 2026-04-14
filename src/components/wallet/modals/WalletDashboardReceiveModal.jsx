@@ -1120,7 +1120,7 @@ export default function WalletDashboardReceiveModal({
             </svg>
           </button>
           <div
-            className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] border-[20px] border-black flex items-center justify-center"
+            className="w-[80vw] max-w-[360px] aspect-square rounded-none border-[20px] border-black flex items-center justify-center"
             style={{ backgroundColor: '#E8E8E8' }}
             onClick={e => e.stopPropagation()}
           >
@@ -1383,7 +1383,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="w-full flex flex-col items-center">
 	                        <div
 	                          ref={receiveQrContainerRef}
-	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[20px] border-black"
+	                          className="w-[220px] md:w-[200px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
 	                          style={{ backgroundColor: '#E8E8E8' }}
 	                          onClick={() => setQrZoomValue(receiveQrValue)}
 	                        >
@@ -1393,7 +1393,7 @@ export default function WalletDashboardReceiveModal({
 	                            style={{ width: '100%', height: '100%' }}
 	                            bgColor="#E8E8E8"
 	                            fgColor="#000000"
-	                            includeMargin={true}
+	                            includeMargin={false}
 	                            level="M"
 	                          />
 	                        </div>
@@ -1685,7 +1685,7 @@ export default function WalletDashboardReceiveModal({
 					                        <div className="w-full flex flex-col items-center">
 				                          <div
 				                            ref={requestQrContainerRef}
-				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[20px] border-black"
+				                            className="w-[220px] md:w-[200px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
 				                            style={{ backgroundColor: '#E8E8E8' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
