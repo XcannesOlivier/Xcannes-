@@ -1120,14 +1120,14 @@ export default function WalletDashboardReceiveModal({
             </svg>
           </button>
           <div
-            className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] p-4 border-[20px] border-black"
+            className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] border-[20px] border-black flex items-center justify-center"
             style={{ backgroundColor: '#E8E8E8' }}
             onClick={e => e.stopPropagation()}
           >
             <QRCodeCanvas
               value={qrZoomValue}
               size={1024}
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: '100%', height: '100%', display: 'block' }}
               bgColor="#E8E8E8"
               fgColor="#000000"
               includeMargin={true}
