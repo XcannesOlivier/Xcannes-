@@ -1593,7 +1593,7 @@ export default function WalletDashboardReceiveModal({
 					                          </div>
 
 					                          {generatedRequest?.memo ? (
-					                            <div className="mt-2 flex items-start gap-2">
+					                            <div className="mt-2 flex items-baseline gap-2">
 					                              <span className="shrink-0 text-[11px] tracking-[0.12em] uppercase text-white/40">
 					                                {t('ui_memo_label', 'Memo')}
 					                              </span>
