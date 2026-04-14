@@ -1597,7 +1597,9 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <div className="mt-5 mb-5 h-px bg-white/10" />
+                      <div className="py-5">
+                        <div className="h-px bg-white/10" />
+                      </div>
 
                       <button
                         type="button"
