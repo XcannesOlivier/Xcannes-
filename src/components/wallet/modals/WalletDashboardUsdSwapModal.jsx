@@ -3434,38 +3434,6 @@ export default function WalletDashboardUsdSwapModal({
                               {t("ui_variable_rate", "Taux variable")}
                             </div>
                           </div>
-
-                          {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE ? (
-                            <div className="mt-4 pt-4 border-t border-white/10">
-                              <label
-                                htmlFor="usd-swap-receive-address-inline"
-                                className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2"
-                              >
-                                {t("ui_receive_address", "Adresse de réception")}
-                              </label>
-                              <input
-                                id="usd-swap-receive-address-inline"
-                                type="text"
-                                value={receiveAddress}
-                                onChange={(e) => {
-                                  setReceiveAddress(e.target.value);
-                                  setApiError("");
-                                }}
-                                placeholder={t(
-                                  "ui_usd_swap_receive_address_placeholder",
-                                  "Adresse du wallet de réception (ex: 0x... / T...)",
-                                )}
-                                className={`w-full rounded-xl bg-black/30 ring-1 ring-inset px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 transition-all duration-150 ${hasReceiveAddressValidationError ? "ring-red-500/40 focus:ring-red-500/60" : `ring-white/15 ${accentRing60}`}`}
-                                autoComplete="off"
-                                spellCheck={false}
-                              />
-                              {hasReceiveAddressValidationError ? (
-                                <p className="mt-2 text-[11px] text-red-300">
-                                  {receiveAddressErrorMessage}
-                                </p>
-                              ) : null}
-                            </div>
-                          ) : null}
                         </div>
                       </div>
                     </div>
