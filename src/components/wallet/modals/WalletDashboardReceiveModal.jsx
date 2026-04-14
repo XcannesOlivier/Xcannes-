@@ -1537,7 +1537,7 @@ export default function WalletDashboardReceiveModal({
 			                          type="text"
 				                          value={requestMemo}
 				                          onChange={e => setRequestMemo(e.target.value)}
-				                          placeholder={t('ui_payment_memo_placeholder', 'Objet du paiement (optionnel)')}
+				                          placeholder={t('ui_request_memo_placeholder', 'Objet de la demande')}
 				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
 				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 				                          }`}
