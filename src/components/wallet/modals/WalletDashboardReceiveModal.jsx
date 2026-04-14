@@ -189,12 +189,6 @@ export default function WalletDashboardReceiveModal({
 	  const receiveQrContainerRef = useRef(null);
 	  const requestQrContainerRef = useRef(null);
 	  const [qrZoomValue, setQrZoomValue] = useState(null);
-	  const [qrBrightness, setQrBrightness] = useState(91);
-	  const qrBgHex = useMemo(() => {
-	    const v = Math.round(qrBrightness * 2.55);
-	    const h = v.toString(16).padStart(2, '0');
-	    return `#${h}${h}${h}`;
-	  }, [qrBrightness]);
 	  const [localReceiveTab, setLocalReceiveTab] = useState('choice');
 
   const setReceiveTabSafe = setReceiveTab || setLocalReceiveTab;
@@ -1127,14 +1121,14 @@ export default function WalletDashboardReceiveModal({
           </button>
           <div
             className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] p-4"
-            style={{ backgroundColor: qrBgHex }}
+            style={{ backgroundColor: '#FFFFFF' }}
             onClick={e => e.stopPropagation()}
           >
             <QRCodeCanvas
               value={qrZoomValue}
               size={1024}
               style={{ width: '100%', height: '100%' }}
-              bgColor={qrBgHex}
+              bgColor="#FFFFFF"
               fgColor="#000000"
               includeMargin={true}
               level="M"
@@ -1387,43 +1381,22 @@ export default function WalletDashboardReceiveModal({
 
 	                    {/* ── QR Code ── */}
 	                    <div className="w-full flex flex-col items-center">
-	                      <div className="relative">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer"
-	                          style={{ backgroundColor: qrBgHex }}
+	                          style={{ backgroundColor: '#FFFFFF' }}
 	                          onClick={() => setQrZoomValue(receiveQrValue)}
 	                        >
 	                          <QRCodeCanvas
 	                            value={receiveQrValue}
 	                            size={qrPixelSize}
 	                            style={{ width: '100%', height: '100%' }}
-	                            bgColor={qrBgHex}
+	                            bgColor="#FFFFFF"
 	                            fgColor="#000000"
 	                            includeMargin={true}
 	                            level="M"
 	                          />
 	                        </div>
-	                        {/* Brightness slider — absolute so it doesn’t shift QR centering */}
-	                        <div className="absolute left-[calc(100%+32px)] top-0 bottom-0 flex flex-col items-center gap-1 py-1 md:py-3">
-	                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4.5 h-4.5 text-white/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-	                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-	                          </svg>
-	                          <input
-	                            type="range"
-	                            min={30}
-	                            max={100}
-	                            value={qrBrightness}
-	                            onChange={e => setQrBrightness(Number(e.target.value))}
-	                            className="qr-brightness-slider flex-1"
-	                            style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
-	                            aria-label="Luminosité du QR"
-	                          />
-	                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/45 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-	                            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-	                          </svg>
-	                        </div>
-	                      </div>
 	                      <button
 	                        type="button"
 	                        onClick={() => setQrZoomValue(receiveQrValue)}
@@ -1710,43 +1683,22 @@ export default function WalletDashboardReceiveModal({
 
 					                        {/* ── QR Code ── */}
 					                        <div className="w-full flex flex-col items-center">
-					                          <div className="relative">
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer"
-				                            style={{ backgroundColor: qrBgHex }}
+				                            style={{ backgroundColor: '#FFFFFF' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
 					                          <QRCodeCanvas
 					                            value={requestQrValue}
 					                            size={requestQrPixelSize}
 					                            style={{ width: '100%', height: '100%' }}
-					                            bgColor={qrBgHex}
+					                            bgColor="#FFFFFF"
 					                            fgColor="#000000"
 					                            includeMargin={true}
 					                            level="M"
 					                          />
 				                          </div>
-					                          {/* Brightness slider — absolute so it doesn’t shift QR centering */}
-					                          <div className="absolute left-[calc(100%+32px)] top-0 bottom-0 flex flex-col items-center gap-1 py-1 md:py-3">
-					                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4.5 h-4.5 text-white/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-					                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-					                            </svg>
-					                            <input
-					                              type="range"
-					                              min={30}
-					                              max={100}
-					                              value={qrBrightness}
-					                              onChange={e => setQrBrightness(Number(e.target.value))}
-					                              className="qr-brightness-slider flex-1"
-					                              style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
-					                              aria-label="Luminosité du QR"
-					                            />
-					                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/45 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-					                              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-					                            </svg>
-					                          </div>
-					                          </div>
 				                          <button
 				                            type="button"
 				                            onClick={() => setQrZoomValue(requestQrValue)}
