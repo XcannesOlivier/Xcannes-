@@ -1528,10 +1528,10 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 					                      </div>
 
-	                      {/* Memo (optional) */}
+	                      {/* Message (optional) */}
 			                      <div className="pt-4">
 			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
-			                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
+			                          {t('ui_message_optional_label', 'Message (optional)')}
 			                        </label>
 				                        <input
 			                          type="text"
