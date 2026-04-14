@@ -1238,7 +1238,7 @@ export default function WalletDashboardReceiveModal({
                       {t('ui_receive_choice_decision_title', 'Comment voulez-vous recevoir ?')}
                     </h3>
                     <p className="mt-2 text-[14px] md:text-[15px] text-white/60 max-w-[34ch] leading-relaxed">
-                      {t('ui_receive_choice_decision_subtitle', 'Partagez votre QR ou créez une demande avec montant')}
+                      {t('ui_receive_choice_decision_subtitle', 'Partagez votre QR ou créez une demande avec le montant')}
                     </p>
                     <div
                       className="mt-5 w-12 h-12 rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.45)] flex items-center justify-center text-xcannes-green/90"

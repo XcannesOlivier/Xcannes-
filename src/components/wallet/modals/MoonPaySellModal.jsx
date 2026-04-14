@@ -7,17 +7,13 @@ import {
   ArrowDownIcon,
   ChevronLeftIcon,
 } from "@heroicons/react/24/outline";
-import SwipeConfirmButton from "@/components/ui/SwipeConfirmButton";
 import { useTranslation } from "next-i18next";
 import { useModalTransition } from "@/hooks/useModalTransition";
 import xcannesApi from "@/lib/xcannesApi";
 import { getCurrencyFlag, formatAmountWithSymbol } from "../walletDashboardConfig";
 import { getCurrencyDescription } from "@/utils/currencyDescriptions";
 import { isIOSDevice } from "@/utils/deviceDetect";
-import {
-  fireOrangeActionBtnBase,
-  violetActionBtnBase,
-} from "./walletModalTokens";
+
 
 const DEBUG_LOGS = process.env.NEXT_PUBLIC_DEBUG_LOGS === "true";
 const MOONPAY_ORIGIN_SUFFIX = ".moonpay.com";
@@ -2314,25 +2310,50 @@ const MoonPaySellModal = ({
           )}
 
 	          {/* Continue button */}
-			          <SwipeConfirmButton
-			            label={continueLabel}
-			            onConfirm={handleContinue}
-			            disabled={continueDisabled}
-			            variant={isSendToWalletFlow ? "fireOrange" : "xcannesViolet"}
-			            className="md:hidden"
-			          />
-			          <button
-			            type="button"
-			            onClick={handleContinue}
-			            disabled={continueDisabled}
-			            className={`hidden md:block w-full text-xl py-4 ${
-			              isSendToWalletFlow
-			                ? fireOrangeActionBtnBase
-			                : violetActionBtnBase
-			            }`}
-			          >
-			            {continueLabel}
-			          </button>
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={continueDisabled}
+            className={[
+              "md:hidden w-full h-12 rounded-xl text-white font-semibold transition-all duration-150",
+              continueDisabled
+                ? "opacity-45 cursor-not-allowed"
+                : "hover:scale-[1.01] active:scale-[0.98]",
+            ].join(" ")}
+            style={continueDisabled
+              ? { background: isSendToWalletFlow
+                  ? 'linear-gradient(180deg, rgba(255,106,0,0.45) 0%, rgba(232,95,0,0.45) 100%)'
+                  : 'linear-gradient(180deg, rgba(124,58,237,0.45) 0%, rgba(91,33,182,0.45) 100%)' }
+              : { background: isSendToWalletFlow
+                  ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
+                  : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
+                boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+            }
+          >
+            {continueLabel}
+          </button>
+          <button
+            type="button"
+            onClick={handleContinue}
+            disabled={continueDisabled}
+            className={[
+              "hidden md:block w-full h-12 rounded-xl text-white text-xl font-semibold transition-all duration-150 py-4",
+              continueDisabled
+                ? "opacity-45 cursor-not-allowed"
+                : "hover:scale-[1.01] active:scale-[0.98]",
+            ].join(" ")}
+            style={continueDisabled
+              ? { background: isSendToWalletFlow
+                  ? 'linear-gradient(180deg, rgba(255,106,0,0.45) 0%, rgba(232,95,0,0.45) 100%)'
+                  : 'linear-gradient(180deg, rgba(124,58,237,0.45) 0%, rgba(91,33,182,0.45) 100%)' }
+              : { background: isSendToWalletFlow
+                  ? 'linear-gradient(180deg, rgba(255,106,0,1) 0%, rgba(232,95,0,1) 100%)'
+                  : 'linear-gradient(180deg, rgba(124,58,237,1) 0%, rgba(91,33,182,1) 100%)',
+                boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+            }
+          >
+            {continueLabel}
+          </button>
 		          <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
 		            <span>
 		              {isSendToWalletFlow

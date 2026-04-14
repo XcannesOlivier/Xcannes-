@@ -897,8 +897,17 @@ export default function WalletDashboardSwapModal({
                           e.stopPropagation();
                           handleConvertAction();
                         }}
-                        className={`hidden md:block w-full text-xl py-4 ${greenActionBtnBase}`}
                         disabled={convertButtonDisabled}
+                        className={[
+                          "hidden md:block w-full h-12 rounded-xl text-white text-xl font-semibold transition-all duration-150 py-4",
+                          convertButtonDisabled
+                            ? "opacity-45 cursor-not-allowed"
+                            : "hover:scale-[1.01] active:scale-[0.98]",
+                        ].join(" ")}
+                        style={convertButtonDisabled
+                          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+                          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                        }
                       >
                         {convertButtonLabel}
                       </button>
