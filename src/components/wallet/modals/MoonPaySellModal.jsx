@@ -2337,7 +2337,7 @@ const MoonPaySellModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex items-center justify-center w-full h-12 rounded-xl text-white text-xl font-semibold transition-all duration-150",
+              "hidden md:flex items-center justify-center w-full h-14 rounded-xl text-white text-xl font-semibold transition-all duration-150",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
