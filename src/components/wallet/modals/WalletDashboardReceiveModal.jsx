@@ -1478,7 +1478,7 @@ export default function WalletDashboardReceiveModal({
 					                        {/* ── Header card (match "Augmenter vos soldes" style) ── */}
 					                        <div
 					                          className={[
-					                            'rounded-[14px] px-4 py-4 bg-[#101415]',
+					                            'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]',
 					                            'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 					                          ].join(' ')}
 					                        >
@@ -1526,12 +1526,10 @@ export default function WalletDashboardReceiveModal({
 					                        </div>
 
 					                        {/* ── QR Code ── */}
+					                        <div className="w-full flex justify-center">
 				                        <div
 				                          ref={requestQrContainerRef}
-				                          className={[
-				                            'w-full max-w-[260px] md:max-w-[240px] mx-auto aspect-square rounded-[14px] bg-white p-3',
-				                            'ring-1 ring-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
-				                          ].join(' ')}
+				                          className="w-[260px] md:w-[240px] aspect-square rounded-[14px] bg-white p-3 ring-1 ring-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 				                        >
 					                          <QRCodeCanvas
 					                            value={requestQrValue}
@@ -1542,6 +1540,7 @@ export default function WalletDashboardReceiveModal({
 					                            includeMargin={true}
 					                            level="M"
 					                          />
+					                        </div>
 					                        </div>
 
 					                        {/* ── Actions ── */}
@@ -1565,7 +1564,8 @@ export default function WalletDashboardReceiveModal({
 	                              e.stopPropagation();
 	                              await handleShareQr(true);
 	                            }}
-	                            className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-white font-semibold transition-colors duration-150 inline-flex items-center justify-center gap-2 shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+	                            className="w-full h-12 rounded-xl text-white font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98]"
+	                            style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
 	                          >
 	                            <ShareIcon className="w-4 h-4" />
 			                            <span>{shareActionLabel}</span>
