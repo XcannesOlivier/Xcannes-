@@ -1461,9 +1461,8 @@ export default function WalletDashboardReceiveModal({
 	                      ) : null}
 	                    </div>
 
-	                    <div className="rounded-[14px] bg-[#101415] p-4 space-y-4 ring-1 ring-white/10 ring-inset">
 		                      {/* Currency */}
-			                      <div className="rounded-[14px] p-3">
+			                      <div className="pt-2">
 			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 			                          {t('ui_currency_1ed55673be', 'Currency')}
 		                        </label>
@@ -1509,7 +1508,7 @@ export default function WalletDashboardReceiveModal({
 			                      </div>
 	
 	                      {/* Memo (optional) */}
-			                      <div className="rounded-[14px] p-3">
+			                      <div className="pt-4">
 			                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 			                          {t('ui_memo_optional_d9594474c7', 'Memo (optional)')}
 			                        </label>
@@ -1525,7 +1524,7 @@ export default function WalletDashboardReceiveModal({
 				                      </div>
 
 		                      {/* Amount */}
-					                      <div className="rounded-[14px] p-3">
+					                      <div className="pt-4">
 					                        <label className="block text-[11px] tracking-[0.22em] uppercase text-white/45 mb-2">
 					                          {t('ui_amount_7668986206', 'Amount')}
 					                        </label>
@@ -1551,17 +1550,16 @@ export default function WalletDashboardReceiveModal({
                           e.stopPropagation();
                           handleGenerateRequest();
                         }}
-                        className="w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors duration-150"
+                        className="mt-4 w-full h-12 rounded-xl bg-xcannes-green hover:bg-xcannes-green/90 text-black font-semibold transition-colors duration-150"
                       >
                         {t('ui_generate_request_fr', 'Générer la demande')}
                       </button>
 
 	                      {generateError ? (
-	                        <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+	                        <div className="mt-2 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
 	                          {generateError}
 	                        </div>
 	                      ) : null}
-	                    </div>
 	                  </div>
 	                </>
 	              ) : null}
