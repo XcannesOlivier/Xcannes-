@@ -344,9 +344,10 @@ export default function WalletDashboardReceiveModal({
 	          buttonClassName={`${walletPickerSurfaceClass} hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150`}
 	          menuClassName={
 	            noticeVariant === 'demo'
-	              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
-	              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y'
+	              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y'
 	          }
+	          backdropClassName="bg-black/35 backdrop-blur-[1px]"
 	          selectClassName={`xcannes-select w-full ${walletPickerSurfaceClass} ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150`}
 	        />
 	      </div>

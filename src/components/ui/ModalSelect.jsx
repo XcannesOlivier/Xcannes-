@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { isValidElement, useEffect, useMemo, useRef, useState } from "react";
+import { isValidElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function ModalSelect({
   value,
@@ -21,19 +21,42 @@ export default function ModalSelect({
   disabled = false,
 }) {
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const isClosingRef = useRef(false);
   const popupRef = useRef(null);
   const triggerRef = useRef(null);
+
+  const openMenu = useCallback(() => {
+    isClosingRef.current = false;
+    setOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    if (isClosingRef.current) return;
+    isClosingRef.current = true;
+    setVisible(false);
+    setTimeout(() => {
+      setOpen(false);
+      isClosingRef.current = false;
+    }, 380);
+  }, []);
+
+  const toggleMenu = useCallback(() => {
+    if (open && !isClosingRef.current) closeMenu();
+    else if (!open) openMenu();
+  }, [open, openMenu, closeMenu]);
 
   useEffect(() => {
     if (!open) return;
     const handleClick = (event) => {
       if (popupRef.current && popupRef.current.contains(event.target)) return;
       if (triggerRef.current && triggerRef.current.contains(event.target)) return;
-      setOpen(false);
+      closeMenu();
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+  }, [open, closeMenu]);
 
   const selected = useMemo(() => {
     return options.find((opt) => String(opt.value) === String(value)) || null;
@@ -41,7 +64,7 @@ export default function ModalSelect({
 
   const handleSelect = (nextValue) => {
     onChange?.(nextValue);
-    setOpen(false);
+    closeMenu();
   };
 
   const renderIcon = (icon) => {
@@ -86,9 +109,12 @@ export default function ModalSelect({
       <div className={customMenuClassName}>
         {open && backdropClassName ? (
           <div
-            className={`fixed inset-0 z-40 ${backdropClassName}`}
+            className={`fixed inset-0 z-40 transition-opacity duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              visible ? "opacity-100" : "opacity-0"
+            } ${backdropClassName}`}
             aria-hidden="true"
-            onClick={() => setOpen(false)}
+            onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
+            onClick={(e) => { e.stopPropagation(); closeMenu(); }}
           />
         ) : null}
         <button
@@ -98,7 +124,7 @@ export default function ModalSelect({
           onClick={(e) => {
             e.stopPropagation();
             if (disabled) return;
-            setOpen((prev) => !prev);
+            toggleMenu();
           }}
           className={`w-full flex items-center justify-between gap-2 ${
             open && backdropClassName ? "relative z-50" : ""
@@ -121,8 +147,8 @@ export default function ModalSelect({
             </span>
           </span>
           <svg
-            className={`w-3 h-3 transition-transform ${
-              open ? "rotate-180" : ""
+            className={`w-3 h-3 transition-transform duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              visible ? "rotate-180" : ""
             }`}
             fill="none"
             stroke="currentColor"
@@ -139,8 +165,13 @@ export default function ModalSelect({
         {open && (
           <div
             ref={popupRef}
-            className={`absolute z-50 mt-1 w-full max-h-64 overflow-y-auto rounded-lg border border-white/10 shadow-2xl ${menuClassName}`}
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className={`absolute z-50 mt-1 w-full max-h-64 overflow-y-auto rounded-lg border border-white/[0.06] shadow-2xl origin-top transition-all duration-[350ms] ${
+              visible
+                ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
+            } ${menuClassName}`}
+            style={{ WebkitOverflowScrolling: "touch", willChange: "transform, opacity" }}
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => e.stopPropagation()}
           >
             {options.map((opt) => {
