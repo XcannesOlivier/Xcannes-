@@ -86,8 +86,21 @@ export default function WalletDashboardHeader({
 }) {
   const { t } = useTranslation("common");
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+  const [isSwitcherVisible, setIsSwitcherVisible] = useState(false);
   const switcherRef = useRef(null);
   const hasMultipleWallets = walletAddresses.length > 1;
+
+  // Smooth open/close with two-phase state (mount → animate in, animate out → unmount)
+  const openSwitcher = () => {
+    setIsSwitcherOpen(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setIsSwitcherVisible(true)));
+  };
+  const closeSwitcher = () => {
+    setIsSwitcherVisible(false);
+    // Wait for the CSS transition to finish before unmounting
+    setTimeout(() => setIsSwitcherOpen(false), 220);
+  };
+  const toggleSwitcher = () => (isSwitcherOpen ? closeSwitcher() : openSwitcher());
   const [labelsByAddress, setLabelsByAddress] = useState({});
 
   const trimmed = (v) => String(v || "").trim();
@@ -210,11 +223,18 @@ export default function WalletDashboardHeader({
     if (!isSwitcherOpen) return;
     const handleClickOutside = (e) => {
       if (isSwitcherOpen && switcherRef.current && !switcherRef.current.contains(e.target)) {
-        setIsSwitcherOpen(false);
+        closeSwitcher();
       }
     };
+    const handleEscape = (e) => {
+      if (e.key === "Escape") closeSwitcher();
+    };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, [isSwitcherOpen]);
 
   return (
@@ -259,20 +279,14 @@ export default function WalletDashboardHeader({
         {isConnected && wallet && (
           <div className="w-full mt-1 md:mt-1.5 mb-2 md:mb-3 px-1 md:px-2 flex justify-center">
 	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
-	              {isSwitcherOpen && hasMultipleWallets ? (
-	                <div
-	                  className="fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px]"
-	                  aria-hidden="true"
-	                  onClick={() => setIsSwitcherOpen(false)}
-	                />
-	              ) : null}
+	
 	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-2.5 md:px-3 py-2 shadow-none">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
                     <button
                       type="button"
-                      onClick={hasMultipleWallets ? () => setIsSwitcherOpen((v) => !v) : undefined}
+                      onClick={hasMultipleWallets ? toggleSwitcher : undefined}
                       className={`w-full text-left ${hasMultipleWallets ? "cursor-pointer" : "cursor-default"}`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -298,9 +312,16 @@ export default function WalletDashboardHeader({
 	                      ) : null}
                     </button>
 
-                    {/* Multi-wallet dropdown */}
+                    {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
-                      <div className="absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-[#101415] border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.6)] max-h-[340px] overflow-y-auto">
+                      <div
+                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-[#101415]/95 backdrop-blur-md border border-white/[0.08] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-200 ease-out ${
+                          isSwitcherVisible
+                            ? "opacity-100 scale-y-100 translate-y-0"
+                            : "opacity-0 scale-y-[0.92] -translate-y-1"
+                        }`}
+                        style={{ willChange: "transform, opacity" }}
+                      >
 	                        {walletAddresses.map((w, index) => {
 	                          const addr = typeof w === "string" ? w : w.address;
                           const label =
@@ -317,16 +338,16 @@ export default function WalletDashboardHeader({
                               type="button"
                               onClick={() => {
                                 if (!isActive) onSwitchWallet?.(addr);
-                                setIsSwitcherOpen(false);
+                                closeSwitcher();
                               }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors ${
+                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 transition-colors duration-150 ${
                                 isActive
                                   ? "bg-xcannes-green/10 border-l-2 border-xcannes-green"
-                                  : "hover:bg-white/5 border-l-2 border-transparent"
+                                  : "hover:bg-white/[0.06] border-l-2 border-transparent"
                               }`}
                             >
                               <span
-                                className={`h-2 w-2 rounded-full shrink-0 ${
+                                className={`h-2 w-2 rounded-full shrink-0 transition-colors duration-150 ${
                                   isActive ? "bg-xcannes-green" : "bg-white/20"
                                 }`}
                               />
@@ -362,12 +383,12 @@ export default function WalletDashboardHeader({
                   {hasMultipleWallets && (
                     <button
                       type="button"
-                      onClick={() => setIsSwitcherOpen((v) => !v)}
+                      onClick={toggleSwitcher}
                       className="p-1 bg-transparent border border-transparent hover:bg-transparent text-white/60 hover:text-white rounded-md transition-all active:scale-95"
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className={`w-[18px] h-[18px] transition-transform ${isSwitcherOpen ? "rotate-180" : ""}`}
+                        className={`w-[18px] h-[18px] transition-transform duration-200 ease-out ${isSwitcherVisible ? "rotate-180" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
