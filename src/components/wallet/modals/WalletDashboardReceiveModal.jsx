@@ -1322,13 +1322,13 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="w-full flex justify-center">
 	                      <div
 	                        ref={receiveQrContainerRef}
-	                        className="w-[260px] md:w-[240px] aspect-square rounded-[14px] bg-white p-3"
+	                        className="w-[220px] md:w-[200px] aspect-square rounded-[14px] bg-[#e8e8e8] p-3"
 	                      >
 	                        <QRCodeCanvas
 	                          value={receiveQrValue}
 	                          size={qrPixelSize}
 	                          style={{ width: '100%', height: '100%' }}
-	                          bgColor="#ffffff"
+	                          bgColor="#e8e8e8"
 	                          fgColor="#000000"
 	                          includeMargin={true}
 	                          level="M"
@@ -1538,13 +1538,13 @@ export default function WalletDashboardReceiveModal({
 					                        <div className="w-full flex justify-center">
 				                        <div
 				                          ref={requestQrContainerRef}
-				                          className="w-[260px] md:w-[240px] aspect-square rounded-[14px] bg-white p-3"
+				                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] bg-[#e8e8e8] p-3"
 				                        >
 					                          <QRCodeCanvas
 					                            value={requestQrValue}
 					                            size={requestQrPixelSize}
 					                            style={{ width: '100%', height: '100%' }}
-					                            bgColor="#ffffff"
+					                            bgColor="#e8e8e8"
 					                            fgColor="#000000"
 					                            includeMargin={true}
 					                            level="M"
