@@ -288,8 +288,10 @@ export default function WalletDashboardHeader({
 	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
-	                  className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px] transition-opacity duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-	                    isSwitcherVisible ? "opacity-100" : "opacity-0"
+	                  className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px] transition-opacity duration-[550ms] ${
+	                    isSwitcherVisible
+	                      ? "opacity-100 ease-[cubic-bezier(0.16,1,0.3,1)]"
+	                      : "opacity-0 ease-[cubic-bezier(0.4,0,1,1)]"
 	                  }`}
 	                  aria-hidden="true"
 	                  onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
@@ -331,10 +333,10 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                        className={`absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 w-[min(560px,calc(100vw-24px))] rounded-xl bg-elevated border border-white/[0.06] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ${
                           isSwitcherVisible
-                            ? "opacity-100 scale-y-100 translate-y-0"
-                            : "opacity-0 scale-y-[0.92] -translate-y-1"
+                            ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                            : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
                         }`}
                         style={{ willChange: "transform, opacity" }}
                         onMouseDown={(e) => e.stopPropagation()}
@@ -397,7 +399,7 @@ export default function WalletDashboardHeader({
                       aria-label={t("ui_switch_wallet", "Changer de wallet")}
                     >
                       <svg
-                        className={`w-[18px] h-[18px] transition-transform duration-[550ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isSwitcherVisible ? "rotate-180" : ""}`}
+                        className={`w-[18px] h-[18px] transition-transform duration-[550ms] ${isSwitcherVisible ? "rotate-180 ease-[cubic-bezier(0.16,1,0.3,1)]" : "ease-[cubic-bezier(0.4,0,1,1)]"}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
