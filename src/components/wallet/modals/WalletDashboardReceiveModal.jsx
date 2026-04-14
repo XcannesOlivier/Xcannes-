@@ -1387,7 +1387,7 @@ export default function WalletDashboardReceiveModal({
 
 	                    {/* ── QR Code ── */}
 	                    <div className="w-full flex flex-col items-center">
-	                      <div className="flex items-center gap-3">
+	                      <div className="flex items-center gap-5">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer"
@@ -1405,8 +1405,8 @@ export default function WalletDashboardReceiveModal({
 	                          />
 	                        </div>
 	                        {/* Brightness slider */}
-	                        <div className="flex flex-col items-center gap-1.5 h-[220px] md:h-[200px]">
-	                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white/40 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+	                        <div className="flex flex-col items-center gap-2 h-[220px] md:h-[170px]">
+	                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4.5 h-4.5 text-white/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
 	                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
 	                          </svg>
 	                          <input
@@ -1419,7 +1419,7 @@ export default function WalletDashboardReceiveModal({
 	                            style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
 	                            aria-label="Luminosité du QR"
 	                          />
-	                          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-white/25 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+	                          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/45 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
 	                            <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
 	                          </svg>
 	                        </div>
@@ -1710,7 +1710,7 @@ export default function WalletDashboardReceiveModal({
 
 					                        {/* ── QR Code ── */}
 					                        <div className="w-full flex flex-col items-center">
-					                          <div className="flex items-center gap-3">
+					                          <div className="flex items-center gap-5">
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer"
@@ -1728,8 +1728,8 @@ export default function WalletDashboardReceiveModal({
 					                          />
 				                          </div>
 					                          {/* Brightness slider */}
-					                          <div className="flex flex-col items-center gap-1.5 h-[220px] md:h-[200px]">
-					                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-white/40 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+					                          <div className="flex flex-col items-center gap-2 h-[220px] md:h-[170px]">
+					                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4.5 h-4.5 text-white/60 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
 					                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
 					                            </svg>
 					                            <input
@@ -1742,7 +1742,7 @@ export default function WalletDashboardReceiveModal({
 					                              style={{ writingMode: 'vertical-lr', direction: 'rtl' }}
 					                              aria-label="Luminosité du QR"
 					                            />
-					                            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-white/25 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+					                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/45 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
 					                              <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
 					                            </svg>
 					                          </div>
