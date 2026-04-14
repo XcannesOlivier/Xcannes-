@@ -2390,7 +2390,7 @@ const MoonPayBuyModal = ({
             }}
             disabled={continueDisabled}
             className={[
-              "md:hidden w-full h-12 rounded-xl text-white font-semibold transition-all duration-150",
+              "md:hidden w-full h-16 rounded-xl text-white font-semibold transition-all duration-150",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
@@ -2407,7 +2407,7 @@ const MoonPayBuyModal = ({
             onClick={handleContinue}
             disabled={continueDisabled}
             className={[
-              "hidden md:flex items-center justify-center w-full h-18 rounded-xl text-white text-xl font-semibold transition-all duration-150",
+              "hidden md:flex items-center justify-center w-full h-16 rounded-xl text-white text-xl font-semibold transition-all duration-150",
               continueDisabled
                 ? "opacity-45 cursor-not-allowed"
                 : "hover:scale-[1.01] active:scale-[0.98]",
