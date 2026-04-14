@@ -2353,6 +2353,7 @@ const MoonPayBuyModal = ({
               )
             ) : (
               <>
+                <div className="hidden md:block h-px bg-white/10 my-4" />
                 <p className="whitespace-pre-line">
                   {useSimpleSwapPartner
                     ? t(
@@ -2371,6 +2372,7 @@ const MoonPayBuyModal = ({
                     {t('moonpay_buy_partner_location_note', 'Le partenaire proposé dépend de votre localisation.')}
                   </div>
                 ) : null}
+                <div className="hidden md:block h-px bg-white/10 my-4" />
               </>
             )}
           </div>

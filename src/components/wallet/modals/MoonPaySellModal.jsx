@@ -2107,6 +2107,7 @@ const MoonPaySellModal = ({
 	                  </p>
 	                ) : isBankSellFlow ? (
 	                  <div className="px-1">
+	                    <div className="hidden md:block h-px bg-white/10 my-4" />
 	                    <p className="text-[15px] md:text-sm leading-snug text-white/85 whitespace-pre-line">
 	                      {highlightPhrases(
 	                        t(
@@ -2122,6 +2123,7 @@ const MoonPaySellModal = ({
 	                        "Le partenaire proposé dépend de votre localisation.",
 	                      )}
 	                    </p>
+	                    <div className="hidden md:block h-px bg-white/10 my-4" />
 	                  </div>
 	                ) : null}
 	              </>
