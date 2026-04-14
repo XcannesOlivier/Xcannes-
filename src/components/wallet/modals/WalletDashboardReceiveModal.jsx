@@ -1121,7 +1121,7 @@ export default function WalletDashboardReceiveModal({
           </button>
           <div
             className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] p-4 border-[20px] border-black"
-            style={{ backgroundColor: '#FFFFFF' }}
+            style={{ backgroundColor: '#FFFFFF', filter: 'brightness(0.92)' }}
             onClick={e => e.stopPropagation()}
           >
             <QRCodeCanvas
@@ -1384,7 +1384,7 @@ export default function WalletDashboardReceiveModal({
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[20px] border-black"
-	                          style={{ backgroundColor: '#FFFFFF' }}
+	                          style={{ backgroundColor: '#FFFFFF', filter: 'brightness(0.92)' }}
 	                          onClick={() => setQrZoomValue(receiveQrValue)}
 	                        >
 	                          <QRCodeCanvas
@@ -1686,7 +1686,7 @@ export default function WalletDashboardReceiveModal({
 				                          <div
 				                            ref={requestQrContainerRef}
 				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[20px] border-black"
-				                            style={{ backgroundColor: '#FFFFFF' }}
+				                            style={{ backgroundColor: '#FFFFFF', filter: 'brightness(0.92)' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
 					                          <QRCodeCanvas
