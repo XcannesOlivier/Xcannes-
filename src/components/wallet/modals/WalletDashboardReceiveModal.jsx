@@ -1120,7 +1120,7 @@ export default function WalletDashboardReceiveModal({
             </svg>
           </button>
           <div
-            className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] p-4 border-[3px] border-black"
+            className="w-[80vw] max-w-[360px] aspect-square rounded-[20px] p-4 border-[12px] border-black"
             style={{ backgroundColor: '#FFFFFF' }}
             onClick={e => e.stopPropagation()}
           >
@@ -1383,7 +1383,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="w-full flex flex-col items-center">
 	                        <div
 	                          ref={receiveQrContainerRef}
-	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[3px] border-black"
+	                          className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[12px] border-black"
 	                          style={{ backgroundColor: '#FFFFFF' }}
 	                          onClick={() => setQrZoomValue(receiveQrValue)}
 	                        >
@@ -1685,7 +1685,7 @@ export default function WalletDashboardReceiveModal({
 					                        <div className="w-full flex flex-col items-center">
 				                          <div
 				                            ref={requestQrContainerRef}
-				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[3px] border-black"
+				                            className="w-[220px] md:w-[200px] aspect-square rounded-[14px] p-3 cursor-pointer border-[12px] border-black"
 				                            style={{ backgroundColor: '#FFFFFF' }}
 				                            onClick={() => setQrZoomValue(requestQrValue)}
 				                          >
