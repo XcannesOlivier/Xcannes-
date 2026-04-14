@@ -1274,7 +1274,6 @@ export default function WalletDashboardReceiveModal({
                 <>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
 	                  <div className="space-y-5 pt-2">
-	                    {walletPicker}
 
 	                    {/* ── Header card (match "Demande de paiement" style) ── */}
 	                    <div
