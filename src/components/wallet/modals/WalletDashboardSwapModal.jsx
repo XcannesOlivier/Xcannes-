@@ -796,18 +796,31 @@ export default function WalletDashboardSwapModal({
                           {previewMeta?.route === "allocation" &&
                           previewMeta?.isFx &&
                           previewMeta?.spreadFeeRlusd > 0 ? (
-                            <div className="text-sm text-white/60 pt-2 mt-2 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
+                            <div className="flex items-baseline justify-between pt-2 mt-2 relative before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-px before:bg-white/10">
+                              <div className="text-sm text-white/60">
                               {t("statement_conversion_fee_label", "Frais")}
                               {" : "}
                               {formatAmountWithSymbol(locale, previewMeta.spreadFeeRlusd, "USD", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}
+                              </div>
+                              {Number.isFinite(Number(previewMeta?.unitRate)) &&
+                              previewMeta?.unitRate > 0 ? (
+                                <div className="text-xs text-white/50 md:hidden">
+                                  {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
+                                    previewMeta.unitRate,
+                                  ).toLocaleString(locale, {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })} ${getDisplayCurrencyCode(quoteCode)}`}
+                                </div>
+                              ) : null}
                             </div>
                           ) : null}
                           {Number.isFinite(Number(previewMeta?.unitRate)) &&
                           previewMeta?.unitRate > 0 ? (
-                            <div className="text-xs text-white/50">
+                            <div className="text-xs text-white/50 hidden md:block">
                               {`1 ${getDisplayCurrencyCode(baseCode)} = ${Number(
                                 previewMeta.unitRate,
                               ).toLocaleString(locale, {
@@ -858,13 +871,26 @@ export default function WalletDashboardSwapModal({
                     </button>
                   ) : (
                     <>
-                      <SwipeConfirmButton
-                        label={convertButtonLabel}
-                        onConfirm={handleConvertAction}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleConvertAction();
+                        }}
                         disabled={convertButtonDisabled}
-                        variant="green"
-                        className="md:hidden"
-                      />
+                        className={[
+                          "md:hidden w-full h-12 rounded-xl text-white font-semibold transition-all duration-150",
+                          convertButtonDisabled
+                            ? "opacity-45 cursor-not-allowed"
+                            : "hover:scale-[1.01] active:scale-[0.98]",
+                        ].join(" ")}
+                        style={convertButtonDisabled
+                          ? { background: 'linear-gradient(180deg, rgba(34,154,86,0.45) 0%, rgba(14,103,58,0.45) 100%)' }
+                          : { background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                        }
+                      >
+                        {convertButtonLabel}
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => {
