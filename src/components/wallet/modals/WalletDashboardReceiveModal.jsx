@@ -1303,7 +1303,7 @@ export default function WalletDashboardReceiveModal({
 	                          options={shareWalletOptions}
 	                          useNativeSelect={false}
 	                          iconClassName="inline-flex items-center justify-center leading-none"
-	                          buttonClassName="w-full bg-transparent hover:bg-white/5 rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
+	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
 	                          menuClassName={
 	                            noticeVariant === 'demo'
 	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
@@ -1397,7 +1397,70 @@ export default function WalletDashboardReceiveModal({
 		                <>
 		                  {/* SECTION 2 — CREATE REQUEST */}
 		                  <div className="space-y-2 pt-2">
-	                    {walletPicker}
+	                    {/* ── Header card wallet (match "Coordonnées de réception" style) ── */}
+	                    <div
+	                      className={[
+	                        'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset border-b border-white/20 bg-[#101415]',
+	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
+	                      ].join(' ')}
+	                    >
+	                      <p className="text-[20px] tracking-[0.14em] font-orbitron font-bold text-white mb-3">
+	                        {t('ui_request_create_card_title', 'DEMANDER UN PAIEMENT')}
+	                      </p>
+
+	                      <div className="my-4 h-px bg-white/10" aria-hidden />
+
+	                      {hasMultipleWallets ? (
+	                        <ModalSelect
+	                          value={wallet}
+	                          onChange={next => {
+	                            const addr = trimmed(next);
+	                            if (!addr || addr === wallet) return;
+	                            onSwitchWallet?.(addr);
+	                          }}
+	                          options={shareWalletOptions}
+	                          useNativeSelect={false}
+	                          iconClassName="inline-flex items-center justify-center leading-none"
+	                          buttonClassName="w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150"
+	                          menuClassName={
+	                            noticeVariant === 'demo'
+	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                          }
+	                          selectClassName="xcannes-select w-full bg-transparent rounded-xl pl-0 pr-2 py-2 text-base text-white focus:outline-none transition-colors duration-150"
+	                        />
+	                      ) : (
+	                        <div className="flex items-center gap-2 mb-1">
+	                          <span
+	                            className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
+	                            aria-hidden
+	                          />
+	                          <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                          </p>
+	                        </div>
+	                      )}
+
+	                      {wallet ? (
+	                        <div className="mt-0.5 flex items-start gap-2">
+	                          <span className="min-w-0 flex-1 text-left font-mono text-[14px] md:text-[15px] text-white/70">
+	                            {shortAddress(wallet, 8, 6)}
+	                          </span>
+	                          <button
+	                            type="button"
+	                            onClick={async e => {
+	                              e.stopPropagation();
+	                              await handleCopyWalletAddress();
+	                            }}
+	                            className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+	                            aria-label={t('ui_copy_address', "Copier l'adresse")}
+	                          >
+	                            {t('ui_copy', 'Copier')}
+	                          </button>
+	                        </div>
+	                      ) : null}
+	                    </div>
+
 	                    <div className="rounded-[14px] bg-[#101415] p-4 space-y-4 ring-1 ring-white/10 ring-inset">
 		                      {/* Currency */}
 			                      <div className="rounded-[14px] p-3">
