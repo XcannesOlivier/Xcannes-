@@ -1288,15 +1288,36 @@ export default function WalletDashboardReceiveModal({
 
 	                      <div className="my-4 h-px bg-white/10" aria-hidden />
 
-	                      <div className="flex items-center gap-2 mb-1">
-	                        <span
-	                          className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
-	                          aria-hidden
+	                      {hasMultipleWallets ? (
+	                        <ModalSelect
+	                          value={wallet}
+	                          onChange={next => {
+	                            const addr = trimmed(next);
+	                            if (!addr || addr === wallet) return;
+	                            onSwitchWallet?.(addr);
+	                          }}
+	                          options={walletOptions}
+	                          useNativeSelect={false}
+	                          iconClassName="inline-flex items-center justify-center leading-none"
+	                          buttonClassName="w-full bg-transparent hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150"
+	                          menuClassName={
+	                            noticeVariant === 'demo'
+	                              ? 'bg-xcannes-surface-demo !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                              : 'bg-elevated !max-h-64 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
+	                          }
+	                          selectClassName="xcannes-select w-full bg-transparent ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150"
 	                        />
-	                        <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
-	                          {activeWalletLabel || t('nav_wallet', 'Wallet')}
-	                        </p>
-	                      </div>
+	                      ) : (
+	                        <div className="flex items-center gap-2 mb-1">
+	                          <span
+	                            className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
+	                            aria-hidden
+	                          />
+	                          <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+	                            {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                          </p>
+	                        </div>
+	                      )}
 
 	                      {wallet ? (
 	                        <div className="mt-0.5 flex items-start gap-2">
@@ -1504,6 +1525,17 @@ export default function WalletDashboardReceiveModal({
 					                              ? `${requestDateParts.date} · ${requestDateParts.time}`
 					                              : requestDateLabel || '—'}
 					                          </div>
+
+					                          {generatedRequest?.memo ? (
+					                            <div className="mt-2 flex items-start gap-2">
+					                              <span className="shrink-0 text-[11px] tracking-[0.12em] uppercase text-white/40">
+					                                {t('ui_memo_label', 'Memo')}
+					                              </span>
+					                              <span className="min-w-0 flex-1 text-[13px] text-white/70 break-words">
+					                                {generatedRequest.memo}
+					                              </span>
+					                            </div>
+					                          ) : null}
 
 					                          <div className="my-4 h-px bg-white/10" aria-hidden />
 
