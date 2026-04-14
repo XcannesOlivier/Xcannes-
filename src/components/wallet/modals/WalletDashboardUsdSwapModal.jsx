@@ -4218,10 +4218,70 @@ export default function WalletDashboardUsdSwapModal({
                         }
                         setStep("address");
                       }}
-	                      className={`w-full text-xl py-4 ${actionBtnBase}`}
-	                    >
-		                      {t("ui_action_continue", "Continuer")}
-		                    </button>
+                      className={[
+                        "md:hidden w-full h-16 rounded-xl font-semibold text-lg transition-all duration-150",
+                        isBinanceYellow ? "text-black" : "text-white",
+                        (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                          ? "opacity-45 cursor-not-allowed"
+                          : "hover:scale-[1.01] active:scale-[0.98]",
+                      ].join(" ")}
+                      style={(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                        ? { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        : { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
+                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      }
+                    >
+                      {t("ui_action_continue", "Continuer")}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={
+                        !hasValidAmount ||
+                        amountOutOfRange ||
+                        insufficientSourceBalance ||
+                        sourceConversionMissing ||
+                        targetConversionMissing ||
+                        hasReceiveAddressValidationError ||
+                        pairUnavailable ||
+                        !fromCurrency ||
+                        !toCurrency ||
+                        !stableCurrency ||
+                        ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) &&
+                          !selectedSourceOption)
+                      }
+                      onClick={() => {
+                        setApiError("");
+                        setStableDropdownOpen(false);
+                        setSearch("");
+                        if (direction === SWAP_DIRECTIONS.STABLE_TO_RLUSD && walletTargetSelectionEnabled) {
+                          createExchange({ returnStep: "form" });
+                          return;
+                        }
+                        setStep("address");
+                      }}
+                      className={[
+                        "hidden md:flex items-center justify-center w-full h-16 rounded-xl font-semibold text-xl transition-all duration-150",
+                        isBinanceYellow ? "text-black" : "text-white",
+                        (!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                          ? "opacity-45 cursor-not-allowed"
+                          : "hover:scale-[1.01] active:scale-[0.98]",
+                      ].join(" ")}
+                      style={(!hasValidAmount || amountOutOfRange || insufficientSourceBalance || sourceConversionMissing || targetConversionMissing || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || ((walletSourceSelectionEnabled || walletTargetSelectionEnabled) && !selectedSourceOption))
+                        ? { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        : { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
+                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      }
+                    >
+                      {t("ui_action_continue", "Continuer")}
+                    </button>
 	                    {direction === SWAP_DIRECTIONS.RLUSD_TO_STABLE || walletTargetSelectionEnabled ? (
 	                      <div className="mt-2 flex items-center justify-center gap-2 text-[11px] md:text-xs text-white/60">
 	                        <span>
@@ -4411,10 +4471,73 @@ export default function WalletDashboardUsdSwapModal({
                         }
                         await createExchange({ returnStep: "address" });
                       }}
-	                      className={`w-full text-xl py-4 ${actionBtnBase}`}
-	                    >
-	                      {t("ui_action_continue", "Continuer")}
-	                    </button>
+                      className={[
+                        "md:hidden w-full h-16 rounded-xl font-semibold text-lg transition-all duration-150",
+                        isBinanceYellow ? "text-black" : "text-white",
+                        (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
+                          ? "opacity-45 cursor-not-allowed"
+                          : "hover:scale-[1.01] active:scale-[0.98]",
+                      ].join(" ")}
+                      style={(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
+                        ? { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        : { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
+                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      }
+                    >
+                      {t("ui_action_continue", "Continuer")}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={
+                        !hasValidAmount ||
+                        amountOutOfRange ||
+                        hasReceiveAddressValidationError ||
+                        pairUnavailable ||
+                        !fromCurrency ||
+                        !toCurrency ||
+                        !stableCurrency ||
+                        !effectiveReceiveAddress
+                      }
+                      onClick={async () => {
+                        const addr = effectiveReceiveAddress;
+                        if (!addr) {
+                          setApiError(
+                            t(
+                              "ui_usd_swap_missing_receive_addr",
+                              "Adresse de réception requise.",
+                            ),
+                          );
+                          return;
+                        }
+                        if (hasReceiveAddressValidationError) {
+                          setApiError(receiveAddressErrorMessage);
+                          return;
+                        }
+                        await createExchange({ returnStep: "address" });
+                      }}
+                      className={[
+                        "hidden md:flex items-center justify-center w-full h-16 rounded-xl font-semibold text-xl transition-all duration-150",
+                        isBinanceYellow ? "text-black" : "text-white",
+                        (!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
+                          ? "opacity-45 cursor-not-allowed"
+                          : "hover:scale-[1.01] active:scale-[0.98]",
+                      ].join(" ")}
+                      style={(!hasValidAmount || amountOutOfRange || hasReceiveAddressValidationError || pairUnavailable || !fromCurrency || !toCurrency || !stableCurrency || !effectiveReceiveAddress)
+                        ? { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,0.45) 0%, rgba(217,168,10,0.45) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,0.45) 0%, rgba(7,101,223,0.45) 100%)' }
+                        : { background: isBinanceYellow
+                            ? 'linear-gradient(180deg, rgba(240,185,11,1) 0%, rgba(217,168,10,1) 100%)'
+                            : 'linear-gradient(180deg, rgba(8,112,248,1) 0%, rgba(7,101,223,1) 100%)',
+                          boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }
+                      }
+                    >
+                      {t("ui_action_continue", "Continuer")}
+                    </button>
                   </>
                 ) : null}
 
