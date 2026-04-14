@@ -1379,6 +1379,8 @@ export default function WalletDashboardReceiveModal({
 	                      ) : null}
 	                    </div>
 
+	                    <div className="hidden md:block h-px bg-white/10" />
+
 	                    {/* ── QR Code ── */}
 	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-2xl py-5">
 	                        <div
@@ -1409,6 +1411,8 @@ export default function WalletDashboardReceiveModal({
 	                        Agrandir
 	                      </button>
 	                    </div>
+
+	                    <div className="hidden md:block h-px bg-white/10" />
 
 	                    {/* ── Actions ── */}
 	                    <div className="grid grid-cols-2 gap-3">
@@ -1593,7 +1597,7 @@ export default function WalletDashboardReceiveModal({
 				                        />
 				                      </div>
 
-                      <div className="mt-4 mb-4 h-px bg-white/10" />
+                      <div className="mt-6 mb-6 h-px bg-white/10" />
 
                       <button
                         type="button"
