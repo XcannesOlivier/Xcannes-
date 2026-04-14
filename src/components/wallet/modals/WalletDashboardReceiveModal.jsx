@@ -1273,12 +1273,57 @@ export default function WalletDashboardReceiveModal({
               {receiveView === 'share' ? (
                 <>
 	                  {/* SECTION 1 — RECEIVE FUNDS */}
-	                  <div className="space-y-2 pt-2">
+	                  <div className="space-y-5 pt-2">
 	                    {walletPicker}
-	                    <div className="flex flex-col items-center pt-2">
+
+	                    {/* ── Header card (match "Demande de paiement" style) ── */}
+	                    <div
+	                      className={[
+	                        'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset border-b border-white/20 bg-[#101415]',
+	                        'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
+	                      ].join(' ')}
+	                    >
+	                      <p className="text-[20px] tracking-[0.14em] font-orbitron font-bold text-white mb-3">
+	                        {t('ui_receive_choice_share_title', 'COORDONNÉES DE RÉCEPTION')}
+	                      </p>
+
+	                      <div className="my-4 h-px bg-white/10" aria-hidden />
+
+	                      <div className="flex items-center gap-2 mb-1">
+	                        <span
+	                          className="h-3 w-3 rounded-full bg-xcannes-green ring-4 ring-xcannes-green/25 shrink-0 animate-pulse"
+	                          aria-hidden
+	                        />
+	                        <p className="min-w-0 text-[16px] md:text-[17px] text-white font-semibold truncate">
+	                          {activeWalletLabel || t('nav_wallet', 'Wallet')}
+	                        </p>
+	                      </div>
+
+	                      {wallet ? (
+	                        <div className="mt-0.5 flex items-start gap-2">
+	                          <span className="min-w-0 flex-1 text-left font-mono text-[14px] md:text-[15px] text-white/70">
+	                            {shortAddress(wallet, 8, 6)}
+	                          </span>
+	                          <button
+	                            type="button"
+	                            onClick={async e => {
+	                              e.stopPropagation();
+	                              await handleCopyWalletAddress();
+	                            }}
+	                            className="shrink-0 rounded-md px-2 py-1 text-[11px] md:text-xs font-semibold ring-1 ring-white/10 bg-elevated text-white/70 hover:text-white hover:ring-white/20 transition-colors"
+	                            aria-label={t('ui_copy_address', "Copier l'adresse")}
+	                          >
+	                            {t('ui_copy', 'Copier')}
+	                          </button>
+	                        </div>
+	                      ) : null}
+	                    </div>
+
+	                    {/* ── QR Code ── */}
+	                    <div className="w-full flex justify-center">
 	                      <div
 	                        ref={receiveQrContainerRef}
-	                        className="w-full max-w-[420px] md:max-w-[360px] mx-auto aspect-square rounded-xl border border-white/10 bg-white p-3"
+	                        className="w-[260px] md:w-[240px] aspect-square rounded-[14px] bg-white p-3 ring-1 ring-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 	                      >
 	                        <QRCodeCanvas
 	                          value={receiveQrValue}
@@ -1290,70 +1335,35 @@ export default function WalletDashboardReceiveModal({
 	                          level="M"
 	                        />
 	                      </div>
+	                    </div>
 
-	                      <WalletActiveLabel
-	                        prefix={t('ui_receive_wallet_prefix', 'Compte de réception:')}
-	                        label={activeWalletLabel}
-	                        className="mt-3 text-[13px] text-white/80 justify-center gap-1"
-	                        prefixClassName="text-white/50"
-	                        labelClassName="font-medium text-white/80"
-	                        dotClassName="hidden"
-		                      />
-		                      {wallet ? (
-		                        <div className="mt-1 w-full flex items-start justify-center gap-2">
-		                          <div className="text-[12px] text-white/55 font-mono break-all text-center">
-		                            {wallet}
-		                          </div>
-		                          <button
-		                            type="button"
-		                            onClick={async e => {
-		                              e.stopPropagation();
-		                              await handleCopyWalletAddress();
-		                            }}
-		                            className="shrink-0 mt-[1px] h-7 w-7 inline-flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-white/80 ring-1 ring-white/10 ring-inset focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150"
-		                            aria-label={t('ui_copy_address', "Copier l'adresse")}
-		                            title={t('ui_copy_address', "Copier l'adresse")}
-		                          >
-		                            <svg
-		                              viewBox="0 0 24 24"
-		                              fill="none"
-		                              stroke="currentColor"
-		                              strokeWidth="2"
-		                              strokeLinecap="round"
-		                              strokeLinejoin="round"
-		                              className="w-4 h-4"
-		                              aria-hidden="true"
-		                            >
-		                              <rect x="9" y="9" width="13" height="13" rx="2" />
-		                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-		                            </svg>
-		                          </button>
-		                        </div>
-		                      ) : null}
-
-		                      <div className="mt-4 w-full grid grid-cols-2 gap-2">
-		                        <button
-	                          type="button"
-	                          onClick={async e => {
-	                            e.stopPropagation();
-	                            await handleCopyQr(false);
-	                          }}
-	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 ring-1 ring-white/10 ring-inset focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
-	                        >
-	                          {t('ui_copy', 'Copier')}
-	                        </button>
-	                        <button
-	                          type="button"
-	                          onClick={async e => {
-	                            e.stopPropagation();
-	                            await handleShareQr(false);
-	                          }}
-	                          className="w-full px-3 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-white/85 text-sm font-medium transition-colors duration-150 inline-flex items-center justify-center gap-2 ring-1 ring-white/10 ring-inset focus:outline-none focus:ring-2 focus:ring-xcannes-green/60"
-	                        >
-	                          <ShareIcon className="w-4 h-4" />
-	                          <span>{shareActionLabel}</span>
-	                        </button>
-	                      </div>
+	                    {/* ── Actions ── */}
+	                    <div className="grid grid-cols-2 gap-3">
+	                      <button
+	                        type="button"
+	                        onClick={async e => {
+	                          e.stopPropagation();
+	                          await handleCopyQr(false);
+	                        }}
+	                        className={[
+	                          'w-full h-12 rounded-xl bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-sm font-semibold',
+	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
+	                        ].join(' ')}
+	                      >
+	                        {t('ui_copy', 'Copier')}
+	                      </button>
+	                      <button
+	                        type="button"
+	                        onClick={async e => {
+	                          e.stopPropagation();
+	                          await handleShareQr(false);
+	                        }}
+	                        className="w-full h-12 rounded-xl text-white font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98]"
+	                        style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
+	                      >
+	                        <ShareIcon className="w-4 h-4" />
+	                        <span>{shareActionLabel}</span>
+	                      </button>
 	                    </div>
 	                  </div>
 	                </>
@@ -1478,7 +1488,7 @@ export default function WalletDashboardReceiveModal({
 					                        {/* ── Header card (match "Augmenter vos soldes" style) ── */}
 					                        <div
 					                          className={[
-					                            'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415]',
+					                            'rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset border-b border-white/20 bg-[#101415]',
 					                            'shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)]',
 					                          ].join(' ')}
 					                        >
