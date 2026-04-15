@@ -298,7 +298,7 @@ export default function WalletDashboardHeader({
 	                  onClick={(e) => { e.stopPropagation(); closeSwitcher(); }}
 	                />
 	              )}
-	              <div className="flex-1 min-w-0 rounded-md bg-elevated px-2.5 md:px-3 py-2 shadow-none relative z-[41]">
+	              <div className="flex-1 min-w-0 rounded-md bg-[#0b0f10] px-2.5 md:px-3 py-2 shadow-none relative z-[41]">
 	                <div className="flex items-start justify-between gap-3" ref={switcherRef}>
                   <div className="min-w-0 flex-1">
                     {/* Wallet name + address — clickable when multi-wallet */}
@@ -333,7 +333,7 @@ export default function WalletDashboardHeader({
                     {/* Multi-wallet dropdown — smooth animated */}
                     {isSwitcherOpen && hasMultipleWallets && (
                       <div
-                        className={`absolute z-50 left-0 top-full mt-0 w-full rounded-xl bg-elevated shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ${
+                        className={`absolute z-50 left-0 top-full mt-0 w-full rounded-xl bg-[#0b0f10] shadow-[0_12px_48px_rgba(0,0,0,0.45)] max-h-[340px] overflow-y-auto overflow-x-hidden origin-top transition-all duration-[550ms] ${
                           isSwitcherVisible
                             ? "opacity-100 scale-y-100 translate-y-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
                             : "opacity-0 scale-y-[0.92] -translate-y-1 ease-[cubic-bezier(0.4,0,1,1)]"
