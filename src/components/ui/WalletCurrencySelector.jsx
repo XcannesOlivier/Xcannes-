@@ -699,7 +699,7 @@ export default function WalletCurrencySelector({
                   )}
                 </div>
 
-                <div className="px-3 py-2 text-[11px] text-white/55 bg-white/[0.02] border-t border-white/5">
+                <div className="px-3 py-3 text-xs text-white/55 bg-white/[0.02] border-t border-white/5">
                   {t("ui_search_results", "Sélectionnez un actif.")}
                 </div>
               </div>
