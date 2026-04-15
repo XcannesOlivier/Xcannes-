@@ -7,10 +7,18 @@ export default function StatementMonthSelect({
   onChange,
   options = [],
   menuClassName = "bg-elevated",
+  label = "",
+  onOpenChange,
 }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
+
+  const updateOpen = (next) => {
+    const val = typeof next === "function" ? next(open) : next;
+    setOpen(val);
+    onOpenChange?.(val);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -19,10 +27,11 @@ export default function StatementMonthSelect({
       if (triggerRef.current && triggerRef.current.contains(event.target))
         return;
       setOpen(false);
+      onOpenChange?.(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+  }, [open, onOpenChange]);
 
   const selectedOption =
     options.find((option) => String(option?.value) === String(value)) ||
@@ -31,20 +40,23 @@ export default function StatementMonthSelect({
 
   const handleSelect = (nextValue) => {
     onChange?.(nextValue);
-    setOpen(false);
+    updateOpen(false);
   };
 
   return (
-    <div className="relative">
+    <div className={`relative ${open ? "z-50" : ""}`}>
+      {label ? (
+        <p className="text-xs text-white/60 mb-1">{label}</p>
+      ) : null}
       <button
         type="button"
         ref={triggerRef}
         onClick={(e) => {
           e.stopPropagation();
-          setOpen((prev) => !prev);
+          updateOpen((prev) => !prev);
         }}
         onKeyDown={(e) => {
-          if (e.key === "Escape") setOpen(false);
+          if (e.key === "Escape") updateOpen(false);
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -73,12 +85,12 @@ export default function StatementMonthSelect({
           <div
             className="fixed inset-0 z-40 bg-black/80 backdrop-blur-[4px]"
             aria-hidden="true"
-            onClick={(e) => { e.stopPropagation(); setOpen(false); }}
+            onClick={(e) => { e.stopPropagation(); updateOpen(false); }}
           />
           <div
             ref={menuRef}
             role="listbox"
-            className={`absolute z-50 mt-0 w-full max-h-96 overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl bg-[#101415] ${menuClassName}`}
+            className={`absolute z-50 mt-0 w-full max-h-[480px] overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl bg-[#101415] ${menuClassName}`}
             onClick={(e) => e.stopPropagation()}
           >
           {options.map((option) => {

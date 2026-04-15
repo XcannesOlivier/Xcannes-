@@ -139,6 +139,7 @@ export default function CurrencyStatement({
   const [exportFormat, setExportFormat] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(0);
   const [showFullAddress, setShowFullAddress] = useState(false);
+  const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
   const [isMobileDate, setIsMobileDate] = useState(false);
   const [highlightedTransactionId, setHighlightedTransactionId] =
     useState(null);
@@ -1695,7 +1696,7 @@ export default function CurrencyStatement({
 
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className={isInlineDesktop ? "md:col-span-3" : ""}>
+            <div className={`${isInlineDesktop ? "md:col-span-3" : ""} ${periodDropdownOpen ? "relative z-50" : ""}`}>
 	              <div className="min-w-0 space-y-0.5 rounded-[20px] border border-white/10 px-3 py-2 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
                 <WalletActiveLabel
                   prefix={t("ui_current_account_prefix", "Compte actuel :")}
@@ -1705,35 +1706,48 @@ export default function CurrencyStatement({
                   labelClassName="text-white font-semibold"
                 />
 	                {walletAddress ? (
-	                  <button
-	                    type="button"
-	                    onClick={() => setShowFullAddress((v) => !v)}
-	                    className={[
-	                      "text-xs md:text-sm text-white/55 font-mono text-left",
-	                      showFullAddress ? "break-all whitespace-normal" : "truncate",
-	                    ].join(" ")}
-                    title={t(
-                      "ui_toggle_full_address",
-                      "Cliquer pour afficher/masquer l'adresse complète",
-                    )}
-                    aria-label={t(
-                      "ui_toggle_full_address",
-                      "Cliquer pour afficher/masquer l'adresse complète",
-                    )}
-                  >
-                    {showFullAddress ? walletAddress : truncatedWalletAddress}
-                  </button>
+	                  <div className="flex items-center gap-1.5 min-w-0">
+	                    <button
+	                      type="button"
+	                      onClick={() => setShowFullAddress((v) => !v)}
+	                      className={[
+	                        "text-xs md:text-sm text-white/55 font-mono text-left min-w-0",
+	                        showFullAddress ? "break-all whitespace-normal" : "truncate",
+	                      ].join(" ")}
+                      title={t(
+                        "ui_toggle_full_address",
+                        "Cliquer pour afficher/masquer l'adresse complète",
+                      )}
+                      aria-label={t(
+                        "ui_toggle_full_address",
+                        "Cliquer pour afficher/masquer l'adresse complète",
+                      )}
+                    >
+                      {showFullAddress ? walletAddress : truncatedWalletAddress}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(walletAddress, t("ui_copied_address", "Adresse copiée"))}
+                      className="shrink-0 text-white/40 hover:text-white/70 transition-colors p-0.5"
+                      title={t("ui_copy_address", "Copier l'adresse")}
+                      aria-label={t("ui_copy_address", "Copier l'adresse")}
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                      </svg>
+                    </button>
+                  </div>
                 ) : null}
               </div>
             </div>
             {!isXrpNetworkView ? (
               <>
                 <div>
-                  <p className="text-xs text-white/60 mb-1">
-                    {t("ui_statement_period_6dedec11d9", "Statement Period")}
-                  </p>
                   <StatementMonthSelect
+                    label={t("ui_statement_period_6dedec11d9", "Statement Period")}
                     value={selectedMonth}
+                    onOpenChange={setPeriodDropdownOpen}
                     onChange={(nextValue) => {
                       if (nextValue === "archives") {
                         setSelectedMonth("archives");
@@ -1750,17 +1764,17 @@ export default function CurrencyStatement({
                   <p className="text-xs text-white/60 mb-1">
                     {t("ui_balance_445d830d72", "Balance")}
                   </p>
-                  <p className="text-sm text-white font-semibold">
+                  <p className="text-lg text-white font-bold">
                     {formatAmountWithSymbolLocal(balance)}
                   </p>
                 </div>
                 {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
                   <div className="ml-auto text-right">
-                    <p className="text-xs text-white/60 mb-1">
+                    <p className="text-[11px] text-white/40 mb-1">
                       {t("ui_digital_usd_label", "USD numérique")}
                     </p>
-                    <p className="text-sm text-white font-semibold">
-                      {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
+                    <p className="text-[12px] text-white/50">
+                      ≈ {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
