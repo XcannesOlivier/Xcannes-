@@ -1383,7 +1383,7 @@ export default function WalletDashboardReceiveModal({
 	                    <div className="hidden md:block h-px bg-white/10" />
 
 	                    {/* ── QR Code ── */}
-	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-2xl py-5 md:pt-8 md:pb-5">
+	                    <div className="w-full flex flex-col items-center bg-[#232829] rounded-[20px] py-5 md:pt-8 md:pb-5">
 	                        <div
 	                          ref={receiveQrContainerRef}
 	                          className="w-[220px] md:w-[200px] aspect-square rounded-none p-3 cursor-pointer border-[20px] border-black"
@@ -1424,7 +1424,7 @@ export default function WalletDashboardReceiveModal({
 	                          await handleCopyQr(false);
 	                        }}
 	                        className={[
-	                          'w-full h-12 rounded-xl bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-sm font-semibold',
+	                          'w-full h-12 rounded-[20px] bg-[#101415] ring-1 ring-white/10 ring-inset text-white/85 text-sm font-semibold',
 	                          'shadow-[0_4px_12px_rgba(0,0,0,0.4)] hover:ring-white/20 hover:bg-white/[0.04] transition-all duration-[140ms] active:scale-[0.99]',
 	                        ].join(' ')}
 	                      >
@@ -1436,7 +1436,7 @@ export default function WalletDashboardReceiveModal({
 	                          e.stopPropagation();
 	                          await handleShareQr(false);
 	                        }}
-	                        className="w-full h-12 rounded-xl text-white font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98]"
+	                        className="w-full h-12 rounded-[20px] text-white font-semibold transition-all duration-150 inline-flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.98]"
 	                        style={{ background: 'linear-gradient(180deg, rgba(34,154,86,1) 0%, rgba(14,103,58,1) 100%)', boxShadow: '0 14px 28px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -12px 20px rgba(0,0,0,0.28)' }}
 	                      >
 	                        <ShareIcon className="w-4 h-4" />
