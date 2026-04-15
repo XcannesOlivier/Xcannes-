@@ -1357,7 +1357,7 @@ export default function CurrencyStatement({
                   {t("ui_status_and_date", "Statut & date")}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                  <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-2">
                     <div className="text-xs text-white/60">
                       {t("ui_status_label", "Statut")}
                     </div>
@@ -1365,7 +1365,7 @@ export default function CurrencyStatement({
                       {detailStatusLabel}
                     </div>
                   </div>
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                  <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-2">
                     <div className="text-xs text-white/60">
                       {t("ui_date_label_7a2c1b9d5e", "Date")}
                     </div>
@@ -1383,7 +1383,7 @@ export default function CurrencyStatement({
                     <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
                       {t("ui_account", "Compte")}
                     </div>
-                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                    <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
                       <div className="text-sm text-white/90 font-semibold truncate">
                         {walletLabel || t("nav_wallet", "Wallet")}
                       </div>
@@ -1397,7 +1397,7 @@ export default function CurrencyStatement({
                     <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
                       {counterpartyTitle}
                     </div>
-                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                    <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="text-sm text-white/90 font-semibold truncate">
@@ -1446,7 +1446,7 @@ export default function CurrencyStatement({
                 <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
                   {t("ui_details_label", "Détails")}
                 </div>
-                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3 space-y-2">
+                <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3 space-y-2">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-xs text-white/60">
                       {t("ui_amount_52cea2dd3d", "Montant")}
@@ -1500,7 +1500,7 @@ export default function CurrencyStatement({
                   <div className="text-[11px] tracking-[0.08em] uppercase text-[#8B98A5]">
                     {t("ui_transaction", "Transaction")}
                   </div>
-                  <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-3">
+                  <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.03] px-3 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="text-xs text-white/60">
@@ -1527,7 +1527,7 @@ export default function CurrencyStatement({
                               copiedHashTimerRef.current = null;
                             }, 1200);
                           }}
-                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
                           aria-label={t("ui_copy_hash", "Copy hash")}
                           title={t("ui_copy_hash", "Copy hash")}
                         >
@@ -1541,7 +1541,7 @@ export default function CurrencyStatement({
                         <button
                           type="button"
                           onClick={handleShareTransaction}
-                          className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
+                          className="inline-flex items-center justify-center w-9 h-9 rounded-[20px] bg-white/[0.04] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-colors"
                           aria-label={t("ui_share", "Partager")}
                           title={t("ui_share", "Partager")}
                         >
@@ -1696,7 +1696,7 @@ export default function CurrencyStatement({
           {/* Account Info dans le header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className={isInlineDesktop ? "md:col-span-3" : ""}>
-	              <div className="min-w-0 space-y-0.5 rounded-xl border border-white/10 px-3 py-2 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
+	              <div className="min-w-0 space-y-0.5 rounded-[20px] border border-white/10 px-3 py-2 bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4)]">
                 <WalletActiveLabel
                   prefix={t("ui_current_account_prefix", "Compte actuel :")}
                   label={walletLabel || t("nav_wallet", "Wallet")}
@@ -1789,7 +1789,7 @@ export default function CurrencyStatement({
             <>
           {/* Archive Notice */}
           {selectedMonth === "archives" && (
-            <div className="bg-blue-500/10 rounded-lg p-3 md:p-4">
+            <div className="bg-blue-500/10 rounded-[20px] p-3 md:p-4">
               <p className="text-sm text-blue-300 flex items-center gap-2">
                 <span className="text-xl">📁</span>
                 <span>
@@ -1845,7 +1845,7 @@ export default function CurrencyStatement({
           </div>
 
           {/* Transactions Timeline */}
-          <div className="rounded-[14px] ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col min-h-0">
+          <div className="rounded-[20px] ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),inset_0_-18px_28px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col min-h-0">
             {error && (
               <div className="bg-red-500/10 px-3 py-2 text-[11px] text-red-200">
                 {error}
@@ -1890,7 +1890,7 @@ export default function CurrencyStatement({
                               ref={isHighlighted ? highlightRowRef : null}
                               onClick={() => openTxDetails(tx)}
                               className={[
-                                "w-full flex items-center gap-2 text-left px-3 py-3 rounded-xl ring-1 ring-white/10 ring-inset",
+                                "w-full flex items-center gap-2 text-left px-3 py-3 rounded-[20px] ring-1 ring-white/10 ring-inset",
                                 "bg-[#101415]",
                                 "shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-12px_18px_rgba(0,0,0,0.45)]",
                                 "transition-colors duration-150",
@@ -1935,7 +1935,7 @@ export default function CurrencyStatement({
               type="button"
               onClick={() => onLoadMore && onLoadMore()}
               disabled={loadingMore}
-              className="w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
+              className="w-full px-4 py-2.5 rounded-[20px] text-sm font-semibold transition-colors disabled:opacity-50 bg-white/10 hover:bg-white/15 text-white/80"
             >
               {loadingMore
                 ? t("ui_loading_1386baebe9", "Loading…")
@@ -1953,7 +1953,7 @@ export default function CurrencyStatement({
               <button
                 onClick={handleExportPdf}
                 disabled={exportFormat === "pdf"}
-                className="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
+                className="flex-1 md:flex-none px-4 py-2.5 rounded-[20px] text-sm font-semibold transition-colors disabled:opacity-50 bg-transparent md:bg-white/10 md:hover:bg-white/15 text-white/80"
               >
                 {exportFormat === "pdf" ? (
                   <>
@@ -1977,7 +1977,7 @@ export default function CurrencyStatement({
               </button>
               <button
                 onClick={handlePrint}
-                className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
+                className="hidden md:inline-flex md:flex-none px-4 py-2.5 rounded-[20px] text-sm font-semibold transition-colors bg-white/10 hover:bg-white/15 text-white/80"
               >
                 {t("ui_print_1313eff37c", "🖨️ Print")}
               </button>
