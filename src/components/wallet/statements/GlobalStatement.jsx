@@ -48,7 +48,7 @@ export default function GlobalStatement({
   const locale = i18n?.language || "en";
   const globalTitle = t(
     "ui_global_statement_13e29aa8aa",
-    "Historique de vos dernières transactions",
+    "Vos dernières transactions",
   );
   const isInlineDesktop = variant === "inline-desktop";
   const MAX_RECENT_TRANSACTIONS = 20;
