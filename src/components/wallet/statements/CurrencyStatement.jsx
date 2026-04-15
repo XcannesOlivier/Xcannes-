@@ -1823,7 +1823,7 @@ export default function CurrencyStatement({
 
           {/* Filters */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="inline-flex items-center rounded-xl p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <div className="inline-flex items-center rounded-[16px] p-1 ring-1 ring-white/10 ring-inset bg-gradient-to-b from-white/[0.08] to-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
               {[
                 {
                   key: "all",
@@ -1850,9 +1850,15 @@ export default function CurrencyStatement({
                   key={item.key}
                   type="button"
                   onClick={() => setFilter(item.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-[12px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap ${
                     filter === item.key
-                      ? "bg-white/5 text-white"
+                      ? item.key === "all"
+                        ? "bg-white/10 text-white"
+                        : item.key === "credit"
+                          ? "bg-green-500/15 text-green-300"
+                          : item.key === "debit"
+                            ? "bg-red-500/15 text-red-300"
+                            : "bg-blue-500/15 text-blue-300"
                       : "text-white/60 hover:text-white/80 hover:bg-white/5"
                   }`}
                 >
