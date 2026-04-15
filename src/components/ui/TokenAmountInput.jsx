@@ -27,7 +27,7 @@ export default function TokenAmountInput({
 
   return (
     <div
-      className={`flex items-center gap-3 bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg px-4 py-3 hover:border-white/20 transition-all duration-300 ${containerClassName}`}
+      className={`flex items-center gap-3 bg-black/40 backdrop-blur-sm border border-white/10 rounded-[20px] px-4 py-3 hover:border-white/20 transition-all duration-300 ${containerClassName}`}
     >
       <input
         className="bg-transparent text-white w-full outline-none text-xl font-medium placeholder:text-white/30"
