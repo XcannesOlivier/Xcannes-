@@ -623,12 +623,12 @@ export default function WalletDashboardSwapModal({
 		                      useNativeSelect={false}
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-		                      backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
+		                      backdropClassName="bg-black/65 backdrop-blur-[2.5px]"
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
-		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
-		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
+		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[420px]"
+		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[420px]"
 		                      }
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
@@ -690,7 +690,7 @@ export default function WalletDashboardSwapModal({
 		                      useNativeSelect={false}
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
-		                      backdropClassName="bg-black/45 backdrop-blur-[1.5px]"
+		                      backdropClassName="bg-black/65 backdrop-blur-[2.5px]"
 		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
