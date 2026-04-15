@@ -512,7 +512,7 @@ body {
 @media (min-width: 768px) {
   .statement-select {
     color-scheme: dark;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: var(--bg-elevated);
   }
 
   .statement-select option {
