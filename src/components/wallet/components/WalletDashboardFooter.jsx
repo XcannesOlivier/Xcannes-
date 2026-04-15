@@ -39,13 +39,13 @@ function ScanIcon({ className = "h-10 w-10" }) {
       className={className}
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.15"
+      strokeWidth="1.5"
       aria-hidden
     >
       <path
         strokeLinecap="butt"
         strokeLinejoin="miter"
-        d="M4 8V4H8M16 4H20V8M8 20H4V16M20 16V20H16"
+        d="M2.5 9V2.5H9M15 2.5H21.5V9M9 21.5H2.5V15M21.5 15V21.5H15"
       />
       <rect x="7.7" y="7.7" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
       <rect x="13.4" y="7.7" width="2.9" height="2.9" rx="0.2" fill="currentColor" stroke="none" />
