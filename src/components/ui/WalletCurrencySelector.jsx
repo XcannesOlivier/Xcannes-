@@ -682,13 +682,13 @@ export default function WalletCurrencySelector({
                           ].join(" ")}
                         >
                           <span className="text-lg">{getFlag(c.code)}</span>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-semibold truncate font-mono">
+                          <div className="min-w-0 flex-1 flex items-center gap-2">
+                            <span className="text-sm font-semibold font-mono whitespace-nowrap">
                               {c.code}
-                            </div>
-                            <div className="text-[11px] text-white/55 truncate">
+                            </span>
+                            <span className="text-[11px] text-white/55 truncate">
                               {c.name || c.code}
-                            </div>
+                            </span>
                           </div>
                           {active ? (
                             <span className="text-xcannes-green font-semibold text-xs">✓</span>
