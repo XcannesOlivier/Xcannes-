@@ -1753,16 +1753,20 @@ export default function CurrencyStatement({
                   <p className="text-sm text-white font-semibold">
                     {formatAmountWithSymbolLocal(balance)}
                   </p>
-                  {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
-                    <p className="text-[11px] text-white/60">
-                      ≈{" "}
+                </div>
+                {estimatedUsd != null && Number.isFinite(estimatedUsd) ? (
+                  <div className="ml-auto text-right">
+                    <p className="text-xs text-white/60 mb-1">
+                      {t("ui_digital_usd_label", "USD numérique")}
+                    </p>
+                    <p className="text-sm text-white font-semibold">
                       {formatAmountWithSymbol(locale, estimatedUsd, "RLUSD", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </p>
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
               </>
             ) : null}
           </div>

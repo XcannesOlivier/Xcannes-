@@ -48,7 +48,7 @@ export default function StatementMonthSelect({
         }}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="statement-select w-full bg-white/5 border border-white/10 rounded-[10px] px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
+        className="statement-select w-full bg-[#101415] border border-white/10 rounded-[10px] px-3 py-2.5 text-sm text-white cursor-pointer transition-colors duration-150 flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:border-xcannes-green/60 focus-visible:ring-2 focus-visible:ring-xcannes-green/20"
       >
         <span className="truncate min-w-0 flex-1">
           {selectedOption?.label || ""}
@@ -69,14 +69,21 @@ export default function StatementMonthSelect({
       </button>
 
       {open && (
-        <div
-          ref={menuRef}
-          role="listbox"
-          className={`absolute z-50 mt-1 w-full max-h-60 overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl ${menuClassName}`}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/80 backdrop-blur-[4px]"
+            aria-hidden="true"
+            onClick={(e) => { e.stopPropagation(); setOpen(false); }}
+          />
+          <div
+            ref={menuRef}
+            role="listbox"
+            className={`absolute z-50 mt-0 w-full max-h-96 overflow-y-auto rounded-[10px] border border-white/10 shadow-2xl bg-[#101415] ${menuClassName}`}
+            onClick={(e) => e.stopPropagation()}
+          >
           {options.map((option) => {
             const isSelected = String(option?.value) === String(value);
+            if (isSelected) return null;
             return (
               <button
                 key={String(option?.value)}
@@ -84,7 +91,7 @@ export default function StatementMonthSelect({
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => handleSelect(option.value)}
-                className={`w-full px-3 py-2 text-sm text-left transition-colors ${
+                className={`w-full px-3 py-2 text-sm text-center transition-colors ${
                   isSelected
                     ? "bg-white/10 text-white"
                     : "text-white/80 hover:bg-white/5"
@@ -95,6 +102,7 @@ export default function StatementMonthSelect({
             );
           })}
         </div>
+        </>
       )}
     </div>
   );
