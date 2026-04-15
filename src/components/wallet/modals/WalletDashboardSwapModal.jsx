@@ -626,13 +626,13 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
-		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[520px]"
 		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[520px]"
 		                      }
-		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -698,13 +698,13 @@ export default function WalletDashboardSwapModal({
 		                      showMobileOptionRight={true}
 		                      iconClassName="text-3xl leading-none"
 		                      backdropClassName="bg-black/80 backdrop-blur-[4px]"
-		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      buttonClassName="bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
 		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
 		                      }
-		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-[20px] px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
 		                  </div>
 
@@ -719,7 +719,7 @@ export default function WalletDashboardSwapModal({
                         "ui_choose_new_currency_plus",
                         "Ajouter une devise",
                       )}
-                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-md px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
+                      buttonClassName="inline-flex items-center gap-2 text-base md:text-[15px] leading-snug text-white/70 font-normal ring-1 ring-white/10 ring-inset rounded-[20px] px-2 py-1 hover:text-white hover:ring-white/15 transition-colors"
                       fullscreenPortalTarget={inline ? modalPanelRef.current : null}
                       placeholder={t(
                         "ui_search_all_currencies_c5d6e7f8",
@@ -747,7 +747,7 @@ export default function WalletDashboardSwapModal({
                       "USD"
 	                    }
 	                    tokenClassName="text-white text-base"
-	                    containerClassName="rounded-xl px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+	                    containerClassName="rounded-[20px] px-4 py-4 bg-black/30 ring-1 ring-white/15 ring-inset transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 	                  />
 	                </div>
 
@@ -771,7 +771,7 @@ export default function WalletDashboardSwapModal({
                       </div>
                     ) : null}
                     {/* ── SECTION 3: Summary ─────────────────────────────── */}
-	                    <div className="rounded-[14px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
+	                    <div className="rounded-[20px] px-4 py-4 ring-1 ring-white/10 ring-inset bg-[#101415] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_28px_rgba(0,0,0,0.55)] space-y-3">
                       <div className="text-[11px] tracking-[0.22em] uppercase text-white/45">
                         {t("ui_summary_title_d4e5f6a7b8", "Résumé")}
                       </div>
@@ -877,7 +877,7 @@ export default function WalletDashboardSwapModal({
                         }}
                         disabled={convertButtonDisabled}
                         className={[
-                          "md:hidden w-full h-14 rounded-xl text-white text-lg font-semibold transition-all duration-150",
+                          "md:hidden w-full h-14 rounded-[20px] text-white text-lg font-semibold transition-all duration-150",
                           convertButtonDisabled
                             ? "opacity-45 cursor-not-allowed"
                             : "hover:scale-[1.01] active:scale-[0.98]",
@@ -897,7 +897,7 @@ export default function WalletDashboardSwapModal({
                         }}
                         disabled={convertButtonDisabled}
                         className={[
-                          "hidden md:flex items-center justify-center w-full h-16 rounded-xl text-white text-xl font-semibold transition-all duration-150",
+                          "hidden md:flex items-center justify-center w-full h-16 rounded-[20px] text-white text-xl font-semibold transition-all duration-150",
                           convertButtonDisabled
                             ? "opacity-45 cursor-not-allowed"
                             : "hover:scale-[1.01] active:scale-[0.98]",
