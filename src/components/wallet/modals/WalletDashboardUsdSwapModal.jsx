@@ -3581,15 +3581,15 @@ export default function WalletDashboardUsdSwapModal({
 			                                        >
 		                                          {renderCurrencyIcon(cur)}
 		                                          <div className="min-w-0 flex-1">
-		                                            <div className="text-sm font-semibold truncate">
-		                                              {String(cur?.ticker || "").toUpperCase()}{" "}
+		                                            <div className="text-[15px] font-semibold truncate">
+		                                              {String(cur?.ticker || "").toUpperCase()}
 		                                              <span className="text-white/50 font-normal">
 		                                                ({String(cur?.network || "").toUpperCase()})
+		                                              </span>{" "}
+		                                              <span className="text-white/55 font-normal text-[13px]">
+		                                                {String(cur?.name || "").trim() ||
+		                                                  currencyLabel(cur)}
 		                                              </span>
-		                                            </div>
-		                                            <div className="text-[11px] text-white/55 truncate">
-		                                              {String(cur?.name || "").trim() ||
-		                                                currencyLabel(cur)}
 		                                            </div>
 		                                          </div>
 			                                          {active ? (
@@ -3790,15 +3790,15 @@ export default function WalletDashboardUsdSwapModal({
 		                                        >
 	                                          {renderCurrencyIcon(cur)}
 	                                          <div className="min-w-0 flex-1">
-	                                            <div className="text-sm font-semibold truncate">
-	                                              {String(cur?.ticker || "").toUpperCase()}{" "}
+	                                            <div className="text-[15px] font-semibold truncate">
+	                                              {String(cur?.ticker || "").toUpperCase()}
 	                                              <span className="text-white/50 font-normal">
 	                                                ({String(cur?.network || "").toUpperCase()})
+	                                              </span>{" "}
+	                                              <span className="text-white/55 font-normal text-[13px]">
+	                                                {String(cur?.name || "").trim() ||
+	                                                  currencyLabel(cur)}
 	                                              </span>
-	                                            </div>
-	                                            <div className="text-[11px] text-white/55 truncate">
-	                                              {String(cur?.name || "").trim() ||
-	                                                currencyLabel(cur)}
 	                                            </div>
 	                                          </div>
 		                                          {active ? (
