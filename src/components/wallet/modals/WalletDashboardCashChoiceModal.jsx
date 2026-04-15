@@ -124,7 +124,7 @@ export default function WalletDashboardCashChoiceModal({
 
   // Match the "Convert" action button background (wallet-actions.css).
   const cardClassName =
-    'w-full text-left rounded-[16px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
+    'w-full text-left rounded-[20px] px-4 py-4 bg-white/[0.02] hover:bg-white/[0.05] active:bg-white/[0.03] ring-1 ring-white/10 ring-inset shadow-[0_8px_26px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-22px_34px_rgba(0,0,0,0.68)] transition-all duration-[140ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:ring-white/20 hover:-translate-y-px active:translate-y-0 active:scale-[0.99]';
 
   const [overlayDragging, setOverlayDragging] = useState(false);
   const [overlayTranslateY, setOverlayTranslateY] = useState(0);
@@ -411,7 +411,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseBuy} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[20px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardAddIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -448,7 +448,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseSell} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[20px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardBankIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -491,7 +491,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseUsdSwapOut} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[20px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardWalletIcon />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -552,7 +552,7 @@ export default function WalletDashboardCashChoiceModal({
 
                     <button type="button" onClick={onChooseUsdSwapIn} className={cardClassName}>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
+                        <div className="w-12 h-12 rounded-[20px] bg-black/30 ring-1 ring-white/10 ring-inset flex items-center justify-center flex-shrink-0">
                           <FundsCardSendIcon />
                         </div>
                         <div className="min-w-0 flex-1">
