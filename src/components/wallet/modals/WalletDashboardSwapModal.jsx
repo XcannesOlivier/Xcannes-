@@ -681,7 +681,7 @@ export default function WalletDashboardSwapModal({
                         const labelRight = selectLabelRightByCurrency?.[code] || null;
                         const isNewLine = !existingCurrencyLinesSet.has(code) && code && code !== "USD";
                         const labelWithHint = isNewLine ? (
-                          <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{t("ui_new_line_hint_short", "· nouvelle ligne")}</span></>
+                          <>{labelLeft} <span className="text-[11px] text-white/35 font-normal">{t("ui_new_currency_line_auto_activate_a1b2c3", "the {{currency}} line will be created automatically.").replace("{{currency}}", code)}</span></>
                         ) : labelLeft;
                         return {
                           value: code,
