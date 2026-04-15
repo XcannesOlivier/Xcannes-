@@ -288,7 +288,7 @@ export default function WalletDashboardHeader({
 	            <div className="relative flex items-center gap-2.5 w-full md:max-w-[520px]">
 	              {isSwitcherOpen && hasMultipleWallets && (
 	                <div
-	                  className={`fixed inset-0 z-40 bg-black/45 backdrop-blur-[1.5px] transition-opacity duration-[550ms] ${
+	                  className={`fixed inset-0 z-40 bg-white/[0.03] backdrop-blur-[6px] transition-opacity duration-[550ms] ${
 	                    isSwitcherVisible
 	                      ? "opacity-100 ease-[cubic-bezier(0.16,1,0.3,1)]"
 	                      : "opacity-0 ease-[cubic-bezier(0.4,0,1,1)]"
