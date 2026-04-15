@@ -628,7 +628,7 @@ export default function WalletDashboardSwapModal({
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
-		                          : "bg-elevated border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
+		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
 		                      }
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
@@ -695,7 +695,7 @@ export default function WalletDashboardSwapModal({
 		                      menuClassName={
 		                        noticeVariant === "demo"
 		                          ? "bg-xcannes-surface-demo border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
-		                          : "bg-elevated border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
+		                          : "bg-[#101415] border-white/15 ring-1 ring-white/10 ring-inset max-h-[320px]"
 		                      }
 		                      selectClassName="xcannes-select w-full bg-[#101415] ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3.5 text-xl text-white outline-none focus:outline-none cursor-pointer transition-colors duration-150 shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
 		                    />
