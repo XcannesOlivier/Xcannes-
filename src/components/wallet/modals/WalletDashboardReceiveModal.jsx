@@ -1552,10 +1552,10 @@ export default function WalletDashboardReceiveModal({
 		                              ? 'bg-xcannes-surface-demo !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                              : 'bg-elevated !max-h-32 overflow-y-auto overscroll-contain touch-pan-y border-white/15 ring-1 ring-white/10'
 		                          }
-			                          buttonClassName={`hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 cursor-pointer transition-colors duration-150 ${
+			                          buttonClassName={`hover:bg-white/5 ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none cursor-pointer transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
-			                          selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
+			                          selectClassName={`xcannes-select w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none transition-colors duration-150 ${
 			                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 			                          }`}
 			                        />
@@ -1572,7 +1572,7 @@ export default function WalletDashboardReceiveModal({
 					                            value={requestAmount}
 					                            onChange={e => setRequestAmount(e.target.value)}
 					                            placeholder="0.00"
-					                            className={`xcannes-no-spinner w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 pr-16 text-lg font-semibold text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
+					                            className={`xcannes-no-spinner w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 pr-16 text-lg font-semibold text-white focus:outline-none transition-colors duration-150 ${
 					                              noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 					                            }`}
 					                          />
@@ -1593,7 +1593,7 @@ export default function WalletDashboardReceiveModal({
 				                          onChange={e => setRequestMemo(e.target.value.slice(0, 40))}
 				                          maxLength={40}
 				                          placeholder={t('ui_request_memo_placeholder', 'Objet de la demande')}
-				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-xcannes-green/60 transition-colors duration-150 ${
+				                          className={`w-full ring-1 ring-white/10 ring-inset rounded-xl px-3.5 py-3 text-base text-white focus:outline-none transition-colors duration-150 ${
 				                            noticeVariant === 'demo' ? 'bg-xcannes-surface-demo' : 'bg-white/[0.02]'
 				                          }`}
 				                        />
